@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
-import { initializeEditor, fireEvent } from 'test/helpers';
+import { initializeEditor, getEditorHtml, fireEvent } from 'test/helpers';
+import { ActionSheetIOS } from 'react-native';
 
 /**
  * WordPress dependencies
  */
+import { Platform } from '@wordpress/element';
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
@@ -20,6 +22,12 @@ afterAll( () => {
 		unregisterBlockType( block.name );
 	} );
 } );
+
+const MEDIA_OPTIONS = [
+	'Choose from device',
+	'Take a Photo',
+	'WordPress Media Library',
+];
 
 const initialHtml = `
 <!-- wp:paragraph -->
@@ -85,18 +93,20 @@ describe( 'when title is focused', () => {
 			screen.getAllByLabelText( /Paragraph Block. Row 2/ )[ 0 ]
 		);
 
-		// Assert that the media buttons are not visible
-		const imageButtons = screen.queryAllByTestId( 'image-button' );
-		expect( imageButtons ).toBeDefined();
+		// Assert that the media buttons are visible
+		const imageButton = screen.queryAllByTestId( 'insert-image-button' );
+		expect( imageButton ).toBeDefined();
 
-		const videoButtons = screen.queryAllByTestId( 'video-button' );
-		expect( videoButtons ).toBeDefined();
+		const videoButton = screen.queryAllByTestId( 'insert-video-button' );
+		expect( videoButton ).toBeDefined();
 
-		const galleryButtons = screen.queryAllByTestId( 'gallery-button' );
-		expect( galleryButtons ).toBeDefined();
+		const galleryButton = screen.queryAllByTestId(
+			'insert-gallery-button'
+		);
+		expect( galleryButton ).toBeDefined();
 
-		const audioButtons = screen.queryAllByTestId( 'audio-button' );
-		expect( audioButtons ).toBeDefined();
+		const audioButton = screen.queryAllByTestId( 'insert-audio-button' );
+		expect( audioButton ).toBeDefined();
 	} );
 } );
 
@@ -159,16 +169,76 @@ describe( 'when title is no longer focused', () => {
 		);
 
 		// Assert that the media buttons are not visible
-		const imageButtons = screen.queryAllByTestId( 'image-button' );
-		expect( imageButtons ).toHaveLength( 0 );
+		const imageButton = screen.queryAllByTestId( 'insert-image-button' );
+		expect( imageButton ).toHaveLength( 0 );
 
-		const videoButtons = screen.queryAllByTestId( 'video-button' );
-		expect( videoButtons ).toHaveLength( 0 );
+		const videoButton = screen.queryAllByTestId( 'insert-video-button' );
+		expect( videoButton ).toHaveLength( 0 );
 
-		const galleryButtons = screen.queryAllByTestId( 'gallery-button' );
-		expect( galleryButtons ).toHaveLength( 0 );
+		const galleryButton = screen.queryAllByTestId(
+			'insert-gallery-button'
+		);
+		expect( galleryButton ).toHaveLength( 0 );
 
-		const audioButtons = screen.queryAllByTestId( 'audio-button' );
-		expect( audioButtons ).toHaveLength( 0 );
+		const audioButton = screen.queryAllByTestId( 'insert-audio-button' );
+		expect( audioButton ).toHaveLength( 0 );
+	} );
+} );
+
+describe( 'when nothing is selected', () => {
+	it( 'media buttons and picker display correctly', async () => {
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		const { getByText, getByTestId } = screen;
+
+		// Check that the gallery button is visible within the toolbar
+		const galleryButton = await screen.getAllByLabelText( /Gallery/ )[ 0 ];
+		expect( galleryButton ).toBeDefined();
+
+		// Press the toolbar Gallery button
+		fireEvent.press( galleryButton );
+
+		// Expect the block to be created
+		expect(
+			screen.getAllByLabelText( /Gallery Block. Row 3/ )[ 0 ]
+		).toBeDefined();
+
+		// Observe that media options picker is displayed
+		/* eslint-disable jest/no-conditional-expect */
+		if ( Platform.isIOS ) {
+			// On iOS the picker is rendered natively, so we have
+			// to check the arguments passed to `ActionSheetIOS`.
+			expect(
+				ActionSheetIOS.showActionSheetWithOptions
+			).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					title: 'Choose images',
+					options: [ 'Cancel', ...MEDIA_OPTIONS ],
+				} ),
+				expect.any( Function )
+			);
+		} else {
+			expect( getByText( 'Choose images' ) ).toBeVisible();
+			MEDIA_OPTIONS.forEach( ( option ) =>
+				expect( getByText( option ) ).toBeVisible()
+			);
+		}
+		/* eslint-enable jest/no-conditional-expect */
+
+		// Dismiss the picker
+		if ( Platform.isIOS ) {
+			fireEvent.press( getByText( 'Cancel' ) );
+		} else {
+			fireEvent( getByTestId( 'media-options-picker' ), 'backdropPress' );
+		}
+
+		// Expect the Gallery block to remain
+		expect(
+			screen.getAllByLabelText( /Gallery Block. Row 3/ )[ 0 ]
+		).toBeDefined();
+
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
