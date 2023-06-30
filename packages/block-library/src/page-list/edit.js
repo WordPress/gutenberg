@@ -169,12 +169,6 @@ export default function PageListEdit( {
 		}, new Map() );
 	}, [ pages ] );
 
-	const convertToNavigationLinks = useConvertToNavigationLinks( {
-		clientId,
-		pages,
-		parentPageID,
-	} );
-
 	const blockProps = useBlockProps( {
 		className: classnames( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
@@ -250,7 +244,7 @@ export default function PageListEdit( {
 	const {
 		isNested,
 		hasSelectedChild,
-		parentBlock,
+		parentClientId,
 		hasDraggedChild,
 		isChildOfNavigation,
 	} = useSelect(
@@ -258,7 +252,6 @@ export default function PageListEdit( {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
-				getBlockRootClientId,
 				hasDraggedInnerBlock,
 			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
@@ -276,11 +269,18 @@ export default function PageListEdit( {
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
-				parentBlock: getBlockRootClientId( clientId ),
+				parentClientId: navigationBlockParents[ 0 ],
 			};
 		},
 		[ clientId ]
 	);
+
+	const convertToNavigationLinks = useConvertToNavigationLinks( {
+		clientId,
+		pages,
+		parentClientId,
+		parentPageID,
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/page-list-item' ],
@@ -297,12 +297,12 @@ export default function PageListEdit( {
 	useEffect( () => {
 		if ( hasSelectedChild || hasDraggedChild ) {
 			openModal();
-			selectBlock( parentBlock );
+			selectBlock( parentClientId );
 		}
 	}, [
 		hasSelectedChild,
 		hasDraggedChild,
-		parentBlock,
+		parentClientId,
 		selectBlock,
 		openModal,
 	] );
