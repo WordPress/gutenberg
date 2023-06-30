@@ -46,6 +46,7 @@ function gutenberg_register_behaviors_support( $block_type ) {
 function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$experiments      = get_option( 'gutenberg-experiments' );
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
+	$aspect_ratio     = isset( $block['attrs']['aspectRatio'] ) ? $block['attrs']['aspectRatio'] : 'none';
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
 		$lightbox_settings = $block['attrs']['behaviors']['lightbox'];
@@ -63,7 +64,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		return $block_content;
 	}
 
-	if ( ! $lightbox_settings || 'none' !== $link_destination || empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) ) {
+	if ( ! $lightbox_settings || 'none' !== $link_destination || 'none' !== $aspect_ratio || empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) ) {
 		return $block_content;
 	}
 

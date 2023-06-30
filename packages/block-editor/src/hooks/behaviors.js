@@ -20,7 +20,7 @@ function BehaviorsControl( {
 	blockBehaviors,
 	onChangeBehavior,
 	onChangeAnimation,
-	disabled = false,
+	override = [],
 } ) {
 	const { settings, themeBehaviors } = useSelect(
 		( select ) => {
@@ -89,9 +89,18 @@ function BehaviorsControl( {
 		return null;
 	}
 
-	const helpText = disabled
-		? __( 'The lightbox behavior is disabled for linked images.' )
-		: '';
+	let helpText =
+		override.length > 0
+			? 'The lightbox is disabled for images with the following configured options: '
+			: '';
+	override.forEach( ( element, index ) => {
+		helpText += element;
+		if ( override.length > 1 && index < override.length - 1 ) {
+			helpText += ', ';
+		} else {
+			helpText += '.';
+		}
+	} );
 
 	return (
 		<InspectorControls group="advanced">
@@ -105,7 +114,7 @@ function BehaviorsControl( {
 					hideCancelButton={ true }
 					help={ helpText }
 					size="__unstable-large"
-					disabled={ disabled }
+					disabled={ override.length > 0 ? true : false }
 				/>
 				{ behaviorsValue === 'lightbox' && (
 					<SelectControl
@@ -129,7 +138,7 @@ function BehaviorsControl( {
 						onChange={ onChangeAnimation }
 						hideCancelButton={ false }
 						size="__unstable-large"
-						disabled={ disabled }
+						disabled={ override.length > 0 ? true : false }
 					/>
 				) }
 			</div>
@@ -154,9 +163,17 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 		if ( ! hasBlockSupport( props.name, 'behaviors' ) ) {
 			return blockEdit;
 		}
-		const blockHasLink =
+		const override = [];
+		if (
 			typeof props.attributes?.linkDestination !== 'undefined' &&
-			props.attributes?.linkDestination !== 'none';
+			props.attributes?.linkDestination !== 'none'
+		) {
+			override.push( 'link' );
+		}
+		if ( typeof props.attributes?.aspectRatio !== 'undefined' ) {
+			override.push( 'aspect ratio' );
+		}
+
 		return (
 			<>
 				{ blockEdit }
@@ -196,7 +213,7 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 							},
 						} );
 					} }
-					disabled={ blockHasLink }
+					override={ override }
 				/>
 			</>
 		);
