@@ -22,7 +22,7 @@ test.describe( 'adding inline tokens', () => {
 		pageUtils,
 	} ) => {
 		// Create a paragraph.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 
 		await page.keyboard.type( 'a ' );
 
