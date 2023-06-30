@@ -143,6 +143,10 @@
 			// has to be flex for collapse button to fit
 			display: flex;
 
+			//hide overflow and scroll
+			overflow: hidden;
+			overflow-x: scroll;
+
 			&.is-collapsed {
 				width: initial;
 			}
@@ -150,7 +154,7 @@
 			.is-fullscreen-mode & {
 				// leave room for block inserter, undo and redo, list view
 				// and some margin left
-				margin-left: $grid-unit-80 * 4 - 2 * $grid-unit + $grid-unit-05;
+				margin-left: $grid-unit-80 * 4 - 2 * $grid-unit;
 				top: $grid-unit - $border-width;
 				&.is-collapsed {
 					width: initial;
@@ -170,7 +174,7 @@
 					margin-right: 0;
 					background-color: $gray-300;
 					position: relative;
-					left: -$grid-unit-05;
+					left: math.div(-$grid-unit-05, 2);
 					top: -1px;
 				}
 			}
@@ -210,6 +214,7 @@
 				border: none;
 
 				.show-icon-labels & {
+					width: $grid-unit-80 * 4;
 					.components-button.has-icon {
 						// Hide the button icons when labels are set to display...
 						svg {
@@ -231,7 +236,7 @@
 					margin-bottom: $grid-unit + $grid-unit-05;
 					background-color: $gray-300;
 					position: relative;
-					left: -10px;
+					left: -8px;
 					height: 3 * $grid-unit;
 					top: -1px;
 				}
@@ -321,7 +326,9 @@
 	// for the block inserter the publish button
 	@include break-large() {
 		&.is-fixed {
-			width: initial;
+			// the combined with of the tools at the right of the header and the margin left
+			// of the toolbar which includes four buttons
+			width: calc(100% - 240px - #{4 * $grid-unit-80});
 		}
 	}
 
