@@ -184,6 +184,7 @@
 	width: 100vw;
 	height: 100vh;
 	visibility: hidden;
+	cursor: zoom-out;
 
 	.close-button {
 		position: absolute;
@@ -268,7 +269,6 @@
 			transform-origin: top left;
 			width: var(--lightbox-image-max-width);
 			height: var(--lightbox-image-max-height);
-			cursor: zoom-out;
 		}
 
 		&.active {
