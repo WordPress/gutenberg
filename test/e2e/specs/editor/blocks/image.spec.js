@@ -59,92 +59,6 @@ test.describe( 'Image', () => {
 		expect( await editor.getEditedPostContent() ).toMatch( regex );
 	} );
 
-	test( 'should replace, reset size, and keep selection', async ( {
-		editor,
-		page,
-		imageBlockUtils,
-	} ) => {
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		const image = imageBlock.locator( 'role=img' );
-
-		const filename = await imageBlockUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' )
-		);
-
-		{
-			await expect( image ).toBeVisible();
-			await expect( image ).toHaveAttribute(
-				'src',
-				new RegExp( filename )
-			);
-
-			const regex = new RegExp(
-				`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->
-<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
-<!-- \\/wp:image -->`
-			);
-			expect( await editor.getEditedPostContent() ).toMatch( regex );
-		}
-
-		{
-			await editor.openDocumentSettingsSidebar();
-			await page.click(
-				'role=group[name="Image size presets"i] >> role=button[name="25%"i]'
-			);
-
-			await expect( image ).toHaveCSS( 'width', '3px' );
-			await expect( image ).toHaveCSS( 'height', '3px' );
-
-			const regex = new RegExp(
-				`<!-- wp:image {"id":(\\d+),"width":3,"height":3,"sizeSlug":"full","linkDestination":"none"} -->
-<figure class="wp-block-image size-full is-resized"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1" width="3" height="3"\\/><\\/figure>
-<!-- /wp:image -->`
-			);
-
-			expect( await editor.getEditedPostContent() ).toMatch( regex );
-		}
-
-		{
-			await editor.showBlockToolbar();
-			await page.click( 'role=button[name="Replace"i]' );
-
-			const replacedFilename = await imageBlockUtils.upload(
-				page
-					// Ideally the menu should have the name of "Replace" but is currently missing.
-					// Hence, we fallback to using CSS classname instead.
-					.locator( '.block-editor-media-replace-flow__options' )
-					.locator( 'data-testid=form-file-upload-input' )
-			);
-
-			await expect( image ).toHaveAttribute(
-				'src',
-				new RegExp( replacedFilename )
-			);
-			await expect( image ).toBeVisible();
-
-			const regex = new RegExp(
-				`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->
-<figure class="wp-block-image size-full"><img src="[^"]+\\/${ replacedFilename }\\.png" alt="" class="wp-image-\\1"/></figure>
-<!-- \\/wp:image -->`
-			);
-			expect( await editor.getEditedPostContent() ).toMatch( regex );
-		}
-
-		{
-			// Focus outside the block to avoid the image caption being selected
-			// It can happen on CI specially.
-			await editor.canvas.click( 'role=textbox[name="Add title"i]' );
-			await image.click();
-			await page.keyboard.press( 'Backspace' );
-
-			expect( await editor.getEditedPostContent() ).toBe( '' );
-		}
-	} );
-
 	test( 'should place caret on caption when clicking to add one', async ( {
 		editor,
 		page,
@@ -461,65 +375,6 @@ test.describe( 'Image', () => {
 		).toMatchSnapshot();
 	} );
 
-	test( 'Should reset dimensions on change URL', async ( {
-		editor,
-		page,
-		imageBlockUtils,
-	} ) => {
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		const image = imageBlock.locator( 'role=img' );
-
-		{
-			// Upload an initial image.
-			const filename = await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' )
-			);
-			await expect( image ).toHaveAttribute(
-				'src',
-				new RegExp( filename )
-			);
-
-			// Resize the Uploaded Image.
-			await editor.openDocumentSettingsSidebar();
-			await page.click(
-				'role=group[name="Image size presets"i] >> role=button[name="25%"i]'
-			);
-
-			const regex = new RegExp(
-				`<!-- wp:image {"id":(\\d+),"width":3,"height":3,"sizeSlug":"full","linkDestination":"none"} -->
-<figure class="wp-block-image size-full is-resized"><img src="[^"]+/${ filename }\\.png" alt="" class="wp-image-\\1" width="3" height="3"/></figure>
-<!-- /wp:image -->`
-			);
-
-			// Check if dimensions are changed.
-			expect( await editor.getEditedPostContent() ).toMatch( regex );
-		}
-
-		{
-			const imageUrl = '/wp-includes/images/w-logo-blue.png';
-
-			// Replace uploaded image with an URL.
-			await editor.clickBlockToolbarButton( 'Replace' );
-			await page.click( 'role=button[name="Edit"i]' );
-			// Replace the url.
-			await page.fill( 'role=combobox[name="URL"i]', imageUrl );
-			await page.click( 'role=button[name="Save"i]' );
-
-			const regex = new RegExp(
-				`<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="${ imageUrl }" alt=""/></figure>
-<!-- /wp:image -->`
-			);
-
-			// Check if dimensions are reset.
-			expect( await editor.getEditedPostContent() ).toMatch( regex );
-		}
-	} );
-
 	test( 'should undo without broken temporary state', async ( {
 		editor,
 		pageUtils,
@@ -825,6 +680,52 @@ test.describe( 'Image', () => {
 		await expect( linkDom ).toBeVisible();
 		await expect( linkDom ).toHaveAttribute( 'href', url );
 	} );
+
+	test( 'should upload external image', async ( { editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+			},
+		} );
+
+		await editor.clickBlockToolbarButton( 'Upload external image' );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.locator( 'img[src^="http"]' );
+		const src = await image.getAttribute( 'src' );
+
+		expect( src ).toMatch( /\/wp-content\/uploads\// );
+	} );
+
+	test( 'should upload through prepublish panel', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+			},
+		} );
+
+		await page
+			.getByRole( 'button', { name: 'Publish', exact: true } )
+			.click();
+		await page.getByRole( 'button', { name: 'Upload all' } ).click();
+
+		await expect( page.locator( '.components-spinner' ) ).toHaveCount( 0 );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.locator( 'img[src^="http"]' );
+		const src = await image.getAttribute( 'src' );
+
+		expect( src ).toMatch( /\/wp-content\/uploads\// );
+	} );
 } );
 
 test.describe( 'Image - interactivity', () => {
@@ -941,13 +842,22 @@ test.describe( 'Image - interactivity', () => {
 
 			const lightbox = page.locator( '.wp-lightbox-overlay' );
 			await expect( lightbox ).toBeHidden();
-			const image = lightbox.locator( 'img' );
+			const responsiveImage = lightbox.locator( '.responsive-image img' );
+			const enlargedImage = lightbox.locator( '.enlarged-image img' );
 
-			await expect( image ).toHaveAttribute( 'src', '' );
+			await expect( responsiveImage ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
+			await expect( enlargedImage ).toHaveAttribute( 'src', '' );
 
 			await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
-			await expect( image ).toHaveAttribute(
+			await expect( responsiveImage ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
+			await expect( enlargedImage ).toHaveAttribute(
 				'src',
 				new RegExp( filename )
 			);
@@ -958,6 +868,12 @@ test.describe( 'Image - interactivity', () => {
 				name: 'Close',
 			} );
 			await closeButton.click();
+
+			await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+			await expect( enlargedImage ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
 
 			await expect( lightbox ).toBeHidden();
 		} );
@@ -1014,6 +930,51 @@ test.describe( 'Image - interactivity', () => {
 			await expect(
 				page.getByRole( 'button', { name: 'Enlarge image' } )
 			).not.toBeInViewport();
+		} );
+
+		test.describe( 'Animation Select visibility', () => {
+			test( 'Animation selector should appear if Behavior is Lightbox', async ( {
+				page,
+			} ) => {
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( 'lightbox' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).toBeVisible();
+			} );
+			test( 'Animation selector should NOT appear if Behavior is None', async ( {
+				page,
+			} ) => {
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( '' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).not.toBeVisible();
+			} );
+			test( 'Animation selector should NOT appear if Behavior is Default', async ( {
+				page,
+			} ) => {
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( 'default' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).not.toBeVisible();
+			} );
 		} );
 
 		test.describe( 'keyboard navigation', () => {
@@ -1130,12 +1091,24 @@ test.describe( 'Image - interactivity', () => {
 		await page.goto( `/?p=${ postId }` );
 
 		const lightbox = page.locator( '.wp-lightbox-overlay' );
-		const imageDom = lightbox.locator( 'img' );
-		await expect( imageDom ).toHaveAttribute( 'src', '' );
+		const responsiveImage = lightbox.locator( '.responsive-image img' );
+		const enlargedImage = lightbox.locator( '.enlarged-image img' );
+
+		await expect( responsiveImage ).toHaveAttribute(
+			'src',
+			new RegExp( imgUrl )
+		);
+		await expect( enlargedImage ).toHaveAttribute( 'src', '' );
 
 		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
-		await expect( imageDom ).toHaveAttribute( 'src', imgUrl );
+		await expect( responsiveImage ).toHaveAttribute( 'src', imgUrl );
+		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
+
+		await page.getByRole( 'button', { name: 'Close' } ).click();
+
+		await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
 	} );
 } );
 

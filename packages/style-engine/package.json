@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/style-engine",
-	"version": "1.18.0",
+	"version": "1.19.0",
 	"description": "A suite of parsers and compilers for WordPress styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,7 +30,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"lodash": "^4.17.21"
+		"change-case": "^4.1.2"
 	},
 	"publishConfig": {
 		"access": "public"

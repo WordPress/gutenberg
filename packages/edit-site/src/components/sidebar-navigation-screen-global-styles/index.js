@@ -15,6 +15,8 @@ import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { humanTimeDiff } from '@wordpress/date';
 import { useCallback } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -33,11 +35,19 @@ const noop = () => {};
 export function SidebarNavigationItemGlobalStyles( props ) {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const hasGlobalStyleVariations = useSelect(
-		( select ) =>
-			!! select(
-				coreStore
-			).__experimentalGetCurrentThemeGlobalStylesVariations()?.length,
+	const { createNotice } = useDispatch( noticesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const { hasGlobalStyleVariations, isDistractionFree } = useSelect(
+		( select ) => ( {
+			hasGlobalStyleVariations:
+				!! select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesVariations()?.length,
+			isDistractionFree: select( preferencesStore ).get(
+				editSiteStore.name,
+				'distractionFree'
+			),
+		} ),
 		[]
 	);
 	if ( hasGlobalStyleVariations ) {
@@ -53,9 +63,22 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 		<SidebarNavigationItem
 			{ ...props }
 			onClick={ () => {
-				// switch to edit mode.
+				// Disable distraction free mode.
+				if ( isDistractionFree ) {
+					setPreference(
+						editSiteStore.name,
+						'distractionFree',
+						false
+					);
+					createNotice(
+						'info',
+						__( 'Distraction free mode turned off.' ),
+						{ type: 'snackbar' }
+					);
+				}
+				// Switch to edit mode.
 				setCanvasMode( 'edit' );
-				// open global styles sidebar.
+				// Open global styles sidebar.
 				openGeneralSidebar( 'edit-site/global-styles' );
 			} }
 		/>

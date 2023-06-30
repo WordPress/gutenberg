@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "25.1.0",
+	"version": "25.2.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -66,7 +66,7 @@
 		"dom-scroll-into-view": "^1.2.1",
 		"downshift": "^6.0.15",
 		"fast-deep-equal": "^3.1.3",
-		"framer-motion": "^10.11.6",
+		"framer-motion": "~10.11.6",
 		"gradient-parser": "^0.1.5",
 		"highlight-words-core": "^1.2.2",
 		"is-plain-object": "^5.0.0",

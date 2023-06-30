@@ -12,7 +12,6 @@
 }
 
 .edit-site-sidebar-navigation-screen__content {
-	color: $gray-400;
 	padding: 0 $grid-unit-20;
 
 	.components-item-group {
@@ -65,6 +64,8 @@
 .edit-site-sidebar-navigation-screen__title {
 	flex-grow: 1;
 	padding: $grid-unit-15 * 0.5 0 0 0;
+	overflow: hidden;
+	overflow-wrap: break-word;
 }
 
 .edit-site-sidebar-navigation-screen__actions {
@@ -106,7 +107,11 @@
 .edit-site-sidebar-navigation-screen__input-control {
 	width: 100%;
 	.components-input-control__container {
-		background: transparent;
+		background: $gray-800;
+
+		.components-button {
+			color: $gray-200 !important;
+		}
 	}
 	.components-input-control__input {
 		color: $gray-200 !important;

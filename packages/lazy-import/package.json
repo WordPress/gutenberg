@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/lazy-import",
-	"version": "1.22.0",
+	"version": "1.23.0",
 	"description": "Lazily import a module, installing it automatically if missing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

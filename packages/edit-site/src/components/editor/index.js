@@ -15,6 +15,7 @@ import {
 	BlockContextProvider,
 	BlockBreadcrumb,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -43,6 +44,8 @@ import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 
+const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
+
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
 	body: __( 'Editor content' ),
@@ -58,6 +61,15 @@ const typeLabels = {
 	wp_template: __( 'Template Part' ),
 	wp_template_part: __( 'Template Part' ),
 	wp_block: __( 'Pattern' ),
+};
+
+// Prevent accidental removal of certain blocks, asking the user for
+// confirmation.
+const blockRemovalRules = {
+	'core/query': __( 'Query Loop displays a list of posts or pages.' ),
+	'core/post-content': __(
+		'Post Content displays the content of a post or page.'
+	),
 };
 
 export default function Editor( { isLoading } ) {
@@ -177,6 +189,7 @@ export default function Editor( { isLoading } ) {
 						<SidebarComplementaryAreaFills />
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton
+							isDistractionFree={ true }
 							enableRegionNavigation={ false }
 							className={ classnames(
 								'edit-site-editor__interface-skeleton',
@@ -191,7 +204,12 @@ export default function Editor( { isLoading } ) {
 									<GlobalStylesRenderer />
 									{ isEditMode && <EditorNotices /> }
 									{ showVisualEditor && editedPost && (
-										<BlockEditor />
+										<>
+											<BlockEditor />
+											<BlockRemovalWarningModal
+												rules={ blockRemovalRules }
+											/>
+										</>
 									) }
 									{ editorMode === 'text' &&
 										editedPost &&
