@@ -85,15 +85,15 @@ wpStore( {
 					Object.values(
 						context.core.navigation[
 							context.core.navigation.type === 'overlay'
-								? 'overlayOpenBy'
-								: 'submenuOpenBy'
+								? 'overlayOpenedBy'
+								: 'submenuOpenedBy'
 						]
 					).filter( Boolean ).length > 0,
 				menuOpenBy: ( { context } ) =>
 					context.core.navigation[
 						context.core.navigation.type === 'overlay'
-							? 'overlayOpenBy'
-							: 'submenuOpenBy'
+							? 'overlayOpenedBy'
+							: 'submenuOpenedBy'
 					],
 			},
 		},
@@ -106,9 +106,9 @@ wpStore( {
 					if (
 						navigation.type === 'submenu' &&
 						// Only open on hover if the overlay is closed.
-						Object.values( navigation.overlayOpenBy || {} ).filter(
-							Boolean
-						).length === 0
+						Object.values(
+							navigation.overlayOpenedBy || {}
+						).filter( Boolean ).length === 0
 					)
 						openMenu( store, 'hover' );
 				},
