@@ -264,7 +264,8 @@ export default function HeaderEditMode() {
 									/>
 								) }
 								{ isZoomedOutViewExperimentEnabled &&
-									! isDistractionFree && (
+									! isDistractionFree &&
+									! hasFixedToolbar && (
 										<ToolbarItem
 											as={ Button }
 											className="edit-site-header-edit-mode__zoom-out-view-toggle"

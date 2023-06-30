@@ -113,7 +113,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 						label={
 							isCollapsed
 								? __( 'Show block tools' )
-								: __( 'Show document tools' )
+								: __( 'Hide block tools' )
 						}
 					/>
 				</ToolbarGroup>
