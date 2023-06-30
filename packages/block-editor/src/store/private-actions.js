@@ -156,8 +156,8 @@ export const privateRemoveBlocks =
 		// register using `setBlockRemovalRules()`.
 		//
 		// @see https://github.com/WordPress/gutenberg/pull/51145
-		let rules;
-		if ( ! forceRemove && ( rules = select.getBlockRemovalRules() ) ) {
+		const rules = ! forceRemove && select.getBlockRemovalRules();
+		if ( rules ) {
 			const blockNamesForPrompt = new Set();
 
 			// Given a list of client IDs of blocks that the user intended to
