@@ -474,8 +474,8 @@ export default function Image( {
 					) }
 					<DimensionsTool
 						value={ {
-							width: width && `${ width }px`,
-							height: height && `${ height }px`,
+							width,
+							height,
 							scale,
 							aspectRatio,
 						} }
@@ -484,12 +484,8 @@ export default function Image( {
 							// for values that are removed since setAttributes
 							// doesn't do anything with keys that aren't set.
 							setAttributes( {
-								width:
-									newValue.width &&
-									parseInt( newValue.width, 10 ),
-								height:
-									newValue.height &&
-									parseInt( newValue.height, 10 ),
+								width: newValue.width,
+								height: newValue.height,
 								scale: newValue.scale,
 								aspectRatio: newValue.aspectRatio,
 							} );
@@ -583,8 +579,8 @@ export default function Image( {
 			<ImageEditor
 				id={ id }
 				url={ url }
-				width={ width }
-				height={ height }
+				width={ width && parseInt( width, 10 ) }
+				height={ height && parseInt( height, 10 ) }
 				clientWidth={ fallbackClientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
@@ -600,14 +596,18 @@ export default function Image( {
 	} else if ( ! isResizable ) {
 		img = <div style={ { width, height, aspectRatio } }>{ img }</div>;
 	} else {
+		const pxWidth = width ? parseInt( width, 10 ) : undefined;
+		const pxHeight = height ? parseInt( height, 10 ) : undefined;
+
 		const ratio =
 			( aspectRatio && evalAspectRatio( aspectRatio ) ) ||
-			( width && height && width / height ) ||
+			( pxWidth && pxHeight && pxWidth / pxHeight ) ||
 			naturalWidth / naturalHeight ||
 			1;
 
-		const currentWidth = ! width && height ? height * ratio : width;
-		const currentHeight = ! height && width ? width / ratio : height;
+		const currentWidth = ! pxWidth && pxHeight ? pxHeight * ratio : pxWidth;
+		const currentHeight =
+			! pxHeight && pxWidth ? pxWidth / ratio : pxHeight;
 
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
@@ -679,8 +679,8 @@ export default function Image( {
 				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
 					setAttributes( {
-						width: elt.offsetWidth,
-						height: elt.offsetHeight,
+						width: `${ elt.offsetWidth }px`,
+						height: `${ elt.offsetHeight }px`,
 						aspectRatio: undefined,
 					} );
 				} }

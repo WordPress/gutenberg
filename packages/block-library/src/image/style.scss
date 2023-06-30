@@ -1,6 +1,5 @@
 .wp-block-image {
 	img {
-		height: auto;
 		max-width: 100%;
 		vertical-align: bottom;
 		box-sizing: border-box;
@@ -29,7 +28,6 @@
 
 	&.alignfull img,
 	&.alignwide img {
-		height: auto;
 		width: 100%;
 	}
 

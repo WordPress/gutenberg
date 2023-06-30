@@ -56,11 +56,13 @@ export default function save( { attributes } ) {
 			className={ imageClasses || undefined }
 			style={ {
 				...borderProps.style,
+				width: ! width && ! height ? undefined : width ?? 'auto',
+				height: ! width && ! height ? undefined : height ?? 'auto',
 				aspectRatio,
 				objectFit: scale,
 			} }
-			width={ width }
-			height={ height }
+			width={ width && parseInt( width, 10 ) }
+			height={ height && parseInt( height, 10 ) }
 			title={ title }
 		/>
 	);

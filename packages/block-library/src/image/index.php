@@ -34,6 +34,35 @@ function render_block_core_image( $attributes, $content ) {
 }
 
 /**
+ * Prevent adding width and height attributes if they are already set in the styles.
+ *
+ * @param bool   $value   The filtered value, defaults to `true`.
+ * @param string $image   The HTML `img` tag where the attribute should be added.
+ * @param string $context Additional context about how the function was called or where the img tag is.
+ * @return bool Whether the width and height attributes should be set.
+ */
+function filter_width_height_core_image( $value, $image, $context ) {
+	$processor = new WP_HTML_Tag_Processor( $image );
+	$processor->next_tag( 'img' );
+
+	$style = $processor->get_attribute( 'style' );
+	echo '<pre>';
+	var_dump( $image, $context  );
+	echo '</pre>';
+
+	if ( $style === null ) {
+		return $value;
+	}
+
+	$match = preg_match( '/\b(width|height|aspect-ratio)\s*:\s*[^;]+/', $style, $matches );
+	echo '<pre>';
+	var_dump( $style, $match, $matches );
+	echo '</pre>';
+
+	return ! $match;
+}
+
+/**
  * Registers the `core/image` block on server.
  */
 function register_block_core_image() {
@@ -46,3 +75,4 @@ function register_block_core_image() {
 	);
 }
 add_action( 'init', 'register_block_core_image' );
+add_filter( 'wp_img_tag_add_width_and_height_attr', 'filter_width_height_core_image', 10, 3 );
