@@ -458,7 +458,8 @@ button.wp-block-navigation-item__content {
 	right: 0;
 	bottom: 0;
 
-	.wp-block-navigation-item a {
+	//Low specificity so that themes can override.
+	&:where(.wp-block-navigation-item a) {
 		color: inherit;
 	}
 
@@ -473,8 +474,8 @@ button.wp-block-navigation-item__content {
 	// If the responsive wrapper is present but overlay is not open,
 	// overlay styles shouldn't apply.
 	&:not(.is-menu-open.is-menu-open) {
-		color: inherit !important;
-		background-color: inherit !important;
+		//color: inherit !important;
+		//background-color: inherit !important;
 	}
 
 	// Overlay menu.
