@@ -30,7 +30,7 @@ export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
 					disabled={ disabled }
 					onClick={ onClick }
 				>
-					{ __( 'Unsync' ) }
+					{ __( 'Detach' ) }
 				</Button>
 			</div>
 		</Modal>
