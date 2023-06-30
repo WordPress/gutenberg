@@ -28,7 +28,7 @@ The direction in which the tooltip should open relative to its parent node. Spec
 
 -   Type: `String`
 -   Required: No
--   Default: `"top center"`
+-   Default: `"bottom"`
 
 ### children
 
