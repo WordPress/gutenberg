@@ -434,6 +434,7 @@ class URLInput extends Component {
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
 			value = '',
+			hideLabelFromVision = false,
 		} = this.props;
 
 		const {
@@ -452,6 +453,7 @@ class URLInput extends Component {
 			className: classnames( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
 			} ),
+			hideLabelFromVision,
 		};
 
 		const inputProps = {
