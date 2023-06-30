@@ -25,6 +25,7 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
+import useCommonCommands from './hooks/commands/use-common-commands';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
@@ -32,6 +33,7 @@ const { useCommands } = unlock( coreCommandsPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	useCommands();
+	useCommonCommands();
 	const {
 		hasFixedToolbar,
 		focusMode,

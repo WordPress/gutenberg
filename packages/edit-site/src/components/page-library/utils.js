@@ -1,9 +1,9 @@
-export const DEFAULT_CATEGORY = 'header';
-export const DEFAULT_TYPE = 'wp_template_part';
+export const DEFAULT_CATEGORY = 'my-patterns';
+export const DEFAULT_TYPE = 'wp_block';
 export const PATTERNS = 'pattern';
 export const TEMPLATE_PARTS = 'wp_template_part';
 export const USER_PATTERNS = 'wp_block';
-export const USER_PATTERN_CATEGORY = 'custom-patterns';
+export const USER_PATTERN_CATEGORY = 'my-patterns';
 
 export const CORE_PATTERN_SOURCES = [
 	'core',

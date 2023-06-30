@@ -78,6 +78,8 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		};
 	}, [] );
 
+	const toolbarWrapperRef = useRef( null );
+
 	// Handles highlighting the current block outline on hover or focus of the
 	// block type toolbar area.
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
@@ -123,7 +125,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 	} );
 
 	return (
-		<div className={ classes }>
+		<div className={ classes } ref={ toolbarWrapperRef }>
 			{ ! isMultiToolbar &&
 				isLargeViewport &&
 				blockEditingMode === 'default' && <BlockParentSelector /> }
@@ -135,6 +137,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 							{ ! isMultiToolbar && (
 								<BlockLockToolbar
 									clientId={ blockClientIds[ 0 ] }
+									wrapperRef={ toolbarWrapperRef }
 								/>
 							) }
 							<BlockMover
