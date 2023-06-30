@@ -41,9 +41,10 @@ class GutenbergViewController: UIViewController {
     }
     
     lazy var undoButton: UIButton = {
+        let isRTL = UIView.userInterfaceLayoutDirection(for: .unspecified) == .rightToLeft
         let undoImage = UIImage(named: "undo")
         let button = UIButton(type: .system)
-        button.setImage(undoImage, for: .normal)
+        button.setImage(isRTL ? undoImage?.withHorizontallyFlippedOrientation() : undoImage, for: .normal)
         button.accessibilityIdentifier = "editor-undo-button"
         button.accessibilityLabel = "Undo"
         button.accessibilityHint = "Double tap to undo last change"
@@ -56,9 +57,10 @@ class GutenbergViewController: UIViewController {
     }()
     
     lazy var redoButton: UIButton = {
+        let isRTL = UIView.userInterfaceLayoutDirection(for: .unspecified) == .rightToLeft
         let redoImage = UIImage(named: "redo")
         let button = UIButton(type: .system)
-        button.setImage(redoImage, for: .normal)
+        button.setImage(isRTL ? redoImage?.withHorizontallyFlippedOrientation() : redoImage, for: .normal)
         button.accessibilityIdentifier = "editor-redo-button"
         button.accessibilityLabel = "Redo"
         button.accessibilityHint = "Double tap to redo last change"
