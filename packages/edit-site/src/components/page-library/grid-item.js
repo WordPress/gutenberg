@@ -46,7 +46,6 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		postId: item.type === USER_PATTERNS ? item.id : item.name,
 		categoryId,
 		categoryType: item.type,
-		canvas: 'view',
 	} );
 
 	const onKeyDown = ( event ) => {
