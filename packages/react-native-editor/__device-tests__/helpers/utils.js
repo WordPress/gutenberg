@@ -269,7 +269,11 @@ const typeStringAndroid = async (
 			const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
 			if ( paragraph in strToKeycode ) {
 				await driver.pressKeycode( strToKeycode[ paragraph ] );
-			} else {
+			}
+			// Empty values passed in the `args` list of `execute` function are removed.
+			// In order to avoid an exception in `text` command due to passing fewer arguments, we don't
+			// execute the command with empty strings.
+			else if ( paragraph !== '' ) {
 				// Execute with adb shell input <text> since normal type auto clears field on Android
 				await driver.execute( 'mobile: shell', {
 					command: 'input',
