@@ -982,7 +982,7 @@ test.describe( 'Navigation block', () => {
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
-				.click();
+				.focus();
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
@@ -1073,15 +1073,15 @@ test.describe( 'Navigation block', () => {
 			await editor.canvas.click( 'body' );
 
 			//Expect the first link to inherit the nav link color from the theme
-			const firstLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
-				.click();
+				.focus();
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
+			const firstLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'First Link' } );
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(207, 46, 46)' );
 			await firstLink.click();
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(155, 81, 224)' );
@@ -1142,6 +1142,7 @@ test.describe( 'Navigation block', () => {
 
 			//We reset global styles so we don't affect other tests
 			await admin.visitSiteEditor();
+			await editor.canvas.click( 'body' );
 			await page
 				.getByRole( 'button', { name: 'Styles', exact: true } )
 				.click();
@@ -1149,18 +1150,49 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'menuitem', { name: 'Reset to defaults' } )
 				.click();
+
+			await editor.saveSiteEditorEntities();
 		} );
 
 		test( 'As a user I expect my navigation links to inherit the colors from the parent container', async ( {
+			admin,
 			page,
 			editor,
 		} ) => {
+			//Make changes to the theme link colors and make sure the group block colors are the ones we see
+			await page
+				.getByRole( 'button', { name: 'Styles', exact: true } )
+				.click();
+			await page.getByRole( 'button', { name: 'Colors styles' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Color Link styles' } )
+				.click();
+			//rgba(207,46,46) is the color of the "vivid red" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Vivid red' } )
+				.click( { force: true } );
+			await page.getByRole( 'tab', { name: 'Hover' } ).click();
+			//rgba(155,81,224) is the color of the "vivid purple" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Vivid purple' } )
+				.click( { force: true } );
+			await editor.canvas.click( 'body' );
+
 			//We group the nav block and add colors to the links inside the group block
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: header' } )
+				.focus();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.click();
 			await page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
 				.getByRole( 'button', { name: 'Options' } )
 				.click();
 			await page.getByRole( 'menuitem', { name: 'Group' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Settings', exact: true } )
+				.click();
 			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.getByRole( 'button', { name: 'Color options' } ).click();
 			await page
@@ -1170,19 +1202,96 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color Link styles' } )
 				.click();
+			//rgba(0,208,132) is the color of the "Vivid green cyan" color preset
 			await page
-				.getByRole( 'button', { name: 'Color: Vivid purple' } )
-				.click();
+				.getByRole( 'button', { name: 'Color: Vivid green cyan' } )
+				.click( { force: true } );
+			await page.getByRole( 'tab', { name: 'Hover' } ).click();
+			//rgba(255,105,0) is the color of the "Luminous vivid orange" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Luminous vivid orange' } )
+				.click( { force: true } );
+			await editor.canvas.click( 'body' );
 
 			const firstLink = editor.canvas
 				.locator( 'a' )
 				.filter( { hasText: 'First Link' } );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: header' } )
+				.focus();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.click();
 
 			//Expect the first link to inherit the link color from the parent group block
-			await expect( firstLink ).toHaveCSS( 'color', 'rgb(155, 81, 224)' );
+			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 208, 132)' );
+			await firstLink.click();
+			await expect( firstLink ).toHaveCSS( 'color', 'rgb(255, 105, 0)' );
+
+			//Expect the second link to behave the same as the first
+			const secondLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'Second Link' } );
+			await expect( secondLink ).toHaveCSS( 'color', 'rgb(0, 208, 132)' );
+			await secondLink.click();
+			await expect( secondLink ).toHaveCSS( 'color', 'rgb(255, 105, 0)' );
+
 			//TODO check frontend on desktop and mobile
 			//TODO then the same for second link
 			//Then the same for background colors
+
+			//We test the overlay on mobile too.
+			await page
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
+			await editor.canvas
+				.getByRole( 'button', { name: 'Open menu' } )
+				.click();
+			const overlay = editor.canvas
+				.locator( '.wp-block-navigation__responsive-container' )
+				.filter( { hasText: 'Second Link' } );
+			await expect( overlay ).toHaveCSS(
+				'background-color',
+				'rgb(255, 255, 255)'
+			);
+			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 208, 132)' );
+			await expect( secondLink ).toHaveCSS( 'color', 'rgb(0, 208, 132)' );
+
+			await editor.saveSiteEditorEntities();
+
+			//And finally we check the frontend
+			await page.goto( '/' );
+			const firstLinkFront = page
+				.locator( 'a' )
+				.filter( { hasText: 'First Link' } );
+			const secondLinkFront = page
+				.locator( 'a' )
+				.filter( { hasText: 'Second Link' } );
+
+			//Expect the links to default to the browser default blue when the theme doesn't define a link color and the background to be white
+			await expect( firstLinkFront ).toHaveCSS(
+				'color',
+				'rgb(0, 208, 132)'
+			);
+			await firstLinkFront.hover();
+			await expect( secondLinkFront ).toHaveCSS(
+				'color',
+				'rgb(0, 208, 132)'
+			);
+
+			//We reset global styles so we don't affect other tests
+			await admin.visitSiteEditor();
+			await editor.canvas.click( 'body' );
+			await page
+				.getByRole( 'button', { name: 'Styles', exact: true } )
+				.click();
+			await page.getByRole( 'button', { name: 'Revisions' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Reset to defaults' } )
+				.click();
+
+			await editor.saveSiteEditorEntities();
 		} );
 
 		test( 'As a user I expect my navigation to use the colors I selected for it', async ( {} ) => {} );
