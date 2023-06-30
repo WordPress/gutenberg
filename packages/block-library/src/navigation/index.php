@@ -103,7 +103,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		) ) {
 			// Add directives to the parent `<li>`.
 			$w->set_attribute( 'data-wp-interactive', true );
-			$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "submenuOpenBy": { "click": false, "hover": false }, "type": "submenu" } } }' );
+			$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "submenuOpenBy": {}, "type": "submenu" } } }' );
 			$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
 			$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.handleMenuFocusout' );
 			$w->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
@@ -711,7 +711,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $should_load_view_script ) {
 		$nav_element_directives          = '
 			data-wp-interactive
-			data-wp-context=\'{ "core": { "navigation": { "overlayOpenBy": { "click": false, "hover": false }, "type": "overlay", "roleAttribute": "" } } }\'
+			data-wp-context=\'{ "core": { "navigation": { "overlayOpenBy": {}, "type": "overlay", "roleAttribute": "" } } }\'
 		';
 		$open_button_directives          = '
 			data-wp-on--click="actions.core.navigation.openMenuOnClick"
