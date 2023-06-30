@@ -72,7 +72,7 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
-	padding: $grid-unit-30 $grid-unit-40 $grid-unit-15;
+	padding: $grid-unit-30 $grid-unit-40 $grid-unit-10;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -130,7 +130,8 @@
 .components-modal__content {
 	flex: 1;
 	margin-top: $header-height + $grid-unit-15;
-	padding: 0 $grid-unit-40 $grid-unit-40;
+	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
+	padding: $grid-unit-05 $grid-unit-40 $grid-unit-40;
 	overflow: auto;
 
 	&.hide-header {

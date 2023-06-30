@@ -298,14 +298,22 @@ export const isEditorPanelOpened = createRegistrySelector(
 /**
  * Returns true if a modal is active, or false otherwise.
  *
+ * @deprecated since WP 6.3 use `core/interface` store's selector with the same name instead.
+ *
  * @param {Object} state     Global application state.
  * @param {string} modalName A string that uniquely identifies the modal.
  *
  * @return {boolean} Whether the modal is active.
  */
-export function isModalActive( state, modalName ) {
-	return state.activeModal === modalName;
-}
+export const isModalActive = createRegistrySelector(
+	( select ) => ( state, modalName ) => {
+		deprecated( `select( 'core/edit-post' ).isModalActive`, {
+			since: '6.3',
+			alternative: `select( 'core/interface' ).isModalActive`,
+		} );
+		return !! select( interfaceStore ).isModalActive( modalName );
+	}
+);
 
 /**
  * Returns whether the given feature is enabled or not.
