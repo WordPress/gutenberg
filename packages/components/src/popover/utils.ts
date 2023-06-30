@@ -20,6 +20,8 @@ const POSITION_TO_PLACEMENT: Record<
 > = {
 	bottom: 'bottom',
 	top: 'top',
+	left: 'left',
+	right: 'right',
 	'middle left': 'left',
 	'middle right': 'right',
 	'bottom left': 'bottom-end',
