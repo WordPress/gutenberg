@@ -22,8 +22,8 @@ import type { BaseSlotComponentProps, SlotComponentProps } from './types';
 /**
  * Whether the argument is a function.
  *
- * @param {*} maybeFunc The argument to check.
- * @return {boolean} True if the argument is a function, false otherwise.
+ * @param maybeFunc The argument to check.
+ * @return True if the argument is a function, false otherwise.
  */
 function isFunction( maybeFunc: any ): maybeFunc is Function {
 	return typeof maybeFunc === 'function';

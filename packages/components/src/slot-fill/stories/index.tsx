@@ -110,7 +110,7 @@ WithSlotChildren.args = {
 };
 
 export const WithContext: ComponentStory< typeof Slot > = ( props ) => {
-	const Context = createContext( null as string | number | null | undefined );
+	const Context = createContext< string | number >( '' );
 	const ContextFill = ( { name }: { name: string } ) => {
 		const value = useContext( Context );
 		return <Fill name={ name }>{ value }</Fill>;

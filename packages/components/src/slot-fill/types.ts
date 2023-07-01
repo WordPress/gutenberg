@@ -35,15 +35,13 @@ export type SlotComponentProps =
 			/**
 			 * A function that returns nodes to be rendered.
 			 * Not supported when `bubblesVirtually` is true.
-			 *
-			 * @param fills
 			 */
 			children?: ( fills: ReactNode ) => ReactNode;
 	  } );
 
 export type FillComponentProps = {
 	/**
-	 * Slot name.
+	 * The name of the slot to fill into.
 	 */
 	name: SlotKey;
 
