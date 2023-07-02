@@ -372,3 +372,38 @@ function gutenberg_register_legacy_social_link_blocks() {
 }
 
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
+
+/**
+ * Ensures there's a `wp-block-<block name>` CSS class in the
+ * rendered markup of every block with supports.className
+ * set to true.
+ *
+ * @since 6.2.0
+ *
+ * @param  string $block_content Rendered block content.
+ * @param  array  $parsed_block  The block being rendered.
+ * @param  object $block         Block object.
+ * @return string                Updated block content.
+ */
+function gutenberg_add_default_class_name_to_rendered_block_markup( $block_content, $parsed_block, $block ) {
+	if ( ! $block_content ) {
+		return $block_content;
+	}
+
+	if ( ! $block->block_type || $block->block_type->is_dynamic() ) {
+		return $block_content;
+	}
+
+	$class_name_supports = _wp_array_get( $block->block_type->supports, array( 'className' ), false );
+	if ( ! $class_name_supports ) {
+		return $block_content;
+	}
+
+	$tags = new WP_HTML_Tag_Processor( $block_content );
+	if ( $tags->next_tag() ) {
+		$tags->add_class( wp_get_block_default_classname( $block->name ) );
+	}
+	return $tags->get_updated_html();
+}
+
+add_action( 'render_block', 'gutenberg_add_default_class_name_to_rendered_block_markup', 10, 3 );
