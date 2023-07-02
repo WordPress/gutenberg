@@ -152,3 +152,27 @@ export const getSupportedStyles = createSelector(
 	},
 	( state, name ) => [ state.blockTypes[ name ] ]
 );
+
+/**
+ * Returns the bootstrapped (initialized statically from server) block type for a give block name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name  Block name.
+ *
+ * @return {Object} Unprocessed block types.
+ */
+export function getBootstrappedBlockType( state, name ) {
+	return state.bootstrappedBlockTypes[ name ];
+}
+
+/**
+ * Returns all the unprocessed (before applying the `registerBlockType` filter)
+ * block types as passed during the registration.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Unprocessed block types.
+ */
+export function getUnprocessedBlockTypes( state ) {
+	return state.unprocessedBlockTypes;
+}
