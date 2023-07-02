@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/babel-plugin-makepot",
-	"version": "5.19.0",
+	"version": "5.20.0",
 	"description": "WordPress Babel internationalization (i18n) plugin.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

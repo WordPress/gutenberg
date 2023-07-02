@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/readable-js-assets-webpack-plugin",
-	"version": "2.18.0",
+	"version": "2.19.0",
 	"description": "Generate a readable JS file for each JS asset.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

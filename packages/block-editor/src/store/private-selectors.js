@@ -205,6 +205,6 @@ export function getRemovalPromptData( state ) {
  *
  * @return {boolean} Whether removal prompt exists.
  */
-export function isRemovalPromptSupported( state ) {
-	return state.isRemovalPromptSupported;
+export function getBlockRemovalRules( state ) {
+	return state.blockRemovalRules;
 }

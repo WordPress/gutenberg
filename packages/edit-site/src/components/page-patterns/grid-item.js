@@ -15,10 +15,11 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__unstableCompositeItem as CompositeItem,
+	Tooltip,
+	Flex,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useId } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Icon,
@@ -26,6 +27,7 @@ import {
 	footer,
 	symbolFilled,
 	moreHorizontal,
+	lockSmall,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
@@ -37,9 +39,10 @@ import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 import { PATTERNS, USER_PATTERNS } from './utils';
 import { useLink } from '../routes/link';
 
+const THEME_PATTERN_TOOLTIP = __( 'Theme patterns cannot be edited.' );
+
 export default function GridItem( { categoryId, composite, icon, item } ) {
-	const instanceId = useInstanceId( GridItem );
-	const descriptionId = `edit-site-library__pattern-description-${ instanceId }`;
+	const descriptionId = useId();
 	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
 
 	const { __experimentalDeleteReusableBlock } =
@@ -61,10 +64,10 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	};
 
 	const isEmpty = ! item.blocks?.length;
-	const patternClassNames = classnames( 'edit-site-library__pattern', {
+	const patternClassNames = classnames( 'edit-site-patterns__pattern', {
 		'is-placeholder': isEmpty,
 	} );
-	const previewClassNames = classnames( 'edit-site-library__preview', {
+	const previewClassNames = classnames( 'edit-site-patterns__preview', {
 		'is-inactive': item.type === PATTERNS,
 	} );
 
@@ -84,14 +87,17 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	};
 
 	const isUserPattern = item.type === USER_PATTERNS;
-	let ariaDescription;
+	const ariaDescriptions = [];
 	if ( isUserPattern ) {
 		// User patterns don't have descriptions, but can be edited and deleted, so include some help text.
-		ariaDescription = __(
-			'Press Enter to edit, or Delete to delete the pattern.'
+		ariaDescriptions.push(
+			__( 'Press Enter to edit, or Delete to delete the pattern.' )
 		);
 	} else if ( item.description ) {
-		ariaDescription = item.description;
+		ariaDescriptions.push( item.description );
+	}
+	if ( item.type === PATTERNS ) {
+		ariaDescriptions.push( THEME_PATTERN_TOOLTIP );
 	}
 
 	let itemIcon = icon;
@@ -115,43 +121,73 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					onKeyDown={ isUserPattern ? onKeyDown : undefined }
 					aria-label={ item.title }
 					aria-describedby={
-						ariaDescription ? descriptionId : undefined
+						ariaDescriptions.length
+							? ariaDescriptions.join( ' ' )
+							: undefined
 					}
 				>
 					{ isEmpty && __( 'Empty pattern' ) }
 					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
 				</CompositeItem>
-				{ ariaDescription && (
+				{ ariaDescriptions.map( ( ariaDescription, index ) => (
 					<div
-						aria-hidden="true"
-						style={ { display: 'none' } }
-						id={ descriptionId }
+						key={ index }
+						hidden
+						id={ `${ descriptionId }-${ index }` }
 					>
 						{ ariaDescription }
 					</div>
-				) }
+				) ) }
 				<HStack
 					aria-hidden="true"
-					className="edit-site-library__footer"
+					className="edit-site-patterns__footer"
 					justify="space-between"
 				>
 					<HStack
 						alignment="center"
 						justify="left"
 						spacing={ 3 }
-						className="edit-site-library__pattern-title"
+						className="edit-site-patterns__pattern-title"
 					>
-						{ icon && <Icon icon={ itemIcon } /> }
-						<Heading level={ 5 }>{ item.title }</Heading>
+						{ icon && (
+							<Icon
+								className="edit-site-patterns__pattern-icon"
+								icon={ itemIcon }
+							/>
+						) }
+						<Flex
+							as={ Heading }
+							level={ 5 }
+							gap={ 0 }
+							justify="left"
+						>
+							{ item.title }
+							{ item.type === PATTERNS && (
+								<Tooltip
+									position="top center"
+									text={ __(
+										'Theme patterns cannot be edited.'
+									) }
+								>
+									<span className="edit-site-patterns__pattern-lock-icon">
+										<Icon
+											style={ { fill: 'currentcolor' } }
+											icon={ lockSmall }
+											size={ 24 }
+										/>
+									</span>
+								</Tooltip>
+							) }
+						</Flex>
 					</HStack>
 					{ item.type === USER_PATTERNS && (
 						<DropdownMenu
 							icon={ moreHorizontal }
 							label={ __( 'Actions' ) }
-							className="edit-site-library__dropdown"
+							className="edit-site-patterns__dropdown"
 							popoverProps={ { placement: 'bottom-end' } }
 							toggleProps={ {
-								className: 'edit-site-library__button',
+								className: 'edit-site-patterns__button',
 								isSmall: true,
 								describedBy: sprintf(
 									/* translators: %s: pattern name */

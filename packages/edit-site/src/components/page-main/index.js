@@ -6,7 +6,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import PageLibrary from '../page-library';
+import PagePatterns from '../page-patterns';
 import PageTemplateParts from '../page-template-parts';
 import PageTemplates from '../page-templates';
 import { unlock } from '../../lock-unlock';
@@ -22,8 +22,8 @@ export default function PageMain() {
 		return <PageTemplates />;
 	} else if ( path === '/wp_template_part/all' ) {
 		return <PageTemplateParts />;
-	} else if ( path === '/library' ) {
-		return <PageLibrary />;
+	} else if ( path === '/patterns' ) {
+		return <PagePatterns />;
 	}
 
 	return null;
