@@ -18,7 +18,9 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	getBlockType,
+	hasBlockSupport,
 } from '@wordpress/blocks';
+
 import { useContext, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -214,13 +216,13 @@ const withPushChangesToGlobalStyles = createHigherOrderComponent(
 		const blockEditingMode = useBlockEditingMode();
 
 		/**
-		 * Do not show the panel for pattern and template part blocks.
+		 * Do not show the panel if the block does not have style support.
 		 *
 		 * @see https://github.com/WordPress/gutenberg/issues/52139
 		 */
 		if (
-			'core/block' === props.name ||
-			'core/template-part' === props.name
+			! hasBlockSupport( props.name, 'color' ) ||
+			! hasBlockSupport( props.name, 'typography' )
 		) {
 			return <BlockEdit { ...props } />;
 		}
