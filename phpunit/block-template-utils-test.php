@@ -9,9 +9,6 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		switch_theme( 'emptytheme' );
-	}
-
-	public static function wpSetUpBeforeClass() {
 		register_post_type(
 			'custom_book',
 			array(
@@ -22,9 +19,10 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 		register_taxonomy( 'book_type', 'custom_book' );
 	}
 
-	public static function wpTearDownAfterClass() {
+	public function tear_down() {
 		unregister_post_type( 'custom_book' );
 		unregister_taxonomy( 'book_type' );
+		parent::tear_down();
 	}
 
 	public function test_get_template_hierarchy() {

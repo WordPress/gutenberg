@@ -156,6 +156,7 @@ export default function ReusableBlockConvertButton( {
 										label={ __( 'Name' ) }
 										value={ title }
 										onChange={ setTitle }
+										placeholder={ __( 'My pattern' ) }
 									/>
 
 									<ToggleControl
@@ -186,7 +187,7 @@ export default function ReusableBlockConvertButton( {
 										</Button>
 
 										<Button variant="primary" type="submit">
-											{ __( 'Save' ) }
+											{ __( 'Create' ) }
 										</Button>
 									</HStack>
 								</VStack>

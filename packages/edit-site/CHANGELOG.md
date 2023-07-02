@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.13.0 (2023-06-23)
+
 ### Enhancements
 -   Site editor sidebar: add home template details and controls [#51223](https://github.com/WordPress/gutenberg/pull/51223).
 -   Site editor sidebar: add footer to template part and ensure nested template areas display [#51669](https://github.com/WordPress/gutenberg/pull/51669).

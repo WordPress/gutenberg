@@ -43,3 +43,13 @@ const registeredStore = registerStore( STORE_NAME, {
 } );
 unlock( registeredStore ).registerPrivateActions( privateActions );
 unlock( registeredStore ).registerPrivateSelectors( privateSelectors );
+
+// TODO: Remove once we switch to the `register` function (see above).
+//
+// Until then, private functions also need to be attached to the original
+// `store` descriptor in order to avoid unit tests failing, which could happen
+// when tests create new registries in which they register stores.
+//
+// @see https://github.com/WordPress/gutenberg/pull/51145#discussion_r1239999590
+unlock( store ).registerPrivateActions( privateActions );
+unlock( store ).registerPrivateSelectors( privateSelectors );

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/postcss-plugins-preset",
-	"version": "4.19.0",
+	"version": "4.20.0",
 	"description": "PostCSS sharable plugins preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

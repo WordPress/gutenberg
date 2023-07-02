@@ -18,7 +18,7 @@ import { useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { SYNC_TYPES, USER_PATTERN_CATEGORY } from '../page-library/utils';
+import { SYNC_TYPES, USER_PATTERN_CATEGORY } from '../page-patterns/utils';
 
 export default function CreatePatternModal( {
 	closeModal,
@@ -26,7 +26,7 @@ export default function CreatePatternModal( {
 	onError,
 } ) {
 	const [ name, setName ] = useState( '' );
-	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
+	const [ syncType, setSyncType ] = useState( SYNC_TYPES.unsynced );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 
 	const onSyncChange = () => {
@@ -54,7 +54,10 @@ export default function CreatePatternModal( {
 					title: name || __( 'Untitled Pattern' ),
 					content: '',
 					status: 'publish',
-					meta: { sync_status: syncType },
+					meta:
+						syncType === SYNC_TYPES.unsynced
+							? { sync_status: syncType }
+							: undefined,
 				},
 				{ throwOnError: true }
 			);
@@ -77,8 +80,6 @@ export default function CreatePatternModal( {
 			onRequestClose={ closeModal }
 			overlayClassName="edit-site-create-pattern-modal"
 		>
-			<p>{ __( 'Turn this block into a pattern to reuse later' ) }</p>
-
 			<form
 				onSubmit={ async ( event ) => {
 					event.preventDefault();
@@ -100,13 +101,11 @@ export default function CreatePatternModal( {
 						__nextHasNoMarginBottom
 					/>
 					<ToggleControl
-						label={ __( 'Synced' ) }
+						label={ __( 'Keep all pattern instances in sync' ) }
 						onChange={ onSyncChange }
-						help={
-							syncType === SYNC_TYPES.full
-								? __( 'Content is synced' )
-								: __( 'Content is not synced' )
-						}
+						help={ __(
+							'Editing the original pattern will also update anywhere the pattern is used.'
+						) }
 						checked={ syncType === SYNC_TYPES.full }
 					/>
 					<HStack justify="right">

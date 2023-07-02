@@ -9,6 +9,8 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import ScreenNavigationMoreMenu from './more-menu';
 import NavigationMenuEditor from './navigation-menu-editor';
+import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
+import EditButton from './edit-button';
 
 export default function SingleNavigationMenu( {
 	navigationMenu,
@@ -21,14 +23,21 @@ export default function SingleNavigationMenu( {
 	return (
 		<SidebarNavigationScreenWrapper
 			actions={
-				<ScreenNavigationMoreMenu
-					menuTitle={ decodeEntities( menuTitle ) }
-					onDelete={ handleDelete }
-					onSave={ handleSave }
-					onDuplicate={ handleDuplicate }
-				/>
+				<>
+					<EditButton postId={ navigationMenu?.id } />
+					<ScreenNavigationMoreMenu
+						menuTitle={ decodeEntities( menuTitle ) }
+						onDelete={ handleDelete }
+						onSave={ handleSave }
+						onDuplicate={ handleDuplicate }
+					/>
+				</>
 			}
-			title={ decodeEntities( menuTitle ) }
+			title={ buildNavigationLabel(
+				navigationMenu?.title,
+				navigationMenu?.id,
+				navigationMenu?.status
+			) }
 			description={ __(
 				'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
 			) }

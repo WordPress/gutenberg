@@ -107,7 +107,11 @@
 .edit-site-sidebar-navigation-screen__input-control {
 	width: 100%;
 	.components-input-control__container {
-		background: transparent;
+		background: $gray-800;
+
+		.components-button {
+			color: $gray-200 !important;
+		}
 	}
 	.components-input-control__input {
 		color: $gray-200 !important;

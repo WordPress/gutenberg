@@ -69,7 +69,6 @@ import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import { unlock } from '../../lock-unlock';
-
 const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 function Navigation( {
@@ -224,7 +223,7 @@ function Navigation( {
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
-	const { getNavigationFallbackId } = useSelect( coreStore );
+	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
 	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
 		? getNavigationFallbackId()
