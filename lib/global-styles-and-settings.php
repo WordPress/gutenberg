@@ -210,8 +210,8 @@ function gutenberg_add_global_styles_for_blocks() {
 					$block_name        = str_replace( 'core/', '', $result[0] );
 					$stylesheet_handle = 'wp-block-' . $block_name;
 				}
-				wp_add_inline_style( $stylesheet_handle, $block_css );
 			}
+			wp_add_inline_style( $stylesheet_handle, $block_css );
 		}
 	}
 }
