@@ -386,7 +386,7 @@ describe( 'UnitControl', () => {
 
 			expect( pt.value ).toBe( 'pt' );
 			expect( vmax.value ).toBe( 'vmax' );
-			expect( plus.value ).toBe( 'plus' );
+			expect( plus.value ).toBe( '+' );
 		} );
 
 		it( 'should reset value on unit change, if unit has default value', async () => {
