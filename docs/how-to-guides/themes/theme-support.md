@@ -477,6 +477,22 @@ Use this setting to enable the following Global Styles settings:
 add_theme_support( 'appearance-tools' );
 ```
 
+## Border
+
+Use this to enable all border settings:
+
+```php
+add_theme_support( 'border' );
+```
+
+## Link color
+
+Use this to enable the link color setting:
+
+```php
+add_theme_support( 'link-color' );
+```
+
 ## Block Based Template Parts
 
 Block Based Template parts allow administrators to edit parts of the site using blocks. This is off by default, and requires the theme to opt in by declaring support:

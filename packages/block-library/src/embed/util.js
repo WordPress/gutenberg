@@ -1,18 +1,13 @@
 /**
- * Internal dependencies
- */
-import { ASPECT_RATIOS, WP_EMBED_TYPE } from './constants';
-
-/**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
 import classnames from 'classnames/dedupe';
 import memoize from 'memize';
 
 /**
  * WordPress dependencies
  */
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { renderToString } from '@wordpress/element';
 import {
 	createBlock,
@@ -24,8 +19,11 @@ import {
  * Internal dependencies
  */
 import metadata from './block.json';
+import { ASPECT_RATIOS, WP_EMBED_TYPE } from './constants';
+import { unlock } from '../lock-unlock';
 
 const { name: DEFAULT_EMBED_BLOCK } = metadata;
+const { kebabCase } = unlock( blockEditorPrivateApis );
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
