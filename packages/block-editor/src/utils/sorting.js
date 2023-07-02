@@ -40,5 +40,5 @@ const comparator = ( field, order ) => {
  * @return {Array} Sorted items.
  */
 export function orderBy( items, field, order = 'asc' ) {
-	return items.concat().sort( comparator( field, order ) );
+	return items.toSorted( comparator( field, order ) );
 }
