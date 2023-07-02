@@ -254,7 +254,7 @@ The following workflow is needed when bug or security fixes need to be backporte
 -   For WordPress minor releases and WordPress security releases (example `5.1.1`).
 
 1. Check out the relevant WordPress major branch (If the minor release is 5.2.1, check out `wp/5.2`).
-2. Create a feature branch from that branch, and cherry-pick the merge commits for the needed bug fixes onto it. The cherry-picking process can be automated with the [`npm run cherry-pick` script](/docs/contributors/code/auto-cherry-picking.md).
+2. Create a feature branch from that branch, and cherry-pick the merge commits for the needed bug fixes onto it. The cherry-picking process can be automated with the [`npm run other:cherry-pick` script](/docs/contributors/code/auto-cherry-picking.md).
 3. Create a Pull Request from this branch targeting the WordPress major branch used above.
 4. Merge the Pull Request using the "Rebase and Merge" button to keep the history of the commits.
 

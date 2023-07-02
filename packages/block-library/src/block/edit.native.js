@@ -148,14 +148,14 @@ export default function ReusableBlockEdit( {
 				? sprintf(
 						/* translators: %s: name of the host app (e.g. WordPress) */
 						__(
-							'Editing reusable blocks is not yet supported on %s for Android'
+							'Editing synced patterns is not yet supported on %s for Android'
 						),
 						hostAppNamespace
 				  )
 				: sprintf(
 						/* translators: %s: name of the host app (e.g. WordPress) */
 						__(
-							'Editing reusable blocks is not yet supported on %s for iOS'
+							'Editing synced patterns is not yet supported on %s for iOS'
 						),
 						hostAppNamespace
 				  );

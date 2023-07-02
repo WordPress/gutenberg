@@ -133,6 +133,16 @@ store( {
 						}
 					}
 				},
+				preloadLightboxImage: ( { context } ) => {
+					if ( ! context.core.image.preloadInitialized ) {
+						context.core.image.preloadInitialized = true;
+						const imgDom = document.createElement( 'img' );
+						imgDom.setAttribute(
+							'src',
+							context.core.image.imageUploadedSrc
+						);
+					}
+				},
 			},
 		},
 	},
@@ -143,7 +153,8 @@ store( {
 					return context.core.image.lightboxEnabled ? 'dialog' : '';
 				},
 				responsiveImgSrc: ( { context } ) => {
-					return context.core.image.activateLargeImage
+					return context.core.image.activateLargeImage &&
+						context.core.image.hideAnimationEnabled
 						? ''
 						: context.core.image.imageCurrentSrc;
 				},
@@ -170,18 +181,6 @@ store( {
 						} );
 					}
 				},
-				preloadLightboxImage: ( { context, ref } ) => {
-					ref.addEventListener( 'mouseover', () => {
-						if ( ! context.core.image.preloadInitialized ) {
-							context.core.image.preloadInitialized = true;
-							const imgDom = document.createElement( 'img' );
-							imgDom.setAttribute(
-								'src',
-								context.core.image.imageUploadedSrc
-							);
-						}
-					} );
-				},
 				initLightbox: async ( { context, ref } ) => {
 					context.core.image.figureRef =
 						ref.querySelector( 'figure' );
@@ -203,51 +202,61 @@ store( {
 } );
 
 function setZoomStyles( imgDom, context, event ) {
-	let targetWidth = context.core.image.targetWidth;
-	let targetHeight = context.core.image.targetHeight;
+	// Typically, we use the image's full-sized dimensions. If those
+	// dimensions have not been set (i.e. an external image with only one size),
+	// the image's dimensions in the lightbox are the same
+	// as those of the image in the content.
+	let targetWidth =
+		context.core.image.targetWidth !== 'none'
+			? context.core.image.targetWidth
+			: event.target.nextElementSibling.naturalWidth;
+	let targetHeight =
+		context.core.image.targetHeight !== 'none'
+			? context.core.image.targetHeight
+			: event.target.nextElementSibling.naturalHeight;
 
+	// Since the lightbox image has `position:absolute`, it
+	// ignores its parent's padding, so we need to set padding here
+	// to calculate dimensions and positioning.
+
+	// As per the design, let's constrain the height with fixed padding
+	const containerOuterHeight = window.innerHeight;
 	const verticalPadding = 40;
+	const containerInnerHeight = containerOuterHeight - verticalPadding * 2;
 
-	// As per the design, let's allow the image to stretch
-	// to the full width of its containing figure, but for the height,
-	// constrain it with a fixed padding
-	const containerWidth = context.core.image.figureRef.clientWidth;
-
-	// The lightbox image has `positione:absolute` and
-	// ignores its parent's padding, so let's set the padding here,
-	// to be used when calculating the image width and positioning
+	// Let's set a variable horizontal padding based on the container width
+	const containerOuterWidth = window.innerWidth;
 	let horizontalPadding = 0;
-	if ( containerWidth > 480 ) {
+	if ( containerOuterWidth > 480 ) {
 		horizontalPadding = 40;
-	} else if ( containerWidth > 1920 ) {
+	} else if ( containerOuterWidth > 1920 ) {
 		horizontalPadding = 80;
 	}
-
-	const containerHeight =
-		context.core.image.figureRef.clientHeight - verticalPadding * 2;
+	const containerInnerWidth = containerOuterWidth - horizontalPadding * 2;
 
 	// Check difference between the image and figure dimensions
 	const widthOverflow = Math.abs(
-		Math.min( containerWidth - targetWidth, 0 )
+		Math.min( containerInnerWidth - targetWidth, 0 )
 	);
 	const heightOverflow = Math.abs(
-		Math.min( containerHeight - targetHeight, 0 )
+		Math.min( containerInnerHeight - targetHeight, 0 )
 	);
 
-	// If image is larger than its container any dimension, resize along its largest axis.
-	// For vertically oriented devices, always maximize the width.
+	// If the image is larger than the container, let's resize
+	// it along the greater axis relative to the container
 	if ( widthOverflow > 0 || heightOverflow > 0 ) {
-		if (
-			widthOverflow >= heightOverflow ||
-			containerHeight >= containerWidth
-		) {
-			targetWidth = containerWidth - horizontalPadding * 2;
+		const containerInnerAspectRatio =
+			containerInnerWidth / containerInnerHeight;
+		const imageAspectRatio = targetWidth / targetHeight;
+
+		if ( imageAspectRatio > containerInnerAspectRatio ) {
+			targetWidth = containerInnerWidth;
 			targetHeight =
-				imgDom.naturalHeight * ( targetWidth / imgDom.naturalWidth );
+				( targetWidth * imgDom.naturalHeight ) / imgDom.naturalWidth;
 		} else {
-			targetHeight = containerHeight;
+			targetHeight = containerInnerHeight;
 			targetWidth =
-				imgDom.naturalWidth * ( targetHeight / imgDom.naturalHeight );
+				( targetHeight * imgDom.naturalWidth ) / imgDom.naturalHeight;
 		}
 	}
 
@@ -261,16 +270,16 @@ function setZoomStyles( imgDom, context, event ) {
 
 	// Get values used to center the image
 	let targetLeft = 0;
-	if ( targetWidth >= containerWidth ) {
+	if ( targetWidth >= containerInnerWidth ) {
 		targetLeft = horizontalPadding;
 	} else {
-		targetLeft = ( containerWidth - targetWidth ) / 2;
+		targetLeft = ( containerOuterWidth - targetWidth ) / 2;
 	}
 	let targetTop = 0;
-	if ( targetHeight >= containerHeight ) {
+	if ( targetHeight >= containerInnerHeight ) {
 		targetTop = verticalPadding;
 	} else {
-		targetTop = ( containerHeight - targetHeight ) / 2 + verticalPadding;
+		targetTop = ( containerOuterHeight - targetHeight ) / 2;
 	}
 
 	const root = document.documentElement;

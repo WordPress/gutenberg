@@ -853,7 +853,10 @@ test.describe( 'Image - interactivity', () => {
 
 			await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
 
-			await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+			await expect( responsiveImage ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
 			await expect( enlargedImage ).toHaveAttribute(
 				'src',
 				new RegExp( filename )
@@ -865,6 +868,12 @@ test.describe( 'Image - interactivity', () => {
 				name: 'Close',
 			} );
 			await closeButton.click();
+
+			await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+			await expect( enlargedImage ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
 
 			await expect( lightbox ).toBeHidden();
 		} );
@@ -1092,6 +1101,11 @@ test.describe( 'Image - interactivity', () => {
 		await expect( enlargedImage ).toHaveAttribute( 'src', '' );
 
 		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
+
+		await expect( responsiveImage ).toHaveAttribute( 'src', imgUrl );
+		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
+
+		await page.getByRole( 'button', { name: 'Close' } ).click();
 
 		await expect( responsiveImage ).toHaveAttribute( 'src', '' );
 		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
