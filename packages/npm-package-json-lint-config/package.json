@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/npm-package-json-lint-config",
-	"version": "4.20.0",
+	"version": "4.21.0",
 	"description": "WordPress npm-package-json-lint shareable configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

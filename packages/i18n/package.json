@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/i18n",
-	"version": "4.35.0",
+	"version": "4.36.0",
 	"description": "WordPress internationalization (i18n) library.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
