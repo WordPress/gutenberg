@@ -170,13 +170,15 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-
-	const isStyleBookOpened = useSelect(
-		( select ) =>
-			'style-book' ===
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
-		[]
-	);
+	const { isViewMode, isStyleBookOpened } = useSelect( ( select ) => {
+		const { getCanvasMode, getEditorCanvasContainerView } = unlock(
+			select( editSiteStore )
+		);
+		return {
+			isViewMode: getCanvasMode() === 'view',
+			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
+		};
+	}, [] );
 
 	const openGlobalStyles = useCallback(
 		async () =>
@@ -246,7 +248,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 					</>
 				}
 			/>
-			{ isStyleBookOpened && ! isMobileViewport && (
+			{ isStyleBookOpened && ! isMobileViewport && isViewMode && (
 				<StyleBook
 					enableResizing={ false }
 					isSelected={ () => false }
