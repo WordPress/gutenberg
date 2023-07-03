@@ -137,31 +137,3 @@ function gutenberg_wp_block_sanitize_post_meta( $meta_value ) {
 	return sanitize_text_field( $meta_value );
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
-
-/**
- * Migrate the legacy `sync_status` meta key to the new `wp_pattern_sync_status` meta key.
- *
- * Note: This should be removed when the minimum required WP version is >= 6.3.
- *
- * @param mixed  $value     The value to return, either a single metadata value or an array of values depending on the value of $single.
- * @param int    $object_id ID of the object metadata is for.
- * @param string $meta_key  Metadata key.
- * @param bool   $single    Whether to return only the first value of the specified $meta_key.
- *
- * @see https://github.com/WordPress/gutenberg/pull/52232
- */
-function gutenberg_wp_block_migrate_post_meta( $value, $object_id, $meta_key, $single ) {
-	if ( 'wp_pattern_sync_status' !== $meta_key || null !== $value ) {
-		return $value;
-	}
-
-	$sync_status = get_post_meta( $object_id, $meta_key, $single );
-
-	if ( $sync_status ) {
-		return $value;
-	}
-
-	// Return legacy meta key.
-	return get_post_meta( $object_id, 'sync_status', $single );
-}
-add_filter( 'get_post_metadata', 'gutenberg_wp_block_migrate_post_meta', 10, 4 );
