@@ -44,38 +44,21 @@ export const Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 	return content;
 };
 
-Content.__unstableIsRichTextContent = {};
-
-function renderChildren( children ) {
-	const values = [];
+function addValuesForElements( children, ...args ) {
 	children = Array.isArray( children ) ? children : [ children ];
 
 	for ( let i = 0; i < children.length; i++ ) {
-		const child = children[ i ];
-		const value = renderElement( child );
-		if ( value ) {
-			if ( Array.isArray( value ) ) {
-				values.push( ...value );
-			} else {
-				values.push( value );
-			}
-		}
+		addValuesForElement( children[ i ], ...args );
 	}
-
-	return values;
 }
 
-function renderComponent( Component, props ) {
-	return renderElement( new Component( props ).render() );
-}
-
-function renderElement( element ) {
+function addValuesForElement( element, ...args ) {
 	if ( null === element || undefined === element || false === element ) {
 		return;
 	}
 
 	if ( Array.isArray( element ) ) {
-		return renderChildren( element );
+		return addValuesForElements( element, ...args );
 	}
 
 	switch ( typeof element ) {
@@ -86,26 +69,24 @@ function renderElement( element ) {
 
 	const { type, props } = element;
 
-	if (
-		type.__unstableIsRichTextContent === Content.__unstableIsRichTextContent
-	) {
-		return props.value;
-	}
-
 	switch ( type ) {
 		case StrictMode:
 		case Fragment:
-			return renderChildren( props.children );
+			return addValuesForElements( props.children, ...args );
 		case RawHTML:
 			return;
 		case InnerBlocks.Content:
-			return getValuesForBlocks( renderElement.innerBlocks );
+			return addValuesForBlocks( ...args );
+		case Content:
+			const [ values ] = args;
+			values.push( props.value );
+			return;
 	}
 
 	switch ( typeof type ) {
 		case 'string':
 			if ( typeof props.children !== 'undefined' ) {
-				return renderChildren( props.children );
+				return addValuesForElements( props.children, ...args );
 			}
 			return;
 		case 'function':
@@ -113,34 +94,28 @@ function renderElement( element ) {
 				type.prototype &&
 				typeof type.prototype.render === 'function'
 			) {
-				return renderComponent( type, props );
+				return addValuesForElement(
+					new type( props ).render(),
+					...args
+				);
 			}
 
-			return renderElement( type( props ) );
+			return addValuesForElement( type( props ), ...args );
 	}
 }
 
-function getValuesForBlocks( blocks ) {
-	const values = [];
+function addValuesForBlocks( values, blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {
 		const { name, attributes, innerBlocks } = blocks[ i ];
 		const saveElement = getSaveElement( name, attributes );
-		renderElement.innerBlocks = innerBlocks;
-		const value = renderElement( saveElement );
-		if ( value ) {
-			if ( Array.isArray( value ) ) {
-				values.push( ...value );
-			} else {
-				values.push( value );
-			}
-		}
+		addValuesForElement( saveElement, values, innerBlocks );
 	}
-	return values;
 }
 
 export function getRichTextValues( blocks = [] ) {
 	getBlockProps.skipFilters = true;
-	const values = getValuesForBlocks( blocks );
+	const values = [];
+	addValuesForBlocks( values, blocks );
 	getBlockProps.skipFilters = false;
 	return values;
 }
