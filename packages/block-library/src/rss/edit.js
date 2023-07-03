@@ -116,6 +116,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Number of items' ) }
 						value={ itemsToShow }
 						onChange={ ( value ) =>
