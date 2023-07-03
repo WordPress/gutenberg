@@ -24,6 +24,7 @@ import {
 	getValidParsedQuantityAndUnit,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
+import { escapeRegExp } from '../utils/strings';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 
 function UnforwardedUnitControl(
@@ -76,9 +77,9 @@ function UnforwardedUnitControl(
 		);
 		const [ { value: firstUnitValue = '' } = {}, ...rest ] = list;
 		const firstCharacters = rest.reduce( ( carry, { value } ) => {
-			const first = value?.substring( 0, 1 ) || '';
+			const first = escapeRegExp( value?.substring( 0, 1 ) || '' );
 			return carry.includes( first ) ? carry : `${ carry }|${ first }`;
-		}, firstUnitValue.substring( 0, 1 ) );
+		}, escapeRegExp( firstUnitValue.substring( 0, 1 ) ) );
 		return [ list, new RegExp( `^(?:${ firstCharacters })$`, 'i' ) ];
 	}, [ nonNullValueProp, unitProp, unitsProp ] );
 	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
