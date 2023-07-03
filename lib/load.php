@@ -108,6 +108,11 @@ require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
+
+if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
+	require __DIR__ . '/experimental/disable-tinymce.php';
+}
+
 if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) ) {
 	require __DIR__ . '/experimental/interactivity-api/blocks.php';
 }
@@ -122,7 +127,6 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-context.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
-
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
