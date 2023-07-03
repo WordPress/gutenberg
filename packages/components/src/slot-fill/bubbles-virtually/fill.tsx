@@ -48,16 +48,15 @@ export default function Fill( props: FillComponentProps ) {
 		return null;
 	}
 
-	const newChildren =
-		typeof children === 'function' ? children( slot.fillProps ) : children;
-
 	// When using a `Fill`, the `children` will be rendered in the document of the
 	// `Slot`. This means that we need to wrap the `children` in a `StyleProvider`
 	// to make sure we're referencing the right document/iframe (instead of the
 	// context of the `Fill`'s parent).
 	const wrappedChildren = (
 		<StyleProvider document={ slot.ref.current.ownerDocument }>
-			{ newChildren }
+			{ typeof children === 'function'
+				? children( slot.fillProps )
+				: children }
 		</StyleProvider>
 	);
 
