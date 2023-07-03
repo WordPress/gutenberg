@@ -89,7 +89,7 @@ function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ) {
 add_filter( 'register_post_type_args', 'gutenberg_add_custom_fields_to_wp_block', 10, 2 );
 
 /**
- * Adds sync_status meta fields to the wp_block post type so an unsynced option can be added.
+ * Adds wp_pattern_sync_status meta fields to the wp_block post type so an unsynced option can be added.
  *
  * Note: This should be removed when the minimum required WP version is >= 6.3.
  *
@@ -101,7 +101,7 @@ function gutenberg_wp_block_register_post_meta() {
 	$post_type = 'wp_block';
 	register_post_meta(
 		$post_type,
-		'sync_status',
+		'wp_pattern_sync_status',
 		array(
 			'auth_callback'     => function() {
 				return current_user_can( 'edit_posts' );
@@ -113,7 +113,7 @@ function gutenberg_wp_block_register_post_meta() {
 				'schema' => array(
 					'type'       => 'string',
 					'properties' => array(
-						'sync_status' => array(
+						'wp_pattern_sync_status' => array(
 							'type' => 'string',
 						),
 					),
@@ -123,7 +123,7 @@ function gutenberg_wp_block_register_post_meta() {
 	);
 }
 /**
- * Sanitizes the array of wp_block post meta sync_status string.
+ * Sanitizes the array of wp_block post meta wp_pattern_sync_status string.
  *
  * Note: This should be removed when the minimum required WP version is >= 6.3.
  *
