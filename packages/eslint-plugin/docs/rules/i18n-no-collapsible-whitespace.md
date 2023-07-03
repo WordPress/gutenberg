@@ -9,7 +9,7 @@ Whitespace can be appropriate in longer translatable content, for example a whol
 Examples of **incorrect** code for this rule:
 
 ```js
-__( "A string\non two lines" );
+__( 'A string\non two lines' );
 __( 'A string\non two lines' );
 __( `A string
 on two lines` );
@@ -20,7 +20,5 @@ __( "Multiple spaces.  Even after a full stop.  (We're going there)" );
 Examples of **correct** code for this rule:
 
 ```js
-__( `A long string ` +
-	`spread over ` +
-	`multiple lines.` );
+__( `A long string ` + `spread over ` + `multiple lines.` );
 ```

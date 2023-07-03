@@ -5,6 +5,10 @@ import { addFilter } from '@wordpress/hooks';
 import { withSelect } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import { STORE_NAME } from '../store/constants';
+/**
  * Adds annotation className to the block-list-block component.
  *
  * @param {Object} OriginalComponent The original BlockListBlock component.
@@ -12,9 +16,10 @@ import { withSelect } from '@wordpress/data';
  */
 const addAnnotationClassName = ( OriginalComponent ) => {
 	return withSelect( ( select, { clientId, className } ) => {
-		const annotations = select(
-			'core/annotations'
-		).__experimentalGetAnnotationsForBlock( clientId );
+		const annotations =
+			select( STORE_NAME ).__experimentalGetAnnotationsForBlock(
+				clientId
+			);
 
 		return {
 			className: annotations

@@ -1,21 +1,16 @@
 /**
- * External dependencies
- */
-import { compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { RawHTML } from '@wordpress/element';
 
-export default function save( { attributes } ) {
-	const { customText, noTeaser } = attributes;
-
+export default function save( { attributes: { customText, noTeaser } } ) {
 	const moreTag = customText ? `<!--more ${ customText }-->` : '<!--more-->';
 
 	const noTeaserTag = noTeaser ? '<!--noteaser-->' : '';
 
 	return (
-		<RawHTML>{ compact( [ moreTag, noTeaserTag ] ).join( '\n' ) }</RawHTML>
+		<RawHTML>
+			{ [ moreTag, noTeaserTag ].filter( Boolean ).join( '\n' ) }
+		</RawHTML>
 	);
 }

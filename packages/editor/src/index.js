@@ -1,23 +1,12 @@
 /**
- * WordPress dependencies
- */
-import '@wordpress/block-editor';
-import '@wordpress/blocks';
-import '@wordpress/core-data';
-import '@wordpress/keyboard-shortcuts';
-import '@wordpress/notices';
-import '@wordpress/rich-text';
-import '@wordpress/viewport';
-
-/**
  * Internal dependencies
  */
-import './store';
 import './hooks';
 
+export { storeConfig, store } from './store';
 export * from './components';
 export * from './utils';
-export { storeConfig } from './store';
+export * from './private-apis';
 
 /*
  * Backward compatibility

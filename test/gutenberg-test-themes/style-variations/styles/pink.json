@@ -1,0 +1,33 @@
+{
+	"version": 2,
+	"settings": {
+		"color": {
+			"palette": [
+				{
+					"slug": "foreground",
+					"color": "#4a074a",
+					"name": "Foreground"
+				},
+				{
+					"slug": "background",
+					"color": "#ca69d3",
+					"name": "Background"
+				},
+				{
+					"slug": "awesome-pink",
+					"color": "#cc00ffc4",
+					"name": "Awesome pink"
+				}
+			]
+		}
+	},
+	"styles": {
+		"color": {
+			"background": "var(--wp--preset--color--background)",
+			"text": "var(--wp--preset--color--foreground)"
+		},
+		"typography": {
+			"fontSize": "var(--wp--preset--font-size--medium)"
+		}
+	}
+}

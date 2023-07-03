@@ -1,0 +1,16 @@
+.block-editor-date-format-picker {
+	margin-bottom: $grid-unit-20;
+}
+
+.block-editor-date-format-picker__custom-format-select-control__custom-option {
+	border-top: 1px solid $gray-300;
+
+	&.has-hint {
+		grid-template-columns: auto 30px;
+	}
+
+	.components-custom-select-control__item-hint {
+		grid-row: 2;
+		text-align: left;
+	}
+}

@@ -9,10 +9,11 @@ import {
 } from '@wordpress/block-editor';
 
 const name = 'core/underline';
+const title = __( 'Underline' );
 
 export const underline = {
 	name,
-	title: __( 'Underline' ),
+	title,
 	tagName: 'span',
 	className: null,
 	attributes: {
@@ -26,6 +27,7 @@ export const underline = {
 					attributes: {
 						style: 'text-decoration: underline;',
 					},
+					title,
 				} )
 			);
 		};

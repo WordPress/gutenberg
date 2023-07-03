@@ -1,8 +1,8 @@
-( function() {
-	var registerBlockType = wp.blocks.registerBlockType;
-	var el = wp.element.createElement;
-	var InnerBlocks = wp.blockEditor.InnerBlocks;
-	var circle = el( 'circle', {
+( function () {
+	const registerBlockType = wp.blocks.registerBlockType;
+	const el = wp.element.createElement;
+	const InnerBlocks = wp.blockEditor.InnerBlocks;
+	const circle = el( 'circle', {
 		cx: 10,
 		cy: 10,
 		r: 10,
@@ -10,7 +10,7 @@
 		stroke: 'blue',
 		strokeWidth: '10',
 	} );
-	var svg = el(
+	const svg = el(
 		'svg',
 		{ width: 20, height: 20, viewBox: '0 0 20 20' },
 		circle
@@ -21,7 +21,7 @@
 		icon: svg,
 		category: 'text',
 
-		edit: function() {
+		edit() {
 			return el(
 				'div',
 				{
@@ -42,7 +42,7 @@
 			);
 		},
 
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{
@@ -59,7 +59,7 @@
 		icon: 'cart',
 		category: 'text',
 
-		edit: function() {
+		edit() {
 			return el(
 				'div',
 				{
@@ -80,7 +80,7 @@
 			);
 		},
 
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{
@@ -94,12 +94,12 @@
 
 	registerBlockType( 'test/test-function-icon', {
 		title: 'TestFunctionIcon',
-		icon: function() {
+		icon() {
 			return svg;
 		},
 		category: 'text',
 
-		edit: function() {
+		edit() {
 			return el(
 				'div',
 				{
@@ -120,7 +120,7 @@
 			);
 		},
 
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{
@@ -141,7 +141,7 @@
 		},
 		category: 'text',
 
-		edit: function() {
+		edit() {
 			return el(
 				'div',
 				{
@@ -162,7 +162,7 @@
 			);
 		},
 
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{
@@ -182,7 +182,7 @@
 		},
 		category: 'text',
 
-		edit: function() {
+		edit() {
 			return el(
 				'div',
 				{
@@ -203,7 +203,7 @@
 			);
 		},
 
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{

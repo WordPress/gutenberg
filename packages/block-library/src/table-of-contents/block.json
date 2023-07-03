@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "core/table-of-contents",
+	"title": "Table of Contents",
+	"category": "layout",
+	"description": "Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.",
+	"keywords": [ "document outline", "summary" ],
+	"textdomain": "default",
+	"attributes": {
+		"headings": {
+			"type": "array",
+			"items": {
+				"type": "object"
+			}
+		},
+		"onlyIncludeCurrentPage": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"color": {
+			"text": true,
+			"background": true,
+			"gradients": true,
+			"link": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
+	},
+	"example": {}
+}

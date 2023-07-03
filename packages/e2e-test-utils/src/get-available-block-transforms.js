@@ -22,5 +22,5 @@ export const getAvailableBlockTransforms = async () => {
 				return button.textContent;
 			}
 		);
-	}, '.block-editor-block-switcher__popover .block-editor-block-types-list .block-editor-block-types-list__list-item button' );
+	}, '.block-editor-block-switcher__popover .block-editor-block-switcher__transforms__menugroup button' );
 };

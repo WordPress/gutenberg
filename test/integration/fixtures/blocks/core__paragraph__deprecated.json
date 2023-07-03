@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/paragraph",
+		"isValid": true,
+		"attributes": {
+			"content": "Unwrapped is <em>still</em> valid.",
+			"dropCap": false
+		},
+		"innerBlocks": []
+	}
+]

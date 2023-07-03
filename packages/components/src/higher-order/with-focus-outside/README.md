@@ -6,7 +6,7 @@
 
 Wrap your original component with `withFocusOutside`, defining a `handleFocusOutside` instance method on the component class.
 
-__Note:__ `withFocusOutside` must only be used to wrap the `Component` class.
+**Note:** `withFocusOutside` must only be used to wrap the `Component` class.
 
 ```jsx
 import { withFocusOutside, TextControl } from '@wordpress/components';
@@ -20,8 +20,8 @@ const MyComponentWithFocusOutside = withFocusOutside(
 		render() {
 			return (
 				<div>
-					<TextControl onChange={ ( ) => { } }/>
-					<TextControl onChange={ ( ) => { } }/>
+					<TextControl onChange={ () => {} } />
+					<TextControl onChange={ () => {} } />
 				</div>
 			);
 		}

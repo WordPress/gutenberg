@@ -6,38 +6,55 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Dropdown, MenuGroup, MenuItem } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Icon, check, chevronDown } from '@wordpress/icons';
+import { check, desktop, mobile, tablet } from '@wordpress/icons';
 
 export default function PreviewOptions( {
 	children,
+	viewLabel,
 	className,
 	isEnabled = true,
 	deviceType,
 	setDeviceType,
+	label,
 } ) {
+	const isMobile = useViewportMatch( 'small', '<' );
+	if ( isMobile ) return null;
+
+	const popoverProps = {
+		className: classnames(
+			className,
+			'block-editor-post-preview__dropdown-content'
+		),
+		placement: 'bottom-end',
+	};
+	const toggleProps = {
+		className: 'block-editor-post-preview__button-toggle',
+		disabled: ! isEnabled,
+		children: viewLabel,
+	};
+	const menuProps = {
+		'aria-label': __( 'View options' ),
+	};
+
+	const deviceIcons = {
+		mobile,
+		tablet,
+		desktop,
+	};
+
 	return (
-		<Dropdown
+		<DropdownMenu
 			className="block-editor-post-preview__dropdown"
-			contentClassName={ classnames(
-				className,
-				'block-editor-post-preview__dropdown-content'
-			) }
-			popoverProps={ { role: 'menu' } }
-			position="bottom left"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					onClick={ onToggle }
-					className="block-editor-post-preview__button-toggle"
-					aria-expanded={ isOpen }
-					disabled={ ! isEnabled }
-				>
-					{ __( 'Preview' ) }
-					<Icon icon={ chevronDown } />
-				</Button>
-			) }
-			renderContent={ () => (
+			popoverProps={ popoverProps }
+			toggleProps={ toggleProps }
+			menuProps={ menuProps }
+			icon={ deviceIcons[ deviceType.toLowerCase() ] }
+			label={ label || __( 'Preview' ) }
+		>
+			{ () => (
 				<>
 					<MenuGroup>
 						<MenuItem
@@ -65,6 +82,6 @@ export default function PreviewOptions( {
 					{ children }
 				</>
 			) }
-		/>
+		</DropdownMenu>
 	);
 }

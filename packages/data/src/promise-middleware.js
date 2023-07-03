@@ -6,7 +6,7 @@ import isPromise from 'is-promise';
 /**
  * Simplest possible promise redux middleware.
  *
- * @return {Function} middleware.
+ * @type {import('redux').Middleware}
  */
 const promiseMiddleware = () => ( next ) => ( action ) => {
 	if ( isPromise( action ) ) {

@@ -1,19 +1,9 @@
 /**
- * External dependencies
- */
-
-import { JSDOM } from 'jsdom';
-
-/**
  * Internal dependencies
  */
-
 import { toDom, applyValue } from '../to-dom';
 import { createElement } from '../create-element';
 import { spec } from './helpers';
-
-const { window } = new JSDOM();
-const { document } = window;
 
 describe( 'recordToDom', () => {
 	beforeAll( () => {
@@ -23,6 +13,7 @@ describe( 'recordToDom', () => {
 
 	spec.forEach(
 		( { description, multilineTag, record, startPath, endPath } ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				const { body, selection } = toDom( {
 					value: record,
@@ -94,6 +85,7 @@ describe( 'applyValue', () => {
 	];
 
 	cases.forEach( ( { current, future, description, movedCount } ) => {
+		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const body = createElement( document, current ).cloneNode( true );
 			const futureBody = createElement( document, future ).cloneNode(

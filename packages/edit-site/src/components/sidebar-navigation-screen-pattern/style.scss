@@ -1,0 +1,29 @@
+.edit-site-sidebar-navigation-screen-pattern__added-by-description {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: $grid-unit-30;
+}
+
+.edit-site-sidebar-navigation-screen-pattern__added-by-description-author {
+	display: inline-flex;
+	align-items: center;
+
+	img {
+		border-radius: $grid-unit-15;
+	}
+
+	svg {
+		fill: $gray-600;
+	}
+}
+
+.edit-site-sidebar-navigation-screen-pattern__added-by-description-author-icon {
+	width: 24px;
+	height: 24px;
+	margin-right: $grid-unit-10;
+}
+
+.edit-site-sidebar-navigation-screen-pattern__lock-icon {
+	display: inline-flex;
+}

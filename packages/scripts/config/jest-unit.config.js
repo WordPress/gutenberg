@@ -10,11 +10,15 @@ const { hasBabelConfig } = require( '../utils' );
 
 const jestUnitConfig = {
 	preset: '@wordpress/jest-preset-default',
+	reporters: [
+		'default',
+		path.join( __dirname, 'jest-github-actions-reporter', 'index.js' ),
+	],
 };
 
 if ( ! hasBabelConfig() ) {
 	jestUnitConfig.transform = {
-		'^.+\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
+		'\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
 	};
 }
 

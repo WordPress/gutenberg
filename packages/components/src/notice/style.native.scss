@@ -1,0 +1,60 @@
+.successText {
+	color: #212121;
+	align-self: center;
+	background-color: transparent;
+	font-size: 12;
+}
+
+.successTextDark {
+	color: $white;
+}
+
+.errorText {
+	color: $red-50;
+	align-self: center;
+	background-color: transparent;
+	font-size: 12;
+}
+
+.errorTextDark {
+	color: $red-30;
+}
+
+.list {
+	position: absolute;
+	margin-left: auto;
+	margin-right: auto;
+	top: 0;
+	flex-direction: column;
+	z-index: 102;
+	align-items: center;
+	align-self: center;
+}
+
+.notice {
+	justify-content: center;
+	position: absolute;
+}
+
+.noticeContent {
+	position: relative;
+	z-index: 1;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.noticeSolid {
+	background-color: #f4f4f4;
+}
+
+.noticeSolidDark {
+	background-color: #2a2a2a;
+}
+
+.blurBackground {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+}

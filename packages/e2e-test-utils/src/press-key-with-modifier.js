@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { capitalize } from 'lodash';
+import { capitalCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -24,8 +24,9 @@ import { modifiers, SHIFT, ALT, CTRL } from '@wordpress/keycodes';
 async function emulateSelectAll() {
 	await page.evaluate( () => {
 		const isMac = /Mac|iPod|iPhone|iPad/.test( window.navigator.platform );
+		const canvasDoc = document.activeElement.contentDocument ?? document;
 
-		document.activeElement.dispatchEvent(
+		canvasDoc.activeElement.dispatchEvent(
 			new KeyboardEvent( 'keydown', {
 				bubbles: true,
 				cancelable: true,
@@ -58,14 +59,14 @@ async function emulateSelectAll() {
 		} );
 
 		const wasPrevented =
-			! document.activeElement.dispatchEvent( preventableEvent ) ||
+			! canvasDoc.activeElement.dispatchEvent( preventableEvent ) ||
 			preventableEvent.defaultPrevented;
 
 		if ( ! wasPrevented ) {
-			document.execCommand( 'selectall', false, null );
+			canvasDoc.execCommand( 'selectall', false, null );
 		}
 
-		document.activeElement.dispatchEvent(
+		canvasDoc.activeElement.dispatchEvent(
 			new KeyboardEvent( 'keyup', {
 				bubbles: true,
 				cancelable: true,
@@ -81,12 +82,34 @@ async function emulateSelectAll() {
 	} );
 }
 
+/**
+ * Sets the clipboard data that can be pasted with
+ * `pressKeyWithModifier( 'primary', 'v' )`.
+ *
+ * @param {Object} $1           Options.
+ * @param {string} $1.plainText Plain text to set.
+ * @param {string} $1.html      HTML to set.
+ */
+export async function setClipboardData( { plainText = '', html = '' } ) {
+	await page.evaluate(
+		( _plainText, _html ) => {
+			window._clipboardData = new DataTransfer();
+			window._clipboardData.setData( 'text/plain', _plainText );
+			window._clipboardData.setData( 'text/html', _html );
+		},
+		plainText,
+		html
+	);
+}
+
 async function emulateClipboard( type ) {
 	await page.evaluate( ( _type ) => {
+		const canvasDoc = document.activeElement.contentDocument ?? document;
+
 		if ( _type !== 'paste' ) {
 			window._clipboardData = new DataTransfer();
 
-			const selection = window.getSelection();
+			const selection = canvasDoc.defaultView.getSelection();
 			const plainText = selection.toString();
 			let html = plainText;
 
@@ -103,9 +126,10 @@ async function emulateClipboard( type ) {
 			window._clipboardData.setData( 'text/html', html );
 		}
 
-		document.activeElement.dispatchEvent(
+		canvasDoc.activeElement.dispatchEvent(
 			new ClipboardEvent( _type, {
 				bubbles: true,
+				cancelable: true,
 				clipboardData: window._clipboardData,
 			} )
 		);
@@ -117,7 +141,7 @@ async function emulateClipboard( type ) {
  * is normalized to platform-specific modifier.
  *
  * @param {string} modifier Modifier key.
- * @param {string} key Key to press while modifier held.
+ * @param {string} key      Key to press while modifier held.
  */
 export async function pressKeyWithModifier( modifier, key ) {
 	if ( modifier.toLowerCase() === 'primary' && key.toLowerCase() === 'a' ) {
@@ -147,7 +171,7 @@ export async function pressKeyWithModifier( modifier, key ) {
 
 	await Promise.all(
 		mappedModifiers.map( async ( mod ) => {
-			const capitalizedMod = capitalize( ctrlSwap( mod ) );
+			const capitalizedMod = capitalCase( ctrlSwap( mod ) );
 			return page.keyboard.down( capitalizedMod );
 		} )
 	);
@@ -156,7 +180,7 @@ export async function pressKeyWithModifier( modifier, key ) {
 
 	await Promise.all(
 		mappedModifiers.map( async ( mod ) => {
-			const capitalizedMod = capitalize( ctrlSwap( mod ) );
+			const capitalizedMod = capitalCase( ctrlSwap( mod ) );
 			return page.keyboard.up( capitalizedMod );
 		} )
 	);

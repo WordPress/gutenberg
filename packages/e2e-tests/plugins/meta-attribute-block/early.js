@@ -1,6 +1,6 @@
-( function() {
-	var registerBlockType = wp.blocks.registerBlockType;
-	var el = wp.element.createElement;
+( function () {
+	const registerBlockType = wp.blocks.registerBlockType;
+	const el = wp.element.createElement;
 
 	registerBlockType( 'test/test-meta-attribute-block-early', {
 		title: 'Test Meta Attribute Block (Early Registration)',
@@ -15,17 +15,17 @@
 			},
 		},
 
-		edit: function( props ) {
+		edit( props ) {
 			return el( 'input', {
 				className: 'my-meta-input',
 				value: props.attributes.content,
-				onChange: function( event ) {
+				onChange( event ) {
 					props.setAttributes( { content: event.target.value } );
 				},
 			} );
 		},
 
-		save: function() {
+		save() {
 			return null;
 		},
 	} );

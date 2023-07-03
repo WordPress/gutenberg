@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
+const glob = require( 'glob' ).sync;
+const { join } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -15,7 +16,8 @@ const { version } = require( './package' );
  * @type {string}
  */
 const majorMinorRegExp =
-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
+	'(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -24,8 +26,176 @@ const majorMinorRegExp =
  */
 const developmentFiles = [
 	'**/benchmark/**/*.js',
-	'**/@(__mocks__|__tests__|test)/**/*.js',
-	'**/@(storybook|stories)/**/*.js',
+	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
+	'**/@(storybook|stories)/**/*.[tj]s?(x)',
+	'packages/babel-preset-default/bin/**/*.js',
+];
+
+// All files from packages that have types provided with TypeScript.
+const typedFiles = glob( 'packages/*/package.json' )
+	.filter( ( fileName ) => require( join( __dirname, fileName ) ).types )
+	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
+
+const restrictedImports = [
+	{
+		name: 'framer-motion',
+		message:
+			'Please use the Framer Motion API through `@wordpress/components` instead.',
+	},
+	{
+		name: 'lodash',
+		importNames: [
+			'camelCase',
+			'capitalize',
+			'castArray',
+			'chunk',
+			'clamp',
+			'clone',
+			'cloneDeep',
+			'compact',
+			'concat',
+			'countBy',
+			'debounce',
+			'deburr',
+			'defaults',
+			'defaultTo',
+			'delay',
+			'difference',
+			'differenceWith',
+			'dropRight',
+			'each',
+			'escape',
+			'escapeRegExp',
+			'every',
+			'extend',
+			'filter',
+			'find',
+			'findIndex',
+			'findKey',
+			'findLast',
+			'first',
+			'flatMap',
+			'flatten',
+			'flattenDeep',
+			'flow',
+			'flowRight',
+			'forEach',
+			'fromPairs',
+			'groupBy',
+			'has',
+			'identity',
+			'includes',
+			'invoke',
+			'isArray',
+			'isBoolean',
+			'isEmpty',
+			'isEqual',
+			'isFinite',
+			'isFunction',
+			'isMatch',
+			'isNil',
+			'isNumber',
+			'isObject',
+			'isObjectLike',
+			'isPlainObject',
+			'isString',
+			'isUndefined',
+			'kebabCase',
+			'keyBy',
+			'keys',
+			'last',
+			'lowerCase',
+			'map',
+			'mapKeys',
+			'mapValues',
+			'maxBy',
+			'memoize',
+			'merge',
+			'mergeWith',
+			'negate',
+			'noop',
+			'nth',
+			'omit',
+			'omitBy',
+			'once',
+			'orderby',
+			'overEvery',
+			'partial',
+			'partialRight',
+			'pick',
+			'pickBy',
+			'random',
+			'reduce',
+			'reject',
+			'repeat',
+			'reverse',
+			'setWith',
+			'size',
+			'snakeCase',
+			'some',
+			'sortBy',
+			'startCase',
+			'startsWith',
+			'stubFalse',
+			'stubTrue',
+			'sum',
+			'sumBy',
+			'take',
+			'throttle',
+			'times',
+			'toString',
+			'trim',
+			'truncate',
+			'unescape',
+			'unionBy',
+			'uniq',
+			'uniqBy',
+			'uniqueId',
+			'uniqWith',
+			'upperFirst',
+			'values',
+			'without',
+			'words',
+			'xor',
+			'zip',
+		],
+		message:
+			'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
+	},
+	{
+		name: 'reakit',
+		message:
+			'Please use Reakit API through `@wordpress/components` instead.',
+	},
+	{
+		name: 'redux',
+		importNames: [ 'combineReducers' ],
+		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
+	},
+	{
+		name: 'puppeteer-testing-library',
+		message: '`puppeteer-testing-library` is still experimental.',
+	},
+	{
+		name: '@emotion/css',
+		message:
+			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+	},
+	{
+		name: '@wordpress/edit-post',
+		message:
+			"edit-post is a WordPress top level package that shouldn't be imported into other packages",
+	},
+	{
+		name: '@wordpress/edit-site',
+		message:
+			"edit-site is a WordPress top level package that shouldn't be imported into other packages",
+	},
+	{
+		name: '@wordpress/edit-widgets',
+		message:
+			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
+	},
 ];
 
 module.exports = {
@@ -34,7 +204,6 @@ module.exports = {
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
 	],
-	plugins: [ 'import' ],
 	globals: {
 		wp: 'off',
 	},
@@ -42,16 +211,41 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/internal-regex': null,
+		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
 		'@wordpress/dependency-group': 'error',
-		'@wordpress/gutenberg-phase': 'error',
+		'@wordpress/is-gutenberg-plugin': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
 			{
 				allowedTextDomain: 'default',
+			},
+		],
+		'@wordpress/no-unsafe-wp-apis': 'off',
+		'@wordpress/data-no-store-string-literals': 'error',
+		'import/default': 'error',
+		'import/named': 'error',
+		'no-restricted-imports': [
+			'error',
+			{
+				paths: restrictedImports,
+			},
+		],
+		'@typescript-eslint/no-restricted-imports': [
+			'error',
+			{
+				paths: [
+					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
+						allowTypeImports: true,
+					},
+				],
 			},
 		],
 		'no-restricted-syntax': [
@@ -67,12 +261,6 @@ module.exports = {
 			},
 			{
 				selector:
-					'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb.cjs)/]',
-				message:
-					'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
-			},
-			{
-				selector:
 					'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' +
 					majorMinorRegExp +
 					'/]',
@@ -81,17 +269,13 @@ module.exports = {
 			},
 			{
 				selector:
-					'ImportDeclaration[source.value="redux"] Identifier.imported[name="combineReducers"]',
-				message: 'Use `combineReducers` from `@wordpress/data`',
-			},
-			{
-				selector:
-					'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
-				message: 'Use memize instead of Lodash’s memoize',
-			},
-			{
-				selector:
 					'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+				message:
+					'This method is deprecated. You should use the more explicit API methods available.',
+			},
+			{
+				selector:
+					'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
@@ -121,21 +305,26 @@ module.exports = {
 					'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
 			},
 		],
-		// Temporarily converted to warning until all errors are resolved.
-		// See https://github.com/WordPress/gutenberg/pull/22771 for the eslint-plugin-jsdoc update.
-		'jsdoc/check-param-names': 'warn',
-		'jsdoc/require-param': 'warn',
 	},
 	overrides: [
 		{
-			files: [ 'packages/**/*.js' ],
-			excludedFiles: [
+			files: [
 				'**/*.@(android|ios|native).js',
+				'packages/react-native-*/**/*.js',
 				...developmentFiles,
 			],
 			rules: {
-				'import/no-extraneous-dependencies': 'error',
-				'import/no-unresolved': 'error',
+				'import/default': 'off',
+				'import/no-extraneous-dependencies': 'off',
+				'import/no-unresolved': 'off',
+				'import/named': 'off',
+				'@wordpress/data-no-store-string-literals': 'off',
+			},
+		},
+		{
+			files: [ 'packages/react-native-*/**/*.js' ],
+			settings: {
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549.
 			},
 		},
 		{
@@ -149,7 +338,6 @@ module.exports = {
 					'error',
 					{
 						forbid: [
-							[ 'button', 'Button' ],
 							[ 'circle', 'Circle' ],
 							[ 'g', 'G' ],
 							[ 'path', 'Path' ],
@@ -167,20 +355,142 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/jest*/**/*.js' ],
+			files: [
+				// Components package.
+				'packages/components/src/**/*.[tj]s?(x)',
+				// Navigation block.
+				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
+			],
+			excludedFiles: [ ...developmentFiles ],
+			rules: {
+				'react-hooks/exhaustive-deps': 'error',
+			},
+		},
+		{
+			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
+			excludedFiles: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
+			files: [ '**/test/**/*.[tj]s?(x)' ],
+			excludedFiles: [
+				'**/*.@(android|ios|native).[tj]s?(x)',
+				'packages/react-native-*/**/*.[tj]s?(x)',
+				'test/native/**/*.[tj]s?(x)',
+				'test/e2e/**/*.[tj]s?(x)',
+				'test/performance/**/*.[tj]s?(x)',
+				'test/storybook-playwright/**/*.[tj]s?(x)',
+			],
+			extends: [
+				'plugin:jest-dom/recommended',
+				'plugin:testing-library/react',
+				'plugin:jest/recommended',
+			],
+		},
+		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
+			excludedFiles: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
 			rules: {
 				'jest/expect-expect': 'off',
 			},
 		},
 		{
-			files: [ 'bin/**/*.js' ],
+			files: [
+				'test/e2e/**/*.[tj]s',
+				'test/performance/**/*.[tj]s',
+				'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			],
+			extends: [
+				'plugin:eslint-plugin-playwright/playwright-test',
+				'plugin:@typescript-eslint/base',
+			],
+			parserOptions: {
+				tsconfigRootDir: __dirname,
+				project: [
+					'./test/e2e/tsconfig.json',
+					'./test/performance/tsconfig.json',
+					'./packages/e2e-test-utils-playwright/tsconfig.json',
+				],
+			},
+			rules: {
+				'@wordpress/no-global-active-element': 'off',
+				'@wordpress/no-global-get-selection': 'off',
+				'playwright/no-page-pause': 'error',
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector: 'CallExpression[callee.property.name="$"]',
+						message:
+							'`$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector: 'CallExpression[callee.property.name="$$"]',
+						message:
+							'`$$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector:
+							'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
+						message: 'Prefer page.locator instead.',
+					},
+				],
+				'@typescript-eslint/await-thenable': 'error',
+				'@typescript-eslint/no-floating-promises': 'error',
+				'@typescript-eslint/no-misused-promises': 'error',
+			},
+		},
+		{
+			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
+			},
+		},
+		{
+			files: typedFiles,
+			rules: {
+				'jsdoc/no-undefined-types': 'off',
+				'jsdoc/valid-types': 'off',
+			},
+		},
+		{
+			files: [
+				'**/@(storybook|stories)/*',
+				'packages/components/src/**/*.tsx',
+			],
+			rules: {
+				// Useful to add story descriptions via JSDoc without specifying params,
+				// or in TypeScript files where params are likely already documented outside of the JSDoc.
+				'jsdoc/require-param': 'off',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			plugins: [ 'ssr-friendly' ],
+			extends: [ 'plugin:ssr-friendly/recommended' ],
+		},
+		{
+			files: [ 'packages/block-editor/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/api-fetch',
+								message:
+									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+							{
+								name: '@wordpress/core-data',
+								message:
+									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+						],
+					},
+				],
 			},
 		},
 	],

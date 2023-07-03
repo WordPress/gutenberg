@@ -1,18 +1,24 @@
 /**
  * External dependencies
  */
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
-import { mount } from 'enzyme';
-import { act } from 'react-dom/test-utils';
+import {
+	act,
+	addBlock,
+	fireEvent,
+	getBlock,
+	initializeEditor,
+	render,
+	setupCoreBlocks,
+} from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
-import { registerCoreBlocks } from '@wordpress/block-library';
+import RNReactNativeGutenbergBridge, {
+	subscribeParentToggleHTMLMode,
+} from '@wordpress/react-native-bridge';
 // Force register 'core/editor' store.
 import { store } from '@wordpress/editor'; // eslint-disable-line no-unused-vars
-
-jest.mock( '../components/layout', () => () => 'Layout' );
 
 /**
  * Internal dependencies
@@ -26,15 +32,23 @@ const unsupportedBlock = `
 <!-- /wp:notablock -->
 `;
 
-describe( 'Editor', () => {
-	beforeAll( registerCoreBlocks );
+beforeAll( () => {
+	jest.useFakeTimers( { legacyFakeTimers: true } );
+} );
 
+afterAll( () => {
+	jest.runOnlyPendingTimers();
+	jest.useRealTimers();
+} );
+
+setupCoreBlocks();
+
+describe( 'Editor', () => {
 	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
-		jest.useFakeTimers();
 		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();
 
 		const appContainer = renderEditorWith( unsupportedBlock );
-		// for some reason resetEditorBlocks() is asynchronous when dispatching editEntityRecord
+		// For some reason resetEditorBlocks() is asynchronous when dispatching editEntityRecord.
 		act( () => {
 			jest.runAllTicks();
 		} );
@@ -47,16 +61,37 @@ describe( 'Editor', () => {
 			RNReactNativeGutenbergBridge.editorDidMount
 		).toHaveBeenCalledWith( [ 'core/notablock' ] );
 	} );
+
+	it( 'toggles the editor from Visual to HTML mode', async () => {
+		// Arrange
+		let toggleMode;
+		subscribeParentToggleHTMLMode.mockImplementation( ( callback ) => {
+			toggleMode = callback;
+		} );
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+
+		toggleMode();
+
+		// Assert
+		const htmlEditor = await screen.findByLabelText( 'html-view-content' );
+		expect( htmlEditor ).toBeVisible();
+	} );
 } );
 
-// Utilities
+// Utilities.
 const renderEditorWith = ( content ) => {
-	return mount(
+	return render(
 		<Editor
 			initialHtml={ content }
 			initialHtmlModeEnabled={ false }
 			initialTitle={ '' }
 			postType="post"
+			postId="1"
 		/>
 	);
 };

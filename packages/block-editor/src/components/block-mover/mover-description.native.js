@@ -13,10 +13,8 @@ const horizontalMover = {
 	forwardButtonIcon: arrowRight,
 	backwardButtonHint: __( 'Double tap to move the block to the left' ),
 	forwardButtonHint: __( 'Double tap to move the block to the right' ),
-	/* translators: %s: block title e.g: "Paragraph" */
-	firstBlockTitle: __( 'Move %s Left' ),
-	/* translators: %s: block title e.g: "Paragraph" */
-	lastBlockTitle: __( 'Move %s Right' ),
+	firstBlockTitle: __( 'Move block left' ),
+	lastBlockTitle: __( 'Move block right' ),
 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
 	backwardButtonTitle: __(
 		'Move block left from position %1$s to position %2$s'
@@ -32,10 +30,8 @@ const verticalMover = {
 	forwardButtonIcon: arrowDown,
 	backwardButtonHint: __( 'Double tap to move the block up' ),
 	forwardButtonHint: __( 'Double tap to move the block down' ),
-	/* translators: %s: block title e.g: "Paragraph" */
-	firstBlockTitle: __( 'Move %s Up' ),
-	/* translators: %s: block title e.g: "Paragraph" */
-	lastBlockTitle: __( 'Move %s Down' ),
+	firstBlockTitle: __( 'Move block up' ),
+	lastBlockTitle: __( 'Move block down' ),
 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
 	backwardButtonTitle: __( 'Move block up from row %1$s to row %2$s' ),
 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
@@ -53,14 +49,13 @@ const SETUP_GETTER = {
 
 export function getMoversSetup(
 	isStackedHorizontally,
-	{ firstIndex, keys = KEYS, blockTitle }
+	{ firstIndex, keys = KEYS }
 ) {
 	return keys.reduce( ( setup, key ) => {
 		if ( KEYS.includes( key ) ) {
 			Object.assign( setup, {
 				[ key ]: getSetup( key, isStackedHorizontally, {
 					firstIndex,
-					blockTitle,
 				} ),
 			} );
 		}
@@ -75,11 +70,11 @@ function switchButtonPropIfRTL(
 	isStackedHorizontally
 ) {
 	if ( I18nManager.isRTL && isStackedHorizontally ) {
-		// for RTL and horizontal direction switch prop between forward and backward button
+		// For RTL and horizontal direction switch prop between forward and backward button.
 		if ( isBackwardButton ) {
-			return forwardButtonProp; // set forwardButtonProp for backward button
+			return forwardButtonProp; // Set forwardButtonProp for backward button.
 		}
-		return backwardButtonProp; // set backwardButtonProp for forward button
+		return backwardButtonProp; // Set backwardButtonProp for forward button.
 	}
 
 	return isBackwardButton ? backwardButtonProp : forwardButtonProp;
@@ -115,7 +110,7 @@ function getArrowIcon( isStackedHorizontally ) {
 	};
 }
 
-function getMoverActionTitle( isStackedHorizontally, { blockTitle } ) {
+function getMoverActionTitle( isStackedHorizontally ) {
 	const { firstBlockTitle, lastBlockTitle } = getMoverDescription(
 		isStackedHorizontally
 	);
@@ -126,17 +121,17 @@ function getMoverActionTitle( isStackedHorizontally, { blockTitle } ) {
 	const actionTitleNext = applyRTLSetup( false, args );
 
 	return {
-		backward: sprintf( actionTitlePrev, blockTitle ),
-		forward: sprintf( actionTitleNext, blockTitle ),
+		backward: sprintf( actionTitlePrev, firstBlockTitle ),
+		forward: sprintf( actionTitleNext, lastBlockTitle ),
 	};
 }
 
 function getMoverButtonTitle( isStackedHorizontally, { firstIndex } ) {
 	const getIndexes = ( isBackwardButton ) => {
-		const fromIndex = firstIndex + 1; // current position based on index
+		const fromIndex = firstIndex + 1; // Current position based on index
 		// for backwardButton decrease index (move left/up) for forwardButton increase index (move right/down)
 		const direction = isBackwardButton ? -1 : 1;
-		const toIndex = fromIndex + direction; // position after move
+		const toIndex = fromIndex + direction; // Position after move.
 		return [ fromIndex, toIndex ];
 	};
 
@@ -145,8 +140,8 @@ function getMoverButtonTitle( isStackedHorizontally, { firstIndex } ) {
 	);
 
 	const args = [
-		backwardButtonTitle,
 		forwardButtonTitle,
+		backwardButtonTitle,
 		isStackedHorizontally,
 	];
 

@@ -1,84 +1,79 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
-import { hasBlockSupport } from '@wordpress/blocks';
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+import { useState, useRef, useEffect } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
-import { cleanEmptyObject } from './utils';
-import { useCustomUnits } from '../components/unit-control';
+import BlockPopover from '../components/block-popover';
+import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 
-export const PADDING_SUPPORT_KEY = '__experimentalPadding';
+function getComputedCSS( element, property ) {
+	return element.ownerDocument.defaultView
+		.getComputedStyle( element )
+		.getPropertyValue( property );
+}
 
-/**
- * Inspector control panel containing the line height related configuration
- *
- * @param {Object} props
- *
- * @return {WPElement} Line height edit element.
- */
-export function PaddingEdit( props ) {
-	const {
-		name: blockName,
-		attributes: { style },
-		setAttributes,
-	} = props;
+export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
+	const blockElement = useBlockElement( clientId );
+	const [ style, setStyle ] = useState();
 
-	const units = useCustomUnits();
+	const padding = attributes?.style?.spacing?.padding;
 
-	if ( ! hasBlockSupport( blockName, PADDING_SUPPORT_KEY ) ) {
+	useEffect( () => {
+		if ( ! blockElement ) {
+			return;
+		}
+
+		setStyle( {
+			borderTopWidth: getComputedCSS( blockElement, 'padding-top' ),
+			borderRightWidth: getComputedCSS( blockElement, 'padding-right' ),
+			borderBottomWidth: getComputedCSS( blockElement, 'padding-bottom' ),
+			borderLeftWidth: getComputedCSS( blockElement, 'padding-left' ),
+		} );
+	}, [ blockElement, padding ] );
+
+	const [ isActive, setIsActive ] = useState( false );
+	const valueRef = useRef( padding );
+	const timeoutRef = useRef();
+
+	const clearTimer = () => {
+		if ( timeoutRef.current ) {
+			window.clearTimeout( timeoutRef.current );
+		}
+	};
+
+	useEffect( () => {
+		if ( ! isShallowEqual( padding, valueRef.current ) && ! forceShow ) {
+			setIsActive( true );
+			valueRef.current = padding;
+
+			timeoutRef.current = setTimeout( () => {
+				setIsActive( false );
+			}, 400 );
+		}
+
+		return () => {
+			setIsActive( false );
+			clearTimer();
+		};
+	}, [ padding, forceShow ] );
+
+	if ( ! isActive && ! forceShow ) {
 		return null;
 	}
 
-	const onChange = ( next ) => {
-		const newStyle = {
-			...style,
-			spacing: {
-				padding: next,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
-	const onChangeShowVisualizer = ( next ) => {
-		const newStyle = {
-			...style,
-			visualizers: {
-				padding: next,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
-	return Platform.select( {
-		web: (
-			<>
-				<BoxControl
-					values={ style?.spacing?.padding }
-					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
-					label={ __( 'Padding' ) }
-					units={ units }
-				/>
-			</>
-		),
-		native: null,
-	} );
+	return (
+		<BlockPopover
+			clientId={ clientId }
+			__unstableCoverTarget
+			__unstableRefreshSize={ padding }
+			__unstablePopoverSlot="block-toolbar"
+			shift={ false }
+		>
+			<div className="block-editor__padding-visualizer" style={ style } />
+		</BlockPopover>
+	);
 }
-
-export const paddingStyleMappings = {
-	paddingTop: [ 'spacing', 'padding', 'top' ],
-	paddingRight: [ 'spacing', 'padding', 'right' ],
-	paddingBottom: [ 'spacing', 'padding', 'bottom' ],
-	paddingLeft: [ 'spacing', 'padding', 'left' ],
-};

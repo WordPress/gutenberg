@@ -1,35 +1,33 @@
-/**
- * External dependencies
- */
-import { uniqueId, take } from 'lodash';
+let uniqueIdCounter = 1;
+
+export const uniqueId = () => uniqueIdCounter++;
 
 export const fauxEntitySuggestions = [
 	{
 		id: uniqueId(),
 		title: 'Hello Page',
-		type: 'Page',
+		type: 'page',
 		info: '2 days ago',
 		url: `?p=${ uniqueId() }`,
 	},
 	{
 		id: uniqueId(),
 		title: 'Hello Post',
-		type: 'Post',
+		type: 'post',
 		info: '19 days ago',
 		url: `?p=${ uniqueId() }`,
 	},
 	{
 		id: uniqueId(),
 		title: 'Hello Another One',
-		type: 'Page',
+		type: 'page',
 		info: '19 days ago',
 		url: `?p=${ uniqueId() }`,
 	},
 	{
 		id: uniqueId(),
-		title:
-			'This is another Post with a much longer title just to be really annoying and to try and break the UI',
-		type: 'Post',
+		title: 'This is another Post with a much longer title just to be really annoying and to try and break the UI',
+		type: 'post',
 		info: '1 month ago',
 		url: `?p=${ uniqueId() }`,
 	},
@@ -38,10 +36,10 @@ export const fauxEntitySuggestions = [
 /* eslint-disable no-unused-vars */
 export const fetchFauxEntitySuggestions = (
 	val = '',
-	{ perPage = null } = {}
+	{ isInitialSuggestions } = {}
 ) => {
-	const suggestions = perPage
-		? take( fauxEntitySuggestions, perPage )
+	const suggestions = isInitialSuggestions
+		? fauxEntitySuggestions.slice( 0, 3 )
 		: fauxEntitySuggestions;
 	return Promise.resolve( suggestions );
 };

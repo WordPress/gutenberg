@@ -1,0 +1,19 @@
+.edit-site-editor-canvas-container {
+	background: $white; // Fallback color, overridden by JavaScript.
+	border-radius: $radius-block-ui;
+	bottom: 0;
+	left: 0;
+	overflow: hidden;
+	position: absolute;
+	right: 0;
+	top: 0;
+	transition: all 0.3s; // Match .block-editor-iframe__body transition.
+}
+
+.edit-site-editor-canvas-container__close-button {
+	position: absolute;
+	right: $grid-unit-10;
+	top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
+	z-index: 1;
+	background: $white;
+}

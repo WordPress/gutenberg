@@ -1,176 +1,221 @@
 /**
- * External dependencies
- */
-import { some, groupBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
-import { __, sprintf, _n } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
-import { close as closeIcon } from '@wordpress/icons';
+import { Button, Flex, FlexItem } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { useCallback, useRef } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
+import { useIsDirty } from './hooks/use-is-dirty';
 
-const ENTITY_NAMES = {
-	wp_template_part: ( number ) =>
-		_n( 'template part', 'template parts', number ),
-	wp_template: ( number ) => _n( 'template', 'templates', number ),
-	post: ( number ) => _n( 'post', 'posts', number ),
-	page: ( number ) => _n( 'page', 'pages', number ),
-	site: ( number ) => _n( 'site', 'sites', number ),
-};
+const PUBLISH_ON_SAVE_ENTITIES = [
+	{
+		kind: 'postType',
+		name: 'wp_navigation',
+	},
+];
 
-const PLACEHOLDER_PHRASES = {
-	// 0 is a back up, but should never be observed.
-	0: __( 'There are no changes.' ),
-	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	1: __( 'Changes have been made to your %s.' ),
-	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	2: __( 'Changes have been made to your %1$s and %2$s.' ),
-	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	3: __( 'Changes have been made to your %1$s, %2$s, and %3$s.' ),
-	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	4: __( 'Changes have been made to your %1$s, %2$s, %3$s, and %4$s.' ),
-	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	5: __( 'Changes have been made to your %1$s, %2$s, %3$s, %4$s, and %5$s.' ),
-};
+function identity( values ) {
+	return values;
+}
 
-export default function EntitiesSavedStates( { isOpen, close } ) {
-	const { dirtyEntityRecords } = useSelect( ( select ) => {
-		return {
-			dirtyEntityRecords: select(
-				'core'
-			).__experimentalGetDirtyEntityRecords(),
-		};
-	}, [] );
-	const { saveEditedEntityRecord } = useDispatch( 'core' );
+export default function EntitiesSavedStates( { close } ) {
+	const isDirtyProps = useIsDirty();
+	return (
+		<EntitiesSavedStatesExtensible close={ close } { ...isDirtyProps } />
+	);
+}
+
+export function EntitiesSavedStatesExtensible( {
+	additionalPrompt = undefined,
+	close,
+	onSave = identity,
+	saveEnabled: saveEnabledProp = undefined,
+	saveLabel = __( 'Save' ),
+
+	dirtyEntityRecords,
+	isDirty,
+	setUnselectedEntities,
+	unselectedEntities,
+} ) {
+	const saveButtonRef = useRef();
+	const {
+		editEntityRecord,
+		saveEditedEntityRecord,
+		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
+	} = useDispatch( coreStore );
+
+	const { __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
+
+	const { createSuccessNotice, createErrorNotice, removeNotice } =
+		useDispatch( noticesStore );
 
 	// To group entities by type.
-	const partitionedSavables = Object.values(
-		groupBy( dirtyEntityRecords, 'name' )
-	);
-
-	// Get labels for text-prompt phrase.
-	const entityNamesForPrompt = [];
-	partitionedSavables.forEach( ( list ) => {
-		if ( ENTITY_NAMES[ list[ 0 ].name ] ) {
-			entityNamesForPrompt.push(
-				ENTITY_NAMES[ list[ 0 ].name ]( list.length )
-			);
+	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
+		const { name } = record;
+		if ( ! acc[ name ] ) {
+			acc[ name ] = [];
 		}
-	} );
-	// Get text-prompt phrase based on number of entity types changed.
-	const placeholderPhrase =
-		PLACEHOLDER_PHRASES[ entityNamesForPrompt.length ] ||
-		// Fallback for edge case that should not be observed (more than 5 entity types edited).
-		__( 'Changes have been made to multiple entity types.' );
-	// eslint-disable-next-line @wordpress/valid-sprintf
-	const promptPhrase = sprintf( placeholderPhrase, ...entityNamesForPrompt );
+		acc[ name ].push( record );
+		return acc;
+	}, {} );
 
-	// Unchecked entities to be ignored by save function.
-	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
+	// Sort entity groups.
+	const {
+		site: siteSavables,
+		wp_template: templateSavables,
+		wp_template_part: templatePartSavables,
+		...contentSavables
+	} = partitionedSavables;
+	const sortedPartitionedSavables = [
+		siteSavables,
+		templateSavables,
+		templatePartSavables,
+		...Object.values( contentSavables ),
+	].filter( Array.isArray );
 
-	const setUnselectedEntities = ( { kind, name, key }, checked ) => {
-		if ( checked ) {
-			_setUnselectedEntities(
-				unselectedEntities.filter(
-					( elt ) =>
-						elt.kind !== kind ||
-						elt.name !== name ||
-						elt.key !== key
-				)
-			);
-		} else {
-			_setUnselectedEntities( [
-				...unselectedEntities,
-				{ kind, name, key },
-			] );
-		}
-	};
+	const saveEnabled = saveEnabledProp ?? isDirty;
 
 	const saveCheckedEntities = () => {
+		const saveNoticeId = 'site-editor-save-success';
+		removeNotice( saveNoticeId );
 		const entitiesToSave = dirtyEntityRecords.filter(
-			( { kind, name, key } ) => {
-				return ! some(
-					unselectedEntities,
+			( { kind, name, key, property } ) => {
+				return ! unselectedEntities.some(
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&
-						elt.key === key
+						elt.key === key &&
+						elt.property === property
 				);
 			}
 		);
 
 		close( entitiesToSave );
 
-		entitiesToSave.forEach( ( { kind, name, key } ) => {
-			saveEditedEntityRecord( kind, name, key );
-		} );
-	};
+		const siteItemsToSave = [];
+		const pendingSavedRecords = [];
+		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
+			if ( 'root' === kind && 'site' === name ) {
+				siteItemsToSave.push( property );
+			} else {
+				if (
+					PUBLISH_ON_SAVE_ENTITIES.some(
+						( typeToPublish ) =>
+							typeToPublish.kind === kind &&
+							typeToPublish.name === name
+					)
+				) {
+					editEntityRecord( kind, name, key, { status: 'publish' } );
+				}
 
-	const [ isReviewing, setIsReviewing ] = useState( false );
-	const toggleIsReviewing = () => setIsReviewing( ( value ) => ! value );
+				pendingSavedRecords.push(
+					saveEditedEntityRecord( kind, name, key )
+				);
+			}
+		} );
+		if ( siteItemsToSave.length ) {
+			pendingSavedRecords.push(
+				saveSpecifiedEntityEdits(
+					'root',
+					'site',
+					undefined,
+					siteItemsToSave
+				)
+			);
+		}
+
+		__unstableMarkLastChangeAsPersistent();
+
+		Promise.all( pendingSavedRecords )
+			.then( ( values ) => {
+				return onSave( values );
+			} )
+			.then( ( values ) => {
+				if (
+					values.some( ( value ) => typeof value === 'undefined' )
+				) {
+					createErrorNotice( __( 'Saving failed.' ) );
+				} else {
+					createSuccessNotice( __( 'Site updated.' ), {
+						type: 'snackbar',
+						id: saveNoticeId,
+					} );
+				}
+			} )
+			.catch( ( error ) =>
+				createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` )
+			);
+	};
 
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
 
-	return isOpen ? (
-		<div className="entities-saved-states__panel">
-			<div className="entities-saved-states__panel-header">
-				<Button
-					isPrimary
-					disabled={
-						dirtyEntityRecords.length -
-							unselectedEntities.length ===
-						0
-					}
+	const [ saveDialogRef, saveDialogProps ] = useDialog( {
+		onClose: () => dismissPanel(),
+	} );
+
+	return (
+		<div
+			ref={ saveDialogRef }
+			{ ...saveDialogProps }
+			className="entities-saved-states__panel"
+		>
+			<Flex className="entities-saved-states__panel-header" gap={ 2 }>
+				<FlexItem
+					isBlock
+					as={ Button }
+					ref={ saveButtonRef }
+					variant="primary"
+					disabled={ ! saveEnabled }
 					onClick={ saveCheckedEntities }
 					className="editor-entities-saved-states__save-button"
 				>
-					{ __( 'Save' ) }
-				</Button>
-				<Button
+					{ saveLabel }
+				</FlexItem>
+				<FlexItem
+					isBlock
+					as={ Button }
+					variant="secondary"
 					onClick={ dismissPanel }
-					icon={ closeIcon }
-					label={ __( 'Close panel' ) }
-				/>
-			</div>
+				>
+					{ __( 'Cancel' ) }
+				</FlexItem>
+			</Flex>
 
 			<div className="entities-saved-states__text-prompt">
 				<strong>{ __( 'Are you ready to save?' ) }</strong>
-				<p>{ promptPhrase }</p>
-				<p>
-					<Button
-						onClick={ toggleIsReviewing }
-						isLink
-						className="entities-saved-states__review-changes-button"
-					>
-						{ isReviewing
-							? __( 'Hide changes.' )
-							: __( 'Review changes.' ) }
-					</Button>
-				</p>
+				{ additionalPrompt }
+				{ isDirty && (
+					<p>
+						{ __(
+							'The following changes have been made to your site, templates, and content.'
+						) }
+					</p>
+				) }
 			</div>
 
-			{ isReviewing &&
-				partitionedSavables.map( ( list ) => {
-					return (
-						<EntityTypeList
-							key={ list[ 0 ].name }
-							list={ list }
-							closePanel={ dismissPanel }
-							unselectedEntities={ unselectedEntities }
-							setUnselectedEntities={ setUnselectedEntities }
-						/>
-					);
-				} ) }
+			{ sortedPartitionedSavables.map( ( list ) => {
+				return (
+					<EntityTypeList
+						key={ list[ 0 ].name }
+						list={ list }
+						closePanel={ dismissPanel }
+						unselectedEntities={ unselectedEntities }
+						setUnselectedEntities={ setUnselectedEntities }
+					/>
+				);
+			} ) }
 		</div>
-	) : null;
+	);
 }

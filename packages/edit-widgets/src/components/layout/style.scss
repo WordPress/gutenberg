@@ -1,0 +1,36 @@
+.edit-widgets-layout__inserter-panel {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	.block-editor-inserter__menu {
+		overflow: hidden;
+	}
+}
+
+.edit-widgets-layout__inserter-panel-header {
+	padding-top: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	display: flex;
+	justify-content: flex-end;
+}
+
+.edit-widgets-layout__inserter-panel-content {
+	// Leave space for the close button
+	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+
+	@include break-medium() {
+		height: 100%;
+	}
+}
+
+.blocks-widgets-container {
+	// making the header be lower than the content
+	// so the fixed toolbar can be positioned on top of it
+	// but only on desktop
+	@include break-medium() {
+		.interface-interface-skeleton__header:not(:focus-within) {
+			z-index: 19;
+		}
+	}
+
+}

@@ -1,10 +1,10 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
- * Given the current and next item entity, returns the minimally "modified"
+ * Given the current and next item entity record, returns the minimally "modified"
  * result of the next item, preferring value references from the original item
  * if equal. If all values match, the original item is returned.
  *
@@ -22,7 +22,7 @@ export default function conservativeMapItem( item, nextItem ) {
 	let hasChanges = false;
 	const result = {};
 	for ( const key in nextItem ) {
-		if ( isEqual( item[ key ], nextItem[ key ] ) ) {
+		if ( fastDeepEqual( item[ key ], nextItem[ key ] ) ) {
 			result[ key ] = item[ key ];
 		} else {
 			hasChanges = true;
@@ -33,5 +33,15 @@ export default function conservativeMapItem( item, nextItem ) {
 	if ( ! hasChanges ) {
 		return item;
 	}
+
+	// Only at this point, backfill properties from the original item which
+	// weren't explicitly set into the result above. This is an optimization
+	// to allow `hasChanges` to return early.
+	for ( const key in item ) {
+		if ( ! result.hasOwnProperty( key ) ) {
+			result[ key ] = item[ key ];
+		}
+	}
+
 	return result;
 }

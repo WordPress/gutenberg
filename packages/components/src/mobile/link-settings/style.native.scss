@@ -1,0 +1,21 @@
+.linkSettingsPanel {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+// used in both light and dark modes
+.placeholderTextColor {
+	color: #87a6bc;
+}
+
+.optionIcon {
+	color: $blue-50;
+}
+
+.optionIconDark {
+	color: $blue-30;
+}
+
+.unselectedOptionIcon {
+	opacity: 0;
+}

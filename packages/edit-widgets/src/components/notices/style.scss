@@ -6,3 +6,21 @@
 	padding-right: 16px;
 }
 @include editor-left(".edit-widgets-notices__snackbar");
+
+.edit-widgets-notices__dismissible,
+.edit-widgets-notices__pinned {
+	.components-notice {
+		box-sizing: border-box;
+		margin: 0;
+		border-bottom: $border-width solid rgba(0, 0, 0, 0.2);
+		padding: 0 $grid-unit-15;
+
+		// Min-height matches the height of a single-line notice with an action button.
+		min-height: $header-height;
+
+		// Margins ensure that the dismiss button aligns to the center of the first line of text.
+		.components-notice__dismiss {
+			margin-top: $grid-unit-15;
+		}
+	}
+}

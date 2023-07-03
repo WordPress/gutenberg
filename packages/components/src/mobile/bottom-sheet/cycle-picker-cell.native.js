@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { findIndex } from 'lodash';
-/**
  * Internal dependencies
  */
 import Cell from './cell';
@@ -14,7 +10,9 @@ export default function BottomSheetCyclePickerCell( props ) {
 		return options[ ( selectedOptionIndex + 1 ) % options.length ].value;
 	};
 
-	const selectedOptionIndex = findIndex( options, [ 'value', value ] );
+	const selectedOptionIndex = options.findIndex(
+		( option ) => option.value === value
+	);
 	const optionsContainsValue =
 		options.length > 0 && selectedOptionIndex !== -1;
 

@@ -1,7 +1,8 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { parse, stringify } from 'qs';
+import { getQueryArgs } from './get-query-args';
+import { buildQueryString } from './build-query-string';
 
 /**
  * Removes arguments from the query string of the url
@@ -18,14 +19,13 @@ import { parse, stringify } from 'qs';
  */
 export function removeQueryArgs( url, ...args ) {
 	const queryStringIndex = url.indexOf( '?' );
-	const query =
-		queryStringIndex !== -1
-			? parse( url.substr( queryStringIndex + 1 ) )
-			: {};
-	const baseUrl =
-		queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
+	if ( queryStringIndex === -1 ) {
+		return url;
+	}
 
+	const query = getQueryArgs( url );
+	const baseURL = url.substr( 0, queryStringIndex );
 	args.forEach( ( arg ) => delete query[ arg ] );
-
-	return baseUrl + '?' + stringify( query );
+	const queryString = buildQueryString( query );
+	return queryString ? baseURL + '?' + queryString : baseURL;
 }

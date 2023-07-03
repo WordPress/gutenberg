@@ -6,9 +6,18 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
-import { navigateRegions } from '@wordpress/components';
+import { forwardRef, useEffect } from '@wordpress/element';
+import {
+	__unstableUseNavigateRegions as useNavigateRegions,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useMergeRefs } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import NavigableRegion from '../navigable-region';
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -24,16 +33,37 @@ function useHTMLClass( className ) {
 	}, [ className ] );
 }
 
-function InterfaceSkeleton( {
-	footer,
-	header,
-	sidebar,
-	leftSidebar,
-	content,
-	actions,
-	labels,
-	className,
-} ) {
+const headerVariants = {
+	hidden: { opacity: 0 },
+	hover: {
+		opacity: 1,
+		transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
+	},
+	distractionFreeInactive: { opacity: 1, transition: { delay: 0 } },
+};
+
+function InterfaceSkeleton(
+	{
+		isDistractionFree,
+		footer,
+		header,
+		editorNotices,
+		sidebar,
+		secondarySidebar,
+		notices,
+		content,
+		actions,
+		labels,
+		className,
+		enableRegionNavigation = true,
+		// Todo: does this need to be a prop.
+		// Can we use a dependency to keyboard-shortcuts directly?
+		shortcuts,
+	},
+	ref
+) {
+	const navigateRegionsProps = useNavigateRegions( shortcuts );
+
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
@@ -41,8 +71,8 @@ function InterfaceSkeleton( {
 		header: __( 'Header' ),
 		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
-		/* translators: accessibility text for the left sidebar landmark region. */
-		leftSidebar: __( 'Left sidebar' ),
+		/* translators: accessibility text for the secondary sidebar landmark region. */
+		secondarySidebar: __( 'Block Library' ),
 		/* translators: accessibility text for the settings landmark region. */
 		sidebar: __( 'Settings' ),
 		/* translators: accessibility text for the publish landmark region. */
@@ -55,73 +85,102 @@ function InterfaceSkeleton( {
 
 	return (
 		<div
+			{ ...( enableRegionNavigation ? navigateRegionsProps : {} ) }
+			ref={ useMergeRefs( [
+				ref,
+				enableRegionNavigation ? navigateRegionsProps.ref : undefined,
+			] ) }
 			className={ classnames(
 				className,
-				'interface-interface-skeleton'
+				'interface-interface-skeleton',
+				navigateRegionsProps.className,
+				!! footer && 'has-footer'
 			) }
 		>
-			{ !! header && (
-				<div
-					className="interface-interface-skeleton__header"
-					role="region"
-					aria-label={ mergedLabels.header }
-					tabIndex="-1"
-				>
-					{ header }
+			<div className="interface-interface-skeleton__editor">
+				{ !! header && (
+					<NavigableRegion
+						as={ motion.div }
+						className="interface-interface-skeleton__header"
+						aria-label={ mergedLabels.header }
+						initial={
+							isDistractionFree
+								? 'hidden'
+								: 'distractionFreeInactive'
+						}
+						whileHover={
+							isDistractionFree
+								? 'hover'
+								: 'distractionFreeInactive'
+						}
+						animate={
+							isDistractionFree
+								? 'hidden'
+								: 'distractionFreeInactive'
+						}
+						variants={ headerVariants }
+						transition={
+							isDistractionFree
+								? { type: 'tween', delay: 0.8 }
+								: undefined
+						}
+					>
+						{ header }
+					</NavigableRegion>
+				) }
+				{ isDistractionFree && (
+					<div className="interface-interface-skeleton__header">
+						{ editorNotices }
+					</div>
+				) }
+				<div className="interface-interface-skeleton__body">
+					{ !! secondarySidebar && (
+						<NavigableRegion
+							className="interface-interface-skeleton__secondary-sidebar"
+							ariaLabel={ mergedLabels.secondarySidebar }
+						>
+							{ secondarySidebar }
+						</NavigableRegion>
+					) }
+					{ !! notices && (
+						<div className="interface-interface-skeleton__notices">
+							{ notices }
+						</div>
+					) }
+					<NavigableRegion
+						className="interface-interface-skeleton__content"
+						ariaLabel={ mergedLabels.body }
+					>
+						{ content }
+					</NavigableRegion>
+					{ !! sidebar && (
+						<NavigableRegion
+							className="interface-interface-skeleton__sidebar"
+							ariaLabel={ mergedLabels.sidebar }
+						>
+							{ sidebar }
+						</NavigableRegion>
+					) }
+					{ !! actions && (
+						<NavigableRegion
+							className="interface-interface-skeleton__actions"
+							ariaLabel={ mergedLabels.actions }
+						>
+							{ actions }
+						</NavigableRegion>
+					) }
 				</div>
-			) }
-			<div className="interface-interface-skeleton__body">
-				{ !! leftSidebar && (
-					<div
-						className="interface-interface-skeleton__left-sidebar"
-						role="region"
-						aria-label={ mergedLabels.leftSidebar }
-						tabIndex="-1"
-					>
-						{ leftSidebar }
-					</div>
-				) }
-				<div
-					className="interface-interface-skeleton__content"
-					role="region"
-					aria-label={ mergedLabels.body }
-					tabIndex="-1"
-				>
-					{ content }
-				</div>
-				{ !! sidebar && (
-					<div
-						className="interface-interface-skeleton__sidebar"
-						role="region"
-						aria-label={ mergedLabels.sidebar }
-						tabIndex="-1"
-					>
-						{ sidebar }
-					</div>
-				) }
-				{ !! actions && (
-					<div
-						className="interface-interface-skeleton__actions"
-						role="region"
-						aria-label={ mergedLabels.actions }
-						tabIndex="-1"
-					>
-						{ actions }
-					</div>
-				) }
 			</div>
 			{ !! footer && (
-				<div
+				<NavigableRegion
 					className="interface-interface-skeleton__footer"
-					role="region"
-					aria-label={ mergedLabels.footer }
-					tabIndex="-1"
+					ariaLabel={ mergedLabels.footer }
 				>
 					{ footer }
-				</div>
+				</NavigableRegion>
 			) }
 		</div>
 	);
 }
 
-export default navigateRegions( InterfaceSkeleton );
+export default forwardRef( InterfaceSkeleton );

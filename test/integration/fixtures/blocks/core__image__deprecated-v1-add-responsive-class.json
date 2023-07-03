@@ -1,0 +1,13 @@
+[
+	{
+		"name": "core/image",
+		"isValid": true,
+		"attributes": {
+			"align": "left",
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"alt": "",
+			"caption": []
+		},
+		"innerBlocks": []
+	}
+]

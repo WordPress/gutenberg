@@ -1,9 +1,5 @@
-.wp-block-group {
-	&.has-background {
-		// Matches paragraph Block padding
-		// Todo: normalise with variables
-		padding: 20px 30px;
-		margin-top: 0;
-		margin-bottom: 0;
-	}
+// Add low specificity default padding to groups with backgrounds.
+:where(.wp-block-group.has-background) {
+	// Matches paragraph block padding.
+	padding: $block-bg-padding--v $block-bg-padding--h;
 }

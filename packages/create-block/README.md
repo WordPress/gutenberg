@@ -1,106 +1,152 @@
 # Create Block
 
-Create Block is an officially supported way to create blocks for registering a block for a WordPress plugin. It offers a modern build setup with no configuration. It generates PHP, JS, CSS code, and everything else you need to start the project.
+Create Block is an **officially supported tool for scaffolding a WordPress plugin that registers a block**. It generates PHP, JS, CSS code, and everything you need to start the project. It also integrates a modern build setup with no configuration.
 
-It is largely inspired by [create-react-app](https://create-react-app.dev/docs/getting-started). Major kudos to [@gaearon](https://github.com/gaearon), the whole Facebook team, and the React community.
+_It is largely inspired by [create-react-app](https://create-react-app.dev/docs/getting-started). Major kudos to [@gaearon](https://github.com/gaearon), the whole Facebook team, and the React community._
 
-## Description
+> **Blocks are the fundamental elements of modern WordPress sites**. Introduced in [WordPress 5.0](https://wordpress.org/news/2018/12/bebo/), they allow [page and post builder-like functionality](https://wordpress.org/gutenberg/) to every up-to-date WordPress website.
 
-Blocks are the fundamental element of the WordPress block editor. They are the primary way in which plugins and themes can register their own functionality and extend the capabilities of the editor.
+> _Learn more about the [Block API at the Gutenberg HandBook](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/)._
 
-Visit the [Gutenberg handbook](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/) to learn more about Block API.
+## Table of Contents
+
+- [Quick start](#quick-start)
+- [Usage](#usage)
+    - [Interactive Mode](#interactive-mode)
+    - [`slug`](#slug)
+    - [`options`](#options)
+- [Available Commands](#available-commands)
+- [External Project Templates](#external-project-templates)
+- [Contributing to this package](#contributing-to-this-package)
+
 
 ## Quick start
 
-![Demo](https://make.wordpress.org/core/files/2020/02/74508276-f0648280-4efe-11ea-9cc0-a607b43d1bcf.gif)
+```bash
+$ npx @wordpress/create-block todo-list
+$ cd todo-list
+$ npm start
+```
 
-You just need to provide the `slug` which is the target location for scaffolded files and the internal block name.
-  ```bash
-  $ npm init @wordpress/block todo-list
-  $ cd todo-list
-  $ npm start
-  ```
+The `slug` provided (`todo-list` in the example) defines the folder name for the scaffolded plugin and the internal block name. The WordPress plugin generated must [be installed manually](https://wordpress.org/documentation/article/manage-plugins/#manual-plugin-installation).
 
-_(requires `node` version `10.0.0` or above, and `npm` version `6.9.0` or above)_
 
-You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on the code.
+_(requires `node` version `14.0.0` or above, and `npm` version `6.14.4` or above)_
+
+
+> [Watch a video introduction to create-block on Learn.wordpress.org](https://learn.wordpress.org/tutorial/using-the-create-block-tool/)
 
 ## Usage
 
-The following command generates PHP, JS and CSS code for registering a block.
+The `create-block` command generates a project with PHP, JS, and CSS code for registering a block with a WordPress plugin.
 
 ```bash
-$ npm init @wordpress/block [options] [slug]
+$ npx @wordpress/create-block [options] [slug]
 ```
 
-`[slug]` is optional. When provided it triggers the quick mode where it is used as the block slug used for its identification, the output location for scaffolded files, and the name of the WordPress plugin. The rest of the configuration is set to all default values unless overriden with some of the options listed below.
+![Demo](https://user-images.githubusercontent.com/699132/103872910-4de15f00-50cf-11eb-8c74-67ca91a8c1a4.gif)
 
-Options:
-```
+> The name for a block is a unique string that identifies a block. Block Names are structured as `namespace`/`slug`, where namespace is the name of your plugin or theme.
+
+> In most cases, we recommended pairing blocks with WordPress plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
+
+### Interactive Mode
+
+When no `slug` is provided, the script will run in interactive mode and will start prompting for the input required (`slug`, title, namespace...) to scaffold the project.
+
+
+### `slug`
+
+The use of `slug` is optional.
+
+When provided it triggers the _quick mode_, where this `slug` is used:
+- as the block slug (required for its identification)
+- as the output location (folder name) for scaffolded files
+- as the name of the WordPress plugin.
+
+The rest of the configuration is set to all default values unless overridden with some options listed below.
+
+### `options`
+
+
+```bash
 -V, --version                output the version number
--t, --template <name>        block template type name, allowed values: "es5", "esnext" (default: "esnext")
+-t, --template <name>        project template type name; allowed values: "static" (default), "es5", the name of an external npm package, or the path to a local directory
+--no-plugin                  scaffold block files only
 --namespace <value>          internal namespace for the block name
---title <value>              display title for the block
---short-description <value>  short description for the block
+--title <value>              display title for the block and the WordPress plugin
+--short-description <value>  short description for the block and the WordPress plugin
 --category <name>            category name for the block
+--wp-scripts                 enable integration with `@wordpress/scripts` package
+--no-wp-scripts              disable integration with `@wordpress/scripts` package
+--wp-env                     enable integration with `@wordpress/env` package
 -h, --help                   output usage information
+--variant                    choose a block variant as defined by the template
 ```
 
-_Please note that `--version` and `--help` options don't work with `npm init`. You have to use `npx` instead, as presented in the examples._
+#### `--template`
 
-More examples:
-
-1. Interactive mode - it gives a chance to customize a few most important options before the code gets generated.
-  ```bash
-  $ npm init @wordpress/block
-  ```
-2. ES5 template – it is also possible to pick ES5 template when you don't want to deal with a build step (`npm start`) which enables ESNext and JSX support.
-  ```bash
-  $ npm init @wordpress/block --template es5
-  ```
-3. Help – you need to use `npx` to output usage information.
-  ```bash
-  $ npx @wordpress/create-block --help
-  ```
-
-When you scaffold a block, you must provide at least a `slug` name, the `namespace` which usually corresponds to either the `theme` or `plugin` name, and the `category`. In most cases, we recommended pairing blocks with plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
-
-## Available Commands
-
-Inside that bootstrapped directory _(it doesn't apply to `es5` template)_, you can run several commands:
+This argument specifies an _external npm package_ as a template.
 
 ```bash
-$ npm start
+$ npx @wordpress/create-block --template my-template-package
 ```
-Starts the build for development. [Learn more](/packages/scripts#start).
+
+This argument also allows to pick a _local directory_ as a template.
 
 ```bash
-$ npm run build
+$ npx @wordpress/create-block --template ./path/to/template-directory
 ```
-Builds the code for production. [Learn more](/packages/scripts#build).
+
+#### `--variant`
+
+With this argument, `create-block` will generate a [dynamic block](https://developer.wordpress.org/block-editor/explanations/glossary/#dynamic-block) based on the built-in template.
 
 ```bash
-$ npm run format:js
+$ npx @wordpress/create-block --variant dynamic
 ```
-Formats JavaScript files. [Learn more](/packages/scripts#format-js).
+
+#### `--help`
+
+With this argument, the `create-block` package outputs usage information.
 
 ```bash
-$ npm run lint:css
+$ npx @wordpress/create-block --help
 ```
-Lints CSS files. [Learn more](/packages/scripts#lint-style).
+
+#### `--no-plugin`
+
+With this argument, the `create-block` package runs in _No plugin mode_ which only scaffolds block files into the current directory.
 
 ```bash
-$ npm run lint:js
+$ npx @wordpress/create-block --no-plugin
 ```
-Lints JavaScript files. [Learn more](/packages/scripts#lint-js).
+#### `--wp-env`
+
+With this argument, the `create-block` package will add to the generated plugin the configuration and the script to run [`wp-env` package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) within the plugin. This will allow you to easily set up a local WordPress environment (via Docker) for building and testing the generated plugin.
 
 ```bash
-$ npm run packages-update
+$ npx @wordpress/create-block --wp-env
 ```
-Updates WordPress packages to the latest version. [Learn more](/packages/scripts#packages-update).
 
-## WP-CLI
+## Available commands in the scaffolded project
 
-Another way of making a developer’s life easier is to use [WP-CLI](https://wp-cli.org), which provides a command-line interface for many actions you might perform on the WordPress instance. One of the commands `wp scaffold block` was used as the baseline for this tool and ES5 template in particular.
+The plugin folder created when executing this command, is a node package with a modern build setup that requires no configuration.
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+A set of scripts is available from inside that folder (provided by the `scripts` package) to make your work easier. [Click here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#available-scripts) for a full description of these commands.
+
+_Note: You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on coding._
+
+For example, running the `start` script from inside the generated folder (`npm start`) would automatically start the build for development.
+
+## External Project Templates
+
+[Click here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/docs/external-template.md) for information on External Project Templates
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

@@ -1,0 +1,17 @@
+{
+	"core/edit-post": {
+		"preferences": {
+			"isGeneralSidebarDismissed": true,
+			"features": {
+				"fixedToolbar": false,
+				"showInserterHelpPanel": false,
+				"fullscreenMode": true,
+				"welcomeGuide": false
+			},
+			"editorMode": "visual",
+			"pinnedPluginItems": {},
+			"hiddenBlockTypes": [],
+			"preferredStyleVariations": {}
+		}
+	}
+}

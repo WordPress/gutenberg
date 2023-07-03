@@ -1,11 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Slot bubblesVirtually false should not break without a Provider 1`] = `
-<div>
-  <div />
-</div>
-`;
-
 exports[`Slot bubblesVirtually false should subsume another slot by the same name 1`] = `
 <div>
   <div
@@ -40,14 +34,6 @@ exports[`Slot bubblesVirtually false should unmount two slots with the same name
   <div
     data-position="second"
   />
-</div>
-`;
-
-exports[`Slot bubblesVirtually true should not break without a Provider 1`] = `
-<div>
-  <div>
-    <div />
-  </div>
 </div>
 `;
 
@@ -164,11 +150,24 @@ exports[`Slot should render empty Fills without HTML wrapper when render props u
 </div>
 `;
 
-exports[`Slot should render in expected order 1`] = `
+exports[`Slot should render in expected order when fills always mounted 1`] = `
 <div>
   <div>
-    first
+    first (rerendered)
     second
+    third
+    fourth (new)
+  </div>
+</div>
+`;
+
+exports[`Slot should render in expected order when fills unmounted 1`] = `
+<div>
+  <div>
+    second
+    third
+    first (rerendered)
+    fourth (new)
   </div>
   <button
     type="button"
@@ -176,5 +175,19 @@ exports[`Slot should render in expected order 1`] = `
   <button
     type="button"
   />
+  <button
+    type="button"
+  />
+  <button
+    type="button"
+  />
+</div>
+`;
+
+exports[`Slot should warn without a Provider 1`] = `
+<div>
+  <div>
+    <div />
+  </div>
 </div>
 `;

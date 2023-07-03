@@ -2,13 +2,20 @@
  * External dependencies
  */
 import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockType,
+	hasBlockSupport,
+	isReusableBlock,
+	isTemplatePart,
+} from '@wordpress/blocks';
+import { ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,37 +24,40 @@ import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
 import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
-import BlockFormatControls from '../block-format-controls';
+import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
-import BlockDraggable from '../block-draggable';
-import { useShowMoversGestures, useToggleBlockHighlight } from './utils';
+import { BlockLockToolbar } from '../block-lock';
+import { BlockGroupToolbar } from '../convert-to-group-buttons';
+import BlockEditVisuallyButton from '../block-edit-visually-button';
+import { useShowMoversGestures } from './utils';
+import { store as blockEditorStore } from '../../store';
+import __unstableBlockNameContext from './block-name-context';
+import { unlock } from '../../lock-unlock';
 
-export default function BlockToolbar( { hideDragHandle } ) {
+const BlockToolbar = ( { hideDragHandle } ) => {
 	const {
 		blockClientIds,
 		blockClientId,
 		blockType,
 		hasFixedToolbar,
+		isDistractionFree,
 		isValid,
 		isVisual,
-		moverDirection,
+		blockEditingMode,
 	} = useSelect( ( select ) => {
-		const { getBlockType } = select( 'core/blocks' );
 		const {
 			getBlockName,
 			getBlockMode,
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockRootClientId,
-			getBlockListSettings,
 			getSettings,
-		} = select( 'core/block-editor' );
+			getBlockEditingMode,
+		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
-
-		const { __experimentalMoverDirection } =
-			getBlockListSettings( blockRootClientId ) || {};
+		const settings = getSettings();
 
 		return {
 			blockClientIds: selectedBlockClientIds,
@@ -55,7 +65,8 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
-			hasFixedToolbar: getSettings().hasFixedToolbar,
+			hasFixedToolbar: settings.hasFixedToolbar,
+			isDistractionFree: settings.isDistractionFree,
 			rootClientId: blockRootClientId,
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
@@ -63,22 +74,33 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
 			),
-			moverDirection: __experimentalMoverDirection,
+			blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
 		};
 	}, [] );
 
-	const toggleBlockHighlight = useToggleBlockHighlight( blockClientId );
-	const nodeRef = useRef();
+	const toolbarWrapperRef = useRef( null );
 
+	// Handles highlighting the current block outline on hover or focus of the
+	// block type toolbar area.
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+	const nodeRef = useRef();
 	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
 		{
 			ref: nodeRef,
-			onChange: toggleBlockHighlight,
+			onChange( isFocused ) {
+				if ( isFocused && isDistractionFree ) {
+					return;
+				}
+				toggleBlockHighlight( blockClientId, isFocused );
+			},
 		}
 	);
 
+	// Account for the cases where the block toolbar is rendered within the
+	// header area and not contextually to the block.
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
+	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
@@ -94,64 +116,75 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 	const shouldShowVisualToolbar = isValid && isVisual;
 	const isMultiToolbar = blockClientIds.length > 1;
+	const isSynced =
+		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
-	const classes = classnames(
-		'block-editor-block-toolbar',
-		shouldShowMovers && 'is-showing-movers'
-	);
+	const classes = classnames( 'block-editor-block-toolbar', {
+		'is-showing-movers': shouldShowMovers,
+		'is-synced': isSynced,
+	} );
 
 	return (
-		<div className={ classes }>
-			<div
-				className="block-editor-block-toolbar__mover-switcher-container"
-				ref={ nodeRef }
-			>
-				{ ! isMultiToolbar && (
-					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
-						<BlockParentSelector clientIds={ blockClientIds } />
+		<div className={ classes } ref={ toolbarWrapperRef }>
+			{ ! isMultiToolbar &&
+				isLargeViewport &&
+				blockEditingMode === 'default' && <BlockParentSelector /> }
+			{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
+				blockEditingMode === 'default' && (
+					<div ref={ nodeRef } { ...showMoversGestures }>
+						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+							<BlockSwitcher clientIds={ blockClientIds } />
+							{ ! isMultiToolbar && (
+								<BlockLockToolbar
+									clientId={ blockClientIds[ 0 ] }
+									wrapperRef={ toolbarWrapperRef }
+								/>
+							) }
+							<BlockMover
+								clientIds={ blockClientIds }
+								hideDragHandle={ hideDragHandle }
+							/>
+						</ToolbarGroup>
 					</div>
 				) }
-
-				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-					<BlockDraggable
-						clientIds={ blockClientIds }
-						cloneClassname="block-editor-block-toolbar__drag-clone"
-					>
-						{ ( {
-							isDraggable,
-							onDraggableStart,
-							onDraggableEnd,
-						} ) => (
-							<div
-								{ ...showMoversGestures }
-								className="block-editor-block-toolbar__block-switcher-wrapper"
-								draggable={ isDraggable && ! hideDragHandle }
-								onDragStart={ onDraggableStart }
-								onDragEnd={ onDraggableEnd }
-							>
-								<BlockSwitcher clientIds={ blockClientIds } />
-								<BlockMover
-									clientIds={ blockClientIds }
-									__experimentalOrientation={ moverDirection }
-								/>
-							</div>
-						) }
-					</BlockDraggable>
-				) }
-			</div>
+			{ shouldShowVisualToolbar && isMultiToolbar && (
+				<BlockGroupToolbar />
+			) }
 			{ shouldShowVisualToolbar && (
 				<>
 					<BlockControls.Slot
-						bubblesVirtually
+						group="parent"
 						className="block-editor-block-toolbar__slot"
 					/>
-					<BlockFormatControls.Slot
-						bubblesVirtually
+					<BlockControls.Slot
+						group="block"
 						className="block-editor-block-toolbar__slot"
 					/>
+					<BlockControls.Slot className="block-editor-block-toolbar__slot" />
+					<BlockControls.Slot
+						group="inline"
+						className="block-editor-block-toolbar__slot"
+					/>
+					<BlockControls.Slot
+						group="other"
+						className="block-editor-block-toolbar__slot"
+					/>
+					<__unstableBlockNameContext.Provider
+						value={ blockType?.name }
+					>
+						<__unstableBlockToolbarLastItem.Slot />
+					</__unstableBlockNameContext.Provider>
 				</>
 			) }
-			<BlockSettingsMenu clientIds={ blockClientIds } />
+			<BlockEditVisuallyButton clientIds={ blockClientIds } />
+			{ blockEditingMode === 'default' && (
+				<BlockSettingsMenu clientIds={ blockClientIds } />
+			) }
 		</div>
 	);
-}
+};
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md
+ */
+export default BlockToolbar;

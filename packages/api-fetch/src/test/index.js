@@ -127,6 +127,7 @@ describe( 'apiFetch', () => {
 		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'bad_request',
 				message: 'Bad Request',
@@ -142,6 +143,7 @@ describe( 'apiFetch', () => {
 		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'invalid_json',
 				message: 'The response is not a valid JSON response.',
@@ -160,6 +162,7 @@ describe( 'apiFetch', () => {
 		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'invalid_json',
 				message: 'The response is not a valid JSON response.',
@@ -171,11 +174,39 @@ describe( 'apiFetch', () => {
 		window.fetch.mockReturnValue( Promise.reject() );
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'fetch_error',
 				message: 'You are probably offline.',
 			} );
 		} );
+	} );
+
+	it( 'should throw AbortError when fetch aborts', async () => {
+		const abortError = new Error();
+		abortError.name = 'AbortError';
+		abortError.code = 20;
+
+		window.fetch.mockReturnValue( Promise.reject( abortError ) );
+
+		const controller = new window.AbortController();
+
+		const promise = apiFetch( {
+			path: '/random',
+			signal: controller.signal,
+		} );
+
+		controller.abort();
+
+		let error;
+
+		try {
+			await promise;
+		} catch ( err ) {
+			error = err;
+		}
+
+		expect( error.name ).toBe( 'AbortError' );
 	} );
 
 	it( 'should return null if response has no content status code', () => {
@@ -186,6 +217,7 @@ describe( 'apiFetch', () => {
 		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( null );
 		} );
 	} );
@@ -215,6 +247,7 @@ describe( 'apiFetch', () => {
 
 		return apiFetch( { path: '/random', parse: false } ).catch(
 			( response ) => {
+				// eslint-disable-next-line jest/no-conditional-expect
 				expect( response ).toEqual( {
 					status: 400,
 				} );

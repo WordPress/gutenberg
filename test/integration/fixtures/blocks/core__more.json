@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/more",
+		"isValid": true,
+		"attributes": {
+			"noTeaser": false
+		},
+		"innerBlocks": []
+	}
+]

@@ -10,28 +10,51 @@ import {
 	ZWNBSP,
 } from './special-characters';
 
+function restoreOnAttributes( attributes, isEditableTree ) {
+	if ( isEditableTree ) {
+		return attributes;
+	}
+
+	const newAttributes = {};
+
+	for ( const key in attributes ) {
+		let newKey = key;
+		if ( key.startsWith( 'data-disable-rich-text-' ) ) {
+			newKey = key.slice( 'data-disable-rich-text-'.length );
+		}
+
+		newAttributes[ newKey ] = attributes[ key ];
+	}
+
+	return newAttributes;
+}
+
 /**
  * Converts a format object to information that can be used to create an element
  * from (type, attributes and object).
  *
- * @param  {Object}  $1                        Named parameters.
- * @param  {string}  $1.type                   The format type.
- * @param  {Object}  $1.attributes             The format attributes.
- * @param  {Object}  $1.unregisteredAttributes The unregistered format
- *                                             attributes.
- * @param  {boolean} $1.object                 Wether or not it is an object
- *                                             format.
- * @param  {boolean} $1.boundaryClass          Wether or not to apply a boundary
- *                                             class.
- * @return {Object}                            Information to be used for
- *                                             element creation.
+ * @param {Object}  $1                        Named parameters.
+ * @param {string}  $1.type                   The format type.
+ * @param {string}  $1.tagName                The tag name.
+ * @param {Object}  $1.attributes             The format attributes.
+ * @param {Object}  $1.unregisteredAttributes The unregistered format
+ *                                            attributes.
+ * @param {boolean} $1.object                 Whether or not it is an object
+ *                                            format.
+ * @param {boolean} $1.boundaryClass          Whether or not to apply a boundary
+ *                                            class.
+ * @param {boolean} $1.isEditableTree
+ *
+ * @return {Object} Information to be used for element creation.
  */
 function fromFormat( {
 	type,
+	tagName,
 	attributes,
 	unregisteredAttributes,
 	object,
 	boundaryClass,
+	isEditableTree,
 } ) {
 	const formatType = getFormatType( type );
 
@@ -46,7 +69,14 @@ function fromFormat( {
 			elementAttributes = { ...attributes, ...elementAttributes };
 		}
 
-		return { type, attributes: elementAttributes, object };
+		return {
+			type,
+			attributes: restoreOnAttributes(
+				elementAttributes,
+				isEditableTree
+			),
+			object,
+		};
 	}
 
 	elementAttributes = { ...unregisteredAttributes, ...elementAttributes };
@@ -71,10 +101,16 @@ function fromFormat( {
 		}
 	}
 
+	// When a format is declared as non editable, make it non editable in the
+	// editor.
+	if ( isEditableTree && formatType.contentEditable === false ) {
+		elementAttributes.contenteditable = 'false';
+	}
+
 	return {
-		type: formatType.tagName,
+		type: formatType.tagName === '*' ? tagName : formatType.tagName,
 		object: formatType.object,
-		attributes: elementAttributes,
+		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
 	};
 }
 
@@ -213,7 +249,8 @@ export function toTree( {
 					return;
 				}
 
-				const { type, attributes, unregisteredAttributes } = format;
+				const { type, tagName, attributes, unregisteredAttributes } =
+					format;
 
 				const boundaryClass =
 					isEditableTree &&
@@ -225,9 +262,11 @@ export function toTree( {
 					parent,
 					fromFormat( {
 						type,
+						tagName,
 						attributes,
 						unregisteredAttributes,
 						boundaryClass,
+						isEditableTree,
 					} )
 				);
 
@@ -258,13 +297,46 @@ export function toTree( {
 		}
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			pointer = append(
-				getParent( pointer ),
-				fromFormat( {
-					...replacements[ i ],
-					object: true,
-				} )
-			);
+			const replacement = replacements[ i ];
+			if ( ! replacement ) continue;
+			const { type, attributes, innerHTML } = replacement;
+			const formatType = getFormatType( type );
+
+			if ( ! isEditableTree && type === 'script' ) {
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						type: 'script',
+						isEditableTree,
+					} )
+				);
+				append( pointer, {
+					html: decodeURIComponent(
+						attributes[ 'data-rich-text-script' ]
+					),
+				} );
+			} else if ( formatType?.contentEditable === false ) {
+				// For non editable formats, render the stored inner HTML.
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						...replacement,
+						isEditableTree,
+						boundaryClass: start === i && end === i + 1,
+					} )
+				);
+
+				if ( innerHTML ) append( pointer, innerHTML );
+			} else {
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						...replacement,
+						object: true,
+						isEditableTree,
+					} )
+				);
+			}
 			// Ensure pointer is text node.
 			pointer = append( getParent( pointer ), '' );
 		} else if ( ! preserveWhiteSpace && character === '\n' ) {
@@ -305,6 +377,7 @@ export function toTree( {
 						// selection. The placeholder is also not editable after
 						// all.
 						contenteditable: 'false',
+						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
 					},
 				} );
 			}

@@ -1,6 +1,8 @@
 .components-button {
 	display: inline-flex;
 	text-decoration: none;
+	font-family: inherit;
+	font-weight: normal;
 	font-size: $default-font-size;
 	margin: 0;
 	border: 0;
@@ -13,13 +15,16 @@
 	align-items: center;
 	box-sizing: border-box;
 	padding: 6px 12px;
-	overflow: hidden;
 	border-radius: $radius-block-ui;
-	color: $dark-gray-primary;
+	color: $components-color-foreground;
+
+	&.is-next-40px-default-size {
+		height: $button-size-next-default-40px;
+	}
 
 	&[aria-expanded="true"],
 	&:hover {
-		color: $theme-color;
+		color: $components-color-accent;
 	}
 
 	// Unset some hovers, instead of adding :not specificity.
@@ -30,10 +35,10 @@
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 $border-width-focus $theme-color;
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 1px solid transparent;
+		outline: 3px solid transparent;
 	}
 
 	/**
@@ -42,27 +47,27 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: color($theme-color);
-		color: $white;
+		background: $components-color-accent;
+		color: $components-color-accent-inverted;
 		text-decoration: none;
 		text-shadow: none;
 
+		// Show the boundary of the button, in High Contrast Mode.
+		outline: 1px solid transparent;
+
 		&:hover:not(:disabled) {
-			background: color($theme-color shade(10%));
-			color: $white;
+			background: $components-color-accent-darker-10;
+			color: $components-color-accent-inverted;
 		}
 
 		&:active:not(:disabled) {
-			background: color($theme-color shade(20%));
-			border-color: color($theme-color shade(20%));
-			color: $white;
+			background: $components-color-accent-darker-20;
+			border-color: $components-color-accent-darker-20;
+			color: $components-color-accent-inverted;
 		}
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
-
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 1px solid transparent;
+			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		}
 
 		&:disabled,
@@ -70,34 +75,36 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			color: color($theme-color tint(40%));
-			background: color($theme-color tint(10%));
-			border-color: color($theme-color tint(10%));
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+			color: rgba($white, 0.4);
+			background: $components-color-accent;
+			border-color: $components-color-accent;
 			opacity: 1;
+			outline: none;
 
 			&:focus:enabled {
 				box-shadow:
-					0 0 0 $border-width $white,
-					0 0 0 3px color($theme-color);
+					0 0 0 $border-width $components-color-background,
+					0 0 0 3px $components-color-accent;
 			}
 		}
 
 		&.is-busy,
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
-			color: $white;
+			color: $components-color-accent-inverted;
 			background-size: 100px 100%;
 			// Disable reason: This function call looks nicer when each argument is on its own line.
 			/* stylelint-disable */
 			background-image: linear-gradient(
 				-45deg,
-				$theme-color 28%,
-				color($theme-color shade(20%)) 28%,
-				color($theme-color shade(20%)) 72%,
-				$theme-color 72%
+				$components-color-accent 33%,
+				$components-color-accent-darker-20 33%,
+				$components-color-accent-darker-20 70%,
+				$components-color-accent 70%
 			);
 			/* stylelint-enable */
-			border-color: color($theme-color);
+			border-color: $components-color-accent;
 		}
 	}
 
@@ -107,25 +114,22 @@
 
 	&.is-secondary,
 	&.is-tertiary {
-		&:active:not(:disabled) {
-			background: $light-gray-tertiary;
-			color: color($theme-color shade(10%));
-			box-shadow: none;
-		}
+		// Show the boundary of the button, in High Contrast Mode.
+		outline: 1px solid transparent;
 
-		&:hover:not(:disabled) {
-			color: color($theme-color shade(10%));
-			box-shadow: inset 0 0 0 $border-width color($theme-color shade(10%));
+		&:active:not(:disabled) {
+			box-shadow: none;
 		}
 
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
-			color: lighten($medium-gray-text, 5%);
-			background: lighten($light-gray-tertiary, 5%);
+			color: $gray-600;
+			background: transparent;
 			transform: none;
 			opacity: 1;
 			box-shadow: none;
+			outline: none;
 		}
 	}
 
@@ -134,11 +138,15 @@
 	 */
 
 	&.is-secondary {
-		box-shadow: inset 0 0 0 $border-width $theme-color;
+		box-shadow: inset 0 0 0 $border-width $components-color-accent;
 		outline: 1px solid transparent; // Shown in high contrast mode.
 		white-space: nowrap;
-		color: $theme-color;
+		color: $components-color-accent;
 		background: transparent;
+
+		&:hover:not(:disabled) {
+			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
+		}
 	}
 
 	/**
@@ -147,13 +155,49 @@
 
 	&.is-tertiary {
 		white-space: nowrap;
-		color: $theme-color;
+		color: $components-color-accent;
 		background: transparent;
-		padding: 6px; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
 
-		.dashicon {
-			display: inline-block;
-			flex: 0 0 auto;
+		&:hover:not(:disabled, [aria-disabled="true"]) {
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		}
+
+		&:active:not(:disabled, [aria-disabled="true"]) {
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+		}
+
+		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
+		p + & {
+			margin-left: -($grid-unit-15 * 0.5);
+		}
+	}
+
+	/**
+	 * Destructive buttons.
+	 */
+	&.is-destructive {
+		--wp-components-color-accent: #{$alert-red};
+		--wp-components-color-accent-darker-10: #{darken($alert-red, 10%)};
+		--wp-components-color-accent-darker-20: #{darken($alert-red, 20%)};
+
+		// Only the default variant is styled differently from the non-destructive counterparts.
+		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
+			color: $alert-red;
+			box-shadow: inset 0 0 0 $border-width $alert-red;
+
+			&:hover:not(:disabled) {
+				color: darken($alert-red, 20%);
+			}
+
+			&:focus:not(:disabled) {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $alert-red;
+			}
+
+			&:active:not(:disabled) {
+				background: $gray-400;
+			}
 		}
 	}
 
@@ -170,8 +214,7 @@
 		background: none;
 		outline: none;
 		text-align: left;
-		/* Mimics the default link style in common.css */
-		color: #0073aa;
+		color: $components-color-accent;
 		text-decoration: underline;
 		transition-property: border, background, color;
 		transition-duration: 0.05s;
@@ -179,26 +222,13 @@
 		@include reduce-motion("transition");
 		height: auto;
 
-		&:hover:not(:disabled),
-		&:active:not(:disabled) {
-			color: #00a0d2;
-		}
-
 		&:focus {
-			color: #124964;
-			box-shadow:
-				0 0 0 $border-width #5b9dd9,
-				0 0 $border-width-focus $border-width rgba(30, 140, 190, 0.8);
+			border-radius: $radius-block-ui;
 		}
 	}
 
-	// Link buttons that are red to indicate destructive behavior.
-	&.is-link.is-destructive {
-		color: $alert-red;
-	}
-
-	&:not([aria-disabled="true"]):active {
-		color: inherit;
+	&:not(:disabled, [aria-disabled="true"]):active {
+		color: $components-color-foreground;
 	}
 
 	&:disabled,
@@ -218,23 +248,35 @@
 		/* stylelint-disable */
 		background-image: linear-gradient(
 			-45deg,
-			color($white shade(2%)) 28%,
-			color($white shade(12%)) 28%,
-			color($white shade(12%)) 72%,
-			color($white shade(2%)) 72%
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+			darken($white, 2%) 33%,
+			darken($white, 12%) 33%,
+			darken($white, 12%) 70%,
+			darken($white, 2%) 70%
 		);
 		/* stylelint-enable */
 	}
 
+	&.is-compact {
+		height: $button-size-compact;
+
+		&.has-icon:not(.has-text) {
+			padding: 0;
+			width: $button-size-compact;
+			min-width: $button-size-compact;
+		}
+	}
+
 	&.is-small {
-		height: 24px;
+		height: $button-size-small;
 		line-height: 22px;
 		padding: 0 8px;
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
-			padding: 0 8px;
-			width: 24px;
+			padding: 0;
+			width: $button-size-small;
+			min-width: $button-size-small;
 		}
 	}
 
@@ -245,40 +287,53 @@
 		min-width: $button-size;
 		justify-content: center;
 
+		&.is-next-40px-default-size {
+			min-width: $button-size-next-default-40px;
+		}
+
 		.dashicon {
-			display: inline-block;
-			flex: 0 0 auto;
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			padding: 2px;
+			box-sizing: content-box;
 		}
 
 		&.has-text {
-			justify-content: left;
-		}
-
-		&.has-text svg {
-			margin-right: 8px;
+			justify-content: start;
+			padding-right: $grid-unit-15;
+			padding-left: $grid-unit-10;
+			gap: $grid-unit-05;
 		}
 	}
 
 	// Toggled style.
 	&.is-pressed {
-		color: $white;
-		background: $dark-gray-primary;
+		color: $components-color-foreground-inverted;
+		background: $components-color-foreground;
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
 		}
 
 		&:hover:not(:disabled) {
-			background: $dark-gray-primary;
+			color: $components-color-foreground-inverted;
+			background: $components-color-foreground;
 		}
 	}
 
 	svg {
 		fill: currentColor;
 		outline: none;
+
+		// Optimizate for high contrast modes.
+		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
+		@media (forced-colors: active) {
+			fill: CanvasText;
+		}
 	}
 
 	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.

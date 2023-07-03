@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, isNumber, mapValues } from 'lodash';
-
-/**
  * Filters an array based on the predicate, but keeps the reference the same if
  * the array hasn't changed.
  *
@@ -21,6 +16,23 @@ function filterWithReference( collection, predicate ) {
 }
 
 /**
+ * Creates a new object with the same keys, but with `callback()` called as
+ * a transformer function on each of the values.
+ *
+ * @param {Object}   obj      The object to transform.
+ * @param {Function} callback The function to transform each object value.
+ * @return {Array} Transformed object.
+ */
+const mapValues = ( obj, callback ) =>
+	Object.entries( obj ).reduce(
+		( acc, [ key, value ] ) => ( {
+			...acc,
+			[ key ]: callback( value ),
+		} ),
+		{}
+	);
+
+/**
  * Verifies whether the given annotations is a valid annotation.
  *
  * @param {Object} annotation The annotation to verify.
@@ -28,8 +40,8 @@ function filterWithReference( collection, predicate ) {
  */
 function isValidAnnotationRange( annotation ) {
 	return (
-		isNumber( annotation.start ) &&
-		isNumber( annotation.end ) &&
+		typeof annotation.start === 'number' &&
+		typeof annotation.end === 'number' &&
 		annotation.start <= annotation.end
 	);
 }
@@ -37,7 +49,7 @@ function isValidAnnotationRange( annotation ) {
 /**
  * Reducer managing annotations.
  *
- * @param {Array} state The annotations currently shown in the editor.
+ * @param {Object} state  The annotations currently shown in the editor.
  * @param {Object} action Dispatched action.
  *
  * @return {Array} Updated state.
@@ -62,7 +74,7 @@ export function annotations( state = {}, action ) {
 				return state;
 			}
 
-			const previousAnnotationsForBlock = get( state, blockClientId, [] );
+			const previousAnnotationsForBlock = state?.[ blockClientId ] ?? [];
 
 			return {
 				...state,

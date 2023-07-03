@@ -1,0 +1,9 @@
+{
+	"version": 2,
+	"settings": {
+		"appearanceTools": true,
+		"typography": {
+			"fluid": true
+		}
+	}
+}

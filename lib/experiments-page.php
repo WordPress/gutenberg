@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping the Gutenberg experiments page.
+ * Bootstrapping the Gutenberg experiments page.
  *
  * @package gutenberg
  */
@@ -40,72 +40,67 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg_display_experiment_section',
 		'gutenberg-experiments'
 	);
+
 	add_settings_field(
-		'gutenberg-widget-experiments',
-		__( 'Widgets', 'gutenberg' ),
+		'gutenberg-zoomed-out-view',
+		__( 'Zoomed out view ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Widgets screen and Legacy Widgets block', 'gutenberg' ),
-			'id'    => 'gutenberg-widget-experiments',
+			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
+			'id'    => 'gutenberg-zoomed-out-view',
 		)
 	);
+
 	add_settings_field(
-		'gutenberg-navigation',
-		__( 'Navigation', 'gutenberg' ),
+		'gutenberg-color-randomizer',
+		__( 'Color randomizer ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Navigation screen', 'gutenberg' ),
-			'id'    => 'gutenberg-navigation',
+			'label' => __( 'Test the Global Styles color randomizer; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
+			'id'    => 'gutenberg-color-randomizer',
 		)
 	);
+
 	add_settings_field(
-		'gutenberg-block-directory',
-		__( 'Block Directory', 'gutenberg' ),
+		'gutenberg-group-grid-variation',
+		__( 'Grid variation for Group block ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable block directory search', 'gutenberg' ),
-			'id'    => 'gutenberg-block-directory',
+			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
+			'id'    => 'gutenberg-group-grid-variation',
 		)
 	);
+
 	add_settings_field(
-		'gutenberg-full-site-editing',
-		__( 'Full Site Editing', 'gutenberg' ),
+		'gutenberg-interactivity-api-core-blocks',
+		__( 'Interactivity API and Behaviors UI', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Full Site Editing (Warning: this will replace your theme and cause potentially irreversible changes to your site. We recommend using this only in a development environment.)', 'gutenberg' ),
-			'id'    => 'gutenberg-full-site-editing',
+			'label' => __( 'Use the Interactivity API to enable the <a href="https://github.com/WordPress/gutenberg/issues/50029">Behaviors UI</a> in the Image block.', 'gutenberg' ),
+			'id'    => 'gutenberg-interactivity-api-core-blocks',
 		)
 	);
+
 	add_settings_field(
-		'gutenberg-full-site-editing-demo',
-		__( 'Full Site Editing Demo Templates', 'gutenberg' ),
+		'gutenberg-no-tinymce',
+		__( 'Disable TinyMCE and Classic block', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Full Site Editing demo templates', 'gutenberg' ),
-			'id'    => 'gutenberg-full-site-editing-demo',
+			'label' => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
+			'id'    => 'gutenberg-no-tinymce',
 		)
 	);
-	add_settings_field(
-		'gutenberg-rich-image-editing',
-		__( 'Rich Image Editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable inline rich image editing', 'gutenberg' ),
-			'id'    => 'gutenberg-rich-image-editing',
-		)
-	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -143,30 +138,3 @@ function gutenberg_display_experiment_section() {
 
 	<?php
 }
-
-/**
- * Extends default editor settings with experiments settings.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_experiments_editor_settings( $settings ) {
-	$experiments_settings = array(
-		'__experimentalEnableLegacyWidgetBlock'   => gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ),
-		'__experimentalBlockDirectory'            => gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ),
-		'__experimentalEnableFullSiteEditing'     => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
-		'__experimentalEnableFullSiteEditingDemo' => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ),
-		'__experimentalEnableRichImageEditing'    => gutenberg_is_experiment_enabled( 'gutenberg-rich-image-editing' ),
-	);
-
-	$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
-	if ( false !== $gradient_presets ) {
-		$experiments_settings['gradients'] = $gradient_presets;
-	}
-
-	$experiments_settings['disableCustomGradients'] = get_theme_support( 'disable-custom-gradients' );
-
-	return array_merge( $settings, $experiments_settings );
-}
-add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );

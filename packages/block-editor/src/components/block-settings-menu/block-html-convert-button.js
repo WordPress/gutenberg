@@ -9,10 +9,11 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockConvertButton from './block-convert-button';
+import { store as blockEditorStore } from '../../store';
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const block = select( 'core/block-editor' ).getBlock( clientId );
+		const block = select( blockEditorStore ).getBlock( clientId );
 
 		return {
 			block,
@@ -21,7 +22,7 @@ export default compose(
 	} ),
 	withDispatch( ( dispatch, { block } ) => ( {
 		onClick: () =>
-			dispatch( 'core/block-editor' ).replaceBlocks(
+			dispatch( blockEditorStore ).replaceBlocks(
 				block.clientId,
 				rawHandler( { HTML: getBlockContent( block ) } )
 			),

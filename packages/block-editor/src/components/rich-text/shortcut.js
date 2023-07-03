@@ -1,32 +1,32 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { KeyboardShortcuts } from '@wordpress/components';
-import { rawShortcut } from '@wordpress/keycodes';
+import { isKeyboardEvent } from '@wordpress/keycodes';
+import { useEffect, useContext, useRef } from '@wordpress/element';
 
-export class RichTextShortcut extends Component {
-	constructor() {
-		super( ...arguments );
+/**
+ * Internal dependencies
+ */
+import { keyboardShortcutContext } from './';
 
-		this.onUse = this.onUse.bind( this );
-	}
+export function RichTextShortcut( { character, type, onUse } ) {
+	const keyboardShortcuts = useContext( keyboardShortcutContext );
+	const onUseRef = useRef();
+	onUseRef.current = onUse;
 
-	onUse() {
-		this.props.onUse();
-		return false;
-	}
+	useEffect( () => {
+		function callback( event ) {
+			if ( isKeyboardEvent[ type ]( event, character ) ) {
+				onUseRef.current();
+				event.preventDefault();
+			}
+		}
 
-	render() {
-		const { character, type } = this.props;
+		keyboardShortcuts.current.add( callback );
+		return () => {
+			keyboardShortcuts.current.delete( callback );
+		};
+	}, [ character, type ] );
 
-		return (
-			<KeyboardShortcuts
-				bindGlobal
-				shortcuts={ {
-					[ rawShortcut[ type ]( character ) ]: this.onUse,
-				} }
-			/>
-		);
-	}
+	return null;
 }

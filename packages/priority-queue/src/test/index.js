@@ -49,7 +49,7 @@ describe( 'createQueue', () => {
 			expect( callbackElementA ).toHaveBeenCalledTimes( 1 );
 			expect( callbackElementB ).not.toHaveBeenCalled();
 
-			// ElementB will be be processed after second tick.
+			// ElementB will be processed after second tick.
 			requestIdleCallback.tick();
 			expect( callbackElementA ).toHaveBeenCalledTimes( 1 );
 			expect( callbackElementB ).toHaveBeenCalledTimes( 1 );
@@ -125,6 +125,33 @@ describe( 'createQueue', () => {
 			// removal).
 			requestIdleCallback.tick();
 			expect( callbackElementA ).toHaveBeenCalledTimes( 1 );
+			expect( callbackElementB ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'cancel', () => {
+		it( 'removes all callbacks associated with element without executing', () => {
+			const elementA = {};
+			const elementB = {};
+			const callbackElementA = jest.fn();
+			const callbackElementB = jest.fn();
+			queue.add( elementA, callbackElementA );
+			queue.add( elementB, callbackElementB );
+
+			expect( callbackElementA ).not.toHaveBeenCalled();
+			expect( callbackElementB ).not.toHaveBeenCalled();
+
+			expect( queue.cancel( elementA ) ).toBe( true );
+
+			// No callbacks should have been called.
+			expect( callbackElementA ).not.toHaveBeenCalled();
+			expect( callbackElementB ).not.toHaveBeenCalled();
+
+			// A subsequent `flush` has nothing to remove.
+			expect( queue.flush( elementA ) ).toBe( false );
+
+			// The queue for `elementA` remained intact and can be successfully flushed.
+			expect( queue.flush( elementB ) ).toBe( true );
 			expect( callbackElementB ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );

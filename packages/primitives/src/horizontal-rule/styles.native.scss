@@ -1,0 +1,23 @@
+.container {
+	align-items: center;
+	flex-direction: row;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.line {
+	background-color: $gray-lighten-20;
+	flex: 1;
+	height: 2;
+}
+
+.lineDark {
+	background-color: $gray-50;
+}
+
+.text {
+	flex: 1;
+	margin-left: 15px;
+	margin-right: 15px;
+	text-align: center;
+}

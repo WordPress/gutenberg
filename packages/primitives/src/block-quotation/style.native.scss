@@ -1,7 +1,8 @@
 %wpBlockQuote-shared {
-	border-left-width: 3px;
+	border-left-width: 4px;
 	border-left-style: solid;
-	padding-left: 13px;
+	padding-left: $block-edge-to-content;
+	padding-top: $dashed-border-space;
 	margin-left: 0;
 }
 
@@ -16,11 +17,10 @@
 }
 
 .wpBlockQuoteCitation {
-	margin-top: 12px;
+	margin-top: 16px;
 	font-size: 14px;
 }
 
-.wpBlockQuoteValue {
-	margin-top: 0; // FIXME: On iOS without margin-top (or any other additional style) the font-size is not applied
-	font-size: 18px;
+.paddingWithBackground {
+	padding-top: $block-edge-to-content - $block-selected-margin;
 }

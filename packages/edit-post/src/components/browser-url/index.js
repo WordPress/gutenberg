@@ -4,6 +4,7 @@
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Returns the Post's Edit URL.
@@ -19,7 +20,7 @@ export function getPostEditURL( postId ) {
 /**
  * Returns the Post's Trashed URL.
  *
- * @param {number} postId    Post ID.
+ * @param {number} postId   Post ID.
  * @param {string} postType Post Type.
  *
  * @return {string} Post trashed URL.
@@ -54,7 +55,8 @@ export class BrowserURL extends Component {
 
 		if (
 			( postId !== prevProps.postId || postId !== historyId ) &&
-			postStatus !== 'auto-draft'
+			postStatus !== 'auto-draft' &&
+			postId
 		) {
 			this.setBrowserURL( postId );
 		}
@@ -63,8 +65,8 @@ export class BrowserURL extends Component {
 	/**
 	 * Navigates the browser to the post trashed URL to show a notice about the trashed post.
 	 *
-	 * @param {number} postId    Post ID.
-	 * @param {string} postType  Post Type.
+	 * @param {number} postId   Post ID.
+	 * @param {string} postType Post Type.
 	 */
 	setTrashURL( postId, postType ) {
 		window.location.href = getPostTrashedURL( postId, postType );
@@ -97,8 +99,13 @@ export class BrowserURL extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const { getCurrentPost, isSavingPost } = select( 'core/editor' );
-	const { id, status, type } = getCurrentPost();
+	const { getCurrentPost, isSavingPost } = select( editorStore );
+	const post = getCurrentPost();
+	let { id, status, type } = post;
+	const isTemplate = [ 'wp_template', 'wp_template_part' ].includes( type );
+	if ( isTemplate ) {
+		id = post.wp_id;
+	}
 
 	return {
 		postId: id,

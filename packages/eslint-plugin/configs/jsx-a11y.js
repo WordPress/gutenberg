@@ -2,10 +2,10 @@ module.exports = {
 	extends: [ 'plugin:jsx-a11y/recommended' ],
 	plugins: [ 'jsx-a11y' ],
 	rules: {
-		'jsx-a11y/label-has-for': [
+		'jsx-a11y/label-has-associated-control': [
 			'error',
 			{
-				required: 'id',
+				assert: 'htmlFor',
 			},
 		],
 		'jsx-a11y/media-has-caption': 'off',

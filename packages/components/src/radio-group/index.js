@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * External dependencies
  */
@@ -12,17 +14,10 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import ButtonGroup from '../button-group';
-import RadioContext from '../radio-context';
+import RadioContext from './radio-context';
 
 function RadioGroup(
-	{
-		accessibilityLabel,
-		checked,
-		defaultChecked,
-		disabled,
-		onChange,
-		...props
-	},
+	{ label, checked, defaultChecked, disabled, onChange, ...props },
 	ref
 ) {
 	const radioState = useRadioState( {
@@ -32,9 +27,9 @@ function RadioGroup(
 	const radioContext = {
 		...radioState,
 		disabled,
-		// controlled or uncontrolled
-		state: checked || radioState.state,
-		setState: onChange || radioState.setState,
+		// Controlled or uncontrolled.
+		state: checked ?? radioState.state,
+		setState: onChange ?? radioState.setState,
 	};
 
 	return (
@@ -42,7 +37,7 @@ function RadioGroup(
 			<ReakitRadioGroup
 				ref={ ref }
 				as={ ButtonGroup }
-				aria-label={ accessibilityLabel }
+				aria-label={ label }
 				{ ...radioState }
 				{ ...props }
 			/>
@@ -50,4 +45,7 @@ function RadioGroup(
 	);
 }
 
+/**
+ * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
+ */
 export default forwardRef( RadioGroup );

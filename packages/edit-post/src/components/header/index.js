@@ -3,10 +3,9 @@
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import {
-	PinnedItems,
-	__experimentalMainDashboardButton as MainDashboardButton,
-} from '@wordpress/interface';
+import { PinnedItems } from '@wordpress/interface';
+import { useViewportMatch } from '@wordpress/compose';
+import { __unstableMotion as motion } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -16,19 +15,36 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
+import ViewLink from '../view-link';
+import MainDashboardButton from './main-dashboard-button';
+import { store as editPostStore } from '../../store';
+import DocumentTitle from './document-title';
 
-function Header( {
-	onToggleInserter,
-	isInserterOpen,
-	setEntitiesSavedStatesCallback,
-} ) {
-	const { hasActiveMetaboxes, isPublishSidebarOpened, isSaving } = useSelect(
+const slideY = {
+	hidden: { y: '-50px' },
+	hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
+};
+
+const slideX = {
+	hidden: { x: '-100%' },
+	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
+};
+
+function Header( { setEntitiesSavedStatesCallback } ) {
+	const isLargeViewport = useViewportMatch( 'large' );
+	const {
+		hasActiveMetaboxes,
+		isPublishSidebarOpened,
+		isSaving,
+		showIconLabels,
+	} = useSelect(
 		( select ) => ( {
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isPublishSidebarOpened: select(
-				'core/edit-post'
-			).isPublishSidebarOpened(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			isPublishSidebarOpened:
+				select( editPostStore ).isPublishSidebarOpened(),
+			isSaving: select( editPostStore ).isSavingMetaBoxes(),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 		} ),
 		[]
 	);
@@ -36,15 +52,28 @@ function Header( {
 	return (
 		<div className="edit-post-header">
 			<MainDashboardButton.Slot>
-				<FullscreenModeClose />
+				<motion.div
+					variants={ slideX }
+					transition={ { type: 'tween', delay: 0.8 } }
+				>
+					<FullscreenModeClose showTooltip />
+				</motion.div>
 			</MainDashboardButton.Slot>
-			<div className="edit-post-header__toolbar">
-				<HeaderToolbar
-					onToggleInserter={ onToggleInserter }
-					isInserterOpen={ isInserterOpen }
-				/>
-			</div>
-			<div className="edit-post-header__settings">
+			<motion.div
+				variants={ slideY }
+				transition={ { type: 'tween', delay: 0.8 } }
+				className="edit-post-header__toolbar"
+			>
+				<HeaderToolbar />
+				<div className="edit-post-header__document-title">
+					<DocumentTitle />
+				</div>
+			</motion.div>
+			<motion.div
+				variants={ slideY }
+				transition={ { type: 'tween', delay: 0.8 } }
+				className="edit-post-header__settings"
+			>
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because
@@ -54,6 +83,7 @@ function Header( {
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
+						showIconLabels={ showIconLabels }
 					/>
 				) }
 				<DevicePreview />
@@ -61,6 +91,7 @@ function Header( {
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
 				/>
+				<ViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
@@ -68,9 +99,16 @@ function Header( {
 						setEntitiesSavedStatesCallback
 					}
 				/>
-				<PinnedItems.Slot scope="core/edit-post" />
-				<MoreMenu />
-			</div>
+				{ ( isLargeViewport || ! showIconLabels ) && (
+					<>
+						<PinnedItems.Slot scope="core/edit-post" />
+						<MoreMenu showIconLabels={ showIconLabels } />
+					</>
+				) }
+				{ showIconLabels && ! isLargeViewport && (
+					<MoreMenu showIconLabels={ showIconLabels } />
+				) }
+			</motion.div>
 		</div>
 	);
 }

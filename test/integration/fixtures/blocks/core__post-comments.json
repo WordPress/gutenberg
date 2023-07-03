@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/comments",
+		"isValid": true,
+		"attributes": {
+			"tagName": "div",
+			"legacy": true
+		},
+		"innerBlocks": []
+	}
+]

@@ -1,19 +1,33 @@
 const stories = [
-	process.env.NODE_ENV !== 'test' && './stories/**/*.(js|mdx)',
-	'../packages/components/src/**/stories/*.js',
-	'../packages/icons/src/**/stories/*.js',
+	process.env.NODE_ENV !== 'test' && './stories/**/*.@(js|tsx|mdx)',
+	'../packages/block-editor/src/**/stories/*.@(js|tsx|mdx)',
+	'../packages/components/src/**/stories/*.@(js|tsx|mdx)',
+	'../packages/icons/src/**/stories/*.@(js|tsx|mdx)',
+	'../packages/edit-site/src/**/stories/*.@(js|tsx|mdx)',
+	'../packages/components/README.mdx',
 ].filter( Boolean );
 
 module.exports = {
+	core: {
+		builder: 'webpack5',
+	},
 	stories,
 	addons: [
 		{
 			name: '@storybook/addon-docs',
-			options: { configureJSX: true },
+			options: { configureJSX: true, transcludeMarkdown: true },
 		},
-		'@storybook/addon-knobs',
-		'@storybook/addon-storysource',
+		'@storybook/addon-controls',
 		'@storybook/addon-viewport',
 		'@storybook/addon-a11y',
+		'@storybook/addon-toolbars',
+		'@storybook/addon-actions',
+		'storybook-source-link',
 	],
+	framework: '@storybook/react',
+	features: {
+		babelModeV7: true,
+		emotionAlias: false,
+		storyStoreV7: true,
+	},
 };

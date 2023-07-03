@@ -1,53 +1,49 @@
 /**
- * External dependencies
- */
-import { invoke } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { TextControl } from '@wordpress/components';
+import {
+	Flex,
+	FlexBlock,
+	__experimentalNumberControl as NumberControl,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, withState } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 
-export const PageAttributesOrder = withState( {
-	orderInput: null,
-} )( ( { onUpdateOrder, order = 0, orderInput, setState } ) => {
+export const PageAttributesOrder = ( { onUpdateOrder, order = 0 } ) => {
+	const [ orderInput, setOrderInput ] = useState( null );
+
 	const setUpdatedOrder = ( value ) => {
-		setState( {
-			orderInput: value,
-		} );
+		setOrderInput( value );
 		const newOrder = Number( value );
-		if (
-			Number.isInteger( newOrder ) &&
-			invoke( value, [ 'trim' ] ) !== ''
-		) {
+		if ( Number.isInteger( newOrder ) && value.trim?.() !== '' ) {
 			onUpdateOrder( Number( value ) );
 		}
 	};
 	const value = orderInput === null ? order : orderInput;
 	return (
-		<TextControl
-			className="editor-page-attributes__order"
-			type="number"
-			label={ __( 'Order' ) }
-			value={ value }
-			onChange={ setUpdatedOrder }
-			size={ 6 }
-			onBlur={ () => {
-				setState( {
-					orderInput: null,
-				} );
-			} }
-		/>
+		<Flex>
+			<FlexBlock>
+				<NumberControl
+					label={ __( 'Order' ) }
+					value={ value }
+					onChange={ setUpdatedOrder }
+					labelPosition="side"
+					onBlur={ () => {
+						setOrderInput( null );
+					} }
+				/>
+			</FlexBlock>
+		</Flex>
 	);
-} );
+};
 
 function PageAttributesOrderWithChecks( props ) {
 	return (
@@ -60,14 +56,12 @@ function PageAttributesOrderWithChecks( props ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			order: select( 'core/editor' ).getEditedPostAttribute(
-				'menu_order'
-			),
+			order: select( editorStore ).getEditedPostAttribute( 'menu_order' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		onUpdateOrder( order ) {
-			dispatch( 'core/editor' ).editPost( {
+			dispatch( editorStore ).editPost( {
 				menu_order: order,
 			} );
 		},

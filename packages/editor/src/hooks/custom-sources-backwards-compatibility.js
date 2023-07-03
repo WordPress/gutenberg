@@ -1,16 +1,17 @@
 /**
- * External dependencies
- */
-import { pickBy, mapValues, isEmpty, mapKeys } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { select as globalSelect, useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../store';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -36,55 +37,61 @@ import { addFilter } from '@wordpress/hooks';
  */
 const createWithMetaAttributeSource = ( metaAttributes ) =>
 	createHigherOrderComponent(
-		( BlockEdit ) => ( { attributes, setAttributes, ...props } ) => {
-			const postType = useSelect(
-				( select ) => select( 'core/editor' ).getCurrentPostType(),
-				[]
-			);
-			const [ meta, setMeta ] = useEntityProp(
-				'postType',
-				postType,
-				'meta'
-			);
+		( BlockEdit ) =>
+			( { attributes, setAttributes, ...props } ) => {
+				const postType = useSelect(
+					( select ) => select( editorStore ).getCurrentPostType(),
+					[]
+				);
+				const [ meta, setMeta ] = useEntityProp(
+					'postType',
+					postType,
+					'meta'
+				);
 
-			const mergedAttributes = useMemo(
-				() => ( {
-					...attributes,
-					...mapValues(
-						metaAttributes,
-						( metaKey ) => meta[ metaKey ]
-					),
-				} ),
-				[ attributes, meta ]
-			);
+				const mergedAttributes = useMemo(
+					() => ( {
+						...attributes,
+						...Object.fromEntries(
+							Object.entries( metaAttributes ).map(
+								( [ attributeKey, metaKey ] ) => [
+									attributeKey,
+									meta[ metaKey ],
+								]
+							)
+						),
+					} ),
+					[ attributes, meta ]
+				);
 
-			return (
-				<BlockEdit
-					attributes={ mergedAttributes }
-					setAttributes={ ( nextAttributes ) => {
-						const nextMeta = mapKeys(
-							// Filter to intersection of keys between the updated
-							// attributes and those with an associated meta key.
-							pickBy(
-								nextAttributes,
-								( value, key ) => metaAttributes[ key ]
-							),
+				return (
+					<BlockEdit
+						attributes={ mergedAttributes }
+						setAttributes={ ( nextAttributes ) => {
+							const nextMeta = Object.fromEntries(
+								Object.entries( nextAttributes ?? {} )
+									.filter(
+										// Filter to intersection of keys between the updated
+										// attributes and those with an associated meta key.
+										( [ key ] ) => key in metaAttributes
+									)
+									.map( ( [ attributeKey, value ] ) => [
+										// Rename the keys to the expected meta key name.
+										metaAttributes[ attributeKey ],
+										value,
+									] )
+							);
 
-							// Rename the keys to the expected meta key name.
-							( value, attributeKey ) =>
-								metaAttributes[ attributeKey ]
-						);
+							if ( Object.entries( nextMeta ).length ) {
+								setMeta( nextMeta );
+							}
 
-						if ( ! isEmpty( nextMeta ) ) {
-							setMeta( nextMeta );
-						}
-
-						setAttributes( nextAttributes );
-					} }
-					{ ...props }
-				/>
-			);
-		},
+							setAttributes( nextAttributes );
+						} }
+						{ ...props }
+					/>
+				);
+			},
 		'withMetaAttributeSource'
 	);
 
@@ -98,11 +105,12 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
  */
 function shimAttributeSource( settings ) {
 	/** @type {WPMetaAttributeMapping} */
-	const metaAttributes = mapValues(
-		pickBy( settings.attributes, { source: 'meta' } ),
-		'meta'
+	const metaAttributes = Object.fromEntries(
+		Object.entries( settings.attributes ?? {} )
+			.filter( ( [ , { source } ] ) => source === 'meta' )
+			.map( ( [ attributeKey, { meta } ] ) => [ attributeKey, meta ] )
 	);
-	if ( ! isEmpty( metaAttributes ) ) {
+	if ( Object.entries( metaAttributes ).length ) {
 		settings.edit = createWithMetaAttributeSource( metaAttributes )(
 			settings.edit
 		);
@@ -135,7 +143,7 @@ addFilter(
 //
 // In the future, we could support updating block settings, at which point this
 // implementation could use that mechanism instead.
-globalSelect( 'core/blocks' )
+globalSelect( blocksStore )
 	.getBlockTypes()
-	.map( ( { name } ) => globalSelect( 'core/blocks' ).getBlockType( name ) )
+	.map( ( { name } ) => globalSelect( blocksStore ).getBlockType( name ) )
 	.forEach( shimAttributeSource );

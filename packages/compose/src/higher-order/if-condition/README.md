@@ -1,5 +1,4 @@
-If Condition
-============
+# If Condition
 
 `ifCondition` is a higher-order component creator, used for creating a new component which renders if the given condition is satisfied.
 
@@ -14,7 +13,7 @@ function MyEvenNumber( { number } ) {
 	return <strong>{ number }</strong>;
 }
 
-MyEvenNumber = ifCondition(
-	( { number } ) => number % 2 === 0
-)( MyEvenNumber );
+MyEvenNumber = ifCondition( ( { number } ) => number % 2 === 0 )(
+	MyEvenNumber
+);
 ```

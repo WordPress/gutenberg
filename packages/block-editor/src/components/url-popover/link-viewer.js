@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { pencil } from '@wordpress/icons';
+import { edit } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,7 +38,7 @@ export default function LinkViewer( {
 			/>
 			{ onEditLinkClick && (
 				<Button
-					icon={ pencil }
+					icon={ edit }
 					label={ __( 'Edit' ) }
 					onClick={ onEditLinkClick }
 				/>

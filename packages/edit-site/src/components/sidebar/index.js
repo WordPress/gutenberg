@@ -1,64 +1,92 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import { memo, useRef } from '@wordpress/element';
 import {
-	ComplementaryArea,
-	ComplementaryAreaMoreMenuItem,
-} from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
-import { cog, pencil } from '@wordpress/icons';
-import { Platform } from '@wordpress/element';
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+} from '@wordpress/components';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
-const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
-	'EditSiteSidebarInspector'
-);
-export const SidebarInspectorFill = InspectorFill;
-const BLOCK_INSPECTOR_ACTIVE_BY_DEFAULT = Platform.select( {
-	web: true,
-	native: false,
-} );
+/**
+ * Internal dependencies
+ */
+import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
+import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
+import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
+import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
+import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
+import useSyncPathWithURL, {
+	getPathFromURL,
+} from '../sync-state-with-url/use-sync-path-with-url';
+import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
+import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
+import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
+import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
+import SaveHub from '../save-hub';
+import { unlock } from '../../lock-unlock';
+import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
+import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 
-const DefaultSidebar = ( { identifier, title, icon, children } ) => {
+const { useLocation } = unlock( routerPrivateApis );
+
+function SidebarScreens() {
+	useSyncPathWithURL();
+
 	return (
 		<>
-			<ComplementaryArea
-				scope="core/edit-site"
-				identifier={ identifier }
-				title={ title }
-				icon={ icon }
-			>
-				{ children }
-			</ComplementaryArea>
-			<ComplementaryAreaMoreMenuItem
-				scope="core/edit-site"
-				identifier={ identifier }
-				icon={ icon }
-			>
-				{ title }
-			</ComplementaryAreaMoreMenuItem>
-		</>
-	);
-};
-
-export function SidebarComplementaryAreaFills() {
-	return (
-		<>
-			<DefaultSidebar
-				identifier="edit-site/block-inspector"
-				title={ __( 'Block Inspector' ) }
-				icon={ cog }
-				isActiveByDefault={ BLOCK_INSPECTOR_ACTIVE_BY_DEFAULT }
-			>
-				<InspectorSlot bubblesVirtually />
-			</DefaultSidebar>
-			<DefaultSidebar
-				identifier="edit-site/global-styles"
-				title={ __( 'Global Styles' ) }
-				icon={ pencil }
-			>
-				<p>Global Styles area</p>
-			</DefaultSidebar>
+			<NavigatorScreen path="/">
+				<SidebarNavigationScreenMain />
+			</NavigatorScreen>
+			<NavigatorScreen path="/navigation">
+				<SidebarNavigationScreenNavigationMenus />
+			</NavigatorScreen>
+			<NavigatorScreen path="/navigation/:postType/:postId">
+				<SidebarNavigationScreenNavigationMenu />
+			</NavigatorScreen>
+			<NavigatorScreen path="/wp_global_styles">
+				<SidebarNavigationScreenGlobalStyles />
+			</NavigatorScreen>
+			<NavigatorScreen path="/page">
+				<SidebarNavigationScreenPages />
+			</NavigatorScreen>
+			<NavigatorScreen path="/page/:postId">
+				<SidebarNavigationScreenPage />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template)">
+				<SidebarNavigationScreenTemplates />
+			</NavigatorScreen>
+			<NavigatorScreen path="/patterns">
+				<SidebarNavigationScreenPatterns />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+				<SidebarNavigationScreenTemplatesBrowse />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template_part|wp_block)/:postId">
+				<SidebarNavigationScreenPattern />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template)/:postId">
+				<SidebarNavigationScreenTemplate />
+			</NavigatorScreen>
 		</>
 	);
 }
+
+function Sidebar() {
+	const { params: urlParams } = useLocation();
+	const initialPath = useRef( getPathFromURL( urlParams ) );
+
+	return (
+		<>
+			<NavigatorProvider
+				className="edit-site-sidebar__content"
+				initialPath={ initialPath.current }
+			>
+				<SidebarScreens />
+			</NavigatorProvider>
+			<SaveHub />
+		</>
+	);
+}
+
+export default memo( Sidebar );

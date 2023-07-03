@@ -1,25 +1,58 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
  */
+import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { uploadMedia } from '@wordpress/media-utils';
+import { Platform } from '@wordpress/element';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { getFilteredTemplatePartBlocks } from './utils';
+
+/**
+ * @typedef {'template'|'template_type'} TemplateType Template type.
+ */
+
+/**
+ * Helper for getting a preference from the preferences store.
+ *
+ * This is only present so that `getSettings` doesn't need to be made a
+ * registry selector.
+ *
+ * It's unstable because the selector needs to be exported and so part of the
+ * public API to work.
+ */
+export const __unstableGetPreference = createRegistrySelector(
+	( select ) => ( state, name ) =>
+		select( preferencesStore ).get( 'core/edit-site', name )
+);
 
 /**
  * Returns whether the given feature is enabled or not.
  *
- * @param {Object} state   Global application state.
- * @param {string} feature Feature slug.
+ * @deprecated
+ * @param {Object} state       Global application state.
+ * @param {string} featureName Feature slug.
  *
  * @return {boolean} Is active.
  */
-export function isFeatureActive( state, feature ) {
-	return get( state.preferences.features, [ feature ], false );
+export function isFeatureActive( state, featureName ) {
+	deprecated( `select( 'core/edit-site' ).isFeatureActive`, {
+		since: '6.0',
+		alternative: `select( 'core/preferences' ).get`,
+	} );
+
+	return !! __unstableGetPreference( state, featureName );
 }
 
 /**
@@ -40,129 +73,305 @@ export function __experimentalGetPreviewDeviceType( state ) {
  *
  * @return {Object} Whether the current user can create media or not.
  */
-export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
-	select( 'core' ).canUser( 'create', 'media' )
+export const getCanUserCreateMedia = createRegistrySelector(
+	( select ) => () => select( coreDataStore ).canUser( 'create', 'media' )
 );
+
+/**
+ * Returns any available Reusable blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} The available reusable blocks.
+ */
+export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
+	const isWeb = Platform.OS === 'web';
+	return isWeb
+		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
+				per_page: -1,
+		  } )
+		: [];
+} );
 
 /**
  * Returns the settings, taking into account active features and permissions.
  *
- * @param {Object} state Global application state.
+ * @param {Object}   state             Global application state.
+ * @param {Function} setIsInserterOpen Setter for the open state of the global inserter.
  *
  * @return {Object} Settings.
  */
 export const getSettings = createSelector(
-	( state ) => {
+	( state, setIsInserterOpen ) => {
+		const settings = {
+			...state.settings,
+			outlineMode: true,
+			focusMode: !! __unstableGetPreference( state, 'focusMode' ),
+			isDistractionFree: !! __unstableGetPreference(
+				state,
+				'distractionFree'
+			),
+			hasFixedToolbar: !! __unstableGetPreference(
+				state,
+				'fixedToolbar'
+			),
+			keepCaretInsideBlock: !! __unstableGetPreference(
+				state,
+				'keepCaretInsideBlock'
+			),
+			showIconLabels: !! __unstableGetPreference(
+				state,
+				'showIconLabels'
+			),
+			__experimentalSetIsInserterOpened: setIsInserterOpen,
+			__experimentalReusableBlocks: getReusableBlocks( state ),
+			__experimentalPreferPatternsOnRoot:
+				'wp_template' === getEditedPostType( state ),
+		};
+
 		const canUserCreateMedia = getCanUserCreateMedia( state );
 		if ( ! canUserCreateMedia ) {
-			return state.settings;
+			return settings;
 		}
 
-		return {
-			...state.settings,
-			focusMode: isFeatureActive( state, 'focusMode' ),
-			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
-			mediaUpload( { onError, ...rest } ) {
-				uploadMedia( {
-					wpAllowedMimeTypes: state.settings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
-					...rest,
-				} );
-			},
+		settings.mediaUpload = ( { onError, ...rest } ) => {
+			uploadMedia( {
+				wpAllowedMimeTypes: state.settings.allowedMimeTypes,
+				onError: ( { message } ) => onError( message ),
+				...rest,
+			} );
 		};
+		return settings;
 	},
 	( state ) => [
 		getCanUserCreateMedia( state ),
 		state.settings,
-		isFeatureActive( state, 'focusMode' ),
-		isFeatureActive( state, 'fixedToolbar' ),
+		__unstableGetPreference( state, 'focusMode' ),
+		__unstableGetPreference( state, 'distractionFree' ),
+		__unstableGetPreference( state, 'fixedToolbar' ),
+		__unstableGetPreference( state, 'keepCaretInsideBlock' ),
+		__unstableGetPreference( state, 'showIconLabels' ),
+		getReusableBlocks( state ),
+		getEditedPostType( state ),
 	]
 );
 
 /**
- * Returns the current home template ID.
- *
- * @param {Object} state Global application state.
- *
- * @return {number} Home template ID.
+ * @deprecated
  */
-export function getHomeTemplateId( state ) {
-	return state.homeTemplateId;
+export function getHomeTemplateId() {
+	deprecated( "select( 'core/edit-site' ).getHomeTemplateId", {
+		since: '6.2',
+		version: '6.4',
+	} );
 }
 
 /**
- * Returns the current template ID.
+ * Returns the current edited post type (wp_template or wp_template_part).
  *
  * @param {Object} state Global application state.
  *
- * @return {number} Template ID.
+ * @return {TemplateType?} Template type.
  */
-export function getTemplateId( state ) {
-	return state.templateId;
+export function getEditedPostType( state ) {
+	return state.editedPost.postType;
 }
 
 /**
- * Returns the current template part ID.
+ * Returns the ID of the currently edited template or template part.
  *
  * @param {Object} state Global application state.
  *
- * @return {number} Template part ID.
+ * @return {string?} Post ID.
  */
-export function getTemplatePartId( state ) {
-	return state.templatePartId;
+export function getEditedPostId( state ) {
+	return state.editedPost.id;
 }
 
 /**
- * Returns the current template type.
+ * Returns the edited post's context object.
  *
+ * @deprecated
  * @param {Object} state Global application state.
  *
- * @return {string} Template type.
+ * @return {Object} Page.
  */
-export function getTemplateType( state ) {
-	return state.templateType;
-}
-
-/**
- * Returns the current template IDs.
- *
- * @param {Object} state Global application state.
- *
- * @return {number[]} Template IDs.
- */
-export function getTemplateIds( state ) {
-	return state.templateIds;
-}
-
-/**
- * Returns the current template part IDs.
- *
- * @param {Object} state Global application state.
- *
- * @return {number[]} Template part IDs.
- */
-export function getTemplatePartIds( state ) {
-	return state.templatePartIds;
+export function getEditedPostContext( state ) {
+	return state.editedPost.context;
 }
 
 /**
  * Returns the current page object.
  *
+ * @deprecated
  * @param {Object} state Global application state.
  *
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return state.page;
+	return { context: state.editedPost.context };
 }
 
 /**
- * Returns the site's current `show_on_front` setting.
+ * Returns the current opened/closed state of the inserter panel.
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} The setting.
+ * @return {boolean} True if the inserter panel should be open; false if closed.
  */
-export function getShowOnFront( state ) {
-	return state.showOnFront;
+export function isInserterOpened( state ) {
+	return !! state.blockInserterPanel;
+}
+
+/**
+ * Get the insertion point for the inserter.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The root client ID, index to insert at and starting filter value.
+ */
+export const __experimentalGetInsertionPoint = createRegistrySelector(
+	( select ) => ( state ) => {
+		if ( typeof state.blockInserterPanel === 'object' ) {
+			const { rootClientId, insertionIndex, filterValue } =
+				state.blockInserterPanel;
+			return { rootClientId, insertionIndex, filterValue };
+		}
+
+		if ( hasPageContentFocus( state ) ) {
+			const [ postContentClientId ] =
+				select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
+					'core/post-content'
+				);
+			if ( postContentClientId ) {
+				return {
+					rootClientId: postContentClientId,
+					insertionIndex: undefined,
+					filterValue: undefined,
+				};
+			}
+		}
+
+		return {
+			rootClientId: undefined,
+			insertionIndex: undefined,
+			filterValue: undefined,
+		};
+	}
+);
+
+/**
+ * Returns the current opened/closed state of the list view panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if the list view panel should be open; false if closed.
+ */
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
+}
+
+/**
+ * Returns the current opened/closed state of the save panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if the save panel should be open; false if closed.
+ */
+export function isSaveViewOpened( state ) {
+	return state.saveViewPanel;
+}
+
+/**
+ * Returns the template parts and their blocks for the current edited template.
+ *
+ * @param {Object} state Global application state.
+ * @return {Array} Template parts and their blocks in an array.
+ */
+export const getCurrentTemplateTemplateParts = createRegistrySelector(
+	( select ) => ( state ) => {
+		const templateType = getEditedPostType( state );
+		const templateId = getEditedPostId( state );
+		const template = select( coreDataStore ).getEditedEntityRecord(
+			'postType',
+			templateType,
+			templateId
+		);
+
+		const templateParts = select( coreDataStore ).getEntityRecords(
+			'postType',
+			'wp_template_part',
+			{ per_page: -1 }
+		);
+
+		return getFilteredTemplatePartBlocks( template.blocks, templateParts );
+	}
+);
+
+/**
+ * Returns the current editing mode.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Editing mode.
+ */
+export function getEditorMode( state ) {
+	return __unstableGetPreference( state, 'editorMode' );
+}
+
+/**
+ * @deprecated
+ */
+export function getCurrentTemplateNavigationPanelSubMenu() {
+	deprecated(
+		"dispatch( 'core/edit-site' ).getCurrentTemplateNavigationPanelSubMenu",
+		{
+			since: '6.2',
+			version: '6.4',
+		}
+	);
+}
+
+/**
+ * @deprecated
+ */
+export function getNavigationPanelActiveMenu() {
+	deprecated( "dispatch( 'core/edit-site' ).getNavigationPanelActiveMenu", {
+		since: '6.2',
+		version: '6.4',
+	} );
+}
+
+/**
+ * @deprecated
+ */
+export function isNavigationOpened() {
+	deprecated( "dispatch( 'core/edit-site' ).isNavigationOpened", {
+		since: '6.2',
+		version: '6.4',
+	} );
+}
+
+/**
+ * Whether or not the editor has a page loaded into it.
+ *
+ * @see setPage
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not the editor has a page loaded into it.
+ */
+export function isPage( state ) {
+	return !! state.editedPost.context?.postId;
+}
+
+/**
+ * Whether or not the editor allows only page content to be edited.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not focus is on editing page content.
+ */
+export function hasPageContentFocus( state ) {
+	return isPage( state ) ? state.hasPageContentFocus : false;
 }

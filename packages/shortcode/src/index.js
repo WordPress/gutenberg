@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { extend, pick, isString, isEqual, forEach, isNumber } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -40,7 +39,7 @@ import memize from 'memize';
  * @param {string} text  Text to search.
  * @param {number} index Index to start search from.
  *
- * @return {?WPShortcodeMatch} Matched information.
+ * @return {WPShortcodeMatch | undefined} Matched information.
  */
 export function next( tag, text, index = 0 ) {
 	const re = regexp( tag );
@@ -90,29 +89,23 @@ export function next( tag, text, index = 0 ) {
  * @return {string} Text with shortcodes replaced.
  */
 export function replace( tag, text, callback ) {
-	return text.replace( regexp( tag ), function (
-		match,
-		left,
-		$3,
-		attrs,
-		slash,
-		content,
-		closing,
-		right
-	) {
-		// If both extra brackets exist, the shortcode has been properly
-		// escaped.
-		if ( left === '[' && right === ']' ) {
-			return match;
+	return text.replace(
+		regexp( tag ),
+		function ( match, left, $3, attrs, slash, content, closing, right ) {
+			// If both extra brackets exist, the shortcode has been properly
+			// escaped.
+			if ( left === '[' && right === ']' ) {
+				return match;
+			}
+
+			// Create the match object and pass it through the callback.
+			const result = callback( fromMatch( arguments ) );
+
+			// Make sure to return any of the extra brackets if they weren't used to
+			// escape the shortcode.
+			return result || result === '' ? left + result + right : match;
 		}
-
-		// Create the match object and pass it through the callback.
-		const result = callback( fromMatch( arguments ) );
-
-		// Make sure to return any of the extra brackets if they weren't used to
-		// escape the shortcode.
-		return result ? left + result + right : match;
-	} );
+	);
 }
 
 /**
@@ -196,7 +189,8 @@ export const attrs = memize( ( text ) => {
 	// 7. A numeric attribute in double quotes.
 	// 8. A numeric attribute in single quotes.
 	// 9. An unquoted numeric attribute.
-	const pattern = /([\w-]+)\s*=\s*"([^"]*)"(?:\s|$)|([\w-]+)\s*=\s*'([^']*)'(?:\s|$)|([\w-]+)\s*=\s*([^\s'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|'([^']*)'(?:\s|$)|(\S+)(?:\s|$)/g;
+	const pattern =
+		/([\w-]+)\s*=\s*"([^"]*)"(?:\s|$)|([\w-]+)\s*=\s*'([^']*)'(?:\s|$)|([\w-]+)\s*=\s*([^\s'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|'([^']*)'(?:\s|$)|(\S+)(?:\s|$)/g;
 
 	// Map zero-width spaces to actual spaces.
 	text = text.replace( /[\u00a0\u200b]/g, ' ' );
@@ -265,14 +259,10 @@ export function fromMatch( match ) {
  *
  * @return {WPShortcode} Shortcode instance.
  */
-const shortcode = extend(
+const shortcode = Object.assign(
 	function ( options ) {
-		extend(
-			this,
-			pick( options || {}, 'tag', 'attrs', 'type', 'content' )
-		);
-
-		const attributes = this.attrs;
+		const { tag, attrs: attributes, type, content } = options || {};
+		Object.assign( this, { tag, type, content } );
 
 		// Ensure we have a correctly formatted `attrs` object.
 		this.attrs = {
@@ -284,17 +274,20 @@ const shortcode = extend(
 			return;
 		}
 
+		const attributeTypes = [ 'named', 'numeric' ];
+
 		// Parse a string of attributes.
-		if ( isString( attributes ) ) {
+		if ( typeof attributes === 'string' ) {
 			this.attrs = attrs( attributes );
 			// Identify a correctly formatted `attrs` object.
 		} else if (
-			isEqual( Object.keys( attributes ), [ 'named', 'numeric' ] )
+			attributes.length === attributeTypes.length &&
+			attributeTypes.every( ( t, key ) => t === attributes[ key ] )
 		) {
 			this.attrs = attributes;
 			// Handle a flat object of attributes.
 		} else {
-			forEach( attributes, ( value, key ) => {
+			Object.entries( attributes ).forEach( ( [ key, value ] ) => {
 				this.set( key, value );
 			} );
 		}
@@ -309,7 +302,7 @@ const shortcode = extend(
 	}
 );
 
-extend( shortcode.prototype, {
+Object.assign( shortcode.prototype, {
 	/**
 	 * Get a shortcode attribute.
 	 *
@@ -321,7 +314,9 @@ extend( shortcode.prototype, {
 	 * @return {string} Attribute value.
 	 */
 	get( attr ) {
-		return this.attrs[ isNumber( attr ) ? 'numeric' : 'named' ][ attr ];
+		return this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][
+			attr
+		];
 	},
 
 	/**
@@ -336,7 +331,8 @@ extend( shortcode.prototype, {
 	 * @return {WPShortcode} Shortcode instance.
 	 */
 	set( attr, value ) {
-		this.attrs[ isNumber( attr ) ? 'numeric' : 'named' ][ attr ] = value;
+		this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][ attr ] =
+			value;
 		return this;
 	},
 
@@ -348,7 +344,7 @@ extend( shortcode.prototype, {
 	string() {
 		let text = '[' + this.tag;
 
-		forEach( this.attrs.numeric, ( value ) => {
+		this.attrs.numeric.forEach( ( value ) => {
 			if ( /\s/.test( value ) ) {
 				text += ' "' + value + '"';
 			} else {
@@ -356,7 +352,7 @@ extend( shortcode.prototype, {
 			}
 		} );
 
-		forEach( this.attrs.named, ( value, name ) => {
+		Object.entries( this.attrs.named ).forEach( ( [ name, value ] ) => {
 			text += ' ' + name + '="' + value + '"';
 		} );
 

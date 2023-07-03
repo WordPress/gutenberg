@@ -1,54 +1,48 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Icon } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
+import { plus } from '@wordpress/icons';
 
 export const LinkControlSearchCreate = ( {
 	searchTerm,
 	onClick,
 	itemProps,
-	isSelected,
+	buttonText,
 } ) => {
 	if ( ! searchTerm ) {
 		return null;
 	}
 
+	let text;
+	if ( buttonText ) {
+		text =
+			typeof buttonText === 'function'
+				? buttonText( searchTerm )
+				: buttonText;
+	} else {
+		text = createInterpolateElement(
+			sprintf(
+				/* translators: %s: search term. */
+				__( 'Create: <mark>%s</mark>' ),
+				searchTerm
+			),
+			{ mark: <mark /> }
+		);
+	}
+
 	return (
-		<Button
+		<MenuItem
 			{ ...itemProps }
-			className={ classnames(
-				'block-editor-link-control__search-create block-editor-link-control__search-item',
-				{
-					'is-selected': isSelected,
-				}
-			) }
+			iconPosition="left"
+			icon={ plus }
+			className="block-editor-link-control__search-item"
 			onClick={ onClick }
 		>
-			<Icon
-				className="block-editor-link-control__search-item-icon"
-				icon="insert"
-			/>
-
-			<span className="block-editor-link-control__search-item-header">
-				<span className="block-editor-link-control__search-item-title">
-					{ createInterpolateElement(
-						sprintf(
-							/* translators: %s: search term. */
-							__( 'New page: <mark>%s</mark>' ),
-							searchTerm
-						),
-						{ mark: <mark /> }
-					) }
-				</span>
-			</span>
-		</Button>
+			{ text }
+		</MenuItem>
 	);
 };
 

@@ -11,23 +11,24 @@ import Cell from './cell';
 import styles from './styles.scss';
 
 export default function BottomSheetColorCell( props ) {
-	const { color, ...cellProps } = props;
+	const { color, withColorIndicator = true, disabled, ...cellProps } = props;
 
 	return (
 		<Cell
 			{ ...cellProps }
-			accessibilityRole={ 'none' }
+			accessibilityRole={ 'button' }
 			accessibilityHint={
 				/* translators: accessibility text (hint for moving to color settings) */
 				__( 'Double tap to go to color settings' )
 			}
 			editable={ false }
-			value={ ! color && 'Default' }
+			disabled={ disabled }
+			value={ withColorIndicator && ! color && __( 'Default' ) }
 		>
-			{ color && (
+			{ withColorIndicator && color && (
 				<ColorIndicator color={ color } style={ styles.colorCircle } />
 			) }
-			<Icon icon={ chevronRight }></Icon>
+			{ disabled ? null : <Icon icon={ chevronRight }></Icon> }
 		</Cell>
 	);
 }

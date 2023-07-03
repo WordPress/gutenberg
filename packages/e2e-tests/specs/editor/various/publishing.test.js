@@ -9,9 +9,59 @@ import {
 	disablePrePublishChecks,
 	arePrePublishChecksEnabled,
 	setBrowserViewport,
+	openPublishPanel,
+	pressKeyWithModifier,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Publishing', () => {
+	describe.each( [ 'post', 'page' ] )(
+		'%s locking prevent saving',
+		( postType ) => {
+			beforeEach( async () => {
+				await createNewPost( postType );
+			} );
+
+			it( `disables the publish button when a ${ postType } is locked`, async () => {
+				await canvas().type(
+					'.editor-post-title__input',
+					'E2E Test Post lock check publish button'
+				);
+				await page.evaluate( () =>
+					wp.data
+						.dispatch( 'core/editor' )
+						.lockPostSaving( 'futurelock' )
+				);
+
+				await openPublishPanel();
+
+				expect(
+					await page.$(
+						'.editor-post-publish-button[aria-disabled="true"]'
+					)
+				).not.toBeNull();
+			} );
+
+			it( `disables the save shortcut when a ${ postType } is locked`, async () => {
+				await canvas().type(
+					'.editor-post-title__input',
+					'E2E Test Post check save shortcut'
+				);
+				await page.evaluate( () =>
+					wp.data
+						.dispatch( 'core/editor' )
+						.lockPostSaving( 'futurelock' )
+				);
+				await pressKeyWithModifier( 'primary', 'S' );
+
+				expect( await page.$( '.editor-post-saved-state' ) ).toBeNull();
+				expect(
+					await page.$( '.editor-post-save-draft' )
+				).not.toBeNull();
+			} );
+		}
+	);
+
 	describe.each( [ 'post', 'page' ] )( 'a %s', ( postType ) => {
 		let werePrePublishChecksEnabled;
 
@@ -30,7 +80,7 @@ describe( 'Publishing', () => {
 		} );
 
 		it( `should publish the ${ postType } and close the panel once we start editing again.`, async () => {
-			await page.type( '.editor-post-title__input', 'E2E Test Post' );
+			await canvas().type( '.editor-post-title__input', 'E2E Test Post' );
 
 			await publishPost();
 
@@ -40,7 +90,7 @@ describe( 'Publishing', () => {
 			).not.toBeNull();
 
 			// Start editing again.
-			await page.type( '.editor-post-title__input', ' (Updated)' );
+			await canvas().type( '.editor-post-title__input', ' (Updated)' );
 
 			// The post-publishing panel is not visible anymore.
 			expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
@@ -54,7 +104,8 @@ describe( 'Publishing', () => {
 
 			beforeEach( async () => {
 				await createNewPost( postType );
-				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
+				werePrePublishChecksEnabled =
+					await arePrePublishChecksEnabled();
 				if ( werePrePublishChecksEnabled ) {
 					await disablePrePublishChecks();
 				}
@@ -67,9 +118,12 @@ describe( 'Publishing', () => {
 			} );
 
 			it( `should publish the ${ postType } without opening the post-publish sidebar.`, async () => {
-				await page.type( '.editor-post-title__input', 'E2E Test Post' );
+				await canvas().type(
+					'.editor-post-title__input',
+					'E2E Test Post'
+				);
 
-				// The "Publish" button should be shown instead of the "Publish..." toggle
+				// The "Publish" button should be shown instead of the "Publish..." toggle.
 				expect(
 					await page.$( '.editor-post-publish-panel__toggle' )
 				).toBeNull();
@@ -94,7 +148,8 @@ describe( 'Publishing', () => {
 
 			beforeEach( async () => {
 				await createNewPost( postType );
-				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
+				werePrePublishChecksEnabled =
+					await arePrePublishChecksEnabled();
 				if ( werePrePublishChecksEnabled ) {
 					await disablePrePublishChecks();
 				}

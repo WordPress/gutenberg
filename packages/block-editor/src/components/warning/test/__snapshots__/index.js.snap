@@ -1,17 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Warning should match snapshot 1`] = `
-<div
-  className="block-editor-warning"
->
+<div>
   <div
-    className="block-editor-warning__contents"
+    style="display: contents; all: initial;"
   >
-    <p
-      className="block-editor-warning__message"
+    <div
+      class="block-editor-warning"
     >
-      error
-    </p>
+      <div
+        class="block-editor-warning__contents"
+      >
+        <p
+          class="block-editor-warning__message"
+        >
+          error
+        </p>
+      </div>
+    </div>
   </div>
 </div>
 `;

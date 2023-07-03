@@ -1,0 +1,13 @@
+[
+	{
+		"name": "core/heading",
+		"isValid": true,
+		"attributes": {
+			"textAlign": "center",
+			"content": "Text",
+			"level": 2,
+			"align": "wide"
+		},
+		"innerBlocks": []
+	}
+]

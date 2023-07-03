@@ -15,6 +15,7 @@ import {
 	getNewBlockTypes,
 	getUnusedBlockTypes,
 	isInstalling,
+	isRequestingDownloadableBlocks,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -28,6 +29,61 @@ describe( 'selectors', () => {
 			};
 			const installedBlockTypes = getInstalledBlockTypes( state );
 			expect( installedBlockTypes ).toEqual( blockTypes );
+		} );
+	} );
+
+	describe( 'isRequestingDownloadableBlocks', () => {
+		it( 'should return false if no requests have been made for the block', () => {
+			const filterValue = 'Awesome Block';
+
+			const state = {
+				downloadableBlocks: {},
+			};
+			const isRequesting = isRequestingDownloadableBlocks(
+				state,
+				filterValue
+			);
+
+			expect( isRequesting ).toEqual( false );
+		} );
+
+		it( 'should return false if there are no pending requests for the block', () => {
+			const filterValue = 'Awesome Block';
+
+			const state = {
+				downloadableBlocks: {
+					[ filterValue ]: {
+						isRequesting: false,
+					},
+				},
+			};
+			const isRequesting = isRequestingDownloadableBlocks(
+				state,
+				filterValue
+			);
+
+			expect( isRequesting ).toEqual( false );
+		} );
+
+		it( 'should return true if the block has a pending request', () => {
+			const filterValue = 'Awesome Block';
+
+			const state = {
+				downloadableBlocks: {
+					[ filterValue ]: {
+						isRequesting: true,
+					},
+					'previous-search-keyword': {
+						isRequesting: false,
+					},
+				},
+			};
+			const isRequesting = isRequestingDownloadableBlocks(
+				state,
+				filterValue
+			);
+
+			expect( isRequesting ).toEqual( true );
 		} );
 	} );
 
@@ -119,7 +175,10 @@ describe( 'selectors', () => {
 	describe( 'getErrorNoticeForBlock', () => {
 		const state = {
 			errorNotices: {
-				'block/has-error': 'Error notice',
+				'block/has-error': {
+					message: 'Error notice',
+					isFatal: false,
+				},
 			},
 		};
 
@@ -128,7 +187,9 @@ describe( 'selectors', () => {
 				state,
 				'block/has-error'
 			);
-			expect( errorNotice ).toEqual( 'Error notice' );
+			expect( errorNotice ).toEqual(
+				state.errorNotices[ 'block/has-error' ]
+			);
 		} );
 
 		it( "should retrieve no error notice for a block that doesn't have one", () => {
@@ -136,16 +197,15 @@ describe( 'selectors', () => {
 				state,
 				'block/no-error'
 			);
-			expect( errorNotice ).toEqual( false );
+			expect( errorNotice ).toEqual( undefined );
 		} );
 	} );
 
 	describe( 'getDownloadableBlocks', () => {
 		const state = {
 			downloadableBlocks: {
-				isRequestingDownloadableBlocks: false,
-				results: {
-					boxer: [ downloadableBlock ],
+				boxer: {
+					results: [ downloadableBlock ],
 				},
 			},
 		};
@@ -174,11 +234,11 @@ describe( 'selectors', () => {
 			},
 		};
 
-		it( 'it should reflect that the block is installing', () => {
+		it( 'should reflect that the block is installing', () => {
 			expect( isInstalling( state, BLOCK_1_ID ) ).toBeTruthy();
 		} );
 
-		it( 'it should reflect that the block is not installing', () => {
+		it( 'should reflect that the block is not installing', () => {
 			expect( isInstalling( state, 'not-in-state' ) ).toBeFalsy();
 			expect( isInstalling( state, BLOCK_2_ID ) ).toBeFalsy();
 		} );

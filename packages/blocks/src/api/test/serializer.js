@@ -12,7 +12,7 @@ import serialize, {
 	serializeAttributes,
 	getCommentDelimitedContent,
 	serializeBlock,
-	getBlockContent,
+	getBlockInnerHTML,
 } from '../serializer';
 import {
 	getBlockTypes,
@@ -307,6 +307,48 @@ describe( 'block serializer', () => {
 
 			expect( content ).toBe( 'Bananas' );
 		} );
+		it( 'preserves content from invalid blocks when source information is present', () => {
+			registerBlockType( 'core/quote', {
+				category: 'text',
+				title: 'Quote',
+				attributes: { content: 'string' },
+				save: ( { attributes } ) =>
+					createElement( 'blockquote', {}, attributes.content ),
+			} );
+
+			const block = {
+				...createBlock( 'core/quote' ),
+				isValid: false,
+				__unstableBlockSource: {
+					blockName: 'quote',
+					attrs: {},
+					innerHTML: '<p>Not a quote</p>',
+					innerBlocks: [],
+					innerContent: [ '<p>Not a quote</p>' ],
+				},
+			};
+
+			expect( serializeBlock( block ) ).toBe(
+				'<!-- wp:quote -->\n<p>Not a quote</p>\n<!-- /wp:quote -->'
+			);
+		} );
+		it( 're-generates content from invalid blocks when source information is missing (losing content)', () => {
+			registerBlockType( 'core/quote', {
+				category: 'text',
+				title: 'Quote',
+				attributes: { content: 'string' },
+				save: ( { attributes } ) =>
+					createElement( 'blockquote', {}, attributes.content ),
+			} );
+
+			// missing attributes as a result of a failed parse
+			const block = {
+				...createBlock( 'core/quote' ),
+				isValid: false,
+			};
+
+			expect( serializeBlock( block ) ).toBe( '<!-- wp:quote /-->' );
+		} );
 	} );
 
 	describe( 'serialize()', () => {
@@ -380,7 +422,7 @@ describe( 'block serializer', () => {
 		} );
 	} );
 
-	describe( 'getBlockContent', () => {
+	describe( 'getBlockInnerHTML', () => {
 		it( "should return the block's serialized inner HTML", () => {
 			const blockType = {
 				attributes: {
@@ -403,7 +445,7 @@ describe( 'block serializer', () => {
 				},
 				isValid: true,
 			};
-			expect( getBlockContent( block ) ).toBe( 'chicken' );
+			expect( getBlockInnerHTML( block ) ).toBe( 'chicken' );
 		} );
 	} );
 } );

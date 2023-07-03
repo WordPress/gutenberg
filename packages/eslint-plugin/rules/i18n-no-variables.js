@@ -18,7 +18,7 @@ function isAcceptableLiteralNode( node ) {
 
 	if ( 'TemplateLiteral' === node.type ) {
 		// Backticks are fine, but if there's any interpolation in it,
-		// that's a problem
+		// that's a problem.
 		return node.expressions.length === 0;
 	}
 

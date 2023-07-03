@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/audio",
+		"isValid": true,
+		"attributes": {
+			"caption": "",
+			"autoplay": false,
+			"loop": false
+		},
+		"innerBlocks": []
+	}
+]

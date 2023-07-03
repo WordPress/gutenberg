@@ -1,4 +1,3 @@
-CycleSelectControl
-===================
+# CycleSelectControl
 
-`CycleSelectControl` is an experimental alternative to SelectControl for mobile. 
+`CycleSelectControl` is an experimental alternative to SelectControl for mobile.

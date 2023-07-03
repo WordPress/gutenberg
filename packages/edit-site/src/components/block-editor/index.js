@@ -1,77 +1,44 @@
 /**
+ * External dependencies
+ */
+
+/**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
-import { useEntityBlockEditor } from '@wordpress/core-data';
-import {
-	BlockEditorProvider,
-	BlockEditorKeyboardShortcuts,
-	__experimentalLinkControl,
-	BlockInspector,
-	WritingFlow,
-	ObserveTyping,
-	BlockList,
-	ButtonBlockerAppender,
-} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { BlockInspector } from '@wordpress/block-editor';
+
+import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
  */
-import NavigateToLink from '../navigate-to-link';
-import { SidebarInspectorFill } from '../sidebar';
+import TemplatePartConverter from '../template-part-converter';
+import { SidebarInspectorFill } from '../sidebar-edit-mode';
+import { store as editSiteStore } from '../../store';
+import SiteEditorCanvas from './site-editor-canvas';
+import getBlockEditorProvider from './get-block-editor-provider';
 
 export default function BlockEditor() {
-	const { settings, templateType, page } = useSelect( ( select ) => {
-		const { getSettings, getTemplateType, getPage } = select(
-			'core/edit-site'
-		);
-		return {
-			settings: getSettings(),
-			templateType: getTemplateType(),
-			page: getPage(),
-		};
-	}, [] );
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		templateType
+	const entityType = useSelect(
+		( select ) => select( editSiteStore ).getEditedPostType(),
+		[]
 	);
 
-	const { setPage } = useDispatch( 'core/edit-site' );
+	// Choose the provider based on the entity type currently
+	// being edited.
+	const BlockEditorProvider = getBlockEditorProvider( entityType );
+
 	return (
-		<BlockEditorProvider
-			settings={ settings }
-			value={ blocks }
-			onInput={ onInput }
-			onChange={ onChange }
-			useSubRegistry={ false }
-		>
-			<BlockEditorKeyboardShortcuts />
-			<__experimentalLinkControl.ViewerFill>
-				{ useCallback(
-					( fillProps ) => (
-						<NavigateToLink
-							{ ...fillProps }
-							activePage={ page }
-							onActivePageChange={ setPage }
-						/>
-					),
-					[ page ]
-				) }
-			</__experimentalLinkControl.ViewerFill>
+		<BlockEditorProvider>
+			<TemplatePartConverter />
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							renderAppender={ ButtonBlockerAppender }
-						/>
-					</ObserveTyping>
-				</WritingFlow>
-			</div>
+
+			<SiteEditorCanvas />
+
+			<ReusableBlocksMenuItems />
 		</BlockEditorProvider>
 	);
 }

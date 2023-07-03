@@ -6,113 +6,76 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
-import { VisuallyHidden } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
+import {
+	RichText,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { View } from '@wordpress/primitives';
+import { forwardRef } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import GalleryImage from './gallery-image';
-import { defaultColumnsNumber } from './shared';
-
-export const Gallery = ( props ) => {
+export const Gallery = ( props, captionRef ) => {
 	const {
 		attributes,
-		className,
 		isSelected,
 		setAttributes,
-		selectedImage,
 		mediaPlaceholder,
-		onMoveBackward,
-		onMoveForward,
-		onRemoveImage,
-		onSelectImage,
-		onDeselectImage,
-		onSetImageAttributes,
-		onFocusGalleryCaption,
 		insertBlocksAfter,
+		blockProps,
+		__unstableLayoutClassNames: layoutClassNames,
+		showCaption,
 	} = props;
 
-	const {
-		align,
-		columns = defaultColumnsNumber( attributes ),
-		caption,
-		imageCrop,
-		images,
-	} = attributes;
+	const { align, columns, caption, imageCrop } = attributes;
 
 	return (
 		<figure
-			className={ classnames( className, {
-				[ `align${ align }` ]: align,
-				[ `columns-${ columns }` ]: columns,
-				'is-cropped': imageCrop,
-			} ) }
-		>
-			<ul className="blocks-gallery-grid">
-				{ images.map( ( img, index ) => {
-					const ariaLabel = sprintf(
-						/* translators: 1: the order number of the image. 2: the total number of images. */
-						__( 'image %1$d of %2$d in gallery' ),
-						index + 1,
-						images.length
-					);
-
-					return (
-						<li
-							className="blocks-gallery-item"
-							key={ img.id || img.url }
-						>
-							<GalleryImage
-								url={ img.url }
-								alt={ img.alt }
-								id={ img.id }
-								isFirstItem={ index === 0 }
-								isLastItem={ index + 1 === images.length }
-								isSelected={
-									isSelected && selectedImage === index
-								}
-								onMoveBackward={ onMoveBackward( index ) }
-								onMoveForward={ onMoveForward( index ) }
-								onRemove={ onRemoveImage( index ) }
-								onSelect={ onSelectImage( index ) }
-								onDeselect={ onDeselectImage( index ) }
-								setAttributes={ ( attrs ) =>
-									onSetImageAttributes( index, attrs )
-								}
-								caption={ img.caption }
-								aria-label={ ariaLabel }
-							/>
-						</li>
-					);
-				} ) }
-			</ul>
-			{ mediaPlaceholder }
-			<RichTextVisibilityHelper
-				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-				tagName="figcaption"
-				className="blocks-gallery-caption"
-				placeholder={ __( 'Write gallery caption…' ) }
-				value={ caption }
-				unstableOnFocus={ onFocusGalleryCaption }
-				onChange={ ( value ) => setAttributes( { caption: value } ) }
-				inlineToolbar
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( 'core/paragraph' ) )
+			{ ...blockProps }
+			className={ classnames(
+				blockProps.className,
+				layoutClassNames,
+				'blocks-gallery-grid',
+				{
+					[ `align${ align }` ]: align,
+					[ `columns-${ columns }` ]: columns !== undefined,
+					[ `columns-default` ]: columns === undefined,
+					'is-cropped': imageCrop,
 				}
-			/>
+			) }
+		>
+			{ blockProps.children }
+			{ isSelected && ! blockProps.children && (
+				<View className="blocks-gallery-media-placeholder-wrapper">
+					{ mediaPlaceholder }
+				</View>
+			) }
+			{ showCaption &&
+				( ! RichText.isEmpty( caption ) || isSelected ) && (
+					<RichText
+						identifier="caption"
+						aria-label={ __( 'Gallery caption text' ) }
+						placeholder={ __( 'Write gallery caption…' ) }
+						value={ caption }
+						className={ classnames(
+							'blocks-gallery-caption',
+							__experimentalGetElementClassName( 'caption' )
+						) }
+						ref={ captionRef }
+						tagName="figcaption"
+						onChange={ ( value ) =>
+							setAttributes( { caption: value } )
+						}
+						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+						}
+					/>
+				) }
 		</figure>
 	);
 };
 
-function RichTextVisibilityHelper( { isHidden, ...richTextProps } ) {
-	return isHidden ? (
-		<VisuallyHidden as={ RichText } { ...richTextProps } />
-	) : (
-		<RichText { ...richTextProps } />
-	);
-}
-
-export default Gallery;
+export default forwardRef( Gallery );

@@ -1,7 +1,12 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/text-columns",
+	"title": "Text Columns (deprecated)",
 	"icon": "columns",
 	"category": "design",
+	"description": "This block is deprecated. Please use the Columns block instead.",
+	"textdomain": "default",
 	"attributes": {
 		"content": {
 			"type": "array",
@@ -13,10 +18,7 @@
 					"source": "html"
 				}
 			},
-			"default": [
-				{},
-				{}
-			]
+			"default": [ {}, {} ]
 		},
 		"columns": {
 			"type": "number",
@@ -28,5 +30,7 @@
 	},
 	"supports": {
 		"inserter": false
-	}
+	},
+	"editorStyle": "wp-block-text-columns-editor",
+	"style": "wp-block-text-columns"
 }

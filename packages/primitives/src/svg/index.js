@@ -8,10 +8,7 @@ import classnames from 'classnames';
  */
 import { createElement } from '@wordpress/element';
 
-// Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly.
-/* eslint-disable jsdoc/valid-types */
 /** @typedef {{isPressed?: boolean} & import('react').ComponentPropsWithoutRef<'svg'>} SVGProps */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * @param {import('react').ComponentPropsWithoutRef<'circle'>} props
@@ -26,6 +23,13 @@ export const Circle = ( props ) => createElement( 'circle', props );
  * @return {JSX.Element} G component
  */
 export const G = ( props ) => createElement( 'g', props );
+
+/**
+ * @param {import('react').ComponentPropsWithoutRef<'line'>} props
+ *
+ * @return {JSX.Element} Path component
+ */
+export const Line = ( props ) => createElement( 'line', props );
 
 /**
  * @param {import('react').ComponentPropsWithoutRef<'path'>} props
@@ -90,7 +94,6 @@ export const SVG = ( { className, isPressed, ...props } ) => {
 		...props,
 		className:
 			classnames( className, { 'is-pressed': isPressed } ) || undefined,
-		role: 'img',
 		'aria-hidden': true,
 		focusable: false,
 	};

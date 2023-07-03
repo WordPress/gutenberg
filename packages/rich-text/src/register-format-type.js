@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
-
+/**
+ * Internal dependencies
+ */
+import { store as richTextStore } from './store';
 /**
  * @typedef {Object} WPFormat
  *
@@ -20,11 +23,11 @@ import { select, dispatch } from '@wordpress/data';
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
- * @param {string}   name                 Format name.
- * @param {WPFormat} settings             Format settings.
+ * @param {string}   name     Format name.
+ * @param {WPFormat} settings Format settings.
  *
- * @return {WPFormat|undefined} The format, if it has been successfully registered;
- *                              otherwise `undefined`.
+ * @return {WPFormat|undefined} The format, if it has been successfully
+ *                              registered; otherwise `undefined`.
  */
 export function registerFormatType( name, settings ) {
 	settings = {
@@ -44,7 +47,7 @@ export function registerFormatType( name, settings ) {
 		return;
 	}
 
-	if ( select( 'core/rich-text' ).getFormatType( settings.name ) ) {
+	if ( select( richTextStore ).getFormatType( settings.name ) ) {
 		window.console.error(
 			'Format "' + settings.name + '" is already registered.'
 		);
@@ -76,10 +79,13 @@ export function registerFormatType( name, settings ) {
 
 	if ( settings.className === null ) {
 		const formatTypeForBareElement = select(
-			'core/rich-text'
+			richTextStore
 		).getFormatTypeForBareElement( settings.tagName );
 
-		if ( formatTypeForBareElement ) {
+		if (
+			formatTypeForBareElement &&
+			formatTypeForBareElement.name !== 'core/unknown'
+		) {
 			window.console.error(
 				`Format "${ formatTypeForBareElement.name }" is already registered to handle bare tag name "${ settings.tagName }".`
 			);
@@ -87,7 +93,7 @@ export function registerFormatType( name, settings ) {
 		}
 	} else {
 		const formatTypeForClassName = select(
-			'core/rich-text'
+			richTextStore
 		).getFormatTypeForClassName( settings.className );
 
 		if ( formatTypeForClassName ) {
@@ -119,7 +125,7 @@ export function registerFormatType( name, settings ) {
 		return;
 	}
 
-	dispatch( 'core/rich-text' ).addFormatTypes( settings );
+	dispatch( richTextStore ).addFormatTypes( settings );
 
 	return settings;
 }

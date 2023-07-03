@@ -1,35 +1,46 @@
 /**
  * External dependencies
  */
-import { forEach, groupBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useMemo } from '@wordpress/element';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalUseColors,
-	BlockColorsStyleSelector,
+	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
+import {
+	ComboboxControl,
+	PanelBody,
+	SelectControl,
+	ToggleControl,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
-const DEFAULT_CONTRAST_CHECK_FONT_SIZE = 12;
+const minimumUsersForCombobox = 25;
 
-function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
-	const { postType, postId } = context;
+const AUTHORS_QUERY = {
+	who: 'authors',
+	per_page: 100,
+};
 
+function PostAuthorEdit( {
+	isSelected,
+	context: { postType, postId, queryId },
+	attributes,
+	setAttributes,
+} ) {
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getUser, getAuthors } = select(
-				'core'
-			);
+			const { getEditedEntityRecord, getUser, getUsers } =
+				select( coreStore );
 			const _authorId = getEditedEntityRecord(
 				'postType',
 				postType,
@@ -39,66 +50,20 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 			return {
 				authorId: _authorId,
 				authorDetails: _authorId ? getUser( _authorId ) : null,
-				authors: getAuthors(),
+				authors: getUsers( AUTHORS_QUERY ),
 			};
 		},
 		[ postType, postId ]
 	);
 
-	const { editEntityRecord } = useDispatch( 'core' );
+	const { editEntityRecord } = useDispatch( coreStore );
 
-	// Need font size in number form for named presets to be used in contrastCheckers.
-	const { fontSizes } = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSettings()
-	);
-	const fontSizeIndex = useMemo( () => groupBy( fontSizes, 'slug' ), [
-		fontSizes,
-	] );
-	const contrastCheckFontSize = useMemo(
-		() =>
-			// Custom size if set.
-			attributes.style?.typography?.fontSize ||
-			// Size of preset/named value if set.
-			fontSizeIndex[ attributes.fontSize ]?.[ 0 ].size ||
-			DEFAULT_CONTRAST_CHECK_FONT_SIZE,
-		[
-			attributes.style?.typography?.fontSize,
-			attributes.fontSize,
-			fontSizeIndex,
-		]
-	);
-	const ref = useRef();
-	const {
-		TextColor,
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		ColorPanel,
-	} = __experimentalUseColors(
-		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'background-color' },
-		],
-		{
-			contrastCheckers: [
-				{
-					backgroundColor: true,
-					textColor: true,
-					fontSize: contrastCheckFontSize,
-				},
-			],
-			colorDetector: { targetRef: ref },
-			colorPanelProps: {
-				initialOpen: true,
-			},
-		},
-		[ contrastCheckFontSize ]
-	);
-
-	const { align, showAvatar, showBio, byline } = attributes;
-
+	const { textAlign, showAvatar, showBio, byline, isLink, linkTarget } =
+		attributes;
 	const avatarSizes = [];
-	if ( authorDetails ) {
-		forEach( authorDetails.avatar_urls, ( url, size ) => {
+	const authorName = authorDetails?.name || __( 'Post Author' );
+	if ( authorDetails?.avatar_urls ) {
+		Object.keys( authorDetails.avatar_urls ).forEach( ( size ) => {
 			avatarSizes.push( {
 				value: size,
 				label: `${ size } x ${ size }`,
@@ -106,34 +71,56 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		} );
 	}
 
-	const classNames = useMemo( () => {
-		return {
-			block: classnames( 'wp-block-post-author', {
-				[ `has-text-align-${ align }` ]: align,
-			} ),
-		};
-	}, [ align ] );
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
+	const authorOptions = authors?.length
+		? authors.map( ( { id, name } ) => {
+				return {
+					value: id,
+					label: name,
+				};
+		  } )
+		: [];
+
+	const handleSelect = ( nextAuthorId ) => {
+		editEntityRecord( 'postType', postType, postId, {
+			author: nextAuthorId,
+		} );
+	};
+
+	const showCombobox = authorOptions.length >= minimumUsersForCombobox;
+	const showAuthorControl =
+		!! postId && ! isDescendentOfQueryLoop && authorOptions.length > 0;
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Author Settings' ) }>
-					<SelectControl
-						label={ __( 'Author' ) }
-						value={ authorId }
-						options={ authors.map( ( { id, name } ) => {
-							return {
-								value: id,
-								label: name,
-							};
-						} ) }
-						onChange={ ( nextAuthorId ) => {
-							editEntityRecord( 'postType', postType, postId, {
-								author: nextAuthorId,
-							} );
-						} }
-					/>
+				<PanelBody title={ __( 'Settings' ) }>
+					{ showAuthorControl &&
+						( ( showCombobox && (
+							<ComboboxControl
+								__nextHasNoMarginBottom
+								label={ __( 'Author' ) }
+								options={ authorOptions }
+								value={ authorId }
+								onChange={ handleSelect }
+								allowReset={ false }
+							/>
+						) ) || (
+							<SelectControl
+								__nextHasNoMarginBottom
+								label={ __( 'Author' ) }
+								value={ authorId }
+								options={ authorOptions }
+								onChange={ handleSelect }
+							/>
+						) ) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }
 						onChange={ () =>
@@ -142,6 +129,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 					/>
 					{ showAvatar && (
 						<SelectControl
+							__nextHasNoMarginBottom
 							label={ __( 'Avatar size' ) }
 							value={ attributes.avatarSize }
 							options={ avatarSizes }
@@ -153,73 +141,92 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						/>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show bio' ) }
 						checked={ showBio }
 						onChange={ () =>
 							setAttributes( { showBio: ! showBio } )
 						}
 					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Link author name to author page' ) }
+						checked={ isLink }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+					/>
+					{ isLink && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 
-			{ InspectorControlsColorPanel }
-
-			<BlockControls>
-				<AlignmentToolbar
-					value={ align }
+			<BlockControls group="block">
+				<AlignmentControl
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-				<BlockColorsStyleSelector
-					TextColor={ TextColor }
-					BackgroundColor={ BackgroundColor }
-				>
-					{ ColorPanel }
-				</BlockColorsStyleSelector>
 			</BlockControls>
 
-			<TextColor>
-				<BackgroundColor>
-					<div ref={ ref } className={ classNames.block }>
-						{ showAvatar && authorDetails && (
-							<div className="wp-block-post-author__avatar">
-								<img
-									width={ attributes.avatarSize }
-									src={
-										authorDetails.avatar_urls[
-											attributes.avatarSize
-										]
-									}
-									alt={ authorDetails.name }
-								/>
-							</div>
-						) }
-						<div className="wp-block-post-author__content">
-							{ ( ! RichText.isEmpty( byline ) ||
-								isSelected ) && (
-								<RichText
-									className="wp-block-post-author__byline"
-									multiline={ false }
-									placeholder={ __( 'Write byline …' ) }
-									value={ byline }
-									onChange={ ( value ) =>
-										setAttributes( { byline: value } )
-									}
-								/>
-							) }
-							<p className="wp-block-post-author__name">
-								{ authorDetails?.name }
-							</p>
-							{ showBio && (
-								<p className="wp-block-post-author__bio">
-									{ authorDetails?.description }
-								</p>
-							) }
-						</div>
+			<div { ...blockProps }>
+				{ showAvatar && authorDetails?.avatar_urls && (
+					<div className="wp-block-post-author__avatar">
+						<img
+							width={ attributes.avatarSize }
+							src={
+								authorDetails.avatar_urls[
+									attributes.avatarSize
+								]
+							}
+							alt={ authorDetails.name }
+						/>
 					</div>
-				</BackgroundColor>
-			</TextColor>
+				) }
+				<div className="wp-block-post-author__content">
+					{ ( ! RichText.isEmpty( byline ) || isSelected ) && (
+						<RichText
+							className="wp-block-post-author__byline"
+							multiline={ false }
+							aria-label={ __( 'Post author byline text' ) }
+							placeholder={ __( 'Write byline…' ) }
+							value={ byline }
+							onChange={ ( value ) =>
+								setAttributes( { byline: value } )
+							}
+						/>
+					) }
+					<p className="wp-block-post-author__name">
+						{ isLink ? (
+							<a
+								href="#post-author-pseudo-link"
+								onClick={ ( event ) => event.preventDefault() }
+							>
+								{ authorName }
+							</a>
+						) : (
+							authorName
+						) }
+					</p>
+					{ showBio && (
+						<p
+							className="wp-block-post-author__bio"
+							dangerouslySetInnerHTML={ {
+								__html: authorDetails?.description,
+							} }
+						/>
+					) }
+				</div>
+			</div>
 		</>
 	);
 }

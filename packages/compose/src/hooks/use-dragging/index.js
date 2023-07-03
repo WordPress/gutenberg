@@ -1,17 +1,21 @@
 /**
  * WordPress dependencies
  */
-import {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
-const useIsomorphicLayoutEffect =
-	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+/**
+ * Internal dependencies
+ */
+import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
+// Event handlers that are triggered from `document` listeners accept a MouseEvent,
+// while those triggered from React listeners accept a React.MouseEvent.
+/**
+ * @param {Object}                                  props
+ * @param {(e: import('react').MouseEvent) => void} props.onDragStart
+ * @param {(e: MouseEvent) => void}                 props.onDragMove
+ * @param {(e?: MouseEvent) => void}                props.onDragEnd
+ */
 export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 
@@ -26,23 +30,26 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 		eventsRef.current.onDragEnd = onDragEnd;
 	}, [ onDragStart, onDragMove, onDragEnd ] );
 
+	/** @type {(e: MouseEvent) => void} */
 	const onMouseMove = useCallback(
-		( ...args ) =>
+		( event ) =>
 			eventsRef.current.onDragMove &&
-			eventsRef.current.onDragMove( ...args ),
+			eventsRef.current.onDragMove( event ),
 		[]
 	);
-	const endDrag = useCallback( ( ...args ) => {
+	/** @type {(e?: MouseEvent) => void} */
+	const endDrag = useCallback( ( event ) => {
 		if ( eventsRef.current.onDragEnd ) {
-			eventsRef.current.onDragEnd( ...args );
+			eventsRef.current.onDragEnd( event );
 		}
 		document.removeEventListener( 'mousemove', onMouseMove );
 		document.removeEventListener( 'mouseup', endDrag );
 		setIsDragging( false );
 	}, [] );
-	const startDrag = useCallback( ( ...args ) => {
+	/** @type {(e: import('react').MouseEvent) => void} */
+	const startDrag = useCallback( ( event ) => {
 		if ( eventsRef.current.onDragStart ) {
-			eventsRef.current.onDragStart( ...args );
+			eventsRef.current.onDragStart( event );
 		}
 		document.addEventListener( 'mousemove', onMouseMove );
 		document.addEventListener( 'mouseup', endDrag );

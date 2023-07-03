@@ -1,0 +1,39 @@
+.wp-block-tag-cloud {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
+	&.aligncenter {
+		text-align: center;
+		justify-content: center;
+	}
+
+	&.alignfull {
+		padding-left: 1em;
+		padding-right: 1em;
+	}
+
+	a {
+		display: inline-block;
+		margin-right: 5px;
+	}
+
+	span {
+		display: inline-block;
+		margin-left: 5px;
+		text-decoration: none;
+	}
+
+	&.is-style-outline {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1ch;
+
+		a {
+			border: 1px solid currentColor;
+			font-size: unset !important; // !important Needed to override the inline styles.
+			margin-right: 0;
+			padding: 1ch 2ch;
+			text-decoration: none !important; // !important needed to override generic post content link decoration.
+		}
+	}
+}

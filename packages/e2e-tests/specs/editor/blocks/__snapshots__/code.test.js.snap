@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Code can be created by three backticks and enter 1`] = `
-"<!-- wp:code -->
-<pre class=\\"wp-block-code\\"><code>&lt;?php</code></pre>
-<!-- /wp:code -->"
-`;

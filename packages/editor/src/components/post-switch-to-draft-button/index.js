@@ -1,10 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	FlexItem,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, useViewportMatch } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 function PostSwitchToDraftButton( {
 	isSaving,
@@ -12,48 +22,52 @@ function PostSwitchToDraftButton( {
 	isScheduled,
 	onClick,
 } ) {
-	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
 	if ( ! isPublished && ! isScheduled ) {
 		return null;
 	}
 
-	const onSwitch = () => {
-		let alertMessage;
-		if ( isPublished ) {
-			alertMessage = __(
-				'Are you sure you want to unpublish this post?'
-			);
-		} else if ( isScheduled ) {
-			alertMessage = __(
-				'Are you sure you want to unschedule this post?'
-			);
-		}
-		// eslint-disable-next-line no-alert
-		if ( window.confirm( alertMessage ) ) {
-			onClick();
-		}
+	let alertMessage;
+	if ( isPublished ) {
+		alertMessage = __( 'Are you sure you want to unpublish this post?' );
+	} else if ( isScheduled ) {
+		alertMessage = __( 'Are you sure you want to unschedule this post?' );
+	}
+
+	const handleConfirm = () => {
+		setShowConfirmDialog( false );
+		onClick();
 	};
 
 	return (
-		<Button
-			className="editor-post-switch-to-draft"
-			onClick={ onSwitch }
-			disabled={ isSaving }
-			isTertiary
-		>
-			{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
-		</Button>
+		<FlexItem isBlock>
+			<Button
+				className="editor-post-switch-to-draft"
+				onClick={ () => {
+					setShowConfirmDialog( true );
+				} }
+				disabled={ isSaving }
+				variant="secondary"
+				style={ { width: '100%', display: 'block' } }
+			>
+				{ __( 'Switch to draft' ) }
+			</Button>
+			<ConfirmDialog
+				isOpen={ showConfirmDialog }
+				onConfirm={ handleConfirm }
+				onCancel={ () => setShowConfirmDialog( false ) }
+			>
+				{ alertMessage }
+			</ConfirmDialog>
+		</FlexItem>
 	);
 }
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			isSavingPost,
-			isCurrentPostPublished,
-			isCurrentPostScheduled,
-		} = select( 'core/editor' );
+		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } =
+			select( editorStore );
 		return {
 			isSaving: isSavingPost(),
 			isPublished: isCurrentPostPublished(),
@@ -61,7 +75,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( 'core/editor' );
+		const { editPost, savePost } = dispatch( editorStore );
 		return {
 			onClick: () => {
 				editPost( { status: 'draft' } );

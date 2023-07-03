@@ -1,52 +1,7 @@
 /**
- * External dependencies
- */
-import { flow } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { PREFERENCES_DEFAULTS } from './defaults';
-
-/**
- * Higher-order reducer creator which provides the given initial state for the
- * original reducer.
- *
- * @param {*} initialState Initial state to provide to reducer.
- *
- * @return {Function} Higher-order reducer.
- */
-const createWithInitialState = ( initialState ) => ( reducer ) => {
-	return ( state = initialState, action ) => reducer( state, action );
-};
-
-/**
- * Reducer returning the user preferences.
- *
- * @param {Object}  state Current state.
- *
- * @return {Object} Updated state.
- */
-export const preferences = flow( [
-	combineReducers,
-	createWithInitialState( PREFERENCES_DEFAULTS ),
-] )( {
-	features( state, action ) {
-		if ( action.type === 'TOGGLE_FEATURE' ) {
-			return {
-				...state,
-				[ action.feature ]: ! state[ action.feature ],
-			};
-		}
-
-		return state;
-	},
-} );
 
 /**
  * Reducer returning the editing canvas device type.
@@ -86,141 +41,150 @@ export function settings( state = {}, action ) {
 }
 
 /**
- * Reducer returning the home template ID.
+ * Reducer keeping track of the currently edited Post Type,
+ * Post Id and the context provided to fill the content of the block editor.
  *
- * @param {Object} state Current state.
- *
- * @return {Object} Updated state.
- */
-export function homeTemplateId( state ) {
-	return state;
-}
-
-/**
- * Reducer returning the template ID.
- *
- * @param {Object} state  Current state.
+ * @param {Object} state  Current edited post.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function templateId( state, action ) {
+export function editedPost( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_TEMPLATE':
-		case 'ADD_TEMPLATE':
-		case 'SET_PAGE':
-			return action.templateId;
+		case 'SET_EDITED_POST':
+			return {
+				postType: action.postType,
+				id: action.id,
+				context: action.context,
+			};
+		case 'SET_EDITED_POST_CONTEXT':
+			return {
+				...state,
+				context: action.context,
+			};
 	}
 
 	return state;
 }
 
 /**
- * Reducer returning the template part ID.
+ * Reducer to set the block inserter panel open or closed.
+ *
+ * Note: this reducer interacts with the navigation and list view panels reducers
+ * to make sure that only one of the three panels is open at the same time.
+ *
+ * @param {boolean|Object} state  Current state.
+ * @param {Object}         action Dispatched action.
+ */
+export function blockInserterPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.isOpen ? false : state;
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value;
+		case 'SET_CANVAS_MODE':
+			return false;
+	}
+	return state;
+}
+
+/**
+ * Reducer to set the list view panel open or closed.
+ *
+ * Note: this reducer interacts with the navigation and inserter panels reducers
+ * to make sure that only one of the three panels is open at the same time.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
  */
-export function templatePartId( state, action ) {
+export function listViewPanel( state = false, action ) {
 	switch ( action.type ) {
-		case 'SET_TEMPLATE_PART':
-			return action.templatePartId;
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value ? false : state;
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.isOpen;
+		case 'SET_CANVAS_MODE':
+			return false;
+	}
+	return state;
+}
+
+/**
+ * Reducer to set the save view panel open or closed.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function saveViewPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_SAVE_VIEW_OPENED':
+			return action.isOpen;
+		case 'SET_CANVAS_MODE':
+			return false;
+	}
+	return state;
+}
+
+/**
+ * Reducer used to track the site editor canvas mode (edit or view).
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+function canvasMode( state = 'init', action ) {
+	switch ( action.type ) {
+		case 'SET_CANVAS_MODE':
+			return action.mode;
 	}
 
 	return state;
 }
 
 /**
- * Reducer returning the template type.
+ * Reducer used to track the site editor canvas container view.
+ * Default is `undefined`, denoting the default, visual block editor.
+ * This could be, for example, `'style-book'` (the style book).
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  */
-export function templateType( state, action ) {
+function editorCanvasContainerView( state = undefined, action ) {
 	switch ( action.type ) {
-		case 'SET_TEMPLATE':
-		case 'ADD_TEMPLATE':
-		case 'SET_PAGE':
-			return 'wp_template';
-		case 'SET_TEMPLATE_PART':
-			return 'wp_template_part';
+		case 'SET_EDITOR_CANVAS_CONTAINER_VIEW':
+			return action.view;
 	}
 
 	return state;
 }
 
 /**
- * Reducer returning the list of template IDs.
+ * Reducer used to track whether the editor allows only page content to be
+ * edited.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {boolean} Updated state.
  */
-export function templateIds( state = [], action ) {
+export function hasPageContentFocus( state = false, action ) {
 	switch ( action.type ) {
-		case 'ADD_TEMPLATE':
-			return [ ...state, action.templateId ];
-		case 'REMOVE_TEMPLATE':
-			return state.filter( ( id ) => id !== action.templateId );
+		case 'SET_EDITED_POST':
+			return !! action.context?.postId;
+		case 'SET_HAS_PAGE_CONTENT_FOCUS':
+			return action.hasPageContentFocus;
 	}
 
-	return state;
-}
-
-/**
- * Reducer returning the list of template part IDs.
- *
- * @param {Object} state Current state.
- *
- * @return {Object} Updated state.
- */
-export function templatePartIds( state = [] ) {
-	return state;
-}
-
-/**
- * Reducer returning the page being edited.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function page( state = {}, action ) {
-	switch ( action.type ) {
-		case 'SET_PAGE':
-			return action.page;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the site's `show_on_front` setting.
- *
- * @param {Object} state Current state.
- *
- * @return {Object} Updated state.
- */
-export function showOnFront( state ) {
 	return state;
 }
 
 export default combineReducers( {
-	preferences,
 	deviceType,
 	settings,
-	homeTemplateId,
-	templateId,
-	templatePartId,
-	templateType,
-	templateIds,
-	templatePartIds,
-	page,
-	showOnFront,
+	editedPost,
+	blockInserterPanel,
+	listViewPanel,
+	saveViewPanel,
+	canvasMode,
+	editorCanvasContainerView,
+	hasPageContentFocus,
 } );

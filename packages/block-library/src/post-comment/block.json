@@ -1,0 +1,22 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": "fse",
+	"name": "core/post-comment",
+	"title": "Post Comment (deprecated)",
+	"category": "theme",
+	"description": "This block is deprecated. Please use the Comments block instead.",
+	"textdomain": "default",
+	"attributes": {
+		"commentId": {
+			"type": "number"
+		}
+	},
+	"providesContext": {
+		"commentId": "commentId"
+	},
+	"supports": {
+		"html": false,
+		"inserter": false
+	}
+}

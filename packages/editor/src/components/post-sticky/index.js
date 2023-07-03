@@ -10,11 +10,13 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import PostStickyCheck from './check';
+import { store as editorStore } from '../../store';
 
 export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 	return (
 		<PostStickyCheck>
 			<CheckboxControl
+				__nextHasNoMarginBottom
 				label={ __( 'Stick to the top of the blog' ) }
 				checked={ postSticky }
 				onChange={ () => onUpdateSticky( ! postSticky ) }
@@ -26,15 +28,14 @@ export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			postSticky: select( 'core/editor' ).getEditedPostAttribute(
-				'sticky'
-			),
+			postSticky:
+				select( editorStore ).getEditedPostAttribute( 'sticky' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		return {
 			onUpdateSticky( postSticky ) {
-				dispatch( 'core/editor' ).editPost( { sticky: postSticky } );
+				dispatch( editorStore ).editPost( { sticky: postSticky } );
 			},
 		};
 	} ),

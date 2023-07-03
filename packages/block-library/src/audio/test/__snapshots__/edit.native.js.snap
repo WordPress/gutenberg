@@ -1,0 +1,449 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Audio block renders audio block error state without crashing 1`] = `
+<View
+  accessibilityState={
+    {
+      "disabled": true,
+    }
+  }
+  accessible={true}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+>
+  <View
+    pointerEvents="box-none"
+    style={
+      [
+        undefined,
+        undefined,
+      ]
+    }
+  >
+    <View
+      style={
+        [
+          undefined,
+          undefined,
+          undefined,
+        ]
+      }
+    />
+    <View
+      accessibilityState={
+        {
+          "disabled": true,
+        }
+      }
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "height": 44,
+        }
+      }
+    >
+      <View>
+        <Svg
+          height={24}
+          style={
+            {
+              "fill": "gray",
+            }
+          }
+          viewBox="0 0 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          Path
+        </Svg>
+      </View>
+      <View
+        style={{}}
+      >
+        <Text>
+          59IrU0WJtq
+        </Text>
+        <View>
+          <Svg
+            height={16}
+            style={{}}
+            viewBox="-2 -2 24 24"
+            width={16}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            Path
+          </Svg>
+          <Text
+            style={{}}
+          >
+            Failed to insert audio file. Please tap for options.
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      [
+        {
+          "height": 44,
+        },
+        false,
+      ]
+    }
+  >
+    <View
+      accessibilityLabel="Audio caption. Empty"
+      accessibilityRole="button"
+      accessible={true}
+      style={
+        {
+          "display": "none",
+          "flex": 1,
+        }
+      }
+    >
+      <View
+        style={
+          [
+            undefined,
+            undefined,
+          ]
+        }
+      >
+        <RCTAztecView
+          accessible={true}
+          activeFormats={[]}
+          blockType={
+            {
+              "tag": "p",
+            }
+          }
+          deleteEnter={true}
+          disableEditingMenu={false}
+          focusable={true}
+          fontFamily="serif"
+          fontSize={14}
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onClick={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
+          onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onSelectionChange={[Function]}
+          onStartShouldSetResponder={[Function]}
+          placeholder="Add caption"
+          placeholderTextColor="gray"
+          style={
+            {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
+            }
+          }
+          text={
+            {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "tag": "p",
+              "text": "",
+            }
+          }
+          textAlign="center"
+          triggerKeyCodes={[]}
+        />
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Audio block renders audio file without crashing 1`] = `
+<View
+  accessibilityState={
+    {
+      "disabled": true,
+    }
+  }
+  accessible={true}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+>
+  <View
+    pointerEvents="box-none"
+    style={
+      [
+        undefined,
+        undefined,
+      ]
+    }
+  >
+    <View
+      style={
+        [
+          undefined,
+          undefined,
+          undefined,
+        ]
+      }
+    />
+    <View
+      accessibilityState={
+        {
+          "disabled": true,
+        }
+      }
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "height": 44,
+        }
+      }
+    >
+      <View>
+        <Svg
+          height={24}
+          style={
+            {
+              "fill": "gray",
+            }
+          }
+          viewBox="0 0 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          Path
+        </Svg>
+      </View>
+      <View
+        style={{}}
+      >
+        <Text>
+          59IrU0WJtq
+        </Text>
+        <View>
+          <Text
+            style={{}}
+          >
+            MP3 audio file
+          </Text>
+        </View>
+      </View>
+      <View
+        accessibilityHint="Double tap to listen the audio file"
+        accessibilityLabel="Audio Player"
+        accessibilityRole="button"
+        accessible={true}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <Text
+          style={
+            {
+              "color": "white",
+            }
+          }
+        >
+          OPEN
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      [
+        {
+          "height": 44,
+        },
+        false,
+      ]
+    }
+  >
+    <View
+      accessibilityLabel="Audio caption. Empty"
+      accessibilityRole="button"
+      accessible={true}
+      style={
+        {
+          "display": "none",
+          "flex": 1,
+        }
+      }
+    >
+      <View
+        style={
+          [
+            undefined,
+            undefined,
+          ]
+        }
+      >
+        <RCTAztecView
+          accessible={true}
+          activeFormats={[]}
+          blockType={
+            {
+              "tag": "p",
+            }
+          }
+          deleteEnter={true}
+          disableEditingMenu={false}
+          focusable={true}
+          fontFamily="serif"
+          fontSize={14}
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onClick={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
+          onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onSelectionChange={[Function]}
+          onStartShouldSetResponder={[Function]}
+          placeholder="Add caption"
+          placeholderTextColor="gray"
+          style={
+            {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
+            }
+          }
+          text={
+            {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "tag": "p",
+              "text": "",
+            }
+          }
+          textAlign="center"
+          triggerKeyCodes={[]}
+        />
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Audio block renders placeholder without crashing 1`] = `
+<View>
+  <View
+    style={
+      {
+        "flex": 1,
+      }
+    }
+  >
+    <View
+      accessibilityHint="Double tap to select an audio file"
+      accessibilityLabel="Audio block. Empty"
+      accessibilityRole="button"
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          [
+            undefined,
+            undefined,
+            undefined,
+          ],
+          undefined,
+        ]
+      }
+    >
+      <View
+        style={
+          {
+            "fill": "gray",
+          }
+        }
+      >
+        <View
+          style={{}}
+        >
+          <Svg
+            height={24}
+            style={{}}
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            Path
+          </Svg>
+        </View>
+      </View>
+      <Text>
+        Audio
+      </Text>
+      <Text>
+        ADD AUDIO
+      </Text>
+    </View>
+  </View>
+</View>
+`;

@@ -1,14 +1,11 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { getFilename } from '@wordpress/url';
 
 const transforms = {
 	from: [
@@ -48,6 +45,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.src,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -60,6 +58,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.src,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -69,9 +68,11 @@ const transforms = {
 			transform: ( attributes ) => {
 				return createBlock( 'core/file', {
 					href: attributes.url,
-					fileName: attributes.caption,
+					fileName:
+						attributes.caption || getFilename( attributes.url ),
 					textLinkHref: attributes.url,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -84,15 +85,16 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( 'core' );
+				const { getMedia } = select( coreStore );
 				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'audio' );
+				return !! media && media.mime_type.includes( 'audio' );
 			},
 			transform: ( attributes ) => {
 				return createBlock( 'core/audio', {
 					src: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -103,15 +105,16 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( 'core' );
+				const { getMedia } = select( coreStore );
 				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'video' );
+				return !! media && media.mime_type.includes( 'video' );
 			},
 			transform: ( attributes ) => {
 				return createBlock( 'core/video', {
 					src: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -122,15 +125,16 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( 'core' );
+				const { getMedia } = select( coreStore );
 				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'image' );
+				return !! media && media.mime_type.includes( 'image' );
 			},
 			transform: ( attributes ) => {
 				return createBlock( 'core/image', {
 					url: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},

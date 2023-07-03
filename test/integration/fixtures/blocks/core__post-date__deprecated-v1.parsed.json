@@ -1,0 +1,15 @@
+[
+	{
+		"blockName": "core/post-date",
+		"attrs": {
+			"style": {
+				"typography": {
+					"fontFamily": "var:preset|font-family|cambria-georgia"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

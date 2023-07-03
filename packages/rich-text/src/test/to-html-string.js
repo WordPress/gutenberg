@@ -1,21 +1,11 @@
 /**
- * External dependencies
- */
-
-import { JSDOM } from 'jsdom';
-
-/**
  * Internal dependencies
  */
-
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
 import { specWithRegistration } from './helpers';
-
-const { window } = new JSDOM();
-const { document } = window;
 
 function createNode( HTML ) {
 	const doc = document.implementation.createHTMLDocument( '' );
@@ -42,6 +32,7 @@ describe( 'toHTMLString', () => {
 				return;
 			}
 
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				if ( formatName ) {
 					registerFormatType( formatName, formatType );
@@ -133,10 +124,9 @@ describe( 'toHTMLString', () => {
 	it( 'should serialize neighbouring same formats', () => {
 		const HTML = '<a href="a">a</a><a href="a">a</a>';
 		const element = createNode( `<p>${ HTML }</p>` );
-		const expectedHTML = '<a href="a">aa</a>';
 
 		expect( toHTMLString( { value: create( { element } ) } ) ).toEqual(
-			expectedHTML
+			HTML
 		);
 	} );
 } );

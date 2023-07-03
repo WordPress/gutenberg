@@ -2,22 +2,24 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
+import { memo } from '@wordpress/element';
 
-export default function BlockIcon( { icon, showColors = false, className } ) {
-	if ( get( icon, [ 'src' ] ) === 'block-default' ) {
+function BlockIcon( { icon, showColors = false, className, context } ) {
+	if ( icon?.src === 'block-default' ) {
 		icon = {
 			src: blockDefault,
 		};
 	}
 
-	const renderedIcon = <Icon icon={ icon && icon.src ? icon.src : icon } />;
+	const renderedIcon = (
+		<Icon icon={ icon && icon.src ? icon.src : icon } context={ context } />
+	);
 	const style = showColors
 		? {
 				backgroundColor: icon && icon.background,
@@ -36,3 +38,8 @@ export default function BlockIcon( { icon, showColors = false, className } ) {
 		</span>
 	);
 }
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-icon/README.md
+ */
+export default memo( BlockIcon );

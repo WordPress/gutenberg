@@ -1,0 +1,180 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ItemGroup Item should read the value of the size prop from context when the prop is not defined 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -8,11 +8,11 @@
+      <div
+        class="css-dcjs67-itemWrapper"
+        role="listitem"
+      >
+        <div
+-         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-17haj95-View-large-item-spacedAround e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Code
+        </div>
+@@ -20,11 +20,11 @@
+      <div
+        class="css-dcjs67-itemWrapper"
+        role="listitem"
+      >
+        <div
+-         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-17haj95-View-large-item-spacedAround e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Is
+        </div>
+`;
+
+exports[`ItemGroup Item should use different amounts of padding depending on the value of the size prop 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -2,11 +2,11 @@
+    <div
+      class="css-dcjs67-itemWrapper"
+      role="listitem"
+    >
+      <div
+-       class="components-item css-cl593w-View-medium-item e19lxcc00"
++       class="components-item css-1yvqxd-View-large-item e19lxcc00"
+        data-wp-c16t="true"
+        data-wp-component="Item"
+      >
+        Code is poetry
+      </div>
+`;
+
+exports[`ItemGroup ItemGroup component should render correctly 1`] = `
+.emotion-0 {
+  border-radius: 2px;
+}
+
+.emotion-0>*:first-of-type>* {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.emotion-0>*:last-of-type>* {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.emotion-2 {
+  width: 100%;
+  display: block;
+}
+
+.emotion-3 {
+  padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
+  box-sizing: border-box;
+  width: 100%;
+  display: block;
+  margin: 0;
+  color: inherit;
+  border-radius: 2px;
+}
+
+<div>
+  <div
+    class="components-item-group emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="ItemGroup"
+    role="list"
+  >
+    <div
+      class="emotion-2"
+      role="listitem"
+    >
+      <div
+        class="components-item emotion-3 emotion-1"
+        data-wp-c16t="true"
+        data-wp-component="Item"
+      >
+        Code is poetry
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ItemGroup ItemGroup component should render items individually when the isSeparated prop is true 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,18 +1,18 @@
+  <div>
+    <div
+-     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
++     class="components-item-group css-18qvw1m-View-separated-rounded e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="ItemGroup"
+      role="list"
+    >
+      <div
+        class="css-dcjs67-itemWrapper"
+        role="listitem"
+      >
+        <div
+-         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-cl593w-View-medium-item e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Code is poetry
+        </div>
+`;
+
+exports[`ItemGroup ItemGroup component should show borders when the isBordered prop is true 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,18 +1,18 @@
+  <div>
+    <div
+-     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
++     class="components-item-group css-acyoj6-View-bordered-rounded e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="ItemGroup"
+      role="list"
+    >
+      <div
+        class="css-dcjs67-itemWrapper"
+        role="listitem"
+      >
+        <div
+-         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-cl593w-View-medium-item e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="Item"
+        >
+          Code is poetry
+        </div>
+`;
+
+exports[`ItemGroup ItemGroup component should show rounded corners when the isRounded prop is true 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,8 +1,8 @@
+  <div>
+    <div
+-     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
++     class="components-item-group css-1mm2cvy-View e19lxcc00"
+      data-wp-c16t="true"
+      data-wp-component="ItemGroup"
+      role="list"
+    >
+      <div
+`;

@@ -1,5 +1,4 @@
-Block Context
-=============
+# Block Context
 
 Block Context is a React implementation of WordPress's block context. Block context, much like [React's context](https://reactjs.org/docs/context.html), is a method for passing and inheriting values deeply through a hierarchy of blocks. Because of the similarities with React's context, the client-side implementation here is quite minimal. It is complemented by equivalent behaviors in the server-side rendering of a block.
 
@@ -44,14 +43,14 @@ The reason `BlockContext` is only internally available within the `@wordpress/bl
 
 ### `value`
 
-- Type: `Record<string,*>`
-- Required: Yes
+-   Type: `Record<string,*>`
+-   Required: Yes
 
 Context value to merge with current value.
 
 ### `children`
 
-- Type: `ReactNode`
-- Required: Yes
+-   Type: `ReactNode`
+-   Required: Yes
 
 Component children.

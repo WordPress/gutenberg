@@ -10,24 +10,38 @@ Install the module
 npm install @wordpress/api-fetch --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
+### GET
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-// GET
-apiFetch( { path: '/wp/v2/posts' } ).then( posts => {
+apiFetch( { path: '/wp/v2/posts' } ).then( ( posts ) => {
 	console.log( posts );
 } );
+```
 
-// POST
+### GET with Query Args
+```js
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+
+const queryParams = { include: [1,2,3] }; // Return posts with ID = 1,2,3.
+
+apiFetch( { path: addQueryArgs( '/wp/v2/posts', queryParams ) } ).then( ( posts ) => {
+	console.log( posts );
+} );
+```
+
+### POST
+```js
 apiFetch( {
 	path: '/wp/v2/posts/1',
 	method: 'POST',
 	data: { title: 'New Post Title' },
-} ).then( res => {
+} ).then( ( res ) => {
 	console.log( res );
 } );
 ```
@@ -52,7 +66,35 @@ Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the par
 
 #### `data` (`object`)
 
-Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
+Sent on `POST` or `PUT` requests only. Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
+
+### Aborting a request
+
+Aborting a request can be achieved through the use of [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) in the same way as you would when using the native `fetch` API.
+
+For legacy browsers that don't support `AbortController`, you can either:
+
+-   Provide your own polyfill of `AbortController` if you still want it to be abortable.
+-   Ignore it as shown in the example below.
+
+**Example**
+
+```js
+const controller =
+	typeof AbortController === 'undefined' ? undefined : new AbortController();
+
+apiFetch( { path: '/wp/v2/posts', signal: controller?.signal } ).catch(
+	( error ) => {
+		// If the browser doesn't support AbortController then the code below will never log.
+		// However, in most cases this should be fine as it can be considered to be a progressive enhancement.
+		if ( error.name === 'AbortError' ) {
+			console.log( 'Request has been aborted' );
+		}
+	}
+);
+
+controller?.abort();
+```
 
 ### Middlewares
 
@@ -67,7 +109,7 @@ apiFetch.use( ( options, next ) => {
 	const start = Date.now();
 	const result = next( options );
 	result.then( () => {
-		console.log( 'The request took ' + Date.now() - start );
+		console.log( 'The request took ' + ( Date.now() - start ) + 'ms' );
 	} );
 	return result;
 } );
@@ -82,7 +124,7 @@ The `api-fetch` package provides built-in middlewares you can use to provide a `
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-const nonce = "nonce value";
+const nonce = 'nonce value';
 apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 ```
 
@@ -93,7 +135,7 @@ The function returned by `createNonceMiddleware` includes a `nonce` property cor
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-const rootURL = "http://my-wordpress-site/wp-json/";
+const rootURL = 'http://my-wordpress-site/wp-json/';
 apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
 ```
 
@@ -120,4 +162,10 @@ apiFetch.setFetchHandler( ( options ) => {
 } );
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

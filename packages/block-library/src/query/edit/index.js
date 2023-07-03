@@ -1,44 +1,46 @@
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
-import { BlockControls, InnerBlocks } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import QueryToolbar from './query-toolbar';
-import QueryProvider from './query-provider';
+import QueryContent from './query-content';
+import QueryPlaceholder from './query-placeholder';
+import PatternSelectionModal from './pattern-selection-modal';
 
-const TEMPLATE = [ [ 'core/query-loop' ], [ 'core/query-pagination' ] ];
-export default function QueryEdit( {
-	attributes: { queryId, query },
-	setAttributes,
-} ) {
-	const instanceId = useInstanceId( QueryEdit );
-	// We need this for multi-query block pagination.
-	// Query parameters for each block are scoped to their ID.
-	useEffect( () => {
-		if ( ! queryId ) {
-			setAttributes( { queryId: instanceId } );
-		}
-	}, [ queryId, instanceId ] );
+const QueryEdit = ( props ) => {
+	const { clientId, attributes } = props;
+	const [ isPatternSelectionModalOpen, setIsPatternSelectionModalOpen ] =
+		useState( false );
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getBlocks( clientId ).length,
+		[ clientId ]
+	);
+	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
 	return (
 		<>
-			<BlockControls>
-				<QueryToolbar
-					query={ query }
-					setQuery={ ( newQuery ) =>
-						setAttributes( { query: { ...query, ...newQuery } } )
+			<Component
+				{ ...props }
+				openPatternSelectionModal={ () =>
+					setIsPatternSelectionModalOpen( true )
+				}
+			/>
+			{ isPatternSelectionModalOpen && (
+				<PatternSelectionModal
+					clientId={ clientId }
+					attributes={ attributes }
+					setIsPatternSelectionModalOpen={
+						setIsPatternSelectionModalOpen
 					}
 				/>
-			</BlockControls>
-			<QueryProvider>
-				<InnerBlocks template={ TEMPLATE } />
-			</QueryProvider>
+			) }
 		</>
 	);
-}
+};
 
-export * from './query-provider';
+export default QueryEdit;

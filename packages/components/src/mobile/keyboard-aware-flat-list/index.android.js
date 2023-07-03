@@ -2,20 +2,26 @@
  * External dependencies
  */
 import { FlatList } from 'react-native';
+import Animated, { useAnimatedScrollHandler } from 'react-native-reanimated';
 
 /**
  * Internal dependencies
  */
 import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
-export const KeyboardAwareFlatList = ( props ) => (
-	<KeyboardAvoidingView style={ { flex: 1 } }>
-		<FlatList { ...props } />
-	</KeyboardAvoidingView>
-);
+const AnimatedFlatList = Animated.createAnimatedComponent( FlatList );
 
-KeyboardAwareFlatList.handleCaretVerticalPositionChange = () => {
-	//no need to handle on Android, it is system managed
+export const KeyboardAwareFlatList = ( { innerRef, onScroll, ...props } ) => {
+	const scrollHandler = useAnimatedScrollHandler( { onScroll } );
+	return (
+		<KeyboardAvoidingView style={ { flex: 1 } }>
+			<AnimatedFlatList
+				ref={ innerRef }
+				onScroll={ scrollHandler }
+				{ ...props }
+			/>
+		</KeyboardAvoidingView>
+	);
 };
 
 export default KeyboardAwareFlatList;

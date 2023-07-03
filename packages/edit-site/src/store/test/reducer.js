@@ -7,40 +7,16 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	preferences,
 	settings,
-	homeTemplateId,
-	templateId,
-	templatePartId,
-	templateType,
-	templateIds,
-	templatePartIds,
-	page,
-	showOnFront,
+	editedPost,
+	blockInserterPanel,
+	listViewPanel,
+	hasPageContentFocus,
 } from '../reducer';
-import { PREFERENCES_DEFAULTS } from '../defaults';
+
+import { setIsInserterOpened, setIsListViewOpened } from '../actions';
 
 describe( 'state', () => {
-	describe( 'preferences()', () => {
-		it( 'should apply all defaults', () => {
-			const state = preferences( undefined, {} );
-
-			expect( state ).toEqual( PREFERENCES_DEFAULTS );
-		} );
-
-		it( 'should toggle a feature flag', () => {
-			const state = preferences(
-				deepFreeze( { features: { chicken: true } } ),
-				{
-					type: 'TOGGLE_FEATURE',
-					feature: 'chicken',
-				}
-			);
-
-			expect( state.features ).toEqual( { chicken: false } );
-		} );
-	} );
-
 	describe( 'settings()', () => {
 		it( 'should apply default state', () => {
 			expect( settings( undefined, {} ) ).toEqual( {} );
@@ -70,193 +46,137 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'homeTemplateId()', () => {
+	describe( 'editedPost()', () => {
 		it( 'should apply default state', () => {
-			expect( homeTemplateId( undefined, {} ) ).toEqual( undefined );
+			expect( editedPost( undefined, {} ) ).toEqual( {} );
 		} );
 
 		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( homeTemplateId( state, {} ) ).toBe( state );
-		} );
-	} );
-
-	describe( 'templateId()', () => {
-		it( 'should apply default state', () => {
-			expect( templateId( undefined, {} ) ).toEqual( undefined );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templateId( state, {} ) ).toBe( state );
+			const state = [];
+			expect( editedPost( state, {} ) ).toBe( state );
 		} );
 
 		it( 'should update when a template is set', () => {
 			expect(
-				templateId( 1, {
-					type: 'SET_TEMPLATE',
-					templateId: 2,
-				} )
-			).toEqual( 2 );
-		} );
-
-		it( 'should update when a template is added', () => {
-			expect(
-				templateId( 1, {
-					type: 'ADD_TEMPLATE',
-					templateId: 2,
-				} )
-			).toEqual( 2 );
-		} );
-
-		it( 'should update when a page is set', () => {
-			expect(
-				templateId( 1, {
-					type: 'SET_PAGE',
-					templateId: 2,
-				} )
-			).toEqual( 2 );
+				editedPost(
+					{ id: 1, type: 'wp_template' },
+					{
+						type: 'SET_EDITED_POST',
+						postType: 'wp_template',
+						id: 2,
+						context: { templateSlug: 'slug' },
+					}
+				)
+			).toEqual( {
+				postType: 'wp_template',
+				id: 2,
+				context: { templateSlug: 'slug' },
+			} );
 		} );
 	} );
 
-	describe( 'templatePartId()', () => {
+	describe( 'blockInserterPanel()', () => {
 		it( 'should apply default state', () => {
-			expect( templatePartId( undefined, {} ) ).toEqual( undefined );
+			expect( blockInserterPanel( undefined, {} ) ).toEqual( false );
 		} );
 
 		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templatePartId( state, {} ) ).toBe( state );
+			expect( blockInserterPanel( true, {} ) ).toBe( true );
 		} );
 
-		it( 'should update when a template part is set', () => {
+		it( 'should set the open state of the inserter panel', () => {
 			expect(
-				templatePartId( 1, {
-					type: 'SET_TEMPLATE_PART',
-					templatePartId: 2,
-				} )
-			).toEqual( 2 );
+				blockInserterPanel( false, setIsInserterOpened( true ) )
+			).toBe( true );
+			expect(
+				blockInserterPanel( true, setIsInserterOpened( false ) )
+			).toBe( false );
+		} );
+
+		it( 'should close the inserter when opening the list view panel', () => {
+			expect(
+				blockInserterPanel( true, setIsListViewOpened( true ) )
+			).toBe( false );
+		} );
+
+		it( 'should not change the state when closing the list view panel', () => {
+			expect(
+				blockInserterPanel( true, setIsListViewOpened( false ) )
+			).toBe( true );
 		} );
 	} );
 
-	describe( 'templateType()', () => {
+	describe( 'listViewPanel()', () => {
 		it( 'should apply default state', () => {
-			expect( templateType( undefined, {} ) ).toEqual( undefined );
+			expect( listViewPanel( undefined, {} ) ).toEqual( false );
 		} );
 
 		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templateType( state, {} ) ).toBe( state );
+			expect( listViewPanel( true, {} ) ).toBe( true );
 		} );
 
-		it( 'should update when a template is set', () => {
-			expect(
-				templateType( undefined, {
-					type: 'SET_TEMPLATE',
-				} )
-			).toEqual( 'wp_template' );
+		it( 'should set the open state of the list view panel', () => {
+			expect( listViewPanel( false, setIsListViewOpened( true ) ) ).toBe(
+				true
+			);
+			expect( listViewPanel( true, setIsListViewOpened( false ) ) ).toBe(
+				false
+			);
 		} );
 
-		it( 'should update when a template is added', () => {
-			expect(
-				templateType( undefined, {
-					type: 'ADD_TEMPLATE',
-				} )
-			).toEqual( 'wp_template' );
+		it( 'should close the list view when opening the inserter panel', () => {
+			expect( listViewPanel( true, setIsInserterOpened( true ) ) ).toBe(
+				false
+			);
 		} );
 
-		it( 'should update when a page is set', () => {
-			expect(
-				templateType( undefined, {
-					type: 'SET_PAGE',
-				} )
-			).toEqual( 'wp_template' );
-		} );
-
-		it( 'should update when a template part is set', () => {
-			expect(
-				templateType( undefined, {
-					type: 'SET_TEMPLATE_PART',
-				} )
-			).toEqual( 'wp_template_part' );
+		it( 'should not change the state when closing the inserter panel', () => {
+			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
+				true
+			);
 		} );
 	} );
 
-	describe( 'templateIds()', () => {
-		it( 'should apply default state', () => {
-			expect( templateIds( undefined, {} ) ).toEqual( [] );
+	describe( 'hasPageContentFocus()', () => {
+		it( 'defaults to false', () => {
+			expect( hasPageContentFocus( undefined, {} ) ).toBe( false );
 		} );
 
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templateIds( state, {} ) ).toBe( state );
-		} );
-
-		it( 'should add template IDs', () => {
+		it( 'becomes false when editing a template', () => {
 			expect(
-				templateIds( deepFreeze( [ 1 ] ), {
-					type: 'ADD_TEMPLATE',
-					templateId: 2,
+				hasPageContentFocus( true, {
+					type: 'SET_EDITED_POST',
+					postType: 'wp_template',
 				} )
-			).toEqual( [ 1, 2 ] );
+			).toBe( false );
 		} );
 
-		it( 'should remove template IDs', () => {
+		it( 'becomes true when editing a page', () => {
 			expect(
-				templateIds( deepFreeze( [ 1, 2 ] ), {
-					type: 'REMOVE_TEMPLATE',
-					templateId: 2,
+				hasPageContentFocus( false, {
+					type: 'SET_EDITED_POST',
+					postType: 'wp_template',
+					context: {
+						postType: 'page',
+						postId: 123,
+					},
 				} )
-			).toEqual( [ 1 ] );
+			).toBe( true );
+		} );
+
+		it( 'can be set', () => {
 			expect(
-				templateIds( deepFreeze( [ 1, 2 ] ), {
-					type: 'REMOVE_TEMPLATE',
-					templateId: 1,
+				hasPageContentFocus( false, {
+					type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+					hasPageContentFocus: true,
 				} )
-			).toEqual( [ 2 ] );
-		} );
-	} );
-
-	describe( 'templatePartIds()', () => {
-		it( 'should apply default state', () => {
-			expect( templatePartIds( undefined, {} ) ).toEqual( [] );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templatePartIds( state, {} ) ).toBe( state );
-		} );
-	} );
-
-	describe( 'page()', () => {
-		it( 'should apply default state', () => {
-			expect( page( undefined, {} ) ).toEqual( {} );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( page( state, {} ) ).toBe( state );
-		} );
-
-		it( 'should set the page', () => {
-			const newPage = {};
+			).toBe( true );
 			expect(
-				page( undefined, {
-					type: 'SET_PAGE',
-					page: newPage,
+				hasPageContentFocus( true, {
+					type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+					hasPageContentFocus: false,
 				} )
-			).toBe( newPage );
-		} );
-	} );
-
-	describe( 'showOnFront()', () => {
-		it( 'should apply default state', () => {
-			expect( showOnFront( undefined, {} ) ).toEqual( undefined );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( showOnFront( state, {} ) ).toBe( state );
+			).toBe( false );
 		} );
 	} );
 } );

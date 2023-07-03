@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { flow } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { escapeEditableHTML } from '@wordpress/escape-html';
+import { pipe } from '@wordpress/compose';
 
 /**
  * Escapes ampersands, shortcodes, and links.
@@ -15,8 +10,7 @@ import { escapeEditableHTML } from '@wordpress/escape-html';
  * @return {string} The given content with some characters escaped.
  */
 export function escape( content ) {
-	return flow(
-		escapeEditableHTML,
+	return pipe(
 		escapeOpeningSquareBrackets,
 		escapeProtocolInIsolatedUrls
 	)( content || '' );
@@ -30,7 +24,7 @@ export function escape( content ) {
  * This function replicates the escaping of HTML tags, where a tag like
  * <strong> becomes &lt;strong>.
  *
- * @param {string}  content The content of a code block.
+ * @param {string} content The content of a code block.
  * @return {string} The given content with its opening shortcode characters
  *                  converted into their HTML entity counterpart
  *                  (i.e. [ => &#91;)
@@ -49,7 +43,7 @@ function escapeOpeningSquareBrackets( content ) {
  *
  * See https://github.com/WordPress/wordpress-develop/blob/5.1.1/src/wp-includes/class-wp-embed.php#L403
  *
- * @param {string}  content The content of a code block.
+ * @param {string} content The content of a code block.
  * @return {string} The given content with its ampersands converted into
  *                  their HTML entity counterpart (i.e. & => &amp;)
  */

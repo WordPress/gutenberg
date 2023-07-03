@@ -2,14 +2,15 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
-import { noop, times } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import {
 	createBlock,
+	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
+	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
 	getBlockTransforms,
@@ -25,6 +26,8 @@ import {
 	setGroupingBlockName,
 } from '../registration';
 
+const noop = () => {};
+
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
 		attributes: {
@@ -38,7 +41,7 @@ describe( 'block factory', () => {
 	};
 
 	beforeAll( () => {
-		// Load blocks store
+		// Load blocks store.
 		require( '../../store' );
 	} );
 
@@ -158,6 +161,125 @@ describe( 'block factory', () => {
 				content: 'test',
 			} );
 		} );
+
+		it( 'should sanitize attributes not defined in the block type', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					align: {
+						type: 'string',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			expect( block.attributes ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'createBlocksFromInnerBlocksTemplate', () => {
+		it( 'should create a block without InnerBlocks', () => {
+			const blockName = 'core/test-block';
+			registerBlockType( blockName, { ...defaultBlockSettings } );
+			const res = createBlock(
+				blockName,
+				{ ...defaultBlockSettings },
+				createBlocksFromInnerBlocksTemplate()
+			);
+			expect( res ).toEqual(
+				expect.objectContaining( {
+					name: blockName,
+					innerBlocks: [],
+				} )
+			);
+		} );
+		describe( 'create block with InnerBlocks', () => {
+			beforeEach( () => {
+				registerBlockType( 'core/test-block', {
+					...defaultBlockSettings,
+				} );
+				registerBlockType( 'core/test-other', {
+					...defaultBlockSettings,
+				} );
+				registerBlockType( 'core/test-paragraph', {
+					...defaultBlockSettings,
+					attributes: {
+						content: {
+							type: 'string',
+							default: 'hello',
+						},
+					},
+				} );
+			} );
+			it( 'should create block with InnerBlocks from template', () => {
+				const res = createBlock(
+					'core/test-block',
+					defaultBlockSettings,
+					createBlocksFromInnerBlocksTemplate( [
+						[ 'core/test-other' ],
+						[ 'core/test-paragraph', { content: 'fromTemplate' } ],
+						[ 'core/test-paragraph' ],
+					] )
+				);
+				expect( res.innerBlocks ).toHaveLength( 3 );
+				expect( res.innerBlocks ).toEqual(
+					expect.arrayContaining( [
+						expect.objectContaining( {
+							name: 'core/test-other',
+						} ),
+						expect.objectContaining( {
+							name: 'core/test-paragraph',
+							attributes: { content: 'fromTemplate' },
+						} ),
+						expect.objectContaining( {
+							name: 'core/test-paragraph',
+							attributes: { content: 'hello' },
+						} ),
+					] )
+				);
+			} );
+			it( 'should create blocks with InnerBlocks template and InnerBlock objects', () => {
+				const nestedInnerBlocks = [
+					createBlock( 'core/test-other' ),
+					createBlock( 'core/test-paragraph' ),
+				];
+				const res = createBlock(
+					'core/test-block',
+					defaultBlockSettings,
+					createBlocksFromInnerBlocksTemplate( [
+						[ 'core/test-other' ],
+						[
+							'core/test-paragraph',
+							{ content: 'fromTemplate' },
+							nestedInnerBlocks,
+						],
+					] )
+				);
+				expect( res.innerBlocks ).toHaveLength( 2 );
+				expect( res.innerBlocks ).toEqual(
+					expect.arrayContaining( [
+						expect.objectContaining( {
+							name: 'core/test-other',
+						} ),
+						expect.objectContaining( {
+							name: 'core/test-paragraph',
+							attributes: { content: 'fromTemplate' },
+							innerBlocks: expect.arrayContaining( [
+								expect.objectContaining( {
+									name: 'core/test-other',
+								} ),
+								expect.objectContaining( {
+									name: 'core/test-other',
+								} ),
+							] ),
+						} ),
+					] )
+				);
+			} );
+		} );
 	} );
 
 	describe( 'cloneBlock()', () => {
@@ -170,6 +292,31 @@ describe( 'block factory', () => {
 					isDifferent: {
 						type: 'boolean',
 						default: false,
+					},
+					includesDefault: {
+						type: 'boolean',
+						default: true,
+					},
+					includesFalseyDefault: {
+						type: 'number',
+						default: 0,
+					},
+					content: {
+						type: 'string',
+						source: 'html',
+					},
+					defaultContent: {
+						type: 'string',
+						source: 'html',
+						default: 'test',
+					},
+					unknownDefaultContent: {
+						type: 'string',
+						source: 'html',
+						default: 1,
+					},
+					htmlContent: {
+						source: 'html',
 					},
 				},
 				save: noop,
@@ -184,12 +331,18 @@ describe( 'block factory', () => {
 
 			const clonedBlock = cloneBlock( block, {
 				isDifferent: true,
+				htmlContent: 'test',
 			} );
 
 			expect( clonedBlock.name ).toEqual( block.name );
 			expect( clonedBlock.attributes ).toEqual( {
+				includesDefault: true,
+				includesFalseyDefault: 0,
 				align: 'left',
 				isDifferent: true,
+				defaultContent: 'test',
+				unknownDefaultContent: 1,
+				htmlContent: 'test',
 			} );
 			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
 			expect( typeof clonedBlock.clientId ).toBe( 'string' );
@@ -274,8 +427,31 @@ describe( 'block factory', () => {
 		} );
 	} );
 
+	describe( '__experimentalCloneSanitizedBlock', () => {
+		it( 'should sanitize attributes not defined in the block type', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					align: {
+						type: 'string',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			const clonedBlock = __experimentalCloneSanitizedBlock( block, {
+				notDefined2: 'not-defined-2',
+			} );
+
+			expect( clonedBlock.attributes ).toEqual( {} );
+		} );
+	} );
+
 	describe( 'getPossibleBlockTransformations()', () => {
-		it( 'should should show as available a simple "from" transformation"', () => {
+		it( 'should show as available a simple "from" transformation"', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -803,7 +979,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks ).toEqual( [] );
 		} );
 
-		it( 'for a non multiblock transform, the isMatch function receives the source block’s attributes object as its first argument', () => {
+		it( 'for a non multiblock transform, the isMatch function receives the source block’s attributes object and the block object as its arguments', () => {
 			const isMatch = jest.fn();
 
 			registerBlockType( 'core/updated-text-block', {
@@ -834,10 +1010,10 @@ describe( 'block factory', () => {
 
 			getPossibleBlockTransformations( [ block ] );
 
-			expect( isMatch ).toHaveBeenCalledWith( { value: 'ribs' } );
+			expect( isMatch ).toHaveBeenCalledWith( { value: 'ribs' }, block );
 		} );
 
-		it( 'for a multiblock transform, the isMatch function receives an array containing every source block’s attributes as its first argument', () => {
+		it( 'for a multiblock transform, the isMatch function receives an array containing every source block’s attributes and an array of source blocks as its arguments', () => {
 			const isMatch = jest.fn();
 
 			registerBlockType( 'core/updated-text-block', {
@@ -873,10 +1049,10 @@ describe( 'block factory', () => {
 
 			getPossibleBlockTransformations( [ meatBlock, cheeseBlock ] );
 
-			expect( isMatch ).toHaveBeenCalledWith( [
-				{ value: 'ribs' },
-				{ value: 'halloumi' },
-			] );
+			expect( isMatch ).toHaveBeenCalledWith(
+				[ { value: 'ribs' }, { value: 'halloumi' } ],
+				[ meatBlock, cheeseBlock ]
+			);
 		} );
 
 		describe( 'wildcard block transforms', () => {
@@ -902,35 +1078,34 @@ describe( 'block factory', () => {
 				} );
 			} );
 
-			it( 'should should show wildcard "from" transformation as available for multiple blocks of the same type', () => {
+			it( 'should show wildcard "from" transformation as available for multiple blocks of the same type', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 				registerBlockType( 'core/image-block', defaultBlockSettings );
 
-				const textBlocks = times( 4, ( index ) => {
+				const textBlocks = [ ...Array( 4 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/text-block', {
 						value: `textBlock${ index + 1 }`,
 					} );
 				} );
 
-				const availableBlocks = getPossibleBlockTransformations(
-					textBlocks
-				);
+				const availableBlocks =
+					getPossibleBlockTransformations( textBlocks );
 
 				expect( availableBlocks ).toHaveLength( 1 );
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
 			} );
 
-			it( 'should should show wildcard "from" transformation as available for multiple blocks of different types', () => {
+			it( 'should show wildcard "from" transformation as available for multiple blocks of different types', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 				registerBlockType( 'core/image-block', defaultBlockSettings );
 
-				const textBlocks = times( 2, ( index ) => {
+				const textBlocks = [ ...Array( 2 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/text-block', {
 						value: `textBlock${ index + 1 }`,
 					} );
 				} );
 
-				const imageBlocks = times( 2, ( index ) => {
+				const imageBlocks = [ ...Array( 2 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/image-block', {
 						value: `imageBlock${ index + 1 }`,
 					} );
@@ -945,18 +1120,17 @@ describe( 'block factory', () => {
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
 			} );
 
-			it( 'should should show wildcard "from" transformation as available for single blocks', () => {
+			it( 'should show wildcard "from" transformation as available for single blocks', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 
-				const blocks = times( 1, ( index ) => {
+				const blocks = [ ...Array( 1 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/text-block', {
 						value: `textBlock${ index + 1 }`,
 					} );
 				} );
 
-				const availableBlocks = getPossibleBlockTransformations(
-					blocks
-				);
+				const availableBlocks =
+					getPossibleBlockTransformations( blocks );
 
 				expect( availableBlocks ).toHaveLength( 1 );
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
@@ -1099,6 +1273,98 @@ describe( 'block factory', () => {
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/updated-text-block'
+			);
+
+			expect( transformedBlocks ).toBeNull();
+		} );
+
+		it( 'should accept transformations that have an isMatch method that returns true', () => {
+			registerBlockType(
+				'core/updated-text-block',
+				defaultBlockSettings
+			);
+			registerBlockType( 'core/text-block', {
+				attributes: {
+					matches: {
+						type: 'boolean',
+						default: true,
+					},
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							isMatch: ( { matches } ) => matches === true,
+							transform: ( { value } ) => {
+								return createBlock( 'core/updated-text-block', {
+									value: 'chicken ' + value,
+								} );
+							},
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'text-block',
+			} );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/updated-text-block'
+			);
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+		} );
+
+		it( 'should reject transformations that have an isMatch method that returns false', () => {
+			registerBlockType(
+				'core/updated-text-block',
+				defaultBlockSettings
+			);
+			registerBlockType( 'core/text-block', {
+				attributes: {
+					matches: {
+						type: 'boolean',
+						default: false,
+					},
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							isMatch: ( { matches } ) => matches === true,
+							transform: ( { value } ) => {
+								return createBlock( 'core/updated-text-block', {
+									value: 'chicken ' + value,
+								} );
+							},
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'text-block',
+			} );
 
 			const block = createBlock( 'core/text-block', {
 				value: 'ribs',
@@ -1361,15 +1627,11 @@ describe( 'block factory', () => {
 			// to keep the existing block's client ID.
 			expect( transformedBlocks ).toHaveLength( 2 );
 			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
-			expect( transformedBlocks[ 0 ].clientId ).not.toBe(
-				block.clientId
-			);
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/text-block' );
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
-			expect( transformedBlocks[ 1 ].clientId ).toBe( block.clientId );
 			expect( transformedBlocks[ 1 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 1 ].name ).toBe(
 				'core/updated-text-block'
@@ -1538,11 +1800,13 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock( 'core/text-block', {
-					value: `textBlock${ index + 1 }`,
-				} );
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -1600,14 +1864,16 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/image-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock(
-					index % 2 ? 'core/text-block' : 'core/image-block',
-					{
-						value: `block-value-${ index + 1 }`,
-					}
-				);
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock(
+						index % 2 ? 'core/text-block' : 'core/image-block',
+						{
+							value: `block-value-${ index + 1 }`,
+						}
+					);
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -1661,11 +1927,13 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/image-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock( 'core/text-block', {
-					value: `block-value-${ index + 1 }`,
-				} );
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `block-value-${ index + 1 }`,
+					} );
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -1719,11 +1987,13 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/image-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock( 'core/text-block', {
-					value: `block-value-${ index + 1 }`,
-				} );
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `block-value-${ index + 1 }`,
+					} );
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -1776,11 +2046,13 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock( 'core/text-block', {
-					value: `textBlock${ index + 1 }`,
-				} );
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -1921,7 +2193,7 @@ describe( 'block factory', () => {
 			const validWildcardBlockTransform = {
 				type: 'block',
 				blocks: [
-					'core/some-other-block-first', // unlikely to happen but...
+					'core/some-other-block-first', // Unlikely to happen but...
 					'*',
 				],
 				blockName: 'core/test-block',

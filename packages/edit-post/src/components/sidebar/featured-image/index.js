@@ -1,16 +1,21 @@
 /**
- * External dependencies
- */
-import { get, partial } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { PostFeaturedImage, PostFeaturedImageCheck } from '@wordpress/editor';
+import {
+	PostFeaturedImage,
+	PostFeaturedImageCheck,
+	store as editorStore,
+} from '@wordpress/editor';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
 
 /**
  * Module Constants
@@ -25,11 +30,9 @@ function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
 	return (
 		<PostFeaturedImageCheck>
 			<PanelBody
-				title={ get(
-					postType,
-					[ 'labels', 'featured_image' ],
-					__( 'Featured image' )
-				) }
+				title={
+					postType?.labels?.featured_image ?? __( 'Featured image' )
+				}
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
 			>
@@ -40,11 +43,10 @@ function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
-	const { getPostType } = select( 'core' );
-	const { isEditorPanelEnabled, isEditorPanelOpened } = select(
-		'core/edit-post'
-	);
+	const { getEditedPostAttribute } = select( editorStore );
+	const { getPostType } = select( coreStore );
+	const { isEditorPanelEnabled, isEditorPanelOpened } =
+		select( editPostStore );
 
 	return {
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
@@ -54,10 +56,11 @@ const applyWithSelect = withSelect( ( select ) => {
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );
+	const { toggleEditorPanelOpened } = dispatch( editPostStore );
 
 	return {
-		onTogglePanel: partial( toggleEditorPanelOpened, PANEL_NAME ),
+		onTogglePanel: ( ...args ) =>
+			toggleEditorPanelOpened( PANEL_NAME, ...args ),
 	};
 } );
 

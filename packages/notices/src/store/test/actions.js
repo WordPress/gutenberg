@@ -8,6 +8,8 @@ import {
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
+	removeAllNotices,
+	removeNotices,
 } from '../actions';
 import { DEFAULT_CONTEXT, DEFAULT_STATUS } from '../constants';
 
@@ -57,6 +59,7 @@ describe( 'actions', () => {
 				id,
 				isDismissible: false,
 				context: 'foo',
+				icon: '🌮',
 			};
 
 			const result = createNotice( status, content, options );
@@ -69,9 +72,13 @@ describe( 'actions', () => {
 					status,
 					content,
 					spokenMessage: content,
+					__unstableHTML: undefined,
 					isDismissible: false,
 					actions: [],
 					type: 'default',
+					icon: '🌮',
+					explicitDismiss: false,
+					onDismiss: undefined,
 				},
 			} );
 		} );
@@ -100,6 +107,9 @@ describe( 'actions', () => {
 					isDismissible: false,
 					actions: [],
 					type: 'default',
+					icon: null,
+					explicitDismiss: false,
+					onDismiss: undefined,
 				},
 			} );
 		} );
@@ -204,6 +214,57 @@ describe( 'actions', () => {
 				type: 'REMOVE_NOTICE',
 				id,
 				context,
+			} );
+		} );
+	} );
+
+	describe( 'removeNotices', () => {
+		it( 'should return action', () => {
+			const ids = [ 'id', 'id2' ];
+
+			expect( removeNotices( ids ) ).toEqual( {
+				type: 'REMOVE_NOTICES',
+				ids,
+				context: DEFAULT_CONTEXT,
+			} );
+		} );
+
+		it( 'should return action with custom context', () => {
+			const ids = [ 'id', 'id2' ];
+			const context = 'foo';
+
+			expect( removeNotices( ids, context ) ).toEqual( {
+				type: 'REMOVE_NOTICES',
+				ids,
+				context,
+			} );
+		} );
+	} );
+
+	describe( 'removeAllNotices', () => {
+		it( 'should return action', () => {
+			expect( removeAllNotices() ).toEqual( {
+				type: 'REMOVE_ALL_NOTICES',
+				noticeType: 'default',
+				context: DEFAULT_CONTEXT,
+			} );
+		} );
+
+		it( 'should return action with custom context', () => {
+			const context = 'foo';
+
+			expect( removeAllNotices( 'default', context ) ).toEqual( {
+				type: 'REMOVE_ALL_NOTICES',
+				noticeType: 'default',
+				context,
+			} );
+		} );
+
+		it( 'should return action with type', () => {
+			expect( removeAllNotices( 'snackbar' ) ).toEqual( {
+				type: 'REMOVE_ALL_NOTICES',
+				noticeType: 'snackbar',
+				context: DEFAULT_CONTEXT,
 			} );
 		} );
 	} );

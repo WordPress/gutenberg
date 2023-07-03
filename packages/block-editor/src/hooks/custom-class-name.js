@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { difference, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -10,21 +9,17 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	hasBlockSupport,
-	parseWithAttributeSchema,
-	getSaveContent,
-} from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { InspectorAdvancedControls } from '../components';
+import { InspectorControls } from '../components';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
- * Filters registered block settings, extending attributes with anchor using ID
- * of the first node.
+ * Filters registered block settings, extending attributes to include `className`.
  *
  * @param {Object} settings Original block settings.
  *
@@ -47,6 +42,7 @@ export function addAttribute( settings ) {
 /**
  * Override the default edit UI to include a new block inspector control for
  * assigning the custom class name, if block supports custom class name.
+ * The control is displayed within the Advanced panel in the block inspector.
  *
  * @param {WPComponent} BlockEdit Original component.
  *
@@ -55,6 +51,7 @@ export function addAttribute( settings ) {
 export const withInspectorControl = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
+			const blockEditingMode = useBlockEditingMode();
 			const hasCustomClassName = hasBlockSupport(
 				props.name,
 				'customClassName',
@@ -64,24 +61,27 @@ export const withInspectorControl = createHigherOrderComponent(
 				return (
 					<>
 						<BlockEdit { ...props } />
-						<InspectorAdvancedControls>
-							<TextControl
-								autoComplete="off"
-								label={ __( 'Additional CSS class(es)' ) }
-								value={ props.attributes.className || '' }
-								onChange={ ( nextValue ) => {
-									props.setAttributes( {
-										className:
-											nextValue !== ''
-												? nextValue
-												: undefined,
-									} );
-								} }
-								help={ __(
-									'Separate multiple classes with spaces.'
-								) }
-							/>
-						</InspectorAdvancedControls>
+						{ blockEditingMode === 'default' && (
+							<InspectorControls group="advanced">
+								<TextControl
+									__nextHasNoMarginBottom
+									autoComplete="off"
+									label={ __( 'Additional CSS class(es)' ) }
+									value={ props.attributes.className || '' }
+									onChange={ ( nextValue ) => {
+										props.setAttributes( {
+											className:
+												nextValue !== ''
+													? nextValue
+													: undefined,
+										} );
+									} }
+									help={ __(
+										'Separate multiple classes with spaces.'
+									) }
+								/>
+							</InspectorControls>
+						) }
 					</>
 				);
 			}
@@ -93,8 +93,8 @@ export const withInspectorControl = createHigherOrderComponent(
 );
 
 /**
- * Override props assigned to save component to inject anchor ID, if block
- * supports anchor. This is only applied if the block's save result is an
+ * Override props assigned to save component to inject the className, if block
+ * supports customClassName. This is only applied if the block's save result is an
  * element and not a markup string.
  *
  * @param {Object} extraProps Additional props applied to save element.
@@ -117,61 +117,43 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
-/**
- * Given an HTML string, returns an array of class names assigned to the root
- * element in the markup.
- *
- * @param {string} innerHTML Markup string from which to extract classes.
- *
- * @return {string[]} Array of class names assigned to the root element.
- */
-export function getHTMLRootElementClasses( innerHTML ) {
-	innerHTML = `<div data-custom-class-name>${ innerHTML }</div>`;
-
-	const parsed = parseWithAttributeSchema( innerHTML, {
-		type: 'string',
-		source: 'attribute',
-		selector: '[data-custom-class-name] > *',
-		attribute: 'class',
-	} );
-
-	return parsed ? parsed.trim().split( /\s+/ ) : [];
-}
-
-/**
- * Given a parsed set of block attributes, if the block supports custom class
- * names and an unknown class (per the block's serialization behavior) is
- * found, the unknown classes are treated as custom classes. This prevents the
- * block from being considered as invalid.
- *
- * @param {Object} blockAttributes Original block attributes.
- * @param {Object} blockType       Block type settings.
- * @param {string} innerHTML       Original block markup.
- *
- * @return {Object} Filtered block attributes.
- */
-export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
-	if ( hasBlockSupport( blockType, 'customClassName', true ) ) {
-		// To determine difference, serialize block given the known set of
-		// attributes, with the exception of `className`. This will determine
-		// the default set of classes. From there, any difference in innerHTML
-		// can be considered as custom classes.
-		const attributesSansClassName = omit( blockAttributes, [
-			'className',
-		] );
-		const serialized = getSaveContent( blockType, attributesSansClassName );
-		const defaultClasses = getHTMLRootElementClasses( serialized );
-		const actualClasses = getHTMLRootElementClasses( innerHTML );
-		const customClasses = difference( actualClasses, defaultClasses );
-
-		if ( customClasses.length ) {
-			blockAttributes.className = customClasses.join( ' ' );
-		} else if ( serialized ) {
-			delete blockAttributes.className;
-		}
+export function addTransforms( result, source, index, results ) {
+	if ( ! hasBlockSupport( result.name, 'customClassName', true ) ) {
+		return result;
 	}
 
-	return blockAttributes;
+	// If the condition verifies we are probably in the presence of a wrapping transform
+	// e.g: nesting paragraphs in a group or columns and in that case the class should not be kept.
+	if ( results.length === 1 && result.innerBlocks.length === source.length ) {
+		return result;
+	}
+
+	// If we are transforming one block to multiple blocks or multiple blocks to one block,
+	// we ignore the class during the transform.
+	if (
+		( results.length === 1 && source.length > 1 ) ||
+		( results.length > 1 && source.length === 1 )
+	) {
+		return result;
+	}
+
+	// If we are in presence of transform between one or more block in the source
+	// that have one or more blocks in the result
+	// we apply the class on source N to the result N,
+	// if source N does not exists we do nothing.
+	if ( source[ index ] ) {
+		const originClassName = source[ index ]?.attributes.className;
+		if ( originClassName ) {
+			return {
+				...result,
+				attributes: {
+					...result.attributes,
+					className: originClassName,
+				},
+			};
+		}
+	}
+	return result;
 }
 
 addFilter(
@@ -189,8 +171,9 @@ addFilter(
 	'core/custom-class-name/save-props',
 	addSaveProps
 );
+
 addFilter(
-	'blocks.getBlockAttributes',
-	'core/custom-class-name/addParsedDifference',
-	addParsedDifference
+	'blocks.switchToBlockType.transformedBlock',
+	'core/color/addTransforms',
+	addTransforms
 );

@@ -1,0 +1,13 @@
+[
+	{
+		"name": "core/comments-title",
+		"isValid": true,
+		"attributes": {
+			"textAlign": "center",
+			"showPostTitle": true,
+			"showCommentsCount": true,
+			"level": 4
+		},
+		"innerBlocks": []
+	}
+]

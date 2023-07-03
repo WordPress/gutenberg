@@ -1,5 +1,9 @@
 # InputControl
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 InputControl components let users enter and edit text. This is an experimental component intended to (in time) merge with or replace [TextControl](../text-control).
 
 ## Usage
@@ -14,7 +18,7 @@ const Example = () => {
 	return (
 		<InputControl
 			value={ value }
-			onChange={ ( nextValue ) => setValue( nextValue ) }
+			onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
 		/>
 	);
 };
@@ -38,13 +42,6 @@ If true, the `ENTER` key press is required in order to trigger an `onChange`. If
 -   Required: No
 -   Default: `false`
 
-### isFloatingLabel
-
-If true, the `label` will render with a floating interaction.
-
--   Type: `Boolean`
--   Required: No
-
 ### hideLabelFromVision
 
 If true, the label will only be visible to screen readers.
@@ -59,12 +56,26 @@ If this property is added, a label will be generated using label property as the
 -   Type: `String`
 -   Required: No
 
+### labelPosition
+
+The position of the label (`top`, `side`, `bottom`, or `edge`).
+
+-   Type: `String`
+-   Required: No
+
 ### onChange
 
 A function that receives the value of the input.
 
 -   Type: `Function`
 -   Required: Yes
+
+### prefix
+
+Renders an element on the left side of the input.
+
+-   Type: `React.ReactNode`
+-   Required: No
 
 ### size
 
@@ -94,5 +105,5 @@ Type of the input element to render. Defaults to "text".
 
 The current value of the input.
 
--   Type: `String | Number`
--   Required: Yes
+-   Type: `String`
+-   Required: No

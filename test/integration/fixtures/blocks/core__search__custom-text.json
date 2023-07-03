@@ -1,0 +1,18 @@
+[
+	{
+		"name": "core/search",
+		"isValid": true,
+		"attributes": {
+			"label": "Custom label",
+			"showLabel": true,
+			"placeholder": "Custom placeholder",
+			"buttonText": "Custom button text",
+			"buttonPosition": "button-outside",
+			"buttonUseIcon": false,
+			"query": {},
+			"buttonBehavior": "expand-searchfield",
+			"isSearchFieldHidden": false
+		},
+		"innerBlocks": []
+	}
+]

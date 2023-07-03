@@ -1,0 +1,24 @@
+/**
+ * Default editor styles.
+ *
+ * These styles are shown if a theme does not register its own editor style,
+ * a theme.json file, or has toggled off "Use theme styles" in preferences.
+ */
+
+body {
+	font-family: $default-font;
+	font-size: 18px;
+	line-height: 1.5;
+	--wp--style--block-gap: 2em;
+}
+
+p {
+	line-height: 1.8;
+}
+
+.editor-post-title__block {
+	margin-top: 2em;
+	margin-bottom: 1em;
+	font-size: 2.5em;
+	font-weight: 800;
+}
