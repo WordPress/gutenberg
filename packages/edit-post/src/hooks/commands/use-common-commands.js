@@ -10,6 +10,8 @@ import {
 	drawerRight,
 	blockDefault,
 	keyboardClose,
+	desktop,
+	listView,
 } from '@wordpress/icons';
 import { useCommand } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -23,16 +25,24 @@ import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { store as editPostStore } from '../../store';
 
 export default function useCommonCommands() {
-	const { openGeneralSidebar, closeGeneralSidebar, switchEditorMode } =
-		useDispatch( editPostStore );
+	const {
+		openGeneralSidebar,
+		closeGeneralSidebar,
+		switchEditorMode,
+		setIsListViewOpened,
+	} = useDispatch( editPostStore );
 	const { openModal } = useDispatch( interfaceStore );
-	const { editorMode, activeSidebar } = useSelect(
-		( select ) => ( {
-			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
-				editPostStore.name
-			),
-			editorMode: select( editPostStore ).getEditorMode(),
-		} ),
+	const { editorMode, activeSidebar, isListViewOpen } = useSelect(
+		( select ) => {
+			const { getEditorMode, isListViewOpened } = select( editPostStore );
+			return {
+				activeSidebar: select(
+					interfaceStore
+				).getActiveComplementaryArea( editPostStore.name ),
+				editorMode: getEditorMode(),
+				isListViewOpen: isListViewOpened(),
+			};
+		},
 		[]
 	);
 	const { toggle } = useDispatch( preferencesStore );
@@ -81,6 +91,26 @@ export default function useCommonCommands() {
 		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'focusMode' );
+			close();
+		},
+	} );
+
+	useCommand( {
+		name: 'core/toggle-fullscreen-mode',
+		label: __( 'Toggle fullscreen mode' ),
+		icon: desktop,
+		callback: ( { close } ) => {
+			toggle( 'core/edit-post', 'fullscreenMode' );
+			close();
+		},
+	} );
+
+	useCommand( {
+		name: 'core/toggle-list-view',
+		label: __( 'Toggle list view' ),
+		icon: listView,
+		callback: ( { close } ) => {
+			setIsListViewOpened( ! isListViewOpen );
 			close();
 		},
 	} );
