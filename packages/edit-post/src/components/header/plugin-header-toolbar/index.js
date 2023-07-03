@@ -1,15 +1,10 @@
 /**
- * External dependencies
- */
-import { isFunction } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
 	createSlotFill,
 	Button,
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	Dropdown,
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
@@ -19,12 +14,21 @@ import { withPluginContext } from '@wordpress/plugins';
 
 const { Fill, Slot } = createSlotFill( 'PluginHeaderToolbar' );
 
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
+
 const PluginHeaderToolbarFill = ( {
 	icon = pluginsIcon,
 	renderContent = null,
 	className = 'plugin-header-toolbar-button',
 	contentClassName = 'plugin-header-toolbar-content',
-	position = 'bottom right',
 } ) => {
 	if ( null === renderContent || ! isFunction( renderContent ) ) {
 		warning(
@@ -34,83 +38,57 @@ const PluginHeaderToolbarFill = ( {
 	}
 	return (
 		<Fill>
-			<ToolbarItem
-				as={ () => (
-					<Dropdown
-						className={ className }
-						contentClassName={ contentClassName }
-						position={ position }
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								onClick={ onToggle }
-								aria-expanded={ isOpen }
-								icon={ icon }
-							/>
-						) }
-						renderContent={ renderContent }
-					/>
-				) }
-			/>
+			{ ( { showIconLabels } ) => (
+				<ToolbarItem
+					showTooltip={ ! showIconLabels }
+					variant={ showIconLabels ? 'tertiary' : undefined }
+					as={ () => (
+						<Dropdown
+							className={ className }
+							contentClassName={ contentClassName }
+							popoverProps={ { placement: 'bottom-start' } }
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<Button
+									onClick={ onToggle }
+									aria-expanded={ isOpen }
+									icon={ icon }
+									className="components-button"
+								/>
+							) }
+							renderContent={ renderContent }
+						/>
+					) }
+				/>
+			) }
 		</Fill>
 	);
 };
 
 /**
- * Renders a button and association dropdown in the header toolbar
+ * Renders a button and association dropdown in the header toolbar.
  *
- * @param {Object} props Component properties.
- * @param {WPComponent} renderContent                                   The component to render as the UI for the dropdown.
- * @param {string} [props.className]                                    Optional. The class name for the button.
- * @param {string} [props.contentClassName]                             Optional. The class name of the dropdown item.
- * @param {string} [props.position]                                     Optional. The title of the panel
- * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {Object}                props                                 Component properties.
+ * @param {WPComponent}           renderContent                         The component to render as the UI for the dropdown.
+ * @param {string}                [props.className]                     Optional. The class name for the button.
+ * @param {string}                [props.contentClassName]              Optional. The class name of the dropdown item.
+ * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
- * // Using ES5 syntax
- * var el = wp.element.createElement;
- * var __ = wp.i18n.__;
- * var registerPlugin = wp.plugins.registerPlugin;
- * var PluginHeaderToolbar = wp.editPost.PluginDocumentSettingPanel;
- *
- * function MyHeaderToolbarPlugin() {
- * 	return el(
- * 		PluginHeaderToolbar,
- * 		{
- * 			className: 'plugin-header-toolbar-button',
- * 			contentClassName: 'plugin-header-toolbar-content',
- * 			position: 'bottom left',
- *          renderContent: function() { return el( <div>Rendered Content</div>)}
- * 		},
- * 	);
- * }
- *
- * registerPlugin( 'my-header-toolbar-plugin', {
- * 		render: MyHeaderToolbarPlugin
- * } );
- * ```
- *
- * @example
- * <caption>ESNext</caption>
- * ```jsx
- * // Using ESNext syntax
- * const { registerPlugin } = wp.plugins;
- * const { PluginHeaderToolbar } = wp.editPost;
+ * import { registerPlugin } from '@wordpress/plugins';
+ * import { PluginHeaderToolbar } from '@wordpress/edit-post';
  *
  * const MyHeaderToolbarPlugin = () => (
  * 		<PluginHeaderToolbar
  *          className="plugin-header-toolbar-button"
  *          classContentName="plugin-header-toolbar-content"
- *          position="bottom left"
  *          renderContent={() => <div>Rendered Content</div>}
  *        />
  *	);
  *
- *  registerPlugin( 'my-header-toolbar-plugin', { render: MyDocumentSettingTest } );
+ *  registerPlugin( 'my-header-toolbar-plugin', { render: MyHeaderToolbarPlugin, icon: 'smiley' } );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
  */
 const PluginHeaderToolbar = compose(
 	withPluginContext( ( context, ownProps ) => {

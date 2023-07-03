@@ -25,6 +25,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import { store as editPostStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import PluginHeaderToolbar from '../plugin-header-toolbar';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
@@ -168,6 +169,11 @@ function HeaderToolbar() {
 							variant={ showIconLabels ? 'tertiary' : undefined }
 						/>
 						{ overflowItems }
+						{ isLargeViewport && (
+							<PluginHeaderToolbar.Slot
+								fillProps={ { showIconLabels } }
+							/>
+						) }
 					</>
 				) }
 			</div>

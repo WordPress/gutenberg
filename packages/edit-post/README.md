@@ -155,6 +155,38 @@ _Returns_
 
 -   `WPComponent`: The component to be rendered.
 
+### PluginHeaderToolbar
+
+Renders a button and association dropdown in the header toolbar.
+
+_Usage_
+
+```js
+import { registerPlugin } from '@wordpress/plugins';
+import { PluginHeaderToolbar } from '@wordpress/edit-post';
+
+const MyHeaderToolbarPlugin = () => (
+	<PluginHeaderToolbar
+		className="plugin-header-toolbar-button"
+		classContentName="plugin-header-toolbar-content"
+		renderContent={ () => <div>Rendered Content</div> }
+	/>
+);
+
+registerPlugin( 'my-header-toolbar-plugin', {
+	render: MyHeaderToolbarPlugin,
+	icon: 'smiley',
+} );
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _renderContent_ `WPComponent`: The component to render as the UI for the dropdown.
+-   _props.className_ `[string]`: Optional. The class name for the button.
+-   _props.contentClassName_ `[string]`: Optional. The class name of the dropdown item.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
+
 ### PluginMoreMenuItem
 
 Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to as a button or link depending on the props provided. The text within the component appears as the menu item label.
