@@ -76,7 +76,7 @@ function getPageDetails( page ) {
 		: 0;
 	const readingTime = Math.round( wordsCounted / AVERAGE_READING_RATE );
 
-	if ( wordsCounted && ! page?.postsPage ) {
+	if ( wordsCounted && ! page?.isPostsPage ) {
 		details.push(
 			{
 				label: __( 'Words' ),
@@ -100,7 +100,7 @@ function getPageDetails( page ) {
 
 export default function PageDetails( { id } ) {
 	const { record } = useEntityRecord( 'postType', 'page', id );
-	const { parentTitle, templateTitle, postsPage } = useSelect(
+	const { parentTitle, templateTitle, isPostsPage } = useSelect(
 		( select ) => {
 			const { getEditedPostContext } = unlock( select( editSiteStore ) );
 			const postContext = getEditedPostContext();
@@ -141,7 +141,7 @@ export default function PageDetails( { id } ) {
 			return {
 				parentTitle: _parentTitle,
 				templateTitle: _templateTitle,
-				postsPage: record?.id === siteSettings?.page_for_posts,
+				isPostsPage: record?.id === siteSettings?.page_for_posts,
 			};
 		},
 		[ record?.parent, record?.id ]
@@ -154,7 +154,7 @@ export default function PageDetails( { id } ) {
 			{ getPageDetails( {
 				parentTitle,
 				templateTitle,
-				postsPage,
+				isPostsPage,
 				...record,
 			} ).map( ( { label, value } ) => (
 				<SidebarNavigationScreenDetailsPanelRow key={ label }>
