@@ -1,3 +1,11 @@
+.dashedBorderColor {
+	border-color: $gray;
+}
+
+.dashedBorderColorDark {
+	border-color: $gray-70;
+}
+
 .blockHolder {
 	flex: 1 1 auto;
 }
