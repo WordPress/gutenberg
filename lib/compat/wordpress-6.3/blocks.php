@@ -102,39 +102,21 @@ function gutenberg_wp_block_register_post_meta() {
 	$post_type = 'wp_block';
 	register_post_meta(
 		$post_type,
-		'wp_sync_status',
+		'wp_pattern_sync_status',
 		array(
 			'auth_callback'     => function() {
 				return current_user_can( 'edit_posts' );
 			},
-			'sanitize_callback' => 'gutenberg_wp_block_sanitize_post_meta',
+			'sanitize_callback' => 'sanitize_text_field',
 			'single'            => true,
 			'type'              => 'string',
 			'show_in_rest'      => array(
 				'schema' => array(
-					'type'       => 'string',
-					'properties' => array(
-						'wp_sync_status' => array(
-							'type' => 'string',
-						),
-					),
+					'type' => 'string',
+					'enum' => array( 'partial', 'unsynced' ),
 				),
 			),
 		)
 	);
-}
-/**
- * Sanitizes the array of wp_block post meta wp_sync_status string.
- *
- * Note: This should be removed when the minimum required WP version is >= 6.3.
- *
- * @see https://github.com/WordPress/gutenberg/pull/51144
- *
- * @param array $meta_value String to sanitize.
- *
- * @return array Sanitized string.
- */
-function gutenberg_wp_block_sanitize_post_meta( $meta_value ) {
-	return sanitize_text_field( $meta_value );
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
