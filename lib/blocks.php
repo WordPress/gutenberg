@@ -392,7 +392,7 @@ function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $si
 
 	$sync_status = get_post_meta( $object_id, 'sync_status', $single );
 
-	if ( isset( $sync_status[0] ) && $sync_status[0] === 'unsynced' ) {
+	if ( isset( $sync_status[0] ) && 'unsynced' === $sync_status[0] ) {
 		return $sync_status;
 	}
 
