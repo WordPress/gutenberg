@@ -7,36 +7,13 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { alignmentHelpers } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './block.scss';
 
-function BlockOutline( {
-	align,
-	blockWidth,
-	isParentSelected,
-	isSelected,
-	name,
-	screenWidth,
-} ) {
-	const { isFullWidth, isContainerRelated } = alignmentHelpers;
-	const isScreenWidthWider = blockWidth < screenWidth;
-
-	const styleSolidBorder = [
-		styles.solidBorder,
-		isFullWidth( align ) && isScreenWidthWider && styles.borderFullWidth,
-		isFullWidth( align ) &&
-			isContainerRelated( name ) &&
-			isScreenWidthWider &&
-			styles.containerBorderFullWidth,
-		usePreferredColorSchemeStyle(
-			styles.solidBorderColor,
-			styles.solidBorderColorDark
-		),
-	];
+function BlockOutline( { isParentSelected, isSelected } ) {
 	const styleDashedBorder = [
 		styles.dashedBorder,
 		usePreferredColorSchemeStyle(
@@ -47,9 +24,7 @@ function BlockOutline( {
 
 	return (
 		<>
-			{ isSelected && (
-				<View pointerEvents="box-none" style={ styleSolidBorder } />
-			) }
+			{ isSelected && <View pointerEvents="box-none" /> }
 			{ isParentSelected && <View style={ styleDashedBorder } /> }
 		</>
 	);
