@@ -33,9 +33,10 @@ export default meta;
 
 const Template: ComponentStory< typeof ColorPalette > = ( {
 	onChange,
+	value,
 	...args
 } ) => {
-	const [ color, setColor ] = useState< string | undefined >();
+	const [ color, setColor ] = useState< string | undefined >( value );
 
 	return (
 		<SlotFillProvider>
@@ -60,6 +61,7 @@ Default.args = {
 		{ name: 'White', color: '#fff' },
 		{ name: 'Blue', color: '#00f' },
 	],
+	value: '#00f',
 };
 
 export const MultipleOrigins = Template.bind( {} );

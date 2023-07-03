@@ -10,6 +10,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
 
@@ -47,7 +48,7 @@ function SinglePalette( {
 	colors,
 	onChange,
 	value,
-	actions,
+	...otherProps
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
 		return colors.map( ( { color, name }, index ) => {
@@ -91,10 +92,10 @@ function SinglePalette( {
 	}, [ colors, value, onChange, clearColor ] );
 
 	return (
-		<CircularOptionPicker
+		<CircularOptionPicker.OptionGroup
 			className={ className }
 			options={ colorOptions }
-			actions={ actions }
+			{ ...otherProps }
 		/>
 	);
 }
@@ -105,9 +106,10 @@ function MultiplePalettes( {
 	colors,
 	onChange,
 	value,
-	actions,
 	headingLevel,
 }: MultiplePalettesProps ) {
+	const instanceId = useInstanceId( MultiplePalettes );
+
 	if ( colors.length === 0 ) {
 		return null;
 	}
@@ -115,9 +117,10 @@ function MultiplePalettes( {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
+				const id = `color-palette-${ instanceId }-${ index }`;
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading level={ headingLevel }>
+						<ColorHeading id={ id } level={ headingLevel }>
 							{ name }
 						</ColorHeading>
 						<SinglePalette
@@ -127,9 +130,7 @@ function MultiplePalettes( {
 								onChange( newColor, index )
 							}
 							value={ value }
-							actions={
-								colors.length === index + 1 ? actions : null
-							}
+							aria-labelledby={ id }
 						/>
 					</VStack>
 				);
@@ -234,17 +235,16 @@ function UnforwardedColorPalette(
 		: __( 'Custom color picker.' );
 
 	const paletteCommonProps = {
-		clearable,
 		clearColor,
 		onChange,
 		value,
-		actions: !! clearable && (
-			<CircularOptionPicker.ButtonAction onClick={ clearColor }>
-				{ __( 'Clear' ) }
-			</CircularOptionPicker.ButtonAction>
-		),
-		headingLevel,
 	};
+
+	const actions = !! clearable && (
+		<CircularOptionPicker.ButtonAction onClick={ clearColor }>
+			{ __( 'Clear' ) }
+		</CircularOptionPicker.ButtonAction>
+	);
 
 	return (
 		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
@@ -298,17 +298,25 @@ function UnforwardedColorPalette(
 					) }
 				/>
 			) }
-			{ hasMultipleColorOrigins ? (
-				<MultiplePalettes
-					{ ...paletteCommonProps }
-					colors={ colors as PaletteObject[] }
-				/>
-			) : (
-				<SinglePalette
-					{ ...paletteCommonProps }
-					colors={ colors as ColorObject[] }
-				/>
-			) }
+			<CircularOptionPicker
+				actions={ actions }
+				options={
+					hasMultipleColorOrigins ? (
+						<MultiplePalettes
+							{ ...paletteCommonProps }
+							headingLevel={ headingLevel }
+							colors={ colors as PaletteObject[] }
+							value={ value }
+						/>
+					) : (
+						<SinglePalette
+							{ ...paletteCommonProps }
+							colors={ colors as ColorObject[] }
+							value={ value }
+						/>
+					)
+				}
+			/>
 		</VStack>
 	);
 }

@@ -36,6 +36,11 @@ export type CircularOptionPickerProps = {
 	 * The child elements.
 	 */
 	children?: ReactNode;
+	/**
+	 * Whether the keyboard interaction should wrap around.
+	 * Defaults to `true`.
+	 */
+	loop?: boolean;
 };
 
 export type DropdownLinkActionProps = {
@@ -46,6 +51,11 @@ export type DropdownLinkActionProps = {
 	linkText: string;
 	dropdownProps: Omit< DropdownProps, 'className' | 'renderToggle' >;
 	className?: string;
+};
+
+export type OptionGroupProps = {
+	className?: string;
+	options: ReactNode;
 };
 
 export type OptionProps = Omit<

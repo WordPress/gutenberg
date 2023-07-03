@@ -7,20 +7,30 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Icon, check } from '@wordpress/icons';
+import { createContext, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
+import {
+	Composite,
+	CompositeGroup,
+	CompositeItem,
+	useCompositeState,
+} from '../composite';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 import type {
 	CircularOptionPickerProps,
 	DropdownLinkActionProps,
+	OptionGroupProps,
 	OptionProps,
 } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 import type { ButtonAsButtonProps } from '../button/types';
+
+const CircularOptionPickerContext = createContext( {} );
 
 export function Option( {
 	className,
@@ -29,13 +39,18 @@ export function Option( {
 	tooltipText,
 	...additionalProps
 }: OptionProps ) {
-	const optionButton = (
-		<Button
+	const compositeState = useContext( CircularOptionPickerContext );
+
+	const optionControl = (
+		<CompositeItem
+			as={ Button }
+			className={ 'components-circular-option-picker__option' }
 			isPressed={ isSelected }
-			className="components-circular-option-picker__option"
 			{ ...additionalProps }
+			{ ...compositeState }
 		/>
 	);
+
 	return (
 		<div
 			className={ classnames(
@@ -44,9 +59,9 @@ export function Option( {
 			) }
 		>
 			{ tooltipText ? (
-				<Tooltip text={ tooltipText }>{ optionButton }</Tooltip>
+				<Tooltip text={ tooltipText }>{ optionControl }</Tooltip>
 			) : (
-				optionButton
+				optionControl
 			) }
 			{ isSelected && (
 				<Icon
@@ -55,6 +70,34 @@ export function Option( {
 				/>
 			) }
 		</div>
+	);
+}
+
+export function OptionGroup( {
+	className,
+	options,
+	...additionalProps
+}: OptionGroupProps ) {
+	const compositeState = useContext( CircularOptionPickerContext );
+
+	// This is unlikely to happen, but on the off-chance that we've ended up
+	// with a list of `OptionGroup`s, we will just return those instead.
+	if ( Array.isArray( options ) && options[ 0 ] instanceof OptionGroup ) {
+		return <>options</>;
+	}
+
+	return (
+		<CompositeGroup
+			role={ 'group' }
+			{ ...additionalProps }
+			{ ...compositeState }
+			className={ classnames(
+				'components-circular-option-picker__swatches',
+				className
+			) }
+		>
+			{ options }
+		</CompositeGroup>
 	);
 }
 
@@ -152,28 +195,37 @@ export function ButtonAction( {
  */
 
 function CircularOptionPicker( props: CircularOptionPickerProps ) {
-	const { actions, className, options, children } = props;
+	const { actions, className, options, children, loop = true } = props;
+	const compositeState = useCompositeState( { loop } );
+
 	return (
-		<div
+		<Composite
+			{ ...compositeState }
+			role={ 'listbox' }
 			className={ classnames(
 				'components-circular-option-picker',
 				className
 			) }
 		>
-			<div className="components-circular-option-picker__swatches">
-				{ options }
-			</div>
-			{ children }
-			{ actions && (
-				<div className="components-circular-option-picker__custom-clear-wrapper">
-					{ actions }
-				</div>
-			) }
-		</div>
+			<CircularOptionPickerContext.Provider value={ compositeState }>
+				{ Array.isArray( options ) ? (
+					<OptionGroup options={ options } />
+				) : (
+					options
+				) }
+				{ children }
+				{ actions && (
+					<div className="components-circular-option-picker__custom-clear-wrapper">
+						{ actions }
+					</div>
+				) }
+			</CircularOptionPickerContext.Provider>
+		</Composite>
 	);
 }
 
 CircularOptionPicker.Option = Option;
+CircularOptionPicker.OptionGroup = OptionGroup;
 CircularOptionPicker.ButtonAction = ButtonAction;
 CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
 
