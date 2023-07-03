@@ -1,4 +1,4 @@
-.edit-post-document-title {
+.edit-post-document-actions {
 	display: flex;
 	align-items: center;
 	gap: $grid-unit;
@@ -21,10 +21,24 @@
 	}
 }
 
-.edit-post-document-title__title.components-button {
+.edit-post-document-actions__command {
 	flex-grow: 1;
 	color: var(--wp-block-synced-color);
 	overflow: hidden;
+}
+
+.edit-post-document-actions__title {
+	flex-grow: 1;
+	color: var(--wp-block-synced-color);
+	overflow: hidden;
+
+	&:hover {
+		color: var(--wp-block-synced-color);
+	}
+
+	.block-editor-block-icon {
+		flex-shrink: 0;
+	}
 
 	h1 {
 		white-space: nowrap;
@@ -34,11 +48,11 @@
 	}
 }
 
-.edit-post-document-title__shortcut {
+.edit-post-document-actions__shortcut {
 	color: $gray-800;
 }
 
-.edit-post-document-title__back.components-button.has-icon.has-text {
+.edit-post-document-actions__back.components-button.has-icon.has-text {
 	min-width: $button-size;
 	flex-shrink: 0;
 	color: $gray-700;

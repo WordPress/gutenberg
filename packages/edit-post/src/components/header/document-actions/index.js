@@ -19,7 +19,7 @@ import { displayShortcut } from '@wordpress/keycodes';
  */
 import { store as editPostStore } from '../../../store';
 
-function DocumentTitle() {
+function DocumentActions() {
 	const { template, isEditing } = useSelect( ( select ) => {
 		const { isEditingTemplate, getEditedPostTemplate } =
 			select( editPostStore );
@@ -46,9 +46,9 @@ function DocumentTitle() {
 	}
 
 	return (
-		<div className="edit-post-document-title">
+		<div className="edit-post-document-actions">
 			<Button
-				className="edit-post-document-title__back"
+				className="edit-post-document-actions__back"
 				onClick={ () => {
 					clearSelectedBlock();
 					setIsEditingTemplate( false );
@@ -58,10 +58,14 @@ function DocumentTitle() {
 				{ __( 'Back' ) }
 			</Button>
 			<Button
-				className="edit-post-document-title__title"
+				className="edit-post-document-actions__command"
 				onClick={ () => openCommandCenter() }
 			>
-				<HStack spacing={ 1 } justify="center">
+				<HStack
+					className="edit-post-document-actions__title"
+					spacing={ 1 }
+					justify="center"
+				>
 					<BlockIcon icon={ layout } />
 					<Text size="body" as="h1">
 						<VisuallyHidden as="span">
@@ -70,7 +74,7 @@ function DocumentTitle() {
 						{ templateTitle }
 					</Text>
 				</HStack>
-				<span className="edit-post-document-title__shortcut">
+				<span className="edit-post-document-actions__shortcut">
 					{ displayShortcut.primary( 'k' ) }
 				</span>
 			</Button>
@@ -78,4 +82,4 @@ function DocumentTitle() {
 	);
 }
 
-export default DocumentTitle;
+export default DocumentActions;
