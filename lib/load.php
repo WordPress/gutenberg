@@ -98,6 +98,7 @@ require __DIR__ . '/compat/wordpress-6.3/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.3/blocks.php';
 require __DIR__ . '/compat/wordpress-6.3/navigation-fallback.php';
 require __DIR__ . '/compat/wordpress-6.3/block-editor-settings.php';
+require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
