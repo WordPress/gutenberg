@@ -373,6 +373,7 @@ describe( 'UnitControl', () => {
 			const units = [
 				{ value: 'pt', label: 'pt', default: 0 },
 				{ value: 'vmax', label: 'vmax', default: 10 },
+				// Proves that units with regex control characters don't error.
 				{ value: '+', label: '+', default: 10 },
 			];
 
