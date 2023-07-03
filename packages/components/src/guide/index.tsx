@@ -111,6 +111,7 @@ function Guide( {
 		<Modal
 			className={ classnames( 'components-guide', className ) }
 			contentLabel={ contentLabel }
+			isDismissible={ pages.length > 1 }
 			onRequestClose={ onFinish }
 			onKeyDown={ ( event ) => {
 				if ( event.code === 'ArrowLeft' ) {
@@ -144,6 +145,7 @@ function Guide( {
 					{ canGoBack && (
 						<Button
 							className="components-guide__back-button"
+							variant="tertiary"
 							onClick={ goBack }
 						>
 							{ __( 'Previous' ) }
@@ -152,6 +154,7 @@ function Guide( {
 					{ canGoForward && (
 						<Button
 							className="components-guide__forward-button"
+							variant="primary"
 							onClick={ goForward }
 						>
 							{ __( 'Next' ) }
@@ -160,6 +163,7 @@ function Guide( {
 					{ ! canGoForward && (
 						<Button
 							className="components-guide__finish-button"
+							variant="primary"
 							onClick={ onFinish }
 						>
 							{ finishButtonText }

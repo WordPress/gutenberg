@@ -1,4 +1,4 @@
-.edit-site-library {
+.edit-site-patterns {
 	background: rgba(0, 0, 0, 0.05);
 	margin: $header-height 0 0;
 	.components-text {
@@ -14,7 +14,7 @@
 	}
 }
 
-.edit-site-library__grid {
+.edit-site-patterns__grid {
 	column-gap: $grid-unit-30;
 	@include break-large() {
 		column-count: 2;
@@ -25,13 +25,13 @@
 	padding-top: $border-width-focus-fallback;
 	margin-bottom: $grid-unit-40;
 
-	.edit-site-library__pattern {
+	.edit-site-patterns__pattern {
 		break-inside: avoid-column;
 		display: flex;
 		flex-direction: column;
 		margin-bottom: $grid-unit-60;
 
-		.edit-site-library__preview {
+		.edit-site-patterns__preview {
 			border-radius: $radius-block-ui;
 			cursor: pointer;
 			overflow: hidden;
@@ -48,12 +48,12 @@
 			}
 		}
 
-		.edit-site-library__footer,
-		.edit-site-library__button {
+		.edit-site-patterns__footer,
+		.edit-site-patterns__button {
 			color: $gray-600;
 		}
 
-		&.is-placeholder .edit-site-library__preview {
+		&.is-placeholder .edit-site-patterns__preview {
 			min-height: $grid-unit-80;
 			color: $gray-600;
 			border: 1px dashed $gray-800;
@@ -67,7 +67,7 @@
 		}
 	}
 
-	.edit-site-library__preview {
+	.edit-site-patterns__preview {
 		flex: 1;
 		margin-bottom: $grid-unit-20;
 	}
@@ -75,7 +75,7 @@
 
 // The increased specificity here is to overcome component styles
 // without relying on internal component class names.
-.edit-site-library__search {
+.edit-site-patterns__search {
 	&#{&} input[type="search"] {
 		background: $gray-800;
 		color: $gray-200;
@@ -90,16 +90,20 @@
 	}
 }
 
-.edit-site-library__pattern-title {
+.edit-site-patterns__pattern-title {
 	color: $gray-600;
 
-	svg {
+	.edit-site-patterns__pattern-icon {
 		border-radius: $grid-unit-05;
 		background: var(--wp-block-synced-color);
 		fill: $white;
 	}
+
+	.edit-site-patterns__pattern-lock-icon {
+		display: inline-flex;
+	}
 }
 
-.edit-site-library__no-results {
+.edit-site-patterns__no-results {
 	color: $gray-600;
 }

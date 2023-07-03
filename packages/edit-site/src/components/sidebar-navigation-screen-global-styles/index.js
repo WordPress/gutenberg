@@ -16,6 +16,7 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
 import { humanTimeDiff } from '@wordpress/date';
 import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -32,14 +33,21 @@ import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-glob
 const noop = () => {};
 
 export function SidebarNavigationItemGlobalStyles( props ) {
-	const { openGeneralSidebar, toggleFeature } = useDispatch( editSiteStore );
+	const { openGeneralSidebar } = useDispatch( editSiteStore );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { createNotice } = useDispatch( noticesStore );
-	const hasGlobalStyleVariations = useSelect(
-		( select ) =>
-			!! select(
-				coreStore
-			).__experimentalGetCurrentThemeGlobalStylesVariations()?.length,
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const { hasGlobalStyleVariations, isDistractionFree } = useSelect(
+		( select ) => ( {
+			hasGlobalStyleVariations:
+				!! select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesVariations()?.length,
+			isDistractionFree: select( preferencesStore ).get(
+				editSiteStore.name,
+				'distractionFree'
+			),
+		} ),
 		[]
 	);
 	if ( hasGlobalStyleVariations ) {
@@ -56,15 +64,18 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 			{ ...props }
 			onClick={ () => {
 				// Disable distraction free mode.
-				toggleFeature( 'distractionFree', false );
-				createNotice(
-					'info',
-					__( 'Distraction free mode turned off' ),
-					{
-						isDismissible: true,
-						type: 'snackbar',
-					}
-				);
+				if ( isDistractionFree ) {
+					setPreference(
+						editSiteStore.name,
+						'distractionFree',
+						false
+					);
+					createNotice(
+						'info',
+						__( 'Distraction free mode turned off.' ),
+						{ type: 'snackbar' }
+					);
+				}
 				// Switch to edit mode.
 				setCanvasMode( 'edit' );
 				// Open global styles sidebar.

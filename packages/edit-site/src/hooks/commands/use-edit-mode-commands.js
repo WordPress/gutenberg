@@ -111,6 +111,10 @@ function useManipulateDocumentCommands() {
 			template.type === 'wp_template'
 				? __( 'Delete template' )
 				: __( 'Delete template part' );
+		const path =
+			template.type === 'wp_template'
+				? '/wp_template'
+				: '/wp_template_part/all';
 		commands.push( {
 			name: 'core/remove-template',
 			label,
@@ -119,7 +123,7 @@ function useManipulateDocumentCommands() {
 				removeTemplate( template );
 				// Navigate to the template list
 				history.push( {
-					path: '/' + template.type,
+					path,
 				} );
 				close();
 			},

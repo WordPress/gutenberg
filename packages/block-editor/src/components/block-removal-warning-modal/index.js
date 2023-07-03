@@ -8,7 +8,7 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -75,11 +75,9 @@ export function BlockRemovalWarningModal() {
 				</ul>
 			) }
 			<p>
-				{ _n(
-					'Removing this block is not advised.',
-					'Removing these blocks is not advised.',
-					blockNamesForPrompt.length
-				) }
+				{ blockNamesForPrompt.length > 1
+					? __( 'Removing these blocks is not advised.' )
+					: __( 'Removing this block is not advised.' ) }
 			</p>
 			<HStack justify="right">
 				<Button variant="tertiary" onClick={ clearRemovalPrompt }>
