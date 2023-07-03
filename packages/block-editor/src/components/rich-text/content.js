@@ -13,6 +13,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { getMultilineTag } from './utils';
+import InnerBlocks from '../inner-blocks';
 
 export const Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 	// Handle deprecated `children` and `node` sources.
@@ -44,14 +45,6 @@ export const Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 };
 
 Content.__unstableIsRichTextContent = {};
-
-function _getSaveElement( { name, attributes, innerBlocks } ) {
-	return getSaveElement(
-		name,
-		attributes,
-		innerBlocks.map( _getSaveElement )
-	);
-}
 
 function renderChildren( children ) {
 	const values = [];
@@ -105,6 +98,8 @@ function renderElement( element ) {
 			return renderChildren( props.children );
 		case RawHTML:
 			return;
+		case InnerBlocks.Content:
+			return getValuesForBlocks( renderElement.innerBlocks );
 	}
 
 	switch ( typeof type ) {
@@ -125,10 +120,27 @@ function renderElement( element ) {
 	}
 }
 
+function getValuesForBlocks( blocks ) {
+	const values = [];
+	for ( let i = 0; i < blocks.length; i++ ) {
+		const { name, attributes, innerBlocks } = blocks[ i ];
+		const saveElement = getSaveElement( name, attributes );
+		renderElement.innerBlocks = innerBlocks;
+		const value = renderElement( saveElement );
+		if ( value ) {
+			if ( Array.isArray( value ) ) {
+				values.push( ...value );
+			} else {
+				values.push( value );
+			}
+		}
+	}
+	return values;
+}
+
 export function getRichTextValues( blocks = [] ) {
 	getBlockProps.skipFilters = true;
-	const saveElement = blocks.map( ( block ) => _getSaveElement( block ) );
-	const values = renderElement( saveElement );
+	const values = getValuesForBlocks( blocks );
 	getBlockProps.skipFilters = false;
 	return values;
 }
