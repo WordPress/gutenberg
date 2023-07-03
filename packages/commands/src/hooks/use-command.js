@@ -10,7 +10,7 @@ import { useDispatch } from '@wordpress/data';
 import { store as commandsStore } from '../store';
 
 /**
- * Attach a command to the Global command menu.
+ * Attach a command to the command palette.
  *
  * @param {import('../store/actions').WPCommandConfig} command command config.
  */
