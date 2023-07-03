@@ -51,7 +51,7 @@ export default function WelcomeGuidePage() {
 							height="240"
 						>
 							<source
-								src="/wp-content/plugins/gutenberg/editing-your-page.mp4"
+								src="https://s.w.org/images/block-editor/editing-your-page.mp4"
 								type="video/mp4"
 							/>
 						</video>
