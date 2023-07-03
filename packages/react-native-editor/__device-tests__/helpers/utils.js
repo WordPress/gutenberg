@@ -38,13 +38,6 @@ let appiumProcess;
 
 const backspace = '\u0008';
 
-// Used to map unicode and special values to keycodes on Android
-// Docs for keycode values: https://developer.android.com/reference/android/view/KeyEvent.html
-const strToKeycode = {
-	'\n': 66,
-	[ backspace ]: 67,
-};
-
 // $block-edge-to-content value
 const blockEdgeToContent = 16;
 
@@ -195,6 +188,9 @@ const stopDriver = async ( driver ) => {
  * On iOS: "clear" is not defaulted to true because calling element.clear when a text is present takes a very long time (approx. 23 seconds)
  */
 const typeString = async ( driver, element, str, clear ) => {
+	if ( isKeycode( str ) ) {
+		return await pressKeycode( driver, getKeycode( str ) );
+	}
 	if ( isAndroid() ) {
 		await typeStringAndroid( driver, element, str, clear );
 	} else {
@@ -236,9 +232,7 @@ const typeStringAndroid = async (
 	str,
 	clear = true // See comment above for why it is defaulted to true.
 ) => {
-	if ( str in strToKeycode ) {
-		return await driver.pressKeycode( strToKeycode[ str ] );
-	} else if ( clear ) {
+	if ( clear ) {
 		/*
 		 * On Android `element.type` deletes the contents of the EditText before typing and, unfortunately,
 		 * with our blocks it also deletes the block entirely. We used to avoid this by using adb to enter
@@ -267,8 +261,8 @@ const typeStringAndroid = async (
 		const paragraphs = str.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
 			const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
-			if ( paragraph in strToKeycode ) {
-				await driver.pressKeycode( strToKeycode[ paragraph ] );
+			if ( isKeycode( paragraph ) ) {
+				return await pressKeycode( driver, getKeycode( paragraph ) );
 			}
 			// Empty values passed in the `args` list of `execute` function are removed.
 			// In order to avoid an exception in `text` command due to passing fewer arguments, we don't
@@ -281,10 +275,56 @@ const typeStringAndroid = async (
 				} );
 			}
 			if ( i !== paragraphs.length - 1 ) {
-				await driver.pressKeycode( strToKeycode[ '\n' ] );
+				await pressKeycode( driver, getKeycode( '\n' ) );
 			}
 		}
 	}
+};
+
+/**
+ * Returns the mapped keycode for a string to use in `pressKeycode` function.
+ *
+ * @param {string} str String associated to a keycode
+ */
+const getKeycode = ( str ) => {
+	if ( isAndroid() ) {
+		// On Android, we map keycodes using Android values.
+		// Reference: https://developer.android.com/reference/android/view/KeyEvent.html
+		return {
+			'\n': 66,
+			[ backspace ]: 67,
+		}[ str ];
+	}
+	// On iOS, we map using the specific special value in WebDriver used to press keys.
+	// Reference: https://github.com/admc/wd/blob/master/lib/special-keys.js
+	return {
+		'\n': wd.SPECIAL_KEYS.Enter,
+		[ backspace ]: wd.SPECIAL_KEYS[ 'Back space' ],
+	}[ str ];
+};
+
+/**
+ *	Determines if the string is associated to a mapped keycode.
+ *
+ * @param {string} str String associated to a keycode
+ */
+const isKeycode = ( str ) => {
+	return !! getKeycode( str );
+};
+
+/**
+ * Presses the keycode specified.
+ *
+ * @param {*} driver  WebDriver instance
+ * @param {*} keycode Keycode to press
+ */
+const pressKeycode = async ( driver, keycode ) => {
+	if ( isAndroid() ) {
+		// `pressKeycode` command is only implemented on Android
+		return await driver.pressKeycode( keycode );
+	}
+	// `keys` command only works on iOS
+	return await driver.keys( [ keycode ] );
 };
 
 // Calculates middle x,y and clicks that position

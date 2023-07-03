@@ -627,7 +627,7 @@ class EditorPage {
 
 			await this.typeTextToTextBlock( block, paragraphs[ i ], clear );
 			if ( i !== paragraphs.length - 1 ) {
-				await this.typeTextToTextBlock( block, '\n', false );
+				await this.typeTextToTextBlock( block, '\n' );
 			}
 		}
 	}
