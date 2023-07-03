@@ -16,7 +16,12 @@
  */
 final class _WP_Editors {
 	/**
-	 * Necessary to ensure no additional TinyMcE assets are enqueued.
+	 * Necessary to ensure no additional TinyMCE assets are enqueued.
 	 */
 	public static function enqueue_default_editor() {}
+
+	/**
+	 * Necessary for wp admin dashboard.
+	 */
+	public static function editor() {}
 }
