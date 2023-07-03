@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RawHTML } from '@wordpress/element';
+import { RawHTML, StrictMode, Fragment } from '@wordpress/element';
 import {
 	children as childrenSource,
 	getSaveElement,
@@ -45,28 +45,6 @@ export const Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 
 Content.__unstableIsRichTextContent = {};
 
-function findContent( blocks, richTextValues = [] ) {
-	if ( ! Array.isArray( blocks ) ) {
-		blocks = [ blocks ];
-	}
-
-	for ( const block of blocks ) {
-		if (
-			block?.type?.__unstableIsRichTextContent ===
-			Content.__unstableIsRichTextContent
-		) {
-			richTextValues.push( block.props.value );
-			continue;
-		}
-
-		if ( block?.props?.children ) {
-			findContent( block.props.children, richTextValues );
-		}
-	}
-
-	return richTextValues;
-}
-
 function _getSaveElement( { name, attributes, innerBlocks } ) {
 	return getSaveElement(
 		name,
@@ -75,11 +53,82 @@ function _getSaveElement( { name, attributes, innerBlocks } ) {
 	);
 }
 
+function renderChildren( children ) {
+	const values = [];
+	children = Array.isArray( children ) ? children : [ children ];
+
+	for ( let i = 0; i < children.length; i++ ) {
+		const child = children[ i ];
+		const value = renderElement( child );
+		if ( value ) {
+			if ( Array.isArray( value ) ) {
+				values.push( ...value );
+			} else {
+				values.push( value );
+			}
+		}
+	}
+
+	return values;
+}
+
+function renderComponent( Component, props ) {
+	return renderElement( new Component( props ).render() );
+}
+
+function renderElement( element ) {
+	if ( null === element || undefined === element || false === element ) {
+		return;
+	}
+
+	if ( Array.isArray( element ) ) {
+		return renderChildren( element );
+	}
+
+	switch ( typeof element ) {
+		case 'string':
+		case 'number':
+			return;
+	}
+
+	const { type, props } = element;
+
+	if (
+		type.__unstableIsRichTextContent === Content.__unstableIsRichTextContent
+	) {
+		return props.value;
+	}
+
+	switch ( type ) {
+		case StrictMode:
+		case Fragment:
+			return renderChildren( props.children );
+		case RawHTML:
+			return;
+	}
+
+	switch ( typeof type ) {
+		case 'string':
+			if ( typeof props.children !== 'undefined' ) {
+				return renderChildren( props.children );
+			}
+			return;
+		case 'function':
+			if (
+				type.prototype &&
+				typeof type.prototype.render === 'function'
+			) {
+				return renderComponent( type, props );
+			}
+
+			return renderElement( type( props ) );
+	}
+}
+
 export function getRichTextValues( blocks = [] ) {
 	getBlockProps.skipFilters = true;
-	const values = findContent(
-		( Array.isArray( blocks ) ? blocks : [ blocks ] ).map( _getSaveElement )
-	);
+	const saveElement = blocks.map( ( block ) => _getSaveElement( block ) );
+	const values = renderElement( saveElement );
 	getBlockProps.skipFilters = false;
 	return values;
 }
