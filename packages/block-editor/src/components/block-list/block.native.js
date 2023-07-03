@@ -37,6 +37,7 @@ import BlockEdit from '../block-edit';
 import BlockDraggable from '../block-draggable';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
+import BlockOutline from './block-outline';
 import styles from './block.scss';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
@@ -69,6 +70,7 @@ function BlockWrapper( {
 	draggingClientId,
 	draggingEnabled,
 	isDescendentBlockSelected,
+	isParentSelected,
 	isSelected,
 	isStackedHorizontally,
 	isTouchable,
@@ -101,6 +103,11 @@ function BlockWrapper( {
 			onPress={ onFocus }
 			style={ blockWrapperStyle }
 		>
+			<BlockOutline
+				isSelected={ isSelected }
+				isParentSelected={ isParentSelected }
+				screenWidth={ screenWidth }
+			/>
 			<BlockDraggable
 				clientId={ clientId }
 				draggingClientId={ draggingClientId }
