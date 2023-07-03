@@ -13,15 +13,15 @@
  * @return string The render.
  */
 function render_block_core_site_logo( $attributes ) {
-	$adjust_width_height_filter = static function ( $image ) use ( $attributes ) {
+	$adjust_width_height_filter = static function ( $image, $attachment_id ) use ( $attributes ) {
 		if ( empty( $attributes['width'] ) || empty( $image ) || ! $image[1] || ! $image[2] ) {
 			return $image;
 		}
 		$height = (float) $attributes['width'] / ( (float) $image[1] / (float) $image[2] );
-		return array( $image[0], (int) $attributes['width'], (int) $height );
+		return image_downsize( $attachment_id, array( $attributes['width'], $height ) );
 	};
 
-	add_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
+	add_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter, 10, 2 );
 
 	$custom_logo = get_custom_logo();
 
