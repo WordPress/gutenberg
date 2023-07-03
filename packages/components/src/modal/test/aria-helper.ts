@@ -17,16 +17,9 @@ describe( 'aria-helper', () => {
 			expect( elementShouldBeHidden( element ) ).toBe( false );
 		} );
 
-		it( 'should return false when an element has the aria-hidden attribute with value "true"', () => {
+		it( 'should return false when an element has the inert attribute', () => {
 			const element = document.createElement( 'div' );
-			element.setAttribute( 'aria-hidden', 'true' );
-
-			expect( elementShouldBeHidden( element ) ).toBe( false );
-		} );
-
-		it( 'should return false when an element has the aria-hidden attribute with value "false"', () => {
-			const element = document.createElement( 'div' );
-			element.setAttribute( 'aria-hidden', 'false' );
+			element.setAttribute( 'inert', '' );
 
 			expect( elementShouldBeHidden( element ) ).toBe( false );
 		} );
