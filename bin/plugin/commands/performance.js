@@ -420,6 +420,7 @@ async function runPerformanceTests( branches, options ) {
 
 	const testSuites = [
 		'post-editor',
+		'post-editor-no-tinymce',
 		'site-editor',
 		'front-end-classic-theme',
 		'front-end-block-theme',
