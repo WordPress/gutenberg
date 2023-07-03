@@ -2047,7 +2047,9 @@ export const getInserterItems = createSelector(
 						( reusableBlock ) =>
 							syncStatus === reusableBlock.meta?.sync_status ||
 							( ! syncStatus &&
-								reusableBlock.meta?.sync_status === '' )
+								( reusableBlock.meta?.sync_status === '' ||
+									reusableBlock.meta?.sync_status ===
+										'fully' ) ) // Only reusable blocks added via site editor in release 16.1 will have sync_status of 'fully'.
 					)
 					.map( buildReusableBlockInserterItem )
 			: [];
