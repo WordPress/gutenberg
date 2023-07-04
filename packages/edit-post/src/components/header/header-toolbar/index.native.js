@@ -39,9 +39,11 @@ function HeaderToolbar( {
 	showKeyboardHideButton,
 	getStylesFromColorScheme,
 	onHideKeyboard,
+	onOpenBlockSettings,
 	isRTL,
 	noContentSelected,
 } ) {
+	const anchorNodeRef = useRef();
 	const wasNoContentSelected = useRef( noContentSelected );
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 
@@ -55,6 +57,7 @@ function HeaderToolbar( {
 			scrollViewRef.current.scrollTo( { x: 0 } );
 		}
 	};
+
 	const renderHistoryButtons = () => {
 		const buttons = [
 			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo. */
@@ -104,6 +107,7 @@ function HeaderToolbar( {
 
 	return (
 		<View
+			ref={ anchorNodeRef }
 			testID={ toolbarAriaLabel }
 			accessibilityLabel={ toolbarAriaLabel }
 			style={ [
@@ -131,8 +135,12 @@ function HeaderToolbar( {
 					useExpandedMode={ useExpandedMode }
 					onToggle={ onToggleInserter }
 				/>
+
 				{ renderHistoryButtons() }
-				<BlockToolbar />
+				<BlockToolbar
+					anchorNodeRef={ anchorNodeRef.current }
+					onOpenBlockSettings={ onOpenBlockSettings }
+				/>
 			</ScrollView>
 			{ showKeyboardHideButton && (
 				<ToolbarGroup
@@ -182,6 +190,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock } = dispatch( blockEditorStore );
+		const { openGeneralSidebar } = dispatch( editPostStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );
 
 		return {
@@ -190,6 +199,9 @@ export default compose( [
 			onHideKeyboard() {
 				clearSelectedBlock();
 				togglePostTitleSelection( false );
+			},
+			onOpenBlockSettings() {
+				openGeneralSidebar( 'edit-post/block' );
 			},
 		};
 	} ),
