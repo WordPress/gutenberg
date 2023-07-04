@@ -271,6 +271,7 @@ export function getEntityConfig(
  * See https://github.com/WordPress/gutenberg/pull/41578 for more details.
  */
 export interface GetEntityRecord {
+	normalizeArgs: ( args: any ) => any;
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
