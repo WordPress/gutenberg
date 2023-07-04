@@ -143,10 +143,6 @@
 			// has to be flex for collapse button to fit
 			display: flex;
 
-			//hide overflow and scroll
-			overflow: hidden;
-			overflow-x: scroll;
-
 			&.is-collapsed {
 				width: initial;
 			}
