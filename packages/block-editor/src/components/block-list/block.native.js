@@ -6,12 +6,11 @@ import { Pressable, useWindowDimensions, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
 	useMobileGlobalStylesColors,
-	alignmentHelpers,
 	useGlobalStyles,
 } from '@wordpress/components';
 import {
@@ -36,9 +35,7 @@ import { compose, ifCondition, pure } from '@wordpress/compose';
 import BlockEdit from '../block-edit';
 import BlockDraggable from '../block-draggable';
 import BlockInvalidWarning from './block-invalid-warning';
-import BlockMobileToolbar from '../block-mobile-toolbar';
 import BlockOutline from './block-outline';
-import styles from './block.scss';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import useSetting from '../use-setting';
@@ -63,8 +60,6 @@ function getWrapperProps( value, getWrapperPropsFunction ) {
 
 function BlockWrapper( {
 	accessibilityLabel,
-	align,
-	blockWidth,
 	children,
 	clientId,
 	draggingClientId,
@@ -72,18 +67,12 @@ function BlockWrapper( {
 	isDescendentBlockSelected,
 	isParentSelected,
 	isSelected,
-	isStackedHorizontally,
 	isTouchable,
 	marginHorizontal,
 	marginVertical,
-	onDeleteBlock,
 	onFocus,
 } ) {
 	const { width: screenWidth } = useWindowDimensions();
-	const anchorNodeRef = useRef();
-	const { isFullWidth } = alignmentHelpers;
-	const isScreenWidthEqual = blockWidth === screenWidth;
-	const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
 	const blockWrapperStyles = { flex: 1 };
 	const blockWrapperStyle = [
 		blockWrapperStyles,
@@ -116,19 +105,6 @@ function BlockWrapper( {
 			>
 				{ children }
 			</BlockDraggable>
-			<View style={ styles.neutralToolbar } ref={ anchorNodeRef }>
-				{ isSelected && (
-					<BlockMobileToolbar
-						anchorNodeRef={ anchorNodeRef.current }
-						blockWidth={ blockWidth }
-						clientId={ clientId }
-						draggingClientId={ draggingClientId }
-						isFullWidth={ isFullWidthToolbar }
-						isStackedHorizontally={ isStackedHorizontally }
-						onDelete={ onDeleteBlock }
-					/>
-				) }
-			</View>
 		</Pressable>
 	);
 }
@@ -295,7 +271,6 @@ function BlockListBlock( {
 		),
 	] );
 
-	const { align } = attributes;
 	const isFocused = isSelected || isDescendentBlockSelected;
 	const isTouchable =
 		isSelected ||
@@ -312,8 +287,6 @@ function BlockListBlock( {
 	return (
 		<BlockWrapper
 			accessibilityLabel={ accessibilityLabel }
-			align={ align }
-			blockWidth={ blockWidth }
 			clientId={ clientId }
 			draggingClientId={ draggingClientId }
 			draggingEnabled={ draggingEnabled }
@@ -325,7 +298,6 @@ function BlockListBlock( {
 			isTouchable={ isTouchable }
 			marginHorizontal={ marginHorizontal }
 			marginVertical={ marginVertical }
-			onDeleteBlock={ onDeleteBlock }
 			onFocus={ onFocus }
 		>
 			{ () =>
