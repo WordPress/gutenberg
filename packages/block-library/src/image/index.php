@@ -52,9 +52,9 @@ function render_block_core_image( $attributes, $content, $block ) {
 	return $processor->get_updated_html();
 }
 
-	/**
-	 * Registers the `core/image` block on server.
-	 */
+/**
+ * Registers the `core/image` block on server.
+ */
 function register_block_core_image() {
 	register_block_type_from_metadata(
 		__DIR__ . '/image',
@@ -63,4 +63,4 @@ function register_block_core_image() {
 		)
 	);
 }
-	add_action( 'init', 'register_block_core_image' );
+add_action( 'init', 'register_block_core_image' );
