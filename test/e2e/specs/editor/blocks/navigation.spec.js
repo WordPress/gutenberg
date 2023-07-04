@@ -977,8 +977,8 @@ test.describe( 'Navigation block', () => {
 				.locator( 'a' )
 				.filter( { hasText: 'First Link' } );
 
-			//Expect the first link to default to black when the theme doesn't define a link color
-			//This is different to the frontend because in the editor the links don't have an href, so the browser doesn't apply the default blue color
+			// Expect the first link to default to black when the theme doesn't define a link color
+			// This is different to the frontend because in the editor the links don't have an href, so the browser doesn't apply the default blue color
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
@@ -988,7 +988,7 @@ test.describe( 'Navigation block', () => {
 				.click();
 			await firstLink.click();
 
-			//We check that the submenu links also have black text color
+			// We check that the submenu links also have black text color
 			const secondLink = editor.canvas
 				.locator( 'a' )
 				.filter( { hasText: 'Second Link' } );
@@ -996,13 +996,13 @@ test.describe( 'Navigation block', () => {
 				.getByRole( 'document', { name: 'Block: Custom Link' } )
 				.filter( { has: secondLink } );
 			await expect( secondLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
-			//We check for the submenu's background color. This one is important when the theme doesn't define an overlay background color
+			// We check for the submenu's background color. This one is important when the theme doesn't define an overlay background color
 			await expect( submenuWrapper ).toHaveCSS(
 				'background-color',
 				'rgb(255, 255, 255)'
 			);
 
-			//We test the overlay on mobile too.
+			// We test the overlay on mobile too.
 			await page
 				.getByRole( 'button', { name: 'View', exact: true } )
 				.click();
@@ -1020,7 +1020,7 @@ test.describe( 'Navigation block', () => {
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
 			await expect( secondLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
 
-			//And finally we check the frontend
+			// And finally we check the frontend
 			await page.goto( '/' );
 			const firstLinkFront = page
 				.locator( 'a' )
@@ -1032,7 +1032,7 @@ test.describe( 'Navigation block', () => {
 				.locator( '.wp-block-navigation__submenu-container' )
 				.filter( { has: secondLinkFront } );
 
-			//Expect the links to default to the browser default blue when the theme doesn't define a link color and the background to be white
+			// Expect the links to default to the browser default blue when the theme doesn't define a link color and the background to be white
 			await expect( firstLinkFront ).toHaveCSS(
 				'color',
 				'rgb(0, 0, 238)'
@@ -1053,7 +1053,7 @@ test.describe( 'Navigation block', () => {
 			page,
 			editor,
 		} ) => {
-			//Set a link color for the theme
+			// Set a link color for the theme
 			await page
 				.getByRole( 'button', { name: 'Styles', exact: true } )
 				.click();
@@ -1061,18 +1061,18 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color Link styles' } )
 				.click();
-			//rgba(207,46,46) is the color of the "vivid red" color preset
+			// rgba(207,46,46) is the color of the "vivid red" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid red' } )
 				.click( { force: true } );
 			await page.getByRole( 'tab', { name: 'Hover' } ).click();
-			//rgba(155,81,224) is the color of the "vivid purple" color preset
+			// rgba(155,81,224) is the color of the "vivid purple" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid purple' } )
 				.click( { force: true } );
 			await editor.canvas.click( 'body' );
 
-			//Expect the first link to inherit the nav link color from the theme
+			// Expect the first link to inherit the nav link color from the theme
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
@@ -1086,7 +1086,7 @@ test.describe( 'Navigation block', () => {
 			await firstLink.click();
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(155, 81, 224)' );
 
-			//Expect the second link to behave the same as the first
+			// Expect the second link to behave the same as the first
 			const secondLink = editor.canvas
 				.locator( 'a' )
 				.filter( { hasText: 'Second Link' } );
@@ -1098,7 +1098,7 @@ test.describe( 'Navigation block', () => {
 				'rgb(155, 81, 224)'
 			);
 
-			//We test the overlay on mobile too.
+			// We test the overlay on mobile too.
 			await page
 				.getByRole( 'button', { name: 'View', exact: true } )
 				.click();
@@ -1111,7 +1111,7 @@ test.describe( 'Navigation block', () => {
 
 			await editor.saveSiteEditorEntities();
 
-			//And finally we check the frontend
+			// And finally we check the frontend
 			await page.goto( '/' );
 			const firstLinkFront = page
 				.locator( 'a' )
@@ -1120,7 +1120,7 @@ test.describe( 'Navigation block', () => {
 				.locator( 'a' )
 				.filter( { hasText: 'Second Link' } );
 
-			//Expect the links to have the same colors as in the editor
+			// Expect the links to have the same colors as in the editor
 			await expect( firstLinkFront ).toHaveCSS(
 				'color',
 				'rgb(207, 46, 46)'
@@ -1140,7 +1140,7 @@ test.describe( 'Navigation block', () => {
 				'rgb(155, 81, 224)'
 			);
 
-			//We reset global styles so we don't affect other tests
+			// We reset global styles so we don't affect other tests
 			await admin.visitSiteEditor();
 			await editor.canvas.click( 'body' );
 			await page
@@ -1159,7 +1159,7 @@ test.describe( 'Navigation block', () => {
 			page,
 			editor,
 		} ) => {
-			//Make changes to the theme link colors and make sure the group block colors are the ones we see
+			// Make changes to the theme link colors and make sure the group block colors are the ones we see
 			await page
 				.getByRole( 'button', { name: 'Styles', exact: true } )
 				.click();
@@ -1167,18 +1167,18 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color Link styles' } )
 				.click();
-			//rgba(207,46,46) is the color of the "vivid red" color preset
+			// rgba(207,46,46) is the color of the "vivid red" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid red' } )
 				.click( { force: true } );
 			await page.getByRole( 'tab', { name: 'Hover' } ).click();
-			//rgba(155,81,224) is the color of the "vivid purple" color preset
+			// rgba(155,81,224) is the color of the "vivid purple" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid purple' } )
 				.click( { force: true } );
 			await editor.canvas.click( 'body' );
 
-			//We group the nav block and add colors to the links inside the group block
+			// We group the nav block and add colors to the links inside the group block
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
@@ -1202,12 +1202,12 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color Link styles' } )
 				.click();
-			//rgba(0,208,132) is the color of the "Vivid green cyan" color preset
+			// rgba(0,208,132) is the color of the "Vivid green cyan" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid green cyan' } )
 				.click( { force: true } );
 			await page.getByRole( 'tab', { name: 'Hover' } ).click();
-			//rgba(255,105,0) is the color of the "Luminous vivid orange" color preset
+			// rgba(255,105,0) is the color of the "Luminous vivid orange" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Luminous vivid orange' } )
 				.click( { force: true } );
@@ -1223,12 +1223,12 @@ test.describe( 'Navigation block', () => {
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
 
-			//Expect the first link to inherit the link color from the parent group block
+			// Expect the first link to inherit the link color from the parent group block
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 208, 132)' );
 			await firstLink.click();
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(255, 105, 0)' );
 
-			//Expect the second link to behave the same as the first
+			// Expect the second link to behave the same as the first
 			const secondLink = editor.canvas
 				.locator( 'a' )
 				.filter( { hasText: 'Second Link' } );
@@ -1236,7 +1236,7 @@ test.describe( 'Navigation block', () => {
 			await secondLink.click();
 			await expect( secondLink ).toHaveCSS( 'color', 'rgb(255, 105, 0)' );
 
-			//We test the overlay on mobile too.
+			// We test the overlay on mobile too.
 			await page
 				.getByRole( 'button', { name: 'View', exact: true } )
 				.click();
@@ -1256,7 +1256,7 @@ test.describe( 'Navigation block', () => {
 
 			await editor.saveSiteEditorEntities();
 
-			//And finally we check the frontend
+			// And finally we check the frontend
 			await page.goto( '/' );
 			const firstLinkFront = page
 				.locator( 'a' )
@@ -1265,7 +1265,7 @@ test.describe( 'Navigation block', () => {
 				.locator( 'a' )
 				.filter( { hasText: 'Second Link' } );
 
-			//Expect the links to default to the browser default blue when the theme doesn't define a link color and the background to be white
+			// Expect the links to default to the browser default blue when the theme doesn't define a link color and the background to be white
 			await expect( firstLinkFront ).toHaveCSS(
 				'color',
 				'rgb(0, 208, 132)'
@@ -1276,7 +1276,7 @@ test.describe( 'Navigation block', () => {
 				'rgb(0, 208, 132)'
 			);
 
-			//We reset global styles so we don't affect other tests
+			// We reset global styles so we don't affect other tests
 			await admin.visitSiteEditor();
 			await editor.canvas.click( 'body' );
 			await page
@@ -1318,18 +1318,18 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color Link styles' } )
 				.click();
-			//rgba(0,208,132) is the color of the "Vivid green cyan" color preset
+			// rgba(0,208,132) is the color of the "Vivid green cyan" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid green cyan' } )
 				.click( { force: true } );
 			await page.getByRole( 'tab', { name: 'Hover' } ).click();
-			//rgba(255,105,0) is the color of the "Luminous vivid orange" color preset
+			// rgba(255,105,0) is the color of the "Luminous vivid orange" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Luminous vivid orange' } )
 				.click( { force: true } );
 			await editor.canvas.click( 'body' );
 
-			//We change the nav block colors
+			// We change the nav block colors
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
@@ -1340,28 +1340,28 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Text', exact: true } )
 				.click();
-			//247, 141, 167 is the color of the "Pale pink" color preset
+			// 247, 141, 167 is the color of the "Pale pink" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Pale pink' } )
 				.click( { force: true } );
 			await page
 				.getByRole( 'button', { name: 'Background', exact: true } )
 				.click();
-			//142, 209, 252 is the color of the "Pale cyan blue" color preset
+			// 142, 209, 252 is the color of the "Pale cyan blue" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
 				.click( { force: true } );
 			await page
 				.getByRole( 'button', { name: 'Submenu & overlay text' } )
 				.click();
-			//171, 184, 195 is the color of the "Cyan bluish gray" color preset
+			// 171, 184, 195 is the color of the "Cyan bluish gray" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
 				.click( { force: true } );
 			await page
 				.getByRole( 'button', { name: 'Submenu & overlay background' } )
 				.click();
-			//rgba(252,185,0) is the color of the "Luminous vivid amber" color preset
+			// rgba(252,185,0) is the color of the "Luminous vivid amber" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Luminous vivid amber' } )
 				.click( { force: true } );
@@ -1378,7 +1378,7 @@ test.describe( 'Navigation block', () => {
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
 
-			//Expect the first link to be "Pale pink" we selected for the nav block
+			// Expect the first link to be "Pale pink" we selected for the nav block
 			await expect( firstLink ).toHaveCSS(
 				'color',
 				'rgb(247, 141, 167)'
