@@ -933,11 +933,9 @@ test.describe( 'Navigation block', () => {
 
 	test.describe( 'Navigation colors', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
-			//we want emptytheme because it doesn't have any styles
+			// We want emptytheme because it doesn't have any styles
 			await requestUtils.activateTheme( 'emptytheme' );
 			await requestUtils.deleteAllTemplates( 'wp_template_part' );
-			await requestUtils.deleteAllTemplates( 'wp_template' );
-			await requestUtils.deleteAllPages();
 			await requestUtils.deleteAllMenus();
 		} );
 
@@ -964,8 +962,6 @@ test.describe( 'Navigation block', () => {
 
 		test.afterEach( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllTemplates( 'wp_template_part' );
-			await requestUtils.deleteAllTemplates( 'wp_template' );
-			await requestUtils.deleteAllPages();
 			await requestUtils.deleteAllMenus();
 		} );
 
@@ -1190,9 +1186,7 @@ test.describe( 'Navigation block', () => {
 				.getByRole( 'button', { name: 'Options' } )
 				.click();
 			await page.getByRole( 'menuitem', { name: 'Group' } ).click();
-			await page
-				.getByRole( 'button', { name: 'Settings', exact: true } )
-				.click();
+			await editor.openDocumentSettingsSidebar();
 			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.getByRole( 'button', { name: 'Color options' } ).click();
 			await page
@@ -1294,7 +1288,7 @@ test.describe( 'Navigation block', () => {
 			editor,
 			page,
 		} ) => {
-			//We add a group cointainer and change its colors so we can test if the nav block settings will prevail
+			// We add a group container and change its colors so we can test if the nav block settings will prevail
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
@@ -1306,9 +1300,7 @@ test.describe( 'Navigation block', () => {
 				.getByRole( 'button', { name: 'Options' } )
 				.click();
 			await page.getByRole( 'menuitem', { name: 'Group' } ).click();
-			await page
-				.getByRole( 'button', { name: 'Settings', exact: true } )
-				.click();
+			await editor.openDocumentSettingsSidebar();
 			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.getByRole( 'button', { name: 'Color options' } ).click();
 			await page
