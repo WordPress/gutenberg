@@ -182,4 +182,101 @@ test.describe( 'Footnotes', () => {
 
 		expect( await getFootnotes( page ) ).toMatchObject( [] );
 	} );
+
+	test( 'can be inserted in a list', async ( { editor, page } ) => {
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '* 1' );
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.locator( 'button:text("Footnote")' ).click();
+
+		await page.keyboard.type( 'a' );
+
+		const id1 = await editor.canvas.evaluate( () => {
+			return document.activeElement.id;
+		} );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content: `1<a data-rich-text-format-boundary="true" href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+						},
+					},
+				],
+			},
+			{
+				name: 'core/footnotes',
+			},
+		] );
+
+		expect( await getFootnotes( page ) ).toMatchObject( [
+			{
+				content: 'a',
+				id: id1,
+			},
+		] );
+	} );
+
+	test( 'can be inserted in a table', async ( { editor, page } ) => {
+		await editor.insertBlock( { name: 'core/table' } );
+		await editor.canvas.click( 'role=button[name="Create Table"i]' );
+		await page.keyboard.type( '1' );
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.locator( 'button:text("Footnote")' ).click();
+
+		await page.keyboard.type( 'a' );
+
+		const id1 = await editor.canvas.evaluate( () => {
+			return document.activeElement.id;
+		} );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/table',
+				attributes: {
+					body: [
+						{
+							cells: [
+								{
+									content: `1<a data-rich-text-format-boundary="true" href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+									tag: 'td',
+								},
+								{
+									content: '',
+									tag: 'td',
+								},
+							],
+						},
+						{
+							cells: [
+								{
+									content: '',
+									tag: 'td',
+								},
+								{
+									content: '',
+									tag: 'td',
+								},
+							],
+						},
+					],
+				},
+			},
+			{
+				name: 'core/footnotes',
+			},
+		] );
+
+		expect( await getFootnotes( page ) ).toMatchObject( [
+			{
+				content: 'a',
+				id: id1,
+			},
+		] );
+	} );
 } );
