@@ -71,7 +71,7 @@ const interfaceLabels = {
 
 const blockRemovalRules = {
 	'core/footnotes': __(
-		'The Footnotes block displays all footnotes found in the content.'
+		'The Footnotes block displays all footnotes found in the content. Note that any footnotes in the content will persist after removing this block.'
 	),
 };
 
