@@ -377,6 +377,7 @@ add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
  * Migrate the legacy `sync_status` meta key to the new `wp_pattern_sync_status` meta key.
  *
  * This filter is INTENTIONALLY left out of core as the meta key was fist introduced to core in 6.3 as `wp_pattern_sync_status`.
+ *
  * @since 16.1.1
  * @see https://github.com/WordPress/gutenberg/pull/52232
  *
