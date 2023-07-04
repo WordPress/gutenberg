@@ -24,7 +24,7 @@ import {
 	Icon,
 	header,
 	footer,
-	symbolFilled,
+	symbolFilled as uncategorized,
 	moreHorizontal,
 	lockSmall,
 } from '@wordpress/icons';
@@ -41,7 +41,7 @@ import { PATTERNS, TEMPLATE_PARTS, USER_PATTERNS } from './utils';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 
-const THEME_PATTERN_TOOLTIP = __( 'Theme patterns cannot be edited.' );
+const templatePartIcons = { header, footer, uncategorized };
 
 export default function GridItem( { categoryId, composite, icon, item } ) {
 	const descriptionId = useId();
@@ -53,9 +53,13 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
+	const isUserPattern = item.type === USER_PATTERNS;
+	const isNonUserPattern = item.type === PATTERNS;
+	const isTemplatePart = item.type === TEMPLATE_PARTS;
+
 	const { onClick } = useLink( {
 		postType: item.type,
-		postId: item.type === USER_PATTERNS ? item.id : item.name,
+		postId: isUserPattern ? item.id : item.name,
 		categoryId,
 		categoryType: item.type,
 	} );
@@ -71,7 +75,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		'is-placeholder': isEmpty,
 	} );
 	const previewClassNames = classnames( 'edit-site-patterns__preview', {
-		'is-inactive': item.type === PATTERNS,
+		'is-inactive': isNonUserPattern,
 	} );
 
 	const deletePattern = async () => {
@@ -88,12 +92,11 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
 	};
-
 	const deleteItem = () =>
-		item.type === TEMPLATE_PARTS ? removeTemplate( item ) : deletePattern();
+		isTemplatePart ? removeTemplate( item ) : deletePattern();
 
-	const isUserPattern = item.type === USER_PATTERNS;
 	const ariaDescriptions = [];
+
 	if ( isUserPattern ) {
 		// User patterns don't have descriptions, but can be edited and deleted, so include some help text.
 		ariaDescriptions.push(
@@ -102,23 +105,18 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	} else if ( item.description ) {
 		ariaDescriptions.push( item.description );
 	}
-	if ( item.type === PATTERNS ) {
-		ariaDescriptions.push( THEME_PATTERN_TOOLTIP );
+
+	if ( isNonUserPattern ) {
+		ariaDescriptions.push( __( 'Theme patterns cannot be edited.' ) );
 	}
 
-	let itemIcon = icon;
-	if ( categoryId === 'header' ) {
-		itemIcon = header;
-	} else if ( categoryId === 'footer' ) {
-		itemIcon = footer;
-	} else if ( categoryId === 'uncategorized' ) {
-		itemIcon = symbolFilled;
-	}
+	const itemIcon = templatePartIcons[ categoryId ]
+		? templatePartIcons[ categoryId ]
+		: icon;
 
 	// Only custom patterns or custom template parts can be renamed or deleted.
 	const isCustomPattern =
-		item.type === USER_PATTERNS ||
-		( item.type === TEMPLATE_PARTS && item.isCustom );
+		isUserPattern || ( isTemplatePart && item.isCustom );
 
 	return (
 		<>
