@@ -295,7 +295,7 @@ const getKeycode = ( str ) => {
 			[ backspace ]: 67,
 		}[ str ];
 	}
-	// On iOS, we map using the specific special value in WebDriver used to press keys.
+	// On iOS, we map keycodes using the special keys defined in WebDriver.
 	// Reference: https://github.com/admc/wd/blob/master/lib/special-keys.js
 	return {
 		'\n': wd.SPECIAL_KEYS.Enter,
@@ -304,16 +304,16 @@ const getKeycode = ( str ) => {
 };
 
 /**
- *	Determines if the string is associated to a mapped keycode.
+ * Determines if the string is mapped to a keycode.
  *
- * @param {string} str String associated to a keycode
+ * @param {string} str String potentially associated to a keycode
  */
 const isKeycode = ( str ) => {
 	return !! getKeycode( str );
 };
 
 /**
- * Presses the keycode specified.
+ * Presses the specified keycode.
  *
  * @param {*} driver  WebDriver instance
  * @param {*} keycode Keycode to press
@@ -323,7 +323,8 @@ const pressKeycode = async ( driver, keycode ) => {
 		// `pressKeycode` command is only implemented on Android
 		return await driver.pressKeycode( keycode );
 	}
-	// `keys` command only works on iOS
+	// `keys` command only works on iOS. On Android, executing this
+	// results in typing a special character instead.
 	return await driver.keys( [ keycode ] );
 };
 
