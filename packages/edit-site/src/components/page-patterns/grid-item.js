@@ -181,11 +181,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 									) }
 								>
 									<span className="edit-site-patterns__pattern-lock-icon">
-										<Icon
-											style={ { fill: 'currentcolor' } }
-											icon={ lockSmall }
-											size={ 24 }
-										/>
+										<Icon icon={ lockSmall } size={ 24 } />
 									</span>
 								</Tooltip>
 							) }
