@@ -20,6 +20,7 @@ import {
 	getNormalizedCommaSeparable,
 	isRawAttribute,
 	setNestedValue,
+	isNumericID,
 } from './utils';
 import type * as ET from './entity-types';
 import type { UndoManager } from '@wordpress/undo-manager';
@@ -364,6 +365,18 @@ export const getEntityRecord = createSelector(
 		];
 	}
 ) as GetEntityRecord;
+
+getEntityRecord.normalizeArgs = ( args ) => {
+	let key = args && args[ 2 ];
+
+	// If key is numeric, assume it's an ID and coerce to number.
+	if ( key && typeof key === 'string' && isNumericID( key ) ) {
+		key = Number( key );
+	}
+
+	args[ 2 ] = key;
+	return args;
+};
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
