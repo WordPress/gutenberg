@@ -1296,6 +1296,7 @@ test.describe( 'Navigation block', () => {
 		} );
 
 		test( 'As a user I expect my navigation to use the colors I selected for it', async ( {
+			admin,
 			editor,
 			page,
 		} ) => {
@@ -1430,17 +1431,49 @@ test.describe( 'Navigation block', () => {
 				'rgb(252, 185, 0)'
 			);
 
-			//TODO Check the overlay on mobile
-			// Expect the submenu background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
-			/*const overlay = editor.canvas
+			// We test the colors of the links on the mobile overlay too.
+			await page
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
+			await editor.canvas
+				.getByRole( 'button', { name: 'Open menu' } )
+				.click();
+			const overlay = editor.canvas
 				.locator( '.wp-block-navigation__responsive-container' )
 				.filter( { hasText: 'Second Link' } );
+			// Expect the overlay background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
 			await expect( overlay ).toHaveCSS(
 				'background-color',
 				'rgb(252, 185, 0)'
-			);*/
+			);
+			// Expect the links to both have the colors selected for the submenu and overlay text
+			await expect( firstLink ).toHaveCSS(
+				'color',
+				'rgb(171, 184, 195)'
+			);
+			await expect( secondLink ).toHaveCSS(
+				'color',
+				'rgb(171, 184, 195)'
+			);
+			await editor.saveSiteEditorEntities();
 
 			//TODO check the frontend
+
+			//await pageUtils.setBrowserViewport( viewport );
+
+			// We reset global styles so we don't affect other tests
+			await admin.visitSiteEditor();
+			await editor.canvas.click( 'body' );
+			await page
+				.getByRole( 'button', { name: 'Styles', exact: true } )
+				.click();
+			await page.getByRole( 'button', { name: 'Revisions' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Reset to defaults' } )
+				.click();
+
+			await editor.saveSiteEditorEntities();
 		} );
 	} );
 } );
