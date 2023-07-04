@@ -891,6 +891,34 @@ test.describe( 'Image - interactivity', () => {
 
 				await expect( lightbox ).toBeVisible();
 
+				const document = page.getByRole( 'document' );
+				const lightboxStyleCheck = await document.evaluate( ( doc ) => {
+					// We don't have access to the getPropertyValue() method
+					// on the CSSStyleDeclaration returned form getComputedStyle()
+					// in the Playwright outer context, so we need to evaluate it here
+					// in the browser context here.
+					const documentStyles = window.getComputedStyle( doc );
+					const lightboxStyleVars = [
+						'--lightbox-scale-width',
+						'--lightbox-scale-height',
+						'--lightbox-image-max-width',
+						'--lightbox-image-max-height',
+						'--lightbox-initial-left-position',
+						'--lightbox-initial-top-position',
+					];
+					const lightboxStyleErrors = [];
+					lightboxStyleVars.forEach( ( styleVar ) => {
+						if ( ! documentStyles.getPropertyValue( styleVar ) ) {
+							lightboxStyleErrors.push( styleVar );
+						}
+					} );
+
+					return lightboxStyleErrors.length > 0
+						? lightboxStyleErrors
+						: true;
+				} );
+				expect( lightboxStyleCheck ).toBe( true );
+
 				const closeButton = lightbox.getByRole( 'button', {
 					name: 'Close',
 				} );
