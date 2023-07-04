@@ -1127,6 +1127,52 @@ _Returns_
 
 -   `boolean`: Whether resolution is in progress.
 
+### Normalizing Selector Arguments
+
+In specific circumstances it may be necessary to normalize the arguments passed to a given call of a selector. This is necessary because selectors are pre-bound to resolvers before they applied. Moreover, metadata selectors/resolvers are also created using the supplied arguments.
+
+In these circumstances selectors may optionally define a custom property ("method") called `normalizeArgs` which should be a function thats returns the normalized form of the arguments.
+
+For example, if the 3rd argument of the selector is supposed to be an `Number` but it is called with a `String` then normalizeArgs can be defined to coerce the argument type:
+
+```js
+
+const getItemsSelector = ( name, type, id ) => {
+	// here 'id' is now guaranteed to be a number.
+	return state.items[name][type][id] || null;
+}
+
+const getItemsResolver = ( name, type, id ) => {
+	// 'id' is also guaranteed to be a number in the resolver.
+	return {};
+}
+
+// Define normalization function.
+getItemsSelector.normalizeArgs = ( args ) {
+	// "id" argument at the 2nd index
+	if (args[2] && typeof args[2] === 'string' ) {
+		args[2] === Number(args[2]);
+	}
+
+	return args;
+}
+
+registry.registerStore( 'store', {
+	// ...
+	selectors: {
+		getItems: getItemsSelector,
+	},
+	resolvers: {
+		getItems: getItemsResolver,
+	},
+} );
+
+// '54' is guaranteed to be coerced to a number/
+registry.select( 'store' ).getItems( 'foo', 'bar', '54' );
+```
+
+This is particularly important to ensure that resolvers are cached correctly. Resolvers are intended to be invoked once per selector call and are then marked as resolved. However, resolvers are keyed in a cache by their arguments. Therefore ensuring type consistency between these arguments is important to avoid cache misses.
+
 ## Going further
 
 -   [What is WordPress Data?](https://unfoldingneurons.com/2020/what-is-wordpress-data/)
