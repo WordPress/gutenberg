@@ -13,13 +13,12 @@ import {
  * Internal dependencies
  */
 
-export default function Header( { title, subTitle, actions } ) {
+export default function Header( { title, subTitle, actions, level = 1 } ) {
 	return (
 		<HStack as="header" alignment="left" className="edit-site-page-header">
 			<FlexBlock className="edit-site-page-header__page-title">
 				<Heading
-					as="h1"
-					level={ 4 }
+					level={ level }
 					className="edit-site-page-header__title"
 				>
 					{ title }
