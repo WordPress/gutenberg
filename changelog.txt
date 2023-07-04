@@ -1,5 +1,34 @@
 == Changelog ==
 
+= 16.1.1 =
+
+## Changelog
+
+### Features
+
+#### Patterns
+
+- Remove ability for user to toggle sync status after pattern creation. This is because changing the sync status can have unintended consequences on existing instances of the block. ([52230](https://github.com/WordPress/gutenberg/pull/52230))
+
+### Code Quality
+
+#### Patterns
+
+- Rename sync_status postmeta from `sync_status` to `wp_pattern_sync_status` to avoid clashes with custom plugin fields. ([52232](https://github.com/WordPress/gutenberg/pull/52232))
+
+### Bugs
+
+#### Patterns
+
+-  Fix issue with wrong sync status being set in the Site Editor when adding new synced patterns. ([52229 ](https://github.com/WordPress/gutenberg/pull/52229))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@glendaviesnz
+
+
 = 16.1.0 =
 
 ## Changelog
