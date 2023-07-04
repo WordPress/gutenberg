@@ -5,148 +5,6 @@
  * @package WordPress
  */
 
-// These functions are used for the __unstableLocation feature and only active
-// when the gutenberg plugin is active.
-if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-	/**
-	 * Returns the menu items for a WordPress menu location.
-	 *
-	 * @param string $location The menu location.
-	 * @return array Menu items for the location.
-	 */
-	function block_core_navigation_get_menu_items_at_location( $location ) {
-		if ( empty( $location ) ) {
-			return;
-		}
-
-		// Build menu data. The following approximates the code in
-		// `wp_nav_menu()` and `gutenberg_output_block_nav_menu`.
-
-		// Find the location in the list of locations, returning early if the
-		// location can't be found.
-		$locations = get_nav_menu_locations();
-		if ( ! isset( $locations[ $location ] ) ) {
-			return;
-		}
-
-		// Get the menu from the location, returning early if there is no
-		// menu or there was an error.
-		$menu = wp_get_nav_menu_object( $locations[ $location ] );
-		if ( ! $menu || is_wp_error( $menu ) ) {
-			return;
-		}
-
-		$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
-		_wp_menu_item_classes_by_context( $menu_items );
-
-		return $menu_items;
-	}
-
-
-	/**
-	 * Sorts a standard array of menu items into a nested structure keyed by the
-	 * id of the parent menu.
-	 *
-	 * @param array $menu_items Menu items to sort.
-	 * @return array An array keyed by the id of the parent menu where each element
-	 *               is an array of menu items that belong to that parent.
-	 */
-	function block_core_navigation_sort_menu_items_by_parent_id( $menu_items ) {
-		$sorted_menu_items = array();
-		foreach ( (array) $menu_items as $menu_item ) {
-			$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
-		}
-		unset( $menu_items, $menu_item );
-
-		$menu_items_by_parent_id = array();
-		foreach ( $sorted_menu_items as $menu_item ) {
-			$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
-		}
-
-		return $menu_items_by_parent_id;
-	}
-
-	/**
-	 * Add Interactivity API directives to the navigation-submenu and page-list blocks markup using the Tag Processor
-	 * The final HTML of the navigation-submenu and the page-list blocks will look similar to this:
-	 *
-	 * <li
-	 *   class="has-child"
-	 *   data-wp-context='{ "core": { "navigation": { "isMenuOpen": false, "overlay": false } } }'
-	 *   data-wp-effect="effects.core.navigation.initMenu"
-	 *   data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
-	 *   data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
-	 * >
-	 *   <button
-	 *     class="wp-block-navigation-submenu__toggle"
-	 *     data-wp-on.click="actions.core.navigation.openMenu"
-	 *     data-wp-bind.aria-expanded="context.core.navigation.isMenuOpen"
-	 *   >
-	 *   </button>
-	 *   <span>Title</span>
-	 *   <ul class="wp-block-navigation__submenu-container">
-	 *     SUBMENU ITEMS
-	 *   </ul>
-	 * </li>
-	 *
-	 * @param string $w Markup of the navigation block.
-	 * @param array  $block_attributes Block attributes.
-	 *
-	 * @return string Submenu markup with the directives injected.
-	 */
-	function block_core_navigation_add_directives_to_submenu( $w, $block_attributes ) {
-		while ( $w->next_tag(
-			array(
-				'tag_name'   => 'LI',
-				'class_name' => 'has-child',
-			)
-		) ) {
-			// Add directives to the parent `<li>`.
-			$w->set_attribute( 'data-wp-interactive', true );
-			$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "isMenuOpen": { "click": false, "hover": false }, "overlay": false } } }' );
-			$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
-			$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.handleMenuFocusout' );
-			$w->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
-			if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
-				$w->set_attribute( 'data-wp-on--mouseenter', 'actions.core.navigation.openMenuOnHover' );
-				$w->set_attribute( 'data-wp-on--mouseleave', 'actions.core.navigation.closeMenuOnHover' );
-			}
-
-			// Add directives to the toggle submenu button.
-			if ( $w->next_tag(
-				array(
-					'tag_name'   => 'BUTTON',
-					'class_name' => 'wp-block-navigation-submenu__toggle',
-				)
-			) ) {
-				$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.toggleMenuOnClick' );
-				$w->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
-			};
-
-			// Iterate through subitems if exist.
-			block_core_navigation_add_directives_to_submenu( $w, $block_attributes );
-		}
-		return $w->get_updated_html();
-	};
-
-	/**
-	 * Replaces view script for the Navigation block with version using Interactivity API.
-	 *
-	 * @param array $metadata Block metadata as read in via block.json.
-	 *
-	 * @return array Filtered block type metadata.
-	 */
-	function gutenberg_block_core_navigation_update_interactive_view_script( $metadata ) {
-		if ( 'core/navigation' === $metadata['name'] ) {
-			$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
-		}
-		return $metadata;
-	}
-	add_filter( 'block_type_metadata', 'gutenberg_block_core_navigation_update_interactive_view_script', 10, 1 );
-}
-
-
-
 /**
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the navigation markup in the front-end.
@@ -454,28 +312,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$attributes['ref'] = $attributes['navigationMenuId'];
 	}
 
-	// If:
-	// - the gutenberg plugin is active
-	// - `__unstableLocation` is defined
-	// - we have menu items at the defined location
-	// - we don't have a relationship to a `wp_navigation` Post (via `ref`).
-	// ...then create inner blocks from the classic menu assigned to that location.
-	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN &&
-		array_key_exists( '__unstableLocation', $attributes ) &&
-		! array_key_exists( 'ref', $attributes ) &&
-		! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
-	) {
-		$menu_items = block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] );
-		if ( empty( $menu_items ) ) {
-			return '';
-		}
-
-		$menu_items_by_parent_id = block_core_navigation_sort_menu_items_by_parent_id( $menu_items );
-		$parsed_blocks           = block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
-		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
-	}
-
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'ref', $attributes ) ) {
 		$navigation_post = get_post( $attributes['ref'] );
@@ -674,15 +510,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 	}
 
-	// Add directives to the submenu if needed.
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $has_submenus && $should_load_view_script ) {
-		$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
-		$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $w, $attributes );
-	}
-
 	$modal_unique_id = wp_unique_id( 'modal-' );
 
-	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive,
+	// Determine whether navigation elements should be wrapped in the markup required to make it responsive,
 	// return early if they don't.
 	if ( ! $is_responsive_menu ) {
 		return sprintf(
@@ -716,46 +546,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
 	$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
 	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
-
-	// Add Interactivity API directives to the markup if needed.
-	$nav_element_directives          = '';
-	$open_button_directives          = '';
-	$responsive_container_directives = '';
-	$responsive_dialog_directives    = '';
-	$close_button_directives         = '';
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $should_load_view_script ) {
-		$nav_element_directives          = '
-			data-wp-interactive
-			data-wp-context=\'{ "core": { "navigation": { "isMenuOpen": { "click": false, "hover": false }, "overlay": true, "roleAttribute": "" } } }\'
-		';
-		$open_button_directives          = '
-			data-wp-on--click="actions.core.navigation.openMenuOnClick"
-			data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
-		';
-		$responsive_container_directives = '
-			data-wp-class--has-modal-open="selectors.core.navigation.isMenuOpen"
-			data-wp-class--is-menu-open="selectors.core.navigation.isMenuOpen"
-			data-wp-effect="effects.core.navigation.initMenu"
-			data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
-			data-wp-on--focusout="actions.core.navigation.handleMenuFocusout"
-			tabindex="-1"
-		';
-		$responsive_dialog_directives    = '
-			data-wp-bind--aria-modal="selectors.core.navigation.isMenuOpen"
-			data-wp-bind--role="selectors.core.navigation.roleAttribute"
-			data-wp-effect="effects.core.navigation.focusFirstElement"
-		';
-		$close_button_directives         = '
-			data-wp-on--click="actions.core.navigation.closeMenuOnClick"
-		';
-	}
-
 	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s" %11$s>%9$s</button>
-			<div class="%5$s" style="%7$s" id="%1$s" %12$s>
-				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
-					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s" %13$s>
-							<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close" %14$s>%10$s</button>
+		'<button aria-haspopup="true" %3$s class="%6$s">%9$s</button>
+			<div class="%5$s" style="%7$s" id="%1$s">
+				<div class="wp-block-navigation__responsive-close" tabindex="-1">
+					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
+							<button %4$s	 class="wp-block-navigation__responsive-container-close">%10$s</button>
 						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
 							%2$s
 						</div>
@@ -771,18 +567,13 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
 		__( 'Menu' ),
 		$toggle_button_content,
-		$toggle_close_button_content,
-		$open_button_directives,
-		$responsive_container_directives,
-		$responsive_dialog_directives,
-		$close_button_directives
+		$toggle_close_button_content
 	);
 
 	return sprintf(
-		'<nav %1$s %3$s>%2$s</nav>',
+		'<nav %1$s>%2$s</nav>',
 		$wrapper_attributes,
-		$responsive_container_markup,
-		$nav_element_directives
+		$responsive_container_markup
 	);
 }
 
