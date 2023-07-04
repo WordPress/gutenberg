@@ -29,7 +29,7 @@ function isFunction( maybeFunc: any ): maybeFunc is Function {
 	return typeof maybeFunc === 'function';
 }
 
-class SlotComponent extends Component< BaseSlotComponentProps, {} > {
+class SlotComponent extends Component< BaseSlotComponentProps > {
 	private isUnmounted: boolean;
 
 	constructor( props: BaseSlotComponentProps ) {
