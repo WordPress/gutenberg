@@ -108,7 +108,8 @@ export default function SidebarNavigationScreenPages() {
 
 	const getPageProps = ( id ) => {
 		let itemIcon = page;
-		const isPostsPage = postsPage && postsPage === id;
+		const isPostsPage =
+			postsPage && postsPage === id && homeTemplate.slug !== 'front-page';
 
 		switch ( id ) {
 			case frontPage:
