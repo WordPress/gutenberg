@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Server-side rendering of the `core/image` block.
  *
@@ -10,8 +9,9 @@
  * Renders the `core/image` block on the server,
  * adding a data-id attribute to the element if core/gallery has added on pre-render.
  *
- * @param  array  $attributes The block attributes.
- * @param  string $content    The block content.
+ * @param  array    $attributes The block attributes.
+ * @param  string   $content    The block content.
+ * @param  WP_Block $block    The block object.
  * @return string Returns the block content with the data-id attribute added.
  */
 function render_block_core_image( $attributes, $content, $block ) {
@@ -34,7 +34,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	$should_load_view_script = ( array_key_exists( 'behaviors', $attributes ) &&
 		array_key_exists( 'lightbox', $attributes['behaviors'] ) &&
 		array_key_exists( 'enabled', $attributes['behaviors']['lightbox'] ) &&
-		$attributes['behaviors']['lightbox']['enabled'] === true );
+		true === $attributes['behaviors']['lightbox']['enabled'] );
 	$view_js_file            = 'wp-block-image-view';
 	if ( ! wp_script_is( $view_js_file ) ) {
 		$script_handles = $block->block_type->view_script_handles;
