@@ -2038,9 +2038,9 @@ export const getInserterItems = createSelector(
 							// for backwards compat between patterns and old reusable blocks, but
 							// some in release 16.1 may have had sync status inadvertantly set to
 							// 'fully' if created in the site editor.
-							reusableBlock.meta?.sync_status === 'fully' ||
-							reusableBlock.meta?.sync_status === '' ||
-							! reusableBlock.meta?.sync_status
+							reusableBlock.wp_pattern_sync_status === 'fully' ||
+							reusableBlock.wp_pattern_sync_status === '' ||
+							! reusableBlock.wp_pattern_sync_status
 					)
 					.map( buildReusableBlockInserterItem )
 			: [];
