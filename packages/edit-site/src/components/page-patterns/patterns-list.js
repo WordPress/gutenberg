@@ -81,14 +81,14 @@ export default function PatternsList( { categoryId, type } ) {
 						</Heading>
 						<Text variant="muted" as="p">
 							{ __(
-								'Patterns that are kept in sync across your site'
+								'Patterns/Reusable blocks that are kept in sync across your site'
 							) }
 						</Text>
 					</VStack>
 					<Grid
 						icon={ symbol }
 						categoryId={ categoryId }
-						label={ __( 'Synced patterns' ) }
+						label={ __( 'Synced patterns/Reusable blocks' ) }
 						items={ syncedPatterns }
 					/>
 				</>

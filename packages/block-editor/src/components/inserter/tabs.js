@@ -19,7 +19,7 @@ const patternsTab = {
 const reusableBlocksTab = {
 	name: 'reusable',
 	/* translators: Locally created Patterns tab title in the block inserter. */
-	title: __( 'Synced patterns' ),
+	title: __( 'Synced patterns/Reusable blocks' ),
 	icon: reusableBlockIcon,
 };
 const mediaTab = {

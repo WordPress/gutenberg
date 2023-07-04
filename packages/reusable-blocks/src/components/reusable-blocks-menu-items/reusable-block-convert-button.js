@@ -97,7 +97,7 @@ export default function ReusableBlockConvertButton( {
 				);
 				createSuccessNotice(
 					syncType === 'fully'
-						? __( 'Synced Pattern created.' )
+						? __( 'Synced Pattern/Reusable block created.' )
 						: __( 'Unsynced Pattern created.' ),
 					{
 						type: 'snackbar',
@@ -160,12 +160,16 @@ export default function ReusableBlockConvertButton( {
 									/>
 
 									<ToggleControl
-										label={ __(
-											'Keep all pattern instances in sync'
-										) }
-										help={ __(
-											'Editing the original pattern will also update anywhere the pattern is used.'
-										) }
+										label={ __( 'Synced/Reusable block ' ) }
+										help={
+											syncType === 'fully'
+												? __(
+														'Editing the pattern/reusable block will update it anywhere it is used.'
+												  )
+												: __(
+														'Each instance of the pattern can be updated independently.'
+												  )
+										}
 										checked={ syncType === 'fully' }
 										onChange={ () => {
 											setSyncType(

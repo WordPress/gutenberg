@@ -29,12 +29,12 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	}
 
 	return (
-		<InserterPanel title={ __( 'Synced patterns' ) }>
+		<InserterPanel title={ __( 'Synced patterns/Reusable blocks' ) }>
 			<BlockTypesList
 				items={ filteredItems }
 				onSelect={ onSelectItem }
 				onHover={ onHover }
-				label={ __( 'Synced patterns' ) }
+				label={ __( 'Synced patterns/Reusable blocks' ) }
 			/>
 		</InserterPanel>
 	);
