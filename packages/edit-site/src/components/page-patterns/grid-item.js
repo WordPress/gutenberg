@@ -35,7 +35,9 @@ import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { PATTERNS, USER_PATTERNS } from './utils';
+import RenameMenuItem from './rename-menu-item';
+import { PATTERNS, TEMPLATE_PARTS, USER_PATTERNS } from './utils';
+import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 
 const THEME_PATTERN_TOOLTIP = __( 'Theme patterns cannot be edited.' );
@@ -44,6 +46,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	const descriptionId = useId();
 	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
 
+	const { removeTemplate } = useDispatch( editSiteStore );
 	const { __experimentalDeleteReusableBlock } =
 		useDispatch( reusableBlocksStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -85,6 +88,9 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		}
 	};
 
+	const deleteItem = () =>
+		item.type === TEMPLATE_PARTS ? removeTemplate( item ) : deletePattern();
+
 	const isUserPattern = item.type === USER_PATTERNS;
 	const ariaDescriptions = [];
 	if ( isUserPattern ) {
@@ -107,6 +113,10 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	} else if ( categoryId === 'uncategorized' ) {
 		itemIcon = symbolFilled;
 	}
+
+	const isCustomPattern =
+		item.type === USER_PATTERNS ||
+		( item.type === TEMPLATE_PARTS && item.isCustom );
 
 	return (
 		<>
@@ -179,7 +189,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 							) }
 						</Flex>
 					</HStack>
-					{ item.type === USER_PATTERNS && (
+					{ isCustomPattern && (
 						<DropdownMenu
 							icon={ moreHorizontal }
 							label={ __( 'Actions' ) }
@@ -200,8 +210,12 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 								tabIndex: -1,
 							} }
 						>
-							{ () => (
+							{ ( { onClose } ) => (
 								<MenuGroup>
+									<RenameMenuItem
+										item={ item }
+										onClose={ onClose }
+									/>
 									<MenuItem
 										onClick={ () =>
 											setIsDeleteDialogOpen( true )
@@ -217,7 +231,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 			</div>
 			{ isDeleteDialogOpen && (
 				<ConfirmDialog
-					onConfirm={ deletePattern }
+					onConfirm={ deleteItem }
 					onCancel={ () => setIsDeleteDialogOpen( false ) }
 				>
 					{ __( 'Are you sure you want to delete this pattern?' ) }
