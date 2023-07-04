@@ -1136,7 +1136,6 @@ In these circumstances selectors may optionally define a custom property ("metho
 For example, if the 3rd argument of the selector is supposed to be an `Number` but it is called with a `String` then normalizeArgs can be defined to coerce the argument type:
 
 ```js
-
 const getItemsSelector = ( name, type, id ) => {
 	// here 'id' is now guaranteed to be a number.
 	return state.items[name][type][id] || null;

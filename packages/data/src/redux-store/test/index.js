@@ -336,4 +336,25 @@ describe( 'normalizing args', () => {
 
 		expect( selector.normalizeArgs ).not.toHaveBeenCalled();
 	} );
+
+	it( 'should call the normalizeArgs method on the selectors without resolvers', async () => {
+		const registry = createRegistry();
+		const selector = () => {};
+
+		selector.normalizeArgs = jest.fn( ( ...args ) => args );
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: selector,
+			},
+		} );
+
+		registry.select( 'store' ).getItems( 'foo', 'bar' );
+
+		expect( selector.normalizeArgs ).toHaveBeenCalledWith( [
+			'foo',
+			'bar',
+		] );
+	} );
 } );
