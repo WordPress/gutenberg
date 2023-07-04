@@ -122,7 +122,12 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					aria-label={ item.title }
 					aria-describedby={
 						ariaDescriptions.length
-							? ariaDescriptions.join( ' ' )
+							? ariaDescriptions
+									.map(
+										( _, index ) =>
+											`${ descriptionId }-${ index }`
+									)
+									.join( ' ' )
 							: undefined
 					}
 				>
