@@ -1391,15 +1391,54 @@ test.describe( 'Navigation block', () => {
 			// Expect the first link to be "Pale pink" we selected for the nav block
 			const firstLink = editor.canvas
 				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
+				.filter( { hasText: 'First Link' } )
+				.filter( {
+					has: editor.canvas.getByRole( 'textbox', {
+						label: 'Navigation link text',
+					} ),
+				} );
 			await expect( firstLink ).toHaveCSS(
 				'color',
 				'rgb(247, 141, 167)'
 			);
 
-			//TODO Check the background colors
+			// Expect the nav block background to be "Pale cyan blue" we selected for the nav block
+			const menuWrapper = editor.canvas.getByRole( 'document', {
+				name: 'Block: Navigation',
+			} );
+			await expect( menuWrapper ).toHaveCSS(
+				'background-color',
+				'rgb(142, 209, 252)'
+			);
+
+			// Expect the second link to be "Cyan bluish gray" we selected for the submenu and overlay text colors
+			const secondLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'Second Link' } );
+			await firstLink.click();
+			await expect( secondLink ).toHaveCSS(
+				'color',
+				'rgb(171, 184, 195)'
+			);
+
+			// Expect the submenu background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
+			const submenuWrapper = editor.canvas
+				.getByRole( 'document', { name: 'Block: Custom Link' } )
+				.filter( { has: secondLink } );
+			await expect( submenuWrapper ).toHaveCSS(
+				'background-color',
+				'rgb(252, 185, 0)'
+			);
 
 			//TODO Check the overlay on mobile
+			// Expect the submenu background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
+			/*const overlay = editor.canvas
+				.locator( '.wp-block-navigation__responsive-container' )
+				.filter( { hasText: 'Second Link' } );
+			await expect( overlay ).toHaveCSS(
+				'background-color',
+				'rgb(252, 185, 0)'
+			);*/
 
 			//TODO check the frontend
 		} );
