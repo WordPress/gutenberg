@@ -45,7 +45,7 @@ export default function PageTemplateParts() {
 			header: __( 'Template Part' ),
 			cell: ( templatePart ) => (
 				<VStack>
-					<Heading level={ 3 }>
+					<Heading as="h3" level={ 5 }>
 						<Link
 							params={ {
 								postId: templatePart.id,
@@ -87,7 +87,6 @@ export default function PageTemplateParts() {
 	return (
 		<Page
 			title={ __( 'Template Parts' ) }
-			titleLevel={ 2 }
 			className="edit-site-page-template-parts"
 			actions={
 				canCreate && (
