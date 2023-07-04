@@ -604,7 +604,7 @@ function mapSelectorWithResolver(
 	}
 
 	const selectorResolver = ( ...args ) => {
-		if ( resolver.normalizeArgs ) {
+		if ( resolver.normalizeArgs && args?.length ) {
 			args = resolver.normalizeArgs( args );
 		}
 		fulfillSelector( args );
