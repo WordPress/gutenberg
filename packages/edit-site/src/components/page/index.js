@@ -16,7 +16,6 @@ import Header from './header';
 
 export default function Page( {
 	title,
-	titleLevel,
 	subTitle,
 	actions,
 	children,
@@ -32,7 +31,6 @@ export default function Page( {
 					title={ title }
 					subTitle={ subTitle }
 					actions={ actions }
-					level={ titleLevel }
 				/>
 			) }
 			<div className="edit-site-page-content">
