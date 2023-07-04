@@ -19,14 +19,6 @@ export default function useNavigationMenu( ref ) {
 	const useSelectResult = useSelect(
 		( select ) => {
 			const {
-				canCreate,
-				canUpdate,
-				canDelete,
-				isResolving,
-				hasResolved,
-			} = permissions;
-
-			const {
 				navigationMenu,
 				isNavigationMenuResolved,
 				isNavigationMenuMissing,
@@ -36,37 +28,27 @@ export default function useNavigationMenu( ref ) {
 				navigationMenu,
 				isNavigationMenuResolved,
 				isNavigationMenuMissing,
-
-				canUserCreateNavigationMenu: canCreate,
-				isResolvingCanUserCreateNavigationMenu: isResolving,
-				hasResolvedCanUserCreateNavigationMenu: hasResolved,
-
-				canUserUpdateNavigationMenu: canUpdate,
-				hasResolvedCanUserUpdateNavigationMenu: ref
-					? hasResolved
-					: undefined,
-
-				canUserDeleteNavigationMenu: canDelete,
-				hasResolvedCanUserDeleteNavigationMenu: ref
-					? hasResolved
-					: undefined,
 			};
 		},
-		[ ref, permissions ]
+		[ ref ]
 	);
+
+	const { canCreate, canUpdate, canDelete, isResolving, hasResolved } =
+		permissions;
 
 	const {
 		records: navigationMenus,
 		isResolving: isResolvingNavigationMenus,
 		hasResolved: hasResolvedNavigationMenus,
-		canSwitchNavigationMenu = ref
-			? navigationMenus?.length > 1
-			: navigationMenus?.length > 0,
 	} = useEntityRecords(
 		'postType',
 		`wp_navigation`,
 		PRELOADED_NAVIGATION_MENUS_QUERY
 	);
+
+	const canSwitchNavigationMenu = ref
+		? navigationMenus?.length > 1
+		: navigationMenus?.length > 0;
 
 	return {
 		...useSelectResult,
@@ -74,6 +56,13 @@ export default function useNavigationMenu( ref ) {
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
 		canSwitchNavigationMenu,
+		canUserCreateNavigationMenu: canCreate,
+		isResolvingCanUserCreateNavigationMenu: isResolving,
+		hasResolvedCanUserCreateNavigationMenu: hasResolved,
+		canUserUpdateNavigationMenu: canUpdate,
+		hasResolvedCanUserUpdateNavigationMenu: ref ? hasResolved : undefined,
+		canUserDeleteNavigationMenu: canDelete,
+		hasResolvedCanUserDeleteNavigationMenu: ref ? hasResolved : undefined,
 	};
 }
 
