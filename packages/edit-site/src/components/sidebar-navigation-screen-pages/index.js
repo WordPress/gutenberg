@@ -106,6 +106,26 @@ export default function SidebarNavigationScreenPages() {
 		setShowAddPage( false );
 	};
 
+	const getPageProps = ( id ) => {
+		let itemIcon = page;
+		const isPostsPage = postsPage && postsPage === id;
+
+		switch ( id ) {
+			case frontPage:
+				itemIcon = home;
+				break;
+			case postsPage:
+				itemIcon = verse;
+				break;
+		}
+
+		return {
+			icon: itemIcon,
+			postType: isPostsPage ? 'wp_template' : 'page',
+			postId: isPostsPage ? homeTemplate.id : id,
+		};
+	};
+
 	return (
 		<>
 			{ showAddPage && (
@@ -152,34 +172,20 @@ export default function SidebarNavigationScreenPages() {
 										</Truncate>
 									</PageItem>
 								) }
-								{ reorderedPages?.map( ( item ) => {
-									let itemIcon;
-									switch ( item.id ) {
-										case frontPage:
-											itemIcon = home;
-											break;
-										case postsPage:
-											itemIcon = verse;
-											break;
-										default:
-											itemIcon = page;
-									}
-									return (
-										<PageItem
-											postId={ item.id }
-											key={ item.id }
-											icon={ itemIcon }
-											withChevron
-										>
-											<Truncate numberOfLines={ 1 }>
-												{ decodeEntities(
-													item?.title?.rendered ||
-														__( '(no title)' )
-												) }
-											</Truncate>
-										</PageItem>
-									);
-								} ) }
+								{ reorderedPages?.map( ( { id, title } ) => (
+									<PageItem
+										{ ...getPageProps( id ) }
+										key={ id }
+										withChevron
+									>
+										<Truncate numberOfLines={ 1 }>
+											{ decodeEntities(
+												title?.rendered ||
+													__( '(no title)' )
+											) }
+										</Truncate>
+									</PageItem>
+								) ) }
 							</ItemGroup>
 						) }
 					</>
