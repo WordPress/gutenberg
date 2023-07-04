@@ -100,3 +100,4 @@ export function initialize( editorName, blockEditorSettings ) {
 		);
 	} );
 }
+export { store } from './store';

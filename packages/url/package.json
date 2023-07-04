@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/url",
-	"version": "3.36.0",
+	"version": "3.37.0",
 	"description": "WordPress URL utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

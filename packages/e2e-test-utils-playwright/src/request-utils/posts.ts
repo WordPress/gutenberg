@@ -7,6 +7,7 @@ export interface Post {
 	id: number;
 	content: string;
 	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+	link: string;
 }
 
 export interface CreatePostPayload {

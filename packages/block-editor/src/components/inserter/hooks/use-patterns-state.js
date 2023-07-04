@@ -14,7 +14,7 @@ import { store as blockEditorStore } from '../../../store';
 
 const CUSTOM_CATEGORY = {
 	name: 'custom',
-	label: __( 'Custom patterns' ),
+	label: __( 'My patterns' ),
 	description: __( 'Custom patterns add by site users' ),
 };
 
