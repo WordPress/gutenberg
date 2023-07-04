@@ -115,6 +115,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		itemIcon = symbolFilled;
 	}
 
+	// Only custom patterns or custom template parts can be renamed or deleted.
 	const isCustomPattern =
 		item.type === USER_PATTERNS ||
 		( item.type === TEMPLATE_PARTS && item.isCustom );
@@ -190,37 +191,39 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 							) }
 						</Flex>
 					</HStack>
-					{ isCustomPattern && (
-						<DropdownMenu
-							icon={ moreHorizontal }
-							label={ __( 'Actions' ) }
-							className="edit-site-patterns__dropdown"
-							popoverProps={ { placement: 'bottom-end' } }
-							toggleProps={ {
-								className: 'edit-site-patterns__button',
-								isSmall: true,
-								describedBy: sprintf(
-									/* translators: %s: pattern name */
-									__( 'Action menu for %s pattern' ),
-									item.title
-								),
-								// The dropdown menu is not focusable using the
-								// keyboard as this would interfere with the grid's
-								// roving tab index system. Instead, keyboard users
-								// use keyboard shortcuts to trigger actions.
-								tabIndex: -1,
-							} }
-						>
-							{ ( { onClose } ) => (
-								<MenuGroup>
+					<DropdownMenu
+						icon={ moreHorizontal }
+						label={ __( 'Actions' ) }
+						className="edit-site-patterns__dropdown"
+						popoverProps={ { placement: 'bottom-end' } }
+						toggleProps={ {
+							className: 'edit-site-patterns__button',
+							isSmall: true,
+							describedBy: sprintf(
+								/* translators: %s: pattern name */
+								__( 'Action menu for %s pattern' ),
+								item.title
+							),
+							// The dropdown menu is not focusable using the
+							// keyboard as this would interfere with the grid's
+							// roving tab index system. Instead, keyboard users
+							// use keyboard shortcuts to trigger actions.
+							tabIndex: -1,
+						} }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								{ isCustomPattern && (
 									<RenameMenuItem
 										item={ item }
 										onClose={ onClose }
 									/>
-									<DuplicateMenuItem
-										item={ item }
-										onClose={ onClose }
-									/>
+								) }
+								<DuplicateMenuItem
+									item={ item }
+									onClose={ onClose }
+								/>
+								{ isCustomPattern && (
 									<MenuItem
 										onClick={ () =>
 											setIsDeleteDialogOpen( true )
@@ -228,10 +231,10 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 									>
 										{ __( 'Delete' ) }
 									</MenuItem>
-								</MenuGroup>
-							) }
-						</DropdownMenu>
-					) }
+								) }
+							</MenuGroup>
+						) }
+					</DropdownMenu>
 				</HStack>
 			</div>
 			{ isDeleteDialogOpen && (

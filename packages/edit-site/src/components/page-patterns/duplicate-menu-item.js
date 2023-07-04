@@ -11,7 +11,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import CreatePatternModal from '../create-pattern-modal';
 import CreateTemplatePartModal from '../create-template-part-modal';
-import { TEMPLATE_PARTS, USER_PATTERNS } from './utils';
+import { TEMPLATE_PARTS } from './utils';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -55,7 +55,7 @@ export default function DuplicateMenuItem( { item, onClose } ) {
 			<MenuItem onClick={ () => setIsModalOpen( true ) }>
 				{ __( 'Duplicate' ) }
 			</MenuItem>
-			{ isModalOpen && item.type === USER_PATTERNS && (
+			{ isModalOpen && item.type !== TEMPLATE_PARTS && (
 				<CreatePatternModal
 					closeModal={ () => setIsModalOpen( false ) }
 					onCreate={ handleCreatePattern }
