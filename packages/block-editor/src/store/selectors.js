@@ -2045,11 +2045,13 @@ export const getInserterItems = createSelector(
 			? getReusableBlocks( state )
 					.filter(
 						( reusableBlock ) =>
-							syncStatus === reusableBlock.meta?.sync_status ||
+							syncStatus ===
+								reusableBlock.meta?.wp_pattern_sync_status ||
 							( ! syncStatus &&
-								( reusableBlock.meta?.sync_status === '' ||
-									reusableBlock.meta?.sync_status ===
-										'fully' ) ) // Only reusable blocks added via site editor in release 16.1 will have sync_status of 'fully'.
+								( reusableBlock.meta?.wp_pattern_sync_status ===
+									'' ||
+									reusableBlock.meta
+										?.wp_pattern_sync_status === 'fully' ) ) // Only reusable blocks added via site editor in release 16.1 will have wp_pattern_sync_status of 'fully'.
 					)
 					.map( buildReusableBlockInserterItem )
 			: [];

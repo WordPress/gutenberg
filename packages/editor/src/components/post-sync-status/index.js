@@ -21,7 +21,7 @@ export default function PostSyncStatus() {
 	if ( postType !== 'wp_block' ) {
 		return null;
 	}
-	const syncStatus = meta?.sync_status;
+	const syncStatus = meta?.wp_pattern_sync_status;
 	const isFullySynced = ! syncStatus;
 
 	return (
