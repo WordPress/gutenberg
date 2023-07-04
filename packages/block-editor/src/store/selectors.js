@@ -2034,9 +2034,6 @@ export const getInserterItems = createSelector(
 			? getReusableBlocks( state )
 					.filter(
 						( reusableBlock ) =>
-							// Filter to either fully synced patterns (wp_pattern_sync_status === 'fully'),
-							// or old school reusable blocks (wp_pattern_sync_status === '').
-							reusableBlock.wp_pattern_sync_status === 'fully' ||
 							reusableBlock.wp_pattern_sync_status === '' ||
 							! reusableBlock.wp_pattern_sync_status
 					)
