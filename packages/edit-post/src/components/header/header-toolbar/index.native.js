@@ -106,7 +106,7 @@ function HeaderToolbar( {
 				title={ __( 'Image' ) }
 				icon={ imageIcon }
 				onClick={ onInsertBlock( 'core/image' ) }
-				testId="image-button"
+				testID="insert-image-button"
 				extraProps={ {
 					hint: __( 'Insert Image Block' ),
 				} }
@@ -116,7 +116,7 @@ function HeaderToolbar( {
 				title={ __( 'Video' ) }
 				icon={ videoIcon }
 				onClick={ onInsertBlock( 'core/video' ) }
-				testId="video-button"
+				testID="insert-video-button"
 				extraProps={ {
 					hint: __( 'Insert Video Block' ),
 				} }
@@ -126,7 +126,7 @@ function HeaderToolbar( {
 				title={ __( 'Gallery' ) }
 				icon={ galleryIcon }
 				onClick={ onInsertBlock( 'core/gallery' ) }
-				testId="gallery-button"
+				testID="insert-gallery-button"
 				extraProps={ {
 					hint: __( 'Insert Gallery Block' ),
 				} }
@@ -136,7 +136,7 @@ function HeaderToolbar( {
 				title={ __( 'Audio' ) }
 				icon={ audioIcon }
 				onClick={ onInsertBlock( 'core/audio' ) }
-				testId="audio-button"
+				testID="insert-audio-button"
 				extraProps={ {
 					hint: __( 'Insert Audio Block' ),
 				} }

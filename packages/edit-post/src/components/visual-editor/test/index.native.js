@@ -88,25 +88,20 @@ describe( 'when title is focused', () => {
 			'select'
 		);
 
-		// Focus last block
-		fireEvent.press(
-			screen.getAllByLabelText( /Paragraph Block. Row 2/ )[ 0 ]
-		);
-
 		// Assert that the media buttons are visible
-		const imageButton = screen.queryAllByTestId( 'insert-image-button' );
-		expect( imageButton ).toBeDefined();
+		const imageButton = await screen.findByTestId( 'insert-image-button' );
+		expect( imageButton ).toBeVisible();
 
-		const videoButton = screen.queryAllByTestId( 'insert-video-button' );
-		expect( videoButton ).toBeDefined();
+		const videoButton = await screen.findByTestId( 'insert-video-button' );
+		expect( videoButton ).toBeVisible();
 
-		const galleryButton = screen.queryAllByTestId(
+		const galleryButton = await screen.findByTestId(
 			'insert-gallery-button'
 		);
-		expect( galleryButton ).toBeDefined();
+		expect( galleryButton ).toBeVisible();
 
-		const audioButton = screen.queryAllByTestId( 'insert-audio-button' );
-		expect( audioButton ).toBeDefined();
+		const audioButton = await screen.findByTestId( 'insert-audio-button' );
+		expect( audioButton ).toBeVisible();
 	} );
 } );
 
@@ -169,19 +164,17 @@ describe( 'when title is no longer focused', () => {
 		);
 
 		// Assert that the media buttons are not visible
-		const imageButton = screen.queryAllByTestId( 'insert-image-button' );
-		expect( imageButton ).toHaveLength( 0 );
+		const imageButton = screen.queryByTestId( 'insert-image-button' );
+		expect( imageButton ).toBeNull();
 
-		const videoButton = screen.queryAllByTestId( 'insert-video-button' );
-		expect( videoButton ).toHaveLength( 0 );
+		const videoButton = screen.queryByTestId( 'insert-video-button' );
+		expect( videoButton ).toBeNull();
 
-		const galleryButton = screen.queryAllByTestId(
-			'insert-gallery-button'
-		);
-		expect( galleryButton ).toHaveLength( 0 );
+		const galleryButton = screen.queryByTestId( 'insert-gallery-button' );
+		expect( galleryButton ).toBeNull();
 
-		const audioButton = screen.queryAllByTestId( 'insert-audio-button' );
-		expect( audioButton ).toHaveLength( 0 );
+		const audioButton = screen.queryByTestId( 'insert-audio-button' );
+		expect( audioButton ).toBeNull();
 	} );
 } );
 
@@ -195,7 +188,7 @@ describe( 'when nothing is selected', () => {
 
 		// Check that the gallery button is visible within the toolbar
 		const galleryButton = await screen.getAllByLabelText( /Gallery/ )[ 0 ];
-		expect( galleryButton ).toBeDefined();
+		expect( galleryButton ).toBeVisible();
 
 		// Press the toolbar Gallery button
 		fireEvent.press( galleryButton );
