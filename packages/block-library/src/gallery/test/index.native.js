@@ -511,10 +511,11 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc010
 	it( 'rearranges gallery items', async () => {
 		// Initialize with a gallery that contains three items
-		const { galleryBlock } = await initializeWithGalleryBlock( {
-			numberOfItems: 3,
-			media,
-		} );
+		const { getByLabelText, galleryBlock } =
+			await initializeWithGalleryBlock( {
+				numberOfItems: 3,
+				media,
+			} );
 
 		// Rearrange items (final disposition will be: Image 3 - Image 1 - Image 2)
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
@@ -523,7 +524,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem3 );
 		await act( () =>
 			fireEvent.press(
-				within( galleryItem3 ).getByLabelText(
+				getByLabelText(
 					/Move block left from position 3 to position 2/
 				)
 			)
@@ -532,7 +533,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem1 );
 		await act( () =>
 			fireEvent.press(
-				within( galleryItem1 ).getByLabelText(
+				getByLabelText(
 					/Move block right from position 1 to position 2/
 				)
 			)
