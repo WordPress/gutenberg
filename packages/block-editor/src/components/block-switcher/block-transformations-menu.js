@@ -9,6 +9,7 @@ import {
 	switchToBlockType,
 } from '@wordpress/blocks';
 import { useState, useMemo } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,6 +18,7 @@ import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
 import BlockVariationTransformations from './block-variation-transformations';
 import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Helper hook to group transformations to display them in a specific order in the UI.
@@ -73,6 +75,7 @@ const BlockTransformationsMenu = ( {
 	onSelectVariation,
 	blocks,
 } ) => {
+	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const [ hoveredTransformItemName, setHoveredTransformItemName ] =
 		useState();
 
@@ -101,7 +104,13 @@ const BlockTransformationsMenu = ( {
 					<MenuItem
 						className={ getBlockMenuDefaultClassName( name ) }
 						onClick={ () => {
-							onUngroup();
+							replaceBlocks(
+								selectedClientIds,
+								onUngroup(
+									firstSelectedBlock.attributes,
+									firstSelectedBlock.innerBlocks
+								)
+							);
 						} }
 					>
 						<BlockIcon icon={ icon } showColors />
