@@ -124,3 +124,5 @@ const registerBlock = ( block ) => {
 	}
 	registerBlockType( name, settings );
 };
+
+export { store } from './store';
