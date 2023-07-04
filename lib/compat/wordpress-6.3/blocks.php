@@ -90,7 +90,7 @@ function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ) {
 add_filter( 'register_post_type_args', 'gutenberg_add_custom_fields_to_wp_block', 10, 2 );
 
 /**
- * Adds wp_sync_status meta fields to the wp_block post type so an unsynced option can be added.
+ * Adds wp_pattern_sync_status meta fields to the wp_block post type so an unsynced option can be added.
  *
  * Note: This should be removed when the minimum required WP version is >= 6.3.
  *
