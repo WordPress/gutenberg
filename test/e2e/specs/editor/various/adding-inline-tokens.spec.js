@@ -63,13 +63,14 @@ test.describe( 'adding inline tokens', () => {
 
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( '20' );
-		await page.keyboard.press( 'Enter' );
+		await page.fill( 'role=spinbutton[name="WIDTH"i]', '20' );
+		await page.click( 'role=button[name="Apply"i]' );
 
 		// Check the content.
 		const contentRegex2 = new RegExp(
 			`a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?>`
 		);
+
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
