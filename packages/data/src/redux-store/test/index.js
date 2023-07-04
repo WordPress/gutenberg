@@ -286,3 +286,48 @@ describe( 'resolveSelect', () => {
 		] );
 	} );
 } );
+
+describe( 'normalizing args', () => {
+	it( 'should call the .normalizeArgs method on the resolver if it exists', async () => {
+		const registry = createRegistry();
+		const resolver = () => {};
+
+		resolver.normalizeArgs = jest.fn( ( ...args ) => args );
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: () => 'items',
+			},
+			resolvers: {
+				getItems: resolver,
+			},
+		} );
+		registry.select( 'store' ).getItems( 'foo', 'bar' );
+
+		expect( resolver.normalizeArgs ).toHaveBeenCalledWith( [
+			'foo',
+			'bar',
+		] );
+	} );
+
+	it( 'should not call normalizeArgs if there are no arguments passed to the resolver', async () => {
+		const registry = createRegistry();
+		const resolver = () => {};
+
+		resolver.normalizeArgs = jest.fn( ( ...args ) => args );
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: () => 'items',
+			},
+			resolvers: {
+				getItems: resolver,
+			},
+		} );
+		registry.select( 'store' ).getItems();
+
+		expect( resolver.normalizeArgs ).not.toHaveBeenCalled();
+	} );
+} );
