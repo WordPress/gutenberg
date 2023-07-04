@@ -945,7 +945,7 @@ test.describe( 'Navigation block', () => {
 				postType: 'wp_template_part',
 			} );
 			await editor.canvas.click( 'body' );
-			await requestUtils.createNavigationMenu( {
+			const { id: menuId } = await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content:
 					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
@@ -953,6 +953,9 @@ test.describe( 'Navigation block', () => {
 			} );
 			await editor.insertBlock( {
 				name: 'core/navigation',
+				attributes: {
+					ref: menuId,
+				},
 			} );
 
 			await editor.saveSiteEditorEntities();
@@ -976,6 +979,7 @@ test.describe( 'Navigation block', () => {
 			// Expect the first link to default to black when the theme doesn't define a link color
 			// This is different to the frontend because in the editor the links don't have an href, so the browser doesn't apply the default blue color
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
+			// Focus the navigation block inside the header template part
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
@@ -998,7 +1002,7 @@ test.describe( 'Navigation block', () => {
 				'rgb(255, 255, 255)'
 			);
 
-			// We test the overlay on mobile too.
+			// We test the colors of the links on the mobile overlay too.
 			await page
 				.getByRole( 'button', { name: 'View', exact: true } )
 				.click();
@@ -1016,7 +1020,7 @@ test.describe( 'Navigation block', () => {
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
 			await expect( secondLink ).toHaveCSS( 'color', 'rgb(0, 0, 0)' );
 
-			// And finally we check the frontend
+			// And finally we check the colors of the links on the frontend
 			await page.goto( '/' );
 			const firstLinkFront = page
 				.locator( 'a' )
@@ -1049,7 +1053,7 @@ test.describe( 'Navigation block', () => {
 			page,
 			editor,
 		} ) => {
-			// Set a link color for the theme
+			// In the inspector sidebar, we set colors for link text and link hover text for this theme
 			await page
 				.getByRole( 'button', { name: 'Styles', exact: true } )
 				.click();
@@ -1068,13 +1072,15 @@ test.describe( 'Navigation block', () => {
 				.click( { force: true } );
 			await editor.canvas.click( 'body' );
 
-			// Expect the first link to inherit the nav link color from the theme
+			// Focus the navigation block inside the header template part
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
+
+			// Expect the first link to inherit the nav link color from the theme
 			const firstLink = editor.canvas
 				.locator( 'a' )
 				.filter( { hasText: 'First Link' } );
@@ -1094,7 +1100,7 @@ test.describe( 'Navigation block', () => {
 				'rgb(155, 81, 224)'
 			);
 
-			// We test the overlay on mobile too.
+			// We test the colors of the links on the mobile overlay too.
 			await page
 				.getByRole( 'button', { name: 'View', exact: true } )
 				.click();
@@ -1107,7 +1113,7 @@ test.describe( 'Navigation block', () => {
 
 			await editor.saveSiteEditorEntities();
 
-			// And finally we check the frontend
+			// And finally we check the colors of the links on the frontend
 			await page.goto( '/' );
 			const firstLinkFront = page
 				.locator( 'a' )
@@ -1174,18 +1180,22 @@ test.describe( 'Navigation block', () => {
 				.click( { force: true } );
 			await editor.canvas.click( 'body' );
 
-			// We group the nav block and add colors to the links inside the group block
+			// Focus the navigation block inside the header template part
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
+
+			// We wrap the nav block inside a group block
 			await page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
 				.getByRole( 'button', { name: 'Options' } )
 				.click();
 			await page.getByRole( 'menuitem', { name: 'Group' } ).click();
+
+			// In the sidebar inspector we add a link color and link hover color to the group block
 			await editor.openDocumentSettingsSidebar();
 			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.getByRole( 'button', { name: 'Color options' } ).click();
@@ -1207,9 +1217,7 @@ test.describe( 'Navigation block', () => {
 				.click( { force: true } );
 			await editor.canvas.click( 'body' );
 
-			const firstLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
+			// Focus the navigation block inside the header template part
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
@@ -1218,6 +1226,9 @@ test.describe( 'Navigation block', () => {
 				.click();
 
 			// Expect the first link to inherit the link color from the parent group block
+			const firstLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'First Link' } );
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(0, 208, 132)' );
 			await firstLink.click();
 			await expect( firstLink ).toHaveCSS( 'color', 'rgb(255, 105, 0)' );
@@ -1230,7 +1241,7 @@ test.describe( 'Navigation block', () => {
 			await secondLink.click();
 			await expect( secondLink ).toHaveCSS( 'color', 'rgb(255, 105, 0)' );
 
-			// We test the overlay on mobile too.
+			// We test the colors of the links on the mobile overlay too.
 			await page
 				.getByRole( 'button', { name: 'View', exact: true } )
 				.click();
@@ -1250,7 +1261,7 @@ test.describe( 'Navigation block', () => {
 
 			await editor.saveSiteEditorEntities();
 
-			// And finally we check the frontend
+			// And finally we check the colors of the links on the frontend
 			await page.goto( '/' );
 			const firstLinkFront = page
 				.locator( 'a' )
@@ -1288,18 +1299,21 @@ test.describe( 'Navigation block', () => {
 			editor,
 			page,
 		} ) => {
-			// We add a group container and change its colors so we can test if the nav block settings will prevail
+			// Focus the navigation block inside the header template part
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
+
+			// We wrap the nav block inside a group block
 			await page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
 				.getByRole( 'button', { name: 'Options' } )
 				.click();
 			await page.getByRole( 'menuitem', { name: 'Group' } ).click();
+			// We change the group link colors so we can test if the nav block settings will prevail
 			await editor.openDocumentSettingsSidebar();
 			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.getByRole( 'button', { name: 'Color options' } ).click();
@@ -1321,14 +1335,17 @@ test.describe( 'Navigation block', () => {
 				.click( { force: true } );
 			await editor.canvas.click( 'body' );
 
-			// We change the nav block colors
+			// Focus the navigation block inside the header template part
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
+
+			// In the inspector sidebar, we change the nav block colors
 			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			// Pale pink for the text color
 			await page
 				.getByRole( 'button', { name: 'Text', exact: true } )
 				.click();
@@ -1336,6 +1353,7 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color: Pale pink' } )
 				.click( { force: true } );
+			// Pale cyan blue for the background color
 			await page
 				.getByRole( 'button', { name: 'Background', exact: true } )
 				.click();
@@ -1343,6 +1361,7 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
 				.click( { force: true } );
+			// Cyan bluish gray for the submenu and overlay text color
 			await page
 				.getByRole( 'button', { name: 'Submenu & overlay text' } )
 				.click();
@@ -1350,6 +1369,7 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
 				.click( { force: true } );
+			// Luminous vivid amber for the submenu and overlay background color
 			await page
 				.getByRole( 'button', { name: 'Submenu & overlay background' } )
 				.click();
@@ -1360,9 +1380,7 @@ test.describe( 'Navigation block', () => {
 
 			await editor.canvas.click( 'body' );
 
-			const firstLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
+			// Focus the navigation block inside the header template part
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
 				.focus();
@@ -1371,6 +1389,9 @@ test.describe( 'Navigation block', () => {
 				.click();
 
 			// Expect the first link to be "Pale pink" we selected for the nav block
+			const firstLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'First Link' } );
 			await expect( firstLink ).toHaveCSS(
 				'color',
 				'rgb(247, 141, 167)'
