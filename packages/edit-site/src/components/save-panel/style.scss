@@ -2,4 +2,51 @@
 	@include break-small() {
 		width: 600px;
 	}
+
+	.components-modal__content {
+		padding-bottom: 0;
+	}
+
+	.entities-saved-states__panel {
+		display: flex;
+		flex-direction: column;
+
+		.components-panel__body {
+			border: 1px solid $gray-200;
+			border-radius: $radius-block-ui;
+			margin-bottom: $grid-unit-20;
+		}
+	}
+
+	.entities-saved-states__panel-header {
+		order: 1;
+		height: auto;
+		border: 0;
+		border-top: 1px solid $gray-200;
+		justify-content: end;
+		position: sticky;
+		bottom: 0;
+		padding: $grid-unit-20 0 $grid-unit-40;
+		z-index: z-index(".edit-site-save-panel__modal .entities-saved-states__panel-header");
+
+		.components-button {
+			flex: initial;
+
+			&.is-primary {
+				order: 1;
+			}
+		}
+	}
+
+	.entities-saved-states__text-prompt {
+		padding: 0;
+
+		p {
+			margin-top: 0;
+		}
+
+		strong {
+			display: none;
+		}
+	}
 }

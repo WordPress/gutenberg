@@ -194,6 +194,7 @@ $z-layers: (
 
 	// Ensure modal footer actions appear above modal contents
 	".edit-site-start-template-options__modal__actions": 1,
+	".edit-site-save-panel__modal .entities-saved-states__panel-header": 1,
 );
 
 @function z-index( $key ) {
