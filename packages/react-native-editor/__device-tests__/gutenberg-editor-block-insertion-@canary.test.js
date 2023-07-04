@@ -104,7 +104,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		);
 
 		expect( await editorPage.assertSlashInserterPresent() ).toBe( true );
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
+		await editorPage.removeBlock();
 	} );
 
 	it( 'should hide the menu after deleting the / character', async () => {
@@ -139,7 +139,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		// Check if the slash inserter UI no longer exists.
 		expect( await editorPage.assertSlashInserterPresent() ).toBe( false );
 
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
+		await editorPage.removeBlock();
 	} );
 
 	it( 'should add an Image block after tying /image and tapping on the Image block button', async () => {
@@ -172,7 +172,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		expect( await editorPage.assertSlashInserterPresent() ).toBe( false );
 
 		// Remove image block.
-		await editorPage.removeBlockAtPosition( blockNames.image );
+		await editorPage.removeBlock();
 	} );
 
 	it( 'should insert an embed image block with "/img" + enter', async () => {
@@ -190,6 +190,6 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 			await editorPage.hasBlockAtPosition( 1, blockNames.embed )
 		).toBe( true );
 
-		await editorPage.removeBlockAtPosition( blockNames.embed );
+		await editorPage.removeBlock();
 	} );
 } );
