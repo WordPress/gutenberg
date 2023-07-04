@@ -377,15 +377,14 @@ add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
  * Migrate the legacy `sync_status` meta key to the new `wp_pattern_sync_status` meta key.
  *
  * This filter is INTENTIONALLY left out of core as the meta key was fist introduced to core in 6.3 as `wp_pattern_sync_status`.
- * 
  * @since 16.1.1
+ * @see https://github.com/WordPress/gutenberg/pull/52232
  *
  * @param mixed  $value     The value to return, either a single metadata value or an array of values depending on the value of $single.
  * @param int    $object_id ID of the object metadata is for.
  * @param string $meta_key  Metadata key.
  * @param bool   $single    Whether to return only the first value of the specified $meta_key.
  *
- * @see https://github.com/WordPress/gutenberg/pull/52232
  */
 function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $single ) {
 	if ( 'wp_pattern_sync_status' !== $meta_key ) {
@@ -394,7 +393,9 @@ function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $si
 
 	$sync_status = get_post_meta( $object_id, 'sync_status', $single );
 
-	if ( isset( $sync_status[0] ) && 'unsynced' === $sync_status[0] ) {
+	if ( $single && 'unsynced' === $sync_status ) {
+		return $sync_status;
+	} elseif ( isset( $sync_status[0] ) && 'unsynced' === $sync_status[0] ) {
 		return $sync_status;
 	}
 
