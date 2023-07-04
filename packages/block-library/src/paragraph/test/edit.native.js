@@ -255,7 +255,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( screen.getByLabelText( 'Link' ) );
 
 		fireEvent.changeText(
-			screen.getByPlaceholderText( 'Add link text', { hidden: true } ),
+			screen.getByPlaceholderText( 'Add link text' ),
 			'WordPress'
 		);
 		fireEvent.press(
