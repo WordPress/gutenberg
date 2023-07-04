@@ -288,46 +288,52 @@ describe( 'resolveSelect', () => {
 } );
 
 describe( 'normalizing args', () => {
-	it( 'should call the .normalizeArgs method on the resolver if it exists', async () => {
+	it( 'should call the normalizeArgs method of the selector for both the selector and the resolver', async () => {
 		const registry = createRegistry();
-		const resolver = () => {};
+		const selector = () => {};
 
-		resolver.normalizeArgs = jest.fn( ( ...args ) => args );
+		const normalizingFunction = jest.fn( ( ...args ) => args );
+
+		selector.normalizeArgs = normalizingFunction;
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
 			selectors: {
-				getItems: () => 'items',
+				getItems: selector,
 			},
 			resolvers: {
-				getItems: resolver,
+				getItems: () => 'items',
 			},
 		} );
 		registry.select( 'store' ).getItems( 'foo', 'bar' );
 
-		expect( resolver.normalizeArgs ).toHaveBeenCalledWith( [
-			'foo',
-			'bar',
-		] );
+		expect( normalizingFunction ).toHaveBeenCalledWith( [ 'foo', 'bar' ] );
+
+		// Needs to be call twice:
+		// 1. When the selector is called.
+		// 2. When the resolver is fullfilled.
+		expect( normalizingFunction ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'should not call normalizeArgs if there are no arguments passed to the resolver', async () => {
+	it( 'should not call the normalizeArgs method if there are no arguments passed to the selector (and thus the resolver)', async () => {
 		const registry = createRegistry();
-		const resolver = () => {};
+		const selector = () => {};
 
-		resolver.normalizeArgs = jest.fn( ( ...args ) => args );
+		selector.normalizeArgs = jest.fn( ( ...args ) => args );
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
 			selectors: {
-				getItems: () => 'items',
+				getItems: selector,
 			},
 			resolvers: {
-				getItems: resolver,
+				getItems: () => 'items',
 			},
 		} );
+
+		// Called with no args so the normalizeArgs method should not be called.
 		registry.select( 'store' ).getItems();
 
-		expect( resolver.normalizeArgs ).not.toHaveBeenCalled();
+		expect( selector.normalizeArgs ).not.toHaveBeenCalled();
 	} );
 } );
