@@ -4,7 +4,6 @@
 import { MenuItem } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -12,70 +11,41 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import CreatePatternModal from '../create-pattern-modal';
 import CreateTemplatePartModal from '../create-template-part-modal';
 import { TEMPLATE_PARTS } from './utils';
-import { unlock } from '../../lock-unlock';
-
-const { useHistory } = unlock( routerPrivateApis );
 
 export default function DuplicateMenuItem( {
 	item,
 	label = __( 'Duplicate' ),
 	onClose,
 } ) {
-	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	function handleCreatePattern( { pattern, categoryId } ) {
-		setIsModalOpen( false );
-		onClose();
-
-		history.push( {
-			postId: pattern.id,
-			postType: 'wp_block',
-			categoryType: 'wp_block',
-			categoryId,
-			canvas: 'edit',
-		} );
-	}
-
-	function handleCreateTemplatePart( templatePart ) {
-		setIsModalOpen( false );
-		onClose();
-
-		// Navigate to the created template part editor.
-		history.push( {
-			postId: templatePart.id,
-			postType: 'wp_template_part',
-			canvas: 'edit',
-		} );
-	}
-
-	function handleError() {
+	function handleClose() {
 		setIsModalOpen( false );
 		onClose();
 	}
+
+	const CreateModal =
+		item.type === TEMPLATE_PARTS
+			? CreateTemplatePartModal
+			: CreatePatternModal;
+
+	const modalProps = {
+		blocks: item.blocks || [],
+		closeModal: handleClose,
+		onCreate: handleClose,
+		onError: handleClose,
+		title:
+			item.type !== TEMPLATE_PARTS
+				? __( 'Duplicate pattern' )
+				: undefined,
+	};
 
 	return (
 		<>
 			<MenuItem onClick={ () => setIsModalOpen( true ) }>
 				{ label }
 			</MenuItem>
-			{ isModalOpen && item.type !== TEMPLATE_PARTS && (
-				<CreatePatternModal
-					closeModal={ () => setIsModalOpen( false ) }
-					onCreate={ handleCreatePattern }
-					onError={ handleError }
-					blocks={ item.blocks || [] }
-					title={ __( 'Duplicate pattern' ) }
-				/>
-			) }
-			{ isModalOpen && item.type === TEMPLATE_PARTS && (
-				<CreateTemplatePartModal
-					closeModal={ () => setIsModalOpen( false ) }
-					blocks={ item.blocks || [] }
-					onCreate={ handleCreateTemplatePart }
-					onError={ handleError }
-				/>
-			) }
+			{ isModalOpen && <CreateModal { ...modalProps } /> }
 		</>
 	);
 }
