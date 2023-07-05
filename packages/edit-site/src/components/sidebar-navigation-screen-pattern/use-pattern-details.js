@@ -21,6 +21,15 @@ import {
 } from '../sidebar-navigation-screen-details-panel';
 
 export default function usePatternDetails( postType, postId ) {
+	const postTypesThatUseStringBasedIds = [
+		'wp_template',
+		'wp_template_part',
+	];
+
+	postId = ! postTypesThatUseStringBasedIds?.includes( postType )
+		? Number( postId )
+		: postId;
+
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
 		postType,
 		postId

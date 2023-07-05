@@ -21,7 +21,17 @@ export default function useEditedEntityRecord( postType, postId ) {
 			const { __experimentalGetTemplateInfo: getTemplateInfo } =
 				select( editorStore );
 			const usedPostType = postType ?? getEditedPostType();
-			const usedPostId = postId ?? getEditedPostId();
+			const postTypesThatUseStringBasedIds = [
+				'wp_template',
+				'wp_template_part',
+			];
+
+			let usedPostId = postId ?? getEditedPostId();
+
+			usedPostId = ! postTypesThatUseStringBasedIds?.includes( postType )
+				? Number( usedPostId )
+				: usedPostId;
+
 			const _record = getEditedEntityRecord(
 				'postType',
 				usedPostType,
