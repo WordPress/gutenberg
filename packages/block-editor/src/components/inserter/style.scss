@@ -719,7 +719,8 @@ $block-inserter-tabs-height: 44px;
 	color: $gray-900;
 	display: flex;
 	flex-direction: row;
-	margin: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
+	margin: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-20;
+	max-width: 380px;
 }
 
 .reusable-blocks-menu-items__rename-hint-content {

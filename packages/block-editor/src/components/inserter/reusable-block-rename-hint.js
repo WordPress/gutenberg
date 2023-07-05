@@ -28,7 +28,9 @@ export default function ReusableBlocksRenameHint() {
 	return (
 		<div ref={ ref } className="reusable-blocks-menu-items__rename-hint">
 			<div className="reusable-blocks-menu-items__rename-hint-content">
-				{ __( 'Reusable blocks are now called "patterns".' ) }
+				{ __(
+					'Reusable blocks are now called "patterns". A "synced" pattern will behave in exactly the same way as a reusable block.'
+				) }
 			</div>
 			<Button
 				className="reusable-blocks-menu-items__rename-hint-dismiss"

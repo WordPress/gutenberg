@@ -131,9 +131,8 @@ export default function ReusableBlockConvertButton( {
 						icon={ symbol }
 						onClick={ () => setIsModalOpen( true ) }
 					>
-						{ __( 'Create pattern' ) }
+						{ __( 'Create pattern/reusable block' ) }
 					</MenuItem>
-					<ReusableBlocksRenameHint />
 					{ isModalOpen && (
 						<Modal
 							title={ __( 'Create pattern' ) }
@@ -152,6 +151,7 @@ export default function ReusableBlockConvertButton( {
 									onClose();
 								} }
 							>
+								<ReusableBlocksRenameHint />
 								<VStack spacing="5">
 									<TextControl
 										__nextHasNoMarginBottom
