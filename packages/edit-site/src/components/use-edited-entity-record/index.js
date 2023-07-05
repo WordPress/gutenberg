@@ -28,7 +28,9 @@ export default function useEditedEntityRecord( postType, postId ) {
 
 			let usedPostId = postId ?? getEditedPostId();
 
-			usedPostId = ! postTypesThatUseStringBasedIds?.includes( postType )
+			usedPostId = ! postTypesThatUseStringBasedIds?.includes(
+				usedPostType
+			)
 				? Number( usedPostId )
 				: usedPostId;
 
