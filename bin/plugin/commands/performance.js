@@ -517,15 +517,15 @@ async function runPerformanceTests( branches, options ) {
 		/** @type {Record<string, Record<string, string>>} */
 		const invertedResult = {};
 		Object.entries( results[ testSuite ] ).reduce(
-			( acc, [ key, val ] ) => {
-				for ( const entry of Object.keys( val ) ) {
+			( acc, [ branch, metrics ] ) => {
+				for ( const [ metric, value ] of Object.entries( metrics ) ) {
 					// @ts-ignore
-					if ( ! acc[ entry ] && isFinite( val[ entry ] ) )
-						acc[ entry ] = {};
+					if ( ! acc[ metric ] && isFinite( value ) )
+						acc[ metric ] = {};
 					// @ts-ignore
-					if ( isFinite( val[ entry ] ) ) {
+					if ( isFinite( value ) ) {
 						// @ts-ignore
-						acc[ entry ][ key ] = val[ entry ] + ' ms';
+						acc[ metric ][ branch ] = value + ' ms';
 					}
 				}
 				return acc;
