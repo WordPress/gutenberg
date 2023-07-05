@@ -49,6 +49,7 @@ test.describe( 'Post Editor Performance', () => {
 
 	test.afterAll( async () => {
 		saveResultsFile( __filename, results );
+		// Delete the trace file.
 		deleteFile( traceFilePath );
 	} );
 
@@ -64,11 +65,13 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 
 	test( 'Loading', async ( { browser, page } ) => {
+		// Turn the large post HTML into blocks and insert.
 		await loadBlocksFromHtml(
 			page,
 			path.join( process.env.ASSETS_PATH, 'large-post.html' )
 		);
 
+		// Save the draft.
 		await page
 			.getByRole( 'button', { name: 'Save draft' } )
 			.click( { timeout: 60_000 } );
@@ -76,19 +79,21 @@ test.describe( 'Post Editor Performance', () => {
 			page.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
 
+		// Get the URL that we will be testing against.
 		const draftURL = page.url();
 
-		// Number of sample measurements to take.
+		// Start the measurements.
 		const samples = 10;
-		// Number of throwaway measurements to perform before recording samples.
-		// Having at least one helps ensure that caching quirks don't manifest in
-		// the results.
 		const throwaway = 1;
 		const rounds = throwaway + samples;
 		for ( let i = 0; i < rounds; i++ ) {
+			// Open a fresh page in a new context to prevent caching.
 			const testPage = await browser.newPage();
 
+			// Go to the test page URL.
 			await testPage.goto( draftURL );
+
+			// Wait for the first block.
 			await testPage
 				.frameLocator( 'iframe[name="editor-canvas"]' )
 				.locator( '.wp-block' )
@@ -97,6 +102,7 @@ test.describe( 'Post Editor Performance', () => {
 					timeout: 120_000,
 				} );
 
+			// Save the results.
 			if ( i >= throwaway ) {
 				const loadingDurations = await getLoadingDurations( testPage );
 				Object.entries( loadingDurations ).forEach(
@@ -111,28 +117,35 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 
 	test( 'Typing', async ( { browser, page, editor } ) => {
+		// Load the large post fixture.
 		await loadBlocksFromHtml(
 			page,
 			path.join( process.env.ASSETS_PATH, 'large-post.html' )
 		);
+
+		// Append an empty paragraph.
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
+		// Start tracing.
 		await browser.startTracing( page, {
 			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
 
-		const samples = 10;
 		// The first character typed triggers a longer time (isTyping change).
 		// It can impact the stability of the metric, so we exclude it. It
 		// probably deserves a dedicated metric itself, though.
+		const samples = 10;
 		const throwaway = 1;
 		const rounds = samples + throwaway;
+
+		// Type the testing sequence into the empty paragraph.
 		await page.keyboard.type( 'x'.repeat( rounds ), {
 			delay: BROWSER_IDLE_WAIT,
 		} );
 
+		// Stop tracing and save results.
 		await browser.stopTracing();
 
 		const traceResults = JSON.parse( readFile( traceFilePath ) );
@@ -144,6 +157,9 @@ test.describe( 'Post Editor Performance', () => {
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);
 		}
+
+		// Delete the trace file.
+		deleteFile( traceFilePath );
 	} );
 
 	test( 'Typing within containers', async ( { browser, page } ) => {
@@ -189,6 +205,9 @@ test.describe( 'Post Editor Performance', () => {
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);
 		}
+
+		// Delete the trace file.
+		deleteFile( traceFilePath );
 	} );
 
 	test( 'Selecting blocks', async ( { browser, page } ) => {
@@ -224,6 +243,9 @@ test.describe( 'Post Editor Performance', () => {
 				);
 			}
 		}
+
+		// Delete the trace file.
+		deleteFile( traceFilePath );
 	} );
 
 	test( 'Opening persistent list view', async ( { browser, page } ) => {
@@ -260,6 +282,9 @@ test.describe( 'Post Editor Performance', () => {
 			// Close List View
 			await listViewToggle.click();
 		}
+
+		// Delete the trace file.
+		deleteFile( traceFilePath );
 	} );
 
 	test( 'Opening the inserter', async ( { browser, page } ) => {
@@ -296,6 +321,9 @@ test.describe( 'Post Editor Performance', () => {
 			// Close Inserter.
 			await globalInserterToggle.click();
 		}
+
+		// Delete the trace file.
+		deleteFile( traceFilePath );
 	} );
 
 	test( 'Searching the inserter', async ( { browser, page } ) => {
@@ -338,6 +366,9 @@ test.describe( 'Post Editor Performance', () => {
 
 		// Close Inserter.
 		await globalInserterToggle.click();
+
+		// Delete the trace file.
+		deleteFile( traceFilePath );
 	} );
 
 	test( 'Hovering Inserter Items', async ( { browser, page } ) => {
@@ -388,5 +419,8 @@ test.describe( 'Post Editor Performance', () => {
 
 		// Close Inserter.
 		await globalInserterToggle.click();
+
+		// Delete the trace file.
+		deleteFile( traceFilePath );
 	} );
 } );

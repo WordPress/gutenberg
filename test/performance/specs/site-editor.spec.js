@@ -21,6 +21,8 @@ const {
 	loadBlocksFromHtml,
 } = require( '../utils' );
 
+const BROWSER_IDLE_WAIT = 1000;
+
 const results = {
 	serverResponse: [],
 	firstPaint: [],
@@ -54,11 +56,21 @@ test.describe( 'Site Editor Performance', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Loading', async ( { browser, page, admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		// Start a new page.
 		await admin.createNewPost( { postType: 'page' } );
 
-		// Turn the large post HTML into blocks and insert.
+		// Disable auto-save to avoid impacting the metrics.
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+				autosaveInterval: 100000000000,
+				localAutosaveInterval: 100000000000,
+			} );
+		} );
+	} );
+
+	test( 'Loading', async ( { browser, page, admin } ) => {
+		// Load the large post fixture.
 		await loadBlocksFromHtml(
 			page,
 			path.join( process.env.ASSETS_PATH, 'large-post.html' )
@@ -84,16 +96,18 @@ test.describe( 'Site Editor Performance', () => {
 		} );
 
 		// Get the URL that we will be testing against.
-		const targetUrl = page.url();
+		const draftURL = page.url();
 
 		// Start the measurements.
-		let i = 3;
-		while ( i-- ) {
+		const samples = 10;
+		const throwaway = 1;
+		const rounds = samples + throwaway;
+		for ( let i = 0; i < rounds; i++ ) {
 			// Open a fresh page in a new context to prevent caching.
 			const testPage = await browser.newPage();
 
 			// Go to the test page URL.
-			await testPage.goto( targetUrl );
+			await testPage.goto( draftURL );
 
 			// Wait for the canvas to appear.
 			await testPage
@@ -107,31 +121,22 @@ test.describe( 'Site Editor Performance', () => {
 				.first()
 				.waitFor( { timeout: 60_000 } );
 
-			// Save results.
-			const {
-				serverResponse,
-				firstPaint,
-				domContentLoaded,
-				loaded,
-				firstContentfulPaint,
-				firstBlock,
-			} = await getLoadingDurations( testPage );
-			results.serverResponse.push( serverResponse );
-			results.firstPaint.push( firstPaint );
-			results.domContentLoaded.push( domContentLoaded );
-			results.loaded.push( loaded );
-			results.firstContentfulPaint.push( firstContentfulPaint );
-			results.firstBlock.push( firstBlock );
+			// Save the results.
+			if ( i >= throwaway ) {
+				const loadingDurations = await getLoadingDurations( testPage );
+				Object.entries( loadingDurations ).forEach(
+					( [ metric, duration ] ) => {
+						results[ metric ].push( duration );
+					}
+				);
+			}
 
 			await testPage.close();
 		}
 	} );
 
-	test( 'Typing', async ( { browser, page, pageUtils, admin } ) => {
-		// Start a new page.
-		await admin.createNewPost( { postType: 'page' } );
-
-		// Turn the large post HTML into blocks and insert.
+	test( 'Typing', async ( { browser, page, admin, editor } ) => {
+		// Load the large post fixture.
 		await loadBlocksFromHtml(
 			page,
 			path.join( process.env.ASSETS_PATH, 'large-post.html' )
@@ -168,14 +173,8 @@ test.describe( 'Site Editor Performance', () => {
 		// Enter edit mode.
 		await canvas.locator( 'body' ).click();
 
-		// Insert a new paragraph right under the first one.
-		await canvas
-			.getByRole( 'document', { name: 'Block: Post Content' } )
-			.click();
-		await firstParagraph.click();
-		await pageUtils.pressKeys( 'primary+a' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'Enter' );
+		// Append an empty paragraph.
+		await editor.insertBlock( { name: 'core/paragraph' } );
 
 		// Start tracing.
 		const traceFilePath = getTraceFilePath();
@@ -185,25 +184,31 @@ test.describe( 'Site Editor Performance', () => {
 			categories: [ 'devtools.timeline' ],
 		} );
 
-		// Type "x" 10 times.
+		// The first character typed triggers a longer time (isTyping change).
+		// It can impact the stability of the metric, so we exclude it. It
+		// probably deserves a dedicated metric itself, though.
 		const samples = 10;
 		const throwaway = 1;
-		await page.keyboard.type( 'x'.repeat( samples + throwaway ), {
-			delay: 1000,
+		const rounds = samples + throwaway;
+
+		// Type the testing sequence into the empty paragraph.
+		await page.keyboard.type( 'x'.repeat( rounds ), {
+			delay: BROWSER_IDLE_WAIT,
 		} );
 
 		// Stop tracing and save results.
 		await browser.stopTracing();
+
 		const traceResults = JSON.parse( readFile( traceFilePath ) );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
-		for ( let i = throwaway; i < keyDownEvents.length; i++ ) {
+		for ( let i = throwaway; i < rounds; i++ ) {
 			results.type.push(
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);
 		}
 
-		// Delete the original trace file.
+		// Delete the trace file.
 		deleteFile( traceFilePath );
 	} );
 } );
