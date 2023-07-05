@@ -97,6 +97,13 @@ type Optional< T > = T | undefined;
 type GetRecordsHttpQuery = Record< string, any >;
 
 /**
+ * Arguments for EntityRecord selectors.
+ */
+type EntityRecordArgs =
+	| [ string, string, EntityRecordKey ]
+	| [ string, string, EntityRecordKey, GetRecordsHttpQuery ];
+
+/**
  * Shared reference to an empty object for cases where it is important to avoid
  * returning a new object reference on every invocation, as in a connected or
  * other pure component which performs `shouldComponentUpdate` check on props.
@@ -271,17 +278,16 @@ export function getEntityConfig(
  * See https://github.com/WordPress/gutenberg/pull/41578 for more details.
  */
 export interface GetEntityRecord {
-	normalizeArgs: ( args: any ) => any;
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
 			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
-		kind: string,
-		name: string,
-		key: EntityRecordKey,
-		query?: GetRecordsHttpQuery
+		kind: EntityRecordArgs[ 0 ],
+		name: EntityRecordArgs[ 1 ],
+		key: EntityRecordArgs[ 2 ],
+		query?: EntityRecordArgs[ 3 ]
 	): EntityRecord | undefined;
 
 	CurriedSignature: <
@@ -289,11 +295,12 @@ export interface GetEntityRecord {
 			| ET.EntityRecord< any >
 			| Partial< ET.EntityRecord< any > >,
 	>(
-		kind: string,
-		name: string,
-		key: EntityRecordKey,
-		query?: GetRecordsHttpQuery
+		kind: EntityRecordArgs[ 0 ],
+		name: EntityRecordArgs[ 1 ],
+		key: EntityRecordArgs[ 2 ],
+		query?: EntityRecordArgs[ 3 ]
 	) => EntityRecord | undefined;
+	normalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
 
 /**
