@@ -6,7 +6,7 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	Button,
 } from '@wordpress/components';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -19,7 +19,18 @@ const PAGE_SIZE = 100;
 export default function Grid( { categoryId, items } ) {
 	const composite = useCompositeState( { orientation: 'vertical' } );
 	const [ page, setPage ] = useState( 1 );
+	const [ nextFocusIndex, setNextFocusIndex ] = useState( -1 );
 	const gridRef = useRef();
+
+	useEffect( () => {
+		if ( gridRef.current && nextFocusIndex >= 0 ) {
+			const nextFocusPattern =
+				gridRef.current.querySelectorAll( '[role="option"]' )[
+					nextFocusIndex
+				];
+			nextFocusPattern?.focus();
+		}
+	}, [ nextFocusIndex ] );
 
 	if ( ! items?.length ) {
 		return null;
@@ -48,7 +59,10 @@ export default function Grid( { categoryId, items } ) {
 			{ items.length >= maxCount && (
 				<Button
 					variant="primary"
-					onClick={ () => setPage( ( prevPage ) => prevPage + 1 ) }
+					onClick={ () => {
+						setPage( ( prevPage ) => prevPage + 1 );
+						setNextFocusIndex( maxCount );
+					} }
 				>
 					{ __( 'Load more' ) }
 				</Button>

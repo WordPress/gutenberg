@@ -61,7 +61,7 @@ const useTemplatePartsAsPatterns = (
 				select( coreStore );
 			const query = {
 				per_page: 5,
-				area: categoryId,
+				// area: categoryId,
 			};
 			const rawTemplateParts = getEntityRecords(
 				'postType',
@@ -81,7 +81,7 @@ const useTemplatePartsAsPatterns = (
 				] ),
 			};
 		},
-		[ postType, categoryId ]
+		[ postType ]
 	);
 
 	const filteredTemplateParts = useMemo( () => {
@@ -165,23 +165,19 @@ const useUserPatterns = (
 	{ filterValue = '', syncFilter } = {}
 ) => {
 	const postType = categoryType === PATTERNS ? USER_PATTERNS : categoryType;
-	const { patterns, isResolving } = useSelect(
+	let { patterns, isResolving } = useSelect(
 		( select ) => {
 			if (
 				postType !== USER_PATTERNS ||
 				categoryId !== USER_PATTERN_CATEGORY
 			) {
-				return EMPTY_PATTERN_LIST;
+				return { patterns: EMPTY_PATTERN_LIST, isResolving: false };
 			}
 
 			const { getEntityRecords, isResolving: _isResolving } =
 				select( coreStore );
 
-			const query = {
-				per_page: -1,
-				sync_status: syncFilter,
-				search: filterValue || undefined,
-			};
+			const query = { per_page: -1 };
 			const records = getEntityRecords( 'postType', postType, query );
 
 			return {
@@ -197,21 +193,30 @@ const useUserPatterns = (
 				] ),
 			};
 		},
-		[ postType, categoryId, syncFilter, filterValue ]
+		[ postType, categoryId ]
 	);
 
-	// const filteredPatterns = useMemo( () => {
-	// 	if ( ! unfilteredPatterns.length ) {
-	// 		return EMPTY_PATTERN_LIST;
-	// 	}
+	patterns = useMemo( () => {
+		if ( ! syncFilter ) {
+			return patterns;
+		}
+		return patterns.filter(
+			( pattern ) => pattern.syncStatus === syncFilter
+		);
+	}, [ patterns, syncFilter ] );
 
-	// 	return searchItems( unfilteredPatterns, filterValue, {
-	// 		// We exit user pattern retrieval early if we aren't in the
-	// 		// catch-all category for user created patterns, so it has
-	// 		// to be in the category.
-	// 		hasCategory: () => true,
-	// 	} );
-	// }, [ unfilteredPatterns, filterValue ] );
+	patterns = useMemo( () => {
+		if ( ! patterns.length ) {
+			return EMPTY_PATTERN_LIST;
+		}
+
+		return searchItems( patterns, filterValue, {
+			// We exit user pattern retrieval early if we aren't in the
+			// catch-all category for user created patterns, so it has
+			// to be in the category.
+			hasCategory: () => true,
+		} );
+	}, [ patterns, filterValue ] );
 
 	return { patterns, isResolving };
 };
@@ -234,9 +239,12 @@ export const usePatterns = (
 	const { templateParts, isResolving: isResolvingTemplateParts } =
 		useTemplatePartsAsPatterns( categoryId, categoryType, { filterValue } );
 
-	const patterns = [ ...templateParts, ...userPatterns, ...blockPatterns ];
+	const patterns = useMemo(
+		() => [ ...templateParts, ...userPatterns, ...blockPatterns ],
+		[ templateParts, userPatterns, blockPatterns ]
+	);
 
-	return [ patterns, isResolvingUserPatterns && isResolvingTemplateParts ];
+	return [ patterns, isResolvingUserPatterns || isResolvingTemplateParts ];
 };
 
 export default usePatterns;

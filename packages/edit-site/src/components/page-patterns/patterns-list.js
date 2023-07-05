@@ -45,9 +45,11 @@ export default function PatternsList( { categoryId, type } ) {
 	const deferredFilterValue = useDeferredValue( delayedFilterValue );
 
 	const [ syncFilter, setSyncFilter ] = useState( 'all' );
+	const deferredSyncedFilter = useDeferredValue( syncFilter );
 	const [ patterns, isResolving ] = usePatterns( type, categoryId, {
 		filterValue: deferredFilterValue,
-		syncFilter: syncFilter === 'all' ? undefined : syncFilter,
+		syncFilter:
+			deferredSyncedFilter === 'all' ? undefined : deferredSyncedFilter,
 	} );
 
 	const hasPatterns = patterns.length;
