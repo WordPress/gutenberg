@@ -946,7 +946,7 @@ test.describe( 'Navigation block', () => {
 			} );
 			await editor.canvas.click( 'body' );
 			const { id: menuId } = await requestUtils.createNavigationMenu( {
-				title: 'Hidden menu',
+				title: 'Colored menu',
 				content:
 					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
 				attributes: { openSubmenusOnClick: true },
@@ -1299,6 +1299,7 @@ test.describe( 'Navigation block', () => {
 			admin,
 			editor,
 			page,
+			pageUtils,
 		} ) => {
 			// Focus the navigation block inside the header template part
 			await editor.canvas
@@ -1351,6 +1352,7 @@ test.describe( 'Navigation block', () => {
 				.getByRole( 'button', { name: 'Text', exact: true } )
 				.click();
 			// 247, 141, 167 is the color of the "Pale pink" color preset
+			const textColor = 'rgb(247, 141, 167)';
 			await page
 				.getByRole( 'button', { name: 'Color: Pale pink' } )
 				.click( { force: true } );
@@ -1359,6 +1361,7 @@ test.describe( 'Navigation block', () => {
 				.getByRole( 'button', { name: 'Background', exact: true } )
 				.click();
 			// 142, 209, 252 is the color of the "Pale cyan blue" color preset
+			const bgColor = 'rgb(142, 209, 252)';
 			await page
 				.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
 				.click( { force: true } );
@@ -1367,6 +1370,7 @@ test.describe( 'Navigation block', () => {
 				.getByRole( 'button', { name: 'Submenu & overlay text' } )
 				.click();
 			// 171, 184, 195 is the color of the "Cyan bluish gray" color preset
+			const overlayTextColor = 'rgb(171, 184, 195)';
 			await page
 				.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
 				.click( { force: true } );
@@ -1374,7 +1378,8 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Submenu & overlay background' } )
 				.click();
-			// rgba(252,185,0) is the color of the "Luminous vivid amber" color preset
+			// 252, 185, 0 is the color of the "Luminous vivid amber" color preset
+			const overlayBgColor = 'rgb(252, 185, 0)';
 			await page
 				.getByRole( 'button', { name: 'Color: Luminous vivid amber' } )
 				.click( { force: true } );
@@ -1398,18 +1403,15 @@ test.describe( 'Navigation block', () => {
 						label: 'Navigation link text',
 					} ),
 				} );
-			await expect( firstLink ).toHaveCSS(
-				'color',
-				'rgb(247, 141, 167)'
-			);
+			await expect( firstLink ).toHaveCSS( 'color', textColor );
 
-			// Expect the nav block background to be "Pale cyan blue" we selected for the nav block
+			// Expect the nav block background to be "Pale cyan blue" we selected for the nav background block
 			const menuWrapper = editor.canvas.getByRole( 'document', {
 				name: 'Block: Navigation',
 			} );
 			await expect( menuWrapper ).toHaveCSS(
 				'background-color',
-				'rgb(142, 209, 252)'
+				bgColor
 			);
 
 			// Expect the second link to be "Cyan bluish gray" we selected for the submenu and overlay text colors
@@ -1417,10 +1419,7 @@ test.describe( 'Navigation block', () => {
 				.locator( 'a' )
 				.filter( { hasText: 'Second Link' } );
 			await firstLink.click();
-			await expect( secondLink ).toHaveCSS(
-				'color',
-				'rgb(171, 184, 195)'
-			);
+			await expect( secondLink ).toHaveCSS( 'color', overlayTextColor );
 
 			// Expect the submenu background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
 			const submenuWrapper = editor.canvas
@@ -1428,7 +1427,7 @@ test.describe( 'Navigation block', () => {
 				.filter( { has: secondLink } );
 			await expect( submenuWrapper ).toHaveCSS(
 				'background-color',
-				'rgb(252, 185, 0)'
+				overlayBgColor
 			);
 
 			// We test the colors of the links on the mobile overlay too.
@@ -1445,30 +1444,76 @@ test.describe( 'Navigation block', () => {
 			// Expect the overlay background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
 			await expect( overlay ).toHaveCSS(
 				'background-color',
-				'rgb(252, 185, 0)'
+				overlayBgColor
 			);
 			// Expect the links to both have the colors selected for the submenu and overlay text
-			await expect( firstLink ).toHaveCSS(
-				'color',
-				'rgb(171, 184, 195)'
-			);
-			await expect( secondLink ).toHaveCSS(
-				'color',
-				'rgb(171, 184, 195)'
-			);
+			await expect( firstLink ).toHaveCSS( 'color', overlayTextColor );
+			await expect( secondLink ).toHaveCSS( 'color', overlayTextColor );
 			await editor.saveSiteEditorEntities();
 
-			//TODO check the frontend
+			// And finally we check the colors of the links on the frontend
+			await page.goto( '/' );
+			const firstLinkFront = page
+				.locator( 'a' )
+				.filter( { hasText: 'First Link' } );
+			const secondLinkFront = page
+				.locator( 'a' )
+				.filter( { hasText: 'Second Link' } );
+			const submenuWrapperFront = page
+				.locator( '.wp-block-navigation__submenu-container' )
+				.filter( { has: secondLinkFront } );
 
-			//await pageUtils.setBrowserViewport( viewport );
+			// Expect the first link to be "Pale pink" we selected for the nav block
+			await expect( firstLinkFront ).toHaveCSS( 'color', textColor );
+			// Expect the nav block background to be "Pale cyan blue" we selected for the nav block
+			const menuWrapperFront = page
+				.getByRole( 'navigation', { name: 'Colored menu' } )
+				.getByRole( 'list' );
+			await expect( menuWrapperFront ).toHaveCSS(
+				'background-color',
+				bgColor
+			);
+
+			await firstLinkFront.hover();
+			// Expect the second link to be "Cyan bluish gray" we selected for the submenu and overlay text colors
+			await expect( secondLinkFront ).toHaveCSS(
+				'color',
+				overlayTextColor
+			);
+			// Expect the submenu background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
+			await expect( submenuWrapperFront ).toHaveCSS(
+				'background-color',
+				overlayBgColor
+			);
+
+			// We test the colors on the mobile overlay on the frontend.
+			await pageUtils.setBrowserViewport( { width: 599, height: 700 } );
+			await page.getByRole( 'button', { name: 'Open menu' } ).click();
+
+			//TODO: this doesn't work because the overlay is not working right now!
+			await expect( firstLinkFront ).toHaveCSS(
+				'color',
+				overlayTextColor
+			);
+			await expect( secondLinkFront ).toHaveCSS(
+				'color',
+				overlayTextColor
+			);
+			await expect( overlay ).toHaveCSS(
+				'background-color',
+				overlayBgColor
+			);
 
 			// We reset global styles so we don't affect other tests
+			await pageUtils.setBrowserViewport( 'large' );
 			await admin.visitSiteEditor();
 			await editor.canvas.click( 'body' );
 			await page
 				.getByRole( 'button', { name: 'Styles', exact: true } )
 				.click();
 			await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+			//await page.pause();
 			await page
 				.getByRole( 'menuitem', { name: 'Reset to defaults' } )
 				.click();
