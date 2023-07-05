@@ -86,7 +86,7 @@ export default function PatternsList( { categoryId, type } ) {
 					<Grid
 						icon={ symbol }
 						categoryId={ categoryId }
-						label={ __( 'Synced patterns' ) }
+						label={ __( 'Synced' ) }
 						items={ syncedPatterns }
 					/>
 				</>
