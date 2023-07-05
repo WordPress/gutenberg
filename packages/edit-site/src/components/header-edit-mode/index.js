@@ -97,15 +97,15 @@ export default function HeaderEditMode() {
 			isVisualMode: getEditorMode() === 'visual',
 			blockEditorMode: __unstableGetEditorMode(),
 			homeUrl: getUnstableBase()?.home,
-			showIconLabels: select( preferencesStore ).get(
-				'core/edit-site',
+			showIconLabels: getPreference(
+				editSiteStore.name,
 				'showIconLabels'
 			),
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
-			isDistractionFree: select( preferencesStore ).get(
-				'core/edit-site',
+			isDistractionFree: getPreference(
+				editSiteStore.name,
 				'distractionFree'
 			),
 			hasFixedToolbar: getPreference(
