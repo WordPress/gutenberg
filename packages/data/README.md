@@ -1205,7 +1205,7 @@ registry.select( 'store' ).getItems( 'foo', 'bar', 54 );
 registry.select( 'store' ).getItems( 'foo', 'bar', '54' );
 ```
 
-Ensuring consistency of arguments for a given selector call is [an important optimization to help improve performance in the data layer](https://github.com/WordPress/gutenberg/pull/52120).
+Ensuring consistency of arguments for a given selector call is [an important optimization to help improve performance in the data layer](https://github.com/WordPress/gutenberg/pull/52120). However, this type of problem can be usually be avoided by ensuring selectors don't use variable types for their arguments.
 
 ## Going further
 
