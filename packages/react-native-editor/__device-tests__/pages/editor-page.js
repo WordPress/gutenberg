@@ -342,14 +342,15 @@ class EditorPage {
 	}
 
 	async swipeToolbarToElement( elementSelector, options ) {
+		const { byId, swipeRight } = options || {};
+		const offset = isAndroid() ? 300 : 50;
+		const maxLocatorAttempts = 5;
+		let locatorAttempts = 0;
+		let element;
+
 		const toolbar = await this.getToolbar();
 		const toolbarLocation = await toolbar.getLocation();
 		const toolbarSize = await toolbar.getSize();
-		const maxLocatorAttempts = 5;
-		const { byId } = options || {};
-		let locatorAttempts = 0;
-		const offset = isAndroid() ? 300 : 50;
-		let element;
 
 		while ( locatorAttempts < maxLocatorAttempts ) {
 			element = byId
@@ -362,11 +363,15 @@ class EditorPage {
 			swipeFromTo(
 				this.driver,
 				{
-					x: toolbarSize.width - offset,
+					x: ! swipeRight
+						? toolbarSize.width - offset
+						: toolbarSize.width / 2,
 					y: toolbarLocation.y + toolbarSize.height / 2,
 				},
 				{
-					x: toolbarSize.width / 2,
+					x: ! swipeRight
+						? toolbarSize.width / 2
+						: toolbarSize.width - offset,
 					y: toolbarLocation.y + toolbarSize.height / 2,
 				},
 				1000
@@ -420,6 +425,7 @@ class EditorPage {
 		if ( ! skipInserterOpen ) {
 			const addButton = await this.swipeToolbarToElement( ADD_BLOCK_ID, {
 				byId: true,
+				swipeRight: true,
 			} );
 			await addButton[ 0 ].click();
 		}
