@@ -93,6 +93,13 @@
 
 	.resizable-editor__drag-handle {
 		right: 0;
+		&.is-variation-separator {
+			height: 150px;
+			&::after {
+				width: 5px;
+				border-radius: 5px;
+			}
+		}
 	}
 }
 
@@ -127,16 +134,14 @@
 	left: 0;
 	bottom: 0;
 	width: 100%;
-
-
 	overflow: hidden;
-	//display: flex;
-	//justify-content: center;
-	//align-items: center;
-	//
-	//&:has(.edit-site-layout__resizable-frame-oversized) {
-	//	justify-content: flex-end;
-	//}
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	&:has(.edit-site-layout__resizable-frame-oversized) {
+		justify-content: flex-end;
+	}
 
 	& > div {
 		color: $gray-900;

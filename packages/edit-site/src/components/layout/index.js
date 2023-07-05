@@ -285,6 +285,11 @@ export default function Layout() {
 						{ showSidebar && (
 							<ResizableBox
 								as={ motion.div }
+								// The sidebar is needed for routing on mobile
+								// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
+								// so we can't remove the element entirely. Using `inert` will make
+								// it inaccessible to screen readers and keyboard navigation.
+								inert={ showSidebar ? undefined : 'inert' }
 								initial={ {
 									opacity: 0,
 								} }
@@ -297,7 +302,10 @@ export default function Layout() {
 								transition={ {
 									type: 'tween',
 									duration:
-										disableMotion || isResizing
+										// Disable transition in mobile to emulate a full page transition.
+										disableMotion ||
+										isResizing ||
+										isMobileViewport
 											? 0
 											: ANIMATION_DURATION,
 									ease: 'easeOut',
@@ -421,6 +429,9 @@ export default function Layout() {
 													top: 0,
 													left: 0,
 													bottom: 0,
+													background:
+														gradientValue ??
+														backgroundColor,
 												} }
 												initial={ false }
 												animate={ {
@@ -437,12 +448,11 @@ export default function Layout() {
 												} }
 											>
 												<ErrorBoundary>
-													{ isEditorPage && (
-														<Editor />
-													) }
-													{ isListPage && (
-														<ListPage />
-													) }
+													<Editor
+														isLoading={
+															isEditorLoading
+														}
+													/>
 												</ErrorBoundary>
 											</motion.div>
 										</motion.div>
