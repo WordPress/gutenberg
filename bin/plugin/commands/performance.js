@@ -431,11 +431,11 @@ async function runPerformanceTests( branches, options ) {
 	for ( const testSuite of testSuites ) {
 		results[ testSuite ] = {};
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
-		const rawResults = [];
+		const resultsRounds = [];
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			const roundInfo = `round ${ i + 1 } of ${ TEST_ROUNDS }`;
 			log( `    >> Suite: ${ testSuite } (${ roundInfo })` );
-			rawResults[ i ] = {};
+			resultsRounds[ i ] = {};
 			for ( const branch of branches ) {
 				const sanitizedBranch = sanitizeBranchName( branch );
 				const runKey = `${ testSuite }_${ sanitizedBranch }_run-${ i }`;
@@ -448,7 +448,7 @@ async function runPerformanceTests( branches, options ) {
 					environmentDirectory
 				);
 				log( '            >> Running the test.' );
-				rawResults[ i ][ branch ] = await runTestSuite(
+				resultsRounds[ i ][ branch ] = await runTestSuite(
 					testSuite,
 					performanceTestDirectory,
 					runKey
@@ -461,50 +461,25 @@ async function runPerformanceTests( branches, options ) {
 			}
 		}
 
-		// Computing medians.
+		// Computing medians from testing rounds for each branch.
 		for ( const branch of branches ) {
-			/**
-			 * @type {string[]}
-			 */
-			let dataPointsForTestSuite = [];
-			if ( rawResults.length > 0 ) {
-				dataPointsForTestSuite = Object.keys(
-					rawResults[ 0 ][ branch ]
+			results[ testSuite ][ branch ] = {};
+			const metrics = Object.keys( resultsRounds[ 0 ][ branch ] );
+
+			for ( const metric of metrics ) {
+				const values = resultsRounds.map(
+					// @ts-ignore
+					( item ) => item[ branch ][ metric ]
+				);
+				// @ts-ignore
+				results[ testSuite ][ branch ][ metric ] = formatTime(
+					median( values )
 				);
 			}
-
-			const resultsByDataPoint = {};
-			dataPointsForTestSuite.forEach( ( dataPoint ) => {
-				// @ts-ignore
-				resultsByDataPoint[ dataPoint ] = rawResults.map(
-					// @ts-ignore
-					( r ) => r[ branch ][ dataPoint ]
-				);
-			} );
-			// @ts-ignore
-			const medians = Object.fromEntries(
-				Object.entries( resultsByDataPoint ).map(
-					( [ dataPoint, dataPointResults ] ) => [
-						dataPoint,
-						median( dataPointResults ),
-					]
-				)
-			);
-
-			// Format results as times.
-			// @ts-ignore
-			results[ testSuite ][ branch ] = Object.fromEntries(
-				Object.entries( medians ).map(
-					( [ dataPoint, dataPointMedian ] ) => [
-						dataPoint,
-						formatTime( dataPointMedian ),
-					]
-				)
-			);
 		}
 	}
 
-	// 5- Formatting the results.
+	// 5- Formatting, displaying and saving the results.
 	log( '\n>> 🎉 Results.\n' );
 
 	log(
@@ -516,22 +491,16 @@ async function runPerformanceTests( branches, options ) {
 
 		/** @type {Record<string, Record<string, string>>} */
 		const invertedResult = {};
-		Object.entries( results[ testSuite ] ).reduce(
-			( acc, [ branch, metrics ] ) => {
-				for ( const [ metric, value ] of Object.entries( metrics ) ) {
-					// @ts-ignore
-					if ( ! acc[ metric ] && isFinite( value ) )
-						acc[ metric ] = {};
-					// @ts-ignore
-					if ( isFinite( value ) ) {
-						// @ts-ignore
-						acc[ metric ][ branch ] = value + ' ms';
-					}
+		for ( const [ branch, metrics ] of Object.entries(
+			results[ testSuite ]
+		) ) {
+			for ( const [ metric, value ] of Object.entries( metrics ) ) {
+				if ( isFinite( value ) ) {
+					invertedResult[ metric ] = invertedResult[ metric ] || {};
+					invertedResult[ metric ][ branch ] = `${ value } ms`;
 				}
-				return acc;
-			},
-			invertedResult
-		);
+			}
+		}
 		console.table( invertedResult );
 
 		const resultsFilename = testSuite + '.performance-results.json';
