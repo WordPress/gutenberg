@@ -30,8 +30,5 @@ export async function loginUser(
 	await page.type( '#user_pass', password );
 
 	const waitForLoginNavigation = page.waitForNavigation();
-	await Promise.all( [
-		waitForLoginNavigation,
-		page.click( '#wp-submit' ),
-	] );
+	await Promise.all( [ waitForLoginNavigation, page.click( '#wp-submit' ) ] );
 }
