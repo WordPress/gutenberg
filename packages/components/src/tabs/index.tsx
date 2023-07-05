@@ -53,7 +53,7 @@ import { usePrevious } from '@wordpress/compose';
  * ```
  */
 
-export const Tabs = ( props: TabPanelProps ) => {
+export const TabPanel = ( props: TabPanelProps ) => {
 	const {
 		tabs,
 		children,
@@ -185,4 +185,4 @@ export const Tabs = ( props: TabPanelProps ) => {
 	);
 };
 
-export default Tabs;
+export default TabPanel;

@@ -11,13 +11,13 @@ import { wordpress, more, link } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Tabs from '..';
+import TabPanel from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 
-const meta: ComponentMeta< typeof Tabs > = {
-	title: 'Components/Tabs',
-	component: Tabs,
+const meta: ComponentMeta< typeof TabPanel > = {
+	title: 'Components/TabPanel v2',
+	component: TabPanel,
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
@@ -26,8 +26,8 @@ const meta: ComponentMeta< typeof Tabs > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Tabs > = ( props ) => {
-	return <Tabs { ...props } />;
+const Template: ComponentStory< typeof TabPanel > = ( props ) => {
+	return <TabPanel { ...props } />;
 };
 
 export const Default = Template.bind( {} );
@@ -67,10 +67,10 @@ DisabledTab.args = {
 
 // SlotFillTemplate is used to ensure the icon's tooltips are not rendered
 // inline, as that would cause them to inherit the tab's opacity.
-const SlotFillTemplate: ComponentStory< typeof Tabs > = ( props ) => {
+const SlotFillTemplate: ComponentStory< typeof TabPanel > = ( props ) => {
 	return (
 		<SlotFillProvider>
-			<Tabs { ...props } />
+			<TabPanel { ...props } />
 			{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
 			<Popover.Slot />
 		</SlotFillProvider>
