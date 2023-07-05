@@ -46,7 +46,7 @@ export type FillComponentProps = {
 	name: SlotKey;
 
 	/**
-	 * Children elements or.
+	 * Children elements or render function.
 	 */
 	children?: ReactNode | ( ( fillProps: any ) => ReactNode );
 };
