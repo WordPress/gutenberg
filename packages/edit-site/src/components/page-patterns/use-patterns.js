@@ -59,10 +59,7 @@ const useTemplatePartsAsPatterns = (
 
 			const { getEntityRecords, isResolving: _isResolving } =
 				select( coreStore );
-			const query = {
-				per_page: 5,
-				// area: categoryId,
-			};
+			const query = { per_page: -1 };
 			const rawTemplateParts = getEntityRecords(
 				'postType',
 				postType,

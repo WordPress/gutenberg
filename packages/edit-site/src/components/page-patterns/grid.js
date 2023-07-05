@@ -22,15 +22,18 @@ export default function Grid( { categoryId, items, ...props } ) {
 	const [ nextFocusIndex, setNextFocusIndex ] = useState( -1 );
 	const gridRef = useRef();
 
-	useEffect( () => {
-		if ( gridRef.current && nextFocusIndex >= 0 ) {
-			const nextFocusPattern =
-				gridRef.current.querySelectorAll( '[role="option"]' )[
-					nextFocusIndex
-				];
-			nextFocusPattern?.focus();
-		}
-	}, [ nextFocusIndex ] );
+	useEffect(
+		function focusFirstPatternOnNextPage() {
+			if ( gridRef.current && nextFocusIndex >= 0 ) {
+				const nextFocusPattern =
+					gridRef.current.querySelectorAll( '[role="option"]' )[
+						nextFocusIndex
+					];
+				nextFocusPattern?.focus();
+			}
+		},
+		[ nextFocusIndex ]
+	);
 
 	if ( ! items?.length ) {
 		return null;
