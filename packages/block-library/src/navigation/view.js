@@ -15,7 +15,7 @@ const focusableSelectors = [
 
 const openMenu = ( store, menuOpenedOn ) => {
 	const { context, ref, selectors } = store;
-	selectors.core.navigation.menuOpenBy( store )[ menuOpenedOn ] = true;
+	selectors.core.navigation.menuOpenedBy( store )[ menuOpenedOn ] = true;
 	context.core.navigation.previousFocus = ref;
 	if ( context.core.navigation.type === 'overlay' ) {
 		// Add a `has-modal-open` class to the <html> root.
@@ -25,7 +25,7 @@ const openMenu = ( store, menuOpenedOn ) => {
 
 const closeMenu = ( store, menuClosedOn ) => {
 	const { context, selectors } = store;
-	selectors.core.navigation.menuOpenBy( store )[ menuClosedOn ] = false;
+	selectors.core.navigation.menuOpenedBy( store )[ menuClosedOn ] = false;
 	// Check if the menu is still open or not.
 	if ( ! selectors.core.navigation.isMenuOpen( store ) ) {
 		if (
@@ -89,7 +89,7 @@ wpStore( {
 								: 'submenuOpenedBy'
 						]
 					).filter( Boolean ).length > 0,
-				menuOpenBy: ( { context } ) =>
+				menuOpenedBy: ( { context } ) =>
 					context.core.navigation[
 						context.core.navigation.type === 'overlay'
 							? 'overlayOpenedBy'
@@ -127,9 +127,9 @@ wpStore( {
 				},
 				toggleMenuOnClick: ( store ) => {
 					const { selectors } = store;
-					const menuOpenBy =
-						selectors.core.navigation.menuOpenBy( store );
-					if ( menuOpenBy.click || menuOpenBy.focus ) {
+					const menuOpenedBy =
+						selectors.core.navigation.menuOpenedBy( store );
+					if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 						closeMenu( store, 'click' );
 						closeMenu( store, 'focus' );
 					} else {
@@ -138,7 +138,9 @@ wpStore( {
 				},
 				handleMenuKeydown: ( store ) => {
 					const { context, selectors, event } = store;
-					if ( selectors.core.navigation.menuOpenBy( store ).click ) {
+					if (
+						selectors.core.navigation.menuOpenedBy( store ).click
+					) {
 						// If Escape close the menu.
 						if ( event?.key === 'Escape' ) {
 							closeMenu( store, 'click' );
