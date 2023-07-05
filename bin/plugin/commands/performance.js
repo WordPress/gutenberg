@@ -239,7 +239,9 @@ async function runPerformanceTests( branches, options ) {
 		await askForConfirmation( 'Ready to go? ' );
 	}
 
-	// 1- Preparing the tests directory.
+	/*
+	 * 1- Preparing the tests directory.
+	 */
 	log( '\n>> Preparing the tests directories' );
 	log( '    >> Cloning the repository' );
 
@@ -291,7 +293,9 @@ async function runPerformanceTests( branches, options ) {
 	log( '    >> Creating the environment folders' );
 	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs' );
 
-	// 2- Preparing the environment directories per branch.
+	/*
+	 * 2- Preparing the environment directories per branch.
+	 */
 	log( '\n>> Preparing an environment directory per branch' );
 	const branchDirectories = {};
 	for ( const branch of branches ) {
@@ -400,7 +404,9 @@ async function runPerformanceTests( branches, options ) {
 		}
 	}
 
-	// 3- Printing the used folders.
+	/*
+	 * 3- Printing the used folders.
+	 */
 	log(
 		'\n>> Perf Tests Directory : ' +
 			formats.success( performanceTestDirectory )
@@ -411,7 +417,9 @@ async function runPerformanceTests( branches, options ) {
 		log( `>> Environment Directory (${ branch }) : ${ envPath }` );
 	}
 
-	// 4- Running the tests.
+	/*
+	 * 4- Running the tests.
+	 */
 	log( '\n>> Running the tests' );
 
 	const testSuites = [
@@ -479,7 +487,9 @@ async function runPerformanceTests( branches, options ) {
 		}
 	}
 
-	// 5- Formatting, displaying and saving the results.
+	/*
+	 * 5- Formatting, displaying and saving the results.
+	 */
 	log( '\n>> 🎉 Results.\n' );
 
 	log(
@@ -489,6 +499,7 @@ async function runPerformanceTests( branches, options ) {
 	for ( const testSuite of testSuites ) {
 		log( `\n>> ${ testSuite }\n` );
 
+		// Format results to display in a table.
 		/** @type {Record<string, Record<string, string>>} */
 		const invertedResult = {};
 		for ( const [ branch, metrics ] of Object.entries(
@@ -503,6 +514,7 @@ async function runPerformanceTests( branches, options ) {
 		}
 		console.table( invertedResult );
 
+		// Save curated results to file.
 		const resultsFilename = testSuite + '.performance-results.json';
 		fs.writeFileSync(
 			path.join( ARTIFACTS_PATH, resultsFilename ),
