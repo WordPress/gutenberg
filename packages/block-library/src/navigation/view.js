@@ -120,6 +120,7 @@ wpStore( {
 				},
 				closeMenuOnClick( store ) {
 					closeMenu( store, 'click' );
+					closeMenu( store, 'focus' );
 				},
 				openMenuOnFocus( store ) {
 					openMenu( store, 'focus' );
@@ -128,6 +129,7 @@ wpStore( {
 					const { selectors } = store;
 					if ( selectors.core.navigation.menuOpenBy( store ).click ) {
 						closeMenu( store, 'click' );
+						closeMenu( store, 'focus' );
 					} else {
 						openMenu( store, 'click' );
 					}
@@ -138,6 +140,7 @@ wpStore( {
 						// If Escape close the menu.
 						if ( event?.key === 'Escape' ) {
 							closeMenu( store, 'click' );
+							closeMenu( store, 'focus' );
 							return;
 						}
 
