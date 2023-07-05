@@ -95,9 +95,12 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	const deleteItem = () =>
 		isTemplatePart ? removeTemplate( item ) : deletePattern();
 
+	// Only custom patterns or custom template parts can be renamed or deleted.
+	const isCustomPattern =
+		isUserPattern || ( isTemplatePart && item.isCustom );
 	const ariaDescriptions = [];
 
-	if ( isUserPattern ) {
+	if ( isCustomPattern ) {
 		// User patterns don't have descriptions, but can be edited and deleted, so include some help text.
 		ariaDescriptions.push(
 			__( 'Press Enter to edit, or Delete to delete the pattern.' )
@@ -114,10 +117,6 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		? templatePartIcons[ categoryId ]
 		: icon;
 
-	// Only custom patterns or custom template parts can be renamed or deleted.
-	const isCustomPattern =
-		isUserPattern || ( isTemplatePart && item.isCustom );
-
 	return (
 		<>
 			<div className={ patternClassNames }>
@@ -127,7 +126,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					as="div"
 					{ ...composite }
 					onClick={ item.type !== PATTERNS ? onClick : undefined }
-					onKeyDown={ isUserPattern ? onKeyDown : undefined }
+					onKeyDown={ isCustomPattern ? onKeyDown : undefined }
 					aria-label={ item.title }
 					aria-describedby={
 						ariaDescriptions.length
