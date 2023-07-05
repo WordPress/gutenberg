@@ -1,3 +1,5 @@
+This patch will be removed when the Gutenberg demo app uses Hermes.
+
 diff --git a/node_modules/react-native-reanimated/RNReanimated.podspec b/node_modules/react-native-reanimated/RNReanimated.podspec
 index 1cbeafc..34f49db 100644
 --- a/node_modules/react-native-reanimated/RNReanimated.podspec
