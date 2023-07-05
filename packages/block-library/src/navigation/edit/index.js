@@ -38,6 +38,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Button,
 	Spinner,
+	Notice,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -485,6 +486,25 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
+	const submenuAccessibilityNotice =
+		! showSubmenuIcon && ! openSubmenusOnClick
+			? __(
+					'The current menu options offer reduced accessibility for users and are not recommended. '
+			  ) +
+			  __(
+					'Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
+			  )
+			: '';
+
+	useEffect( () => {
+		if ( submenuAccessibilityNotice )
+			speak(
+				__(
+					'The current menu options offer reduced accessibility for users and are not recommended.'
+				)
+			);
+	}, [ submenuAccessibilityNotice ] );
+
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const stylingInspectorControls = (
 		<>
@@ -578,6 +598,18 @@ function Navigation( {
 									disabled={ attributes.openSubmenusOnClick }
 									label={ __( 'Show arrow' ) }
 								/>
+
+								{ submenuAccessibilityNotice && (
+									<div>
+										<Notice
+											spokenMessage={ null }
+											status="warning"
+											isDismissible={ false }
+										>
+											{ submenuAccessibilityNotice }
+										</Notice>
+									</div>
+								) }
 							</>
 						) }
 					</PanelBody>
