@@ -27,7 +27,12 @@ test.describe( 'Block Switcher', () => {
 		await pageUtils.pressKeys( 'alt+F10' );
 
 		// Verify the block switcher exists.
-		expect( page.locator( 'role=button[name="List"i]' ) ).toBeTruthy();
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+		await expect(
+			blockToolbar.getByRole( 'button', { name: 'List' } )
+		).toBeVisible();
 
 		// Verify the correct block transforms appear.
 		expect( await blockSwitcher.getAvailableBlockTransforms() ).toEqual(
@@ -46,11 +51,9 @@ test.describe( 'Block Switcher', () => {
 		blockSwitcher,
 		pageUtils,
 	} ) => {
-		const wp = '';
-
 		// Remove the quote block from the list of registered blocks.
 		await page.evaluate( () => {
-			wp.blocks.unregisterBlockType( 'core/quote' );
+			window.wp.blocks.unregisterBlockType( 'core/quote' );
 		} );
 
 		// Insert a list block.
@@ -61,7 +64,12 @@ test.describe( 'Block Switcher', () => {
 		await pageUtils.pressKeys( 'alt+F10' );
 
 		// Verify the block switcher exists.
-		expect( page.locator( 'role=button[name="List"i]' ) ).toBeTruthy();
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+		await expect(
+			blockToolbar.getByRole( 'button', { name: 'List' } )
+		).toBeVisible();
 
 		// Verify the correct block transforms appear.
 		expect( await blockSwitcher.getAvailableBlockTransforms() ).toEqual(
@@ -78,7 +86,6 @@ test.describe( 'Block Switcher', () => {
 		page,
 		pageUtils,
 	} ) => {
-		const wp = '';
 		async function getAvailableBlockTransforms() {
 			return page.evaluate( ( buttonSelector ) => {
 				return Array.from(
@@ -93,9 +100,6 @@ test.describe( 'Block Switcher', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '- List content' );
 
-		await page.keyboard.press( 'ArrowUp' );
-		await pageUtils.pressKeys( 'alt+F10' );
-
 		// Remove the paragraph and quote block from the list of registered blocks.
 		await page.evaluate( () => {
 			[
@@ -108,12 +112,16 @@ test.describe( 'Block Switcher', () => {
 			].forEach( ( block ) => wp.blocks.unregisterBlockType( block ) );
 		} );
 
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'alt+F10' );
+
 		// Verify the block switcher exists.
-		expect(
-			page.locator(
-				'.block-editor-block-toolbar .block-editor-block-switcher'
-			)
-		).toBeTruthy();
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+		await expect(
+			blockToolbar.getByRole( 'button', { name: 'List' } )
+		).toBeVisible();
 
 		// Verify the correct block transforms appear.
 		expect( await getAvailableBlockTransforms() ).toHaveLength( 0 );
