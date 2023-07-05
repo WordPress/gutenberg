@@ -309,7 +309,7 @@ describe( 'normalizing args', () => {
 
 		expect( normalizingFunction ).toHaveBeenCalledWith( [ 'foo', 'bar' ] );
 
-		// Needs to be call twice:
+		// Needs to be called twice:
 		// 1. When the selector is called.
 		// 2. When the resolver is fullfilled.
 		expect( normalizingFunction ).toHaveBeenCalledTimes( 2 );
