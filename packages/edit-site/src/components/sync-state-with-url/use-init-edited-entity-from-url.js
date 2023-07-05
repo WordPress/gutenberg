@@ -49,10 +49,10 @@ export default function useInitEditedEntityFromURL() {
 					setTemplatePart( postId );
 					break;
 				case 'wp_navigation':
-					setNavigationMenu( postId );
+					setNavigationMenu( Number( postId ) );
 					break;
 				case 'wp_block':
-					setEditedEntity( postType, postId );
+					setEditedEntity( postType, Number( postId ) );
 					break;
 				default:
 					setPage( {
@@ -66,7 +66,7 @@ export default function useInitEditedEntityFromURL() {
 		// In all other cases, we need to set the home page in the site editor view.
 		if ( homepageId ) {
 			setPage( {
-				context: { postType: 'page', postId: homepageId },
+				context: { postType: 'page', postId: Number( homepageId ) },
 			} );
 		} else if ( ! isRequestingSite ) {
 			setPage( {
