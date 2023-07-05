@@ -254,7 +254,7 @@ class ToolbarUtils {
 			exact: true,
 		} );
 		this.blockToolbarShowDocumentButton = this.page.getByRole( 'button', {
-			name: 'Show document tools',
+			name: 'Hide block tools',
 			exact: true,
 		} );
 	}
