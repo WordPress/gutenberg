@@ -4,8 +4,6 @@
 import { useState, useDeferredValue } from '@wordpress/element';
 import {
 	SearchControl,
-	// __experimentalHeading as Heading,
-	// __experimentalText as Text,
 	__experimentalVStack as VStack,
 	Flex,
 	FlexBlock,
@@ -20,6 +18,7 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import PatternsHeader from './header';
 import Grid from './grid';
 import NoPatterns from './no-patterns';
 import usePatterns from './use-patterns';
@@ -56,14 +55,7 @@ export default function PatternsList( { categoryId, type } ) {
 
 	return (
 		<VStack spacing={ 6 }>
-			{ /* <VStack className="edit-site-patterns__section-header">
-				<Heading as="h2" level={ 4 }>
-					{ __( 'Synced' ) }
-				</Heading>
-				<Text variant="muted" as="p">
-					{ __( 'Patterns that are kept in sync across your site' ) }
-				</Text>
-			</VStack> */ }
+			<PatternsHeader categoryId={ categoryId } type={ type } />
 
 			<Flex alignment="stretch" wrap>
 				{ isMobileViewport && (

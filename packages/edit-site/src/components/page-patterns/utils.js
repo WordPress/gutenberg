@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 export const DEFAULT_CATEGORY = 'my-patterns';
 export const DEFAULT_TYPE = 'wp_block';
 export const PATTERNS = 'pattern';
