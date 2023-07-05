@@ -12,6 +12,8 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -133,6 +135,23 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
+	const { settingsDrawerStatePreference } = useSelect( ( select ) => {
+		const prefsStore = select( preferencesStore );
+
+		const postEditorEnabled =
+			prefsStore.get( 'core/edit-post', 'linkControlSettingsDrawer' ) ??
+			false;
+
+		const siteEditorEnabled =
+			prefsStore.get( 'core/edit-site', 'linkControlSettingsDrawer' ) ??
+			false;
+
+		return {
+			settingsDrawerStatePreference:
+				postEditorEnabled || siteEditorEnabled,
+		};
+	}, [] );
+
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
@@ -140,7 +159,9 @@ function LinkControl( {
 
 	const settingsKeys = settings.map( ( { id } ) => id );
 
-	const [ settingsOpen, setSettingsOpen ] = useState( false );
+	const [ settingsOpen, setSettingsOpen ] = useState(
+		settingsDrawerStatePreference
+	);
 
 	const [
 		internalControlValue,

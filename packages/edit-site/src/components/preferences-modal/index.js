@@ -7,7 +7,6 @@ import {
 	PreferencesModalSection,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -41,7 +40,7 @@ export default function EditSitePreferencesModal() {
 		} );
 	};
 
-	const sections = useMemo( () => [
+	const sections = [
 		{
 			name: 'general',
 			tabLabel: __( 'General' ),
@@ -86,6 +85,13 @@ export default function EditSitePreferencesModal() {
 						) }
 						label={ __( 'Display block breadcrumbs' ) }
 					/>
+					<EnableFeature
+						featureName="linkControlSettingsDrawer"
+						help={ __(
+							`Toggle's default open/closed state of the link creation interface's settings drawer.`
+						) }
+						label={ __( 'Always open Link UI Settings Drawer' ) }
+					/>
 				</PreferencesModalSection>
 			),
 		},
@@ -109,7 +115,8 @@ export default function EditSitePreferencesModal() {
 				</PreferencesModalSection>
 			),
 		},
-	] );
+	];
+
 	if ( ! isModalActive ) {
 		return null;
 	}

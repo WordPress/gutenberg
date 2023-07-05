@@ -5,7 +5,7 @@
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import {
 	PostTaxonomies,
 	PostExcerptCheck,
@@ -69,12 +69,17 @@ export default function EditPostPreferencesModal() {
 
 	const { set: setPreference } = useDispatch( preferencesStore );
 
-	const toggleDistractionFree = () => {
+	const toggleDistractionFree = useCallback( () => {
 		setPreference( 'core/edit-post', 'fixedToolbar', false );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
 		closeGeneralSidebar();
-	};
+	}, [
+		closeGeneralSidebar,
+		setIsInserterOpened,
+		setIsListViewOpened,
+		setPreference,
+	] );
 
 	const sections = useMemo(
 		() => [
@@ -152,6 +157,15 @@ export default function EditPostPreferencesModal() {
 									label={ __( 'Display block breadcrumbs' ) }
 								/>
 							) }
+							<EnableFeature
+								featureName="linkControlSettingsDrawer"
+								help={ __(
+									`Toggle's default open/closed state of the link creation interface's settings drawer.`
+								) }
+								label={ __(
+									'Always open Link UI Settings Drawer'
+								) }
+							/>
 						</PreferencesModalSection>
 					</>
 				),
@@ -252,7 +266,7 @@ export default function EditPostPreferencesModal() {
 				),
 			},
 		],
-		[ isLargeViewport, showBlockBreadcrumbsOption ]
+		[ isLargeViewport, showBlockBreadcrumbsOption, toggleDistractionFree ]
 	);
 
 	if ( ! isModalActive ) {
