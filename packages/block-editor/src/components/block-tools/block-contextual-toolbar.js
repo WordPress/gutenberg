@@ -56,6 +56,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 				hasParents: parents.length,
 				showParentSelector:
 					parentBlockType &&
+					getBlockEditingMode( firstParentClientId ) === 'default' &&
 					hasBlockSupport(
 						parentBlockType,
 						'__experimentalParentSelector',
