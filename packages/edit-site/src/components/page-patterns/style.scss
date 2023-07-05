@@ -60,19 +60,20 @@
 }
 
 .edit-site-patterns__grid {
-	display: flex;
-	gap: $grid-unit-30;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: $grid-unit-40;
 	// Small top padding required to avoid cutting off the visible outline
 	// when hovering items.
 	padding-top: $border-width-focus-fallback;
 	margin-bottom: $grid-unit-40;
-
+	@include break-large {
+		grid-template-columns: 1fr 1fr;
+	}
 	.edit-site-patterns__pattern {
 		break-inside: avoid-column;
 		display: flex;
 		flex-direction: column;
-		margin-bottom: $grid-unit-60;
-
 		.edit-site-patterns__preview {
 			border-radius: $radius-block-ui;
 			cursor: pointer;
@@ -110,7 +111,7 @@
 	}
 
 	.edit-site-patterns__preview {
-		flex: 1;
+		flex: 0 1 auto;
 		margin-bottom: $grid-unit-20;
 	}
 }
