@@ -1129,24 +1129,41 @@ _Returns_
 
 ### Normalizing Selector Arguments
 
-In specific circumstances it may be necessary to normalize the arguments passed to a given call of a selector. This is necessary because selectors are pre-bound to resolvers before they applied. Moreover, metadata selectors/resolvers are also created using the supplied arguments.
+In specific circumstances it may be necessary to normalize the arguments passed to a given _call_ of a selector/resolver pairing.
 
-In these circumstances selectors may optionally define a custom property ("method") called `normalizeArgs` which should be a function thats returns the normalized form of the arguments.
+Each resolver has [its resolution status cached in an internal state](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/reducer.ts#L39) where the [key is the arguments supplied to the selector](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/utils.ts#L48) at _call_ time.
 
-For example, if the 3rd argument of the selector is supposed to be an `Number` but it is called with a `String` then normalizeArgs can be defined to coerce the argument type:
+For example for a selector with a single argument, the related resolver would generate a cache key of: `[ 123 ]`.
+
+[This cache is used to determine the resolution status of a given resolver](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/selectors.js#L22-L29) which is used to [avoid unwanted additional invocations of resolvers](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/index.js#L469-L474) (which often undertake "expensive" operations such as network requests).
+
+As a result it's important that arguments remain _consistent_ when calling the selector. For example, by _default_ these two calls will not be cached using the same key, even though they are likely identical:
+
+```js
+// Arg as number
+getSomeDataById( 123 );
+
+// Arg as string
+getSomeDataById( '123' );
+```
+
+This is an opportunity to utilize the `normalizeArgs` property to guarantee consistency.
+
+#### Example
+
+For example, if the 3rd argument of the following selector is intended to be a `Number`:
 
 ```js
 const getItemsSelector = ( name, type, id ) => {
 	// here 'id' is now guaranteed to be a number.
-	return state.items[name][type][id] || null;
-}
+	return state.items[ name ][ type ][ id ] || null;
+};
+```
 
-const getItemsResolver = ( name, type, id ) => {
-	// 'id' is also guaranteed to be a number in the resolver.
-	return {};
-}
+However, it is possible that the `id` parameter will be passed as a `String`. In this case, the `normalizeArgs` method (property) can be defined on the _selector_ to coerce the arguments to the desired type:
 
-// Define normalization function.
+```js
+// Define normalization method.
 getItemsSelector.normalizeArgs = ( args ) {
 	// "id" argument at the 2nd index
 	if (args[2] && typeof args[2] === 'string' ) {
@@ -1155,6 +1172,20 @@ getItemsSelector.normalizeArgs = ( args ) {
 
 	return args;
 }
+```
+
+With this in place the following code will behave consistency:
+
+```js
+const getItemsSelector = ( name, type, id ) => {
+	// here 'id' is now guaranteed to be a number.
+	return state.items[ name ][ type ][ id ] || null;
+};
+
+const getItemsResolver = ( name, type, id ) => {
+	// 'id' is also guaranteed to be a number in the resolver.
+	return {};
+};
 
 registry.registerStore( 'store', {
 	// ...
@@ -1166,11 +1197,16 @@ registry.registerStore( 'store', {
 	},
 } );
 
-// '54' is guaranteed to be coerced to a number/
+// Call with correct number type.
+registry.select( 'store' ).getItems( 'foo', 'bar', 54 );
+
+// Call with the wrong string type, **but** here we have avoided an
+// wanted resolver call because '54' is guaranteed to have been
+// coerced to a number by the `normalizeArgs` method.
 registry.select( 'store' ).getItems( 'foo', 'bar', '54' );
 ```
 
-This is particularly important to ensure that resolvers are cached correctly. Resolvers are intended to be invoked once per selector call and are then marked as resolved. However, resolvers are keyed in a cache by their arguments. Therefore ensuring type consistency between these arguments is important to avoid cache misses.
+Ensuring consistency of arguments for a given selector call is [an important optimization to help improve performance in the data layer](https://github.com/WordPress/gutenberg/pull/52120).
 
 ## Going further
 
