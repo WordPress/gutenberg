@@ -124,9 +124,6 @@ wpStore( {
 				openMenuOnFocus( store ) {
 					openMenu( store, 'focus' );
 				},
-				closeMenuOnFocus( store ) {
-					closeMenu( store, 'focus' );
-				},
 				toggleMenuOnClick: ( store ) => {
 					const { selectors } = store;
 					if ( selectors.core.navigation.menuOpenBy( store ).click ) {
@@ -170,20 +167,20 @@ wpStore( {
 					}
 				},
 				handleMenuFocusout: ( store ) => {
-					const { context, selectors, event } = store;
+					const { context, event } = store;
 					// If focus is outside modal, and in the document, close menu
 					// event.target === The element losing focus
 					// event.relatedTarget === The element receiving focus (if any)
 					// When focusout is outsite the document,
 					// `window.document.activeElement` doesn't change.
 					if (
-						selectors.core.navigation.menuOpenBy( store ).click &&
 						! context.core.navigation.modal?.contains(
 							event.relatedTarget
 						) &&
 						event.target !== window.document.activeElement
 					) {
 						closeMenu( store, 'click' );
+						closeMenu( store, 'focus' );
 					}
 				},
 			},

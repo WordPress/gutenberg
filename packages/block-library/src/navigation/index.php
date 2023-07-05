@@ -131,7 +131,6 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 				)
 			) ) {
 				$w->set_attribute( 'data-wp-on--focusin', 'actions.core.navigation.openMenuOnFocus' );
-				$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.closeMenuOnFocus' );
 			}
 
 			// Iterate through subitems if exist.
