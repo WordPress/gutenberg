@@ -40,8 +40,8 @@ function render_block_core_image( $attributes, $content, $block ) {
 		// If the lightbox setting is not set in the block attributes, get it from the theme.json file.
 	} else {
 		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
-		if ( isset( $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'] ) ) {
-			$lightbox_settings = $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
+		if ( isset( $theme_data['behaviors']['blocks'][ $block->name ]['lightbox'] ) ) {
+			$lightbox_settings = $theme_data['behaviors']['blocks'][ $block->name ]['lightbox'];
 		} else {
 			$lightbox_settings = null;
 		}
