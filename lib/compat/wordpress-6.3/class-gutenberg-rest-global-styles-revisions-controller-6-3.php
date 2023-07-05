@@ -63,9 +63,56 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => $this->get_collection_params(),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
+		);
+	}
+
+	/**
+	 * Retrieves the query params for collections.
+	 *
+	 * Inherits from WP_REST_Controller::get_collection_params(),
+	 * also reflects changes to return value WP_REST_Revisions_Controller::get_collection_params().
+	 *
+	 * @since 6.3.0
+	 *
+	 * @return array Collection parameters.
+	 */
+	public function get_collection_params() {
+		$collection_params                       = parent::get_collection_params();
+		$collection_params['context']['default'] = 'view';
+		$collection_params['offset']             = array(
+			'description' => __( 'Offset the result set by a specific number of items.' ),
+			'type'        => 'integer',
+		);
+		unset( $collection_params['search'] );
+		unset( $collection_params['per_page']['default'] );
+
+		return $collection_params;
+	}
+
+	/**
+	 * Returns decoded JSON from post content string,
+	 * or a 404 if not found.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param string $raw_json Encoded JSON from global styles custom post content.
+	 * @return Array|WP_Error
+	 */
+	private function get_decoded_global_styles_json( $raw_json ) {
+		$decoded_json = json_decode( $raw_json, true );
+
+		if ( is_array( $decoded_json ) && isset( $decoded_json['isGlobalStylesUserThemeJSON'] ) && true === $decoded_json['isGlobalStylesUserThemeJSON'] ) {
+			return $decoded_json;
+		}
+
+		return new WP_Error(
+			'rest_global_styles_not_found',
+			__( 'Cannot find user global styles revisions.' ),
+			array( 'status' => 404 )
 		);
 	}
 
@@ -84,27 +131,112 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 		if ( is_wp_error( $parent ) ) {
 			return $parent;
 		}
-		$response                         = array();
-		$raw_config                       = json_decode( $parent->post_content, true );
-		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
 
-		if ( $is_global_styles_user_theme_json ) {
-			$user_theme_revisions = wp_get_post_revisions(
-				$parent->ID,
-				array(
-					'posts_per_page' => 100,
-				)
-			);
+		$global_styles_config = $this->get_decoded_global_styles_json( $parent->post_content );
 
-			if ( ! empty( $user_theme_revisions ) ) {
-				foreach ( $user_theme_revisions as $revision ) {
-					$revision   = $this->prepare_item_for_response( $revision, $request );
-					$response[] = $this->prepare_response_for_collection( $revision );
-				}
-			}
+		if ( is_wp_error( $global_styles_config ) ) {
+			return $global_styles_config;
 		}
 
-		return rest_ensure_response( $response );
+		if ( wp_revisions_enabled( $parent ) ) {
+			$registered = $this->get_collection_params();
+			$query_args = array(
+				'post_parent'    => $parent->ID,
+				'post_type'      => 'revision',
+				'post_status'    => 'inherit',
+				'posts_per_page' => -1,
+				'orderby'        => 'date ID',
+				'order'          => 'DESC',
+			);
+
+			$parameter_mappings = array(
+				'offset'   => 'offset',
+				'page'     => 'paged',
+				'per_page' => 'posts_per_page',
+			);
+
+			foreach ( $parameter_mappings as $api_param => $wp_param ) {
+				if ( isset( $registered[ $api_param ], $request[ $api_param ] ) ) {
+					$query_args[ $wp_param ] = $request[ $api_param ];
+				}
+			}
+
+			$revisions_query = new WP_Query();
+			$revisions       = $revisions_query->query( $query_args );
+			$offset          = isset( $query_args['offset'] ) ? (int) $query_args['offset'] : 0;
+			$page            = (int) $query_args['paged'];
+			$total_revisions = $revisions_query->found_posts;
+
+			if ( $total_revisions < 1 ) {
+				// Out-of-bounds, run the query again without LIMIT for total count.
+				unset( $query_args['paged'], $query_args['offset'] );
+				$count_query = new WP_Query();
+				$count_query->query( $query_args );
+
+				$total_revisions = $count_query->found_posts;
+			}
+
+			if ( $revisions_query->query_vars['posts_per_page'] > 0 ) {
+				$max_pages = ceil( $total_revisions / (int) $revisions_query->query_vars['posts_per_page'] );
+			} else {
+				$max_pages = $total_revisions > 0 ? 1 : 0;
+			}
+			if ( $total_revisions > 0 ) {
+				if ( $offset >= $total_revisions ) {
+					return new WP_Error(
+						'rest_revision_invalid_offset_number',
+						__( 'The offset number requested is larger than or equal to the number of available revisions.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				} elseif ( ! $offset && $page > $max_pages ) {
+					return new WP_Error(
+						'rest_revision_invalid_page_number',
+						__( 'The page number requested is larger than the number of pages available.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+			}
+		} else {
+			$revisions       = array();
+			$total_revisions = 0;
+			$max_pages       = 0;
+			$page            = (int) $request['page'];
+		}
+
+		$response = array();
+
+		foreach ( $revisions as $revision ) {
+			$data       = $this->prepare_item_for_response( $revision, $request );
+			$response[] = $this->prepare_response_for_collection( $data );
+		}
+
+		$response = rest_ensure_response( $response );
+
+		$response->header( 'X-WP-Total', (int) $total_revisions );
+		$response->header( 'X-WP-TotalPages', (int) $max_pages );
+
+		$request_params = $request->get_query_params();
+		$base_path      = rest_url( sprintf( '%s/%s/%d/%s', $this->namespace, $this->parent_base, $request['parent'], $this->rest_base ) );
+		$base           = add_query_arg( urlencode_deep( $request_params ), $base_path );
+
+		if ( $page > 1 ) {
+			$prev_page = $page - 1;
+
+			if ( $prev_page > $max_pages ) {
+				$prev_page = $max_pages;
+			}
+
+			$prev_link = add_query_arg( 'page', $prev_page, $base );
+			$response->link_header( 'prev', $prev_link );
+		}
+		if ( $max_pages > $page ) {
+			$next_page = $page + 1;
+			$next_link = add_query_arg( 'page', $next_page, $base );
+
+			$response->link_header( 'next', $next_link );
+		}
+
+		return $response;
 	}
 
 	/**
@@ -137,17 +269,28 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 	 *
 	 * @param WP_Post         $post    Post revision object.
 	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response Response object.
+	 * @return WP_REST_Response|WP_Error Response object.
 	 */
 	public function prepare_item_for_response( $post, $request ) {
-		$parent = $this->get_parent( $request['parent'] );
-		// Retrieves global styles config as JSON.
-		$raw_revision_config = json_decode( $post->post_content, true );
-		$config              = ( new WP_Theme_JSON_Gutenberg( $raw_revision_config, 'custom' ) )->get_raw_data();
+		$parent               = $this->get_parent( $request['parent'] );
+		$global_styles_config = $this->get_decoded_global_styles_json( $post->post_content );
 
-		// Prepares item data.
-		$data   = array();
+		if ( is_wp_error( $global_styles_config ) ) {
+			return $global_styles_config;
+		}
+
 		$fields = $this->get_fields_for_response( $request );
+		$data   = array();
+
+		if ( ! empty( $global_styles_config['styles'] ) || ! empty( $global_styles_config['settings'] ) ) {
+			$global_styles_config = ( new WP_Theme_JSON_Gutenberg( $global_styles_config, 'custom' ) )->get_raw_data();
+			if ( rest_is_field_included( 'settings', $fields ) ) {
+				$data['settings'] = ! empty( $global_styles_config['settings'] ) ? $global_styles_config['settings'] : new stdClass();
+			}
+			if ( rest_is_field_included( 'styles', $fields ) ) {
+				$data['styles'] = ! empty( $global_styles_config['styles'] ) ? $global_styles_config['styles'] : new stdClass();
+			}
+		}
 
 		if ( rest_is_field_included( 'author', $fields ) ) {
 			$data['author'] = (int) $post->post_author;
@@ -175,14 +318,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 
 		if ( rest_is_field_included( 'parent', $fields ) ) {
 			$data['parent'] = (int) $parent->ID;
-		}
-
-		if ( rest_is_field_included( 'settings', $fields ) ) {
-			$data['settings'] = ! empty( $config['settings'] ) ? $config['settings'] : new stdClass();
-		}
-
-		if ( rest_is_field_included( 'styles', $fields ) ) {
-			$data['styles'] = ! empty( $config['styles'] ) ? $config['styles'] : new stdClass();
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';

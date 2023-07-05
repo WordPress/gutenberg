@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 import { decodeEntities } from '@wordpress/html-entities';
 import {
@@ -20,6 +21,7 @@ import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 import { useLink } from '../routes/link';
 import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
 import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
+import { unlock } from '../../lock-unlock';
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
 function buildMenuLabel( title, id, status ) {
@@ -40,15 +42,42 @@ function buildMenuLabel( title, id, status ) {
 	);
 }
 
+// Save a boolean to prevent us creating a fallback more than once per session.
+let hasCreatedFallback = false;
+
 export default function SidebarNavigationScreenNavigationMenus() {
-	const { records: navigationMenus, isResolving: isLoading } =
-		useEntityRecords(
-			'postType',
-			`wp_navigation`,
-			PRELOADED_NAVIGATION_MENUS_QUERY
-		);
+	const {
+		records: navigationMenus,
+		isResolving: isResolvingNavigationMenus,
+		hasResolved: hasResolvedNavigationMenus,
+	} = useEntityRecords(
+		'postType',
+		`wp_navigation`,
+		PRELOADED_NAVIGATION_MENUS_QUERY
+	);
+
+	const isLoading =
+		isResolvingNavigationMenus && ! hasResolvedNavigationMenus;
+
+	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
 	const firstNavigationMenu = navigationMenus?.[ 0 ];
+
+	// Save a boolean to prevent us creating a fallback more than once per session.
+	if ( firstNavigationMenu ) {
+		hasCreatedFallback = true;
+	}
+
+	// If there is no navigation menu found
+	// then trigger fallback algorithm to create one.
+	if (
+		! firstNavigationMenu &&
+		! isResolvingNavigationMenus &&
+		hasResolvedNavigationMenus &&
+		! hasCreatedFallback
+	) {
+		getNavigationFallbackId();
+	}
 
 	const { handleSave, handleDelete, handleDuplicate } =
 		useNavigationMenuHandlers();
@@ -78,7 +107,9 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				navigationMenu={ firstNavigationMenu }
 				handleDelete={ () => handleDelete( firstNavigationMenu ) }
 				handleDuplicate={ () => handleDuplicate( firstNavigationMenu ) }
-				handleSave={ () => handleSave( firstNavigationMenu ) }
+				handleSave={ ( edits ) =>
+					handleSave( firstNavigationMenu, edits )
+				}
 			/>
 		);
 	}

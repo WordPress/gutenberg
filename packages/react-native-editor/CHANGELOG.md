@@ -10,7 +10,14 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Rename "Reusable blocks" to "Synced patterns", aligning with the web editor. [#51704]
+
+## 1.98.1
+-   [*] fix: Display heading level dropdown icons and labels [#52004]
+
+## 1.98.0
 -   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]
+-   [*] Fix cursor positioning when dictating text on iOS [#51227]
 
 ## 1.97.1
 -   [**] Fix crash when using the delete key to remove a single button [#51435]

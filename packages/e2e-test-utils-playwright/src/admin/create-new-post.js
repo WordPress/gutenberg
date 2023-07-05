@@ -13,6 +13,7 @@ import { addQueryArgs } from '@wordpress/url';
  * @param {string}  [object.content]          Content of the new post.
  * @param {string}  [object.excerpt]          Excerpt of the new post.
  * @param {boolean} [object.showWelcomeGuide] Whether to show the welcome guide.
+ * @param {boolean} [object.legacyCanvas]     Whether the non-iframed editor canvas is awaited.
  */
 export async function createNewPost( {
 	postType,
@@ -20,6 +21,7 @@ export async function createNewPost( {
 	content,
 	excerpt,
 	showWelcomeGuide = false,
+	legacyCanvas = false,
 } = {} ) {
 	const query = addQueryArgs( '', {
 		post_type: postType,
@@ -29,7 +31,15 @@ export async function createNewPost( {
 	} ).slice( 1 );
 
 	await this.visitAdminPage( 'post-new.php', query );
-	await this.page.waitForSelector( '.edit-post-layout' );
+
+	const canvasReadyLocator = legacyCanvas
+		? this.page.locator( '.edit-post-layout' )
+		: this.page
+				.frameLocator( '[name=editor-canvas]' )
+				.locator( 'body > *' )
+				.first();
+
+	await canvasReadyLocator.waitFor();
 
 	await this.page.evaluate( ( welcomeGuide ) => {
 		window.wp.data

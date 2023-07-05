@@ -9,12 +9,13 @@
 	&:hover,
 	&:focus,
 	&[aria-current] {
-		color: $white;
+		color: $gray-200;
 		background: $gray-800;
 	}
 
 	&[aria-current] {
 		background: var(--wp-admin-theme-color);
+		color: $white;
 	}
 
 	.edit-site-sidebar-navigation-item__drilldown-indicator {

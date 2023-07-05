@@ -60,7 +60,6 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 			onClose={ () => {
 				setInsertedBlock( null );
 			} }
-			hasCreateSuggestion={ false }
 			onChange={ ( updatedValue ) => {
 				updateAttributes(
 					updatedValue,

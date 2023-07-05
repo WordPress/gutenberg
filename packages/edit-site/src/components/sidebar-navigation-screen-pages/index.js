@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { layout, page, home, loop, plus } from '@wordpress/icons';
+import { layout, page, home, verse, plus } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -159,7 +159,7 @@ export default function SidebarNavigationScreenPages() {
 											itemIcon = home;
 											break;
 										case postsPage:
-											itemIcon = loop;
+											itemIcon = verse;
 											break;
 										default:
 											itemIcon = page;

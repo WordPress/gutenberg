@@ -22,7 +22,7 @@ export default function TemplatePartNavigationMenu( { id } ) {
 				size="12"
 				upperCase={ true }
 			>
-				{ title?.rendered || __( 'Navigation' ) }
+				{ title?.rendered || title || __( 'Navigation' ) }
 			</Heading>
 			<NavigationMenuEditor navigationMenuId={ id } />
 		</>

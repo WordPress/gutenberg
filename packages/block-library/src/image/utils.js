@@ -3,6 +3,22 @@
  */
 import { NEW_TAB_REL } from './constants';
 
+/**
+ * Evaluates a CSS aspect-ratio property value as a number.
+ *
+ * Degenerate or invalid ratios behave as 'auto'. And 'auto' ratios return NaN.
+ *
+ * @see https://drafts.csswg.org/css-sizing-4/#aspect-ratio
+ *
+ * @param {string} value CSS aspect-ratio property value.
+ * @return {number} Numerical aspect ratio or NaN if invalid.
+ */
+export function evalAspectRatio( value ) {
+	const [ width, height = 1 ] = value.split( '/' ).map( Number );
+	const aspectRatio = width / height;
+	return aspectRatio === Infinity || aspectRatio === 0 ? NaN : aspectRatio;
+}
+
 export function removeNewTabRel( currentRel ) {
 	let newRel = currentRel;
 

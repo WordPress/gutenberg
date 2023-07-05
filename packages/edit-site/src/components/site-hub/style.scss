@@ -20,7 +20,7 @@
 			opacity: 1;
 		}
 		svg {
-			fill: $white;
+			fill: $gray-200;
 		}
 	}
 	&:hover {
@@ -55,12 +55,13 @@
 .edit-site-site-hub__site-title {
 	margin-left: $grid-unit-05;
 	flex-grow: 1;
+	color: $gray-200;
 }
 
 .edit-site-site-hub_toggle-command-center {
-	color: $white;
+	color: $gray-200;
 
 	&:hover {
-		color: $white;
+		color: $gray-100;
 	}
 }

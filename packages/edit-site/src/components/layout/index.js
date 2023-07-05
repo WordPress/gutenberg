@@ -72,24 +72,36 @@ export default function Layout() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isListPage = getIsListPage( params, isMobileViewport );
 	const isEditorPage = ! isListPage;
-	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
-		useSelect( ( select ) => {
-			const { getAllShortcutKeyCombinations } = select(
-				keyboardShortcutsStore
-			);
-			const { getCanvasMode } = unlock( select( editSiteStore ) );
-			return {
-				canvasMode: getCanvasMode(),
-				previousShortcut: getAllShortcutKeyCombinations(
-					'core/edit-site/previous-region'
-				),
-				nextShortcut: getAllShortcutKeyCombinations(
-					'core/edit-site/next-region'
-				),
-				hasFixedToolbar:
-					select( preferencesStore ).get( 'fixedToolbar' ),
-			};
-		}, [] );
+
+	const {
+		isDistractionFree,
+		hasFixedToolbar,
+		canvasMode,
+		previousShortcut,
+		nextShortcut,
+	} = useSelect( ( select ) => {
+		const { getAllShortcutKeyCombinations } = select(
+			keyboardShortcutsStore
+		);
+		const { getCanvasMode } = unlock( select( editSiteStore ) );
+		return {
+			canvasMode: getCanvasMode(),
+			previousShortcut: getAllShortcutKeyCombinations(
+				'core/edit-site/previous-region'
+			),
+			nextShortcut: getAllShortcutKeyCombinations(
+				'core/edit-site/next-region'
+			),
+			hasFixedToolbar: select( preferencesStore ).get(
+				'core/edit-site',
+				'fixedToolbar'
+			),
+			isDistractionFree: select( preferencesStore ).get(
+				'core/edit-site',
+				'distractionFree'
+			),
+		};
+	}, [] );
 	const isEditing = canvasMode === 'edit';
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
@@ -110,7 +122,28 @@ export default function Layout() {
 	const [ isResizing ] = useState( false );
 	const isEditorLoading = useIsSiteEditorLoading();
 
-	// Sets the right context for the command center
+	// This determines which animation variant should apply to the header.
+	// There is also a `isDistractionFreeHovering` state that gets priority
+	// when hovering the `edit-site-layout__header-container` in distraction
+	// free mode. It's set via framer and trickles down to all the children
+	// so they can use this variant state too.
+	//
+	// TODO: The issue with this is we want to have the hover state stick when hovering
+	// a popover opened via the header. We'll probably need to lift this state to
+	// handle it ourselves. Also, focusWithin the header needs to be handled.
+	let headerAnimationState;
+
+	if ( canvasMode === 'view' ) {
+		// We need 'view' to always take priority so 'isDistractionFree'
+		// doesn't bleed over into the view (sidebar) state
+		headerAnimationState = 'view';
+	} else if ( isDistractionFree ) {
+		headerAnimationState = 'isDistractionFree';
+	} else {
+		headerAnimationState = canvasMode; // edit, view, init
+	}
+
+	// Sets the right context for the command palette
 	const commandContext =
 		canvasMode === 'edit' && isEditorPage
 			? 'site-editor-edit'
@@ -140,81 +173,112 @@ export default function Layout() {
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
+						'is-distraction-free': isDistractionFree && isEditing,
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': isEditing,
 						'has-fixed-toolbar': hasFixedToolbar,
 					}
 				) }
 			>
-				<SiteHub ref={ hubRef } className="edit-site-layout__hub" />
-
-				<AnimatePresence initial={ false }>
-					{ isEditorPage && isEditing && (
-						<NavigableRegion
-							className="edit-site-layout__header"
-							ariaLabel={ __( 'Editor top bar' ) }
-							as={ motion.div }
-							animate={ {
-								y: 0,
-							} }
-							initial={ {
-								y: '-100%',
-							} }
-							exit={ {
-								y: '-100%',
-							} }
-							transition={ {
+				<motion.div
+					className="edit-site-layout__header-container"
+					variants={ {
+						isDistractionFree: {
+							opacity: 0,
+							transition: {
 								type: 'tween',
-								duration: disableMotion
-									? 0
-									: ANIMATION_DURATION,
-								ease: 'easeOut',
-							} }
-						>
-							{ isEditing && <Header /> }
-						</NavigableRegion>
-					) }
-				</AnimatePresence>
+								delay: 0.8,
+								delayChildren: 0.8,
+							}, // How long to wait before the header exits
+						},
+						isDistractionFreeHovering: {
+							opacity: 1,
+							transition: {
+								type: 'tween',
+								delay: 0.2,
+								delayChildren: 0.2,
+							}, // How long to wait before the header shows
+						},
+						view: { opacity: 1 },
+						edit: { opacity: 1 },
+					} }
+					whileHover={
+						isDistractionFree
+							? 'isDistractionFreeHovering'
+							: undefined
+					}
+					animate={ headerAnimationState }
+				>
+					<SiteHub
+						as={ motion.div }
+						variants={ {
+							isDistractionFree: { x: '-100%' },
+							isDistractionFreeHovering: { x: 0 },
+							view: { x: 0 },
+							edit: { x: 0 },
+						} }
+						ref={ hubRef }
+						className="edit-site-layout__hub"
+					/>
 
-				<div className="edit-site-layout__content">
 					<AnimatePresence initial={ false }>
-						{
-							<motion.div
-								initial={ {
-									opacity: 0,
+						{ isEditorPage && isEditing && (
+							<NavigableRegion
+								key="header"
+								className="edit-site-layout__header"
+								ariaLabel={ __( 'Editor top bar' ) }
+								as={ motion.div }
+								variants={ {
+									isDistractionFree: { opacity: 0, y: 0 },
+									isDistractionFreeHovering: {
+										opacity: 1,
+										y: 0,
+									},
+									view: { opacity: 1, y: '-100%' },
+									edit: { opacity: 1, y: 0 },
 								} }
-								animate={
-									showSidebar
-										? { opacity: 1, display: 'block' }
-										: {
-												opacity: 0,
-												transitionEnd: {
-													display: 'none',
-												},
-										  }
-								}
 								exit={ {
-									opacity: 0,
+									y: '-100%',
+								} }
+								initial={ {
+									opacity: isDistractionFree ? 1 : 0,
+									y: isDistractionFree ? 0 : '-100%',
 								} }
 								transition={ {
 									type: 'tween',
-									duration:
-										// Disable transition in mobile to emulate a full page transition.
-										disableMotion || isMobileViewport
-											? 0
-											: ANIMATION_DURATION,
+									duration: disableMotion ? 0 : 0.2,
 									ease: 'easeOut',
 								} }
-								className="edit-site-layout__sidebar"
 							>
-								<NavigableRegion
-									ariaLabel={ __( 'Navigation' ) }
-								>
-									<Sidebar />
-								</NavigableRegion>
-							</motion.div>
-						}
+								<Header />
+							</NavigableRegion>
+						) }
 					</AnimatePresence>
+				</motion.div>
+
+				<div className="edit-site-layout__content">
+					<motion.div
+						// The sidebar is needed for routing on mobile
+						// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
+						// so we can't remove the element entirely. Using `inert` will make
+						// it inaccessible to screen readers and keyboard navigation.
+						inert={ showSidebar ? undefined : 'inert' }
+						animate={ { opacity: showSidebar ? 1 : 0 } }
+						transition={ {
+							type: 'tween',
+							duration:
+								// Disable transition in mobile to emulate a full page transition.
+								disableMotion || isMobileViewport
+									? 0
+									: ANIMATION_DURATION,
+							ease: 'easeOut',
+						} }
+						className="edit-site-layout__sidebar"
+					>
+						<NavigableRegion ariaLabel={ __( 'Navigation' ) }>
+							<Sidebar />
+						</NavigableRegion>
+					</motion.div>
 
 					<SavePanel />
 

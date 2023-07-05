@@ -90,3 +90,15 @@ export const isFeatureActive = createRegistrySelector(
 		return !! select( preferencesStore ).get( scope, featureName );
 	}
 );
+
+/**
+ * Returns true if a modal is active, or false otherwise.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} modalName A string that uniquely identifies the modal.
+ *
+ * @return {boolean} Whether the modal is active.
+ */
+export function isModalActive( state, modalName ) {
+	return state.activeModal === modalName;
+}
