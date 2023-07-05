@@ -127,7 +127,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 			if ( $w->next_tag(
 				array(
 					'tag_name'   => 'UL',
-					'class_name' => 'wp-block-navigation-submenu',
+					'class_name' => 'wp-block-navigation__submenu-container',
 				)
 			) ) {
 				$w->set_attribute( 'data-wp-on--focusin', 'actions.core.navigation.openMenuOnFocus' );
