@@ -5,6 +5,7 @@
 ### Bug Fix
 
 -   `UnitControl`: Fix crash when certain units are used ([#52211](https://github.com/WordPress/gutenberg/pull/52211)).
+-   `Guide`: Place focus on the guide's container instead of its first tabbable ([#52300](https://github.com/WordPress/gutenberg/pull/52300)).
 
 ## 25.2.0 (2023-06-23)
 
