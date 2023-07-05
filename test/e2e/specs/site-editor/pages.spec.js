@@ -78,7 +78,7 @@ test.describe( 'Pages', () => {
 		).toBeVisible();
 
 		// Switch to template editing focus.
-		await page.getByRole( 'button', { name: 'Settings' } ).click();
+		await editor.openDocumentSettingsSidebar();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Edit template' } )
@@ -102,7 +102,10 @@ test.describe( 'Pages', () => {
 			.fill( 'New Site Title' );
 
 		// Go back to page editing focus.
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Back' } )
+			.click();
 
 		// Site Title and Page entities should have been modified.
 		await page.getByRole( 'button', { name: 'Save', exact: true } ).click();

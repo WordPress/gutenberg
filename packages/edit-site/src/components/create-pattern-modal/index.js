@@ -56,7 +56,7 @@ export default function CreatePatternModal( {
 					status: 'publish',
 					meta:
 						syncType === SYNC_TYPES.unsynced
-							? { sync_status: syncType }
+							? { wp_pattern_sync_status: syncType }
 							: undefined,
 				},
 				{ throwOnError: true }
