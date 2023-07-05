@@ -1280,7 +1280,7 @@ test.describe( 'Navigation block', () => {
 				.locator( 'a' )
 				.filter( { hasText: 'Third Link' } );
 			await expect( thirdLink ).toHaveCSS( 'color', 'rgb(0, 208, 132)' );
-			await secondLink.click();
+			await thirdLink.click();
 			await expect( thirdLink ).toHaveCSS( 'color', 'rgb(255, 105, 0)' );
 
 			// We test the colors of the links on the mobile overlay too.
@@ -1347,7 +1347,6 @@ test.describe( 'Navigation block', () => {
 		} );
 
 		test( 'As a user I expect my navigation to use the colors I selected for it', async ( {
-			admin,
 			editor,
 			page,
 			pageUtils,
@@ -1550,8 +1549,11 @@ test.describe( 'Navigation block', () => {
 			await pageUtils.setBrowserViewport( { width: 599, height: 700 } );
 			await page.getByRole( 'button', { name: 'Open menu' } ).click();
 
-			//TODO: fix this
-			/*await expect( firstLinkFront ).toHaveCSS(
+			const overlayFront = page
+				.locator( '.wp-block-navigation__responsive-container' )
+				.filter( { hasText: 'Second Link' } );
+
+			await expect( firstLinkFront ).toHaveCSS(
 				'color',
 				overlayTextColor
 			);
@@ -1559,27 +1561,14 @@ test.describe( 'Navigation block', () => {
 				'color',
 				overlayTextColor
 			);
-			await expect( overlay ).toHaveCSS(
+			await expect( thirdLinkFront ).toHaveCSS(
+				'color',
+				overlayTextColor
+			);
+			await expect( overlayFront ).toHaveCSS(
 				'background-color',
 				overlayBgColor
-			);*/
-
-			// We reset global styles so we don't affect other tests
-			await pageUtils.setBrowserViewport( 'large' );
-			await admin.visitSiteEditor();
-			await editor.canvas.click( 'body' );
-			await page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Styles', exact: true } )
-				.click();
-			await page.getByRole( 'button', { name: 'Revisions' } ).click();
-
-			//await page.pause();
-			await page
-				.getByRole( 'menuitem', { name: 'Reset to defaults' } )
-				.click();
-
-			await editor.saveSiteEditorEntities();
+			);
 		} );
 	} );
 } );

@@ -476,8 +476,8 @@ button.wp-block-navigation-item__content {
 	// If the responsive wrapper is present but overlay is not open,
 	// overlay styles shouldn't apply.
 	&:not(.is-menu-open.is-menu-open) {
-		//color: inherit !important;
-		//background-color: inherit !important;
+		color: inherit !important;
+		background-color: inherit !important;
 	}
 
 	// Overlay menu.
@@ -582,6 +582,7 @@ button.wp-block-navigation-item__content {
 		// Remove background colors for items inside the overlay menu.
 		// Has to be !important to override global styles.
 		.wp-block-navigation-item .wp-block-navigation__submenu-container,
+		.wp-block-navigation__container,
 		.wp-block-navigation-item,
 		.wp-block-page-list {
 			color: inherit !important;
