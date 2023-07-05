@@ -378,17 +378,23 @@ export const getEntityRecord = createSelector(
  * Normalizes `recordKey`s that look like numeric IDs to numbers.
  *
  * @param args EntityRecordArgs the selector arguments.
- * @return the normalized selector arguments.
+ * @return EntityRecordArgs the normalized arguments.
  */
-getEntityRecord.normalizeArgs = ( args ) => {
-	let key = args && args[ 2 ];
+getEntityRecord.normalizeArgs = (
+	args: EntityRecordArgs
+): EntityRecordArgs => {
+	let recordKey = args && args[ 2 ];
 
-	// If key is numeric, assume it's an ID and coerce to number.
-	if ( key && typeof key === 'string' && isNumericID( key ) ) {
-		key = Number( key );
+	// If recordKey looks to be a numeric ID then coerce to number.
+	if (
+		recordKey &&
+		typeof recordKey === 'string' &&
+		isNumericID( recordKey )
+	) {
+		recordKey = Number( recordKey );
 	}
 
-	args[ 2 ] = key;
+	args[ 2 ] = recordKey;
 	return args;
 };
 
