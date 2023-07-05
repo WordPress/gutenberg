@@ -501,7 +501,8 @@ function Navigation( {
 			speak(
 				__(
 					'The current menu options offer reduced accessibility for users and are not recommended.'
-				)
+				),
+				'assertive'
 			);
 	}, [ submenuAccessibilityNotice ] );
 
