@@ -20,7 +20,6 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-
 import { useContext, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -214,23 +213,14 @@ function PushChangesToGlobalStylesControl( {
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const blockEditingMode = useBlockEditingMode();
-
-		/**
-		 * Do not show the panel if the block does not have style support.
-		 *
-		 * @see https://github.com/WordPress/gutenberg/issues/52139
-		 */
-		if (
-			! hasBlockSupport( props.name, 'color' ) ||
-			! hasBlockSupport( props.name, 'typography' )
-		) {
-			return <BlockEdit { ...props } />;
-		}
+		const supportsStyles =
+			hasBlockSupport( props.name, 'color' ) ||
+			hasBlockSupport( props.name, 'typography' );
 
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ blockEditingMode === 'default' && (
+				{ blockEditingMode === 'default' && supportsStyles && (
 					<InspectorAdvancedControls>
 						<PushChangesToGlobalStylesControl { ...props } />
 					</InspectorAdvancedControls>
