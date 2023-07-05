@@ -374,6 +374,12 @@ export const getEntityRecord = createSelector(
 	}
 ) as GetEntityRecord;
 
+/**
+ * Normalizes `recordKey`s that look like numeric IDs to numbers.
+ *
+ * @param args EntityRecordArgs the selector arguments.
+ * @return the normalized selector arguments.
+ */
 getEntityRecord.normalizeArgs = ( args ) => {
 	let key = args && args[ 2 ];
 
