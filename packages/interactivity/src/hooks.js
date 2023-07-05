@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { h, options, createContext, cloneElement } from 'preact';
-import { useRef, useMemo } from 'preact/hooks';
+import { options, createContext, cloneElement } from 'preact';
 /**
  * Internal dependencies
  */
@@ -47,40 +46,21 @@ const getEvaluate =
 
 // Separate directives by priority. The resulting array contains objects
 // of directives grouped by same priority, and sorted in ascending order.
-const usePriorityLevels = ( directives ) =>
-	useMemo( () => {
-		const byPriority = Object.entries( directives ).reduce(
-			( acc, [ name, values ] ) => {
-				const priority = directivePriorities[ name ];
-				if ( ! acc[ priority ] ) acc[ priority ] = {};
-				acc[ priority ][ name ] = values;
+const getPriorityLevels = ( directives ) => {
+	const byPriority = Object.entries( directives ).reduce(
+		( acc, [ name, values ] ) => {
+			const priority = directivePriorities[ name ];
+			if ( ! acc[ priority ] ) acc[ priority ] = {};
+			acc[ priority ][ name ] = values;
 
-				return acc;
-			},
-			{}
-		);
-
-		return Object.entries( byPriority )
-			.sort( ( [ p1 ], [ p2 ] ) => p1 - p2 )
-			.map( ( [ , obj ] ) => obj );
-	}, [ directives ] );
-
-// Directive wrapper.
-const Directive = ( { type, directives, props: originalProps } ) => {
-	const ref = useRef( null );
-	const element = h( type, { ...originalProps, ref } );
-	const evaluate = useMemo( () => getEvaluate( { ref } ), [] );
-
-	// Add wrappers recursively for each priority level.
-	const byPriorityLevel = usePriorityLevels( directives );
-	return (
-		<RecursivePriorityLevel
-			directives={ byPriorityLevel }
-			element={ element }
-			evaluate={ evaluate }
-			originalProps={ originalProps }
-		/>
+			return acc;
+		},
+		{}
 	);
+
+	return Object.entries( byPriority )
+		.sort( ( [ p1 ], [ p2 ] ) => p1 - p2 )
+		.map( ( [ , obj ] ) => obj );
 };
 
 // Priority level wrapper.
@@ -131,14 +111,21 @@ const old = options.vnode;
 options.vnode = ( vnode ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
-		const directives = props.__directives;
+		const priorityLevels = getPriorityLevels( props.__directives );
 		delete props.__directives;
+		const ref = { current: props.__node };
+		delete props.__node;
 		vnode.props = {
-			type: vnode.type,
-			directives,
-			props,
+			directives: priorityLevels,
+			originalProps: props,
+			evaluate: getEvaluate( { ref } ),
+			element: {
+				type: vnode.type,
+				ref,
+				props,
+			},
 		};
-		vnode.type = Directive;
+		vnode.type = RecursivePriorityLevel;
 	}
 
 	if ( old ) old( vnode );

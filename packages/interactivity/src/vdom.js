@@ -92,7 +92,10 @@ export function toVdom( root ) {
 			];
 		if ( island ) hydratedIslands.add( node );
 
-		if ( hasDirectives ) props.__directives = directives;
+		if ( hasDirectives ) {
+			props.__directives = directives;
+			props.__node = node;
+		}
 
 		let child = treeWalker.firstChild();
 		if ( child ) {
