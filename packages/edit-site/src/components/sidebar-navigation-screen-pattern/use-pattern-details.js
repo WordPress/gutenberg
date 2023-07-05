@@ -95,7 +95,7 @@ export default function usePatternDetails( postType, postId ) {
 		details.push( {
 			label: __( 'Syncing' ),
 			value:
-				record.meta?.sync_status === 'unsynced'
+				record.wp_pattern_sync_status === 'unsynced'
 					? __( 'Not synced' )
 					: __( 'Fully synced' ),
 		} );
