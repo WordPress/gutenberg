@@ -74,7 +74,7 @@ Optional block name.
 
 # `useHasRecursion()`
 
-Used in conjunction with `RecursionProvider`, this hook us used to identify if a block has already been rendered.
+Used in conjunction with `RecursionProvider`, this hook is used to identify if a block has already been rendered.
 
 ## Usage
 
