@@ -40,32 +40,43 @@ export const rawStore = { state: deepSignal( rawState ) };
 
 /**
  * Extends the global store with the passed properties. These props tipically
- * consist of `state`, `actions` and `effects` used by interactive blocks, and
+ * consist of `state`, `selectors` and `actions` used by interactive blocks, and
  * any of them may be accessed by any directive present in the page.
  *
  * @example
  * ```js
  *  store({
  *    state: {
- *      favoriteMovies: [],
+ *      counter: { value: 0 },
  *    },
  *    actions: {
- *      addMovie: ({ state, context }) => {
- *        // We assume that there is a `wp-context` directive
- *        // on the block which provides the item ID.
- *        state.favoriteMovies.push(context.item.id);
- *      },
- *      clearFavoriteMovies: ({ state }) => {
- *        state.favoriteMovies = [];
+ *      counter: {
+ *        increment: ({ state }) => {
+ *          state.counter.value += 1;
+ *        },
  *      },
  *    },
  *  });
  * ```
  *
- * @param {Object} properties           Properties to be added to the global store.
- * @param {Object} [properties.state]   State to be added to the global store.
- * @param {Object} [properties.actions] Actions to be added to the global store.
- * @param {Object} [properties.effects] Effects to be added to the global store.
+ * The code from the example above allows blocks to subscribe and interact with
+ * the store by using directives in the HTML, e.g.:
+ *
+ * ```html
+ * <div data-wp-interactive>
+ *   <button
+ *     data-wp-text="state.counter.value"
+ *     data-wp-on--click="actions.counter.increment"
+ *   >
+ *     0
+ *   </button>
+ * </div>
+ * ```
+ *
+ * @param {Object} properties             Properties to be added to the global store.
+ * @param {Object} [properties.state]     State to be added to the global store.
+ * @param {Object} [properties.selectors] Selectors to be added to the global store.
+ * @param {Object} [properties.actions]   Actions to be added to the global store.
  */
 export const store = ( { state, ...block } ) => {
 	deepMerge( rawStore, block );
