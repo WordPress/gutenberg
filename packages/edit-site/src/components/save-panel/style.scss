@@ -15,6 +15,17 @@
 			border: 1px solid $gray-200;
 			border-radius: $radius-block-ui;
 			margin-bottom: $grid-unit-20;
+
+			&.is-opened {
+				.components-panel__body-title,
+				.components-panel__body-title:hover {
+					border-bottom: 1px solid $gray-100;
+				}
+			}
+
+			.components-panel__body-title + .components-panel__row {
+				margin-top: $grid-unit-15;
+			}
 		}
 	}
 
