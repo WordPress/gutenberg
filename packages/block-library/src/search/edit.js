@@ -17,7 +17,7 @@ import {
 	__experimentalGetElementClassName,
 	useSetting,
 } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
@@ -115,6 +115,25 @@ export default function SearchEdit( {
 		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
 	} );
+
+	useEffect( () => {
+		if ( hasOnlyButton && ! isSelected ) {
+			setAttributes( {
+				isSearchFieldHidden: true,
+			} );
+		}
+	}, [ hasOnlyButton, isSelected, setAttributes ] );
+
+	// Show the search field when width changes.
+	useEffect( () => {
+		if ( ! hasOnlyButton || ! isSelected ) {
+			return;
+		}
+
+		setAttributes( {
+			isSearchFieldHidden: false,
+		} );
+	}, [ hasOnlyButton, isSelected, setAttributes, width ] );
 
 	const getBlockClassNames = () => {
 		return classnames(
