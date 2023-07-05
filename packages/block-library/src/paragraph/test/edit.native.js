@@ -14,6 +14,7 @@ import {
 	waitFor,
 	within,
 	withFakeTimers,
+	waitForElementToBeRemoved,
 } from 'test/helpers';
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -264,9 +265,9 @@ describe( 'Paragraph block', () => {
 		const typeURLInput = await waitFor( () =>
 			screen.getByPlaceholderText( 'Search or type URL' )
 		);
-		// Wait for side effects produced by link suggestions
-		await act( () =>
-			fireEvent.changeText( typeURLInput, 'wordpress.org' )
+		fireEvent.changeText( typeURLInput, 'wordpress.org' );
+		await waitForElementToBeRemoved( () =>
+			screen.getByTestId( 'link-picker-loading' )
 		);
 		// Back navigation from link picker uses `setTimeout`
 		await withFakeTimers( () => {
@@ -307,9 +308,9 @@ describe( 'Paragraph block', () => {
 		const typeURLInput = await waitFor( () =>
 			screen.getByPlaceholderText( 'Search or type URL' )
 		);
-		// Wait for side effects produced by link suggestions
-		await act( () =>
-			fireEvent.changeText( typeURLInput, 'wordpress.org' )
+		fireEvent.changeText( typeURLInput, 'wordpress.org' );
+		await waitForElementToBeRemoved( () =>
+			screen.getByTestId( 'link-picker-loading' )
 		);
 		// Back navigation from link picker uses `setTimeout`
 		await withFakeTimers( () => {
