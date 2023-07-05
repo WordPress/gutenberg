@@ -66,6 +66,7 @@ export default function HeaderEditMode() {
 		homeUrl,
 		showIconLabels,
 		editorCanvasView,
+		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -82,6 +83,8 @@ export default function HeaderEditMode() {
 		const {
 			getUnstableBase, // Site index.
 		} = select( coreStore );
+
+		const { get: getPreference } = select( preferencesStore );
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
@@ -105,11 +108,12 @@ export default function HeaderEditMode() {
 				'core/edit-site',
 				'distractionFree'
 			),
+			hasFixedToolbar: getPreference(
+				editSiteStore.name,
+				'fixedToolbar'
+			),
 		};
 	}, [] );
-
-	const { get: getPreference } = useSelect( preferencesStore );
-	const hasFixedToolbar = getPreference( editSiteStore.name, 'fixedToolbar' );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
