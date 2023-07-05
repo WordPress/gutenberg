@@ -109,7 +109,7 @@ test.describe( 'Block Switcher', () => {
 				'core/group',
 				'core/heading',
 				'core/columns',
-			].forEach( ( block ) => wp.blocks.unregisterBlockType( block ) );
+			].forEach( ( block ) => window.wp.blocks.unregisterBlockType( block ) );
 		} );
 
 		await page.keyboard.press( 'ArrowUp' );
