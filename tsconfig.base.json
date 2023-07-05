@@ -21,7 +21,7 @@
 		"noUnusedParameters": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
-		"importsNotUsedAsValues": "error",
+		"verbatimModuleSyntax": true,
 
 		/* Module Resolution Options */
 		"moduleResolution": "node",
