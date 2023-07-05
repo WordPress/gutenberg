@@ -235,13 +235,7 @@ export default function createReduxStore( key, options ) {
 					selector.registry = registry;
 				}
 				const boundSelector = ( ...args ) => {
-					if (
-						selector.normalizeArgs &&
-						typeof selector.normalizeArgs === 'function' &&
-						args?.length
-					) {
-						args = selector.normalizeArgs( args );
-					}
+					args = normalize( selector, args );
 					const state = store.__unstableOriginalGetState();
 					return selector( state.root, ...args );
 				};
@@ -617,16 +611,29 @@ function mapSelectorWithResolver(
 	}
 
 	const selectorResolver = ( ...args ) => {
-		if (
-			selector.normalizeArgs &&
-			typeof selector.normalizeArgs === 'function' &&
-			args?.length
-		) {
-			args = selector.normalizeArgs( args );
-		}
+		args = normalize( selector, args );
+
 		fulfillSelector( args );
 		return selector( ...args );
 	};
 	selectorResolver.hasResolver = true;
 	return selectorResolver;
+}
+
+/**
+ * Applies selector's normalization function to the given arguments
+ * if it exists.
+ *
+ * @param {Object} selector The selector potentially with a normalization method property.
+ * @param {Array}  args     selector arguments to normalize.
+ * @return {Array} Potentially normalized arguments.
+ */
+function normalize( selector, args ) {
+	if (
+		selector.normalizeArgs &&
+		typeof selector.normalizeArgs === 'function'
+	) {
+		return selector.normalizeArgs( args );
+	}
+	return args;
 }
