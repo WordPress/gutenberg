@@ -14,12 +14,10 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	getTypographyClassesAndStyles as useTypographyProps,
-	store as blockEditorStore,
 	__experimentalGetElementClassName,
 	useSetting,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
@@ -67,7 +65,6 @@ export default function SearchEdit( {
 	setAttributes,
 	toggleSelection,
 	isSelected,
-	clientId,
 } ) {
 	const {
 		label,
@@ -84,29 +81,6 @@ export default function SearchEdit( {
 		style,
 	} = attributes;
 
-	const insertedInNavigationBlock = useSelect(
-		( select ) => {
-			const { getBlockParentsByBlockName, wasBlockJustInserted } =
-				select( blockEditorStore );
-			return (
-				!! getBlockParentsByBlockName( clientId, 'core/navigation' )
-					?.length && wasBlockJustInserted( clientId )
-			);
-		},
-		[ clientId ]
-	);
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-	useEffect( () => {
-		if ( ! insertedInNavigationBlock ) return;
-		// This side-effect should not create an undo level.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			showLabel: false,
-			buttonUseIcon: true,
-			buttonPosition: 'button-inside',
-		} );
-	}, [ insertedInNavigationBlock ] );
 	const borderRadius = style?.border?.radius;
 	const borderProps = useBorderProps( attributes );
 
@@ -141,25 +115,6 @@ export default function SearchEdit( {
 		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
 	} );
-
-	useEffect( () => {
-		if ( hasOnlyButton && ! isSelected ) {
-			setAttributes( {
-				isSearchFieldHidden: true,
-			} );
-		}
-	}, [ hasOnlyButton, isSelected, setAttributes ] );
-
-	// Show the search field when width changes.
-	useEffect( () => {
-		if ( ! hasOnlyButton || ! isSelected ) {
-			return;
-		}
-
-		setAttributes( {
-			isSearchFieldHidden: false,
-		} );
-	}, [ hasOnlyButton, isSelected, setAttributes, width ] );
 
 	const getBlockClassNames = () => {
 		return classnames(
