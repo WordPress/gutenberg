@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] Rename "Reusable blocks" to "Synced patterns", aligning with the web editor. [#51704]
+-   [**] Fix a crash related to Reanimated when closing the editor [#52320]
 
 ## 1.98.1
 -   [*] fix: Display heading level dropdown icons and labels [#52004]
