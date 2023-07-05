@@ -15,7 +15,12 @@ import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
 
 export default function useInitEditedEntityFromURL() {
-	const { params: { postId, postType } = {} } = useLocation();
+	const { params } = useLocation();
+
+	const { postType } = params;
+
+	let postId = params?.postId;
+
 	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
 		const { getSite, getUnstableBase } = select( coreDataStore );
 		const siteData = getSite();
@@ -39,6 +44,15 @@ export default function useInitEditedEntityFromURL() {
 		setNavigationMenu,
 	} = useDispatch( editSiteStore );
 
+	const postTypesThatUseStringBasedIds = [
+		'wp_template',
+		'wp_template_part',
+	];
+
+	postId = ! postTypesThatUseStringBasedIds?.includes( postType )
+		? Number( postId )
+		: postId;
+
 	useEffect( () => {
 		if ( postType && postId ) {
 			switch ( postType ) {
@@ -49,10 +63,10 @@ export default function useInitEditedEntityFromURL() {
 					setTemplatePart( postId );
 					break;
 				case 'wp_navigation':
-					setNavigationMenu( Number( postId ) );
+					setNavigationMenu( postId );
 					break;
 				case 'wp_block':
-					setEditedEntity( postType, Number( postId ) );
+					setEditedEntity( postType, postId );
 					break;
 				default:
 					setPage( {
