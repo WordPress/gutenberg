@@ -12,14 +12,56 @@
 	@include break-medium {
 		margin: 0;
 	}
+
+	.edit-site-patterns__search-block {
+		min-width: fit-content;
+		flex-grow: 1;
+	}
+
+	// The increased specificity here is to overcome component styles
+	// without relying on internal component class names.
+	.edit-site-patterns__search {
+		&#{&} input[type="search"] {
+			background: $gray-800;
+			color: $gray-200;
+
+			&:focus {
+				background: $gray-800;
+			}
+		}
+
+		svg {
+			fill: $gray-600;
+		}
+	}
+
+	.edit-site-patterns__sync-status-filter {
+		background: #000;
+		border: none;
+		height: 48px;
+		border-radius: 6px;
+		min-width: max-content;
+		width: 100vw;
+		max-width: 100%;
+
+		@include break-medium {
+			width: 300px;
+		}
+
+		// Override the default component style.
+		& [role="presentation"] {
+			border-radius: 6px;
+		}
+
+		.edit-site-patterns__sync-status-filter-option {
+			border-radius: 6px;
+		}
+	}
 }
 
 .edit-site-patterns__grid {
-	column-gap: $grid-unit-30;
-	@include break-large() {
-		column-count: 2;
-	}
-
+	display: flex;
+	gap: $grid-unit-30;
 	// Small top padding required to avoid cutting off the visible outline
 	// when hovering items.
 	padding-top: $border-width-focus-fallback;
@@ -70,23 +112,6 @@
 	.edit-site-patterns__preview {
 		flex: 1;
 		margin-bottom: $grid-unit-20;
-	}
-}
-
-// The increased specificity here is to overcome component styles
-// without relying on internal component class names.
-.edit-site-patterns__search {
-	&#{&} input[type="search"] {
-		background: $gray-800;
-		color: $gray-200;
-
-		&:focus {
-			background: $gray-800;
-		}
-	}
-
-	svg {
-		fill: $gray-600;
 	}
 }
 

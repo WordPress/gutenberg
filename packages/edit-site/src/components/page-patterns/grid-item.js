@@ -25,6 +25,7 @@ import {
 	header,
 	footer,
 	symbolFilled as uncategorized,
+	symbol,
 	moreHorizontal,
 	lockSmall,
 } from '@wordpress/icons';
@@ -37,13 +38,13 @@ import { DELETE, BACKSPACE } from '@wordpress/keycodes';
  */
 import RenameMenuItem from './rename-menu-item';
 import DuplicateMenuItem from './duplicate-menu-item';
-import { PATTERNS, TEMPLATE_PARTS, USER_PATTERNS } from './utils';
+import { PATTERNS, TEMPLATE_PARTS, USER_PATTERNS, SYNC_TYPES } from './utils';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 
 const templatePartIcons = { header, footer, uncategorized };
 
-export default function GridItem( { categoryId, composite, icon, item } ) {
+export default function GridItem( { categoryId, composite, item } ) {
 	const descriptionId = useId();
 	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
 
@@ -122,9 +123,10 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		ariaDescriptions.push( __( 'Theme patterns cannot be edited.' ) );
 	}
 
-	const itemIcon = templatePartIcons[ categoryId ]
-		? templatePartIcons[ categoryId ]
-		: icon;
+	const itemIcon =
+		item.syncStatus === SYNC_TYPES.full
+			? symbol
+			: templatePartIcons[ categoryId ];
 
 	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
 	const confirmPrompt = hasThemeFile
@@ -180,7 +182,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 						spacing={ 3 }
 						className="edit-site-patterns__pattern-title"
 					>
-						{ icon && (
+						{ itemIcon && (
 							<Icon
 								className="edit-site-patterns__pattern-icon"
 								icon={ itemIcon }

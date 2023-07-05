@@ -120,3 +120,50 @@ function gutenberg_wp_block_register_post_meta() {
 	);
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
+
+/**
+ * Allow querying blocks by sync_status.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 6.3.
+ *
+ * @param array           $args    Array of arguments for WP_Query.
+ * @param WP_REST_Request $request The REST API request.
+ *
+ * @return array Updated array of arguments for WP_Query.
+ */
+function gutenberg_rest_wp_block_query( $args, $request ) {
+	if ( isset( $request['sync_status'] ) ) {
+		if ( 'fully' === $request['sync_status'] ) {
+			$sync_status_query = array(
+				'relation' => 'OR',
+				array(
+					'key'     => 'sync_status',
+					'value'   => '',
+					'compare' => 'NOT EXISTS',
+				),
+				array(
+					'key'     => 'sync_status',
+					'value'   => 'fully',
+					'compare' => '=',
+				),
+			);
+		} else {
+			$sync_status_query = array(
+				array(
+					'key'     => 'sync_status',
+					'value'   => sanitize_text_field( $request['sync_status'] ),
+					'compare' => '=',
+				),
+			);
+		}
+
+		if ( isset( $args['meta_query'] ) && is_array( $args['meta_query'] ) ) {
+			array_push( $args['meta_query'], $sync_status_query );
+		} else {
+			$args['meta_query'] = $sync_status_query;
+		}
+	}
+
+	return $args;
+}
+add_filter( 'rest_wp_block_query', 'gutenberg_rest_wp_block_query', 10, 2 );

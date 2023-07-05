@@ -46,7 +46,7 @@ const templatePartHasCategory = ( item, category ) =>
 const useTemplatePartsAsPatterns = (
 	categoryId,
 	postType = TEMPLATE_PARTS,
-	filterValue = ''
+	{ filterValue = '' } = {}
 ) => {
 	const { templateParts, isResolving } = useSelect(
 		( select ) => {
@@ -59,7 +59,10 @@ const useTemplatePartsAsPatterns = (
 
 			const { getEntityRecords, isResolving: _isResolving } =
 				select( coreStore );
-			const query = { per_page: -1 };
+			const query = {
+				per_page: 5,
+				area: categoryId,
+			};
 			const rawTemplateParts = getEntityRecords(
 				'postType',
 				postType,
@@ -78,7 +81,7 @@ const useTemplatePartsAsPatterns = (
 				] ),
 			};
 		},
-		[ postType ]
+		[ postType, categoryId ]
 	);
 
 	const filteredTemplateParts = useMemo( () => {
@@ -98,7 +101,7 @@ const useTemplatePartsAsPatterns = (
 const useThemePatterns = (
 	categoryId,
 	postType = PATTERNS,
-	filterValue = ''
+	{ filterValue = '' } = {}
 ) => {
 	const blockPatterns = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -159,10 +162,10 @@ const reusableBlockToPattern = ( reusableBlock ) => ( {
 const useUserPatterns = (
 	categoryId,
 	categoryType = PATTERNS,
-	filterValue = ''
+	{ filterValue = '', syncFilter } = {}
 ) => {
 	const postType = categoryType === PATTERNS ? USER_PATTERNS : categoryType;
-	const unfilteredPatterns = useSelect(
+	const { patterns, isResolving } = useSelect(
 		( select ) => {
 			if (
 				postType !== USER_PATTERNS ||
@@ -171,73 +174,69 @@ const useUserPatterns = (
 				return EMPTY_PATTERN_LIST;
 			}
 
-			const { getEntityRecords } = select( coreStore );
-			const records = getEntityRecords( 'postType', postType, {
+			const { getEntityRecords, isResolving: _isResolving } =
+				select( coreStore );
+
+			const query = {
 				per_page: -1,
-			} );
+				sync_status: syncFilter,
+				search: filterValue || undefined,
+			};
+			const records = getEntityRecords( 'postType', postType, query );
 
-			if ( ! records ) {
-				return EMPTY_PATTERN_LIST;
-			}
-
-			return records.map( ( record ) =>
-				reusableBlockToPattern( record )
-			);
+			return {
+				patterns: records
+					? records.map( ( record ) =>
+							reusableBlockToPattern( record )
+					  )
+					: EMPTY_PATTERN_LIST,
+				isResolving: _isResolving( 'getEntityRecords', [
+					'postType',
+					postType,
+					query,
+				] ),
+			};
 		},
-		[ postType, categoryId ]
+		[ postType, categoryId, syncFilter, filterValue ]
 	);
 
-	const filteredPatterns = useMemo( () => {
-		if ( ! unfilteredPatterns.length ) {
-			return EMPTY_PATTERN_LIST;
-		}
+	// const filteredPatterns = useMemo( () => {
+	// 	if ( ! unfilteredPatterns.length ) {
+	// 		return EMPTY_PATTERN_LIST;
+	// 	}
 
-		return searchItems( unfilteredPatterns, filterValue, {
-			// We exit user pattern retrieval early if we aren't in the
-			// catch-all category for user created patterns, so it has
-			// to be in the category.
-			hasCategory: () => true,
-		} );
-	}, [ unfilteredPatterns, filterValue ] );
+	// 	return searchItems( unfilteredPatterns, filterValue, {
+	// 		// We exit user pattern retrieval early if we aren't in the
+	// 		// catch-all category for user created patterns, so it has
+	// 		// to be in the category.
+	// 		hasCategory: () => true,
+	// 	} );
+	// }, [ unfilteredPatterns, filterValue ] );
 
-	const patterns = { syncedPatterns: [], unsyncedPatterns: [] };
-
-	filteredPatterns.forEach( ( pattern ) => {
-		if ( pattern.syncStatus === SYNC_TYPES.full ) {
-			patterns.syncedPatterns.push( pattern );
-		} else {
-			patterns.unsyncedPatterns.push( pattern );
-		}
-	} );
-
-	return patterns;
+	return { patterns, isResolving };
 };
 
-export const usePatterns = ( categoryType, categoryId, filterValue ) => {
-	const blockPatterns = useThemePatterns(
-		categoryId,
-		categoryType,
-		filterValue
-	);
+export const usePatterns = (
+	categoryType,
+	categoryId,
+	{ filterValue = '', syncFilter }
+) => {
+	const blockPatterns = useThemePatterns( categoryId, categoryType, {
+		filterValue,
+	} );
 
-	const { syncedPatterns = [], unsyncedPatterns = [] } = useUserPatterns(
-		categoryId,
-		categoryType,
-		filterValue
-	);
+	const { patterns: userPatterns, isResolving: isResolvingUserPatterns } =
+		useUserPatterns( categoryId, categoryType, {
+			filterValue,
+			syncFilter,
+		} );
 
-	const { templateParts, isResolving } = useTemplatePartsAsPatterns(
-		categoryId,
-		categoryType,
-		filterValue
-	);
+	const { templateParts, isResolving: isResolvingTemplateParts } =
+		useTemplatePartsAsPatterns( categoryId, categoryType, { filterValue } );
 
-	const patterns = {
-		syncedPatterns: [ ...templateParts, ...syncedPatterns ],
-		unsyncedPatterns: [ ...blockPatterns, ...unsyncedPatterns ],
-	};
+	const patterns = [ ...templateParts, ...userPatterns, ...blockPatterns ];
 
-	return [ patterns, isResolving ];
+	return [ patterns, isResolvingUserPatterns && isResolvingTemplateParts ];
 };
 
 export default usePatterns;
