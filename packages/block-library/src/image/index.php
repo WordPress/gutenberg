@@ -31,11 +31,32 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$processor->set_attribute( 'data-id', $attributes['data-id'] );
 	}
 
-	$should_load_view_script = ( array_key_exists( 'behaviors', $attributes ) &&
-		array_key_exists( 'lightbox', $attributes['behaviors'] ) &&
-		array_key_exists( 'enabled', $attributes['behaviors']['lightbox'] ) &&
-		true === $attributes['behaviors']['lightbox']['enabled'] );
-	$view_js_file            = 'wp-block-image-view';
+	$should_load_view_script = false;
+	$experiments             = get_option( 'gutenberg-experiments' );
+	$link_destination        = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
+	// Get the lightbox setting from the block attributes.
+	if ( isset( $attributes['behaviors']['lightbox'] ) ) {
+		$lightbox_settings = $attributes['behaviors']['lightbox'];
+		// If the lightbox setting is not set in the block attributes, get it from the theme.json file.
+	} else {
+		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
+		if ( isset( $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'] ) ) {
+			$lightbox_settings = $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
+		} else {
+			$lightbox_settings = null;
+		}
+	}
+
+	// If the lightbox is enabled, the image is not linked, and the Interactivity API is enabled, load the view script.
+	if ( isset( $lightbox_settings['enabled'] ) &&
+		true === $lightbox_settings['enabled'] &&
+		'none' === $link_destination &&
+		! empty( $experiments['gutenberg-interactivity-api-core-blocks'] )
+	) {
+		$should_load_view_script = true;
+	}
+
+	$view_js_file = 'wp-block-image-view';
 	if ( ! wp_script_is( $view_js_file ) ) {
 		$script_handles = $block->block_type->view_script_handles;
 
@@ -52,9 +73,9 @@ function render_block_core_image( $attributes, $content, $block ) {
 	return $processor->get_updated_html();
 }
 
-/**
- * Registers the `core/image` block on server.
- */
+	/**
+	 * Registers the `core/image` block on server.
+	 */
 function register_block_core_image() {
 	register_block_type_from_metadata(
 		__DIR__ . '/image',
@@ -63,4 +84,4 @@ function register_block_core_image() {
 		)
 	);
 }
-add_action( 'init', 'register_block_core_image' );
+	add_action( 'init', 'register_block_core_image' );
