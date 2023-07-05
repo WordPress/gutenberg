@@ -127,13 +127,16 @@
 	left: 0;
 	bottom: 0;
 	width: 100%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
 
-	&:has(.edit-site-layout__resizable-frame-oversized) {
-		justify-content: flex-end;
-	}
+
+	overflow: hidden;
+	//display: flex;
+	//justify-content: center;
+	//align-items: center;
+	//
+	//&:has(.edit-site-layout__resizable-frame-oversized) {
+	//	justify-content: flex-end;
+	//}
 
 	& > div {
 		color: $gray-900;
