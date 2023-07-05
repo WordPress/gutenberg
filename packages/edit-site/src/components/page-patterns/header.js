@@ -21,7 +21,12 @@ import {
 	PATTERNS,
 } from './utils';
 
-export default function PatternsHeader( { categoryId, type } ) {
+export default function PatternsHeader( {
+	categoryId,
+	type,
+	titleId,
+	descriptionId,
+} ) {
 	const { patternCategories } = usePatternCategories();
 	const templatePartAreas = useSelect(
 		( select ) =>
@@ -51,11 +56,11 @@ export default function PatternsHeader( { categoryId, type } ) {
 
 	return (
 		<VStack className="edit-site-patterns__section-header">
-			<Heading as="h2" level={ 4 }>
+			<Heading as="h2" level={ 4 } id={ titleId }>
 				{ title }
 			</Heading>
 			{ description ? (
-				<Text variant="muted" as="p">
+				<Text variant="muted" as="p" id={ descriptionId }>
 					{ description }
 				</Text>
 			) : null }

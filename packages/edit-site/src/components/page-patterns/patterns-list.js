@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useDeferredValue } from '@wordpress/element';
+import { useState, useDeferredValue, useId } from '@wordpress/element';
 import {
 	SearchControl,
 	__experimentalVStack as VStack,
@@ -51,11 +51,20 @@ export default function PatternsList( { categoryId, type } ) {
 			deferredSyncedFilter === 'all' ? undefined : deferredSyncedFilter,
 	} );
 
+	const id = useId();
+	const titleId = `${ id }-title`;
+	const descriptionId = `${ id }-description`;
+
 	const hasPatterns = patterns.length;
 
 	return (
 		<VStack spacing={ 6 }>
-			<PatternsHeader categoryId={ categoryId } type={ type } />
+			<PatternsHeader
+				categoryId={ categoryId }
+				type={ type }
+				titleId={ titleId }
+				descriptionId={ descriptionId }
+			/>
 
 			<Flex alignment="stretch" wrap>
 				{ isMobileViewport && (
@@ -87,7 +96,7 @@ export default function PatternsList( { categoryId, type } ) {
 					<ToggleGroupControl
 						className="edit-site-patterns__sync-status-filter"
 						hideLabelFromVision
-						label={ __( 'Sync status filter' ) }
+						label={ __( 'Filter by sync status' ) }
 						value={ syncFilter }
 						isBlock
 						onChange={ ( value ) => setSyncFilter( value ) }
@@ -109,7 +118,12 @@ export default function PatternsList( { categoryId, type } ) {
 
 			{ isResolving && __( 'Loading' ) }
 			{ ! isResolving && hasPatterns && (
-				<Grid categoryId={ categoryId } items={ patterns } />
+				<Grid
+					categoryId={ categoryId }
+					items={ patterns }
+					aria-labelledby={ titleId }
+					aria-describedby={ descriptionId }
+				/>
 			) }
 			{ ! isResolving && ! hasPatterns && <NoPatterns /> }
 		</VStack>

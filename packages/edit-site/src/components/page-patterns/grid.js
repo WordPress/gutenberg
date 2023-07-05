@@ -16,7 +16,7 @@ import GridItem from './grid-item';
 
 const PAGE_SIZE = 100;
 
-export default function Grid( { categoryId, items } ) {
+export default function Grid( { categoryId, items, ...props } ) {
 	const composite = useCompositeState( { orientation: 'vertical' } );
 	const [ page, setPage ] = useState( 1 );
 	const [ nextFocusIndex, setNextFocusIndex ] = useState( -1 );
@@ -45,6 +45,7 @@ export default function Grid( { categoryId, items } ) {
 				{ ...composite }
 				role="listbox"
 				className="edit-site-patterns__grid"
+				{ ...props }
 				ref={ gridRef }
 			>
 				{ list.map( ( item ) => (
