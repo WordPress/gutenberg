@@ -187,7 +187,9 @@ describe( 'when nothing is selected', () => {
 		const { getByText, getByTestId } = screen;
 
 		// Check that the gallery button is visible within the toolbar
-		const galleryButton = await screen.getAllByLabelText( /Gallery/ )[ 0 ];
+		const galleryButton = await screen.queryByTestId(
+			'insert-gallery-button'
+		);
 		expect( galleryButton ).toBeVisible();
 
 		// Press the toolbar Gallery button
