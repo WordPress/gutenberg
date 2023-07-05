@@ -16,7 +16,11 @@ import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export default function DuplicateMenuItem( { item, onClose } ) {
+export default function DuplicateMenuItem( {
+	item,
+	label = __( 'Duplicate' ),
+	onClose,
+} ) {
 	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
@@ -53,7 +57,7 @@ export default function DuplicateMenuItem( { item, onClose } ) {
 	return (
 		<>
 			<MenuItem onClick={ () => setIsModalOpen( true ) }>
-				{ __( 'Duplicate' ) }
+				{ label }
 			</MenuItem>
 			{ isModalOpen && item.type !== TEMPLATE_PARTS && (
 				<CreatePatternModal

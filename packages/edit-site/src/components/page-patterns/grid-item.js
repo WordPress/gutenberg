@@ -215,6 +215,11 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 								<DuplicateMenuItem
 									item={ item }
 									onClose={ onClose }
+									label={
+										isNonUserPattern
+											? __( 'Copy to My patterns' )
+											: __( 'Duplicate' )
+									}
 								/>
 								{ isCustomPattern && (
 									<MenuItem
