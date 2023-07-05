@@ -56,10 +56,35 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		PRELOADED_NAVIGATION_MENUS_QUERY
 	);
 
-	const isLoading =
+	const {
+		getNavigationFallbackId,
+		hasResolvedNavigationFallbackId,
+		isResolvingNavigationFallbackId,
+	} = useSelect( ( select ) => {
+		const {
+			getNavigationFallbackId: getNavigationFallbackIdSelector,
+			hasFinishedResolution,
+			isResolving,
+		} = unlock( select( coreStore ) );
+
+		return {
+			getNavigationFallbackId: getNavigationFallbackIdSelector,
+			isResolvingNavigationFallbackId: isResolving(
+				'getNavigationFallbackId'
+			),
+			hasResolvedNavigationFallbackId: hasFinishedResolution(
+				'getNavigationFallbackId'
+			),
+		};
+	}, [] );
+
+	const isLoadingNavigationMenus =
 		isResolvingNavigationMenus && ! hasResolvedNavigationMenus;
 
-	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
+	const isLoadingFallback =
+		isResolvingNavigationFallbackId && ! hasResolvedNavigationFallbackId;
+
+	const isLoading = isLoadingNavigationMenus || isLoadingFallback;
 
 	const firstNavigationMenu = navigationMenus?.[ 0 ];
 
