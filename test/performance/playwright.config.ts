@@ -21,6 +21,7 @@ const config = defineConfig( {
 	workers: 1,
 	retries: 0,
 	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 600_000, // Defaults to 10 minutes.
+	reportSlowTests: null,
 	testDir: fileURLToPath( new URL( './specs', 'file:' + __filename ).href ),
 	outputDir: path.join( process.env.WP_ARTIFACTS_PATH, 'test-results' ),
 	snapshotPathTemplate:
