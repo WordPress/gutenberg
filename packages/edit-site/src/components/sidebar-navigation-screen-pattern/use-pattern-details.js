@@ -19,16 +19,10 @@ import {
 	SidebarNavigationScreenDetailsPanelLabel,
 	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
+import normalizePostIdForPostType from '../../utils/normalize-post-id-for-post-type';
 
 export default function usePatternDetails( postType, postId ) {
-	const postTypesThatUseStringBasedIds = [
-		'wp_template',
-		'wp_template_part',
-	];
-
-	postId = ! postTypesThatUseStringBasedIds?.includes( postType )
-		? Number( postId )
-		: postId;
+	postId = normalizePostIdForPostType( postId, postType );
 
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
 		postType,

@@ -11,6 +11,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import normalizePostIdForPostType from '../../utils/normalize-post-id-for-post-type';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -19,7 +20,7 @@ export default function useInitEditedEntityFromURL() {
 
 	const { postType } = params;
 
-	let postId = params?.postId;
+	const postId = normalizePostIdForPostType( params?.postId, postType );
 
 	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
 		const { getSite, getUnstableBase } = select( coreDataStore );
@@ -43,15 +44,6 @@ export default function useInitEditedEntityFromURL() {
 		setPage,
 		setNavigationMenu,
 	} = useDispatch( editSiteStore );
-
-	const postTypesThatUseStringBasedIds = [
-		'wp_template',
-		'wp_template_part',
-	];
-
-	postId = ! postTypesThatUseStringBasedIds?.includes( postType )
-		? Number( postId )
-		: postId;
 
 	useEffect( () => {
 		if ( postType && postId ) {

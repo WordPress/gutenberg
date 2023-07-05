@@ -16,12 +16,15 @@ import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-e
 import usePatternDetails from './use-pattern-details';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import normalizePostIdForPostType from '../../utils/normalize-post-id-for-post-type';
 
 export default function SidebarNavigationScreenPattern() {
-	const { params } = useNavigator();
 	const { categoryType } = getQueryArgs( window.location.href );
-	const { postType, postId } = params;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+
+	const { params } = useNavigator();
+	const { postType } = params;
+	const postId = normalizePostIdForPostType( params?.postId, postType );
 
 	useInitEditedEntityFromURL();
 

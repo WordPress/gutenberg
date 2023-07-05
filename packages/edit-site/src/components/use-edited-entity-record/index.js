@@ -10,6 +10,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import normalizePostIdForPostType from '../../utils/normalize-post-id-for-post-type';
 
 export default function useEditedEntityRecord( postType, postId ) {
 	const { record, title, description, isLoaded, icon } = useSelect(
@@ -21,18 +22,10 @@ export default function useEditedEntityRecord( postType, postId ) {
 			const { __experimentalGetTemplateInfo: getTemplateInfo } =
 				select( editorStore );
 			const usedPostType = postType ?? getEditedPostType();
-			const postTypesThatUseStringBasedIds = [
-				'wp_template',
-				'wp_template_part',
-			];
 
 			let usedPostId = postId ?? getEditedPostId();
 
-			usedPostId = ! postTypesThatUseStringBasedIds?.includes(
-				usedPostType
-			)
-				? Number( usedPostId )
-				: usedPostId;
+			usedPostId = normalizePostIdForPostType( usedPostId, usedPostType );
 
 			const _record = getEditedEntityRecord(
 				'postType',
