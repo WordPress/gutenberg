@@ -52,10 +52,10 @@
 		icon: 'cart',
 		category: 'text',
 
-		edit() {
-			return el( InnerBlocks, {
+		edit: function InnerBlocksNoLockingEdit() {
+			return el( 'div', useBlockProps(), el( InnerBlocks, {
 				template: TEMPLATE,
-			} );
+			} ) );
 		},
 
 		save,
@@ -67,11 +67,11 @@
 		icon: 'cart',
 		category: 'text',
 
-		edit() {
-			return el( InnerBlocks, {
+		edit: function InnerBlocksBlocksLockingAllEdit() {
+			return el( 'div', useBlockProps(), el( InnerBlocks, {
 				template: TEMPLATE,
 				templateLock: 'all',
-			} );
+			} ) );
 		},
 
 		save,
@@ -90,7 +90,7 @@
 			},
 		},
 
-		edit( props ) {
+		edit: function InnerBlocksUpdateLockedTemplateEdit( props ) {
 			const hasUpdatedTemplated = props.attributes.hasUpdatedTemplate;
 			return el( 'div', null, [
 				el(
@@ -102,12 +102,12 @@
 					},
 					'Update template'
 				),
-				el( InnerBlocks, {
+				el( 'div', useBlockProps(), el( InnerBlocks, {
 					template: hasUpdatedTemplated
 						? TEMPLATE_TWO_PARAGRAPHS
 						: TEMPLATE,
 					templateLock: 'all',
-				} ),
+				} ) ),
 			] );
 		},
 
@@ -120,11 +120,11 @@
 		icon: 'cart',
 		category: 'text',
 
-		edit() {
-			return el( InnerBlocks, {
+		edit: function InnerBlocksParagraphPlaceholderEdit() {
+			return el( 'div', useBlockProps(), el( InnerBlocks, {
 				template: TEMPLATE_PARAGRAPH_PLACEHOLDER,
 				templateInsertUpdatesSelection: true,
-			} );
+			} ) );
 		},
 
 		save,
@@ -170,27 +170,14 @@
 			],
 		},
 
-		edit() {
-			return el( InnerBlocks, {
+		edit: function InnerBlocksTransformerTargetEdit() {
+			return el( 'div', useBlockProps(), el( InnerBlocks, {
 				template: TEMPLATE,
-			} );
+			} ) );
 		},
 
 		save,
 	} );
-
-
-	function InnerBlocksAsyncTemplateEdit() {
-		const [ template, setTemplate ] = useState( [] );
-
-		setInterval( () => {
-			setTemplate( TEMPLATE_TWO_PARAGRAPHS );
-		}, 1000 );
-
-		return el('div', useBlockProps(), el( InnerBlocks, {
-			template,
-		} ) );
-	}
 
 	registerBlockType(
 		'test/test-inner-blocks-async-template',
@@ -200,7 +187,17 @@
 			icon: 'cart',
 			category: 'text',
 
-			edit: InnerBlocksAsyncTemplateEdit,
+			edit: function InnerBlocksAsyncTemplateEdit() {
+				const [ template, setTemplate ] = useState( [] );
+
+				setInterval( () => {
+					setTemplate( TEMPLATE_TWO_PARAGRAPHS );
+				}, 1000 );
+
+				return el('div', useBlockProps(), el( InnerBlocks, {
+					template,
+				} ) );
+			},
 
 			// Purposely do not save inner blocks so that it's possible to test template resolution.
 			save() {},
