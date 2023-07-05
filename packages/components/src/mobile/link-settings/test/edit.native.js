@@ -5,7 +5,6 @@
  */
 import Clipboard from '@react-native-clipboard/clipboard';
 import {
-	act,
 	fireEvent,
 	initializeEditor,
 	waitForElementToBeRemoved,
@@ -129,25 +128,18 @@ describe.each( [
 				fireEvent.press( block );
 				fireEvent.press( block );
 				fireEvent.press( subject.getByLabelText( 'Open Settings' ) );
-				// Wait for side effects produced by Clipboard
-				await act( () =>
-					fireEvent.press(
-						subject.getByLabelText(
-							`Link to, ${
-								type === 'core/image'
-									? 'None'
-									: 'Search or type URL'
-							}`
-						)
+				fireEvent.press(
+					subject.getByLabelText(
+						`Link to, ${
+							type === 'core/image'
+								? 'None'
+								: 'Search or type URL'
+						}`
 					)
 				);
 				if ( type === 'core/image' ) {
 					// Wait for side effects produced by Clipboard and link suggestions
-					await act( () =>
-						fireEvent.press(
-							subject.getByLabelText( /Custom URL/ )
-						)
-					);
+					fireEvent.press( subject.getByLabelText( /Custom URL/ ) );
 				}
 				await subject.findByLabelText( 'Apply' );
 
