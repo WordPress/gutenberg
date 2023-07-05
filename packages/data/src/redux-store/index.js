@@ -630,7 +630,8 @@ function mapSelectorWithResolver(
 function normalize( selector, args ) {
 	if (
 		selector.normalizeArgs &&
-		typeof selector.normalizeArgs === 'function'
+		typeof selector.normalizeArgs === 'function' &&
+		args?.length
 	) {
 		return selector.normalizeArgs( args );
 	}
