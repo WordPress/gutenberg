@@ -118,6 +118,11 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		? templatePartIcons[ categoryId ]
 		: icon;
 
+	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
+	const confirmPrompt = hasThemeFile
+		? __( 'Are you sure you want to clear these customizations?' )
+		: __( 'Are you sure you want to delete this pattern?' );
+
 	return (
 		<>
 			<div className={ patternClassNames }>
@@ -240,11 +245,11 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 			</div>
 			{ isDeleteDialogOpen && (
 				<ConfirmDialog
-					confirmButtonText={ __( 'Delete' ) }
+					confirmButtonText={ confirmButtonText }
 					onConfirm={ deleteItem }
 					onCancel={ () => setIsDeleteDialogOpen( false ) }
 				>
-					{ __( 'Are you sure you want to delete this pattern?' ) }
+					{ confirmPrompt }
 				</ConfirmDialog>
 			) }
 		</>
