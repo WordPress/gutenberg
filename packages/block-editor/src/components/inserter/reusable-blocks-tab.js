@@ -55,7 +55,9 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 export function ReusableBlocksTab( { rootClientId, onInsert, onHover } ) {
 	return (
 		<>
-			<ReusableBlocksRenameHint />
+			<div className="block-editor-inserter__hint">
+				<ReusableBlocksRenameHint />
+			</div>
 			<ReusableBlocksList
 				onHover={ onHover }
 				onInsert={ onInsert }

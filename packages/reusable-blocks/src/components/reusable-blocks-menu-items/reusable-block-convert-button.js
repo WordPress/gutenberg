@@ -151,8 +151,8 @@ export default function ReusableBlockConvertButton( {
 									onClose();
 								} }
 							>
-								<ReusableBlocksRenameHint />
 								<VStack spacing="5">
+									<ReusableBlocksRenameHint />
 									<TextControl
 										__nextHasNoMarginBottom
 										label={ __( 'Name' ) }

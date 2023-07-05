@@ -712,6 +712,10 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__hint {
+	margin: $grid-unit-20 $grid-unit-20 0;
+}
+
 .reusable-blocks-menu-items__rename-hint {
 	align-items: top;
 	background: $gray-100;
@@ -719,7 +723,6 @@ $block-inserter-tabs-height: 44px;
 	color: $gray-900;
 	display: flex;
 	flex-direction: row;
-	margin: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-20;
 	max-width: 380px;
 }
 
