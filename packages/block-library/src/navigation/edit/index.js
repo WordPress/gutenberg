@@ -489,22 +489,14 @@ function Navigation( {
 	const submenuAccessibilityNotice =
 		! showSubmenuIcon && ! openSubmenusOnClick
 			? __(
-					'The current menu options offer reduced accessibility for users and are not recommended. '
-			  ) +
-			  __(
-					'Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
+					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
 			  )
 			: '';
 
-	const isFirstRender = useRef( true );
+	const isFirstRender = useRef( true ); // Don't speak on first render.
 	useEffect( () => {
 		if ( ! isFirstRender.current && submenuAccessibilityNotice ) {
-			speak(
-				__(
-					'The current menu options offer reduced accessibility for users and are not recommended.'
-				),
-				'assertive'
-			);
+			speak( submenuAccessibilityNotice );
 		}
 		isFirstRender.current = false;
 	}, [ submenuAccessibilityNotice ] );
