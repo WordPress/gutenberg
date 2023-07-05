@@ -87,7 +87,6 @@ export default function PageTemplateParts() {
 	return (
 		<Page
 			title={ __( 'Template Parts' ) }
-			className="edit-site-page-template-parts"
 			actions={
 				canCreate && (
 					<AddNewTemplate
