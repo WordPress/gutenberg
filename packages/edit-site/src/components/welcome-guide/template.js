@@ -36,7 +36,7 @@ export default function WelcomeGuideTemplate() {
 		return null;
 	}
 
-	const heading = __( 'Editing your template' );
+	const heading = __( 'Editing a template' );
 
 	return (
 		<Guide
@@ -70,7 +70,7 @@ export default function WelcomeGuideTemplate() {
 							</h1>
 							<p className="edit-site-welcome-guide__text">
 								{ __(
-									'You’re now editing your page’s template. To switch back to editing your page you can click the back button in the toolbar.'
+									'Note that the same template can be used by multiple pages, so any changes made here may affect other pages on the site. To switch back to editing the page content click the ‘Back’ button in the toolbar.'
 								) }
 							</p>
 						</>
