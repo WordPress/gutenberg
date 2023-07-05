@@ -251,20 +251,8 @@ add_filter(
 		wp_print_fonts( true );
 		$styles = ob_get_clean();
 
-		// The fonts are wrapped in the STYLE tag, which has to be removed.
-		$styles = strip_tags( $styles );
-
-		// Add the font-face styles to the editor assets.
-		if ( empty( $settings['styles'] ) ) {
-			$settings['styles'] = array();
-		}
-
-		$settings['styles'][] = array(
-			'css'            => $styles,
-			'__unstableType' => 'theme',
-			'isGlobalStyles' => true,
-		);
-
+		// Add the font-face styles to iframed editor assets.
+		$settings['__unstableResolvedAssets']['styles'] .= $styles;
 		return $settings;
 	},
 	11
