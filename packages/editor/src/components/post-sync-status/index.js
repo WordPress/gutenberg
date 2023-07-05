@@ -11,17 +11,17 @@ import { PanelRow } from '@wordpress/components';
 import { store as editorStore } from '../../store';
 
 export default function PostSyncStatus() {
-	const { meta, postType } = useSelect( ( select ) => {
+	const { syncStatus, postType } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
 		return {
-			meta: getEditedPostAttribute( 'meta' ),
+			syncStatus: getEditedPostAttribute( 'wp_pattern_sync_status' ),
 			postType: getEditedPostAttribute( 'type' ),
 		};
 	}, [] );
 	if ( postType !== 'wp_block' ) {
 		return null;
 	}
-	const syncStatus = meta?.sync_status;
+
 	const isFullySynced = ! syncStatus;
 
 	return (
