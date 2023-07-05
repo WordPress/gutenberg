@@ -76,7 +76,9 @@ export default function PatternsList( { categoryId, type } ) {
 			{ ! isResolving && !! syncedPatterns.length && (
 				<>
 					<VStack className="edit-site-patterns__section-header">
-						<Heading level={ 4 }>{ __( 'Synced' ) }</Heading>
+						<Heading as="h2" level={ 4 }>
+							{ __( 'Synced' ) }
+						</Heading>
 						<Text variant="muted" as="p">
 							{ __(
 								'Patterns that are kept in sync across your site'
@@ -86,7 +88,7 @@ export default function PatternsList( { categoryId, type } ) {
 					<Grid
 						icon={ symbol }
 						categoryId={ categoryId }
-						label={ __( 'Synced patterns' ) }
+						label={ __( 'Synced' ) }
 						items={ syncedPatterns }
 					/>
 				</>
@@ -94,7 +96,9 @@ export default function PatternsList( { categoryId, type } ) {
 			{ ! isResolving && !! unsyncedPatterns.length && (
 				<>
 					<VStack className="edit-site-patterns__section-header">
-						<Heading level={ 4 }>{ __( 'Standard' ) }</Heading>
+						<Heading as="h2" level={ 4 }>
+							{ __( 'Standard' ) }
+						</Heading>
 						<Text variant="muted" as="p">
 							{ __(
 								'Patterns that can be changed freely without affecting your site'

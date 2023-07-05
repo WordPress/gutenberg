@@ -3,6 +3,24 @@
  *
  * @param {Object} state Global application state.
  *
+ * @example
+ * ```js
+ * import { store as customizeWidgetsStore } from '@wordpress/customize-widgets';
+ * import { __ } from '@wordpress/i18n';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *    const { isInserterOpened } = useSelect(
+ *        ( select ) => select( customizeWidgetsStore ),
+ *        []
+ *    );
+ *
+ *    return isInserterOpened()
+ *        ? __( 'Inserter is open' )
+ *        : __( 'Inserter is closed.' );
+ * };
+ * ```
+ *
  * @return {boolean} Whether the inserter is opened.
  */
 export function isInserterOpened( state ) {

@@ -12,7 +12,6 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__unstableCompositeItem as CompositeItem,
 	Tooltip,
@@ -122,7 +121,12 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					aria-label={ item.title }
 					aria-describedby={
 						ariaDescriptions.length
-							? ariaDescriptions.join( ' ' )
+							? ariaDescriptions
+									.map(
+										( _, index ) =>
+											`${ descriptionId }-${ index }`
+									)
+									.join( ' ' )
 							: undefined
 					}
 				>
@@ -155,12 +159,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 								icon={ itemIcon }
 							/>
 						) }
-						<Flex
-							as={ Heading }
-							level={ 5 }
-							gap={ 0 }
-							justify="left"
-						>
+						<Flex as="span" gap={ 0 } justify="left">
 							{ item.title }
 							{ item.type === PATTERNS && (
 								<Tooltip
