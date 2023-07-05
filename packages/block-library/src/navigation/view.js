@@ -121,6 +121,12 @@ wpStore( {
 				closeMenuOnClick( store ) {
 					closeMenu( store, 'click' );
 				},
+				openMenuOnFocus( store ) {
+					openMenu( store, 'focus' );
+				},
+				closeMenuOnFocus( store ) {
+					closeMenu( store, 'focus' );
+				},
 				toggleMenuOnClick: ( store ) => {
 					const { selectors } = store;
 					if ( selectors.core.navigation.menuOpenBy( store ).click ) {

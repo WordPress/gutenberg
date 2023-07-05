@@ -123,6 +123,17 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 				$w->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
 			};
 
+			// Add directives to the submenu.
+			if ( $w->next_tag(
+				array(
+					'tag_name'   => 'UL',
+					'class_name' => 'wp-block-navigation-submenu',
+				)
+			) ) {
+				$w->set_attribute( 'data-wp-on--focusin', 'actions.core.navigation.openMenuOnFocus' );
+				$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.closeMenuOnFocus' );
+			}
+
 			// Iterate through subitems if exist.
 			block_core_navigation_add_directives_to_submenu( $w, $block_attributes );
 		}
