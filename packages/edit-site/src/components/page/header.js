@@ -18,7 +18,7 @@ export default function Header( { title, subTitle, actions } ) {
 		<HStack as="header" alignment="left" className="edit-site-page-header">
 			<FlexBlock className="edit-site-page-header__page-title">
 				<Heading
-					as="h1"
+					as="h2"
 					level={ 4 }
 					className="edit-site-page-header__title"
 				>
