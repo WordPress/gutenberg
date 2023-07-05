@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { Platform, ScrollView, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { useCallback, useRef, useState } from '@wordpress/element';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { __ } from '@wordpress/i18n';
@@ -30,6 +30,14 @@ import { store as editorStore } from '@wordpress/editor';
 import styles from './style.scss';
 import { store as editPostStore } from '../../../store';
 
+const shadowStyle = {
+	shadowColor: styles[ 'header-toolbar__keyboard-hide-shadow' ].color,
+	shadowOffset: { width: 3, height: 2 },
+	shadowOpacity: 0.3,
+	shadowRadius: 6,
+	elevation: 5,
+};
+
 function HeaderToolbar( {
 	hasRedo,
 	hasUndo,
@@ -37,7 +45,6 @@ function HeaderToolbar( {
 	undo,
 	showInserter,
 	showKeyboardHideButton,
-	getStylesFromColorScheme,
 	onHideKeyboard,
 	isRTL,
 	noContentSelected,
@@ -102,15 +109,24 @@ function HeaderToolbar( {
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
+	const showKeyboardButtonStyles = [
+		usePreferredColorSchemeStyle(
+			styles[ 'header-toolbar__keyboard-hide-container' ],
+			styles[ 'header-toolbar__keyboard-hide-container--dark' ]
+		),
+		shadowStyle,
+	];
+
 	return (
 		<View
 			testID={ toolbarAriaLabel }
 			accessibilityLabel={ toolbarAriaLabel }
 			style={ [
-				getStylesFromColorScheme(
+				usePreferredColorSchemeStyle(
 					styles[ 'header-toolbar__container' ],
 					styles[ 'header-toolbar__container--dark' ]
 				),
+				{ borderTopWidth: StyleSheet.hairlineWidth },
 				useExpandedMode &&
 					styles[ 'header-toolbar__container--expanded' ],
 			] }
@@ -135,11 +151,7 @@ function HeaderToolbar( {
 				<BlockToolbar />
 			</ScrollView>
 			{ showKeyboardHideButton && (
-				<ToolbarGroup
-					passedStyle={
-						styles[ 'header-toolbar__keyboard-hide-container' ]
-					}
-				>
+				<ToolbarGroup passedStyle={ showKeyboardButtonStyles }>
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
 						icon={ keyboardClose }
@@ -194,5 +206,4 @@ export default compose( [
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withPreferredColorScheme,
 ] )( HeaderToolbar );

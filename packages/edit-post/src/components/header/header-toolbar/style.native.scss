@@ -3,8 +3,8 @@
 	height: $mobile-header-toolbar-height;
 	flex-direction: row;
 	background-color: $app-background;
-	border-top-color: #e9eff3;
-	border-top-width: 1px;
+	border-top-color: $toolbar-group-separator-light;
+	overflow: hidden;
 }
 
 .header-toolbar__container--dark {
@@ -27,4 +27,14 @@
 	width: 44px;
 	justify-content: center;
 	align-items: center;
+	border-color: transparent;
+	background-color: $app-background;
+}
+
+.header-toolbar__keyboard-hide-container--dark {
+	background-color: $app-background-dark-alt;
+}
+
+.header-toolbar__keyboard-hide-shadow {
+	color: $black;
 }

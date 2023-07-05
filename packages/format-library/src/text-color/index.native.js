@@ -14,7 +14,11 @@ import {
 	ToolbarButton,
 	useMobileGlobalStylesColors,
 } from '@wordpress/components';
-import { Icon, textColor as textColorIcon } from '@wordpress/icons';
+import {
+	Icon,
+	color as colorIcon,
+	textColor as textColorIcon,
+} from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -131,7 +135,11 @@ function TextColorEdit( {
 						isActive={ isActive }
 						icon={
 							<Icon
-								icon={ textColorIcon }
+								icon={
+									Object.keys( activeAttributes ).length
+										? textColorIcon
+										: colorIcon
+								}
 								style={
 									colorIndicatorStyle?.color && {
 										color: colorIndicatorStyle.color,
