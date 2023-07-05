@@ -45,7 +45,7 @@ export default function PageTemplateParts() {
 			header: __( 'Template Part' ),
 			cell: ( templatePart ) => (
 				<VStack>
-					<Heading level={ 5 }>
+					<Heading as="h3" level={ 5 }>
 						<Link
 							params={ {
 								postId: templatePart.id,
