@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { initializeEditor, getEditorHtml, fireEvent } from 'test/helpers';
-import { ActionSheetIOS } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -200,27 +199,10 @@ describe( 'when nothing is selected', () => {
 			screen.getAllByLabelText( /Gallery Block. Row 3/ )[ 0 ]
 		).toBeDefined();
 
-		// Observe that media options picker is displayed
-		/* eslint-disable jest/no-conditional-expect */
-		if ( Platform.isIOS ) {
-			// On iOS the picker is rendered natively, so we have
-			// to check the arguments passed to `ActionSheetIOS`.
-			expect(
-				ActionSheetIOS.showActionSheetWithOptions
-			).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					title: 'Choose images',
-					options: [ 'Cancel', ...MEDIA_OPTIONS ],
-				} ),
-				expect.any( Function )
-			);
-		} else {
-			expect( getByText( 'Choose images' ) ).toBeVisible();
-			MEDIA_OPTIONS.forEach( ( option ) =>
-				expect( getByText( option ) ).toBeVisible()
-			);
-		}
-		/* eslint-enable jest/no-conditional-expect */
+		expect( getByText( 'Choose images' ) ).toBeVisible();
+		MEDIA_OPTIONS.forEach( ( option ) =>
+			expect( getByText( option ) ).toBeVisible()
+		);
 
 		// Dismiss the picker
 		if ( Platform.isIOS ) {
