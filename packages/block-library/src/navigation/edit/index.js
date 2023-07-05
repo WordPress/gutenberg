@@ -496,14 +496,17 @@ function Navigation( {
 			  )
 			: '';
 
+	const isFirstRender = useRef( true );
 	useEffect( () => {
-		if ( submenuAccessibilityNotice )
+		if ( ! isFirstRender.current && submenuAccessibilityNotice ) {
 			speak(
 				__(
 					'The current menu options offer reduced accessibility for users and are not recommended.'
 				),
 				'assertive'
 			);
+		}
+		isFirstRender.current = false;
 	}, [ submenuAccessibilityNotice ] );
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
