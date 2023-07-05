@@ -22,12 +22,22 @@
 		order: 1;
 		height: auto;
 		border: 0;
-		border-top: 1px solid $gray-200;
 		justify-content: end;
 		position: sticky;
 		bottom: 0;
-		padding: $grid-unit-20 0 $grid-unit-40;
+		padding: $grid-unit-30 0 $grid-unit-40;
 		z-index: z-index(".edit-site-save-panel__modal .entities-saved-states__panel-header");
+
+		&::before {
+			content: "";
+			display: block;
+			height: 1px;
+			background: $gray-200;
+			position: absolute;
+			top: 0;
+			left: - $grid-unit-40;
+			right: - $grid-unit-40;
+		}
 
 		.components-button {
 			flex: initial;
