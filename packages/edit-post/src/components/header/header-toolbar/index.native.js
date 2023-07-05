@@ -100,7 +100,7 @@ function HeaderToolbar( {
 	);
 
 	const renderMediaButtons = (
-		<>
+		<ToolbarGroup>
 			<ToolbarButton
 				key="imageButton"
 				title={ __( 'Image' ) }
@@ -141,7 +141,7 @@ function HeaderToolbar( {
 					hint: __( 'Insert Audio Block' ),
 				} }
 			/>
-		</>
+		</ToolbarGroup>
 	);
 
 	const onToggleInserter = useCallback(
