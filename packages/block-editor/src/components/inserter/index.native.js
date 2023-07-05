@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { AccessibilityInfo, Platform, Text } from 'react-native';
+import { AccessibilityInfo, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -38,18 +38,7 @@ const defaultRenderToggle = ( {
 	iconStyle,
 	buttonStyle,
 	onLongPress,
-	useExpandedMode,
 } ) => {
-	// The "expanded mode" refers to the editor's appearance when no blocks
-	// are currently selected. The "add block" button has an style object
-	// for the expanded mode to correct the margins and padding:
-	//   .inserter-menu__add-block-button--expanded
-	const expandedModeViewText = (
-		<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
-			{ __( 'Add blocks' ) }
-		</Text>
-	);
-
 	return (
 		<ToolbarButton
 			title={ _x(
@@ -68,9 +57,7 @@ const defaultRenderToggle = ( {
 			isDisabled={ disabled }
 			customContainerStyles={ buttonStyle }
 			fixedRatio={ false }
-		>
-			{ useExpandedMode && expandedModeViewText }
-		</ToolbarButton>
+		/>
 	);
 };
 
@@ -245,23 +232,15 @@ export class Inserter extends Component {
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
 			showSeparator,
-			useExpandedMode,
 		} = this.props;
 		if ( showSeparator && isOpen ) {
 			return <BlockInsertionPoint />;
 		}
 
-		const buttonColorScheme = getStylesFromColorScheme(
+		const buttonStyle = getStylesFromColorScheme(
 			styles[ 'inserter-menu__add-block-button' ],
 			styles[ 'inserter-menu__add-block-button--dark' ]
 		);
-
-		const buttonStyle = {
-			...buttonColorScheme,
-			...( useExpandedMode
-				? styles[ 'inserter-menu__add-block-button--expanded' ]
-				: {} ),
-		};
 
 		const iconStyle = getStylesFromColorScheme(
 			styles[ 'inserter-menu__add-block-button-icon' ],
@@ -306,7 +285,6 @@ export class Inserter extends Component {
 					iconStyle,
 					buttonStyle,
 					onLongPress,
-					useExpandedMode,
 				} ) }
 				<Picker
 					ref={ ( instance ) => ( this.picker = instance ) }

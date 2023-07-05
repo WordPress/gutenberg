@@ -43,7 +43,13 @@ function HeaderToolbar( {
 	noContentSelected,
 } ) {
 	const wasNoContentSelected = useRef( noContentSelected );
+	// eslint-disable-next-line no-unused-vars
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
+
+	const containerStyle = getStylesFromColorScheme(
+		styles[ 'header-toolbar__container' ],
+		styles[ 'header-toolbar__container--dark' ]
+	);
 
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
@@ -93,12 +99,6 @@ function HeaderToolbar( {
 		[ noContentSelected ]
 	);
 
-	// Expanded mode should be preserved while the inserter is open.
-	// This way we prevent style updates during the opening transition.
-	const useExpandedMode = isInserterOpen
-		? wasNoContentSelected.current
-		: noContentSelected;
-
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
@@ -106,14 +106,7 @@ function HeaderToolbar( {
 		<View
 			testID={ toolbarAriaLabel }
 			accessibilityLabel={ toolbarAriaLabel }
-			style={ [
-				getStylesFromColorScheme(
-					styles[ 'header-toolbar__container' ],
-					styles[ 'header-toolbar__container--dark' ]
-				),
-				useExpandedMode &&
-					styles[ 'header-toolbar__container--expanded' ],
-			] }
+			style={ containerStyle }
 		>
 			<ScrollView
 				ref={ scrollViewRef }
@@ -128,7 +121,6 @@ function HeaderToolbar( {
 			>
 				<Inserter
 					disabled={ ! showInserter }
-					useExpandedMode={ useExpandedMode }
 					onToggle={ onToggleInserter }
 				/>
 				{ renderHistoryButtons() }
