@@ -439,7 +439,7 @@ export const entities = ( state = {}, action ) => {
  *
  * @property {number} list   The undo stack.
  * @property {number} offset Where in the undo stack we are.
- * @property {Object} cache  Cache of unpersisted transient edits.
+ * @property {Object} cache  Cache of unpersisted edits.
  */
 
 /** @typedef {Array<Object> & UndoStateMeta} UndoState */
@@ -543,10 +543,6 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				return state;
 			}
 
-			const isCachedChange = Object.keys( action.edits ).every(
-				( key ) => action.transientEdits[ key ]
-			);
-
 			const edits = Object.keys( action.edits ).map( ( key ) => {
 				return {
 					kind: action.kind,
@@ -558,7 +554,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				};
 			} );
 
-			if ( isCachedChange ) {
+			if ( action.meta.undo.isCached ) {
 				return {
 					...state,
 					cache: edits.reduce( appendEditToStack, state.cache ),
