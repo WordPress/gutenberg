@@ -172,7 +172,7 @@ function UnconnectedNavigatorProvider(
 					skipFocus,
 				};
 
-				if ( prevLocationHistory.length < 1 ) {
+				if ( prevLocationHistory.length < 1 || isBack ) {
 					return [ newLocation ];
 				}
 
@@ -225,6 +225,7 @@ function UnconnectedNavigatorProvider(
 			},
 			params: matchedPath ? matchedPath.params : {},
 			match: matchedPath ? matchedPath.id : undefined,
+			hasBack: locationHistory.length > 1,
 			goTo,
 			goBack,
 			goToParent,

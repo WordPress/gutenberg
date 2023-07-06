@@ -109,6 +109,13 @@ export default function useSyncPathWithURL() {
 	}, [ navigatorLocation?.path, navigatorParams, history ] );
 
 	useEffect( () => {
+		if (
+			Object.entries( urlParams ).every( ( [ key, value ] ) => {
+				return currentUrlParams.current[ key ] === value;
+			} )
+		) {
+			return;
+		}
 		currentUrlParams.current = urlParams;
 		const path = getPathFromURL( urlParams );
 		if ( currentPath.current !== path ) {

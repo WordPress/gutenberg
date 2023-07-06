@@ -26,6 +26,7 @@ export type NavigatorLocation = NavigateOptions & {
 export type Navigator = {
 	location: NavigatorLocation;
 	params: MatchParams;
+	hasBack: boolean;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: () => void;
 	goToParent: () => void;

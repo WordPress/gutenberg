@@ -21,7 +21,6 @@ const config = {
 		description: __(
 			'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
 		),
-		backPath: '/patterns',
 	},
 };
 
@@ -33,7 +32,6 @@ export default function SidebarNavigationScreenTemplatesBrowse() {
 		<SidebarNavigationScreen
 			title={ config[ postType ].title }
 			description={ config[ postType ].description }
-			backPath={ config[ postType ].backPath }
 		/>
 	);
 }
