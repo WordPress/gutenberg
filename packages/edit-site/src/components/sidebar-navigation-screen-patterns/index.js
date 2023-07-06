@@ -33,7 +33,7 @@ const templatePartAreaLabels = {
 	header: __( 'Headers' ),
 	footer: __( 'Footers' ),
 	sidebar: __( 'Sidebar' ),
-	uncategorized: __( 'Uncategorized' ),
+	uncategorized: __( 'General' ),
 };
 
 export default function SidebarNavigationScreenPatterns() {
