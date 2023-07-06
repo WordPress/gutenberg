@@ -44,6 +44,14 @@ export async function visitSiteEditor(
 			window.wp.data
 				.dispatch( 'core/preferences' )
 				.set( 'core/edit-site', 'welcomeGuideStyles', false );
+
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'welcomeGuidePage', false );
+
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'welcomeGuideTemplate', false );
 		} );
 	}
 

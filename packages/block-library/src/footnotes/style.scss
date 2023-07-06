@@ -3,7 +3,7 @@
 	counter-reset: footnotes;
 }
 
-.fn {
+[data-fn].fn {
 	vertical-align: super;
 	font-size: smaller;
 	counter-increment: footnotes;
@@ -11,7 +11,7 @@
 	text-indent: -9999999px;
 }
 
-.fn::after {
+[data-fn].fn::after {
 	content: "[" counter(footnotes) "]";
 	text-indent: 0;
 	float: left;
