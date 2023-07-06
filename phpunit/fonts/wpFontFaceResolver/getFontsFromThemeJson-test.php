@@ -29,7 +29,7 @@ if ( ! class_exists( 'WP_Font_Face' ) ) {
  * @group fontface
  * @covers WP_Font_Face_Resolver::get_fonts_from_theme_json
  */
-class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_TestCase {
+class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Font_Face_TestCase {
 	const FONTS_THEME = 'fonts-block-theme';
 
 	public static function set_up_before_class() {
@@ -38,7 +38,7 @@ class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_Test
 		parent::set_up_before_class();
 	}
 
-	public function test_should_return_empty_array_when_no_fonts_defined() {
+	public function test_should_return_empty_array_when_no_fonts_defined_in_theme() {
 		switch_theme( 'block-theme' );
 
 		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
@@ -46,19 +46,12 @@ class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_Test
 		$this->assertEmpty( $fonts, 'Should return an empty array' );
 	}
 
-	/**
-	 * Tests all font families are registered and enqueued. "All" means all font families from
-	 * the theme's theme.json.
-	 */
-	public function test_should_return_all_defined_font_families() {
+	public function test_should_return_all_fonts_from_theme() {
 		switch_theme( static::FONTS_THEME );
 
-		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
-
-		$this->assertSameSetsWithIndex(
-			array( 'DM Sans', 'Source Serif Pro' ),
-			array_keys( $fonts )
-		);
+		$actual   = WP_Font_Face_Resolver::get_fonts_from_theme_json();
+		$expected = $this->get_expected_fonts_for_fonts_block_theme( 'fonts' );
+		$this->assertSame( $expected, $actual );
 	}
 
 	/**

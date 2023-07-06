@@ -198,4 +198,77 @@ CSS
 			),
 		);
 	}
+
+	public function get_expected_fonts_for_fonts_block_theme( $key = '' ) {
+		static $data = null;
+
+		if ( null === $data ) {
+			$uri  = get_stylesheet_directory_uri() . '/assets/fonts/';
+			$data = array(
+				'fonts'            => array(
+					'DM Sans'          => array(
+						array(
+							'src'          => array( $uri . 'dm-sans/DMSans-Regular.woff2' ),
+							'font-family'  => 'DM Sans',
+							'font-stretch' => 'normal',
+							'font-style'   => 'normal',
+							'font-weight'  => '400',
+						),
+						array(
+							'src'          => array( $uri . 'dm-sans/DMSans-Regular-Italic.woff2' ),
+							'font-family'  => 'DM Sans',
+							'font-stretch' => 'normal',
+							'font-style'   => 'italic',
+							'font-weight'  => '400',
+						),
+						array(
+							'src'          => array( $uri . 'dm-sans/DMSans-Bold.woff2' ),
+							'font-family'  => 'DM Sans',
+							'font-stretch' => 'normal',
+							'font-style'   => 'normal',
+							'font-weight'  => '700',
+						),
+						array(
+							'src'          => array( $uri . 'dm-sans/DMSans-Bold-Italic.woff2' ),
+							'font-family'  => 'DM Sans',
+							'font-stretch' => 'normal',
+							'font-style'   => 'italic',
+							'font-weight'  => '700',
+						),
+					),
+					'Source Serif Pro' => array(
+						array(
+							'src'          => array( $uri . 'source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
+							'font-family'  => 'Source Serif Pro',
+							'font-stretch' => 'normal',
+							'font-style'   => 'normal',
+							'font-weight'  => '200 900',
+						),
+						array(
+							'src'          => array( $uri . 'source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2' ),
+							'font-family'  => 'Source Serif Pro',
+							'font-stretch' => 'normal',
+							'font-style'   => 'italic',
+							'font-weight'  => '200 900',
+						),
+					),
+				),
+				'font_face_styles' => <<<CSS
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:400;font-display:fallback;src:url('{$uri}dm-sans/DMSans-Regular.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"DM Sans";font-style:italic;font-weight:400;font-display:fallback;src:url('{$uri}dm-sans/DMSans-Regular-Italic.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:700;font-display:fallback;src:url('{$uri}dm-sans/DMSans-Bold.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"DM Sans";font-style:italic;font-weight:700;font-display:fallback;src:url('{$uri}dm-sans/DMSans-Bold-Italic.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;src:url('{$uri}source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');font-stretch:normal;}
+@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-display:fallback;src:url('{$uri}source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');font-stretch:normal;}
+CSS
+				,
+			);
+		}
+
+		if ( isset( $data[ $key ] ) ) {
+			return $data[ $key ];
+		}
+
+		return $data;
+	}
 }
