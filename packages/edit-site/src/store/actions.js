@@ -141,11 +141,18 @@ export const removeTemplate =
 				throw lastError;
 			}
 
+			// Depending on how the entity was retrieved it's title might be
+			// an object or simple string.
+			const templateTitle =
+				typeof template.title === 'string'
+					? template.title
+					: template.title?.rendered;
+
 			registry.dispatch( noticesStore ).createSuccessNotice(
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" deleted.' ),
-					decodeEntities( template.title.rendered )
+					decodeEntities( templateTitle )
 				),
 				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
 			);
@@ -188,6 +195,22 @@ export function setNavigationMenu( navigationMenuId ) {
 		type: 'SET_EDITED_POST',
 		postType: 'wp_navigation',
 		id: navigationMenuId,
+	};
+}
+
+/**
+ * Action that sets an edited entity.
+ *
+ * @param {string} postType The entity's post type.
+ * @param {string} postId   The entity's ID.
+ *
+ * @return {Object} Action object.
+ */
+export function setEditedEntity( postType, postId ) {
+	return {
+		type: 'SET_EDITED_POST',
+		postType,
+		id: postId,
 	};
 }
 

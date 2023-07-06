@@ -11,6 +11,7 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
 	createSlotFill,
+	Button,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -142,33 +143,42 @@ function GlobalStylesRevisionsMenu() {
 
 	return (
 		<GlobalStylesMenuFill>
-			<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
-				{ ( { onClose } ) => (
-					<MenuGroup>
-						{ hasRevisions && (
+			{ canReset || hasRevisions ? (
+				<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							{ hasRevisions && (
+								<MenuItem
+									onClick={ loadRevisions }
+									icon={
+										<RevisionsCountBadge>
+											{ revisionsCount }
+										</RevisionsCountBadge>
+									}
+								>
+									{ __( 'Revision history' ) }
+								</MenuItem>
+							) }
 							<MenuItem
-								onClick={ loadRevisions }
-								icon={
-									<RevisionsCountBadge>
-										{ revisionsCount }
-									</RevisionsCountBadge>
-								}
+								onClick={ () => {
+									onReset();
+									onClose();
+								} }
+								disabled={ ! canReset }
 							>
-								{ __( 'Revision history' ) }
+								{ __( 'Reset to defaults' ) }
 							</MenuItem>
-						) }
-						<MenuItem
-							onClick={ () => {
-								onReset();
-								onClose();
-							} }
-							disabled={ ! canReset }
-						>
-							{ __( 'Reset to defaults' ) }
-						</MenuItem>
-					</MenuGroup>
-				) }
-			</DropdownMenu>
+						</MenuGroup>
+					) }
+				</DropdownMenu>
+			) : (
+				<Button
+					label={ __( 'Revisions' ) }
+					icon={ backup }
+					disabled
+					__experimentalIsFocusable
+				/>
+			) }
 		</GlobalStylesMenuFill>
 	);
 }
@@ -311,7 +321,10 @@ function GlobalStylesEditorCanvasContainerLink() {
 			// Switching to any container other than revisions should
 			// redirect from the revisions screen to the root global styles screen.
 			goTo( '/' );
+		} else if ( editorCanvasContainerView === 'global-styles-css' ) {
+			goTo( '/css' );
 		}
+
 		// location?.path is not a dependency because we don't want to track it.
 		// Doing so will cause an infinite loop. We could abstract logic to avoid
 		// having to disable the check later.

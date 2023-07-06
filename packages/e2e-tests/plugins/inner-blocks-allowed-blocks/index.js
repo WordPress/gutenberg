@@ -12,6 +12,7 @@
 	const allowedBlocksWhenMultipleChildren = [ 'core/gallery', 'core/video' ];
 
 	registerBlockType( 'test/allowed-blocks-dynamic', {
+		apiVersion: 3,
 		title: 'Allowed Blocks Dynamic',
 		icon: 'carrot',
 		category: 'text',

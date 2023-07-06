@@ -28,17 +28,6 @@ test.describe( 'Links', () => {
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
-		// Open settings.
-		await page.getByRole( 'button', { name: 'Link Settings' } ).click();
-
-		// Navigate to and toggle the "Open in new tab" checkbox.
-		const checkbox = page.getByLabel( 'Open in new tab' );
-		await checkbox.click();
-
-		// Toggle should still have focus and be checked.
-		await expect( checkbox ).toBeChecked();
-		await expect( checkbox ).toBeFocused();
-
 		// Ensure that the contents of the post have not been changed, since at
 		// this point the link is still not inserted.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -47,6 +36,32 @@ test.describe( 'Links', () => {
 				attributes: { content: 'This is Gutenberg' },
 			},
 		] );
+
+		await page.keyboard.press( 'Enter' );
+
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Edit link.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Open settings.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Navigate to and toggle the "Open in new tab" checkbox.
+		const checkbox = page.getByLabel( 'Open in new tab' );
+		await checkbox.click();
+
+		// Toggle should still have focus and be checked.
+		await expect( checkbox ).toBeChecked();
+		await expect( checkbox ).toBeFocused();
 
 		// Tab back to the Submit and apply the link.
 		await page
@@ -82,11 +97,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'w.org' );
 
-		await page
-			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
+		await page.keyboard.press( 'Enter' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -107,7 +118,11 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'wordpress.org' );
 
 		// Update the link.
-		await page.keyboard.press( 'Enter' );
+		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
 
 		// Navigate back to the popover.
 		await page.keyboard.press( 'ArrowLeft' );

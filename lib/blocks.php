@@ -24,6 +24,7 @@ function gutenberg_reregister_core_block_types() {
 				'comments',
 				'details',
 				'group',
+				'footnotes',
 				'html',
 				'list',
 				'list-item',
@@ -65,6 +66,7 @@ function gutenberg_reregister_core_block_types() {
 				'comments-pagination-previous.php' => 'core/comments-pagination-previous',
 				'comments-title.php'               => 'core/comments-title',
 				'comments.php'                     => 'core/comments',
+				'footnotes.php'                    => 'core/footnotes',
 				'file.php'                         => 'core/file',
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
@@ -370,3 +372,31 @@ function gutenberg_register_legacy_social_link_blocks() {
 }
 
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
+
+/**
+ * Migrate the legacy `sync_status` meta key (added 16.1) to the new `wp_pattern_sync_status` meta key (16.1.1).
+ *
+ * This filter is INTENTIONALLY left out of core as the meta key was fist introduced to core in 6.3 as `wp_pattern_sync_status`.
+ * see https://github.com/WordPress/gutenberg/pull/52232
+ *
+ * @param mixed  $value     The value to return, either a single metadata value or an array of values depending on the value of $single.
+ * @param int    $object_id ID of the object metadata is for.
+ * @param string $meta_key  Metadata key.
+ * @param bool   $single    Whether to return only the first value of the specified $meta_key.
+ */
+function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $single ) {
+	if ( 'wp_pattern_sync_status' !== $meta_key ) {
+		return $value;
+	}
+
+	$sync_status = get_post_meta( $object_id, 'sync_status', $single );
+
+	if ( $single && 'unsynced' === $sync_status ) {
+		return $sync_status;
+	} elseif ( isset( $sync_status[0] ) && 'unsynced' === $sync_status[0] ) {
+		return $sync_status;
+	}
+
+	return $value;
+}
+add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 4 );

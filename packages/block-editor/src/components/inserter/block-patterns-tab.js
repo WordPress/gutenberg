@@ -18,7 +18,6 @@ import {
 	Button,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
-import { parse } from '@wordpress/blocks';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -28,13 +27,13 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
-import useBlockTypesState from './hooks/use-block-types-state';
 
 const noop = () => {};
 
 // Preferred order of pattern categories. Any other categories should
 // be at the bottom without any re-ordering.
 const patternCategoriesOrder = [
+	'custom',
 	'featured',
 	'posts',
 	'text',
@@ -51,18 +50,6 @@ function usePatternsCategories( rootClientId ) {
 		rootClientId
 	);
 
-	const [ unsyncedPatterns ] = useBlockTypesState(
-		rootClientId,
-		undefined,
-		'unsynced'
-	);
-
-	const filteredUnsyncedPatterns = useMemo( () => {
-		return unsyncedPatterns.filter(
-			( { category: unsyncedPatternCategory } ) =>
-				unsyncedPatternCategory === 'reusable'
-		);
-	}, [ unsyncedPatterns ] );
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
 			if ( ! pattern.categories || ! pattern.categories.length ) {
@@ -107,20 +94,9 @@ function usePatternsCategories( rootClientId ) {
 				label: _x( 'Uncategorized' ),
 			} );
 		}
-		if ( filteredUnsyncedPatterns.length > 0 ) {
-			categories.push( {
-				name: 'reusable',
-				label: _x( 'Custom patterns' ),
-			} );
-		}
 
 		return categories;
-	}, [
-		allCategories,
-		allPatterns,
-		filteredUnsyncedPatterns.length,
-		hasRegisteredCategory,
-	] );
+	}, [ allCategories, allPatterns, hasRegisteredCategory ] );
 
 	return populatedCategories;
 }
@@ -169,24 +145,6 @@ export function BlockPatternsCategoryPanel( {
 		onInsert,
 		rootClientId
 	);
-	const [ unsyncedPatterns ] = useBlockTypesState(
-		rootClientId,
-		onInsert,
-		'unsynced'
-	);
-	const filteredUnsyncedPatterns = useMemo( () => {
-		return unsyncedPatterns
-			.filter(
-				( { category: unsyncedPatternCategory } ) =>
-					unsyncedPatternCategory === 'reusable'
-			)
-			.map( ( syncedPattern ) => ( {
-				...syncedPattern,
-				blocks: parse( syncedPattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ),
-			} ) );
-	}, [ unsyncedPatterns ] );
 
 	const availableCategories = usePatternsCategories( rootClientId );
 	const currentCategoryPatterns = useMemo(
@@ -208,21 +166,15 @@ export function BlockPatternsCategoryPanel( {
 
 				return availablePatternCategories.length === 0;
 			} ),
-		[ allPatterns, category ]
+		[ allPatterns, availableCategories, category.name ]
 	);
-	const patterns =
-		category.name === 'reusable'
-			? filteredUnsyncedPatterns
-			: currentCategoryPatterns;
-	const currentShownPatterns = useAsyncList( patterns );
+
+	const categoryPatternsList = useAsyncList( currentCategoryPatterns );
 
 	// Hide block pattern preview on unmount.
 	useEffect( () => () => onHover( null ), [] );
 
-	if (
-		! currentCategoryPatterns.length &&
-		! filteredUnsyncedPatterns.length
-	) {
+	if ( ! currentCategoryPatterns.length ) {
 		return null;
 	}
 
@@ -233,8 +185,8 @@ export function BlockPatternsCategoryPanel( {
 			</div>
 			<p>{ category.description }</p>
 			<BlockPatternList
-				shownPatterns={ currentShownPatterns }
-				blockPatterns={ patterns }
+				shownPatterns={ categoryPatternsList }
+				blockPatterns={ currentCategoryPatterns }
 				onClickPattern={ onClick }
 				onHover={ onHover }
 				label={ category.label }

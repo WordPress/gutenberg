@@ -4,4 +4,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
+	circle {
+		stroke: rgba($black, 0.3);
+	}
 }
