@@ -19,7 +19,7 @@ import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
 
-const EMPTY_CONFIG = { settings: {}, styles: {} };
+const EMPTY_CONFIG = { settings: {}, styles: {}, behaviors: {} };
 
 const VALID_SETTINGS = [
 	'appearanceTools',
@@ -460,4 +460,75 @@ export function useGradientsPerOrigin( settings ) {
 		defaultGradients,
 		shouldDisplayDefaultGradients,
 	] );
+}
+
+export function __experimentalUseGlobalBehaviors(
+	path,
+	blockName,
+	source = 'all',
+	{ shouldDecodeEncode = true } = {}
+) {
+	const {
+		merged: mergedConfig,
+		base: baseConfig,
+		user: userConfig,
+		setUserConfig,
+	} = useContext( GlobalStylesContext );
+	const appendedPath = path ? '.' + path : '';
+	const finalPath = ! blockName
+		? `behaviors${ appendedPath }`
+		: `behaviors.blocks.${ blockName }${ appendedPath }`;
+
+	const setBehavior = ( newValue ) => {
+		let newBehavior;
+		switch ( newValue ) {
+			case 'default':
+				break;
+			case 'lightbox':
+				newBehavior = {
+					lightbox: {
+						enabled: true,
+						animation: 'zoom',
+					},
+				};
+				break;
+			case '':
+				newBehavior = {
+					lightbox: false,
+				};
+				break;
+		}
+		setUserConfig( ( currentConfig ) => {
+			// Deep clone `currentConfig` to avoid mutating it later.
+			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
+			set( newUserConfig, finalPath, newBehavior );
+			return newUserConfig;
+		} );
+	};
+
+	let rawResult, result;
+	switch ( source ) {
+		case 'all':
+			rawResult = get( mergedConfig, finalPath );
+			result = shouldDecodeEncode
+				? getValueFromVariable( mergedConfig, blockName, rawResult )
+				: rawResult;
+			break;
+		case 'user':
+			rawResult = get( userConfig, finalPath );
+			result = shouldDecodeEncode
+				? getValueFromVariable( mergedConfig, blockName, rawResult )
+				: rawResult;
+			break;
+		case 'base':
+			rawResult = get( baseConfig, finalPath );
+			result = shouldDecodeEncode
+				? getValueFromVariable( baseConfig, blockName, rawResult )
+				: rawResult;
+			break;
+		default:
+			throw 'Unsupported source';
+	}
+
+	return [ result, setBehavior ];
 }
