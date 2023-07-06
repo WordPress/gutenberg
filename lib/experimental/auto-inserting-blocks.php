@@ -111,7 +111,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_bl
 
 function gutenberg_parse_and_serialize_block_templates( $query_result ) {
 	foreach ( $query_result as $block_template ) {
-		if ( 'theme' !== $block_template->source ) {
+		if ( 'custom' === $block_template->source ) {
 			continue;
 		}
 		$blocks                  = parse_blocks( $block_template->content );
