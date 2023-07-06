@@ -45,9 +45,11 @@ function HeaderToolbar( {
 	getStylesFromColorScheme,
 	insertBlock,
 	onHideKeyboard,
+	onOpenBlockSettings,
 	isRTL,
 	noContentSelected,
 } ) {
+	const anchorNodeRef = useRef();
 	const wasNoContentSelected = useRef( noContentSelected );
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 
@@ -165,6 +167,7 @@ function HeaderToolbar( {
 
 	return (
 		<View
+			ref={ anchorNodeRef }
 			testID={ toolbarAriaLabel }
 			accessibilityLabel={ toolbarAriaLabel }
 			style={ [
@@ -192,9 +195,13 @@ function HeaderToolbar( {
 					useExpandedMode={ useExpandedMode }
 					onToggle={ onToggleInserter }
 				/>
+
 				{ noContentSelected && renderMediaButtons }
 				{ renderHistoryButtons() }
-				<BlockToolbar />
+				<BlockToolbar
+					anchorNodeRef={ anchorNodeRef.current }
+					onOpenBlockSettings={ onOpenBlockSettings }
+				/>
 			</ScrollView>
 			{ showKeyboardHideButton && (
 				<ToolbarGroup
@@ -245,6 +252,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock, insertBlock } =
 			dispatch( blockEditorStore );
+		const { openGeneralSidebar } = dispatch( editPostStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );
 
 		return {
@@ -255,6 +263,9 @@ export default compose( [
 				togglePostTitleSelection( false );
 			},
 			insertBlock,
+			onOpenBlockSettings() {
+				openGeneralSidebar( 'edit-post/block' );
+			},
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),

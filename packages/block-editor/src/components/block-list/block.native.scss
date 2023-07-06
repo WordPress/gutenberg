@@ -51,15 +51,10 @@
 	min-height: 50px;
 }
 
-.neutralToolbar {
-	margin-left: -$block-edge-to-content;
-	margin-right: -$block-edge-to-content;
-}
-
 .solidBorder {
 	position: absolute;
 	top: -$solid-border-space;
-	bottom: 0;
+	bottom: -$solid-border-space;
 	left: -$solid-border-space;
 	right: -$solid-border-space;
 	border-width: $block-selected-border-width;
