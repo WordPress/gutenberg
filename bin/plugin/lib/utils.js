@@ -121,10 +121,32 @@ function getRandomTemporaryPath() {
 	return path.join( os.tmpdir(), uuid() );
 }
 
+/**
+ * Scans the given directory and returns an array of file paths.
+ *
+ * @param {string} dir The path to the directory to scan.
+ *
+ * @return {string[]} An array of file paths.
+ */
+function getFilesFromDir( dir ) {
+	if ( ! fs.existsSync( dir ) ) {
+		console.log( 'Directory does not exist: ', dir );
+		return [];
+	}
+
+	const files = fs.readdirSync( dir );
+	const filelist = files
+		.map( ( file ) => path.join( dir, file ) ) // map to full file path
+		.filter( ( file ) => fs.lstatSync( file ).isFile() ); // filter out subdirectories
+
+	return filelist;
+}
+
 module.exports = {
 	askForConfirmation,
 	runStep,
 	readJSONFile,
 	runShellScript,
 	getRandomTemporaryPath,
+	getFilesFromDir,
 };

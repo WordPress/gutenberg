@@ -14,6 +14,7 @@ const {
 	readJSONFile,
 	askForConfirmation,
 	getRandomTemporaryPath,
+	getFilesFromDir,
 } = require( '../lib/utils' );
 const config = require( '../config' );
 
@@ -190,26 +191,17 @@ function curateResults( testSuite, results ) {
  *
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
- * @param {string} runKey                   Unique identifier for the test run, e.g. `branch-name_post-editor_run-3`.
- *
- * @return {Promise<WPPerformanceResults>} Performance results for the branch.
+ * @param {string} runKey                   Unique identifier for the test run.
  */
 async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
-	const resultsFilename = `${ runKey }.performance-results.json`;
-
 	await runShellScript(
 		`npm run test:performance:playwright -- ${ testSuite }`,
 		performanceTestDirectory,
 		{
 			...process.env,
 			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
-			RESULTS_FILENAME: resultsFilename,
+			RESULTS_FILENAME: `${ runKey }.performance-results.json`,
 		}
-	);
-
-	return curateResults(
-		testSuite,
-		await readJSONFile( path.join( ARTIFACTS_PATH, resultsFilename ) )
 	);
 }
 
@@ -242,6 +234,7 @@ async function runPerformanceTests( branches, options ) {
 	/*
 	 * 1- Preparing the tests directory.
 	 */
+
 	log( '\n>> Preparing the tests directories' );
 	log( '    >> Cloning the repository' );
 
@@ -296,6 +289,7 @@ async function runPerformanceTests( branches, options ) {
 	/*
 	 * 2- Preparing the environment directories per branch.
 	 */
+
 	log( '\n>> Preparing an environment directory per branch' );
 	const branchDirectories = {};
 	for ( const branch of branches ) {
@@ -404,9 +398,7 @@ async function runPerformanceTests( branches, options ) {
 		}
 	}
 
-	/*
-	 * 3- Printing the used folders.
-	 */
+	// Printing the used folders.
 	log(
 		'\n>> Perf Tests Directory : ' +
 			formats.success( performanceTestDirectory )
@@ -418,35 +410,27 @@ async function runPerformanceTests( branches, options ) {
 	}
 
 	/*
-	 * 4- Running the tests.
+	 * 3- Running the tests.
 	 */
+
 	log( '\n>> Running the tests' );
 
-	const testSuites = [
-		'post-editor',
-		'site-editor',
-		'front-end-classic-theme',
-		'front-end-block-theme',
-	];
+	const testSuites = getFilesFromDir(
+		path.join( performanceTestDirectory, 'test/performance/specs' )
+	).map( ( file ) => path.basename( file, '.spec.js' ) );
 
-	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
-	const results = {};
 	const wpEnvPath = path.join(
 		performanceTestDirectory,
 		'node_modules/.bin/wp-env'
 	);
 
 	for ( const testSuite of testSuites ) {
-		results[ testSuite ] = {};
-		/** @type {Array<Record<string, WPPerformanceResults>>} */
-		const resultsRounds = [];
-		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
-			const roundInfo = `round ${ i + 1 } of ${ TEST_ROUNDS }`;
+		for ( let i = 1; i <= TEST_ROUNDS; i++ ) {
+			const roundInfo = `round ${ i } of ${ TEST_ROUNDS }`;
 			log( `    >> Suite: ${ testSuite } (${ roundInfo })` );
-			resultsRounds[ i ] = {};
 			for ( const branch of branches ) {
 				const sanitizedBranch = sanitizeBranchName( branch );
-				const runKey = `${ testSuite }_${ sanitizedBranch }_run-${ i }`;
+				const runKey = `${ testSuite }_${ sanitizedBranch }_round-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
 				log( `        >> Branch: ${ branch }` );
@@ -456,7 +440,7 @@ async function runPerformanceTests( branches, options ) {
 					environmentDirectory
 				);
 				log( '            >> Running the test.' );
-				resultsRounds[ i ][ branch ] = await runTestSuite(
+				await runTestSuite(
 					testSuite,
 					performanceTestDirectory,
 					runKey
@@ -468,30 +452,56 @@ async function runPerformanceTests( branches, options ) {
 				);
 			}
 		}
+	}
 
-		// Computing medians from testing rounds for each branch.
+	/*
+	 * 4- Formatting and saving the results.
+	 */
+
+	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>
+		file.endsWith( 'performance-results.json' )
+	);
+	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
+	const results = {};
+
+	for ( const testSuite of testSuites ) {
+		results[ testSuite ] = {};
+
 		for ( const branch of branches ) {
+			const resultsRounds = resultFiles
+				.filter( ( file ) =>
+					file.includes( `${ testSuite }__${ branch }__round-` )
+				)
+				.map( ( file ) =>
+					curateResults( testSuite, readJSONFile( file ) )
+				);
+
+			const metrics = Object.keys( resultsRounds[ 0 ] );
 			results[ testSuite ][ branch ] = {};
-			const metrics = Object.keys( resultsRounds[ 0 ][ branch ] );
 
 			for ( const metric of metrics ) {
-				const values = resultsRounds.map(
-					// @ts-ignore
-					( item ) => item[ branch ][ metric ]
-				);
+				// @ts-ignore
+				const values = resultsRounds.map( ( item ) => item[ metric ] );
 				// @ts-ignore
 				results[ testSuite ][ branch ][ metric ] = formatTime(
 					median( values )
 				);
 			}
 		}
+
+		// Save curated results to file.
+		const resultsFilename = testSuite + '.performance-results.json';
+		fs.writeFileSync(
+			path.join( ARTIFACTS_PATH, resultsFilename ),
+			JSON.stringify( results[ testSuite ], null, 2 )
+		);
 	}
 
 	/*
-	 * 5- Formatting, displaying and saving the results.
+	 * 5- Displaying the results.
 	 */
-	log( '\n>> 🎉 Results.\n' );
 
+	log( '\n>> 🎉 Results.\n' );
 	log(
 		'\nPlease note that client side metrics EXCLUDE the server response time.\n'
 	);
@@ -499,7 +509,7 @@ async function runPerformanceTests( branches, options ) {
 	for ( const testSuite of testSuites ) {
 		log( `\n>> ${ testSuite }\n` );
 
-		// Format results to display in a table.
+		// Invert the results so we can display them in a table.
 		/** @type {Record<string, Record<string, string>>} */
 		const invertedResult = {};
 		for ( const [ branch, metrics ] of Object.entries(
@@ -512,14 +522,9 @@ async function runPerformanceTests( branches, options ) {
 				}
 			}
 		}
-		console.table( invertedResult );
 
-		// Save curated results to file.
-		const resultsFilename = testSuite + '.performance-results.json';
-		fs.writeFileSync(
-			path.join( ARTIFACTS_PATH, resultsFilename ),
-			JSON.stringify( results[ testSuite ], null, 2 )
-		);
+		// Printing the results.
+		console.table( invertedResult );
 	}
 }
 
