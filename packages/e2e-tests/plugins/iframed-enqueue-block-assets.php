@@ -27,7 +27,7 @@ add_action(
 			'iframed-enqueue-block-assets-script',
 			'iframedEnqueueBlockAssetsL10n',
 			array(
-				'test' => __( 'Iframed Enqueue Block Assets!' ),
+				'test' => 'Iframed Enqueue Block Assets!',
 			)
 		);
 	}
