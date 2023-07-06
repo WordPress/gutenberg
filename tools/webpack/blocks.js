@@ -2,6 +2,7 @@
  * External dependencies
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const { ModuleFederationPlugin } = require( 'webpack' ).container;
 const { join, sep } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
 
@@ -87,6 +88,13 @@ module.exports = [
 		},
 		plugins: [
 			...plugins,
+			new ModuleFederationPlugin( {
+				name: 'block',
+				remotes: {
+					$wordpress:
+						'__wordpress_module_federation_interactivity__@/./wp-content/plugins/gutenberg/build/interactivity/index.min.js',
+				},
+			} ),
 			new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 			new CopyWebpackPlugin( {
 				patterns: [].concat(

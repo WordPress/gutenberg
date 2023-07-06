@@ -11,8 +11,9 @@ const { baseConfig } = require( './shared' );
 
 module.exports = {
 	mode: baseConfig.mode,
-	entry: './empty.js',
+	entry: { empty: './empty.js' },
 	name: 'interactivity',
+	devtool: false,
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './[name].min.js',
@@ -21,7 +22,7 @@ module.exports = {
 	plugins: [
 		new ModuleFederationPlugin( {
 			name: '__wordpress_module_federation_interactivity__',
-			filename: 'remoteEntry.js',
+			filename: 'index.min.js',
 			exposes: {
 				'./interactivity': './packages/interactivity/src/index.js',
 			},
