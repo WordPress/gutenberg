@@ -82,6 +82,11 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await editor.setIsFixedToolbar( true );
 		} );
 
+		test.afterEach( async ( { editor } ) => {
+			// Ensure the fixed toolbar option is off
+			await editor.setIsFixedToolbar( false );
+		} );
+
 		test( 'Focuses the correct toolbar in edit mode', async ( {
 			editor,
 			page,
@@ -95,11 +100,8 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await toolbarUtils.moveToToolbarShortcut();
 			await expect(
-				toolbarUtils.blockToolbarShowDocumentButton
+				toolbarUtils.blockToolbarParagraphButton
 			).toBeFocused();
-			await expect(
-				toolbarUtils.documentToolbarTooltip
-			).not.toBeVisible();
 
 			// Test: Focus the block toolbar from paragraph block with content
 			await editor.insertBlock( { name: 'core/paragraph' } );
@@ -108,11 +110,8 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			);
 			await toolbarUtils.moveToToolbarShortcut();
 			await expect(
-				toolbarUtils.blockToolbarShowDocumentButton
+				toolbarUtils.blockToolbarParagraphButton
 			).toBeFocused();
-			await expect(
-				toolbarUtils.documentToolbarTooltip
-			).not.toBeVisible();
 		} );
 
 		test( 'Focuses the correct toolbar in select mode', async ( {
@@ -130,11 +129,8 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await toolbarUtils.useSelectMode();
 			await toolbarUtils.moveToToolbarShortcut();
 			await expect(
-				toolbarUtils.blockToolbarShowDocumentButton
+				toolbarUtils.blockToolbarParagraphButton
 			).toBeFocused();
-			await expect(
-				toolbarUtils.documentToolbarTooltip
-			).not.toBeVisible();
 
 			// Test: Focus the block toolbar from paragraph in select mode
 			await editor.insertBlock( { name: 'core/paragraph' } );
@@ -144,11 +140,8 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await toolbarUtils.useSelectMode();
 			await toolbarUtils.moveToToolbarShortcut();
 			await expect(
-				toolbarUtils.blockToolbarShowDocumentButton
+				toolbarUtils.blockToolbarParagraphButton
 			).toBeFocused();
-			await expect(
-				toolbarUtils.documentToolbarTooltip
-			).not.toBeVisible();
 		} );
 	} );
 
@@ -159,11 +152,6 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 				width: 700,
 				height: 700,
 			},
-		} );
-
-		test.beforeEach( async ( { editor } ) => {
-			// Ensure the fixed toolbar option is off
-			await editor.setIsFixedToolbar( false );
 		} );
 
 		test( 'Focuses the correct toolbar in edit mode', async ( {
@@ -254,7 +242,7 @@ class ToolbarUtils {
 			exact: true,
 		} );
 		this.blockToolbarShowDocumentButton = this.page.getByRole( 'button', {
-			name: 'Show document tools',
+			name: 'Hide block tools',
 			exact: true,
 		} );
 	}

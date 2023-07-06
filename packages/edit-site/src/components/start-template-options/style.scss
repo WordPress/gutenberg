@@ -29,9 +29,6 @@ $actions-height: 92px;
 	column-count: 2;
 	column-gap: $grid-unit-30;
 
-	// Small top padding required to avoid cutting off the visible outline when hovering items
-	padding-top: $border-width-focus-fallback;
-
 	@include break-medium() {
 		column-count: 3;
 	}

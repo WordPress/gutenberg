@@ -54,4 +54,20 @@ test.describe( 'Button', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'dashicon', () => {
+		test.beforeEach( async ( { page } ) => {
+			await gotoStoryId( page, 'components-button--dashicons', {
+				decorators: { css: 'wordpress' },
+			} );
+			// Wait for dashicons font to load
+			await page.waitForFunction( () =>
+				document.fonts.check( '20px dashicons' )
+			);
+		} );
+
+		test( 'should render with correct spacing', async ( { page } ) => {
+			expect( await page.screenshot() ).toMatchSnapshot();
+		} );
+	} );
 } );

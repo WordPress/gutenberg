@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.5.0 (2023-07-05)
+
+## 4.4.0 (2023-06-23)
+
+## 4.3.0 (2023-06-07)
+
 ### New Feature
 
 -   Add a new action `removeNotices` which allows bulk removal of notices by their IDs. ([#39940](https://github.com/WordPress/gutenberg/pull/39940))

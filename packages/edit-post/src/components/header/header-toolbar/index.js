@@ -19,12 +19,13 @@ import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
-import { unlock } from '../../../private-apis';
+import { unlock } from '../../../lock-unlock';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
@@ -36,6 +37,8 @@ function HeaderToolbar() {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editPostStore );
+	const { get: getPreference } = useSelect( preferencesStore );
+	const hasFixedToolbar = getPreference( 'core/edit-post', 'fixedToolbar' );
 	const {
 		isInserterEnabled,
 		isInserterOpened,
@@ -147,7 +150,7 @@ function HeaderToolbar() {
 				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ isLargeViewport && (
+						{ isLargeViewport && ! hasFixedToolbar && (
 							<ToolbarItem
 								as={ ToolSelector }
 								showTooltip={ ! showIconLabels }

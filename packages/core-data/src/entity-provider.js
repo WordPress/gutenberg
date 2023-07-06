@@ -9,15 +9,19 @@ import {
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
+import { unlock } from './private-apis';
 
 /** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
 
 const EMPTY_ARRAY = [];
+
+let oldFootnotes = {};
 
 /**
  * Internal dependencies
@@ -152,13 +156,14 @@ export function useEntityProp( kind, name, prop, _id ) {
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, blocks } = useSelect(
+	const { content, blocks, meta } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord } = select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
 				blocks: editedRecord.blocks,
 				content: editedRecord.content,
+				meta: editedRecord.meta,
 			};
 		},
 		[ kind, name, id ]
@@ -184,34 +189,104 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		}
 	}, [ content ] );
 
+	const updateFootnotes = useCallback(
+		( _blocks ) => {
+			if ( ! meta ) return;
+			// If meta.footnotes is empty, it means the meta is not registered.
+			if ( meta.footnotes === undefined ) return {};
+
+			const { getRichTextValues } = unlock( blockEditorPrivateApis );
+			const _content = getRichTextValues( _blocks ).join( '' ) || '';
+			const newOrder = [];
+
+			// This can be avoided when
+			// https://github.com/WordPress/gutenberg/pull/43204 lands. We can then
+			// get the order directly from the rich text values.
+			if ( _content.indexOf( 'data-fn' ) !== -1 ) {
+				const regex = /data-fn="([^"]+)"/g;
+				let match;
+				while ( ( match = regex.exec( _content ) ) !== null ) {
+					newOrder.push( match[ 1 ] );
+				}
+			}
+
+			const footnotes = meta.footnotes
+				? JSON.parse( meta.footnotes )
+				: [];
+			const currentOrder = footnotes.map( ( fn ) => fn.id );
+
+			if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return;
+
+			const newFootnotes = newOrder.map(
+				( fnId ) =>
+					footnotes.find( ( fn ) => fn.id === fnId ) ||
+					oldFootnotes[ fnId ] || {
+						id: fnId,
+						content: '',
+					}
+			);
+
+			oldFootnotes = {
+				...oldFootnotes,
+				...footnotes.reduce( ( acc, fn ) => {
+					if ( ! newOrder.includes( fn.id ) ) {
+						acc[ fn.id ] = fn;
+					}
+					return acc;
+				}, {} ),
+			};
+
+			return {
+				meta: {
+					...meta,
+					footnotes: JSON.stringify( newFootnotes ),
+				},
+			};
+		},
+		[ meta ]
+	);
+
 	const onChange = useCallback(
 		( newBlocks, options ) => {
-			const { selection } = options;
-			const edits = { blocks: newBlocks, selection };
-
-			const noChange = blocks === edits.blocks;
+			const noChange = blocks === newBlocks;
 			if ( noChange ) {
 				return __unstableCreateUndoLevel( kind, name, id );
 			}
+			const { selection } = options;
 
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
 			// a new undo level.
-			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-				__unstableSerializeAndClean( blocksForSerialization );
+			const edits = {
+				blocks: newBlocks,
+				selection,
+				content: ( { blocks: blocksForSerialization = [] } ) =>
+					__unstableSerializeAndClean( blocksForSerialization ),
+				...updateFootnotes( newBlocks ),
+			};
 
-			editEntityRecord( kind, name, id, edits );
+			editEntityRecord( kind, name, id, edits, { isCached: false } );
 		},
-		[ kind, name, id, blocks ]
+		[
+			kind,
+			name,
+			id,
+			blocks,
+			updateFootnotes,
+			__unstableCreateUndoLevel,
+			editEntityRecord,
+		]
 	);
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
 			const { selection } = options;
-			const edits = { blocks: newBlocks, selection };
-			editEntityRecord( kind, name, id, edits );
+			const footnotesChanges = updateFootnotes( newBlocks );
+			const edits = { blocks: newBlocks, selection, ...footnotesChanges };
+
+			editEntityRecord( kind, name, id, edits, { isCached: true } );
 		},
-		[ kind, name, id ]
+		[ kind, name, id, updateFootnotes, editEntityRecord ]
 	);
 
 	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];

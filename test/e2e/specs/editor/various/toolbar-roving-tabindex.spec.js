@@ -16,11 +16,13 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await page.keyboard.type( 'First block' );
 	} );
 
-	test( 'ensures paragraph block toolbar uses roving tabindex', async ( {
+	test( 'ensures base block toolbars use roving tabindex', async ( {
 		editor,
 		page,
+		pageUtils,
 		ToolbarRovingTabindexUtils,
 	} ) => {
+		// ensures paragraph block toolbar uses roving tabindex
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Paragraph' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
@@ -34,13 +36,8 @@ test.describe( 'Toolbar roving tabindex', () => {
 			'Paragraph block',
 			'Paragraph'
 		);
-	} );
 
-	test( 'ensures heading block toolbar uses roving tabindex', async ( {
-		editor,
-		page,
-		ToolbarRovingTabindexUtils,
-	} ) => {
+		// test: ensures heading block toolbar uses roving tabindex
 		await editor.insertBlock( { name: 'core/heading' } );
 		await page.keyboard.type( 'Heading' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
@@ -52,13 +49,8 @@ test.describe( 'Toolbar roving tabindex', () => {
 			'Block: Heading',
 			'Heading'
 		);
-	} );
 
-	test( 'ensures list block toolbar uses roving tabindex', async ( {
-		editor,
-		page,
-		ToolbarRovingTabindexUtils,
-	} ) => {
+		// ensures list block toolbar uses roving tabindex
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'List' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
@@ -71,36 +63,15 @@ test.describe( 'Toolbar roving tabindex', () => {
 			'Block: List',
 			'List'
 		);
-	} );
 
-	test( 'ensures image block toolbar uses roving tabindex', async ( {
-		editor,
-		ToolbarRovingTabindexUtils,
-	} ) => {
-		await editor.insertBlock( { name: 'core/image' } );
-		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
-			'Block: Image',
-			'Image'
-		);
-		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'Image' );
-		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			'Block: Image',
-			'Image'
-		);
-	} );
-
-	test( 'ensures table block toolbar uses roving tabindex', async ( {
-		editor,
-		page,
-		ToolbarRovingTabindexUtils,
-		pageUtils,
-	} ) => {
+		// ensures table block toolbar uses roving tabindex
 		await editor.insertBlock( { name: 'core/table' } );
 		await page.keyboard.press( 'ArrowLeft' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'Block: Table',
 			'Table'
 		);
+
 		// Move focus to the first toolbar item.
 		await page.keyboard.press( 'Home' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Table' );
@@ -115,12 +86,8 @@ test.describe( 'Toolbar roving tabindex', () => {
 			'Block: Table',
 			'Table'
 		);
-	} );
 
-	test( 'ensures custom html block toolbar uses roving tabindex', async ( {
-		editor,
-		ToolbarRovingTabindexUtils,
-	} ) => {
+		// ensures custom html block toolbar uses roving tabindex
 		await editor.insertBlock( { name: 'core/html' } );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'HTML',
@@ -132,6 +99,19 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
 			'Block: Custom HTML',
 			'Custom HTML'
+		);
+
+		// ensures image block toolbar uses roving tabindex
+		// This also tests if shift + tab works as expected to move focus to the toolbar when the preceding block has a form element.
+		await editor.insertBlock( { name: 'core/image' } );
+		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
+			'Block: Image',
+			'Image'
+		);
+		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'Image' );
+		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
+			'Block: Image',
+			'Image'
 		);
 	} );
 

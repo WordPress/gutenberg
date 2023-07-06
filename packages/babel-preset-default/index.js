@@ -89,6 +89,7 @@ module.exports = ( api ) => {
 				{
 					pragma: 'createElement',
 					pragmaFrag: 'Fragment',
+					useSpread: true,
 				},
 			],
 			maybeGetPluginTransformRuntime(),

@@ -16,6 +16,8 @@ function enqueue_block_api_plugin_script() {
 		plugins_url( 'block-api/index.js', __FILE__ ),
 		array(
 			'wp-blocks',
+			'wp-block-editor',
+			'wp-element',
 			'wp-hooks',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'block-api/index.js' ),

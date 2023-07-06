@@ -3,8 +3,14 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -84,17 +90,14 @@ export default function TemplateActions( {
 								template={ template }
 								onClose={ onClose }
 							/>
-							<MenuItem
-								isDestructive
-								isTertiary
-								onClick={ () => {
+							<DeleteMenuItem
+								onRemove={ () => {
 									removeTemplate( template );
 									onRemove?.();
 									onClose();
 								} }
-							>
-								{ __( 'Delete' ) }
-							</MenuItem>
+								isTemplate={ template.type === 'wp_template' }
+							/>
 						</>
 					) }
 					{ isRevertable && (
@@ -113,5 +116,32 @@ export default function TemplateActions( {
 				</MenuGroup>
 			) }
 		</DropdownMenu>
+	);
+}
+
+function DeleteMenuItem( { onRemove, isTemplate } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	return (
+		<>
+			<MenuItem
+				isDestructive
+				isTertiary
+				onClick={ () => setIsModalOpen( true ) }
+			>
+				{ __( 'Delete' ) }
+			</MenuItem>
+			<ConfirmDialog
+				isOpen={ isModalOpen }
+				onConfirm={ onRemove }
+				onCancel={ () => setIsModalOpen( false ) }
+				confirmButtonText={ __( 'Delete' ) }
+			>
+				{ isTemplate
+					? __( 'Are you sure you want to delete this template?' )
+					: __(
+							'Are you sure you want to delete this template part?'
+					  ) }
+			</ConfirmDialog>
+		</>
 	);
 }

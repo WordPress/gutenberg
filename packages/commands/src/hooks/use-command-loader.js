@@ -10,7 +10,7 @@ import { useDispatch } from '@wordpress/data';
 import { store as commandsStore } from '../store';
 
 /**
- * Attach a command loader to the Global command menu.
+ * Attach a command loader to the command palette.
  *
  * @param {import('../store/actions').WPCommandLoaderConfig} loader command loader config.
  */
