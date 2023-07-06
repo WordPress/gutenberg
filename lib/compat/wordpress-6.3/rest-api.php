@@ -65,7 +65,7 @@ add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoin
  * Registers the Global Styles REST API routes.
  */
 function gutenberg_register_global_styles_endpoints() {
-	$global_styles_controller = new Gutenberg_REST_Global_Styles_Controller_6_3();
+	$global_styles_controller = new Gutenberg_REST_Global_Styles_Controller();
 	$global_styles_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );

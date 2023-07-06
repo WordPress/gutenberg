@@ -64,7 +64,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
-
+	require_once __DIR__ . '/experimental/class-gutenberg-rest-global-styles-controller.php';
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
