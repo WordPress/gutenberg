@@ -1,6 +1,13 @@
 .edit-site-patterns {
 	background: rgba(0, 0, 0, 0.15);
 	margin: $header-height 0 0;
+	.components-base-control {
+		width: 100%;
+		@include break-medium {
+			width: auto;
+		}
+	}
+
 	.components-text {
 		color: $gray-600;
 	}
