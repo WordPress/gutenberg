@@ -63,7 +63,7 @@ function commandLoaders( state = {}, action ) {
 }
 
 /**
- * Reducer returning the command center open state.
+ * Reducer returning the command palette open state.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -82,7 +82,7 @@ function isOpen( state = false, action ) {
 }
 
 /**
- * Reducer returning the command center's active context.
+ * Reducer returning the command palette's active context.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.

@@ -73,7 +73,7 @@ export default function SidebarNavigationScreenPatterns() {
 			isRoot={ isTemplatePartsMode }
 			title={ __( 'Patterns' ) }
 			description={ __(
-				'Manage what patterns are available when editing your site.'
+				'Manage what patterns are available when editing the site.'
 			) }
 			actions={ <AddNewPattern /> }
 			footer={ footer }

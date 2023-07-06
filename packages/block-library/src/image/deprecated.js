@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName as getBorderClassesAndStyles,
+} from '@wordpress/block-editor';
 
 /**
  * Deprecation for adding the `wp-image-${id}` class to the image block for
@@ -539,4 +543,95 @@ const v5 = {
 	},
 };
 
-export default [ v5, v4, v3, v2, v1 ];
+/**
+ * Deprecation for adding width and height as style rules on the inner img.
+ * It also updates the widht and height attributes to be strings instead of numbers.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/31366
+ */
+const v6 = {
+	save( { attributes } ) {
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			aspectRatio,
+			scale,
+			id,
+			linkTarget,
+			sizeSlug,
+			title,
+		} = attributes;
+
+		const newRel = ! rel ? undefined : rel;
+		const borderProps = getBorderClassesAndStyles( attributes );
+
+		const classes = classnames( {
+			[ `align${ align }` ]: align,
+			[ `size-${ sizeSlug }` ]: sizeSlug,
+			'is-resized': width || height,
+			'has-custom-border':
+				!! borderProps.className ||
+				( borderProps.style &&
+					Object.keys( borderProps.style ).length > 0 ),
+		} );
+
+		const imageClasses = classnames( borderProps.className, {
+			[ `wp-image-${ id }` ]: !! id,
+		} );
+
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ imageClasses || undefined }
+				style={ {
+					...borderProps.style,
+					aspectRatio,
+					objectFit: scale,
+				} }
+				width={ width }
+				height={ height }
+				title={ title }
+			/>
+		);
+
+		const figure = (
+			<>
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ newRel }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
+				{ ! RichText.isEmpty( caption ) && (
+					<RichText.Content
+						className={ getBorderClassesAndStyles( 'caption' ) }
+						tagName="figcaption"
+						value={ caption }
+					/>
+				) }
+			</>
+		);
+
+		return (
+			<figure { ...useBlockProps.save( { className: classes } ) }>
+				{ figure }
+			</figure>
+		);
+	},
+};
+
+export default [ v6, v5, v4, v3, v2, v1 ];

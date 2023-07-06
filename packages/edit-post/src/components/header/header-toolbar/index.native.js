@@ -19,10 +19,15 @@ import {
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import {
 	keyboardClose,
+	audio as audioIcon,
+	media as imageIcon,
+	video as videoIcon,
+	gallery as galleryIcon,
 	undo as undoIcon,
 	redo as redoIcon,
 } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -38,6 +43,7 @@ function HeaderToolbar( {
 	showInserter,
 	showKeyboardHideButton,
 	getStylesFromColorScheme,
+	insertBlock,
 	onHideKeyboard,
 	onOpenBlockSettings,
 	isRTL,
@@ -85,6 +91,60 @@ function HeaderToolbar( {
 
 		return isRTL ? buttons.reverse() : buttons;
 	};
+
+	const onInsertBlock = useCallback(
+		( blockType ) => () => {
+			insertBlock( createBlock( blockType ), undefined, undefined, true, {
+				source: 'inserter_menu',
+			} );
+		},
+		[ insertBlock ]
+	);
+
+	const renderMediaButtons = (
+		<ToolbarGroup>
+			<ToolbarButton
+				key="imageButton"
+				title={ __( 'Image' ) }
+				icon={ imageIcon }
+				onClick={ onInsertBlock( 'core/image' ) }
+				testID="insert-image-button"
+				extraProps={ {
+					hint: __( 'Insert Image Block' ),
+				} }
+			/>
+			<ToolbarButton
+				key="videoButton"
+				title={ __( 'Video' ) }
+				icon={ videoIcon }
+				onClick={ onInsertBlock( 'core/video' ) }
+				testID="insert-video-button"
+				extraProps={ {
+					hint: __( 'Insert Video Block' ),
+				} }
+			/>
+			<ToolbarButton
+				key="galleryButton"
+				title={ __( 'Gallery' ) }
+				icon={ galleryIcon }
+				onClick={ onInsertBlock( 'core/gallery' ) }
+				testID="insert-gallery-button"
+				extraProps={ {
+					hint: __( 'Insert Gallery Block' ),
+				} }
+			/>
+			<ToolbarButton
+				key="audioButton"
+				title={ __( 'Audio' ) }
+				icon={ audioIcon }
+				onClick={ onInsertBlock( 'core/audio' ) }
+				testID="insert-audio-button"
+				extraProps={ {
+					hint: __( 'Insert Audio Block' ),
+				} }
+			/>
+		</ToolbarGroup>
+	);
 
 	const onToggleInserter = useCallback(
 		( isOpen ) => {
@@ -136,6 +196,7 @@ function HeaderToolbar( {
 					onToggle={ onToggleInserter }
 				/>
 
+				{ noContentSelected && renderMediaButtons }
 				{ renderHistoryButtons() }
 				<BlockToolbar
 					anchorNodeRef={ anchorNodeRef.current }
@@ -189,7 +250,8 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( blockEditorStore );
+		const { clearSelectedBlock, insertBlock } =
+			dispatch( blockEditorStore );
 		const { openGeneralSidebar } = dispatch( editPostStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );
 
@@ -200,6 +262,7 @@ export default compose( [
 				clearSelectedBlock();
 				togglePostTitleSelection( false );
 			},
+			insertBlock,
 			onOpenBlockSettings() {
 				openGeneralSidebar( 'edit-post/block' );
 			},
