@@ -150,4 +150,61 @@ class Gutenberg_REST_Global_Styles_Controller extends Gutenberg_REST_Global_Styl
 		return $response;
 	}
 
+	/**
+	 * Returns the given theme global styles config.
+	 * Duplicated from core.
+	 * The only change is that we call WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' ) instead of WP_Theme_JSON_Resolver::get_merged_data( 'theme' ).
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_theme_item( $request ) {
+		if ( get_stylesheet() !== $request['stylesheet'] ) {
+			// This endpoint only supports the active theme for now.
+			return new WP_Error(
+				'rest_theme_not_found',
+				__( 'Theme not found.' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$theme  = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
+		$data   = array();
+		$fields = $this->get_fields_for_response( $request );
+
+		if ( rest_is_field_included( 'settings', $fields ) ) {
+			$data['settings'] = $theme->get_settings();
+		}
+
+		if ( rest_is_field_included( 'styles', $fields ) ) {
+			$raw_data       = $theme->get_raw_data();
+			$data['styles'] = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
+		}
+
+		if ( rest_is_field_included( 'behaviors', $fields ) ) {
+			$raw_data          = $theme->get_raw_data();
+			$data['behaviors'] = isset( $raw_data['behaviors'] ) ? $raw_data['behaviors'] : array();
+		}
+
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
+
+		$response = rest_ensure_response( $data );
+
+		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
+			$links = array(
+				'self' => array(
+					'href' => rest_url( sprintf( '%s/%s/themes/%s', $this->namespace, $this->rest_base, $request['stylesheet'] ) ),
+				),
+			);
+			$response->add_links( $links );
+		}
+
+		return $response;
+	}
+
+
 }
