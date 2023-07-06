@@ -495,9 +495,8 @@ async function runPerformanceTests( branches, options ) {
 		}
 
 		// Save curated results to file.
-		const resultsFilename = testSuite + RESULTS_FILE_SUFFIX;
 		fs.writeFileSync(
-			path.join( ARTIFACTS_PATH, resultsFilename ),
+			path.join( ARTIFACTS_PATH, testSuite + RESULTS_FILE_SUFFIX ),
 			JSON.stringify( results[ testSuite ], null, 2 )
 		);
 	}
