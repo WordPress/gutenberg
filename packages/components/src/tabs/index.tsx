@@ -7,14 +7,14 @@ import cx from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useLayoutEffect } from '@wordpress/element';
+import { useCallback, useEffect, useLayoutEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import type { TabPanelProps } from '../tab-panel/types';
-import { usePrevious } from '@wordpress/compose';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
 
 /**
  * Tabs is an ARIA-compliant tabpanel.
@@ -65,25 +65,55 @@ export const TabPanel = ( props: TabPanelProps ) => {
 		activeClass = 'is-active',
 	} = props;
 
+	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
+
+	const prependInstanceId = useCallback(
+		( tabName: string | undefined ) => {
+			if ( typeof tabName === 'undefined' ) {
+				return;
+			}
+			return `${ instanceId }-${ tabName }`;
+		},
+		[ instanceId ]
+	);
+
+	// Separate the actual tab name from the instance ID. This is
+	// necessary because Ariakit internally uses the element ID when
+	// a new tab is selected, but our implementation looks specifically
+	// for the tab name to be passed to the `onSelect` callback.
+	const extractTabName = useCallback( ( id: string | undefined | null ) => {
+		if ( typeof id === 'undefined' || id === null ) {
+			return;
+		}
+		return id.match( /^tab-panel-[0-9]*-(.*)/ )?.[ 1 ];
+	}, [] );
+
 	const tabStore = Ariakit.useTabStore( {
 		setSelectedId: ( newTabValue ) => {
 			if ( typeof newTabValue === 'undefined' || newTabValue === null ) {
 				return;
 			}
 
-			const newTab = tabs.find( ( t ) => t.name === newTabValue );
+			const newTab = tabs.find(
+				( t ) => prependInstanceId( t.name ) === newTabValue
+			);
 			if ( newTab?.disabled || newTab === selectedTab ) {
 				return;
 			}
 
-			onSelect?.( newTabValue );
+			const simplifiedTabName = extractTabName( newTabValue );
+			if ( typeof simplifiedTabName === 'undefined' ) {
+				return;
+			}
+
+			onSelect?.( simplifiedTabName );
 		},
 		orientation,
 		selectOnMove,
-		defaultSelectedId: initialTabName,
+		defaultSelectedId: prependInstanceId( initialTabName ),
 	} );
 
-	const selectedTabName = tabStore.useState( 'selectedId' );
+	const selectedTabName = extractTabName( tabStore.useState( 'selectedId' ) );
 	const setTabStoreState = tabStore.setState;
 
 	const selectedTab = tabs.find( ( { name } ) => name === selectedTabName );
@@ -116,16 +146,29 @@ export const TabPanel = ( props: TabPanelProps ) => {
 		}
 		if ( initialTab && ! initialTab.disabled ) {
 			// Select the initial tab if it's not disabled.
-			setTabStoreState( 'selectedId', initialTab.name );
+			setTabStoreState(
+				'selectedId',
+				prependInstanceId( initialTab.name )
+			);
 		} else {
 			// Fallback to the first enabled tab when the initial tab is
 			// disabled or it can't be found.
 			const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
 			if ( firstEnabledTab ) {
-				setTabStoreState( 'selectedId', firstEnabledTab.name );
+				setTabStoreState(
+					'selectedId',
+					prependInstanceId( firstEnabledTab.name )
+				);
 			}
 		}
-	}, [ tabs, selectedTab, initialTabName, setTabStoreState ] );
+	}, [
+		tabs,
+		selectedTab,
+		initialTabName,
+		instanceId,
+		setTabStoreState,
+		prependInstanceId,
+	] );
 
 	// Handle the currently selected tab becoming disabled.
 	useEffect( () => {
@@ -137,9 +180,18 @@ export const TabPanel = ( props: TabPanelProps ) => {
 		// If the currently selected tab becomes disabled, select the first enabled tab.
 		// (if there is one).
 		if ( firstEnabledTab ) {
-			setTabStoreState( 'selectedId', firstEnabledTab.name );
+			setTabStoreState(
+				'selectedId',
+				prependInstanceId( firstEnabledTab.name )
+			);
 		}
-	}, [ tabs, selectedTab?.disabled, setTabStoreState ] );
+	}, [
+		tabs,
+		selectedTab?.disabled,
+		setTabStoreState,
+		instanceId,
+		prependInstanceId,
+	] );
 
 	return (
 		<div className={ className }>
@@ -148,7 +200,7 @@ export const TabPanel = ( props: TabPanelProps ) => {
 					return (
 						<Ariakit.Tab
 							key={ tab.name }
-							id={ tab.name }
+							id={ prependInstanceId( tab.name ) }
 							className={ cx(
 								'components-tab-panel__tabs-item',
 								tab.className,
@@ -175,7 +227,7 @@ export const TabPanel = ( props: TabPanelProps ) => {
 				<Ariakit.TabPanel
 					store={ tabStore }
 					key={ tab.name }
-					tabId={ tab.name }
+					tabId={ prependInstanceId( tab.name ) }
 					className={ 'components-tab-panel__tab-content' }
 				>
 					{ children( tab ) }
