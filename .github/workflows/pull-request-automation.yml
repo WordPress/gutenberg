@@ -10,7 +10,7 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' }}
         strategy:
             matrix:
-                node: ['14']
+                node: ['18']
 
         steps:
             # Checkout defaults to using the branch which triggered the event, which
