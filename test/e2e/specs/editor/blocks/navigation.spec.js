@@ -937,6 +937,7 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.activateTheme( 'emptytheme' );
 			await requestUtils.deleteAllTemplates( 'wp_template_part' );
 			await requestUtils.deleteAllMenus();
+			await requestUtils.deleteAllPages();
 		} );
 
 		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
@@ -945,10 +946,13 @@ test.describe( 'Navigation block', () => {
 				postType: 'wp_template_part',
 			} );
 			await editor.canvas.click( 'body' );
+			const { id: pageId } = await requestUtils.createPage( {
+				title: 'Test Page',
+				status: 'publish',
+			} );
 			const { id: menuId } = await requestUtils.createNavigationMenu( {
 				title: 'Colored menu',
-				content:
-					'<!-- wp:navigation-submenu {"label":"First link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- wp:navigation-link {"label":"Third link","type":"page","id":2,"url":"http://localhost:8888/?page_id=2","kind":"post-type"} /-->',
+				content: `<!-- wp:navigation-submenu {"label":"First Link","type":"custom","url":"https://wordpress.org","kind":"custom"} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"https://wordpress.org","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- wp:navigation-link {"label":"Test Page","type":"page","id": ${ pageId },"url":"http://localhost:8889/?page_id=${ pageId }","kind":"post-type"} /-->`,
 				attributes: { openSubmenusOnClick: true },
 			} );
 			await editor.insertBlock( {
@@ -966,6 +970,7 @@ test.describe( 'Navigation block', () => {
 		test.afterEach( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllTemplates( 'wp_template_part' );
 			await requestUtils.deleteAllMenus();
+			await requestUtils.deleteAllPages();
 		} );
 
 		test( 'As a user I expect my navigation links to have appropriate default colors', async ( {
@@ -977,9 +982,9 @@ test.describe( 'Navigation block', () => {
 				.filter( { hasText: 'First Link' } );
 			const thirdLink = editor.canvas
 				.locator( 'a' )
-				.filter( { hasText: 'Third Link' } );
+				.filter( { hasText: 'Test Page' } );
 
-			// Expect the first and third link to default to black when the theme doesn't define a link color
+			// Expect the first and test page link to default to black when the theme doesn't define a link color
 			const defaultLinkColor = 'rgb(0, 0, 0)';
 			const defaultBackgroundColor = 'rgb(255, 255, 255)';
 			// This is different to the frontend because in the editor the links don't have an href, so the browser doesn't apply the default blue color
@@ -1037,7 +1042,7 @@ test.describe( 'Navigation block', () => {
 				.filter( { hasText: 'Second Link' } );
 			const thirdLinkFront = page
 				.locator( 'a' )
-				.filter( { hasText: 'Third Link' } );
+				.filter( { hasText: 'Test Page' } );
 			const submenuWrapperFront = page
 				.locator( '.wp-block-navigation__submenu-container' )
 				.filter( { has: secondLinkFront } );
@@ -1103,7 +1108,7 @@ test.describe( 'Navigation block', () => {
 				.filter( { hasText: 'First Link' } );
 			const thirdLink = editor.canvas
 				.locator( 'a' )
-				.filter( { hasText: 'Third Link' } );
+				.filter( { hasText: 'Test Page' } );
 			await expect( firstLink ).toHaveCSS( 'color', linkThemeColor );
 			await expect( thirdLink ).toHaveCSS( 'color', linkThemeColor );
 			await firstLink.click();
@@ -1147,7 +1152,7 @@ test.describe( 'Navigation block', () => {
 				.filter( { hasText: 'Second Link' } );
 			const thirdLinkFront = page
 				.locator( 'a' )
-				.filter( { hasText: 'Third Link' } );
+				.filter( { hasText: 'Test Page' } );
 
 			// Expect the links to have the same colors as in the editor
 			await expect( firstLinkFront ).toHaveCSS( 'color', linkThemeColor );
@@ -1284,7 +1289,7 @@ test.describe( 'Navigation block', () => {
 			// Expect the third link to behave the same as the first
 			const thirdLink = editor.canvas
 				.locator( 'a' )
-				.filter( { hasText: 'Third Link' } );
+				.filter( { hasText: 'Test Page' } );
 			await expect( thirdLink ).toHaveCSS( 'color', linkParentColor );
 			await thirdLink.click();
 			await expect( thirdLink ).toHaveCSS(
@@ -1316,7 +1321,7 @@ test.describe( 'Navigation block', () => {
 				.filter( { hasText: 'Second Link' } );
 			const thirdLinkFront = page
 				.locator( 'a' )
-				.filter( { hasText: 'Third Link' } );
+				.filter( { hasText: 'Test Page' } );
 
 			// Expect the links to default to the browser default blue when the theme doesn't define a link color and the background to be white
 			await expect( firstLinkFront ).toHaveCSS(
@@ -1458,7 +1463,7 @@ test.describe( 'Navigation block', () => {
 			await expect( firstLink ).toHaveCSS( 'color', textColor );
 			const thirdLink = editor.canvas
 				.locator( 'a' )
-				.filter( { hasText: 'Third Link' } );
+				.filter( { hasText: 'Test Page' } );
 			await expect( thirdLink ).toHaveCSS( 'color', textColor );
 
 			// Expect the nav block background to be "Pale cyan blue" we selected for the nav background block
@@ -1518,7 +1523,7 @@ test.describe( 'Navigation block', () => {
 				.filter( { hasText: 'Second Link' } );
 			const thirdLinkFront = page
 				.locator( 'a' )
-				.filter( { hasText: 'Third Link' } );
+				.filter( { hasText: 'Test Page' } );
 			const submenuWrapperFront = page
 				.locator( '.wp-block-navigation__submenu-container' )
 				.filter( { has: secondLinkFront } );
