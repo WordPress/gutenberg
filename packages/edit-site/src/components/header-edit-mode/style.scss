@@ -173,11 +173,6 @@ $header-toolbar-min-width: 335px;
 			background-color: transparent;
 		}
 	}
-	// Some margins and padding have to be adjusted so the buttons can still fit on smaller screens.
-	.edit-site-save-button__button {
-		padding-left: 6px;
-		padding-right: 6px;
-	}
 
 	// The template details toggle has a custom label, different from its aria-label, so we don't want to display both.
 	.edit-site-document-actions__get-info.edit-site-document-actions__get-info.edit-site-document-actions__get-info {
@@ -195,4 +190,10 @@ $header-toolbar-min-width: 335px;
 	.edit-site-header-edit-mode__start .edit-site-header-edit-mode__toolbar > * + * {
 		margin-left: $grid-unit-10;
 	}
+}
+
+// Some margins and padding have to be adjusted so the buttons can still fit on smaller screens.
+.edit-site-save-button__button {
+	justify-content: center;
+	min-width: 66px;
 }
