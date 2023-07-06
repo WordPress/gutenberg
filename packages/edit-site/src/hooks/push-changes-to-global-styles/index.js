@@ -94,6 +94,8 @@ const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontFamily': 'fontFamily',
 };
 
+const SUPPORTED_STYLES = [ 'border', 'color', 'spacing', 'typography' ];
+
 function useChangesToPush( name, attributes ) {
 	const supports = useSupportedStyles( name );
 
@@ -213,9 +215,9 @@ function PushChangesToGlobalStylesControl( {
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const blockEditingMode = useBlockEditingMode();
-		const supportsStyles =
-			hasBlockSupport( props.name, 'color' ) ||
-			hasBlockSupport( props.name, 'typography' );
+		const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
+			hasBlockSupport( props.name, feature )
+		);
 
 		return (
 			<>
