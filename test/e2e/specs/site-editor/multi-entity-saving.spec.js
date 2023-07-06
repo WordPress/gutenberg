@@ -5,11 +5,17 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site Editor - Multi-entity save flow', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'emptytheme' );
+		await Promise.all( [
+			requestUtils.activateTheme( 'emptytheme' ),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+		] );
 	} );
 
 	test.beforeEach( async ( { admin, editor } ) => {
