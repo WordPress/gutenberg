@@ -2,6 +2,7 @@
  * External dependencies
  */
 const { join } = require( 'path' );
+const { ModuleFederationPlugin } = require( 'webpack' ).container;
 
 /**
  * Internal dependencies
@@ -9,22 +10,23 @@ const { join } = require( 'path' );
 const { baseConfig } = require( './shared' );
 
 module.exports = {
-	...baseConfig,
+	mode: baseConfig.mode,
+	entry: './empty.js',
 	name: 'interactivity',
-	entry: {
-		index: {
-			import: `./packages/interactivity/src/index.js`,
-			library: {
-				name: [ 'wp', 'interactivity' ],
-				type: 'window',
-			},
-		},
-	},
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './build/interactivity/[name].min.js',
-		path: join( __dirname, '..', '..' ),
+		filename: './[name].min.js',
+		path: join( __dirname, '..', '..', 'build', 'interactivity' ),
 	},
+	plugins: [
+		new ModuleFederationPlugin( {
+			name: '__wordpress_module_federation_interactivity__',
+			filename: 'remoteEntry.js',
+			exposes: {
+				'./interactivity': './packages/interactivity/src/index.js',
+			},
+		} ),
+	],
 	module: {
 		rules: [
 			{
