@@ -789,6 +789,11 @@ export const __experimentalSaveSpecifiedEntityEdits =
 				editsToSave[ edit ] = edits[ edit ];
 			}
 		}
+
+		// Provide recordKey to saveEntityRecord to avoid creating a new record
+		// and instead update the existing record.
+		editsToSave.id = recordId;
+
 		return await dispatch.saveEntityRecord(
 			kind,
 			name,
