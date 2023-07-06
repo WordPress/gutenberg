@@ -81,7 +81,7 @@ export default function PatternsList( { categoryId, type } ) {
 						</Heading>
 						<Text variant="muted" as="p">
 							{ __(
-								'Patterns that are kept in sync across your site'
+								'Patterns that are kept in sync across the site'
 							) }
 						</Text>
 					</VStack>
@@ -101,7 +101,7 @@ export default function PatternsList( { categoryId, type } ) {
 						</Heading>
 						<Text variant="muted" as="p">
 							{ __(
-								'Patterns that can be changed freely without affecting your site'
+								'Patterns that can be changed freely without affecting the site'
 							) }
 						</Text>
 					</VStack>
