@@ -81,15 +81,23 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	const deletePattern = async () => {
 		try {
 			await __experimentalDeleteReusableBlock( item.id );
-			createSuccessNotice( __( 'Pattern successfully deleted.' ), {
-				type: 'snackbar',
-			} );
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The pattern's title e.g. 'Call to action'.
+					__( "'%s' deleted." ),
+					item.title
+				),
+				{ type: 'snackbar', id: 'edit-site-patterns-success' }
+			);
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
 					: __( 'An error occurred while deleting the pattern.' );
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+				id: 'edit-site-patterns-error',
+			} );
 		}
 	};
 	const deleteItem = () =>
@@ -121,7 +129,11 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
 	const confirmPrompt = hasThemeFile
 		? __( 'Are you sure you want to clear these customizations?' )
-		: __( 'Are you sure you want to delete this pattern?' );
+		: sprintf(
+				// translators: %s: The pattern or template part's title e.g. 'Call to action'.
+				__( "Are you sure you want to delete '%s'?" ),
+				item.title
+		  );
 
 	return (
 		<>
@@ -219,6 +231,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 									/>
 								) }
 								<DuplicateMenuItem
+									categoryId={ categoryId }
 									item={ item }
 									onClose={ onClose }
 									label={

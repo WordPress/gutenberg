@@ -28,12 +28,14 @@ import { unlock } from '../../lock-unlock';
 const { useHistory } = unlock( routerPrivateApis );
 
 export default function DuplicateMenuItem( {
+	categoryId,
 	item,
 	label = __( 'Duplicate' ),
 	onClose,
 } ) {
-	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 
 	const history = useHistory();
 	const existingTemplateParts = useExistingTemplateParts();
@@ -52,11 +54,35 @@ export default function DuplicateMenuItem( {
 			const slug = getCleanTemplatePartSlug( title );
 			const { area, content } = item.templatePart;
 
-			await saveEntityRecord(
+			const result = await saveEntityRecord(
 				'postType',
 				'wp_template_part',
 				{ slug, title, content, area },
 				{ throwOnError: true }
+			);
+
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
+					__( "'%s' created." ),
+					title
+				),
+				{
+					type: 'snackbar',
+					id: 'edit-site-patterns-success',
+					actions: [
+						{
+							label: __( 'Edit template part' ),
+							onClick: () =>
+								history.push( {
+									postType: TEMPLATE_PARTS,
+									postId: result?.id,
+									categoryType: TEMPLATE_PARTS,
+									categoryId,
+								} ),
+						},
+					],
+				}
 			);
 
 			onClose();
@@ -68,7 +94,10 @@ export default function DuplicateMenuItem( {
 							'An error occurred while creating the template part.'
 					  );
 
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+				id: 'edit-site-patterns-error',
+			} );
 			onClose();
 		}
 	}
@@ -82,7 +111,7 @@ export default function DuplicateMenuItem( {
 				item.title
 			);
 
-			await saveEntityRecord(
+			const result = await saveEntityRecord(
 				'postType',
 				'wp_block',
 				{
@@ -98,22 +127,52 @@ export default function DuplicateMenuItem( {
 				{ throwOnError: true }
 			);
 
-			onClose();
+			const actionLabel = isThemePattern
+				? __( 'View my patterns' )
+				: __( 'Edit pattern' );
 
-			// If this was a theme pattern, we're "copying to my patterns", so
-			// we need to navigate to that category to display the new pattern.
-			history.push( {
-				categoryType: USER_PATTERNS,
-				categoryId: USER_PATTERN_CATEGORY,
-				path: '/patterns',
-			} );
+			const newLocation = isThemePattern
+				? {
+						categoryType: USER_PATTERNS,
+						categoryId: USER_PATTERN_CATEGORY,
+						path: '/patterns',
+				  }
+				: {
+						categoryType: USER_PATTERNS,
+						categoryId: USER_PATTERN_CATEGORY,
+						postType: USER_PATTERNS,
+						postId: result?.id,
+				  };
+
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
+					__( "'%s' added to my patterns." ),
+					title
+				),
+				{
+					type: 'snackbar',
+					id: 'edit-site-patterns-success',
+					actions: [
+						{
+							label: actionLabel,
+							onClick: () => history.push( newLocation ),
+						},
+					],
+				}
+			);
+
+			onClose();
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
 					: __( 'An error occurred while creating the pattern.' );
 
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+				id: 'edit-site-patterns-error',
+			} );
 			onClose();
 		}
 	}
