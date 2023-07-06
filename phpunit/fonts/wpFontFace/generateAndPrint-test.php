@@ -32,6 +32,14 @@ if ( ! class_exists( 'WP_Font_Face' ) ) {
 class Tests_Fonts_WPFontFace_GenerateAndPrint extends WP_UnitTestCase {
 	use WP_Font_Face_Tests_Datasets;
 
+	public function test_should_not_generate_and_print_when_no_fonts() {
+		$font_face = new WP_Font_Face();
+		$fonts     = array();
+
+		$this->expectOutputString( '' );
+		$font_face->generate_and_print( $fonts );
+	}
+
 	/**
 	 * @dataProvider data_should_print_given_fonts
 	 *

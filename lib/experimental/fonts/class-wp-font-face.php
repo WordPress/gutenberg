@@ -118,6 +118,11 @@ class WP_Font_Face {
 	public function generate_and_print( array $fonts ) {
 		$fonts = $this->validate_fonts( $fonts );
 
+		// Bail out if there are no fonts are given to process.
+		if ( empty( $fonts ) ) {
+			return;
+		}
+
 		printf(
 			$this->get_style_element(),
 			$this->get_css( $fonts )

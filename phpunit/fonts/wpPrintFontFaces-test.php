@@ -38,6 +38,13 @@ class Tests_Fonts_WPPrintFontFaces extends WP_Font_Face_TestCase {
 		parent::set_up_before_class();
 	}
 
+	public function test_should_not_print_when_no_fonts() {
+		switch_theme( 'block-theme' );
+
+		$this->expectOutputString( '' );
+		wp_print_font_faces();
+	}
+
 	/**
 	 * @dataProvider data_should_print_given_fonts
 	 *
