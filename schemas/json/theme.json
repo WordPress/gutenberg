@@ -11,16 +11,16 @@
 			"type": "object",
 			"properties": {
 				"lightbox": {
-					"description": "Allow users to control lightbox.",
+					"description": "Settings related to the lightbox behavior.",
 					"type": "object",
 					"properties": {
 						"enabled": {
-							"description": "Allow users to enable lightbox.",
+							"description": "Allow users to enable the lightbox behavior.",
 							"type": "boolean",
 							"default": false
 						},
 						"animation": {
-							"description": "Allow users to set lightbox animation.",
+							"description": "Set lightbox animation. Possible values: `fade`, `zoom`, `''` (empty string).",
 							"type": "string",
 							"enum": [ "fade", "zoom", "" ]
 						}
