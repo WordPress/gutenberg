@@ -24,7 +24,8 @@
 							"type": "string",
 							"enum": [ "fade", "zoom", "" ]
 						}
-					}
+					},
+					"additionalProperties": false
 				}
 			},
 			"additionalProperties": false
