@@ -59,6 +59,7 @@ export default function Grid( { categoryId, items, ...props } ) {
 			</Composite>
 			{ items.length >= maxCount && (
 				<Button
+					className="edit-site-patterns__load-more"
 					variant="primary"
 					onClick={ () => {
 						setPage( ( prevPage ) => prevPage + 1 );

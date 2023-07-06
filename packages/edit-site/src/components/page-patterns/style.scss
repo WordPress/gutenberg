@@ -1,5 +1,5 @@
 .edit-site-patterns {
-	background: rgba(0, 0, 0, 0.05);
+	background: rgba(0, 0, 0, 0.15);
 	margin: $header-height 0 0;
 	.components-text {
 		color: $gray-600;
@@ -21,7 +21,8 @@
 	// The increased specificity here is to overcome component styles
 	// without relying on internal component class names.
 	.edit-site-patterns__search {
-		&#{&} input[type="search"] {
+		input[type="search"] {
+			height: $button-size-next-default-40px;
 			background: $gray-800;
 			color: $gray-200;
 
@@ -36,26 +37,20 @@
 	}
 
 	.edit-site-patterns__sync-status-filter {
-		background: #000;
+		background: $gray-800;
 		border: none;
-		height: 48px;
-		border-radius: 6px;
+		height: $button-size-next-default-40px;
 		min-width: max-content;
-		width: 100vw;
+		width: 100%;
 		max-width: 100%;
 
 		@include break-medium {
 			width: 300px;
 		}
-
-		// Override the default component style.
-		& [role="presentation"] {
-			border-radius: 6px;
-		}
-
-		.edit-site-patterns__sync-status-filter-option {
-			border-radius: 6px;
-		}
+	}
+	.edit-site-patterns__sync-status-filter-option:active {
+		background: $gray-700;
+		color: $gray-100;
 	}
 }
 
@@ -114,6 +109,10 @@
 		flex: 0 1 auto;
 		margin-bottom: $grid-unit-20;
 	}
+}
+
+.edit-site-patterns__load-more {
+	align-self: center;
 }
 
 .edit-site-patterns__pattern-title {
