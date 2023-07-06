@@ -20,6 +20,7 @@ const config = require( '../config' );
 
 const ARTIFACTS_PATH =
 	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
+const RESULTS_FILE_SUFFIX = '.performance-results.json';
 
 /**
  * @typedef WPPerformanceCommandOptions
@@ -200,7 +201,7 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 		{
 			...process.env,
 			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
-			RESULTS_FILENAME: `${ runKey }.performance-results.json`,
+			RESULTS_FILENAME: runKey + RESULTS_FILE_SUFFIX,
 		}
 	);
 }
@@ -459,7 +460,7 @@ async function runPerformanceTests( branches, options ) {
 	 */
 
 	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>
-		file.endsWith( 'performance-results.json' )
+		file.endsWith( RESULTS_FILE_SUFFIX )
 	);
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
 	const results = {};
@@ -490,7 +491,7 @@ async function runPerformanceTests( branches, options ) {
 		}
 
 		// Save curated results to file.
-		const resultsFilename = testSuite + '.performance-results.json';
+		const resultsFilename = testSuite + RESULTS_FILE_SUFFIX;
 		fs.writeFileSync(
 			path.join( ARTIFACTS_PATH, resultsFilename ),
 			JSON.stringify( results[ testSuite ], null, 2 )
