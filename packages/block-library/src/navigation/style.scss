@@ -460,7 +460,7 @@ button.wp-block-navigation-item__content {
 	right: 0;
 	bottom: 0;
 
-	//Low specificity so that themes can override.
+	// Low specificity so that themes can override.
 	&:where(.wp-block-navigation-item a) {
 		color: inherit;
 	}
