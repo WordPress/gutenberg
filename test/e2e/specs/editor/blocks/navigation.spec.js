@@ -1192,7 +1192,7 @@ test.describe( 'Navigation block', () => {
 			await editor.saveSiteEditorEntities();
 		} );
 
-		test( 'As a user I expect my navigation links to inherit the colors from the parent container', async ( {
+		test( 'As a user I expect my navigation links to inherit the link colors from the parent container', async ( {
 			admin,
 			page,
 			editor,
@@ -1351,6 +1351,108 @@ test.describe( 'Navigation block', () => {
 				.click();
 
 			await editor.saveSiteEditorEntities();
+		} );
+
+		test( 'As a user I expect my navigation links to inherit the text colors from the parent container', async ( {
+			page,
+			editor,
+		} ) => {
+			// Focus the navigation block inside the header template part
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: header' } )
+				.focus();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.click();
+
+			// We wrap the nav block inside a group block
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Group' } ).click();
+
+			// In the sidebar inspector we add a link color and link hover color to the group block
+			await editor.openDocumentSettingsSidebar();
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Color Text styles' } )
+				.click();
+
+			// rgb(0, 208, 132) is the color of the "Vivid green cyan" color preset
+			const textParentColor = 'rgb(0, 208, 132)';
+			await page
+				.getByRole( 'button', { name: 'Color: Vivid green cyan' } )
+				.click( { force: true } );
+			await editor.canvas.click( 'body' );
+
+			// Focus the navigation block inside the header template part
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: header' } )
+				.focus();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.click();
+
+			// Expect the first link to inherit the link color from the parent group block
+			const firstLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'First Link' } );
+			await expect( firstLink ).toHaveCSS( 'color', textParentColor );
+			await firstLink.click();
+
+			// Expect the second link to behave the same as the first
+			const secondLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'Second Link' } );
+			await expect( secondLink ).toHaveCSS( 'color', textParentColor );
+
+			// Expect the third link to behave the same as the first
+			const thirdLink = editor.canvas
+				.locator( 'a' )
+				.filter( { hasText: 'Test Page' } );
+			await expect( thirdLink ).toHaveCSS( 'color', textParentColor );
+
+			// We test the colors of the links on the mobile overlay too.
+			await page
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
+			await editor.canvas
+				.getByRole( 'button', { name: 'Open menu' } )
+				.click();
+			await expect( firstLink ).toHaveCSS( 'color', textParentColor );
+			await expect( secondLink ).toHaveCSS( 'color', textParentColor );
+			await expect( thirdLink ).toHaveCSS( 'color', textParentColor );
+
+			await editor.saveSiteEditorEntities();
+
+			// And finally we check the colors of the links on the frontend
+			await page.goto( '/' );
+			const firstLinkFront = page
+				.locator( 'a' )
+				.filter( { hasText: 'First Link' } );
+			const secondLinkFront = page
+				.locator( 'a' )
+				.filter( { hasText: 'Second Link' } );
+			const thirdLinkFront = page
+				.locator( 'a' )
+				.filter( { hasText: 'Test Page' } );
+
+			// Expect the links to default to the browser default blue when the theme doesn't define a link color and the background to be white
+			await expect( firstLinkFront ).toHaveCSS(
+				'color',
+				textParentColor
+			);
+			await firstLinkFront.hover();
+			await expect( secondLinkFront ).toHaveCSS(
+				'color',
+				textParentColor
+			);
+			await expect( thirdLinkFront ).toHaveCSS(
+				'color',
+				textParentColor
+			);
 		} );
 
 		test( 'As a user I expect my navigation to use the colors I selected for it', async ( {
