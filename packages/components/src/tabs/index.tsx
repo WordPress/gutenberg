@@ -195,7 +195,10 @@ export const TabPanel = ( props: TabPanelProps ) => {
 
 	return (
 		<div className={ className }>
-			<Ariakit.TabList store={ tabStore }>
+			<Ariakit.TabList
+				store={ tabStore }
+				className="components-tab-panel__tabs"
+			>
 				{ tabs.map( ( tab ) => {
 					return (
 						<Ariakit.Tab
@@ -225,6 +228,7 @@ export const TabPanel = ( props: TabPanelProps ) => {
 			</Ariakit.TabList>
 			{ tabs.map( ( tab ) => (
 				<Ariakit.TabPanel
+					id={ `${ prependInstanceId( tab.name ) }-view` }
 					store={ tabStore }
 					key={ tab.name }
 					tabId={ prependInstanceId( tab.name ) }
