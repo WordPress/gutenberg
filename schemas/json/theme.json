@@ -672,9 +672,27 @@
 				}
 			}
 		},
+		"settingsPropertiesBehaviors": {
+			"type": "object",
+			"properties": {
+				"behaviors": {
+					"description": "Settings related to behaviors.",
+					"type": "object",
+					"properties": {
+						"lightbox": {
+							"description": "Allow users to enable/disable lightbox.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
+				{ "$ref": "#/definitions/settingsPropertiesBehaviors" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
 				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
@@ -695,6 +713,7 @@
 				{
 					"properties": {
 						"appearanceTools": {},
+						"behaviors": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
