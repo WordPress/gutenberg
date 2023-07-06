@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [**] Update Editor block inserter button styles and default text input placeholder/selection styles
+-   [*] Rename "Reusable blocks" to "Synced patterns", aligning with the web editor. [#51704]
+
+## 1.98.1
+-   [*] fix: Display heading level dropdown icons and labels [#52004]
 
 ## 1.98.0
 -   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]

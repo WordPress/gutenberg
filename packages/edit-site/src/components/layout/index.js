@@ -143,7 +143,7 @@ export default function Layout() {
 		headerAnimationState = canvasMode; // edit, view, init
 	}
 
-	// Sets the right context for the command center
+	// Sets the right context for the command palette
 	const commandContext =
 		canvasMode === 'edit' && isEditorPage
 			? 'site-editor-edit'
@@ -224,14 +224,25 @@ export default function Layout() {
 					<AnimatePresence initial={ false }>
 						{ isEditorPage && isEditing && (
 							<NavigableRegion
+								key="header"
 								className="edit-site-layout__header"
 								ariaLabel={ __( 'Editor top bar' ) }
 								as={ motion.div }
 								variants={ {
-									isDistractionFree: { opacity: 0 },
-									isDistractionFreeHovering: { opacity: 1 },
-									view: { opacity: 1 },
-									edit: { opacity: 1 },
+									isDistractionFree: { opacity: 0, y: 0 },
+									isDistractionFreeHovering: {
+										opacity: 1,
+										y: 0,
+									},
+									view: { opacity: 1, y: '-100%' },
+									edit: { opacity: 1, y: 0 },
+								} }
+								exit={ {
+									y: '-100%',
+								} }
+								initial={ {
+									opacity: isDistractionFree ? 1 : 0,
+									y: isDistractionFree ? 0 : '-100%',
 								} }
 								transition={ {
 									type: 'tween',
@@ -239,51 +250,35 @@ export default function Layout() {
 									ease: 'easeOut',
 								} }
 							>
-								{ isEditing && <Header /> }
+								<Header />
 							</NavigableRegion>
 						) }
 					</AnimatePresence>
 				</motion.div>
 
 				<div className="edit-site-layout__content">
-					<AnimatePresence initial={ false }>
-						{
-							<motion.div
-								initial={ {
-									opacity: 0,
-								} }
-								animate={
-									showSidebar
-										? { opacity: 1, display: 'block' }
-										: {
-												opacity: 0,
-												transitionEnd: {
-													display: 'none',
-												},
-										  }
-								}
-								exit={ {
-									opacity: 0,
-								} }
-								transition={ {
-									type: 'tween',
-									duration:
-										// Disable transition in mobile to emulate a full page transition.
-										disableMotion || isMobileViewport
-											? 0
-											: ANIMATION_DURATION,
-									ease: 'easeOut',
-								} }
-								className="edit-site-layout__sidebar"
-							>
-								<NavigableRegion
-									ariaLabel={ __( 'Navigation' ) }
-								>
-									<Sidebar />
-								</NavigableRegion>
-							</motion.div>
-						}
-					</AnimatePresence>
+					<motion.div
+						// The sidebar is needed for routing on mobile
+						// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
+						// so we can't remove the element entirely. Using `inert` will make
+						// it inaccessible to screen readers and keyboard navigation.
+						inert={ showSidebar ? undefined : 'inert' }
+						animate={ { opacity: showSidebar ? 1 : 0 } }
+						transition={ {
+							type: 'tween',
+							duration:
+								// Disable transition in mobile to emulate a full page transition.
+								disableMotion || isMobileViewport
+									? 0
+									: ANIMATION_DURATION,
+							ease: 'easeOut',
+						} }
+						className="edit-site-layout__sidebar"
+					>
+						<NavigableRegion ariaLabel={ __( 'Navigation' ) }>
+							<Sidebar />
+						</NavigableRegion>
+					</motion.div>
 
 					<SavePanel />
 

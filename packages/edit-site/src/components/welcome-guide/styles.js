@@ -38,7 +38,7 @@ export default function WelcomeGuideStyles() {
 
 	return (
 		<Guide
-			className="edit-site-welcome-guide"
+			className="edit-site-welcome-guide guide-styles"
 			contentLabel={ welcomeLabel }
 			finishButtonText={ __( 'Get started' ) }
 			onFinish={ () => toggle( 'core/edit-site', 'welcomeGuideStyles' ) }

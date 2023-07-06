@@ -373,18 +373,21 @@ describe( 'UnitControl', () => {
 			const units = [
 				{ value: 'pt', label: 'pt', default: 0 },
 				{ value: 'vmax', label: 'vmax', default: 10 },
+				// Proves that units with regex control characters don't error.
+				{ value: '+', label: '+', default: 10 },
 			];
 
 			render( <UnitControl units={ units } /> );
 
 			const options = getSelectOptions();
 
-			expect( options.length ).toBe( 2 );
+			expect( options.length ).toBe( 3 );
 
-			const [ pt, vmax ] = options;
+			const [ pt, vmax, plus ] = options;
 
 			expect( pt.value ).toBe( 'pt' );
 			expect( vmax.value ).toBe( 'vmax' );
+			expect( plus.value ).toBe( '+' );
 		} );
 
 		it( 'should reset value on unit change, if unit has default value', async () => {

@@ -264,6 +264,8 @@ _Returns_
 
 ### isModalActive
 
+> **Deprecated** since WP 6.3 use `core/interface` store's selector with the same name instead.
+
 Returns true if a modal is active, or false otherwise.
 
 _Parameters_
@@ -336,6 +338,8 @@ Returns an action object signalling that the user closed the sidebar.
 
 ### closeModal
 
+> **Deprecated** since WP 6.3 use `core/interface` store's action with the same name instead.
+
 Returns an action object signalling that the user closed a modal.
 
 _Returns_
@@ -387,6 +391,8 @@ _Parameters_
 -   _name_ `?string`: Sidebar name to be opened.
 
 ### openModal
+
+> **Deprecated** since WP 6.3 use `core/interface` store's action with the same name instead.
 
 Returns an action object used in signalling that the user opened a modal.
 

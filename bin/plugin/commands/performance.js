@@ -330,6 +330,10 @@ async function runPerformanceTests( branches, options ) {
 			path.join( environmentDirectory, '.wp-env.json' ),
 			JSON.stringify(
 				{
+					config: {
+						WP_DEBUG: false,
+						SCRIPT_DEBUG: false,
+					},
 					core: 'WordPress/WordPress',
 					plugins: [ path.join( environmentDirectory, 'plugin' ) ],
 					themes: [

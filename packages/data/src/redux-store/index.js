@@ -24,6 +24,7 @@ import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
 /** @typedef {import('../types').DataRegistry} DataRegistry */
+/** @typedef {import('../types').ListenerFunction} ListenerFunction */
 /**
  * @typedef {import('../types').StoreDescriptor<C>} StoreDescriptor
  * @template {import('../types').AnyConfig} C
@@ -105,10 +106,10 @@ function createBindingCache( bind ) {
 	const cache = new WeakMap();
 
 	return {
-		get( item ) {
+		get( item, itemName ) {
 			let boundItem = cache.get( item );
 			if ( ! boundItem ) {
-				boundItem = bind( item );
+				boundItem = bind( item, itemName );
 				cache.set( item, boundItem );
 			}
 			return boundItem;
@@ -158,6 +159,19 @@ export default function createReduxStore( key, options ) {
 	const storeDescriptor = {
 		name: key,
 		instantiate: ( registry ) => {
+			/**
+			 * Stores listener functions registered with `subscribe()`.
+			 *
+			 * When functions register to listen to store changes with
+			 * `subscribe()` they get added here. Although Redux offers
+			 * its own `subscribe()` function directly, by wrapping the
+			 * subscription in this store instance it's possible to
+			 * optimize checking if the state has changed before calling
+			 * each listener.
+			 *
+			 * @type {Set<ListenerFunction>}
+			 */
+			const listeners = new Set();
 			const reducer = options.reducer;
 			const thunkArgs = {
 				registry,
@@ -198,7 +212,7 @@ export default function createReduxStore( key, options ) {
 				get: ( target, prop ) => {
 					const privateAction = privateActions[ prop ];
 					return privateAction
-						? boundPrivateActions.get( privateAction )
+						? boundPrivateActions.get( privateAction, prop )
 						: actions[ prop ];
 				},
 			} );
@@ -210,7 +224,11 @@ export default function createReduxStore( key, options ) {
 
 			lock( actions, allActions );
 
-			function bindSelector( selector ) {
+			const resolvers = options.resolvers
+				? mapResolvers( options.resolvers )
+				: {};
+
+			function bindSelector( selector, selectorName ) {
 				if ( selector.isRegistrySelector ) {
 					selector.registry = registry;
 				}
@@ -218,8 +236,20 @@ export default function createReduxStore( key, options ) {
 					const state = store.__unstableOriginalGetState();
 					return selector( state.root, ...args );
 				};
-				boundSelector.hasResolver = false;
-				return boundSelector;
+
+				const resolver = resolvers[ selectorName ];
+				if ( ! resolver ) {
+					boundSelector.hasResolver = false;
+					return boundSelector;
+				}
+
+				return mapSelectorWithResolver(
+					boundSelector,
+					selectorName,
+					resolver,
+					store,
+					resolversCache
+				);
 			}
 
 			function bindMetadataSelector( selector ) {
@@ -231,35 +261,26 @@ export default function createReduxStore( key, options ) {
 				return boundSelector;
 			}
 
-			let selectors = {
+			const selectors = {
 				...mapValues( metadataSelectors, bindMetadataSelector ),
 				...mapValues( options.selectors, bindSelector ),
 			};
-
-			let resolvers;
-			if ( options.resolvers ) {
-				resolvers = mapResolvers( options.resolvers );
-				selectors = mapSelectorsWithResolvers(
-					selectors,
-					resolvers,
-					store,
-					resolversCache
-				);
-			}
 
 			const boundPrivateSelectors = createBindingCache( bindSelector );
 
 			// Pre-bind the private selectors that have been registered by the time of
 			// instantiation, so that registry selectors are bound to the registry.
-			for ( const privateSelector of Object.values( privateSelectors ) ) {
-				boundPrivateSelectors.get( privateSelector );
+			for ( const [ selectorName, selector ] of Object.entries(
+				privateSelectors
+			) ) {
+				boundPrivateSelectors.get( selector, selectorName );
 			}
 
 			const allSelectors = new Proxy( () => {}, {
 				get: ( target, prop ) => {
 					const privateSelector = privateSelectors[ prop ];
 					return privateSelector
-						? boundPrivateSelectors.get( privateSelector )
+						? boundPrivateSelectors.get( privateSelector, prop )
 						: selectors[ prop ];
 				},
 			} );
@@ -290,17 +311,23 @@ export default function createReduxStore( key, options ) {
 			const subscribe =
 				store &&
 				( ( listener ) => {
-					let lastState = store.__unstableOriginalGetState();
-					return store.subscribe( () => {
-						const state = store.__unstableOriginalGetState();
-						const hasChanged = state !== lastState;
-						lastState = state;
+					listeners.add( listener );
 
-						if ( hasChanged ) {
-							listener();
-						}
-					} );
+					return () => listeners.delete( listener );
 				} );
+
+			let lastState = store.__unstableOriginalGetState();
+			store.subscribe( () => {
+				const state = store.__unstableOriginalGetState();
+				const hasChanged = state !== lastState;
+				lastState = state;
+
+				if ( hasChanged ) {
+					for ( const listener of listeners ) {
+						listener();
+					}
+				}
+			} );
 
 			// This can be simplified to just { subscribe, getSelectors, getActions }
 			// Once we remove the use function.
@@ -402,6 +429,7 @@ function mapResolveSelectors( selectors, store ) {
 		getCachedResolvers,
 		getResolutionState,
 		getResolutionError,
+		hasResolvingSelectors,
 		...storeSelectors
 	} = selectors;
 
@@ -509,22 +537,24 @@ function mapResolvers( resolvers ) {
 }
 
 /**
- * Returns resolvers with matched selectors for a given namespace.
+ * Returns a selector with a matched resolver.
  * Resolvers are side effects invoked once per argument set of a given selector call,
  * used in ensuring that the data needs for the selector are satisfied.
  *
- * @param {Object} selectors      The current selectors to be modified.
- * @param {Object} resolvers      Resolvers to register.
+ * @param {Object} selector       The selector function to be bound.
+ * @param {string} selectorName   The selector name.
+ * @param {Object} resolver       Resolver to call.
  * @param {Object} store          The redux store to which the resolvers should be mapped.
  * @param {Object} resolversCache Resolvers Cache.
  */
-function mapSelectorsWithResolvers(
-	selectors,
-	resolvers,
+function mapSelectorWithResolver(
+	selector,
+	selectorName,
+	resolver,
 	store,
 	resolversCache
 ) {
-	function fulfillSelector( resolver, selectorName, args ) {
+	function fulfillSelector( args ) {
 		const state = store.getState();
 
 		if (
@@ -570,17 +600,10 @@ function mapSelectorsWithResolvers(
 		}, 0 );
 	}
 
-	return mapValues( selectors, ( selector, selectorName ) => {
-		const resolver = resolvers[ selectorName ];
-		if ( ! resolver ) {
-			return selector;
-		}
-
-		const selectorResolver = ( ...args ) => {
-			fulfillSelector( resolver, selectorName, args );
-			return selector( ...args );
-		};
-		selectorResolver.hasResolver = true;
-		return selectorResolver;
-	} );
+	const selectorResolver = ( ...args ) => {
+		fulfillSelector( args );
+		return selector( ...args );
+	};
+	selectorResolver.hasResolver = true;
+	return selectorResolver;
 }

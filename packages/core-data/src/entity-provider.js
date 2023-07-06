@@ -7,7 +7,7 @@ import {
 	useCallback,
 	useEffect,
 } from '@wordpress/element';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -154,17 +154,16 @@ export function useEntityProp( kind, name, prop, _id ) {
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
-	const [ meta, updateMeta ] = useEntityProp( kind, name, 'meta', _id );
-	const registry = useRegistry();
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, blocks } = useSelect(
+	const { content, blocks, meta } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord } = select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
 				blocks: editedRecord.blocks,
 				content: editedRecord.content,
+				meta: editedRecord.meta,
 			};
 		},
 		[ kind, name, id ]
@@ -194,7 +193,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		( _blocks ) => {
 			if ( ! meta ) return;
 			// If meta.footnotes is empty, it means the meta is not registered.
-			if ( meta.footnotes === undefined ) return;
+			if ( meta.footnotes === undefined ) return {};
 
 			const { getRichTextValues } = unlock( blockEditorPrivateApis );
 			const _content = getRichTextValues( _blocks ).join( '' ) || '';
@@ -237,48 +236,57 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				}, {} ),
 			};
 
-			updateMeta( {
-				...meta,
-				footnotes: JSON.stringify( newFootnotes ),
-			} );
+			return {
+				meta: {
+					...meta,
+					footnotes: JSON.stringify( newFootnotes ),
+				},
+			};
 		},
-		[ meta, updateMeta ]
+		[ meta ]
 	);
 
 	const onChange = useCallback(
 		( newBlocks, options ) => {
-			const { selection } = options;
-			const edits = { blocks: newBlocks, selection };
-
-			const noChange = blocks === edits.blocks;
+			const noChange = blocks === newBlocks;
 			if ( noChange ) {
 				return __unstableCreateUndoLevel( kind, name, id );
 			}
+			const { selection } = options;
 
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
 			// a new undo level.
-			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-				__unstableSerializeAndClean( blocksForSerialization );
+			const edits = {
+				blocks: newBlocks,
+				selection,
+				content: ( { blocks: blocksForSerialization = [] } ) =>
+					__unstableSerializeAndClean( blocksForSerialization ),
+				...updateFootnotes( newBlocks ),
+			};
 
-			registry.batch( () => {
-				updateFootnotes( edits.blocks );
-				editEntityRecord( kind, name, id, edits );
-			} );
+			editEntityRecord( kind, name, id, edits, { isCached: false } );
 		},
-		[ kind, name, id, blocks, updateFootnotes ]
+		[
+			kind,
+			name,
+			id,
+			blocks,
+			updateFootnotes,
+			__unstableCreateUndoLevel,
+			editEntityRecord,
+		]
 	);
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
 			const { selection } = options;
-			const edits = { blocks: newBlocks, selection };
-			registry.batch( () => {
-				updateFootnotes( edits.blocks );
-				editEntityRecord( kind, name, id, edits );
-			} );
+			const footnotesChanges = updateFootnotes( newBlocks );
+			const edits = { blocks: newBlocks, selection, ...footnotesChanges };
+
+			editEntityRecord( kind, name, id, edits, { isCached: true } );
 		},
-		[ kind, name, id, updateFootnotes ]
+		[ kind, name, id, updateFootnotes, editEntityRecord ]
 	);
 
 	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];

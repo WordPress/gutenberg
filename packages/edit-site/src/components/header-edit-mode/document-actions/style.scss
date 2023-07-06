@@ -16,6 +16,14 @@
 		color: currentColor;
 		background: $gray-200;
 	}
+
+	@include break-medium() {
+		width: 50%;
+	}
+
+	@include break-large() {
+		width: min(100%, 450px);
+	}
 }
 
 .edit-site-document-actions__command {
