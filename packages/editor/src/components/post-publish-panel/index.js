@@ -141,6 +141,7 @@ export default compose( [
 			isCurrentPostScheduled,
 			isEditedPostBeingScheduled,
 			isEditedPostDirty,
+			isAutosavingPost,
 			isSavingPost,
 			isSavingNonPostEntityChanges,
 		} = select( editorStore );
@@ -155,7 +156,7 @@ export default compose( [
 			isDirty: isEditedPostDirty(),
 			isPublished: isCurrentPostPublished(),
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
-			isSaving: isSavingPost(),
+			isSaving: isSavingPost() && ! isAutosavingPost(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
 		};

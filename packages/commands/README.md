@@ -38,7 +38,7 @@ _Type_
 
 ### useCommand
 
-Attach a command to the Global command menu.
+Attach a command to the command palette.
 
 _Parameters_
 
@@ -46,7 +46,7 @@ _Parameters_
 
 ### useCommandLoader
 
-Attach a command loader to the Global command menu.
+Attach a command loader to the command palette.
 
 _Parameters_
 

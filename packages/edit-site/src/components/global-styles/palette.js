@@ -91,15 +91,16 @@ function Palette( { name } ) {
 					</HStack>
 				</NavigationButtonAsItem>
 			</ItemGroup>
-			{ themeColors?.length > 0 && (
-				<Button
-					variant="secondary"
-					icon={ shuffle }
-					onClick={ randomizeThemeColors }
-				>
-					{ __( 'Randomize colors' ) }
-				</Button>
-			) }
+			{ window.__experimentalEnableColorRandomizer &&
+				themeColors?.length > 0 && (
+					<Button
+						variant="secondary"
+						icon={ shuffle }
+						onClick={ randomizeThemeColors }
+					>
+						{ __( 'Randomize colors' ) }
+					</Button>
+				) }
 		</VStack>
 	);
 }

@@ -607,7 +607,8 @@ export default function Image( {
 		const ratio =
 			( aspectRatio && evalAspectRatio( aspectRatio ) ) ||
 			( width && height && width / height ) ||
-			naturalWidth / naturalHeight;
+			naturalWidth / naturalHeight ||
+			1;
 
 		const currentWidth = ! width && height ? height * ratio : width;
 		const currentHeight = ! height && width ? width / ratio : height;

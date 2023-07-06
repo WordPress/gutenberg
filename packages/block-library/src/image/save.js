@@ -58,6 +58,8 @@ export default function save( { attributes } ) {
 				...borderProps.style,
 				aspectRatio,
 				objectFit: scale,
+				width,
+				height,
 			} }
 			width={ width }
 			height={ height }

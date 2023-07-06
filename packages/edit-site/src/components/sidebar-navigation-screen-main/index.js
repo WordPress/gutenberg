@@ -75,11 +75,11 @@ export default function SidebarNavigationScreenMain() {
 					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
-						path="/library"
+						path="/patterns"
 						withChevron
 						icon={ symbol }
 					>
-						{ __( 'Library' ) }
+						{ __( 'Patterns' ) }
 					</NavigatorButton>
 				</ItemGroup>
 			}
