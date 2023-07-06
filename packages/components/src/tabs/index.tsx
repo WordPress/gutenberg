@@ -114,7 +114,13 @@ export const TabPanel = ( props: TabPanelProps ) => {
 	} );
 
 	const selectedTabName = extractTabName( tabStore.useState( 'selectedId' ) );
-	const setTabStoreState = tabStore.setState;
+
+	const setTabStoreSelectedId = useCallback(
+		( tabName: string ) => {
+			tabStore.setState( 'selectedId', prependInstanceId( tabName ) );
+		},
+		[ prependInstanceId, tabStore ]
+	);
 
 	const selectedTab = tabs.find( ( { name } ) => name === selectedTabName );
 
@@ -146,19 +152,13 @@ export const TabPanel = ( props: TabPanelProps ) => {
 		}
 		if ( initialTab && ! initialTab.disabled ) {
 			// Select the initial tab if it's not disabled.
-			setTabStoreState(
-				'selectedId',
-				prependInstanceId( initialTab.name )
-			);
+			setTabStoreSelectedId( initialTab.name );
 		} else {
 			// Fallback to the first enabled tab when the initial tab is
 			// disabled or it can't be found.
 			const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
 			if ( firstEnabledTab ) {
-				setTabStoreState(
-					'selectedId',
-					prependInstanceId( firstEnabledTab.name )
-				);
+				setTabStoreSelectedId( firstEnabledTab.name );
 			}
 		}
 	}, [
@@ -166,8 +166,7 @@ export const TabPanel = ( props: TabPanelProps ) => {
 		selectedTab,
 		initialTabName,
 		instanceId,
-		setTabStoreState,
-		prependInstanceId,
+		setTabStoreSelectedId,
 	] );
 
 	// Handle the currently selected tab becoming disabled.
@@ -180,18 +179,9 @@ export const TabPanel = ( props: TabPanelProps ) => {
 		// If the currently selected tab becomes disabled, select the first enabled tab.
 		// (if there is one).
 		if ( firstEnabledTab ) {
-			setTabStoreState(
-				'selectedId',
-				prependInstanceId( firstEnabledTab.name )
-			);
+			setTabStoreSelectedId( firstEnabledTab.name );
 		}
-	}, [
-		tabs,
-		selectedTab?.disabled,
-		setTabStoreState,
-		instanceId,
-		prependInstanceId,
-	] );
+	}, [ tabs, selectedTab?.disabled, setTabStoreSelectedId, instanceId ] );
 
 	return (
 		<div className={ className }>
