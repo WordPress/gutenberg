@@ -19,6 +19,10 @@
 
 	.components-placeholder__learn-more {
 		margin-top: 1em;
+		.components-external-link,
+		a {
+			color: var(--wp-admin-theme-color);
+		}
 	}
 }
 
