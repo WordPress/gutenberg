@@ -4,6 +4,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { useState, useEffect } from '@wordpress/element';
 
 import { decodeEntities } from '@wordpress/html-entities';
 import {
@@ -44,6 +45,21 @@ function buildMenuLabel( title, id, status ) {
 
 // Save a boolean to prevent us creating a fallback more than once per session.
 let hasCreatedFallback = false;
+
+function DelayedSpinner( { delay = 250, ...props } ) {
+	const [ show, setShow ] = useState( false );
+
+	useEffect( () => {
+		const timeout = setTimeout( () => {
+			setShow( true );
+		}, delay );
+		return () => {
+			clearTimeout( timeout );
+		};
+	}, [ delay ] );
+
+	return show && <Spinner { ...props } />;
+}
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	const {
@@ -112,7 +128,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	if ( isLoading ) {
 		return (
 			<SidebarNavigationScreenWrapper>
-				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
+				<DelayedSpinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
 			</SidebarNavigationScreenWrapper>
 		);
 	}
