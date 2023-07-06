@@ -12,8 +12,19 @@
 			"properties": {
 				"lightbox": {
 					"description": "Allow users to control lightbox.",
-					"type": "boolean",
-					"default": false
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"description": "Allow users to enable lightbox.",
+							"type": "boolean",
+							"default": false
+						},
+						"animation": {
+							"description": "Allow users to set lightbox animation.",
+							"type": "string",
+							"enum": [ "fade", "zoom" ]
+						}
+					}
 				}
 			},
 			"additionalProperties": false
