@@ -36,7 +36,7 @@ const DEFAULT_BLOCK = {
 };
 
 function ButtonsEdit( { attributes, className } ) {
-	const { fontSize, style } = attributes;
+	const { fontSize, layout, style } = attributes;
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
 			'has-custom-font-size': fontSize || style?.typography?.fontSize,
@@ -59,8 +59,8 @@ function ButtonsEdit( { attributes, className } ) {
 				{ className: preferredStyle && `is-style-${ preferredStyle }` },
 			],
 		],
-
 		templateInsertUpdatesSelection: true,
+		orientation: layout?.orientation ?? 'horizontal',
 	} );
 
 	return <div { ...innerBlocksProps } />;

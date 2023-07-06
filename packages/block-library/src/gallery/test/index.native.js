@@ -27,6 +27,8 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from '@wordpress/react-native-bridge';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -73,6 +75,24 @@ describe( 'Gallery block', () => {
 
 		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( "renders gallery block placeholder correctly if the block doesn't have inner blocks", async () => {
+		const getBlockSpy = jest
+			.spyOn( select( blockEditorStore ), 'getBlock' )
+			.mockReturnValue( {
+				innerBlocks: undefined,
+				attributes: {
+					content: '',
+				},
+			} );
+
+		const screen = await addGalleryBlock();
+
+		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+
+		getBlockSpy.mockReset();
 	} );
 
 	it( 'selects a gallery item', async () => {
@@ -141,7 +161,7 @@ describe( 'Gallery block', () => {
 
 	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
 	// is addressed.
-	it.skip( 'block remains selected after dimissing the media options picker', async () => {
+	it.skip( 'block remains selected after dismissing the media options picker', async () => {
 		// Initialize with an empty gallery
 		const { getByLabelText, getByText, getByTestId } =
 			await initializeEditor( {
@@ -155,7 +175,7 @@ describe( 'Gallery block', () => {
 		expect( getByText( 'Choose images' ) ).toBeVisible();
 		expect( getByText( 'WordPress Media Library' ) ).toBeVisible();
 
-		// Dimiss the picker
+		// Dismiss the picker
 		if ( Platform.isIOS ) {
 			fireEvent.press( getByText( 'Cancel' ) );
 		} else {
@@ -209,7 +229,9 @@ describe( 'Gallery block', () => {
 		} );
 
 		// Check gallery item caption is not visible
-		const galleryItemCaption = getByLabelText( /Image caption. Empty/ );
+		const galleryItemCaption = getByLabelText( /Image caption. Empty/, {
+			hidden: true,
+		} );
 		expect( galleryItemCaption ).not.toBeVisible();
 
 		// Set gallery caption

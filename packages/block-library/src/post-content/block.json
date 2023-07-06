@@ -8,10 +8,9 @@
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
-		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
-		"__experimentalLayout": true,
+		"layout": true,
 		"dimensions": {
 			"minHeight": true
 		},

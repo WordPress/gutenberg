@@ -169,12 +169,6 @@ export default function PageListEdit( {
 		}, new Map() );
 	}, [ pages ] );
 
-	const convertToNavigationLinks = useConvertToNavigationLinks( {
-		clientId,
-		pages,
-		parentPageID,
-	} );
-
 	const blockProps = useBlockProps( {
 		className: classnames( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
@@ -189,68 +183,71 @@ export default function PageListEdit( {
 		style: { ...context.style?.color },
 	} );
 
-	const getBlockList = ( parentId = parentPageID ) => {
-		const childPages = pagesByParentId.get( parentId );
+	const pagesTree = useMemo(
+		function makePagesTree( parentId = 0, level = 0 ) {
+			const childPages = pagesByParentId.get( parentId );
 
-		if ( ! childPages?.length ) {
-			return [];
-		}
-
-		return childPages.reduce( ( template, page ) => {
-			const hasChildren = pagesByParentId.has( page.id );
-			const pageProps = {
-				id: page.id,
-				label:
-					// translators: displayed when a page has an empty title.
-					page.title?.rendered?.trim() !== ''
-						? page.title?.rendered
-						: __( '(no title)' ),
-				title: page.title?.rendered,
-				link: page.url,
-				hasChildren,
-			};
-			let item = null;
-			const children = getBlockList( page.id );
-			item = createBlock( 'core/page-list-item', pageProps, children );
-			template.push( item );
-
-			return template;
-		}, [] );
-	};
-
-	const makePagesTree = ( parentId = 0, level = 0 ) => {
-		const childPages = pagesByParentId.get( parentId );
-
-		if ( ! childPages?.length ) {
-			return [];
-		}
-
-		return childPages.reduce( ( tree, page ) => {
-			const hasChildren = pagesByParentId.has( page.id );
-			const item = {
-				value: page.id,
-				label: '— '.repeat( level ) + page.title.rendered,
-				rawName: page.title.rendered,
-			};
-			tree.push( item );
-			if ( hasChildren ) {
-				tree.push( ...makePagesTree( page.id, level + 1 ) );
+			if ( ! childPages?.length ) {
+				return [];
 			}
-			return tree;
-		}, [] );
-	};
 
-	const pagesTree = useMemo( makePagesTree, [ pagesByParentId ] );
+			return childPages.reduce( ( tree, page ) => {
+				const hasChildren = pagesByParentId.has( page.id );
+				const item = {
+					value: page.id,
+					label: '— '.repeat( level ) + page.title.rendered,
+					rawName: page.title.rendered,
+				};
+				tree.push( item );
+				if ( hasChildren ) {
+					tree.push( ...makePagesTree( page.id, level + 1 ) );
+				}
+				return tree;
+			}, [] );
+		},
+		[ pagesByParentId ]
+	);
 
-	const blockList = useMemo( getBlockList, [
-		pagesByParentId,
-		parentPageID,
-	] );
+	const blockList = useMemo(
+		function getBlockList( parentId = parentPageID ) {
+			const childPages = pagesByParentId.get( parentId );
+
+			if ( ! childPages?.length ) {
+				return [];
+			}
+
+			return childPages.reduce( ( template, page ) => {
+				const hasChildren = pagesByParentId.has( page.id );
+				const pageProps = {
+					id: page.id,
+					label:
+						// translators: displayed when a page has an empty title.
+						page.title?.rendered?.trim() !== ''
+							? page.title?.rendered
+							: __( '(no title)' ),
+					title: page.title?.rendered,
+					link: page.url,
+					hasChildren,
+				};
+				let item = null;
+				const children = getBlockList( page.id );
+				item = createBlock(
+					'core/page-list-item',
+					pageProps,
+					children
+				);
+				template.push( item );
+
+				return template;
+			}, [] );
+		},
+		[ pagesByParentId, parentPageID ]
+	);
 
 	const {
 		isNested,
 		hasSelectedChild,
-		parentBlock,
+		parentClientId,
 		hasDraggedChild,
 		isChildOfNavigation,
 	} = useSelect(
@@ -258,7 +255,6 @@ export default function PageListEdit( {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
-				getBlockRootClientId,
 				hasDraggedInnerBlock,
 			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
@@ -276,11 +272,18 @@ export default function PageListEdit( {
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
-				parentBlock: getBlockRootClientId( clientId ),
+				parentClientId: navigationBlockParents[ 0 ],
 			};
 		},
 		[ clientId ]
 	);
+
+	const convertToNavigationLinks = useConvertToNavigationLinks( {
+		clientId,
+		pages,
+		parentClientId,
+		parentPageID,
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/page-list-item' ],
@@ -297,12 +300,12 @@ export default function PageListEdit( {
 	useEffect( () => {
 		if ( hasSelectedChild || hasDraggedChild ) {
 			openModal();
-			selectBlock( parentBlock );
+			selectBlock( parentClientId );
 		}
 	}, [
 		hasSelectedChild,
 		hasDraggedChild,
-		parentBlock,
+		parentClientId,
 		selectBlock,
 		openModal,
 	] );

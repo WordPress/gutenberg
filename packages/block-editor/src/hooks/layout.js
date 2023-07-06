@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,8 +29,17 @@ import { LayoutStyle } from '../components/block-list/layout';
 import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
+import { kebabCase } from '../utils/object';
 
-const layoutBlockSupportKey = '__experimentalLayout';
+const layoutBlockSupportKey = 'layout';
+
+function hasLayoutBlockSupport( blockName ) {
+	return (
+		hasBlockSupport( blockName, 'layout' ) ||
+		hasBlockSupport( blockName, '__experimentalLayout' )
+	);
+}
 
 /**
  * Generates the utility classnames for the given block's layout attributes.
@@ -47,8 +55,6 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 		return getSettings().__experimentalFeatures
 			?.useRootPaddingAwareAlignments;
 	}, [] );
-	const globalLayoutSettings = useSetting( 'layout' ) || {};
-
 	const { layout } = blockAttributes;
 
 	const { default: defaultBlockLayout } =
@@ -60,13 +66,9 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 
 	const layoutClassnames = [];
 
-	if (
-		globalLayoutSettings?.definitions?.[ usedLayout?.type || 'default' ]
-			?.className
-	) {
+	if ( LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className ) {
 		const baseClassName =
-			globalLayoutSettings?.definitions?.[ usedLayout?.type || 'default' ]
-				?.className;
+			LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className;
 		const compoundClassName = `wp-block-${ blockName
 			.split( '/' )
 			.pop() }-${ baseClassName }`;
@@ -118,14 +120,12 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 			? { ...layout, type: 'constrained' }
 			: layout || {};
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
-	const globalLayoutSettings = useSetting( 'layout' ) || {};
 	const blockGapSupport = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
 	const css = fullLayoutType?.getLayoutStyle?.( {
 		blockName,
 		selector,
 		layout,
-		layoutDefinitions: globalLayoutSettings?.definitions,
 		style,
 		hasBlockGapSupport,
 	} );
@@ -302,7 +302,7 @@ export function addAttribute( settings ) {
 	if ( 'type' in ( settings.attributes?.layout ?? {} ) ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, layoutBlockSupportKey ) ) {
+	if ( hasLayoutBlockSupport( settings ) ) {
 		settings.attributes = {
 			...settings.attributes,
 			layout: {
@@ -324,10 +324,7 @@ export function addAttribute( settings ) {
 export const withInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		const supportLayout = hasBlockSupport(
-			blockName,
-			layoutBlockSupportKey
-		);
+		const supportLayout = hasLayoutBlockSupport( blockName );
 
 		const blockEditingMode = useBlockEditingMode();
 		return [
@@ -350,18 +347,14 @@ export const withInspectorControls = createHigherOrderComponent(
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
-		const hasLayoutBlockSupport = hasBlockSupport(
-			name,
-			layoutBlockSupportKey
-		);
+		const blockSupportsLayout = hasLayoutBlockSupport( name );
 		const disableLayoutStyles = useSelect( ( select ) => {
 			const { getSettings } = select( blockEditorStore );
 			return !! getSettings().disableLayoutStyles;
 		} );
 		const shouldRenderLayoutStyles =
-			hasLayoutBlockSupport && ! disableLayoutStyles;
+			blockSupportsLayout && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
-		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
@@ -370,7 +363,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 			layout?.inherit || layout?.contentSize || layout?.wideSize
 				? { ...layout, type: 'constrained' }
 				: layout || defaultBlockLayout || {};
-		const layoutClasses = hasLayoutBlockSupport
+		const layoutClasses = blockSupportsLayout
 			? useLayoutClasses( attributes, name )
 			: null;
 		// Higher specificity to override defaults from theme.json.
@@ -389,7 +382,6 @@ export const withLayoutStyles = createHigherOrderComponent(
 				blockName: name,
 				selector,
 				layout: usedLayout,
-				layoutDefinitions: defaultThemeLayout?.definitions,
 				style: attributes?.style,
 				hasBlockGapSupport,
 			} );

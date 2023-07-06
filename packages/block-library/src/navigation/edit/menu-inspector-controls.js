@@ -60,7 +60,6 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 			onClose={ () => {
 				setInsertedBlock( null );
 			} }
-			hasCreateSuggestion={ false }
 			onChange={ ( updatedValue ) => {
 				updateAttributes(
 					updatedValue,
@@ -138,6 +137,7 @@ const MenuInspectorControls = ( props ) => {
 		onSelectClassicMenu,
 		onSelectNavigationMenu,
 		isManageMenusButtonDisabled,
+		blockEditingMode,
 	} = props;
 
 	return (
@@ -150,22 +150,24 @@ const MenuInspectorControls = ( props ) => {
 					>
 						{ __( 'Menu' ) }
 					</Heading>
-					<NavigationMenuSelector
-						currentMenuId={ currentMenuId }
-						onSelectClassicMenu={ onSelectClassicMenu }
-						onSelectNavigationMenu={ onSelectNavigationMenu }
-						onCreateNew={ onCreateNew }
-						createNavigationMenuIsSuccess={
-							createNavigationMenuIsSuccess
-						}
-						createNavigationMenuIsError={
-							createNavigationMenuIsError
-						}
-						actionLabel={ actionLabel }
-						isManageMenusButtonDisabled={
-							isManageMenusButtonDisabled
-						}
-					/>
+					{ blockEditingMode === 'default' && (
+						<NavigationMenuSelector
+							currentMenuId={ currentMenuId }
+							onSelectClassicMenu={ onSelectClassicMenu }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
+							onCreateNew={ onCreateNew }
+							createNavigationMenuIsSuccess={
+								createNavigationMenuIsSuccess
+							}
+							createNavigationMenuIsError={
+								createNavigationMenuIsError
+							}
+							actionLabel={ actionLabel }
+							isManageMenusButtonDisabled={
+								isManageMenusButtonDisabled
+							}
+						/>
+					) }
 				</HStack>
 				<MainContent { ...props } />
 			</PanelBody>

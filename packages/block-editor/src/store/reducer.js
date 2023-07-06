@@ -1470,6 +1470,56 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
+ * Reducer returning the data needed to display a prompt when certain blocks
+ * are removed, or `false` if no such prompt is requested.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object|false} Data for removal prompt display, if any.
+ */
+function removalPromptData( state = false, action ) {
+	switch ( action.type ) {
+		case 'DISPLAY_BLOCK_REMOVAL_PROMPT':
+			const { clientIds, selectPrevious, blockNamesForPrompt } = action;
+			return {
+				clientIds,
+				selectPrevious,
+				blockNamesForPrompt,
+			};
+		case 'CLEAR_BLOCK_REMOVAL_PROMPT':
+			return false;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning any rules that a block editor may provide in order to
+ * prevent a user from accidentally removing certain blocks. These rules are
+ * then used to display a confirmation prompt to the user. For instance, in the
+ * Site Editor, the Query Loop block is important enough to warrant such
+ * confirmation.
+ *
+ * The data is a record whose keys are block types (e.g. 'core/query') and
+ * whose values are the explanation to be shown to users (e.g. 'Query Loop
+ * displays a list of posts or pages.').
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Record<string,string>} Updated state.
+ */
+function blockRemovalRules( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_REMOVAL_RULES':
+			return action.rules;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the initial block selection.
  *
  * Currently this in only used to restore the selection after block deletion and
@@ -1581,6 +1631,12 @@ export function template( state = { isValid: true }, action ) {
 export function settings( state = SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'UPDATE_SETTINGS':
+			if ( action.reset ) {
+				return {
+					...SETTINGS_DEFAULTS,
+					...action.settings,
+				};
+			}
 			return {
 				...state,
 				...action.settings,
@@ -1881,6 +1937,8 @@ const combinedReducers = combineReducers( {
 	temporarilyEditingAsBlocks,
 	blockVisibility,
 	blockEditingModes,
+	removalPromptData,
+	blockRemovalRules,
 } );
 
 function withAutomaticChangeReset( reducer ) {
