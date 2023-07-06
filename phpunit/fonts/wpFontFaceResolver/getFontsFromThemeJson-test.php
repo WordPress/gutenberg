@@ -6,9 +6,12 @@
  * @subpackage Fonts
  */
 
-require_once __DIR__ . '/../../fonts-api/wp-fonts-testcase.php';
-// This code is only needed if the Font API is enabled.
-// It should be removed after Font Manager is merged into Gutenberg.
+require_once __DIR__ . '/../wp-font-face-testcase.php';
+
+/*
+ * This code is only needed if the Font API is enabled.
+ * @todo remove this code when Font Library is merged into Gutenberg.
+ */
 if ( ! class_exists( 'WP_Font_Face' ) ) {
 	require_once __DIR__ . '/../../../lib/experimental/fonts/class-wp-font-face.php';
 	require_once __DIR__ . '/../../../lib/experimental/fonts/class-wp-font-face-resolver.php';
@@ -23,23 +26,11 @@ if ( ! class_exists( 'WP_Font_Face' ) ) {
  *
  * @since X.X.X
  * @group fonts
+ * @group fontface
  * @covers WP_Font_Face_Resolver::get_fonts_from_theme_json
  */
 class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_TestCase {
-	const FONTS_THEME   = 'fonts-block-theme';
-	const FONT_FAMILIES = array(
-		'fonts-block-theme' => array(
-			// From theme.json.
-			'DM Sans',
-			'Source Serif Pro',
-		),
-	);
-
-	const STYLE_VARIATIONS_FONTS = array(
-		'fonts-block-theme' => array(
-			'Open Sans',
-		),
-	);
+	const FONTS_THEME = 'fonts-block-theme';
 
 	public static function set_up_before_class() {
 		self::$requires_switch_theme_fixtures = true;
@@ -47,11 +38,12 @@ class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_Test
 		parent::set_up_before_class();
 	}
 
-	public function test_should_return_no_fonts_when_no_fonts_defined() {
+	public function test_should_return_empty_array_when_no_fonts_defined() {
 		switch_theme( 'block-theme' );
 
 		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
-		$this->assertSame( array(), $fonts );
+		$this->assertIsArray( $fonts, 'Should return an array data type' );
+		$this->assertEmpty( $fonts, 'Should return an empty array' );
 	}
 
 	/**
@@ -63,30 +55,18 @@ class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Fonts_Test
 
 		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
 
-		$expected = static::FONT_FAMILIES[ static::FONTS_THEME ];
-		$this->assertSameSetsWithIndex( $expected, array_keys( $fonts ) );
-	}
-
-	/**
-	 * Test ensures that the style variations are not returned.
-	 */
-	public function test_should_not_return_fonts_from_style_variations() {
-		switch_theme( static::FONTS_THEME );
-
-		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
-
-		$style_variations_fonts = static::STYLE_VARIATIONS_FONTS[ static::FONTS_THEME ];
-		foreach ( $style_variations_fonts as $style_variations_font ) {
-			$this->assertArrayNotHasKey( $style_variations_font, $fonts );
-		}
+		$this->assertSameSetsWithIndex(
+			array( 'DM Sans', 'Source Serif Pro' ),
+			array_keys( $fonts )
+		);
 	}
 
 	/**
 	 * @dataProvider data_should_replace_src_file_placeholder
 	 *
-	 * @param string $font_name Font's name.
+	 * @param string $font_name  Font's name.
 	 * @param string $font_index Font's index in the $fonts array.
-	 * @param string $expected  Expected src.
+	 * @param string $expected   Expected src.
 	 */
 	public function test_should_replace_src_file_placeholder( $font_name, $font_index, $expected ) {
 		switch_theme( static::FONTS_THEME );
