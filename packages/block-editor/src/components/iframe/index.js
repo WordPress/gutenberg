@@ -116,9 +116,16 @@ function Iframe( {
 			bubbleEvents( contentDocument );
 			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
+			bodyRef( contentDocument.body );
 
 			contentDocument.body.classList.add( 'wp-block-editor__iframe' );
 			contentDocument.body.classList.add( 'editor-styles-wrapper' );
+
+			contentDocument.body.addEventListener( 'click', ( event ) => {
+				if ( event.target === contentDocument.body ) {
+					node.click();
+				}
+			} );
 
 			// Ideally ALL classes that are added through get_body_class should
 			// be added in the editor too, which we'll somehow have to get from
@@ -235,12 +242,12 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						<div ref={ bodyRef }>
+						<>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
 								{ children }
 							</StyleProvider>
-						</div>,
+						</>,
 						iframeDocument.body
 					) }
 			</iframe>
