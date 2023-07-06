@@ -2112,7 +2112,7 @@
 			"description": "Description of the global styles variation."
 		},
 		"behaviors": {
-			"description": "A list of blocks that have behaviors. These setting controls the display of the behaviors UI in the block editor.",
+			"description": "A list of blocks that have behaviors. This setting controls the display of the Behaviors UI in the block editor.",
 			"type": "object",
 			"properties": {
 				"blocks": {
