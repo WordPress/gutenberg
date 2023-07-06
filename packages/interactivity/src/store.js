@@ -39,9 +39,10 @@ const rawState = getSerializedState();
 export const rawStore = { state: deepSignal( rawState ) };
 
 /**
- * Extends the global store with the passed properties. These props tipically
- * consist of `state`, `selectors` and `actions` used by interactive blocks, and
- * any of them may be accessed by any directive present in the page.
+ * Extends the Interactivity API global store with the passed properties.
+ *
+ * These props tipically consist of `state`, `selectors` and `actions` that can
+ * be used by any directive, making the HTML reactive and interactive.
  *
  * @example
  * ```js
