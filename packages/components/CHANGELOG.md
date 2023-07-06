@@ -15,6 +15,7 @@
 -   `Button`: Introduce `size` prop with `default`, `compact`, and `small` variants ([#51842](https://github.com/WordPress/gutenberg/pull/51842)).
 -   `ItemGroup`: Update button focus state styles to target `:focus-visible` rather than `:focus`. ([#51787](https://github.com/WordPress/gutenberg/pull/51787)).
 -   `Guide`: Don't show Close button when there is only one page, and use default button and accent/theme styling ([#52014](https://github.com/WordPress/gutenberg/pull/52014)).
+-   `PreferencesModal`: Make heading and label colors consistent across the editor. ([#51246](https://github.com/WordPress/gutenberg/pull/51246/).
 
 ### Bug Fix
 
