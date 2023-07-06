@@ -475,7 +475,7 @@ async function runPerformanceTests( branches, options ) {
 		for ( const branch of branches ) {
 			const resultsRounds = resultFiles
 				.filter( ( file ) =>
-					file.includes( `${ testSuite }__${ branch }__round-` )
+					file.includes( `${ testSuite }_${ branch }_round-` )
 				)
 				.map( ( file ) =>
 					curateResults( testSuite, readJSONFile( file ) )
