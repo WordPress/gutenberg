@@ -32,7 +32,6 @@ class Gutenberg_Navigation_Fallback_Test extends WP_UnitTestCase {
 		$this->assertTrue( class_exists( 'Gutenberg_Navigation_Fallback' ), 'Gutenberg_Navigation_Fallback class should exist.' );
 	}
 
-
 	/**
 	 * @covers WP_REST_Navigation_Fallback_Controller::get_fallback
 	 */
@@ -52,6 +51,24 @@ class Gutenberg_Navigation_Fallback_Test extends WP_UnitTestCase {
 		$navs_in_db = $this->get_navigations_in_database();
 
 		$this->assertCount( 1, $navs_in_db, 'The fallback Navigation post should be the only one in the database.' );
+	}
+
+	/**
+	 * @covers WP_REST_Navigation_Fallback_Controller::get_fallback
+	 */
+	public function test_should_not_automatically_create_fallback_if_filter_is_falsey() {
+
+		add_filter( 'gutenberg_navigation_should_create_fallback', '__return_false' );
+
+		$data = Gutenberg_Navigation_Fallback::get_fallback();
+
+		$this->assertEmpty( $data );
+
+		$navs_in_db = $this->get_navigations_in_database();
+
+		$this->assertCount( 0, $navs_in_db, 'The fallback Navigation post should not have been created.' );
+
+		remove_filter( 'gutenberg_navigation_should_create_fallback', '__return_false' );
 	}
 
 	/**
