@@ -6,6 +6,7 @@ import {
 	useState,
 	useEffect,
 	useContext,
+	startTransition,
 } from '@wordpress/element';
 
 /**
@@ -39,7 +40,9 @@ export function RouterProvider( { children } ) {
 
 	useEffect( () => {
 		return history.listen( ( { location: updatedLocation } ) => {
-			setLocation( getLocationWithParams( updatedLocation ) );
+			startTransition( () => {
+				setLocation( getLocationWithParams( updatedLocation ) );
+			} );
 		} );
 	}, [] );
 

@@ -4,6 +4,8 @@
 import { parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -38,37 +40,58 @@ const templatePartToPattern = ( templatePart ) => ( {
 	templatePart,
 } );
 
-const templatePartHasCategory = ( item, category ) =>
-	item.templatePart.area === category;
-
 const selectTemplatePartsAsPatterns = (
 	select,
-	{ categoryId, search = '' } = {}
+	{ categoryId, search = '', page = 1 } = {}
 ) => {
-	const { getEntityRecords, getIsResolving } = select( coreStore );
-	const query = { per_page: -1 };
-	const rawTemplateParts =
+	const { getEntityRecords, getIsResolving, getEntityConfig } =
+		select( coreStore );
+	const query = {
+		per_page: 20,
+		page,
+		area: categoryId,
+		// TODO: The template parts REST API doesn't support searching yet.
+		search,
+		search_columns: 'post_title',
+	};
+	const templateParts =
 		getEntityRecords( 'postType', TEMPLATE_PARTS, query ) ??
 		EMPTY_PATTERN_LIST;
-	const templateParts = rawTemplateParts.map( ( templatePart ) =>
+	const patterns = templateParts.map( ( templatePart ) =>
 		templatePartToPattern( templatePart )
 	);
 
 	const isResolving = getIsResolving( 'getEntityRecords', [
 		'postType',
-		'wp_template_part',
+		TEMPLATE_PARTS,
 		query,
 	] );
 
-	const patterns = searchItems( templateParts, search, {
-		categoryId,
-		hasCategory: templatePartHasCategory,
-	} );
+	const getTotalPages = async ( { signal } = {} ) => {
+		const entityConfig = getEntityConfig( 'postType', TEMPLATE_PARTS );
+		const response = await apiFetch( {
+			path: addQueryArgs( entityConfig.baseURL, {
+				...entityConfig.baseURLParams,
+				...query,
+			} ),
+			method: 'HEAD',
+			parse: false,
+			signal,
+		} );
+		return parseInt( response.headers.get( 'X-WP-Totalpages' ), 10 );
+	};
 
-	return { patterns, isResolving };
+	return {
+		patterns,
+		isResolving,
+		getTotalPages,
+	};
 };
 
-const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
+const selectThemePatterns = (
+	select,
+	{ categoryId, search = '', page = 1 } = {}
+) => {
 	const { getSettings } = unlock( select( editSiteStore ) );
 	const settings = getSettings();
 	const blockPatterns =
@@ -98,7 +121,13 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 			item.categories?.includes( currentCategory ),
 	} );
 
-	return { patterns, isResolving: false };
+	patterns = patterns.slice( ( page - 1 ) * 20, page * 20 );
+
+	return {
+		patterns,
+		isResolving: false,
+		getTotalPages: async () => Math.ceil( patterns.length / 20 ),
+	};
 };
 
 const reusableBlockToPattern = ( reusableBlock ) => ( {
@@ -112,41 +141,53 @@ const reusableBlockToPattern = ( reusableBlock ) => ( {
 	reusableBlock,
 } );
 
-const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
-	const { getEntityRecords, getIsResolving } = select( coreStore );
+const selectUserPatterns = (
+	select,
+	{ search = '', syncStatus, page = 1 } = {}
+) => {
+	const { getEntityRecords, getIsResolving, getEntityConfig } =
+		select( coreStore );
 
-	const query = { per_page: -1 };
+	const query = {
+		per_page: 20,
+		page,
+		search,
+		search_columns: 'post_title',
+		sync_status: syncStatus,
+	};
 	const records = getEntityRecords( 'postType', USER_PATTERNS, query );
 
-	let patterns = records
-		? records.map( ( record ) => reusableBlockToPattern( record ) )
-		: EMPTY_PATTERN_LIST;
 	const isResolving = getIsResolving( 'getEntityRecords', [
 		'postType',
 		USER_PATTERNS,
 		query,
 	] );
 
-	if ( syncStatus ) {
-		patterns = patterns.filter(
-			( pattern ) => pattern.syncStatus === syncStatus
-		);
-	}
+	const patterns = records
+		? records.map( ( record ) => reusableBlockToPattern( record ) )
+		: EMPTY_PATTERN_LIST;
 
-	patterns = searchItems( patterns, search, {
-		// We exit user pattern retrieval early if we aren't in the
-		// catch-all category for user created patterns, so it has
-		// to be in the category.
-		hasCategory: () => true,
-	} );
+	const getTotalPages = async ( { signal } = {} ) => {
+		const entityConfig = getEntityConfig( 'postType', USER_PATTERNS );
+		const response = await apiFetch( {
+			path: addQueryArgs( entityConfig.baseURL, {
+				...entityConfig.baseURLParams,
+				...query,
+			} ),
+			method: 'HEAD',
+			parse: false,
+			signal,
+		} );
+		return parseInt( response.headers.get( 'X-Wp-Totalpages' ), 10 );
+	};
 
-	return { patterns, isResolving };
+	return { patterns, isResolving, getTotalPages };
 };
 
 export const usePatterns = (
 	categoryType,
 	categoryId,
-	{ search = '', syncStatus }
+	{ search = '', page = 1, syncStatus }
 ) => {
 	return useSelect(
 		( select ) => {
@@ -154,15 +195,28 @@ export const usePatterns = (
 				return selectTemplatePartsAsPatterns( select, {
 					categoryId,
 					search,
+					page,
 				} );
 			} else if ( categoryType === PATTERNS ) {
-				return selectThemePatterns( select, { categoryId, search } );
+				return selectThemePatterns( select, {
+					categoryId,
+					search,
+					page,
+				} );
 			} else if ( categoryType === USER_PATTERNS ) {
-				return selectUserPatterns( select, { search, syncStatus } );
+				return selectUserPatterns( select, {
+					search,
+					syncStatus,
+					page,
+				} );
 			}
-			return { patterns: EMPTY_PATTERN_LIST, isResolving: false };
+			return {
+				patterns: EMPTY_PATTERN_LIST,
+				isResolving: false,
+				getTotalPages: async () => 1,
+			};
 		},
-		[ categoryId, categoryType, search, syncStatus ]
+		[ categoryType, categoryId, search, page, syncStatus ]
 	);
 };
 

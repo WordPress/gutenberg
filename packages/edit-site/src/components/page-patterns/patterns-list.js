@@ -22,6 +22,7 @@ import PatternsHeader from './header';
 import Grid from './grid';
 import NoPatterns from './no-patterns';
 import usePatterns from './use-patterns';
+import PatternsPagination from './pagination';
 import SidebarButton from '../sidebar-button';
 import useDebouncedInput from '../../utils/use-debounced-input';
 import { unlock } from '../../lock-unlock';
@@ -39,17 +40,25 @@ export default function PatternsList( { categoryId, type } ) {
 	const location = useLocation();
 	const history = useHistory();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const [ page, setPage ] = useState( 1 );
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( '' );
 	const deferredFilterValue = useDeferredValue( delayedFilterValue );
-
 	const [ syncFilter, setSyncFilter ] = useState( 'all' );
 	const deferredSyncedFilter = useDeferredValue( syncFilter );
-	const { patterns, isResolving } = usePatterns( type, categoryId, {
-		search: deferredFilterValue,
-		syncStatus:
-			deferredSyncedFilter === 'all' ? undefined : deferredSyncedFilter,
-	} );
+
+	const { patterns, isResolving, getTotalPages } = usePatterns(
+		type,
+		categoryId,
+		{
+			search: deferredFilterValue,
+			page,
+			syncStatus:
+				deferredSyncedFilter === 'all'
+					? undefined
+					: deferredSyncedFilter,
+		}
+	);
 
 	const id = useId();
 	const titleId = `${ id }-title`;
@@ -85,7 +94,10 @@ export default function PatternsList( { categoryId, type } ) {
 				<FlexBlock className="edit-site-patterns__search-block">
 					<SearchControl
 						className="edit-site-patterns__search"
-						onChange={ ( value ) => setFilterValue( value ) }
+						onChange={ ( value ) => {
+							setFilterValue( value );
+							setPage( 1 );
+						} }
 						placeholder={ __( 'Search patterns' ) }
 						label={ __( 'Search patterns' ) }
 						value={ filterValue }
@@ -99,7 +111,10 @@ export default function PatternsList( { categoryId, type } ) {
 						label={ __( 'Filter by sync status' ) }
 						value={ syncFilter }
 						isBlock
-						onChange={ ( value ) => setSyncFilter( value ) }
+						onChange={ ( value ) => {
+							setSyncFilter( value );
+							setPage( 1 );
+						} }
 						__nextHasNoMarginBottom
 					>
 						{ Object.entries( SYNC_FILTERS ).map(
@@ -117,12 +132,20 @@ export default function PatternsList( { categoryId, type } ) {
 			</Flex>
 
 			{ hasPatterns && (
-				<Grid
-					categoryId={ categoryId }
-					items={ patterns }
-					aria-labelledby={ titleId }
-					aria-describedby={ descriptionId }
-				/>
+				<>
+					<Grid
+						categoryId={ categoryId }
+						items={ patterns }
+						aria-labelledby={ titleId }
+						aria-describedby={ descriptionId }
+					/>
+					<PatternsPagination
+						page={ page }
+						setPage={ setPage }
+						patterns={ patterns }
+						getTotalPages={ getTotalPages }
+					/>
+				</>
 			) }
 			{ ! isResolving && ! hasPatterns && <NoPatterns /> }
 		</VStack>
