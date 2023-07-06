@@ -261,10 +261,24 @@ export default function createReduxStore( key, options ) {
 				);
 			}
 
-			function bindMetadataSelector( selector ) {
+			function bindMetadataSelector( metaDataSelector ) {
 				const boundSelector = ( ...args ) => {
 					const state = store.__unstableOriginalGetState();
-					return selector( state.metadata, ...args );
+
+					const originalSelectorName = args && args[ 0 ];
+					const originalSelectorArgs = args && args[ 1 ];
+					const targetSelector =
+						options?.selectors?.[ originalSelectorName ];
+
+					// Normalize the arguments passed to the target selector.
+					if ( originalSelectorName && targetSelector ) {
+						args[ 1 ] = normalize(
+							targetSelector,
+							originalSelectorArgs
+						);
+					}
+
+					return metaDataSelector( state.metadata, ...args );
 				};
 				boundSelector.hasResolver = false;
 				return boundSelector;
