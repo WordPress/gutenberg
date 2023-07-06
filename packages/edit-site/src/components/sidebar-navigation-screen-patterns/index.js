@@ -7,6 +7,7 @@ import {
 	Flex,
 	Icon,
 	Tooltip,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -109,9 +110,21 @@ export default function SidebarNavigationScreenPatterns() {
 								</ItemGroup>
 							) }
 							{ hasTemplateParts && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									{ Object.entries( templatePartAreas ).map(
-										( [ area, parts ] ) => (
+								<>
+									<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
+										<Heading level={ 2 }>
+											{ __( 'Template parts' ) }
+										</Heading>
+										<p>
+											{ __(
+												'Synced patterns for use in template building.'
+											) }
+										</p>
+									</div>
+									<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+										{ Object.entries(
+											templatePartAreas
+										).map( ( [ area, parts ] ) => (
 											<CategoryItem
 												key={ area }
 												count={ parts.length }
@@ -131,54 +144,71 @@ export default function SidebarNavigationScreenPatterns() {
 														'wp_template_part'
 												}
 											/>
-										)
-									) }
-								</ItemGroup>
+										) ) }
+									</ItemGroup>
+								</>
 							) }
 							{ hasPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									{ patternCategories.map( ( category ) => (
-										<CategoryItem
-											key={ category.name }
-											count={ category.count }
-											label={
-												<Flex
-													justify="left"
-													align="center"
-													gap={ 0 }
-												>
-													{ category.label }
-													<Tooltip
-														position="top center"
-														text={ __(
-															'Theme patterns cannot be edited.'
-														) }
-													>
-														<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
-															<Icon
-																style={ {
-																	fill: 'currentcolor',
-																} }
-																icon={
-																	lockSmall
-																}
-																size={ 24 }
-															/>
-														</span>
-													</Tooltip>
-												</Flex>
-											}
-											icon={ file }
-											id={ category.name }
-											type="pattern"
-											isActive={
-												currentCategory ===
-													`${ category.name }` &&
-												currentType === 'pattern'
-											}
-										/>
-									) ) }
-								</ItemGroup>
+								<>
+									<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
+										<Heading level={ 2 }>
+											{ __( 'Theme patterns' ) }
+										</Heading>
+										<p>
+											{ __(
+												'For insertion into documents where they can then be customized.'
+											) }
+										</p>
+									</div>
+									<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+										{ patternCategories.map(
+											( category ) => (
+												<CategoryItem
+													key={ category.name }
+													count={ category.count }
+													label={
+														<Flex
+															justify="left"
+															align="center"
+															gap={ 0 }
+														>
+															{ category.label }
+															<Tooltip
+																position="top center"
+																text={ __(
+																	'Theme patterns cannot be edited.'
+																) }
+															>
+																<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
+																	<Icon
+																		style={ {
+																			fill: 'currentcolor',
+																		} }
+																		icon={
+																			lockSmall
+																		}
+																		size={
+																			24
+																		}
+																	/>
+																</span>
+															</Tooltip>
+														</Flex>
+													}
+													icon={ file }
+													id={ category.name }
+													type="pattern"
+													isActive={
+														currentCategory ===
+															`${ category.name }` &&
+														currentType ===
+															'pattern'
+													}
+												/>
+											)
+										) }
+									</ItemGroup>
+								</>
 							) }
 						</>
 					) }
