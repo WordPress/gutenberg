@@ -49,8 +49,5 @@
 		}
 	},
 	"editorStyle": "wp-block-avatar-editor",
-	"style": "wp-block-avatar",
-	"__experimentalAutoInsert": {
-		"core/comment-template": "lastChild"
-	}
+	"style": "wp-block-avatar"
 }
