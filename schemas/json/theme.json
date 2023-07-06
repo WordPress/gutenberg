@@ -22,7 +22,7 @@
 						"animation": {
 							"description": "Allow users to set lightbox animation.",
 							"type": "string",
-							"enum": [ "fade", "zoom" ]
+							"enum": [ "fade", "zoom", "" ]
 						}
 					}
 				}
