@@ -206,5 +206,64 @@ class Gutenberg_REST_Global_Styles_Controller extends Gutenberg_REST_Global_Styl
 		return $response;
 	}
 
+	/**
+	 * Prepares a single global styles config for update.
+	 *
+	 * @since 5.9.0
+	 * @since 6.2.0 Added validation of styles.css property.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return stdClass Changes to pass to wp_update_post.
+	 */
+	protected function prepare_item_for_database( $request ) {
+		$changes         = new stdClass();
+		$changes->ID     = $request['id'];
+		$post            = get_post( $request['id'] );
+		$existing_config = array();
+		if ( $post ) {
+			$existing_config     = json_decode( $post->post_content, true );
+			$json_decoding_error = json_last_error();
+			if ( JSON_ERROR_NONE !== $json_decoding_error || ! isset( $existing_config['isGlobalStylesUserThemeJSON'] ) ||
+				! $existing_config['isGlobalStylesUserThemeJSON'] ) {
+				$existing_config = array();
+			}
+		}
+		if ( isset( $request['styles'] ) || isset( $request['settings'] ) || isset( $request['behaviors'] ) ) {
+			$config = array();
+			if ( isset( $request['styles'] ) ) {
+				$config['styles'] = $request['styles'];
+				if ( isset( $request['styles']['css'] ) ) {
+					$validate_custom_css = $this->validate_custom_css( $request['styles']['css'] );
+					if ( is_wp_error( $validate_custom_css ) ) {
+						return $validate_custom_css;
+					}
+				}
+			} elseif ( isset( $existing_config['styles'] ) ) {
+				$config['styles'] = $existing_config['styles'];
+			}
+			if ( isset( $request['settings'] ) ) {
+				$config['settings'] = $request['settings'];
+			} elseif ( isset( $existing_config['settings'] ) ) {
+				$config['settings'] = $existing_config['settings'];
+			}
+			if ( isset( $request['behaviors'] ) ) {
+				$config['behaviors'] = $request['behaviors'];
+			} elseif ( isset( $existing_config['behaviors'] ) ) {
+				$config['behaviors'] = $existing_config['behaviors'];
+			}
+			$config['isGlobalStylesUserThemeJSON'] = true;
+			$config['version']                     = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
+			$changes->post_content                 = wp_json_encode( $config );
+		}
+		// Post title.
+		if ( isset( $request['title'] ) ) {
+			if ( is_string( $request['title'] ) ) {
+				$changes->post_title = $request['title'];
+			} elseif ( ! empty( $request['title']['raw'] ) ) {
+				$changes->post_title = $request['title']['raw'];
+			}
+		}
+		return $changes;
+	}
 
 }

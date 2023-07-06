@@ -282,6 +282,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 		$fields = $this->get_fields_for_response( $request );
 		$data   = array();
 
+		// Should we include behaviors here?
 		if ( ! empty( $global_styles_config['styles'] ) || ! empty( $global_styles_config['settings'] ) ) {
 			$global_styles_config = ( new WP_Theme_JSON_Gutenberg( $global_styles_config, 'custom' ) )->get_raw_data();
 			if ( rest_is_field_included( 'settings', $fields ) ) {
@@ -401,6 +402,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
+				// Should we include behaviors here?
 			),
 		);
 
