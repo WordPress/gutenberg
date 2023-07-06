@@ -8,7 +8,7 @@ import { useRef, useCallback } from 'preact/hooks';
  */
 import { rawStore as store } from './store';
 
-/** @typedef {import('preact').VNode} Element */
+/** @typedef {import('preact').VNode} VNode */
 /** @typedef {typeof context} Context */
 /** @typedef {ReturnType<typeof getEvaluate>} Evaluate */
 
@@ -16,7 +16,7 @@ import { rawStore as store } from './store';
  * @typedef {Object} DirectiveCallbackParams Callback parameters.
  * @property {Object}   directives Object map with the defined directives of the element being evaluated.
  * @property {Object}   props      Props present in the current element.
- * @property {Element}  element    Virtual node representing the original element.
+ * @property {VNode}    element    Virtual node representing the original element.
  * @property {Context}  context    The inherited context.
  * @property {Evaluate} evaluate   Function that resolves a given path to a value either in the store or the context.
  */
