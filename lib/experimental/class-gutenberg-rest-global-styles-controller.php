@@ -29,39 +29,39 @@ class Gutenberg_REST_Global_Styles_Controller extends Gutenberg_REST_Global_Styl
 			'type'       => 'object',
 			'properties' => array(
 				'id'        => array(
-					'description' => __( 'ID of global styles config.' ),
+					'description' => __( 'ID of global styles config.', 'default' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'styles'    => array(
-					'description' => __( 'Global styles.' ),
+					'description' => __( 'Global styles.', 'default' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
 				'settings'  => array(
-					'description' => __( 'Global settings.' ),
+					'description' => __( 'Global settings.', 'default' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
 				'behaviors' => array(
-					'description' => __( 'Global behaviors.' ),
+					'description' => __( 'Global behaviors.', 'default' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
 				'title'     => array(
-					'description' => __( 'Title of the global styles variation.' ),
+					'description' => __( 'Title of the global styles variation.', 'default' ),
 					'type'        => array( 'object', 'string' ),
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'properties'  => array(
 						'raw'      => array(
-							'description' => __( 'Title for the global styles variation, as it exists in the database.' ),
+							'description' => __( 'Title for the global styles variation, as it exists in the database.', 'default' ),
 							'type'        => 'string',
 							'context'     => array( 'view', 'edit', 'embed' ),
 						),
 						'rendered' => array(
-							'description' => __( 'HTML title for the post, transformed for display.' ),
+							'description' => __( 'HTML title for the post, transformed for display.', 'default' ),
 							'type'        => 'string',
 							'context'     => array( 'view', 'edit', 'embed' ),
 							'readonly'    => true,
@@ -165,7 +165,7 @@ class Gutenberg_REST_Global_Styles_Controller extends Gutenberg_REST_Global_Styl
 			// This endpoint only supports the active theme for now.
 			return new WP_Error(
 				'rest_theme_not_found',
-				__( 'Theme not found.' ),
+				__( 'Theme not found.', 'default' ),
 				array( 'status' => 404 )
 			);
 		}
