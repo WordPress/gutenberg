@@ -53,6 +53,7 @@ const defaultRenderToggle = ( {
 				// usually required for components. See: https://github.com/WordPress/gutenberg/pull/18832#issuecomment-561411389.
 				testID: 'add-block-button',
 				onLongPress,
+				hitSlop: { top: 10, bottom: 10, left: 10, right: 10 },
 			} }
 			isDisabled={ disabled }
 			customContainerStyles={ buttonStyle }
