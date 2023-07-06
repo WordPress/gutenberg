@@ -1076,13 +1076,13 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color Link styles' } )
 				.click();
-			// rgba(207,46,46) is the color of the "vivid red" color preset
+			// rgb(207, 46, 46) is the color of the "vivid red" color preset
 			const linkThemeColor = 'rgb(207, 46, 46)';
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid red' } )
 				.click( { force: true } );
 			await page.getByRole( 'tab', { name: 'Hover' } ).click();
-			// rgba(155,81,224) is the color of the "vivid purple" color preset
+			// rgb(155, 81, 224) is the color of the "vivid purple" color preset
 			const linkThemeHoverColor = 'rgb(155, 81, 224)';
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid purple' } )
@@ -1201,12 +1201,12 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color Link styles' } )
 				.click();
-			// rgba(207,46,46) is the color of the "vivid red" color preset
+			// rga(207, 46 ,46) is the color of the "vivid red" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid red' } )
 				.click( { force: true } );
 			await page.getByRole( 'tab', { name: 'Hover' } ).click();
-			// rgba(155,81,224) is the color of the "vivid purple" color preset
+			// rgb(155, 81, 224) is the color of the "vivid purple" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid purple' } )
 				.click( { force: true } );
@@ -1238,14 +1238,14 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color Link styles' } )
 				.click();
-			// rgba(0,208,132) is the color of the "Vivid green cyan" color preset
-			const linkParentColor = 'rgba(0, 208, 132)';
+			// rgb(0, 208, 132) is the color of the "Vivid green cyan" color preset
+			const linkParentColor = 'rgb(0, 208, 132)';
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid green cyan' } )
 				.click( { force: true } );
 			await page.getByRole( 'tab', { name: 'Hover' } ).click();
-			// rgba(255,105,0) is the color of the "Luminous vivid orange" color preset
-			const linkParentHoverColor = 'rgba(255, 105, 0)';
+			// rgb(255, 105, 0) is the color of the "Luminous vivid orange" color preset
+			const linkParentHoverColor = 'rgb(255, 105, 0)';
 			await page
 				.getByRole( 'button', { name: 'Color: Luminous vivid orange' } )
 				.click( { force: true } );
@@ -1378,12 +1378,12 @@ test.describe( 'Navigation block', () => {
 			await page
 				.getByRole( 'button', { name: 'Color Link styles' } )
 				.click();
-			// rgba(0,208,132) is the color of the "Vivid green cyan" color preset
+			// rgb(0, 208, 132) is the color of the "Vivid green cyan" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid green cyan' } )
 				.click( { force: true } );
 			await page.getByRole( 'tab', { name: 'Hover' } ).click();
-			// rgba(255,105,0) is the color of the "Luminous vivid orange" color preset
+			// rgb(255, 105, 0) is the color of the "Luminous vivid orange" color preset
 			await page
 				.getByRole( 'button', { name: 'Color: Luminous vivid orange' } )
 				.click( { force: true } );
