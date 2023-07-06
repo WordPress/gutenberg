@@ -133,16 +133,6 @@ function Iframe( {
 				}
 			}
 
-			for ( const compatStyle of compatStyles ) {
-				if ( contentDocument.getElementById( compatStyle.id ) ) {
-					continue;
-				}
-
-				contentDocument.head.appendChild(
-					compatStyle.cloneNode( true )
-				);
-			}
-
 			contentDocument.dir = ownerDocument.dir;
 
 			for ( const compatStyle of compatStyles ) {
