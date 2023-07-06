@@ -17,7 +17,7 @@ import GridItem from './grid-item';
 const PAGE_SIZE = 100;
 
 export default function Grid( { categoryId, items, ...props } ) {
-	const composite = useCompositeState( { orientation: 'vertical' } );
+	const composite = useCompositeState( { wrap: true } );
 	const [ page, setPage ] = useState( 1 );
 	const [ nextFocusIndex, setNextFocusIndex ] = useState( -1 );
 	const gridRef = useRef();
@@ -56,7 +56,7 @@ export default function Grid( { categoryId, items, ...props } ) {
 						key={ item.name }
 						item={ item }
 						categoryId={ categoryId }
-						composite={ composite }
+						{ ...composite }
 					/>
 				) ) }
 			</Composite>
