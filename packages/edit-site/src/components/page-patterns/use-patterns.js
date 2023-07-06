@@ -38,14 +38,8 @@ const templatePartToPattern = ( templatePart ) => ( {
 	templatePart,
 } );
 
-const templatePartCategories = [ 'header', 'footer', 'sidebar' ];
-const templatePartHasCategory = ( item, category ) => {
-	if ( category === 'uncategorized' ) {
-		return ! templatePartCategories.includes( item.templatePart.area );
-	}
-
-	return item.templatePart.area === category;
-};
+const templatePartHasCategory = ( item, category ) =>
+	item.templatePart.area === category;
 
 const useTemplatePartsAsPatterns = (
 	categoryId,

@@ -30,13 +30,6 @@ import usePatternCategories from './use-pattern-categories';
 import useMyPatterns from './use-my-patterns';
 import useTemplatePartAreas from './use-template-part-areas';
 
-const templatePartAreaLabels = {
-	header: __( 'Headers' ),
-	footer: __( 'Footers' ),
-	sidebar: __( 'Sidebar' ),
-	uncategorized: __( 'Uncategorized' ),
-};
-
 export default function SidebarNavigationScreenPatterns() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
@@ -124,18 +117,14 @@ export default function SidebarNavigationScreenPatterns() {
 									<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 										{ Object.entries(
 											templatePartAreas
-										).map( ( [ area, parts ] ) => (
+										).map( ( [ area, { label, templateParts } ] ) => (
 											<CategoryItem
 												key={ area }
-												count={ parts.length }
+												count={ templateParts?.length }
 												icon={ getTemplatePartIcon(
 													area
 												) }
-												label={
-													templatePartAreaLabels[
-														area
-													]
-												}
+												label={ label }
 												id={ area }
 												type="wp_template_part"
 												isActive={
