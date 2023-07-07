@@ -60,7 +60,7 @@ function fromFormat( {
 
 	let elementAttributes = {};
 
-	if ( boundaryClass ) {
+	if ( boundaryClass && isEditableTree ) {
 		elementAttributes[ 'data-rich-text-format-boundary' ] = 'true';
 	}
 
