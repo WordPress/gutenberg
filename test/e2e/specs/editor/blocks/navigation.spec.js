@@ -952,7 +952,7 @@ test.describe( 'Navigation block', () => {
 			} );
 			const { id: menuId } = await requestUtils.createNavigationMenu( {
 				title: 'Colored menu',
-				content: `<!-- wp:navigation-submenu {"label":"First Link","type":"custom","url":"https://wordpress.org","kind":"custom"} --><!-- wp:navigation-link {"label":"Second Link","type":"custom","url":"https://wordpress.org","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- wp:navigation-link {"label":"Test Page","type":"page","id": ${ pageId },"url":"http://localhost:8889/?page_id=${ pageId }","kind":"post-type"} /-->`,
+				content: `<!-- wp:navigation-submenu {"label":"Custom Link","type":"custom","url":"https://wordpress.org","kind":"custom"} --><!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"https://wordpress.org","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- wp:navigation-link {"label":"Page Link","type":"page","id": ${ pageId },"url":"http://localhost:8889/?page_id=${ pageId }","kind":"post-type"} /-->`,
 				attributes: { openSubmenusOnClick: true },
 			} );
 			await editor.insertBlock( {
@@ -973,22 +973,28 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.deleteAllPages();
 		} );
 
-		test( 'All navigation links have defaults set (black text, white background for submenus and mobile)', async ( {
+		test.use( {
+			colorControl: async ( { admin, editor, page, pageUtils }, use ) => {
+				await use(
+					new ColorControl( { admin, editor, page, pageUtils } )
+				);
+			},
+		} );
+
+		test( 'All navigation links should default to the body color and submenus and mobile overlay should default to a white background with black text', async ( {
 			editor,
 			page,
+			colorControl,
 		} ) => {
-			const firstLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
-			const thirdLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'Test Page' } );
-
 			// Expect the first and test page link to default to black when the theme doesn't define a link color
-			const defaultLinkColor = 'rgb(0, 0, 0)';
-			const defaultBackgroundColor = 'rgb(255, 255, 255)';
-			await expect( firstLink ).toHaveCSS( 'color', defaultLinkColor );
-			await expect( thirdLink ).toHaveCSS( 'color', defaultLinkColor );
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				colorControl.black
+			);
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				colorControl.black
+			);
 			// Focus the navigation block inside the header template part
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: header' } )
@@ -996,80 +1002,67 @@ test.describe( 'Navigation block', () => {
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
-			await firstLink.click();
+			await colorControl.customLink.click();
 
 			// We check that the submenu links also have black text color
-			const secondLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'Second Link' } );
-			const submenuWrapper = editor.canvas
-				.getByRole( 'document', { name: 'Block: Custom Link' } )
-				.filter( { has: secondLink } );
-			await expect( secondLink ).toHaveCSS( 'color', defaultLinkColor );
+			await expect( colorControl.submenuLink ).toHaveCSS(
+				'color',
+				colorControl.black
+			);
 			// We check for the submenu's background color. This one is important when the theme doesn't define an overlay background color
-			await expect( submenuWrapper ).toHaveCSS(
+			await expect( colorControl.submenuWrapper ).toHaveCSS(
 				'background-color',
-				'rgb(255, 255, 255)'
+				colorControl.white
 			);
 
 			// We test the colors of the links on the mobile overlay too.
-			await page
-				.getByRole( 'button', { name: 'View', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
-			await editor.canvas
-				.getByRole( 'button', { name: 'Open menu' } )
-				.click();
-			const overlay = editor.canvas
-				.locator( '.wp-block-navigation__responsive-container' )
-				.filter( { hasText: 'Second Link' } );
-			await expect( overlay ).toHaveCSS(
+			colorControl.openEditorOverlay();
+
+			await expect( colorControl.overlay ).toHaveCSS(
 				'background-color',
-				'rgb(255, 255, 255)'
+				colorControl.white
 			);
-			await expect( firstLink ).toHaveCSS( 'color', defaultLinkColor );
-			await expect( thirdLink ).toHaveCSS( 'color', defaultLinkColor );
-			await expect( secondLink ).toHaveCSS( 'color', defaultLinkColor );
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				colorControl.black
+			);
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				colorControl.black
+			);
+			await expect( colorControl.submenuLink ).toHaveCSS(
+				'color',
+				colorControl.black
+			);
 
 			// And finally we check the colors of the links on the frontend
 			await page.goto( '/' );
-			const firstLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
-			const secondLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'Second Link' } );
-			const thirdLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'Test Page' } );
-			const submenuWrapperFront = page
-				.locator( '.wp-block-navigation__submenu-container' )
-				.filter( { has: secondLinkFront } );
 
 			// Expect the links to default to black when the theme doesn't define a link color
-			await expect( firstLinkFront ).toHaveCSS(
+			await expect( colorControl.customLinkFront ).toHaveCSS(
 				'color',
-				defaultLinkColor
+				colorControl.black
 			);
-			await expect( thirdLinkFront ).toHaveCSS(
+			await expect( colorControl.pageLinkFront ).toHaveCSS(
 				'color',
-				defaultLinkColor
+				colorControl.black
 			);
-			await firstLinkFront.hover();
-			await expect( secondLinkFront ).toHaveCSS(
+			await colorControl.customLinkFront.hover();
+			await expect( colorControl.submenuLinkFront ).toHaveCSS(
 				'color',
-				defaultLinkColor
+				colorControl.black
 			);
-			await expect( submenuWrapperFront ).toHaveCSS(
+			await expect( colorControl.submenuWrapperFront ).toHaveCSS(
 				'background-color',
-				defaultBackgroundColor
+				colorControl.white
 			);
+			// TODO: Check frontend overlay colors
 		} );
 
-		test( 'As a user I expect my navigation links to inherit the colors from the theme', async ( {
-			admin,
+		test( 'As a user I expect my navigation links to inherit the link colors from the theme', async ( {
 			page,
 			editor,
+			colorControl,
 		} ) => {
 			// In the inspector sidebar, we set colors for link text and link hover text for this theme
 			await page
@@ -1102,99 +1095,99 @@ test.describe( 'Navigation block', () => {
 				.click();
 
 			// Expect the first and third link to inherit the nav link color from the theme
-			const firstLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
-			const thirdLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'Test Page' } );
-			await expect( firstLink ).toHaveCSS( 'color', linkThemeColor );
-			await expect( thirdLink ).toHaveCSS( 'color', linkThemeColor );
-			await firstLink.click();
-			await expect( firstLink ).toHaveCSS( 'color', linkThemeHoverColor );
-			await thirdLink.click();
-			await expect( thirdLink ).toHaveCSS( 'color', linkThemeHoverColor );
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				linkThemeColor
+			);
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				linkThemeColor
+			);
+			await colorControl.customLink.click();
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				linkThemeHoverColor
+			);
+			await colorControl.pageLink.click();
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				linkThemeHoverColor
+			);
 
 			// Expect the second link to behave the same as the first
-			const secondLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'Second Link' } );
-			await firstLink.click();
-			await expect( secondLink ).toHaveCSS( 'color', linkThemeColor );
-			await secondLink.click();
-			await expect( secondLink ).toHaveCSS(
+			await colorControl.customLink.click();
+			await expect( colorControl.submenuLink ).toHaveCSS(
+				'color',
+				linkThemeColor
+			);
+			await colorControl.submenuLink.click();
+			await expect( colorControl.submenuLink ).toHaveCSS(
 				'color',
 				linkThemeHoverColor
 			);
 
 			// We test the colors of the links on the mobile overlay too.
-			await page
-				.getByRole( 'button', { name: 'View', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
-			await editor.canvas
-				.getByRole( 'button', { name: 'Open menu' } )
-				.click();
-			await expect( firstLink ).toHaveCSS( 'color', linkThemeColor );
-			await expect( secondLink ).toHaveCSS( 'color', linkThemeColor );
-			await expect( thirdLink ).toHaveCSS( 'color', linkThemeColor );
+			// These should remain the base defaults, as only the overlay background
+			// and text color should apply here. Otherwise, it's too easy to accidentally
+			// get to a situation of setting a link color that is unreadable on the overlay.
+			// Submenu/Overlay colors should always be explicitly set by the user in the
+			// navigation color settings.
+			colorControl.openEditorOverlay();
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				colorControl.black
+			);
+			await expect( colorControl.submenuLink ).toHaveCSS(
+				'color',
+				colorControl.black
+			);
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				colorControl.black
+			);
 
 			await editor.saveSiteEditorEntities();
 
 			// And finally we check the colors of the links on the frontend
 			await page.goto( '/' );
-			const firstLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
-			const secondLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'Second Link' } );
-			const thirdLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'Test Page' } );
 
 			// Expect the links to have the same colors as in the editor
-			await expect( firstLinkFront ).toHaveCSS( 'color', linkThemeColor );
-			await expect( thirdLinkFront ).toHaveCSS( 'color', linkThemeColor );
-			await firstLinkFront.hover();
-			await expect( firstLinkFront ).toHaveCSS(
-				'color',
-				linkThemeHoverColor
-			);
-			await expect( secondLinkFront ).toHaveCSS(
+			await expect( colorControl.customLinkFront ).toHaveCSS(
 				'color',
 				linkThemeColor
 			);
-			await secondLinkFront.hover();
-			await expect( secondLinkFront ).toHaveCSS(
+			await expect( colorControl.pageLinkFront ).toHaveCSS(
+				'color',
+				linkThemeColor
+			);
+			await colorControl.customLinkFront.hover();
+			await expect( colorControl.customLinkFront ).toHaveCSS(
 				'color',
 				linkThemeHoverColor
 			);
-			await thirdLinkFront.hover();
-			await expect( thirdLinkFront ).toHaveCSS(
+			await expect( colorControl.submenuLinkFront ).toHaveCSS(
+				'color',
+				linkThemeColor
+			);
+			await colorControl.submenuLinkFront.hover();
+			await expect( colorControl.submenuLinkFront ).toHaveCSS(
+				'color',
+				colorControl.black
+			);
+			await colorControl.pageLinkFront.hover();
+			await expect( colorControl.pageLinkFront ).toHaveCSS(
 				'color',
 				linkThemeHoverColor
 			);
 
 			// We reset global styles so we don't affect other tests
-			await admin.visitSiteEditor();
-			await editor.canvas.click( 'body' );
-			await page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Styles', exact: true } )
-				.click();
-			await page.getByRole( 'button', { name: 'Revisions' } ).click();
-			await page
-				.getByRole( 'menuitem', { name: 'Reset to defaults' } )
-				.click();
-
-			await editor.saveSiteEditorEntities();
+			colorControl.resetGlobalStyles();
 		} );
 
 		test( 'As a user I expect my navigation links to inherit the link colors from the parent container', async ( {
-			admin,
 			page,
 			editor,
+			colorControl,
 		} ) => {
 			// Make changes to the theme link colors and make sure the group block colors are the ones we see
 			await page
@@ -1264,97 +1257,81 @@ test.describe( 'Navigation block', () => {
 				.click();
 
 			// Expect the first link to inherit the link color from the parent group block
-			const firstLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
-			await expect( firstLink ).toHaveCSS( 'color', linkParentColor );
-			await firstLink.click();
-			await expect( firstLink ).toHaveCSS(
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				linkParentColor
+			);
+			await colorControl.customLink.click();
+			await expect( colorControl.customLink ).toHaveCSS(
 				'color',
 				linkParentHoverColor
 			);
 
 			// Expect the second link to behave the same as the first
-			const secondLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'Second Link' } );
-			await expect( secondLink ).toHaveCSS( 'color', linkParentColor );
-			await secondLink.click();
-			await expect( secondLink ).toHaveCSS(
+			await expect( colorControl.submenuLink ).toHaveCSS(
+				'color',
+				linkParentColor
+			);
+			await colorControl.submenuLink.click();
+			await expect( colorControl.submenuLink ).toHaveCSS(
 				'color',
 				linkParentHoverColor
 			);
 
 			// Expect the third link to behave the same as the first
-			const thirdLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'Test Page' } );
-			await expect( thirdLink ).toHaveCSS( 'color', linkParentColor );
-			await thirdLink.click();
-			await expect( thirdLink ).toHaveCSS(
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				linkParentColor
+			);
+			await colorControl.pageLink.click();
+			await expect( colorControl.pageLink ).toHaveCSS(
 				'color',
 				linkParentHoverColor
 			);
 
 			// We test the colors of the links on the mobile overlay too.
-			await page
-				.getByRole( 'button', { name: 'View', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
-			await editor.canvas
-				.getByRole( 'button', { name: 'Open menu' } )
-				.click();
-			await expect( firstLink ).toHaveCSS( 'color', linkParentColor );
-			await expect( secondLink ).toHaveCSS( 'color', linkParentColor );
-			await expect( thirdLink ).toHaveCSS( 'color', linkParentColor );
+			colorControl.openEditorOverlay();
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				linkParentColor
+			);
+			await expect( colorControl.submenuLink ).toHaveCSS(
+				'color',
+				linkParentColor
+			);
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				linkParentColor
+			);
 
 			await editor.saveSiteEditorEntities();
 
 			// And finally we check the colors of the links on the frontend
 			await page.goto( '/' );
-			const firstLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
-			const secondLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'Second Link' } );
-			const thirdLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'Test Page' } );
 
 			// Expect the links to default to the browser default blue when the theme doesn't define a link color and the background to be white
-			await expect( firstLinkFront ).toHaveCSS(
+			await expect( colorControl.customLinkFront ).toHaveCSS(
 				'color',
 				linkParentColor
 			);
-			await firstLinkFront.hover();
-			await expect( secondLinkFront ).toHaveCSS(
+			await colorControl.customLinkFront.hover();
+			await expect( colorControl.submenuLinkFront ).toHaveCSS(
 				'color',
 				linkParentColor
 			);
-			await expect( thirdLinkFront ).toHaveCSS(
+			await expect( colorControl.pageLinkFront ).toHaveCSS(
 				'color',
 				linkParentColor
 			);
 
 			// We reset global styles so we don't affect other tests
-			await admin.visitSiteEditor();
-			await editor.canvas.click( 'body' );
-			await page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Styles', exact: true } )
-				.click();
-			await page.getByRole( 'button', { name: 'Revisions' } ).click();
-			await page
-				.getByRole( 'menuitem', { name: 'Reset to defaults' } )
-				.click();
-
-			await editor.saveSiteEditorEntities();
+			colorControl.resetGlobalStyles();
 		} );
 
 		test( 'As a user I expect my navigation links to inherit the text colors from the parent container', async ( {
 			page,
 			editor,
+			colorControl,
 		} ) => {
 			// Focus the navigation block inside the header template part
 			await editor.canvas
@@ -1393,62 +1370,56 @@ test.describe( 'Navigation block', () => {
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
 
-			// Expect the first link to inherit the link color from the parent group block
-			const firstLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
-			await expect( firstLink ).toHaveCSS( 'color', textParentColor );
-			await firstLink.click();
+			// Expect the top level link to inherit the link color from the parent group block
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				textParentColor
+			);
+			await colorControl.customLink.click();
 
-			// Expect the second link to behave the same as the first
-			const secondLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'Second Link' } );
-			await expect( secondLink ).toHaveCSS( 'color', textParentColor );
+			// Expect the submenu link to behave the same as the first
+			await expect( colorControl.submenuLink ).toHaveCSS(
+				'color',
+				textParentColor
+			);
 
-			// Expect the third link to behave the same as the first
-			const thirdLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'Test Page' } );
-			await expect( thirdLink ).toHaveCSS( 'color', textParentColor );
+			// Expect the page link to behave the same as the first
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				textParentColor
+			);
 
 			// We test the colors of the links on the mobile overlay too.
-			await page
-				.getByRole( 'button', { name: 'View', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
-			await editor.canvas
-				.getByRole( 'button', { name: 'Open menu' } )
-				.click();
-			await expect( firstLink ).toHaveCSS( 'color', textParentColor );
-			await expect( secondLink ).toHaveCSS( 'color', textParentColor );
-			await expect( thirdLink ).toHaveCSS( 'color', textParentColor );
+			colorControl.openEditorOverlay();
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				textParentColor
+			);
+			await expect( colorControl.submenuLink ).toHaveCSS(
+				'color',
+				textParentColor
+			);
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				textParentColor
+			);
 
 			await editor.saveSiteEditorEntities();
 
 			// And finally we check the colors of the links on the frontend
 			await page.goto( '/' );
-			const firstLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
-			const secondLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'Second Link' } );
-			const thirdLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'Test Page' } );
 
 			// Expect the links to default to the browser default blue when the theme doesn't define a link color and the background to be white
-			await expect( firstLinkFront ).toHaveCSS(
+			await expect( colorControl.customLinkFront ).toHaveCSS(
 				'color',
 				textParentColor
 			);
-			await firstLinkFront.hover();
-			await expect( secondLinkFront ).toHaveCSS(
+			await colorControl.customLinkFront.hover();
+			await expect( colorControl.submenuLinkFront ).toHaveCSS(
 				'color',
 				textParentColor
 			);
-			await expect( thirdLinkFront ).toHaveCSS(
+			await expect( colorControl.pageLinkFront ).toHaveCSS(
 				'color',
 				textParentColor
 			);
@@ -1457,7 +1428,7 @@ test.describe( 'Navigation block', () => {
 		test( 'As a user I expect my navigation to use the colors I selected for it', async ( {
 			editor,
 			page,
-			pageUtils,
+			colorControl,
 		} ) => {
 			// Focus the navigation block inside the header template part
 			await editor.canvas
@@ -1553,19 +1524,14 @@ test.describe( 'Navigation block', () => {
 				.click();
 
 			// Expect the first and third link to be "Pale pink" we selected for the nav block
-			const firstLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } )
-				.filter( {
-					has: editor.canvas.getByRole( 'textbox', {
-						label: 'Navigation link text',
-					} ),
-				} );
-			await expect( firstLink ).toHaveCSS( 'color', textColor );
-			const thirdLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'Test Page' } );
-			await expect( thirdLink ).toHaveCSS( 'color', textColor );
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				textColor
+			);
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				textColor
+			);
 
 			// Expect the nav block background to be "Pale cyan blue" we selected for the nav background block
 			const menuWrapper = editor.canvas.getByRole( 'document', {
@@ -1577,61 +1543,52 @@ test.describe( 'Navigation block', () => {
 			);
 
 			// Expect the second link to be "Cyan bluish gray" we selected for the submenu and overlay text colors
-			const secondLink = editor.canvas
-				.locator( 'a' )
-				.filter( { hasText: 'Second Link' } );
-			await firstLink.click();
-			await expect( secondLink ).toHaveCSS( 'color', overlayTextColor );
+			await colorControl.customLink.click();
+			await expect( colorControl.submenuLink ).toHaveCSS(
+				'color',
+				overlayTextColor
+			);
 
 			// Expect the submenu background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
-			const submenuWrapper = editor.canvas
-				.getByRole( 'document', { name: 'Block: Custom Link' } )
-				.filter( { has: secondLink } );
-			await expect( submenuWrapper ).toHaveCSS(
+			await expect( colorControl.submenuWrapper ).toHaveCSS(
 				'background-color',
 				overlayBgColor
 			);
 
 			// We test the colors of the links on the mobile overlay too.
-			await page
-				.getByRole( 'button', { name: 'View', exact: true } )
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
-			await editor.canvas
-				.getByRole( 'button', { name: 'Open menu' } )
-				.click();
-			const overlay = editor.canvas
-				.locator( '.wp-block-navigation__responsive-container' )
-				.filter( { hasText: 'Second Link' } );
+			colorControl.openEditorOverlay();
 			// Expect the overlay background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
-			await expect( overlay ).toHaveCSS(
+			await expect( colorControl.overlay ).toHaveCSS(
 				'background-color',
 				overlayBgColor
 			);
 			// Expect the links to both have the colors selected for the submenu and overlay text
-			await expect( firstLink ).toHaveCSS( 'color', overlayTextColor );
-			await expect( secondLink ).toHaveCSS( 'color', overlayTextColor );
-			await expect( thirdLink ).toHaveCSS( 'color', overlayTextColor );
+			await expect( colorControl.customLink ).toHaveCSS(
+				'color',
+				overlayTextColor
+			);
+			await expect( colorControl.submenuLink ).toHaveCSS(
+				'color',
+				overlayTextColor
+			);
+			await expect( colorControl.pageLink ).toHaveCSS(
+				'color',
+				overlayTextColor
+			);
 			await editor.saveSiteEditorEntities();
 
 			// And finally we check the colors of the links on the frontend
 			await page.goto( '/' );
-			const firstLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'First Link' } );
-			const secondLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'Second Link' } );
-			const thirdLinkFront = page
-				.locator( 'a' )
-				.filter( { hasText: 'Test Page' } );
-			const submenuWrapperFront = page
-				.locator( '.wp-block-navigation__submenu-container' )
-				.filter( { has: secondLinkFront } );
 
 			// Expect the first and third link to be "Pale pink" we selected for the nav block
-			await expect( firstLinkFront ).toHaveCSS( 'color', textColor );
-			await expect( thirdLinkFront ).toHaveCSS( 'color', textColor );
+			await expect( colorControl.customLinkFront ).toHaveCSS(
+				'color',
+				textColor
+			);
+			await expect( colorControl.pageLinkFront ).toHaveCSS(
+				'color',
+				textColor
+			);
 			// Expect the nav block background to be "Pale cyan blue" we selected for the nav block
 			const menuWrapperFront = page
 				.getByRole( 'navigation', { name: 'Colored menu' } )
@@ -1641,39 +1598,34 @@ test.describe( 'Navigation block', () => {
 				bgColor
 			);
 
-			await firstLinkFront.hover();
+			await colorControl.customLinkFront.hover();
 			// Expect the second link to be "Cyan bluish gray" we selected for the submenu and overlay text colors
-			await expect( secondLinkFront ).toHaveCSS(
+			await expect( colorControl.submenuLinkFront ).toHaveCSS(
 				'color',
 				overlayTextColor
 			);
 			// Expect the submenu background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
-			await expect( submenuWrapperFront ).toHaveCSS(
+			await expect( colorControl.submenuWrapperFront ).toHaveCSS(
 				'background-color',
 				overlayBgColor
 			);
 
 			// We test the colors on the mobile overlay on the frontend.
-			await pageUtils.setBrowserViewport( { width: 599, height: 700 } );
-			await page.getByRole( 'button', { name: 'Open menu' } ).click();
+			colorControl.openFrontendOverlay();
 
-			const overlayFront = page
-				.locator( '.wp-block-navigation__responsive-container' )
-				.filter( { hasText: 'Second Link' } );
-
-			await expect( firstLinkFront ).toHaveCSS(
+			await expect( colorControl.customLinkFront ).toHaveCSS(
 				'color',
 				overlayTextColor
 			);
-			await expect( secondLinkFront ).toHaveCSS(
+			await expect( colorControl.submenuLinkFront ).toHaveCSS(
 				'color',
 				overlayTextColor
 			);
-			await expect( thirdLinkFront ).toHaveCSS(
+			await expect( colorControl.pageLinkFront ).toHaveCSS(
 				'color',
 				overlayTextColor
 			);
-			await expect( overlayFront ).toHaveCSS(
+			await expect( colorControl.overlayFront ).toHaveCSS(
 				'background-color',
 				overlayBgColor
 			);
@@ -2000,6 +1952,80 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} );
 	} );
 } );
+
+class ColorControl {
+	constructor( { admin, editor, page, pageUtils } ) {
+		this.admin = admin;
+		this.editor = editor;
+		this.page = page;
+		this.pageUtils = pageUtils;
+		// Editor elements
+		this.black = 'rgb(0, 0, 0)';
+		this.white = 'rgb(255, 255, 255)';
+		this.customLink = this.editor.canvas
+			.locator( 'a' )
+			.filter( { hasText: 'Custom Link' } );
+		this.submenuLink = this.editor.canvas
+			.locator( 'a' )
+			.filter( { hasText: 'Submenu Link' } );
+		this.pageLink = this.editor.canvas
+			.locator( 'a' )
+			.filter( { hasText: 'Page Link' } );
+		this.submenuWrapper = this.editor.canvas
+			.getByRole( 'document', { name: 'Block: Custom Link' } )
+			.filter( { has: this.submenuLink } );
+		this.overlay = this.editor.canvas
+			.locator( '.wp-block-navigation__responsive-container' )
+			.filter( { hasText: 'Submenu Link' } );
+
+		// Frontend Elements
+		this.customLinkFront = this.page
+			.locator( 'a' )
+			.filter( { hasText: 'Custom Link' } );
+		this.submenuLinkFront = this.page
+			.locator( 'a' )
+			.filter( { hasText: 'Submenu Link' } );
+		this.pageLinkFront = this.page
+			.locator( 'a' )
+			.filter( { hasText: 'Page Link' } );
+		this.submenuWrapperFront = this.page
+			.locator( '.wp-block-navigation__submenu-container' )
+			.filter( { has: this.submenuLinkFront } );
+		this.overlayFront = this.page
+			.locator( '.wp-block-navigation__responsive-container' )
+			.filter( { hasText: 'Submenu Link' } );
+	}
+
+	async openEditorOverlay() {
+		await this.page
+			.getByRole( 'button', { name: 'View', exact: true } )
+			.click();
+		await this.page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
+		await this.editor.canvas
+			.getByRole( 'button', { name: 'Open menu' } )
+			.click();
+	}
+
+	async openFrontendOverlay() {
+		await this.pageUtils.setBrowserViewport( { width: 599, height: 700 } );
+		await this.page.getByRole( 'button', { name: 'Open menu' } ).click();
+	}
+
+	async resetGlobalStyles() {
+		await this.admin.visitSiteEditor();
+		await this.editor.canvas.click( 'body' );
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles', exact: true } )
+			.click();
+		await this.page.getByRole( 'button', { name: 'Revisions' } ).click();
+		await this.page
+			.getByRole( 'menuitem', { name: 'Reset to defaults' } )
+			.click();
+
+		await this.editor.saveSiteEditorEntities();
+	}
+}
 
 class LinkControl {
 	constructor( { page } ) {
