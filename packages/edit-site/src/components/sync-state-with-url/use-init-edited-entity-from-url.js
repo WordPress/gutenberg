@@ -11,7 +11,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import normalizePostIdForPostType from '../../utils/normalize-post-id-for-post-type';
+import normalizeRecordKey from '../../utils/normalize-record-key';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -20,7 +20,7 @@ export default function useInitEditedEntityFromURL() {
 
 	const { postType } = params;
 
-	const postId = normalizePostIdForPostType( params?.postId, postType );
+	const postId = normalizeRecordKey( params?.postId );
 
 	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
 		const { getSite, getUnstableBase } = select( coreDataStore );

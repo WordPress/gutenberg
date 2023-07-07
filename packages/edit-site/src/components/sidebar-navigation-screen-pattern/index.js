@@ -16,7 +16,7 @@ import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-e
 import usePatternDetails from './use-pattern-details';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import normalizePostIdForPostType from '../../utils/normalize-post-id-for-post-type';
+import normalizeRecordKey from '../../utils/normalize-record-key';
 
 export default function SidebarNavigationScreenPattern() {
 	const { categoryType } = getQueryArgs( window.location.href );
@@ -24,7 +24,7 @@ export default function SidebarNavigationScreenPattern() {
 
 	const { params } = useNavigator();
 	const { postType } = params;
-	const postId = normalizePostIdForPostType( params?.postId, postType );
+	const postId = normalizeRecordKey( params?.postId );
 
 	useInitEditedEntityFromURL();
 

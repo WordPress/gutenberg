@@ -19,10 +19,10 @@ import {
 	SidebarNavigationScreenDetailsPanelLabel,
 	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
-import normalizePostIdForPostType from '../../utils/normalize-post-id-for-post-type';
+import normalizeRecordKey from '../../utils/normalize-record-key';
 
 export default function usePatternDetails( postType, postId ) {
-	postId = normalizePostIdForPostType( postId, postType );
+	postId = normalizeRecordKey( postId );
 
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
 		postType,
