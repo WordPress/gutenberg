@@ -103,7 +103,7 @@ require __DIR__ . '/compat/wordpress-6.3/block-editor-settings.php';
 require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
 // Experimental features.
-require __DIR__ . '/experimental/behaviors.php';
+remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';

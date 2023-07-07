@@ -22,15 +22,14 @@ function BehaviorsControl( {
 	onChangeAnimation,
 	disabled = false,
 } ) {
-	const { settings, themeBehaviors } = useSelect(
+	const { settings } = useSelect(
 		( select ) => {
-			const { getBehaviors, getSettings } = select( blockEditorStore );
+			const { getSettings } = select( blockEditorStore );
 
 			return {
 				settings:
 					getSettings()?.__experimentalFeatures?.blocks?.[ blockName ]
 						?.behaviors,
-				themeBehaviors: getBehaviors()?.blocks?.[ blockName ],
 			};
 		},
 		[ blockName ]
@@ -68,7 +67,6 @@ function BehaviorsControl( {
 
 	const { behaviors, behaviorsValue } = useMemo( () => {
 		const mergedBehaviors = {
-			...themeBehaviors,
 			...( blockBehaviors || {} ),
 		};
 
@@ -83,7 +81,7 @@ function BehaviorsControl( {
 			behaviors: mergedBehaviors,
 			behaviorsValue: value,
 		};
-	}, [ blockBehaviors, themeBehaviors ] );
+	}, [ blockBehaviors ] );
 	// If every behavior is disabled, do not show the behaviors inspector control.
 	if ( behaviorsOptions.length === 0 ) {
 		return null;
