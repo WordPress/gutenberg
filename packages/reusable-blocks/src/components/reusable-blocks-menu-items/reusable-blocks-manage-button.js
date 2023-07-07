@@ -18,12 +18,19 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as reusableBlocksStore } from '../../store';
 
 function ReusableBlocksManageButton( { clientId } ) {
-	const { canRemove, isVisible, innerBlockCount } = useSelect(
+	const {
+		canRemove,
+		isVisible,
+		innerBlockCount,
+		canManagePatterns,
+		managePatternsUrl,
+	} = useSelect(
 		( select ) => {
-			const { getBlock, canRemoveBlock, getBlockCount } =
+			const { getBlock, canRemoveBlock, getBlockCount, getSettings } =
 				select( blockEditorStore );
 			const { canUser } = select( coreStore );
 			const reusableBlock = getBlock( clientId );
+			const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
 
 			return {
 				canRemove: canRemoveBlock( clientId ),
@@ -36,6 +43,17 @@ function ReusableBlocksManageButton( { clientId } ) {
 						reusableBlock.attributes.ref
 					),
 				innerBlockCount: getBlockCount( clientId ),
+				// The site editor and templates both check whether the user
+				// has edit_theme_options capabilities. We can leverage that here
+				// and omit the manage patterns link if the user can't access it.
+				canManagePatterns: canUser( 'read', 'templates' ),
+				managePatternsUrl: isBlockTheme
+					? addQueryArgs( 'site-editor.php', {
+							path: '/patterns',
+					  } )
+					: addQueryArgs( 'edit.php', {
+							post_type: 'wp_block',
+					  } ),
 			};
 		},
 		[ clientId ]
@@ -50,11 +68,11 @@ function ReusableBlocksManageButton( { clientId } ) {
 
 	return (
 		<BlockSettingsMenuControls>
-			<MenuItem
-				href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
-			>
-				{ __( 'Manage Patterns' ) }
-			</MenuItem>
+			{ canManagePatterns && (
+				<MenuItem href={ managePatternsUrl }>
+					{ __( 'Manage Patterns' ) }
+				</MenuItem>
+			) }
 			{ canRemove && (
 				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
 					{ innerBlockCount > 1
