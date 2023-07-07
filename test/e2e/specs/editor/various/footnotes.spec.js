@@ -48,7 +48,7 @@ test.describe( 'Footnotes', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `second paragraph<a data-rich-text-format-boundary="true" href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+					content: `second paragraph<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
 				},
 			},
 			{
@@ -72,13 +72,13 @@ test.describe( 'Footnotes', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `first paragraph<a data-rich-text-format-boundary="true" href="#${ id2 }" id="${ id2 }-link" data-fn="${ id2 }" class="fn">*</a>`,
+					content: `first paragraph<a href="#${ id2 }" id="${ id2 }-link" data-fn="${ id2 }" class="fn">*</a>`,
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `second paragraph<a data-rich-text-format-boundary="true" href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+					content: `second paragraph<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
 				},
 			},
 			{
@@ -106,13 +106,13 @@ test.describe( 'Footnotes', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `second paragraph<a data-rich-text-format-boundary="true" href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+					content: `second paragraph<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `first paragraph<a data-rich-text-format-boundary="true" href="#${ id2 }" id="${ id2 }-link" data-fn="${ id2 }" class="fn">*</a>`,
+					content: `first paragraph<a href="#${ id2 }" id="${ id2 }-link" data-fn="${ id2 }" class="fn">*</a>`,
 				},
 			},
 			{
@@ -138,7 +138,7 @@ test.describe( 'Footnotes', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `second paragraph<a data-rich-text-format-boundary="true" href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+					content: `second paragraph<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
 				},
 			},
 			{
