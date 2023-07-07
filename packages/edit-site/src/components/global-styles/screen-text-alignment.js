@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalVStack as VStack, Button } from '@wordpress/components';
+import {
+	__experimentalVStack as VStack,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	Button,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -70,6 +75,24 @@ function ScreenTextAlignment() {
 							</Button>
 						)
 					) }
+
+					<ToggleGroupControl
+						isBlock
+						label={ __( 'Hyphens' ) }
+						onClick={ ( event ) => {
+							// TODO: update the style with useGlobalStyle
+							// eslint-disable-next-line no-console
+							console.log( 'changed', event.target.value );
+						} }
+						value="auto"
+					>
+						<ToggleGroupControlOption label="auto" value="auto" />
+						<ToggleGroupControlOption
+							label="manual"
+							value="manual"
+						/>
+						<ToggleGroupControlOption label="none" value="none" />
+					</ToggleGroupControl>
 				</VStack>
 			</div>
 		</>
