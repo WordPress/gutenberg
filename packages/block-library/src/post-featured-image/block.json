@@ -75,8 +75,7 @@
 		},
 		"html": false,
 		"spacing": {
-			"margin": true,
-			"padding": true
+			"margin": true
 		}
 	},
 	"editorStyle": "wp-block-post-featured-image-editor",
