@@ -123,7 +123,12 @@ export default function DuplicateMenuItem( {
 						: {
 								...item.reusableBlock.meta,
 								wp_pattern_sync_status:
-									item.reusableBlock.wp_pattern_sync_status,
+									item.reusableBlock
+										.wp_pattern_sync_status ===
+									SYNC_TYPES.unsynced
+										? item.reusableBlock
+												.wp_pattern_sync_status
+										: undefined,
 						  },
 					status: 'publish',
 					title,
