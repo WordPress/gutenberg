@@ -30,7 +30,7 @@ class Gutenberg_REST_Block_Patterns_Controller extends Gutenberg_REST_Block_Patt
 			return $response;
 		}
 
-		$data     = $response->get_data();
+		$data = $response->get_data();
 
 		$blocks          = parse_blocks( $data['content'] );
 		$data['content'] = gutenberg_serialize_blocks( $blocks ); // Serialize or render?
