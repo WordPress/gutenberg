@@ -16,23 +16,9 @@ import {
 	useEditorWrapperStyles,
 } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import styles from './style.scss';
-
 const Header = memo(
-	function EditorHeader( {
-		editTitle,
-		setTitleRef,
-		title,
-		getStylesFromColorScheme,
-	} ) {
+	function EditorHeader( { editTitle, setTitleRef, title } ) {
 		const [ wrapperStyles ] = useEditorWrapperStyles();
-		const blockHolderFocusedStyle = getStylesFromColorScheme(
-			styles.blockHolderFocused,
-			styles.blockHolderFocusedDark
-		);
 		return (
 			<View style={ wrapperStyles }>
 				<PostTitle
@@ -40,8 +26,6 @@ const Header = memo(
 					title={ title }
 					onUpdate={ editTitle }
 					placeholder={ __( 'Add title' ) }
-					borderStyle={ styles.blockHolderFullBordered }
-					focusedBorderColor={ blockHolderFocusedStyle.borderColor }
 					accessibilityLabel="post-title"
 				/>
 			</View>
