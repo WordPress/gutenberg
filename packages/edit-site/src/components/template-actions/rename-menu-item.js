@@ -48,7 +48,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 				'postType',
 				template.type,
 				template.id,
-				[ 'title' ], // only save title to avoid persisting other edits.
+				[ 'title' ], // Only save title to avoid persisting other edits.
 				{
 					throwOnError: true,
 				}
