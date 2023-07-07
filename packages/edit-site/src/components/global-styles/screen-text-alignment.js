@@ -86,12 +86,18 @@ function ScreenTextAlignment() {
 						} }
 						value="auto"
 					>
-						<ToggleGroupControlOption label="auto" value="auto" />
 						<ToggleGroupControlOption
-							label="manual"
+							label={ __( 'auto' ) }
+							value="auto"
+						/>
+						<ToggleGroupControlOption
+							label={ __( 'manual' ) }
 							value="manual"
 						/>
-						<ToggleGroupControlOption label="none" value="none" />
+						<ToggleGroupControlOption
+							label={ __( 'none' ) }
+							value="none"
+						/>
 					</ToggleGroupControl>
 				</VStack>
 			</div>
