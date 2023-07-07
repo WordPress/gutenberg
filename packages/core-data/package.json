@@ -42,6 +42,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/sync": "file:../sync",
 		"@wordpress/url": "file:../url",
 		"change-case": "^4.1.2",
 		"equivalent-key-map": "^0.2.2",

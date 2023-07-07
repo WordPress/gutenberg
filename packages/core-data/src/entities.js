@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { addEntities } from './actions';
+import { getSyncProvider } from './sync';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -37,6 +38,31 @@ export const rootEntitiesConfig = [
 				'url',
 			].join( ',' ),
 		},
+		syncConfig: {
+			fetch: async () => {
+				await new Promise( ( resolve ) => setTimeout( resolve, 5000 ) );
+				return apiFetch( { path: '/' } );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				[ 'name', 'description' ].forEach( ( key ) => {
+					if ( document.get( key ) !== changes[ key ] ) {
+						document.set( key, changes[ key ] );
+					}
+				} );
+				/*Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );*/
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+			handleChanges: () => {},
+		},
+		syncObjectType: 'root/base',
+		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Site' ),
@@ -299,6 +325,12 @@ export const getMethodName = (
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
 
+function registerSyncConfigs( configs ) {
+	configs.forEach( ( { syncObjectType, syncConfig } ) => {
+		getSyncProvider().register( syncObjectType, syncConfig );
+	} );
+}
+
 /**
  * Loads the kind entities into the store.
  *
@@ -311,6 +343,7 @@ export const getOrLoadEntitiesConfig =
 	async ( { select, dispatch } ) => {
 		let configs = select.getEntitiesConfig( kind );
 		if ( configs && configs.length !== 0 ) {
+			registerSyncConfigs( configs );
 			return configs;
 		}
 
@@ -322,6 +355,7 @@ export const getOrLoadEntitiesConfig =
 		}
 
 		configs = await loader.loadEntities();
+		registerSyncConfigs( configs );
 		dispatch( addEntities( configs ) );
 
 		return configs;
