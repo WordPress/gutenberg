@@ -40,26 +40,19 @@ export const rootEntitiesConfig = [
 		},
 		syncConfig: {
 			fetch: async () => {
-				await new Promise( ( resolve ) => setTimeout( resolve, 5000 ) );
 				return apiFetch( { path: '/' } );
 			},
 			applyChangesToDoc: ( doc, changes ) => {
 				const document = doc.getMap( 'document' );
-				[ 'name', 'description' ].forEach( ( key ) => {
-					if ( document.get( key ) !== changes[ key ] ) {
-						document.set( key, changes[ key ] );
-					}
-				} );
-				/*Object.entries( changes ).forEach( ( [ key, value ] ) => {
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
 					if ( document.get( key ) !== value ) {
 						document.set( key, value );
 					}
-				} );*/
+				} );
 			},
 			fromCRDTDoc: ( doc ) => {
 				return doc.getMap( 'document' ).toJSON();
 			},
-			handleChanges: () => {},
 		},
 		syncObjectType: 'root/base',
 		getSyncObjectId: () => 'index',
@@ -72,6 +65,24 @@ export const rootEntitiesConfig = [
 		getTitle: ( record ) => {
 			return record?.title ?? __( 'Site Title' );
 		},
+		syncConfig: {
+			fetch: async () => {
+				return apiFetch( { path: '/wp/v2/settings' } );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/site',
+		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Post Type' ),
@@ -80,6 +91,26 @@ export const rootEntitiesConfig = [
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
+		syncConfig: {
+			fetch: async ( id ) => {
+				return apiFetch( {
+					path: `/wp/v2/types/${ id }?context=edit`,
+				} );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/postType',
+		getSyncObjectId: ( id ) => id,
 	},
 	{
 		name: 'media',
@@ -263,6 +294,26 @@ async function loadPostTypeEntities() {
 					: String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
+			syncConfig: {
+				fetch: async ( id ) => {
+					return apiFetch( {
+						path: `/${ namespace }/${ postType.rest_base }/${ id }?context=edit`,
+					} );
+				},
+				applyChangesToDoc: ( doc, changes ) => {
+					const document = doc.getMap( 'document' );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						if ( document.get( key ) !== value ) {
+							document.set( key, value );
+						}
+					} );
+				},
+				fromCRDTDoc: ( doc ) => {
+					return doc.getMap( 'document' ).toJSON();
+				},
+			},
+			syncObjectType: 'postType/' + postType.name,
+			getSyncObjectId: ( id ) => id,
 		};
 	} );
 }
