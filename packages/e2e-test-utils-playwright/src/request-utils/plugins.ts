@@ -27,7 +27,9 @@ async function getPluginsMap( this: RequestUtils, forceRefetch = false ) {
 	for ( const plugin of plugins ) {
 		// Ideally, we should be using sanitize_title() in PHP rather than kebabCase(),
 		// but we don't have the exact port of it in JS.
-		this.pluginsMap[ kebabCase( plugin.name ) ] = plugin.plugin;
+		// This is a good approximation though.
+		const slug = kebabCase( plugin.name.toLowerCase() );
+		this.pluginsMap[ slug ] = plugin.plugin;
 	}
 	return this.pluginsMap;
 }
