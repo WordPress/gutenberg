@@ -119,8 +119,11 @@ export default function DuplicateMenuItem( {
 						? item.content
 						: item.reusableBlock.content,
 					meta: isThemePattern
-						? { sync_status: SYNC_TYPES.unsynced }
-						: item.reusableBlock.meta,
+						? { wp_pattern_sync_status: SYNC_TYPES.unsynced }
+						: {
+								wp_pattern_sync_status:
+									item.reusableBlock.wp_pattern_sync_status,
+						  },
 					status: 'publish',
 					title,
 				},
