@@ -105,7 +105,7 @@ function ScreenBlock( { name, variation } ) {
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
-	const hasBehaviorsPanel = __experimentalUseHasBehaviorsPanel( name );
+	const hasBehaviorsPanel = __experimentalUseHasBehaviorsPanel( rawSettings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );

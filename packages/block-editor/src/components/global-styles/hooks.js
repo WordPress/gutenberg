@@ -23,6 +23,7 @@ const EMPTY_CONFIG = { settings: {}, styles: {}, behaviors: {} };
 
 const VALID_SETTINGS = [
 	'appearanceTools',
+	'behaviors',
 	'useRootPaddingAwareAlignments',
 	'border.color',
 	'border.radius',
@@ -88,7 +89,6 @@ export const useGlobalStylesReset = () => {
 
 export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
-
 	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
 	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
 	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
@@ -135,7 +135,6 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
 		);
 	};
-
 	return [ settingValue, setSetting ];
 }
 

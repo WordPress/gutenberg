@@ -4,11 +4,8 @@
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export function __experimentalUseHasBehaviorsPanel( blockName ) {
-	if ( blockName === 'core/image' ) {
-		return true;
-	}
-	return false;
+export function __experimentalUseHasBehaviorsPanel( settings ) {
+	return settings?.behaviors;
 }
 
 export default function ( { onChange, value, behaviors } ) {
