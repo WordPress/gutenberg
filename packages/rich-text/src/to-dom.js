@@ -57,12 +57,12 @@ function getNodeByPath( node, path ) {
 }
 
 function append( element, child ) {
-	if ( typeof child === 'string' ) {
-		child = element.ownerDocument.createTextNode( child );
-	}
-
 	if ( child.html !== undefined ) {
 		return ( element.innerHTML += child.html );
+	}
+
+	if ( typeof child === 'string' ) {
+		child = element.ownerDocument.createTextNode( child );
 	}
 
 	const { type, attributes } = child;
