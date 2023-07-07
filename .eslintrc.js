@@ -129,6 +129,7 @@ const restrictedImports = [
 			'reject',
 			'repeat',
 			'reverse',
+			'set',
 			'setWith',
 			'size',
 			'snakeCase',
