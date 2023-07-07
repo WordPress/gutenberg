@@ -5,7 +5,10 @@ import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export function __experimentalUseHasBehaviorsPanel( settings ) {
-	return settings?.behaviors;
+	// If every behavior is disabled, do not show the behaviors inspector control.
+	return Object.values( settings?.behaviors ).some(
+		( value ) => value === true
+	);
 }
 
 export default function ( { onChange, value, behaviors } ) {

@@ -25,11 +25,10 @@ function BehaviorsControl( {
 	const { settings } = useSelect(
 		( select ) => {
 			const { getSettings } = select( blockEditorStore );
-
 			return {
 				settings:
 					getSettings()?.__experimentalFeatures?.blocks?.[ blockName ]
-						?.behaviors,
+						?.behaviors || {},
 			};
 		},
 		[ blockName ]
@@ -45,7 +44,6 @@ function BehaviorsControl( {
 			label: __( 'No behaviors' ),
 		},
 	};
-
 	const behaviorsOptions = Object.entries( settings )
 		.filter(
 			( [ behaviorName, behaviorValue ] ) =>
@@ -59,7 +57,6 @@ function BehaviorsControl( {
 				.slice( 1 )
 				.toLowerCase() }`,
 		} ) );
-
 	const options = [
 		...Object.values( defaultBehaviors ),
 		...behaviorsOptions,
@@ -82,6 +79,7 @@ function BehaviorsControl( {
 			behaviorsValue: value,
 		};
 	}, [ blockBehaviors ] );
+
 	// If every behavior is disabled, do not show the behaviors inspector control.
 	if ( behaviorsOptions.length === 0 ) {
 		return null;
