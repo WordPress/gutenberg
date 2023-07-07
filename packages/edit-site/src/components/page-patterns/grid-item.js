@@ -84,7 +84,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The pattern's title e.g. 'Call to action'.
-					__( "'%s' deleted." ),
+					__( '"%s" deleted.' ),
 					item.title
 				),
 				{ type: 'snackbar', id: 'edit-site-patterns-success' }
@@ -131,7 +131,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		? __( 'Are you sure you want to clear these customizations?' )
 		: sprintf(
 				// translators: %s: The pattern or template part's title e.g. 'Call to action'.
-				__( "Are you sure you want to delete '%s'?" ),
+				__( 'Are you sure you want to delete "%s"?' ),
 				item.title
 		  );
 

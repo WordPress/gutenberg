@@ -64,7 +64,7 @@ export default function DuplicateMenuItem( {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
-					__( "'%s' created." ),
+					__( '"%s" created.' ),
 					title
 				),
 				{
@@ -72,7 +72,7 @@ export default function DuplicateMenuItem( {
 					id: 'edit-site-patterns-success',
 					actions: [
 						{
-							label: __( 'Edit template part' ),
+							label: __( 'Edit' ),
 							onClick: () =>
 								history.push( {
 									postType: TEMPLATE_PARTS,
@@ -129,7 +129,7 @@ export default function DuplicateMenuItem( {
 
 			const actionLabel = isThemePattern
 				? __( 'View my patterns' )
-				: __( 'Edit pattern' );
+				: __( 'Edit' );
 
 			const newLocation = isThemePattern
 				? {
@@ -147,7 +147,7 @@ export default function DuplicateMenuItem( {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
-					__( "'%s' added to my patterns." ),
+					__( '"%s" added to my patterns.' ),
 					title
 				),
 				{
