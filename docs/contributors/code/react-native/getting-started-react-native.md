@@ -89,7 +89,7 @@ One of the extensions we are using is the [React Native Tools](https://marketpla
 Use the following command to run the test suite:
 
 ```sh
-npm run native test
+npm run test:native
 ```
 
 It will run the [jest](https://github.com/facebook/jest) test runner on your tests. The tests are running on the desktop against Node.js.
@@ -97,7 +97,7 @@ It will run the [jest](https://github.com/facebook/jest) test runner on your tes
 To run the tests with debugger support, start it with the following CLI command:
 
 ```sh
-npm run native test:debug
+npm run test:native:debug
 ```
 
 Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to sprinkle `debugger` statements anywhere in the code that you'd like the debugger to break.

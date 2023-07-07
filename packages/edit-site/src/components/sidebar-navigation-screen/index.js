@@ -60,8 +60,9 @@ export default function SidebarNavigationScreen( {
 					{ ! isRoot && ! backPath && (
 						<NavigatorToParentButton
 							as={ SidebarButton }
-							icon={ icon }
+							icon={ isRTL() ? chevronRight : chevronLeft }
 							label={ __( 'Back' ) }
+							showTooltip={ false }
 						/>
 					) }
 					{ ! isRoot && backPath && (
@@ -69,6 +70,7 @@ export default function SidebarNavigationScreen( {
 							onClick={ () => goTo( backPath, { isBack: true } ) }
 							icon={ icon }
 							label={ __( 'Back' ) }
+							showTooltip={ false }
 						/>
 					) }
 					{ isRoot && (
@@ -88,8 +90,8 @@ export default function SidebarNavigationScreen( {
 					) }
 					<Heading
 						className="edit-site-sidebar-navigation-screen__title"
-						color={ 'white' }
-						level={ 2 }
+						color={ '#e0e0e0' /* $gray-200 */ }
+						level={ 1 }
 						size={ 20 }
 					>
 						{ ! isPreviewingTheme()

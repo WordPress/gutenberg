@@ -35,10 +35,7 @@ import {
 } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
-import {
-	store as coreStore,
-	useResourcePermissions,
-} from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -184,9 +181,6 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
 
-	const pagesPermissions = useResourcePermissions( 'pages' );
-	const postsPermissions = useResourcePermissions( 'posts' );
-
 	const {
 		innerBlocks,
 		isAtMaxNesting,
@@ -320,13 +314,6 @@ export default function NavigationLinkEdit( {
 
 		// Close the link editing UI.
 		setIsLinkOpen( false );
-	}
-
-	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
-		userCanCreate = pagesPermissions.canCreate;
-	} else if ( type === 'post' ) {
-		userCanCreate = postsPermissions.canCreate;
 	}
 
 	const {
@@ -589,7 +576,6 @@ export default function NavigationLinkEdit( {
 							link={ attributes }
 							onClose={ () => setIsLinkOpen( false ) }
 							anchor={ popoverAnchor }
-							hasCreateSuggestion={ userCanCreate }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {
 								updateAttributes(

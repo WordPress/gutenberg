@@ -43,7 +43,7 @@ const pendingIcon = (
 
 export default function StatusLabel( { status, date, short } ) {
 	const relateToNow = humanTimeDiff( date );
-	let statusLabel = '';
+	let statusLabel = status;
 	let statusIcon = pendingIcon;
 	switch ( status ) {
 		case 'publish':

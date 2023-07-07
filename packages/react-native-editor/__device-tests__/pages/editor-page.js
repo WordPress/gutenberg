@@ -341,6 +341,46 @@ class EditorPage {
 		}
 	}
 
+	async swipeToolbarToElement( elementSelector, options ) {
+		const { byId, swipeRight } = options || {};
+		const offset = isAndroid() ? 300 : 50;
+		const maxLocatorAttempts = 5;
+		let locatorAttempts = 0;
+		let element;
+
+		const toolbar = await this.getToolbar();
+		const toolbarLocation = await toolbar.getLocation();
+		const toolbarSize = await toolbar.getSize();
+
+		while ( locatorAttempts < maxLocatorAttempts ) {
+			element = byId
+				? await this.driver.elementsByAccessibilityId( elementSelector )
+				: await this.driver.elementsByXPath( elementSelector );
+			if ( await element[ 0 ]?.isDisplayed() ) {
+				break;
+			}
+
+			swipeFromTo(
+				this.driver,
+				{
+					x: ! swipeRight
+						? toolbarSize.width - offset
+						: toolbarSize.width / 2,
+					y: toolbarLocation.y + toolbarSize.height / 2,
+				},
+				{
+					x: ! swipeRight
+						? toolbarSize.width / 2
+						: toolbarSize.width - offset,
+					y: toolbarLocation.y + toolbarSize.height / 2,
+				},
+				1000
+			);
+			locatorAttempts++;
+		}
+		return element;
+	}
+
 	async openBlockSettings() {
 		const settingsButtonElement = isAndroid()
 			? '//android.widget.Button[@content-desc="Open Settings"]/android.view.ViewGroup'
@@ -356,10 +396,10 @@ class EditorPage {
 		const blockActionsButtonElement = isAndroid()
 			? '//android.widget.Button[contains(@content-desc, "Open Block Actions Menu")]'
 			: '//XCUIElementTypeButton[@name="Open Block Actions Menu"]';
-		const blockActionsMenu = await this.waitForElementToBeDisplayedByXPath(
+		const blockActionsMenu = await this.swipeToolbarToElement(
 			blockActionsButtonElement
 		);
-		await blockActionsMenu.click();
+		await blockActionsMenu[ 0 ].click();
 
 		const removeElement = 'Remove block';
 		const removeBlockButton = await this.waitForElementToBeDisplayedById(
@@ -378,13 +418,16 @@ class EditorPage {
 	// =========================
 
 	async getToolbar() {
-		return await this.driver.elementsByAccessibilityId( 'Document tools' );
+		return this.waitForElementToBeDisplayedById( 'Document tools', 4000 );
 	}
 
 	async addNewBlock( blockName, { skipInserterOpen = false } = {} ) {
 		if ( ! skipInserterOpen ) {
-			const addButton = await this.getAddBlockButton();
-			await addButton.click();
+			const addButton = await this.swipeToolbarToElement( ADD_BLOCK_ID, {
+				byId: true,
+				swipeRight: true,
+			} );
+			await addButton[ 0 ].click();
 		}
 
 		// Click on block of choice.
@@ -599,10 +642,8 @@ class EditorPage {
 		const identifier = isAndroid()
 			? `//android.widget.Button[@content-desc="${ formatting }"]/android.view.ViewGroup`
 			: `//XCUIElementTypeButton[@name="${ formatting }"]`;
-		const toggleElement = await this.waitForElementToBeDisplayedByXPath(
-			identifier
-		);
-		return await toggleElement.click();
+		const toggleElement = await this.swipeToolbarToElement( identifier );
+		return await toggleElement[ 0 ].click();
 	}
 
 	async openLinkToSettings() {

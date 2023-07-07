@@ -151,11 +151,12 @@ class PostEditorTemplateMode {
 
 		await expect(
 			this.editorTopBar.getByRole( 'heading[level=1]' )
-		).toHaveText( 'Editing template: Singular' );
+		).toHaveText( 'Editing template: Single Entries' );
 	}
 
 	async createPostAndSaveDraft() {
 		await this.admin.createNewPost();
+		await this.editor.canvas.waitForLoadState();
 		// Create a random post.
 		await this.page.keyboard.type( 'Just an FSE Post' );
 		await this.page.keyboard.press( 'Enter' );

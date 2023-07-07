@@ -5,6 +5,7 @@ import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import {
 	BlockSettingsMenuControls,
 	store as blockEditorStore,
+	ReusableBlocksRenameHint,
 } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
@@ -18,7 +19,7 @@ import {
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -97,15 +98,25 @@ export default function ReusableBlockConvertButton( {
 				);
 				createSuccessNotice(
 					syncType === 'fully'
-						? __( 'Synced Pattern created.' )
-						: __( 'Unsynced Pattern created.' ),
+						? sprintf(
+								// translators: %s: the name the user has given to the pattern.
+								__( 'Synced Pattern created: %s' ),
+								reusableBlockTitle
+						  )
+						: sprintf(
+								// translators: %s: the name the user has given to the pattern.
+								__( 'Unsynced Pattern created: %s' ),
+								reusableBlockTitle
+						  ),
 					{
 						type: 'snackbar',
+						id: 'convert-to-reusable-block-success',
 					}
 				);
 			} catch ( error ) {
 				createErrorNotice( error.message, {
 					type: 'snackbar',
+					id: 'convert-to-reusable-block-error',
 				} );
 			}
 		},
@@ -130,11 +141,11 @@ export default function ReusableBlockConvertButton( {
 						icon={ symbol }
 						onClick={ () => setIsModalOpen( true ) }
 					>
-						{ __( 'Create a Pattern' ) }
+						{ __( 'Create pattern/reusable block' ) }
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
-							title={ __( 'Create a Pattern' ) }
+							title={ __( 'Create pattern' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );
@@ -151,19 +162,19 @@ export default function ReusableBlockConvertButton( {
 								} }
 							>
 								<VStack spacing="5">
+									<ReusableBlocksRenameHint />
 									<TextControl
 										__nextHasNoMarginBottom
 										label={ __( 'Name' ) }
 										value={ title }
 										onChange={ setTitle }
+										placeholder={ __( 'My pattern' ) }
 									/>
 
 									<ToggleControl
-										label={ __(
-											'Keep all pattern instances in sync'
-										) }
+										label={ __( 'Synced' ) }
 										help={ __(
-											'Editing the original pattern will also update anywhere the pattern is used.'
+											'Editing the pattern will update it anywhere it is used.'
 										) }
 										checked={ syncType === 'fully' }
 										onChange={ () => {
@@ -186,7 +197,7 @@ export default function ReusableBlockConvertButton( {
 										</Button>
 
 										<Button variant="primary" type="submit">
-											{ __( 'Save' ) }
+											{ __( 'Create' ) }
 										</Button>
 									</HStack>
 								</VStack>

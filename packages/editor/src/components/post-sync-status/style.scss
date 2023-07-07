@@ -9,8 +9,8 @@
 		flex-shrink: 0;
 	}
 
-	.components-base-control {
+	> div {
 		// Match padding on tertiary buttons for alignment.
-		padding-left: $grid-unit-15 * 0.5;
+		padding-left: $grid-unit-15;
 	}
 }

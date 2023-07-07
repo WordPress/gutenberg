@@ -119,8 +119,8 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 							onClick={ () => convertBlockToStatic( clientId ) }
 							label={
 								innerBlockCount > 1
-									? __( 'Convert to regular blocks' )
-									: __( 'Convert to regular block' )
+									? __( 'Detach patterns' )
+									: __( 'Detach pattern' )
 							}
 							icon={ ungroup }
 							showTooltip

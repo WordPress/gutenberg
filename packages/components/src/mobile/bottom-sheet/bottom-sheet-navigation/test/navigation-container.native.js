@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Text } from 'react-native';
-import { render, fireEvent, waitFor, act } from 'test/helpers';
+import { render, fireEvent, act } from 'test/helpers';
 import { useNavigation } from '@react-navigation/native';
 
 /**
@@ -49,8 +49,8 @@ it( 'animates height transitioning from non-full-screen to full-screen', async (
 	);
 
 	// Await navigation screen to allow async state updates to complete
-	const navigationScreen = await waitFor( () =>
-		screen.getByTestId( 'navigation-screen-test-screen-1' )
+	const navigationScreen = await screen.findByTestId(
+		'navigation-screen-test-screen-1'
 	);
 	// Trigger non-full-screen layout event
 	act( () => {
@@ -65,11 +65,9 @@ it( 'animates height transitioning from non-full-screen to full-screen', async (
 		jest.advanceTimersByTime( 10 );
 	} );
 	// Navigate to screen 2
-	fireEvent.press(
-		await waitFor( () => screen.getByText( /test-screen-1/ ) )
-	);
+	fireEvent.press( await screen.findByText( /test-screen-1/ ) );
 	// Await navigation screen to allow async state updates to complete
-	await waitFor( () => screen.getByText( /test-screen-2/ ) );
+	await screen.findByText( /test-screen-2/ );
 
 	expect( performLayoutAnimation ).toHaveBeenCalledTimes( 1 );
 } );
@@ -87,8 +85,8 @@ it( 'animates height transitioning from full-screen to non-full-screen', async (
 	);
 
 	// Await navigation screen to allow async state updates to complete
-	const navigationScreen = await waitFor( () =>
-		screen.getByTestId( 'navigation-screen-test-screen-1' )
+	const navigationScreen = await screen.findByTestId(
+		'navigation-screen-test-screen-1'
 	);
 	// Trigger non-full-screen layout event
 	act( () => {
@@ -103,16 +101,11 @@ it( 'animates height transitioning from full-screen to non-full-screen', async (
 		jest.advanceTimersByTime( 10 );
 	} );
 	// Navigate to screen 2
-	fireEvent.press(
-		await waitFor( () => screen.getByText( /test-screen-1/ ) )
-	);
+	fireEvent.press( await screen.findByText( /test-screen-1/ ) );
 	// Navigate to screen 1
-	fireEvent.press(
-		// Use custom waitFor due to https://github.com/callstack/react-native-testing-library/issues/379
-		await waitFor( () => screen.getByText( /test-screen-2/ ) )
-	);
+	fireEvent.press( await screen.findByText( /test-screen-2/ ) );
 	// Await navigation screen to allow async state updates to complete
-	await waitFor( () => screen.getByText( /test-screen-1/ ) );
+	await screen.findByText( /test-screen-1/ );
 
 	expect( performLayoutAnimation ).toHaveBeenCalledTimes( 2 );
 } );
@@ -135,8 +128,8 @@ it( 'does not animate height transitioning from full-screen to full-screen', asy
 	);
 
 	// Await navigation screen to allow async state updates to complete
-	const navigationScreen = await waitFor( () =>
-		screen.getByTestId( 'navigation-screen-test-screen-1' )
+	const navigationScreen = await screen.findByTestId(
+		'navigation-screen-test-screen-1'
 	);
 	// Trigger non-full-screen layout event
 	act( () => {
@@ -151,19 +144,13 @@ it( 'does not animate height transitioning from full-screen to full-screen', asy
 		jest.advanceTimersByTime( 10 );
 	} );
 	// Navigate to screen 2
-	fireEvent.press(
-		await waitFor( () => screen.getByText( /test-screen-1/ ) )
-	);
+	fireEvent.press( await screen.findByText( /test-screen-1/ ) );
 	// Navigate to screen 3
-	fireEvent.press(
-		await waitFor( () => screen.getByText( /test-screen-2/ ) )
-	);
+	fireEvent.press( await screen.findByText( /test-screen-2/ ) );
 	// Navigate to screen 2
-	fireEvent.press(
-		await waitFor( () => screen.getByText( /test-screen-3/ ) )
-	);
+	fireEvent.press( await screen.findByText( /test-screen-3/ ) );
 	// Await navigation screen to allow async state updates to complete
-	await waitFor( () => screen.getByText( /test-screen-2/ ) );
+	await screen.findByText( /test-screen-2/ );
 
 	expect( performLayoutAnimation ).toHaveBeenCalledTimes( 1 );
 } );

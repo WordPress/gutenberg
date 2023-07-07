@@ -17,8 +17,15 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
-import { keyboardClose } from '@wordpress/icons';
+import {
+	keyboardClose,
+	audio as audioIcon,
+	media as imageIcon,
+	video as videoIcon,
+	gallery as galleryIcon,
+} from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
+import { createBlock } from '@wordpress/blocks';
 import {
 	toggleUndoButton,
 	toggleRedoButton,
@@ -40,10 +47,13 @@ function HeaderToolbar( {
 	showInserter,
 	showKeyboardHideButton,
 	getStylesFromColorScheme,
+	insertBlock,
 	onHideKeyboard,
+	onOpenBlockSettings,
 	isRTL,
 	noContentSelected,
 } ) {
+	const anchorNodeRef = useRef();
 	const wasNoContentSelected = useRef( noContentSelected );
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const { height: windowHeight, width: windowWidth } = useWindowDimensions();
@@ -85,6 +95,60 @@ function HeaderToolbar( {
 		}
 	};
 
+	const onInsertBlock = useCallback(
+		( blockType ) => () => {
+			insertBlock( createBlock( blockType ), undefined, undefined, true, {
+				source: 'inserter_menu',
+			} );
+		},
+		[ insertBlock ]
+	);
+
+	const renderMediaButtons = (
+		<ToolbarGroup>
+			<ToolbarButton
+				key="imageButton"
+				title={ __( 'Image' ) }
+				icon={ imageIcon }
+				onClick={ onInsertBlock( 'core/image' ) }
+				testID="insert-image-button"
+				extraProps={ {
+					hint: __( 'Insert Image Block' ),
+				} }
+			/>
+			<ToolbarButton
+				key="videoButton"
+				title={ __( 'Video' ) }
+				icon={ videoIcon }
+				onClick={ onInsertBlock( 'core/video' ) }
+				testID="insert-video-button"
+				extraProps={ {
+					hint: __( 'Insert Video Block' ),
+				} }
+			/>
+			<ToolbarButton
+				key="galleryButton"
+				title={ __( 'Gallery' ) }
+				icon={ galleryIcon }
+				onClick={ onInsertBlock( 'core/gallery' ) }
+				testID="insert-gallery-button"
+				extraProps={ {
+					hint: __( 'Insert Gallery Block' ),
+				} }
+			/>
+			<ToolbarButton
+				key="audioButton"
+				title={ __( 'Audio' ) }
+				icon={ audioIcon }
+				onClick={ onInsertBlock( 'core/audio' ) }
+				testID="insert-audio-button"
+				extraProps={ {
+					hint: __( 'Insert Audio Block' ),
+				} }
+			/>
+		</ToolbarGroup>
+	);
+
 	const onToggleInserter = useCallback(
 		( isOpen ) => {
 			if ( isOpen ) {
@@ -106,6 +170,7 @@ function HeaderToolbar( {
 
 	return (
 		<View
+			ref={ anchorNodeRef }
 			testID={ toolbarAriaLabel }
 			accessibilityLabel={ toolbarAriaLabel }
 			style={ [
@@ -133,7 +198,11 @@ function HeaderToolbar( {
 					useExpandedMode={ useExpandedMode }
 					onToggle={ onToggleInserter }
 				/>
-				<BlockToolbar />
+				{ noContentSelected && renderMediaButtons }
+				<BlockToolbar
+					anchorNodeRef={ anchorNodeRef.current }
+					onOpenBlockSettings={ onOpenBlockSettings }
+				/>
 			</ScrollView>
 			{ showKeyboardHideButton && (
 				<ToolbarGroup
@@ -182,7 +251,9 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( blockEditorStore );
+		const { clearSelectedBlock, insertBlock } =
+			dispatch( blockEditorStore );
+		const { openGeneralSidebar } = dispatch( editPostStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );
 
 		return {
@@ -191,6 +262,10 @@ export default compose( [
 			onHideKeyboard() {
 				clearSelectedBlock();
 				togglePostTitleSelection( false );
+			},
+			insertBlock,
+			onOpenBlockSettings() {
+				openGeneralSidebar( 'edit-post/block' );
 			},
 		};
 	} ),

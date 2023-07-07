@@ -6,7 +6,6 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Children } from '@wordpress/element';
 import { BottomSheetConsumer } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
@@ -16,7 +15,6 @@ import deprecated from '@wordpress/deprecated';
  */
 import groups from './groups';
 import useDisplayBlockControls from '../use-display-block-controls';
-import { BlockSettingsButton } from '../block-settings';
 
 export default function InspectorControlsFill( {
 	children,
@@ -55,7 +53,6 @@ export default function InspectorControlsFill( {
 					</BottomSheetConsumer>
 				}
 			</Fill>
-			{ Children.count( children ) > 0 && <BlockSettingsButton /> }
 		</>
 	);
 }

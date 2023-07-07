@@ -136,21 +136,18 @@ export const isBlockSubtreeDisabled = createSelector(
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getListViewClientIdsTree = createSelector(
+export const getEnabledClientIdsTree = createSelector(
 	( state, rootClientId = '' ) => {
 		return getBlockOrder( state, rootClientId ).flatMap( ( clientId ) => {
 			if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
 				return [
 					{
 						clientId,
-						innerBlocks: getListViewClientIdsTree(
-							state,
-							clientId
-						),
+						innerBlocks: getEnabledClientIdsTree( state, clientId ),
 					},
 				];
 			}
-			return getListViewClientIdsTree( state, clientId );
+			return getEnabledClientIdsTree( state, clientId );
 		} );
 	},
 	( state ) => [
@@ -185,3 +182,26 @@ export const getEnabledBlockParents = createSelector(
 		state.blockListSettings,
 	]
 );
+
+/**
+ * Selector that returns the data needed to display a prompt when certain
+ * blocks are removed, or `false` if no such prompt is requested.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object|false} Data for removal prompt display, if any.
+ */
+export function getRemovalPromptData( state ) {
+	return state.removalPromptData;
+}
+
+/**
+ * Returns true if removal prompt exists, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether removal prompt exists.
+ */
+export function getBlockRemovalRules( state ) {
+	return state.blockRemovalRules;
+}
