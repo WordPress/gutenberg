@@ -6,6 +6,7 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
@@ -16,13 +17,12 @@ import deprecated from '@wordpress/deprecated';
 import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
-import {
-	getNormalizedCommaSeparable,
-	isRawAttribute,
-	setNestedValue,
-} from './utils';
+import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 import type * as ET from './entity-types';
 import { getUndoEdits, getRedoEdits } from './private-selectors';
+import { unlock } from './private-apis';
+
+const { setNestedValue } = unlock( blockEditorPrivateApis );
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve

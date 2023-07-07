@@ -17,8 +17,9 @@ import {
  */
 import { DocumentOutline } from '../';
 
-jest.mock( '@wordpress/block-editor', () => ( {
+jest.mock( '', () => ( {
 	BlockTitle: () => 'Block Title',
+	...jest.requireActual( '@wordpress/block-editor' ),
 } ) );
 
 describe( 'DocumentOutline', () => {

@@ -5,10 +5,17 @@ import createSelector from 'rememo';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
+ * WordPress dependencies
+ */
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+
+/**
  * Internal dependencies
  */
 import getQueryParts from './get-query-parts';
-import { setNestedValue } from '../utils';
+import { unlock } from '../private-apis';
+
+const { setNestedValue } = unlock( blockEditorPrivateApis );
 
 /**
  * Cache of state keys to EquivalentKeyMap where the inner map tracks queries

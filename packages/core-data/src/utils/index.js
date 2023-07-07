@@ -6,4 +6,3 @@ export { default as onSubKey } from './on-sub-key';
 export { default as replaceAction } from './replace-action';
 export { default as withWeakMapCache } from './with-weak-map-cache';
 export { default as isRawAttribute } from './is-raw-attribute';
-export { default as setNestedValue } from './set-nested-value';
