@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fix
+
+- `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([52356](https://github.com/WordPress/gutenberg/pull/52356)).
+
+## 25.3.0 (2023-07-05)
+
 ### Enhancements
 
 -   `SelectControl`: Added option to set hidden options. ([#51545](https://github.com/WordPress/gutenberg/pull/51545))

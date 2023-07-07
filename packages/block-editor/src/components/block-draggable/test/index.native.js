@@ -133,16 +133,6 @@ describe( 'BlockDraggable', () => {
 					// "firePanGesture" finishes the dragging gesture
 					firePanGesture( blockDraggableWrapper );
 					expect( getDraggableChip( screen ) ).not.toBeDefined();
-
-					// Start dragging from block's mobile toolbar
-					fireLongPress(
-						paragraphBlock,
-						'draggable-trigger-mobile-toolbar'
-					);
-					expect( getDraggableChip( screen ) ).toBeVisible();
-					// "firePanGesture" finishes the dragging gesture
-					firePanGesture( blockDraggableWrapper );
-					expect( getDraggableChip( screen ) ).not.toBeDefined();
 				} ) );
 
 			it( 'does not enable drag mode when selected and editing text', async () =>
@@ -243,16 +233,6 @@ describe( 'BlockDraggable', () => {
 					// "firePanGesture" finishes the dragging gesture
 					firePanGesture( blockDraggableWrapper );
 					expect( getDraggableChip( screen ) ).not.toBeDefined();
-
-					// Start dragging from block's mobile toolbar
-					fireLongPress(
-						imageBlock,
-						'draggable-trigger-mobile-toolbar'
-					);
-					expect( getDraggableChip( screen ) ).toBeVisible();
-					// "firePanGesture" finishes the dragging gesture
-					firePanGesture( blockDraggableWrapper );
-					expect( getDraggableChip( screen ) ).not.toBeDefined();
 				} ) );
 		} );
 
@@ -301,16 +281,6 @@ describe( 'BlockDraggable', () => {
 					// "firePanGesture" finishes the dragging gesture
 					firePanGesture( blockDraggableWrapper );
 					expect( getDraggableChip( screen ) ).not.toBeDefined();
-
-					// Start dragging from block's mobile toolbar
-					fireLongPress(
-						galleryBlock,
-						'draggable-trigger-mobile-toolbar'
-					);
-					expect( getDraggableChip( screen ) ).toBeVisible();
-					// "firePanGesture" finishes the dragging gesture
-					firePanGesture( blockDraggableWrapper );
-					expect( getDraggableChip( screen ) ).not.toBeDefined();
 				} ) );
 
 			it( 'enables drag mode when nested block is selected', async () =>
@@ -332,20 +302,6 @@ describe( 'BlockDraggable', () => {
 
 					// Start dragging from nested block's content
 					fireLongPress( galleryItem, 'draggable-trigger-content' );
-					expect( getDraggableChip( screen ) ).toBeVisible();
-					// "firePanGesture" finishes the dragging gesture
-					firePanGesture( blockDraggableWrapper );
-					expect( getDraggableChip( screen ) ).not.toBeDefined();
-
-					// After dropping the block, the gallery item gets automatically selected.
-					// Hence, we have to select the gallery item again.
-					fireEvent.press( galleryItem );
-
-					// Start dragging from nested block's mobile toolbar
-					fireLongPress(
-						galleryItem,
-						'draggable-trigger-mobile-toolbar'
-					);
 					expect( getDraggableChip( screen ) ).toBeVisible();
 					// "firePanGesture" finishes the dragging gesture
 					firePanGesture( blockDraggableWrapper );
@@ -386,16 +342,6 @@ describe( 'BlockDraggable', () => {
 
 					// Start dragging from block's content
 					fireLongPress( spacerBlock, 'draggable-trigger-content' );
-					expect( getDraggableChip( screen ) ).toBeVisible();
-					// "firePanGesture" finishes the dragging gesture
-					firePanGesture( blockDraggableWrapper );
-					expect( getDraggableChip( screen ) ).not.toBeDefined();
-
-					// Start dragging from block's mobile toolbar
-					fireLongPress(
-						spacerBlock,
-						'draggable-trigger-mobile-toolbar'
-					);
 					expect( getDraggableChip( screen ) ).toBeVisible();
 					// "firePanGesture" finishes the dragging gesture
 					firePanGesture( blockDraggableWrapper );

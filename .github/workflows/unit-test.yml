@@ -85,7 +85,6 @@ jobs:
             fail-fast: true
             matrix:
                 php:
-                    - '5.6'
                     - '7.0'
                     - '7.1'
                     - '7.2'
@@ -297,4 +296,4 @@ jobs:
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

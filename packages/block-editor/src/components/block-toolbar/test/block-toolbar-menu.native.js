@@ -9,6 +9,7 @@ import {
 	within,
 	getEditorHtml,
 	typeInRichText,
+	openBlockActionsMenu,
 } from 'test/helpers';
 
 /**
@@ -36,15 +37,14 @@ describe( 'Block Actions Menu', () => {
             <p></p>
             <!-- /wp:paragraph -->`,
 		} );
-		const { getByLabelText, getByRole } = screen;
+		const { getByRole } = screen;
 
 		// Get block
 		const paragraphBlock = await getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 
 		// Open block actions menu
-		const blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
-		fireEvent.press( blockActionsButton );
+		await openBlockActionsMenu( screen );
 
 		// Get Picker title
 		const pickerHeader = getByRole( 'header' );
@@ -56,10 +56,8 @@ describe( 'Block Actions Menu', () => {
 
 	describe( 'moving blocks', () => {
 		it( 'moves blocks up and down', async () => {
-			const screen = await initializeEditor( {
-				screenWidth: 100, // To collapse the up/arrow buttons bellow blocks
-			} );
-			const { getByLabelText, getByTestId } = screen;
+			const screen = await initializeEditor();
+			const { getByLabelText } = screen;
 
 			// Add Paragraph block
 			await addBlock( screen, 'Paragraph' );
@@ -85,16 +83,8 @@ describe( 'Block Actions Menu', () => {
 			} );
 			fireEvent.press( spacerBlock );
 
-			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
-
-			// Get block actions modal
-			let blockActionsMenu = await getByTestId( 'block-actions-menu' );
-
 			// Tap on the Move Down button
-			fireEvent.press(
-				within( blockActionsMenu ).getByLabelText( 'Move block down' )
-			);
+			fireEvent.press( getByLabelText( /Move block down/ ) );
 
 			// Get Heading block
 			const headingBlock = await getBlock( screen, 'Heading', {
@@ -102,25 +92,15 @@ describe( 'Block Actions Menu', () => {
 			} );
 			fireEvent.press( headingBlock );
 
-			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
-
-			// Get block actions modal
-			blockActionsMenu = await getByTestId( 'block-actions-menu' );
-
 			// Tap on the Move Up button
-			fireEvent.press(
-				within( blockActionsMenu ).getByLabelText( 'Move block up' )
-			);
+			fireEvent.press( getByLabelText( /Move block up/ ) );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		it( 'disables the Move Up button for the first block', async () => {
-			const screen = await initializeEditor( {
-				screenWidth: 100, // To collapse the up/arrow buttons bellow blocks
-			} );
-			const { getByLabelText, getByTestId } = screen;
+			const screen = await initializeEditor();
+			const { getByLabelText } = screen;
 
 			// Add Paragraph block
 			await addBlock( screen, 'Paragraph' );
@@ -144,15 +124,8 @@ describe( 'Block Actions Menu', () => {
 			paragraphBlock = await getBlock( screen, 'Paragraph' );
 			fireEvent.press( paragraphBlock );
 
-			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
-
-			// Get block actions modal
-			const blockActionsMenu = await getByTestId( 'block-actions-menu' );
-
 			// Get the Move Up button
-			const upButton =
-				within( blockActionsMenu ).getByLabelText( 'Move block up' );
+			const upButton = getByLabelText( /Move block up/ );
 			const isUpButtonDisabled =
 				upButton.props.accessibilityState?.disabled;
 			expect( isUpButtonDisabled ).toBe( true );
@@ -167,7 +140,7 @@ describe( 'Block Actions Menu', () => {
 			const screen = await initializeEditor( {
 				screenWidth: 100,
 			} );
-			const { getByLabelText, getByTestId } = screen;
+			const { getByLabelText } = screen;
 
 			// Add Paragraph block
 			await addBlock( screen, 'Paragraph' );
@@ -193,15 +166,8 @@ describe( 'Block Actions Menu', () => {
 			} );
 			fireEvent.press( headingBlock );
 
-			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
-
-			// Get block actions modal
-			const blockActionsMenu = await getByTestId( 'block-actions-menu' );
-
 			// Get the Move Down button
-			const downButton =
-				within( blockActionsMenu ).getByLabelText( 'Move block down' );
+			const downButton = getByLabelText( /Move block down/ );
 			const isDownButtonDisabled =
 				downButton.props.accessibilityState?.disabled;
 			expect( isDownButtonDisabled ).toBe( true );
@@ -243,7 +209,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( headingBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			await openBlockActionsMenu( screen );
 
 			// Tap on the Copy button
 			fireEvent.press( getByLabelText( /Copy/ ) );
@@ -253,7 +219,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( paragraphBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			await openBlockActionsMenu( screen );
 
 			// Tap on the Paste block after button
 			fireEvent.press( getByLabelText( /Paste block after/ ) );
@@ -290,7 +256,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( headingBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			await openBlockActionsMenu( screen );
 
 			// Tap on the Copy button
 			fireEvent.press( getByLabelText( /Copy/ ) );
@@ -300,7 +266,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( paragraphBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			await openBlockActionsMenu( screen );
 
 			// Tap on the Past block after button
 			fireEvent.press( getByLabelText( /Paste block after/ ) );
@@ -335,7 +301,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( paragraphBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			await openBlockActionsMenu( screen );
 
 			// Tap on the Cut button
 			fireEvent.press( getByLabelText( /Cut block/ ) );
@@ -346,7 +312,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( headingBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			await openBlockActionsMenu( screen );
 
 			// Tap on the Cut button
 			fireEvent.press( getByLabelText( /Paste block after/ ) );
@@ -383,7 +349,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( spacerBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			await openBlockActionsMenu( screen );
 
 			// Tap on the Duplicate button
 			fireEvent.press( getByLabelText( /Duplicate block/ ) );
@@ -418,7 +384,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( paragraphBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			await openBlockActionsMenu( screen );
 
 			// Tap on the Transform block button
 			fireEvent.press( getByLabelText( /Transform block…/ ) );

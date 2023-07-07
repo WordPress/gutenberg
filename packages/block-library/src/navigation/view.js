@@ -15,7 +15,7 @@ const focusableSelectors = [
 
 const openMenu = ( store, menuOpenedOn ) => {
 	const { context, ref, selectors } = store;
-	selectors.core.navigation.menuOpenBy( store )[ menuOpenedOn ] = true;
+	selectors.core.navigation.menuOpenedBy( store )[ menuOpenedOn ] = true;
 	context.core.navigation.previousFocus = ref;
 	if ( context.core.navigation.type === 'overlay' ) {
 		// Add a `has-modal-open` class to the <html> root.
@@ -25,7 +25,7 @@ const openMenu = ( store, menuOpenedOn ) => {
 
 const closeMenu = ( store, menuClosedOn ) => {
 	const { context, selectors } = store;
-	selectors.core.navigation.menuOpenBy( store )[ menuClosedOn ] = false;
+	selectors.core.navigation.menuOpenedBy( store )[ menuClosedOn ] = false;
 	// Check if the menu is still open or not.
 	if ( ! selectors.core.navigation.isMenuOpen( store ) ) {
 		if (
@@ -89,7 +89,7 @@ wpStore( {
 								: 'submenuOpenedBy'
 						]
 					).filter( Boolean ).length > 0,
-				menuOpenBy: ( { context } ) =>
+				menuOpenedBy: ( { context } ) =>
 					context.core.navigation[
 						context.core.navigation.type === 'overlay'
 							? 'overlayOpenedBy'
@@ -120,21 +120,31 @@ wpStore( {
 				},
 				closeMenuOnClick( store ) {
 					closeMenu( store, 'click' );
+					closeMenu( store, 'focus' );
+				},
+				openMenuOnFocus( store ) {
+					openMenu( store, 'focus' );
 				},
 				toggleMenuOnClick: ( store ) => {
 					const { selectors } = store;
-					if ( selectors.core.navigation.menuOpenBy( store ).click ) {
+					const menuOpenedBy =
+						selectors.core.navigation.menuOpenedBy( store );
+					if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 						closeMenu( store, 'click' );
+						closeMenu( store, 'focus' );
 					} else {
 						openMenu( store, 'click' );
 					}
 				},
 				handleMenuKeydown: ( store ) => {
 					const { context, selectors, event } = store;
-					if ( selectors.core.navigation.menuOpenBy( store ).click ) {
+					if (
+						selectors.core.navigation.menuOpenedBy( store ).click
+					) {
 						// If Escape close the menu.
 						if ( event?.key === 'Escape' ) {
 							closeMenu( store, 'click' );
+							closeMenu( store, 'focus' );
 							return;
 						}
 
@@ -164,20 +174,20 @@ wpStore( {
 					}
 				},
 				handleMenuFocusout: ( store ) => {
-					const { context, selectors, event } = store;
+					const { context, event } = store;
 					// If focus is outside modal, and in the document, close menu
 					// event.target === The element losing focus
 					// event.relatedTarget === The element receiving focus (if any)
 					// When focusout is outsite the document,
 					// `window.document.activeElement` doesn't change.
 					if (
-						selectors.core.navigation.menuOpenBy( store ).click &&
 						! context.core.navigation.modal?.contains(
 							event.relatedTarget
 						) &&
 						event.target !== window.document.activeElement
 					) {
 						closeMenu( store, 'click' );
+						closeMenu( store, 'focus' );
 					}
 				},
 			},

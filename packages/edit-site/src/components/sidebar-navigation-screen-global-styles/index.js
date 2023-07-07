@@ -171,13 +171,15 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const { get: getPrefference } = useSelect( preferencesStore );
-
-	const isStyleBookOpened = useSelect(
-		( select ) =>
-			'style-book' ===
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
-		[]
-	);
+	const { isViewMode, isStyleBookOpened } = useSelect( ( select ) => {
+		const { getCanvasMode, getEditorCanvasContainerView } = unlock(
+			select( editSiteStore )
+		);
+		return {
+			isViewMode: 'view' === getCanvasMode(),
+			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
+		};
+	}, [] );
 
 	const turnOffDistractionFreeMode = useCallback( () => {
 		const isDistractionFree = getPrefference(
@@ -261,7 +263,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 					</>
 				}
 			/>
-			{ isStyleBookOpened && ! isMobileViewport && (
+			{ isStyleBookOpened && ! isMobileViewport && isViewMode && (
 				<StyleBook
 					enableResizing={ false }
 					isSelected={ () => false }

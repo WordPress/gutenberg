@@ -38,7 +38,7 @@ export default function usePatternDetails( postType, postId ) {
 	if ( ! descriptionText && addedBy.text ) {
 		descriptionText = sprintf(
 			// translators: %s: pattern title e.g: "Header".
-			__( 'This is your %s pattern.' ),
+			__( 'This is the %s pattern.' ),
 			getTitle()
 		);
 	}
@@ -46,7 +46,7 @@ export default function usePatternDetails( postType, postId ) {
 	if ( ! descriptionText && postType === 'wp_block' && record?.title ) {
 		descriptionText = sprintf(
 			// translators: %s: user created pattern title e.g. "Footer".
-			__( 'This is your %s pattern.' ),
+			__( 'This is the %s pattern.' ),
 			record.title
 		);
 	}

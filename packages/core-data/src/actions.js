@@ -357,7 +357,7 @@ export const editEntityRecord =
 				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 			);
 		}
-		const { transientEdits = {}, mergedEdits = {} } = entityConfig;
+		const { mergedEdits = {} } = entityConfig;
 		const record = select.getRawEntityRecord( kind, name, recordId );
 		const editedRecord = select.getEditedEntityRecord(
 			kind,
@@ -382,7 +382,6 @@ export const editEntityRecord =
 					: value;
 				return acc;
 			}, {} ),
-			transientEdits,
 		};
 		dispatch( {
 			type: 'EDIT_ENTITY_RECORD',
@@ -395,6 +394,7 @@ export const editEntityRecord =
 						acc[ key ] = editedRecord[ key ];
 						return acc;
 					}, {} ),
+					isCached: options.isCached,
 				},
 			},
 		} );
@@ -789,6 +789,22 @@ export const __experimentalSaveSpecifiedEntityEdits =
 				editsToSave[ edit ] = edits[ edit ];
 			}
 		}
+
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+
+		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
+
+		// If a record key is provided then update the existing record.
+		// This necessitates providing `recordKey` to saveEntityRecord as part of the
+		// `record` argument (here called `editsToSave`) to stop that action creating
+		// a new record and instead cause it to update the existing record.
+		if ( recordId ) {
+			editsToSave[ entityIdKey ] = recordId;
+		}
+
 		return await dispatch.saveEntityRecord(
 			kind,
 			name,
