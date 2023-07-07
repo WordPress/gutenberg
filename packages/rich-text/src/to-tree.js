@@ -108,7 +108,7 @@ function fromFormat( {
 	}
 
 	return {
-		type: formatType.tagName === '*' ? tagName : formatType.tagName,
+		type: tagName,
 		object: formatType.object,
 		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
 	};

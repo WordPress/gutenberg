@@ -9,7 +9,8 @@ a[data-fn].fn {
 	vertical-align: super;
 	font-size: smaller;
 	counter-increment: footnotes;
-	display: inline-block;
+	display: inline-flex;
+	text-decoration: none;
 	text-indent: -9999999px;
 }
 

@@ -259,6 +259,19 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 							return `${ opening }${ index + 1 }</a></sup>`;
 						}
 					);
+
+					const compatRegex =
+						/<a[^>]+data-fn="([^"]+)"[^>]*>\*<\/a>/g;
+
+					attributes[ key ] = value.replace(
+						compatRegex,
+						( match, fnId ) => {
+							const index = newOrder.indexOf( fnId );
+							return `<sup data-fn="${ fnId }" class="fn"><a href="#${ fnId }" id="${ fnId }-link">${
+								index + 1
+							}</a></sup>`;
+						}
+					);
 				}
 
 				return attributes;
