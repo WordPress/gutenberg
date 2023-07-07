@@ -790,9 +790,20 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			}
 		}
 
-		// Provide recordKey to saveEntityRecord to avoid creating a new record
-		// and instead update the existing record.
-		editsToSave.id = recordId;
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+
+		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
+
+		// If a record key is provided then update the existing record.
+		// This necessitates providing `recordKey` to saveEntityRecord as part of the
+		// `record` argument (here called `editsToSave`) to stop that action creating
+		// a new record and instead cause it to update the existing record.
+		if ( recordId ) {
+			editsToSave[ entityIdKey ] = recordId;
+		}
 
 		return await dispatch.saveEntityRecord(
 			kind,
