@@ -243,13 +243,13 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 						// When we store rich text values, this would no longer
 						// require a regex.
 						const regex =
-							/(<a[^>]+data-fn="([^"]+)"[^>]*>)\d*<\/a>/g;
+							/(<sup[^>]+data-fn="([^"]+)"[^>]*><a[^>]*>)\d*<\/a><\/sup>/g;
 
 						attributes[ key ] = value.replace(
 							regex,
 							( match, opening, fnId ) => {
 								const index = newOrder.indexOf( fnId );
-								return `${ opening }${ index + 1 }</a>`;
+								return `${ opening }${ index + 1 }</a></sup>`;
 							}
 						);
 					}

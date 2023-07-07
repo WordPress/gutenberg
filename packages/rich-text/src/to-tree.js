@@ -326,7 +326,11 @@ export function toTree( {
 					} )
 				);
 
-				if ( innerHTML ) append( pointer, innerHTML );
+				if ( innerHTML ) {
+					append( pointer, {
+						html: innerHTML,
+					} );
+				}
 			} else {
 				pointer = append(
 					getParent( pointer ),

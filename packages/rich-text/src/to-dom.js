@@ -61,6 +61,10 @@ function append( element, child ) {
 		child = element.ownerDocument.createTextNode( child );
 	}
 
+	if ( child.html !== undefined ) {
+		return ( element.innerHTML += child.html );
+	}
+
 	const { type, attributes } = child;
 
 	if ( type ) {
