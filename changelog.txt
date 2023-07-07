@@ -1,12 +1,5 @@
 == Changelog ==
 
-= 16.1.2 =
-
-## Bugfixes
-
-* Footnotes: increase selector specificity for anchor (https://github.com/WordPress/gutenberg/pull/52179)
-
-
 = 16.2.0-rc.1 =
 
 
