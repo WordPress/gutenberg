@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Platform, ScrollView, View, useWindowDimensions } from 'react-native';
+import { Platform, ScrollView, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -56,8 +56,6 @@ function HeaderToolbar( {
 	const anchorNodeRef = useRef();
 	const wasNoContentSelected = useRef( noContentSelected );
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
-	const { height: windowHeight, width: windowWidth } = useWindowDimensions();
-	const isLandscape = windowWidth >= windowHeight;
 
 	useEffect( () => {
 		const onUndoSubscription = subscribeOnUndoPressed( undo );
@@ -76,13 +74,6 @@ function HeaderToolbar( {
 	useEffect( () => {
 		toggleRedoButton( ! hasRedo );
 	}, [ hasRedo ] );
-
-	// When the orientation changes, updating of the undo/redo buttons
-	// is needed for Android.
-	useEffect( () => {
-		toggleUndoButton( ! hasUndo );
-		toggleRedoButton( ! hasRedo );
-	}, [ isLandscape, hasUndo, hasRedo ] );
 
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
