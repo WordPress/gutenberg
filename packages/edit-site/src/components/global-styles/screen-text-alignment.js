@@ -79,10 +79,10 @@ function ScreenTextAlignment() {
 					<ToggleGroupControl
 						isBlock
 						label={ __( 'Hyphens' ) }
-						onClick={ ( event ) => {
+						onChange={ ( value ) => {
 							// TODO: update the style with useGlobalStyle
 							// eslint-disable-next-line no-console
-							console.log( 'changed', event.target.value );
+							console.log( 'changed', value );
 						} }
 						value="auto"
 					>
