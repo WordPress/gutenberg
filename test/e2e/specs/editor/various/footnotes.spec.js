@@ -203,7 +203,7 @@ test.describe( 'Footnotes', () => {
 					{
 						name: 'core/list-item',
 						attributes: {
-							content: `1<a data-rich-text-format-boundary="true" href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+							content: `1<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
 						},
 					},
 				],
@@ -243,7 +243,7 @@ test.describe( 'Footnotes', () => {
 						{
 							cells: [
 								{
-									content: `1<a data-rich-text-format-boundary="true" href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+									content: `1<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
 									tag: 'td',
 								},
 								{
