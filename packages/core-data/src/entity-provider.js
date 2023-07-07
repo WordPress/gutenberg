@@ -191,7 +191,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => {
-			const output = { blocks: _blocks, meta };
+			const output = { blocks: _blocks };
 			if ( ! meta ) return output;
 			// If meta.footnotes is empty, it means the meta is not registered.
 			if ( meta.footnotes === undefined ) return output;
@@ -228,37 +228,47 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 					}
 			);
 
-			function updateBlocksAttributes( __blocks ) {
-				return __blocks.map( ( block ) => {
-					const attributes = { ...block.attributes };
-					for ( const key in attributes ) {
-						const value = attributes[ key ];
+			function updateAttributes( attributes ) {
+				attributes = { ...attributes };
 
-						if ( typeof value !== 'string' ) {
-							continue;
-						}
+				for ( const key in attributes ) {
+					const value = attributes[ key ];
 
-						if ( value.indexOf( 'data-fn' ) === -1 ) {
-							continue;
-						}
-
-						// When we store rich text values, this would no longer
-						// require a regex.
-						const regex =
-							/(<sup[^>]+data-fn="([^"]+)"[^>]*><a[^>]*>)[\d*]*<\/a><\/sup>/g;
-
-						attributes[ key ] = value.replace(
-							regex,
-							( match, opening, fnId ) => {
-								const index = newOrder.indexOf( fnId );
-								return `${ opening }${ index + 1 }</a></sup>`;
-							}
-						);
+					if ( Array.isArray( value ) ) {
+						attributes[ key ] = value.map( updateAttributes );
+						continue;
 					}
 
+					if ( typeof value !== 'string' ) {
+						continue;
+					}
+
+					if ( value.indexOf( 'data-fn' ) === -1 ) {
+						continue;
+					}
+
+					// When we store rich text values, this would no longer
+					// require a regex.
+					const regex =
+						/(<sup[^>]+data-fn="([^"]+)"[^>]*><a[^>]*>)[\d*]*<\/a><\/sup>/g;
+
+					attributes[ key ] = value.replace(
+						regex,
+						( match, opening, fnId ) => {
+							const index = newOrder.indexOf( fnId );
+							return `${ opening }${ index + 1 }</a></sup>`;
+						}
+					);
+				}
+
+				return attributes;
+			}
+
+			function updateBlocksAttributes( __blocks ) {
+				return __blocks.map( ( block ) => {
 					return {
 						...block,
-						attributes,
+						attributes: updateAttributes( block.attributes ),
 						innerBlocks: updateBlocksAttributes(
 							block.innerBlocks
 						),
