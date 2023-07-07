@@ -463,10 +463,9 @@ export function useGradientsPerOrigin( settings ) {
 }
 
 export function __experimentalUseGlobalBehaviors(
-	path,
 	blockName,
 	source = 'all',
-	{ shouldDecodeEncode = true } = {}
+	{ shouldDecodeEncode = true, shouldReturnBehaviors = true } = {}
 ) {
 	const {
 		merged: mergedConfig,
@@ -474,10 +473,9 @@ export function __experimentalUseGlobalBehaviors(
 		user: userConfig,
 		setUserConfig,
 	} = useContext( GlobalStylesContext );
-	const appendedPath = path ? '.' + path : '';
 	const finalPath = ! blockName
-		? `behaviors${ appendedPath }`
-		: `behaviors.blocks.${ blockName }${ appendedPath }`;
+		? `behaviors`
+		: `behaviors.blocks.${ blockName }`;
 
 	const setBehavior = ( newValue ) => {
 		let newBehavior;
@@ -494,7 +492,10 @@ export function __experimentalUseGlobalBehaviors(
 				break;
 			case '':
 				newBehavior = {
-					lightbox: false,
+					lightbox: {
+						enabled: false,
+						animation: 'zoom',
+					},
 				};
 				break;
 		}
@@ -507,6 +508,7 @@ export function __experimentalUseGlobalBehaviors(
 	};
 
 	let rawResult, result;
+
 	switch ( source ) {
 		case 'all':
 			rawResult = get( mergedConfig, finalPath );
@@ -529,6 +531,16 @@ export function __experimentalUseGlobalBehaviors(
 		default:
 			throw 'Unsupported source';
 	}
+	if ( shouldReturnBehaviors ) {
+		return [ result, setBehavior ];
+	}
+	let behaviorValue = '';
+	if ( result === undefined ) {
+		behaviorValue = 'default';
+	}
+	if ( result?.lightbox.enabled ) {
+		behaviorValue = 'lightbox';
+	}
 
-	return [ result, setBehavior ];
+	return [ behaviorValue, setBehavior ];
 }

@@ -94,10 +94,13 @@ function ScreenBlock( { name, variation } ) {
 	} );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
-	const [ behaviors, setBehaviors ] = __experimentalUseGlobalBehaviors(
-		'',
-		name
-	);
+	const [ inheritedBehaviors, setBehaviors ] =
+		__experimentalUseGlobalBehaviors( name );
+	const [ behavior ] = __experimentalUseGlobalBehaviors( name, 'user', {
+		shouldDecodeEncode: true,
+		shouldReturnBehaviors: false,
+	} );
+
 	const blockType = getBlockType( name );
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
@@ -281,9 +284,9 @@ function ScreenBlock( { name, variation } ) {
 					/>
 					{ hasBehaviorsPanel && (
 						<StylesBehaviorsPanel
-							value={ style }
+							value={ behavior }
 							onChange={ onChangeBehaviors }
-							behaviors={ behaviors }
+							behaviors={ inheritedBehaviors }
 						></StylesBehaviorsPanel>
 					) }
 				</PanelBody>
