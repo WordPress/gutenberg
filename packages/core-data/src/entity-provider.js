@@ -226,6 +226,48 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 					}
 			);
 
+			function updateBlocksAttributes( __blocks ) {
+				return __blocks.map( ( block ) => {
+					const attributes = { ...block.attributes };
+					for ( const key in attributes ) {
+						const value = attributes[ key ];
+
+						if ( typeof value !== 'string' ) {
+							continue;
+						}
+
+						if ( value.indexOf( 'data-fn' ) === -1 ) {
+							continue;
+						}
+
+						// When we store rich text values, this would no longer
+						// require a regex.
+						const regex =
+							/(<a[^>]+data-fn="([^"]+)"[^>]*>)\d*<\/a>/g;
+
+						attributes[ key ] = value.replace(
+							regex,
+							( match, opening, fnId ) => {
+								const index = newOrder.indexOf( fnId );
+								return `${ opening }${ index + 1 }</a>`;
+							}
+						);
+					}
+
+					return {
+						...block,
+						attributes,
+						innerBlocks: updateBlocksAttributes(
+							block.innerBlocks
+						),
+					};
+				} );
+			}
+
+			// We need to go through all block attributs deeply and update the
+			// footnote anchor numbering (textContent) to match the new order.
+			const newBlocks = updateBlocksAttributes( _blocks );
+
 			oldFootnotes = {
 				...oldFootnotes,
 				...footnotes.reduce( ( acc, fn ) => {
@@ -241,6 +283,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 					...meta,
 					footnotes: JSON.stringify( newFootnotes ),
 				},
+				blocks: newBlocks,
 			};
 		},
 		[ meta ]
@@ -258,7 +301,6 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			// to make sure the edit makes the post dirty and creates
 			// a new undo level.
 			const edits = {
-				blocks: newBlocks,
 				selection,
 				content: ( { blocks: blocksForSerialization = [] } ) =>
 					__unstableSerializeAndClean( blocksForSerialization ),
@@ -282,7 +324,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		( newBlocks, options ) => {
 			const { selection } = options;
 			const footnotesChanges = updateFootnotes( newBlocks );
-			const edits = { blocks: newBlocks, selection, ...footnotesChanges };
+			const edits = { selection, ...footnotesChanges };
 
 			editEntityRecord( kind, name, id, edits, { isCached: true } );
 		},

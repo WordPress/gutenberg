@@ -54,7 +54,7 @@ export const format = {
 							id: `${ id }-link`,
 							'data-fn': id,
 						},
-						innerHTML: '*',
+						innerHTML: '',
 					},
 					value.end,
 					value.end
