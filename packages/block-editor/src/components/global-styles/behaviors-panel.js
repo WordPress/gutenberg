@@ -45,7 +45,6 @@ export default function ( { onChange, value, behaviors } ) {
 			label: __( 'Fade' ),
 		},
 	];
-
 	return (
 		<div style={ { marginTop: '2rem' } }>
 			<SelectControl

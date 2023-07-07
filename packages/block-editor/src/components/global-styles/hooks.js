@@ -476,6 +476,32 @@ export function __experimentalUseGlobalBehaviors(
 		? `behaviors`
 		: `behaviors.blocks.${ blockName }`;
 
+	let rawResult, result;
+	switch ( source ) {
+		case 'all':
+			rawResult = get( mergedConfig, finalPath );
+			result = shouldDecodeEncode
+				? getValueFromVariable( mergedConfig, blockName, rawResult )
+				: rawResult;
+			break;
+		case 'user':
+			rawResult = get( userConfig, finalPath );
+			result = shouldDecodeEncode
+				? getValueFromVariable( mergedConfig, blockName, rawResult )
+				: rawResult;
+			break;
+		case 'base':
+			rawResult = get( baseConfig, finalPath );
+			result = shouldDecodeEncode
+				? getValueFromVariable( baseConfig, blockName, rawResult )
+				: rawResult;
+			break;
+		default:
+			throw 'Unsupported source';
+	}
+
+	const animation = result?.lightbox?.animation || 'zoom';
+
 	const setBehavior = ( newValue ) => {
 		let newBehavior;
 		switch ( newValue ) {
@@ -485,7 +511,7 @@ export function __experimentalUseGlobalBehaviors(
 				newBehavior = {
 					lightbox: {
 						enabled: true,
-						animation: 'zoom',
+						animation,
 					},
 				};
 				break;
@@ -509,6 +535,7 @@ export function __experimentalUseGlobalBehaviors(
 				newBehavior = {
 					lightbox: {
 						enabled: false,
+						animation,
 					},
 				};
 				break;
@@ -521,30 +548,6 @@ export function __experimentalUseGlobalBehaviors(
 		} );
 	};
 
-	let rawResult, result;
-
-	switch ( source ) {
-		case 'all':
-			rawResult = get( mergedConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( mergedConfig, blockName, rawResult )
-				: rawResult;
-			break;
-		case 'user':
-			rawResult = get( userConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( mergedConfig, blockName, rawResult )
-				: rawResult;
-			break;
-		case 'base':
-			rawResult = get( baseConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( baseConfig, blockName, rawResult )
-				: rawResult;
-			break;
-		default:
-			throw 'Unsupported source';
-	}
 	if ( shouldReturnBehaviors ) {
 		return [ result, setBehavior ];
 	}
