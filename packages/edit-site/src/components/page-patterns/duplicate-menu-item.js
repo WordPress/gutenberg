@@ -121,6 +121,7 @@ export default function DuplicateMenuItem( {
 					meta: isThemePattern
 						? { wp_pattern_sync_status: SYNC_TYPES.unsynced }
 						: {
+								...item.reusableBlock.meta,
 								wp_pattern_sync_status:
 									item.reusableBlock.wp_pattern_sync_status,
 						  },
