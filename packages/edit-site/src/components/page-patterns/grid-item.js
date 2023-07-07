@@ -124,9 +124,8 @@ function GridItem( { categoryId, item, ...props } ) {
 	}
 
 	const itemIcon =
-		item.syncStatus === SYNC_TYPES.full
-			? symbol
-			: templatePartIcons[ categoryId ];
+		templatePartIcons[ categoryId ] ||
+		( item.syncStatus === SYNC_TYPES.full ? symbol : undefined );
 
 	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
 	const confirmPrompt = hasThemeFile
@@ -144,6 +143,8 @@ function GridItem( { categoryId, item, ...props } ) {
 					className={ previewClassNames }
 					role="option"
 					as="div"
+					// Even though still incomplete, passing ids helps performance.
+					// @see https://reakit.io/docs/composite/#performance.
 					id={ `edit-site-patterns-${ item.name }` }
 					{ ...props }
 					onClick={ item.type !== PATTERNS ? onClick : undefined }
