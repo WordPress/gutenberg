@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -21,9 +22,11 @@ import { useDispatch } from '@wordpress/data';
 import { SYNC_TYPES, USER_PATTERN_CATEGORY } from '../page-patterns/utils';
 
 export default function CreatePatternModal( {
+	blocks = [],
 	closeModal,
 	onCreate,
 	onError,
+	title,
 } ) {
 	const [ name, setName ] = useState( '' );
 	const [ syncType, setSyncType ] = useState( SYNC_TYPES.unsynced );
@@ -52,7 +55,7 @@ export default function CreatePatternModal( {
 				'wp_block',
 				{
 					title: name || __( 'Untitled Pattern' ),
-					content: '',
+					content: blocks?.length ? serialize( blocks ) : '',
 					status: 'publish',
 					meta:
 						syncType === SYNC_TYPES.unsynced
@@ -76,7 +79,7 @@ export default function CreatePatternModal( {
 
 	return (
 		<Modal
-			title={ __( 'Create pattern' ) }
+			title={ title || __( 'Create pattern' ) }
 			onRequestClose={ closeModal }
 			overlayClassName="edit-site-create-pattern-modal"
 		>

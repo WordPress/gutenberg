@@ -101,6 +101,10 @@
 
 	.edit-site-patterns__pattern-lock-icon {
 		display: inline-flex;
+
+		svg {
+			fill: currentcolor;
+		}
 	}
 }
 
