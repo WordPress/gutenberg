@@ -490,11 +490,26 @@ export function __experimentalUseGlobalBehaviors(
 					},
 				};
 				break;
+			case 'fade':
+				newBehavior = {
+					lightbox: {
+						enabled: true,
+						animation: 'fade',
+					},
+				};
+				break;
+			case 'zoom':
+				newBehavior = {
+					lightbox: {
+						enabled: true,
+						animation: 'zoom',
+					},
+				};
+				break;
 			case '':
 				newBehavior = {
 					lightbox: {
 						enabled: false,
-						animation: 'zoom',
 					},
 				};
 				break;
