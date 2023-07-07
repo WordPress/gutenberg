@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Pressable, useWindowDimensions, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -72,7 +72,6 @@ function BlockWrapper( {
 	marginVertical,
 	onFocus,
 } ) {
-	const { width: screenWidth } = useWindowDimensions();
 	const blockWrapperStyles = { flex: 1 };
 	const blockWrapperStyle = [
 		blockWrapperStyles,
@@ -92,11 +91,7 @@ function BlockWrapper( {
 			onPress={ onFocus }
 			style={ blockWrapperStyle }
 		>
-			<BlockOutline
-				isSelected={ isSelected }
-				isParentSelected={ isParentSelected }
-				screenWidth={ screenWidth }
-			/>
+			<BlockOutline isParentSelected={ isParentSelected } />
 			<BlockDraggable
 				clientId={ clientId }
 				draggingClientId={ draggingClientId }

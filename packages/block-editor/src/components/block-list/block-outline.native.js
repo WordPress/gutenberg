@@ -13,7 +13,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './block.scss';
 
-function BlockOutline( { isParentSelected, isSelected } ) {
+function BlockOutline( { isParentSelected } ) {
 	const styleDashedBorder = [
 		styles.dashedBorder,
 		usePreferredColorSchemeStyle(
@@ -22,12 +22,7 @@ function BlockOutline( { isParentSelected, isSelected } ) {
 		),
 	];
 
-	return (
-		<>
-			{ isSelected && <View pointerEvents="box-none" /> }
-			{ isParentSelected && <View style={ styleDashedBorder } /> }
-		</>
-	);
+	return isParentSelected && <View style={ styleDashedBorder } />;
 }
 
 export default BlockOutline;
