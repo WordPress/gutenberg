@@ -27,6 +27,20 @@ import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
+function getPatternMeta( item ) {
+	if ( item.type === PATTERNS ) {
+		return { wp_pattern_sync_status: SYNC_TYPES.unsynced };
+	}
+
+	const syncStatus = item.reusableBlock.wp_pattern_sync_status;
+	const isUnsynced = syncStatus === SYNC_TYPES.unsynced;
+
+	return {
+		...item.reusableBlock.meta,
+		wp_pattern_sync_status: isUnsynced ? syncStatus : undefined,
+	};
+}
+
 export default function DuplicateMenuItem( {
 	categoryId,
 	item,
@@ -118,18 +132,7 @@ export default function DuplicateMenuItem( {
 					content: isThemePattern
 						? item.content
 						: item.reusableBlock.content,
-					meta: isThemePattern
-						? { wp_pattern_sync_status: SYNC_TYPES.unsynced }
-						: {
-								...item.reusableBlock.meta,
-								wp_pattern_sync_status:
-									item.reusableBlock
-										.wp_pattern_sync_status ===
-									SYNC_TYPES.unsynced
-										? item.reusableBlock
-												.wp_pattern_sync_status
-										: undefined,
-						  },
+					meta: getPatternMeta( item ),
 					status: 'publish',
 					title,
 				},
