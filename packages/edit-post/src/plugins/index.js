@@ -19,29 +19,25 @@ import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 
 function ManagePatternsMenuItem() {
-	const { isBlockTheme, isVisible } = useSelect( ( select ) => {
+	const url = useSelect( ( select ) => {
 		const { canUser } = select( coreStore );
 		const { getEditorSettings } = select( editorStore );
 
-		return {
-			// The site editor and templates both check whether the user has
-			// edit_theme_options capabilities. We can leverage that here and not
-			// display the manage patterns link if the user can't access it.
-			isVisible: canUser( 'read', 'templates' ),
-			isBlockTheme: getEditorSettings().__unstableIsBlockBasedTheme,
-		};
+		const isBlockTheme = getEditorSettings().__unstableIsBlockBasedTheme;
+		const defaultUrl = addQueryArgs( 'edit.php', {
+			post_type: 'wp_block',
+		} );
+		const patternsUrl = addQueryArgs( 'site-editor.php', {
+			path: '/patterns',
+		} );
+
+		// The site editor and templates both check whether the user has
+		// edit_theme_options capabilities. We can leverage that here and not
+		// display the manage patterns link if the user can't access it.
+		return canUser( 'read', 'templates' ) && isBlockTheme
+			? patternsUrl
+			: defaultUrl;
 	}, [] );
-
-	if ( ! isVisible ) {
-		return null;
-	}
-
-	const defaultUrl = addQueryArgs( 'edit.php', { post_type: 'wp_block' } );
-	const patternsUrl = addQueryArgs( 'site-editor.php', {
-		path: '/patterns',
-	} );
-
-	const url = isBlockTheme ? patternsUrl : defaultUrl;
 
 	return (
 		<MenuItem role="menuitem" href={ url }>
