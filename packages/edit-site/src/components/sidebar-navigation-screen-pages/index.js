@@ -58,13 +58,16 @@ export default function SidebarNavigationScreenPages() {
 		templates?.find( ( template ) => template.slug === 'home' ) ||
 		templates?.find( ( template ) => template.slug === 'index' );
 
+	const getPostsPageTemplate = () =>
+		templates?.find( ( template ) => template.slug === 'home' ) ||
+		templates?.find( ( template ) => template.slug === 'index' );
+
 	const pagesAndTemplates = pages?.concat( dynamicPageTemplates, [
 		homeTemplate,
 	] );
 
 	const { frontPage, postsPage } = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreStore );
-
 		const siteSettings = getEntityRecord( 'root', 'site' );
 		return {
 			frontPage: siteSettings?.page_on_front,
@@ -108,8 +111,8 @@ export default function SidebarNavigationScreenPages() {
 
 	const getPageProps = ( id ) => {
 		let itemIcon = page;
-		const isPostsPage =
-			postsPage && postsPage === id && homeTemplate.slug !== 'front-page';
+		const postsPageTemplateId =
+			postsPage && postsPage === id ? getPostsPageTemplate()?.id : null;
 
 		switch ( id ) {
 			case frontPage:
@@ -122,8 +125,8 @@ export default function SidebarNavigationScreenPages() {
 
 		return {
 			icon: itemIcon,
-			postType: isPostsPage ? 'wp_template' : 'page',
-			postId: isPostsPage ? homeTemplate.id : id,
+			postType: postsPageTemplateId ? 'wp_template' : 'page',
+			postId: postsPageTemplateId || id,
 		};
 	};
 

@@ -26,18 +26,11 @@ import SidebarButton from '../sidebar-button';
 import PageDetails from './page-details';
 import PageActions from '../page-actions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
-import HomeTemplateDetails from '../sidebar-navigation-screen-template/home-template-details';
 
 function usePageDetails( postId ) {
-	const {
-		isPostsPage,
-		record,
-		featuredMediaSourceUrl,
-		featuredMediaAltText,
-	} = useSelect(
+	const { record, featuredMediaSourceUrl, featuredMediaAltText } = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
-			const siteSettings = getEntityRecord( 'root', 'site' );
 			const pageRecord = select( coreStore ).getEntityRecord(
 				'postType',
 				'page',
@@ -54,8 +47,6 @@ function usePageDetails( postId ) {
 				: null;
 			return {
 				record: pageRecord,
-				isPostsPage:
-					parseInt( postId, 10 ) === siteSettings?.page_for_posts,
 				featuredMediaSourceUrl:
 					attachedMedia?.media_details.sizes?.medium?.source_url ||
 					attachedMedia?.source_url,
@@ -72,19 +63,14 @@ function usePageDetails( postId ) {
 	const title = decodeEntities(
 		record?.title?.rendered || __( '(no title)' )
 	);
-	const description = isPostsPage
-		? __( 'This page displays your latest posts' )
-		: '';
 
 	const featureImageAltText = featuredMediaAltText
 		? decodeEntities( featuredMediaAltText )
 		: decodeEntities( record?.title?.rendered || __( 'Featured image' ) );
 
-	const content = isPostsPage ? (
-		<HomeTemplateDetails />
-	) : (
+	const content = (
 		<>
-			{ !! featuredMediaSourceUrl && ! isPostsPage && (
+			{ !! featuredMediaSourceUrl && (
 				<VStack
 					className="edit-site-sidebar-navigation-screen-page__featured-image-wrapper"
 					alignment="left"
@@ -98,7 +84,7 @@ function usePageDetails( postId ) {
 					</div>
 				</VStack>
 			) }
-			{ !! record?.excerpt?.rendered && ! isPostsPage && (
+			{ !! record?.excerpt?.rendered && (
 				<Truncate
 					className="edit-site-sidebar-navigation-screen-page__excerpt"
 					numberOfLines={ 3 }
@@ -125,7 +111,7 @@ function usePageDetails( postId ) {
 		/>
 	) : null;
 
-	return { title, meta, description, content, footer };
+	return { title, meta, content, footer };
 }
 
 export default function SidebarNavigationScreenPage() {
@@ -134,13 +120,11 @@ export default function SidebarNavigationScreenPage() {
 	const {
 		params: { postId },
 	} = useNavigator();
-	const { title, meta, content, description, footer } =
-		usePageDetails( postId );
+	const { title, meta, content, footer } = usePageDetails( postId );
 
 	return (
 		<SidebarNavigationScreen
 			title={ title }
-			description={ description }
 			actions={
 				<>
 					<PageActions
