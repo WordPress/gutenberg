@@ -973,7 +973,7 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.deleteAllPages();
 		} );
 
-		test( 'As a user I expect my navigation links to have appropriate default colors', async ( {
+		test( 'All navigation links have defaults set (black text, white background for submenus and mobile)', async ( {
 			editor,
 			page,
 		} ) => {
@@ -987,7 +987,6 @@ test.describe( 'Navigation block', () => {
 			// Expect the first and test page link to default to black when the theme doesn't define a link color
 			const defaultLinkColor = 'rgb(0, 0, 0)';
 			const defaultBackgroundColor = 'rgb(255, 255, 255)';
-			// This is different to the frontend because in the editor the links don't have an href, so the browser doesn't apply the default blue color
 			await expect( firstLink ).toHaveCSS( 'color', defaultLinkColor );
 			await expect( thirdLink ).toHaveCSS( 'color', defaultLinkColor );
 			// Focus the navigation block inside the header template part
@@ -1047,19 +1046,19 @@ test.describe( 'Navigation block', () => {
 				.locator( '.wp-block-navigation__submenu-container' )
 				.filter( { has: secondLinkFront } );
 
-			// Expect the links to default to the browser default blue when the theme doesn't define a link color and the background to be white
+			// Expect the links to default to black when the theme doesn't define a link color
 			await expect( firstLinkFront ).toHaveCSS(
 				'color',
-				'rgb(0, 0, 238)'
+				defaultLinkColor
 			);
 			await expect( thirdLinkFront ).toHaveCSS(
 				'color',
-				'rgb(0, 0, 238)'
+				defaultLinkColor
 			);
 			await firstLinkFront.hover();
 			await expect( secondLinkFront ).toHaveCSS(
 				'color',
-				'rgb(0, 0, 238)'
+				defaultLinkColor
 			);
 			await expect( submenuWrapperFront ).toHaveCSS(
 				'background-color',
