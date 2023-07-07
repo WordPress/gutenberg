@@ -45,9 +45,9 @@ export default function PatternsList( { categoryId, type } ) {
 
 	const [ syncFilter, setSyncFilter ] = useState( 'all' );
 	const deferredSyncedFilter = useDeferredValue( syncFilter );
-	const [ patterns, isResolving ] = usePatterns( type, categoryId, {
-		filterValue: deferredFilterValue,
-		syncFilter:
+	const { patterns, isResolving } = usePatterns( type, categoryId, {
+		search: deferredFilterValue,
+		syncStatus:
 			deferredSyncedFilter === 'all' ? undefined : deferredSyncedFilter,
 	} );
 
@@ -116,8 +116,7 @@ export default function PatternsList( { categoryId, type } ) {
 				) }
 			</Flex>
 
-			{ isResolving && __( 'Loading' ) }
-			{ ! isResolving && hasPatterns && (
+			{ hasPatterns && (
 				<Grid
 					categoryId={ categoryId }
 					items={ patterns }

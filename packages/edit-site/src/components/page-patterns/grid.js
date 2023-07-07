@@ -4,10 +4,10 @@
 import {
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
-	Button,
+	__experimentalText as Text,
 } from '@wordpress/components';
-import { useState, useRef, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useRef } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -18,29 +18,14 @@ const PAGE_SIZE = 100;
 
 export default function Grid( { categoryId, items, ...props } ) {
 	const composite = useCompositeState( { wrap: true } );
-	const [ page, setPage ] = useState( 1 );
-	const [ nextFocusIndex, setNextFocusIndex ] = useState( -1 );
 	const gridRef = useRef();
-
-	useEffect(
-		function focusFirstPatternOnNextPage() {
-			if ( gridRef.current && nextFocusIndex >= 0 ) {
-				const nextFocusPattern =
-					gridRef.current.querySelectorAll( '[role="option"]' )[
-						nextFocusIndex
-					];
-				nextFocusPattern?.focus();
-			}
-		},
-		[ nextFocusIndex ]
-	);
 
 	if ( ! items?.length ) {
 		return null;
 	}
 
-	const maxCount = page * PAGE_SIZE;
-	const list = items.slice( 0, maxCount );
+	const list = items.slice( 0, PAGE_SIZE );
+	const restLength = items.length - PAGE_SIZE;
 
 	return (
 		<>
@@ -60,17 +45,14 @@ export default function Grid( { categoryId, items, ...props } ) {
 					/>
 				) ) }
 			</Composite>
-			{ items.length >= maxCount && (
-				<Button
-					className="edit-site-patterns__load-more"
-					variant="primary"
-					onClick={ () => {
-						setPage( ( prevPage ) => prevPage + 1 );
-						setNextFocusIndex( maxCount );
-					} }
-				>
-					{ __( 'Load more' ) }
-				</Button>
+			{ restLength > 0 && (
+				<Text variant="muted" as="p" align="center">
+					{ sprintf(
+						/* translators: %d: number of patterns */
+						__( '+ %d more patterns' ),
+						restLength
+					) }
+				</Text>
 			) }
 		</>
 	);
