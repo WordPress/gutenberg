@@ -30,12 +30,79 @@ import usePatternCategories from './use-pattern-categories';
 import useMyPatterns from './use-my-patterns';
 import useTemplatePartAreas from './use-template-part-areas';
 
-const templatePartAreaLabels = {
-	header: __( 'Headers' ),
-	footer: __( 'Footers' ),
-	sidebar: __( 'Sidebar' ),
-	uncategorized: __( 'Uncategorized' ),
-};
+function TemplatePartGroup( { areas, currentArea, currentType } ) {
+	return (
+		<>
+			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
+				<Heading level={ 2 }>{ __( 'Template parts' ) }</Heading>
+				<p>{ __( 'Synced patterns for use in template building.' ) }</p>
+			</div>
+			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+				{ Object.entries( areas ).map(
+					( [ area, { label, templateParts } ] ) => (
+						<CategoryItem
+							key={ area }
+							count={ templateParts?.length }
+							icon={ getTemplatePartIcon( area ) }
+							label={ label }
+							id={ area }
+							type="wp_template_part"
+							isActive={
+								currentArea === area &&
+								currentType === 'wp_template_part'
+							}
+						/>
+					)
+				) }
+			</ItemGroup>
+		</>
+	);
+}
+
+function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
+	return (
+		<>
+			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
+				<Heading level={ 2 }>{ __( 'Theme patterns' ) }</Heading>
+				<p>
+					{ __(
+						'For insertion into documents where they can then be customized.'
+					) }
+				</p>
+			</div>
+			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+				{ categories.map( ( category ) => (
+					<CategoryItem
+						key={ category.name }
+						count={ category.count }
+						label={
+							<Flex justify="left" align="center" gap={ 0 }>
+								{ category.label }
+								<Tooltip
+									position="top center"
+									text={ __(
+										'Theme patterns cannot be edited.'
+									) }
+								>
+									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
+										<Icon icon={ lockSmall } size={ 24 } />
+									</span>
+								</Tooltip>
+							</Flex>
+						}
+						icon={ file }
+						id={ category.name }
+						type="pattern"
+						isActive={
+							currentCategory === `${ category.name }` &&
+							currentType === 'pattern'
+						}
+					/>
+				) ) }
+			</ItemGroup>
+		</>
+	);
+}
 
 export default function SidebarNavigationScreenPatterns() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -110,105 +177,18 @@ export default function SidebarNavigationScreenPatterns() {
 								</ItemGroup>
 							) }
 							{ hasTemplateParts && (
-								<>
-									<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
-										<Heading level={ 2 }>
-											{ __( 'Template parts' ) }
-										</Heading>
-										<p>
-											{ __(
-												'Synced patterns for use in template building.'
-											) }
-										</p>
-									</div>
-									<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-										{ Object.entries(
-											templatePartAreas
-										).map( ( [ area, parts ] ) => (
-											<CategoryItem
-												key={ area }
-												count={ parts.length }
-												icon={ getTemplatePartIcon(
-													area
-												) }
-												label={
-													templatePartAreaLabels[
-														area
-													]
-												}
-												id={ area }
-												type="wp_template_part"
-												isActive={
-													currentCategory === area &&
-													currentType ===
-														'wp_template_part'
-												}
-											/>
-										) ) }
-									</ItemGroup>
-								</>
+								<TemplatePartGroup
+									areas={ templatePartAreas }
+									currentArea={ currentCategory }
+									currentType={ currentType }
+								/>
 							) }
 							{ hasPatterns && (
-								<>
-									<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
-										<Heading level={ 2 }>
-											{ __( 'Theme patterns' ) }
-										</Heading>
-										<p>
-											{ __(
-												'For insertion into documents where they can then be customized.'
-											) }
-										</p>
-									</div>
-									<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-										{ patternCategories.map(
-											( category ) => (
-												<CategoryItem
-													key={ category.name }
-													count={ category.count }
-													label={
-														<Flex
-															justify="left"
-															align="center"
-															gap={ 0 }
-														>
-															{ category.label }
-															<Tooltip
-																position="top center"
-																text={ __(
-																	'Theme patterns cannot be edited.'
-																) }
-															>
-																<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
-																	<Icon
-																		style={ {
-																			fill: 'currentcolor',
-																		} }
-																		icon={
-																			lockSmall
-																		}
-																		size={
-																			24
-																		}
-																	/>
-																</span>
-															</Tooltip>
-														</Flex>
-													}
-													icon={ file }
-													id={ category.name }
-													type="pattern"
-													isActive={
-														currentCategory ===
-															`${ category.name }` &&
-														currentType ===
-															'pattern'
-													}
-												/>
-											)
-										) }
-									</ItemGroup>
-								</>
+								<ThemePatternsGroup
+									categories={ patternCategories }
+									currentCategory={ currentCategory }
+									currentType={ currentType }
+								/>
 							) }
 						</>
 					) }
