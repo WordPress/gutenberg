@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `UnitControl`: Fix crash when certain units are used ([#52211](https://github.com/WordPress/gutenberg/pull/52211)).
+-   `Guide`: Place focus on the guide's container instead of its first tabbable ([#52300](https://github.com/WordPress/gutenberg/pull/52300)).
+- `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([52356](https://github.com/WordPress/gutenberg/pull/52356)).
+
+## 25.2.0 (2023-06-23)
+
 ### Enhancements
 
--   `SelectControl`: Added option to set hidden options. ([#51545](https://github.com/WordPress/gutenberg/pull/51545))
 -   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
 -   `Modal`: Update corner radius to be between buttons and the site view frame, in a 2-4-8 system. ([#51254](https://github.com/WordPress/gutenberg/pull/51254)).
 -   `Button`: Introduce `size` prop with `default`, `compact`, and `small` variants ([#51842](https://github.com/WordPress/gutenberg/pull/51842)).

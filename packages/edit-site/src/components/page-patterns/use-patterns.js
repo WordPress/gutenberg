@@ -38,14 +38,8 @@ const templatePartToPattern = ( templatePart ) => ( {
 	templatePart,
 } );
 
-const templatePartCategories = [ 'header', 'footer', 'sidebar' ];
-const templatePartHasCategory = ( item, category ) => {
-	if ( category === 'uncategorized' ) {
-		return ! templatePartCategories.includes( item.templatePart.area );
-	}
-
-	return item.templatePart.area === category;
-};
+const templatePartHasCategory = ( item, category ) =>
+	item.templatePart.area === category;
 
 const useTemplatePartsAsPatterns = (
 	categoryId,
@@ -154,7 +148,7 @@ const reusableBlockToPattern = ( reusableBlock ) => ( {
 	categories: reusableBlock.wp_pattern,
 	id: reusableBlock.id,
 	name: reusableBlock.slug,
-	syncStatus: reusableBlock.meta?.sync_status || SYNC_TYPES.full,
+	syncStatus: reusableBlock.wp_pattern_sync_status || SYNC_TYPES.full,
 	title: reusableBlock.title.raw,
 	type: reusableBlock.type,
 	reusableBlock,

@@ -24,7 +24,7 @@ export const createReusableBlock = async ( content, title ) => {
 	await page.keyboard.type( content );
 
 	await clickBlockToolbarButton( 'Options' );
-	await clickMenuItem( 'Create pattern' );
+	await clickMenuItem( 'Create pattern/reusable block' );
 	const nameInput = await page.waitForSelector(
 		reusableBlockNameInputSelector
 	);
@@ -38,7 +38,7 @@ export const createReusableBlock = async ( content, title ) => {
 
 	// Wait for creation to finish
 	await page.waitForXPath(
-		'//*[contains(@class, "components-snackbar")]/*[text()="Synced Pattern created."]'
+		'//*[contains(@class, "components-snackbar")]/*[contains(text(),"Pattern created:")]'
 	);
 
 	// Check that we have a reusable block on the page
