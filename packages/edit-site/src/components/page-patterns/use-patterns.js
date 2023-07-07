@@ -31,21 +31,17 @@ const templatePartToPattern = ( templatePart ) => ( {
 	blocks: parse( templatePart.content.raw ),
 	categories: [ templatePart.area ],
 	description: templatePart.description || '',
+	isCustom: templatePart.source === 'custom',
 	keywords: templatePart.keywords || [],
+	id: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	title: templatePart.title.rendered,
 	type: templatePart.type,
 	templatePart,
 } );
 
-const templatePartCategories = [ 'header', 'footer', 'sidebar' ];
-const templatePartHasCategory = ( item, category ) => {
-	if ( category === 'uncategorized' ) {
-		return ! templatePartCategories.includes( item.templatePart.area );
-	}
-
-	return item.templatePart.area === category;
-};
+const templatePartHasCategory = ( item, category ) =>
+	item.templatePart.area === category;
 
 const useTemplatePartsAsPatterns = (
 	categoryId,

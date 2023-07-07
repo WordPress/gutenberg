@@ -9,6 +9,7 @@ import { Platform, findNodeHandle } from 'react-native';
 import {
 	getClipboard,
 	setClipboard,
+	ToolbarGroup,
 	ToolbarButton,
 	Picker,
 } from '@wordpress/components';
@@ -254,11 +255,13 @@ const BlockActionsMenu = ( {
 	// End early if there are no options to show.
 	if ( ! options.length ) {
 		return (
-			<ToolbarButton
-				title={ __( 'Open Block Actions Menu' ) }
-				icon={ moreHorizontalMobile }
-				disabled={ true }
-			/>
+			<ToolbarGroup>
+				<ToolbarButton
+					title={ __( 'Open Block Actions Menu' ) }
+					icon={ moreHorizontalMobile }
+					disabled={ true }
+				/>
+			</ToolbarGroup>
 		);
 	}
 
@@ -294,7 +297,7 @@ const BlockActionsMenu = ( {
 		anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined;
 
 	return (
-		<>
+		<ToolbarGroup>
 			<ToolbarButton
 				title={ __( 'Open Block Actions Menu' ) }
 				onClick={ onPickerPresent }
@@ -324,7 +327,7 @@ const BlockActionsMenu = ( {
 				selectedBlock={ getBlocksByClientId( selectedBlockClientId ) }
 				selectedBlockClientId={ selectedBlockClientId }
 			/>
-		</>
+		</ToolbarGroup>
 	);
 };
 

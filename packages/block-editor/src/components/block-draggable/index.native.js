@@ -109,8 +109,12 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 		draggingScrollHandler( event );
 	};
 
-	const { onBlockDragOver, onBlockDragEnd, onBlockDrop, targetBlockIndex } =
-		useBlockDropZone();
+	const {
+		onBlockDragOverWorklet,
+		onBlockDragEnd,
+		onBlockDrop,
+		targetBlockIndex,
+	} = useBlockDropZone();
 
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
@@ -184,7 +188,7 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 		chip.y.value = dragPosition.y;
 		currentYPosition.value = dragPosition.y;
 
-		runOnJS( onBlockDragOver )( { x, y: y + scroll.offsetY.value } );
+		onBlockDragOverWorklet( { x, y: y + scroll.offsetY.value } );
 
 		// Update scrolling velocity
 		scrollOnDragOver( dragPosition.y );

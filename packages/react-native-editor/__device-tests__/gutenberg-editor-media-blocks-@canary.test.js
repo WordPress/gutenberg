@@ -134,7 +134,7 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 
 		// Navigate upwards to select parent block
 		await editorPage.moveBlockSelectionUp();
-		await editorPage.removeBlockAtPosition( blockNames.cover );
+		await editorPage.removeBlock();
 	} );
 
 	// Testing this for iOS on a device is valuable to ensure that it properly
@@ -165,6 +165,6 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 		await editorPage.chooseMediaLibrary();
 
 		expect( coverBlock ).toBeTruthy();
-		await editorPage.removeBlockAtPosition( blockNames.cover );
+		await editorPage.removeBlock();
 	} );
 } );
