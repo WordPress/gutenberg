@@ -35,7 +35,6 @@ import { compose, ifCondition, pure } from '@wordpress/compose';
 import BlockEdit from '../block-edit';
 import BlockDraggable from '../block-draggable';
 import BlockInvalidWarning from './block-invalid-warning';
-import BlockOutline from './block-outline';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import useSetting from '../use-setting';
@@ -65,7 +64,6 @@ function BlockWrapper( {
 	draggingClientId,
 	draggingEnabled,
 	isDescendentBlockSelected,
-	isParentSelected,
 	isSelected,
 	isTouchable,
 	marginHorizontal,
@@ -91,7 +89,6 @@ function BlockWrapper( {
 			onPress={ onFocus }
 			style={ blockWrapperStyle }
 		>
-			<BlockOutline isParentSelected={ isParentSelected } />
 			<BlockDraggable
 				clientId={ clientId }
 				draggingClientId={ draggingClientId }
@@ -287,7 +284,6 @@ function BlockListBlock( {
 			draggingEnabled={ draggingEnabled }
 			isFocused={ isFocused }
 			isDescendentBlockSelected={ isDescendentBlockSelected }
-			isParentSelected={ isParentSelected }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
 			isTouchable={ isTouchable }
