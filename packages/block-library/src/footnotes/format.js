@@ -50,7 +50,7 @@ export const format = {
 						attributes: {
 							'data-fn': id,
 						},
-						innerHTML: `<a href="#${ id }" id="${ id }-link"></a>`,
+						innerHTML: `<a href="#${ id }" id="${ id }-link">*</a>`,
 					},
 					value.end,
 					value.end

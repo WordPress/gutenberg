@@ -427,16 +427,25 @@ function createFromElement( {
 		// When a format type is declared as not editable, replace it with an
 		// object replacement character and preserve the inner HTML.
 		if ( format?.formatType?.contentEditable === false ) {
+			// To do: remove this migration at some point.
+			if ( format.type === 'core/footnote' && tagName === 'a' ) {
+				const anchorAttrs = Object.entries(
+					format.unregisteredAttributes
+				)
+					.map( ( [ key, value ] ) => `${ key }="${ value }"` )
+					.join( ' ' );
+				format.tagName = 'sup';
+				format.innerHTML = `<a ${ anchorAttrs }>*</a>`;
+				format.unregisteredAttributes = {};
+			} else {
+				format.innerHTML = node.innerHTML;
+			}
+
 			delete format.formatType;
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			mergePair( accumulator, {
 				formats: [ , ],
-				replacements: [
-					{
-						...format,
-						innerHTML: node.innerHTML,
-					},
-				],
+				replacements: [ format ],
 				text: OBJECT_REPLACEMENT_CHARACTER,
 			} );
 			continue;

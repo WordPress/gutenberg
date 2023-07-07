@@ -191,9 +191,10 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => {
-			if ( ! meta ) return;
+			const output = { blocks: _blocks, meta };
+			if ( ! meta ) return output;
 			// If meta.footnotes is empty, it means the meta is not registered.
-			if ( meta.footnotes === undefined ) return {};
+			if ( meta.footnotes === undefined ) return output;
 
 			const { getRichTextValues } = unlock( blockEditorPrivateApis );
 			const _content = getRichTextValues( _blocks ).join( '' ) || '';
@@ -215,7 +216,8 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				: [];
 			const currentOrder = footnotes.map( ( fn ) => fn.id );
 
-			if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return;
+			if ( currentOrder.join( '' ) === newOrder.join( '' ) )
+				return output;
 
 			const newFootnotes = newOrder.map(
 				( fnId ) =>
@@ -243,7 +245,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 						// When we store rich text values, this would no longer
 						// require a regex.
 						const regex =
-							/(<sup[^>]+data-fn="([^"]+)"[^>]*><a[^>]*>)\d*<\/a><\/sup>/g;
+							/(<sup[^>]+data-fn="([^"]+)"[^>]*><a[^>]*>)[\d*]*<\/a><\/sup>/g;
 
 						attributes[ key ] = value.replace(
 							regex,
