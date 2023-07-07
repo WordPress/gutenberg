@@ -1016,7 +1016,7 @@ test.describe( 'Navigation block', () => {
 			);
 
 			// We test the colors of the links on the mobile overlay too.
-			colorControl.openEditorOverlay();
+			await colorControl.openEditorOverlay();
 
 			await expect( colorControl.overlay ).toHaveCSS(
 				'background-color',
@@ -1057,9 +1057,10 @@ test.describe( 'Navigation block', () => {
 				colorControl.white
 			);
 			// TODO: Check frontend overlay colors
+			// Overlay background should be white, all text should be black
 		} );
 
-		test( 'As a user I expect my navigation links to inherit the link colors from the theme', async ( {
+		test( 'Top level navigation links inherit the text color from the theme', async ( {
 			page,
 			editor,
 			colorControl,
@@ -1071,18 +1072,12 @@ test.describe( 'Navigation block', () => {
 				.click();
 			await page.getByRole( 'button', { name: 'Colors styles' } ).click();
 			await page
-				.getByRole( 'button', { name: 'Color Link styles' } )
+				.getByRole( 'button', { name: 'Color Text styles' } )
 				.click();
 			// rgb(207, 46, 46) is the color of the "vivid red" color preset
-			const linkThemeColor = 'rgb(207, 46, 46)';
+			const textThemeColor = 'rgb(207, 46, 46)';
 			await page
 				.getByRole( 'button', { name: 'Color: Vivid red' } )
-				.click( { force: true } );
-			await page.getByRole( 'tab', { name: 'Hover' } ).click();
-			// rgb(155, 81, 224) is the color of the "vivid purple" color preset
-			const linkThemeHoverColor = 'rgb(155, 81, 224)';
-			await page
-				.getByRole( 'button', { name: 'Color: Vivid purple' } )
 				.click( { force: true } );
 			await editor.canvas.click( 'body' );
 
@@ -1094,36 +1089,25 @@ test.describe( 'Navigation block', () => {
 				.getByRole( 'document', { name: 'Block: Navigation' } )
 				.click();
 
-			// Expect the first and third link to inherit the nav link color from the theme
+			// Expect the top level links to inherit the text color from the theme
 			await expect( colorControl.customLink ).toHaveCSS(
 				'color',
-				linkThemeColor
+				textThemeColor
 			);
 			await expect( colorControl.pageLink ).toHaveCSS(
 				'color',
-				linkThemeColor
-			);
-			await colorControl.customLink.click();
-			await expect( colorControl.customLink ).toHaveCSS(
-				'color',
-				linkThemeHoverColor
-			);
-			await colorControl.pageLink.click();
-			await expect( colorControl.pageLink ).toHaveCSS(
-				'color',
-				linkThemeHoverColor
+				textThemeColor
 			);
 
-			// Expect the second link to behave the same as the first
+			// Expect the submenu link to still have the default text and background color settings
 			await colorControl.customLink.click();
 			await expect( colorControl.submenuLink ).toHaveCSS(
 				'color',
-				linkThemeColor
+				colorControl.black
 			);
-			await colorControl.submenuLink.click();
-			await expect( colorControl.submenuLink ).toHaveCSS(
-				'color',
-				linkThemeHoverColor
+			await expect( colorControl.submenuWrapper ).toHaveCSS(
+				'background-color',
+				colorControl.white
 			);
 
 			// We test the colors of the links on the mobile overlay too.
@@ -1132,7 +1116,7 @@ test.describe( 'Navigation block', () => {
 			// get to a situation of setting a link color that is unreadable on the overlay.
 			// Submenu/Overlay colors should always be explicitly set by the user in the
 			// navigation color settings.
-			colorControl.openEditorOverlay();
+			await colorControl.openEditorOverlay();
 			await expect( colorControl.customLink ).toHaveCSS(
 				'color',
 				colorControl.black
@@ -1144,6 +1128,10 @@ test.describe( 'Navigation block', () => {
 			await expect( colorControl.pageLink ).toHaveCSS(
 				'color',
 				colorControl.black
+			);
+			await expect( colorControl.overlay ).toHaveCSS(
+				'background-color',
+				colorControl.white
 			);
 
 			await editor.saveSiteEditorEntities();
@@ -1154,34 +1142,27 @@ test.describe( 'Navigation block', () => {
 			// Expect the links to have the same colors as in the editor
 			await expect( colorControl.customLinkFront ).toHaveCSS(
 				'color',
-				linkThemeColor
+				textThemeColor
 			);
 			await expect( colorControl.pageLinkFront ).toHaveCSS(
 				'color',
-				linkThemeColor
+				textThemeColor
 			);
 			await colorControl.customLinkFront.hover();
-			await expect( colorControl.customLinkFront ).toHaveCSS(
-				'color',
-				linkThemeHoverColor
-			);
-			await expect( colorControl.submenuLinkFront ).toHaveCSS(
-				'color',
-				linkThemeColor
-			);
-			await colorControl.submenuLinkFront.hover();
 			await expect( colorControl.submenuLinkFront ).toHaveCSS(
 				'color',
 				colorControl.black
 			);
-			await colorControl.pageLinkFront.hover();
-			await expect( colorControl.pageLinkFront ).toHaveCSS(
-				'color',
-				linkThemeHoverColor
+			await expect( colorControl.submenuWrapperFront ).toHaveCSS(
+				'background-color',
+				colorControl.white
 			);
 
+			// TODO: Check frontend overlay colors
+			// Overlay background should be white, all text should be black
+
 			// We reset global styles so we don't affect other tests
-			colorControl.resetGlobalStyles();
+			await colorControl.resetGlobalStyles();
 		} );
 
 		test( 'As a user I expect my navigation links to inherit the link colors from the parent container', async ( {
@@ -1290,7 +1271,7 @@ test.describe( 'Navigation block', () => {
 			);
 
 			// We test the colors of the links on the mobile overlay too.
-			colorControl.openEditorOverlay();
+			await colorControl.openEditorOverlay();
 			await expect( colorControl.customLink ).toHaveCSS(
 				'color',
 				linkParentColor
@@ -1325,7 +1306,7 @@ test.describe( 'Navigation block', () => {
 			);
 
 			// We reset global styles so we don't affect other tests
-			colorControl.resetGlobalStyles();
+			await colorControl.resetGlobalStyles();
 		} );
 
 		test( 'As a user I expect my navigation links to inherit the text colors from the parent container', async ( {
@@ -1377,10 +1358,14 @@ test.describe( 'Navigation block', () => {
 			);
 			await colorControl.customLink.click();
 
-			// Expect the submenu link to behave the same as the first
+			// Expect the submenu link to have the default submenu link colors
 			await expect( colorControl.submenuLink ).toHaveCSS(
 				'color',
-				textParentColor
+				colorControl.black
+			);
+			await expect( colorControl.submenuWrapper ).toHaveCSS(
+				'background-color',
+				colorControl.white
 			);
 
 			// Expect the page link to behave the same as the first
@@ -1389,19 +1374,19 @@ test.describe( 'Navigation block', () => {
 				textParentColor
 			);
 
-			// We test the colors of the links on the mobile overlay too.
-			colorControl.openEditorOverlay();
+			// The mobile overlay links should remain the defaults. Only the overlay color settings should change these.
+			await colorControl.openEditorOverlay();
 			await expect( colorControl.customLink ).toHaveCSS(
 				'color',
-				textParentColor
+				colorControl.black
 			);
 			await expect( colorControl.submenuLink ).toHaveCSS(
 				'color',
-				textParentColor
+				colorControl.black
 			);
 			await expect( colorControl.pageLink ).toHaveCSS(
 				'color',
-				textParentColor
+				colorControl.black
 			);
 
 			await editor.saveSiteEditorEntities();
@@ -1417,12 +1402,18 @@ test.describe( 'Navigation block', () => {
 			await colorControl.customLinkFront.hover();
 			await expect( colorControl.submenuLinkFront ).toHaveCSS(
 				'color',
-				textParentColor
+				colorControl.black
+			);
+			await expect( colorControl.submenuWrapperFront ).toHaveCSS(
+				'background-color',
+				colorControl.white
 			);
 			await expect( colorControl.pageLinkFront ).toHaveCSS(
 				'color',
 				textParentColor
 			);
+
+			// TODO: Check the mobile overlay for white background with black text
 		} );
 
 		test( 'As a user I expect my navigation to use the colors I selected for it', async ( {
@@ -1556,7 +1547,7 @@ test.describe( 'Navigation block', () => {
 			);
 
 			// We test the colors of the links on the mobile overlay too.
-			colorControl.openEditorOverlay();
+			await colorControl.openEditorOverlay();
 			// Expect the overlay background to be "Luminous vivid amber" we selected for the submenu and overlay background colors
 			await expect( colorControl.overlay ).toHaveCSS(
 				'background-color',
@@ -1611,7 +1602,7 @@ test.describe( 'Navigation block', () => {
 			);
 
 			// We test the colors on the mobile overlay on the frontend.
-			colorControl.openFrontendOverlay();
+			await colorControl.openFrontendOverlay();
 
 			await expect( colorControl.customLinkFront ).toHaveCSS(
 				'color',
