@@ -263,7 +263,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 					const compatRegex =
 						/<a[^>]+data-fn="([^"]+)"[^>]*>\*<\/a>/g;
 
-					attributes[ key ] = value.replace(
+					attributes[ key ] = attributes[ key ].replace(
 						compatRegex,
 						( match, fnId ) => {
 							const index = newOrder.indexOf( fnId );
