@@ -35,6 +35,38 @@ async function getPluginsMap( this: RequestUtils, forceRefetch = false ) {
 }
 
 /**
+ * Finds a plugin in the plugin map.
+ *
+ * Attempts to provide a helpful error message if not found.
+ *
+ * @param slug       Plugin slug.
+ * @param pluginsMap Plugins map.
+ */
+function getPluginFromMap(
+	slug: string,
+	pluginsMap: Record< string, string >
+) {
+	const plugin = pluginsMap[ slug ];
+
+	if ( ! plugin ) {
+		for ( const key of Object.keys( pluginsMap ) ) {
+			if (
+				key.toLowerCase().replaceAll( '-', '' ) ===
+				slug.toLowerCase().replaceAll( '-', '' )
+			) {
+				throw new Error(
+					`The plugin "${ slug }" isn't installed. Did you perhaps mean "${ key }"?`
+				);
+			}
+		}
+
+		throw new Error( `The plugin "${ slug }" isn't installed` );
+	}
+
+	return plugin;
+}
+
+/**
  * Activates an installed plugin.
  *
  * @param this RequestUtils.
@@ -42,11 +74,7 @@ async function getPluginsMap( this: RequestUtils, forceRefetch = false ) {
  */
 async function activatePlugin( this: RequestUtils, slug: string ) {
 	const pluginsMap = await this.getPluginsMap();
-	const plugin = pluginsMap[ slug ];
-
-	if ( ! plugin ) {
-		throw new Error( `The plugin "${ slug }" isn't installed` );
-	}
+	const plugin = getPluginFromMap( slug, pluginsMap );
 
 	await this.rest( {
 		method: 'PUT',
@@ -63,11 +91,7 @@ async function activatePlugin( this: RequestUtils, slug: string ) {
  */
 async function deactivatePlugin( this: RequestUtils, slug: string ) {
 	const pluginsMap = await this.getPluginsMap();
-	const plugin = pluginsMap[ slug ];
-
-	if ( ! plugin ) {
-		throw new Error( `The plugin "${ slug }" isn't installed` );
-	}
+	const plugin = getPluginFromMap( slug, pluginsMap );
 
 	await this.rest( {
 		method: 'PUT',
