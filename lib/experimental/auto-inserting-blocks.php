@@ -56,6 +56,13 @@ function gutenberg_auto_insert_block( $anchor_block, $relative_position, $insert
 	};
 }
 
+/**
+ * Register blocks for auto-insertion.
+ *
+ * @param array $settings Array of determined settings for registering a block type.
+ * @param array $metadata Metadata provided for registering a block type.
+ * @return array Updated settings array.
+ */
 function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 	if ( ! isset( $metadata['__experimentalAutoInsert'] ) ) {
 		return $settings;
@@ -109,6 +116,12 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 }
 add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_blocks', 10, 2 );
 
+/**
+ * Parse and serialize block templates to allow running filters.
+ *
+ * @param WP_Block_Template[] $query_result Array of found block templates.
+ * @return void
+ */
 function gutenberg_parse_and_serialize_block_templates( $query_result ) {
 	foreach ( $query_result as $block_template ) {
 		if ( 'custom' === $block_template->source ) {
@@ -137,21 +150,21 @@ function gutenberg_parse_and_serialize_blocks( $block_template ) {
 add_filter( 'get_block_file_template', 'gutenberg_parse_and_serialize_blocks', 10, 1 );
 
 /**
- * Filterable version of `serialize_blocks()`.
+ * Filterable version of `serialize_block()`.
  *
- * This function is identical to `serialize_blocks()`, except that it applies
+ * This function is identical to `serialize_block()`, except that it applies
  * the `gutenberg_serialize_block` filter to each block before it is serialized.
  *
  * @param array $block The block to be serialized.
  * @return string The serialized block.
  *
- * @see serialize_blocks()
+ * @see serialize_block()
  */
 function gutenberg_serialize_block( $block ) {
 	$block_content = '';
 
 	/**
-	 * Filters a block before it is serialized.
+	 * Filters a parsed block before it is serialized.
 	 *
 	 * @param array $block The block to be serialized.
 	 */
@@ -178,6 +191,17 @@ function gutenberg_serialize_block( $block ) {
 	);
 }
 
+/**
+ * Filterable version of `serialize_blocks()`.
+ *
+ * This function is identical to `serialize_blocks()`, except that it applies
+ * the `gutenberg_serialize_block` filter to each block before it is serialized.
+ *
+ * @param array $block The block to be serialized.
+ * @return string The serialized block.
+ *
+ * @see serialize_blocks()
+ */
 function gutenberg_serialize_blocks( $blocks ) {
 	return implode( '', array_map( 'gutenberg_serialize_block', $blocks ) );
 }
