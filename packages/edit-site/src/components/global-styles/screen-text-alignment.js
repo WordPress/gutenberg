@@ -49,7 +49,7 @@ function ScreenTextAlignment() {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Global Text Alignment' ) }
+				title={ __( 'Text Alignment' ) }
 				description={ __(
 					'Manage the global text alignment for pages and posts content.'
 				) }
