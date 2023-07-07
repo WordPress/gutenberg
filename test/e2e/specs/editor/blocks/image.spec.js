@@ -774,7 +774,11 @@ test.describe( 'Image - interactivity', () => {
 	test.describe( 'tests using uploaded image', () => {
 		let filename = null;
 
-		test.beforeEach( async ( { editor, imageBlockUtils } ) => {
+		test( 'should toggle "lightbox" in saved attributes', async ( {
+			editor,
+			page,
+			imageBlockUtils,
+		} ) => {
 			const imageBlock = editor.canvas.locator(
 				'role=document[name="Block: Image"i]'
 			);
@@ -792,12 +796,7 @@ test.describe( 'Image - interactivity', () => {
 			);
 
 			await editor.openDocumentSettingsSidebar();
-		} );
 
-		test( 'should toggle "lightbox" in saved attributes', async ( {
-			editor,
-			page,
-		} ) => {
 			await page.getByRole( 'button', { name: 'Advanced' } ).click();
 			await page
 				.getByRole( 'combobox', { name: 'Behaviors' } )
@@ -830,14 +829,34 @@ test.describe( 'Image - interactivity', () => {
 		} );
 
 		test.describe( 'should open and close the image in a lightbox when using a mouse and dynamically load src', () => {
-			test.beforeEach( async ( { page } ) => {
+			test( 'zoom animation', async ( {
+				editor,
+				page,
+				imageBlockUtils,
+			} ) => {
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				filename = await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' ),
+					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				);
+				const image = imageBlock.locator( 'role=img' );
+				await expect( image ).toBeVisible();
+				await expect( image ).toHaveAttribute(
+					'src',
+					new RegExp( filename )
+				);
+
+				await editor.openDocumentSettingsSidebar();
+
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
 				await page
 					.getByRole( 'combobox', { name: 'Behaviors' } )
 					.selectOption( 'lightbox' );
-			} );
 
-			test( 'zoom animation', async ( { editor, page } ) => {
 				await page
 					.getByRole( 'combobox', { name: 'Animation' } )
 					.selectOption( 'zoom' );
@@ -933,7 +952,33 @@ test.describe( 'Image - interactivity', () => {
 				await expect( lightbox ).toBeHidden();
 			} );
 
-			test( 'fade animation', async ( { editor, page } ) => {
+			test( 'fade animation', async ( {
+				editor,
+				page,
+				imageBlockUtils,
+			} ) => {
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				filename = await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' ),
+					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				);
+				const image = imageBlock.locator( 'role=img' );
+				await expect( image ).toBeVisible();
+				await expect( image ).toHaveAttribute(
+					'src',
+					new RegExp( filename )
+				);
+
+				await editor.openDocumentSettingsSidebar();
+
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				await page
+					.getByRole( 'combobox', { name: 'Behaviors' } )
+					.selectOption( 'lightbox' );
 				await page
 					.getByRole( 'combobox', { name: 'Animation' } )
 					.selectOption( 'fade' );
@@ -1005,7 +1050,26 @@ test.describe( 'Image - interactivity', () => {
 		test( 'lightbox should be overriden when link is configured for image', async ( {
 			editor,
 			page,
+			imageBlockUtils,
 		} ) => {
+			const imageBlock = editor.canvas.locator(
+				'role=document[name="Block: Image"i]'
+			);
+			await expect( imageBlock ).toBeVisible();
+
+			filename = await imageBlockUtils.upload(
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
+				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+			);
+			const image = imageBlock.locator( 'role=img' );
+			await expect( image ).toBeVisible();
+			await expect( image ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
+
+			await editor.openDocumentSettingsSidebar();
+
 			await page.getByRole( 'button', { name: 'Advanced' } ).click();
 			const behaviorSelect = page.getByRole( 'combobox', {
 				name: 'Behaviors',
@@ -1040,7 +1104,26 @@ test.describe( 'Image - interactivity', () => {
 		test( 'markup should not appear if Lightbox is disabled', async ( {
 			editor,
 			page,
+			imageBlockUtils,
 		} ) => {
+			const imageBlock = editor.canvas.locator(
+				'role=document[name="Block: Image"i]'
+			);
+			await expect( imageBlock ).toBeVisible();
+
+			filename = await imageBlockUtils.upload(
+				imageBlock.locator( 'data-testid=form-file-upload-input' ),
+				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+			);
+			const image = imageBlock.locator( 'role=img' );
+			await expect( image ).toBeVisible();
+			await expect( image ).toHaveAttribute(
+				'src',
+				new RegExp( filename )
+			);
+
+			await editor.openDocumentSettingsSidebar();
+
 			await page.getByRole( 'button', { name: 'Advanced' } ).click();
 			const behaviorSelect = page.getByRole( 'combobox', {
 				name: 'Behaviors',
@@ -1058,8 +1141,28 @@ test.describe( 'Image - interactivity', () => {
 
 		test.describe( 'Animation Select visibility', () => {
 			test( 'Animation selector should appear if Behavior is Lightbox', async ( {
+				editor,
 				page,
+				imageBlockUtils,
 			} ) => {
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				filename = await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' ),
+					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				);
+				const image = imageBlock.locator( 'role=img' );
+				await expect( image ).toBeVisible();
+				await expect( image ).toHaveAttribute(
+					'src',
+					new RegExp( filename )
+				);
+
+				await editor.openDocumentSettingsSidebar();
+
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
 				const behaviorSelect = page.getByRole( 'combobox', {
 					name: 'Behaviors',
@@ -1073,7 +1176,27 @@ test.describe( 'Image - interactivity', () => {
 			} );
 			test( 'Animation selector should NOT appear if Behavior is None', async ( {
 				page,
+				editor,
+				imageBlockUtils,
 			} ) => {
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				filename = await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' ),
+					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				);
+				const image = imageBlock.locator( 'role=img' );
+				await expect( image ).toBeVisible();
+				await expect( image ).toHaveAttribute(
+					'src',
+					new RegExp( filename )
+				);
+
+				await editor.openDocumentSettingsSidebar();
+
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
 				const behaviorSelect = page.getByRole( 'combobox', {
 					name: 'Behaviors',
@@ -1087,7 +1210,27 @@ test.describe( 'Image - interactivity', () => {
 			} );
 			test( 'Animation selector should NOT appear if Behavior is Default', async ( {
 				page,
+				editor,
+				imageBlockUtils,
 			} ) => {
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				filename = await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' ),
+					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				);
+				const image = imageBlock.locator( 'role=img' );
+				await expect( image ).toBeVisible();
+				await expect( image ).toHaveAttribute(
+					'src',
+					new RegExp( filename )
+				);
+
+				await editor.openDocumentSettingsSidebar();
+
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
 				const behaviorSelect = page.getByRole( 'combobox', {
 					name: 'Behaviors',
@@ -1106,7 +1249,25 @@ test.describe( 'Image - interactivity', () => {
 			let lightbox;
 			let closeButton;
 
-			test.beforeEach( async ( { page, editor } ) => {
+			test.beforeEach( async ( { page, editor, imageBlockUtils } ) => {
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				filename = await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' ),
+					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				);
+				const image = imageBlock.locator( 'role=img' );
+				await expect( image ).toBeVisible();
+				await expect( image ).toHaveAttribute(
+					'src',
+					new RegExp( filename )
+				);
+
+				await editor.openDocumentSettingsSidebar();
+
 				await page.getByRole( 'button', { name: 'Advanced' } ).click();
 				await page
 					.getByRole( 'combobox', { name: 'Behaviors' } )
