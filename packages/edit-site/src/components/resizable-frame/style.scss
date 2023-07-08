@@ -65,7 +65,7 @@
 
 	&:hover,
 	&:focus,
-	.is-resizing & {
+	&.is-resizing {
 		background-color: var(--wp-admin-theme-color);
 	}
 }

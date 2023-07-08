@@ -261,7 +261,10 @@ function ResizableFrame( {
 					<Tooltip text={ __( 'Drag to resize' ) }>
 						<motion.button
 							key="handle"
-							className="edit-site-resizable-frame__handle"
+							className={ classnames(
+								'edit-site-resizable-frame__handle',
+								{ 'is-resizing': isResizing }
+							) }
 							variants={ resizeHandleVariants }
 							animate={ shouldShowHandle ? 'visible' : 'hidden' }
 							onKeyDown={ handleResizableHandleKeyDown }
