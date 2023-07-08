@@ -218,6 +218,12 @@ function ResizableFrame( {
 			scaleY: 1.3,
 		},
 	};
+	const currentResizeHandleVariant = ( () => {
+		if ( isResizing ) {
+			return 'active';
+		}
+		return shouldShowHandle ? 'visible' : 'hidden';
+	} )();
 
 	return (
 		<ResizableBox
@@ -266,7 +272,7 @@ function ResizableFrame( {
 								{ 'is-resizing': isResizing }
 							) }
 							variants={ resizeHandleVariants }
-							animate={ shouldShowHandle ? 'visible' : 'hidden' }
+							animate={ currentResizeHandleVariant }
 							aria-label={ __( 'Drag to resize' ) }
 							onKeyDown={ handleResizableHandleKeyDown }
 							initial="hidden"
