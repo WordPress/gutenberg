@@ -10,8 +10,10 @@ import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	ResizableBox,
 	Tooltip,
+	VisuallyHidden,
 	__unstableMotion as motion,
 } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -95,6 +97,10 @@ function ResizableFrame( {
 	const initialComputedWidthRef = useRef( null );
 	const FRAME_TRANSITION = { type: 'tween', duration: isResizing ? 0 : 0.5 };
 	const frameRef = useRef( null );
+	const resizableHandleHelpId = useInstanceId(
+		ResizableFrame,
+		'edit-site-resizable-frame-handle-help'
+	);
 
 	// Remember frame dimensions on initial render.
 	useEffect( () => {
@@ -264,23 +270,32 @@ function ResizableFrame( {
 			onMouseOut={ () => setShouldShowHandle( false ) }
 			handleComponent={ {
 				left: (
-					<Tooltip text={ __( 'Drag to resize' ) }>
-						<motion.button
-							key="handle"
-							className={ classnames(
-								'edit-site-resizable-frame__handle',
-								{ 'is-resizing': isResizing }
+					<>
+						<Tooltip text={ __( 'Drag to resize' ) }>
+							<motion.button
+								key="handle"
+								type="button"
+								className={ classnames(
+									'edit-site-resizable-frame__handle',
+									{ 'is-resizing': isResizing }
+								) }
+								variants={ resizeHandleVariants }
+								animate={ currentResizeHandleVariant }
+								aria-label={ __( 'Drag to resize' ) }
+								aria-describedby={ resizableHandleHelpId }
+								onKeyDown={ handleResizableHandleKeyDown }
+								initial="hidden"
+								exit="hidden"
+								whileFocus="active"
+								whileHover="active"
+							/>
+						</Tooltip>
+						<VisuallyHidden id={ resizableHandleHelpId }>
+							{ __(
+								'Use left and right arrow keys to resize the canvas.'
 							) }
-							variants={ resizeHandleVariants }
-							animate={ currentResizeHandleVariant }
-							aria-label={ __( 'Drag to resize' ) }
-							onKeyDown={ handleResizableHandleKeyDown }
-							initial="hidden"
-							exit="hidden"
-							whileFocus="active"
-							whileHover="active"
-						/>
-					</Tooltip>
+						</VisuallyHidden>
+					</>
 				),
 			} }
 			onResizeStart={ handleResizeStart }
