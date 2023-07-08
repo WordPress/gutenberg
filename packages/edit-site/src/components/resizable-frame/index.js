@@ -267,6 +267,7 @@ function ResizableFrame( {
 							) }
 							variants={ resizeHandleVariants }
 							animate={ shouldShowHandle ? 'visible' : 'hidden' }
+							aria-label={ __( 'Drag to resize' ) }
 							onKeyDown={ handleResizableHandleKeyDown }
 							initial="hidden"
 							exit="hidden"
