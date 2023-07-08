@@ -168,12 +168,10 @@ describe( 'Editor History', () => {
 			'A quick brown fox jumps over the lazy dog.',
 			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
 		);
-		// Artifical delay to create two history entries for typing and bolding.
+		// Artifical delay to create two history entries for typing and formatting.
 		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
 		fireEvent.press( screen.getByLabelText( 'Bold' ) );
 		fireEvent.press( screen.getByLabelText( 'Italic' ) );
-
-		// TODO: Determine a way to type multiple times within a given block.
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
