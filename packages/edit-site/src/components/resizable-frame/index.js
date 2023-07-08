@@ -9,9 +9,11 @@ import classnames from 'classnames';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	ResizableBox,
+	Tooltip,
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -42,6 +44,8 @@ const FRAME_TARGET_ASPECT_RATIO = 9 / 19.5;
 // viewport's edge. If the frame is resized to be closer to the viewport's edge
 // than this distance, then "canvas mode" will be enabled.
 const SNAP_TO_EDIT_CANVAS_MODE_THRESHOLD = 200;
+// Default size for the `frameSize` state.
+const INITIAL_FRAME_SIZE = { width: '100%', height: '100%' };
 
 function calculateNewHeight( width, initialAspectRatio ) {
 	const lerp = ( a, b, amount ) => {
@@ -78,14 +82,11 @@ function ResizableFrame( {
 	oversizedClassName,
 	innerContentStyle,
 } ) {
-	const [ frameSize, setFrameSize ] = useState( {
-		width: '100%',
-		height: '100%',
-	} );
+	const [ frameSize, setFrameSize ] = useState( INITIAL_FRAME_SIZE );
 	// The width of the resizable frame when a new resize gesture starts.
 	const [ startingWidth, setStartingWidth ] = useState();
 	const [ isResizing, setIsResizing ] = useState( false );
-	const [ isHovering, setIsHovering ] = useState( false );
+	const [ shouldShowHandle, setShouldShowHandle ] = useState( false );
 	const [ isOversized, setIsOversized ] = useState( false );
 	const [ resizeRatio, setResizeRatio ] = useState( 1 );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
@@ -154,10 +155,40 @@ function ResizableFrame( {
 		if ( remainingWidth > SNAP_TO_EDIT_CANVAS_MODE_THRESHOLD ) {
 			// Reset the initial aspect ratio if the frame is resized slightly
 			// above the sidebar but not far enough to trigger full screen.
-			setFrameSize( { width: '100%', height: '100%' } );
+			setFrameSize( INITIAL_FRAME_SIZE );
 		} else {
 			// Trigger full screen if the frame is resized far enough to the left.
 			setCanvasMode( 'edit' );
+		}
+	};
+
+	// Handle resize by arrow keys
+	const handleResizableHandleKeyDown = ( event ) => {
+		if ( ! [ 'ArrowLeft', 'ArrowRight' ].includes( event.key ) ) {
+			return;
+		}
+
+		const step = 20 * ( event.shiftKey ? 5 : 1 );
+		const delta = step * ( event.key === 'ArrowLeft' ? 1 : -1 );
+		const newWidth = Math.max(
+			FRAME_MIN_WIDTH,
+			frameRef.current.resizable.offsetWidth + delta
+		);
+
+		setFrameSize( {
+			width: newWidth,
+			height: calculateNewHeight(
+				newWidth,
+				initialAspectRatioRef.current
+			),
+		} );
+
+		// If oversized, immediately switch to edit mode
+		if ( newWidth > initialComputedWidthRef.current ) {
+			setFrameSize( INITIAL_FRAME_SIZE );
+			setCanvasMode( 'edit' );
+			// TODO: Confirm if this is the focus behavior we want
+			document.querySelector( 'iframe[name=editor-canvas]' ).focus();
 		}
 	};
 
@@ -173,11 +204,15 @@ function ResizableFrame( {
 	};
 
 	const resizeHandleVariants = {
-		default: {
+		hidden: {
+			opacity: 0,
+			left: 0,
+		},
+		visible: {
 			opacity: 1,
 			left: -16,
 		},
-		resizing: {
+		active: {
 			opacity: 1,
 			left: -16,
 			scaleY: 1.3,
@@ -217,28 +252,26 @@ function ResizableFrame( {
 			minWidth={ FRAME_MIN_WIDTH }
 			maxWidth={ isFullWidth ? '100%' : '150%' }
 			maxHeight={ '100%' }
-			onMouseOver={ () => setIsHovering( true ) }
-			onMouseOut={ () => setIsHovering( false ) }
+			onFocus={ () => setShouldShowHandle( true ) }
+			onBlur={ () => setShouldShowHandle( false ) }
+			onMouseOver={ () => setShouldShowHandle( true ) }
+			onMouseOut={ () => setShouldShowHandle( false ) }
 			handleComponent={ {
-				left:
-					isHovering || isResizing ? (
-						<motion.div
+				left: (
+					<Tooltip text={ __( 'Drag to resize' ) }>
+						<motion.button
 							key="handle"
 							className="edit-site-resizable-frame__handle"
 							variants={ resizeHandleVariants }
-							animate={ isResizing ? 'resizing' : 'default' }
-							title="Drag to resize"
-							initial={ {
-								opacity: 0,
-								left: 0,
-							} }
-							exit={ {
-								opacity: 0,
-								left: 0,
-							} }
-							whileHover={ { scaleY: 1.3 } }
+							animate={ shouldShowHandle ? 'visible' : 'hidden' }
+							onKeyDown={ handleResizableHandleKeyDown }
+							initial="hidden"
+							exit="hidden"
+							whileFocus="active"
+							whileHover="active"
 						/>
-					) : null,
+					</Tooltip>
+				),
 			} }
 			onResizeStart={ handleResizeStart }
 			onResize={ handleResize }
