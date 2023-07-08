@@ -58,6 +58,11 @@
 		width: $grid-unit-40;
 	}
 
+	&:focus-visible {
+		// Works with Windows high contrast mode while also hiding weird outline in Safari.
+		outline: 2px solid transparent;
+	}
+
 	&:hover,
 	&:focus,
 	.is-resizing & {
