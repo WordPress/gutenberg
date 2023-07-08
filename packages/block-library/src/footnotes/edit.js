@@ -3,6 +3,8 @@
  */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
+import { Placeholder } from '@wordpress/components';
 
 export default function FootnotesEdit( { context: { postType, postId } } ) {
 	const [ meta, updateMeta ] = useEntityProp(
@@ -12,8 +14,18 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 		postId
 	);
 	const footnotes = meta?.footnotes ? JSON.parse( meta.footnotes ) : [];
+	const blockProps = useBlockProps();
+
+	if ( ! footnotes.length ) {
+		return (
+			<Placeholder { ...blockProps }>
+				{ __( 'No footnotes yet.' ) }
+			</Placeholder>
+		);
+	}
+
 	return (
-		<ol { ...useBlockProps() }>
+		<ol { ...blockProps }>
 			{ footnotes.map( ( { id, content } ) => (
 				<li key={ id }>
 					<RichText
