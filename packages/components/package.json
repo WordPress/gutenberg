@@ -58,7 +58,6 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/warning": "file:../warning",
-		"ariakit": "^2.0.0-next.43",
 		"change-case": "^4.1.2",
 		"classnames": "^2.3.1",
 		"colord": "^2.7.0",

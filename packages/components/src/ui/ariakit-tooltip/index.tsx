@@ -1,8 +1,11 @@
 /**
  * External dependencies
  */
-import { Tooltip, TooltipAnchor, useTooltipState } from 'ariakit/tooltip';
-import { Slot } from '@radix-ui/react-slot';
+import {
+	Tooltip,
+	TooltipAnchor,
+	useTooltipStore,
+} from '@ariakit/react/tooltip';
 
 /**
  * WordPress dependencies
@@ -53,21 +56,20 @@ function AriaToolTip( props: ToolTipProps ) {
 		} );
 	}
 
-	const tooltipState = useTooltipState( {
+	const tooltipStore = useTooltipStore( {
+		// @ts-ignore
 		placement: computedPlacement,
 		timeout: delay,
 	} );
 
 	return (
 		<>
-			<TooltipAnchor as={ Slot } described state={ tooltipState }>
-				{ children }
-			</TooltipAnchor>
+			<TooltipAnchor render={ children } store={ tooltipStore } />
 			{ ( text || shortcut ) && (
 				<Tooltip
 					className="components-ariakit-tooltip"
 					id={ describedById }
-					state={ tooltipState }
+					store={ tooltipStore }
 				>
 					{ text }
 					{ shortcut && (

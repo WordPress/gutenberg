@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { TooltipStateProps } from 'ariakit/tooltip';
+import type { TooltipProps, TooltipStoreProps } from '@ariakit/react/tooltip';
 /**
  * Internal dependencies
  */
@@ -12,7 +12,7 @@ export type ToolTipProps = {
 	/**
 	 * The anchor for the tooltip. Accepts only one child element.
 	 */
-	children: React.ReactElement | string;
+	children: TooltipProps[ 'render' ];
 	/**
 	 * The amount of time in milliseconds to wait before showing the tooltip.
 	 *
@@ -24,7 +24,7 @@ export type ToolTipProps = {
 	 *
 	 * @default bottom
 	 */
-	placement?: TooltipStateProps[ 'placement' ];
+	placement?: TooltipStoreProps[ 'placement' ];
 	/**
 	 * _Note: this prop is deprecated. Please use the `placement` prop instead._
 	 *
