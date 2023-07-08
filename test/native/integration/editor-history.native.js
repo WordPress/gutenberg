@@ -100,12 +100,10 @@ describe( 'Editor History', () => {
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
-		typeInRichText(
-			paragraphTextInput,
-			'A quick brown fox jumps over the lazy dog.'
-		);
-
-		// TODO: Determine a way to type multiple times within a given block.
+		typeInRichText( paragraphTextInput, 'A quick brown fox' );
+		// Artifical delay to create two history entries for typing
+		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+		typeInRichText( paragraphTextInput, ' jumps over the lazy dog.' );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -120,12 +118,32 @@ describe( 'Editor History', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
+		<p>A quick brown fox</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
 		<p></p>
 		<!-- /wp:paragraph -->"
 	` );
 
 		// Act
 		toggleRedo();
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A quick brown fox</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Redo' ) );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
