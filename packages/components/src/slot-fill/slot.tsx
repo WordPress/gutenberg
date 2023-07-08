@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode, Key } from 'react';
 
 /**
  * WordPress dependencies
@@ -77,7 +77,7 @@ class SlotComponent extends Component< BaseSlotComponentProps > {
 					if ( ! child || typeof child === 'string' ) {
 						return child;
 					}
-					let childKey: string | number = childIndex;
+					let childKey: Key = childIndex;
 					if (
 						typeof child === 'object' &&
 						'key' in child &&
@@ -95,8 +95,7 @@ class SlotComponent extends Component< BaseSlotComponentProps > {
 				// In some cases fills are rendered only when some conditions apply.
 				// This ensures that we only use non-empty fills when rendering, i.e.,
 				// it allows us to render wrappers only when the fills are actually present.
-				( element ): element is Exclude< typeof element, undefined > =>
-					! isEmptyElement( element )
+				( element ) => ! isEmptyElement( element )
 			);
 
 		return <>{ isFunction( children ) ? children( fills ) : fills }</>;
