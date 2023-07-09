@@ -15,7 +15,7 @@ import {
 import { __, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -70,6 +70,7 @@ export default function PatternsList( { categoryId, type } ) {
 	const hasPatterns = patterns.length;
 	const title = SYNC_FILTERS[ syncFilter ];
 	const description = SYNC_DESCRIPTIONS[ syncFilter ];
+	const shownPatterns = useAsyncList( patterns );
 
 	return (
 		<VStack spacing={ 6 }>
@@ -129,20 +130,22 @@ export default function PatternsList( { categoryId, type } ) {
 					</ToggleGroupControl>
 				) }
 			</Flex>
-			<VStack className="edit-site-patterns__section-header">
-				<Heading as="h3" level={ 4 } id={ titleId }>
-					{ title }
-				</Heading>
-				{ description ? (
-					<Text variant="muted" as="p" id={ descriptionId }>
-						{ description }
-					</Text>
-				) : null }
-			</VStack>
+			{ syncFilter !== 'all' && (
+				<VStack className="edit-site-patterns__section-header">
+					<Heading as="h3" level={ 4 } id={ titleId }>
+						{ title }
+					</Heading>
+					{ description ? (
+						<Text variant="muted" as="p" id={ descriptionId }>
+							{ description }
+						</Text>
+					) : null }
+				</VStack>
+			) }
 			{ hasPatterns && (
 				<Grid
 					categoryId={ categoryId }
-					items={ patterns }
+					items={ shownPatterns }
 					aria-labelledby={ titleId }
 					aria-describedby={ descriptionId }
 				/>
