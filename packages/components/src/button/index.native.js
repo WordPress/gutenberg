@@ -24,6 +24,7 @@ import {
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
+import style from './style';
 
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
@@ -96,6 +97,7 @@ export function Button( props ) {
 		isActiveStyle,
 		customContainerStyles,
 		hitSlop,
+		className,
 	} = props;
 	const preferredColorScheme = usePreferredColorScheme();
 
@@ -157,10 +159,15 @@ export function Button( props ) {
 				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
+	const classNameStyles = usePreferredColorSchemeStyle(
+		style?.[ `${ className?.split( ' ' )?.[ 0 ] }--light` ],
+		style?.[ `${ className?.split( ' ' )?.[ 0 ] }--dark` ]
+	);
 	const newIcon = icon
 		? cloneElement( <Icon icon={ icon } size={ iconSize } />, {
 				colorScheme: preferredColorScheme,
 				isPressed,
+				...( className ? { style: classNameStyles } : {} ),
 		  } )
 		: null;
 
