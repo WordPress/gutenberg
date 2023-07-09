@@ -9,6 +9,8 @@ import {
 	FlexBlock,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalHeading as Heading,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
@@ -35,6 +37,16 @@ const SYNC_FILTERS = {
 	[ SYNC_TYPES.unsynced ]: __( 'Standard' ),
 };
 
+const SYNC_DESCRIPTIONS = {
+	all: '',
+	[ SYNC_TYPES.full ]: __(
+		'Patterns that are kept in sync across your site.'
+	),
+	[ SYNC_TYPES.unsynced ]: __(
+		'Patterns that can be changed freely without affecting your site.'
+	),
+};
+
 export default function PatternsList( { categoryId, type } ) {
 	const location = useLocation();
 	const history = useHistory();
@@ -56,6 +68,8 @@ export default function PatternsList( { categoryId, type } ) {
 	const descriptionId = `${ id }-description`;
 
 	const hasPatterns = patterns.length;
+	const title = SYNC_FILTERS[ syncFilter ];
+	const description = SYNC_DESCRIPTIONS[ syncFilter ];
 
 	return (
 		<VStack spacing={ 6 }>
@@ -115,7 +129,16 @@ export default function PatternsList( { categoryId, type } ) {
 					</ToggleGroupControl>
 				) }
 			</Flex>
-
+			<VStack className="edit-site-patterns__section-header">
+				<Heading as="h2" level={ 4 } id={ titleId }>
+					{ title }
+				</Heading>
+				{ description ? (
+					<Text variant="muted" as="p" id={ descriptionId }>
+						{ description }
+					</Text>
+				) : null }
+			</VStack>
 			{ hasPatterns && (
 				<Grid
 					categoryId={ categoryId }

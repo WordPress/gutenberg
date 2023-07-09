@@ -37,7 +37,7 @@ export default function PatternsHeader( {
 	let title, description;
 	if ( categoryId === USER_PATTERN_CATEGORY && type === USER_PATTERNS ) {
 		title = __( 'My Patterns' );
-		description = __( 'Patterns that are kept in sync across your site.' ); // TODO
+		description = '';
 	} else if ( type === TEMPLATE_PARTS ) {
 		const templatePartArea = templatePartAreas.find(
 			( area ) => area.area === categoryId
