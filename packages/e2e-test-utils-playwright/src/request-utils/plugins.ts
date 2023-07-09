@@ -51,8 +51,8 @@ function getPluginFromMap(
 	if ( ! plugin ) {
 		for ( const key of Object.keys( pluginsMap ) ) {
 			if (
-				key.toLowerCase().replaceAll( '-', '' ) ===
-				slug.toLowerCase().replaceAll( '-', '' )
+				key.toLowerCase().replace( /-/g, '' ) ===
+				slug.toLowerCase().replace( /-/g, '' )
 			) {
 				throw new Error(
 					`The plugin "${ slug }" isn't installed. Did you perhaps mean "${ key }"?`
