@@ -1,9 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 import {
 	Button,
 	MenuItem,
@@ -13,30 +10,34 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
-export default function RenameMenuItem( { template, onClose } ) {
-	const [ title, setTitle ] = useState( () => template.title.rendered );
+/**
+ * Internal dependencies
+ */
+import { TEMPLATE_PARTS } from './utils';
+
+export default function RenameMenuItem( { item, onClose } ) {
+	const [ title, setTitle ] = useState( () => item.title );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	const {
-		editEntityRecord,
-		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
-	} = useDispatch( coreStore );
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	if ( template.type === 'wp_template' && ! template.is_custom ) {
+	if ( item.type === TEMPLATE_PARTS && ! item.isCustom ) {
 		return null;
 	}
 
-	async function onTemplateRename( event ) {
+	async function onRename( event ) {
 		event.preventDefault();
 
 		try {
-			await editEntityRecord( 'postType', template.type, template.id, {
-				title,
-			} );
+			await editEntityRecord( 'postType', item.type, item.id, { title } );
 
 			// Update state before saving rerenders the list.
 			setTitle( '' );
@@ -44,15 +45,9 @@ export default function RenameMenuItem( { template, onClose } ) {
 			onClose();
 
 			// Persist edited entity.
-			await saveSpecifiedEntityEdits(
-				'postType',
-				template.type,
-				template.id,
-				[ 'title' ], // Only save title to avoid persisting other edits.
-				{
-					throwOnError: true,
-				}
-			);
+			await saveEditedEntityRecord( 'postType', item.type, item.id, {
+				throwOnError: true,
+			} );
 
 			createSuccessNotice( __( 'Entity renamed.' ), {
 				type: 'snackbar',
@@ -72,7 +67,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 			<MenuItem
 				onClick={ () => {
 					setIsModalOpen( true );
-					setTitle( template.title.rendered );
+					setTitle( item.title );
 				} }
 			>
 				{ __( 'Rename' ) }
@@ -82,10 +77,11 @@ export default function RenameMenuItem( { template, onClose } ) {
 					title={ __( 'Rename' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
+						onClose();
 					} }
-					overlayClassName="edit-site-list__rename-modal"
+					overlayClassName="edit-site-list__rename_modal"
 				>
-					<form onSubmit={ onTemplateRename }>
+					<form onSubmit={ onRename }>
 						<VStack spacing="5">
 							<TextControl
 								__nextHasNoMarginBottom
@@ -100,6 +96,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
+										onClose();
 									} }
 								>
 									{ __( 'Cancel' ) }

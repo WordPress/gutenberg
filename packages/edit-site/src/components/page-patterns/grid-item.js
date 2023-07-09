@@ -24,7 +24,7 @@ import {
 	Icon,
 	header,
 	footer,
-	symbolFilled,
+	symbolFilled as uncategorized,
 	moreHorizontal,
 	lockSmall,
 } from '@wordpress/icons';
@@ -35,23 +35,31 @@ import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { PATTERNS, USER_PATTERNS } from './utils';
+import RenameMenuItem from './rename-menu-item';
+import DuplicateMenuItem from './duplicate-menu-item';
+import { PATTERNS, TEMPLATE_PARTS, USER_PATTERNS } from './utils';
+import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 
-const THEME_PATTERN_TOOLTIP = __( 'Theme patterns cannot be edited.' );
+const templatePartIcons = { header, footer, uncategorized };
 
 export default function GridItem( { categoryId, composite, icon, item } ) {
 	const descriptionId = useId();
 	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
 
+	const { removeTemplate } = useDispatch( editSiteStore );
 	const { __experimentalDeleteReusableBlock } =
 		useDispatch( reusableBlocksStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
+	const isUserPattern = item.type === USER_PATTERNS;
+	const isNonUserPattern = item.type === PATTERNS;
+	const isTemplatePart = item.type === TEMPLATE_PARTS;
+
 	const { onClick } = useLink( {
 		postType: item.type,
-		postId: item.type === USER_PATTERNS ? item.id : item.name,
+		postId: isUserPattern ? item.id : item.name,
 		categoryId,
 		categoryType: item.type,
 	} );
@@ -67,27 +75,41 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		'is-placeholder': isEmpty,
 	} );
 	const previewClassNames = classnames( 'edit-site-patterns__preview', {
-		'is-inactive': item.type === PATTERNS,
+		'is-inactive': isNonUserPattern,
 	} );
 
 	const deletePattern = async () => {
 		try {
 			await __experimentalDeleteReusableBlock( item.id );
-			createSuccessNotice( __( 'Pattern successfully deleted.' ), {
-				type: 'snackbar',
-			} );
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The pattern's title e.g. 'Call to action'.
+					__( '"%s" deleted.' ),
+					item.title
+				),
+				{ type: 'snackbar', id: 'edit-site-patterns-success' }
+			);
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
 					: __( 'An error occurred while deleting the pattern.' );
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+				id: 'edit-site-patterns-error',
+			} );
 		}
 	};
+	const deleteItem = () =>
+		isTemplatePart ? removeTemplate( item ) : deletePattern();
 
-	const isUserPattern = item.type === USER_PATTERNS;
+	// Only custom patterns or custom template parts can be renamed or deleted.
+	const isCustomPattern =
+		isUserPattern || ( isTemplatePart && item.isCustom );
+	const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
 	const ariaDescriptions = [];
-	if ( isUserPattern ) {
+
+	if ( isCustomPattern ) {
 		// User patterns don't have descriptions, but can be edited and deleted, so include some help text.
 		ariaDescriptions.push(
 			__( 'Press Enter to edit, or Delete to delete the pattern.' )
@@ -95,18 +117,23 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 	} else if ( item.description ) {
 		ariaDescriptions.push( item.description );
 	}
-	if ( item.type === PATTERNS ) {
-		ariaDescriptions.push( THEME_PATTERN_TOOLTIP );
+
+	if ( isNonUserPattern ) {
+		ariaDescriptions.push( __( 'Theme patterns cannot be edited.' ) );
 	}
 
-	let itemIcon = icon;
-	if ( categoryId === 'header' ) {
-		itemIcon = header;
-	} else if ( categoryId === 'footer' ) {
-		itemIcon = footer;
-	} else if ( categoryId === 'uncategorized' ) {
-		itemIcon = symbolFilled;
-	}
+	const itemIcon = templatePartIcons[ categoryId ]
+		? templatePartIcons[ categoryId ]
+		: icon;
+
+	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
+	const confirmPrompt = hasThemeFile
+		? __( 'Are you sure you want to clear these customizations?' )
+		: sprintf(
+				// translators: %s: The pattern or template part's title e.g. 'Call to action'.
+				__( 'Are you sure you want to delete "%s"?' ),
+				item.title
+		  );
 
 	return (
 		<>
@@ -117,7 +144,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					as="div"
 					{ ...composite }
 					onClick={ item.type !== PATTERNS ? onClick : undefined }
-					onKeyDown={ isUserPattern ? onKeyDown : undefined }
+					onKeyDown={ isCustomPattern ? onKeyDown : undefined }
 					aria-label={ item.title }
 					aria-describedby={
 						ariaDescriptions.length
@@ -169,58 +196,73 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 									) }
 								>
 									<span className="edit-site-patterns__pattern-lock-icon">
-										<Icon
-											style={ { fill: 'currentcolor' } }
-											icon={ lockSmall }
-											size={ 24 }
-										/>
+										<Icon icon={ lockSmall } size={ 24 } />
 									</span>
 								</Tooltip>
 							) }
 						</Flex>
 					</HStack>
-					{ item.type === USER_PATTERNS && (
-						<DropdownMenu
-							icon={ moreHorizontal }
-							label={ __( 'Actions' ) }
-							className="edit-site-patterns__dropdown"
-							popoverProps={ { placement: 'bottom-end' } }
-							toggleProps={ {
-								className: 'edit-site-patterns__button',
-								isSmall: true,
-								describedBy: sprintf(
-									/* translators: %s: pattern name */
-									__( 'Action menu for %s pattern' ),
-									item.title
-								),
-								// The dropdown menu is not focusable using the
-								// keyboard as this would interfere with the grid's
-								// roving tab index system. Instead, keyboard users
-								// use keyboard shortcuts to trigger actions.
-								tabIndex: -1,
-							} }
-						>
-							{ () => (
-								<MenuGroup>
+					<DropdownMenu
+						icon={ moreHorizontal }
+						label={ __( 'Actions' ) }
+						className="edit-site-patterns__dropdown"
+						popoverProps={ { placement: 'bottom-end' } }
+						toggleProps={ {
+							className: 'edit-site-patterns__button',
+							isSmall: true,
+							describedBy: sprintf(
+								/* translators: %s: pattern name */
+								__( 'Action menu for %s pattern' ),
+								item.title
+							),
+							// The dropdown menu is not focusable using the
+							// keyboard as this would interfere with the grid's
+							// roving tab index system. Instead, keyboard users
+							// use keyboard shortcuts to trigger actions.
+							tabIndex: -1,
+						} }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								{ isCustomPattern && ! hasThemeFile && (
+									<RenameMenuItem
+										item={ item }
+										onClose={ onClose }
+									/>
+								) }
+								<DuplicateMenuItem
+									categoryId={ categoryId }
+									item={ item }
+									onClose={ onClose }
+									label={
+										isNonUserPattern
+											? __( 'Copy to My patterns' )
+											: __( 'Duplicate' )
+									}
+								/>
+								{ isCustomPattern && (
 									<MenuItem
 										onClick={ () =>
 											setIsDeleteDialogOpen( true )
 										}
 									>
-										{ __( 'Delete' ) }
+										{ hasThemeFile
+											? __( 'Clear customizations' )
+											: __( 'Delete' ) }
 									</MenuItem>
-								</MenuGroup>
-							) }
-						</DropdownMenu>
-					) }
+								) }
+							</MenuGroup>
+						) }
+					</DropdownMenu>
 				</HStack>
 			</div>
 			{ isDeleteDialogOpen && (
 				<ConfirmDialog
-					onConfirm={ deletePattern }
+					confirmButtonText={ confirmButtonText }
+					onConfirm={ deleteItem }
 					onCancel={ () => setIsDeleteDialogOpen( false ) }
 				>
-					{ __( 'Are you sure you want to delete this pattern?' ) }
+					{ confirmPrompt }
 				</ConfirmDialog>
 			) }
 		</>

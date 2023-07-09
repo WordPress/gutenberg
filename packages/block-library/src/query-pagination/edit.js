@@ -34,20 +34,23 @@ export default function QueryPaginationEdit( {
 	setAttributes,
 	clientId,
 } ) {
-	const hasNextPreviousBlocks = useSelect( ( select ) => {
-		const { getBlocks } = select( blockEditorStore );
-		const innerBlocks = getBlocks( clientId );
-		/**
-		 * Show the `paginationArrow` and `showLabel` controls only if a
-		 * `QueryPaginationNext/Previous` block exists.
-		 */
-		return innerBlocks?.find( ( innerBlock ) => {
-			return [
-				'core/query-pagination-next',
-				'core/query-pagination-previous',
-			].includes( innerBlock.name );
-		} );
-	}, [] );
+	const hasNextPreviousBlocks = useSelect(
+		( select ) => {
+			const { getBlocks } = select( blockEditorStore );
+			const innerBlocks = getBlocks( clientId );
+			/**
+			 * Show the `paginationArrow` and `showLabel` controls only if a
+			 * `QueryPaginationNext/Previous` block exists.
+			 */
+			return innerBlocks?.find( ( innerBlock ) => {
+				return [
+					'core/query-pagination-next',
+					'core/query-pagination-previous',
+				].includes( innerBlock.name );
+			} );
+		},
+		[ clientId ]
+	);
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
