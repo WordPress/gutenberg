@@ -37,7 +37,7 @@
 		"clean-metro": "rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/metro-bundler-cache-*;",
 		"clean-node": "rm -rf node_modules/;",
 		"clean-react": "rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/react-native-packager-cache-*;",
-		"clean-watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all;",
+		"clean-watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
 		"clean:install": "npm run clean && npm install"
 	}
 }
