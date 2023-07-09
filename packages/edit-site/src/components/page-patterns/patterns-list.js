@@ -130,7 +130,7 @@ export default function PatternsList( { categoryId, type } ) {
 				) }
 			</Flex>
 			<VStack className="edit-site-patterns__section-header">
-				<Heading as="h2" level={ 4 } id={ titleId }>
+				<Heading as="h3" level={ 4 } id={ titleId }>
 					{ title }
 				</Heading>
 				{ description ? (
