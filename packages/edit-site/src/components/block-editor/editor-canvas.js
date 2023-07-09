@@ -88,7 +88,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 					enableResizing ? 'min-height:0!important;' : ''
 				}}body{position:relative; ${
 					canvasMode === 'view'
-						? 'cursor: pointer; height: 100vh'
+						? 'cursor: pointer; min-height: 100vh;'
 						: ''
 				}}}`
 			}</style>
