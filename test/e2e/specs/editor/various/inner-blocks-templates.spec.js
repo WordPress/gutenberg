@@ -6,7 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Inner blocks templates', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin(
-			'gutenberg-test-inner-blocks-templates'
+			'gutenberg-test-innerblocks-templates'
 		);
 	} );
 
@@ -16,7 +16,7 @@ test.describe( 'Inner blocks templates', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
-			'gutenberg-test-inner-blocks-templates'
+			'gutenberg-test-innerblocks-templates'
 		);
 	} );
 

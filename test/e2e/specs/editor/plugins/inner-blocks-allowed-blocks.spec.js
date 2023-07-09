@@ -6,13 +6,13 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin(
-			'gutenberg-test-inner-blocks-allowed-blocks'
+			'gutenberg-test-innerblocks-allowed-blocks'
 		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
-			'gutenberg-test-inner-blocks-allowed-blocks'
+			'gutenberg-test-innerblocks-allowed-blocks'
 		);
 	} );
 
