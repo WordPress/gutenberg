@@ -38,6 +38,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Button,
 	Spinner,
+	Notice,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -69,7 +70,6 @@ import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import { unlock } from '../../lock-unlock';
-
 const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 function Navigation( {
@@ -224,7 +224,7 @@ function Navigation( {
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
-	const { getNavigationFallbackId } = useSelect( coreStore );
+	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
 	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
 		? getNavigationFallbackId()
@@ -486,6 +486,21 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
+	const submenuAccessibilityNotice =
+		! showSubmenuIcon && ! openSubmenusOnClick
+			? __(
+					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
+			  )
+			: '';
+
+	const isFirstRender = useRef( true ); // Don't speak on first render.
+	useEffect( () => {
+		if ( ! isFirstRender.current && submenuAccessibilityNotice ) {
+			speak( submenuAccessibilityNotice );
+		}
+		isFirstRender.current = false;
+	}, [ submenuAccessibilityNotice ] );
+
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const stylingInspectorControls = (
 		<>
@@ -579,6 +594,18 @@ function Navigation( {
 									disabled={ attributes.openSubmenusOnClick }
 									label={ __( 'Show arrow' ) }
 								/>
+
+								{ submenuAccessibilityNotice && (
+									<div>
+										<Notice
+											spokenMessage={ null }
+											status="warning"
+											isDismissible={ false }
+										>
+											{ submenuAccessibilityNotice }
+										</Notice>
+									</div>
+								) }
 							</>
 						) }
 					</PanelBody>

@@ -37,7 +37,7 @@ class WP_Interactivity_Store {
 	/**
 	 * Merge data.
 	 *
-	 * @param array $data The data that will be merged with the exsisting store.
+	 * @param array $data The data that will be merged with the existing store.
 	 */
 	static function merge_data( $data ) {
 		self::$store = array_replace_recursive( self::$store, $data );

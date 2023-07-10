@@ -63,6 +63,18 @@ const typeLabels = {
 	wp_block: __( 'Pattern' ),
 };
 
+// Prevent accidental removal of certain blocks, asking the user for
+// confirmation.
+const blockRemovalRules = {
+	'core/query': __( 'Query Loop displays a list of posts or pages.' ),
+	'core/post-content': __(
+		'Post Content displays the content of a post or page.'
+	),
+	'core/footnotes': __(
+		'The Footnotes block displays all footnotes found in the content. Note that any footnotes in the content will persist after removing this block.'
+	),
+};
+
 export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
@@ -197,7 +209,9 @@ export default function Editor( { isLoading } ) {
 									{ showVisualEditor && editedPost && (
 										<>
 											<BlockEditor />
-											<BlockRemovalWarningModal />
+											<BlockRemovalWarningModal
+												rules={ blockRemovalRules }
+											/>
 										</>
 									) }
 									{ editorMode === 'text' &&

@@ -16,6 +16,14 @@
 		color: currentColor;
 		background: $gray-200;
 	}
+
+	@include break-medium() {
+		width: 50%;
+	}
+
+	@include break-large() {
+		width: min(100%, 450px);
+	}
 }
 
 .edit-site-document-actions__command {
@@ -31,6 +39,10 @@
 	color: var(--wp-block-synced-color);
 	overflow: hidden;
 	grid-column: 2 / 3;
+
+	.block-editor-block-icon {
+		min-width: $grid-unit-30;
+	}
 
 	h1 {
 		white-space: nowrap;

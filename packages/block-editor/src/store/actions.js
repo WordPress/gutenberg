@@ -28,7 +28,6 @@ import {
 } from '../utils/selection';
 import {
 	__experimentalUpdateSettings,
-	ensureDefaultBlock,
 	privateRemoveBlocks,
 } from './private-actions';
 
@@ -403,7 +402,7 @@ export const replaceBlocks =
 			initialPosition,
 			meta,
 		} );
-		dispatch( ensureDefaultBlock() );
+		dispatch.ensureDefaultBlock();
 	};
 
 /**

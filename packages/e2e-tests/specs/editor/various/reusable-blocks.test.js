@@ -197,7 +197,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert block to a reusable block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create pattern' );
+		await clickMenuItem( 'Create pattern/reusable block' );
 
 		// Set title.
 		const nameInput = await page.waitForSelector(
@@ -212,7 +212,7 @@ describe( 'Reusable blocks', () => {
 
 		// Wait for creation to finish.
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Synced Pattern created."]'
+			'//*[contains(@class, "components-snackbar")]/*[contains(text(),"Pattern created:")]'
 		);
 
 		await clearAllBlocks();
@@ -383,7 +383,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert to reusable.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create pattern' );
+		await clickMenuItem( 'Create pattern/reusable block' );
 		const nameInput = await page.waitForSelector(
 			reusableBlockNameInputSelector
 		);

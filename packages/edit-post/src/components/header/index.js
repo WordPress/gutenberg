@@ -32,22 +32,17 @@ const slideX = {
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const isLargeViewport = useViewportMatch( 'large' );
-	const {
-		hasActiveMetaboxes,
-		isPublishSidebarOpened,
-		isSaving,
-		showIconLabels,
-	} = useSelect(
-		( select ) => ( {
-			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isPublishSidebarOpened:
-				select( editPostStore ).isPublishSidebarOpened(),
-			isSaving: select( editPostStore ).isSavingMetaBoxes(),
-			showIconLabels:
-				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-		} ),
-		[]
-	);
+	const { hasActiveMetaboxes, isPublishSidebarOpened, showIconLabels } =
+		useSelect(
+			( select ) => ( {
+				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+				isPublishSidebarOpened:
+					select( editPostStore ).isPublishSidebarOpened(),
+				showIconLabels:
+					select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			} ),
+			[]
+		);
 
 	return (
 		<div className="edit-post-header">
@@ -82,19 +77,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					// when the publish sidebar has been closed.
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
-						forceIsSaving={ isSaving }
 						showIconLabels={ showIconLabels }
 					/>
 				) }
 				<DevicePreview />
-				<PostPreviewButton
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
+				<PostPreviewButton forceIsAutosaveable={ hasActiveMetaboxes } />
 				<ViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
 					setEntitiesSavedStatesCallback={
 						setEntitiesSavedStatesCallback
 					}
