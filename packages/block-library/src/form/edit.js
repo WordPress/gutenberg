@@ -9,7 +9,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl } from '@wordpress/components';
+import { PanelBody, TextControl, SelectControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 const ALLOWED_BLOCKS = [
@@ -50,7 +50,7 @@ const TEMPLATE = [
 ];
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
-	const { formId } = attributes;
+	const { formId, action, method } = attributes;
 	const blockProps = useBlockProps();
 
 	const { hasInnerBlocks } = useSelect(
@@ -90,6 +90,33 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						) }
 					/>
 				</PanelBody>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<TextControl
+					__nextHasNoMarginBottom
+					autoComplete="off"
+					label={ __( 'Form action' ) }
+					value={ action }
+					onChange={ ( newVal ) => {
+						setAttributes( {
+							action: newVal,
+						} );
+					} }
+					help={ __( 'Define where the form should be submitted.' ) }
+				/>
+				<SelectControl
+					__nextHasNoMarginBottom
+					label={ __( 'Form method' ) }
+					options={ [
+						{ label: 'Get', value: 'get' },
+						{ label: __( 'Post' ), value: 'post' },
+					] }
+					value={ method }
+					onChange={ ( value ) => setAttributes( { method: value } ) }
+					help={ __(
+						'Whether the form will submit a POST or GET request.'
+					) }
+				/>
 			</InspectorControls>
 			<form { ...innerBlocksProps } />
 		</>
