@@ -75,10 +75,6 @@ selectorNames.forEach( ( name ) => {
 				};
 			},
 
-			isSavingEntityRecord() {
-				return state.saving && state.saving.requesting;
-			},
-
 			getLastEntitySaveError() {
 				const saving = state.saving;
 				const successful = saving && saving.successful;
@@ -1254,7 +1250,7 @@ describe( 'selectors', () => {
 					title: 'sassel',
 				},
 				saving: {
-					requesting: true,
+					pending: true,
 				},
 			};
 
@@ -1403,9 +1399,8 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
-				saving: {
-					requesting: true,
-				},
+				postAutosavingLock: {},
+				saving: {},
 				getCurrentUser() {},
 				hasFetchedAutosaves() {
 					return false;
@@ -1434,9 +1429,8 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
-				saving: {
-					requesting: true,
-				},
+				postAutosavingLock: {},
+				saving: {},
 				getCurrentUser() {},
 				hasFetchedAutosaves() {
 					return true;
@@ -2017,7 +2011,7 @@ describe( 'selectors', () => {
 		it( 'should return true if the post is currently being saved', () => {
 			const state = {
 				saving: {
-					requesting: true,
+					pending: true,
 				},
 			};
 
@@ -2027,7 +2021,7 @@ describe( 'selectors', () => {
 		it( 'should return false if the post is not currently being saved', () => {
 			const state = {
 				saving: {
-					requesting: false,
+					pending: false,
 				},
 			};
 
