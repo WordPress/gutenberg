@@ -4,7 +4,6 @@
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -54,37 +53,7 @@ export default function usePatternDetails( postType, postId ) {
 		);
 	}
 
-	const description = (
-		<>
-			{ descriptionText }
-
-			{ addedBy.text && ! isAddedByActiveTheme && (
-				<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description">
-					<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-author">
-						<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-author-icon">
-							{ addedBy.imageUrl ? (
-								<img
-									src={ addedBy.imageUrl }
-									alt=""
-									width="24"
-									height="24"
-								/>
-							) : (
-								<Icon icon={ addedBy.icon } />
-							) }
-						</span>
-						{ addedBy.text }
-					</span>
-
-					{ addedBy.isCustomized && (
-						<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-customized">
-							{ _x( '(Customized)', 'pattern' ) }
-						</span>
-					) }
-				</span>
-			) }
-		</>
-	);
+	const description = <>{ descriptionText }</>;
 
 	const footer = !! record?.modified ? (
 		<SidebarNavigationScreenDetailsFooter
@@ -94,13 +63,67 @@ export default function usePatternDetails( postType, postId ) {
 
 	const details = [];
 
-	if ( postType === 'wp_block' ) {
+	if ( postType === 'wp_block' || 'wp_template_part' ) {
 		details.push( {
 			label: __( 'Syncing' ),
 			value:
 				record.wp_pattern_sync_status === 'unsynced'
 					? __( 'Not synced' )
 					: __( 'Fully synced' ),
+		} );
+	}
+
+	const templatePartAreaLabels = {
+		header: __( 'Header' ),
+		footer: __( 'Footer' ),
+		sidebar: __( 'Sidebar' ),
+		uncategorized: __( 'General' ),
+	};
+
+	if ( postType === 'wp_template_part' ) {
+		details.push( {
+			label: __( 'Area' ),
+			value: templatePartAreaLabels[ record.area ],
+		} );
+	}
+
+	if (
+		postType === 'wp_template_part' &&
+		addedBy.text &&
+		! isAddedByActiveTheme
+	) {
+		details.push( {
+			label: __( 'Added by' ),
+			value: (
+				<>
+					<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-author">
+						{ addedBy.text }
+					</span>
+				</>
+			),
+		} );
+	}
+
+	if (
+		postType === 'wp_template_part' &&
+		addedBy.text &&
+		( record.origin === 'plugin' || record.has_theme_file === true )
+	) {
+		details.push( {
+			label: __( 'Customized' ),
+			value: (
+				<>
+					{ addedBy.isCustomized ? (
+						<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-customized">
+							{ _x( 'Yes', 'pattern' ) }
+						</span>
+					) : (
+						<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-customized">
+							{ _x( 'No', 'pattern' ) }
+						</span>
+					) }
+				</>
+			),
 		} );
 	}
 
