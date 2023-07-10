@@ -15,41 +15,48 @@
  */
 function render_block_core_form( $attributes, $content ) {
 
-	/**
-	 * Adds the action to the <form> element.
-	 *
-	 * - If no action is specified, the default is the REST API endpoint.
-	 * - If the action is `/wp-comments-post.php`, the form is a comment form.
-	 * - If the action is anything else, it is a custom form.
-	 */
 	$processed_content = new WP_HTML_Tag_Processor( $content );
 	$processed_content->next_tag( 'form' );
-	if ( empty( $attributes['action'] ) ) { // Default to the REST API endpoint.
-		$processed_content->set_attribute( 'action', esc_attr( rest_url( 'wp/v2/block-form-submit' ) ) );
-	} elseif ( '/wp-comments-post.php' === $attributes['action'] ) { // Comments.
-		$processed_content->set_attribute( 'action', esc_url( site_url( '/wp-comments-post.php' ) ) );
-	} else { // Custom.
-		$processed_content->set_attribute( 'action', esc_attr( $attributes['action'] ) );
+
+	// Get the action for this form.
+	$action = '';
+	if ( isset( $attributes['action'] ) ) {
+		$action = str_replace( '{SITE_URL}', site_url(), $attributes['action'] );
 	}
+
+	$processed_content->set_attribute( 'action', esc_attr( $action ) );
 
 	// Add the method attribute. If it is not set, default to `post`.
 	$attributes['method'] = empty( $attributes['method'] ) ? 'post' : $attributes['method'];
 	$processed_content->set_attribute( 'method', $attributes['method'] );
 
-	$extra_fields = wp_nonce_field( 'wp-block-form', 'wp_rest', true, false );
+	$extra_fields = apply_filters( 'render_block_core_form_extra_fields', '', $attributes );
 
-	// If the form is a comment form, add the post ID.
-	if ( '/wp-comments-post.php' === $attributes['action'] ) {
-		$extra_fields .= '<input type="hidden" name="comment_post_ID" value="' . get_the_ID() . '" id="comment_post_ID">';
-	}
-
-	// Inject a hidden input with the nonce to strengthen security form-ID.
 	return str_replace(
 		'</form>',
 		$extra_fields . '</form>',
 		$processed_content->get_updated_html()
 	);
 }
+
+/**
+ * Adds extra fields to the form.
+ *
+ * If the form is a comment form, adds the post ID as a hidden field,
+ * to allow the comment to be associated with the post.
+ *
+ * @param string $extra_fields The extra fields.
+ * @param array  $attributes   The block attributes.
+ *
+ * @return string The extra fields.
+ */
+function gutenberg_block_core_form_extra_fields_comment_form( $extra_fields, $attributes ) {
+	if ( ! empty( $attributes['action'] ) && str_ends_with( $attributes['action'], '/wp-comments-post.php' ) ) {
+		$extra_fields .= '<input type="hidden" name="comment_post_ID" value="' . get_the_ID() . '" id="comment_post_ID">';
+	}
+	return $extra_fields;
+}
+add_filter( 'render_block_core_form_extra_fields', 'gutenberg_block_core_form_extra_fields_comment_form', 10, 2 );
 
 /**
  * Registers the `core/form` block on server.
