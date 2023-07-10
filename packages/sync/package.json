@@ -29,6 +29,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"y-indexeddb": "~9.0.11",
+		"y-webrtc": "~10.2.5",
 		"yjs": "~13.6.6"
 	},
 	"publishConfig": {
