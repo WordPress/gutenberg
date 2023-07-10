@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element';
 import TextTransformControl from '../';
 
 export default {
-	title: 'BlockEditor/TextTransformControl',
+	title: 'BlockEditor (Experimental)/TextTransformControl',
 	component: TextTransformControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
