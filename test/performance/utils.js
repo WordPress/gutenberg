@@ -21,14 +21,14 @@ export function getTraceFilePath() {
 }
 
 export function saveResultsFile( testFilename, results, isRaw = false ) {
-	const resultsFilename =
-		process.env.RESULTS_FILENAME ||
-		`${ path.basename( testFilename, '.spec.js' ) }.performance-results${
-			isRaw ? '.raw' : ''
-		}.json`;
+	const basename =
+		process.env.RESULTS_ID || path.basename( testFilename, '.spec.js' );
+	const filename = `${ basename }.performance-results${
+		isRaw ? '.raw' : ''
+	}.json`;
 
 	return writeFileSync(
-		path.join( process.env.WP_ARTIFACTS_PATH, resultsFilename ),
+		path.join( process.env.WP_ARTIFACTS_PATH, filename ),
 		JSON.stringify( results, null, 2 )
 	);
 }

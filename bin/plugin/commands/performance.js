@@ -71,7 +71,7 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 		{
 			...process.env,
 			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
-			RESULTS_FILENAME: runKey + RESULTS_FILE_SUFFIX,
+			RESULTS_ID: runKey,
 		}
 	);
 }
@@ -333,12 +333,14 @@ async function runPerformanceTests( branches, options ) {
 	 * 4- Formatting and saving the results.
 	 */
 
+	// Load curated results from each round.
 	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>
 		file.endsWith( RESULTS_FILE_SUFFIX )
 	);
 	/** @type {Record<string,Record<string, Record<string, number>>>} */
 	const results = {};
 
+	// Calculate medians from all rounds.
 	for ( const testSuite of testSuites ) {
 		results[ testSuite ] = {};
 
@@ -360,7 +362,7 @@ async function runPerformanceTests( branches, options ) {
 			}
 		}
 
-		// Save curated results to file.
+		// Save calculated results to file.
 		fs.writeFileSync(
 			path.join( ARTIFACTS_PATH, testSuite + RESULTS_FILE_SUFFIX ),
 			JSON.stringify( results[ testSuite ], null, 2 )
