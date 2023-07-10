@@ -29,6 +29,7 @@
 		"html": false,
 		"color": {
 			"gradients": true,
+			"heading": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -75,7 +76,7 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSizingOnChildren": true
 		}
 	},

@@ -8,7 +8,10 @@ import {
 	__experimentalHStack as HStack,
 	FlexItem,
 } from '@wordpress/components';
-import { getBlockType, __experimentalGetBlockLabel } from '@wordpress/blocks';
+import {
+	__experimentalGetBlockLabel,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -33,7 +36,7 @@ export default function BlockQuickNavigation( { clientIds } ) {
 }
 
 function BlockQuickNavigationItem( { clientId } ) {
-	const { name, attributes, isSelected } = useSelect(
+	const { name, icon, isSelected } = useSelect(
 		( select ) => {
 			const {
 				getBlockName,
@@ -41,9 +44,20 @@ function BlockQuickNavigationItem( { clientId } ) {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
+			const { getBlockType } = select( blocksStore );
+
+			const blockType = getBlockType( getBlockName( clientId ) );
+			const attributes = getBlockAttributes( clientId );
+
 			return {
-				name: getBlockName( clientId ),
-				attributes: getBlockAttributes( clientId ),
+				name:
+					blockType &&
+					__experimentalGetBlockLabel(
+						blockType,
+						attributes,
+						'list-view'
+					),
+				icon: blockType?.icon,
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
@@ -52,22 +66,15 @@ function BlockQuickNavigationItem( { clientId } ) {
 		[ clientId ]
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const blockType = getBlockType( name );
+
 	return (
 		<Button
-			key={ clientId }
 			isPressed={ isSelected }
 			onClick={ () => selectBlock( clientId ) }
 		>
 			<HStack justify="flex-start">
-				<BlockIcon icon={ blockType.icon } />
-				<FlexItem>
-					{ __experimentalGetBlockLabel(
-						blockType,
-						attributes,
-						'list-view'
-					) }
-				</FlexItem>
+				<BlockIcon icon={ icon } />
+				<FlexItem>{ name }</FlexItem>
 			</HStack>
 		</Button>
 	);

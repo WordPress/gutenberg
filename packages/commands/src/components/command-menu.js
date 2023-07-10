@@ -155,7 +155,7 @@ export function CommandMenu() {
 		registerShortcut( {
 			name: 'core/commands',
 			category: 'global',
-			description: __( 'Open the global command menu' ),
+			description: __( 'Open the command palette' ),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'k',
@@ -192,7 +192,7 @@ export function CommandMenu() {
 	};
 
 	useEffect( () => {
-		// Focus the command menu input when mounting the modal.
+		// Focus the command palette input when mounting the modal.
 		if ( isOpen ) {
 			commandMenuInput.current.focus();
 		}
@@ -211,7 +211,7 @@ export function CommandMenu() {
 			__experimentalHideHeader
 		>
 			<div className="commands-command-menu__container">
-				<Command label={ __( 'Global Command Menu' ) }>
+				<Command label={ __( 'Command palette' ) }>
 					<div className="commands-command-menu__header">
 						<Command.Input
 							ref={ commandMenuInput }

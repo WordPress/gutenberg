@@ -77,7 +77,7 @@ export default function TemplatePartEdit( {
 				area: _area,
 			};
 		},
-		[ templatePartId, clientId ]
+		[ templatePartId, attributes.area, clientId ]
 	);
 	const { templateParts } = useAlternativeTemplateParts(
 		area,

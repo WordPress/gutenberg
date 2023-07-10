@@ -13,10 +13,10 @@
 	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
-		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,
+			"heading": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,

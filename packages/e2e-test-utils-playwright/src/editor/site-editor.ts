@@ -24,10 +24,8 @@ export async function saveSiteEditorEntities( this: Editor ) {
 		.getByRole( 'button', { name: 'Save', exact: true } )
 		.click();
 
-	// A role selector cannot be used here because it needs to check that the `is-busy` class is not present.
 	await this.page
-		.locator( '[aria-label="Editor top bar"] [aria-label="Saved"].is-busy' )
-		.waitFor( {
-			state: 'hidden',
-		} );
+		.getByRole( 'button', { name: 'Dismiss this notice' } )
+		.getByText( 'Site updated.' )
+		.waitFor();
 }

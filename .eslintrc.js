@@ -100,6 +100,7 @@ const restrictedImports = [
 			'isPlainObject',
 			'isString',
 			'isUndefined',
+			'kebabCase',
 			'keyBy',
 			'keys',
 			'last',
@@ -110,6 +111,7 @@ const restrictedImports = [
 			'maxBy',
 			'memoize',
 			'merge',
+			'mergeWith',
 			'negate',
 			'noop',
 			'nth',
@@ -127,6 +129,7 @@ const restrictedImports = [
 			'reject',
 			'repeat',
 			'reverse',
+			'set',
 			'setWith',
 			'size',
 			'snakeCase',
@@ -366,7 +369,7 @@ module.exports = {
 		},
 		{
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
-			excludedFiles: [ 'test/e2e/**/*.js' ],
+			excludedFiles: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
@@ -376,6 +379,7 @@ module.exports = {
 				'packages/react-native-*/**/*.[tj]s?(x)',
 				'test/native/**/*.[tj]s?(x)',
 				'test/e2e/**/*.[tj]s?(x)',
+				'test/performance/**/*.[tj]s?(x)',
 				'test/storybook-playwright/**/*.[tj]s?(x)',
 			],
 			extends: [
@@ -395,6 +399,7 @@ module.exports = {
 		{
 			files: [
 				'test/e2e/**/*.[tj]s',
+				'test/performance/**/*.[tj]s',
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
 			],
 			extends: [
@@ -405,6 +410,7 @@ module.exports = {
 				tsconfigRootDir: __dirname,
 				project: [
 					'./test/e2e/tsconfig.json',
+					'./test/performance/tsconfig.json',
 					'./packages/e2e-test-utils-playwright/tsconfig.json',
 				],
 			},

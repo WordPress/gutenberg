@@ -116,6 +116,7 @@ import * as termDescription from './term-description';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as footnotes from './footnotes';
 
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
 
@@ -141,7 +142,6 @@ const getAllBlocks = () => {
 		buttons,
 		calendar,
 		categories,
-		...( window.wp && window.wp.oldEditor ? [ classic ] : [] ), // Only add the classic block in WP Context.
 		code,
 		column,
 		columns,
@@ -176,6 +176,7 @@ const getAllBlocks = () => {
 		textColumns,
 		verse,
 		video,
+		footnotes,
 
 		// theme blocks
 		navigation,
@@ -227,6 +228,24 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 	];
+
+	// When in a WordPress context, conditionally
+	// add the classic block and TinyMCE editor
+	// under any of the following conditions:
+	//   - the current post contains a classic block
+	//   - the experiment to disable TinyMCE isn't active.
+	//   - a query argument specifies that TinyMCE should be loaded
+	if (
+		window?.wp?.oldEditor &&
+		( window?.wp?.needsClassicBlock ||
+			! window?.__experimentalDisableTinymce ||
+			!! new URLSearchParams( window?.location?.search ).get(
+				'requiresTinymce'
+			) )
+	) {
+		blocks.push( classic );
+	}
+
 	return blocks.filter( Boolean );
 };
 

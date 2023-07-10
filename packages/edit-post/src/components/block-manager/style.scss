@@ -16,7 +16,6 @@
 	padding: $grid-unit-10;
 	background-color: $white;
 	text-align: center;
-	font-style: italic;
 	position: sticky;
 	// When sticking, tuck the top border beneath the modal header border
 	top: -1px;
@@ -26,6 +25,9 @@
 	~ .edit-post-block-manager__results .edit-post-block-manager__category-title {
 		top: 35px;
 	}
+	.is-link {
+		margin-left: 12px;
+	}
 }
 
 .edit-post-block-manager__category {
@@ -34,7 +36,7 @@
 
 .edit-post-block-manager__category-title {
 	position: sticky;
-	top: 0;
+	top: - $grid-unit-05; // Offsets the top padding on the modal content container
 	padding: $grid-unit-20 0;
 	background-color: $white;
 	z-index: z-index(".edit-post-block-manager__category-title");

@@ -330,6 +330,10 @@ async function runPerformanceTests( branches, options ) {
 			path.join( environmentDirectory, '.wp-env.json' ),
 			JSON.stringify(
 				{
+					config: {
+						WP_DEBUG: false,
+						SCRIPT_DEBUG: false,
+					},
 					core: 'WordPress/WordPress',
 					plugins: [ path.join( environmentDirectory, 'plugin' ) ],
 					themes: [
@@ -337,8 +341,6 @@ async function runPerformanceTests( branches, options ) {
 							performanceTestDirectory,
 							'test/emptytheme'
 						),
-						'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
-						'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
 					],
 					env: {
 						tests: {
@@ -352,6 +354,15 @@ async function runPerformanceTests( branches, options ) {
 										performanceTestDirectory,
 										'packages/e2e-tests/plugins'
 									),
+								'wp-content/themes/gutenberg-test-themes':
+									path.join(
+										performanceTestDirectory,
+										'test/gutenberg-test-themes'
+									),
+								'wp-content/themes/gutenberg-test-themes/twentytwentyone':
+									'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
+								'wp-content/themes/gutenberg-test-themes/twentytwentythree':
+									'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
 							},
 						},
 					},
