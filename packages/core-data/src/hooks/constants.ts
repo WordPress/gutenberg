@@ -4,3 +4,13 @@ export const enum Status {
 	Error = 'ERROR',
 	Success = 'SUCCESS',
 }
+
+export const EMPTY_ARRAY = [];
+
+export const META_SELECTORS = [
+	'getIsResolving',
+	'hasStartedResolution',
+	'hasFinishedResolution',
+	'isResolving',
+	'getCachedResolvers',
+];

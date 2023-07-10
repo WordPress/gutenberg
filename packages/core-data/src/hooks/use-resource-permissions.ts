@@ -9,37 +9,7 @@ import deprecated from '@wordpress/deprecated';
 import { store as coreStore } from '../';
 import { Status } from './constants';
 import useQuerySelect from './use-query-select';
-
-interface GlobalResourcePermissionsResolution {
-	/** Can the current user create new resources of this type? */
-	canCreate: boolean;
-}
-interface SpecificResourcePermissionsResolution {
-	/** Can the current user update resources of this type? */
-	canUpdate: boolean;
-	/** Can the current user delete resources of this type? */
-	canDelete: boolean;
-}
-interface ResolutionDetails {
-	/** Resolution status */
-	status: Status;
-	/**
-	 * Is the data still being resolved?
-	 */
-	isResolving: boolean;
-}
-
-/**
- * Is the data resolved by now?
- */
-type HasResolved = boolean;
-
-type ResourcePermissionsResolution< IdType > = [
-	HasResolved,
-	ResolutionDetails &
-		GlobalResourcePermissionsResolution &
-		( IdType extends void ? SpecificResourcePermissionsResolution : {} )
-];
+import type { ResourcePermissionsResolution } from './types';
 
 /**
  * Resolves resource permissions.
