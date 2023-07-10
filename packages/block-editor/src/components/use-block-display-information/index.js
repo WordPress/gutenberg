@@ -82,13 +82,15 @@ export default function useBlockDisplayInformation( clientId ) {
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isReusable = isReusableBlock( blockType );
 			if ( isReusable ) {
-				title = __experimentalGetReusableBlockTitle( attributes.ref );
+				title =
+					__experimentalGetReusableBlockTitle( attributes.ref ) ||
+					blockType.title;
 			}
 			const isSynced = isReusable || isTemplatePart( blockType );
 			const positionLabel = getPositionTypeLabel( attributes );
 			const blockTypeInfo = {
 				isSynced,
-				title: title ? title : blockType.title,
+				title,
 				icon: blockType.icon,
 				description: blockType.description,
 				anchor: attributes?.anchor,
