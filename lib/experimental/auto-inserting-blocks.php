@@ -57,7 +57,7 @@ function gutenberg_auto_insert_block( $anchor_block, $relative_position, $insert
 }
 
 /**
- * Register blocks for auto-insertion.
+ * Register blocks for auto-insertion, based on their block.json metadata.
  *
  * @param array $settings Array of determined settings for registering a block type.
  * @param array $metadata Metadata provided for registering a block type.
@@ -78,7 +78,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 
 	$inserted_block_name = $metadata['name'];
 	foreach ( $auto_insert as $anchor_block_name => $position ) {
-		// Avoid infinite recursion (auto-inserting into self).
+		// Avoid infinite recursion (auto-inserting next to or into self).
 		if ( $inserted_block_name === $anchor_block_name ) {
 			_doing_it_wrong(
 				__METHOD__,
@@ -102,12 +102,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 			'innerBlocks'  => array(),
 		);
 
-		// TODO: In the long run, we'd likely want some sort of registry for auto-inserted blocks.
-
-		// Auto-insert sibling and child blocks into the editor (via the templates and patterns
-		// REST API endpoints), and auto-insert sibling blocks on the frontend.
-		$inserter = gutenberg_auto_insert_block( $anchor_block_name, $mapped_position, $inserted_block );
-		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
+		gutenberg_register_auto_inserted_block( $inserted_block, $mapped_position, $anchor_block_name );
 
 		$settings['auto_insert'][ $anchor_block_name ] = $mapped_position;
 	}
@@ -115,6 +110,24 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 	return $settings;
 }
 add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_blocks', 10, 2 );
+
+/**
+ * Register block for auto-insertion into the frontend and REST API.
+ *
+ * Register a block for auto-insertion into the frontend and into the markup
+ * returned by the templates and patterns REST API endpoints.
+ *
+ * @todo In the long run, we'd likely want some sort of registry for auto-inserted blocks.
+ *
+ * @param string $inserted_block  The name of the block to insert.
+ * @param string $position        The desired position of the auto-inserted block, relative to its anchor block.
+ * @param string $anchor_block    The name of the block to insert the auto-inserted block next to.
+ * @return void
+ */
+function gutenberg_register_auto_inserted_block( $inserted_block, $position, $anchor_block ) {
+		$inserter = gutenberg_auto_insert_block( $anchor_block, $position, $inserted_block );
+		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
+}
 
 /**
  * Parse and serialize block templates to allow running filters.
