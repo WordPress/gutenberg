@@ -1,31 +1,51 @@
 /**
  * WordPress dependencies
  */
-
+import { useState, useDeferredValue, useId } from '@wordpress/element';
 import {
 	SearchControl,
-	__experimentalHeading as Heading,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	Flex,
 	FlexBlock,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalHeading as Heading,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
-import { symbol, chevronLeft, chevronRight } from '@wordpress/icons';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
+import PatternsHeader from './header';
 import Grid from './grid';
 import NoPatterns from './no-patterns';
 import usePatterns from './use-patterns';
 import SidebarButton from '../sidebar-button';
 import useDebouncedInput from '../../utils/use-debounced-input';
 import { unlock } from '../../lock-unlock';
+import { SYNC_TYPES, USER_PATTERN_CATEGORY } from './utils';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
+
+const SYNC_FILTERS = {
+	all: __( 'All' ),
+	[ SYNC_TYPES.full ]: __( 'Synced' ),
+	[ SYNC_TYPES.unsynced ]: __( 'Standard' ),
+};
+
+const SYNC_DESCRIPTIONS = {
+	all: '',
+	[ SYNC_TYPES.full ]: __(
+		'Patterns that are kept in sync across your site.'
+	),
+	[ SYNC_TYPES.unsynced ]: __(
+		'Patterns that can be changed freely without affecting your site.'
+	),
+};
 
 export default function PatternsList( { categoryId, type } ) {
 	const location = useLocation();
@@ -33,19 +53,35 @@ export default function PatternsList( { categoryId, type } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( '' );
+	const deferredFilterValue = useDeferredValue( delayedFilterValue );
 
-	const [ patterns, isResolving ] = usePatterns(
-		type,
-		categoryId,
-		delayedFilterValue
-	);
+	const [ syncFilter, setSyncFilter ] = useState( 'all' );
+	const deferredSyncedFilter = useDeferredValue( syncFilter );
+	const { patterns, isResolving } = usePatterns( type, categoryId, {
+		search: deferredFilterValue,
+		syncStatus:
+			deferredSyncedFilter === 'all' ? undefined : deferredSyncedFilter,
+	} );
 
-	const { syncedPatterns, unsyncedPatterns } = patterns;
-	const hasPatterns = !! syncedPatterns.length || !! unsyncedPatterns.length;
+	const id = useId();
+	const titleId = `${ id }-title`;
+	const descriptionId = `${ id }-description`;
+
+	const hasPatterns = patterns.length;
+	const title = SYNC_FILTERS[ syncFilter ];
+	const description = SYNC_DESCRIPTIONS[ syncFilter ];
+	const shownPatterns = useAsyncList( patterns );
 
 	return (
 		<VStack spacing={ 6 }>
-			<Flex>
+			<PatternsHeader
+				categoryId={ categoryId }
+				type={ type }
+				titleId={ titleId }
+				descriptionId={ descriptionId }
+			/>
+
+			<Flex alignment="stretch" wrap>
 				{ isMobileViewport && (
 					<SidebarButton
 						icon={ isRTL() ? chevronRight : chevronLeft }
@@ -61,7 +97,7 @@ export default function PatternsList( { categoryId, type } ) {
 						} }
 					/>
 				) }
-				<FlexBlock>
+				<FlexBlock className="edit-site-patterns__search-block">
 					<SearchControl
 						className="edit-site-patterns__search"
 						onChange={ ( value ) => setFilterValue( value ) }
@@ -71,46 +107,48 @@ export default function PatternsList( { categoryId, type } ) {
 						__nextHasNoMarginBottom
 					/>
 				</FlexBlock>
+				{ categoryId === USER_PATTERN_CATEGORY && (
+					<ToggleGroupControl
+						className="edit-site-patterns__sync-status-filter"
+						hideLabelFromVision
+						label={ __( 'Filter by sync status' ) }
+						value={ syncFilter }
+						isBlock
+						onChange={ ( value ) => setSyncFilter( value ) }
+						__nextHasNoMarginBottom
+					>
+						{ Object.entries( SYNC_FILTERS ).map(
+							( [ key, label ] ) => (
+								<ToggleGroupControlOption
+									className="edit-site-patterns__sync-status-filter-option"
+									key={ key }
+									value={ key }
+									label={ label }
+								/>
+							)
+						) }
+					</ToggleGroupControl>
+				) }
 			</Flex>
-			{ isResolving && __( 'Loading' ) }
-			{ ! isResolving && !! syncedPatterns.length && (
-				<>
-					<VStack className="edit-site-patterns__section-header">
-						<Heading as="h2" level={ 4 }>
-							{ __( 'Synced' ) }
-						</Heading>
-						<Text variant="muted" as="p">
-							{ __(
-								'Patterns that are kept in sync across the site'
-							) }
+			{ syncFilter !== 'all' && (
+				<VStack className="edit-site-patterns__section-header">
+					<Heading as="h3" level={ 4 } id={ titleId }>
+						{ title }
+					</Heading>
+					{ description ? (
+						<Text variant="muted" as="p" id={ descriptionId }>
+							{ description }
 						</Text>
-					</VStack>
-					<Grid
-						icon={ symbol }
-						categoryId={ categoryId }
-						label={ __( 'Synced' ) }
-						items={ syncedPatterns }
-					/>
-				</>
+					) : null }
+				</VStack>
 			) }
-			{ ! isResolving && !! unsyncedPatterns.length && (
-				<>
-					<VStack className="edit-site-patterns__section-header">
-						<Heading as="h2" level={ 4 }>
-							{ __( 'Standard' ) }
-						</Heading>
-						<Text variant="muted" as="p">
-							{ __(
-								'Patterns that can be changed freely without affecting the site'
-							) }
-						</Text>
-					</VStack>
-					<Grid
-						categoryId={ categoryId }
-						label={ __( 'Standard patterns' ) }
-						items={ unsyncedPatterns }
-					/>
-				</>
+			{ hasPatterns && (
+				<Grid
+					categoryId={ categoryId }
+					items={ shownPatterns }
+					aria-labelledby={ titleId }
+					aria-describedby={ descriptionId }
+				/>
 			) }
 			{ ! isResolving && ! hasPatterns && <NoPatterns /> }
 		</VStack>

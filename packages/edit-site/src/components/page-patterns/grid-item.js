@@ -18,13 +18,14 @@ import {
 	Flex,
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-import { useState, useId } from '@wordpress/element';
+import { useState, useId, memo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Icon,
 	header,
 	footer,
 	symbolFilled as uncategorized,
+	symbol,
 	moreHorizontal,
 	lockSmall,
 } from '@wordpress/icons';
@@ -37,13 +38,13 @@ import { DELETE, BACKSPACE } from '@wordpress/keycodes';
  */
 import RenameMenuItem from './rename-menu-item';
 import DuplicateMenuItem from './duplicate-menu-item';
-import { PATTERNS, TEMPLATE_PARTS, USER_PATTERNS } from './utils';
+import { PATTERNS, TEMPLATE_PARTS, USER_PATTERNS, SYNC_TYPES } from './utils';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 
 const templatePartIcons = { header, footer, uncategorized };
 
-export default function GridItem( { categoryId, composite, icon, item } ) {
+function GridItem( { categoryId, item, ...props } ) {
 	const descriptionId = useId();
 	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
 
@@ -122,9 +123,9 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		ariaDescriptions.push( __( 'Theme patterns cannot be edited.' ) );
 	}
 
-	const itemIcon = templatePartIcons[ categoryId ]
-		? templatePartIcons[ categoryId ]
-		: icon;
+	const itemIcon =
+		templatePartIcons[ categoryId ] ||
+		( item.syncStatus === SYNC_TYPES.full ? symbol : undefined );
 
 	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
 	const confirmPrompt = hasThemeFile
@@ -142,7 +143,10 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 					className={ previewClassNames }
 					role="option"
 					as="div"
-					{ ...composite }
+					// Even though still incomplete, passing ids helps performance.
+					// @see https://reakit.io/docs/composite/#performance.
+					id={ `edit-site-patterns-${ item.name }` }
+					{ ...props }
 					onClick={ item.type !== PATTERNS ? onClick : undefined }
 					onKeyDown={ isCustomPattern ? onKeyDown : undefined }
 					aria-label={ item.title }
@@ -180,7 +184,7 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 						spacing={ 3 }
 						className="edit-site-patterns__pattern-title"
 					>
-						{ icon && (
+						{ itemIcon && (
 							<Icon
 								className="edit-site-patterns__pattern-icon"
 								icon={ itemIcon }
@@ -268,3 +272,5 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 		</>
 	);
 }
+
+export default memo( GridItem );
