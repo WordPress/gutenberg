@@ -3,11 +3,6 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-/**
- * Internal dependencies
- */
-const { saveResultsFile } = require( '../utils' );
-
 const results = {
 	timeToFirstByte: [],
 	largestContentfulPaint: [],
@@ -19,8 +14,11 @@ test.describe( 'Front End Performance', () => {
 		await requestUtils.activateTheme( 'twentytwentythree' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		saveResultsFile( __filename, results, true );
+	test.afterAll( async ( { requestUtils }, testInfo ) => {
+		await testInfo.attach( 'results', {
+			body: JSON.stringify( results, null, 2 ),
+			contentType: 'application/json',
+		} );
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 

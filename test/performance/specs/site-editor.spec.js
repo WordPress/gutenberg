@@ -14,7 +14,6 @@ const path = require( 'path' );
 const {
 	readFile,
 	deleteFile,
-	saveResultsFile,
 	getTraceFilePath,
 	getTypingEventDurations,
 	getLoadingDurations,
@@ -48,8 +47,11 @@ test.describe( 'Site Editor Performance', () => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		saveResultsFile( __filename, results, true );
+	test.afterAll( async ( { requestUtils }, testInfo ) => {
+		await testInfo.attach( 'results', {
+			body: JSON.stringify( results, null, 2 ),
+			contentType: 'application/json',
+		} );
 
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );

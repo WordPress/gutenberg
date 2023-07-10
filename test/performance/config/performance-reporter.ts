@@ -2,23 +2,18 @@
  * External dependencies
  */
 import path from 'path';
+import { writeFileSync } from 'fs';
 import type {
 	Reporter,
-	FullConfig,
-	Suite,
 	FullResult,
+	TestCase,
+	TestResult,
 } from '@playwright/test/reporter';
 
 /**
  * Internal dependencies
  */
-import {
-	readFile,
-	average,
-	median,
-	formatTime,
-	saveResultsFile,
-} from '../utils';
+import { average, median, formatTime } from '../utils';
 
 export interface WPRawPerformanceResults {
 	timeToFirstByte: number[];
@@ -131,20 +126,52 @@ export function curateResults(
 	);
 }
 class PerformanceReporter implements Reporter {
-	private testSuites: string[];
+	private results: Record< string, WPPerformanceResults >;
 
 	constructor() {
-		this.testSuites = [];
+		this.results = {};
 	}
 
-	onBegin( _: FullConfig, suite: Suite ) {
-		// Map suites from the reporter state instead of reading from the disk
-		// to avoid including existing result files that are irrelevant to the
-		// current run.
-		const suites = suite.suites[ 0 ].suites; // It's where the suites are at.
-		this.testSuites = suites.map( ( s ) =>
-			path.basename( s.location?.file as string, '.spec.js' )
-		);
+	onTestEnd( test: TestCase, result: TestResult ): void {
+		for ( const attachment of result.attachments ) {
+			if ( attachment.name !== 'results' ) {
+				continue;
+			}
+
+			if ( ! attachment.body ) {
+				throw new Error( 'Empty results attachment' );
+			}
+
+			const testSuite = path.basename( test.location.file, '.spec.js' );
+			const resultsId = process.env.RESULTS_ID || testSuite;
+			const resultsPath = process.env.WP_ARTIFACTS_PATH as string;
+			const resultsBody = attachment.body.toString();
+
+			// Save raw results to file.
+			writeFileSync(
+				path.join(
+					resultsPath,
+					`${ resultsId }.performance-results.raw.json`
+				),
+				resultsBody
+			);
+
+			const curatedResults = curateResults(
+				testSuite,
+				JSON.parse( resultsBody )
+			);
+
+			// Save curated results to file.
+			writeFileSync(
+				path.join(
+					resultsPath,
+					`${ resultsId }.performance-results.json`
+				),
+				JSON.stringify( curatedResults, null, 2 )
+			);
+
+			this.results[ testSuite ] = curatedResults;
+		}
 	}
 
 	onEnd( result: FullResult ) {
@@ -152,37 +179,24 @@ class PerformanceReporter implements Reporter {
 			return;
 		}
 
-		for ( const testSuite of this.testSuites ) {
-			// Get raw results filepaths.
-			const rawResultsPath = path.join(
-				process.env.WP_ARTIFACTS_PATH as string,
-				testSuite + '.performance-results.raw.json'
-			);
+		if ( process.env.CI ) {
+			return;
+		}
 
-			// Read the raw metrics.
-			const rawResults = JSON.parse(
-				readFile( rawResultsPath )
-			) as WPRawPerformanceResults;
+		// Print the results.
+		for ( const [ testSuite, results ] of Object.entries( this.results ) ) {
+			const printableResults: Record< string, { value: string } > = {};
 
-			// Curate the results.
-			const results = curateResults( testSuite, rawResults );
-
-			// Save curated results to file.
-			saveResultsFile( testSuite, results );
-
-			if ( ! process.env.CI ) {
-				// Print the results.
-				const printableResults = Object.fromEntries(
-					Object.entries( results ).map( ( [ key, value ] ) => {
-						return [ key, { value: `${ value } ms` } ];
-					} )
-				);
-
-				// eslint-disable-next-line no-console
-				console.log( `\n${ testSuite }\n` );
-				// eslint-disable-next-line no-console
-				console.table( printableResults );
+			for ( const [ key, value ] of Object.entries( results ) ) {
+				if ( isFinite( value ) ) {
+					printableResults[ key ] = { value: `${ value } ms` };
+				}
 			}
+
+			// eslint-disable-next-line no-console
+			console.log( `\n${ testSuite }\n` );
+			// eslint-disable-next-line no-console
+			console.table( printableResults );
 		}
 	}
 }

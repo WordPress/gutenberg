@@ -2,12 +2,14 @@
  * External dependencies
  */
 import path from 'path';
-import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, unlinkSync } from 'fs';
 
 export function readFile( filePath ) {
-	return existsSync( filePath )
-		? readFileSync( filePath, 'utf8' ).trim()
-		: '';
+	if ( ! existsSync( filePath ) ) {
+		throw new Error( `File does not exist: ${ filePath }` );
+	}
+
+	return readFileSync( filePath, 'utf8' ).trim();
 }
 
 export function deleteFile( filePath ) {
@@ -18,19 +20,6 @@ export function deleteFile( filePath ) {
 
 export function getTraceFilePath() {
 	return path.join( process.env.WP_ARTIFACTS_PATH, '/trace.json' );
-}
-
-export function saveResultsFile( testFilename, results, isRaw = false ) {
-	const basename =
-		process.env.RESULTS_ID || path.basename( testFilename, '.spec.js' );
-	const filename = `${ basename }.performance-results${
-		isRaw ? '.raw' : ''
-	}.json`;
-
-	return writeFileSync(
-		path.join( process.env.WP_ARTIFACTS_PATH, filename ),
-		JSON.stringify( results, null, 2 )
-	);
 }
 
 function isEvent( item ) {
@@ -144,7 +133,7 @@ export function sum( arr ) {
 }
 
 export function average( array ) {
-	return array.reduce( ( a, b ) => a + b ) / array.length;
+	return array.reduce( ( a, b ) => a + b, 0 ) / array.length;
 }
 
 export function median( array ) {

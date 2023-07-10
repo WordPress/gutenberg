@@ -21,7 +21,6 @@ const {
 	getLoadingDurations,
 	loadBlocksFromHtml,
 	load1000Paragraphs,
-	saveResultsFile,
 	sum,
 	getTraceFilePath,
 } = require( '../utils' );
@@ -47,8 +46,12 @@ const results = {
 test.describe( 'Post Editor Performance', () => {
 	const traceFilePath = getTraceFilePath();
 
-	test.afterAll( async () => {
-		saveResultsFile( __filename, results, true );
+	test.afterAll( async ( {}, testInfo ) => {
+		await testInfo.attach( 'results', {
+			body: JSON.stringify( results, null, 2 ),
+			contentType: 'application/json',
+		} );
+
 		// Delete the trace file.
 		deleteFile( traceFilePath );
 	} );
