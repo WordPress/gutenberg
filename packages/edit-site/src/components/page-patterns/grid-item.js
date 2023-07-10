@@ -138,8 +138,9 @@ function GridItem( { categoryId, item, ...props } ) {
 
 	return (
 		<>
-			<CompositeItem className={ patternClassNames } as="li">
-				<div
+			<div className={ patternClassNames }>
+				<CompositeItem
+					className={ previewClassNames }
 					role="option"
 					as="div"
 					// Even though still incomplete, passing ids helps performance.
@@ -162,7 +163,7 @@ function GridItem( { categoryId, item, ...props } ) {
 				>
 					{ isEmpty && __( 'Empty pattern' ) }
 					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
-				</div>
+				</CompositeItem>
 				{ ariaDescriptions.map( ( ariaDescription, index ) => (
 					<div
 						key={ index }
@@ -258,7 +259,7 @@ function GridItem( { categoryId, item, ...props } ) {
 						) }
 					</DropdownMenu>
 				</HStack>
-			</CompositeItem>
+			</div>
 			{ isDeleteDialogOpen && (
 				<ConfirmDialog
 					confirmButtonText={ confirmButtonText }
