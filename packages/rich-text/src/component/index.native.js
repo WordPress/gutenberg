@@ -1049,6 +1049,37 @@ export class RichText extends Component {
 			: defaultColor;
 	}
 
+	getSelectionColor() {
+		const {
+			baseGlobalStyles,
+			getStylesFromColorScheme,
+			selectionColor: currentSelectionColor,
+		} = this.props;
+		let selectionColor = getStylesFromColorScheme(
+			styles[ 'rich-text-selection' ],
+			styles[ 'rich-text-selection--dark' ]
+		).color;
+
+		if ( currentSelectionColor ) {
+			selectionColor = currentSelectionColor;
+		}
+
+		if ( this.getIsBlockBasedTheme() ) {
+			const colordTextColor = colord( selectionColor );
+			const colordBackgroundColor = colord(
+				baseGlobalStyles?.color?.background
+			);
+			const isColordTextReadable = colordTextColor.isReadable(
+				colordBackgroundColor
+			);
+			if ( ! isColordTextReadable ) {
+				selectionColor = baseGlobalStyles?.color?.text;
+			}
+		}
+
+		return selectionColor;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -1154,6 +1185,8 @@ export class RichText extends Component {
 			},
 		];
 
+		const selectionColor = this.getSelectionColor();
+
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;
 
@@ -1238,7 +1271,7 @@ export class RichText extends Component {
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
 					minWidth={ minWidth }
 					id={ this.props.id }
-					selectionColor={ this.props.selectionColor }
+					selectionColor={ selectionColor }
 					disableAutocorrection={ this.props.disableAutocorrection }
 				/>
 				{ isSelected && (

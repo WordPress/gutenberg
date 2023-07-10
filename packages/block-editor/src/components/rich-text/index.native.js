@@ -15,11 +15,7 @@ import {
 	findTransform,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import {
-	useInstanceId,
-	useMergeRefs,
-	usePreferredColorSchemeStyle,
-} from '@wordpress/compose';
+import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
 	__experimentalRichText as RichText,
 	__unstableCreateElement,
@@ -206,11 +202,6 @@ function RichTextWrapper(
 				)
 			);
 	}
-
-	const defaultSelectionColor = usePreferredColorSchemeStyle(
-		'black',
-		'white'
-	);
 
 	const onSelectionChange = useCallback(
 		( selectionChangeStart, selectionChangeEnd ) => {
@@ -628,9 +619,7 @@ function RichTextWrapper(
 			deleteEnter={ deleteEnter }
 			placeholderTextColor={ placeholderTextColor }
 			textAlign={ textAlign }
-			selectionColor={
-				selectionColor ? selectionColor : defaultSelectionColor
-			}
+			selectionColor={ selectionColor }
 			tagsToEliminate={ tagsToEliminate }
 			disableEditingMenu={ disableEditingMenu }
 			fontSize={ fontSize }
