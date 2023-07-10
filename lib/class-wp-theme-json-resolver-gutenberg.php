@@ -275,7 +275,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 
 			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-			static::$theme = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( static::$theme );
+			if ( ! class_exists( 'WP_Font_Face' ) && class_exists( 'WP_Fonts_Resolver' ) ) {
+				static::$theme = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( static::$theme );
+			}
 			// END OF EXPERIMENTAL CODE.
 
 		}
