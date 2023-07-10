@@ -114,6 +114,21 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
+function getUniqueFontSizesBySlug( settings ) {
+	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
+	const fontSizes = []
+		.concat( fontSizesPerOrigin?.custom ?? [] )
+		.concat( fontSizesPerOrigin?.theme ?? [] )
+		.concat( fontSizesPerOrigin.default ?? [] );
+
+	return fontSizes.reduce( ( acc, currentSize ) => {
+		if ( ! acc.some( ( { slug } ) => slug === currentSize.slug ) ) {
+			acc.push( currentSize );
+		}
+		return acc;
+	}, [] );
+}
+
 function TypographyToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -189,11 +204,8 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
-	const fontSizes = []
-		.concat( fontSizesPerOrigin?.custom ?? [] )
-		.concat( fontSizesPerOrigin?.theme ?? [] )
-		.concat( fontSizesPerOrigin.default ?? [] );
+	const fontSizes = getUniqueFontSizesBySlug( settings );
+
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug
