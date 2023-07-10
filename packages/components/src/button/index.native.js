@@ -52,8 +52,6 @@ const styles = StyleSheet.create( {
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderRadius: 6,
-		borderColor: '#2e4453',
-		backgroundColor: '#2e4453',
 	},
 	subscriptInactive: {
 		color: '#7b9ab1', // $toolbar-button.
@@ -97,7 +95,6 @@ export function Button( props ) {
 		isActiveStyle,
 		customContainerStyles,
 		hitSlop,
-		className,
 	} = props;
 	const preferredColorScheme = usePreferredColorScheme();
 
@@ -108,10 +105,16 @@ export function Button( props ) {
 		customContainerStyles && { ...customContainerStyles },
 	];
 
+	const buttonActiveColorStyles = usePreferredColorSchemeStyle(
+		style[ 'components-button-light--active' ],
+		style[ 'components-button-dark--active' ]
+	);
+
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.3 : 1,
 		...( fixedRatio && styles.fixedRatio ),
 		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
+		...( isPressed ? buttonActiveColorStyles : {} ),
 		...( isPressed &&
 			isActiveStyle?.borderRadius && {
 				borderRadius: isActiveStyle.borderRadius,
@@ -159,15 +162,9 @@ export function Button( props ) {
 				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
-	const classNameStyles = usePreferredColorSchemeStyle(
-		style?.[ `${ className?.split( ' ' )?.[ 0 ] }--light` ],
-		style?.[ `${ className?.split( ' ' )?.[ 0 ] }--dark` ]
-	);
 	const newIcon = icon
 		? cloneElement( <Icon icon={ icon } size={ iconSize } />, {
-				colorScheme: preferredColorScheme,
 				isPressed,
-				...( className ? { style: classNameStyles } : {} ),
 		  } )
 		: null;
 
