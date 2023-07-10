@@ -292,7 +292,6 @@
 		"other:check-local-changes": "node ./bin/check-local-changes.js",
 		"other:cherry-pick": "node ./bin/cherry-pick.mjs",
 		"postinstall": "patch-package && node ./patches/patch-xcode.js",
-		"prepare": "husky install",
 		"prepublishOnly": "npm run clean:package-types && npm run build:packages",
 		"publish:check": "lerna updated",
 		"publish:latest": "lerna publish --no-private",
