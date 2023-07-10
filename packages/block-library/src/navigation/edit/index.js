@@ -69,6 +69,8 @@ import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import { unlock } from '../../lock-unlock';
+import { ALLOWED_BLOCKS } from '../constants';
+
 const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 function Navigation( {
@@ -103,6 +105,7 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
+		allowedBlocks = ALLOWED_BLOCKS,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -675,6 +678,7 @@ function Navigation( {
 						createNavigationMenu={ createNavigationMenu }
 						blocks={ uncontrolledInnerBlocks }
 						hasSelection={ isSelected || isInnerBlockSelected }
+						allowedBlocks={ allowedBlocks }
 					/>
 				</ResponsiveWrapper>
 			</TagName>
@@ -830,6 +834,7 @@ function Navigation( {
 									}
 									templateLock={ templateLock }
 									orientation={ orientation }
+									allowedBlocks={ allowedBlocks }
 								/>
 							) }
 						</ResponsiveWrapper>

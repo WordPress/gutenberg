@@ -11,11 +11,7 @@ import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { areBlocksDirty } from './are-blocks-dirty';
-import {
-	DEFAULT_BLOCK,
-	ALLOWED_BLOCKS,
-	SELECT_NAVIGATION_MENUS_ARGS,
-} from '../constants';
+import { DEFAULT_BLOCK, SELECT_NAVIGATION_MENUS_ARGS } from '../constants';
 
 const EMPTY_OBJECT = {};
 
@@ -23,6 +19,7 @@ export default function UnsavedInnerBlocks( {
 	blocks,
 	createNavigationMenu,
 	hasSelection,
+	allowedBlocks,
 } ) {
 	const originalBlocks = useRef();
 
@@ -67,7 +64,7 @@ export default function UnsavedInnerBlocks( {
 		},
 		{
 			renderAppender: hasSelection ? undefined : false,
-			allowedBlocks: ALLOWED_BLOCKS,
+			allowedBlocks,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: shouldDirectInsert,
 		}
