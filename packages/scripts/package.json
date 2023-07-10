@@ -47,7 +47,7 @@
 		"adm-zip": "^0.5.9",
 		"babel-jest": "^29.5.0",
 		"babel-loader": "^8.2.3",
-		"browserslist": "^4.17.6",
+		"browserslist": "^4.21.9",
 		"chalk": "^4.0.0",
 		"check-node-version": "^4.1.0",
 		"clean-webpack-plugin": "^3.0.0",
