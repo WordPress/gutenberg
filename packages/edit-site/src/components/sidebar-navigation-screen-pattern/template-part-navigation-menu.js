@@ -19,7 +19,7 @@ export default function TemplatePartNavigationMenu( { id } ) {
 		<>
 			<Heading
 				className="edit-site-sidebar-navigation-screen-template-part-navigation-menu__title"
-				size="12"
+				size="11"
 				upperCase={ true }
 			>
 				{ title?.rendered || title || __( 'Navigation' ) }
