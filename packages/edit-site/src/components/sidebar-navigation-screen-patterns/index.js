@@ -35,7 +35,6 @@ function TemplatePartGroup( { areas, currentArea, currentType } ) {
 		<>
 			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
 				<Heading level={ 2 }>{ __( 'Template parts' ) }</Heading>
-				<p>{ __( 'Synced patterns for use in template building.' ) }</p>
 			</div>
 			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 				{ Object.entries( areas ).map(
@@ -64,11 +63,6 @@ function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 		<>
 			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
 				<Heading level={ 2 }>{ __( 'Theme patterns' ) }</Heading>
-				<p>
-					{ __(
-						'For insertion into documents where they can then be customized.'
-					) }
-				</p>
 			</div>
 			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 				{ categories.map( ( category ) => (
