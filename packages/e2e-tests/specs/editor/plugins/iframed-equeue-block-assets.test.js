@@ -32,6 +32,7 @@ describe( 'iframed inline styles', () => {
 	} );
 
 	it( 'should load styles added through enqueue_block_assets', async () => {
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 		// Check stylesheet.
 		expect(
 			await getComputedStyle( canvas(), 'body', 'background-color' )
@@ -40,5 +41,11 @@ describe( 'iframed inline styles', () => {
 		expect( await getComputedStyle( canvas(), 'body', 'padding' ) ).toBe(
 			'20px'
 		);
+
+		expect(
+			await canvas().evaluate( () => ( { ...document.body.dataset } ) )
+		).toEqual( {
+			iframedEnqueueBlockAssetsL10n: 'Iframed Enqueue Block Assets!',
+		} );
 	} );
 } );
