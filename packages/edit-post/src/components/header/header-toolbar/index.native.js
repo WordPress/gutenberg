@@ -36,11 +36,10 @@ import styles from './style.scss';
 import { store as editPostStore } from '../../../store';
 
 const shadowStyle = {
-	shadowColor: styles[ 'header-toolbar__keyboard-hide-shadow' ].color,
-	shadowOffset: { width: 3, height: 2 },
-	shadowOpacity: 0.3,
+	shadowOffset: { width: 2, height: 2 },
+	shadowOpacity: 1,
 	shadowRadius: 6,
-	elevation: 5,
+	elevation: 18,
 };
 
 function HeaderToolbar( {
@@ -59,11 +58,11 @@ function HeaderToolbar( {
 	const anchorNodeRef = useRef();
 	const wasNoContentSelected = useRef( noContentSelected );
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
+	const isAndroid = Platform.OS === 'android';
 
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
 		// scrollview doesn't seem to automatically adjust to RTL on Android so, scroll to end when Android
-		const isAndroid = Platform.OS === 'android';
 		if ( isAndroid && isRTL ) {
 			scrollViewRef.current.scrollToEnd();
 		} else {
@@ -172,12 +171,21 @@ function HeaderToolbar( {
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
+	const shadowColor = usePreferredColorSchemeStyle(
+		styles[ 'header-toolbar__keyboard-hide-shadow--light' ],
+		styles[ 'header-toolbar__keyboard-hide-shadow--dark' ]
+	);
 	const showKeyboardButtonStyles = [
 		usePreferredColorSchemeStyle(
 			styles[ 'header-toolbar__keyboard-hide-container' ],
 			styles[ 'header-toolbar__keyboard-hide-container--dark' ]
 		),
 		shadowStyle,
+		{
+			shadowColor: isAndroid
+				? styles[ 'header-toolbar__keyboard-hide-shadow--solid' ].color
+				: shadowColor.color,
+		},
 	];
 
 	return (
