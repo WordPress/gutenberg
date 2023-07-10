@@ -58,13 +58,16 @@ export default function SidebarNavigationScreenPages() {
 		templates?.find( ( template ) => template.slug === 'home' ) ||
 		templates?.find( ( template ) => template.slug === 'index' );
 
+	const getPostsPageTemplate = () =>
+		templates?.find( ( template ) => template.slug === 'home' ) ||
+		templates?.find( ( template ) => template.slug === 'index' );
+
 	const pagesAndTemplates = pages?.concat( dynamicPageTemplates, [
 		homeTemplate,
 	] );
 
 	const { frontPage, postsPage } = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreStore );
-
 		const siteSettings = getEntityRecord( 'root', 'site' );
 		return {
 			frontPage: siteSettings?.page_on_front,
@@ -104,6 +107,27 @@ export default function SidebarNavigationScreenPages() {
 			canvas: 'edit',
 		} );
 		setShowAddPage( false );
+	};
+
+	const getPageProps = ( id ) => {
+		let itemIcon = page;
+		const postsPageTemplateId =
+			postsPage && postsPage === id ? getPostsPageTemplate()?.id : null;
+
+		switch ( id ) {
+			case frontPage:
+				itemIcon = home;
+				break;
+			case postsPage:
+				itemIcon = verse;
+				break;
+		}
+
+		return {
+			icon: itemIcon,
+			postType: postsPageTemplateId ? 'wp_template' : 'page',
+			postId: postsPageTemplateId || id,
+		};
 	};
 
 	return (
@@ -152,34 +176,20 @@ export default function SidebarNavigationScreenPages() {
 										</Truncate>
 									</PageItem>
 								) }
-								{ reorderedPages?.map( ( item ) => {
-									let itemIcon;
-									switch ( item.id ) {
-										case frontPage:
-											itemIcon = home;
-											break;
-										case postsPage:
-											itemIcon = verse;
-											break;
-										default:
-											itemIcon = page;
-									}
-									return (
-										<PageItem
-											postId={ item.id }
-											key={ item.id }
-											icon={ itemIcon }
-											withChevron
-										>
-											<Truncate numberOfLines={ 1 }>
-												{ decodeEntities(
-													item?.title?.rendered ||
-														__( '(no title)' )
-												) }
-											</Truncate>
-										</PageItem>
-									);
-								} ) }
+								{ reorderedPages?.map( ( { id, title } ) => (
+									<PageItem
+										{ ...getPageProps( id ) }
+										key={ id }
+										withChevron
+									>
+										<Truncate numberOfLines={ 1 }>
+											{ decodeEntities(
+												title?.rendered ||
+													__( '(no title)' )
+											) }
+										</Truncate>
+									</PageItem>
+								) ) }
 							</ItemGroup>
 						) }
 					</>
