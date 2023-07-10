@@ -24,7 +24,9 @@ function render_block_core_form( $attributes, $content ) {
 		$action = str_replace( '{SITE_URL}', site_url(), $attributes['action'] );
 	}
 
-	$processed_content->set_attribute( 'action', esc_attr( $action ) );
+	if ( ! empty( $action ) ) {
+		$processed_content->set_attribute( 'action', esc_attr( $action ) );
+	}
 
 	// Add the method attribute. If it is not set, default to `post`.
 	$attributes['method'] = empty( $attributes['method'] ) ? 'post' : $attributes['method'];
