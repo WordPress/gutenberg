@@ -260,6 +260,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 							layoutBlockSupport={ layoutBlockSupport }
 						/>
 					) }
+					<InspectorControls.Slot __experimentalGroup="layout" />
 				</PanelBody>
 			</InspectorControls>
 			{ ! inherit && blockEditingMode === 'default' && layoutType && (
