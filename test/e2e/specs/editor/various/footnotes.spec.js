@@ -48,7 +48,7 @@ test.describe( 'Footnotes', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `second paragraph<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+					content: `second paragraph<sup data-fn="${ id1 }" class="fn"><a href="#${ id1 }" id="${ id1 }-link">1</a></sup>`,
 				},
 			},
 			{
@@ -72,13 +72,13 @@ test.describe( 'Footnotes', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `first paragraph<a href="#${ id2 }" id="${ id2 }-link" data-fn="${ id2 }" class="fn">*</a>`,
+					content: `first paragraph<sup data-fn="${ id2 }" class="fn"><a href="#${ id2 }" id="${ id2 }-link">1</a></sup>`,
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `second paragraph<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+					content: `second paragraph<sup data-fn="${ id1 }" class="fn"><a href="#${ id1 }" id="${ id1 }-link">2</a></sup>`,
 				},
 			},
 			{
@@ -106,13 +106,13 @@ test.describe( 'Footnotes', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `second paragraph<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+					content: `second paragraph<sup data-fn="${ id1 }" class="fn"><a href="#${ id1 }" id="${ id1 }-link">1</a></sup>`,
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `first paragraph<a href="#${ id2 }" id="${ id2 }-link" data-fn="${ id2 }" class="fn">*</a>`,
+					content: `first paragraph<sup data-fn="${ id2 }" class="fn"><a href="#${ id2 }" id="${ id2 }-link">2</a></sup>`,
 				},
 			},
 			{
@@ -138,7 +138,7 @@ test.describe( 'Footnotes', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `second paragraph<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+					content: `second paragraph<sup data-fn="${ id1 }" class="fn"><a href="#${ id1 }" id="${ id1 }-link">1</a></sup>`,
 				},
 			},
 			{
@@ -202,7 +202,7 @@ test.describe( 'Footnotes', () => {
 					{
 						name: 'core/list-item',
 						attributes: {
-							content: `1<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+							content: `1<sup data-fn="${ id1 }" class="fn"><a href="#${ id1 }" id="${ id1 }-link">1</a></sup>`,
 						},
 					},
 				],
@@ -242,7 +242,7 @@ test.describe( 'Footnotes', () => {
 						{
 							cells: [
 								{
-									content: `1<a href="#${ id1 }" id="${ id1 }-link" data-fn="${ id1 }" class="fn">*</a>`,
+									content: `1<sup data-fn="${ id1 }" class="fn"><a href="#${ id1 }" id="${ id1 }-link">1</a></sup>`,
 									tag: 'td',
 								},
 								{
