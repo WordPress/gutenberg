@@ -78,7 +78,7 @@ export default function SidebarNavigationScreen( {
 							icon={ icon }
 							label={
 								! isPreviewingTheme()
-									? __( 'Go back to the Dashboard' )
+									? __( 'Go to the Dashboard' )
 									: __( 'Go back to the theme showcase' )
 							}
 							href={
