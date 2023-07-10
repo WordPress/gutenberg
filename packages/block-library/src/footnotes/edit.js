@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { BlockIcon, RichText, useBlockProps } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { Placeholder } from '@wordpress/components';
+import { formatListNumbered as icon } from '@wordpress/icons';
 
 export default function FootnotesEdit( { context: { postType, postId } } ) {
 	const [ meta, updateMeta ] = useEntityProp(
@@ -18,9 +19,15 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 
 	if ( ! footnotes.length ) {
 		return (
-			<Placeholder { ...blockProps }>
-				{ __( 'No footnotes yet.' ) }
-			</Placeholder>
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ <BlockIcon icon={ icon } /> }
+					label={ __( 'Footnotes' ) }
+					instructions={ __(
+						'Footnotes found in blocks within this document will be displayed here.'
+					) }
+				/>
+			</div>
 		);
 	}
 
