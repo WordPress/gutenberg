@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -102,10 +102,13 @@ function TextColorEdit( {
 		}
 	}, [ hasColorsToChoose, value ] );
 
-	const outlineStyle = usePreferredColorSchemeStyle(
-		styles[ 'components-inline-color__outline' ],
-		styles[ 'components-inline-color__outline--dark' ]
-	);
+	const outlineStyle = [
+		usePreferredColorSchemeStyle(
+			styles[ 'components-inline-color__outline' ],
+			styles[ 'components-inline-color__outline--dark' ]
+		),
+		{ borderWidth: StyleSheet.hairlineWidth },
+	];
 
 	if ( ! hasColorsToChoose && ! isActive ) {
 		return null;
