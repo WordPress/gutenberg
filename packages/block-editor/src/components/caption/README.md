@@ -7,7 +7,6 @@ This component encapsulates the "caption" behaviour and styles over a `<RichText
 ## Table of contents
 
 1. [Development guidelines](#development-guidelines)
-
 2. [Related components](#related-components)
 
 ## Development guidelines
