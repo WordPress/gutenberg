@@ -100,6 +100,10 @@
 			&.is-inactive {
 				cursor: default;
 			}
+			&.is-inactive:focus {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $gray-800;
+				opacity: 0.8;
+			}
 		}
 
 		.edit-site-patterns__footer,

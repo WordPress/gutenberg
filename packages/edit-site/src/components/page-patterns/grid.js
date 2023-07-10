@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__experimentalText as Text,
-} from '@wordpress/components';
+import { __experimentalText as Text } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -17,7 +13,6 @@ import GridItem from './grid-item';
 const PAGE_SIZE = 100;
 
 export default function Grid( { categoryId, items, ...props } ) {
-	const composite = useCompositeState( { wrap: true } );
 	const gridRef = useRef();
 
 	if ( ! items?.length ) {
@@ -29,8 +24,7 @@ export default function Grid( { categoryId, items, ...props } ) {
 
 	return (
 		<>
-			<Composite
-				{ ...composite }
+			<ul
 				role="listbox"
 				className="edit-site-patterns__grid"
 				{ ...props }
@@ -41,10 +35,9 @@ export default function Grid( { categoryId, items, ...props } ) {
 						key={ item.name }
 						item={ item }
 						categoryId={ categoryId }
-						{ ...composite }
 					/>
 				) ) }
-			</Composite>
+			</ul>
 			{ restLength > 0 && (
 				<Text variant="muted" as="p" align="center">
 					{ sprintf(
