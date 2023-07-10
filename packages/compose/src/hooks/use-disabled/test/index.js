@@ -26,7 +26,7 @@ describe( 'useDisabled', () => {
 	} );
 
 	function DisabledComponent( props ) {
-		const disabledRef = useDisabled();
+		const disabledRef = useDisabled( { inert: props.inert } );
 		return <Form ref={ disabledRef } { ...props } />;
 	}
 
@@ -40,6 +40,18 @@ describe( 'useDisabled', () => {
 		expect( input ).toHaveAttribute( 'inert', 'true' );
 		expect( link ).toHaveAttribute( 'inert', 'true' );
 		expect( p ).toHaveAttribute( 'inert', 'true' );
+	} );
+
+	it( 'will not disable all fields', () => {
+		render( <DisabledComponent inert={ false } /> );
+
+		const input = screen.getByRole( 'textbox' );
+		const link = screen.getByRole( 'link' );
+		const p = screen.getByRole( 'document' );
+
+		expect( input ).not.toHaveAttribute( 'inert' );
+		expect( link ).not.toHaveAttribute( 'inert' );
+		expect( p ).not.toHaveAttribute( 'inert' );
 	} );
 
 	it( 'will disable an element rendered in an update to the component', async () => {

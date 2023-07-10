@@ -279,7 +279,7 @@ const DisabledExample = () => {
 _Parameters_
 
 -   _config_ `Object`: Configuration object.
--   _config.isDisabled_ `boolean=`: Whether the element should be disabled.
+-   _config.inert_ `boolean|undefined`: Whether to disable the element or not. If this is false, the element is not disabled.
 
 _Returns_
 

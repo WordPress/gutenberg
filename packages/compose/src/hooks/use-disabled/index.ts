@@ -3,6 +3,27 @@
  */
 import { debounce } from '../../utils/debounce';
 import useRefEffect from '../use-ref-effect';
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+type UseDisabledProps = {
+	/**
+	 * Whether the element should be disabled. @deprecated
+	 *
+	 * @default false
+	 * @deprecated
+	 */
+	isDisabled?: boolean;
+
+	/**
+	 * Whether to disable the element or not. If this is false, the element is not disabled.
+	 *
+	 * @default true
+	 */
+	inert?: boolean;
+};
 
 /**
  * In some circumstances, such as block previews, all focusable DOM elements
@@ -11,8 +32,8 @@ import useRefEffect from '../use-ref-effect';
  *
  * If you can, prefer the use of the inert HTML attribute.
  *
- * @param {Object}   config            Configuration object.
- * @param {boolean=} config.isDisabled Whether the element should be disabled.
+ * @param {Object}            config       Configuration object.
+ * @param {boolean|undefined} config.inert Whether to disable the element or not. If this is false, the element is not disabled.
  * @return {import('react').RefCallback<HTMLElement>} Element Ref.
  *
  * @example
@@ -31,11 +52,24 @@ import useRefEffect from '../use-ref-effect';
  * ```
  */
 export default function useDisabled( {
-	isDisabled: isDisabledProp = false,
-} = {} ) {
+	inert: inertProp = true,
+	...props
+}: UseDisabledProps = {} ) {
+	let isInert = inertProp;
+	const { isDisabled } = props;
+
+	if ( isDisabled !== undefined ) {
+		deprecated( '`isDisabled` parameter in `useDisabled`', {
+			since: '6.3',
+			alternative: '`inert` parameter',
+		} );
+
+		isInert = ! isDisabled;
+	}
+
 	return useRefEffect(
 		( node ) => {
-			if ( isDisabledProp ) {
+			if ( ! isInert ) {
 				return;
 			}
 
@@ -81,6 +115,6 @@ export default function useDisabled( {
 				updates.forEach( ( update ) => update() );
 			};
 		},
-		[ isDisabledProp ]
+		[ isInert ]
 	);
 }
