@@ -186,7 +186,6 @@ test.describe( 'Footnotes', () => {
 	test( 'can be inserted in a list', async ( { editor, page } ) => {
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '* 1' );
-		await editor.showBlockToolbar();
 		await editor.clickBlockToolbarButton( 'More' );
 		await page.locator( 'button:text("Footnote")' ).click();
 
