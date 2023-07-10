@@ -125,7 +125,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_bl
  * @return void
  */
 function gutenberg_register_auto_inserted_block( $inserted_block, $position, $anchor_block ) {
-		$inserter = gutenberg_auto_insert_block(  $inserted_block, $position, $anchor_block );
+		$inserter = gutenberg_auto_insert_block( $inserted_block, $position, $anchor_block );
 		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
 }
 
@@ -133,7 +133,7 @@ function gutenberg_register_auto_inserted_block( $inserted_block, $position, $an
  * Parse and serialize block templates to allow running filters.
  *
  * @param WP_Block_Template[] $query_result Array of found block templates.
- * @return void
+ * @return WP_Block_Template[] Updated array of found block templates.
  */
 function gutenberg_parse_and_serialize_block_templates( $query_result ) {
 	foreach ( $query_result as $block_template ) {
@@ -210,8 +210,8 @@ function gutenberg_serialize_block( $block ) {
  * This function is identical to `serialize_blocks()`, except that it applies
  * the `gutenberg_serialize_block` filter to each block before it is serialized.
  *
- * @param array $block The block to be serialized.
- * @return string The serialized block.
+ * @param array $blocks The blocks to be serialized.
+ * @return string[] The serialized blocks.
  *
  * @see serialize_blocks()
  */
