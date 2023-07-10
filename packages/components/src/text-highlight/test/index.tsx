@@ -39,7 +39,7 @@ describe( 'TextHighlight', () => {
 			}
 		);
 
-		it( 'should highlight multiple occurances of the string every time it exists in the text', () => {
+		it( 'should highlight multiple occurances of a single string every time it exists in the text', () => {
 			const highlight = 'edit';
 
 			const { container } = render(
@@ -55,7 +55,29 @@ describe( 'TextHighlight', () => {
 			} );
 		} );
 
-		it( 'should highlight occurances of a string regardless of capitalisation', () => {
+		it( 'should highlight multiple occurances of multiple strings every time they exist in the text', () => {
+			const highlight = [ 'edit', 'post' ];
+
+			const { container } = render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />
+			);
+
+			const highlightedEls = getMarks( container );
+
+			expect( highlightedEls ).toHaveLength( 3 );
+
+			// Join strings & make sure the matcher is case insensitive, since the test should
+			// match regardless of the case of the string.
+			const regex = new RegExp( `(${ highlight.join( '|' ) })`, 'i' );
+
+			highlightedEls.forEach( ( el ) => {
+				expect( el.textContent ).toEqual(
+					expect.stringMatching( regex )
+				);
+			} );
+		} );
+
+		it( 'should highlight occurances of a single string regardless of capitalisation', () => {
 			// Note that `The` occurs twice in the default text, once in
 			// lowercase and once capitalized.
 			const highlight = 'The';

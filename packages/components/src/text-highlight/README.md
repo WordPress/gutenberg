@@ -23,9 +23,9 @@ const MyTextHighlight = () => (
 
 The component accepts the following props.
 
-### `highlight`: `string`
+### `highlight`: `string | string[]`
 
-The string to search for and highlight within the `text`. Case insensitive. Multiple matches.
+The string or array of strings to search for and highlight within the `text`. Case insensitive. Multiple matches.
 
 -   Required: Yes
 -   Default: `''`

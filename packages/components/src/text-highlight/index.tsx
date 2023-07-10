@@ -26,16 +26,23 @@ import type { TextHighlightProps } from './types';
  */
 export const TextHighlight = ( props: TextHighlightProps ) => {
 	const { text = '', highlight = '' } = props;
-	const trimmedHighlightText = highlight.trim();
+	// Convert single string to array, trim thim & filters empty|null values.
+	const trimmedHighlightText = ( ! Array.isArray( highlight )
+		? [ highlight ]
+		: highlight
+	)
+		// Trim each highlight.
+		.map( ( h ) => h.trim() )
+		// Filter out empty | null items.
+		.filter( ( h ) => !! h )
+		// Escape regex for each string.
+		.map( ( h ) => escapeRegExp( h ) );
 
-	if ( ! trimmedHighlightText ) {
+	if ( ! trimmedHighlightText.length ) {
 		return <>{ text }</>;
 	}
 
-	const regex = new RegExp(
-		`(${ escapeRegExp( trimmedHighlightText ) })`,
-		'gi'
-	);
+	const regex = new RegExp( `(${ trimmedHighlightText.join( '|' ) })`, 'gi' );
 
 	return createInterpolateElement( text.replace( regex, '<mark>$&</mark>' ), {
 		mark: <mark />,
