@@ -79,7 +79,7 @@ export function PostSyncStatusModal() {
 		} );
 	};
 
-	if ( postType !== 'wp_block' ) {
+	if ( postType !== 'wp_block' || ! isNewPost ) {
 		return null;
 	}
 
