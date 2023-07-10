@@ -144,7 +144,10 @@ $z-layers: (
 	// The focus styles of the region navigation containers should be above their content.
 	".is-focusing-regions {region} :focus::after": 1000000,
 
-	// Show tooltips above wp-admin menus, submenus, and sidebar:
+	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
+	".nux-dot-tip": 1000001,
+
+	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
 	".components-tooltip": 1000002,
 
 	// Keep template popover underneath 'Create custom template' modal overlay.
