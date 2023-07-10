@@ -61,6 +61,12 @@
 	}
 }
 
+.edit-site-patterns__section-header {
+	.screen-reader-shortcut:focus {
+		top: 0;
+	}
+}
+
 .edit-site-patterns__grid {
 	display: grid;
 	grid-template-columns: 1fr;
