@@ -40,6 +40,10 @@
 	overflow: hidden;
 	grid-column: 2 / 3;
 
+	.block-editor-block-icon {
+		min-width: $grid-unit-30;
+	}
+
 	h1 {
 		white-space: nowrap;
 		overflow: hidden;
