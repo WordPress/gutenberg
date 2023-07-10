@@ -37,6 +37,8 @@ export async function installTheme( slug, { searchTerm } = {} ) {
 
 	await page.waitForSelector( `.theme-install[data-slug="${ slug }"]` );
 	await page.click( `.theme-install[data-slug="${ slug }"]` );
-	await page.waitForSelector( `.theme[data-slug="${ slug }"] .activate` );
+	await page.waitForSelector( `.theme[data-slug="${ slug }"] .activate`, {
+		timeout: 60000,
+	} );
 	await switchUserToTest();
 }
