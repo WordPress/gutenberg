@@ -163,7 +163,7 @@ export default function EditPostPreferencesModal() {
 									`Toggle's default open/closed state of the link creation interface's settings drawer.`
 								) }
 								label={ __(
-									'Always open Link UI Settings Drawer'
+									'Always open advanced link settings'
 								) }
 							/>
 						</PreferencesModalSection>
