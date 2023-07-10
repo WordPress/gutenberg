@@ -173,10 +173,19 @@ function GridItem( { categoryId, item, ...props } ) {
 					className="edit-site-patterns__pattern-title"
 				>
 					{ itemIcon && (
-						<Icon
-							className="edit-site-patterns__pattern-icon"
-							icon={ itemIcon }
-						/>
+						<Tooltip
+							position="top center"
+							text={ __(
+								'Editing this pattern will also update anywhere it is used'
+							) }
+						>
+							<span>
+								<Icon
+									className="edit-site-patterns__pattern-icon"
+									icon={ itemIcon }
+								/>
+							</span>
+						</Tooltip>
 					) }
 					<Flex as="span" gap={ 0 } justify="left">
 						{ item.title }
