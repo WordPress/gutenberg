@@ -160,7 +160,7 @@ export default function EditPostPreferencesModal() {
 							<EnableFeature
 								featureName="linkControlSettingsDrawer"
 								help={ __(
-									`Toggle's default open/closed state of the link creation interface's settings drawer.`
+									`Toggles advanced link creation settings.`
 								) }
 								label={ __(
 									'Always open advanced link settings'
