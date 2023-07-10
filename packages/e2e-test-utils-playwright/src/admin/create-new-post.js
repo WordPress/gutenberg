@@ -13,6 +13,7 @@ import { addQueryArgs } from '@wordpress/url';
  * @param {string}  [object.content]          Content of the new post.
  * @param {string}  [object.excerpt]          Excerpt of the new post.
  * @param {boolean} [object.showWelcomeGuide] Whether to show the welcome guide.
+ * @param {boolean} [object.legacyCanvas]     Whether the non-iframed editor canvas is awaited.
  */
 export async function createNewPost( {
 	postType,
@@ -20,6 +21,7 @@ export async function createNewPost( {
 	content,
 	excerpt,
 	showWelcomeGuide = false,
+	legacyCanvas = false,
 } = {} ) {
 	const query = addQueryArgs( '', {
 		post_type: postType,
@@ -30,37 +32,22 @@ export async function createNewPost( {
 
 	await this.visitAdminPage( 'post-new.php', query );
 
-	await this.page.waitForSelector( '.edit-post-layout' );
+	const canvasReadyLocator = legacyCanvas
+		? this.page.locator( '.edit-post-layout' )
+		: this.page
+				.frameLocator( '[name=editor-canvas]' )
+				.locator( 'body > *' )
+				.first();
 
-	const isWelcomeGuideActive = await this.page.evaluate( () =>
+	await canvasReadyLocator.waitFor();
+
+	await this.page.evaluate( ( welcomeGuide ) => {
 		window.wp.data
-			.select( 'core/edit-post' )
-			.isFeatureActive( 'welcomeGuide' )
-	);
-	const isFullscreenMode = await this.page.evaluate( () =>
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-post', 'welcomeGuide', welcomeGuide );
+
 		window.wp.data
-			.select( 'core/edit-post' )
-			.isFeatureActive( 'fullscreenMode' )
-	);
-
-	if ( showWelcomeGuide !== isWelcomeGuideActive ) {
-		await this.page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/edit-post' )
-				.toggleFeature( 'welcomeGuide' )
-		);
-
-		await this.page.reload();
-		await this.page.waitForSelector( '.edit-post-layout' );
-	}
-
-	if ( isFullscreenMode ) {
-		await this.page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/edit-post' )
-				.toggleFeature( 'fullscreenMode' )
-		);
-
-		await this.page.waitForSelector( 'body:not(.is-fullscreen-mode)' );
-	}
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-post', 'fullscreenMode', false );
+	}, showWelcomeGuide );
 }

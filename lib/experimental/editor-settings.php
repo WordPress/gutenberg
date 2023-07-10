@@ -83,14 +83,15 @@ function gutenberg_enable_experiments() {
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-color-randomizer', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableColorRandomizer = true', 'before' );
 	}
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-command-center', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-edit-site', 'window.__experimentalEnableCommandCenter = true', 'before' );
-	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-group-grid-variation', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableGroupGridVariation = true', 'before' );
 	}
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-details-blocks', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableDetailsBlocks = true', 'before' );
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-interactivity-api-core-blocks', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalInteractivityAPI = true', 'before' );
+	}
+
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
 	}
 }
 

@@ -45,6 +45,7 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		template,
@@ -62,6 +63,7 @@ function UncontrolledInnerBlocks( props ) {
 	useNestedSettingsUpdate(
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		templateLock,
@@ -86,7 +88,9 @@ function UncontrolledInnerBlocks( props ) {
 	);
 
 	const defaultLayoutBlockSupport =
-		getBlockSupport( name, '__experimentalLayout' ) || EMPTY_OBJECT;
+		getBlockSupport( name, 'layout' ) ||
+		getBlockSupport( name, '__experimentalLayout' ) ||
+		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
 
@@ -114,7 +118,7 @@ function UncontrolledInnerBlocks( props ) {
 				rootClientId={ clientId }
 				renderAppender={ renderAppender }
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				__experimentalLayout={ memoedLayout }
+				layout={ memoedLayout }
 				wrapperRef={ wrapperRef }
 				placeholder={ placeholder }
 			/>

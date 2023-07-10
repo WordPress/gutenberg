@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Site editor command center', () => {
+test.describe( 'Site editor command palette', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
@@ -17,36 +17,35 @@ test.describe( 'Site editor command center', () => {
 		await admin.visitSiteEditor();
 	} );
 
-	test.skip( 'Open the command center and navigate to the page create page', async ( {
+	test( 'Open the command palette and navigate to the page create page', async ( {
 		page,
 	} ) => {
+		await page
+			.getByRole( 'button', { name: 'Open command palette' } )
+			.focus();
 		await page.keyboard.press( 'Meta+k' );
-		const newPageButton = page.locator(
-			'role=option[name="Create a new page"i]'
-		);
-		await expect( newPageButton ).toBeVisible();
-
-		// Type a random post title
-		await page.keyboard.type( 'E2E Test Post' );
-		await page.click(
-			'role=option[name="Create a new post \\"E2E Test Post\\""i]'
-		);
-
+		await page.keyboard.type( 'new page' );
+		await page.getByRole( 'option', { name: 'Add new page' } ).click();
 		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 		const frame = page.frame( 'editor-canvas' );
-		const postTitleInput = frame.locator(
-			'role=textbox[name=/Add title/i]'
+		await expect( page ).toHaveURL(
+			'/wp-admin/post-new.php?post_type=page'
 		);
-		await expect( postTitleInput ).toHaveText( 'E2E Test Post' );
+		await expect(
+			frame.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeVisible();
 	} );
 
-	test.skip( 'Open the command center and navigate to a template', async ( {
+	test( 'Open the command palette and navigate to a template', async ( {
 		page,
 	} ) => {
-		await page.keyboard.press( 'Meta+k' );
-
+		await page
+			.getByRole( 'button', { name: 'Open command palette' } )
+			.click();
 		await page.keyboard.type( 'index' );
-		await page.click( 'role=option[name="index"i]' );
-		await expect( page.locator( 'h2' ) ).toHaveText( 'Index' );
+		await page.getByRole( 'option', { name: 'index' } ).click();
+		await expect( page.getByRole( 'heading', { level: 1 } ) ).toHaveText(
+			'Index'
+		);
 	} );
 } );

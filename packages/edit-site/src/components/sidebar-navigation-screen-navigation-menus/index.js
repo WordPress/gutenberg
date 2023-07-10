@@ -1,132 +1,157 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { BlockEditorProvider } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+
+import { decodeEntities } from '@wordpress/html-entities';
+import {
+	__experimentalItemGroup as ItemGroup,
+	Spinner,
+} from '@wordpress/components';
+import { navigation } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import { useHistory } from '../routes';
-import NavigationMenuContent from './navigation-menu-content';
-import { NavigationMenuLoader } from './loader';
-import { unlock } from '../../private-apis';
-import { store as editSiteStore } from '../../store';
+import SidebarNavigationItem from '../sidebar-navigation-item';
+import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
+import { useLink } from '../routes/link';
+import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
+import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
+import { unlock } from '../../lock-unlock';
 
-const noop = () => {};
-const NAVIGATION_MENUS_QUERY = {
-	per_page: 1,
-	status: 'publish',
-	order: 'desc',
-	orderby: 'date',
-};
+// Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
+function buildMenuLabel( title, id, status ) {
+	if ( ! title?.rendered ) {
+		/* translators: %s is the index of the menu in the list of menus. */
+		return sprintf( __( '(no title %s)' ), id );
+	}
 
-function SidebarNavigationScreenWrapper( { children, actions } ) {
+	if ( status === 'publish' ) {
+		return decodeEntities( title?.rendered );
+	}
+
+	return sprintf(
+		// translators: %1s: title of the menu; %2s: status of the menu (draft, pending, etc.).
+		__( '%1$s (%2$s)' ),
+		decodeEntities( title?.rendered ),
+		status
+	);
+}
+
+// Save a boolean to prevent us creating a fallback more than once per session.
+let hasCreatedFallback = false;
+
+export default function SidebarNavigationScreenNavigationMenus() {
+	const {
+		records: navigationMenus,
+		isResolving: isResolvingNavigationMenus,
+		hasResolved: hasResolvedNavigationMenus,
+	} = useEntityRecords(
+		'postType',
+		`wp_navigation`,
+		PRELOADED_NAVIGATION_MENUS_QUERY
+	);
+
+	const isLoading =
+		isResolvingNavigationMenus && ! hasResolvedNavigationMenus;
+
+	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
+
+	const firstNavigationMenu = navigationMenus?.[ 0 ];
+
+	// Save a boolean to prevent us creating a fallback more than once per session.
+	if ( firstNavigationMenu ) {
+		hasCreatedFallback = true;
+	}
+
+	// If there is no navigation menu found
+	// then trigger fallback algorithm to create one.
+	if (
+		! firstNavigationMenu &&
+		! isResolvingNavigationMenus &&
+		hasResolvedNavigationMenus &&
+		! hasCreatedFallback
+	) {
+		getNavigationFallbackId();
+	}
+
+	const { handleSave, handleDelete, handleDuplicate } =
+		useNavigationMenuHandlers();
+
+	const hasNavigationMenus = !! navigationMenus?.length;
+
+	if ( isLoading ) {
+		return (
+			<SidebarNavigationScreenWrapper>
+				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
+			</SidebarNavigationScreenWrapper>
+		);
+	}
+
+	if ( ! isLoading && ! hasNavigationMenus ) {
+		return (
+			<SidebarNavigationScreenWrapper
+				description={ __( 'No Navigation Menus found.' ) }
+			/>
+		);
+	}
+
+	// if single menu then render it
+	if ( navigationMenus?.length === 1 ) {
+		return (
+			<SingleNavigationMenu
+				navigationMenu={ firstNavigationMenu }
+				handleDelete={ () => handleDelete( firstNavigationMenu ) }
+				handleDuplicate={ () => handleDuplicate( firstNavigationMenu ) }
+				handleSave={ ( edits ) =>
+					handleSave( firstNavigationMenu, edits )
+				}
+			/>
+		);
+	}
+
+	return (
+		<SidebarNavigationScreenWrapper>
+			<ItemGroup>
+				{ navigationMenus?.map( ( { id, title, status }, index ) => (
+					<NavMenuItem
+						postId={ id }
+						key={ id }
+						withChevron
+						icon={ navigation }
+					>
+						{ buildMenuLabel( title, index + 1, status ) }
+					</NavMenuItem>
+				) ) }
+			</ItemGroup>
+		</SidebarNavigationScreenWrapper>
+	);
+}
+
+export function SidebarNavigationScreenWrapper( {
+	children,
+	actions,
+	title,
+	description,
+} ) {
 	return (
 		<SidebarNavigationScreen
-			title={ __( 'Navigation' ) }
+			title={ title || __( 'Navigation' ) }
 			actions={ actions }
-			description={ __(
-				'Browse your site, edit pages, and manage your primary navigation menu.'
-			) }
+			description={ description || __( 'Manage your Navigation menus.' ) }
 			content={ children }
 		/>
 	);
 }
 
-export default function SidebarNavigationScreenNavigationMenus() {
-	const history = useHistory();
-	const { navigationMenus, hasResolvedNavigationMenus, storedSettings } =
-		useSelect( ( select ) => {
-			const { getSettings } = unlock( select( editSiteStore ) );
-			const { getEntityRecords, hasFinishedResolution } =
-				select( coreStore );
-
-			const navigationMenusQuery = [
-				'postType',
-				'wp_navigation',
-				NAVIGATION_MENUS_QUERY,
-			];
-			return {
-				storedSettings: getSettings( false ),
-				navigationMenus: getEntityRecords( ...navigationMenusQuery ),
-				hasResolvedNavigationMenus: hasFinishedResolution(
-					'getEntityRecords',
-					navigationMenusQuery
-				),
-			};
-		}, [] );
-
-	const firstNavigationMenu = navigationMenus?.[ 0 ]?.id;
-	const blocks = useMemo( () => {
-		return [
-			createBlock( 'core/navigation', { ref: firstNavigationMenu } ),
-		];
-	}, [ firstNavigationMenu ] );
-
-	const isLoading = ! hasResolvedNavigationMenus;
-	const hasNavigationMenus = !! navigationMenus?.length;
-
-	const onSelect = useCallback(
-		( selectedBlock ) => {
-			const { attributes, name } = selectedBlock;
-			if (
-				attributes.kind === 'post-type' &&
-				attributes.id &&
-				attributes.type &&
-				history
-			) {
-				history.push( {
-					postType: attributes.type,
-					postId: attributes.id,
-				} );
-			}
-			if ( name === 'core/page-list-item' && attributes.id && history ) {
-				history.push( {
-					postType: 'page',
-					postId: attributes.id,
-				} );
-			}
-		},
-		[ history ]
-	);
-
-	if ( hasResolvedNavigationMenus && ! hasNavigationMenus ) {
-		return (
-			<SidebarNavigationScreenWrapper>
-				{ __( 'There are no Navigation Menus.' ) }
-			</SidebarNavigationScreenWrapper>
-		);
-	}
-
-	if ( ! hasResolvedNavigationMenus || isLoading ) {
-		return (
-			<SidebarNavigationScreenWrapper>
-				<NavigationMenuLoader />
-			</SidebarNavigationScreenWrapper>
-		);
-	}
-
-	return (
-		<BlockEditorProvider
-			settings={ storedSettings }
-			value={ blocks }
-			onChange={ noop }
-			onInput={ noop }
-		>
-			<SidebarNavigationScreenWrapper>
-				<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
-					<NavigationMenuContent
-						rootClientId={ blocks[ 0 ].clientId }
-						onSelect={ onSelect }
-					/>
-				</div>
-			</SidebarNavigationScreenWrapper>
-		</BlockEditorProvider>
-	);
-}
+const NavMenuItem = ( { postId, ...props } ) => {
+	const linkInfo = useLink( {
+		postId,
+		postType: 'wp_navigation',
+	} );
+	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
+};

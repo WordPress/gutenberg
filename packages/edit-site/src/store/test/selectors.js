@@ -15,6 +15,8 @@ import {
 	isInserterOpened,
 	isListViewOpened,
 	__unstableGetPreference,
+	isPage,
+	hasPageContentFocus,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -75,6 +77,7 @@ describe( 'selectors', () => {
 				outlineMode: true,
 				focusMode: false,
 				hasFixedToolbar: false,
+				isDistractionFree: false,
 				keepCaretInsideBlock: false,
 				showIconLabels: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
@@ -100,6 +103,7 @@ describe( 'selectors', () => {
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,
+				isDistractionFree: false,
 				keepCaretInsideBlock: false,
 				showIconLabels: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
@@ -143,6 +147,61 @@ describe( 'selectors', () => {
 			expect( isListViewOpened( state ) ).toBe( true );
 			state.listViewPanel = false;
 			expect( isListViewOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isPage', () => {
+		it( 'returns true if the edited post type is a page', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+			};
+			expect( isPage( state ) ).toBe( true );
+		} );
+
+		it( 'returns false if the edited post type is a template', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+				},
+			};
+			expect( isPage( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'hasPageContentFocus', () => {
+		it( 'returns true if locked and the edited post type is a page', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+				hasPageContentFocus: true,
+			};
+			expect( hasPageContentFocus( state ) ).toBe( true );
+		} );
+
+		it( 'returns false if not locked and the edited post type is a page', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+				hasPageContentFocus: false,
+			};
+			expect( hasPageContentFocus( state ) ).toBe( false );
+		} );
+
+		it( 'returns false if locked and the edited post type is a template', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+				},
+				hasPageContentFocus: true,
+			};
+			expect( hasPageContentFocus( state ) ).toBe( false );
 		} );
 	} );
 } );

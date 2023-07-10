@@ -15,6 +15,7 @@ import { forwardRef } from '@wordpress/element';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
+import { useListViewContext } from './context';
 
 const ListViewBlockContents = forwardRef(
 	(
@@ -43,8 +44,11 @@ const ListViewBlockContents = forwardRef(
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
 				};
 			},
-			[ clientId ]
+			[]
 		);
+
+		const { AdditionalBlockContent, insertedBlock, setInsertedBlock } =
+			useListViewContext();
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
@@ -62,26 +66,35 @@ const ListViewBlockContents = forwardRef(
 			: [ clientId ];
 
 		return (
-			<BlockDraggable clientIds={ draggableClientIds }>
-				{ ( { draggable, onDragStart, onDragEnd } ) => (
-					<ListViewBlockSelectButton
-						ref={ ref }
-						className={ className }
+			<>
+				{ AdditionalBlockContent && (
+					<AdditionalBlockContent
 						block={ block }
-						onClick={ onClick }
-						onToggleExpanded={ onToggleExpanded }
-						isSelected={ isSelected }
-						position={ position }
-						siblingBlockCount={ siblingBlockCount }
-						level={ level }
-						draggable={ draggable }
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
-						isExpanded={ isExpanded }
-						{ ...props }
+						insertedBlock={ insertedBlock }
+						setInsertedBlock={ setInsertedBlock }
 					/>
 				) }
-			</BlockDraggable>
+				<BlockDraggable clientIds={ draggableClientIds }>
+					{ ( { draggable, onDragStart, onDragEnd } ) => (
+						<ListViewBlockSelectButton
+							ref={ ref }
+							className={ className }
+							block={ block }
+							onClick={ onClick }
+							onToggleExpanded={ onToggleExpanded }
+							isSelected={ isSelected }
+							position={ position }
+							siblingBlockCount={ siblingBlockCount }
+							level={ level }
+							draggable={ draggable }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
+							isExpanded={ isExpanded }
+							{ ...props }
+						/>
+					) }
+				</BlockDraggable>
+			</>
 		);
 	}
 );

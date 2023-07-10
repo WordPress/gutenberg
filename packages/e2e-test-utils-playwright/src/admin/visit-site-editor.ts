@@ -43,7 +43,15 @@ export async function visitSiteEditor(
 
 			window.wp.data
 				.dispatch( 'core/preferences' )
-				.toggle( 'core/edit-site', 'welcomeGuideStyles', false );
+				.set( 'core/edit-site', 'welcomeGuideStyles', false );
+
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'welcomeGuidePage', false );
+
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'welcomeGuideTemplate', false );
 		} );
 	}
 
@@ -54,4 +62,9 @@ export async function visitSiteEditor(
 		.locator( 'body > *' )
 		.first()
 		.waitFor();
+
+	// TODO: Ideally the content underneath the spinner should be marked inert until it's ready.
+	await this.page
+		.locator( '.edit-site-canvas-spinner' )
+		.waitFor( { state: 'hidden' } );
 }

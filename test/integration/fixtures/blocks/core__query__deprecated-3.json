@@ -18,10 +18,6 @@
 				"inherit": false
 			},
 			"tagName": "div",
-			"displayLayout": {
-				"type": "flex",
-				"columns": 3
-			},
 			"align": "wide"
 		},
 		"innerBlocks": [
@@ -49,7 +45,11 @@
 						"name": "core/post-template",
 						"isValid": true,
 						"attributes": {
-							"fontSize": "large"
+							"fontSize": "large",
+							"layout": {
+								"type": "grid",
+								"columnCount": 3
+							}
 						},
 						"innerBlocks": [
 							{
@@ -87,7 +87,8 @@
 						"name": "core/query-pagination",
 						"isValid": true,
 						"attributes": {
-							"paginationArrow": "none"
+							"paginationArrow": "none",
+							"showLabel": true
 						},
 						"innerBlocks": [
 							{

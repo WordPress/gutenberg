@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useViewportMatch } from '@wordpress/compose';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { check } from '@wordpress/icons';
+import { check, desktop, mobile, tablet } from '@wordpress/icons';
 
 export default function PreviewOptions( {
 	children,
@@ -18,6 +18,7 @@ export default function PreviewOptions( {
 	isEnabled = true,
 	deviceType,
 	setDeviceType,
+	label,
 } ) {
 	const isMobile = useViewportMatch( 'small', '<' );
 	if ( isMobile ) return null;
@@ -27,10 +28,9 @@ export default function PreviewOptions( {
 			className,
 			'block-editor-post-preview__dropdown-content'
 		),
-		position: 'bottom left',
+		placement: 'bottom-end',
 	};
 	const toggleProps = {
-		variant: 'tertiary',
 		className: 'block-editor-post-preview__button-toggle',
 		disabled: ! isEnabled,
 		children: viewLabel,
@@ -38,15 +38,23 @@ export default function PreviewOptions( {
 	const menuProps = {
 		'aria-label': __( 'View options' ),
 	};
+
+	const deviceIcons = {
+		mobile,
+		tablet,
+		desktop,
+	};
+
 	return (
 		<DropdownMenu
 			className="block-editor-post-preview__dropdown"
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
-			icon={ null }
+			icon={ deviceIcons[ deviceType.toLowerCase() ] }
+			label={ label || __( 'Preview' ) }
 		>
-			{ () => (
+			{ ( renderProps ) => (
 				<>
 					<MenuGroup>
 						<MenuItem
@@ -71,7 +79,7 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
-					{ children }
+					{ children( renderProps ) }
 				</>
 			) }
 		</DropdownMenu>

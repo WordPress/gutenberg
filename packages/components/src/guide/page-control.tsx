@@ -28,11 +28,7 @@ export default function PageControl( {
 				>
 					<Button
 						key={ page }
-						icon={
-							<PageControlIcon
-								isSelected={ page === currentPage }
-							/>
-						}
+						icon={ <PageControlIcon /> }
 						aria-label={ sprintf(
 							/* translators: 1: current page number 2: total number of pages */
 							__( 'Page %1$d of %2$d' ),

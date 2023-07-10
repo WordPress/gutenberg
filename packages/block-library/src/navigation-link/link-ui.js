@@ -9,8 +9,11 @@ import {
 	BlockIcon,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { createInterpolateElement } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { createInterpolateElement, useMemo } from '@wordpress/element';
+import {
+	store as coreStore,
+	useResourcePermissions,
+} from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -125,6 +128,8 @@ function LinkControlTransforms( { clientId } ) {
 
 export function LinkUI( props ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const pagesPermissions = useResourcePermissions( 'pages' );
+	const postsPermissions = useResourcePermissions( 'posts' );
 
 	async function handleCreate( pageTitle ) {
 		const postType = props.link.type || 'page';
@@ -154,11 +159,24 @@ export function LinkUI( props ) {
 	}
 
 	const { label, url, opensInNewTab, type, kind } = props.link;
-	const link = {
-		url,
-		opensInNewTab,
-		title: label && stripHTML( label ),
-	};
+
+	let userCanCreate = false;
+	if ( ! type || type === 'page' ) {
+		userCanCreate = pagesPermissions.canCreate;
+	} else if ( type === 'post' ) {
+		userCanCreate = postsPermissions.canCreate;
+	}
+
+	// Memoize link value to avoid overriding the LinkControl's internal state.
+	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
+	const link = useMemo(
+		() => ( {
+			url,
+			opensInNewTab,
+			title: label && stripHTML( label ),
+		} ),
+		[ label, opensInNewTab, url ]
+	);
 
 	return (
 		<Popover
@@ -173,7 +191,7 @@ export function LinkUI( props ) {
 				className={ props.className }
 				value={ link }
 				showInitialSuggestions={ true }
-				withCreateSuggestion={ props.hasCreateSuggestion }
+				withCreateSuggestion={ userCanCreate }
 				createSuggestion={ handleCreate }
 				createSuggestionButtonText={ ( searchTerm ) => {
 					let format;

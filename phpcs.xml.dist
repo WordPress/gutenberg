@@ -28,6 +28,7 @@
 	<rule ref="WordPress.WP.I18n.MissingArgDomainDefault">
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>packages/block-library/src/*</exclude-pattern>
+		<exclude-pattern>build/block-library/*</exclude-pattern>
 	</rule>
 
 	<arg value="ps"/>
@@ -45,6 +46,10 @@
 
 	<!-- Exclude generated files -->
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
+	<exclude-pattern>node_modules/*</exclude-pattern>
+
+	<!-- Exclude third party libraries -->
+	<exclude-pattern>./vendor/*</exclude-pattern>
 
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
@@ -57,6 +62,7 @@
 	</rule>
 	<rule ref="Squiz.Commenting.FileComment.Missing">
 		<exclude-pattern>phpunit/*</exclude-pattern>
+		<exclude-pattern>**/*.min.asset.php</exclude-pattern>
 	</rule>
 	<rule ref="Squiz.Commenting.ClassComment.Missing">
 		<exclude-pattern>phpunit/*</exclude-pattern>

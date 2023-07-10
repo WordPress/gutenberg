@@ -20,7 +20,6 @@ import { displayShortcut } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 import { store as editorStore } from '../../store';
 
 /**
@@ -30,14 +29,11 @@ import { store as editorStore } from '../../store';
  * @param {Object}   props                Component props.
  * @param {?boolean} props.forceIsDirty   Whether to force the post to be marked
  *                                        as dirty.
- * @param {?boolean} props.forceIsSaving  Whether to force the post to be marked
- *                                        as being saved.
  * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
  * @return {import('@wordpress/element').WPComponent} The component.
  */
 export default function PostSavedState( {
 	forceIsDirty,
-	forceIsSaving,
 	showIconLabels = false,
 } ) {
 	const [ forceSavedMessage, setForceSavedMessage ] = useState( false );
@@ -73,14 +69,14 @@ export default function PostSavedState( {
 				isNew: isEditedPostNew(),
 				isPending: 'pending' === getEditedPostAttribute( 'status' ),
 				isPublished: isCurrentPostPublished(),
-				isSaving: forceIsSaving || isSavingPost(),
+				isSaving: isSavingPost(),
 				isSaveable: isEditedPostSaveable(),
 				isScheduled: isCurrentPostScheduled(),
 				hasPublishAction:
 					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
 			};
 		},
-		[ forceIsDirty, forceIsSaving ]
+		[ forceIsDirty ]
 	);
 
 	const { savePost } = useDispatch( editorStore );
@@ -107,7 +103,7 @@ export default function PostSavedState( {
 	}
 
 	if ( isPublished || isScheduled ) {
-		return <PostSwitchToDraftButton />;
+		return null;
 	}
 
 	/* translators: button label text should, if possible, be under 16 characters. */

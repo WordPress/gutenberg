@@ -6,7 +6,7 @@ import { toTree } from './to-tree';
 import { createElement } from './create-element';
 import { isRangeEqual } from './is-range-equal';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Creates a path as an array of indices from the given root node to the given
@@ -57,6 +57,10 @@ function getNodeByPath( node, path ) {
 }
 
 function append( element, child ) {
+	if ( child.html !== undefined ) {
+		return ( element.innerHTML += child.html );
+	}
+
 	if ( typeof child === 'string' ) {
 		child = element.ownerDocument.createTextNode( child );
 	}

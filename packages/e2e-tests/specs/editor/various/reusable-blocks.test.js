@@ -16,12 +16,17 @@ import {
 	saveDraft,
 	createReusableBlock,
 	publishPost,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const reusableBlockNameInputSelector =
 	'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
 const reusableBlockInspectorNameInputSelector =
 	'.block-editor-block-inspector .components-text-control__input';
+const syncToggleSelector =
+	'.reusable-blocks-menu-items__convert-modal .components-form-toggle__input';
+const syncToggleSelectorChecked =
+	'.reusable-blocks-menu-items__convert-modal .components-form-toggle.is-checked';
 
 const saveAll = async () => {
 	const publishButtonSelector =
@@ -83,7 +88,7 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Surprised greeting block' );
 
 		// Quickly focus the paragraph block.
-		await page.click(
+		await canvas().click(
 			'.block-editor-block-list__block[data-type="core/block"] p'
 		);
 		await page.keyboard.press( 'Escape' ); // Enter navigation mode.
@@ -96,7 +101,7 @@ describe( 'Reusable blocks', () => {
 		await saveAllButDontPublish();
 
 		// Check that its content is up to date.
-		const text = await page.$eval(
+		const text = await canvas().$eval(
 			'.block-editor-block-list__block[data-type="core/block"] p',
 			( element ) => element.innerText
 		);
@@ -108,16 +113,16 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block.
-		await clickBlockToolbarButton( 'Convert to regular block' );
+		await clickBlockToolbarButton( 'Detach pattern' );
 
 		// Check that we have a paragraph block on the page.
-		const paragraphBlock = await page.$(
+		const paragraphBlock = await canvas().$(
 			'.block-editor-block-list__block[data-type="core/paragraph"]'
 		);
 		expect( paragraphBlock ).not.toBeNull();
 
 		// Check that its content is up to date.
-		const paragraphContent = await page.$eval(
+		const paragraphContent = await canvas().$eval(
 			'.block-editor-block-list__block[data-type="core/paragraph"]',
 			( element ) => element.innerText
 		);
@@ -132,7 +137,7 @@ describe( 'Reusable blocks', () => {
 		);
 
 		// Make sure the reusable block has loaded properly before attempting to publish the post.
-		await page.waitForSelector( 'p[aria-label="Paragraph block"]' );
+		await canvas().waitForSelector( 'p[aria-label="Paragraph block"]' );
 
 		await publishPost();
 
@@ -142,8 +147,8 @@ describe( 'Reusable blocks', () => {
 		await page.waitForSelector( closePublishPanelSelector );
 		await page.click( closePublishPanelSelector );
 
-		await page.waitForSelector( 'p[aria-label="Paragraph block"]' );
-		await page.focus( 'p[aria-label="Paragraph block"]' );
+		await canvas().waitForSelector( 'p[aria-label="Paragraph block"]' );
+		await canvas().focus( 'p[aria-label="Paragraph block"]' );
 
 		// Change the block's content.
 		await page.keyboard.type( 'Einen ' );
@@ -152,7 +157,7 @@ describe( 'Reusable blocks', () => {
 		await saveAll();
 
 		// Check that its content is up to date.
-		const paragraphContent = await page.$eval(
+		const paragraphContent = await canvas().$eval(
 			'p[aria-label="Paragraph block"]',
 			( element ) => element.innerText
 		);
@@ -192,7 +197,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert block to a reusable block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create Reusable block' );
+		await clickMenuItem( 'Create pattern/reusable block' );
 
 		// Set title.
 		const nameInput = await page.waitForSelector(
@@ -200,11 +205,14 @@ describe( 'Reusable blocks', () => {
 		);
 		await nameInput.click();
 		await page.keyboard.type( 'Multi-selection reusable block' );
+		const syncToggle = await page.waitForSelector( syncToggleSelector );
+		syncToggle.click();
+		await page.waitForSelector( syncToggleSelectorChecked );
 		await page.keyboard.press( 'Enter' );
 
 		// Wait for creation to finish.
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[contains(text(),"Pattern created:")]'
 		);
 
 		await clearAllBlocks();
@@ -213,7 +221,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Multi-selection reusable block' );
 
 		// Convert block to a regular block.
-		await clickBlockToolbarButton( 'Convert to regular blocks' );
+		await clickBlockToolbarButton( 'Detach patterns' );
 
 		// Check that we have two paragraph blocks on the page.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -235,11 +243,12 @@ describe( 'Reusable blocks', () => {
 		await editButton.click();
 
 		await page.waitForNavigation();
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 
 		// Click the block to give it focus.
 		const blockSelector = 'p[data-title="Paragraph"]';
-		await page.waitForSelector( blockSelector );
-		await page.click( blockSelector );
+		await canvas().waitForSelector( blockSelector );
+		await canvas().click( blockSelector );
 
 		// Delete the block, leaving the reusable block empty.
 		await clickBlockToolbarButton( 'Options' );
@@ -257,7 +266,7 @@ describe( 'Reusable blocks', () => {
 		// Save the reusable block.
 		await page.click( publishButtonSelector );
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block updated."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Pattern updated."]'
 		);
 
 		await createNewPost();
@@ -277,7 +286,7 @@ describe( 'Reusable blocks', () => {
 			] );
 		} );
 
-		await page.waitForXPath(
+		await canvas().waitForXPath(
 			'//*[contains(@class, "block-editor-warning")]/*[text()="Block has been deleted or is unavailable."]'
 		);
 
@@ -295,15 +304,16 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Duplicated reusable block' );
 		await saveDraft();
 		await page.reload();
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 
 		// Wait for the paragraph to be loaded.
-		await page.waitForSelector(
+		await canvas().waitForSelector(
 			'.block-editor-block-list__block[data-type="core/paragraph"]'
 		);
 		// The first click selects the reusable block wrapper.
 		// The second click selects the actual paragraph block.
-		await page.click( '.wp-block-block' );
-		await page.focus(
+		await canvas().click( '.wp-block-block' );
+		await canvas().focus(
 			'.block-editor-block-list__block[data-type="core/paragraph"]'
 		);
 		await pressKeyWithModifier( 'primary', 'a' );
@@ -333,17 +343,17 @@ describe( 'Reusable blocks', () => {
 
 		// Make an edit to the reusable block and assert that there's only a
 		// paragraph in a reusable block.
-		await page.waitForSelector( 'p[aria-label="Paragraph block"]' );
-		await page.click( 'p[aria-label="Paragraph block"]' );
+		await canvas().waitForSelector( 'p[aria-label="Paragraph block"]' );
+		await canvas().click( 'p[aria-label="Paragraph block"]' );
 		await page.keyboard.type( '2' );
 		const selector =
-			'//div[@aria-label="Block: Reusable block"]//p[@aria-label="Paragraph block"][.="12"]';
+			'//div[@aria-label="Block: Pattern"]//p[@aria-label="Paragraph block"][.="12"]';
 		const reusableBlockWithParagraph = await page.$x( selector );
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
 		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select Reusable block' );
-		await clickBlockToolbarButton( 'Convert to regular block' );
+		await clickBlockToolbarButton( 'Select Pattern' );
+		await clickBlockToolbarButton( 'Detach pattern' );
 		await page.waitForXPath( selector, {
 			hidden: true,
 		} );
@@ -358,9 +368,10 @@ describe( 'Reusable blocks', () => {
 		insertBlock( 'Quote' );
 		await saveDraft();
 		await page.reload();
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 
 		// The quote block should have a visible preview in the sidebar for this test to be valid.
-		const quoteBlock = await page.waitForSelector(
+		const quoteBlock = await canvas().waitForSelector(
 			'.block-editor-block-list__block[aria-label="Block: Quote"]'
 		);
 		// Select the quote block.
@@ -372,15 +383,18 @@ describe( 'Reusable blocks', () => {
 
 		// Convert to reusable.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create Reusable block' );
+		await clickMenuItem( 'Create pattern/reusable block' );
 		const nameInput = await page.waitForSelector(
 			reusableBlockNameInputSelector
 		);
 		await nameInput.click();
 		await page.keyboard.type( 'Block with styles' );
+		const syncToggle = await page.waitForSelector( syncToggleSelector );
+		syncToggle.click();
+		await page.waitForSelector( syncToggleSelectorChecked );
 		await page.keyboard.press( 'Enter' );
-		const reusableBlock = await page.waitForSelector(
-			'.block-editor-block-list__block[aria-label="Block: Reusable block"]'
+		const reusableBlock = await canvas().waitForSelector(
+			'.block-editor-block-list__block[aria-label="Block: Pattern"]'
 		);
 		expect( reusableBlock ).toBeTruthy();
 	} );

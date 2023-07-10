@@ -212,14 +212,8 @@ export function Draggable( {
 		// Update cursor to 'grabbing', document wide.
 		ownerDocument.body.classList.add( bodyClass );
 
-		// Allow the Synthetic Event to be accessed from asynchronous code.
-		// https://reactjs.org/docs/events.html#event-pooling
-		event.persist();
-
-		let timerId: number | undefined;
-
 		if ( onDragStart ) {
-			timerId = setTimeout( () => onDragStart( event ) );
+			onDragStart( event );
 		}
 
 		cleanup.current = () => {
@@ -236,8 +230,6 @@ export function Draggable( {
 			ownerDocument.body.classList.remove( bodyClass );
 
 			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
-
-			clearTimeout( timerId );
 		};
 	}
 

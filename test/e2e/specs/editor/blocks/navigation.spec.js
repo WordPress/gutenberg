@@ -48,11 +48,8 @@ test.describe( 'Navigation block', () => {
 			// Check the markup of the block is correct.
 			await editor.publishPost();
 			const content = await editor.getEditedPostContent();
-			expect( content ).toBe(
-				`<!-- wp:navigation -->
-<!-- wp:page-list /-->
-<!-- /wp:navigation -->`
-			);
+
+			expect( content ).toMatch( /<!-- wp:navigation {"ref":\d+} \/-->/ );
 		} );
 
 		test( 'default to my only existing menu', async ( {
@@ -65,7 +62,7 @@ test.describe( 'Navigation block', () => {
 			const createdMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
-					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->',
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -141,7 +138,7 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
-					'<!-- wp:navigation-link {"label":"Menu 1 Link","type":"custom","url":"http://localhost:8889/#menu-1-link","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"Menu 1 Link","type":"custom","url":"http://localhost:8889/#menu-1-link","kind":"custom"} /-->',
 			} );
 
 			//FIXME this is needed because if the two menus are created at the same time, the API will return them in the wrong order.
@@ -151,7 +148,7 @@ test.describe( 'Navigation block', () => {
 			const latestMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 2',
 				content:
-					'<!-- wp:navigation-link {"label":"Menu 2 Link","type":"custom","url":"http://localhost:8889/#menu-2-link","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"Menu 2 Link","type":"custom","url":"http://localhost:8889/#menu-2-link","kind":"custom"} /-->',
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -253,7 +250,7 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu',
 				content:
-					'<!-- wp:navigation-submenu {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} --><!-- wp:navigation-link {"label":"WordPress Child","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /--><!-- /wp:navigation-submenu -->',
+					'<!-- wp:navigation-submenu {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} --><!-- wp:navigation-link {"label":"WordPress Child","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -399,6 +396,26 @@ test.describe( 'Navigation block', () => {
 			<!-- /wp:navigation-submenu -->`,
 		};
 
+		test.beforeAll( async ( { requestUtils } ) => {
+			// We need pages to be published so the Link Control can return pages
+			await requestUtils.createPage( {
+				title: 'Test Page 1',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Test Page 2',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Test Page 3',
+				status: 'publish',
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+		} );
+
 		test.use( {
 			linkControl: async ( { page }, use ) => {
 				await use( new LinkControl( { page } ) );
@@ -466,7 +483,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Page Link link',
+						name: 'Page Link',
 					} )
 					.filter( {
 						hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
@@ -477,7 +494,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Submenu link',
+						name: 'Submenu',
 					} )
 					.filter( {
 						hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
@@ -488,7 +505,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Page Link link',
+						name: 'Page Link',
 					} )
 					.filter( {
 						hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
@@ -505,9 +522,25 @@ test.describe( 'Navigation block', () => {
 			linkControl,
 		} ) => {
 			await admin.createNewPost();
-			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+			const { id: menuId } = await requestUtils.createNavigationMenu(
+				navMenuBlocksFixture
+			);
 
-			await editor.insertBlock( { name: 'core/navigation' } );
+			// Insert x2 blocks as a stress test as several bugs have been found with inserting
+			// blocks into the navigation block when there are multiple blocks referencing the
+			// **same** menu.
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menuId,
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menuId,
+				},
+			} );
 
 			await editor.openDocumentSettingsSidebar();
 
@@ -555,11 +588,17 @@ test.describe( 'Navigation block', () => {
 			// Expect to see the Link creation UI be focused.
 			const linkUIInput = linkControl.getSearchInput();
 
+			// Coverage for bug whereby Link UI input would be incorrectly prepopulated.
+			// It should:
+			// - be focused - should not be in "preview" mode but rather ready to accept input.
+			// - be empty - not pre-populated
+			// See: https://github.com/WordPress/gutenberg/issues/50733
 			await expect( linkUIInput ).toBeFocused();
+			await expect( linkUIInput ).toBeEmpty();
 
 			const firstResult = await linkControl.getNthSearchResult( 0 );
 
-			// Grab the text from the first result so we can check it was inserted.
+			// Grab the text from the first result so we can check (later on) that it was inserted.
 			const firstResultText = await linkControl.getSearchResultText(
 				firstResult
 			);
@@ -571,7 +610,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Page Link link',
+						name: 'Page Link',
 					} )
 					.filter( {
 						hasText: 'Block 3 of 3, Level 1', // proxy for filtering by description.
@@ -599,7 +638,7 @@ test.describe( 'Navigation block', () => {
 			} );
 
 			const submenuOptions = listView.getByRole( 'button', {
-				name: 'Options for Submenu block',
+				name: 'Options for Submenu',
 			} );
 
 			// Open the options menu.
@@ -609,7 +648,7 @@ test.describe( 'Navigation block', () => {
 			// outside of the treegrid.
 			const removeBlockOption = page
 				.getByRole( 'menu', {
-					name: 'Options for Submenu block',
+					name: 'Options for Submenu',
 				} )
 				.getByRole( 'menuitem', {
 					name: 'Remove Top Level Item 2',
@@ -621,7 +660,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Submenu link',
+						name: 'Submenu',
 					} )
 					.filter( {
 						hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
@@ -649,10 +688,12 @@ test.describe( 'Navigation block', () => {
 			} );
 
 			// Click on the first menu item to open its settings.
-			const firstMenuItemAnchor = listView.getByRole( 'link', {
-				name: 'Top Level Item 1',
-				includeHidden: true,
-			} );
+			const firstMenuItemAnchor = listView
+				.getByRole( 'link', {
+					name: 'Page',
+					includeHidden: true,
+				} )
+				.getByText( 'Top Level Item 1' );
 			await firstMenuItemAnchor.click();
 
 			// Get the settings panel.
@@ -681,7 +722,7 @@ test.describe( 'Navigation block', () => {
 						name: 'Settings',
 					} )
 					.getByRole( 'heading', {
-						name: 'Link Settings',
+						name: 'Settings',
 					} )
 			).toBeVisible();
 
@@ -713,7 +754,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listViewPanel
 					.getByRole( 'gridcell', {
-						name: 'Page Link link',
+						name: 'Page Link',
 					} )
 					.filter( {
 						hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
@@ -744,7 +785,7 @@ test.describe( 'Navigation block', () => {
 			// click on options menu for the first menu item and select remove.
 			const firstMenuItem = listView
 				.getByRole( 'gridcell', {
-					name: 'Page Link link',
+					name: 'Page Link',
 				} )
 				.filter( {
 					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
@@ -754,7 +795,7 @@ test.describe( 'Navigation block', () => {
 			const firstItemOptions = firstMenuItem
 				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Options for Page Link block',
+					name: 'Options for Page Link',
 				} );
 
 			// Open the options menu.
@@ -765,10 +806,10 @@ test.describe( 'Navigation block', () => {
 			// outside of the treegrid.
 			const addSubmenuOption = page
 				.getByRole( 'menu', {
-					name: 'Options for Page Link block',
+					name: 'Options for Page Link',
 				} )
 				.getByRole( 'menuitem', {
-					name: 'Add submenu link',
+					name: 'Add submenu',
 				} );
 
 			await addSubmenuOption.click();
@@ -781,7 +822,7 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Custom Link link',
+						name: 'Custom Link',
 					} )
 					.filter( {
 						hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
@@ -794,13 +835,419 @@ test.describe( 'Navigation block', () => {
 			await expect(
 				listView
 					.getByRole( 'gridcell', {
-						name: 'Submenu link',
+						name: 'Submenu',
 					} )
 					.filter( {
 						hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
 					} )
 					.getByText( 'Top Level Item 1' )
 			).toBeVisible();
+		} );
+
+		test( `does not display link interface for blocks that have not just been inserted`, async ( {
+			admin,
+			page,
+			editor,
+			requestUtils,
+			linkControl,
+		} ) => {
+			// Provides coverage for a bug whereby the Link UI would be unexpectedly displayed for the last
+			// inserted block even if the block had been deselected and then reselected.
+			// See: https://github.com/WordPress/gutenberg/issues/50601
+
+			await admin.createNewPost();
+			const { id: menuId } = await requestUtils.createNavigationMenu(
+				navMenuBlocksFixture
+			);
+
+			// Insert x2 blocks as a stress test as several bugs have been found with inserting
+			// blocks into the navigation block when there are multiple blocks referencing the
+			// **same** menu.
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menuId,
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menuId,
+				},
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+				description: 'Structure for navigation menu: Test Menu',
+			} );
+
+			await listView
+				.getByRole( 'button', {
+					name: 'Add block',
+				} )
+				.click();
+
+			const blockResults = page.getByRole( 'listbox', {
+				name: 'Blocks',
+			} );
+
+			await expect( blockResults ).toBeVisible();
+
+			const blockResultOptions = blockResults.getByRole( 'option' );
+
+			// Select the Page Link option.
+			await blockResultOptions.nth( 0 ).click();
+
+			// Immediately dismiss the Link UI thereby not populating the `url` attribute
+			// of the block.
+			await page.keyboard.press( 'Escape' );
+
+			// Get the Inspector Tabs.
+			const blockSettings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Trigger "unmount" of the List View.
+			await blockSettings
+				.getByRole( 'tab', {
+					name: 'Settings',
+				} )
+				.click();
+
+			// "Remount" the List View.
+			// this is where the bug previously occurred.
+			await blockSettings
+				.getByRole( 'tab', {
+					name: 'List View',
+				} )
+				.click();
+
+			// Check that despite being the last inserted block, the Link UI is not displayed
+			// in this scenario because it was not **just** inserted into the List View (i.e.
+			// we have unmounted the list view and then remounted it).
+			await expect( linkControl.getSearchInput() ).not.toBeVisible();
+		} );
+	} );
+} );
+
+test.describe( 'Navigation block - Frontend interactivity', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.deleteAllPages();
+		await requestUtils.deleteAllMenus();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.deleteAllPages();
+		await requestUtils.deleteAllMenus();
+	} );
+
+	test.describe( 'Overlay menu', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'always' },
+			} );
+			await editor.saveSiteEditorEntities();
+		} );
+
+		test( 'Overlay menu interactions', async ( { page, pageUtils } ) => {
+			await page.goto( '/' );
+			const overlayMenuFirstElement = page.getByRole( 'link', {
+				name: 'Item 1',
+			} );
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+
+			const closeMenuButton = page.getByRole( 'button', {
+				name: 'Close menu',
+			} );
+
+			// Test: overlay menu opens on click on open menu button
+			await expect( overlayMenuFirstElement ).toBeHidden();
+			await openMenuButton.click();
+			await expect( overlayMenuFirstElement ).toBeVisible();
+
+			// Test: overlay menu focuses on first element after opening
+			await expect( overlayMenuFirstElement ).toBeFocused();
+
+			// Test: overlay menu traps focus
+			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
+			await expect( closeMenuButton ).toBeFocused();
+			await pageUtils.pressKeys( 'Shift+Tab', { times: 2, delay: 50 } );
+			await expect( overlayMenuFirstElement ).toBeFocused();
+
+			// Test: overlay menu closes on click on close menu button
+			await closeMenuButton.click();
+			await expect( overlayMenuFirstElement ).toBeHidden();
+
+			// Test: overlay menu closes on ESC key
+			await openMenuButton.click();
+			await expect( overlayMenuFirstElement ).toBeVisible();
+			await pageUtils.pressKeys( 'Escape' );
+			await expect( overlayMenuFirstElement ).toBeHidden();
+			await expect( openMenuButton ).toBeFocused();
+		} );
+	} );
+
+	test.describe( 'Submenu mouse and keyboard interactions', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-submenu {"label":"Simple Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Simple Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- /wp:navigation-submenu -->
+					<!-- wp:navigation-submenu {"label":"Complex Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Complex Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-submenu {"label":"Nested Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-link {"label":"Nested Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- /wp:navigation-submenu -->
+						<!-- wp:navigation-link {"label":"Complex Submenu Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- /wp:navigation-submenu -->
+					<!-- wp:navigation-link {"label":"Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
+			} );
+			await editor.saveSiteEditorEntities();
+		} );
+
+		test( 'Submenu interactions', async ( { page, pageUtils } ) => {
+			await page.goto( '/' );
+			const simpleSubmenuButton = page.getByRole( 'button', {
+				name: 'Simple Submenu',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Simple Submenu Link 1',
+			} );
+			const complexSubmenuButton = page.getByRole( 'button', {
+				name: 'Complex Submenu',
+			} );
+			const nestedSubmenuButton = page.getByRole( 'button', {
+				name: 'Nested Submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Complex Submenu Link 1',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Submenu Link 1',
+			} );
+
+			// Test: submenu opens on click
+			await expect( innerElement ).toBeHidden();
+			await simpleSubmenuButton.click();
+			await expect( innerElement ).toBeVisible();
+
+			// Test: submenu closes on click outside submenu
+			await page.click( 'body' );
+			await expect( innerElement ).toBeHidden();
+
+			// Test: nested submenu opens on click
+			await complexSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			await nestedSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+
+			// Test: nested submenus close on click outside submenu
+			await page.click( 'body' );
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+
+			// Test: submenu opens on Enter keypress
+			await simpleSubmenuButton.focus();
+			await pageUtils.pressKeys( 'Enter' );
+			await expect( innerElement ).toBeVisible();
+
+			// Test: submenu closes on ESC key and focuses parent link
+			await pageUtils.pressKeys( 'Escape' );
+			await expect( innerElement ).toBeHidden();
+			await expect( simpleSubmenuButton ).toBeFocused();
+
+			// Test: submenu closes on tab outside submenu
+			await simpleSubmenuButton.focus();
+			await pageUtils.pressKeys( 'Enter' );
+			await expect( innerElement ).toBeVisible();
+			// Tab to first element, then tab outside the submenu.
+			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
+			await expect( innerElement ).toBeHidden();
+			await expect( complexSubmenuButton ).toBeFocused();
+
+			// Test: only nested submenu closes on tab outside
+			await complexSubmenuButton.focus();
+			await pageUtils.pressKeys( 'Enter' );
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			await nestedSubmenuButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+
+			// Tab to nested submenu first element, then tab outside the nested
+			// submenu.
+			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+			// Tab outside the complex submenu.
+			await page.keyboard.press( 'Tab' );
+			await expect( firstLevelElement ).toBeHidden();
+		} );
+	} );
+
+	test.describe( 'Submenus (Arrow setting)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Hidden menu',
+				content: `
+					<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-submenu {"label":"Nested Menu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-link {"label":"Nested Menu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- /wp:navigation-submenu -->
+					<!-- /wp:navigation-submenu -->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off' },
+			} );
+			await editor.saveSiteEditorEntities();
+		} );
+
+		test( 'submenu opens on click in the arrow', async ( { page } ) => {
+			await page.goto( '/' );
+			const arrowButton = page.getByRole( 'button', {
+				name: 'Submenu submenu',
+			} );
+			const nestedSubmenuArrowButton = page.getByRole( 'button', {
+				name: 'Nested Menu submenu',
+			} );
+			const firstLevelElement = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+			const secondLevelElement = page.getByRole( 'link', {
+				name: 'Nested Menu Link',
+			} );
+
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+			await arrowButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+			await nestedSubmenuArrowButton.click();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeVisible();
+			await page.click( 'body' );
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+		} );
+	} );
+
+	test.describe( 'Page list block', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			const parentPage = await requestUtils.createPage( {
+				title: 'Parent Page',
+				status: 'publish',
+			} );
+
+			await requestUtils.createPage( {
+				title: 'Subpage',
+				status: 'publish',
+				parent: parentPage.id,
+			} );
+
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+			} );
+			await editor.canvas.click( 'body' );
+			await requestUtils.createNavigationMenu( {
+				title: 'Page list menu',
+				content: `
+					<!-- wp:page-list /-->
+					<!-- wp:navigation-link {"label":"Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
+			} );
+			await editor.saveSiteEditorEntities();
+		} );
+
+		test( 'page-list submenu user interactions', async ( {
+			page,
+			pageUtils,
+		} ) => {
+			await page.goto( '/' );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Parent Page',
+			} );
+			const innerElement = page.getByRole( 'link', {
+				name: 'Subpage',
+			} );
+			await expect( innerElement ).toBeHidden();
+
+			// page-list submenu opens on click
+			await submenuButton.click();
+			await expect( innerElement ).toBeVisible();
+
+			// page-list submenu closes on click outside
+			await page.click( 'body' );
+			await expect( innerElement ).toBeHidden();
+
+			// page-list submenu opens on enter keypress
+			await submenuButton.focus();
+			await pageUtils.pressKeys( 'Enter' );
+			await expect( innerElement ).toBeVisible();
+
+			// page-list submenu closes on ESC key and focuses submenu button
+			await pageUtils.pressKeys( 'Escape' );
+			await expect( innerElement ).toBeHidden();
+			await expect( submenuButton ).toBeFocused();
+
+			// page-list submenu closes on tab outside submenu
+			await pageUtils.pressKeys( 'Enter', { delay: 50 } );
+			// Tab to first element, then tab outside the submenu.
+			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
+			await expect( innerElement ).toBeHidden();
 		} );
 	} );
 } );
@@ -812,7 +1259,7 @@ class LinkControl {
 
 	getSearchInput() {
 		return this.page.getByRole( 'combobox', {
-			name: 'URL',
+			name: 'Link',
 		} );
 	}
 
@@ -849,7 +1296,9 @@ class LinkControl {
 		await expect( result ).toBeVisible();
 
 		return result
-			.locator( '.block-editor-link-control__search-item-title' ) // this is the only way to get the label text without the URL.
+			.locator(
+				'.components-menu-item__info-wrapper .components-menu-item__item'
+			) // this is the only way to get the label text without the URL.
 			.innerText();
 	}
 }

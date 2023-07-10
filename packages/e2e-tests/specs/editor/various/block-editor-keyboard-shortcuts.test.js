@@ -9,6 +9,7 @@ import {
 	clickBlockToolbarButton,
 	clickMenuItem,
 	clickOnCloseModalButton,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const createTestParagraphBlocks = async () => {
@@ -51,7 +52,7 @@ describe( 'block editor keyboard shortcuts', () => {
 				await createTestParagraphBlocks();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 				await pressKeyWithModifier( 'shift', 'ArrowUp' );
-				await page.waitForSelector(
+				await canvas().waitForSelector(
 					'[aria-label="Multiple selected blocks"]'
 				);
 				await moveUp();
@@ -63,7 +64,7 @@ describe( 'block editor keyboard shortcuts', () => {
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 				await page.keyboard.press( 'ArrowUp' );
 				await pressKeyWithModifier( 'shift', 'ArrowUp' );
-				await page.waitForSelector(
+				await canvas().waitForSelector(
 					'[aria-label="Multiple selected blocks"]'
 				);
 				await moveDown();
@@ -89,7 +90,7 @@ describe( 'block editor keyboard shortcuts', () => {
 		} );
 		it( 'should prevent deleting multiple selected blocks from inputs', async () => {
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Create Reusable block' );
+			await clickMenuItem( 'Create pattern/reusable block' );
 			const reusableBlockNameInputSelector =
 				'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
 			const nameInput = await page.waitForSelector(

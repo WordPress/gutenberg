@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Icon,
 	BaseControl,
@@ -13,20 +13,38 @@ import {
 	Modal,
 	__experimentalRadioGroup as RadioGroup,
 	__experimentalRadio as Radio,
+	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { store as editorStore } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { TEMPLATE_PART_AREA_GENERAL } from '../../store/constants';
+import {
+	useExistingTemplateParts,
+	getUniqueTemplatePartTitle,
+	getCleanTemplatePartSlug,
+} from '../../utils/template-part-create';
 
-export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
+export default function CreateTemplatePartModal( {
+	closeModal,
+	blocks = [],
+	onCreate,
+	onError,
+} ) {
+	const { createErrorNotice } = useDispatch( noticesStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const existingTemplateParts = useExistingTemplateParts();
+
 	const [ title, setTitle ] = useState( '' );
 	const [ area, setArea ] = useState( TEMPLATE_PART_AREA_GENERAL );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
@@ -38,9 +56,52 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 		[]
 	);
 
+	async function createTemplatePart() {
+		if ( ! title ) {
+			createErrorNotice( __( 'Please enter a title.' ), {
+				type: 'snackbar',
+			} );
+			return;
+		}
+
+		try {
+			const uniqueTitle = getUniqueTemplatePartTitle(
+				title,
+				existingTemplateParts
+			);
+			const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
+
+			const templatePart = await saveEntityRecord(
+				'postType',
+				'wp_template_part',
+				{
+					slug: cleanSlug,
+					title: uniqueTitle,
+					content: serialize( blocks ),
+					area,
+				},
+				{ throwOnError: true }
+			);
+			await onCreate( templatePart );
+
+			// TODO: Add a success notice?
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __(
+							'An error occurred while creating the template part.'
+					  );
+
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+
+			onError?.();
+		}
+	}
+
 	return (
 		<Modal
-			title={ __( 'Create a template part' ) }
+			title={ __( 'Create template part' ) }
 			onRequestClose={ closeModal }
 			overlayClassName="edit-site-create-template-part-modal"
 		>
@@ -51,7 +112,7 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 						return;
 					}
 					setIsSubmitting( true );
-					await onCreate( { title, area } );
+					await createTemplatePart();
 				} }
 			>
 				<VStack spacing="4">
@@ -106,31 +167,24 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 							) }
 						</RadioGroup>
 					</BaseControl>
-					<Flex
-						className="edit-site-create-template-part-modal__modal-actions"
-						justify="flex-end"
-					>
-						<FlexItem>
-							<Button
-								variant="secondary"
-								onClick={ () => {
-									closeModal();
-								} }
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-						</FlexItem>
-						<FlexItem>
-							<Button
-								variant="primary"
-								type="submit"
-								disabled={ ! title }
-								isBusy={ isSubmitting }
-							>
-								{ __( 'Create' ) }
-							</Button>
-						</FlexItem>
-					</Flex>
+					<HStack justify="right">
+						<Button
+							variant="tertiary"
+							onClick={ () => {
+								closeModal();
+							} }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							variant="primary"
+							type="submit"
+							disabled={ ! title }
+							isBusy={ isSubmitting }
+						>
+							{ __( 'Create' ) }
+						</Button>
+					</HStack>
 				</VStack>
 			</form>
 		</Modal>
