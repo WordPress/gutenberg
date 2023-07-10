@@ -4,6 +4,7 @@
 import { parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -33,7 +34,7 @@ const templatePartToPattern = ( templatePart ) => ( {
 	keywords: templatePart.keywords || [],
 	id: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
-	title: templatePart.title.rendered,
+	title: decodeEntities( templatePart.title.rendered ),
 	type: templatePart.type,
 	templatePart,
 } );
