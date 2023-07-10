@@ -25,7 +25,7 @@ export function useSelectObject() {
 			if ( selection.containsNode( target ) ) return;
 
 			const range = ownerDocument.createRange();
-			// If the target in within a non editable element, select the non
+			// If the target is within a non editable element, select the non
 			// editable element.
 			const nodeToSelect = target.isContentEditable
 				? target
