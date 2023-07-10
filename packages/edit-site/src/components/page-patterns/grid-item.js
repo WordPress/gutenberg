@@ -12,9 +12,7 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
-	__unstableCompositeItem as CompositeItem,
 	Tooltip,
 	Flex,
 } from '@wordpress/components';
@@ -32,7 +30,6 @@ import {
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
-import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -65,12 +62,6 @@ function GridItem( { categoryId, item, ...props } ) {
 		categoryId,
 		categoryType: item.type,
 	} );
-
-	const onKeyDown = ( event ) => {
-		if ( DELETE === event.keyCode || BACKSPACE === event.keyCode ) {
-			setIsDeleteDialogOpen( true );
-		}
-	};
 
 	const isEmpty = ! item.blocks?.length;
 	const patternClassNames = classnames( 'edit-site-patterns__pattern', {
@@ -138,134 +129,120 @@ function GridItem( { categoryId, item, ...props } ) {
 		  );
 
 	return (
-		<>
-			<div className={ patternClassNames }>
-				<CompositeItem
-					className={ previewClassNames }
-					role="option"
-					as="div"
-					// Even though still incomplete, passing ids helps performance.
-					// @see https://reakit.io/docs/composite/#performance.
-					id={ `edit-site-patterns-${ item.name }` }
-					{ ...props }
-					onClick={ item.type !== PATTERNS ? onClick : undefined }
-					onKeyDown={ isCustomPattern ? onKeyDown : undefined }
-					aria-label={ item.title }
-					aria-describedby={
-						ariaDescriptions.length
-							? ariaDescriptions
-									.map(
-										( _, index ) =>
-											`${ descriptionId }-${ index }`
-									)
-									.join( ' ' )
-							: undefined
-					}
+		<li className={ patternClassNames }>
+			<button
+				className={ previewClassNames }
+				// Even though still incomplete, passing ids helps performance.
+				// @see https://reakit.io/docs/composite/#performance.
+				id={ `edit-site-patterns-${ item.name }` }
+				{ ...props }
+				onClick={ item.type !== PATTERNS ? onClick : undefined }
+				aria-disabled={ item.type !== PATTERNS ? 'false' : 'true' }
+				aria-label={ item.title }
+				aria-describedby={
+					ariaDescriptions.length
+						? ariaDescriptions
+								.map(
+									( _, index ) =>
+										`${ descriptionId }-${ index }`
+								)
+								.join( ' ' )
+						: undefined
+				}
+			>
+				{ isEmpty && __( 'Empty pattern' ) }
+				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
+			</button>
+			{ ariaDescriptions.map( ( ariaDescription, index ) => (
+				<div
+					key={ index }
+					hidden
+					id={ `${ descriptionId }-${ index }` }
 				>
-					{ isEmpty && __( 'Empty pattern' ) }
-					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
-				</CompositeItem>
-				{ ariaDescriptions.map( ( ariaDescription, index ) => (
-					<div
-						key={ index }
-						hidden
-						id={ `${ descriptionId }-${ index }` }
-					>
-						{ ariaDescription }
-					</div>
-				) ) }
+					{ ariaDescription }
+				</div>
+			) ) }
+			<HStack
+				className="edit-site-patterns__footer"
+				justify="space-between"
+			>
 				<HStack
-					aria-hidden="true"
-					className="edit-site-patterns__footer"
-					justify="space-between"
+					alignment="center"
+					justify="left"
+					spacing={ 3 }
+					className="edit-site-patterns__pattern-title"
 				>
-					<HStack
-						alignment="center"
-						justify="left"
-						spacing={ 3 }
-						className="edit-site-patterns__pattern-title"
-					>
-						{ itemIcon && (
-							<Icon
-								className="edit-site-patterns__pattern-icon"
-								icon={ itemIcon }
-							/>
-						) }
-						<Flex
-							as={ Heading }
-							level={ 5 }
-							gap={ 0 }
-							justify="left"
-						>
-							{ item.title }
-							{ item.type === PATTERNS && (
-								<Tooltip
-									position="top center"
-									text={ __(
-										'Theme patterns cannot be edited.'
-									) }
-								>
-									<span className="edit-site-patterns__pattern-lock-icon">
-										<Icon icon={ lockSmall } size={ 24 } />
-									</span>
-								</Tooltip>
-							) }
-						</Flex>
-					</HStack>
-					<DropdownMenu
-						icon={ moreHorizontal }
-						label={ __( 'Actions' ) }
-						className="edit-site-patterns__dropdown"
-						popoverProps={ { placement: 'bottom-end' } }
-						toggleProps={ {
-							className: 'edit-site-patterns__button',
-							isSmall: true,
-							describedBy: sprintf(
-								/* translators: %s: pattern name */
-								__( 'Action menu for %s pattern' ),
-								item.title
-							),
-							// The dropdown menu is not focusable using the
-							// keyboard as this would interfere with the grid's
-							// roving tab index system. Instead, keyboard users
-							// use keyboard shortcuts to trigger actions.
-							tabIndex: -1,
-						} }
-					>
-						{ ( { onClose } ) => (
-							<MenuGroup>
-								{ isCustomPattern && ! hasThemeFile && (
-									<RenameMenuItem
-										item={ item }
-										onClose={ onClose }
-									/>
+					{ itemIcon && (
+						<Icon
+							className="edit-site-patterns__pattern-icon"
+							icon={ itemIcon }
+						/>
+					) }
+					<Flex as="span" gap={ 0 } justify="left">
+						{ item.title }
+						{ item.type === PATTERNS && (
+							<Tooltip
+								position="top center"
+								text={ __(
+									'Theme patterns cannot be edited.'
 								) }
-								<DuplicateMenuItem
-									categoryId={ categoryId }
+							>
+								<span className="edit-site-patterns__pattern-lock-icon">
+									<Icon icon={ lockSmall } size={ 24 } />
+								</span>
+							</Tooltip>
+						) }
+					</Flex>
+				</HStack>
+				<DropdownMenu
+					icon={ moreHorizontal }
+					label={ __( 'Actions' ) }
+					className="edit-site-patterns__dropdown"
+					popoverProps={ { placement: 'bottom-end' } }
+					toggleProps={ {
+						className: 'edit-site-patterns__button',
+						isSmall: true,
+						describedBy: sprintf(
+							/* translators: %s: pattern name */
+							__( 'Action menu for %s pattern' ),
+							item.title
+						),
+					} }
+				>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							{ isCustomPattern && ! hasThemeFile && (
+								<RenameMenuItem
 									item={ item }
 									onClose={ onClose }
-									label={
-										isNonUserPattern
-											? __( 'Copy to My patterns' )
-											: __( 'Duplicate' )
-									}
 								/>
-								{ isCustomPattern && (
-									<MenuItem
-										onClick={ () =>
-											setIsDeleteDialogOpen( true )
-										}
-									>
-										{ hasThemeFile
-											? __( 'Clear customizations' )
-											: __( 'Delete' ) }
-									</MenuItem>
-								) }
-							</MenuGroup>
-						) }
-					</DropdownMenu>
-				</HStack>
-			</div>
+							) }
+							<DuplicateMenuItem
+								categoryId={ categoryId }
+								item={ item }
+								onClose={ onClose }
+								label={
+									isNonUserPattern
+										? __( 'Copy to My patterns' )
+										: __( 'Duplicate' )
+								}
+							/>
+							{ isCustomPattern && (
+								<MenuItem
+									onClick={ () =>
+										setIsDeleteDialogOpen( true )
+									}
+								>
+									{ hasThemeFile
+										? __( 'Clear customizations' )
+										: __( 'Delete' ) }
+								</MenuItem>
+							) }
+						</MenuGroup>
+					) }
+				</DropdownMenu>
+			</HStack>
+
 			{ isDeleteDialogOpen && (
 				<ConfirmDialog
 					confirmButtonText={ confirmButtonText }
@@ -275,7 +252,7 @@ function GridItem( { categoryId, item, ...props } ) {
 					{ confirmPrompt }
 				</ConfirmDialog>
 			) }
-		</>
+		</li>
 	);
 }
 
