@@ -102,7 +102,9 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 							action: newVal,
 						} );
 					} }
-					help={ __( 'Define where the form should be submitted.' ) }
+					help={ __(
+						'Define where the form should be submitted. Leave empty to send an email to the site admin when a form gets submitted.'
+					) }
 				/>
 				<SelectControl
 					__nextHasNoMarginBottom
