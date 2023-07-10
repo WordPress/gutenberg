@@ -8,13 +8,13 @@
 /**
  * Return a function that auto-inserts blocks relative to a given block.
  *
- * @param string $anchor_block      The block to insert relative to.
- * @param string $relative_position The position relative to the given block.
  * @param array  $inserted_block    The block to insert.
+ * @param string $relative_position The position relative to the given block.
+ * @param string $anchor_block      The block to insert relative to.
  * @return callable A function that accepts a block's content and returns the content with the inserted block.
  */
-function gutenberg_auto_insert_block( $anchor_block, $relative_position, $inserted_block ) {
-	return function( $block ) use ( $anchor_block, $relative_position, $inserted_block ) {
+function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anchor_block ) {
+	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block ) {
 		if ( $anchor_block === $block['blockName'] ) {
 			if ( 'first_child' === $relative_position ) {
 				array_unshift( $block['innerBlocks'], $inserted_block );
@@ -125,7 +125,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_bl
  * @return void
  */
 function gutenberg_register_auto_inserted_block( $inserted_block, $position, $anchor_block ) {
-		$inserter = gutenberg_auto_insert_block( $anchor_block, $position, $inserted_block );
+		$inserter = gutenberg_auto_insert_block(  $inserted_block, $position, $anchor_block );
 		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
 }
 
