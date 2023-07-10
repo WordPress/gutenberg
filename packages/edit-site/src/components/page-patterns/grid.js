@@ -49,9 +49,7 @@ export default function Grid( { categoryId, items, ...props } ) {
 				<Text variant="muted" as="p" align="center">
 					{ sprintf(
 						/* translators: %d: number of patterns */
-						__(
-							'+ %d more patterns. Use the search option to display more.'
-						),
+						__( '+ %d more patterns discoverable by searching' ),
 						restLength
 					) }
 				</Text>
