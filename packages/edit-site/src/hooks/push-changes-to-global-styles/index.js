@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -96,6 +91,14 @@ const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 
 const SUPPORTED_STYLES = [ 'border', 'color', 'spacing', 'typography' ];
 
+const getValueFromObjectPath = ( object, path ) => {
+	let value = object;
+	path.forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
+
 function useChangesToPush( name, attributes ) {
 	const supports = useSupportedStyles( name );
 
@@ -115,7 +118,7 @@ function useChangesToPush( name, attributes ) {
 					];
 				const value = presetAttributeValue
 					? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
-					: get( attributes.style, path );
+					: getValueFromObjectPath( attributes.style, path );
 				return value ? [ { path, value } ] : [];
 			} ),
 		[ supports, name, attributes ]
