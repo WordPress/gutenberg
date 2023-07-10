@@ -20,7 +20,7 @@ test.describe( 'Front End Performance', () => {
 	} );
 
 	test.afterAll( async () => {
-		saveResultsFile( __filename, results );
+		saveResultsFile( __filename, results, true );
 	} );
 
 	test( 'Measure TTFB, LCP, and LCP-TTFB', async ( { page } ) => {

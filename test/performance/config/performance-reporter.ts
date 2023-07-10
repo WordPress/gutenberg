@@ -2,190 +2,188 @@
  * External dependencies
  */
 import path from 'path';
-import chalk from 'chalk';
-import { readFileSync, existsSync } from 'fs';
-import type { Reporter, TestCase } from '@playwright/test/reporter';
+import type {
+	Reporter,
+	FullConfig,
+	Suite,
+	FullResult,
+} from '@playwright/test/reporter';
 
 /**
  * Internal dependencies
  */
-import { average, round } from '../utils';
+import {
+	readFile,
+	average,
+	median,
+	formatTime,
+	saveResultsFile,
+} from '../utils';
 
-const title = chalk.bold;
-const success = chalk.bold.green;
+export interface WPRawPerformanceResults {
+	timeToFirstByte: number[];
+	largestContentfulPaint: number[];
+	lcpMinusTtfb: number[];
+	serverResponse: number[];
+	firstPaint: number[];
+	domContentLoaded: number[];
+	loaded: number[];
+	firstContentfulPaint: number[];
+	firstBlock: number[];
+	type: number[];
+	typeContainer: number[];
+	focus: number[];
+	inserterOpen: number[];
+	inserterSearch: number[];
+	inserterHover: number[];
+	listViewOpen: number[];
+}
 
+export interface WPPerformanceResults {
+	timeToFirstByte?: number;
+	largestContentfulPaint?: number;
+	lcpMinusTtfb?: number;
+	serverResponse?: number;
+	firstPaint?: number;
+	domContentLoaded?: number;
+	loaded?: number;
+	firstContentfulPaint?: number;
+	firstBlock?: number;
+	type?: number;
+	minType?: number;
+	maxType?: number;
+	typeContainer?: number;
+	minTypeContainer?: number;
+	maxTypeContainer?: number;
+	focus?: number;
+	minFocus?: number;
+	maxFocus?: number;
+	inserterOpen?: number;
+	minInserterOpen?: number;
+	maxInserterOpen?: number;
+	inserterSearch?: number;
+	minInserterSearch?: number;
+	maxInserterSearch?: number;
+	inserterHover?: number;
+	minInserterHover?: number;
+	maxInserterHover?: number;
+	listViewOpen?: number;
+	minListViewOpen?: number;
+	maxListViewOpen?: number;
+}
+
+/**
+ * Curate the raw performance results.
+ *
+ * @param {string}                  testSuite
+ * @param {WPRawPerformanceResults} results
+ *
+ * @return {WPPerformanceResults} Curated Performance results.
+ */
+export function curateResults(
+	testSuite: string,
+	results: WPRawPerformanceResults
+): WPPerformanceResults {
+	let output: WPPerformanceResults;
+
+	if ( testSuite.includes( 'front-end' ) ) {
+		output = {
+			timeToFirstByte: median( results.timeToFirstByte ),
+			largestContentfulPaint: median( results.largestContentfulPaint ),
+			lcpMinusTtfb: median( results.lcpMinusTtfb ),
+		};
+	} else {
+		output = {
+			serverResponse: average( results.serverResponse ),
+			firstPaint: average( results.firstPaint ),
+			domContentLoaded: average( results.domContentLoaded ),
+			loaded: average( results.loaded ),
+			firstContentfulPaint: average( results.firstContentfulPaint ),
+			firstBlock: average( results.firstBlock ),
+			type: average( results.type ),
+			minType: Math.min( ...results.type ),
+			maxType: Math.max( ...results.type ),
+			typeContainer: average( results.typeContainer ),
+			minTypeContainer: Math.min( ...results.typeContainer ),
+			maxTypeContainer: Math.max( ...results.typeContainer ),
+			focus: average( results.focus ),
+			minFocus: Math.min( ...results.focus ),
+			maxFocus: Math.max( ...results.focus ),
+			inserterOpen: average( results.inserterOpen ),
+			minInserterOpen: Math.min( ...results.inserterOpen ),
+			maxInserterOpen: Math.max( ...results.inserterOpen ),
+			inserterSearch: average( results.inserterSearch ),
+			minInserterSearch: Math.min( ...results.inserterSearch ),
+			maxInserterSearch: Math.max( ...results.inserterSearch ),
+			inserterHover: average( results.inserterHover ),
+			minInserterHover: Math.min( ...results.inserterHover ),
+			maxInserterHover: Math.max( ...results.inserterHover ),
+			listViewOpen: average( results.listViewOpen ),
+			minListViewOpen: Math.min( ...results.listViewOpen ),
+			maxListViewOpen: Math.max( ...results.listViewOpen ),
+		};
+	}
+
+	return Object.fromEntries(
+		Object.entries( output ).map( ( [ key, value ] ) => {
+			return [ key, formatTime( value ) ];
+		} )
+	);
+}
 class PerformanceReporter implements Reporter {
-	onTestEnd( test: TestCase ) {
-		const basename = path.basename( test.location.file, '.js' );
-		const filepath = path.join(
-			process.env.WP_ARTIFACTS_PATH as string,
-			basename + '.performance-results.json'
-		);
+	private testSuites: string[];
 
-		if ( ! existsSync( filepath ) ) {
+	constructor() {
+		this.testSuites = [];
+	}
+
+	onBegin( _: FullConfig, suite: Suite ) {
+		// Map suites from the reporter state instead of reading from the disk
+		// to avoid including existing result files that are irrelevant to the
+		// current run.
+		const suites = suite.suites[ 0 ].suites; // It's where the suites are at.
+		this.testSuites = suites.map( ( s ) =>
+			path.basename( s.location?.file as string, '.spec.js' )
+		);
+	}
+
+	onEnd( result: FullResult ) {
+		if ( result.status !== 'passed' ) {
 			return;
 		}
 
-		const results = readFileSync( filepath, 'utf8' );
-		const {
-			serverResponse,
-			firstPaint,
-			domContentLoaded,
-			loaded,
-			firstContentfulPaint,
-			firstBlock,
-			type,
-			typeContainer,
-			focus,
-			listViewOpen,
-			inserterOpen,
-			inserterHover,
-			inserterSearch,
-			timeToFirstByte,
-			largestContentfulPaint,
-			lcpMinusTtfb,
-		} = JSON.parse( results );
+		for ( const testSuite of this.testSuites ) {
+			// Get raw results filepaths.
+			const rawResultsPath = path.join(
+				process.env.WP_ARTIFACTS_PATH as string,
+				testSuite + '.performance-results.raw.json'
+			);
 
-		if ( serverResponse && serverResponse.length ) {
-			// eslint-disable-next-line no-console
-			console.log( `
-${ title( 'Loading Time:' ) }
-Average time to server response (subtracted from client side metrics): ${ success(
-				round( average( serverResponse ) ) + 'ms'
-			) }
-Average time to first paint: ${ success(
-				round( average( firstPaint ) ) + 'ms'
-			) }
-Average time to DOM content load: ${ success(
-				round( average( domContentLoaded ) ) + 'ms'
-			) }
-Average time to load: ${ success( round( average( loaded ) ) + 'ms' ) }
-Average time to first contentful paint: ${ success(
-				round( average( firstContentfulPaint ) ) + 'ms'
-			) }
-Average time to first block: ${ success(
-				round( average( firstBlock ) ) + 'ms'
-			) }` );
+			// Read the raw metrics.
+			const rawResults = JSON.parse(
+				readFile( rawResultsPath )
+			) as WPRawPerformanceResults;
+
+			// Curate the results.
+			const results = curateResults( testSuite, rawResults );
+
+			// Save curated results to file.
+			saveResultsFile( testSuite, results );
+
+			if ( ! process.env.CI ) {
+				// Print the results.
+				const printableResults = Object.fromEntries(
+					Object.entries( results ).map( ( [ key, value ] ) => {
+						return [ key, { value: `${ value } ms` } ];
+					} )
+				);
+
+				// eslint-disable-next-line no-console
+				console.log( `\n${ testSuite }\n` );
+				// eslint-disable-next-line no-console
+				console.table( printableResults );
+			}
 		}
-
-		if ( type && type.length ) {
-			// eslint-disable-next-line no-console
-			console.log( `
-${ title( 'Typing:' ) }
-Average time to type character: ${ success( round( average( type ) ) + 'ms' ) }
-Slowest time to type character: ${ success(
-				round( Math.max( ...type ) ) + 'ms'
-			) }
-Fastest time to type character: ${ success(
-				round( Math.min( ...type ) ) + 'ms'
-			) }` );
-		}
-
-		if ( typeContainer && typeContainer.length ) {
-			// eslint-disable-next-line no-console
-			console.log( `
-${ title( 'Typing within a container:' ) }
-Average time to type within a container: ${ success(
-				round( average( typeContainer ) ) + 'ms'
-			) }
-Slowest time to type within a container: ${ success(
-				round( Math.max( ...typeContainer ) ) + 'ms'
-			) }
-Fastest time to type within a container: ${ success(
-				round( Math.min( ...typeContainer ) ) + 'ms'
-			) }` );
-		}
-
-		if ( focus && focus.length ) {
-			// eslint-disable-next-line no-console
-			console.log( `
-${ title( 'Block Selection:' ) }
-Average time to select a block: ${ success( round( average( focus ) ) + 'ms' ) }
-Slowest time to select a block: ${ success(
-				round( Math.max( ...focus ) ) + 'ms'
-			) }
-Fastest time to select a block: ${ success(
-				round( Math.min( ...focus ) ) + 'ms'
-			) }` );
-		}
-
-		if ( listViewOpen && listViewOpen.length ) {
-			// eslint-disable-next-line no-console
-			console.log( `
-${ title( 'Opening List View:' ) }
-Average time to open list view: ${ success(
-				round( average( listViewOpen ) ) + 'ms'
-			) }
-Slowest time to open list view: ${ success(
-				round( Math.max( ...listViewOpen ) ) + 'ms'
-			) }
-Fastest time to open list view: ${ success(
-				round( Math.min( ...listViewOpen ) ) + 'ms'
-			) }` );
-		}
-
-		if ( inserterOpen && inserterOpen.length ) {
-			// eslint-disable-next-line no-console
-			console.log( `
-${ title( 'Opening Global Inserter:' ) }
-Average time to open global inserter: ${ success(
-				round( average( inserterOpen ) ) + 'ms'
-			) }
-Slowest time to open global inserter: ${ success(
-				round( Math.max( ...inserterOpen ) ) + 'ms'
-			) }
-Fastest time to open global inserter: ${ success(
-				round( Math.min( ...inserterOpen ) ) + 'ms'
-			) }` );
-		}
-
-		if ( inserterSearch && inserterSearch.length ) {
-			// eslint-disable-next-line no-console
-			console.log( `
-${ title( 'Inserter Search:' ) }
-Average time to type the inserter search input: ${ success(
-				round( average( inserterSearch ) ) + 'ms'
-			) }
-Slowest time to type the inserter search input: ${ success(
-				round( Math.max( ...inserterSearch ) ) + 'ms'
-			) }
-Fastest time to type the inserter search input: ${ success(
-				round( Math.min( ...inserterSearch ) ) + 'ms'
-			) }` );
-		}
-
-		if ( inserterHover && inserterHover.length ) {
-			// eslint-disable-next-line no-console
-			console.log( `
-${ title( 'Inserter Block Item Hover:' ) }
-Average time to move mouse between two block item in the inserter: ${ success(
-				round( average( inserterHover ) ) + 'ms'
-			) }
-Slowest time to move mouse between two block item in the inserter: ${ success(
-				round( Math.max( ...inserterHover ) ) + 'ms'
-			) }
-Fastest time to move mouse between two block item in the inserter: ${ success(
-				round( Math.min( ...inserterHover ) ) + 'ms'
-			) }` );
-		}
-
-		if ( timeToFirstByte && timeToFirstByte.length ) {
-			// eslint-disable-next-line no-console
-			console.log( `
-${ title( 'Front End Performance:' ) }
-Average time to first byte (TTFB): ${ success(
-				round( average( timeToFirstByte ) ) + 'ms'
-			) }
-Average time to largest contentful paint (LCP): ${ success(
-				round( average( largestContentfulPaint ) ) + 'ms'
-			) }
-Average primary content load time (LCP - TTFB): ${ success(
-				round( average( lcpMinusTtfb ) ) + 'ms'
-			) }` );
-		}
-
-		// eslint-disable-next-line no-console
-		console.log( '' );
 	}
 }
 

@@ -32,62 +32,6 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  */
 
 /**
- * @typedef WPRawPerformanceResults
- *
- * @property {number[]} timeToFirstByte        Represents the time since the browser started the request until it received a response.
- * @property {number[]} largestContentfulPaint Represents the time when the main content of the page has likely loaded.
- * @property {number[]} lcpMinusTtfb           Represents the difference between LCP and TTFB.
- * @property {number[]} serverResponse         Represents the time the server takes to respond.
- * @property {number[]} firstPaint             Represents the time when the user agent first rendered after navigation.
- * @property {number[]} domContentLoaded       Represents the time immediately after the document's DOMContentLoaded event completes.
- * @property {number[]} loaded                 Represents the time when the load event of the current document is completed.
- * @property {number[]} firstContentfulPaint   Represents the time when the browser first renders any text or media.
- * @property {number[]} firstBlock             Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number[]} type                   Average type time.
- * @property {number[]} typeContainer          Average type time within a container.
- * @property {number[]} focus                  Average block selection time.
- * @property {number[]} inserterOpen           Average time to open global inserter.
- * @property {number[]} inserterSearch         Average time to search the inserter.
- * @property {number[]} inserterHover          Average time to move mouse between two block item in the inserter.
- * @property {number[]} listViewOpen           Average time to open listView
- */
-
-/**
- * @typedef WPPerformanceResults
- *
- * @property {number=} timeToFirstByte        Represents the time since the browser started the request until it received a response.
- * @property {number=} largestContentfulPaint Represents the time when the main content of the page has likely loaded.
- * @property {number=} lcpMinusTtfb           Represents the difference between LCP and TTFB.
- * @property {number=} serverResponse         Represents the time the server takes to respond.
- * @property {number=} firstPaint             Represents the time when the user agent first rendered after navigation.
- * @property {number=} domContentLoaded       Represents the time immediately after the document's DOMContentLoaded event completes.
- * @property {number=} loaded                 Represents the time when the load event of the current document is completed.
- * @property {number=} firstContentfulPaint   Represents the time when the browser first renders any text or media.
- * @property {number=} firstBlock             Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number=} type                   Average type time.
- * @property {number=} minType                Minimum type time.
- * @property {number=} maxType                Maximum type time.
- * @property {number=} typeContainer          Average type time within a container.
- * @property {number=} minTypeContainer       Minimum type time within a container.
- * @property {number=} maxTypeContainer       Maximum type time within a container.
- * @property {number=} focus                  Average block selection time.
- * @property {number=} minFocus               Min block selection time.
- * @property {number=} maxFocus               Max block selection time.
- * @property {number=} inserterOpen           Average time to open global inserter.
- * @property {number=} minInserterOpen        Min time to open global inserter.
- * @property {number=} maxInserterOpen        Max time to open global inserter.
- * @property {number=} inserterSearch         Average time to open global inserter.
- * @property {number=} minInserterSearch      Min time to open global inserter.
- * @property {number=} maxInserterSearch      Max time to open global inserter.
- * @property {number=} inserterHover          Average time to move mouse between two block item in the inserter.
- * @property {number=} minInserterHover       Min time to move mouse between two block item in the inserter.
- * @property {number=} maxInserterHover       Max time to move mouse between two block item in the inserter.
- * @property {number=} listViewOpen           Average time to open list view.
- * @property {number=} minListViewOpen        Min time to open list view.
- * @property {number=} maxListViewOpen        Max time to open list view.
- */
-
-/**
  * Sanitizes branch name to be used in a path or a filename.
  *
  * @param {string} branch
@@ -96,17 +40,6 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  */
 function sanitizeBranchName( branch ) {
 	return branch.replace( /[^a-zA-Z0-9-]/g, '-' );
-}
-
-/**
- * Computes the average number from an array numbers.
- *
- * @param {number[]} array
- *
- * @return {number} Average.
- */
-function average( array ) {
-	return array.reduce( ( a, b ) => a + b, 0 ) / array.length;
 }
 
 /**
@@ -122,69 +55,6 @@ function median( array ) {
 	return array.length % 2 !== 0
 		? numbers[ mid ]
 		: ( numbers[ mid - 1 ] + numbers[ mid ] ) / 2;
-}
-
-/**
- * Rounds and format a time passed in milliseconds.
- *
- * @param {number} number
- *
- * @return {number} Formatted time.
- */
-function formatTime( number ) {
-	const factor = Math.pow( 10, 2 );
-	return Math.round( number * factor ) / factor;
-}
-
-/**
- * Curate the raw performance results.
- *
- * @param {string}                  testSuite
- * @param {WPRawPerformanceResults} results
- *
- * @return {WPPerformanceResults} Curated Performance results.
- */
-function curateResults( testSuite, results ) {
-	if (
-		testSuite === 'front-end-classic-theme' ||
-		testSuite === 'front-end-block-theme'
-	) {
-		return {
-			timeToFirstByte: median( results.timeToFirstByte ),
-			largestContentfulPaint: median( results.largestContentfulPaint ),
-			lcpMinusTtfb: median( results.lcpMinusTtfb ),
-		};
-	}
-
-	return {
-		serverResponse: average( results.serverResponse ),
-		firstPaint: average( results.firstPaint ),
-		domContentLoaded: average( results.domContentLoaded ),
-		loaded: average( results.loaded ),
-		firstContentfulPaint: average( results.firstContentfulPaint ),
-		firstBlock: average( results.firstBlock ),
-		type: average( results.type ),
-		minType: Math.min( ...results.type ),
-		maxType: Math.max( ...results.type ),
-		typeContainer: average( results.typeContainer ),
-		minTypeContainer: Math.min( ...results.typeContainer ),
-		maxTypeContainer: Math.max( ...results.typeContainer ),
-		focus: average( results.focus ),
-		minFocus: Math.min( ...results.focus ),
-		maxFocus: Math.max( ...results.focus ),
-		inserterOpen: average( results.inserterOpen ),
-		minInserterOpen: Math.min( ...results.inserterOpen ),
-		maxInserterOpen: Math.max( ...results.inserterOpen ),
-		inserterSearch: average( results.inserterSearch ),
-		minInserterSearch: Math.min( ...results.inserterSearch ),
-		maxInserterSearch: Math.max( ...results.inserterSearch ),
-		inserterHover: average( results.inserterHover ),
-		minInserterHover: Math.min( ...results.inserterHover ),
-		maxInserterHover: Math.max( ...results.inserterHover ),
-		listViewOpen: average( results.listViewOpen ),
-		minListViewOpen: Math.min( ...results.listViewOpen ),
-		maxListViewOpen: Math.max( ...results.listViewOpen ),
-	};
 }
 
 /**
@@ -466,7 +336,7 @@ async function runPerformanceTests( branches, options ) {
 	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>
 		file.endsWith( RESULTS_FILE_SUFFIX )
 	);
-	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
+	/** @type {Record<string,Record<string, Record<string, number>>>} */
 	const results = {};
 
 	for ( const testSuite of testSuites ) {
@@ -477,9 +347,7 @@ async function runPerformanceTests( branches, options ) {
 				.filter( ( file ) =>
 					file.includes( `${ testSuite }_${ branch }_round-` )
 				)
-				.map( ( file ) =>
-					curateResults( testSuite, readJSONFile( file ) )
-				);
+				.map( ( file ) => readJSONFile( file ) );
 
 			const metrics = Object.keys( resultsRounds[ 0 ] );
 			results[ testSuite ][ branch ] = {};
@@ -488,9 +356,7 @@ async function runPerformanceTests( branches, options ) {
 				// @ts-ignore
 				const values = resultsRounds.map( ( item ) => item[ metric ] );
 				// @ts-ignore
-				results[ testSuite ][ branch ][ metric ] = formatTime(
-					median( values )
-				);
+				results[ testSuite ][ branch ][ metric ] = median( values );
 			}
 		}
 
@@ -527,7 +393,7 @@ async function runPerformanceTests( branches, options ) {
 			}
 		}
 
-		// Printing the results.
+		// Print the results.
 		console.table( invertedResult );
 	}
 }

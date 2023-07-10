@@ -49,7 +49,7 @@ test.describe( 'Site Editor Performance', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		saveResultsFile( __filename, results );
+		saveResultsFile( __filename, results, true );
 
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );

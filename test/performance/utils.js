@@ -20,10 +20,12 @@ export function getTraceFilePath() {
 	return path.join( process.env.WP_ARTIFACTS_PATH, '/trace.json' );
 }
 
-export function saveResultsFile( testFilename, results ) {
+export function saveResultsFile( testFilename, results, isRaw = false ) {
 	const resultsFilename =
 		process.env.RESULTS_FILENAME ||
-		path.basename( testFilename, '.js' ) + '.performance-results.json';
+		`${ path.basename( testFilename, '.spec.js' ) }.performance-results${
+			isRaw ? '.raw' : ''
+		}.json`;
 
 	return writeFileSync(
 		path.join( process.env.WP_ARTIFACTS_PATH, resultsFilename ),
@@ -145,8 +147,28 @@ export function average( array ) {
 	return array.reduce( ( a, b ) => a + b ) / array.length;
 }
 
+export function median( array ) {
+	const mid = Math.floor( array.length / 2 ),
+		numbers = [ ...array ].sort( ( a, b ) => a - b );
+	return array.length % 2 !== 0
+		? numbers[ mid ]
+		: ( numbers[ mid - 1 ] + numbers[ mid ] ) / 2;
+}
+
 export function round( number, decimalPlaces = 2 ) {
 	const factor = Math.pow( 10, decimalPlaces );
+	return Math.round( number * factor ) / factor;
+}
+
+/**
+ * Rounds and format a time passed in milliseconds.
+ *
+ * @param {number} number
+ *
+ * @return {number} Formatted time.
+ */
+export function formatTime( number ) {
+	const factor = Math.pow( 10, 2 );
 	return Math.round( number * factor ) / factor;
 }
 

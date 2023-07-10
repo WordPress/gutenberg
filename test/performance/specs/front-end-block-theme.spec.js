@@ -20,7 +20,7 @@ test.describe( 'Front End Performance', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		saveResultsFile( __filename, results );
+		saveResultsFile( __filename, results, true );
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 

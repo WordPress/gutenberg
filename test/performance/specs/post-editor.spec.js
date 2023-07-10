@@ -48,7 +48,7 @@ test.describe( 'Post Editor Performance', () => {
 	const traceFilePath = getTraceFilePath();
 
 	test.afterAll( async () => {
-		saveResultsFile( __filename, results );
+		saveResultsFile( __filename, results, true );
 		// Delete the trace file.
 		deleteFile( traceFilePath );
 	} );
