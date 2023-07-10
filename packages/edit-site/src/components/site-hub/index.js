@@ -57,7 +57,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
 				href: dashboardLink,
-				label: __( 'Go back to the Dashboard' ),
+				label: __( 'Go to the Dashboard' ),
 		  }
 		: {
 				href: dashboardLink, // We need to keep the `href` here so the component doesn't remount as a `<button>` and break the animation.
