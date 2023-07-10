@@ -32,6 +32,7 @@ exports[`Paragraph block should render without crashing and match snapshot 1`] =
     onSelectionChange={[Function]}
     placeholder="Start writing…"
     placeholderTextColor="gray"
+    selectionColor="black"
     triggerKeyCodes={[]}
     value=""
   />
