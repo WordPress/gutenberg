@@ -61,6 +61,62 @@ function gutenberg_block_core_form_extra_fields_comment_form( $extra_fields, $at
 add_filter( 'render_block_core_form_extra_fields', 'gutenberg_block_core_form_extra_fields_comment_form', 10, 2 );
 
 /**
+ * Adds extra fields to the form.
+ *
+ * If the form is a comment form, adds the post ID as a hidden field,
+ * to allow the comment to be associated with the post.
+ *
+ * @param string $extra_fields The extra fields.
+ * @param array  $attributes   The block attributes.
+ *
+ * @return string The extra fields.
+ */
+function gutenberg_block_core_form_extra_fields_contact_form( $extra_fields, $attributes ) {
+	if ( empty( $attributes['action'] ) ) {
+		$extra_fields .= wp_nonce_field( 'wp-block-form', 'wp_block_form', true, false );
+		$extra_fields .= '<input type="hidden" name="wp-send-email" value="1">';
+	}
+	return $extra_fields;
+}
+add_filter( 'render_block_core_form_extra_fields', 'gutenberg_block_core_form_extra_fields_contact_form', 10, 2 );
+
+/**
+ * Sends an email if the form is a contact form.
+ *
+ * @return void
+ */
+function gutenberg_block_core_form_email_if_action_is_empty() {
+	// Get the POST data.
+	$params = wp_unslash( $_POST );
+
+	// Bail early if not a form submission, or if the nonce is not valid.
+	if ( empty( $params['wp_block_form'] )
+		|| empty( $params['wp-send-email'] )
+		|| '1' !== $params['wp-send-email']
+		|| ! wp_verify_nonce( $params['wp_block_form'], 'wp-block-form' )
+	) {
+		return;
+	}
+
+	// Start building the email content.
+	$content = sprintf(
+		/* translators: %s: The request URI. */
+		__( 'Form submission from %1$s', 'gutenberg' ) . '</br>',
+		'<a href="' . esc_url( get_site_url( null, $params['_wp_http_referer'] ) ) . '">' . get_bloginfo( 'name' ) . '</a>'
+	);
+
+	$skip_fields = array( 'wp_block_form', '_wp_http_referer', 'wp-send-email' );
+	foreach ( $params as $key => $value ) {
+		if ( in_array( $key, $skip_fields, true ) ) {
+			continue;
+		}
+		$content .= $key . ': ' . $value . '</br>';
+	}
+	wp_mail( get_option( 'admin_email' ), __( 'Form submission', 'gutenberg' ), $content );
+}
+add_action( 'wp', 'gutenberg_block_core_form_email_if_action_is_empty' );
+
+/**
  * Registers the `core/form` block on server.
  */
 function register_block_core_form() {
