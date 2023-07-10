@@ -12,15 +12,19 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 } from '@wordpress/react-native-bridge';
-import { Icon, Image, IMAGE_DEFAULT_FOCAL_POINT } from '@wordpress/components';
+import {
+	Icon,
+	Image,
+	IMAGE_DEFAULT_FOCAL_POINT,
+	VIDEO_ASPECT_RATIO,
+	VideoPlayer,
+} from '@wordpress/components';
 import {
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
-	VIDEO_ASPECT_RATIO,
-	VideoPlayer,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';

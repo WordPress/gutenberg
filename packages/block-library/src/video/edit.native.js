@@ -17,6 +17,8 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	PanelBody,
+	VIDEO_ASPECT_RATIO,
+	VideoPlayer,
 } from '@wordpress/components';
 import { withPreferredColorScheme, compose } from '@wordpress/compose';
 import {
@@ -26,8 +28,6 @@ import {
 	MediaUploadProgress,
 	MEDIA_TYPE_VIDEO,
 	BlockControls,
-	VIDEO_ASPECT_RATIO,
-	VideoPlayer,
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';

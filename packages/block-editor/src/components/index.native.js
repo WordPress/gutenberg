@@ -73,7 +73,6 @@ export {
 	BlockSettingsButton,
 	blockSettingsScreens,
 } from './block-settings';
-export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
 export {
 	getSpacingPresetCssVar,
