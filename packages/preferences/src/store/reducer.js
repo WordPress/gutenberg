@@ -41,6 +41,7 @@ export function defaults( state = {}, action ) {
  */
 function withPersistenceLayer( reducer ) {
 	let persistenceLayer;
+	let isNextChangeExpensive = false;
 
 	return ( state, action ) => {
 		// Setup the persistence layer, and return the persisted data
@@ -51,9 +52,16 @@ function withPersistenceLayer( reducer ) {
 			return persistedData;
 		}
 
+		if ( action.type === 'MARK_NEXT_CHANGE_AS_EXPENSIVE' ) {
+			isNextChangeExpensive = true;
+		}
+
 		const nextState = reducer( state, action );
 		if ( action.type === 'SET_PREFERENCE_VALUE' ) {
-			persistenceLayer?.set( nextState );
+			persistenceLayer?.set( nextState, {
+				isExpensive: isNextChangeExpensive,
+			} );
+			isNextChangeExpensive = false;
 		}
 
 		return nextState;

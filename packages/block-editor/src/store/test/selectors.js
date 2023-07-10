@@ -12,6 +12,7 @@ import { RawHTML } from '@wordpress/element';
  * Internal dependencies
  */
 import * as selectors from '../selectors';
+import { getInsertUsage } from '../private-selectors';
 
 const {
 	getBlockName,
@@ -73,6 +74,11 @@ const {
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
 } = selectors;
+
+jest.mock( '../private-selectors', () => ( {
+	...jest.requireActual( '../private-selectors' ),
+	getInsertUsage: jest.fn(),
+} ) );
 
 describe( 'selectors', () => {
 	let cachedSelectors;
@@ -3288,6 +3294,8 @@ describe( 'selectors', () => {
 
 	describe( 'getInserterItems', () => {
 		it( 'should properly list block type and reusable block items', () => {
+			getInsertUsage.mockImplementation( () => ( {} ) );
+
 			const state = {
 				blocks: {
 					byClientId: new Map(),
@@ -3313,11 +3321,6 @@ describe( 'selectors', () => {
 						},
 					],
 				},
-				// Intentionally include a test case which considers
-				// `insertUsage` as not present within preferences.
-				//
-				// See: https://github.com/WordPress/gutenberg/issues/14580
-				preferences: {},
 				blockListSettings: {},
 				blockEditingModes: new Map(),
 			};
@@ -3360,6 +3363,11 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should correctly cache the return values', () => {
+			// Define the empty object here to simulate that the preferences
+			// store won't return a new object every time.
+			const EMPTY_OBJECT = {};
+			getInsertUsage.mockImplementation( () => EMPTY_OBJECT );
+
 			const state = {
 				blocks: {
 					byClientId: new Map(
@@ -3421,9 +3429,6 @@ describe( 'selectors', () => {
 						},
 					],
 				},
-				preferences: {
-					insertUsage: {},
-				},
 				blockListSettings: {
 					block3: {},
 					block4: {},
@@ -3478,6 +3483,8 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
+			getInsertUsage.mockImplementation( () => ( {} ) );
+
 			const state = {
 				blocks: {
 					byClientId: new Map(
@@ -3511,9 +3518,6 @@ describe( 'selectors', () => {
 					controlledInnerBlocks: {},
 					parents: new Map(),
 				},
-				preferences: {
-					insertUsage: {},
-				},
 				blockListSettings: {},
 				settings: {},
 				blockEditingModes: new Map(),
@@ -3526,6 +3530,9 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should set a frecency', () => {
+			getInsertUsage.mockImplementation( () => ( {
+				'core/test-block-b': { count: 10, time: 1000 },
+			} ) );
 			const state = {
 				blocks: {
 					byClientId: new Map(),
@@ -3533,11 +3540,6 @@ describe( 'selectors', () => {
 					order: new Map(),
 					parents: new Map(),
 					cache: {},
-				},
-				preferences: {
-					insertUsage: {
-						'core/test-block-b': { count: 10, time: 1000 },
-					},
 				},
 				blockListSettings: {},
 				settings: {},
@@ -3780,6 +3782,10 @@ describe( 'selectors', () => {
 			);
 		} );
 		it( 'should set frecency', () => {
+			getInsertUsage.mockImplementation( () => ( {
+				'core/with-tranforms-a': { count: 10, time: 1000 },
+			} ) );
+
 			const state = {
 				blocks: {
 					byClientId: new Map(),

@@ -30,6 +30,7 @@ import {
 	__experimentalUpdateSettings,
 	ensureDefaultBlock,
 	privateRemoveBlocks,
+	updateInsertUsage,
 } from './private-actions';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
@@ -398,11 +399,11 @@ export const replaceBlocks =
 			type: 'REPLACE_BLOCKS',
 			clientIds,
 			blocks,
-			time: Date.now(),
 			indexToSelect,
 			initialPosition,
 			meta,
 		} );
+		dispatch( updateInsertUsage( blocks ) );
 		dispatch( ensureDefaultBlock() );
 	};
 
@@ -603,12 +604,12 @@ export const insertBlocks =
 			}
 		}
 		if ( allowedBlocks.length ) {
+			dispatch( updateInsertUsage( blocks ) );
 			dispatch( {
 				type: 'INSERT_BLOCKS',
 				blocks: allowedBlocks,
 				index,
 				rootClientId,
-				time: Date.now(),
 				updateSelection,
 				initialPosition: updateSelection ? initialPosition : null,
 				meta,
@@ -1214,7 +1215,6 @@ export function replaceInnerBlocks(
 		blocks,
 		updateSelection,
 		initialPosition: updateSelection ? initialPosition : null,
-		time: Date.now(),
 	};
 }
 

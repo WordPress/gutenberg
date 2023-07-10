@@ -6,8 +6,9 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
+import { createRegistrySelector, select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -19,6 +20,8 @@ import {
 	getBlockOrder,
 	getBlockParents,
 } from './selectors';
+
+const EMPTY_OBJECT = {};
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -205,3 +208,19 @@ export function getRemovalPromptData( state ) {
 export function getBlockRemovalRules( state ) {
 	return state.blockRemovalRules;
 }
+
+/**
+ * Return all insert usage stats.
+ *
+ * This is only exported since registry selectors need to be exported. It's marked
+ * as unstable so that it's not considered part of the public API.
+ *
+ * @return {Object<string,Object>} An object with an `id` key representing the type
+ *                                 of block and an object value that contains
+ *                                 block insertion statistics.
+ */
+export const getInsertUsage = createRegistrySelector(
+	( registrySelect ) => () =>
+		registrySelect( preferencesStore ).get( 'core', 'insertUsage' ) ??
+		EMPTY_OBJECT
+);

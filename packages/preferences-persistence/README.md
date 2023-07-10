@@ -42,6 +42,7 @@ _Parameters_
 -   _options.preloadedData_ `?Object`: Any persisted preferences data that should be preloaded. When set, the persistence layer will avoid fetching data from the REST API.
 -   _options.localStorageRestoreKey_ `?string`: The key to use for restoring the localStorage backup, used when the persistence layer calls `localStorage.getItem` or `localStorage.setItem`.
 -   _options.requestDebounceMS_ `?number`: Debounce requests to the API so that they only occur at minimum every `requestDebounceMS` milliseconds, and don't swamp the server. Defaults to 2500ms.
+-   _options.expensiveRequestDebounceMS_ `?number`: A longer debounce that can be defined for updates that have `isExpensive=true` defined. defaults to 60000ms.
 
 _Returns_
 

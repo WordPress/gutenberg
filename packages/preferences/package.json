@@ -34,6 +34,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/private-apis": "file:../private-apis",
 		"classnames": "^2.3.1"
 	},
 	"peerDependencies": {
