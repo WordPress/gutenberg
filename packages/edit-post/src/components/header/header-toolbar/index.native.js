@@ -6,7 +6,7 @@ import { Platform, ScrollView, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -50,10 +50,6 @@ function HeaderToolbar( {
 	noContentSelected,
 } ) {
 	const anchorNodeRef = useRef();
-	const wasNoContentSelected = useRef( noContentSelected );
-	// eslint-disable-next-line no-unused-vars
-	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
-
 	const containerStyle = getStylesFromColorScheme(
 		styles[ 'header-toolbar__container' ],
 		styles[ 'header-toolbar__container--dark' ]
@@ -152,16 +148,6 @@ function HeaderToolbar( {
 		</ToolbarGroup>
 	);
 
-	const onToggleInserter = useCallback(
-		( isOpen ) => {
-			if ( isOpen ) {
-				wasNoContentSelected.current = noContentSelected;
-			}
-			setIsInserterOpen( isOpen );
-		},
-		[ noContentSelected ]
-	);
-
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
@@ -183,10 +169,7 @@ function HeaderToolbar( {
 					styles[ 'header-toolbar__scrollable-content' ]
 				}
 			>
-				<Inserter
-					disabled={ ! showInserter }
-					onToggle={ onToggleInserter }
-				/>
+				<Inserter disabled={ ! showInserter } />
 
 				{ noContentSelected && renderMediaButtons }
 				{ renderHistoryButtons() }
