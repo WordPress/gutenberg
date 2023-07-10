@@ -13,7 +13,6 @@ import {
 } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { ReusableBlocksRenameHint } from '@wordpress/block-editor';
-import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -21,22 +20,50 @@ import { getQueryArgs } from '@wordpress/url';
 import { store as editorStore } from '../../store';
 
 export default function PostSyncStatus() {
+	const { syncStatus, postType, meta } = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
+		return {
+			syncStatus: getEditedPostAttribute( 'wp_pattern_sync_status' ),
+			meta: getEditedPostAttribute( 'meta' ),
+			postType: getEditedPostAttribute( 'type' ),
+		};
+	} );
+
+	if ( postType !== 'wp_block' ) {
+		return null;
+	}
+	// When the post is first created, the top level wp_pattern_sync_status is not set so get meta value instead.
+	const currentSyncStatus =
+		meta.wp_pattern_sync_status === 'unsynced' ? 'unsynced' : syncStatus;
+
+	return (
+		<PanelRow className="edit-post-sync-status">
+			<span>{ __( 'Sync status' ) }</span>
+			<div>
+				{ currentSyncStatus === 'unsynced'
+					? __( 'Not synced' )
+					: __( 'Fully synced' ) }
+			</div>
+		</PanelRow>
+	);
+}
+
+export function PostSyncStatusModal() {
 	const { editPost } = useDispatch( editorStore );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ syncType, setSyncType ] = useState( 'fully' );
 
-	const { syncStatus, postType, isNewPost } = useSelect( ( select ) => {
+	const { postType, isNewPost } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, isCleanNewPost } =
 			select( editorStore );
 		return {
-			syncStatus: getEditedPostAttribute( 'wp_pattern_sync_status' ),
 			postType: getEditedPostAttribute( 'type' ),
 			isNewPost: isCleanNewPost(),
 		};
 	}, [] );
 
 	useEffect( () => {
-		if ( isNewPost ) {
+		if ( isNewPost && postType === 'wp_block' ) {
 			setIsModalOpen( true );
 		}
 		// We only want the modal to open when the page is first loaded.
@@ -47,7 +74,7 @@ export default function PostSyncStatus() {
 		editPost( {
 			meta: {
 				wp_pattern_sync_status:
-					syncType === 'unsynced' ? 'unsynced' : null,
+					syncType === 'unsynced' ? 'unsynced' : undefined,
 			},
 		} );
 	};
@@ -55,11 +82,9 @@ export default function PostSyncStatus() {
 	if ( postType !== 'wp_block' ) {
 		return null;
 	}
-	const { action } = getQueryArgs( window.location.href );
-	const currentSyncStatus = action === 'edit' ? syncStatus : syncType;
 
 	return (
-		<PanelRow className="edit-post-sync-status">
+		<>
 			{ isModalOpen && (
 				<Modal
 					title={ __( 'Set pattern sync status' ) }
@@ -100,12 +125,6 @@ export default function PostSyncStatus() {
 					</form>
 				</Modal>
 			) }
-			<span>{ __( 'Sync status' ) }</span>
-			<div>
-				{ currentSyncStatus === 'unsynced'
-					? __( 'Not synced' )
-					: __( 'Fully synced' ) }
-			</div>
-		</PanelRow>
+		</>
 	);
 }
