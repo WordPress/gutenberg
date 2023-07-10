@@ -28,6 +28,20 @@ _Returns_
 
 -   `Promise<() => void>`: Promise that resolves when the connection is established.
 
+### connectWebRTC
+
+Connect function to the IndexedDB persistence provider.
+
+_Parameters_
+
+-   _objectId_ `ObjectID`: The object ID.
+-   _objectType_ `ObjectType`: The object type.
+-   _doc_ `CRDTDoc`: The CRDT document.
+
+_Returns_
+
+-   `Promise<() => void>`: Promise that resolves when the connection is established.
+
 ### createSyncProvider
 
 Create a sync provider.

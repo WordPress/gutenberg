@@ -1,12 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { createSyncProvider, connectIndexDb } from '@wordpress/sync';
+import {
+	createSyncProvider,
+	connectIndexDb,
+	connectWebRTC,
+} from '@wordpress/sync';
 
 let syncProvider;
+
 export function getSyncProvider() {
 	if ( ! syncProvider ) {
-		syncProvider = createSyncProvider( connectIndexDb );
+		syncProvider = createSyncProvider( connectIndexDb, connectWebRTC );
 	}
 
 	return syncProvider;
