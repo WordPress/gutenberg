@@ -187,4 +187,7 @@ module.exports = {
 	placeholderColor: {
 		color: 'gray',
 	},
+	'rich-text-selection': {
+		color: 'black',
+	},
 };
