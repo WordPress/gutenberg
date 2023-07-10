@@ -108,7 +108,7 @@ function fromFormat( {
 	}
 
 	return {
-		type: formatType.tagName === '*' ? tagName : formatType.tagName,
+		type: tagName || formatType.tagName,
 		object: formatType.object,
 		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
 	};
@@ -326,7 +326,11 @@ export function toTree( {
 					} )
 				);
 
-				if ( innerHTML ) append( pointer, innerHTML );
+				if ( innerHTML ) {
+					append( pointer, {
+						html: innerHTML,
+					} );
+				}
 			} else {
 				pointer = append(
 					getParent( pointer ),
