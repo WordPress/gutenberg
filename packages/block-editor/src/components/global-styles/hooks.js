@@ -479,19 +479,19 @@ export function __experimentalUseGlobalBehaviors(
 	let rawResult, result;
 	switch ( source ) {
 		case 'all':
-			rawResult = get( mergedConfig, finalPath );
+			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'user':
-			rawResult = get( userConfig, finalPath );
+			rawResult = getValueFromObjectPath( userConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'base':
-			rawResult = get( baseConfig, finalPath );
+			rawResult = getValueFromObjectPath( baseConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( baseConfig, blockName, rawResult )
 				: rawResult;
@@ -543,7 +543,7 @@ export function __experimentalUseGlobalBehaviors(
 		setUserConfig( ( currentConfig ) => {
 			// Deep clone `currentConfig` to avoid mutating it later.
 			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set( newUserConfig, finalPath, newBehavior );
+			setImmutably( newUserConfig, finalPath, newBehavior );
 			return newUserConfig;
 		} );
 	};
