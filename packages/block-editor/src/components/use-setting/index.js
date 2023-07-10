@@ -132,7 +132,7 @@ export default function useSetting( path ) {
 				blockName
 			);
 
-			if ( undefined !== result ) {
+			if ( result ) {
 				return result;
 			}
 
@@ -170,7 +170,7 @@ export default function useSetting( path ) {
 							`settings.blocks.${ blockName }.${ normalizedPath }`
 						) ??
 						get( candidateAtts, `settings.${ normalizedPath }` );
-					if ( result !== undefined ) {
+					if ( result ) {
 						// Stop the search for more distant ancestors and move on.
 						break;
 					}
@@ -179,7 +179,7 @@ export default function useSetting( path ) {
 
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
-			if ( result === undefined ) {
+			if ( ! result ) {
 				const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
 				const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
 				result =
@@ -187,7 +187,7 @@ export default function useSetting( path ) {
 			}
 
 			// Return if the setting was found in either the block instance or the store.
-			if ( result !== undefined ) {
+			if ( result ) {
 				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
 					return result.custom ?? result.theme ?? result.default;
 				}
