@@ -4,13 +4,17 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
+	Flex,
+	Icon,
+	Tooltip,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
-import { file } from '@wordpress/icons';
+import { file, starFilled, lockSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,19 +23,82 @@ import AddNewPattern from '../add-new-pattern';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
-import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-library/utils';
+import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-patterns/utils';
 import { store as editSiteStore } from '../../store';
+import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
+import useMyPatterns from './use-my-patterns';
 import useTemplatePartAreas from './use-template-part-areas';
 
-const templatePartAreaLabels = {
-	header: __( 'Headers' ),
-	footer: __( 'Footers' ),
-	sidebar: __( 'Sidebar' ),
-	uncategorized: __( 'Uncategorized' ),
-};
+function TemplatePartGroup( { areas, currentArea, currentType } ) {
+	return (
+		<>
+			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
+				<Heading level={ 2 }>{ __( 'Template parts' ) }</Heading>
+			</div>
+			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+				{ Object.entries( areas ).map(
+					( [ area, { label, templateParts } ] ) => (
+						<CategoryItem
+							key={ area }
+							count={ templateParts?.length }
+							icon={ getTemplatePartIcon( area ) }
+							label={ label }
+							id={ area }
+							type="wp_template_part"
+							isActive={
+								currentArea === area &&
+								currentType === 'wp_template_part'
+							}
+						/>
+					)
+				) }
+			</ItemGroup>
+		</>
+	);
+}
 
-export default function SidebarNavigationScreenLibrary() {
+function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
+	return (
+		<>
+			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
+				<Heading level={ 2 }>{ __( 'Theme patterns' ) }</Heading>
+			</div>
+			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+				{ categories.map( ( category ) => (
+					<CategoryItem
+						key={ category.name }
+						count={ category.count }
+						label={
+							<Flex justify="left" align="center" gap={ 0 }>
+								{ category.label }
+								<Tooltip
+									position="top center"
+									text={ __(
+										'Theme patterns cannot be edited.'
+									) }
+								>
+									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
+										<Icon icon={ lockSmall } size={ 24 } />
+									</span>
+								</Tooltip>
+							</Flex>
+						}
+						icon={ file }
+						id={ category.name }
+						type="pattern"
+						isActive={
+							currentCategory === `${ category.name }` &&
+							currentType === 'pattern'
+						}
+					/>
+				) ) }
+			</ItemGroup>
+		</>
+	);
+}
+
+export default function SidebarNavigationScreenPatterns() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
 	const currentCategory = categoryId || DEFAULT_CATEGORY;
@@ -40,40 +107,45 @@ export default function SidebarNavigationScreenLibrary() {
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
 	const { patternCategories, hasPatterns } = usePatternCategories();
+	const { myPatterns, hasPatterns: hasMyPatterns } = useMyPatterns();
 
 	const isTemplatePartsMode = useSelect( ( select ) => {
 		const settings = select( editSiteStore ).getSettings();
 		return !! settings.supportsTemplatePartsMode;
 	}, [] );
 
+	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
+	const footer = ! isMobileViewport ? (
+		<ItemGroup>
+			<SidebarNavigationItem withChevron { ...templatePartsLink }>
+				{ __( 'Manage all template parts' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				as="a"
+				href="edit.php?post_type=wp_block"
+				withChevron
+			>
+				{ __( 'Manage all of my patterns' ) }
+			</SidebarNavigationItem>
+		</ItemGroup>
+	) : undefined;
+
 	return (
 		<SidebarNavigationScreen
 			isRoot={ isTemplatePartsMode }
-			title={ __( 'Library' ) }
+			title={ __( 'Patterns' ) }
 			description={ __(
-				'Manage what patterns are available when editing your site.'
+				'Manage what patterns are available when editing the site.'
 			) }
 			actions={ <AddNewPattern /> }
-			footer={
-				<ItemGroup>
-					{ ! isMobileViewport && (
-						<SidebarNavigationItem
-							as="a"
-							href="edit.php?post_type=wp_block"
-							withChevron
-						>
-							{ __( 'Manage all custom patterns' ) }
-						</SidebarNavigationItem>
-					) }
-				</ItemGroup>
-			}
+			footer={ footer }
 			content={
 				<>
-					{ isLoading && __( 'Loading library' ) }
+					{ isLoading && __( 'Loading patterns' ) }
 					{ ! isLoading && (
 						<>
 							{ ! hasTemplateParts && ! hasPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-library__group">
+								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 									<Item>
 										{ __(
 											'No template parts or patterns found'
@@ -81,55 +153,36 @@ export default function SidebarNavigationScreenLibrary() {
 									</Item>
 								</ItemGroup>
 							) }
-							{ hasTemplateParts && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-library__group">
-									{ Object.entries( templatePartAreas ).map(
-										( [ area, parts ] ) => (
-											<CategoryItem
-												key={ area }
-												count={ parts.length }
-												icon={ getTemplatePartIcon(
-													area
-												) }
-												label={
-													templatePartAreaLabels[
-														area
-													]
-												}
-												id={ area }
-												type="wp_template_part"
-												// A human readable label for the type.
-												typeLabel={ __(
-													'template part'
-												) }
-												isActive={
-													currentCategory === area &&
-													currentType ===
-														'wp_template_part'
-												}
-											/>
-										)
-									) }
+							{ hasMyPatterns && (
+								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+									<CategoryItem
+										key={ myPatterns.name }
+										count={ myPatterns.count }
+										label={ myPatterns.label }
+										icon={ starFilled }
+										id={ myPatterns.name }
+										type="wp_block"
+										isActive={
+											currentCategory ===
+												`${ myPatterns.name }` &&
+											currentType === 'wp_block'
+										}
+									/>
 								</ItemGroup>
 							) }
+							{ hasTemplateParts && (
+								<TemplatePartGroup
+									areas={ templatePartAreas }
+									currentArea={ currentCategory }
+									currentType={ currentType }
+								/>
+							) }
 							{ hasPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-library__group">
-									{ patternCategories.map( ( category ) => (
-										<CategoryItem
-											key={ category.name }
-											count={ category.count }
-											label={ category.label }
-											icon={ file }
-											id={ category.name }
-											type="pattern"
-											isActive={
-												currentCategory ===
-													`${ category.name }` &&
-												currentType === 'pattern'
-											}
-										/>
-									) ) }
-								</ItemGroup>
+								<ThemePatternsGroup
+									categories={ patternCategories }
+									currentCategory={ currentCategory }
+									currentType={ currentType }
+								/>
 							) }
 						</>
 					) }

@@ -11,7 +11,7 @@ import { useMemo } from '@wordpress/element';
 import {
 	CORE_PATTERN_SOURCES,
 	filterOutDuplicatesByName,
-} from '../page-library/utils';
+} from '../page-patterns/utils';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 

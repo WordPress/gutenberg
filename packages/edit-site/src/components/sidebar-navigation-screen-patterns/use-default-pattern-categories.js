@@ -1,32 +1,47 @@
 /**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
+import useDefaultPatternCategories from './use-default-pattern-categories';
+import useThemePatterns from './use-theme-patterns';
 
-export default function useDefaultPatternCategories() {
-	const blockPatternCategories = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-		const settings = getSettings();
+export default function usePatternCategories() {
+	const defaultCategories = useDefaultPatternCategories();
+	const themePatterns = useThemePatterns();
 
-		return (
-			settings.__experimentalAdditionalBlockPatternCategories ??
-			settings.__experimentalBlockPatternCategories
-		);
-	} );
+	const patternCategories = useMemo( () => {
+		const categoryMap = {};
+		const categoriesWithCounts = [];
 
-	const restBlockPatternCategories = useSelect( ( select ) =>
-		select( coreStore ).getBlockPatternCategories()
-	);
+		// Create a map for easier counting of patterns in categories.
+		defaultCategories.forEach( ( category ) => {
+			if ( ! categoryMap[ category.name ] ) {
+				categoryMap[ category.name ] = { ...category, count: 0 };
+			}
+		} );
 
-	return [
-		...( blockPatternCategories || [] ),
-		...( restBlockPatternCategories || [] ),
-	];
+		// Update the category counts to reflect theme registered patterns.
+		themePatterns.forEach( ( pattern ) => {
+			pattern.categories?.forEach( ( category ) => {
+				if ( categoryMap[ category ] ) {
+					categoryMap[ category ].count += 1;
+				}
+			} );
+		} );
+
+		// Filter categories so we only have those containing patterns.
+		defaultCategories.forEach( ( category ) => {
+			if ( categoryMap[ category.name ].count ) {
+				categoriesWithCounts.push( categoryMap[ category.name ] );
+			}
+		} );
+
+		return categoriesWithCounts;
+	}, [ defaultCategories, themePatterns ] );
+
+	return { patternCategories, hasPatterns: !! patternCategories.length };
 }
