@@ -51,7 +51,7 @@ export default function PostSyncStatus() {
 export function PostSyncStatusModal() {
 	const { editPost } = useDispatch( editorStore );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const [ syncType, setSyncType ] = useState( 'fully' );
+	const [ syncType, setSyncType ] = useState( undefined );
 
 	const { postType, isNewPost } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, isCleanNewPost } =
@@ -73,8 +73,7 @@ export function PostSyncStatusModal() {
 	const setSyncStatus = () => {
 		editPost( {
 			meta: {
-				wp_pattern_sync_status:
-					syncType === 'unsynced' ? 'unsynced' : undefined,
+				wp_pattern_sync_status: syncType,
 			},
 		} );
 	};
@@ -107,12 +106,10 @@ export function PostSyncStatusModal() {
 								help={ __(
 									'Editing the pattern will update it anywhere it is used.'
 								) }
-								checked={ syncType === 'fully' }
+								checked={ ! syncType }
 								onChange={ () => {
 									setSyncType(
-										syncType === 'fully'
-											? 'unsynced'
-											: 'fully'
+										! syncType ? 'unsynced' : undefined
 									);
 								} }
 							/>
