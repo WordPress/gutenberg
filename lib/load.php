@@ -149,7 +149,6 @@ if ( class_exists( 'WP_Fonts_Library' ) || class_exists( 'WP_Fonts_Library_Contr
 		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts.php';
 		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts-provider-local.php';
 		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts-resolver.php';
-		require __DIR__ . '/experimental/fonts/bc-layer/fonts-api.php';
 		require __DIR__ . '/experimental/fonts/bc-layer/class-gutenberg-fonts-api-bc-layer.php';
 		require __DIR__ . '/experimental/fonts/bc-layer/webfonts-deprecations.php';
 		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-webfonts-utils.php';
