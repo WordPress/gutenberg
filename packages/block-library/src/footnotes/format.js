@@ -8,7 +8,7 @@ import { v4 as createId } from 'uuid';
  */
 import { __ } from '@wordpress/i18n';
 import { formatListNumbered as icon } from '@wordpress/icons';
-import { insertObject } from '@wordpress/rich-text';
+import { remove, insertObject } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	store as blockEditorStore,
@@ -40,7 +40,13 @@ export const format = {
 		} = useSelect( blockEditorStore );
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
+
 		function onClick() {
+			if ( isObjectActive ) {
+				onChange( remove( value, value.start, value.end ) );
+				return;
+			}
+
 			registry.batch( () => {
 				const id = createId();
 				const newValue = insertObject(
