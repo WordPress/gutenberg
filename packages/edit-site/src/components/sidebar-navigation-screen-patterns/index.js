@@ -75,7 +75,7 @@ function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 								<Tooltip
 									position="top center"
 									text={ __(
-										'Theme patterns cannot be edited.'
+										'Theme & plugin patterns cannot be edited.'
 									) }
 								>
 									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
