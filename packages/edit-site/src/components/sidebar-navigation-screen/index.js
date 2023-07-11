@@ -78,7 +78,7 @@ export default function SidebarNavigationScreen( {
 							icon={ icon }
 							label={
 								! isPreviewingTheme()
-									? __( 'Go back to the Dashboard' )
+									? __( 'Go to the Dashboard' )
 									: __( 'Go back to the theme showcase' )
 							}
 							href={
@@ -90,7 +90,7 @@ export default function SidebarNavigationScreen( {
 					) }
 					<Heading
 						className="edit-site-sidebar-navigation-screen__title"
-						color={ 'white' }
+						color={ '#e0e0e0' /* $gray-200 */ }
 						level={ 1 }
 						size={ 20 }
 					>

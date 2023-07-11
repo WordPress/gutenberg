@@ -150,6 +150,22 @@ describe( 'setImmutably', () => {
 			expect( result ).toEqual( { test: 2 } );
 		} );
 
+		it( 'handles first level arrays properly', () => {
+			const result = setImmutably( [ 5 ], 0, 6 );
+
+			expect( result ).toEqual( [ 6 ] );
+		} );
+
+		it( 'handles nested arrays properly', () => {
+			const result = setImmutably(
+				[ [ 'foo', [ 'bar' ] ] ],
+				[ 0, 1, 0 ],
+				'baz'
+			);
+
+			expect( result ).toEqual( [ [ 'foo', [ 'baz' ] ] ] );
+		} );
+
 		describe( 'with array notation access', () => {
 			it( 'assigns values at deeper levels', () => {
 				const result = setImmutably( {}, [ 'foo', 'bar', 'baz' ], 5 );
@@ -235,6 +251,26 @@ describe( 'setImmutably', () => {
 			expect( result.foo ).not.toBe( input.foo );
 			expect( result.foo.bar ).not.toBe( input.foo.bar );
 			expect( result.foo.bar.baz ).not.toBe( input.foo.bar.baz );
+		} );
+
+		it( 'clones arrays at the first level', () => {
+			const input = [];
+			const result = setImmutably( input, 0, 1 );
+
+			expect( result ).not.toBe( input );
+		} );
+
+		it( 'clones arrays at deeper levels', () => {
+			const input = [ [ [ [ 'foo', [ 'bar' ] ] ] ] ];
+			const result = setImmutably( input, [ 0, 0, 0, 1, 0 ], 'baz' );
+
+			expect( result ).not.toBe( input );
+			expect( result[ 0 ] ).not.toBe( input[ 0 ] );
+			expect( result[ 0 ][ 0 ] ).not.toBe( input[ 0 ][ 0 ] );
+			expect( result[ 0 ][ 0 ][ 0 ] ).not.toBe( input[ 0 ][ 0 ][ 0 ] );
+			expect( result[ 0 ][ 0 ][ 0 ][ 1 ] ).not.toBe(
+				input[ 0 ][ 0 ][ 0 ][ 1 ]
+			);
 		} );
 	} );
 } );

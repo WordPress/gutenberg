@@ -28,9 +28,16 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 					...settings,
 					__internalIsInitialized: true,
 				},
-				stripExperimentalSettings
+				{
+					stripExperimentalSettings,
+					reset: true,
+				}
 			);
-		}, [ settings ] );
+		}, [
+			settings,
+			stripExperimentalSettings,
+			__experimentalUpdateSettings,
+		] );
 
 		// Syncs the entity provider with changes in the block-editor store.
 		useBlockSync( props );

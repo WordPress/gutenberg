@@ -66,6 +66,7 @@ export default function HeaderEditMode() {
 		homeUrl,
 		showIconLabels,
 		editorCanvasView,
+		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -83,6 +84,8 @@ export default function HeaderEditMode() {
 			getUnstableBase, // Site index.
 		} = select( coreStore );
 
+		const { get: getPreference } = select( preferencesStore );
+
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			templateType: postType,
@@ -94,16 +97,20 @@ export default function HeaderEditMode() {
 			isVisualMode: getEditorMode() === 'visual',
 			blockEditorMode: __unstableGetEditorMode(),
 			homeUrl: getUnstableBase()?.home,
-			showIconLabels: select( preferencesStore ).get(
-				'core/edit-site',
+			showIconLabels: getPreference(
+				editSiteStore.name,
 				'showIconLabels'
 			),
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
-			isDistractionFree: select( preferencesStore ).get(
-				'core/edit-site',
+			isDistractionFree: getPreference(
+				editSiteStore.name,
 				'distractionFree'
+			),
+			hasFixedToolbar: getPreference(
+				editSiteStore.name,
+				'fixedToolbar'
 			),
 		};
 	}, [] );
@@ -213,14 +220,18 @@ export default function HeaderEditMode() {
 						) }
 						{ isLargeViewport && (
 							<>
-								<ToolbarItem
-									as={ ToolSelector }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-									disabled={ ! isVisualMode }
-								/>
+								{ ! hasFixedToolbar && (
+									<ToolbarItem
+										as={ ToolSelector }
+										showTooltip={ ! showIconLabels }
+										variant={
+											showIconLabels
+												? 'tertiary'
+												: undefined
+										}
+										disabled={ ! isVisualMode }
+									/>
+								) }
 								<ToolbarItem
 									as={ UndoButton }
 									showTooltip={ ! showIconLabels }
@@ -257,7 +268,8 @@ export default function HeaderEditMode() {
 									/>
 								) }
 								{ isZoomedOutViewExperimentEnabled &&
-									! isDistractionFree && (
+									! isDistractionFree &&
+									! hasFixedToolbar && (
 										<ToolbarItem
 											as={ Button }
 											className="edit-site-header-edit-mode__zoom-out-view-toggle"
@@ -311,21 +323,24 @@ export default function HeaderEditMode() {
 								setDeviceType={ setPreviewDeviceType }
 								label={ __( 'View' ) }
 							>
-								<MenuGroup>
-									<MenuItem
-										href={ homeUrl }
-										target="_blank"
-										icon={ external }
-									>
-										{ __( 'View site' ) }
-										<VisuallyHidden as="span">
-											{
-												/* translators: accessibility text */
-												__( '(opens in a new tab)' )
-											}
-										</VisuallyHidden>
-									</MenuItem>
-								</MenuGroup>
+								{ ( { onClose } ) => (
+									<MenuGroup>
+										<MenuItem
+											href={ homeUrl }
+											target="_blank"
+											icon={ external }
+											onClick={ onClose }
+										>
+											{ __( 'View site' ) }
+											<VisuallyHidden as="span">
+												{
+													/* translators: accessibility text */
+													__( '(opens in a new tab)' )
+												}
+											</VisuallyHidden>
+										</MenuItem>
+									</MenuGroup>
+								) }
 							</PreviewOptions>
 						</div>
 					) }

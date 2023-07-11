@@ -4,8 +4,6 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	code,
-	cog,
 	trash,
 	backup,
 	layout,
@@ -13,6 +11,9 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
+	cog,
+	code,
+	keyboardClose,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -26,20 +27,60 @@ import { store as editSiteStore } from '../../store';
 import useEditedEntityRecord from '../../components/use-edited-entity-record';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
+import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
+import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
-function useEditModeCommandLoader() {
-	const { isLoaded, record: template } = useEditedEntityRecord();
-	const { removeTemplate, revertTemplate, setHasPageContentFocus } =
-		useDispatch( editSiteStore );
-	const history = useHistory();
-	const { isPage, hasPageContentFocus } = useSelect(
+function usePageContentFocusCommands() {
+	const { isPage, canvasMode, hasPageContentFocus } = useSelect(
 		( select ) => ( {
 			isPage: select( editSiteStore ).isPage(),
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
 		} ),
+		[]
+	);
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+
+	if ( ! isPage || canvasMode !== 'edit' ) {
+		return { isLoading: false, commands: [] };
+	}
+
+	const commands = [];
+
+	if ( hasPageContentFocus ) {
+		commands.push( {
+			name: 'core/switch-to-template-focus',
+			label: __( 'Edit template' ),
+			icon: layout,
+			callback: ( { close } ) => {
+				setHasPageContentFocus( false );
+				close();
+			},
+		} );
+	} else {
+		commands.push( {
+			name: 'core/switch-to-page-focus',
+			label: __( 'Back to page' ),
+			icon: page,
+			callback: ( { close } ) => {
+				setHasPageContentFocus( true );
+				close();
+			},
+		} );
+	}
+
+	return { isLoading: false, commands };
+}
+
+function useManipulateDocumentCommands() {
+	const { isLoaded, record: template } = useEditedEntityRecord();
+	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
+	const history = useHistory();
+	const hasPageContentFocus = useSelect(
+		( select ) => select( editSiteStore ).hasPageContentFocus(),
 		[]
 	);
 
@@ -48,32 +89,6 @@ function useEditModeCommandLoader() {
 	}
 
 	const commands = [];
-
-	if ( isPage ) {
-		if ( hasPageContentFocus ) {
-			commands.push( {
-				name: 'core/switch-to-template-focus',
-				label: __( 'Edit template' ),
-				icon: layout,
-				context: 'site-editor-edit',
-				callback: ( { close } ) => {
-					setHasPageContentFocus( false );
-					close();
-				},
-			} );
-		} else {
-			commands.push( {
-				name: 'core/switch-to-page-focus',
-				label: __( 'Back to page' ),
-				icon: page,
-				context: 'site-editor-edit',
-				callback: ( { close } ) => {
-					setHasPageContentFocus( true );
-					close();
-				},
-			} );
-		}
-	}
 
 	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
 		const label =
@@ -96,16 +111,19 @@ function useEditModeCommandLoader() {
 			template.type === 'wp_template'
 				? __( 'Delete template' )
 				: __( 'Delete template part' );
+		const path =
+			template.type === 'wp_template'
+				? '/wp_template'
+				: '/wp_template_part/all';
 		commands.push( {
 			name: 'core/remove-template',
 			label,
 			icon: trash,
-			context: 'site-editor-edit',
 			callback: ( { close } ) => {
 				removeTemplate( template );
 				// Navigate to the template list
 				history.push( {
-					path: '/' + template.type,
+					path,
 				} );
 				close();
 			},
@@ -118,13 +136,11 @@ function useEditModeCommandLoader() {
 	};
 }
 
-function useEditUICommandLoader() {
+function useEditUICommands() {
 	const { openGeneralSidebar, closeGeneralSidebar, switchEditorMode } =
 		useDispatch( editSiteStore );
 	const { canvasMode, editorMode, activeSidebar } = useSelect(
 		( select ) => ( {
-			isPage: select( editSiteStore ).isPage(),
-			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			editorMode: select( editSiteStore ).getEditorMode(),
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
@@ -133,6 +149,7 @@ function useEditUICommandLoader() {
 		} ),
 		[]
 	);
+	const { openModal } = useDispatch( interfaceStore );
 	const { toggle } = useDispatch( preferencesStore );
 
 	if ( canvasMode !== 'edit' ) {
@@ -170,7 +187,7 @@ function useEditUICommandLoader() {
 	} );
 
 	commands.push( {
-		name: 'core/toggle-distraction-free-mode',
+		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
 		icon: cog,
 		callback: ( { close } ) => {
@@ -199,6 +216,24 @@ function useEditUICommandLoader() {
 		},
 	} );
 
+	commands.push( {
+		name: 'core/open-preferences',
+		label: __( 'Open editor preferences' ),
+		icon: cog,
+		callback: () => {
+			openModal( PREFERENCES_MODAL_NAME );
+		},
+	} );
+
+	commands.push( {
+		name: 'core/open-shortcut-help',
+		label: __( 'Open keyboard shortcuts' ),
+		icon: keyboardClose,
+		callback: () => {
+			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
+		},
+	} );
+
 	return {
 		isLoading: false,
 		commands,
@@ -207,13 +242,18 @@ function useEditUICommandLoader() {
 
 export function useEditModeCommands() {
 	useCommandLoader( {
-		name: 'core/edit-site/manipulate-document',
-		hook: useEditModeCommandLoader,
+		name: 'core/edit-site/page-content-focus',
+		hook: usePageContentFocusCommands,
 		context: 'site-editor-edit',
 	} );
 
 	useCommandLoader( {
+		name: 'core/edit-site/manipulate-document',
+		hook: useManipulateDocumentCommands,
+	} );
+
+	useCommandLoader( {
 		name: 'core/edit-site/edit-ui',
-		hook: useEditUICommandLoader,
+		hook: useEditUICommands,
 	} );
 }
