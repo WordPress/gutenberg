@@ -2,7 +2,11 @@ name: End-to-End Tests
 
 on:
     pull_request:
+        paths-ignore:
+          - '**.md'
     push:
+        paths-ignore:
+          - '**.md'
         branches:
             - trunk
             - 'release/**'
