@@ -431,6 +431,7 @@ class BottomSheetCell extends Component {
 						<Icon
 							icon={ check }
 							fill={ platformStyles.isSelected.color }
+							testID="bottom-sheet-cell-selected-icon"
 						/>
 					) }
 					{ showValue && getValueComponent() }

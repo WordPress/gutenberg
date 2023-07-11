@@ -1,0 +1,14 @@
+{
+	"apiVersion": 2,
+	"name": "test/tovdom",
+	"title": "E2E Interactivity tests - tovdom",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScript": "tovdom-view",
+	"render": "file:./render.php"
+}

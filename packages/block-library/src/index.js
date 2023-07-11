@@ -144,7 +144,6 @@ const getAllBlocks = () => {
 		buttons,
 		calendar,
 		categories,
-		...( window.wp && window.wp.oldEditor ? [ classic ] : [] ), // Only add the classic block in WP Context.
 		code,
 		column,
 		columns,
@@ -231,6 +230,24 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 	];
+
+	// When in a WordPress context, conditionally
+	// add the classic block and TinyMCE editor
+	// under any of the following conditions:
+	//   - the current post contains a classic block
+	//   - the experiment to disable TinyMCE isn't active.
+	//   - a query argument specifies that TinyMCE should be loaded
+	if (
+		window?.wp?.oldEditor &&
+		( window?.wp?.needsClassicBlock ||
+			! window?.__experimentalDisableTinymce ||
+			!! new URLSearchParams( window?.location?.search ).get(
+				'requiresTinymce'
+			) )
+	) {
+		blocks.push( classic );
+	}
+
 	return blocks.filter( Boolean );
 };
 

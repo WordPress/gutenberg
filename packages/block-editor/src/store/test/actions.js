@@ -216,6 +216,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlock( 'chicken', block )( { select, dispatch } );
 
@@ -281,6 +282,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlocks( [ 'chicken' ], blocks )( { select, dispatch } );
 
@@ -314,6 +316,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlocks(
 				[ 'chicken' ],
@@ -618,6 +621,7 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => undefined,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
@@ -728,6 +732,7 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => null,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
@@ -752,6 +757,7 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => null,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),

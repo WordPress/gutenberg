@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { NavigableRegion } from '@wordpress/interface';
+import { EditorSnackbars } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -32,7 +33,10 @@ export default function Page( {
 					actions={ actions }
 				/>
 			) }
-			<div className="edit-site-page-content">{ children }</div>
+			<div className="edit-site-page-content">
+				{ children }
+				<EditorSnackbars />
+			</div>
 		</NavigableRegion>
 	);
 }
