@@ -7,7 +7,6 @@ const variations = [
 	{
 		name: 'comment-form',
 		title: __( 'Comment form' ),
-		icon: 'comments',
 		description: __( 'A comment form for posts and pages.' ),
 		attributes: {
 			action: '{SITE_URL}/wp-comments-post.php',
