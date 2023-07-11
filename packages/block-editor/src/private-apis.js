@@ -4,7 +4,8 @@
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
-import { getRichTextValues } from './components/rich-text/content';
+import { getRichTextValues } from './components/rich-text/get-rich-text-values';
+import { kebabCase } from './utils/object';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
 import { PrivateListView } from './components/list-view';
@@ -27,6 +28,7 @@ lock( privateApis, {
 	...globalStyles,
 	ExperimentalBlockEditorProvider,
 	getRichTextValues,
+	kebabCase,
 	PrivateInserter,
 	PrivateListView,
 	ResizableBoxPopover,

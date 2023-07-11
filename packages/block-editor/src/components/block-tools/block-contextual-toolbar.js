@@ -15,7 +15,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { levelUp } from '@wordpress/icons';
+import { next, previous } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -24,7 +24,6 @@ import { useViewportMatch } from '@wordpress/compose';
 import NavigableToolbar from '../navigable-toolbar';
 import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
-import BlockIcon from '../block-icon';
 import { unlock } from '../../lock-unlock';
 
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
@@ -57,6 +56,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 				hasParents: parents.length,
 				showParentSelector:
 					parentBlockType &&
+					getBlockEditingMode( firstParentClientId ) === 'default' &&
 					hasBlockSupport(
 						parentBlockType,
 						'__experimentalParentSelector',
@@ -93,6 +93,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			aria-label={ __( 'Block tools' ) }
 			{ ...props }
 		>
+			{ ! isCollapsed && <BlockToolbar hideDragHandle={ isFixed } /> }
 			{ isFixed && isLargeViewport && blockType && (
 				<ToolbarGroup
 					className={
@@ -104,13 +105,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 					<ToolbarItem
 						as={ ToolbarButton }
 						ref={ toolbarButtonRef }
-						icon={
-							isCollapsed ? (
-								<BlockIcon icon={ blockType.icon } />
-							) : (
-								levelUp
-							)
-						}
+						icon={ isCollapsed ? next : previous }
 						onClick={ () => {
 							setIsCollapsed( ( collapsed ) => ! collapsed );
 							toolbarButtonRef.current.focus();
@@ -118,12 +113,11 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 						label={
 							isCollapsed
 								? __( 'Show block tools' )
-								: __( 'Show document tools' )
+								: __( 'Hide block tools' )
 						}
 					/>
 				</ToolbarGroup>
 			) }
-			{ ! isCollapsed && <BlockToolbar hideDragHandle={ isFixed } /> }
 		</NavigableToolbar>
 	);
 }

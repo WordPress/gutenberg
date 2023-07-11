@@ -36,7 +36,7 @@
 
 .edit-post-block-manager__category-title {
 	position: sticky;
-	top: 0;
+	top: - $grid-unit-05; // Offsets the top padding on the modal content container
 	padding: $grid-unit-20 0;
 	background-color: $white;
 	z-index: z-index(".edit-post-block-manager__category-title");

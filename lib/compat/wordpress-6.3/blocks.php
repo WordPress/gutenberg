@@ -45,7 +45,7 @@ function gutenberg_rename_reusable_block_cpt_to_pattern( $args, $post_type ) {
 		$args['labels']['singular_name']            = _x( 'Pattern', 'post type singular name' );
 		$args['labels']['add_new_item']             = __( 'Add new Pattern' );
 		$args['labels']['new_item']                 = __( 'New Pattern' );
-		$args['labels']['edit_item']                = __( 'Edit Pattern' );
+		$args['labels']['edit_item']                = __( 'Edit Block Pattern' );
 		$args['labels']['view_item']                = __( 'View Pattern' );
 		$args['labels']['view_items']               = __( 'View Patterns' );
 		$args['labels']['all_items']                = __( 'All Patterns' );
@@ -60,6 +60,7 @@ function gutenberg_rename_reusable_block_cpt_to_pattern( $args, $post_type ) {
 		$args['labels']['item_reverted_to_draft']   = __( 'Pattern reverted to draft.' );
 		$args['labels']['item_scheduled']           = __( 'Pattern scheduled.' );
 		$args['labels']['item_updated']             = __( 'Pattern updated.' );
+		$args['rest_controller_class']              = 'Gutenberg_REST_Blocks_Controller';
 	}
 
 	return $args;
@@ -89,7 +90,7 @@ function gutenberg_add_custom_fields_to_wp_block( $args, $post_type ) {
 add_filter( 'register_post_type_args', 'gutenberg_add_custom_fields_to_wp_block', 10, 2 );
 
 /**
- * Adds sync_status meta fields to the wp_block post type so an unsynced option can be added.
+ * Adds wp_pattern_sync_status meta fields to the wp_block post type so an unsynced option can be added.
  *
  * Note: This should be removed when the minimum required WP version is >= 6.3.
  *
@@ -101,39 +102,21 @@ function gutenberg_wp_block_register_post_meta() {
 	$post_type = 'wp_block';
 	register_post_meta(
 		$post_type,
-		'sync_status',
+		'wp_pattern_sync_status',
 		array(
 			'auth_callback'     => function() {
 				return current_user_can( 'edit_posts' );
 			},
-			'sanitize_callback' => 'gutenberg_wp_block_sanitize_post_meta',
+			'sanitize_callback' => 'sanitize_text_field',
 			'single'            => true,
 			'type'              => 'string',
 			'show_in_rest'      => array(
 				'schema' => array(
-					'type'       => 'string',
-					'properties' => array(
-						'sync_status' => array(
-							'type' => 'string',
-						),
-					),
+					'type' => 'string',
+					'enum' => array( 'partial', 'unsynced' ),
 				),
 			),
 		)
 	);
-}
-/**
- * Sanitizes the array of wp_block post meta sync_status string.
- *
- * Note: This should be removed when the minimum required WP version is >= 6.3.
- *
- * @see https://github.com/WordPress/gutenberg/pull/51144
- *
- * @param array $meta_value String to sanitize.
- *
- * @return array Sanitized string.
- */
-function gutenberg_wp_block_sanitize_post_meta( $meta_value ) {
-	return sanitize_text_field( $meta_value );
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );

@@ -24,7 +24,7 @@ export function useAdminNavigationCommands() {
 	} );
 	useCommand( {
 		name: 'core/manage-reusable-blocks',
-		label: __( 'Manage all custom patterns' ),
+		label: __( 'Manage all of my patterns' ),
 		callback: () => {
 			document.location.href = 'edit.php?post_type=wp_block';
 		},

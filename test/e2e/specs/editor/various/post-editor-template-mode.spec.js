@@ -151,7 +151,7 @@ class PostEditorTemplateMode {
 
 		await expect(
 			this.editorTopBar.getByRole( 'heading[level=1]' )
-		).toHaveText( 'Editing template: Singular' );
+		).toHaveText( 'Editing template: Single Entries' );
 	}
 
 	async createPostAndSaveDraft() {

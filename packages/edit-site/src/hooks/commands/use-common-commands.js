@@ -10,6 +10,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -104,14 +105,19 @@ export function useCommonCommands() {
 		useDispatch( editSiteStore )
 	);
 	const { set } = useDispatch( preferencesStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
 	const history = useHistory();
-	const { homeUrl } = useSelect( ( select ) => {
+	const { homeUrl, isDistractionFree } = useSelect( ( select ) => {
 		const {
 			getUnstableBase, // Site index.
 		} = select( coreStore );
 
 		return {
 			homeUrl: getUnstableBase()?.home,
+			isDistractionFree: select( preferencesStore ).get(
+				editSiteStore.name,
+				'distractionFree'
+			),
 		};
 	}, [] );
 
@@ -139,6 +145,12 @@ export function useCommonCommands() {
 				path: '/wp_global_styles',
 				canvas: 'edit',
 			} );
+			if ( isDistractionFree ) {
+				set( editSiteStore.name, 'distractionFree', false );
+				createInfoNotice( __( 'Distraction free mode turned off.' ), {
+					type: 'snackbar',
+				} );
+			}
 			openGeneralSidebar( 'edit-site/global-styles' );
 		},
 		icon: styles,

@@ -8,7 +8,7 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -16,38 +16,26 @@ import { __, _n } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-// In certain editing contexts, we'd like to prevent accidental removal of
-// important blocks. For example, in the site editor, the Query Loop block is
-// deemed important. In such cases, we'll ask the user for confirmation that
-// they intended to remove such block(s).
-//
-// @see https://github.com/WordPress/gutenberg/pull/51145
-export const blockTypePromptMessages = {
-	'core/query': __( 'Query Loop displays a list of posts or pages.' ),
-	'core/post-content': __(
-		'Post Content displays the content of a post or page.'
-	),
-};
-
-export function BlockRemovalWarningModal() {
+export function BlockRemovalWarningModal( { rules } ) {
 	const { clientIds, selectPrevious, blockNamesForPrompt } = useSelect(
 		( select ) =>
 			unlock( select( blockEditorStore ) ).getRemovalPromptData()
 	);
 
 	const {
-		clearRemovalPrompt,
-		toggleRemovalPromptSupport,
+		clearBlockRemovalPrompt,
+		setBlockRemovalRules,
 		privateRemoveBlocks,
 	} = unlock( useDispatch( blockEditorStore ) );
 
-	// Signalling the removal prompt is in place.
+	// Load block removal rules, simultaneously signalling that the block
+	// removal prompt is in place.
 	useEffect( () => {
-		toggleRemovalPromptSupport( true );
+		setBlockRemovalRules( rules );
 		return () => {
-			toggleRemovalPromptSupport( false );
+			setBlockRemovalRules();
 		};
-	}, [ toggleRemovalPromptSupport ] );
+	}, [ rules, setBlockRemovalRules ] );
 
 	if ( ! blockNamesForPrompt ) {
 		return;
@@ -55,34 +43,30 @@ export function BlockRemovalWarningModal() {
 
 	const onConfirmRemoval = () => {
 		privateRemoveBlocks( clientIds, selectPrevious, /* force */ true );
-		clearRemovalPrompt();
+		clearBlockRemovalPrompt();
 	};
 
 	return (
 		<Modal
 			title={ __( 'Are you sure?' ) }
-			onRequestClose={ clearRemovalPrompt }
+			onRequestClose={ clearBlockRemovalPrompt }
 		>
 			{ blockNamesForPrompt.length === 1 ? (
-				<p>{ blockTypePromptMessages[ blockNamesForPrompt[ 0 ] ] }</p>
+				<p>{ rules[ blockNamesForPrompt[ 0 ] ] }</p>
 			) : (
 				<ul style={ { listStyleType: 'disc', paddingLeft: '1rem' } }>
 					{ blockNamesForPrompt.map( ( name ) => (
-						<li key={ name }>
-							{ blockTypePromptMessages[ name ] }
-						</li>
+						<li key={ name }>{ rules[ name ] }</li>
 					) ) }
 				</ul>
 			) }
 			<p>
-				{ _n(
-					'Removing this block is not advised.',
-					'Removing these blocks is not advised.',
-					blockNamesForPrompt.length
-				) }
+				{ blockNamesForPrompt.length > 1
+					? __( 'Removing these blocks is not advised.' )
+					: __( 'Removing this block is not advised.' ) }
 			</p>
 			<HStack justify="right">
-				<Button variant="tertiary" onClick={ clearRemovalPrompt }>
+				<Button variant="tertiary" onClick={ clearBlockRemovalPrompt }>
 					{ __( 'Cancel' ) }
 				</Button>
 				<Button variant="primary" onClick={ onConfirmRemoval }>
