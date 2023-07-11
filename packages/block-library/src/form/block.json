@@ -14,10 +14,6 @@
 		},
 		"method": {
 			"type": "string"
-		},
-		"formId": {
-			"type": "string",
-			"default": ""
 		}
 	},
 	"supports": {

@@ -11,7 +11,7 @@ const variations = [
 		attributes: {
 			action: '{SITE_URL}/wp-comments-post.php',
 			method: 'post',
-			formId: 'comment-form',
+			anchor: 'comment-form',
 		},
 		isDefault: false,
 		innerBlocks: [

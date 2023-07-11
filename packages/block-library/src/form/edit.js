@@ -9,7 +9,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, SelectControl } from '@wordpress/components';
+import { TextControl, SelectControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 const ALLOWED_BLOCKS = [
@@ -50,7 +50,7 @@ const TEMPLATE = [
 ];
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
-	const { formId, action, method } = attributes;
+	const { action, method } = attributes;
 	const blockProps = useBlockProps();
 
 	const { hasInnerBlocks } = useSelect(
@@ -74,23 +74,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Form settings' ) }>
-					<TextControl
-						autoComplete="off"
-						label={ __( 'Form ID' ) }
-						value={ formId }
-						onChange={ ( newVal ) => {
-							setAttributes( {
-								formId: newVal,
-							} );
-						} }
-						help={ __(
-							'Unique identifier for this form. This value gets sent along with the form submission.'
-						) }
-					/>
-				</PanelBody>
-			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
 					__nextHasNoMarginBottom
