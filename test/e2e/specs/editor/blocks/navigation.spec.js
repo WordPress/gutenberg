@@ -1039,6 +1039,10 @@ test.describe( 'Navigation block', () => {
 
 			// Save them so we can check on the frontend later too.
 			await editor.saveSiteEditorEntities();
+			// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas
+			await page
+				.getByRole( 'button', { name: 'Close Settings' } )
+				.click( { force: true } );
 
 			await editor.canvas.click( 'body' );
 
@@ -1085,6 +1089,10 @@ test.describe( 'Navigation block', () => {
 				.click( { force: true } );
 
 			await editor.saveSiteEditorEntities();
+			// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas
+			await page
+				.getByRole( 'button', { name: 'Close Settings' } )
+				.click( { force: true } );
 
 			await editor.canvas.click( 'body' );
 
@@ -1101,6 +1109,56 @@ test.describe( 'Navigation block', () => {
 				backgroundColor: colorControl.transparent, // There should be no background color set
 				submenuTextColor: palePink,
 				submenuBackgroundColor: colorControl.white,
+			};
+
+			await colorControl.testEditorColors( expectedNavigationColors );
+
+			// And finally we check the colors of the links on the frontend
+			await page.goto( '/' );
+
+			await colorControl.testFrontendColors( expectedNavigationColors );
+		} );
+
+		test( 'The navigation background color should apply to all navigation links including submenu and overlay backgrounds', async ( {
+			page,
+			editor,
+			colorControl,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+
+			// In the inspector sidebar, we change the nav block colors
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			// Pale pink for the text color
+			await page
+				.getByRole( 'button', { name: 'Background', exact: true } )
+				.click();
+			// 142, 209, 252 is the color of the "Pale cyan blue" color preset
+			const paleCyan = 'rgb(142, 209, 252)';
+			await page
+				.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
+				.click( { force: true } );
+
+			await editor.saveSiteEditorEntities();
+			// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas
+			await page
+				.getByRole( 'button', { name: 'Close Settings' } )
+				.click( { force: true } );
+			await editor.canvas.click( 'body' );
+
+			// Focus the navigation block inside the header template part
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: header' } )
+				.focus();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.click();
+
+			// The navigation background, submenu background and overlay background should all be paleCyan
+			const expectedNavigationColors = {
+				textColor: colorControl.black,
+				backgroundColor: paleCyan,
+				submenuTextColor: colorControl.black,
+				submenuBackgroundColor: paleCyan,
 			};
 
 			await colorControl.testEditorColors( expectedNavigationColors );
@@ -1158,6 +1216,10 @@ test.describe( 'Navigation block', () => {
 				.click( { force: true } );
 
 			await editor.saveSiteEditorEntities();
+			// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas
+			await page
+				.getByRole( 'button', { name: 'Close Settings' } )
+				.click( { force: true } );
 
 			await editor.canvas.click( 'body' );
 
