@@ -71,11 +71,11 @@ class EditorPage {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
-	async getAddBlockButton( options = { timeout: 3000 } ) {
-		return await this.waitForElementToBeDisplayedById(
-			ADD_BLOCK_ID,
-			options.timeout
+	async getAddBlockButton() {
+		const elements = await this.driver.elementsByAccessibilityId(
+			ADD_BLOCK_ID
 		);
+		return elements[ 0 ];
 	}
 
 	// ===============================
