@@ -87,8 +87,11 @@ add_filter( 'render_block_core_form_extra_fields', 'gutenberg_block_core_form_ex
  * @return void
  */
 function gutenberg_block_core_form_email_if_action_is_empty() {
-	// Get the POST data.
+	// Get the POST or GET data.
 	$params = wp_unslash( $_POST );
+	if ( empty( $params['wp_block_form'] ) ) {
+		$params = wp_unslash( $_GET );
+	}
 
 	// Bail early if not a form submission, or if the nonce is not valid.
 	if ( empty( $params['wp_block_form'] )
