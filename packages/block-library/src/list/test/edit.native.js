@@ -353,7 +353,7 @@ describe( 'List block', () => {
 		fireEvent.press( listBlock );
 		await triggerBlockListLayout( listBlock );
 		const listItemField = screen.getByLabelText( /Text input. .*One.*/ );
-		selectRangeInRichText( listItemField, 3, 3 );
+		selectRangeInRichText( listItemField, 3 );
 		fireEvent( listItemField, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
