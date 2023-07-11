@@ -22,14 +22,19 @@ test.describe( 'Front End Performance', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Report TTFB, LCP, and LCP-TTFB', async ( { page } ) => {
-		let i = 16;
-		while ( i-- ) {
+	test( 'Report TTFB, LCP, and LCP-TTFB', async ( { browser } ) => {
+		const samples = 16;
+		const throwaway = 0;
+		const rounds = samples + throwaway;
+
+		for ( let i = 0; i < rounds; i++ ) {
+			const testPage = await browser.newPage( { storageState: {} } );
+
 			// Go to the base URL.
-			await page.goto( '/', { waitUntil: 'networkidle' } );
+			await testPage.goto( '/', { waitUntil: 'networkidle' } );
 
 			// Take the measurements.
-			const [ lcp, ttfb ] = await page.evaluate( () => {
+			const [ lcp, ttfb ] = await testPage.evaluate( () => {
 				return Promise.all( [
 					// Measure the Largest Contentful Paint time.
 					// Based on https://www.checklyhq.com/learn/headless/basics-performance#largest-contentful-paint-api-largest-contentful-paint
@@ -66,9 +71,13 @@ test.describe( 'Front End Performance', () => {
 			expect( ttfb ).toBeGreaterThan( 0 );
 
 			// Save the results.
-			results.largestContentfulPaint.push( lcp );
-			results.timeToFirstByte.push( ttfb );
-			results.lcpMinusTtfb.push( lcp - ttfb );
+			if ( i >= throwaway ) {
+				results.largestContentfulPaint.push( lcp );
+				results.timeToFirstByte.push( ttfb );
+				results.lcpMinusTtfb.push( lcp - ttfb );
+			}
+
+			await testPage.close();
 		}
 	} );
 } );
