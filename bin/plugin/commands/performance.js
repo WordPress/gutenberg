@@ -49,8 +49,8 @@ function sanitizeBranchName( branch ) {
  *
  * @return {number|undefined} Median value or undefined if array empty.
  */
-export function median( array ) {
-	if ( array.length === 0 ) return undefined;
+function median( array ) {
+	if ( ! array || ! array.length ) return undefined;
 
 	const numbers = [ ...array ].sort( ( a, b ) => a - b );
 	const middleIndex = Math.floor( numbers.length / 2 );
@@ -363,9 +363,9 @@ async function runPerformanceTests( branches, options ) {
 					.map( ( round ) => round[ metric ] )
 					.filter( ( value ) => typeof value === 'number' );
 
-				const medianValue = median( values );
-				if ( medianValue !== undefined ) {
-					results[ testSuite ][ branch ][ metric ] = medianValue;
+				const value = median( values );
+				if ( value !== undefined ) {
+					results[ testSuite ][ branch ][ metric ] = value;
 				}
 			}
 		}
@@ -396,10 +396,8 @@ async function runPerformanceTests( branches, options ) {
 			results[ testSuite ]
 		) ) {
 			for ( const [ metric, value ] of Object.entries( metrics ) ) {
-				if ( isFinite( value ) ) {
-					invertedResult[ metric ] = invertedResult[ metric ] || {};
-					invertedResult[ metric ][ branch ] = `${ value } ms`;
-				}
+				invertedResult[ metric ] = invertedResult[ metric ] || {};
+				invertedResult[ metric ][ branch ] = `${ value } ms`;
 			}
 		}
 
