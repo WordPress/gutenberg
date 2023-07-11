@@ -74,6 +74,7 @@ function render_block_core_search( $attributes ) {
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
 			wp_enqueue_script( 'wp-block--search-view', plugins_url( 'search/view.min.js', __FILE__ ) );
+			wp_script_add_data( 'wp-block--search-view', 'strategy', 'defer' );
 		}
 	}
 
