@@ -14,6 +14,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import { useShowMoversGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Block parent selector component, displaying the hierarchy of the
@@ -24,14 +25,15 @@ import { store as blockEditorStore } from '../../store';
 export default function BlockParentSelector() {
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
-	const { firstParentClientId, shouldHide, isDistractionFree } = useSelect(
+	const { firstParentClientId, isVisible, isDistractionFree } = useSelect(
 		( select ) => {
 			const {
 				getBlockName,
 				getBlockParents,
 				getSelectedBlockClientId,
 				getSettings,
-			} = select( blockEditorStore );
+				getBlockEditingMode,
+			} = unlock( select( blockEditorStore ) );
 			const { hasBlockSupport } = select( blocksStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const parents = getBlockParents( selectedBlockClientId );
@@ -41,11 +43,14 @@ export default function BlockParentSelector() {
 			const settings = getSettings();
 			return {
 				firstParentClientId: _firstParentClientId,
-				shouldHide: ! hasBlockSupport(
-					_parentBlockType,
-					'__experimentalParentSelector',
-					true
-				),
+				isVisible:
+					_firstParentClientId &&
+					getBlockEditingMode( _firstParentClientId ) === 'default' &&
+					hasBlockSupport(
+						_parentBlockType,
+						'__experimentalParentSelector',
+						true
+					),
 				isDistractionFree: settings.isDistractionFree,
 			};
 		},
@@ -66,7 +71,7 @@ export default function BlockParentSelector() {
 		},
 	} );
 
-	if ( shouldHide || firstParentClientId === undefined ) {
+	if ( ! isVisible ) {
 		return null;
 	}
 

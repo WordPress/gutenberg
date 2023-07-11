@@ -2,7 +2,7 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { get, set } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import { setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
 
@@ -108,7 +109,7 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 			);
 		}
 
-		const result = {};
+		let result = {};
 		VALID_SETTINGS.forEach( ( setting ) => {
 			const value =
 				get(
@@ -116,7 +117,7 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 					`settings${ appendedBlockPath }.${ setting }`
 				) ?? get( configToUse, `settings.${ setting }` );
 			if ( value ) {
-				set( result, setting, value );
+				result = setImmutably( result, setting.split( '.' ), value );
 			}
 		} );
 		return result;
@@ -130,13 +131,9 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	] );
 
 	const setSetting = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set( newUserConfig, contextualPath, newValue );
-
-			return newUserConfig;
-		} );
+		setUserConfig( ( currentConfig ) =>
+			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
+		);
 	};
 
 	return [ settingValue, setSetting ];
@@ -160,12 +157,10 @@ export function useGlobalStyle(
 		: `styles.blocks.${ blockName }${ appendedPath }`;
 
 	const setStyle = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set(
-				newUserConfig,
-				finalPath,
+		setUserConfig( ( currentConfig ) =>
+			setImmutably(
+				currentConfig,
+				finalPath.split( '.' ),
 				shouldDecodeEncode
 					? getPresetVariableFromValue(
 							mergedConfig.settings,
@@ -174,9 +169,8 @@ export function useGlobalStyle(
 							newValue
 					  )
 					: newValue
-			);
-			return newUserConfig;
-		} );
+			)
+		);
 	};
 
 	let rawResult, result;

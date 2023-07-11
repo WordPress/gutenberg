@@ -202,8 +202,18 @@ store( {
 } );
 
 function setZoomStyles( imgDom, context, event ) {
-	let targetWidth = context.core.image.targetWidth;
-	let targetHeight = context.core.image.targetHeight;
+	// Typically, we use the image's full-sized dimensions. If those
+	// dimensions have not been set (i.e. an external image with only one size),
+	// the image's dimensions in the lightbox are the same
+	// as those of the image in the content.
+	let targetWidth =
+		context.core.image.targetWidth !== 'none'
+			? context.core.image.targetWidth
+			: event.target.nextElementSibling.naturalWidth;
+	let targetHeight =
+		context.core.image.targetHeight !== 'none'
+			? context.core.image.targetHeight
+			: event.target.nextElementSibling.naturalHeight;
 
 	// Since the lightbox image has `position:absolute`, it
 	// ignores its parent's padding, so we need to set padding here

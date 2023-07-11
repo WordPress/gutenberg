@@ -33,7 +33,7 @@ export default function SidebarNavigationScreenPattern() {
 	const backPath =
 		! categoryType && postType === 'wp_template_part'
 			? '/wp_template_part/all'
-			: '/library';
+			: '/patterns';
 
 	return (
 		<SidebarNavigationScreen
