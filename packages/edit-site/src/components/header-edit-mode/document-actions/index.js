@@ -20,6 +20,7 @@ import {
 	chevronLeftSmall as chevronLeftSmallIcon,
 	page as pageIcon,
 	navigation as navigationIcon,
+	symbol,
 } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useState, useEffect, useRef } from '@wordpress/element';
@@ -118,10 +119,17 @@ function TemplateDocumentActions( { className, onBack } ) {
 
 	const entityLabel = getEntityLabel( record.type );
 
+	let typeIcon = icon;
+	if ( record.type === 'wp_navigation' ) {
+		typeIcon = navigationIcon;
+	} else if ( record.type === 'wp_block' ) {
+		typeIcon = symbol;
+	}
+
 	return (
 		<BaseDocumentActions
 			className={ className }
-			icon={ record.type === 'wp_navigation' ? navigationIcon : icon }
+			icon={ typeIcon }
 			onBack={ onBack }
 		>
 			<VisuallyHidden as="span">

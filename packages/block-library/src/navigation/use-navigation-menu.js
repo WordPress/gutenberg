@@ -7,6 +7,11 @@ import {
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { SELECT_NAVIGATION_MENUS_ARGS } from './constants';
+
 export default function useNavigationMenu( ref ) {
 	const permissions = useResourcePermissions( 'navigation', ref );
 
@@ -68,17 +73,15 @@ function selectNavigationMenus( select ) {
 	const { getEntityRecords, hasFinishedResolution, isResolving } =
 		select( coreStore );
 
-	const args = [
-		'postType',
-		'wp_navigation',
-		{ per_page: -1, status: [ 'publish', 'draft' ] },
-	];
 	return {
-		navigationMenus: getEntityRecords( ...args ),
-		isResolvingNavigationMenus: isResolving( 'getEntityRecords', args ),
+		navigationMenus: getEntityRecords( ...SELECT_NAVIGATION_MENUS_ARGS ),
+		isResolvingNavigationMenus: isResolving(
+			'getEntityRecords',
+			SELECT_NAVIGATION_MENUS_ARGS
+		),
 		hasResolvedNavigationMenus: hasFinishedResolution(
 			'getEntityRecords',
-			args
+			SELECT_NAVIGATION_MENUS_ARGS
 		),
 	};
 }

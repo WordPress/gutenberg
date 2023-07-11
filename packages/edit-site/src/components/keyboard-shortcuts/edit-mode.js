@@ -1,12 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { createBlock } from '@wordpress/blocks';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -29,14 +32,30 @@ function KeyboardShortcutsEditMode() {
 		[]
 	);
 	const { redo, undo } = useDispatch( coreStore );
-	const { setIsListViewOpened, switchEditorMode } =
-		useDispatch( editSiteStore );
+	const {
+		isFeatureActive,
+		setIsListViewOpened,
+		switchEditorMode,
+		toggleFeature,
+		setIsInserterOpened,
+		closeGeneralSidebar,
+	} = useDispatch( editSiteStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
 		useSelect( blockEditorStore );
+
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
+
+	const toggleDistractionFree = () => {
+		setPreference( 'core/edit-site', 'fixedToolbar', false );
+		setIsInserterOpened( false );
+		setIsListViewOpened( false );
+		closeGeneralSidebar();
+	};
 
 	const handleTextLevelShortcut = ( event, level ) => {
 		event.preventDefault();
@@ -111,6 +130,20 @@ function KeyboardShortcutsEditMode() {
 		useShortcut(
 			`core/edit-site/transform-paragraph-to-heading-${ level }`,
 			( event ) => handleTextLevelShortcut( event, level )
+		);
+	} );
+
+	useShortcut( 'core/edit-site/toggle-distraction-free', () => {
+		toggleDistractionFree();
+		toggleFeature( 'distractionFree' );
+		createInfoNotice(
+			isFeatureActive( 'distractionFree' )
+				? __( 'Distraction free mode turned on.' )
+				: __( 'Distraction free mode turned off.' ),
+			{
+				id: 'core/edit-site/distraction-free-mode/notice',
+				type: 'snackbar',
+			}
 		);
 	} );
 

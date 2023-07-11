@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Paragraph block should render without crashing and match snapshot 1`] = `
+<View
+  style={
+    [
+      undefined,
+      undefined,
+    ]
+  }
+>
+  <TextInput
+    accessibilityLabel="Text input. Empty"
+    activeFormats={[]}
+    blockType={
+      {
+        "tag": "p",
+      }
+    }
+    deleteEnter={true}
+    disableEditingMenu={false}
+    fontFamily="serif"
+    fontSize={16}
+    isMultiline={false}
+    maxImagesWidth={200}
+    onBlur={[Function]}
+    onChange={[Function]}
+    onContentSizeChange={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onPaste={[Function]}
+    onSelectionChange={[Function]}
+    placeholder="Start writing…"
+    placeholderTextColor="gray"
+    triggerKeyCodes={[]}
+    value=""
+  />
+</View>
+`;

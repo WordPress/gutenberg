@@ -15,13 +15,13 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
-import { useDebounce } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
+import useDebouncedInput from '../../utils/use-debounced-input';
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];
@@ -71,18 +71,6 @@ function SuggestionListItem( {
 			) }
 		</CompositeItem>
 	);
-}
-
-function useDebouncedInput() {
-	const [ input, setInput ] = useState( '' );
-	const [ debounced, setter ] = useState( '' );
-	const setDebounced = useDebounce( setter, 250 );
-	useEffect( () => {
-		if ( debounced !== input ) {
-			setDebounced( input );
-		}
-	}, [ debounced, input ] );
-	return [ input, setInput, debounced ];
 }
 
 function useSearchSuggestions( entityForSuggestions, search ) {

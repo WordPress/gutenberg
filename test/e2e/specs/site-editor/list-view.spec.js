@@ -21,6 +21,34 @@ test.describe( 'Site Editor List View', () => {
 		await editor.canvas.click( 'body' );
 	} );
 
+	test( 'should open by default when preference is enabled', async ( {
+		page,
+	} ) => {
+		await expect(
+			page.locator( 'role=region[name="List View"i]' )
+		).toBeHidden();
+
+		// Turn on block list view by default.
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'showListViewByDefault', true );
+		} );
+
+		await page.reload();
+
+		await expect(
+			page.locator( 'role=region[name="List View"i]' )
+		).toBeVisible();
+
+		// The preferences cleanup.
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'showListViewByDefault', false );
+		} );
+	} );
+
 	// If list view sidebar is open and focus is not inside the sidebar, move
 	// focus to the sidebar when using the shortcut. If focus is inside the
 	// sidebar, shortcut should close the sidebar.

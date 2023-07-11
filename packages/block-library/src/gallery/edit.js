@@ -144,7 +144,10 @@ function GalleryEdit( props ) {
 
 	const innerBlockImages = useSelect(
 		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
+			const innerBlocks =
+				select( blockEditorStore ).getBlock( clientId )?.innerBlocks ??
+				[];
+			return innerBlocks;
 		},
 		[ clientId ]
 	);
@@ -559,7 +562,7 @@ function GalleryEdit( props ) {
 							max={ Math.min( MAX_COLUMNS, images.length ) }
 							{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 							required
-							size="__unstable-large"
+							__next40pxDefaultSize
 						/>
 					) }
 					<ToggleControl

@@ -54,7 +54,7 @@ function render_block_core_file( $attributes, $content, $block ) {
 	);
 
 	// If it uses the Interactivity API, add the directives.
-	if ( $should_load_view_script ) {
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $should_load_view_script ) {
 		$processor = new WP_HTML_Tag_Processor( $content );
 		$processor->next_tag();
 		$processor->set_attribute( 'data-wp-interactive', '' );

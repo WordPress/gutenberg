@@ -147,7 +147,7 @@ test.describe( 'Template Part', () => {
 		await editor.selectBlocks( paragraphBlock1, paragraphBlock2 );
 
 		// Convert block to a template part.
-		await editor.clickBlockOptionsMenuItem( 'Create Template part' );
+		await editor.clickBlockOptionsMenuItem( 'Create template part' );
 		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Test' );
 		await page.keyboard.press( 'Enter' );
 
@@ -391,7 +391,7 @@ test.describe( 'Template Part', () => {
 		await editor.selectBlocks( siteTitleInGroup );
 
 		// Change heading level of the Site Title block.
-		await editor.clickBlockToolbarButton( 'Change heading level' );
+		await editor.clickBlockToolbarButton( 'Change level' );
 		const Heading3Button = page.getByRole( 'menuitemradio', {
 			name: 'Heading 3',
 		} );
@@ -401,7 +401,7 @@ test.describe( 'Template Part', () => {
 		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect(
-			page.locator( 'role=button[name="Change heading level"i]' )
+			page.locator( 'role=button[name="Change level"i]' )
 		).toBeFocused();
 	} );
 } );
