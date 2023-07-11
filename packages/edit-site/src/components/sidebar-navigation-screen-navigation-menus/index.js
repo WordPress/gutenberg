@@ -21,6 +21,7 @@ import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 import { useLink } from '../routes/link';
 import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
 import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
+import { unlock } from '../../lock-unlock';
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
 function buildMenuLabel( title, id, status ) {
@@ -41,6 +42,9 @@ function buildMenuLabel( title, id, status ) {
 	);
 }
 
+// Save a boolean to prevent us creating a fallback more than once per session.
+let hasCreatedFallback = false;
+
 export default function SidebarNavigationScreenNavigationMenus() {
 	const {
 		records: navigationMenus,
@@ -55,18 +59,22 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	const isLoading =
 		isResolvingNavigationMenus && ! hasResolvedNavigationMenus;
 
-	const getNavigationFallbackId = useSelect(
-		( select ) => select( coreStore ).getNavigationFallbackId
-	);
+	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
 	const firstNavigationMenu = navigationMenus?.[ 0 ];
+
+	// Save a boolean to prevent us creating a fallback more than once per session.
+	if ( firstNavigationMenu ) {
+		hasCreatedFallback = true;
+	}
 
 	// If there is no navigation menu found
 	// then trigger fallback algorithm to create one.
 	if (
 		! firstNavigationMenu &&
 		! isResolvingNavigationMenus &&
-		hasResolvedNavigationMenus
+		hasResolvedNavigationMenus &&
+		! hasCreatedFallback
 	) {
 		getNavigationFallbackId();
 	}

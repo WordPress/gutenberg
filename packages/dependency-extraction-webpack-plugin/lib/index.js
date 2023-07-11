@@ -27,7 +27,6 @@ class DependencyExtractionWebpackPlugin {
 				combinedOutputFile: null,
 				externalizedReport: false,
 				injectPolyfill: false,
-				__experimentalInjectInteractivityRuntime: false,
 				outputFormat: 'php',
 				outputFilename: null,
 				useDefaults: true,
@@ -143,7 +142,6 @@ class DependencyExtractionWebpackPlugin {
 			combinedOutputFile,
 			externalizedReport,
 			injectPolyfill,
-			__experimentalInjectInteractivityRuntime,
 			outputFormat,
 			outputFilename,
 		} = this.options;
@@ -185,14 +183,6 @@ class DependencyExtractionWebpackPlugin {
 			const chunkDeps = new Set();
 			if ( injectPolyfill ) {
 				chunkDeps.add( 'wp-polyfill' );
-			}
-			// Temporary fix for Interactivity API until it gets moved to its package.
-			if ( __experimentalInjectInteractivityRuntime ) {
-				if ( ! chunkJSFile.startsWith( './interactivity/' ) ) {
-					chunkDeps.add( 'wp-interactivity-runtime' );
-				} else if ( './interactivity/runtime.min.js' === chunkJSFile ) {
-					chunkDeps.add( 'wp-interactivity-vendors' );
-				}
 			}
 
 			const processModule = ( { userRequest } ) => {

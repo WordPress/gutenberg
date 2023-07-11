@@ -90,6 +90,9 @@ function gutenberg_enable_experiments() {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalInteractivityAPI = true', 'before' );
 	}
 
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );

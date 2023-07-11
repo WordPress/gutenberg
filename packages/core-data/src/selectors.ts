@@ -1258,18 +1258,6 @@ export function getBlockPatternCategories( state: State ): Array< any > {
 }
 
 /**
- * Retrieve the fallback Navigation.
- *
- * @param state Data state.
- * @return The ID for the fallback Navigation post.
- */
-export function getNavigationFallbackId(
-	state: State
-): EntityRecordKey | undefined {
-	return state.navigationFallbackId;
-}
-
-/**
  * Returns the revisions of the current global styles theme.
  *
  * @param state Data state.

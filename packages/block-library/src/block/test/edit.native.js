@@ -56,8 +56,8 @@ afterAll( () => {
 	} );
 } );
 
-describe( 'Reusable block', () => {
-	it( 'inserts a reusable block', async () => {
+describe( 'Synced patterns', () => {
+	it( 'inserts a synced pattern', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const reusableBlockMock1 = getMockedReusableBlock( 1 );
 		const reusableBlockMock2 = getMockedReusableBlock( 2 );
@@ -86,7 +86,7 @@ describe( 'Reusable block', () => {
 		fireEvent.press( await screen.findByLabelText( 'Add block' ) );
 
 		// Navigate to reusable tab.
-		const reusableSegment = await screen.findByText( 'Reusable' );
+		const reusableSegment = await screen.findByText( 'Synced patterns' );
 		// onLayout event is required by Segment component.
 		fireEvent( reusableSegment, 'layout', {
 			nativeEvent: {
@@ -98,7 +98,7 @@ describe( 'Reusable block', () => {
 		fireEvent.press( reusableSegment );
 
 		const reusableBlockList = screen.getByTestId(
-			'InserterUI-ReusableBlocks'
+			'InserterUI-SyncedPatterns'
 		);
 		// onScroll event used to force the FlatList to render all items.
 		fireEvent.scroll( reusableBlockList, {
