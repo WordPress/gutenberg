@@ -80,7 +80,7 @@ export default function useBlockDisplayInformation( clientId ) {
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isReusable = isReusableBlock( blockType );
-			const resusableTitle = isReusableBlock( blockType )
+			const resusableTitle = isReusable
 				? __experimentalGetReusableBlockTitle( attributes.ref )
 				: undefined;
 			const title = resusableTitle || blockType.title;
