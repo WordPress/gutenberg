@@ -176,9 +176,12 @@ function ResizableFrame( {
 
 		const step = 20 * ( event.shiftKey ? 5 : 1 );
 		const delta = step * ( event.key === 'ArrowLeft' ? 1 : -1 );
-		const newWidth = Math.max(
-			FRAME_MIN_WIDTH,
-			frameRef.current.resizable.offsetWidth + delta
+		const newWidth = Math.min(
+			Math.max(
+				FRAME_MIN_WIDTH,
+				frameRef.current.resizable.offsetWidth + delta
+			),
+			initialComputedWidthRef.current
 		);
 
 		setFrameSize( {
@@ -188,14 +191,6 @@ function ResizableFrame( {
 				initialAspectRatioRef.current
 			),
 		} );
-
-		// If oversized, immediately switch to edit mode
-		if ( newWidth > initialComputedWidthRef.current ) {
-			setFrameSize( INITIAL_FRAME_SIZE );
-			setCanvasMode( 'edit' );
-			// TODO: Confirm if this is the focus behavior we want
-			document.querySelector( 'iframe[name=editor-canvas]' ).focus();
-		}
 	};
 
 	const frameAnimationVariants = {
