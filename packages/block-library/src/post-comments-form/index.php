@@ -48,6 +48,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 
 	// Enqueue the comment-reply script.
 	wp_enqueue_script( 'comment-reply' );
+	wp_script_add_data( 'comment-reply', 'strategy', 'defer' );
 
 	return $form;
 }

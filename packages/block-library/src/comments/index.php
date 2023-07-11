@@ -76,6 +76,7 @@ function render_block_core_comments( $attributes, $content, $block ) {
 	 * why they are not defined in `block.json`.
 	 */
 	wp_enqueue_script( 'comment-reply' );
+	wp_script_add_data( 'comment-reply', 'strategy', 'defer' );
 	enqueue_legacy_post_comments_block_styles( $block->name );
 
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $output );
