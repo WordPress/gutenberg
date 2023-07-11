@@ -2049,25 +2049,14 @@ export const getInserterItems = createSelector(
 			buildScope: 'inserter',
 		} );
 
-		// Create a list of block types and their variations.
-		const blockVariations = getBlockTypes()
-			.map( ( blockType ) => {
-				return getBlockVariations( blockType.name, 'inserter' ).map(
-					( variation ) => {
-						variation.name = blockType.name + '/' + variation.name;
-						return variation;
-					}
+		const blockTypeInserterItems = getBlockTypes()
+			.filter( ( blockType ) => {
+				return canIncludeBlockTypeInInserter(
+					state,
+					blockType,
+					rootClientId
 				);
 			} )
-			.flat();
-		const blockTypesAndVariations =
-			getBlockTypes().concat( blockVariations );
-
-		// TODO - this list needs to also return variations of blocks that are allowed as inner blocks.
-		const blockTypeInserterItems = blockTypesAndVariations
-			.filter( ( blockType ) =>
-				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
-			)
 			.map( buildBlockTypeInserterItem );
 
 		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
@@ -2229,7 +2218,22 @@ export const getAllowedBlocks = createSelector(
 			return;
 		}
 
-		return getBlockTypes().filter( ( blockType ) =>
+		// Create a list of block types and their variations.
+		const blockVariations = getBlockTypes()
+			.map( ( blockType ) => {
+				return getBlockVariations( blockType.name, 'inserter' ).map(
+					( variation ) => {
+						variation.name = blockType.name + '/' + variation.name;
+						return variation;
+					}
+				);
+			} )
+			.flat();
+		const blockTypesAndVariations =
+			getBlockTypes().concat( blockVariations );
+
+		// TODO - this list needs to also return variations of blocks that are allowed as inner blocks.
+		return blockTypesAndVariations.filter( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
 	},
