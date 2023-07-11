@@ -139,6 +139,16 @@
 .edit-site-patterns__pattern-title {
 	color: $gray-200;
 
+	.is-link {
+		text-decoration: none;
+		color: $gray-200;
+
+		&:hover,
+		&:focus {
+			color: $white;
+		}
+	}
+
 	.edit-site-patterns__pattern-icon {
 		border-radius: $grid-unit-05;
 		background: var(--wp-block-synced-color);
