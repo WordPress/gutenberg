@@ -11,7 +11,7 @@ import {
 	getLastInsertedBlocksClientIds,
 	getBlockEditingMode,
 	isBlockSubtreeDisabled,
-	getListViewClientIdsTree,
+	getEnabledClientIdsTree,
 	getEnabledBlockParents,
 } from '../private-selectors';
 
@@ -391,7 +391,7 @@ describe( 'private selectors', () => {
 		} );
 	} );
 
-	describe( 'getListViewClientIdsTree', () => {
+	describe( 'getEnabledClientIdsTree', () => {
 		const baseState = {
 			settings: {},
 			blocks: {
@@ -462,7 +462,7 @@ describe( 'private selectors', () => {
 				...baseState,
 				blockEditingModes: new Map( [] ),
 			};
-			expect( getListViewClientIdsTree( state ) ).toEqual( [
+			expect( getEnabledClientIdsTree( state ) ).toEqual( [
 				{
 					clientId: '6cf70164-9097-4460-bcbf-200560546988',
 					innerBlocks: [],
@@ -500,7 +500,7 @@ describe( 'private selectors', () => {
 				blockEditingModes: new Map( [] ),
 			};
 			expect(
-				getListViewClientIdsTree(
+				getEnabledClientIdsTree(
 					state,
 					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337'
 				)
@@ -534,7 +534,7 @@ describe( 'private selectors', () => {
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'contentOnly' ],
 				] ),
 			};
-			expect( getListViewClientIdsTree( state ) ).toEqual( [
+			expect( getEnabledClientIdsTree( state ) ).toEqual( [
 				{
 					clientId: 'b26fc763-417d-4f01-b81c-2ec61e14a972',
 					innerBlocks: [],
