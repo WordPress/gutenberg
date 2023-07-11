@@ -34,7 +34,7 @@ const BottomSheetNavigationScreen = ( {
 	name,
 } ) => {
 	const navigation = useNavigation();
-	const heightRef = useRef( { maxHeight: 0 } );
+	const maxHeight = useRef( 0 );
 	const isFocused = useIsFocused();
 	const {
 		onHandleHardwareButtonPress,
@@ -89,15 +89,12 @@ const BottomSheetNavigationScreen = ( {
 			if ( fullScreen ) {
 				setHeight( windowHeight );
 				setIsFullScreen( true );
-			} else if ( heightRef.current.maxHeight !== 0 ) {
+			} else if ( maxHeight.current !== 0 ) {
 				setIsFullScreen( false );
-				setHeight( heightRef.current.maxHeight );
+				setHeight( maxHeight.current );
 			}
 			return () => {};
-			// Disable reason: deferring this refactor to the native team.
-			// see https://github.com/WordPress/gutenberg/pull/41166
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, [ setHeight ] )
+		}, [ fullScreen, setHeight, setIsFullScreen, windowHeight ] )
 	);
 
 	const onLayout = ( { nativeEvent } ) => {
@@ -105,9 +102,8 @@ const BottomSheetNavigationScreen = ( {
 			return;
 		}
 		const { height } = nativeEvent.layout;
-
-		if ( heightRef.current.maxHeight !== height && isFocused ) {
-			heightRef.current.maxHeight = height;
+		if ( maxHeight.current !== height && isFocused ) {
+			maxHeight.current = height;
 			setHeightDebounce( height );
 		}
 	};
