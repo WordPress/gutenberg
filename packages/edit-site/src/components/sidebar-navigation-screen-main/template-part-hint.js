@@ -29,7 +29,7 @@ export default function TemplatePartHint() {
 			} }
 		>
 			{ __(
-				'Looking for template parts? You can now find them in the new "Patterns" page.'
+				'Looking for template parts? Find them in the new "Patterns" panel.'
 			) }
 		</Notice>
 	);
