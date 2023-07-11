@@ -5,19 +5,19 @@ import path from 'path';
 import { existsSync, readFileSync, unlinkSync } from 'fs';
 
 export function sum( array ) {
-	if ( array.length === 0 ) return undefined;
+	if ( ! array || ! array.length ) return undefined;
 
 	return array.reduce( ( a, b ) => a + b, 0 );
 }
 
 export function average( array ) {
-	if ( array.length === 0 ) return undefined;
+	if ( ! array || ! array.length ) return undefined;
 
 	return sum( array ) / array.length;
 }
 
 export function median( array ) {
-	if ( array.length === 0 ) return undefined;
+	if ( ! array || ! array.length ) return undefined;
 
 	const numbers = [ ...array ].sort( ( a, b ) => a - b );
 	const middleIndex = Math.floor( numbers.length / 2 );
@@ -29,13 +29,13 @@ export function median( array ) {
 }
 
 export function minimum( array ) {
-	if ( array.length === 0 ) return undefined;
+	if ( ! array || ! array.length ) return undefined;
 
 	return Math.min( ...array );
 }
 
 export function maximum( array ) {
-	if ( array.length === 0 ) return undefined;
+	if ( ! array || ! array.length ) return undefined;
 
 	return Math.max( ...array );
 }

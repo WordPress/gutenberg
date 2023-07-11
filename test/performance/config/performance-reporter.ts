@@ -70,59 +70,57 @@ export interface WPPerformanceResults {
 /**
  * Curate the raw performance results.
  *
- * @param {string}                  testSuite
  * @param {WPRawPerformanceResults} results
  *
  * @return {WPPerformanceResults} Curated Performance results.
  */
 export function curateResults(
-	testSuite: string,
 	results: WPRawPerformanceResults
 ): WPPerformanceResults {
-	let output: WPPerformanceResults;
+	const output = {
+		timeToFirstByte: median( results.timeToFirstByte ),
+		largestContentfulPaint: median( results.largestContentfulPaint ),
+		lcpMinusTtfb: median( results.lcpMinusTtfb ),
+		serverResponse: average( results.serverResponse ),
+		firstPaint: average( results.firstPaint ),
+		domContentLoaded: average( results.domContentLoaded ),
+		loaded: average( results.loaded ),
+		firstContentfulPaint: average( results.firstContentfulPaint ),
+		firstBlock: average( results.firstBlock ),
+		type: average( results.type ),
+		minType: minimum( results.type ),
+		maxType: maximum( results.type ),
+		typeContainer: average( results.typeContainer ),
+		minTypeContainer: minimum( results.typeContainer ),
+		maxTypeContainer: maximum( results.typeContainer ),
+		focus: average( results.focus ),
+		minFocus: minimum( results.focus ),
+		maxFocus: maximum( results.focus ),
+		inserterOpen: average( results.inserterOpen ),
+		minInserterOpen: minimum( results.inserterOpen ),
+		maxInserterOpen: maximum( results.inserterOpen ),
+		inserterSearch: average( results.inserterSearch ),
+		minInserterSearch: minimum( results.inserterSearch ),
+		maxInserterSearch: maximum( results.inserterSearch ),
+		inserterHover: average( results.inserterHover ),
+		minInserterHover: minimum( results.inserterHover ),
+		maxInserterHover: maximum( results.inserterHover ),
+		listViewOpen: average( results.listViewOpen ),
+		minListViewOpen: minimum( results.listViewOpen ),
+		maxListViewOpen: maximum( results.listViewOpen ),
+	};
 
-	if ( testSuite.includes( 'front-end' ) ) {
-		output = {
-			timeToFirstByte: median( results.timeToFirstByte ),
-			largestContentfulPaint: median( results.largestContentfulPaint ),
-			lcpMinusTtfb: median( results.lcpMinusTtfb ),
-		};
-	} else {
-		output = {
-			serverResponse: average( results.serverResponse ),
-			firstPaint: average( results.firstPaint ),
-			domContentLoaded: average( results.domContentLoaded ),
-			loaded: average( results.loaded ),
-			firstContentfulPaint: average( results.firstContentfulPaint ),
-			firstBlock: average( results.firstBlock ),
-			type: average( results.type ),
-			minType: minimum( results.type ),
-			maxType: maximum( results.type ),
-			typeContainer: average( results.typeContainer ),
-			minTypeContainer: minimum( results.typeContainer ),
-			maxTypeContainer: maximum( results.typeContainer ),
-			focus: average( results.focus ),
-			minFocus: minimum( results.focus ),
-			maxFocus: maximum( results.focus ),
-			inserterOpen: average( results.inserterOpen ),
-			minInserterOpen: minimum( results.inserterOpen ),
-			maxInserterOpen: maximum( results.inserterOpen ),
-			inserterSearch: average( results.inserterSearch ),
-			minInserterSearch: minimum( results.inserterSearch ),
-			maxInserterSearch: maximum( results.inserterSearch ),
-			inserterHover: average( results.inserterHover ),
-			minInserterHover: minimum( results.inserterHover ),
-			maxInserterHover: maximum( results.inserterHover ),
-			listViewOpen: average( results.listViewOpen ),
-			minListViewOpen: minimum( results.listViewOpen ),
-			maxListViewOpen: maximum( results.listViewOpen ),
-		};
-	}
-
-	return Object.fromEntries(
-		Object.entries( output ).map( ( [ key, value ] ) => {
-			return [ key, round( value ) ];
-		} )
+	return (
+		Object.entries( output )
+			// Reduce the output to contain taken metrics only.
+			.filter( ( [ _, value ] ) => typeof value === 'number' )
+			.reduce(
+				( acc, [ key, value ] ) => ( {
+					...acc,
+					[ key ]: round( value ),
+				} ),
+				{}
+			)
 	);
 }
 class PerformanceReporter implements Reporter {
@@ -156,10 +154,7 @@ class PerformanceReporter implements Reporter {
 				resultsBody
 			);
 
-			const curatedResults = curateResults(
-				testSuite,
-				JSON.parse( resultsBody )
-			);
+			const curatedResults = curateResults( JSON.parse( resultsBody ) );
 
 			// Save curated results to file.
 			writeFileSync(
@@ -188,9 +183,7 @@ class PerformanceReporter implements Reporter {
 			const printableResults: Record< string, { value: string } > = {};
 
 			for ( const [ key, value ] of Object.entries( results ) ) {
-				if ( typeof value === 'number' ) {
-					printableResults[ key ] = { value: `${ value } ms` };
-				}
+				printableResults[ key ] = { value: `${ value } ms` };
 			}
 
 			// eslint-disable-next-line no-console
