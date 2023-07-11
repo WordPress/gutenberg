@@ -272,10 +272,10 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 
 ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/footnotes))
 
--   **Name:** core/footnotes
--   **Category:** text
--   **Supports:** ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
--   **Attributes:**
+-	**Name:** core/footnotes
+-	**Category:** text
+-	**Supports:** ~~html~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** 
 
 ## Classic
 

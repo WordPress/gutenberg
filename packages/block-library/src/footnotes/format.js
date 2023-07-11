@@ -24,11 +24,9 @@ import { name } from './block.json';
 export const formatName = 'core/footnote';
 export const format = {
 	title: __( 'Footnote' ),
-	tagName: 'a',
+	tagName: 'sup',
 	className: 'fn',
 	attributes: {
-		id: 'id',
-		href: 'href',
 		'data-fn': 'data-fn',
 	},
 	contentEditable: false,
@@ -50,11 +48,9 @@ export const format = {
 					{
 						type: formatName,
 						attributes: {
-							href: '#' + id,
-							id: `${ id }-link`,
 							'data-fn': id,
 						},
-						innerHTML: '*',
+						innerHTML: `<a href="#${ id }" id="${ id }-link">*</a>`,
 					},
 					value.end,
 					value.end

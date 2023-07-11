@@ -11,6 +11,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -567,33 +568,23 @@ export const initializeMetaBoxes =
 
 		metaBoxesInitialized = true;
 
-		let wasSavingPost = registry.select( editorStore ).isSavingPost();
-		let wasAutosavingPost = registry
-			.select( editorStore )
-			.isAutosavingPost();
+		// Save metaboxes on save completion, except for autosaves.
+		addFilter(
+			'editor.__unstableSavePost',
+			'core/edit-post/save-metaboxes',
+			( previous, options ) =>
+				previous.then( () => {
+					if ( options.isAutosave ) {
+						return;
+					}
 
-		// Save metaboxes when performing a full save on the post.
-		registry.subscribe( async () => {
-			const isSavingPost = registry.select( editorStore ).isSavingPost();
-			const isAutosavingPost = registry
-				.select( editorStore )
-				.isAutosavingPost();
+					if ( ! select.hasMetaBoxes() ) {
+						return;
+					}
 
-			// Save metaboxes on save completion, except for autosaves.
-			const shouldTriggerMetaboxesSave =
-				wasSavingPost &&
-				! wasAutosavingPost &&
-				! isSavingPost &&
-				select.hasMetaBoxes();
-
-			// Save current state for next inspection.
-			wasSavingPost = isSavingPost;
-			wasAutosavingPost = isAutosavingPost;
-
-			if ( shouldTriggerMetaboxesSave ) {
-				await dispatch.requestMetaBoxUpdates();
-			}
-		} );
+					return dispatch.requestMetaBoxUpdates();
+				} )
+		);
 
 		dispatch( {
 			type: 'META_BOXES_INITIALIZED',
