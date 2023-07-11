@@ -41,3 +41,6 @@ const MyBlockCaption = (
 );
 ```
 
+## Related components
+
+`BlockCaption` passes props directly to the [`Caption`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/caption) component.
