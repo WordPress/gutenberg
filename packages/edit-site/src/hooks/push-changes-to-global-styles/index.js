@@ -25,9 +25,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesContext, useBlockEditingMode } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	GlobalStylesContext,
+	useBlockEditingMode,
+	__experimentalUseGlobalBehaviors,
+} = unlock( blockEditorPrivateApis );
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
 // removed by moving PushChangesToGlobalStylesControl to
@@ -179,9 +181,43 @@ function PushChangesToGlobalStylesControl( {
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 
+	const __experimentalBehaviorsIsDirty = !! attributes?.behaviors;
+
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
+
+	const [ inheritedBehaviors, setBehaviors ] =
+		__experimentalUseGlobalBehaviors( name );
+	const pushBehaviorChanges = useCallback( () => {
+		if ( ! __experimentalBehaviorsIsDirty ) {
+			return;
+		}
+		__unstableMarkNextChangeAsNotPersistent();
+		setBehaviors( attributes.behaviors );
+		createSuccessNotice(
+			sprintf(
+				// translators: %s: Title of the block e.g. 'Heading'.
+				__( '%s behaviors applied.' ),
+				getBlockType( name ).title
+			),
+			{
+				type: 'snackbar',
+				actions: [
+					{
+						label: __( 'Undo' ),
+						onClick() {
+							__unstableMarkNextChangeAsNotPersistent();
+							setBehaviors( inheritedBehaviors );
+							setUserConfig( () => userConfig, {
+								undoIgnore: true,
+							} );
+						},
+					},
+				],
+			}
+		);
+	}, [ attributes.behaviors, userConfig ] );
 
 	const pushChanges = useCallback( () => {
 		if ( changes.length === 0 ) {
@@ -240,7 +276,7 @@ function PushChangesToGlobalStylesControl( {
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
 				__(
-					'Apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
+					'Apply this block’s typography, spacing, dimensions, color styles, and behaviors to all %s blocks.'
 				),
 				getBlockType( name ).title
 			) }
@@ -250,8 +286,14 @@ function PushChangesToGlobalStylesControl( {
 			</BaseControl.VisualLabel>
 			<Button
 				variant="primary"
-				disabled={ changes.length === 0 }
-				onClick={ pushChanges }
+				disabled={
+					changes.length === 0 && ! __experimentalBehaviorsIsDirty
+				}
+				onClick={
+					__experimentalBehaviorsIsDirty
+						? pushBehaviorChanges
+						: pushChanges
+				}
 			>
 				{ __( 'Apply globally' ) }
 			</Button>
