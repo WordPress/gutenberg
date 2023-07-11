@@ -265,6 +265,7 @@ function PushChangesToGlobalStylesControl( {
 		);
 	}, [ changes, attributes, userConfig, name ] );
 
+	// This is a temporary workaround to force only update behaviors.
 	const hasBehaviorChanges = !! attributes.behaviors;
 
 	return (
@@ -285,7 +286,8 @@ function PushChangesToGlobalStylesControl( {
 				variant="primary"
 				disabled={ false }
 				onClick={
-					hasBehaviorChanges ? pushChanges : pushBehaviorChanges
+					// This is a temporary workaround to force only update behaviors.
+					hasBehaviorChanges ? pushBehaviorChanges : pushChanges
 				}
 			>
 				{ __( 'Apply globally' ) }

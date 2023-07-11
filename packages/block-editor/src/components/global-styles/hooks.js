@@ -545,14 +545,10 @@ export function __experimentalUseGlobalBehaviors(
 					break;
 			}
 		}
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			setImmutably( newUserConfig, finalPath, newBehavior );
-			return newUserConfig;
-		} );
+		setUserConfig( ( currentConfig ) =>
+			setImmutably( currentConfig, finalPath.split( '.' ), newBehavior )
+		);
 	};
-
 	if ( shouldReturnBehaviors ) {
 		return [ result, setBehavior ];
 	}
