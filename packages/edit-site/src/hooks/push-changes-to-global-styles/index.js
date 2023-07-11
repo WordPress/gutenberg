@@ -18,6 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	getBlockType,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import { useContext, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -92,6 +93,8 @@ const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontSize': 'fontSize',
 	'typography.fontFamily': 'fontFamily',
 };
+
+const SUPPORTED_STYLES = [ 'border', 'color', 'spacing', 'typography' ];
 
 function useChangesToPush( name, attributes ) {
 	const supports = useSupportedStyles( name );
@@ -212,10 +215,14 @@ function PushChangesToGlobalStylesControl( {
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const blockEditingMode = useBlockEditingMode();
+		const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
+			hasBlockSupport( props.name, feature )
+		);
+
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ blockEditingMode === 'default' && (
+				{ blockEditingMode === 'default' && supportsStyles && (
 					<InspectorAdvancedControls>
 						<PushChangesToGlobalStylesControl { ...props } />
 					</InspectorAdvancedControls>
