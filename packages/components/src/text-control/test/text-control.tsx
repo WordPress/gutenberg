@@ -11,36 +11,51 @@ import TextControl from '..';
 const noop = () => {};
 
 describe( 'TextControl', () => {
-	it( 'should generate an ID if not passed as a prop', () => {
-		render( <TextControl onChange={ noop } value={ '' } /> );
+	describe( 'When no ID prop is provided', () => {
+		it( 'should generate an ID', () => {
+			render( <TextControl onChange={ noop } value="" /> );
 
-		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
-			'id',
-			expect.stringMatching( /^inspector-text-control-/ )
-		);
+			expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
+				'id',
+				expect.stringMatching( /^inspector-text-control-/ )
+			);
+		} );
+
+		it( 'should be labelled correctly', () => {
+			const labelValue = 'Test Label';
+			render(
+				<TextControl label={ labelValue } onChange={ noop } value="" />
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: labelValue } )
+			).toBeVisible();
+		} );
 	} );
 
-	it( 'should use the passed ID prop if provided', () => {
+	describe( 'When an ID prop is provided', () => {
 		const id = 'test-id';
-		render( <TextControl onChange={ noop } id={ id } value={ '' } /> );
 
-		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute( 'id', id );
-	} );
+		it( 'should use the passed ID prop if provided', () => {
+			render( <TextControl id={ id } onChange={ noop } value="" /> );
 
-	it( 'should map the label and input together when given an ID', () => {
-		const id = 'test-id';
-		const labelValue = 'Test Label';
-		render(
-			<TextControl
-				onChange={ noop }
-				id={ id }
-				label={ labelValue }
-				value={ '' }
-			/>
-		);
+			expect( screen.getByRole( 'textbox' ) ).toHaveAttribute( 'id', id );
+		} );
 
-		const textbox = screen.getByRole( 'textbox' );
-		const label = screen.getByText( labelValue );
-		expect( textbox ).toHaveAttribute( 'id', label.getAttribute( 'for' ) );
+		it( 'should be labelled correctly', () => {
+			const labelValue = 'Test Label';
+			render(
+				<TextControl
+					label={ labelValue }
+					id={ id }
+					onChange={ noop }
+					value=""
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: labelValue } )
+			).toBeVisible();
+		} );
 	} );
 } );
