@@ -57,7 +57,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
 				href: dashboardLink,
-				label: __( 'Go back to the Dashboard' ),
+				label: __( 'Go to the Dashboard' ),
 		  }
 		: {
 				href: dashboardLink, // We need to keep the `href` here so the component doesn't remount as a `<button>` and break the animation.
@@ -174,7 +174,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 						className="edit-site-site-hub_toggle-command-center"
 						icon={ search }
 						onClick={ () => openCommandCenter() }
-						label={ __( 'Open command center' ) }
+						label={ __( 'Open command palette' ) }
 					/>
 				) }
 			</HStack>

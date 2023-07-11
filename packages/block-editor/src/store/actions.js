@@ -28,7 +28,6 @@ import {
 } from '../utils/selection';
 import {
 	__experimentalUpdateSettings,
-	ensureDefaultBlock,
 	privateRemoveBlocks,
 } from './private-actions';
 
@@ -403,7 +402,7 @@ export const replaceBlocks =
 			initialPosition,
 			meta,
 		} );
-		dispatch( ensureDefaultBlock() );
+		dispatch.ensureDefaultBlock();
 	};
 
 /**
@@ -1390,7 +1389,9 @@ export function updateBlockListSettings( clientId, settings ) {
  * @return {Object} Action object
  */
 export function updateSettings( settings ) {
-	return __experimentalUpdateSettings( settings, true );
+	return __experimentalUpdateSettings( settings, {
+		stripExperimentalSettings: true,
+	} );
 }
 
 /**

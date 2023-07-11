@@ -681,15 +681,9 @@ export function isDeletingPost( state ) {
  *
  * @return {boolean} Whether post is being saved.
  */
-export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	return select( coreStore ).isSavingEntityRecord(
-		'postType',
-		postType,
-		postId
-	);
-} );
+export function isSavingPost( state ) {
+	return !! state.saving.pending;
+}
 
 /**
  * Returns true if non-post entities are currently being saved, or false otherwise.
@@ -760,10 +754,7 @@ export const didPostSaveRequestFail = createRegistrySelector(
  * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
-	if ( ! isSavingPost( state ) ) {
-		return false;
-	}
-	return Boolean( state.saving.options?.isAutosave );
+	return isSavingPost( state ) && Boolean( state.saving.options?.isAutosave );
 }
 
 /**
@@ -774,10 +765,7 @@ export function isAutosavingPost( state ) {
  * @return {boolean} Whether the post is being previewed.
  */
 export function isPreviewingPost( state ) {
-	if ( ! isSavingPost( state ) ) {
-		return false;
-	}
-	return Boolean( state.saving.options?.isPreview );
+	return isSavingPost( state ) && Boolean( state.saving.options?.isPreview );
 }
 
 /**

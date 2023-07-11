@@ -56,12 +56,17 @@ export function kebabCase( str ) {
 
 /**
  * Clones an object.
+ * Arrays are also cloned as arrays.
  * Non-object values are returned unchanged.
  *
  * @param {*} object Object to clone.
  * @return {*} Cloned object, or original literal non-object value.
  */
 function cloneObject( object ) {
+	if ( Array.isArray( object ) ) {
+		return object.map( cloneObject );
+	}
+
 	if ( object && typeof object === 'object' ) {
 		return {
 			...Object.fromEntries(
@@ -79,7 +84,7 @@ function cloneObject( object ) {
 /**
  * Immutably sets a value inside an object. Like `lodash#set`, but returning a
  * new object. Treats nullish initial values as empty objects. Clones any
- * nested objects.
+ * nested objects. Supports arrays, too.
  *
  * @param {Object}              object Object to set a value in.
  * @param {number|string|Array} path   Path in the object to modify.
@@ -92,7 +97,11 @@ export function setImmutably( object, path, value ) {
 
 	normalizedPath.reduce( ( acc, key, i ) => {
 		if ( acc[ key ] === undefined ) {
-			acc[ key ] = {};
+			if ( Number.isInteger( path[ i + 1 ] ) ) {
+				acc[ key ] = [];
+			} else {
+				acc[ key ] = {};
+			}
 		}
 		if ( i === normalizedPath.length - 1 ) {
 			acc[ key ] = value;

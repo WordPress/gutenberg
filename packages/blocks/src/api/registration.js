@@ -129,7 +129,7 @@ import { store as blocksStore } from '../store';
  *                                              then no preview is shown.
  */
 
-export const serverSideBlockDefinitions = {};
+const serverSideBlockDefinitions = {};
 
 function isObject( object ) {
 	return object !== null && typeof object === 'object';
