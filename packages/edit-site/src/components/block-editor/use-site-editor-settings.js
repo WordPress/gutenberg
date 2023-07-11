@@ -12,11 +12,13 @@ import { unlock } from '../../lock-unlock';
 import inserterMediaCategories from './inserter-media-categories';
 
 export default function useSiteEditorSettings( templateType ) {
-	const { storedSettings } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-
+	const { storedSettings, canvasMode } = useSelect( ( select ) => {
+		const { getSettings, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
 		return {
 			storedSettings: getSettings(),
+			canvasMode: getCanvasMode(),
 		};
 	}, [] );
 
@@ -70,6 +72,7 @@ export default function useSiteEditorSettings( templateType ) {
 		const {
 			__experimentalAdditionalBlockPatterns,
 			__experimentalAdditionalBlockPatternCategories,
+			focusMode,
 			...restStoredSettings
 		} = storedSettings;
 
@@ -78,6 +81,7 @@ export default function useSiteEditorSettings( templateType ) {
 			inserterMediaCategories,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
+			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 		};
-	}, [ storedSettings, blockPatterns, blockPatternCategories ] );
+	}, [ storedSettings, blockPatterns, blockPatternCategories, canvasMode ] );
 }
