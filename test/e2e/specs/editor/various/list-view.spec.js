@@ -261,6 +261,13 @@ test.describe( 'List View', () => {
 		page,
 		pageUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -331,13 +338,12 @@ test.describe( 'List View', () => {
 
 		// Focus the list view close button and make sure the shortcut will
 		// close the list view. This is to catch a bug where elements could be
-		// out of range of the sidebar region. Must shift+tab 3 times to reach
-		// close button before tabs.
-		await pageUtils.pressKeys( 'shift+Tab' );
+		// out of range of the sidebar region. Must shift+tab 2 times to reach
+		// close button before tab panel.
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
-			editor.canvas
+			page
 				.getByRole( 'region', { name: 'Document Overview' } )
 				.getByRole( 'button', {
 					name: 'Close',
@@ -354,7 +360,8 @@ test.describe( 'List View', () => {
 		// Focus the outline tab and select it. This test ensures the outline
 		// tab receives similar focus events based on the shortcut.
 		await pageUtils.pressKeys( 'shift+Tab' );
-		const outlineButton = editor.canvas.getByRole( 'button', {
+		await page.keyboard.press( 'ArrowRight' );
+		const outlineButton = page.getByRole( 'tab', {
 			name: 'Outline',
 		} );
 		await expect( outlineButton ).toBeFocused();

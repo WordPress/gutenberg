@@ -10,12 +10,14 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	Tooltip,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock } from '@wordpress/icons';
+import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -60,6 +62,15 @@ function ListViewBlockSelectButton(
 	} = useSelect( blockEditorStore );
 	const { removeBlocks } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
+	const isSticky = blockInformation?.positionType === 'sticky';
+
+	const positionLabel = blockInformation?.positionLabel
+		? sprintf(
+				// translators: 1: Position of selected block, e.g. "Sticky" or "Fixed".
+				__( 'Position: %1$s' ),
+				blockInformation.positionLabel
+		  )
+		: '';
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -165,6 +176,13 @@ function ListViewBlockSelectButton(
 								{ blockInformation.anchor }
 							</Truncate>
 						</span>
+					) }
+					{ positionLabel && isSticky && (
+						<Tooltip text={ positionLabel }>
+							<span className="block-editor-list-view-block-select-button__sticky">
+								<Icon icon={ pinSmall } />
+							</span>
+						</Tooltip>
 					) }
 					{ isLocked && (
 						<span className="block-editor-list-view-block-select-button__lock">

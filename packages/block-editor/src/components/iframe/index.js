@@ -11,7 +11,6 @@ import {
 	createPortal,
 	forwardRef,
 	useMemo,
-	useReducer,
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -78,33 +77,9 @@ function bubbleEvents( doc ) {
 	}
 }
 
-function useParsedAssets( html ) {
-	return useMemo( () => {
-		const doc = document.implementation.createHTMLDocument( '' );
-		doc.body.innerHTML = html;
-		return Array.from( doc.body.children );
-	}, [ html ] );
-}
-
-async function loadScript( head, { id, src } ) {
-	return new Promise( ( resolve, reject ) => {
-		const script = head.ownerDocument.createElement( 'script' );
-		script.id = id;
-		if ( src ) {
-			script.src = src;
-			script.onload = () => resolve();
-			script.onerror = () => reject();
-		} else {
-			resolve();
-		}
-		head.appendChild( script );
-	} );
-}
-
 function Iframe( {
 	contentRef,
 	children,
-	head,
 	tabIndex = 0,
 	scale = 1,
 	frameSize = 0,
@@ -113,26 +88,22 @@ function Iframe( {
 	forwardedRef: ref,
 	...props
 } ) {
-	const assets = useSelect(
+	const { styles = '', scripts = '' } = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().__unstableResolvedAssets,
 		[]
 	);
-	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const styles = useParsedAssets( assets?.styles );
-	const styleIds = styles.map( ( style ) => style.id );
 	const compatStyles = useCompatibilityStyles();
-	const neededCompatStyles = compatStyles.filter(
-		( style ) => ! styleIds.includes( style.id )
-	);
-	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
 	const setRef = useRefEffect( ( node ) => {
+		node._load = () => {
+			setIframeDocument( node.contentDocument );
+		};
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.
 		function preventFileDropDefault( event ) {
@@ -144,7 +115,6 @@ function Iframe( {
 			iFrameDocument = contentDocument;
 
 			bubbleEvents( contentDocument );
-			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
 
 			// Ideally ALL classes that are added through get_body_class should
@@ -160,8 +130,22 @@ function Iframe( {
 			);
 
 			contentDocument.dir = ownerDocument.dir;
-			documentElement.removeChild( contentDocument.head );
-			documentElement.removeChild( contentDocument.body );
+
+			for ( const compatStyle of compatStyles ) {
+				if ( contentDocument.getElementById( compatStyle.id ) ) {
+					continue;
+				}
+
+				contentDocument.head.appendChild(
+					compatStyle.cloneNode( true )
+				);
+
+				// eslint-disable-next-line no-console
+				console.warn(
+					`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+					compatStyle
+				);
+			}
 
 			iFrameDocument.addEventListener(
 				'dragover',
@@ -190,19 +174,6 @@ function Iframe( {
 		};
 	}, [] );
 
-	const headRef = useRefEffect( ( element ) => {
-		scripts
-			.reduce(
-				( promise, script ) =>
-					promise.then( () => loadScript( element, script ) ),
-				Promise.resolve()
-			)
-			.finally( () => {
-				// When script are loaded, re-render blocks to allow them
-				// to initialise.
-				forceRender();
-			} );
-	}, [] );
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		contentRef,
@@ -211,36 +182,21 @@ function Iframe( {
 		disabledRef,
 	] );
 
-	const styleAssets = (
-		<>
-			<style>{ 'html{height:auto!important;}body{margin:0}' }</style>
-			{ [ ...styles, ...neededCompatStyles ].map(
-				( { tagName, href, id, rel, media, textContent } ) => {
-					const TagName = tagName.toLowerCase();
-
-					if ( TagName === 'style' ) {
-						return (
-							<TagName { ...{ id } } key={ id }>
-								{ textContent }
-							</TagName>
-						);
-					}
-
-					return (
-						<TagName { ...{ href, id, rel, media } } key={ id } />
-					);
-				}
-			) }
-		</>
-	);
-
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
-	const html =
-		'<!doctype html>' +
-		'<style>html{height:auto!important;}body{margin:0}</style>' +
-		( assets?.styles ?? '' );
+	const html = `<!doctype html>
+<html>
+	<head>
+		<script>window.frameElement._load()</script>
+		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
+		${ styles }
+		${ scripts }
+	</head>
+	<body>
+		<script>document.currentScript.parentElement.remove()</script>
+	</body>
+</html>`;
 
 	const [ src, cleanup ] = useMemo( () => {
 		const _src = URL.createObjectURL(
@@ -288,25 +244,19 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						<>
-							<head ref={ headRef }>
-								{ styleAssets }
-								{ head }
-							</head>
-							<body
-								ref={ bodyRef }
-								className={ classnames(
-									'block-editor-iframe__body',
-									'editor-styles-wrapper',
-									...bodyClasses
-								) }
-							>
-								{ contentResizeListener }
-								<StyleProvider document={ iframeDocument }>
-									{ children }
-								</StyleProvider>
-							</body>
-						</>,
+						<body
+							ref={ bodyRef }
+							className={ classnames(
+								'block-editor-iframe__body',
+								'editor-styles-wrapper',
+								...bodyClasses
+							) }
+						>
+							{ contentResizeListener }
+							<StyleProvider document={ iframeDocument }>
+								{ children }
+							</StyleProvider>
+						</body>,
 						iframeDocument.documentElement
 					) }
 			</iframe>

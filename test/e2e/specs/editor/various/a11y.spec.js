@@ -20,10 +20,18 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 	test( 'navigating through the Editor regions four times should land on the Editor top bar region', async ( {
 		page,
 		pageUtils,
+		editor,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		// On a new post, initial focus is set on the Post title.
 		await expect(
-			page.locator( 'role=textbox[name=/Add title/i]' )
+			editor.canvas.locator( 'role=textbox[name=/Add title/i]' )
 		).toBeFocused();
 		// Navigate to the 'Editor settings' region.
 		await pageUtils.pressKeys( 'ctrl+`' );
@@ -47,6 +55,13 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		page,
 		pageUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		// Open keyboard shortcuts modal.
 		await pageUtils.pressKeys( 'access+h' );
 

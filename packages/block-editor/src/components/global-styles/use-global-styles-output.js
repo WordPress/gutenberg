@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, kebabCase, set } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,12 +22,17 @@ import { getCSSRules } from '@wordpress/style-engine';
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
-import { getTypographyFontSizeValue } from './typography-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
 import { PresetDuotoneFilter } from '../duotone/components';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
+import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
+import { kebabCase, setImmutably } from '../../utils/object';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -398,7 +403,7 @@ export function getStylesDeclarations(
 			 */
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
-				tree?.settings?.typography
+				getFluidTypographyOptionsFromSettings( tree?.settings )
 			);
 		}
 
@@ -413,7 +418,7 @@ export function getStylesDeclarations(
  * in theme.json, and outputting common layout styles, and specific blockGap values.
  *
  * @param {Object}  props
- * @param {Object}  props.tree                  A theme.json tree containing layout definitions.
+ * @param {Object}  props.layoutDefinitions     Layout definitions, keyed by layout type.
  * @param {Object}  props.style                 A style object containing spacing values.
  * @param {string}  props.selector              Selector used to group together layout styling rules.
  * @param {boolean} props.hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
@@ -422,7 +427,7 @@ export function getStylesDeclarations(
  * @return {string} Generated CSS rules for the layout styles.
  */
 export function getLayoutStyles( {
-	tree,
+	layoutDefinitions = LAYOUT_DEFINITIONS,
 	style,
 	selector,
 	hasBlockGapSupport,
@@ -444,11 +449,15 @@ export function getLayoutStyles( {
 		}
 	}
 
-	if ( gapValue && tree?.settings?.layout?.definitions ) {
-		Object.values( tree.settings.layout.definitions ).forEach(
+	if ( gapValue && layoutDefinitions ) {
+		Object.values( layoutDefinitions ).forEach(
 			( { className, name, spacingStyles } ) => {
 				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
-				if ( ! hasBlockGapSupport && 'flex' !== name ) {
+				if (
+					! hasBlockGapSupport &&
+					'flex' !== name &&
+					'grid' !== name
+				) {
 					return;
 				}
 
@@ -506,12 +515,9 @@ export function getLayoutStyles( {
 	}
 
 	// Output base styles
-	if (
-		selector === ROOT_BLOCK_SELECTOR &&
-		tree?.settings?.layout?.definitions
-	) {
+	if ( selector === ROOT_BLOCK_SELECTOR && layoutDefinitions ) {
 		const validDisplayModes = [ 'block', 'flex', 'grid' ];
-		Object.values( tree.settings.layout.definitions ).forEach(
+		Object.values( layoutDefinitions ).forEach(
 			( { className, displayMode, baseStyles } ) => {
 				if (
 					displayMode &&
@@ -672,11 +678,11 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	}
 
 	const pickPresets = ( treeToPickFrom ) => {
-		const presets = {};
+		let presets = {};
 		PRESET_METADATA.forEach( ( { path } ) => {
 			const value = get( treeToPickFrom, path, false );
 			if ( value !== false ) {
-				set( presets, path, value );
+				presets = setImmutably( presets, path, value );
 			}
 		} );
 		return presets;
@@ -685,7 +691,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	// Top-level.
 	const presets = pickPresets( tree.settings );
 	const custom = tree.settings?.custom;
-	if ( ! isEmpty( presets ) || custom ) {
+	if ( Object.keys( presets ).length > 0 || custom ) {
 		nodes.push( {
 			presets,
 			custom,
@@ -698,7 +704,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 		( [ blockName, node ] ) => {
 			const blockPresets = pickPresets( node );
 			const blockCustom = node.custom;
-			if ( ! isEmpty( blockPresets ) || blockCustom ) {
+			if ( Object.keys( blockPresets ).length > 0 || blockCustom ) {
 				nodes.push( {
 					presets: blockPresets,
 					custom: blockCustom,
@@ -873,7 +879,6 @@ export const toStyles = (
 				( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
 			) {
 				ruleset += getLayoutStyles( {
-					tree,
 					style: styles,
 					selector,
 					hasBlockGapSupport,
@@ -964,7 +969,7 @@ export const toStyles = (
 		}
 
 		const classes = getPresetsClasses( selector, presets );
-		if ( ! isEmpty( classes ) ) {
+		if ( classes.length > 0 ) {
 			ruleset += classes;
 		}
 	} );
@@ -980,7 +985,10 @@ export function toSvgFilters( tree, blockSelectors ) {
 }
 
 const getSelectorsConfig = ( blockType, rootSelector ) => {
-	if ( ! isEmpty( blockType?.selectors ) ) {
+	if (
+		blockType?.selectors &&
+		Object.keys( blockType.selectors ).length > 0
+	) {
 		return blockType.selectors;
 	}
 
@@ -1023,7 +1031,9 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 				duotoneSupport && scopeSelector( rootSelector, duotoneSupport );
 		}
 
-		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
+		const hasLayoutSupport =
+			!! blockType?.supports?.layout ||
+			!! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
 

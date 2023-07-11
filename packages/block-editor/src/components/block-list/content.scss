@@ -161,15 +161,6 @@
 	padding: 0;
 }
 
-.block-editor-block-list__layout,
-.block-editor-block-list__block {
-	pointer-events: initial;
-
-	&.is-editing-disabled {
-		pointer-events: none;
-	}
-}
-
 .block-editor-block-list__layout .block-editor-block-list__block {
 	// With `position: static`, Safari marks a full-width selection rectangle, including margins.
 	// With `position: relative`, Safari marks an inline selection rectangle, similar to that of
@@ -178,11 +169,16 @@
 	// We choose relative, as that matches the multi-selection, which is limited to the block footprint.
 	position: relative;
 
-	// Re-enable text-selection on editable blocks.
-	user-select: text;
-
 	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
+
+	pointer-events: auto;
+	user-select: text;
+
+	&.is-editing-disabled {
+		pointer-events: none;
+		user-select: none;
+	}
 
 	.reusable-block-edit-panel * {
 		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");

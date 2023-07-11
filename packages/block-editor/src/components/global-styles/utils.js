@@ -7,7 +7,10 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 /**
  * Internal dependencies
  */
-import { getTypographyFontSizeValue } from './typography-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from './typography-utils';
 
 /* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
@@ -73,8 +76,11 @@ export const PRESET_METADATA = [
 	},
 	{
 		path: [ 'typography', 'fontSizes' ],
-		valueFunc: ( preset, { typography: typographySettings } ) =>
-			getTypographyFontSizeValue( preset, typographySettings ),
+		valueFunc: ( preset, settings ) =>
+			getTypographyFontSizeValue(
+				preset,
+				getFluidTypographyOptionsFromSettings( settings )
+			),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],

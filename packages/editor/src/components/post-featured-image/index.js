@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 import {
 	DropZone,
 	Button,
@@ -27,7 +28,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import PostFeaturedImageCheck from './check';
 import { store as editorStore } from '../../store';
-import getFeaturedMediaDetails from './get-featured-media-details';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -42,6 +42,49 @@ const instructions = (
 		) }
 	</p>
 );
+
+function getMediaDetails( media, postId ) {
+	if ( ! media ) {
+		return {};
+	}
+
+	const defaultSize = applyFilters(
+		'editor.PostFeaturedImage.imageSize',
+		'large',
+		media.id,
+		postId
+	);
+	if ( defaultSize in ( media?.media_details?.sizes ?? {} ) ) {
+		return {
+			mediaWidth: media.media_details.sizes[ defaultSize ].width,
+			mediaHeight: media.media_details.sizes[ defaultSize ].height,
+			mediaSourceUrl: media.media_details.sizes[ defaultSize ].source_url,
+		};
+	}
+
+	// Use fallbackSize when defaultSize is not available.
+	const fallbackSize = applyFilters(
+		'editor.PostFeaturedImage.imageSize',
+		'thumbnail',
+		media.id,
+		postId
+	);
+	if ( fallbackSize in ( media?.media_details?.sizes ?? {} ) ) {
+		return {
+			mediaWidth: media.media_details.sizes[ fallbackSize ].width,
+			mediaHeight: media.media_details.sizes[ fallbackSize ].height,
+			mediaSourceUrl:
+				media.media_details.sizes[ fallbackSize ].source_url,
+		};
+	}
+
+	// Use full image size when fallbackSize and defaultSize are not available.
+	return {
+		mediaWidth: media.media_details.width,
+		mediaHeight: media.media_details.height,
+		mediaSourceUrl: media.source_url,
+	};
+}
 
 function PostFeaturedImage( {
 	currentPostId,
@@ -58,7 +101,7 @@ function PostFeaturedImage( {
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
-	const { mediaWidth, mediaHeight, mediaSourceUrl } = getFeaturedMediaDetails(
+	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
 		media,
 		currentPostId
 	);

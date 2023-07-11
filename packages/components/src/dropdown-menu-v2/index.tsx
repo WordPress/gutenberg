@@ -6,7 +6,12 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import {
+	forwardRef,
+	createContext,
+	useContext,
+	useMemo,
+} from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { check, chevronRightSmall, lineSolid } from '@wordpress/icons';
 import { SVG, Circle } from '@wordpress/primitives';
@@ -14,7 +19,10 @@ import { SVG, Circle } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
+import { useContextSystem, contextConnectWithoutRef } from '../ui/context';
+import { useSlot } from '../slot-fill';
 import Icon from '../icon';
+import { SLOT_NAME as POPOVER_DEFAULT_SLOT_NAME } from '../popover';
 import * as DropdownMenuStyled from './styles';
 import type {
 	DropdownMenuProps,
@@ -27,32 +35,56 @@ import type {
 	DropdownMenuRadioItemProps,
 	DropdownMenuSeparatorProps,
 	DropdownSubMenuTriggerProps,
+	DropdownMenuInternalContext,
+	DropdownMenuPrivateContext as DropdownMenuPrivateContextType,
 } from './types';
 
 // Menu content's side padding + 4px
-const SUB_MENU_OFFSET_SIDE = 12;
+const SUB_MENU_OFFSET_SIDE = 16;
 // Opposite amount of the top padding of the menu item
 const SUB_MENU_OFFSET_ALIGN = -8;
 
-/**
- * `DropdownMenu` displays a menu to the user (such as a set of actions
- * or functions) triggered by a button.
- */
-export const DropdownMenu = ( {
-	// Root props
-	defaultOpen,
-	open,
-	onOpenChange,
-	modal = true,
-	// Content positioning props
-	side = 'bottom',
-	sideOffset = 0,
-	align = 'center',
-	alignOffset = 0,
-	// Render props
-	children,
-	trigger,
-}: DropdownMenuProps ) => {
+const DropdownMenuPrivateContext =
+	createContext< DropdownMenuPrivateContextType >( {
+		variant: undefined,
+		portalContainer: null,
+	} );
+
+const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
+	const {
+		// Root props
+		defaultOpen,
+		open,
+		onOpenChange,
+		modal = true,
+		// Content positioning props
+		side = 'bottom',
+		sideOffset = 0,
+		align = 'center',
+		alignOffset = 0,
+		// Render props
+		children,
+		trigger,
+
+		// From internal components context
+		variant,
+	} = useContextSystem<
+		// Adding `className` to the context type to avoid a TS error
+		DropdownMenuProps & DropdownMenuInternalContext & { className?: string }
+	>( props, 'DropdownMenu' );
+
+	// Render the portal in the default slot used by the legacy Popover component.
+	const slot = useSlot( POPOVER_DEFAULT_SLOT_NAME );
+	const portalContainer = slot.ref?.current;
+
+	const privateContextValue = useMemo(
+		() => ( {
+			variant,
+			portalContainer,
+		} ),
+		[ variant, portalContainer ]
+	);
+
 	return (
 		<DropdownMenuPrimitive.Root
 			defaultOpen={ defaultOpen }
@@ -64,20 +96,34 @@ export const DropdownMenu = ( {
 			<DropdownMenuPrimitive.Trigger asChild>
 				{ trigger }
 			</DropdownMenuPrimitive.Trigger>
-			<DropdownMenuPrimitive.Portal>
+			<DropdownMenuPrimitive.Portal container={ portalContainer }>
 				<DropdownMenuStyled.Content
 					side={ side }
 					align={ align }
 					sideOffset={ sideOffset }
 					alignOffset={ alignOffset }
 					loop={ true }
+					variant={ variant }
 				>
-					{ children }
+					<DropdownMenuPrivateContext.Provider
+						value={ privateContextValue }
+					>
+						{ children }
+					</DropdownMenuPrivateContext.Provider>
 				</DropdownMenuStyled.Content>
 			</DropdownMenuPrimitive.Portal>
 		</DropdownMenuPrimitive.Root>
 	);
 };
+
+/**
+ * `DropdownMenu` displays a menu to the user (such as a set of actions
+ * or functions) triggered by a button.
+ */
+export const DropdownMenu = contextConnectWithoutRef(
+	UnconnectedDropdownMenu,
+	'DropdownMenu'
+);
 
 export const DropdownSubMenuTrigger = ( {
 	prefix,
@@ -118,6 +164,10 @@ export const DropdownSubMenu = ( {
 	children,
 	trigger,
 }: DropdownSubMenuProps ) => {
+	const { variant, portalContainer } = useContext(
+		DropdownMenuPrivateContext
+	);
+
 	return (
 		<DropdownMenuPrimitive.Sub
 			defaultOpen={ defaultOpen }
@@ -130,11 +180,12 @@ export const DropdownSubMenu = ( {
 			>
 				{ trigger }
 			</DropdownMenuStyled.SubTrigger>
-			<DropdownMenuPrimitive.Portal>
+			<DropdownMenuPrimitive.Portal container={ portalContainer }>
 				<DropdownMenuStyled.SubContent
 					loop
 					sideOffset={ SUB_MENU_OFFSET_SIDE }
 					alignOffset={ SUB_MENU_OFFSET_ALIGN }
+					variant={ variant }
 				>
 					{ children }
 				</DropdownMenuStyled.SubContent>
@@ -236,6 +287,7 @@ export const DropdownMenuRadioItem = ( {
 	);
 };
 
-export const DropdownMenuSeparator = ( props: DropdownMenuSeparatorProps ) => (
-	<DropdownMenuStyled.Separator { ...props } />
-);
+export const DropdownMenuSeparator = ( props: DropdownMenuSeparatorProps ) => {
+	const { variant } = useContext( DropdownMenuPrivateContext );
+	return <DropdownMenuStyled.Separator { ...props } variant={ variant } />;
+};

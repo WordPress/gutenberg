@@ -18,7 +18,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 import EditorCanvasContainer from '../editor-canvas-container';
 

@@ -44,7 +44,7 @@ export type DropdownMenuProps = {
 	 * The preferred alignment against the trigger.
 	 * May change when collisions occur.
 	 *
-	 * @default 'center'
+	 * @default 'start'
 	 */
 	align?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'align' ];
 	/**
@@ -248,3 +248,18 @@ export type DropdownMenuGroupProps = {
 };
 
 export type DropdownMenuSeparatorProps = {};
+
+export type DropdownMenuInternalContext = {
+	/**
+	 * This variant can be used to change the appearance of the component in
+	 * specific contexts, ie. when rendered inside the `Toolbar` component.
+	 */
+	variant?: 'toolbar';
+};
+
+export type DropdownMenuPrivateContext = Pick<
+	DropdownMenuInternalContext,
+	'variant'
+> & {
+	portalContainer: HTMLElement | null;
+};

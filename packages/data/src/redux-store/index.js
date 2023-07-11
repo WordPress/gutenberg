@@ -15,7 +15,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { builtinControls } from '../controls';
-import { lock } from '../private-apis';
+import { lock } from '../lock-unlock';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import createThunkMiddleware from './thunk-middleware';
@@ -24,6 +24,7 @@ import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
 /** @typedef {import('../types').DataRegistry} DataRegistry */
+/** @typedef {import('../types').ListenerFunction} ListenerFunction */
 /**
  * @typedef {import('../types').StoreDescriptor<C>} StoreDescriptor
  * @template {import('../types').AnyConfig} C
@@ -54,12 +55,11 @@ const trimUndefinedValues = ( array ) => {
  * @return {Array} Transformed object.
  */
 const mapValues = ( obj, callback ) =>
-	Object.entries( obj ?? {} ).reduce(
-		( acc, [ key, value ] ) => ( {
-			...acc,
-			[ key ]: callback( value, key ),
-		} ),
-		{}
+	Object.fromEntries(
+		Object.entries( obj ?? {} ).map( ( [ key, value ] ) => [
+			key,
+			callback( value, key ),
+		] )
 	);
 
 // Convert Map objects to plain objects
@@ -98,6 +98,21 @@ function createResolversCache() {
 			}
 
 			cache[ selectorName ].set( trimUndefinedValues( args ), true );
+		},
+	};
+}
+
+function createBindingCache( bind ) {
+	const cache = new WeakMap();
+
+	return {
+		get( item, itemName ) {
+			let boundItem = cache.get( item );
+			if ( ! boundItem ) {
+				boundItem = bind( item, itemName );
+				cache.set( item, boundItem );
+			}
+			return boundItem;
 		},
 	};
 }
@@ -144,21 +159,27 @@ export default function createReduxStore( key, options ) {
 	const storeDescriptor = {
 		name: key,
 		instantiate: ( registry ) => {
+			/**
+			 * Stores listener functions registered with `subscribe()`.
+			 *
+			 * When functions register to listen to store changes with
+			 * `subscribe()` they get added here. Although Redux offers
+			 * its own `subscribe()` function directly, by wrapping the
+			 * subscription in this store instance it's possible to
+			 * optimize checking if the state has changed before calling
+			 * each listener.
+			 *
+			 * @type {Set<ListenerFunction>}
+			 */
+			const listeners = new Set();
 			const reducer = options.reducer;
 			const thunkArgs = {
 				registry,
 				get dispatch() {
-					return Object.assign(
-						( action ) => store.dispatch( action ),
-						getActions()
-					);
+					return thunkActions;
 				},
 				get select() {
-					return Object.assign(
-						( selector ) =>
-							selector( store.__unstableOriginalGetState() ),
-						getSelectors()
-					);
+					return thunkSelectors;
 				},
 				get resolveSelect() {
 					return getResolveSelectors();
@@ -176,75 +197,100 @@ export default function createReduxStore( key, options ) {
 			lock( store, privateRegistrationFunctions );
 			const resolversCache = createResolversCache();
 
-			const actions = mapActions(
-				{
-					...metadataActions,
-					...options.actions,
+			function bindAction( action ) {
+				return ( ...args ) =>
+					Promise.resolve( store.dispatch( action( ...args ) ) );
+			}
+
+			const actions = {
+				...mapValues( metadataActions, bindAction ),
+				...mapValues( options.actions, bindAction ),
+			};
+
+			const boundPrivateActions = createBindingCache( bindAction );
+			const allActions = new Proxy( () => {}, {
+				get: ( target, prop ) => {
+					const privateAction = privateActions[ prop ];
+					return privateAction
+						? boundPrivateActions.get( privateAction, prop )
+						: actions[ prop ];
 				},
-				store
-			);
-			lock(
-				actions,
-				new Proxy( privateActions, {
-					get: ( target, prop ) => {
-						return (
-							mapActions( privateActions, store )[ prop ] ||
-							actions[ prop ]
-						);
-					},
-				} )
-			);
+			} );
 
-			let selectors = mapSelectors(
-				{
-					...mapValues(
-						metadataSelectors,
-						( selector ) =>
-							( state, ...args ) =>
-								selector( state.metadata, ...args )
-					),
-					...mapValues( options.selectors, ( selector ) => {
-						if ( selector.isRegistrySelector ) {
-							selector.registry = registry;
-						}
+			const thunkActions = new Proxy( allActions, {
+				apply: ( target, thisArg, [ action ] ) =>
+					store.dispatch( action ),
+			} );
 
-						return ( state, ...args ) =>
-							selector( state.root, ...args );
-					} ),
-				},
-				store
-			);
-			lock(
-				selectors,
-				new Proxy( privateSelectors, {
-					get: ( target, prop ) => {
-						return (
-							mapSelectors(
-								mapValues( privateSelectors, ( selector ) => {
-									if ( selector.isRegistrySelector ) {
-										selector.registry = registry;
-									}
+			lock( actions, allActions );
 
-									return ( state, ...args ) =>
-										selector( state.root, ...args );
-								} ),
-								store
-							)[ prop ] || selectors[ prop ]
-						);
-					},
-				} )
-			);
+			const resolvers = options.resolvers
+				? mapResolvers( options.resolvers )
+				: {};
 
-			let resolvers;
-			if ( options.resolvers ) {
-				resolvers = mapResolvers( options.resolvers );
-				selectors = mapSelectorsWithResolvers(
-					selectors,
-					resolvers,
+			function bindSelector( selector, selectorName ) {
+				if ( selector.isRegistrySelector ) {
+					selector.registry = registry;
+				}
+				const boundSelector = ( ...args ) => {
+					const state = store.__unstableOriginalGetState();
+					return selector( state.root, ...args );
+				};
+
+				const resolver = resolvers[ selectorName ];
+				if ( ! resolver ) {
+					boundSelector.hasResolver = false;
+					return boundSelector;
+				}
+
+				return mapSelectorWithResolver(
+					boundSelector,
+					selectorName,
+					resolver,
 					store,
 					resolversCache
 				);
 			}
+
+			function bindMetadataSelector( selector ) {
+				const boundSelector = ( ...args ) => {
+					const state = store.__unstableOriginalGetState();
+					return selector( state.metadata, ...args );
+				};
+				boundSelector.hasResolver = false;
+				return boundSelector;
+			}
+
+			const selectors = {
+				...mapValues( metadataSelectors, bindMetadataSelector ),
+				...mapValues( options.selectors, bindSelector ),
+			};
+
+			const boundPrivateSelectors = createBindingCache( bindSelector );
+
+			// Pre-bind the private selectors that have been registered by the time of
+			// instantiation, so that registry selectors are bound to the registry.
+			for ( const [ selectorName, selector ] of Object.entries(
+				privateSelectors
+			) ) {
+				boundPrivateSelectors.get( selector, selectorName );
+			}
+
+			const allSelectors = new Proxy( () => {}, {
+				get: ( target, prop ) => {
+					const privateSelector = privateSelectors[ prop ];
+					return privateSelector
+						? boundPrivateSelectors.get( privateSelector, prop )
+						: selectors[ prop ];
+				},
+			} );
+
+			const thunkSelectors = new Proxy( allSelectors, {
+				apply: ( target, thisArg, [ selector ] ) =>
+					selector( store.__unstableOriginalGetState() ),
+			} );
+
+			lock( selectors, allSelectors );
 
 			const resolveSelectors = mapResolveSelectors( selectors, store );
 			const suspendSelectors = mapSuspendSelectors( selectors, store );
@@ -265,17 +311,23 @@ export default function createReduxStore( key, options ) {
 			const subscribe =
 				store &&
 				( ( listener ) => {
-					let lastState = store.__unstableOriginalGetState();
-					return store.subscribe( () => {
-						const state = store.__unstableOriginalGetState();
-						const hasChanged = state !== lastState;
-						lastState = state;
+					listeners.add( listener );
 
-						if ( hasChanged ) {
-							listener();
-						}
-					} );
+					return () => listeners.delete( listener );
 				} );
+
+			let lastState = store.__unstableOriginalGetState();
+			store.subscribe( () => {
+				const state = store.__unstableOriginalGetState();
+				const hasChanged = state !== lastState;
+				lastState = state;
+
+				if ( hasChanged ) {
+					for ( const listener of listeners ) {
+						listener();
+					}
+				}
+			} );
 
 			// This can be simplified to just { subscribe, getSelectors, getActions }
 			// Once we remove the use function.
@@ -360,44 +412,6 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 }
 
 /**
- * Maps selectors to a store.
- *
- * @param {Object} selectors Selectors to register. Keys will be used as the
- *                           public facing API. Selectors will get passed the
- *                           state as first argument.
- * @param {Object} store     The store to which the selectors should be mapped.
- * @return {Object} Selectors mapped to the provided store.
- */
-function mapSelectors( selectors, store ) {
-	const createStateSelector = ( registrySelector ) => {
-		const selector = ( ...args ) =>
-			registrySelector( store.__unstableOriginalGetState(), ...args );
-		selector.hasResolver = false;
-		return selector;
-	};
-
-	return mapValues( selectors, createStateSelector );
-}
-
-/**
- * Maps actions to dispatch from a given store.
- *
- * @param {Object} actions Actions to register.
- * @param {Object} store   The redux store to which the actions should be mapped.
- *
- * @return {Object} Actions mapped to the redux store provided.
- */
-function mapActions( actions, store ) {
-	const createBoundAction =
-		( action ) =>
-		( ...args ) => {
-			return Promise.resolve( store.dispatch( action( ...args ) ) );
-		};
-
-	return mapValues( actions, createBoundAction );
-}
-
-/**
  * Maps selectors to functions that return a resolution promise for them
  *
  * @param {Object} selectors Selectors to map.
@@ -415,6 +429,7 @@ function mapResolveSelectors( selectors, store ) {
 		getCachedResolvers,
 		getResolutionState,
 		getResolutionError,
+		hasResolvingSelectors,
 		...storeSelectors
 	} = selectors;
 
@@ -522,22 +537,24 @@ function mapResolvers( resolvers ) {
 }
 
 /**
- * Returns resolvers with matched selectors for a given namespace.
+ * Returns a selector with a matched resolver.
  * Resolvers are side effects invoked once per argument set of a given selector call,
  * used in ensuring that the data needs for the selector are satisfied.
  *
- * @param {Object} selectors      The current selectors to be modified.
- * @param {Object} resolvers      Resolvers to register.
+ * @param {Object} selector       The selector function to be bound.
+ * @param {string} selectorName   The selector name.
+ * @param {Object} resolver       Resolver to call.
  * @param {Object} store          The redux store to which the resolvers should be mapped.
  * @param {Object} resolversCache Resolvers Cache.
  */
-function mapSelectorsWithResolvers(
-	selectors,
-	resolvers,
+function mapSelectorWithResolver(
+	selector,
+	selectorName,
+	resolver,
 	store,
 	resolversCache
 ) {
-	function fulfillSelector( resolver, selectorName, args ) {
+	function fulfillSelector( args ) {
 		const state = store.getState();
 
 		if (
@@ -583,18 +600,10 @@ function mapSelectorsWithResolvers(
 		}, 0 );
 	}
 
-	return mapValues( selectors, ( selector, selectorName ) => {
-		const resolver = resolvers[ selectorName ];
-		if ( ! resolver ) {
-			selector.hasResolver = false;
-			return selector;
-		}
-
-		const selectorResolver = ( ...args ) => {
-			fulfillSelector( resolver, selectorName, args );
-			return selector( ...args );
-		};
-		selectorResolver.hasResolver = true;
-		return selectorResolver;
-	} );
+	const selectorResolver = ( ...args ) => {
+		fulfillSelector( args );
+		return selector( ...args );
+	};
+	selectorResolver.hasResolver = true;
+	return selectorResolver;
 }

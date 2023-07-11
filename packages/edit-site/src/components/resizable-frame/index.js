@@ -16,7 +16,7 @@ import { useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 // Removes the inline styles in the drag handles.
@@ -76,6 +76,7 @@ function ResizableFrame( {
 	isReady,
 	children,
 	oversizedClassName,
+	innerContentStyle,
 } ) {
 	const [ frameSize, setFrameSize ] = useState( {
 		width: '100%',
@@ -253,6 +254,7 @@ function ResizableFrame( {
 					borderRadius: isFullWidth ? 0 : 8,
 				} }
 				transition={ FRAME_TRANSITION }
+				style={ innerContentStyle }
 			>
 				{ children }
 			</motion.div>

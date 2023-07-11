@@ -21,6 +21,7 @@ import {
 	DropdownSubMenu as DropdownSubMenuV2,
 	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
 } from './dropdown-menu-v2';
+import { ComponentsContext } from './ui/context/context-system-provider';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -33,6 +34,7 @@ lock( privateApis, {
 	CustomSelectControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,
+	ComponentsContext,
 	DropdownMenuV2,
 	DropdownMenuCheckboxItemV2,
 	DropdownMenuGroupV2,

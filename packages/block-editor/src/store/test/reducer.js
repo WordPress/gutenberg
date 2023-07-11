@@ -2889,7 +2889,6 @@ describe( 'state', () => {
 					'core/embed': {
 						time: 123456,
 						count: 1,
-						insert: { name: 'core/embed' },
 					},
 				},
 			} );
@@ -2900,7 +2899,6 @@ describe( 'state', () => {
 						'core/embed': {
 							time: 123456,
 							count: 1,
-							insert: { name: 'core/embed' },
 						},
 					},
 				} ),
@@ -2926,12 +2924,10 @@ describe( 'state', () => {
 					'core/embed': {
 						time: 123457,
 						count: 2,
-						insert: { name: 'core/embed' },
 					},
 					'core/block/123': {
 						time: 123457,
 						count: 1,
-						insert: { name: 'core/block', ref: 123 },
 					},
 				},
 			} );
@@ -2994,17 +2990,14 @@ describe( 'state', () => {
 						[ orangeVariationName ]: {
 							time: 123456,
 							count: 1,
-							insert: { name: orangeVariationName },
 						},
 						[ appleVariationName ]: {
 							time: 123456,
 							count: 1,
-							insert: { name: appleVariationName },
 						},
 						[ blockWithVariations ]: {
 							time: 123456,
 							count: 2,
-							insert: { name: blockWithVariations },
 						},
 					} ),
 				} );

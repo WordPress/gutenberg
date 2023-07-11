@@ -19,7 +19,7 @@ import {
  * Internal dependencies
  */
 import ScreenHeader from '../header';
-import { unlock } from '../../../private-apis';
+import { unlock } from '../../../lock-unlock';
 import Revisions from '../../revisions';
 import SidebarFixedBottom from '../../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../../store';

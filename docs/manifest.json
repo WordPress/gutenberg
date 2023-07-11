@@ -1674,6 +1674,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/interactivity",
+		"slug": "packages-interactivity",
+		"markdown_source": "../packages/interactivity/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/interface",
 		"slug": "packages-interface",
 		"markdown_source": "../packages/interface/README.md",
@@ -2170,12 +2176,6 @@
 		"slug": "overusing-snapshots",
 		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
 		"parent": "e2e"
-	},
-	{
-		"title": "Block Grammar",
-		"slug": "grammar",
-		"markdown_source": "../docs/contributors/code/grammar.md",
-		"parent": "code"
 	},
 	{
 		"title": "Scripts",

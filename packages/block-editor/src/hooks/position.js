@@ -28,6 +28,7 @@ import { addFilter } from '@wordpress/hooks';
 import BlockList from '../components/block-list';
 import useSetting from '../components/use-setting';
 import InspectorControls from '../components/inspector-controls';
+import useBlockDisplayInformation from '../components/use-block-display-information';
 import { cleanEmptyObject } from './utils';
 import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
@@ -222,32 +223,39 @@ export function PositionPanel( props ) {
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
 
-	const { hasParents } = useSelect(
+	const { firstParentClientId } = useSelect(
 		( select ) => {
 			const { getBlockParents } = select( blockEditorStore );
 			const parents = getBlockParents( clientId );
-			return {
-				hasParents: parents.length,
-			};
+			return { firstParentClientId: parents[ parents.length - 1 ] };
 		},
 		[ clientId ]
 	);
 
+	const blockInformation = useBlockDisplayInformation( firstParentClientId );
+	const stickyHelpText =
+		allowSticky && value === STICKY_OPTION.value && blockInformation
+			? sprintf(
+					/* translators: %s: the name of the parent block. */
+					__(
+						'The block will stick to the scrollable area of the parent %s block.'
+					),
+					blockInformation.title
+			  )
+			: null;
+
 	const options = useMemo( () => {
 		const availableOptions = [ DEFAULT_OPTION ];
-		// Only display sticky option if the block has no parents (is at the root of the document),
-		// or if the block already has a sticky position value set.
-		if (
-			( allowSticky && ! hasParents ) ||
-			value === STICKY_OPTION.value
-		) {
+		// Display options if they are allowed, or if a block already has a valid value set.
+		// This allows for a block to be switched off from a position type that is not allowed.
+		if ( allowSticky || value === STICKY_OPTION.value ) {
 			availableOptions.push( STICKY_OPTION );
 		}
 		if ( allowFixed || value === FIXED_OPTION.value ) {
 			availableOptions.push( FIXED_OPTION );
 		}
 		return availableOptions;
-	}, [ allowFixed, allowSticky, hasParents, value ] );
+	}, [ allowFixed, allowSticky, value ] );
 
 	const onChangeType = ( next ) => {
 		// For now, use a hard-coded `0px` value for the position.
@@ -281,7 +289,11 @@ export function PositionPanel( props ) {
 		web:
 			options.length > 1 ? (
 				<InspectorControls group="position">
-					<BaseControl className="block-editor-hooks__position-selection">
+					<BaseControl
+						className="block-editor-hooks__position-selection"
+						__nextHasNoMarginBottom
+						help={ stickyHelpText }
+					>
 						<CustomSelectControl
 							__nextUnconstrainedWidth
 							__next36pxDefaultSize

@@ -93,7 +93,7 @@ function UncontrolledInnerBlocks( props ) {
 		horizontalAlignment,
 		filterInnerBlocks,
 		blockWidth,
-		__experimentalLayout: layout = defaultLayout,
+		layout = defaultLayout,
 		gridProperties,
 	} = props;
 

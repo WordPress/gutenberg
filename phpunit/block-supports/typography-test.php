@@ -78,7 +78,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 		register_block_type(
 			$this->test_block_name,
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'fontSize' => array(
 						'type' => 'string',
@@ -112,7 +112,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 		register_block_type(
 			$this->test_block_name,
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'style' => array(
 						'type' => 'object',
@@ -145,7 +145,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 		register_block_type(
 			$this->test_block_name,
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'style' => array(
 						'type' => 'object',
@@ -191,7 +191,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 		register_block_type(
 			$this->test_block_name,
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'style' => array(
 						'type' => 'object',
@@ -227,7 +227,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 		register_block_type(
 			$this->test_block_name,
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'style' => array(
 						'type' => 'object',
@@ -260,7 +260,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 		register_block_type(
 			$this->test_block_name,
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'style' => array(
 						'type' => 'object',
@@ -432,6 +432,30 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
 			),
 
+			'returns clamp value where min and max fluid values defined' => array(
+				'font_size'                   => array(
+					'size'  => '80px',
+					'fluid' => array(
+						'min' => '70px',
+						'max' => '125px',
+					),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(70px, 4.375rem + ((1vw - 3.2px) * 4.297), 125px)',
+			),
+
+			'returns clamp value where max is equal to size' => array(
+				'font_size'                   => array(
+					'size'  => '7.8125rem',
+					'fluid' => array(
+						'min' => '4.375rem',
+						'max' => '7.8125rem',
+					),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(4.375rem, 4.375rem + ((1vw - 0.2rem) * 4.298), 7.8125rem)',
+			),
+
 			'returns clamp value if min font size is greater than max' => array(
 				'font_size'                   => array(
 					'size'  => '3rem',
@@ -601,7 +625,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 		register_block_type(
 			$this->test_block_name,
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'style' => array(
 						'type' => 'object',
@@ -861,6 +885,89 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			'size: false' => array( false ),
 			'size: true'  => array( true ),
 			'size: array' => array( array( '10' ) ),
+		);
+	}
+
+	/**
+	 * Tests computed font size values.
+	 *
+	 * @covers ::gutenberg_get_computed_fluid_typography_value
+	 *
+	 * @dataProvider data_get_computed_fluid_typography_value
+	 *
+	 * @param array  $args {
+	 *      Optional. An associative array of values to calculate a fluid formula for font size. Default is empty array.
+	 *
+	 *     @type string $maximum_viewport_width Maximum size up to which type will have fluidity.
+	 *     @type string $minimum_viewport_width Minimum viewport size from which type will have fluidity.
+	 *     @type string $maximum_font_size      Maximum font size for any clamp() calculation.
+	 *     @type string $minimum_font_size      Minimum font size for any clamp() calculation.
+	 *     @type int    $scale_factor           A scale factor to determine how fast a font scales within boundaries.
+	 * }
+	 * @param string $expected_output             Expected value of style property from gutenberg_apply_typography_support().
+	 */
+	public function test_get_computed_fluid_typography_value( $args, $expected_output ) {
+		$actual = gutenberg_get_computed_fluid_typography_value( $args );
+		$this->assertSame( $expected_output, $actual );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_computed_fluid_typography_value() {
+		return array(
+			'returns clamped value with valid args' => array(
+				'args'            => array(
+					'minimum_viewport_width' => '320px',
+					'maximum_viewport_width' => '1000px',
+					'minimum_font_size'      => '50px',
+					'maximum_font_size'      => '100px',
+					'scale_factor'           => 1,
+				),
+				'expected_output' => 'clamp(50px, 3.125rem + ((1vw - 3.2px) * 7.353), 100px)',
+			),
+			'returns `null` when `maximum_viewport_width` is an unsupported unit' => array(
+				'args'            => array(
+					'minimum_viewport_width' => '320px',
+					'maximum_viewport_width' => 'calc(100% - 60px)',
+					'minimum_font_size'      => '50px',
+					'maximum_font_size'      => '100px',
+					'scale_factor'           => 1,
+				),
+				'expected_output' => null,
+			),
+			'returns `null` when `minimum_viewport_width` is an unsupported unit' => array(
+				'args'            => array(
+					'minimum_viewport_width' => 'calc(100% - 60px)',
+					'maximum_viewport_width' => '1000px',
+					'minimum_font_size'      => '50px',
+					'maximum_font_size'      => '100px',
+					'scale_factor'           => 1,
+				),
+				'expected_output' => null,
+			),
+			'returns `null` when `minimum_font_size` is an unsupported unit' => array(
+				'args'            => array(
+					'minimum_viewport_width' => '320em',
+					'maximum_viewport_width' => '1000em',
+					'minimum_font_size'      => '10vw',
+					'maximum_font_size'      => '100em',
+					'scale_factor'           => 1,
+				),
+				'expected_output' => null,
+			),
+			'returns `null` when `maximum_font_size` is an unsupported unit' => array(
+				'args'            => array(
+					'minimum_viewport_width' => '320em',
+					'maximum_viewport_width' => '1000em',
+					'minimum_font_size'      => '50px',
+					'maximum_font_size'      => '100%',
+					'scale_factor'           => 1,
+				),
+				'expected_output' => null,
+			),
 		);
 	}
 }

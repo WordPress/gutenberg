@@ -6,6 +6,10 @@
 	&.is-loading {
 		opacity: 0;
 	}
+
+	.interface-interface-skeleton__header {
+		border: 0;
+	}
 }
 
 .edit-site-editor__toggle-save-panel {
@@ -20,7 +24,7 @@
 
 // Adjust the position of the notices
 .edit-site .components-editor-notices__snackbar {
-	position: fixed;
+	position: absolute;
 	right: 0;
 	bottom: 40px;
 	padding-left: 16px;

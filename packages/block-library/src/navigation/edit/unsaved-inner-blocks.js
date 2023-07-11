@@ -11,7 +11,11 @@ import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { areBlocksDirty } from './are-blocks-dirty';
-import { DEFAULT_BLOCK, ALLOWED_BLOCKS } from '../constants';
+import {
+	DEFAULT_BLOCK,
+	ALLOWED_BLOCKS,
+	SELECT_NAVIGATION_MENUS_ARGS,
+} from '../constants';
 
 const EMPTY_OBJECT = {};
 
@@ -82,11 +86,7 @@ export default function UnsavedInnerBlocks( {
 				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
 				hasResolvedAllNavigationMenus: hasFinishedResolution(
 					'getEntityRecords',
-					[
-						'postType',
-						'wp_navigation',
-						{ per_page: -1, status: [ 'publish', 'draft' ] },
-					]
+					SELECT_NAVIGATION_MENUS_ARGS
 				),
 			};
 		},

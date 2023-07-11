@@ -16,7 +16,7 @@ describe( 'Front End Performance', () => {
 	};
 
 	beforeAll( async () => {
-		await activateTheme( 'twentytwentyone' );
+		await activateTheme( 'gutenberg-test-themes/twentytwentyone' );
 		await logout();
 	} );
 

@@ -7,6 +7,7 @@ import path from 'path';
  * WordPress dependencies
  */
 import {
+	activateTheme,
 	createNewPost,
 	saveDraft,
 	insertBlock,
@@ -82,6 +83,11 @@ describe( 'Post Editor Performance', () => {
 	const traceFilePath = getTraceFilePath();
 
 	let traceResults;
+
+	beforeAll( async () => {
+		// See https://github.com/WordPress/gutenberg/pull/50905/files#r1209014677;
+		await activateTheme( 'gutenberg-test-themes/twentytwentyone' );
+	} );
 
 	afterAll( async () => {
 		saveResultsFile( __filename, results );

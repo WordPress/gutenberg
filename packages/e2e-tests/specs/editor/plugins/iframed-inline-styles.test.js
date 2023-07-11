@@ -35,8 +35,10 @@ describe( 'iframed inline styles', () => {
 		await insertBlock( 'Iframed Inline Styles' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		expect( await getComputedStyle( page, 'padding' ) ).toBe( '20px' );
-		expect( await getComputedStyle( page, 'border-width' ) ).toBe( '2px' );
+		expect( await getComputedStyle( canvas(), 'padding' ) ).toBe( '20px' );
+		expect( await getComputedStyle( canvas(), 'border-width' ) ).toBe(
+			'2px'
+		);
 
 		await createNewTemplate( 'Iframed Test' );
 
@@ -48,5 +50,7 @@ describe( 'iframed inline styles', () => {
 		expect( await getComputedStyle( canvas(), 'border-width' ) ).toBe(
 			'2px'
 		);
+
+		expect( console ).toHaveWarned();
 	} );
 } );

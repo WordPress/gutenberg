@@ -181,12 +181,6 @@ function LinkControl( {
 			isMounting.current = false;
 			return;
 		}
-		// Unless we are mounting, we always want to focus either:
-		// - the URL input
-		// - the first focusable element in the Link UI.
-		// But in editing mode if there is a text input present then
-		// the URL input is at index 1. If not then it is at index 0.
-		const whichFocusTargetIndex = textInputRef?.current ? 1 : 0;
 
 		// Scenario - when:
 		// - switching between editable and non editable LinkControl
@@ -194,9 +188,8 @@ function LinkControl( {
 		// ...then move focus to the *first* element to avoid focus loss
 		// and to ensure focus is *within* the Link UI.
 		const nextFocusTarget =
-			focus.focusable.find( wrapperNode.current )[
-				whichFocusTargetIndex
-			] || wrapperNode.current;
+			focus.focusable.find( wrapperNode.current )[ 0 ] ||
+			wrapperNode.current;
 
 		nextFocusTarget.focus();
 
@@ -299,7 +292,8 @@ function LinkControl( {
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
-	const showSettings = !! settings?.length;
+	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
+	const showActions = isEditingLink && hasLinkValue;
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
@@ -307,6 +301,7 @@ function LinkControl( {
 	const showTextControl = hasLinkValue && hasTextControl;
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
+	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
 
 	return (
 		<div
@@ -328,6 +323,18 @@ function LinkControl( {
 							'has-text-control': showTextControl,
 						} ) }
 					>
+						{ showTextControl && (
+							<TextControl
+								__nextHasNoMarginBottom
+								ref={ textInputRef }
+								className="block-editor-link-control__field block-editor-link-control__text-content"
+								label={ __( 'Text' ) }
+								value={ internalControlValue?.title }
+								onChange={ setInternalTextInputValue }
+								onKeyDown={ handleSubmitWithEnter }
+								size="__unstable-large"
+							/>
+						) }
 						<LinkControlSearchInput
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
@@ -345,7 +352,7 @@ function LinkControl( {
 							createSuggestionButtonText={
 								createSuggestionButtonText
 							}
-							useLabel={ showTextControl }
+							hideLabelFromVision={ ! showTextControl }
 						/>
 					</div>
 					{ errorMessage && (
@@ -371,51 +378,38 @@ function LinkControl( {
 				/>
 			) }
 
-			{ isEditing && (
+			{ showSettings && (
 				<div className="block-editor-link-control__tools">
-					{ ( showSettings || showTextControl ) && (
+					{ ! currentInputIsEmpty && (
 						<LinkControlSettingsDrawer
 							settingsOpen={ settingsOpen }
 							setSettingsOpen={ setSettingsOpen }
 						>
-							{ showTextControl && (
-								<TextControl
-									__nextHasNoMarginBottom
-									ref={ textInputRef }
-									className="block-editor-link-control__setting block-editor-link-control__text-content"
-									label="Text"
-									value={ internalControlValue?.title }
-									onChange={ setInternalTextInputValue }
-									onKeyDown={ handleSubmitWithEnter }
-								/>
-							) }
-							{ showSettings && (
-								<LinkSettings
-									value={ internalControlValue }
-									settings={ settings }
-									onChange={ createSetInternalSettingValueHandler(
-										settingsKeys
-									) }
-								/>
-							) }
+							<LinkSettings
+								value={ internalControlValue }
+								settings={ settings }
+								onChange={ createSetInternalSettingValueHandler(
+									settingsKeys
+								) }
+							/>
 						</LinkControlSettingsDrawer>
 					) }
+				</div>
+			) }
 
-					<div className="block-editor-link-control__search-actions">
-						<Button
-							variant="primary"
-							onClick={ handleSubmit }
-							className="block-editor-link-control__search-submit"
-							disabled={
-								! valueHasChanges || currentInputIsEmpty
-							}
-						>
-							{ __( 'Save' ) }
-						</Button>
-						<Button variant="tertiary" onClick={ handleCancel }>
-							{ __( 'Cancel' ) }
-						</Button>
-					</div>
+			{ showActions && (
+				<div className="block-editor-link-control__search-actions">
+					<Button
+						variant="primary"
+						onClick={ isDisabled ? noop : handleSubmit }
+						className="block-editor-link-control__search-submit"
+						aria-disabled={ isDisabled }
+					>
+						{ __( 'Save' ) }
+					</Button>
+					<Button variant="tertiary" onClick={ handleCancel }>
+						{ __( 'Cancel' ) }
+					</Button>
 				</div>
 			) }
 

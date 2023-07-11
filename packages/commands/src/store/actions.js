@@ -84,7 +84,7 @@ export function unregisterCommandLoader( name ) {
 }
 
 /**
- * Opens the command center.
+ * Opens the command palette.
  *
  * @return {Object} action.
  */
@@ -95,26 +95,12 @@ export function open() {
 }
 
 /**
- * Closes the command center.
+ * Closes the command palette.
  *
  * @return {Object} action.
  */
 export function close() {
 	return {
 		type: 'CLOSE',
-	};
-}
-
-/**
- * Sets the active context.
- *
- * @param {string} context Context.
- *
- * @return {Object} action.
- */
-export function setContext( context ) {
-	return {
-		type: 'SET_CONTEXT',
-		context,
 	};
 }

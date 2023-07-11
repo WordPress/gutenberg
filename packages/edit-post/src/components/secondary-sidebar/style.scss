@@ -17,8 +17,29 @@
 		width: 350px;
 	}
 
-	.edit-post-sidebar__panel-tabs {
-		flex-direction: row-reverse;
+	.edit-post-editor__document-overview-panel__close-button {
+		position: absolute;
+		right: $grid-unit-10;
+		top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
+		z-index: 1;
+		background: $white;
+	}
+
+	// The TabPanel style overrides in the following blocks should be removed when the new TabPanel is available.
+	.components-tab-panel__tabs {
+		border-bottom: $border-width solid $gray-300;
+		box-sizing: border-box;
+		display: flex;
+		width: 100%;
+		padding-right: $grid-unit-70;
+
+		.edit-post-sidebar__panel-tab {
+			width: 50%;
+		}
+	}
+
+	.components-tab-panel__tab-content {
+		height: calc(100% - #{$grid-unit-60});
 	}
 }
 
@@ -34,34 +55,6 @@
 	height: calc(100% - #{$button-size} - #{$grid-unit-10});
 	@include break-medium() {
 		height: 100%;
-	}
-}
-
-.edit-post-editor__document-overview-panel-header {
-	border-bottom: $border-width solid $gray-300;
-	display: flex;
-	justify-content: space-between;
-	height: $grid-unit-60;
-	padding-left: $grid-unit-20;
-	padding-right: $grid-unit-05;
-	ul {
-		width: calc(100% - #{ $grid-unit-50 });
-	}
-	li {
-		width: 50%;
-		button {
-			width: 100%;
-			text-align: initial;
-		}
-	}
-	li:only-child {
-		width: 100%;
-	}
-
-	&.components-panel__header.edit-post-sidebar__panel-tabs {
-		.components-button.has-icon {
-			display: flex;
-		}
 	}
 }
 
@@ -118,5 +111,9 @@
 .edit-post-editor__list-view-container {
 	display: flex;
 	flex-direction: column;
-	height: calc(100% - #{$grid-unit-60});
+	height: 100%;
+}
+
+.edit-post-editor__document-overview-panel__tab-panel {
+	height: 100%;
 }

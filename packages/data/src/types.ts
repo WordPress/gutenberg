@@ -70,6 +70,12 @@ export type MapSelect = (
 
 export type SelectFunction = < S >( store: S ) => CurriedSelectorsOf< S >;
 
+/**
+ * Callback for store's `subscribe()` method that
+ * runs when the store data has changed.
+ */
+export type ListenerFunction = () => void;
+
 export type CurriedSelectorsOf< S > = S extends StoreDescriptor<
 	ReduxStoreConfig< any, any, infer Selectors >
 >
