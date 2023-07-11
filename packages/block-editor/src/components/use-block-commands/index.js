@@ -86,7 +86,11 @@ export const useTransformCommands = () => {
 	const hasPossibleBlockTransformations =
 		!! possibleBlockTransformations.length && canRemove && ! isTemplate;
 
-	if ( ! hasPossibleBlockTransformations ) {
+	if (
+		! clientIds ||
+		clientIds.length < 1 ||
+		! hasPossibleBlockTransformations
+	) {
 		return { isLoading: false, commands: [] };
 	}
 
@@ -247,6 +251,10 @@ const useActionsCommands = () => {
 		}
 		await pasteStyles( blocks );
 	};
+
+	if ( ! clientIds || clientIds.length < 1 ) {
+		return { isLoading: false, commands: [] };
+	}
 
 	const commands = [
 		onPasteStyles,
