@@ -18,6 +18,7 @@ import {
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import { BACKSPACE } from '@wordpress/keycodes';
 
 const BUTTONS_HTML = `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button /--></div>
@@ -80,7 +81,8 @@ describe( 'Buttons block', () => {
 			);
 
 			const incrementButton = await within( radiusStepper ).findByTestId(
-				'Increment'
+				'Increment',
+				{ hidden: true }
 			);
 			fireEvent( incrementButton, 'onPressIn' );
 
@@ -180,7 +182,7 @@ describe( 'Buttons block', () => {
 			expect( addBlockHerePlaceholders.length ).toBe( 0 );
 
 			// Add a new Button block
-			fireEvent.press( await screen.findByText( 'Button' ) );
+			fireEvent.press( within( blockList ).getByText( 'Button' ) );
 
 			// Get new button
 			const secondButtonBlock = await getBlock( screen, 'Button', {
@@ -229,6 +231,32 @@ describe( 'Buttons block', () => {
 				// Delete block
 				const deleteButton = screen.getByLabelText( /Remove block/ );
 				fireEvent.press( deleteButton );
+
+				expect( getEditorHtml() ).toMatchSnapshot();
+			} );
+
+			it( 'removes the button and buttons block when deleting the block using the delete (backspace) key', async () => {
+				const screen = await initializeEditor( {
+					initialHtml: BUTTONS_HTML,
+				} );
+
+				// Get block
+				const buttonsBlock = await getBlock( screen, 'Buttons' );
+				triggerBlockListLayout( buttonsBlock );
+
+				// Get inner button block
+				const buttonBlock = await getBlock( screen, 'Button' );
+				fireEvent.press( buttonBlock );
+
+				const buttonInput =
+					within( buttonBlock ).getByLabelText( 'Text input. Empty' );
+
+				// Delete block
+				fireEvent( buttonInput, 'onKeyDown', {
+					nativeEvent: {},
+					preventDefault() {},
+					keyCode: BACKSPACE,
+				} );
 
 				expect( getEditorHtml() ).toMatchSnapshot();
 			} );

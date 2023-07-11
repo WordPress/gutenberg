@@ -29,9 +29,9 @@ export default function useBlockSelection() {
 	const { getBlockType } = useSelect( blocksStore );
 
 	const updateBlockSelection = useCallback(
-		async ( event, clientId, destinationClientId ) => {
+		async ( event, clientId, destinationClientId, focusPosition ) => {
 			if ( ! event?.shiftKey ) {
-				selectBlock( clientId );
+				selectBlock( clientId, focusPosition );
 				return;
 			}
 

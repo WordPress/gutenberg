@@ -15,15 +15,23 @@ export const unstyledButton = css`
 	background: none;
 	text-align: start;
 
+	svg,
+	path {
+		fill: currentColor;
+	}
+
 	&:hover {
 		color: ${ COLORS.ui.theme };
 	}
 
-	&:focus {
-		background-color: transparent;
-		color: ${ COLORS.ui.theme };
-		border-color: ${ COLORS.ui.theme };
-		outline: 3px solid transparent;
+	&:focus-visible {
+		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+			var(
+				--wp-components-color-accent,
+				var( --wp-admin-theme-color, ${ COLORS.ui.theme } )
+			);
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
 	}
 `;
 

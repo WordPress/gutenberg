@@ -35,7 +35,7 @@ export function useHasColorPanel( settings ) {
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
-	const hasButtonPanel = useHasHeadingPanel( settings );
+	const hasButtonPanel = useHasButtonPanel( settings );
 	const hasCaptionPanel = useHasCaptionPanel( settings );
 
 	return (
@@ -525,14 +525,14 @@ export default function ColorPanel( {
 			isShownByDefault: defaultControls.background,
 			indicators: [ gradient ?? backgroundColor ],
 			tabs: [
-				{
+				hasSolidColors && {
 					key: 'background',
 					label: __( 'Solid' ),
 					inheritedValue: backgroundColor,
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
 				},
-				{
+				hasGradientColors && {
 					key: 'gradient',
 					label: __( 'Gradient' ),
 					inheritedValue: gradient,
@@ -540,7 +540,7 @@ export default function ColorPanel( {
 					userValue: userGradient,
 					isGradient: true,
 				},
-			],
+			].filter( Boolean ),
 		},
 		showLinkPanel && {
 			key: 'link',

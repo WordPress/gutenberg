@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -58,10 +57,11 @@ function ColorGradientControlInner( {
 	headingLevel,
 } ) {
 	const canChooseAColor =
-		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
+		onColorChange &&
+		( ( colors && colors.length > 0 ) || ! disableCustomColors );
 	const canChooseAGradient =
 		onGradientChange &&
-		( ! isEmpty( gradients ) || ! disableCustomGradients );
+		( ( gradients && gradients.length > 0 ) || ! disableCustomGradients );
 
 	if ( ! canChooseAColor && ! canChooseAGradient ) {
 		return null;

@@ -17,3 +17,34 @@
 .customize-widgets-popover {
 	@include reset;
 }
+
+/**
+	Fixed bloock toolbar overrides. We can't detect each editor instance
+	in the styles of the block editor component so we need to override
+	the fixed styles here because the breakpoint css does not fire in the
+	customizer's left panel.
+*/
+.block-editor-block-contextual-toolbar {
+	&.is-fixed {
+		position: sticky;
+		top: 0;
+		left: 0;
+		z-index: z-index(".block-editor-block-list__insertion-point");
+		width: calc(100% + 2 * 12px); //12px is the padding of customizer sidebar content
+
+		overflow-y: hidden;
+
+		border: none;
+		border-bottom: $border-width solid $gray-200;
+		border-radius: 0;
+
+		.block-editor-block-toolbar .components-toolbar-group,
+		.block-editor-block-toolbar .components-toolbar {
+			border-right-color: $gray-200;
+		}
+
+		&.is-collapsed {
+			margin-left: -12px; //12px is the padding of customizer sidebar content
+		}
+	}
+}

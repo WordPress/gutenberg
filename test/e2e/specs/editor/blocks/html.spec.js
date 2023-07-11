@@ -10,7 +10,7 @@ test.describe( 'HTML block', () => {
 
 	test( 'can be created by typing "/html"', async ( { editor, page } ) => {
 		// Create a Custom HTML block with the slash shortcut.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/html' );
 		await expect(
 			page.locator( 'role=option[name="Custom HTML"i][selected]' )
@@ -33,7 +33,7 @@ test.describe( 'HTML block', () => {
 
 	test( 'should not encode <', async ( { editor, page } ) => {
 		// Create a Custom HTML block with the slash shortcut.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/html' );
 		await expect(
 			page.locator( 'role=option[name="Custom HTML"i][selected]' )
@@ -42,8 +42,9 @@ test.describe( 'HTML block', () => {
 		await page.keyboard.type( '1 < 2' );
 		await editor.publishPost();
 		await page.reload();
+		await page.waitForSelector( '[name="editor-canvas"]' );
 		await expect(
-			page.locator( '[data-type="core/html"] textarea' )
+			editor.canvas.locator( '[data-type="core/html"] textarea' )
 		).toBeVisible();
 	} );
 } );

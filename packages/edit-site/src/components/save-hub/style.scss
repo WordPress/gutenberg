@@ -1,9 +1,15 @@
 .edit-site-save-hub {
 	color: $gray-600;
+	border-top: 1px solid $gray-800;
+	flex-shrink: 0;
+	margin: 0;
+	padding: $canvas-padding;
 }
 
 .edit-site-save-hub__button {
 	color: inherit;
+	width: 100%;
+	justify-content: center;
 
 	&[aria-disabled="true"] {
 		opacity: 1;

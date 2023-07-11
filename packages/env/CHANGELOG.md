@@ -2,9 +2,46 @@
 
 ## Unreleased
 
+## 8.3.0 (2023-07-05)
+
+## 8.2.0 (2023-06-23)
+
+## 8.1.1 (2023-06-17)
+
+### Bug fix
+
+-   Address issue where a missing file in the underlying Docker image caused `wp-env` to crash. [#51513](https://github.com/WordPress/gutenberg/pull/51513)
+
+## 8.1.0 (2023-06-07)
+
+### New feature
+
+-   Execute the local package's `wp-env` instead of the globally installed version if one is available.
+
+### Bug fix
+
+-   Run `useradd` with `-l` option to prevent excessive Docker image sizes.
+
+## 8.0.0 (2023-05-24)
+
+### Breaking Change
+
+-   Remove `afterSetup` option from `.wp-env.json` and the `WP_ENV_AFTER_SETUP` environment variable in favor of more granular lifecycle scripts.
+
+### New feature
+
+-   Add `afterStart`, `afterClean`, and `afterDestroy` lifecycle scripts to a new `lifecycleScripts` key in `.wp-env.json`.
+-   Add a series of `WP_ENV_LIFECYCLE_SCRIPT_` environment variables for the various lifecycle scripts.
+-   Rework `run` command to resolve bugs with non-quoted commands. As a consequence it is no longer possible to pass your entire command to `wp-env` wrapped in double-quotes. While `npx wp-env run cli wp help` will still work, `npx wp-env run cli "wp help"` will not. If you are currently escaping any quotes you will need to review those commands and ensure they are compatible with this update.
+
 ### Enhancement
 
+-   Support using double dashes in `wp-env run ...` to pass arguments that would otherwise be consumed by `wp-env`. For example, while normally `--help` would provide the `wp-env` help text, if you use `npx wp-env run cli php -- --help` you will see the PHP help text.
 -   Validate whether or not config options exist to prevent accidentally including ones that don't.
+
+### Bug fix
+
+-   Support Windows without requiring the use of WSL.
 
 ## 7.0.0 (2023-05-10)
 

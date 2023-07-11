@@ -59,9 +59,9 @@ function mergeRootToEnvironments( config ) {
 		config.env.tests.port = config.testsPort;
 		delete config.testsPort;
 	}
-	if ( config.afterSetup !== undefined ) {
-		removedRootOptions.afterSetup = config.afterSetup;
-		delete config.afterSetup;
+	if ( config.lifecycleScripts !== undefined ) {
+		removedRootOptions.lifecycleScripts = config.lifecycleScripts;
+		delete config.lifecycleScripts;
 	}
 
 	// Merge the root config and the environment configs together so that

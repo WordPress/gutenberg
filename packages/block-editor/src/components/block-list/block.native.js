@@ -1,17 +1,16 @@
 /**
  * External dependencies
  */
-import { Pressable, useWindowDimensions, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
 	useMobileGlobalStylesColors,
-	alignmentHelpers,
 	useGlobalStyles,
 } from '@wordpress/components';
 import {
@@ -36,9 +35,6 @@ import { compose, ifCondition, pure } from '@wordpress/compose';
 import BlockEdit from '../block-edit';
 import BlockDraggable from '../block-draggable';
 import BlockInvalidWarning from './block-invalid-warning';
-import BlockMobileToolbar from '../block-mobile-toolbar';
-import BlockOutline from './block-outline';
-import styles from './block.scss';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import useSetting from '../use-setting';
@@ -63,27 +59,17 @@ function getWrapperProps( value, getWrapperPropsFunction ) {
 
 function BlockWrapper( {
 	accessibilityLabel,
-	align,
-	blockWidth,
 	children,
 	clientId,
 	draggingClientId,
 	draggingEnabled,
 	isDescendentBlockSelected,
-	isParentSelected,
 	isSelected,
-	isStackedHorizontally,
 	isTouchable,
 	marginHorizontal,
 	marginVertical,
-	onDeleteBlock,
 	onFocus,
 } ) {
-	const { width: screenWidth } = useWindowDimensions();
-	const anchorNodeRef = useRef();
-	const { isFullWidth } = alignmentHelpers;
-	const isScreenWidthEqual = blockWidth === screenWidth;
-	const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
 	const blockWrapperStyles = { flex: 1 };
 	const blockWrapperStyle = [
 		blockWrapperStyles,
@@ -103,11 +89,6 @@ function BlockWrapper( {
 			onPress={ onFocus }
 			style={ blockWrapperStyle }
 		>
-			<BlockOutline
-				isSelected={ isSelected }
-				isParentSelected={ isParentSelected }
-				screenWidth={ screenWidth }
-			/>
 			<BlockDraggable
 				clientId={ clientId }
 				draggingClientId={ draggingClientId }
@@ -116,19 +97,6 @@ function BlockWrapper( {
 			>
 				{ children }
 			</BlockDraggable>
-			<View style={ styles.neutralToolbar } ref={ anchorNodeRef }>
-				{ isSelected && (
-					<BlockMobileToolbar
-						anchorNodeRef={ anchorNodeRef.current }
-						blockWidth={ blockWidth }
-						clientId={ clientId }
-						draggingClientId={ draggingClientId }
-						isFullWidth={ isFullWidthToolbar }
-						isStackedHorizontally={ isStackedHorizontally }
-						onDelete={ onDeleteBlock }
-					/>
-				) }
-			</View>
 		</Pressable>
 	);
 }
@@ -295,7 +263,6 @@ function BlockListBlock( {
 		),
 	] );
 
-	const { align } = attributes;
 	const isFocused = isSelected || isDescendentBlockSelected;
 	const isTouchable =
 		isSelected ||
@@ -312,20 +279,16 @@ function BlockListBlock( {
 	return (
 		<BlockWrapper
 			accessibilityLabel={ accessibilityLabel }
-			align={ align }
-			blockWidth={ blockWidth }
 			clientId={ clientId }
 			draggingClientId={ draggingClientId }
 			draggingEnabled={ draggingEnabled }
 			isFocused={ isFocused }
 			isDescendentBlockSelected={ isDescendentBlockSelected }
-			isParentSelected={ isParentSelected }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
 			isTouchable={ isTouchable }
 			marginHorizontal={ marginHorizontal }
 			marginVertical={ marginVertical }
-			onDeleteBlock={ onDeleteBlock }
 			onFocus={ onFocus }
 		>
 			{ () =>
@@ -345,6 +308,7 @@ function BlockListBlock( {
 							isSelectionEnabled={ isSelectionEnabled }
 							mergeBlocks={ canRemove ? onMerge : undefined }
 							name={ name }
+							onDeleteBlock={ onDeleteBlock }
 							onFocus={ onFocus }
 							onRemove={ canRemove ? onRemove : undefined }
 							onReplace={ canRemove ? onReplace : undefined }
@@ -481,26 +445,26 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				) {
 					removeBlock( _clientId );
 				} else {
-					if (
-						canInsertBlockType(
-							getBlockName( firstClientId ),
-							targetRootClientId
-						)
-					) {
-						moveBlocksToPosition(
-							[ firstClientId ],
-							_clientId,
-							targetRootClientId,
-							getBlockIndex( _clientId )
-						);
-					} else {
-						const replacement = switchToBlockType(
-							getBlock( firstClientId ),
-							getDefaultBlockName()
-						);
+					registry.batch( () => {
+						if (
+							canInsertBlockType(
+								getBlockName( firstClientId ),
+								targetRootClientId
+							)
+						) {
+							moveBlocksToPosition(
+								[ firstClientId ],
+								_clientId,
+								targetRootClientId,
+								getBlockIndex( _clientId )
+							);
+						} else {
+							const replacement = switchToBlockType(
+								getBlock( firstClientId ),
+								getDefaultBlockName()
+							);
 
-						if ( replacement && replacement.length ) {
-							registry.batch( () => {
+							if ( replacement && replacement.length ) {
 								insertBlocks(
 									replacement,
 									getBlockIndex( _clientId ),
@@ -508,16 +472,16 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 									changeSelection
 								);
 								removeBlock( firstClientId, false );
-							} );
+							}
 						}
-					}
 
-					if (
-						! getBlockOrder( _clientId ).length &&
-						isUnmodifiedBlock( getBlock( _clientId ) )
-					) {
-						removeBlock( _clientId, false );
-					}
+						if (
+							! getBlockOrder( _clientId ).length &&
+							isUnmodifiedBlock( getBlock( _clientId ) )
+						) {
+							removeBlock( _clientId, false );
+						}
+					} );
 				}
 			}
 

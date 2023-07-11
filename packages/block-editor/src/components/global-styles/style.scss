@@ -44,6 +44,9 @@
 
 .block-editor-global-styles-advanced-panel__custom-css-input textarea {
 	font-family: $editor_html_font;
+	// CSS input is always LTR regardless of language.
+	/*rtl:ignore*/
+	direction: ltr;
 }
 
 .block-editor-global-styles-advanced-panel__custom-css-validation-wrapper {

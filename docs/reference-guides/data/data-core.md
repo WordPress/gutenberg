@@ -329,18 +329,6 @@ _Returns_
 
 -   `any`: The entity record's save error.
 
-### getNavigationFallbackId
-
-Retrieve the fallback Navigation.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `EntityRecordKey | undefined`: The ID for the fallback Navigation post.
-
 ### getRawEntityRecord
 
 Returns the entity's record object by key, with its attributes mapped to their raw values.
@@ -357,6 +345,8 @@ _Returns_
 -   `EntityRecord | undefined`: Object with the entity's raw attributes.
 
 ### getRedoEdit
+
+> **Deprecated** since 6.3
 
 Returns the next edit from the current undo offset for the entity records edits history, if any.
 
@@ -400,6 +390,8 @@ _Returns_
 -   `any`: Index data.
 
 ### getUndoEdit
+
+> **Deprecated** since 6.3
 
 Returns the previous edit from the current undo offset for the entity records edits history, if any.
 

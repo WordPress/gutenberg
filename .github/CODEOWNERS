@@ -54,6 +54,9 @@
 # Full Site Editing
 /packages/edit-site
 
+# Interactivity API
+/packages/interactivity                         @luisherranz @darerodz
+
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra
@@ -78,7 +81,7 @@
 /packages/prettier-config                       @ntwb @gziolo
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
-/test/e2e                                       @kevin940726
+/test/e2e                                       @kevin940726 @Mamaduka
 
 # UI Components
 /packages/components                            @ajitbohra
@@ -125,7 +128,7 @@
 /packages/report-flaky-tests                    @kevin940726
 
 # wp-env
-/packages/env                                   @noahtallen @ObliviousHarmony
+/packages/env                                   @noahtallen @ObliviousHarmony @t-hamano
 
 # PHP
 /lib                                            @spacedmonkey

@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import { Edit } from '../edit';
+import Edit from '../edit';
 import { BlockContextProvider } from '../../block-context';
 
 const noop = () => {};
@@ -107,7 +107,7 @@ describe( 'Edit', () => {
 		it( 'should assign context', () => {
 			const edit = ( { context } ) => context.value;
 			registerBlockType( 'core/test-block', {
-				apiVersion: 2,
+				apiVersion: 3,
 				category: 'text',
 				title: 'block title',
 				usesContext: [ 'value' ],

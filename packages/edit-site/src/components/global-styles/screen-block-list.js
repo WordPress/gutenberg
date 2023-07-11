@@ -23,7 +23,7 @@ import { speak } from '@wordpress/a11y';
 import { useBlockVariations } from './variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const {
 	useHasDimensionsPanel,

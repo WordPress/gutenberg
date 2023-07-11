@@ -25,12 +25,11 @@ test.describe( 'Cover', () => {
 	} );
 
 	test( 'can set overlay color using color picker on block placeholder', async ( {
-		page,
 		editor,
 		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
-		const coverBlock = page.getByRole( 'document', {
+		const coverBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
 
@@ -56,12 +55,11 @@ test.describe( 'Cover', () => {
 	} );
 
 	test( 'can set background image using image upload on block placeholder', async ( {
-		page,
 		editor,
 		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
-		const coverBlock = page.getByRole( 'document', {
+		const coverBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
 
@@ -80,12 +78,11 @@ test.describe( 'Cover', () => {
 	} );
 
 	test( 'dims background image down by 50% by default', async ( {
-		page,
 		editor,
 		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
-		const coverBlock = page.getByRole( 'document', {
+		const coverBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
 
@@ -104,11 +101,11 @@ test.describe( 'Cover', () => {
 		expect( backgroundDimOpacity ).toBe( '0.5' );
 	} );
 
-	test( 'can have the title edited', async ( { page, editor } ) => {
+	test( 'can have the title edited', async ( { editor } ) => {
 		const titleText = 'foo';
 
 		await editor.insertBlock( { name: 'core/cover' } );
-		const coverBlock = page.getByRole( 'document', {
+		const coverBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
 
@@ -134,7 +131,7 @@ test.describe( 'Cover', () => {
 
 	test( 'can be resized using drag & drop', async ( { page, editor } ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
-		const coverBlock = page.getByRole( 'document', {
+		const coverBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
 		await coverBlock
@@ -205,13 +202,12 @@ test.describe( 'Cover', () => {
 	} );
 
 	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
-		page,
 		editor,
 		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.getByRole( 'document', {
+		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
 		} );
 
@@ -220,14 +216,14 @@ test.describe( 'Cover', () => {
 		);
 
 		await expect(
-			page
+			editor.canvas
 				.getByRole( 'document', { name: 'Block: Image' } )
 				.locator( 'img' )
 		).toBeVisible();
 
 		await editor.transformBlockTo( 'core/cover' );
 
-		const coverBlock = page.getByRole( 'document', {
+		const coverBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Cover',
 		} );
 

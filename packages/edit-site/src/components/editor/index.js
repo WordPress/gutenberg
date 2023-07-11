@@ -1,15 +1,21 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import { EntityProvider } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockContextProvider,
 	BlockBreadcrumb,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -32,12 +38,13 @@ import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
-
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
+
+const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -50,42 +57,22 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function useIsSiteEditorLoading() {
-	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
-	const [ loaded, setLoaded ] = useState( false );
-	const inLoadingPause = useSelect(
-		( select ) => {
-			const hasResolvingSelectors =
-				select( coreStore ).hasResolvingSelectors();
-			return ! loaded && ! hasResolvingSelectors;
-		},
-		[ loaded ]
-	);
+const typeLabels = {
+	wp_template: __( 'Template Part' ),
+	wp_template_part: __( 'Template Part' ),
+	wp_block: __( 'Pattern' ),
+};
 
-	useEffect( () => {
-		if ( inLoadingPause ) {
-			/*
-			 * We're using an arbitrary 1s timeout here to catch brief moments
-			 * without any resolving selectors that would result in displaying
-			 * brief flickers of loading state and loaded state.
-			 *
-			 * It's worth experimenting with different values, since this also
-			 * adds 1s of artificial delay after loading has finished.
-			 */
-			const timeout = setTimeout( () => {
-				setLoaded( true );
-			}, 1000 );
+// Prevent accidental removal of certain blocks, asking the user for
+// confirmation.
+const blockRemovalRules = {
+	'core/query': __( 'Query Loop displays a list of posts or pages.' ),
+	'core/post-content': __(
+		'Post Content displays the content of a post or page.'
+	),
+};
 
-			return () => {
-				clearTimeout( timeout );
-			};
-		}
-	}, [ inLoadingPause ] );
-
-	return ! loaded || ! hasLoadedPost;
-}
-
-export default function Editor() {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -104,6 +91,7 @@ export default function Editor() {
 		isListViewOpen,
 		showIconLabels,
 		showBlockBreadcrumbs,
+		hasPageContentFocus,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -111,6 +99,7 @@ export default function Editor() {
 			getCanvasMode,
 			isInserterOpened,
 			isListViewOpened,
+			hasPageContentFocus: _hasPageContentFocus,
 		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
@@ -135,6 +124,7 @@ export default function Editor() {
 				'core/edit-site',
 				'showBlockBreadcrumbs'
 			),
+			hasPageContentFocus: _hasPageContentFocus(),
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
@@ -142,7 +132,7 @@ export default function Editor() {
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
-	const shouldShowBlockBreakcrumbs =
+	const shouldShowBlockBreadcrumbs =
 		showBlockBreadcrumbs &&
 		isEditMode &&
 		showVisualEditor &&
@@ -152,9 +142,10 @@ export default function Editor() {
 	const secondarySidebarLabel = isListViewOpen
 		? __( 'List View' )
 		: __( 'Block Library' );
-	const blockContext = useMemo(
-		() => ( {
-			...context,
+	const blockContext = useMemo( () => {
+		const { postType, postId, ...nonPostFields } = context ?? {};
+		return {
+			...( hasPageContentFocus ? context : nonPostFields ),
 			queryContext: [
 				context?.queryContext || { page: 1 },
 				( newQueryContext ) =>
@@ -166,16 +157,12 @@ export default function Editor() {
 						},
 					} ),
 			],
-		} ),
-		[ context, setEditedPostContext ]
-	);
+		};
+	}, [ hasPageContentFocus, context, setEditedPostContext ] );
 
 	let title;
 	if ( hasLoadedPost ) {
-		const type =
-			editedPostType === 'wp_template'
-				? __( 'Template' )
-				: __( 'Template Part' );
+		const type = typeLabels[ editedPostType ] ?? __( 'Template' );
 		title = sprintf(
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s ‹ Editor' ),
@@ -185,10 +172,8 @@ export default function Editor() {
 	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
-	// action in <URlQueryController> from double-announcing.
+	// action in <URLQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
-
-	const isLoading = useIsSiteEditorLoading();
 
 	return (
 		<>
@@ -204,20 +189,27 @@ export default function Editor() {
 						<SidebarComplementaryAreaFills />
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton
+							isDistractionFree={ true }
 							enableRegionNavigation={ false }
-							className={ showIconLabels && 'show-icon-labels' }
-							notices={
-								( isEditMode ||
-									window?.__experimentalEnableThemePreviews ) && (
-									<EditorSnackbars />
-								)
-							}
+							className={ classnames(
+								'edit-site-editor__interface-skeleton',
+								{
+									'show-icon-labels': showIconLabels,
+									'is-loading': isLoading,
+								}
+							) }
+							notices={ <EditorSnackbars /> }
 							content={
 								<>
 									<GlobalStylesRenderer />
 									{ isEditMode && <EditorNotices /> }
 									{ showVisualEditor && editedPost && (
-										<BlockEditor />
+										<>
+											<BlockEditor />
+											<BlockRemovalWarningModal
+												rules={ blockRemovalRules }
+											/>
+										</>
 									) }
 									{ editorMode === 'text' &&
 										editedPost &&
@@ -256,9 +248,13 @@ export default function Editor() {
 								)
 							}
 							footer={
-								shouldShowBlockBreakcrumbs && (
+								shouldShowBlockBreadcrumbs && (
 									<BlockBreadcrumb
-										rootLabelText={ __( 'Template' ) }
+										rootLabelText={
+											hasPageContentFocus
+												? __( 'Page' )
+												: __( 'Template' )
+										}
 									/>
 								)
 							}

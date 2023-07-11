@@ -12,21 +12,19 @@ import {
 	__experimentalHeading as Heading,
 	Spinner,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { updateAttributes } from '../../navigation-link/update-attributes';
 import { LinkUI } from '../../navigation-link/link-ui';
-import { useInsertedBlock } from '../../navigation-link/use-inserted-block';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
@@ -34,6 +32,48 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 ];
+const { PrivateListView } = unlock( blockEditorPrivateApis );
+
+function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
+		insertedBlock?.name
+	);
+	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
+	const showLinkControls = supportsLinkControls && blockWasJustInserted;
+
+	if ( ! showLinkControls ) {
+		return null;
+	}
+
+	const setInsertedBlockAttributes =
+		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
+			if ( ! _insertedBlockClientId ) return;
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
+		};
+
+	return (
+		<LinkUI
+			clientId={ insertedBlock?.clientId }
+			link={ insertedBlock?.attributes }
+			onClose={ () => {
+				setInsertedBlock( null );
+			} }
+			onChange={ ( updatedValue ) => {
+				updateAttributes(
+					updatedValue,
+					setInsertedBlockAttributes( insertedBlock?.clientId ),
+					insertedBlock?.attributes
+				);
+				setInsertedBlock( null );
+			} }
+			onCancel={ () => {
+				setInsertedBlock( null );
+			} }
+		/>
+	);
+}
 
 const MainContent = ( {
 	clientId,
@@ -42,52 +82,12 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
-	const { PrivateListView } = unlock( blockEditorPrivateApis );
-
-	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
-	// This is required else the list view will display the entire block tree.
-	const clientIdsTree = useSelect(
+	const hasChildren = useSelect(
 		( select ) => {
-			const { __unstableGetClientIdsTree } = select( blockEditorStore );
-			return __unstableGetClientIdsTree( clientId );
+			return !! select( blockEditorStore ).getBlockCount( clientId );
 		},
 		[ clientId ]
 	);
-
-	const [ clientIdWithOpenLinkUI, setClientIdWithOpenLinkUI ] = useState();
-	const { lastInsertedBlockClientId } = useSelect( ( select ) => {
-		const { getLastInsertedBlocksClientIds } = unlock(
-			select( blockEditorStore )
-		);
-		const lastInsertedBlocksClientIds = getLastInsertedBlocksClientIds();
-		return {
-			lastInsertedBlockClientId:
-				lastInsertedBlocksClientIds && lastInsertedBlocksClientIds[ 0 ],
-		};
-	}, [] );
-
-	const {
-		insertedBlockAttributes,
-		insertedBlockName,
-		setInsertedBlockAttributes,
-	} = useInsertedBlock( lastInsertedBlockClientId );
-
-	const hasExistingLinkValue = insertedBlockAttributes?.url;
-
-	useEffect( () => {
-		if (
-			lastInsertedBlockClientId &&
-			BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName ) &&
-			! hasExistingLinkValue // don't re-show the Link UI if the block already has a link value.
-		) {
-			setClientIdWithOpenLinkUI( lastInsertedBlockClientId );
-		}
-	}, [
-		lastInsertedBlockClientId,
-		clientId,
-		insertedBlockName,
-		hasExistingLinkValue,
-	] );
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
@@ -109,43 +109,20 @@ const MainContent = ( {
 				'You have not yet created any menus. Displaying a list of your Pages'
 		  );
 
-	const renderLinkUI = ( block ) => {
-		return (
-			clientIdWithOpenLinkUI === block.clientId && (
-				<LinkUI
-					clientId={ lastInsertedBlockClientId }
-					link={ insertedBlockAttributes }
-					onClose={ () => setClientIdWithOpenLinkUI( null ) }
-					hasCreateSuggestion={ false }
-					onChange={ ( updatedValue ) => {
-						updateAttributes(
-							updatedValue,
-							setInsertedBlockAttributes,
-							insertedBlockAttributes
-						);
-						setClientIdWithOpenLinkUI( null );
-					} }
-					onCancel={ () => setClientIdWithOpenLinkUI( null ) }
-				/>
-			)
-		);
-	};
-
 	return (
 		<div className="wp-block-navigation__menu-inspector-controls">
-			{ clientIdsTree.length === 0 && (
+			{ ! hasChildren && (
 				<p className="wp-block-navigation__menu-inspector-controls__empty-message">
 					{ __( 'This navigation menu is empty.' ) }
 				</p>
 			) }
 			<PrivateListView
-				blocks={ clientIdsTree }
 				rootClientId={ clientId }
 				isExpanded
 				description={ description }
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
-				renderAdditionalBlockUI={ renderLinkUI }
+				additionalBlockContent={ AdditionalBlockContent }
 			/>
 		</div>
 	);
@@ -160,6 +137,7 @@ const MenuInspectorControls = ( props ) => {
 		onSelectClassicMenu,
 		onSelectNavigationMenu,
 		isManageMenusButtonDisabled,
+		blockEditingMode,
 	} = props;
 
 	return (
@@ -172,22 +150,24 @@ const MenuInspectorControls = ( props ) => {
 					>
 						{ __( 'Menu' ) }
 					</Heading>
-					<NavigationMenuSelector
-						currentMenuId={ currentMenuId }
-						onSelectClassicMenu={ onSelectClassicMenu }
-						onSelectNavigationMenu={ onSelectNavigationMenu }
-						onCreateNew={ onCreateNew }
-						createNavigationMenuIsSuccess={
-							createNavigationMenuIsSuccess
-						}
-						createNavigationMenuIsError={
-							createNavigationMenuIsError
-						}
-						actionLabel={ actionLabel }
-						isManageMenusButtonDisabled={
-							isManageMenusButtonDisabled
-						}
-					/>
+					{ blockEditingMode === 'default' && (
+						<NavigationMenuSelector
+							currentMenuId={ currentMenuId }
+							onSelectClassicMenu={ onSelectClassicMenu }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
+							onCreateNew={ onCreateNew }
+							createNavigationMenuIsSuccess={
+								createNavigationMenuIsSuccess
+							}
+							createNavigationMenuIsError={
+								createNavigationMenuIsError
+							}
+							actionLabel={ actionLabel }
+							isManageMenusButtonDisabled={
+								isManageMenusButtonDisabled
+							}
+						/>
+					) }
 				</HStack>
 				<MainContent { ...props } />
 			</PanelBody>

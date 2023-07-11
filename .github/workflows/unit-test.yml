@@ -85,7 +85,6 @@ jobs:
             fail-fast: true
             matrix:
                 php:
-                    - '5.6'
                     - '7.0'
                     - '7.1'
                     - '7.2'
@@ -171,12 +170,12 @@ jobs:
 
             - name: Docker container debug information
               run: |
-                  npm run wp-env run tests-mysql "mysql --version"
-                  npm run wp-env run tests-wordpress "php --version"
-                  npm run wp-env run tests-wordpress "php -m"
-                  npm run wp-env run tests-wordpress "php -i"
-                  npm run wp-env run tests-wordpress "/var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit --version"
-                  npm run wp-env run tests-wordpress "locale -a"
+                  npm run wp-env run tests-mysql mysql -- --version
+                  npm run wp-env run tests-wordpress php -- --version
+                  npm run wp-env run tests-wordpress php -m
+                  npm run wp-env run tests-wordpress php -i
+                  npm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
+                  npm run wp-env run tests-wordpress locale -a
 
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
@@ -297,4 +296,4 @@ jobs:
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

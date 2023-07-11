@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"__experimental": "fse",
 	"name": "core/post-comments-link",
 	"title": "Post Comments Link",
@@ -14,7 +14,6 @@
 		}
 	},
 	"supports": {
-		"anchor": true,
 		"html": false,
 		"color": {
 			"link": true,

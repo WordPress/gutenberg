@@ -2,6 +2,58 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	sidesAll,
+	sidesAxial,
+	sidesBottom,
+	sidesHorizontal,
+	sidesLeft,
+	sidesRight,
+	sidesTop,
+	sidesVertical,
+} from '@wordpress/icons';
+
+export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+
+export const DEFAULT_VALUES = {
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
+};
+
+export const ICONS = {
+	custom: sidesAll,
+	axial: sidesAxial,
+	horizontal: sidesHorizontal,
+	vertical: sidesVertical,
+	top: sidesTop,
+	right: sidesRight,
+	bottom: sidesBottom,
+	left: sidesLeft,
+};
+
+export const LABELS = {
+	default: __( 'Spacing control' ),
+	top: __( 'Top' ),
+	bottom: __( 'Bottom' ),
+	left: __( 'Left' ),
+	right: __( 'Right' ),
+	mixed: __( 'Mixed' ),
+	vertical: __( 'Vertical' ),
+	horizontal: __( 'Horizontal' ),
+	axial: __( 'Horizontal & vertical' ),
+	custom: __( 'Custom' ),
+};
+
+export const VIEWS = {
+	axial: 'axial',
+	top: 'top',
+	right: 'right',
+	bottom: 'bottom',
+	left: 'left',
+	custom: 'custom',
+};
 
 /**
  * Checks is given value is a spacing preset.
@@ -131,26 +183,6 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 	return sliderValue !== -1 ? sliderValue : NaN;
 }
 
-export const LABELS = {
-	all: __( 'All sides' ),
-	top: __( 'Top' ),
-	bottom: __( 'Bottom' ),
-	left: __( 'Left' ),
-	right: __( 'Right' ),
-	mixed: __( 'Mixed' ),
-	vertical: __( 'Vertical' ),
-	horizontal: __( 'Horizontal' ),
-};
-
-export const DEFAULT_VALUES = {
-	top: undefined,
-	right: undefined,
-	bottom: undefined,
-	left: undefined,
-};
-
-export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
-
 /**
  * Gets an items with the most occurrence within an array
  * https://stackoverflow.com/a/20762713
@@ -207,4 +239,155 @@ export function isValuesDefined( values ) {
 		return false;
 	}
 	return Object.values( values ).filter( ( value ) => !! value ).length > 0;
+}
+
+/**
+ * Determines whether a particular axis has support. If no axis is
+ * specified, this function checks if either axis is supported.
+ *
+ * @param {Array}  sides Supported sides.
+ * @param {string} axis  Which axis to check.
+ *
+ * @return {boolean} Whether there is support for the specified axis or both axes.
+ */
+export function hasAxisSupport( sides, axis ) {
+	if ( ! sides || ! sides.length ) {
+		return false;
+	}
+
+	const hasHorizontalSupport =
+		sides.includes( 'horizontal' ) ||
+		( sides.includes( 'left' ) && sides.includes( 'right' ) );
+
+	const hasVerticalSupport =
+		sides.includes( 'vertical' ) ||
+		( sides.includes( 'top' ) && sides.includes( 'bottom' ) );
+
+	if ( axis === 'horizontal' ) {
+		return hasHorizontalSupport;
+	}
+
+	if ( axis === 'vertical' ) {
+		return hasVerticalSupport;
+	}
+
+	return hasHorizontalSupport || hasVerticalSupport;
+}
+
+/**
+ * Determines which menu options should be included in the SidePicker.
+ *
+ * @param {Array} sides Supported sides.
+ *
+ * @return {Object} Menu options with each option containing label & icon.
+ */
+export function getSupportedMenuItems( sides ) {
+	if ( ! sides || ! sides.length ) {
+		return {};
+	}
+
+	const menuItems = {};
+
+	// Determine the primary "side" menu options.
+	const hasHorizontalSupport = hasAxisSupport( sides, 'horizontal' );
+	const hasVerticalSupport = hasAxisSupport( sides, 'vertical' );
+
+	if ( hasHorizontalSupport && hasVerticalSupport ) {
+		menuItems.axial = { label: LABELS.axial, icon: ICONS.axial };
+	} else if ( hasHorizontalSupport ) {
+		menuItems.axial = { label: LABELS.horizontal, icon: ICONS.horizontal };
+	} else if ( hasVerticalSupport ) {
+		menuItems.axial = { label: LABELS.vertical, icon: ICONS.vertical };
+	}
+
+	// Track whether we have any individual sides so we can omit the custom
+	// option if required.
+	let numberOfIndividualSides = 0;
+
+	ALL_SIDES.forEach( ( side ) => {
+		if ( sides.includes( side ) ) {
+			numberOfIndividualSides += 1;
+			menuItems[ side ] = {
+				label: LABELS[ side ],
+				icon: ICONS[ side ],
+			};
+		}
+	} );
+
+	// Add custom item if there are enough sides to warrant a separated view.
+	if ( numberOfIndividualSides > 1 ) {
+		menuItems.custom = { label: LABELS.custom, icon: ICONS.custom };
+	}
+
+	return menuItems;
+}
+
+/**
+ * Checks if the supported sides are balanced for each axis.
+ * - Horizontal - both left and right sides are supported.
+ * - Vertical - both top and bottom are supported.
+ *
+ * @param {Array} sides The supported sides which may be axes as well.
+ *
+ * @return {boolean} Whether or not the supported sides are balanced.
+ */
+export function hasBalancedSidesSupport( sides = [] ) {
+	const counts = { top: 0, right: 0, bottom: 0, left: 0 };
+	sides.forEach( ( side ) => ( counts[ side ] += 1 ) );
+
+	return (
+		( counts.top + counts.bottom ) % 2 === 0 &&
+		( counts.left + counts.right ) % 2 === 0
+	);
+}
+
+/**
+ * Determines which view the SpacingSizesControl should default to on its
+ * first render; Axial, Custom, or Single side.
+ *
+ * @param {Object} values Current side values.
+ * @param {Array}  sides  Supported sides.
+ *
+ * @return {string} View to display.
+ */
+export function getInitialView( values = {}, sides ) {
+	const { top, right, bottom, left } = values;
+	const sideValues = [ top, right, bottom, left ].filter( Boolean );
+
+	// Axial ( Horizontal & vertical ).
+	// - Has axial side support
+	// - Has axial side values which match
+	// - Has no values and the supported sides are balanced
+	const hasMatchingAxialValues =
+		top === bottom && left === right && ( !! top || !! left );
+	const hasNoValuesAndBalancedSides =
+		! sideValues.length && hasBalancedSidesSupport( sides );
+
+	if (
+		hasAxisSupport( sides ) &&
+		( hasMatchingAxialValues || hasNoValuesAndBalancedSides )
+	) {
+		return VIEWS.axial;
+	}
+
+	// Single side.
+	// - Ensure the side returned is the first side that has a value.
+	if ( sideValues.length === 1 ) {
+		let side;
+
+		Object.entries( values ).some( ( [ key, value ] ) => {
+			side = key;
+			return value !== undefined;
+		} );
+
+		return side;
+	}
+
+	// Only single side supported and no value defined.
+	if ( sides?.length === 1 && ! sideValues.length ) {
+		return sides[ 0 ];
+	}
+
+	// Default to the Custom (separated sides) view.
+	return VIEWS.custom;
 }

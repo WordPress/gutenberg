@@ -111,6 +111,19 @@ const transforms = {
 		},
 		{
 			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { citation }, innerBlocks ) =>
+				citation
+					? [
+							...innerBlocks,
+							createBlock( 'core/paragraph', {
+								content: citation,
+							} ),
+					  ]
+					: innerBlocks,
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/group' ],
 			transform: ( { citation, anchor }, innerBlocks ) =>
 				createBlock(
@@ -126,20 +139,16 @@ const transforms = {
 						: innerBlocks
 				),
 		},
-		{
-			type: 'block',
-			blocks: [ '*' ],
-			transform: ( { citation }, innerBlocks ) =>
-				citation
-					? [
-							...innerBlocks,
-							createBlock( 'core/paragraph', {
-								content: citation,
-							} ),
-					  ]
-					: innerBlocks,
-		},
 	],
+	ungroup: ( { citation }, innerBlocks ) =>
+		citation
+			? [
+					...innerBlocks,
+					createBlock( 'core/paragraph', {
+						content: citation,
+					} ),
+			  ]
+			: innerBlocks,
 };
 
 export default transforms;

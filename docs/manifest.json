@@ -594,13 +594,13 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Version 2 (living reference)",
+		"title": "Theme.json Version 2",
 		"slug": "theme-json-living",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-living.md",
 		"parent": "theme-json-reference"
 	},
 	{
-		"title": "Version 1 Reference",
+		"title": "Theme.json Version 1 Reference",
 		"slug": "theme-json-v1",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v1.md",
 		"parent": "theme-json-reference"
@@ -1674,6 +1674,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/interactivity",
+		"slug": "packages-interactivity",
+		"markdown_source": "../packages/interactivity/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/interface",
 		"slug": "packages-interface",
 		"markdown_source": "../packages/interface/README.md",
@@ -2040,6 +2046,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Entities and Undo/Redo.",
+		"slug": "entities",
+		"markdown_source": "../docs/explanations/architecture/entities.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Modularity",
 		"slug": "modularity",
 		"markdown_source": "../docs/explanations/architecture/modularity.md",
@@ -2164,12 +2176,6 @@
 		"slug": "overusing-snapshots",
 		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
 		"parent": "e2e"
-	},
-	{
-		"title": "Block Grammar",
-		"slug": "grammar",
-		"markdown_source": "../docs/contributors/code/grammar.md",
-		"parent": "code"
 	},
 	{
 		"title": "Scripts",
@@ -2307,12 +2313,6 @@
 		"title": "Versions in WordPress",
 		"slug": "versions-in-wordpress",
 		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Upcoming Projects & Roadmap",
-		"slug": "roadmap",
-		"markdown_source": "../docs/contributors/roadmap.md",
 		"parent": "contributors"
 	}
 ]

@@ -623,7 +623,7 @@ describe( 'Moment.js Localization', () => {
 	} );
 
 	describe( 'humanTimeDiff', () => {
-		it( 'should return human readable time differences', () => {
+		it( 'should return human readable time differences in the past', () => {
 			expect(
 				humanTimeDiff(
 					'2023-04-28T11:00:00.000Z',
@@ -642,6 +642,21 @@ describe( 'Moment.js Localization', () => {
 					'2023-04-30T13:00:00.000Z'
 				)
 			).toBe( '2 days ago' );
+		} );
+
+		it( 'should return human readable time differences in the future', () => {
+			// Future.
+			const now = new Date();
+			const twoHoursLater = new Date(
+				now.getTime() + 2 * 60 * 60 * 1000
+			);
+			expect( humanTimeDiff( twoHoursLater ) ).toBe( 'in 2 hours' );
+
+			const twoDaysLater = new Date(
+				now.getTime() + 2 * 24 * 60 * 60 * 1000
+			); // Adding 2 days in milliseconds
+
+			expect( humanTimeDiff( twoDaysLater ) ).toBe( 'in 2 days' );
 		} );
 	} );
 } );

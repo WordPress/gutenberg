@@ -45,7 +45,8 @@ function mergeConfig( config, toMerge ) {
 		switch ( option ) {
 			// Some config options are merged together instead of entirely replaced.
 			case 'config':
-			case 'mappings': {
+			case 'mappings':
+			case 'lifecycleScripts': {
 				config[ option ] = Object.assign(
 					config[ option ],
 					toMerge[ option ]

@@ -124,6 +124,7 @@ function wordpressDockerFileContents( env, config ) {
 # Update apt sources for archived versions of Debian.
 
 # stretch (https://lists.debian.org/debian-devel-announce/2023/03/msg00006.html)
+RUN touch /etc/apt/sources.list
 RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g' /etc/apt/sources.list
 RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
 RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
@@ -133,8 +134,8 @@ ARG HOST_USERNAME
 ARG HOST_UID
 ARG HOST_GID
 # When the IDs are already in use we can still safely move on.
-RUN groupadd -g $HOST_GID $HOST_USERNAME || true
-RUN useradd -m -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
+RUN groupadd -o -g $HOST_GID $HOST_USERNAME || true
+RUN useradd -mlo -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
 
 # Install any dependencies we need in the container.
 ${ installDependencies( 'wordpress', env, config ) }`;
@@ -167,7 +168,7 @@ RUN adduser -h /home/$HOST_USERNAME -G $( getent group $HOST_GID | cut -d: -f1 )
 
 # Install any dependencies we need in the container.
 ${ installDependencies( 'cli', env, config ) }
-	
+
 # Switch back to the original user now that we're done.
 USER www-data
 
@@ -200,17 +201,25 @@ RUN apt-get -qy update
 # Install some basic PHP dependencies.
 RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
+# Install git
+RUN apt-get -qy install git
+
 # Set up sudo so they can have root access.
 RUN apt-get -qy install sudo
-RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 			break;
 		}
 		case 'cli': {
 			dockerFileContent += `
+# Make sure we're working with the latest packages.
 RUN apk update
+
+# Install some basic PHP dependencies.
 RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
+
+# Set up sudo so they can have root access.
 RUN apk --no-cache add sudo linux-headers
-RUN echo "$HOST_USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 			break;
 		}
 		default: {
@@ -238,8 +247,8 @@ RUN rm /tmp/composer-setup.php`;
 	// Install any Composer packages we might need globally.
 	// Make sure to do this as the user and ensure the binaries are available in the $PATH.
 	dockerFileContent += `
-USER $HOST_USERNAME
-ENV PATH="\${PATH}:/home/$HOST_USERNAME/.composer/vendor/bin"
+USER $HOST_UID:$HOST_GID
+ENV PATH="\${PATH}:~/.composer/vendor/bin"
 RUN composer global require --dev yoast/phpunit-polyfills:"^1.0"
 USER root`;
 

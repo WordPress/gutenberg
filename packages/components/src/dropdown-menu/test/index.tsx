@@ -13,7 +13,7 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
  * Internal dependencies
  */
 import DropdownMenu from '..';
-import { MenuItem } from '../..';
+import MenuItem from '../../menu-item';
 
 describe( 'DropdownMenu', () => {
 	it( 'should not render when neither controls nor children are assigned', () => {

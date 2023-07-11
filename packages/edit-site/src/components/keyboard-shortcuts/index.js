@@ -93,8 +93,12 @@ function KeyboardShortcuts() {
 		event.preventDefault();
 	} );
 
+	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
 	useShortcut( 'core/edit-site/toggle-list-view', () => {
-		setIsListViewOpened( ! isListViewOpen );
+		if ( ! isListViewOpen ) {
+			return;
+		}
+		setIsListViewOpened( true );
 	} );
 
 	useShortcut( 'core/edit-site/toggle-block-settings-sidebar', ( event ) => {

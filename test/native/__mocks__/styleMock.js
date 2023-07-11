@@ -184,4 +184,7 @@ module.exports = {
 	'components-picker__button-title': {
 		color: 'white',
 	},
+	placeholderColor: {
+		color: 'gray',
+	},
 };

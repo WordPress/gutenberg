@@ -178,7 +178,7 @@ const ImageComponent = ( {
 			imageData &&
 			containerSize && {
 				height:
-					imageData?.width > containerSize?.width
+					imageData?.width > containerSize?.width && ! imageWidth
 						? containerSize?.width / imageData?.aspectRatio
 						: undefined,
 			},

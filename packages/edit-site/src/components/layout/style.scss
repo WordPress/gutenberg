@@ -1,7 +1,7 @@
 .edit-site-layout {
 	height: 100%;
 	background: $gray-900;
-	color: $white;
+	color: $gray-400;
 	display: flex;
 	flex-direction: column;
 }
@@ -34,6 +34,10 @@
 			padding-right: 0;
 		}
 	}
+}
+
+.edit-site-layout__header-container {
+	z-index: z-index(".edit-site-layout__header-container");
 }
 
 .edit-site-layout__header {
@@ -81,6 +85,13 @@
 	}
 }
 
+.edit-site-layout__main {
+	flex-grow: 1;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
 .edit-site-layout__canvas-container {
 	position: relative;
 	flex-grow: 1;
@@ -105,7 +116,13 @@
 	left: 0;
 	bottom: 0;
 	width: 100%;
-	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	&:has(.edit-site-layout__resizable-frame-oversized) {
+		justify-content: flex-end;
+	}
 
 	& > div {
 		color: $gray-900;
@@ -236,12 +253,54 @@
 	// so the fixed toolbar can be positioned on top of it
 	// but only on desktop
 	@include break-medium() {
+		.edit-site-layout__canvas-container {
+			z-index: 5;
+		}
 		.edit-site-site-hub {
 			z-index: 4;
 		}
 		.edit-site-layout__header:focus-within {
 			z-index: 3;
 		}
+	}
+}
+
+.is-edit-mode.is-distraction-free {
+
+	.edit-site-layout__header-container {
+		height: $header-height;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: z-index(".edit-site-layout__header-container");
+		width: 100%;
+
+		// We need ! important because we override inline styles
+		// set by the motion component.
+		&:focus-within {
+			opacity: 1 !important;
+			div {
+				transform: translateX(0) translateY(0) translateZ(0) !important;
+			}
+
+			.edit-site-layout__header {
+				opacity: 1 !important;
+			}
+		}
+	}
+
+	.edit-site-site-hub,
+	.edit-site-layout__header {
+		position: absolute;
+		top: 0;
+		z-index: z-index(".edit-site-layout__header");
+	}
+	.edit-site-site-hub {
+		z-index: z-index(".edit-site-layout__hub");
+	}
+	.edit-site-layout__header {
+		width: 100%;
 	}
 
 }
