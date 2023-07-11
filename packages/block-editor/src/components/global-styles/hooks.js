@@ -504,41 +504,46 @@ export function __experimentalUseGlobalBehaviors(
 
 	const setBehavior = ( newValue ) => {
 		let newBehavior;
-		switch ( newValue ) {
-			case 'default':
-				break;
-			case 'lightbox':
-				newBehavior = {
-					lightbox: {
-						enabled: true,
-						animation,
-					},
-				};
-				break;
-			case 'fade':
-				newBehavior = {
-					lightbox: {
-						enabled: true,
-						animation: 'fade',
-					},
-				};
-				break;
-			case 'zoom':
-				newBehavior = {
-					lightbox: {
-						enabled: true,
-						animation: 'zoom',
-					},
-				};
-				break;
-			case '':
-				newBehavior = {
-					lightbox: {
-						enabled: false,
-						animation,
-					},
-				};
-				break;
+		// The user saves with Apply Globally option.
+		if ( typeof newValue === 'object' ) {
+			newBehavior = newValue;
+		} else {
+			switch ( newValue ) {
+				case 'default':
+					break;
+				case 'lightbox':
+					newBehavior = {
+						lightbox: {
+							enabled: true,
+							animation,
+						},
+					};
+					break;
+				case 'fade':
+					newBehavior = {
+						lightbox: {
+							enabled: true,
+							animation: 'fade',
+						},
+					};
+					break;
+				case 'zoom':
+					newBehavior = {
+						lightbox: {
+							enabled: true,
+							animation: 'zoom',
+						},
+					};
+					break;
+				case '':
+					newBehavior = {
+						lightbox: {
+							enabled: false,
+							animation,
+						},
+					};
+					break;
+			}
 		}
 		setUserConfig( ( currentConfig ) => {
 			// Deep clone `currentConfig` to avoid mutating it later.

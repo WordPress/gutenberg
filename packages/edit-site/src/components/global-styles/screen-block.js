@@ -94,7 +94,7 @@ function ScreenBlock( { name, variation } ) {
 	} );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
-	const [ inheritedBehaviors, setBehaviors ] =
+	const [ inheritedBehaviors, setBehavior ] =
 		__experimentalUseGlobalBehaviors( name );
 	const [ behavior ] = __experimentalUseGlobalBehaviors( name, 'user', {
 		shouldDecodeEncode: true,
@@ -191,10 +191,6 @@ function ScreenBlock( { name, variation } ) {
 		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
 	};
 
-	const onChangeBehaviors = ( newBehaviors ) => {
-		setBehaviors( newBehaviors );
-	};
-
 	return (
 		<>
 			<ScreenHeader
@@ -285,7 +281,7 @@ function ScreenBlock( { name, variation } ) {
 					{ hasBehaviorsPanel && (
 						<StylesBehaviorsPanel
 							value={ behavior }
-							onChange={ onChangeBehaviors }
+							onChange={ setBehavior }
 							behaviors={ inheritedBehaviors }
 						></StylesBehaviorsPanel>
 					) }

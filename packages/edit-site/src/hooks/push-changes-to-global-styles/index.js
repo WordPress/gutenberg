@@ -123,7 +123,7 @@ function useChangesToPush( name, attributes ) {
 					: getValueFromObjectPath( attributes.style, path );
 				return value ? [ { path, value } ] : [];
 			} ),
-		[ supports, name, attributes ]
+		[ supports, attributes ]
 	);
 }
 
@@ -181,20 +181,15 @@ function PushChangesToGlobalStylesControl( {
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 
-	const __experimentalBehaviorsIsDirty = !! attributes?.behaviors;
-
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const [ inheritedBehaviors, setBehaviors ] =
+	const [ inheritedBehaviors, setBehavior ] =
 		__experimentalUseGlobalBehaviors( name );
 	const pushBehaviorChanges = useCallback( () => {
-		if ( ! __experimentalBehaviorsIsDirty ) {
-			return;
-		}
 		__unstableMarkNextChangeAsNotPersistent();
-		setBehaviors( attributes.behaviors );
+		setBehavior( attributes.behaviors );
 		createSuccessNotice(
 			sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
@@ -208,7 +203,7 @@ function PushChangesToGlobalStylesControl( {
 						label: __( 'Undo' ),
 						onClick() {
 							__unstableMarkNextChangeAsNotPersistent();
-							setBehaviors( inheritedBehaviors );
+							setBehavior( inheritedBehaviors );
 							setUserConfig( () => userConfig, {
 								undoIgnore: true,
 							} );
@@ -270,6 +265,8 @@ function PushChangesToGlobalStylesControl( {
 		);
 	}, [ changes, attributes, userConfig, name ] );
 
+	const hasBehaviorChanges = !! attributes.behaviors;
+
 	return (
 		<BaseControl
 			className="edit-site-push-changes-to-global-styles-control"
@@ -286,13 +283,9 @@ function PushChangesToGlobalStylesControl( {
 			</BaseControl.VisualLabel>
 			<Button
 				variant="primary"
-				disabled={
-					changes.length === 0 && ! __experimentalBehaviorsIsDirty
-				}
+				disabled={ false }
 				onClick={
-					__experimentalBehaviorsIsDirty
-						? pushBehaviorChanges
-						: pushChanges
+					hasBehaviorChanges ? pushChanges : pushBehaviorChanges
 				}
 			>
 				{ __( 'Apply globally' ) }
