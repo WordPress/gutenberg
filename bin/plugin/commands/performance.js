@@ -47,14 +47,18 @@ function sanitizeBranchName( branch ) {
  *
  * @param {number[]} array
  *
- * @return {number} Median.
+ * @return {number|undefined} Median value or undefined if array empty.
  */
-function median( array ) {
-	const mid = Math.floor( array.length / 2 ),
-		numbers = [ ...array ].sort( ( a, b ) => a - b );
-	return array.length % 2 !== 0
-		? numbers[ mid ]
-		: ( numbers[ mid - 1 ] + numbers[ mid ] ) / 2;
+export function median( array ) {
+	if ( array.length === 0 ) return undefined;
+
+	const numbers = [ ...array ].sort( ( a, b ) => a - b );
+	const middleIndex = Math.floor( numbers.length / 2 );
+
+	if ( numbers.length % 2 === 0 ) {
+		return ( numbers[ middleIndex - 1 ] + numbers[ middleIndex ] ) / 2;
+	}
+	return numbers[ middleIndex ];
 }
 
 /**
@@ -355,10 +359,14 @@ async function runPerformanceTests( branches, options ) {
 			results[ testSuite ][ branch ] = {};
 
 			for ( const metric of metrics ) {
-				// @ts-ignore
-				const values = resultsRounds.map( ( item ) => item[ metric ] );
-				// @ts-ignore
-				results[ testSuite ][ branch ][ metric ] = median( values );
+				const values = resultsRounds
+					.map( ( round ) => round[ metric ] )
+					.filter( ( value ) => typeof value === 'number' );
+
+				const medianValue = median( values );
+				if ( medianValue !== undefined ) {
+					results[ testSuite ][ branch ][ metric ] = medianValue;
+				}
 			}
 		}
 

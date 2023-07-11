@@ -13,7 +13,7 @@ import type {
 /**
  * Internal dependencies
  */
-import { average, median, formatTime } from '../utils';
+import { average, median, minimum, maximum, round } from '../utils';
 
 export interface WPRawPerformanceResults {
 	timeToFirstByte: number[];
@@ -96,32 +96,32 @@ export function curateResults(
 			firstContentfulPaint: average( results.firstContentfulPaint ),
 			firstBlock: average( results.firstBlock ),
 			type: average( results.type ),
-			minType: Math.min( ...results.type ),
-			maxType: Math.max( ...results.type ),
+			minType: minimum( results.type ),
+			maxType: maximum( results.type ),
 			typeContainer: average( results.typeContainer ),
-			minTypeContainer: Math.min( ...results.typeContainer ),
-			maxTypeContainer: Math.max( ...results.typeContainer ),
+			minTypeContainer: minimum( results.typeContainer ),
+			maxTypeContainer: maximum( results.typeContainer ),
 			focus: average( results.focus ),
-			minFocus: Math.min( ...results.focus ),
-			maxFocus: Math.max( ...results.focus ),
+			minFocus: minimum( results.focus ),
+			maxFocus: maximum( results.focus ),
 			inserterOpen: average( results.inserterOpen ),
-			minInserterOpen: Math.min( ...results.inserterOpen ),
-			maxInserterOpen: Math.max( ...results.inserterOpen ),
+			minInserterOpen: minimum( results.inserterOpen ),
+			maxInserterOpen: maximum( results.inserterOpen ),
 			inserterSearch: average( results.inserterSearch ),
-			minInserterSearch: Math.min( ...results.inserterSearch ),
-			maxInserterSearch: Math.max( ...results.inserterSearch ),
+			minInserterSearch: minimum( results.inserterSearch ),
+			maxInserterSearch: maximum( results.inserterSearch ),
 			inserterHover: average( results.inserterHover ),
-			minInserterHover: Math.min( ...results.inserterHover ),
-			maxInserterHover: Math.max( ...results.inserterHover ),
+			minInserterHover: minimum( results.inserterHover ),
+			maxInserterHover: maximum( results.inserterHover ),
 			listViewOpen: average( results.listViewOpen ),
-			minListViewOpen: Math.min( ...results.listViewOpen ),
-			maxListViewOpen: Math.max( ...results.listViewOpen ),
+			minListViewOpen: minimum( results.listViewOpen ),
+			maxListViewOpen: maximum( results.listViewOpen ),
 		};
 	}
 
 	return Object.fromEntries(
 		Object.entries( output ).map( ( [ key, value ] ) => {
-			return [ key, formatTime( value ) ];
+			return [ key, round( value ) ];
 		} )
 	);
 }
@@ -188,7 +188,7 @@ class PerformanceReporter implements Reporter {
 			const printableResults: Record< string, { value: string } > = {};
 
 			for ( const [ key, value ] of Object.entries( results ) ) {
-				if ( isFinite( value ) ) {
+				if ( typeof value === 'number' ) {
 					printableResults[ key ] = { value: `${ value } ms` };
 				}
 			}

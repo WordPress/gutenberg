@@ -4,6 +4,48 @@
 import path from 'path';
 import { existsSync, readFileSync, unlinkSync } from 'fs';
 
+export function sum( array ) {
+	if ( array.length === 0 ) return undefined;
+
+	return array.reduce( ( a, b ) => a + b, 0 );
+}
+
+export function average( array ) {
+	if ( array.length === 0 ) return undefined;
+
+	return sum( array ) / array.length;
+}
+
+export function median( array ) {
+	if ( array.length === 0 ) return undefined;
+
+	const numbers = [ ...array ].sort( ( a, b ) => a - b );
+	const middleIndex = Math.floor( numbers.length / 2 );
+
+	if ( numbers.length % 2 === 0 ) {
+		return ( numbers[ middleIndex - 1 ] + numbers[ middleIndex ] ) / 2;
+	}
+	return numbers[ middleIndex ];
+}
+
+export function minimum( array ) {
+	if ( array.length === 0 ) return undefined;
+
+	return Math.min( ...array );
+}
+
+export function maximum( array ) {
+	if ( array.length === 0 ) return undefined;
+
+	return Math.max( ...array );
+}
+
+export function round( number, decimalPlaces = 2 ) {
+	const factor = Math.pow( 10, decimalPlaces );
+
+	return Math.round( number * factor ) / factor;
+}
+
 export function readFile( filePath ) {
 	if ( ! existsSync( filePath ) ) {
 		throw new Error( `File does not exist: ${ filePath }` );
@@ -126,39 +168,6 @@ export async function getLoadingDurations( page ) {
 			firstBlock: performance.now() - responseEnd,
 		};
 	} );
-}
-
-export function sum( arr ) {
-	return arr.reduce( ( a, b ) => a + b, 0 );
-}
-
-export function average( array ) {
-	return array.reduce( ( a, b ) => a + b, 0 ) / array.length;
-}
-
-export function median( array ) {
-	const mid = Math.floor( array.length / 2 ),
-		numbers = [ ...array ].sort( ( a, b ) => a - b );
-	return array.length % 2 !== 0
-		? numbers[ mid ]
-		: ( numbers[ mid - 1 ] + numbers[ mid ] ) / 2;
-}
-
-export function round( number, decimalPlaces = 2 ) {
-	const factor = Math.pow( 10, decimalPlaces );
-	return Math.round( number * factor ) / factor;
-}
-
-/**
- * Rounds and format a time passed in milliseconds.
- *
- * @param {number} number
- *
- * @return {number} Formatted time.
- */
-export function formatTime( number ) {
-	const factor = Math.pow( 10, 2 );
-	return Math.round( number * factor ) / factor;
 }
 
 export async function loadBlocksFromHtml( page, filepath ) {
