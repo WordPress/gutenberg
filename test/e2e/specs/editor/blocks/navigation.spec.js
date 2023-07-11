@@ -1007,7 +1007,7 @@ test.describe( 'Navigation block', () => {
 			await colorControl.testFrontendColors( expectedNavigationColors );
 		} );
 
-		test( 'Top level navigation links inherit the text color from the theme but not apply to the submenu or overlay', async ( {
+		test( 'Top level navigation links inherit the text color from the theme/group but do not apply to the submenu or overlay text', async ( {
 			page,
 			editor,
 			colorControl,
@@ -1057,6 +1057,71 @@ test.describe( 'Navigation block', () => {
 			const expectedNavigationColors = {
 				textColor: colorControl.white,
 				backgroundColor: colorControl.transparent, // There should be no background color set even though the body background is black
+				submenuTextColor: colorControl.black,
+				submenuBackgroundColor: colorControl.white,
+			};
+
+			await colorControl.testEditorColors( expectedNavigationColors );
+
+			// And finally we check the colors of the links on the frontend
+			await page.goto( '/' );
+
+			await colorControl.testFrontendColors( expectedNavigationColors );
+		} );
+
+		test( 'Navigation text does not inherit the link color from the theme/group', async ( {
+			page,
+			editor,
+			colorControl,
+		} ) => {
+			// Wrap the nav block inside a group block
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Group' } ).click();
+
+			// In the sidebar inspector we add a link color and link hover color to the group block
+			await editor.openDocumentSettingsSidebar();
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			await page.getByRole( 'button', { name: 'Color options' } ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
+				.click();
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Color Link styles' } )
+				.click();
+			// rga(207, 46 ,46) is the color of the "vivid red" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Vivid red' } )
+				.click( { force: true } );
+			await page.getByRole( 'tab', { name: 'Hover' } ).click();
+			// rgb(155, 81, 224) is the color of the "vivid purple" color preset
+			await page
+				.getByRole( 'button', { name: 'Color: Vivid purple' } )
+				.click( { force: true } );
+
+			// Save them so we can check on the frontend later too.
+			await editor.saveSiteEditorEntities();
+			// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas
+			await page
+				.getByRole( 'button', { name: 'Close Settings' } )
+				.click( { force: true } );
+
+			await editor.canvas.click( 'body' );
+
+			// Focus the navigation block inside the header template part
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: header' } )
+				.focus();
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.click();
+
+			const expectedNavigationColors = {
+				textColor: colorControl.black,
+				backgroundColor: colorControl.transparent,
 				submenuTextColor: colorControl.black,
 				submenuBackgroundColor: colorControl.white,
 			};
