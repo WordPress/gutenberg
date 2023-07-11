@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	act,
 	addBlock,
 	dismissModal,
 	getBlock,
@@ -30,10 +31,18 @@ describe( 'Editor History', () => {
 
 	beforeAll( () => {
 		subscribeOnUndoPressed.mockImplementation( ( callback ) => {
-			toggleUndo = callback;
+			toggleUndo = () => {
+				act( () => {
+					callback();
+				} );
+			};
 		} );
 		subscribeOnRedoPressed.mockImplementation( ( callback ) => {
-			toggleRedo = callback;
+			toggleRedo = () => {
+				act( () => {
+					callback();
+				} );
+			};
 		} );
 	} );
 
