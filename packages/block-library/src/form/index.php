@@ -117,6 +117,9 @@ function gutenberg_block_core_form_email_if_action_is_empty() {
 		$content .= $key . ': ' . $value . '</br>';
 	}
 	wp_mail( get_option( 'admin_email' ), __( 'Form submission', 'gutenberg' ), $content );
+
+	wp_safe_redirect( get_site_url( null, $params['_wp_http_referer'] ) );
+	exit;
 }
 add_action( 'wp', 'gutenberg_block_core_form_email_if_action_is_empty' );
 
