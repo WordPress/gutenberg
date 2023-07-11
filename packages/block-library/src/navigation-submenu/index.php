@@ -6,16 +6,6 @@
  */
 
 /**
- * Build an array with CSS classes and inline styles defining the colors
- * which will be applied to the navigation markup in the front-end.
- *
- * @param  array $context     Navigation block context.
- * @param  array $attributes  Block attributes.
- * @param  bool  $is_sub_menu Whether the block is a sub-menu.
- * @return array Colors CSS classes and inline styles.
- */
-
-/**
  * Build an array with CSS classes and inline styles defining the font sizes
  * which will be applied to the navigation markup in the front-end.
  *
@@ -199,9 +189,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			$attributes['style']['color']['background'] = $block->context['customOverlayBackgroundColor'];
 		}
 
-		// This allows us to be able to get a response from gutenberg_apply_colors_support.
+		// This allows us to be able to get a response from wp_apply_colors_support.
 		$block->block_type->supports['color'] = true;
-		$colors_supports                      = gutenberg_apply_colors_support( $block->block_type, $attributes );
+		$colors_supports                      = wp_apply_colors_support( $block->block_type, $attributes );
 		$css_classes                          = 'wp-block-navigation__submenu-container';
 		if ( array_key_exists( 'class', $colors_supports ) ) {
 			$css_classes .= ' ' . $colors_supports['class'];

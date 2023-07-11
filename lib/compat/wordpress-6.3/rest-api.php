@@ -109,3 +109,13 @@ function gutenberg_register_rest_block_patterns() {
 	$block_patterns->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
+
+
+/**
+ * Registers the Navigation Fallbacks REST API routes.
+ */
+function gutenberg_register_rest_navigation_fallbacks() {
+	$editor_settings = new Gutenberg_REST_Navigation_Fallback_Controller();
+	$editor_settings->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_navigation_fallbacks' );

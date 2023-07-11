@@ -1,9 +1,18 @@
 /**
+ * WordPress dependencies
+ */
+import { store } from '@wordpress/interactivity';
+/**
  * Internal dependencies
  */
-import { hidePdfEmbedsOnUnsupportedBrowsers } from './utils';
+import { browserSupportsPdfs as hasPdfPreview } from './utils';
 
-document.addEventListener(
-	'DOMContentLoaded',
-	hidePdfEmbedsOnUnsupportedBrowsers
-);
+store( {
+	selectors: {
+		core: {
+			file: {
+				hasPdfPreview,
+			},
+		},
+	},
+} );

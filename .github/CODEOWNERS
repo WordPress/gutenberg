@@ -54,6 +54,9 @@
 # Full Site Editing
 /packages/edit-site
 
+# Interactivity API
+/packages/interactivity                         @luisherranz @darerodz
+
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra

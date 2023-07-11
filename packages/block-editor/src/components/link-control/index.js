@@ -292,7 +292,8 @@ function LinkControl( {
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
-	const showSettings = !! settings?.length;
+	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
+	const showActions = isEditingLink && hasLinkValue;
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
@@ -322,6 +323,18 @@ function LinkControl( {
 							'has-text-control': showTextControl,
 						} ) }
 					>
+						{ showTextControl && (
+							<TextControl
+								__nextHasNoMarginBottom
+								ref={ textInputRef }
+								className="block-editor-link-control__field block-editor-link-control__text-content"
+								label={ __( 'Text' ) }
+								value={ internalControlValue?.title }
+								onChange={ setInternalTextInputValue }
+								onKeyDown={ handleSubmitWithEnter }
+								size="__unstable-large"
+							/>
+						) }
 						<LinkControlSearchInput
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
@@ -339,19 +352,8 @@ function LinkControl( {
 							createSuggestionButtonText={
 								createSuggestionButtonText
 							}
-							useLabel={ showTextControl }
+							hideLabelFromVision={ ! showTextControl }
 						/>
-						{ showTextControl && (
-							<TextControl
-								__nextHasNoMarginBottom
-								ref={ textInputRef }
-								className="block-editor-link-control__field block-editor-link-control__text-content"
-								label={ __( 'Text' ) }
-								value={ internalControlValue?.title }
-								onChange={ setInternalTextInputValue }
-								onKeyDown={ handleSubmitWithEnter }
-							/>
-						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -376,9 +378,9 @@ function LinkControl( {
 				/>
 			) }
 
-			{ isEditing && (
+			{ showSettings && (
 				<div className="block-editor-link-control__tools">
-					{ showSettings && (
+					{ ! currentInputIsEmpty && (
 						<LinkControlSettingsDrawer
 							settingsOpen={ settingsOpen }
 							setSettingsOpen={ setSettingsOpen }
@@ -392,20 +394,22 @@ function LinkControl( {
 							/>
 						</LinkControlSettingsDrawer>
 					) }
+				</div>
+			) }
 
-					<div className="block-editor-link-control__search-actions">
-						<Button
-							variant="primary"
-							onClick={ isDisabled ? noop : handleSubmit }
-							className="block-editor-link-control__search-submit"
-							aria-disabled={ isDisabled }
-						>
-							{ __( 'Save' ) }
-						</Button>
-						<Button variant="tertiary" onClick={ handleCancel }>
-							{ __( 'Cancel' ) }
-						</Button>
-					</div>
+			{ showActions && (
+				<div className="block-editor-link-control__search-actions">
+					<Button
+						variant="primary"
+						onClick={ isDisabled ? noop : handleSubmit }
+						className="block-editor-link-control__search-submit"
+						aria-disabled={ isDisabled }
+					>
+						{ __( 'Save' ) }
+					</Button>
+					<Button variant="tertiary" onClick={ handleCancel }>
+						{ __( 'Cancel' ) }
+					</Button>
 				</div>
 			) }
 

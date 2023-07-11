@@ -54,7 +54,7 @@ export default function PreviewOptions( {
 			icon={ deviceIcons[ deviceType.toLowerCase() ] }
 			label={ label || __( 'Preview' ) }
 		>
-			{ () => (
+			{ ( renderProps ) => (
 				<>
 					<MenuGroup>
 						<MenuItem
@@ -79,7 +79,7 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
-					{ children }
+					{ children( renderProps ) }
 				</>
 			) }
 		</DropdownMenu>

@@ -155,19 +155,21 @@ describe( 'undo', () => {
 		from,
 		to,
 	} );
-	const createNextEditAction = ( edits, transientEdits = {} ) => {
+	const createNextEditAction = ( edits, isCached ) => {
 		let action = {
 			kind: 'someKind',
 			name: 'someName',
 			recordId: 'someRecordId',
 			edits,
-			transientEdits,
 		};
 		action = {
 			type: 'EDIT_ENTITY_RECORD',
 			...action,
 			meta: {
-				undo: { edits: lastValues },
+				undo: {
+					isCached,
+					edits: lastValues,
+				},
 			},
 		};
 		lastValues = { ...lastValues, ...edits };
@@ -303,10 +305,7 @@ describe( 'undo', () => {
 	it( 'handles flattened undos/redos', () => {
 		undoState = createNextUndoState();
 		undoState = createNextUndoState( { value: 1 } );
-		undoState = createNextUndoState(
-			{ transientValue: 2 },
-			{ transientValue: true }
-		);
+		undoState = createNextUndoState( { transientValue: 2 }, true );
 		undoState = createNextUndoState( { value: 3 } );
 		expectedUndoState.list.push(
 			[
@@ -335,10 +334,7 @@ describe( 'undo', () => {
 
 		// Check that transient edits are merged into the last
 		// edits.
-		undoState = createNextUndoState(
-			{ transientValue: 2 },
-			{ transientValue: true }
-		);
+		undoState = createNextUndoState( { transientValue: 2 }, true );
 		undoState = createNextUndoState( 'isCreate' );
 		expectedUndoState.list[ expectedUndoState.list.length - 1 ].push(
 			createExpectedDiff( 'transientValue', { from: undefined, to: 2 } )
@@ -359,10 +355,7 @@ describe( 'undo', () => {
 	it( 'explicitly creates an undo level when undoing while there are pending transient edits', () => {
 		undoState = createNextUndoState();
 		undoState = createNextUndoState( { value: 1 } );
-		undoState = createNextUndoState(
-			{ transientValue: 2 },
-			{ transientValue: true }
-		);
+		undoState = createNextUndoState( { transientValue: 2 }, true );
 		undoState = createNextUndoState( 'isUndo' );
 		expectedUndoState.list.push( [
 			createExpectedDiff( 'value', { from: undefined, to: 1 } ),
