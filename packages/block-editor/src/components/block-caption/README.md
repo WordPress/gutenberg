@@ -4,6 +4,11 @@ The `BlockCaption` component renders block-level UI for adding and editing capti
 
 `BlockCaption` is used in several native blocks, including `Video`, `Image`, `Audio`, etc.
 
+## Table of contents
+
+1. [Development guidelines](#development-guidelines)
+2. [Related components](#related-components)
+
 ## Development guidelines
 
 ### Usage
