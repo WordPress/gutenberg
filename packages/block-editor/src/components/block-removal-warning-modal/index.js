@@ -50,9 +50,6 @@ export function BlockRemovalWarningModal( { rules } ) {
 		<Modal
 			title={ __( 'Are you sure?' ) }
 			onRequestClose={ clearBlockRemovalPrompt }
-			style={ {
-				maxWidth: '40rem',
-			} }
 		>
 			{ blockNamesForPrompt.length === 1 ? (
 				<p>{ rules[ blockNamesForPrompt[ 0 ] ] }</p>
