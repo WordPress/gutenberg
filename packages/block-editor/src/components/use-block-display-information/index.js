@@ -77,15 +77,13 @@ export default function useBlockDisplayInformation( clientId ) {
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
 			if ( ! blockType ) return null;
-			let title = blockType.title;
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isReusable = isReusableBlock( blockType );
-			if ( isReusable ) {
-				title =
-					__experimentalGetReusableBlockTitle( attributes.ref ) ||
-					blockType.title;
-			}
+			const resusableTitle = isReusableBlock( blockType )
+				? __experimentalGetReusableBlockTitle( attributes.ref )
+				: undefined;
+			const title = resusableTitle || blockType.title;
 			const isSynced = isReusable || isTemplatePart( blockType );
 			const positionLabel = getPositionTypeLabel( attributes );
 			const blockTypeInfo = {
