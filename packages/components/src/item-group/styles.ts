@@ -8,33 +8,35 @@ import { css } from '@emotion/react';
  */
 import { CONFIG, COLORS } from '../utils';
 
-export const unstyledButton = css`
-	appearance: none;
-	border: 1px solid transparent;
-	cursor: pointer;
-	background: none;
-	text-align: start;
-	text-decoration: none;
+export const unstyledButton = ( as: 'a' | 'button' ) => {
+	return css`
+		appearance: none;
+		border: 1px solid transparent;
+		cursor: pointer;
+		background: none;
+		text-align: start;
+		text-decoration: ${ as === 'a' ? 'none' : undefined };
 
-	svg,
-	path {
-		fill: currentColor;
-	}
+		svg,
+		path {
+			fill: currentColor;
+		}
 
-	&:hover {
-		color: ${ COLORS.ui.theme };
-	}
+		&:hover {
+			color: ${ COLORS.ui.theme };
+		}
 
-	&:focus-visible {
-		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
-			var(
-				--wp-components-color-accent,
-				var( --wp-admin-theme-color, ${ COLORS.ui.theme } )
-			);
-		// Windows high contrast mode.
-		outline: 2px solid transparent;
-	}
-`;
+		&:focus-visible {
+			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+				var(
+					--wp-components-color-accent,
+					var( --wp-admin-theme-color, ${ COLORS.ui.theme } )
+				);
+			// Windows high contrast mode.
+			outline: 2px solid transparent;
+		}
+	`;
+};
 
 export const itemWrapper = css`
 	width: 100%;
