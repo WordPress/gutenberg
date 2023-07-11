@@ -405,8 +405,14 @@ button.wp-block-navigation-item__content {
 		// submenus have a default background color, this feature has regressed
 		// several times, so care needs to be taken.
 		background-color: #fff;
-		color: #000;
 		border: 1px solid rgba(0, 0, 0, 0.15);
+	}
+}
+
+.wp-block-navigation:not(.has-text-color) {
+	.wp-block-navigation__submenu-container {
+		// Set a default color for submenu text if none is selected
+		color: #000;
 	}
 }
 
@@ -622,8 +628,13 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation:not(.has-background)
 .wp-block-navigation__responsive-container.is-menu-open {
 	background-color: #fff;
+}
+
+.wp-block-navigation:not(.has-text-color)
+.wp-block-navigation__responsive-container.is-menu-open {
 	color: #000;
 }
+
 
 // Overlay menu toggle button label
 .wp-block-navigation__toggle_button_label {
