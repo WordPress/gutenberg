@@ -9,6 +9,15 @@ const variations = [
 		isDefault: true,
 		attributes: { buttonText: __( 'Search' ), label: __( 'Search' ) },
 	},
+	{
+		name: 'inline',
+		title: 'Inline Search',
+		attributes: {
+			showLabel: false,
+			buttonUseIcon: true,
+			buttonPosition: 'button-inside',
+		},
+	},
 ];
 
 export default variations;

@@ -5,6 +5,7 @@ export const DEFAULT_BLOCK = {
 export const ALLOWED_BLOCKS = [
 	'core/navigation-link',
 	'core/search',
+	'core/search/inline',
 	'core/social-links',
 	'core/page-list',
 	'core/spacer',
@@ -18,6 +19,7 @@ export const ALLOWED_BLOCKS = [
 export const PRIORITIZED_INSERTER_BLOCKS = [
 	'core/navigation-link/page',
 	'core/navigation-link',
+	'core/search/inline',
 ];
 
 export const SELECT_NAVIGATION_MENUS_ARGS = [
