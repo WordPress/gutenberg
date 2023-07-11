@@ -6,7 +6,12 @@ import {
 	useNavigation,
 	useFocusEffect,
 } from '@react-navigation/native';
-import { View, ScrollView, TouchableHighlight } from 'react-native';
+import {
+	ScrollView,
+	TouchableHighlight,
+	useWindowDimensions,
+	View,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -38,6 +43,7 @@ const BottomSheetNavigationScreen = ( {
 		listProps,
 		safeAreaBottomInset,
 	} = useContext( BottomSheetContext );
+	const { height: windowHeight } = useWindowDimensions();
 
 	const { setHeight } = useContext( BottomSheetNavigationContext );
 
@@ -81,7 +87,7 @@ const BottomSheetNavigationScreen = ( {
 	useFocusEffect(
 		useCallback( () => {
 			if ( fullScreen ) {
-				setHeight( '100%' );
+				setHeight( windowHeight );
 				setIsFullScreen( true );
 			} else if ( heightRef.current.maxHeight !== 0 ) {
 				setIsFullScreen( false );
