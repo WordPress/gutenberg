@@ -63,8 +63,9 @@ add_filter( 'render_block_core_form_extra_fields', 'gutenberg_block_core_form_ex
 /**
  * Adds extra fields to the form.
  *
- * If the form is a comment form, adds the post ID as a hidden field,
- * to allow the comment to be associated with the post.
+ * If the form does not have an `action` defined, assume this is a contact form.
+ * Adds a nonce field and a hidden input to enable sending an email
+ * to the admin when the form is submitted.
  *
  * @param string $extra_fields The extra fields.
  * @param array  $attributes   The block attributes.
