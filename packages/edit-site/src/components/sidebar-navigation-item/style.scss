@@ -22,17 +22,6 @@
 		fill: $gray-700;
 	}
 
-	&:is(a) {
-		text-decoration: none;
-		display: flex;
-		align-items: center;
-
-		&:focus {
-			box-shadow: none;
-			outline: none;
-		}
-	}
-
 	&.with-suffix {
 		padding-right: $grid-unit-20;
 	}

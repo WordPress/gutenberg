@@ -42,7 +42,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 	const classes = useMemo(
 		() =>
 			cx(
-				as === 'button' && styles.unstyledButton,
+				( as === 'button' || as === 'a' ) && styles.unstyledButton,
 				styles.itemSizes[ size ] || styles.itemSizes.medium,
 				styles.item,
 				spacedAround && styles.spacedAround,

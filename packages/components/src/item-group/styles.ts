@@ -14,6 +14,7 @@ export const unstyledButton = css`
 	cursor: pointer;
 	background: none;
 	text-align: start;
+	text-decoration: none;
 
 	svg,
 	path {
