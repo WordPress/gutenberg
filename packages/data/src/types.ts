@@ -6,7 +6,7 @@ import type { combineReducers as reduxCombineReducers } from 'redux';
 
 type MapOf< T > = { [ name: string ]: T };
 
-export type ActionCreator = Function | Generator;
+export type ActionCreator = ( ...args: any[] ) => any | Generator;
 export type Resolver = Function | Generator;
 export type Selector = Function;
 
@@ -170,8 +170,16 @@ export type ConfigOf< S > = S extends StoreDescriptor< infer C > ? C : never;
 
 export type ActionCreatorsOf< Config extends AnyConfig > =
 	Config extends ReduxStoreConfig< any, infer ActionCreators, any >
-		? ActionCreators
+		? PromisifiedActionCreator< ActionCreators >
 		: never;
+
+// When dispatching an action creator, the return value is a promise.
+type PromisifiedActionCreator< ActionCreators extends MapOf< ActionCreator > > =
+	{
+		[ Action in keyof ActionCreators ]: (
+			...args: Parameters< ActionCreators[ Action ] >
+		) => Promise< void >;
+	};
 
 type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 	any,
