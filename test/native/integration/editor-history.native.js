@@ -123,7 +123,7 @@ describe( 'Editor History', () => {
 	` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+		toggleUndo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -143,7 +143,7 @@ describe( 'Editor History', () => {
 	` );
 
 		// Act
-		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+		toggleRedo();
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
