@@ -108,8 +108,8 @@ describe( 'Gutenberg Editor Paste tests', () => {
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		expect( text ).toBe( testData.pastePlainText );
 
-		await editorPage.removeBlockAtPosition( blockNames.paragraph, 2 );
-		await editorPage.removeBlockAtPosition( blockNames.paragraph, 1 );
+		await editorPage.removeBlock();
+		await editorPage.removeBlock();
 	} );
 
 	it.skip( 'copies styled text from one paragraph block and pastes in another', async () => {

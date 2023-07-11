@@ -63,6 +63,15 @@ const typeLabels = {
 	wp_block: __( 'Pattern' ),
 };
 
+// Prevent accidental removal of certain blocks, asking the user for
+// confirmation.
+const blockRemovalRules = {
+	'core/query': __( 'Query Loop displays a list of posts or pages.' ),
+	'core/post-content': __(
+		'Post Content displays the content of a post or page.'
+	),
+};
+
 export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
@@ -197,7 +206,9 @@ export default function Editor( { isLoading } ) {
 									{ showVisualEditor && editedPost && (
 										<>
 											<BlockEditor />
-											<BlockRemovalWarningModal />
+											<BlockRemovalWarningModal
+												rules={ blockRemovalRules }
+											/>
 										</>
 									) }
 									{ editorMode === 'text' &&

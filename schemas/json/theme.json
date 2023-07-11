@@ -458,6 +458,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"writingMode": {
+							"description": "Allow users to set the writing mode.",
+							"type": "boolean",
+							"default": false
+						},
 						"textTransform": {
 							"description": "Allow users to set custom text transforms.",
 							"type": "boolean",
@@ -1499,6 +1504,17 @@
 						},
 						"textDecoration": {
 							"description": "Sets the `text-decoration` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"writingMode": {
+							"description": "Sets the `writing-mode` CSS property.",
 							"oneOf": [
 								{
 									"type": "string"

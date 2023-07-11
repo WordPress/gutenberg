@@ -4,17 +4,6 @@
 	color: $gray-400;
 	display: flex;
 	flex-direction: column;
-
-	// Expand the fixed block toolbar to cover the document title control.
-	.block-editor-block-contextual-toolbar {
-		@include break-medium() {
-			&.is-fixed {
-				// the combined with of the tools at the right of the header and the margin left
-				width: calc(100% - 240px - #{$grid-unit-80} - #{$grid-unit-70});
-			}
-		}
-	}
-
 }
 
 .edit-site-layout__hub {

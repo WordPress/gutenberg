@@ -158,6 +158,7 @@ Settings related to typography.
 | lineHeight | boolean | false |  |
 | textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
+| writingMode | boolean | false |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
 | fontSizes | array |  | fluid, name, size, slug |
@@ -239,6 +240,7 @@ Typography styles.
 | lineHeight | string, object |  |
 | textColumns | string |  |
 | textDecoration | string, object |  |
+| writingMode | string, object |  |
 | textTransform | string, object |  |
 
 ---

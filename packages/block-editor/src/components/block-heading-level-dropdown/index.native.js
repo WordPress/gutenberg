@@ -30,7 +30,11 @@ const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
  *
  * @return {WPComponent} The toolbar.
  */
-export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
+export default function HeadingLevelDropdown( {
+	options = HEADING_LEVELS,
+	value,
+	onChange,
+} ) {
 	const createLevelControl = (
 		targetLevel,
 		currentLevel,
@@ -53,9 +57,9 @@ export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
 
 	return (
 		<DropdownMenu
-			icon={ <HeadingLevelIcon level={ selectedLevel } /> }
-			controls={ HEADING_LEVELS.map( ( index ) =>
-				createLevelControl( index, selectedLevel, onChange )
+			icon={ <HeadingLevelIcon level={ value } /> }
+			controls={ options.map( ( index ) =>
+				createLevelControl( index, value, onChange )
 			) }
 			label={ __( 'Change level' ) }
 		/>

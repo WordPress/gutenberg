@@ -202,6 +202,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              `--wp--style--root--padding-*`, and `box-shadow` properties,
 	 *              removed the `--wp--style--block-gap` property.
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
+	 * @since 6.3.0 Added `writing-mode` property.
 	 *
 	 * @var array
 	 */
@@ -260,6 +261,7 @@ class WP_Theme_JSON_Gutenberg {
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
+		'writing-mode'                      => array( 'typography', 'writingMode' ),
 	);
 
 	/**
@@ -339,7 +341,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added `layout.definitions` and `useRootPaddingAwareAlignments`.
 	 * @since 6.2.0 Added `dimensions.minHeight`, 'shadow.presets', 'shadow.defaultPresets',
 	 *              `position.fixed` and `position.sticky`.
-	 * @since 6.3.0 Removed `layout.definitions`.
+	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -406,6 +408,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
+			'writingMode'    => null,
 		),
 		'behaviors'                     => null,
 	);
@@ -468,6 +471,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
+			'writingMode'    => null,
 		),
 		'css'        => null,
 	);

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, set } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	getBlockType,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import { useContext, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -93,6 +94,8 @@ const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontFamily': 'fontFamily',
 };
 
+const SUPPORTED_STYLES = [ 'border', 'color', 'spacing', 'typography' ];
+
 function useChangesToPush( name, attributes ) {
 	const supports = useSupportedStyles( name );
 
@@ -117,6 +120,46 @@ function useChangesToPush( name, attributes ) {
 			} ),
 		[ supports, name, attributes ]
 	);
+}
+
+/**
+ * Sets the value at path of object.
+ * If a portion of path doesn’t exist, it’s created.
+ * Arrays are created for missing index properties while objects are created
+ * for all other missing properties.
+ *
+ * This function intentionally mutates the input object.
+ *
+ * Inspired by _.set().
+ *
+ * @see https://lodash.com/docs/4.17.15#set
+ *
+ * @todo Needs to be deduplicated with its copy in `@wordpress/core-data`.
+ *
+ * @param {Object} object Object to modify
+ * @param {Array}  path   Path of the property to set.
+ * @param {*}      value  Value to set.
+ */
+function setNestedValue( object, path, value ) {
+	if ( ! object || typeof object !== 'object' ) {
+		return object;
+	}
+
+	path.reduce( ( acc, key, idx ) => {
+		if ( acc[ key ] === undefined ) {
+			if ( Number.isInteger( path[ idx + 1 ] ) ) {
+				acc[ key ] = [];
+			} else {
+				acc[ key ] = {};
+			}
+		}
+		if ( idx === path.length - 1 ) {
+			acc[ key ] = value;
+		}
+		return acc[ key ];
+	}, object );
+
+	return object;
 }
 
 function cloneDeep( object ) {
@@ -148,8 +191,12 @@ function PushChangesToGlobalStylesControl( {
 		const newUserConfig = cloneDeep( userConfig );
 
 		for ( const { path, value } of changes ) {
-			set( newBlockStyles, path, undefined );
-			set( newUserConfig, [ 'styles', 'blocks', name, ...path ], value );
+			setNestedValue( newBlockStyles, path, undefined );
+			setNestedValue(
+				newUserConfig,
+				[ 'styles', 'blocks', name, ...path ],
+				value
+			);
 		}
 
 		// @wordpress/core-data doesn't support editing multiple entity types in
@@ -212,10 +259,14 @@ function PushChangesToGlobalStylesControl( {
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const blockEditingMode = useBlockEditingMode();
+		const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
+			hasBlockSupport( props.name, feature )
+		);
+
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ blockEditingMode === 'default' && (
+				{ blockEditingMode === 'default' && supportsStyles && (
 					<InspectorAdvancedControls>
 						<PushChangesToGlobalStylesControl { ...props } />
 					</InspectorAdvancedControls>

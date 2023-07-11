@@ -59,11 +59,11 @@ function SidebarScreens() {
 			<NavigatorScreen path="/patterns">
 				<SidebarNavigationScreenPatterns />
 			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+				<SidebarNavigationScreenTemplatesBrowse />
+			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template_part|wp_block)/:postId">
 				<SidebarNavigationScreenPattern />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template)/all">
-				<SidebarNavigationScreenTemplatesBrowse />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
