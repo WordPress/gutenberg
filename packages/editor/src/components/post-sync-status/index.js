@@ -34,7 +34,7 @@ export default function PostSyncStatus() {
 	}
 	// When the post is first created, the top level wp_pattern_sync_status is not set so get meta value instead.
 	const currentSyncStatus =
-		meta.wp_pattern_sync_status === 'unsynced' ? 'unsynced' : syncStatus;
+		meta?.wp_pattern_sync_status === 'unsynced' ? 'unsynced' : syncStatus;
 
 	return (
 		<PanelRow className="edit-post-sync-status">
