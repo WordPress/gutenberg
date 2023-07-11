@@ -8,10 +8,12 @@ import classnames from 'classnames';
  */
 import { BlockPreview } from '@wordpress/block-editor';
 import {
+	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	Tooltip,
 	Flex,
@@ -188,7 +190,21 @@ function GridItem( { categoryId, item, ...props } ) {
 						</Tooltip>
 					) }
 					<Flex as="span" gap={ 0 } justify="left">
-						{ item.title }
+						{ item.type === PATTERNS ? (
+							item.title
+						) : (
+							<Heading level={ 5 }>
+								<Button
+									variant="link"
+									onClick={ onClick }
+									// Required for the grid's roving tab index system.
+									// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
+									tabIndex="-1"
+								>
+									{ item.title }
+								</Button>
+							</Heading>
+						) }
 						{ item.type === PATTERNS && (
 							<Tooltip
 								position="top center"
