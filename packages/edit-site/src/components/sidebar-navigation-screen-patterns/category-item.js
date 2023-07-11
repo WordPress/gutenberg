@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { useInstanceId } from '@wordpress/compose';
+import { VisuallyHidden } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
@@ -12,6 +18,7 @@ export default function CategoryItem( {
 	label,
 	type,
 } ) {
+	const instanceId = useInstanceId( CategoryItem );
 	const linkInfo = useLink(
 		{
 			path: '/patterns',
@@ -31,13 +38,19 @@ export default function CategoryItem( {
 	}
 
 	return (
-		<SidebarNavigationItem
-			{ ...linkInfo }
-			icon={ icon }
-			suffix={ <span>{ count }</span> }
-			aria-current={ isActive ? 'true' : undefined }
-		>
-			{ label }
-		</SidebarNavigationItem>
+		<>
+			<SidebarNavigationItem
+				{ ...linkInfo }
+				icon={ icon }
+				suffix={ <span aria-hidden="true">{ count }</span> }
+				aria-current={ isActive ? 'true' : undefined }
+				aria-describedby={ `category-item-${ instanceId }` }
+			>
+				{ label }
+			</SidebarNavigationItem>
+			<VisuallyHidden id={ `category-item-${ instanceId }` }>
+				{ count }
+			</VisuallyHidden>
+		</>
 	);
 }
