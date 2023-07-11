@@ -2049,7 +2049,22 @@ export const getInserterItems = createSelector(
 			buildScope: 'inserter',
 		} );
 
-		const blockTypeInserterItems = getBlockTypes()
+		// Create a list of block types and their variations.
+		const blockVariations = getBlockTypes()
+			.map( ( blockType ) => {
+				return getBlockVariations( blockType.name, 'inserter' ).map(
+					( variation ) => {
+						variation.name = blockType.name + '/' + variation.name;
+						return variation;
+					}
+				);
+			} )
+			.flat();
+		const blockTypesAndVariations =
+			getBlockTypes().concat( blockVariations );
+
+		// TODO - this list needs to also return variations of blocks that are allowed as inner blocks.
+		const blockTypeInserterItems = blockTypesAndVariations
 			.filter( ( blockType ) =>
 				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 			)

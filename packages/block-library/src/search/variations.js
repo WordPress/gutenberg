@@ -17,6 +17,7 @@ const variations = [
 			buttonUseIcon: true,
 			buttonPosition: 'button-inside',
 		},
+		scope: [ 'block', 'inserter', 'transform' ],
 	},
 ];
 

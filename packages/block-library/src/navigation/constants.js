@@ -4,7 +4,6 @@ export const DEFAULT_BLOCK = {
 
 export const ALLOWED_BLOCKS = [
 	'core/navigation-link',
-	'core/search',
 	'core/search/inline',
 	'core/social-links',
 	'core/page-list',
