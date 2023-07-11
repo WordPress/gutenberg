@@ -267,9 +267,13 @@ function ResizableFrame( {
 				left: (
 					<>
 						<Tooltip text={ __( 'Drag to resize' ) }>
-							<motion.button
+							{ /* Disable reason: role="separator" does in fact support aria-valuenow */ }
+							{ /* eslint-disable-next-line jsx-a11y/role-supports-aria-props */ }
+							<motion.div
 								key="handle"
-								type="button"
+								role="separator"
+								tabIndex={ 0 }
+								aria-orientation="vertical"
 								className={ classnames(
 									'edit-site-resizable-frame__handle',
 									{ 'is-resizing': isResizing }
@@ -278,6 +282,14 @@ function ResizableFrame( {
 								animate={ currentResizeHandleVariant }
 								aria-label={ __( 'Drag to resize' ) }
 								aria-describedby={ resizableHandleHelpId }
+								aria-valuenow={
+									frameRef.current?.resizable?.offsetWidth ||
+									undefined
+								}
+								aria-valuemin={ FRAME_MIN_WIDTH }
+								aria-valuemax={
+									initialComputedWidthRef.current
+								}
 								onKeyDown={ handleResizableHandleKeyDown }
 								initial="hidden"
 								exit="hidden"
