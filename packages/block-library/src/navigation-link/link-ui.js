@@ -193,6 +193,7 @@ export function LinkUI( props ) {
 				showInitialSuggestions={ true }
 				withCreateSuggestion={ userCanCreate }
 				createSuggestion={ handleCreate }
+				forceIsEditingLink={ ! props.isDraft }
 				createSuggestionButtonText={ ( searchTerm ) => {
 					let format;
 
