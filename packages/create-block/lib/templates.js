@@ -61,6 +61,16 @@ const predefinedPluginTemplates = {
 				title: 'Example Dynamic',
 				render: 'file:./render.php',
 			},
+			interactive: {
+				slug: 'example-interactive',
+				title: 'Example Interactive',
+				npmDependencies: [ '@wordpress/interactivity' ],
+				supports: {
+					interactivity: true,
+				},
+				render: 'file:./render.php',
+				viewScript: 'file:./view.js',
+			},
 		},
 	},
 };
