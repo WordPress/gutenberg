@@ -33,6 +33,7 @@ const predefinedPluginTemplates = {
 			editorScript: null,
 			editorStyle: null,
 			style: null,
+			viewScript: 'file:./view.js',
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
 		variants: {
@@ -53,6 +54,7 @@ const predefinedPluginTemplates = {
 			supports: {
 				html: false,
 			},
+			viewScript: 'file:./view.js',
 		},
 		variants: {
 			static: {},
@@ -60,16 +62,6 @@ const predefinedPluginTemplates = {
 				slug: 'example-dynamic',
 				title: 'Example Dynamic',
 				render: 'file:./render.php',
-			},
-			interactive: {
-				slug: 'example-interactive',
-				title: 'Example Interactive',
-				npmDependencies: [ '@wordpress/interactivity' ],
-				supports: {
-					interactivity: true,
-				},
-				render: 'file:./render.php',
-				viewScript: 'file:./view.js',
 			},
 		},
 	},
