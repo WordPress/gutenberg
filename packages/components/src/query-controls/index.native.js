@@ -84,6 +84,7 @@ const QueryControls = memo(
 				) }
 				{ onNumberOfItemsChange && (
 					<RangeControl
+						__next40pxDefaultSize
 						label={ __( 'Number of items' ) }
 						value={ numberOfItems }
 						onChange={ onNumberOfItemsChange }

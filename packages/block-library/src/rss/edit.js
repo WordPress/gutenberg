@@ -116,6 +116,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Number of items' ) }
 						value={ itemsToShow }
 						onChange={ ( value ) =>
@@ -146,6 +147,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					{ displayExcerpt && (
 						<RangeControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Max number of words in excerpt' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -159,6 +161,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					{ blockLayout === 'grid' && (
 						<RangeControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Columns' ) }
 							value={ columns }
 							onChange={ ( value ) =>
