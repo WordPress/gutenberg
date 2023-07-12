@@ -40,10 +40,13 @@ function FontLibraryProvider( { children } ) {
 		{ refreshKey }
 	);
 
-	const libraryFonts = ( posts || [] ).map( post => (
-		JSON.parse( post.content.raw )
-	)) || [];
-	
+	const libraryFonts = ( posts || [] ).map( post => {
+		const post_content = JSON.parse( post.content.raw )
+		return {
+			...post_content,
+			postId: post.id,
+		}
+	}) || [];
 	
 
 	// Global Styles (settings) font families
@@ -190,8 +193,9 @@ function FontLibraryProvider( { children } ) {
 		const newLibraryFonts = await fetchInstallFonts( libraryFonts );
 	}
 
-	async function uninstallFont( fontFamily ) {
-		const newLibraryFonts = await fetchUninstallFonts( fontFamily );
+	async function uninstallFont( font ) {
+		await fetchUninstallFonts( { id: font.postId } );
+		refreshLibrary();
 	}
 
 	const toggleActivateFont = ( font, face ) => {

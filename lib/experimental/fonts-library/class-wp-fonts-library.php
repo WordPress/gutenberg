@@ -48,8 +48,6 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
 	);
 
     public function register_routes () {
-        
-
         register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
@@ -73,7 +71,6 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
 				),
 			)
 		);
-
         register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/google_fonts',
@@ -86,6 +83,61 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
 			)
 		);
 
+    }
+
+    /**
+     * Removes a font family from the fonts library and all their assets
+     *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+    function uninstall_font_family ( $request ) {
+        $post = get_post( $request['id'] );
+
+        if ( ! $post ) {
+            return new WP_Error(
+                'font_family_invalid_id',
+                __( 'Invalid font family ID.' ),
+                array(
+                    'status' => 404,
+                )
+            );
+        }
+
+        $font_family = json_decode( $post->post_content, true );
+        $were_assets_removed = $this->remove_font_family_assets( $font_family );
+        $was_post_deleted = wp_delete_post ( $request['id'], true );
+
+        if ( $was_post_deleted  === null || $were_assets_removed === false ) {
+            return new WP_Error(
+                'font_family_delete_error',
+                __( 'Error: Could not delete font family.' ),
+                array(
+                    'status' => 500,
+                )
+            );
+        }
+
+        return new WP_REST_Response( true );
+    }
+
+
+    /**
+     * Removes font family assets
+     *
+     * @param array $font_family
+     * @return bool True if assets were removed, false otherwise.
+     */
+    function remove_font_family_assets ( $font_family ) {
+        if ( isset( $font_family['fontFace'] ) ) {
+            foreach ( $font_family['fontFace'] as $font_face ) {
+                $were_assets_removed = $this->delete_font_face_assets( $font_face );
+                if ( $were_assets_removed === false ) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 	/**
@@ -155,75 +207,6 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
     }
 
     /**
-     * Gets the fonts library post content
-     * 
-     * @return WP_REST_Response|WP_Error
-     */
-    function get_fonts_library () {
-        $post = $this->query_fonts_library();
-        if ( is_wp_error( $post ) ) {
-            return $post;
-        }
-        return new WP_REST_Response( $post->post_content );
-    }
-
-     /**
-     * Query fonts library post
-     *
-     * @return WP_Post|WP_Error
-     */
-    private function query_fonts_library () {
-        // Try to get the fonts library post
-        $wp_fonts_library_query = new WP_Query( $this->base_post_query );
-        if ( $wp_fonts_library_query->have_posts() ) {
-            $post = $wp_fonts_library_query->posts[0];
-            return $post;
-        }
-
-        // Create empty post if there are no post
-        $args = $this->base_post_query;
-        $args['post_content'] = '{"fontFamilies":[]}';
-        $post_id = wp_insert_post( $args );
-        $post = get_post( $post_id );
-        if ( ! $post ) {
-            return new WP_Error(
-				'rest_cant_create_fonts_library',
-				__( 'Error creating fonts library post.' ),
-				array( 'status' => 500 )
-			);
-        }
-        return $post;
-    }
-
-    /**
-     * Updates the fonts library post content.
-     *
-     * Updates the content of the fonts library post with a new list of fonts families.
-     *
-     * @param array $new_fonts_families The new list of fonts families to replace the current content of the fonts library post.
-     * @return WP_REST_Response|WP_Error The updated fonts library post content wrapped in a WP_REST_Response object.
-     */
-    function update_fonts_library ( $new_fonts_families ) {
-        $post = $this->query_fonts_library();
-        $new_fonts_library = array (
-            'fontFamilies' => $new_fonts_families,
-        );
-        $updated_post_data = array (
-            'ID' => $post->ID,
-            'post_content' => wp_json_encode( $new_fonts_library ),
-        );
-        $updated_post = wp_update_post( $updated_post_data );
-        if ( is_wp_error( $updated_post ) ){
-            return $updated_post;
-        }
-        $new_post = $this->query_fonts_library();
-        if ( is_wp_error( $new_post ) ){
-            return $new_post;
-        }
-        return new WP_REST_Response( $new_post->post_content );
-    }
-
-    /**
      * Fetches the Google Fonts JSON file.
      *
      * Reads the "google-fonts.json" file from the file system and returns its content.
@@ -275,17 +258,17 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
      * @param array $font_face The font face array containing the 'src' attribute with the file path(s) to be deleted.
      */
     function delete_font_face_assets ( $font_face ) {
-        if ( ! is_array( $font_face['src'] ) ) {
-            return $this->delete_asset( $font_face['src'] );
-        }
-        
-        foreach ( $font_face['src'] as $src ) {
+        $srcs = !empty ( $font_face['src'] ) && is_array( $font_face['src'] )
+            ? $font_face['src']
+            : array( $font_face['src'] );
+        foreach ( $srcs as $src ) {
             $was_asset_removed = $this->delete_asset($src);
             if ( ! $was_asset_removed ) {
                 // Bail if any of the assets could not be removed
                 return false;
             }
         }
+        return true;
     }
 
     /**
@@ -376,55 +359,6 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         return $new_font_face;
     }
 
-    /**
-     * Uninstalls a font family.
-     *
-     * Removes a font family from the fonts library and deletes its associated font face assets.
-     *
-     * @param WP_REST_Request $request The request object containing the font family to uninstall in the request parameters.
-     * @return WP_REST_Response|WP_Error The updated fonts library post content.
-     */
-    function uninstall_font_family ( $request ) {
-        $post = $this->query_fonts_library();
-        if ( is_wp_error( $post ) ) {
-            return $post;
-        }
-        $post_content = $post->post_content;
-        $library = json_decode( $post_content, true );
-        $font_families = $library['fontFamilies'];
-
-        $font_to_uninstall = $request->get_json_params();
-        $new_font_families = $this->remove_font_family( $font_families, $font_to_uninstall );
-        
-        return $this->update_fonts_library( $new_font_families );
-    }
-
-    /**
-     * Removes a font family.
-     *
-     * Removes a font family from an array of font families. If the font family to remove contains font face 
-     * definitions, the associated assets are deleted.
-     *
-     * @param array $font_families The current array of font families.
-     * @param array $font_to_uninstall The font family to remove from the font families array.
-     * @return array The updated array of font families.
-     */
-    function remove_font_family ( $font_families, $font_to_uninstall ) {
-        $new_font_families = array();
-        foreach ( $font_families as $font_family ) {
-            if ( $font_family['slug'] !== $font_to_uninstall['slug'] ) {
-                $new_font_families[] = $font_family;
-            } else {
-                if ( isset ( $font_family['fontFace'] ) ){
-                    foreach( $font_family['fontFace'] as $font_face ) {
-                        $this->delete_font_face_assets( $font_face );
-                    }
-                }
-            }
-        }
-        return $new_font_families;
-    }
-
     function get_font_post ( $font ) {
         $args = array (
             'post_type' => $this->post_type,
@@ -443,22 +377,35 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         return null;
     }
 
-    function create_font_post ( $font ) {
+    /**
+     * Create a post for a font family
+     *
+     * @param array $font_family
+     * @return int
+     */
+    function create_font_post ( $font_family ) {
         $post = array(
-            'post_title' => $font['name'],
-            'post_name' => $font['slug'],
+            'post_title' => $font_family['name'],
+            'post_name' => $font_family['slug'],
             'post_type' => $this->post_type,
-            'post_content' => json_encode( $font ),
+            'post_content' => json_encode( $font_family ),
             'post_status' => 'publish',
         );
-
         $post_id = wp_insert_post( $post );
+        if ( $post_id === 0 ) {
+            return WP_Error( 'font_post_creation_failed', __( 'Font post creation failed', 'wp-fonts' ) );
+        }
         return $post_id;
     }
 
-    function update_font_post ( $font, $post ) {
+    /**
+     * @param array $font_family  
+     * @param WP_Post $post
+     * @return int
+     */
+    function update_font_post ( $font_family, $post ) {
         $existing_font = json_decode( $post->post_content, true );
-        $new_font = $this->merge_fonts( $existing_font, $font );
+        $new_font = $this->merge_fonts( $existing_font, $font_family );
 
         $post = array(
             'ID' => $post->ID,
@@ -469,16 +416,23 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         return $post_id;
     }
 
-    function create_or_update_font_post ( $font ) {
-        $post = $this->get_font_post( $font );
+    /**
+     * Creates a post for a font in the fonts library if it doesn't exist, or updates it if it does.
+     * 
+     * @param array $font_family
+     * @return WP_Post
+     */
+    function create_or_update_font_post ( $font_family ) {
+        $post = $this->get_font_post( $font_family );
 
         if ( $post ) {
             // update post
-            return $this->update_font_post( $font, $post );
+            return $this->update_font_post( $font_family, $post );
         } 
 
         // create post
-        return $this->create_font_post( $font );
+        $new_post =  $this->create_font_post( $font_family );
+        return $new_post;
     }
 
     /**
