@@ -61,8 +61,6 @@ The client ID of the block that the caption is associated with. This is prop is 
 
 ### `accessible`
 
-## Begin again from here.
-
 -   **Type:** `Boolean`
 -   **Required:** `No`
 -   **Default:** `false`
