@@ -40,10 +40,10 @@ const SYNC_FILTERS = {
 const SYNC_DESCRIPTIONS = {
 	all: '',
 	[ SYNC_TYPES.full ]: __(
-		'Patterns that are kept in sync across your site.'
+		'Patterns that are kept in sync across the site.'
 	),
 	[ SYNC_TYPES.unsynced ]: __(
-		'Patterns that can be changed freely without affecting your site.'
+		'Patterns that can be changed freely without affecting the site.'
 	),
 };
 

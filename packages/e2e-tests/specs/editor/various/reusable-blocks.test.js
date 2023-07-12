@@ -352,7 +352,7 @@ describe( 'Reusable blocks', () => {
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
 		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select Pattern' );
+		await clickBlockToolbarButton( 'Select Edited block' );
 		await clickBlockToolbarButton( 'Detach pattern' );
 		await page.waitForXPath( selector, {
 			hidden: true,
