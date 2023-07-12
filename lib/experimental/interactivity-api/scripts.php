@@ -18,7 +18,7 @@ function gutenberg_interactivity_move_interactive_scripts_to_the_footer() {
 	// Move all the view scripts of the interactive blocks to the footer.
 	$registered_blocks = \WP_Block_Type_Registry::get_instance()->get_all_registered();
 	foreach ( array_values( $registered_blocks ) as $block ) {
-		if ( isset( $block->supports['interactivity'] ) && $block->supports['interactivity'] ) {
+		if ( isset( $block->supports['interactivity'] ) && $block->supports['interactivity'] && gutenberg_should_block_use_interactivity_api( $block->name ) ) {
 			foreach ( $block->view_script_handles as $handle ) {
 				wp_script_add_data( $handle, 'group', 1 );
 			}
