@@ -7,7 +7,7 @@
 
 // These functions are used for the __unstableLocation feature and only active
 // when the gutenberg plugin is active.
-if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+if ( apply_filters( 'gutenberg_block_core_navigation_use_interactivity_api', true ) ) {
 	/**
 	 * Returns the menu items for a WordPress menu location.
 	 *
@@ -471,7 +471,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// - we don't have a relationship to a `wp_navigation` Post (via `ref`).
 	// ...then create inner blocks from the classic menu assigned to that location.
 	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN &&
+		apply_filters( 'gutenberg_block_core_navigation_use_interactivity_api', true ) &&
 		array_key_exists( '__unstableLocation', $attributes ) &&
 		! array_key_exists( 'ref', $attributes ) &&
 		! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
@@ -685,7 +685,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	// Add directives to the submenu if needed.
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $has_submenus && $should_load_view_script ) {
+	if ( apply_filters( 'gutenberg_block_core_navigation_use_interactivity_api', true ) && $has_submenus && $should_load_view_script ) {
 		$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
 		$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $w, $attributes );
 	}
@@ -733,7 +733,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$responsive_container_directives = '';
 	$responsive_dialog_directives    = '';
 	$close_button_directives         = '';
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $should_load_view_script ) {
+	if ( apply_filters( 'gutenberg_block_core_navigation_use_interactivity_api', true ) && $should_load_view_script ) {
 		$nav_element_directives          = '
 			data-wp-interactive
 			data-wp-context=\'{ "core": { "navigation": { "overlayOpenedBy": {}, "type": "overlay", "roleAttribute": "" } } }\'
