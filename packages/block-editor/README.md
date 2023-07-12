@@ -789,6 +789,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+### useBlockCommands
+
+Undocumented declaration.
+
 ### useBlockDisplayInformation
 
 Hook used to try to find a matching block variation and return the appropriate information for display reasons. In order to to try to find a match we need to things: 1. Block's client id to extract it's current attributes. 2. A block variation should have set `isActive` prop to a proper function.
