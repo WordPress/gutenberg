@@ -8,6 +8,7 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 	Tooltip,
+	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -25,6 +26,17 @@ const WithToolTip = ( { showTooltip, title, children } ) => {
 	return <>{ children }</>;
 };
 
+function BlockPatternItemPlaceholder( { title } ) {
+	return (
+		<div className="block-editor-block-patterns-list__empty-item">
+			<Truncate numberOfLines={ 2 }>{ title }</Truncate>
+			<span className="block-editor-block-patterns-list__empty-item-text">
+				{ __( '(Empty pattern)' ) }
+			</span>
+		</div>
+	);
+}
+
 function BlockPattern( {
 	isDraggable,
 	pattern,
@@ -37,6 +49,7 @@ function BlockPattern( {
 	const { blocks, viewportWidth } = pattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
+	const isEmpty = ! blocks?.length;
 
 	return (
 		<InserterDraggableBlocks
@@ -87,10 +100,17 @@ function BlockPattern( {
 								pattern.description ? descriptionId : undefined
 							}
 						>
-							<BlockPreview
-								blocks={ blocks }
-								viewportWidth={ viewportWidth }
-							/>
+							{ ! isEmpty ? (
+								<BlockPreview
+									blocks={ blocks }
+									viewportWidth={ viewportWidth }
+								/>
+							) : (
+								<BlockPatternItemPlaceholder
+									title={ pattern.title }
+								/>
+							) }
+
 							{ ! showTooltip && (
 								<div className="block-editor-block-patterns-list__item-title">
 									{ pattern.title }
