@@ -6,10 +6,12 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS } from '../utils';
+import { CONFIG, COLORS, font } from '../utils';
 
 export const unstyledButton = ( as: 'a' | 'button' ) => {
 	return css`
+		font-size: ${ font( 'default.fontSize' ) };
+		font-family: inherit;
 		appearance: none;
 		border: 1px solid transparent;
 		cursor: pointer;
@@ -26,6 +28,11 @@ export const unstyledButton = ( as: 'a' | 'button' ) => {
 			color: ${ COLORS.ui.theme };
 		}
 
+		&:focus {
+			box-shadow: none;
+			outline: none;
+		}
+
 		&:focus-visible {
 			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
 				var(
@@ -34,6 +41,7 @@ export const unstyledButton = ( as: 'a' | 'button' ) => {
 				);
 			// Windows high contrast mode.
 			outline: 2px solid transparent;
+			outline-offset: 0;
 		}
 	`;
 };
