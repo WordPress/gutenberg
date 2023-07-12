@@ -13,6 +13,7 @@ import {
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -58,7 +59,7 @@ export default function TemplateActions( {
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" reverted.' ),
-					template.title.rendered
+					decodeEntities( template.title.rendered )
 				),
 				{
 					type: 'snackbar',

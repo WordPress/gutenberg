@@ -94,6 +94,7 @@ export function Button( props ) {
 		tooltipPosition,
 		isActiveStyle,
 		customContainerStyles,
+		hitSlop,
 	} = props;
 	const preferredColorScheme = usePreferredColorScheme();
 
@@ -188,6 +189,7 @@ export function Button( props ) {
 			style={ containerStyle }
 			disabled={ isDisabled }
 			testID={ testID }
+			hitSlop={ hitSlop }
 		>
 			<LongPressGestureHandler
 				minDurationMs={ 500 }

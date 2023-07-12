@@ -14,9 +14,11 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { decodeEntities } from '@wordpress/html-entities';
 
 export default function RenameMenuItem( { template, onClose } ) {
-	const [ title, setTitle ] = useState( () => template.title.rendered );
+	const title = decodeEntities( template.title.rendered );
+	const [ editedTitle, setEditedTitle ] = useState( title );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
 	const {
@@ -35,11 +37,11 @@ export default function RenameMenuItem( { template, onClose } ) {
 
 		try {
 			await editEntityRecord( 'postType', template.type, template.id, {
-				title,
+				title: editedTitle,
 			} );
 
 			// Update state before saving rerenders the list.
-			setTitle( '' );
+			setEditedTitle( '' );
 			setIsModalOpen( false );
 			onClose();
 
@@ -72,7 +74,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 			<MenuItem
 				onClick={ () => {
 					setIsModalOpen( true );
-					setTitle( template.title.rendered );
+					setEditedTitle( title );
 				} }
 			>
 				{ __( 'Rename' ) }
@@ -90,8 +92,8 @@ export default function RenameMenuItem( { template, onClose } ) {
 							<TextControl
 								__nextHasNoMarginBottom
 								label={ __( 'Name' ) }
-								value={ title }
-								onChange={ setTitle }
+								value={ editedTitle }
+								onChange={ setEditedTitle }
 								required
 							/>
 
