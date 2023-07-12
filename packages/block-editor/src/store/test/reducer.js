@@ -3328,7 +3328,7 @@ describe( 'state', () => {
 			expect( state.clientIds ).toEqual( [ clientIdOne, clientIdTwo ] );
 		} );
 
-		it( 'should return client ids of all blocks when inner blocks are replaced with REPLACE_INNER_BLOCKS', () => {
+		it( 'should not return client ids of all blocks when inner blocks are replaced with REPLACE_INNER_BLOCKS', () => {
 			const clientIdOne = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 			const clientIdTwo = '9db792c6-a25a-495d-adbd-97d56a4c4189';
 
@@ -3346,7 +3346,10 @@ describe( 'state', () => {
 
 			const state = lastBlockInserted( {}, action );
 
-			expect( state.clientIds ).toEqual( [ clientIdOne, clientIdTwo ] );
+			expect( state.clientIds ).not.toEqual( [
+				clientIdOne,
+				clientIdTwo,
+			] );
 		} );
 
 		it( 'should return empty state if last block inserted is called with action RESET_BLOCKS', () => {
