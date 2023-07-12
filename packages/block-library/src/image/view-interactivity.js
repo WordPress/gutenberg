@@ -206,14 +206,37 @@ function setZoomStyles( imgDom, context, event ) {
 	// dimensions have not been set (i.e. an external image with only one size),
 	// the image's dimensions in the lightbox are the same
 	// as those of the image in the content.
+	const { naturalWidth, naturalHeight, offsetWidth, offsetHeight } =
+		event.target.nextElementSibling;
+
 	let targetWidth =
 		context.core.image.targetWidth !== 'none'
 			? context.core.image.targetWidth
-			: event.target.nextElementSibling.naturalWidth;
+			: naturalWidth;
 	let targetHeight =
 		context.core.image.targetHeight !== 'none'
 			? context.core.image.targetHeight
-			: event.target.nextElementSibling.naturalHeight;
+			: naturalHeight;
+
+	targetWidth = parseFloat( targetWidth );
+	targetHeight = parseFloat( targetHeight );
+
+	// If the image has been pixelated on purpose, keep that size.
+	if ( offsetWidth > naturalWidth || offsetHeight > naturalHeight ) {
+		targetWidth = offsetWidth;
+		targetHeight = offsetHeight;
+	}
+
+	// Change the targetRatio if it the original aspect ratio has been changed.
+	const targetRatio = targetWidth / targetHeight;
+	const offsetRatio =
+		event.target.nextElementSibling.offsetWidth /
+		event.target.nextElementSibling.offsetHeight;
+
+	if ( targetRatio.toFixed( 2 ) !== offsetRatio.toFixed( 2 ) ) {
+		if ( offsetRatio >= 1 ) targetWidth = targetHeight * offsetRatio;
+		if ( offsetRatio < 1 ) targetHeight = targetWidth / offsetRatio;
+	}
 
 	// Since the lightbox image has `position:absolute`, it
 	// ignores its parent's padding, so we need to set padding here
@@ -234,31 +257,44 @@ function setZoomStyles( imgDom, context, event ) {
 	}
 	const containerInnerWidth = containerOuterWidth - horizontalPadding * 2;
 
+	const widthOverflow = targetWidth - containerInnerWidth;
+	const heightOverflow = targetHeight - containerInnerHeight;
+
+	if ( widthOverflow > 0 || heightOverflow > 0 ) {
+		if ( widthOverflow > heightOverflow ) {
+			targetWidth = containerInnerWidth;
+			targetHeight = containerInnerWidth / offsetRatio;
+		} else {
+			targetHeight = containerInnerHeight;
+			targetWidth = containerInnerHeight * offsetRatio;
+		}
+	}
+
 	// Check difference between the image and figure dimensions
-	const widthOverflow = Math.abs(
-		Math.min( containerInnerWidth - targetWidth, 0 )
-	);
-	const heightOverflow = Math.abs(
-		Math.min( containerInnerHeight - targetHeight, 0 )
-	);
+	// const widthOverflow = Math.abs(
+	// 	Math.min( containerInnerWidth - targetWidth, 0 )
+	// );
+	// const heightOverflow = Math.abs(
+	// 	Math.min( containerInnerHeight - targetHeight, 0 )
+	// );
 
 	// If the image is larger than the container, let's resize
 	// it along the greater axis relative to the container
-	if ( widthOverflow > 0 || heightOverflow > 0 ) {
-		const containerInnerAspectRatio =
-			containerInnerWidth / containerInnerHeight;
-		const imageAspectRatio = targetWidth / targetHeight;
+	// if ( widthOverflow > 0 || heightOverflow > 0 ) {
+	// 	const containerInnerAspectRatio =
+	// 		containerInnerWidth / containerInnerHeight;
+	// 	const imageAspectRatio = targetWidth / targetHeight;
 
-		if ( imageAspectRatio > containerInnerAspectRatio ) {
-			targetWidth = containerInnerWidth;
-			targetHeight =
-				( targetWidth * imgDom.naturalHeight ) / imgDom.naturalWidth;
-		} else {
-			targetHeight = containerInnerHeight;
-			targetWidth =
-				( targetHeight * imgDom.naturalWidth ) / imgDom.naturalHeight;
-		}
-	}
+	// 	if ( imageAspectRatio > containerInnerAspectRatio ) {
+	// 		targetWidth = containerInnerWidth;
+	// 		targetHeight =
+	// 			( targetWidth * imgDom.naturalHeight ) / imgDom.naturalWidth;
+	// 	} else {
+	// 		targetHeight = containerInnerHeight;
+	// 		targetWidth =
+	// 			( targetHeight * imgDom.naturalWidth ) / imgDom.naturalHeight;
+	// 	}
+	// }
 
 	// The reference img element lies adjacent to the event target button in the DOM
 	const { x: originLeft, y: originTop } =
