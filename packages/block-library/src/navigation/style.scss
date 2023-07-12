@@ -31,6 +31,7 @@ $navigation-icon-size: 24px;
 
 	// Menu item container.
 	.wp-block-navigation-item {
+		background-color: inherit;
 		display: flex;
 		align-items: center;
 		position: relative;
@@ -398,14 +399,19 @@ button.wp-block-navigation-item__content {
 }
 
 // Default background and font color.
-.wp-block-navigation:not(.has-background) {
+.wp-block-navigation:not(.has-background) .wp-block-navigation__submenu-container {
+	// Set a background color for submenus so that they're not transparent.
+	// NOTE TO DEVS - if refactoring this code, please double-check that
+	// submenus have a default background color, this feature has regressed
+	// several times, so care needs to be taken.
+	background-color: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+// If we do have a background color selected, inherit it from the navigation block
+.wp-block-navigation.has-background {
 	.wp-block-navigation__submenu-container {
-		// Set a background color for submenus so that they're not transparent.
-		// NOTE TO DEVS - if refactoring this code, please double-check that
-		// submenus have a default background color, this feature has regressed
-		// several times, so care needs to be taken.
-		background-color: #fff;
-		border: 1px solid rgba(0, 0, 0, 0.15);
+		background-color: inherit;
 	}
 }
 
