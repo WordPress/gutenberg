@@ -20,7 +20,7 @@ export const CLASSIC_MENU_CONVERSION_IDLE = 'idle';
 // do not import the same classic menu twice.
 let classicMenuBeingConvertedId = null;
 
-function useConvertClassicToBlockMenu( createNavigationMenu ) {
+function useConvertClassicToBlockMenu( clientId, createNavigationMenu ) {
 	const registry = useRegistry();
 	const { editEntityRecord } = useDispatch( coreStore );
 
