@@ -59,6 +59,14 @@
 		background: $gray-700;
 		color: $gray-100;
 	}
+
+	.edit-site-patterns__grid-pagination {
+		width: fit-content;
+
+		.edit-site-patterns__grid-pagination-label {
+			color: $white;
+		}
+	}
 }
 
 .edit-site-patterns__section-header {
