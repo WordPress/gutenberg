@@ -2,7 +2,6 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +15,7 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
-import { setImmutably } from '../../utils/object';
+import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
 
@@ -104,18 +103,19 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 
 		if ( propertyPath ) {
 			return (
-				get( configToUse, contextualPath ) ??
-				get( configToUse, globalPath )
+				getValueFromObjectPath( configToUse, contextualPath ) ??
+				getValueFromObjectPath( configToUse, globalPath )
 			);
 		}
 
 		let result = {};
 		VALID_SETTINGS.forEach( ( setting ) => {
 			const value =
-				get(
+				getValueFromObjectPath(
 					configToUse,
 					`settings${ appendedBlockPath }.${ setting }`
-				) ?? get( configToUse, `settings.${ setting }` );
+				) ??
+				getValueFromObjectPath( configToUse, `settings.${ setting }` );
 			if ( value ) {
 				result = setImmutably( result, setting.split( '.' ), value );
 			}
@@ -176,19 +176,19 @@ export function useGlobalStyle(
 	let rawResult, result;
 	switch ( source ) {
 		case 'all':
-			rawResult = get( mergedConfig, finalPath );
+			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'user':
-			rawResult = get( userConfig, finalPath );
+			rawResult = getValueFromObjectPath( userConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'base':
-			rawResult = get( baseConfig, finalPath );
+			rawResult = getValueFromObjectPath( baseConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( baseConfig, blockName, rawResult )
 				: rawResult;
