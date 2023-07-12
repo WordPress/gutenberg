@@ -36,7 +36,7 @@ const HANDLE_STYLES_OVERRIDE = {
 };
 
 // The minimum width of the frame (in px) while resizing.
-const FRAME_MIN_WIDTH = 340;
+const FRAME_MIN_WIDTH = 320;
 // The reference width of the frame (in px) used to calculate the aspect ratio.
 const FRAME_REFERENCE_WIDTH = 1300;
 // 9 : 19.5 is the target aspect ratio enforced (when possible) while resizing.
