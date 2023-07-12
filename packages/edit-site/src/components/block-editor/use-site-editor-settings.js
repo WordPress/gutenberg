@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 /**
@@ -12,15 +12,19 @@ import { unlock } from '../../lock-unlock';
 import inserterMediaCategories from './inserter-media-categories';
 
 export default function useSiteEditorSettings( templateType ) {
-	const { storedSettings, canvasMode } = useSelect( ( select ) => {
-		const { getSettings, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
-		return {
-			storedSettings: getSettings(),
-			canvasMode: getCanvasMode(),
-		};
-	}, [] );
+	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const { storedSettings, canvasMode } = useSelect(
+		( select ) => {
+			const { getSettings, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			return {
+				storedSettings: getSettings( setIsInserterOpened ),
+				canvasMode: getCanvasMode(),
+			};
+		},
+		[ setIsInserterOpened ]
+	);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
