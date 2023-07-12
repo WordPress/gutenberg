@@ -106,4 +106,4 @@ Function to handle how blocks are inserted after pressing enter at the end of th
 
 ## Related components
 
-`BlockCaption` passes props directly to the [`Caption`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/caption) component.
+`BlockCaption` passes props directly to the [`Caption`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/caption) component. In turn, the `Caption` component uses the [`RichText`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/) component. It is recommended to refer to each of those components' documentation for more information on their props and usage.
