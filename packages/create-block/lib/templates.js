@@ -33,7 +33,6 @@ const predefinedPluginTemplates = {
 			editorScript: null,
 			editorStyle: null,
 			style: null,
-			viewScript: 'file:./view.js',
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
 		variants: {
@@ -54,7 +53,6 @@ const predefinedPluginTemplates = {
 			supports: {
 				html: false,
 			},
-			viewScript: 'file:./view.js',
 		},
 		variants: {
 			static: {},
