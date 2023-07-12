@@ -284,10 +284,10 @@ export interface GetEntityRecord {
 			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
-		kind: EntityRecordArgs[ 0 ],
-		name: EntityRecordArgs[ 1 ],
-		key: EntityRecordArgs[ 2 ],
-		query?: EntityRecordArgs[ 3 ]
+		kind: string,
+		name: string,
+		key: EntityRecordKey,
+		query?: GetRecordsHttpQuery
 	): EntityRecord | undefined;
 
 	CurriedSignature: <
@@ -295,10 +295,10 @@ export interface GetEntityRecord {
 			| ET.EntityRecord< any >
 			| Partial< ET.EntityRecord< any > >,
 	>(
-		kind: EntityRecordArgs[ 0 ],
-		name: EntityRecordArgs[ 1 ],
-		key: EntityRecordArgs[ 2 ],
-		query?: EntityRecordArgs[ 3 ]
+		kind: string,
+		name: string,
+		key: EntityRecordKey,
+		query?: GetRecordsHttpQuery
 	) => EntityRecord | undefined;
 	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
