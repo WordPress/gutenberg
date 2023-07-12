@@ -34,6 +34,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 function render_block_core_file( $attributes, $content, $block ) {
 	$should_load_view_script = ! empty( $attributes['displayPreview'] );
 	$view_js_file            = 'wp-block-file-view';
+	wp_script_add_data( $view_js_file, 'strategy', 'defer' );
 	// If the script already exists, there is no point in removing it from viewScript.
 	if ( ! wp_script_is( $view_js_file ) ) {
 		$script_handles = $block->block_type->view_script_handles;
