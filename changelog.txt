@@ -1,5 +1,40 @@
 == Changelog ==
 
+= 16.2.0 =
+
+## Changelog
+
+### Bug Fixes
+
+- Library - make pattern title clickable. ([51898](https://github.com/WordPress/gutenberg/pull/51898))
+
+#### Block Library
+- Allow editing existing footnote from RichText formats toolbar. ([52506](https://github.com/WordPress/gutenberg/pull/52506))
+- Revert "Post editor: Require confirmation before removing Footnotes (#52277)". ([52486](https://github.com/WordPress/gutenberg/pull/52486))
+- Trim footnote anchors from excerpts. ([52518](https://github.com/WordPress/gutenberg/pull/52518))
+
+#### Interactivity API
+- Fix md5 class messed up with new block key. ([52557](https://github.com/WordPress/gutenberg/pull/52557))
+
+#### Block Editor
+- Site Editor: Restore quick inserter 'Browse all' button. ([52529](https://github.com/WordPress/gutenberg/pull/52529))
+
+#### Patterns
+- Check that core hasn't already moved sync status meta before moving and unsetting. ([52494](https://github.com/WordPress/gutenberg/pull/52494))
+
+
+### Various
+
+- Rename block theme activation nonce variable. ([52398](https://github.com/WordPress/gutenberg/pull/52398))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@getdave @glendaviesnz @luisherranz @Mamaduka @mcsf @peterwilsoncc @priethor
 = 16.2.0-rc.3 =
 
 ## Changelog
@@ -334,13 +369,13 @@ The following contributors merged PRs in this release:
 - Template revisions API: Move back to experimental. ([51774](https://github.com/WordPress/gutenberg/pull/51774))
 
 
-
-
 ## Contributors
 
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @ajlende @annezazu @artemiomorales @c4rl0sbr4v0 @carolinan @DAreRodz @dcalhoun @draganescu @ellatrix @fullofcaffeine @getdave @glendaviesnz @hellofromtonya @jameskoster @jasmussen @jeryj @jsnajdr @juanfra @juanmaguitar @kevin940726 @luisherranz @Mamaduka @mcsf @michalczaplinski @miminari @noisysocks @ntsekouras @oandregal @ockham @priethor @ramonjd @richtabor @ryanwelcher @SaxonF @scruffian @spacedmonkey @stokesman @t-hamano @talldan @tellthemachines @tyxla @WunderBart @youknowriad
+
+
 
 
 = 16.1.1 =
