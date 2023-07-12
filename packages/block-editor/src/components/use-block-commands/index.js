@@ -39,7 +39,6 @@ export const useTransformCommands = () => {
 			const {
 				getBlockRootClientId,
 				getBlockTransformItems,
-				__experimentalGetPatternTransformItems,
 				canRemoveBlocks,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId(
@@ -51,10 +50,6 @@ export const useTransformCommands = () => {
 					rootClientId
 				),
 				canRemove: canRemoveBlocks( clientIds, rootClientId ),
-				patterns: __experimentalGetPatternTransformItems(
-					blocks,
-					rootClientId
-				),
 			};
 		},
 		[ clientIds, blocks ]
@@ -97,7 +92,7 @@ export const useTransformCommands = () => {
 	const commands = possibleBlockTransformations.map( ( transformation ) => {
 		const { name, title, icon } = transformation;
 		return {
-			name: 'core/block-editor/transform-to-' + name,
+			name: 'core/block-editor/transform-to-' + name.replace( '/', '-' ),
 			// translators: %s: block title/name.
 			label: sprintf( __( 'Transform to %s' ), title ),
 			icon: icon.src,
@@ -271,9 +266,9 @@ const useActionsCommands = () => {
 			.replace( 'on', '' )
 			.replace( /([a-z])([A-Z])/g, '$1 $2' );
 		return {
-			name: 'core/block-edotpr/action-' + callback.name,
-			// translators: %s: block title/name.
-			label: `${ action } block`,
+			name: 'core/block-editor/action-' + callback.name,
+			// translators: %s: type of the command.
+			label: sprintf( __( `%s block` ), action ),
 			icon: copy,
 			callback: ( { close } ) => {
 				callback();
