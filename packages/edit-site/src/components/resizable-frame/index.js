@@ -13,7 +13,7 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -90,6 +90,10 @@ function ResizableFrame( {
 	const [ shouldShowHandle, setShouldShowHandle ] = useState( false );
 	const [ isOversized, setIsOversized ] = useState( false );
 	const [ resizeRatio, setResizeRatio ] = useState( 1 );
+	const canvasMode = useSelect(
+		( select ) => unlock( select( editSiteStore ) ).getCanvasMode(),
+		[]
+	);
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const initialAspectRatioRef = useRef( null );
 	// The width of the resizable frame on initial render.
@@ -265,7 +269,7 @@ function ResizableFrame( {
 			onMouseOver={ () => setShouldShowHandle( true ) }
 			onMouseOut={ () => setShouldShowHandle( false ) }
 			handleComponent={ {
-				left: (
+				left: canvasMode === 'view' && (
 					<>
 						<Tooltip text={ __( 'Drag to resize' ) }>
 							{ /* Disable reason: role="separator" does in fact support aria-valuenow */ }
