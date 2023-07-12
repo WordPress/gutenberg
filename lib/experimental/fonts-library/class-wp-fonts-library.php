@@ -315,16 +315,16 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
      *
      * @param array $font_face The font face array containing 'fontFamily', 'fontStyle', and 'fontWeight' attributes.
      * @param string $url The URL of the font face asset, used to derive the file extension.
-     * @param int $i Optional counter for appending to the filename, default is 0.
+     * @param int $i Optional counter for appending to the filename, default is 1.
      * @return string The generated filename for the font face asset.
      */
-    function get_filename_from_font_face ( $font_face, $url, $i=0 ) {
+    function get_filename_from_font_face ( $font_face, $url, $i=1 ) {
         $extension = pathinfo( $url, PATHINFO_EXTENSION );
         $family = sanitize_title( $font_face['fontFamily'] );
         $style = sanitize_title( $font_face['fontStyle'] );
         $weight = sanitize_title( $font_face['fontWeight'] );
         $filename = "{$family}_{$style}_{$weight}";
-        if ($i > 0) {
+        if ($i > 1) {
             $filename .= "_{$i}";
         }
         return "{$filename}.{$extension}";
@@ -347,7 +347,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         $new_font_face['src'] = array();
         $i = 0;
         foreach ( $srcs as $src ) {              
-            $filename = $this->get_filename_from_font_face( $font_face, $src, ++$i );
+            $filename = $this->get_filename_from_font_face( $font_face, $src, $i++ );
             $new_src = $this->download_asset($src, $filename);
             if ( $new_src ) {
                 $new_font_face['src'][] = $new_src;
