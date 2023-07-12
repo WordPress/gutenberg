@@ -63,6 +63,35 @@ const flatColorPalettes = memize( ( colorsPalettes ) => [
 	...( colorsPalettes?.default || [] ),
 ] );
 
+const getSelectionColor = memize(
+	(
+		currentSelectionColor,
+		defaultSelectionColor,
+		baseGlobalStyles,
+		isBlockBasedTheme
+	) => {
+		let selectionColor = defaultSelectionColor;
+		if ( currentSelectionColor ) {
+			selectionColor = currentSelectionColor;
+		}
+
+		if ( isBlockBasedTheme ) {
+			const colordTextColor = colord( selectionColor );
+			const colordBackgroundColor = colord(
+				baseGlobalStyles?.color?.background
+			);
+			const isColordTextReadable = colordTextColor.isReadable(
+				colordBackgroundColor
+			);
+			if ( ! isColordTextReadable ) {
+				selectionColor = baseGlobalStyles?.color?.text;
+			}
+		}
+
+		return selectionColor;
+	}
+);
+
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
@@ -1049,37 +1078,6 @@ export class RichText extends Component {
 			: defaultColor;
 	}
 
-	getSelectionColor() {
-		const {
-			baseGlobalStyles,
-			getStylesFromColorScheme,
-			selectionColor: currentSelectionColor,
-		} = this.props;
-		let selectionColor = getStylesFromColorScheme(
-			styles[ 'rich-text-selection' ],
-			styles[ 'rich-text-selection--dark' ]
-		).color;
-
-		if ( currentSelectionColor ) {
-			selectionColor = currentSelectionColor;
-		}
-
-		if ( this.getIsBlockBasedTheme() ) {
-			const colordTextColor = colord( selectionColor );
-			const colordBackgroundColor = colord(
-				baseGlobalStyles?.color?.background
-			);
-			const isColordTextReadable = colordTextColor.isReadable(
-				colordBackgroundColor
-			);
-			if ( ! isColordTextReadable ) {
-				selectionColor = baseGlobalStyles?.color?.text;
-			}
-		}
-
-		return selectionColor;
-	}
-
 	render() {
 		const {
 			tagName,
@@ -1185,7 +1183,16 @@ export class RichText extends Component {
 			},
 		];
 
-		const selectionColor = this.getSelectionColor();
+		const defaultSelectionColor = getStylesFromColorScheme(
+			styles[ 'rich-text-selection' ],
+			styles[ 'rich-text-selection--dark' ]
+		).color;
+		const selectionColor = getSelectionColor(
+			this.props.selectionColor,
+			defaultSelectionColor,
+			baseGlobalStyles,
+			this.getIsBlockBasedTheme()
+		);
 
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;
