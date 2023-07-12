@@ -49,6 +49,9 @@ exports[`Block Mover Picker should render without crashing and match snapshot 1`
       {
         "height": 44,
       },
+      {
+        "borderLeftWidth": 0.5,
+      },
       undefined,
     ]
   }
@@ -108,7 +111,6 @@ exports[`Block Mover Picker should render without crashing and match snapshot 1`
           }
         >
           <Svg
-            colorScheme="light"
             height={24}
             style={{}}
             viewBox="0 0 24 24"
@@ -176,7 +178,6 @@ exports[`Block Mover Picker should render without crashing and match snapshot 1`
           }
         >
           <Svg
-            colorScheme="light"
             height={24}
             style={{}}
             viewBox="0 0 24 24"
