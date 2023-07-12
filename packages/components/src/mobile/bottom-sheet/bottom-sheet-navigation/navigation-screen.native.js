@@ -17,7 +17,6 @@ import {
  * WordPress dependencies
  */
 import { BottomSheetContext } from '@wordpress/components';
-import { debounce } from '@wordpress/compose';
 import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
 
 /**
@@ -46,13 +45,6 @@ const BottomSheetNavigationScreen = ( {
 	const { height: windowHeight } = useWindowDimensions();
 
 	const { setHeight } = useContext( BottomSheetNavigationContext );
-
-	// Disable reason: deferring this refactor to the native team.
-	// see https://github.com/WordPress/gutenberg/pull/41166
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [
-		setHeight,
-	] );
 
 	useFocusEffect(
 		useCallback( () => {
@@ -104,7 +96,7 @@ const BottomSheetNavigationScreen = ( {
 		const { height } = nativeEvent.layout;
 		if ( maxHeight.current !== height && isFocused ) {
 			maxHeight.current = height;
-			setHeightDebounce( height );
+			setHeight( height );
 		}
 	};
 
