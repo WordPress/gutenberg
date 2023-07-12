@@ -14,6 +14,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Update native BlockOutline component styles to remove blue border from blocks [#51222]
 -   [**] Move the undo/redo buttons to the navigation bar [#51766]
 -   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
+-   [**] Update Editor toolbar icons and colors [#52336]
 
 ## 1.99.0
 -   [*] Rename "Reusable blocks" to "Synced patterns", aligning with the web editor. [#51704]
