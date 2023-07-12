@@ -151,7 +151,8 @@ if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) ) {
 	 */
 	function gutenberg_block_core_navigation_update_interactive_view_script( $metadata ) {
 		if ( 'core/navigation' === $metadata['name'] ) {
-			$metadata['viewScript'] = array( 'file:./view-interactivity.min.js' );
+			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
+			$metadata['supports']['interactivity'] = true;
 		}
 		return $metadata;
 	}
