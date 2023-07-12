@@ -1647,16 +1647,6 @@ class ColorControl {
 		this.transparent = 'rgba(0, 0, 0, 0)';
 	}
 
-	async openEditorOverlay() {
-		await this.page
-			.getByRole( 'button', { name: 'View', exact: true } )
-			.click();
-		await this.page.getByRole( 'menuitem', { name: 'Mobile' } ).click();
-		await this.editor.canvas
-			.getByRole( 'button', { name: 'Open menu' } )
-			.click();
-	}
-
 	async testEditorColors( {
 		textColor,
 		backgroundColor,
@@ -1701,7 +1691,19 @@ class ColorControl {
 			submenuBackgroundColor
 		);
 
-		await this.openEditorOverlay();
+		// Switch to mobile view for the rest of the editor color tests
+		// Focus the navigation block
+		await this.editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+		await this.editor.openDocumentSettingsSidebar();
+		// Switch to settings tab
+		await this.page.getByRole( 'tab', { name: 'Settings' } ).click();
+		// Set it to always be the mobile view, but don't save this setting so we can still check all the frontend colors
+		await this.page.getByRole( 'radio', { name: 'Always' } ).click();
+		await this.editor.canvas
+			.getByRole( 'button', { name: 'Open menu' } )
+			.click();
 
 		const overlay = this.editor.canvas
 			.locator( '.wp-block-navigation__responsive-container' )
