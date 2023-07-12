@@ -84,13 +84,17 @@ function BottomSheetNavigationContainer( {
 		styles.backgroundDark
 	);
 
-	const _theme = theme || {
-		...DefaultTheme,
-		colors: {
-			...DefaultTheme.colors,
-			background: backgroundStyle.backgroundColor,
-		},
-	};
+	const defaultTheme = useMemo(
+		() => ( {
+			...DefaultTheme,
+			colors: {
+				...DefaultTheme.colors,
+				background: backgroundStyle.backgroundColor,
+			},
+		} ),
+		[ backgroundStyle.backgroundColor ]
+	);
+	const _theme = theme || defaultTheme;
 
 	const setHeight = useCallback(
 		( height ) => {
@@ -141,10 +145,7 @@ function BottomSheetNavigationContainer( {
 				/>
 			);
 		} );
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ children ] );
+	}, [ children, main ] );
 
 	return useMemo( () => {
 		return (
@@ -172,10 +173,15 @@ function BottomSheetNavigationContainer( {
 				</BottomSheetNavigationProvider>
 			</Animated.View>
 		);
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ _theme ] );
+	}, [
+		_theme,
+		animatedStyles,
+		currentHeight,
+		main,
+		screens,
+		setHeight,
+		style,
+	] );
 }
 
 export default BottomSheetNavigationContainer;
