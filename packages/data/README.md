@@ -1147,7 +1147,7 @@ getSomeDataById( 123 );
 getSomeDataById( '123' );
 ```
 
-This is an opportunity to utilize the `normalizeArgs` property to guarantee consistency by protecting callers from passing incorrect types.
+This is an opportunity to utilize the `__unstableNormalizeArgs` property to guarantee consistency by protecting callers from passing incorrect types.
 
 #### Example
 
@@ -1159,11 +1159,11 @@ const getItemsSelector = ( name, type, id ) => {
 };
 ```
 
-However, it is possible that the `id` parameter will be passed as a `String`. In this case, the `normalizeArgs` method (property) can be defined on the _selector_ to coerce the arguments to the desired type even if they are provided "incorrectly":
+However, it is possible that the `id` parameter will be passed as a `String`. In this case, the `__unstableNormalizeArgs` method (property) can be defined on the _selector_ to coerce the arguments to the desired type even if they are provided "incorrectly":
 
 ```js
 // Define normalization method.
-getItemsSelector.normalizeArgs = ( args ) {
+getItemsSelector.__unstableNormalizeArgs = ( args ) {
 	// "id" argument at the 2nd index
 	if (args[2] && typeof args[2] === 'string' ) {
 		args[2] === Number(args[2]);
@@ -1201,7 +1201,7 @@ registry.select( 'store' ).getItems( 'foo', 'bar', 54 );
 
 // Call with the wrong string type, **but** here we have avoided an
 // wanted resolver call because '54' is guaranteed to have been
-// coerced to a number by the `normalizeArgs` method.
+// coerced to a number by the `__unstableNormalizeArgs` method.
 registry.select( 'store' ).getItems( 'foo', 'bar', '54' );
 ```
 
