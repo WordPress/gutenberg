@@ -185,7 +185,7 @@ export type PromisifiedActionCreators<
 // creator, so that consumers know that they are dealing with a Promise.
 export type PromisifyActionCreator< Action extends ActionCreator > = (
 	...args: Parameters< Action >
-) => Promise< void >;
+) => Promise< ReturnType< Action > >;
 
 type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 	any,
