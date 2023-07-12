@@ -210,9 +210,7 @@ function GridItem( { categoryId, item, ...props } ) {
 						{ item.type === PATTERNS && (
 							<Tooltip
 								position="top center"
-								text={ __(
-									'Theme & plugin patterns cannot be edited.'
-								) }
+								text={ __( 'This pattern cannot be edited.' ) }
 							>
 								<span className="edit-site-patterns__pattern-lock-icon">
 									<Icon icon={ lockSmall } size={ 24 } />
