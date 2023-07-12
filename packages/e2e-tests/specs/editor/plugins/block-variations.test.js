@@ -157,7 +157,7 @@ describe( 'Block variations', () => {
 			expect( navigationItem.startsWith( 'Quote' ) ).toBeTruthy();
 			const description = await getBlockCardDescription();
 			expect( description ).toEqual(
-				'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar'
+				'Give quoted text visual emphasis.'
 			);
 		} );
 		it( 'should display variations info if all declared', async () => {
