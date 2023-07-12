@@ -16,13 +16,6 @@ import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../ui/context';
 import type { TextControlProps } from './types';
 
-function useUniqueId( idProp?: string ) {
-	const instanceId = useInstanceId( TextControl );
-	const id = `inspector-text-control-${ instanceId }`;
-
-	return idProp || id;
-}
-
 function UnforwardedTextControl(
 	props: WordPressComponentProps< TextControlProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
@@ -39,7 +32,7 @@ function UnforwardedTextControl(
 		type = 'text',
 		...additionalProps
 	} = props;
-	const id = useUniqueId( idProp );
+	const id = useInstanceId( TextControl, 'inspector-text-control', idProp );
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
 
