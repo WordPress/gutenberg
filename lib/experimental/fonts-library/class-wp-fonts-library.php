@@ -49,17 +49,6 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
 
     public function register_routes () {
         
-        register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base,
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_fonts_library' ),
-					'permission_callback' => array( $this, 'read_fonts_library_permissions_check' ),
-				),
-			)
-		);
 
         register_rest_route(
 			$this->namespace,
@@ -373,6 +362,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
             ? $font_face['src']
             : array( $font_face['src'] );
         $new_font_face['src'] = array();
+        $i = 0;
         foreach ( $srcs as $src ) {              
             $filename = $this->get_filename_from_font_face( $font_face, $src, ++$i );
             $new_src = $this->download_asset($src, $filename);
@@ -435,6 +425,62 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         return $new_font_families;
     }
 
+    function get_font_post ( $font ) {
+        $args = array (
+            'post_type' => $this->post_type,
+            'post_name' => $font['slug'],
+            'name' => $font['slug'],
+            'posts_per_page' => 1,
+        );
+
+        $posts_query = new WP_Query( $args );
+
+        if ( $posts_query->have_posts() ) {
+            $post = $posts_query->posts[0];
+            return $post;
+        }
+
+        return null;
+    }
+
+    function create_font_post ( $font ) {
+        $post = array(
+            'post_title' => $font['name'],
+            'post_name' => $font['slug'],
+            'post_type' => $this->post_type,
+            'post_content' => json_encode( $font ),
+            'post_status' => 'publish',
+        );
+
+        $post_id = wp_insert_post( $post );
+        return $post_id;
+    }
+
+    function update_font_post ( $font, $post ) {
+        $existing_font = json_decode( $post->post_content, true );
+        $new_font = $this->merge_fonts( $existing_font, $font );
+
+        $post = array(
+            'ID' => $post->ID,
+            'post_content' => json_encode( $new_font ),
+        );
+
+        $post_id = wp_update_post( $post );
+        return $post_id;
+    }
+
+    function create_or_update_font_post ( $font ) {
+        $post = $this->get_font_post( $font );
+
+        if ( $post ) {
+            // update post
+            return $this->update_font_post( $font, $post );
+        } 
+
+        // create post
+        return $this->create_font_post( $font );
+    }
+
     /**
      * Installs new fonts.
      *
@@ -444,15 +490,6 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
      * @return WP_REST_Response|WP_Error The updated fonts library post content.
      */
     function install_fonts ( $request ) {
-        // Get existing font families
-        $post = $this->query_fonts_library();
-        if ( is_wp_error( $post ) ) {
-            return $post;
-        }
-        $post_content = $post->post_content;
-        $library = json_decode( $post_content, true );
-        $font_families = $library['fontFamilies'];
-
         // Get new fonts to install
         $fonts_to_install = $request->get_param('fontFamilies');
         if ( is_string( $fonts_to_install ) ) {
@@ -471,42 +508,39 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         $new_fonts = $this->download_or_move_fonts( $fonts_to_install, $files );
 
         if ( ! empty ( $new_fonts )  ){
-            // Updates the fonts library with the new successfully downloaded fonts.
-            $new_library_fonts = $this->merge_fonts( $font_families, $new_fonts );
-
-            // Sanitizes the fonts library using WP_Theme_JSON
-            $this->sanitize_font_families( $new_library_fonts );
-
-            // Updates the fonts library post content and returns it
-            return $this->update_fonts_library( $new_library_fonts );
+            foreach ( $new_fonts as $new_font ) {
+                $sanitized_font = $this->sanitize_font( $new_font );
+                $this->create_or_update_font_post( $sanitized_font );
+            }
+            return new WP_REST_Response( $new_fonts );
         }
-        
+      
         return new WP_Error( 'error_installing_fonts', __( 'Error installing fonts. No font was installed.' ), array( 'status' => 500 ) );
     }
 
     /**
-     * Sanitizes the font families data using WP_Theme_JSON.
+     * Sanitizes the font family data using WP_Theme_JSON.
      *
-     * @param array $font_families An array of font families.
-     * @return array A sanitized array of font families.
+     * @param array $font A font family definition.
+     * @return array A sanitized font family defintion.
      */
-    function sanitize_font_families ( $font_families ) {
+    function sanitize_font ( $font ) {
         // Creates the structure of theme.json array with the new fonts
         $fonts_json = array(
             'version' => '2',
             'settings' => array(
                 'typography' => array(
-                    'fontFamilies' => $font_families
+                    'fontFamilies' => array( $font )
                 )
             )
         );
         // Creates a new WP_Theme_JSON object with the new fonts to mmake profit of the sanitization and validation
         $theme_json = new WP_Theme_JSON( $fonts_json );
         $theme_data = $theme_json->get_data();
-        $sanitized_font_families = !empty( $theme_data['settings']['typography']['fontFamilies'] )
-            ? $theme_data['settings']['typography']['fontFamilies']
+        $sanitized_font = !empty( $theme_data['settings']['typography']['fontFamilies'] )
+            ? $theme_data['settings']['typography']['fontFamilies'][0]
             : array();
-        return $sanitized_font_families;
+        return $sanitized_font;
     }
 
     /**
@@ -586,36 +620,36 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
         return $new_font_face;
     }
 
+
     /**
-     * Merge new fonts with existing fonts
+     * Merges two fonts and their font faces.
      *
-     * @param array $current_fonts Fonts already installed.
-     * @param array $add_fonts Fonts to be installed.
-     * @return array Merged current fonts + new fonts.
+     * @param array $font1 The first font to merge.
+     * @param array $font2 The second font to merge.
+     *
+     * @return array The merged font.
      */
-    function merge_fonts ( $current_fonts, $add_fonts ) {
-        $new_fonts = $current_fonts;
-        // Search if there is a font family with the same slug in the current fonts. If there is, add the new fontFace definitions to the current font face and if there is not, add the new font family to the current fonts.
-        foreach ( $add_fonts as $add_font ) {
-            $existing_font = array_search( $add_font['slug'], array_column( $new_fonts, 'slug' ) );
+    function merge_fonts ( $font1, $font2 ) {
+        $font_faces_1 = $font1['fontFace'] ?? array();
+        $font_faces_2 = $font2['fontFace'] ?? array();
 
-            if ( $existing_font === false ) {
-                $new_fonts[] = $add_font;
-            } else {
-                $current_font_faces = $new_fonts[$existing_font]['fontFace'];
-                $add_font_faces = $add_font['fontFace'];
+        $merged_font_faces = array_merge( $font_faces_1, $font_faces_2 );
+        $merged_font_faces = array_map("unserialize", array_unique(array_map("serialize", $merged_font_faces)));
+        
+        $merged_font = array_merge( $font1, $font2 );
+        $merged_fonts = array_unique( $merged_font );
+        $merged_font['fontFace'] = $merged_font_faces;
 
-                if ( $add_font['fontFace'] ){
-                    $new_font_faces = array_merge($current_font_faces, $add_font_faces);
-                    $new_font_faces = array_map("unserialize", array_unique(array_map("serialize", $new_font_faces)));
-                    $new_fonts[$existing_font]['fontFace'] = $new_font_faces;
-                } else {
-                    $new_fonts[] = $current_fonts[ $existing_font ];
-                }
-            }  
+        return $merged_font;
+    }
 
-        }
-        return $new_fonts;
+    function register_post_type () {
+        $args = array(
+            'public' => true,
+            'label'  => 'Font Library',
+            'show_in_rest' => true,
+        );
+        register_post_type( 'wp_fonts_library', $args );
     }
 
 }
@@ -623,6 +657,7 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
 function fonts_library_register_routes () {
 	$fonts_library = new WP_Fonts_Library_Controller();
 	$fonts_library->register_routes();
+    $fonts_library->register_post_type();
 }
 
 add_action( 'rest_api_init', 'fonts_library_register_routes' );

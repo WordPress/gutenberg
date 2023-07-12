@@ -9,12 +9,12 @@ import {
 } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import {
-	fetchFontLibrary,
 	fetchGoogleFonts,
 	fetchInstallFonts,
 	fetchUninstallFonts,
@@ -27,6 +27,25 @@ import { setUIValuesNeeded, isUrlEncoded } from './utils';
 export const FontLibraryContext = createContext( {} );
 
 function FontLibraryProvider( { children } ) {
+
+	const [refreshKey, setRefreshKey] = useState(0);
+
+	const refreshLibrary = () => {
+		setRefreshKey(prevKey => prevKey + 1);
+	};
+
+	const { records: posts = [] } = useEntityRecords(
+		'postType',
+		'wp_fonts_library',
+		{ refreshKey }
+	);
+
+	const libraryFonts = ( posts || [] ).map( post => (
+		JSON.parse( post.content.raw )
+	)) || [];
+	
+	
+
 	// Global Styles (settings) font families
 	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies'
@@ -38,31 +57,30 @@ function FontLibraryProvider( { children } ) {
 
 	// Library Fonts
 	const [ modalTabOepn, setModalTabOepn ] = useState( false );
-	const [ libraryFonts, setLibraryFonts ] = useState( [] );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
 
 	const baseThemeFonts = baseFontFamilies?.theme
 	? baseFontFamilies.theme
 		.map( f => setUIValuesNeeded(f, { source: 'theme' }) )
-		.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+		.sort( ( a, b ) => ( a.name ).localeCompare( b.name ) )
 	: [];
 
 	const themeFonts = fontFamilies.theme
 		? fontFamilies.theme
 			.map( f => setUIValuesNeeded(f, { source: 'theme' }) )
-			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+			.sort( ( a, b ) => ( a.name ).localeCompare( b.name ) )
 		: [];
 
 	const customFonts = fontFamilies.custom
 		? fontFamilies.custom
 			.map( f => setUIValuesNeeded(f, { source: 'custom' }) )
-			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+			.sort( ( a, b ) => ( a.name ).localeCompare( b.name ) )
 		: [];
 
 	const baseCustomFonts = libraryFonts
 		? libraryFonts
 			.map( f => setUIValuesNeeded(f, { source: 'custom' }) )
-			.sort( ( a, b ) => ( a.name || a.slug ).localeCompare( b.name || b.slug ) )
+			.sort( ( a, b ) => ( a.name ).localeCompare( b.name ) )
 		: [];
 
 	useEffect( () => {
@@ -131,9 +149,6 @@ function FontLibraryProvider( { children } ) {
 		site?.url + '/wp-content/themes/' + currentTheme?.stylesheet;
 
 	useEffect( () => {
-		fetchFontLibrary().then( ( response ) => {
-			setLibraryFonts( response );
-		} );
 		fetchGoogleFonts().then( ( { fontFamilies, categories } ) => {
 			setGoogleFonts( fontFamilies );
 			setGoogleFontsCategories( [ 'all', ...categories ] );
@@ -173,12 +188,10 @@ function FontLibraryProvider( { children } ) {
 
 	async function installFonts( libraryFonts ) {
 		const newLibraryFonts = await fetchInstallFonts( libraryFonts );
-		setLibraryFonts( newLibraryFonts );
 	}
 
 	async function uninstallFont( fontFamily ) {
 		const newLibraryFonts = await fetchUninstallFonts( fontFamily );
-		setLibraryFonts( newLibraryFonts );
 	}
 
 	const toggleActivateFont = ( font, face ) => {
@@ -325,6 +338,7 @@ function FontLibraryProvider( { children } ) {
 				getAvailableFontsOutline,
 				modalTabOepn,
 				toggleModal,
+				refreshLibrary
 			} }
 		>
 			{ children }

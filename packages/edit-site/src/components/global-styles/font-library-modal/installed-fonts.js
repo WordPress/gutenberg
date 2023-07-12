@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useState } from '@wordpress/element';
+import { useContext, useEffect } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
@@ -20,7 +20,7 @@ import PreviewControls from './preview-controls';
 import LibraryFontCard from './library-font-card';
 
 function InstalledFonts() {
-	const { baseCustomFonts, libraryFontSelected, baseThemeFonts, handleSetLibraryFontSelected } = useContext( FontLibraryContext );
+	const { baseCustomFonts, libraryFontSelected, baseThemeFonts, handleSetLibraryFontSelected, refreshLibrary } = useContext( FontLibraryContext );
 
 	const handleUnselectFont = () => {
 		handleSetLibraryFontSelected( null );
@@ -33,6 +33,10 @@ function InstalledFonts() {
 	const tabDescription = !! libraryFontSelected
 		? __( "Choose font variants. Keep in mind that too many variants could make your site slower." )
 		: null;
+
+	useEffect( () => {
+		refreshLibrary();
+	}, [] );
 
 	return (
 		<TabLayout
