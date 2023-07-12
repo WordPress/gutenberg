@@ -10,7 +10,6 @@ import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	ResizableBox,
 	Tooltip,
-	VisuallyHidden,
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
@@ -296,11 +295,11 @@ function ResizableFrame( {
 								whileHover="active"
 							/>
 						</Tooltip>
-						<VisuallyHidden id={ resizableHandleHelpId }>
+						<div hidden id={ resizableHandleHelpId }>
 							{ __(
 								'Use left and right arrow keys to resize the canvas.'
 							) }
-						</VisuallyHidden>
+						</div>
 					</>
 				),
 			} }
