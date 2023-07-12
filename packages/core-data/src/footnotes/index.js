@@ -12,13 +12,25 @@ const { getRichTextValues } = unlock( blockEditorPrivateApis );
 
 let oldFootnotes = {};
 
+const cache = new WeakMap();
+
+function getRichTextValuesCached( block ) {
+	if ( ! cache.has( block ) ) {
+		const values = getRichTextValues( [ block ] );
+		cache.set( block, values );
+	}
+	return cache.get( block );
+}
+
 export function updateFootnotesFromMeta( blocks, meta ) {
 	const output = { blocks };
 	if ( ! meta ) return output;
+
 	// If meta.footnotes is empty, it means the meta is not registered.
 	if ( meta.footnotes === undefined ) return output;
 
-	const _content = getRichTextValues( blocks ).join( '' ) || '';
+	const _content = blocks.map( getRichTextValuesCached ).join( '' );
+
 	const newOrder = [];
 
 	// This can be avoided when
