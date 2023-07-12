@@ -152,7 +152,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		}
 		return $metadata;
 	}
-	add_filter( 'block_type_metadata', 'gutenberg_block_core_navigation_update_interactive_view_script', 10, 1 );	
+	add_filter( 'block_type_metadata', 'gutenberg_block_core_navigation_update_interactive_view_script', 10, 1 );
 }
 
 
