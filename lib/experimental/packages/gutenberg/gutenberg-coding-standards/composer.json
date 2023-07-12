@@ -60,10 +60,5 @@
 		"fix-cs": "Run the PHPCBF script to fix all the autofixable violations on the codebase.",
 		"run-tests": "Run all the unit tests for the Gutenberg Coding Standards sniffs.",
 		"check-all": "Run all checks (lint, phpcs) and tests."
-	},
-	"support": {
-		"issues": "https://github.com/anton-vlasenko/Gutenberg-Coding-Standards/issues",
-		"wiki": "https://github.com/anton-vlasenko/Gutenberg-Coding-Standards/wiki",
-		"source": "https://github.com/anton-vlasenko/Gutenberg-Coding-Standards"
 	}
 }
