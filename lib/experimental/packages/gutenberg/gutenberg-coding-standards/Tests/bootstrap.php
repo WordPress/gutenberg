@@ -9,8 +9,8 @@
  * - Load the Composer autoload file.
  * - Automatically limit the testing to the WordPressCS tests.
  *
- * @package gutenberg-coding-standards/gbcs
- * @link    https://github.com/anton-vlasenko/Gutenberg-Coding-Standards
+ * @package gutenberg/gutenberg-coding-standards
+ * @link    https://github.com/WordPress/gutenberg
  * @license https://opensource.org/licenses/MIT MIT
  */
 

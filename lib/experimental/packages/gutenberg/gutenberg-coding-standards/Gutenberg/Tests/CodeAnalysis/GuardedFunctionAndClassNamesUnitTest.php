@@ -3,7 +3,7 @@
  * Unit test class for Gutenberg Coding Standard.
  *
  * @package gutenberg-coding-standards/gbc
- * @link    https://github.com/anton-vlasenko/Gutenberg-Coding-Standards
+ * @link    https://github.com/WordPress/gutenberg
  * @license https://opensource.org/licenses/MIT MIT
  */
 

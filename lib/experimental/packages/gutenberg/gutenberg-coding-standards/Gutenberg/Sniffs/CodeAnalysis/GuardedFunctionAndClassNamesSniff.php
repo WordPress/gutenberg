@@ -2,8 +2,8 @@
 /**
  * Gutenberg Coding Standards.
  *
- * @package gutenberg-coding-standards/gbcs
- * @link    https://github.com/anton-vlasenko/Gutenberg-Coding-Standards
+ * @package gutenberg/gutenberg-coding-standards
+ * @link    https://github.com/WordPress/gutenberg
  * @license https://opensource.org/licenses/MIT MIT
  */
 
@@ -21,7 +21,7 @@ use PHP_CodeSniffer\Sniffs\Sniff;
  *
  * @link https://github.com/WordPress/gutenberg/blob/trunk/lib/README.md#wrap-functions-and-classes-with--function_exists-and--class_exists
  *
- * @package gutenberg-coding-standards/gbcs
+ * @package gutenberg/gutenberg-coding-standards
  *
  * @since   1.0.0
  */
