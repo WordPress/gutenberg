@@ -64,8 +64,8 @@ The client ID of the block that the caption is associated with. This is prop is 
 ### `accessible`
 
 -   **Type:** `Boolean`
--   **Required:** `No`
 -   **Default:** `false`
+-   **Required:** `No`
 
 Boolean to indicate whether component is an accessibility element. When set to true, the component and all of its children will be treated as a single accessible element. Refer to [the relevant React Native documentation](https://reactnative.dev/docs/accessibility#accessible) for the most up-to-date information on this prop.
 
