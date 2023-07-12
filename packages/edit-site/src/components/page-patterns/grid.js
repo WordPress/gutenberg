@@ -88,9 +88,11 @@ export default function Grid( { categoryId, items, ...props } ) {
 
 	return (
 		<>
-			<Pagination
-				{ ...{ currentPage, numPages, changePage, totalItems } }
-			/>
+			{ numPages > 1 && (
+				<Pagination
+					{ ...{ currentPage, numPages, changePage, totalItems } }
+				/>
+			) }
 			<ul
 				role="listbox"
 				className="edit-site-patterns__grid"
@@ -105,9 +107,11 @@ export default function Grid( { categoryId, items, ...props } ) {
 					/>
 				) ) }
 			</ul>
-			<Pagination
-				{ ...{ currentPage, numPages, changePage, totalItems } }
-			/>
+			{ numPages > 1 && (
+				<Pagination
+					{ ...{ currentPage, numPages, changePage, totalItems } }
+				/>
+			) }
 		</>
 	);
 }
