@@ -1,5 +1,5 @@
 {
-	"name": "gutenberg-coding-standards/gbcs",
+	"name": "gutenberg/gutenberg-coding-standards",
 	"type": "phpcodesniffer-standard",
 	"description": "PHP_CodeSniffer rules (sniffs) to enforce Gutenberg coding conventions",
 	"keywords": [
@@ -12,7 +12,7 @@
 	"authors": [
 		{
 			"name": "Contributors",
-			"homepage": "https://github.com/anton-vlasenko/Gutenberg-Coding-Standards/graphs/contributors"
+			"homepage": "https://github.com/WordPress/gutenberg/graphs/contributors"
 		}
 	],
 	"require": {
