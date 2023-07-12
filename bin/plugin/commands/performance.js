@@ -70,7 +70,7 @@ function median( array ) {
  */
 async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 	await runShellScript(
-		`npm run test:performance:playwright -- ${ testSuite }`,
+		`npm run test:performance -- ${ testSuite }`,
 		performanceTestDirectory,
 		{
 			...process.env,
