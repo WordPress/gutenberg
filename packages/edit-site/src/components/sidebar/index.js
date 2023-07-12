@@ -12,9 +12,9 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
-import SidebarNavigationScreenLibrary from '../sidebar-navigation-screen-library';
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
+import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
 import useSyncPathWithURL, {
 	getPathFromURL,
@@ -56,8 +56,8 @@ function SidebarScreens() {
 			<NavigatorScreen path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
 			</NavigatorScreen>
-			<NavigatorScreen path="/library">
-				<SidebarNavigationScreenLibrary />
+			<NavigatorScreen path="/patterns">
+				<SidebarNavigationScreenPatterns />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />

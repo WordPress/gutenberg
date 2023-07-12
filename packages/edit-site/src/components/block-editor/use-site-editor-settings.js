@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 /**
@@ -12,13 +12,19 @@ import { unlock } from '../../lock-unlock';
 import inserterMediaCategories from './inserter-media-categories';
 
 export default function useSiteEditorSettings( templateType ) {
-	const { storedSettings } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-
-		return {
-			storedSettings: getSettings(),
-		};
-	}, [] );
+	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const { storedSettings, canvasMode } = useSelect(
+		( select ) => {
+			const { getSettings, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			return {
+				storedSettings: getSettings( setIsInserterOpened ),
+				canvasMode: getCanvasMode(),
+			};
+		},
+		[ setIsInserterOpened ]
+	);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -70,6 +76,7 @@ export default function useSiteEditorSettings( templateType ) {
 		const {
 			__experimentalAdditionalBlockPatterns,
 			__experimentalAdditionalBlockPatternCategories,
+			focusMode,
 			...restStoredSettings
 		} = storedSettings;
 
@@ -78,6 +85,7 @@ export default function useSiteEditorSettings( templateType ) {
 			inserterMediaCategories,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
+			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 		};
-	}, [ storedSettings, blockPatterns, blockPatternCategories ] );
+	}, [ storedSettings, blockPatterns, blockPatternCategories, canvasMode ] );
 }

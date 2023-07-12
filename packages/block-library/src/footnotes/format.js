@@ -24,11 +24,9 @@ import { name } from './block.json';
 export const formatName = 'core/footnote';
 export const format = {
 	title: __( 'Footnote' ),
-	tagName: 'a',
+	tagName: 'sup',
 	className: 'fn',
 	attributes: {
-		id: 'id',
-		href: 'href',
 		'data-fn': 'data-fn',
 	},
 	contentEditable: false,
@@ -42,26 +40,30 @@ export const format = {
 		} = useSelect( blockEditorStore );
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
+
 		function onClick() {
 			registry.batch( () => {
-				const id = createId();
-				const newValue = insertObject(
-					value,
-					{
-						type: formatName,
-						attributes: {
-							href: '#' + id,
-							id: `${ id }-link`,
-							'data-fn': id,
+				let id;
+				if ( isObjectActive ) {
+					const object = value.replacements[ value.start ];
+					id = object?.attributes?.[ 'data-fn' ];
+				} else {
+					id = createId();
+					const newValue = insertObject(
+						value,
+						{
+							type: formatName,
+							attributes: {
+								'data-fn': id,
+							},
+							innerHTML: `<a href="#${ id }" id="${ id }-link">*</a>`,
 						},
-						innerHTML: '*',
-					},
-					value.end,
-					value.end
-				);
-				newValue.start = newValue.end - 1;
-
-				onChange( newValue );
+						value.end,
+						value.end
+					);
+					newValue.start = newValue.end - 1;
+					onChange( newValue );
+				}
 
 				// BFS search to find the first footnote block.
 				let fnBlock = null;

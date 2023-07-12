@@ -16,12 +16,15 @@ import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-e
 import usePatternDetails from './use-pattern-details';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import normalizeRecordKey from '../../utils/normalize-record-key';
 
 export default function SidebarNavigationScreenPattern() {
-	const { params } = useNavigator();
 	const { categoryType } = getQueryArgs( window.location.href );
-	const { postType, postId } = params;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+
+	const { params } = useNavigator();
+	const { postType } = params;
+	const postId = normalizeRecordKey( params?.postId );
 
 	useInitEditedEntityFromURL();
 
@@ -33,7 +36,7 @@ export default function SidebarNavigationScreenPattern() {
 	const backPath =
 		! categoryType && postType === 'wp_template_part'
 			? '/wp_template_part/all'
-			: '/library';
+			: '/patterns';
 
 	return (
 		<SidebarNavigationScreen

@@ -16,6 +16,7 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
 import { humanTimeDiff } from '@wordpress/date';
 import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -32,9 +33,26 @@ import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-glob
 const noop = () => {};
 
 export function SidebarNavigationItemGlobalStyles( props ) {
-	const { openGeneralSidebar, toggleFeature } = useDispatch( editSiteStore );
+	const { openGeneralSidebar } = useDispatch( editSiteStore );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { createNotice } = useDispatch( noticesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const { get: getPrefference } = useSelect( preferencesStore );
+
+	const turnOffDistractionFreeMode = useCallback( () => {
+		const isDistractionFree = getPrefference(
+			editSiteStore.name,
+			'distractionFree'
+		);
+		if ( ! isDistractionFree ) {
+			return;
+		}
+		setPreference( editSiteStore.name, 'distractionFree', false );
+		createNotice( 'info', __( 'Distraction free mode turned off' ), {
+			isDismissible: true,
+			type: 'snackbar',
+		} );
+	}, [ createNotice, setPreference, getPrefference ] );
 	const hasGlobalStyleVariations = useSelect(
 		( select ) =>
 			!! select(
@@ -55,16 +73,7 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 		<SidebarNavigationItem
 			{ ...props }
 			onClick={ () => {
-				// Disable distraction free mode.
-				toggleFeature( 'distractionFree', false );
-				createNotice(
-					'info',
-					__( 'Distraction free mode turned off' ),
-					{
-						isDismissible: true,
-						type: 'snackbar',
-					}
-				);
+				turnOffDistractionFreeMode();
 				// Switch to edit mode.
 				setCanvasMode( 'edit' );
 				// Open global styles sidebar.
@@ -159,22 +168,41 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const { createNotice } = useDispatch( noticesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const { get: getPrefference } = useSelect( preferencesStore );
+	const { isViewMode, isStyleBookOpened } = useSelect( ( select ) => {
+		const { getCanvasMode, getEditorCanvasContainerView } = unlock(
+			select( editSiteStore )
+		);
+		return {
+			isViewMode: 'view' === getCanvasMode(),
+			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
+		};
+	}, [] );
 
-	const isStyleBookOpened = useSelect(
-		( select ) =>
-			'style-book' ===
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
-		[]
-	);
+	const turnOffDistractionFreeMode = useCallback( () => {
+		const isDistractionFree = getPrefference(
+			editSiteStore.name,
+			'distractionFree'
+		);
+		if ( ! isDistractionFree ) {
+			return;
+		}
+		setPreference( editSiteStore.name, 'distractionFree', false );
+		createNotice( 'info', __( 'Distraction free mode turned off' ), {
+			isDismissible: true,
+			type: 'snackbar',
+		} );
+	}, [ createNotice, setPreference, getPrefference ] );
 
-	const openGlobalStyles = useCallback(
-		async () =>
-			Promise.all( [
-				setCanvasMode( 'edit' ),
-				openGeneralSidebar( 'edit-site/global-styles' ),
-			] ),
-		[ setCanvasMode, openGeneralSidebar ]
-	);
+	const openGlobalStyles = useCallback( async () => {
+		turnOffDistractionFreeMode();
+		return Promise.all( [
+			setCanvasMode( 'edit' ),
+			openGeneralSidebar( 'edit-site/global-styles' ),
+		] );
+	}, [ setCanvasMode, openGeneralSidebar, turnOffDistractionFreeMode ] );
 
 	const openStyleBook = useCallback( async () => {
 		await openGlobalStyles();
@@ -235,7 +263,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 					</>
 				}
 			/>
-			{ isStyleBookOpened && ! isMobileViewport && (
+			{ isStyleBookOpened && ! isMobileViewport && isViewMode && (
 				<StyleBook
 					enableResizing={ false }
 					isSelected={ () => false }

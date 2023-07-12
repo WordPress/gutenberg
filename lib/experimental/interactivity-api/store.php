@@ -7,9 +7,9 @@
  */
 
 /**
- * Merge data with the exsisting store.
+ * Merge data with the existing store.
  *
- * @param array $data Data that will be merged with the exsisting store.
+ * @param array $data Data that will be merged with the existing store.
  *
  * @return $data The current store data.
  */

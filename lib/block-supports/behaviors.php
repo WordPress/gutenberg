@@ -97,9 +97,8 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		$img_uploaded_srcset = wp_get_attachment_image_srcset( $block['attrs']['id'] );
 	} else {
 		$img_uploaded_src    = $z->get_attribute( 'src' );
-		$img_dimensions      = wp_getimagesize( $img_uploaded_src );
-		$img_width           = $img_dimensions[0];
-		$img_height          = $img_dimensions[1];
+		$img_width           = 'none';
+		$img_height          = 'none';
 		$img_uploaded_srcset = '';
 	}
 
@@ -141,7 +140,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
 	$button       = '<div class="img-container">
-                             <button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox" data-wp-effect="effects.core.image.preloadLightboxImage"></button>'
+                             <button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox" data-wp-on--mouseenter="actions.core.image.preloadLightboxImage"></button>'
 		. $img[0] .
 		'</div>';
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );

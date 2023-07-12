@@ -15,7 +15,9 @@
  */
 function gutenberg_block_update_interactive_view_script( $metadata ) {
 	if (
+		array_key_exists( 'name', $metadata ) &&
 		in_array( $metadata['name'], array( 'core/image' ), true ) &&
+		array_key_exists( 'file', $metadata ) &&
 		str_contains( $metadata['file'], 'build/block-library/blocks' )
 	) {
 		$metadata['viewScript'] = array( 'file:./view-interactivity.min.js' );
