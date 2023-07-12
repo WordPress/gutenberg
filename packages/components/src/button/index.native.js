@@ -24,7 +24,7 @@ import {
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
-import style from './style';
+import style from './style.scss';
 
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
