@@ -299,7 +299,7 @@ function ResizableFrame( {
 						</Tooltip>
 						<div hidden id={ resizableHandleHelpId }>
 							{ __(
-								'Use left and right arrow keys to resize the canvas.'
+								'Use left and right arrow keys to resize the canvas. Hold shift to resize in larger increments.'
 							) }
 						</div>
 					</>
