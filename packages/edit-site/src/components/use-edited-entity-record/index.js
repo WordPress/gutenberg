@@ -10,6 +10,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import normalizeRecordKey from '../../utils/normalize-record-key';
 
 export default function useEditedEntityRecord( postType, postId ) {
 	const { record, title, description, isLoaded, icon } = useSelect(
@@ -21,7 +22,11 @@ export default function useEditedEntityRecord( postType, postId ) {
 			const { __experimentalGetTemplateInfo: getTemplateInfo } =
 				select( editorStore );
 			const usedPostType = postType ?? getEditedPostType();
-			const usedPostId = postId ?? getEditedPostId();
+
+			let usedPostId = postId ?? getEditedPostId();
+
+			usedPostId = normalizeRecordKey( usedPostId, usedPostType );
+
 			const _record = getEditedEntityRecord(
 				'postType',
 				usedPostType,
