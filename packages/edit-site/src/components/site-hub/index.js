@@ -51,7 +51,10 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 
 	const disableMotion = useReducedMotion();
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const {
+		setCanvasMode,
+		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
+	} = unlock( useDispatch( editSiteStore ) );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const isBackToDashboardButton = canvasMode === 'view';
 	const siteIconButtonProps = isBackToDashboardButton
@@ -67,6 +70,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 					event.preventDefault();
 					if ( canvasMode === 'edit' ) {
 						clearSelectedBlock();
+						setPreviewDeviceType( 'desktop' );
 						setCanvasMode( 'view' );
 					}
 				},
