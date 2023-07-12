@@ -70,6 +70,7 @@ function BottomSheetNavigationContainer( {
 	main,
 	theme,
 	style,
+	testID,
 } ) {
 	const Stack = useRef( createStackNavigator() ).current;
 	const navigationContext = useContext( BottomSheetNavigationContext );
@@ -149,7 +150,10 @@ function BottomSheetNavigationContainer( {
 
 	return useMemo( () => {
 		return (
-			<Animated.View style={ [ style, animatedStyles ] }>
+			<Animated.View
+				style={ [ style, animatedStyles ] }
+				testID={ testID }
+			>
 				<BottomSheetNavigationProvider
 					value={ { setHeight, currentHeight } }
 				>
@@ -181,6 +185,7 @@ function BottomSheetNavigationContainer( {
 		screens,
 		setHeight,
 		style,
+		testID,
 	] );
 }
 
