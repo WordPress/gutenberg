@@ -2214,15 +2214,24 @@ export const getAllowedBlocks = createSelector(
 			return;
 		}
 
-		return getBlockTypes().filter( ( blockType ) =>
+		const blockTypes = getBlockTypes().filter( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
+		const hasReusableBlock =
+			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) &&
+			getReusableBlocks( state ).length > 0;
+
+		return [
+			...blockTypes,
+			...( hasReusableBlock ? [ 'core/block' ] : [] ),
+		];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
+		getReusableBlocks( state ),
 		getBlockTypes(),
 	]
 );
