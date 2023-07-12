@@ -509,8 +509,6 @@ export function __experimentalUseGlobalBehaviors(
 			newBehavior = newValue;
 		} else {
 			switch ( newValue ) {
-				case 'default':
-					break;
 				case 'lightbox':
 					newBehavior = {
 						lightbox: {
@@ -542,6 +540,8 @@ export function __experimentalUseGlobalBehaviors(
 							animation,
 						},
 					};
+					break;
+				default:
 					break;
 			}
 		}

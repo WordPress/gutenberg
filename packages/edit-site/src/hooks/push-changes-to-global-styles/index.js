@@ -127,19 +127,6 @@ function useChangesToPush( name, attributes ) {
 	);
 }
 
-function __experimentalUseBehaviorChangesToPush( attributes ) {
-	return useMemo( () => {
-		const behaviors = [ 'lightbox' ];
-		return behaviors.flatMap( ( behavior ) => {
-			if ( ! attributes?.behaviors ) {
-				return [];
-			}
-			const value = attributes?.behaviors[ behavior ];
-			return value ? [ { [ behavior ]: value } ] : [];
-		} );
-	}, [ attributes ] );
-}
-
 /**
  * Sets the value at path of object.
  * If a portion of path doesn’t exist, it’s created.
@@ -190,8 +177,6 @@ function PushChangesToGlobalStylesControl( {
 	setAttributes,
 } ) {
 	const changes = useChangesToPush( name, attributes );
-	const behaviorChanges =
-		__experimentalUseBehaviorChangesToPush( attributes );
 
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
@@ -203,8 +188,10 @@ function PushChangesToGlobalStylesControl( {
 	const [ inheritedBehaviors, setBehavior ] =
 		__experimentalUseGlobalBehaviors( name );
 
+	const userHasEditedBehaviors = attributes.hasOwnProperty( 'behaviors' );
+
 	const pushChanges = useCallback( () => {
-		if ( changes.length === 0 && behaviorChanges.length === 0 ) {
+		if ( changes.length === 0 && ! userHasEditedBehaviors ) {
 			return;
 		}
 		if ( changes.length > 0 ) {
@@ -252,7 +239,7 @@ function PushChangesToGlobalStylesControl( {
 				}
 			);
 		}
-		if ( behaviorChanges.length > 0 ) {
+		if ( userHasEditedBehaviors ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setBehavior( attributes.behaviors );
 			createSuccessNotice(
@@ -296,9 +283,7 @@ function PushChangesToGlobalStylesControl( {
 			</BaseControl.VisualLabel>
 			<Button
 				variant="primary"
-				disabled={
-					changes.length === 0 && behaviorChanges.length === 0
-				}
+				disabled={ changes.length === 0 && ! userHasEditedBehaviors }
 				onClick={ pushChanges }
 			>
 				{ __( 'Apply globally' ) }
