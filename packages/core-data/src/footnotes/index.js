@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import getRichTextValuesCached from './get-rich-text-values-cached';
+import getFootnotesOrder from './get-footnotes-order';
 
 let oldFootnotes = {};
 
@@ -12,20 +12,7 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 	// If meta.footnotes is empty, it means the meta is not registered.
 	if ( meta.footnotes === undefined ) return output;
 
-	const _content = blocks.map( getRichTextValuesCached ).join( '' );
-
-	const newOrder = [];
-
-	// This can be avoided when
-	// https://github.com/WordPress/gutenberg/pull/43204 lands. We can then
-	// get the order directly from the rich text values.
-	if ( _content.indexOf( 'data-fn' ) !== -1 ) {
-		const regex = /data-fn="([^"]+)"/g;
-		let match;
-		while ( ( match = regex.exec( _content ) ) !== null ) {
-			newOrder.push( match[ 1 ] );
-		}
-	}
+	const newOrder = getFootnotesOrder( blocks );
 
 	const footnotes = meta.footnotes ? JSON.parse( meta.footnotes ) : [];
 	const currentOrder = footnotes.map( ( fn ) => fn.id );
