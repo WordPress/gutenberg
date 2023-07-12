@@ -170,16 +170,22 @@ export type ConfigOf< S > = S extends StoreDescriptor< infer C > ? C : never;
 
 export type ActionCreatorsOf< Config extends AnyConfig > =
 	Config extends ReduxStoreConfig< any, infer ActionCreators, any >
-		? PromisifiedActionCreator< ActionCreators >
+		? PromisifiedActionCreators< ActionCreators >
 		: never;
 
-// When dispatching an action creator, the return value is a promise.
-type PromisifiedActionCreator< ActionCreators extends MapOf< ActionCreator > > =
-	{
-		[ Action in keyof ActionCreators ]: (
-			...args: Parameters< ActionCreators[ Action ] >
-		) => Promise< void >;
-	};
+export type PromisifiedActionCreators<
+	ActionCreators extends MapOf< ActionCreator >
+> = {
+	[ Action in keyof ActionCreators ]: PromisifyActionCreator<
+		ActionCreators[ Action ]
+	>;
+};
+
+// A dispatched action returns a Promise. This helper extends the original action
+// creator, so that consumers know that they are dealing with a Promise.
+export type PromisifyActionCreator< Action extends ActionCreator > = (
+	...args: Parameters< Action >
+) => Promise< void >;
 
 type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 	any,
