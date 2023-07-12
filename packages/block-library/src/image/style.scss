@@ -183,6 +183,11 @@
 	overflow: hidden;
 	width: 100vw;
 	height: 100vh;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
 	visibility: hidden;
 	cursor: zoom-out;
 
@@ -196,24 +201,25 @@
 	}
 
 	.wp-block-image {
-		width: 100%;
-		height: 100%;
 		position: absolute;
+		transform-origin: top left;
+		width: var(--lightbox-image-max-width);
+		height: var(--lightbox-image-max-height);
 		z-index: 3000000;
-		box-sizing: border-box;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		flex-direction: column;
+
 
 		figcaption {
 			display: none;
 		}
 
 		img {
+			width: var(--lightbox-image-max-width);
+			height: var(--lightbox-image-max-height);
 			max-width: 100%;
 			max-height: 100%;
-			width: auto;
 		}
 	}
 
@@ -265,16 +271,14 @@
 
 	&.zoom {
 		img {
-			position: absolute;
-			transform-origin: top left;
-			width: var(--lightbox-image-max-width);
-			height: var(--lightbox-image-max-height);
+			width: inherit !important;
+			height: inherit !important;
 		}
 
 		&.active {
 			opacity: 1;
 			visibility: visible;
-			.wp-block-image img {
+			.wp-block-image {
 				animation: lightbox-zoom-in 0.4s forwards;
 
 				@media (prefers-reduced-motion) {
@@ -287,7 +291,7 @@
 		}
 		&.hideanimationenabled {
 			&:not(.active) {
-				.wp-block-image img {
+				.wp-block-image {
 					animation: lightbox-zoom-out 0.4s forwards;
 
 					@media (prefers-reduced-motion) {
@@ -337,18 +341,18 @@ html.has-lightbox-open {
 		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
 	}
 	100% {
-		left: var(--lightbox-target-left-position);
-		top: var(--lightbox-target-top-position);
-		transform: scale(1, 1);
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%) scale(1, 1);
 	}
 }
 
 @keyframes lightbox-zoom-out {
 	0% {
 		visibility: visible;
-		left: var(--lightbox-target-left-position);
-		top: var(--lightbox-target-top-position);
-		transform: scale(1, 1);
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%) scale(1, 1);
 	}
 	99% {
 		visibility: visible;
