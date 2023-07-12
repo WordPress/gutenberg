@@ -127,6 +127,19 @@ function useChangesToPush( name, attributes ) {
 	);
 }
 
+function __experimentalUseBehaviorChangesToPush( attributes ) {
+	return useMemo( () => {
+		const behaviors = [ 'lightbox' ];
+		return behaviors.flatMap( ( behavior ) => {
+			if ( ! attributes?.behaviors ) {
+				return [];
+			}
+			const value = attributes?.behaviors[ behavior ];
+			return value ? [ { [ behavior ]: value } ] : [];
+		} );
+	}, [ attributes ] );
+}
+
 /**
  * Sets the value at path of object.
  * If a portion of path doesn’t exist, it’s created.
@@ -177,6 +190,8 @@ function PushChangesToGlobalStylesControl( {
 	setAttributes,
 } ) {
 	const changes = useChangesToPush( name, attributes );
+	const behaviorChanges =
+		__experimentalUseBehaviorChangesToPush( attributes );
 
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
@@ -187,86 +202,83 @@ function PushChangesToGlobalStylesControl( {
 
 	const [ inheritedBehaviors, setBehavior ] =
 		__experimentalUseGlobalBehaviors( name );
-	const pushBehaviorChanges = useCallback( () => {
-		__unstableMarkNextChangeAsNotPersistent();
-		setBehavior( attributes.behaviors );
-		createSuccessNotice(
-			sprintf(
-				// translators: %s: Title of the block e.g. 'Heading'.
-				__( '%s behaviors applied.' ),
-				getBlockType( name ).title
-			),
-			{
-				type: 'snackbar',
-				actions: [
-					{
-						label: __( 'Undo' ),
-						onClick() {
-							__unstableMarkNextChangeAsNotPersistent();
-							setBehavior( inheritedBehaviors );
-							setUserConfig( () => userConfig, {
-								undoIgnore: true,
-							} );
-						},
-					},
-				],
-			}
-		);
-	}, [ attributes.behaviors, userConfig ] );
 
 	const pushChanges = useCallback( () => {
-		if ( changes.length === 0 ) {
+		if ( changes.length === 0 && behaviorChanges.length === 0 ) {
 			return;
 		}
+		if ( changes.length > 0 ) {
+			const { style: blockStyles } = attributes;
 
-		const { style: blockStyles } = attributes;
+			const newBlockStyles = cloneDeep( blockStyles );
+			const newUserConfig = cloneDeep( userConfig );
 
-		const newBlockStyles = cloneDeep( blockStyles );
-		const newUserConfig = cloneDeep( userConfig );
+			for ( const { path, value } of changes ) {
+				setNestedValue( newBlockStyles, path, undefined );
+				setNestedValue(
+					newUserConfig,
+					[ 'styles', 'blocks', name, ...path ],
+					value
+				);
+			}
 
-		for ( const { path, value } of changes ) {
-			setNestedValue( newBlockStyles, path, undefined );
-			setNestedValue(
-				newUserConfig,
-				[ 'styles', 'blocks', name, ...path ],
-				value
+			// @wordpress/core-data doesn't support editing multiple entity types in
+			// a single undo level. So for now, we disable @wordpress/core-data undo
+			// tracking and implement our own Undo button in the snackbar
+			// notification.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { style: newBlockStyles } );
+			setUserConfig( () => newUserConfig, { undoIgnore: true } );
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: Title of the block e.g. 'Heading'.
+					__( '%s styles applied.' ),
+					getBlockType( name ).title
+				),
+				{
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick() {
+								__unstableMarkNextChangeAsNotPersistent();
+								setAttributes( { style: blockStyles } );
+								setUserConfig( () => userConfig, {
+									undoIgnore: true,
+								} );
+							},
+						},
+					],
+				}
 			);
 		}
-
-		// @wordpress/core-data doesn't support editing multiple entity types in
-		// a single undo level. So for now, we disable @wordpress/core-data undo
-		// tracking and implement our own Undo button in the snackbar
-		// notification.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { style: newBlockStyles } );
-		setUserConfig( () => newUserConfig, { undoIgnore: true } );
-
-		createSuccessNotice(
-			sprintf(
-				// translators: %s: Title of the block e.g. 'Heading'.
-				__( '%s styles applied.' ),
-				getBlockType( name ).title
-			),
-			{
-				type: 'snackbar',
-				actions: [
-					{
-						label: __( 'Undo' ),
-						onClick() {
-							__unstableMarkNextChangeAsNotPersistent();
-							setAttributes( { style: blockStyles } );
-							setUserConfig( () => userConfig, {
-								undoIgnore: true,
-							} );
+		if ( behaviorChanges.length > 0 ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setBehavior( attributes.behaviors );
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: Title of the block e.g. 'Heading'.
+					__( '%s behaviors applied.' ),
+					getBlockType( name ).title
+				),
+				{
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick() {
+								__unstableMarkNextChangeAsNotPersistent();
+								setBehavior( inheritedBehaviors );
+								setUserConfig( () => userConfig, {
+									undoIgnore: true,
+								} );
+							},
 						},
-					},
-				],
-			}
-		);
+					],
+				}
+			);
+		}
 	}, [ changes, attributes, userConfig, name ] );
-
-	// This is a temporary workaround to force only update behaviors.
-	const hasBehaviorChanges = !! attributes.behaviors;
 
 	return (
 		<BaseControl
@@ -284,11 +296,10 @@ function PushChangesToGlobalStylesControl( {
 			</BaseControl.VisualLabel>
 			<Button
 				variant="primary"
-				disabled={ false }
-				onClick={
-					// This is a temporary workaround to force only update behaviors.
-					hasBehaviorChanges ? pushBehaviorChanges : pushChanges
+				disabled={
+					changes.length === 0 && behaviorChanges.length === 0
 				}
+				onClick={ pushChanges }
 			>
 				{ __( 'Apply globally' ) }
 			</Button>
