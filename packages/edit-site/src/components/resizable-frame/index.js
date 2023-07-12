@@ -173,6 +173,8 @@ function ResizableFrame( {
 			return;
 		}
 
+		event.preventDefault();
+
 		const step = 20 * ( event.shiftKey ? 5 : 1 );
 		const delta = step * ( event.key === 'ArrowLeft' ? 1 : -1 );
 		const newWidth = Math.min(
