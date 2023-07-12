@@ -6,7 +6,7 @@ import { Platform, ScrollView, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef, useState, useEffect } from '@wordpress/element';
+import { useCallback, useRef, useEffect } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -54,8 +54,10 @@ function HeaderToolbar( {
 	noContentSelected,
 } ) {
 	const anchorNodeRef = useRef();
-	const wasNoContentSelected = useRef( noContentSelected );
-	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
+	const containerStyle = getStylesFromColorScheme(
+		styles[ 'header-toolbar__container' ],
+		styles[ 'header-toolbar__container--dark' ]
+	);
 
 	useEffect( () => {
 		const onUndoSubscription = subscribeOnUndoPressed( undo );
@@ -140,22 +142,6 @@ function HeaderToolbar( {
 		</ToolbarGroup>
 	);
 
-	const onToggleInserter = useCallback(
-		( isOpen ) => {
-			if ( isOpen ) {
-				wasNoContentSelected.current = noContentSelected;
-			}
-			setIsInserterOpen( isOpen );
-		},
-		[ noContentSelected ]
-	);
-
-	// Expanded mode should be preserved while the inserter is open.
-	// This way we prevent style updates during the opening transition.
-	const useExpandedMode = isInserterOpen
-		? wasNoContentSelected.current
-		: noContentSelected;
-
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
@@ -164,14 +150,7 @@ function HeaderToolbar( {
 			ref={ anchorNodeRef }
 			testID={ toolbarAriaLabel }
 			accessibilityLabel={ toolbarAriaLabel }
-			style={ [
-				getStylesFromColorScheme(
-					styles[ 'header-toolbar__container' ],
-					styles[ 'header-toolbar__container--dark' ]
-				),
-				useExpandedMode &&
-					styles[ 'header-toolbar__container--expanded' ],
-			] }
+			style={ containerStyle }
 		>
 			<ScrollView
 				ref={ scrollViewRef }
@@ -184,11 +163,8 @@ function HeaderToolbar( {
 					styles[ 'header-toolbar__scrollable-content' ]
 				}
 			>
-				<Inserter
-					disabled={ ! showInserter }
-					useExpandedMode={ useExpandedMode }
-					onToggle={ onToggleInserter }
-				/>
+				<Inserter disabled={ ! showInserter } />
+
 				{ noContentSelected && renderMediaButtons }
 				<BlockToolbar
 					anchorNodeRef={ anchorNodeRef.current }
