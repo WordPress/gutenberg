@@ -48,9 +48,11 @@ const MyBlockCaption = (
 
 ### Props
 
-The `clientId` prop is the only required prop, but the others are recommended.
+The `clientId` prop is the only required prop.
 
-The `onBlur`, `onFocus`, `isSelected`, and `insertBlocksAfter` props are all passed directly to the `Caption` component, which then passes them to the inner `RichText` component. ([See detailed info about the RichText component's props](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md)).
+The `onBlur`, `onFocus`, `isSelected`, and `insertBlocksAfter` props are all passed directly to the `Caption` component, which then passes them to the inner `RichText` component. ([See detailed info about the RichText component's props](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md)). These props are not strictly required, but necessary for many implementations of the component to function as expected.
+
+The `accessible` prop is `false` by default and must be set to `true` in order to set an accessibility label via the `accessibilityLabelCreator` prop.
 
 ### `clientId`
 
