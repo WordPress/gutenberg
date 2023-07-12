@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   The return type for a dispatched action has been changed to a Promise, which matches how actions work.
+
 ## 9.8.0 (2023-07-20)
 
 ## 9.7.0 (2023-07-05)
@@ -62,7 +66,7 @@
 
 ### Breaking Changes
 
-–   Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+– Add TypeScript types to the built package (via "types": "build-types" in the package.json)
 
 ### Bug Fix
 
@@ -100,9 +104,9 @@
 
 ### New Features
 
-- Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
-- Store the resolution errors in store metadata and expose them using `hasResolutionFailed` the `getResolutionError` meta-selectors ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
-- Expose the resolution status (undefined, resolving, finished, error) via the `getResolutionState` meta-selector ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+-   Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
+-   Store the resolution errors in store metadata and expose them using `hasResolutionFailed` the `getResolutionError` meta-selectors ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+-   Expose the resolution status (undefined, resolving, finished, error) via the `getResolutionState` meta-selector ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
 
 ## 6.2.1 (2022-02-10)
 
