@@ -13,13 +13,11 @@ import {
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
 	EditorSnackbars,
+	PostSyncStatusModal,
 	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	BlockBreadcrumb,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
@@ -52,9 +50,6 @@ import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
 import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -67,12 +62,6 @@ const interfaceLabels = {
 	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
-};
-
-const blockRemovalRules = {
-	'core/footnotes': __(
-		'The Footnotes block displays all footnotes found in the content. Note that any footnotes in the content will persist after removing this block.'
-	),
 };
 
 function Layout( { styles } ) {
@@ -214,7 +203,6 @@ function Layout( { styles } ) {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
-			<BlockRemovalWarningModal rules={ blockRemovalRules } />
 			<SettingsSidebar />
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isLargeViewport }
@@ -304,6 +292,7 @@ function Layout( { styles } ) {
 			<EditPostPreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
+			<PostSyncStatusModal />
 			<StartPageOptions />
 			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />

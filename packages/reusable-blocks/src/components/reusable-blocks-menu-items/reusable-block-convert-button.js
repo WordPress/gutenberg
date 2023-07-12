@@ -19,7 +19,7 @@ import {
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -98,15 +98,25 @@ export default function ReusableBlockConvertButton( {
 				);
 				createSuccessNotice(
 					syncType === 'fully'
-						? __( 'Synced Pattern created.' )
-						: __( 'Unsynced Pattern created.' ),
+						? sprintf(
+								// translators: %s: the name the user has given to the pattern.
+								__( 'Synced Pattern created: %s' ),
+								reusableBlockTitle
+						  )
+						: sprintf(
+								// translators: %s: the name the user has given to the pattern.
+								__( 'Unsynced Pattern created: %s' ),
+								reusableBlockTitle
+						  ),
 					{
 						type: 'snackbar',
+						id: 'convert-to-reusable-block-success',
 					}
 				);
 			} catch ( error ) {
 				createErrorNotice( error.message, {
 					type: 'snackbar',
+					id: 'convert-to-reusable-block-error',
 				} );
 			}
 		},

@@ -1,5 +1,47 @@
 == Changelog ==
 
+= 16.2.0-rc.3 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Build Tooling
+- Revert phpcs testVersion back to PHP 5.6. ([52384](https://github.com/WordPress/gutenberg/pull/52384))
+
+
+= 16.2.0-rc.2 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- RichText/Footnotes: Make getRichTextValues work with InnerBlocks.Content. ([52241](https://github.com/WordPress/gutenberg/pull/52241))
+
+#### Blocks
+- Post and Comment Template blocks: Change render_block_context priority to 1 (https://github.com/WordPress/gutenberg/pull/52364)
+- Footnotes: Fix incorrect anchor position in Firefox (https://github.com/WordPress/gutenberg/pull/52425)
+- Footnotes: fix lingering format boundary attr (https://github.com/WordPress/gutenberg/pull/52439)
+- Footnotes: save numbering through the entity provider (https://github.com/WordPress/gutenberg/pull/52423)
+
+#### Code Quality / Performance
+- Iframe: avoid asset parsing & fix script localisation 
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ellatrix  @ockham @t-hamano 
+
+
+= 16.1.2 =
+
+### Bug fixes
+
+* Footnotes: increase selector specificity for anchor (https://github.com/WordPress/gutenberg/pull/52179)
+
+
 = 16.2.0-rc.1 =
 
 

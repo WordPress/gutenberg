@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, set } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ import { PresetDuotoneFilter } from '../duotone/components';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
-import { kebabCase } from '../../utils/object';
+import { kebabCase, setImmutably } from '../../utils/object';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -678,11 +678,11 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	}
 
 	const pickPresets = ( treeToPickFrom ) => {
-		const presets = {};
+		let presets = {};
 		PRESET_METADATA.forEach( ( { path } ) => {
 			const value = get( treeToPickFrom, path, false );
 			if ( value !== false ) {
-				set( presets, path, value );
+				presets = setImmutably( presets, path, value );
 			}
 		} );
 		return presets;

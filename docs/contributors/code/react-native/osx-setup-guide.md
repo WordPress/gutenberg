@@ -212,7 +212,7 @@ After a bit of a wait, we’ll see something like this:
 ## Unit Tests
 
 ```sh
-npm run native test
+npm run test:native
 ```
 
 ## Integration Tests
