@@ -107,7 +107,7 @@ export default function SidebarNavigationScreenPatterns() {
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
 	const { patternCategories, hasPatterns } = usePatternCategories();
-	const { myPatterns, hasPatterns: hasMyPatterns } = useMyPatterns();
+	const { myPatterns } = useMyPatterns();
 
 	const isTemplatePartsMode = useSelect( ( select ) => {
 		const settings = select( editSiteStore ).getSettings();
@@ -153,23 +153,25 @@ export default function SidebarNavigationScreenPatterns() {
 									</Item>
 								</ItemGroup>
 							) }
-							{ hasMyPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									<CategoryItem
-										key={ myPatterns.name }
-										count={ myPatterns.count }
-										label={ myPatterns.label }
-										icon={ starFilled }
-										id={ myPatterns.name }
-										type="wp_block"
-										isActive={
-											currentCategory ===
-												`${ myPatterns.name }` &&
-											currentType === 'wp_block'
-										}
-									/>
-								</ItemGroup>
-							) }
+							<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+								<CategoryItem
+									key={ myPatterns.name }
+									count={
+										! myPatterns.count
+											? '0'
+											: myPatterns.count
+									}
+									label={ myPatterns.label }
+									icon={ starFilled }
+									id={ myPatterns.name }
+									type="wp_block"
+									isActive={
+										currentCategory ===
+											`${ myPatterns.name }` &&
+										currentType === 'wp_block'
+									}
+								/>
+							</ItemGroup>
 							{ hasTemplateParts && (
 								<TemplatePartGroup
 									areas={ templatePartAreas }
