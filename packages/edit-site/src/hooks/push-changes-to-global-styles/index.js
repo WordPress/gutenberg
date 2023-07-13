@@ -28,7 +28,8 @@ import { unlock } from '../../lock-unlock';
 const {
 	GlobalStylesContext,
 	useBlockEditingMode,
-	__experimentalUseGlobalBehaviors,
+	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
+	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
 } = unlock( blockEditorPrivateApis );
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
@@ -178,6 +179,9 @@ function PushChangesToGlobalStylesControl( {
 } ) {
 	const changes = useChangesToPush( name, attributes );
 
+	const hasBehaviorsPanel = useHasBehaviorsPanel( attributes, name, {
+		blockSupportOnly: true,
+	} );
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 
@@ -185,12 +189,10 @@ function PushChangesToGlobalStylesControl( {
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const [ inheritedBehaviors, setBehavior ] =
-		__experimentalUseGlobalBehaviors( name );
+	const [ inheritedBehaviors, setBehavior ] = useGlobalBehaviors( name );
 
 	const userHasEditedBehaviors =
-		attributes.hasOwnProperty( 'behaviors' ) &&
-		window?.__experimentalInteractivityAPI;
+		attributes.hasOwnProperty( 'behaviors' ) && hasBehaviorsPanel;
 
 	const pushChanges = useCallback( () => {
 		if ( changes.length === 0 && ! userHasEditedBehaviors ) {

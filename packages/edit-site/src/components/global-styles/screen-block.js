@@ -61,7 +61,7 @@ const {
 	useHasDimensionsPanel,
 	useHasTypographyPanel,
 	useHasBorderPanel,
-	__experimentalUseHasBehaviorsPanel,
+	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
 	useHasColorPanel,
@@ -105,7 +105,7 @@ function ScreenBlock( { name, variation } ) {
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
-	const hasBehaviorsPanel = __experimentalUseHasBehaviorsPanel( rawSettings );
+	const hasBehaviorsPanel = useHasBehaviorsPanel( rawSettings, name );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );
@@ -283,6 +283,7 @@ function ScreenBlock( { name, variation } ) {
 							value={ behavior }
 							onChange={ setBehavior }
 							behaviors={ inheritedBehaviors }
+							blockName={ name }
 						></StylesBehaviorsPanel>
 					) }
 				</PanelBody>

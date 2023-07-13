@@ -1,16 +1,31 @@
 /**
  * WordPress dependencies
  */
+import { hasBlockSupport } from '@wordpress/blocks';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export function __experimentalUseHasBehaviorsPanel( settings ) {
+export function __experimentalUseHasBehaviorsPanel(
+	settings,
+	name,
+	{ blockSupportOnly = false } = {}
+) {
 	if ( ! settings?.behaviors || ! window?.__experimentalInteractivityAPI ) {
 		return false;
 	}
+
+	// If every behavior is disabled on block supports, do not show the behaviors inspector control.
+	const hasSomeBlockSupport = Object.keys( settings?.behaviors ).some(
+		( key ) => hasBlockSupport( name, `behaviors.${ key }` )
+	);
+
+	if ( blockSupportOnly ) {
+		return hasSomeBlockSupport;
+	}
+
 	// If every behavior is disabled, do not show the behaviors inspector control.
 	return Object.values( settings?.behaviors ).some(
-		( value ) => value === true
+		( value ) => value === true && hasSomeBlockSupport
 	);
 }
 
