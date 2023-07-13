@@ -266,7 +266,7 @@ test.describe( 'Navigation colors', () => {
 
 		// In the inspector sidebar, we change the nav block colors.
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		// Pale pink for the text color
+		// Pale pink for the text color.
 		await page
 			.getByRole( 'button', { name: 'Background', exact: true } )
 			.click();
