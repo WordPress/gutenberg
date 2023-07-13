@@ -35,6 +35,7 @@ function Pagination( { currentPage, numPages, changePage, totalItems } ) {
 					variant="tertiary"
 					onClick={ () => changePage( 1 ) }
 					disabled={ currentPage === 1 }
+					aria-label={ __( 'First page' ) }
 				>
 					«
 				</Button>
@@ -42,6 +43,7 @@ function Pagination( { currentPage, numPages, changePage, totalItems } ) {
 					variant="tertiary"
 					onClick={ () => changePage( currentPage - 1 ) }
 					disabled={ currentPage === 1 }
+					aria-label={ __( 'Previous page' ) }
 				>
 					‹
 				</Button>
@@ -57,6 +59,7 @@ function Pagination( { currentPage, numPages, changePage, totalItems } ) {
 					variant="tertiary"
 					onClick={ () => changePage( currentPage + 1 ) }
 					disabled={ currentPage === numPages }
+					aria-label={ __( 'Next page' ) }
 				>
 					›
 				</Button>
@@ -64,6 +67,7 @@ function Pagination( { currentPage, numPages, changePage, totalItems } ) {
 					variant="tertiary"
 					onClick={ () => changePage( numPages ) }
 					disabled={ currentPage === numPages }
+					aria-label={ __( 'Last page' ) }
 				>
 					»
 				</Button>
