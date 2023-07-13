@@ -536,7 +536,7 @@ class ColorControl {
 			submenuBackgroundColor
 		);
 
-		// We need to reset the overlay to the default viewport if something runs after these tests
+		// We need to reset the overlay to the default viewport if something runs after these tests.
 		await this.pageUtils.setBrowserViewport( 'large' );
 	}
 }
