@@ -178,6 +178,9 @@ export type ActionCreatorsOf< Config extends AnyConfig > =
 		? PromisifiedActionCreators< ActionCreators >
 		: never;
 
+// Takes an object containing all action creators for a store and updates the
+// return type of each action creator to account for internal registry details --
+// for example, dispatched actions are wrapped with a Promise.
 export type PromisifiedActionCreators<
 	ActionCreators extends MapOf< ActionCreator >
 > = {
@@ -186,14 +189,13 @@ export type PromisifiedActionCreators<
 	>;
 };
 
-// A dispatched action returns a Promise. This helper extends the original action
-// creator, so that consumers know that they are dealing with a Promise.
+// Wraps action creator return types with a Promise -- also handles thunks by
+// extracting the return type of the inner function of the thunk's action creator.
 export type PromisifyActionCreator< Action extends ActionCreator > = (
 	...args: Parameters< Action >
 ) => Promise<
 	ReturnType< Action > extends ( ..._args: any[] ) => any
-		? // Thunks return another function, so we unwrap the return type twice in that scenario.
-		  ReturnType< ReturnType< Action > >
+		? ReturnType< ReturnType< Action > > // Thunks need to be unwrapped twice.
 		: ReturnType< Action >
 >;
 
