@@ -150,7 +150,7 @@ function LocalFonts() {
 
 			{ selectedFiles.length > 0 && (
 				<>
-					<PreviewContols />
+					{/* <PreviewContols /> */}
 					<Spacer margin={8}/>
 
 					<VStack spacing={ 4 }>
