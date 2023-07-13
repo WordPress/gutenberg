@@ -446,10 +446,10 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
     function install_fonts ( $request ) {
         // Get new fonts to install
         $fonts_to_install = $request->get_param('fontFamilies');
-        if ( is_string( $fonts_to_install ) ) {
-            // If we are receiving form data (as we to upload local fonts), the font families are encoded as a string.
-            $fonts_to_install = json_decode( $fonts_to_install, true );
-        }
+
+        // As we are receiving form data, the font families are encoded as a string.
+        // We are using form data because local fonts need to use that format to attach the files in the request
+        $fonts_to_install = json_decode( $fonts_to_install, true );
 
         if ( empty ( $fonts_to_install ) ) {
             return new WP_Error( 'no_fonts_to_install', __( 'No fonts to install' ), array( 'status' => 400 ) );
