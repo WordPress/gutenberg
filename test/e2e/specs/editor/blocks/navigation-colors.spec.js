@@ -220,7 +220,7 @@ test.describe( 'Navigation colors', () => {
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		// Pale pink for the text color.
 		await page.getByRole( 'button', { name: 'Text', exact: true } ).click();
-		// 247, 141, 167 is the color of the "Pale pink" color preset
+		// 247, 141, 167 is the color of the "Pale pink" color preset.
 		const palePink = 'rgb(247, 141, 167)';
 		await page
 			.getByRole( 'button', { name: 'Color: Pale pink' } )
