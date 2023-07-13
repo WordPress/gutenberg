@@ -15,13 +15,9 @@ export async function switchBlockInspectorTab(
 	this: Editor,
 	ariaLabel: string
 ) {
-	const tabButton = this.page.locator(
-		`.block-editor-block-inspector__tabs button[aria-label="${ ariaLabel }"]`
-	);
-	const id = await tabButton.getAttribute( 'id' );
-
-	await tabButton.click();
-	await this.page.waitForSelector(
-		`div[role="tabpanel"][aria-labelledby="${ id }"]`
-	);
+	const sidebar = this.page.getByRole( 'region', {
+		name: 'Editor settings',
+	} );
+	await sidebar.getByRole( 'tab', { name: ariaLabel } ).click();
+	await sidebar.getByRole( 'tabpanel', { name: ariaLabel } ).waitFor();
 }
