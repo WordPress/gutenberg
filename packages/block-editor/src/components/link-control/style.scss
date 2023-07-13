@@ -125,7 +125,7 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__search-results {
 	margin-top: -$grid-unit-20;
 	padding: $grid-unit-10;
-	max-height: 200px;
+	max-height: $grid-unit * 24;
 	overflow-y: auto; // allow results list to scroll
 
 	&.is-loading {
