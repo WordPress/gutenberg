@@ -244,7 +244,7 @@ test.describe( 'Navigation colors', () => {
 
 		const expectedNavigationColors = {
 			textColor: palePink,
-			backgroundColor: colorControl.transparent, // There should be no background color set
+			backgroundColor: colorControl.transparent, // There should be no background color set.
 			submenuTextColor: palePink,
 			submenuBackgroundColor: colorControl.white,
 		};
