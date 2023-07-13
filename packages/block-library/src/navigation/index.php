@@ -675,7 +675,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$should_load_view_script = ( $is_responsive_menu || ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) );
 	$view_js_file            = 'wp-block-navigation-view';
 	$view_js_file2           = 'wp-block-navigation-view-2';
-	wp_script_add_data( $view_js_file, 'strategy', 'defer' );
+	wp_script_add_data( $view_js_file, 'strategy', 'async' );
 	wp_script_add_data( $view_js_file2, 'strategy', 'defer' );
 	if ( ! wp_script_is( $view_js_file ) ) {
 		$script_handles = $block->block_type->view_script_handles;
