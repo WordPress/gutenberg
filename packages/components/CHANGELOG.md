@@ -9,8 +9,8 @@
 
 ### Bug Fix
 
--   `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([52356](https://github.com/WordPress/gutenberg/pull/52356)).
--   `Item`: Unify focus style and add default font styles. ([52495](https://github.com/WordPress/gutenberg/pull/52495)).
+-   `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([#52356](https://github.com/WordPress/gutenberg/pull/52356)).
+-   `Item`: Unify focus style and add default font styles. ([#52495](https://github.com/WordPress/gutenberg/pull/52495)).
 
 ## 25.3.0 (2023-07-05)
 
