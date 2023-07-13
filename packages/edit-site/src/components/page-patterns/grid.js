@@ -105,10 +105,8 @@ export default function Grid( { categoryId, items, ...props } ) {
 
 	const numPages = Math.ceil( items.length / PAGE_SIZE );
 	const changePage = ( page ) => {
-		const scrollContainer =
-			document.getElementsByClassName( 'edit-site-patterns' );
-
-		scrollContainer[ 0 ]?.scrollTo( 0, 0 );
+		const scrollContainer = document.querySelector( '.edit-site-patterns' );
+		scrollContainer?.scrollTo( 0, 0 );
 
 		setCurrentPage( page );
 	};
