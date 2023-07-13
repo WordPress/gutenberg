@@ -671,24 +671,37 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks_html .= '</ul>';
 	}
 
-	// If the script already exists, there is no point in removing it from viewScript.
-	$should_load_view_script = ( $is_responsive_menu || ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) );
-	$view_js_file            = 'wp-block-navigation-view';
-	$view_js_file2           = 'wp-block-navigation-view-2';
-	wp_script_add_data( $view_js_file, 'strategy', 'async' );
-	wp_script_add_data( $view_js_file2, 'strategy', 'async' );
-	if ( ! wp_script_is( $view_js_file ) ) {
-		$script_handles = $block->block_type->view_script_handles;
+	// Enqueue the view script for submenus-on-click if enabled.
+	if ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) {
+		$submenu_onclick_script_handle = 'wp-block-navigation-view';
 
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file, $view_js_file2 ) );
-		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file, $view_js_file2 ) );
-		}
+		// See logic in gutenberg_register_packages_scripts().
+		$asset_file      = plugin_dir_path( __FILE__ ) . '/navigation/view.min.asset.php';
+		$script_url      = plugins_url( 'navigation/view.min.js', __FILE__ );
+		$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+		$asset           = file_exists( $asset_file ) ? require $asset_file : null;
+		$dependencies    = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
+		$version         = isset( $asset['version'] ) ? $asset['version'] : $default_version;
+		wp_enqueue_script( $submenu_onclick_script_handle, $script_url, $dependencies, $version );
+		wp_script_add_data( $submenu_onclick_script_handle, 'strategy', 'async' );
 	}
+
+	// Enqueue the view script for responsive modal if enabled.
+	if ( $is_responsive_menu ) {
+		$responsive_menu_script_handle = 'wp-block-navigation-view-2';
+
+		// See logic in gutenberg_register_packages_scripts().
+		$asset_file      = plugin_dir_path( __FILE__ ) . '/navigation/view-modal.min.asset.php';
+		$script_url      = plugins_url( 'navigation/view-modal.min.js', __FILE__ );
+		$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+		$asset           = file_exists( $asset_file ) ? require $asset_file : null;
+		$dependencies    = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
+		$version         = isset( $asset['version'] ) ? $asset['version'] : $default_version;
+		wp_enqueue_script( $responsive_menu_script_handle, $script_url, $dependencies, $version );
+		wp_script_add_data( $responsive_menu_script_handle, 'strategy', 'async' );
+	}
+
+	$should_load_view_script = ( $is_responsive_menu || ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) );
 
 	// Add directives to the submenu if needed.
 	if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) && $has_submenus && $should_load_view_script ) {
