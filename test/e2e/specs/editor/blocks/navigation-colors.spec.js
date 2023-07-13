@@ -37,7 +37,7 @@ test.describe( 'Navigation colors', () => {
 		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
 		await editor.canvas.click( 'body' );
-		// Focus the navigation block inside the header template part
+		// Focus the navigation block inside the header template part.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: header' } )
 			.focus();
