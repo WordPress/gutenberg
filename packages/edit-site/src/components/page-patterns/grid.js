@@ -14,7 +14,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import GridItem from './grid-item';
 
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 20;
 
 function Pagination( { currentPage, numPages, changePage, totalItems } ) {
 	return (
