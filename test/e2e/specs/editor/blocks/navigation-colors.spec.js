@@ -92,7 +92,7 @@ test.describe( 'Navigation colors', () => {
 		colorControl,
 	} ) => {
 		// Set the text and background styles for the group. The text color should apply to the top level links but not the submenu or overlay.
-		// We wrap the nav block inside a group block
+		// We wrap the nav block inside a group block.
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
