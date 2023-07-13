@@ -71,6 +71,13 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
+		},
+		"defaultBlock": {
+			"type": "object",
+			"default": {
+				"name": "core/navigation-link",
+				"attributes": {}
+			}
 		}
 	},
 	"providesContext": {

@@ -25,6 +25,7 @@ export default function NavigationInnerBlocks( {
 	hasCustomPlaceholder,
 	orientation,
 	templateLock,
+	defaultBlock,
 } ) {
 	const {
 		isImmediateParentOfSelectedBlock,
@@ -88,6 +89,11 @@ export default function NavigationInnerBlocks( {
 	const showPlaceholder =
 		! hasCustomPlaceholder && ! hasMenuItems && ! isSelected;
 
+	// If the `defaultBlock` attribute is set and itself has an attributes object with values then use it
+	// otherwise fallback to the DEFAULT_BLOCK constant.
+	// This allows site owners to set the default `core/navigation-link` variation to use.
+	const navDefaultBlock = defaultBlock?.attributes && Object.keys(defaultBlock.attributes).length > 0 ? defaultBlock : DEFAULT_BLOCK;	
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
@@ -98,7 +104,7 @@ export default function NavigationInnerBlocks( {
 			onChange,
 			allowedBlocks: ALLOWED_BLOCKS,
 			prioritizedInserterBlocks: PRIORITIZED_INSERTER_BLOCKS,
-			defaultBlock: DEFAULT_BLOCK,
+			defaultBlock: navDefaultBlock,
 			directInsert: shouldDirectInsert,
 			orientation,
 			templateLock,
