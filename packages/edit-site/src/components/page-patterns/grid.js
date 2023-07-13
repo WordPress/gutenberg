@@ -7,7 +7,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { useRef, useState, useMemo } from '@wordpress/element';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
 /**
@@ -27,7 +27,7 @@ function Pagination( { currentPage, numPages, changePage, totalItems } ) {
 			<Text variant="muted">
 				{
 					// translators: %s: Total number of patterns.
-					sprintf( __( '%s items' ), totalItems )
+					sprintf( _n( '%s items' ), totalItems )
 				}
 			</Text>
 			<HStack expanded={ false } spacing={ 1 }>
