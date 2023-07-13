@@ -123,7 +123,15 @@
 				"type": "flex"
 			}
 		},
-		"interactivity": true
+		"__experimentalStyle": {
+			"elements": {
+				"link": {
+					"color": {
+						"text": "inherit"
+					}
+				}
+			}
+		}
 	},
 	"viewScript": [ "file:./view.min.js", "file:./view-modal.min.js" ],
 	"editorStyle": "wp-block-navigation-editor",
