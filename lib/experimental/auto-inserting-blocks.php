@@ -94,15 +94,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 
 		$mapped_position = $property_mappings[ $position ];
 
-		$inserted_block = array(
-			'blockName'    => $inserted_block_name,
-			'attrs'        => array(),
-			'innerHTML'    => '',
-			'innerContent' => array(),
-			'innerBlocks'  => array(),
-		);
-
-		gutenberg_register_auto_inserted_block( $inserted_block, $mapped_position, $anchor_block_name );
+		gutenberg_register_auto_inserted_block( $inserted_block_name, $mapped_position, $anchor_block_name );
 
 		$settings['auto_insert'][ $anchor_block_name ] = $mapped_position;
 	}
@@ -125,6 +117,13 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_bl
  * @return void
  */
 function gutenberg_register_auto_inserted_block( $inserted_block, $position, $anchor_block ) {
+		$inserted_block = array(
+			'blockName'    => $inserted_block,
+			'attrs'        => array(),
+			'innerHTML'    => '',
+			'innerContent' => array(),
+			'innerBlocks'  => array(),
+		);
 		$inserter = gutenberg_auto_insert_block( $inserted_block, $position, $anchor_block );
 		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
 }
