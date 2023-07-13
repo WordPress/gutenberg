@@ -184,11 +184,12 @@
 	width: 100vw;
 	height: 100vh;
 	visibility: hidden;
+	cursor: zoom-out;
 
 	.close-button {
 		position: absolute;
-		top: 12.5px;
-		right: 12.5px;
+		top: calc(env(safe-area-inset-top) + 12.5px);
+		right: calc(env(safe-area-inset-right) + 12.5px);
 		padding: 0;
 		cursor: pointer;
 		z-index: 5000000;
@@ -231,6 +232,18 @@
 	}
 
 	&.fade {
+		.wp-block-image {
+			padding: 40px 0;
+
+			@media screen and (min-width: 480px) {
+				padding: 40px;
+			}
+
+			@media screen and (min-width: 1920px) {
+				padding: 40px 80px;
+			}
+		}
+
 		&.active {
 			visibility: visible;
 			animation: both turn-on-visibility 0.25s;

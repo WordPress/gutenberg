@@ -6,7 +6,7 @@ import { Platform, ScrollView, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useRef, useEffect } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -19,10 +19,19 @@ import {
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import {
 	keyboardClose,
-	undo as undoIcon,
-	redo as redoIcon,
+	audio as audioIcon,
+	media as imageIcon,
+	video as videoIcon,
+	gallery as galleryIcon,
 } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
+import { createBlock } from '@wordpress/blocks';
+import {
+	toggleUndoButton,
+	toggleRedoButton,
+	subscribeOnUndoPressed,
+	subscribeOnRedoPressed,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -38,12 +47,35 @@ function HeaderToolbar( {
 	showInserter,
 	showKeyboardHideButton,
 	getStylesFromColorScheme,
+	insertBlock,
 	onHideKeyboard,
+	onOpenBlockSettings,
 	isRTL,
 	noContentSelected,
 } ) {
-	const wasNoContentSelected = useRef( noContentSelected );
-	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
+	const anchorNodeRef = useRef();
+	const containerStyle = getStylesFromColorScheme(
+		styles[ 'header-toolbar__container' ],
+		styles[ 'header-toolbar__container--dark' ]
+	);
+
+	useEffect( () => {
+		const onUndoSubscription = subscribeOnUndoPressed( undo );
+		const onRedoSubscription = subscribeOnRedoPressed( redo );
+
+		return () => {
+			onUndoSubscription?.remove();
+			onRedoSubscription?.remove();
+		};
+	}, [ undo, redo ] );
+
+	useEffect( () => {
+		toggleUndoButton( ! hasUndo );
+	}, [ hasUndo ] );
+
+	useEffect( () => {
+		toggleRedoButton( ! hasRedo );
+	}, [ hasRedo ] );
 
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
@@ -55,65 +87,70 @@ function HeaderToolbar( {
 			scrollViewRef.current.scrollTo( { x: 0 } );
 		}
 	};
-	const renderHistoryButtons = () => {
-		const buttons = [
-			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo. */
-			<ToolbarButton
-				key="undoButton"
-				title={ __( 'Undo' ) }
-				icon={ ! isRTL ? undoIcon : redoIcon }
-				isDisabled={ ! hasUndo }
-				onClick={ undo }
-				extraProps={ {
-					hint: __( 'Double tap to undo last change' ),
-				} }
-			/>,
-			<ToolbarButton
-				key="redoButton"
-				title={ __( 'Redo' ) }
-				icon={ ! isRTL ? redoIcon : undoIcon }
-				isDisabled={ ! hasRedo }
-				onClick={ redo }
-				extraProps={ {
-					hint: __( 'Double tap to redo last change' ),
-				} }
-			/>,
-		];
 
-		return isRTL ? buttons.reverse() : buttons;
-	};
-
-	const onToggleInserter = useCallback(
-		( isOpen ) => {
-			if ( isOpen ) {
-				wasNoContentSelected.current = noContentSelected;
-			}
-			setIsInserterOpen( isOpen );
+	const onInsertBlock = useCallback(
+		( blockType ) => () => {
+			insertBlock( createBlock( blockType ), undefined, undefined, true, {
+				source: 'inserter_menu',
+			} );
 		},
-		[ noContentSelected ]
+		[ insertBlock ]
 	);
 
-	// Expanded mode should be preserved while the inserter is open.
-	// This way we prevent style updates during the opening transition.
-	const useExpandedMode = isInserterOpen
-		? wasNoContentSelected.current
-		: noContentSelected;
+	const renderMediaButtons = (
+		<ToolbarGroup>
+			<ToolbarButton
+				key="imageButton"
+				title={ __( 'Image' ) }
+				icon={ imageIcon }
+				onClick={ onInsertBlock( 'core/image' ) }
+				testID="insert-image-button"
+				extraProps={ {
+					hint: __( 'Insert Image Block' ),
+				} }
+			/>
+			<ToolbarButton
+				key="videoButton"
+				title={ __( 'Video' ) }
+				icon={ videoIcon }
+				onClick={ onInsertBlock( 'core/video' ) }
+				testID="insert-video-button"
+				extraProps={ {
+					hint: __( 'Insert Video Block' ),
+				} }
+			/>
+			<ToolbarButton
+				key="galleryButton"
+				title={ __( 'Gallery' ) }
+				icon={ galleryIcon }
+				onClick={ onInsertBlock( 'core/gallery' ) }
+				testID="insert-gallery-button"
+				extraProps={ {
+					hint: __( 'Insert Gallery Block' ),
+				} }
+			/>
+			<ToolbarButton
+				key="audioButton"
+				title={ __( 'Audio' ) }
+				icon={ audioIcon }
+				onClick={ onInsertBlock( 'core/audio' ) }
+				testID="insert-audio-button"
+				extraProps={ {
+					hint: __( 'Insert Audio Block' ),
+				} }
+			/>
+		</ToolbarGroup>
+	);
 
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
 	return (
 		<View
+			ref={ anchorNodeRef }
 			testID={ toolbarAriaLabel }
 			accessibilityLabel={ toolbarAriaLabel }
-			style={ [
-				getStylesFromColorScheme(
-					styles[ 'header-toolbar__container' ],
-					styles[ 'header-toolbar__container--dark' ]
-				),
-				useExpandedMode &&
-					styles[ 'header-toolbar__container--expanded' ],
-			] }
+			style={ containerStyle }
 		>
 			<ScrollView
 				ref={ scrollViewRef }
@@ -126,13 +163,13 @@ function HeaderToolbar( {
 					styles[ 'header-toolbar__scrollable-content' ]
 				}
 			>
-				<Inserter
-					disabled={ ! showInserter }
-					useExpandedMode={ useExpandedMode }
-					onToggle={ onToggleInserter }
+				<Inserter disabled={ ! showInserter } />
+
+				{ noContentSelected && renderMediaButtons }
+				<BlockToolbar
+					anchorNodeRef={ anchorNodeRef.current }
+					onOpenBlockSettings={ onOpenBlockSettings }
 				/>
-				{ renderHistoryButtons() }
-				<BlockToolbar />
 			</ScrollView>
 			{ showKeyboardHideButton && (
 				<ToolbarGroup
@@ -181,7 +218,9 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( blockEditorStore );
+		const { clearSelectedBlock, insertBlock } =
+			dispatch( blockEditorStore );
+		const { openGeneralSidebar } = dispatch( editPostStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );
 
 		return {
@@ -190,6 +229,10 @@ export default compose( [
 			onHideKeyboard() {
 				clearSelectedBlock();
 				togglePostTitleSelection( false );
+			},
+			insertBlock,
+			onOpenBlockSettings() {
+				openGeneralSidebar( 'edit-post/block' );
 			},
 		};
 	} ),

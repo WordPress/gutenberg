@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -41,7 +36,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 				{
 					status: 'draft',
 					title,
-					slug: kebabCase( title || __( 'No title' ) ),
+					slug: title || __( 'No title' ),
 				},
 				{ throwOnError: true }
 			);

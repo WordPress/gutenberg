@@ -112,4 +112,22 @@ describe( 'Heading block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
+
+	it( 'change level dropdown displays active selection', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Heading' );
+		const headingBlock = await getBlock( screen, 'Heading' );
+
+		// Act
+		fireEvent.press( headingBlock );
+		fireEvent.press( screen.getByLabelText( 'Change level' ) );
+
+		// Assert
+		expect(
+			within( screen.getByLabelText( 'Heading 2' ) ).getByTestId(
+				'bottom-sheet-cell-selected-icon'
+			)
+		).toBeVisible();
+	} );
 } );

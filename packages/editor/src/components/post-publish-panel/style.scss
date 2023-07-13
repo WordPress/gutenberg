@@ -6,7 +6,7 @@
 	// Ensure the post-publish panel accounts for the header and footer height.
 	min-height: calc(100% - #{$header-height + 84px});
 
-	.components-spinner {
+	> .components-spinner {
 		display: block;
 		margin: 100px auto 0;
 	}

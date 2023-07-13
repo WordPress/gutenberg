@@ -680,6 +680,10 @@ _Related_
 
 Private @wordpress/block-editor APIs.
 
+### ReusableBlocksRenameHint
+
+Undocumented declaration.
+
 ### RichText
 
 _Related_
@@ -711,6 +715,7 @@ _Properties_
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `boolean|Array`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
+-   _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode

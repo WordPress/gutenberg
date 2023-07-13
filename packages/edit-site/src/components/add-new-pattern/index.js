@@ -4,7 +4,7 @@
 import { DropdownMenu } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { plus, header, file } from '@wordpress/icons';
+import { plus, symbol, symbolFilled } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -12,8 +12,8 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import CreatePatternModal from '../create-pattern-modal';
 import CreateTemplatePartModal from '../create-template-part-modal';
-import { unlock } from '../../lock-unlock';
 import SidebarButton from '../sidebar-button';
+import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -56,23 +56,21 @@ export default function AddNewPattern() {
 			<DropdownMenu
 				controls={ [
 					{
-						icon: header,
+						icon: symbolFilled,
 						onClick: () => setShowTemplatePartModal( true ),
-						title: 'Create a template part',
+						title: __( 'Create template part' ),
 					},
 					{
-						icon: file,
+						icon: symbol,
 						onClick: () => setShowPatternModal( true ),
-						title: 'Create a pattern',
+						title: __( 'Create pattern' ),
 					},
 				] }
-				icon={
-					<SidebarButton
-						icon={ plus }
-						label={ __( 'Create a pattern' ) }
-					/>
-				}
-				label="Create a pattern."
+				toggleProps={ {
+					as: SidebarButton,
+				} }
+				icon={ plus }
+				label={ __( 'Create pattern' ) }
 			/>
 			{ showPatternModal && (
 				<CreatePatternModal

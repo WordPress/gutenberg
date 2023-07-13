@@ -65,13 +65,19 @@ function useSaveNavigationMenu() {
 		};
 	}, [] );
 
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
+	const {
+		editEntityRecord,
+		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
+	} = useDispatch( coreStore );
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const handleSave = async ( navigationMenu, edits = {} ) => {
+	const handleSave = async ( navigationMenu, edits ) => {
+		if ( ! edits ) {
+			return;
+		}
+
 		const postId = navigationMenu?.id;
 		// Prepare for revert in case of error.
 		const originalRecord = getEditedEntityRecord(
@@ -83,11 +89,19 @@ function useSaveNavigationMenu() {
 		// Apply the edits.
 		editEntityRecord( 'postType', postType, postId, edits );
 
+		const recordPropertiesToSave = Object.keys( edits );
+
 		// Attempt to persist.
 		try {
-			await saveEditedEntityRecord( 'postType', postType, postId, {
-				throwOnError: true,
-			} );
+			await saveSpecifiedEntityEdits(
+				'postType',
+				postType,
+				postId,
+				recordPropertiesToSave,
+				{
+					throwOnError: true,
+				}
+			);
 			createSuccessNotice( __( 'Renamed Navigation menu' ), {
 				type: 'snackbar',
 			} );

@@ -15,7 +15,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	 */
 	function gutenberg_block_core_file_update_interactive_view_script( $metadata ) {
 		if ( 'core/file' === $metadata['name'] ) {
-			$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
+			$metadata['viewScript'] = array( 'file:./view-interactivity.min.js' );
 		}
 		return $metadata;
 	}

@@ -113,7 +113,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block.
-		await clickBlockToolbarButton( 'Convert to regular block' );
+		await clickBlockToolbarButton( 'Detach pattern' );
 
 		// Check that we have a paragraph block on the page.
 		const paragraphBlock = await canvas().$(
@@ -197,7 +197,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert block to a reusable block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create a Pattern' );
+		await clickMenuItem( 'Create pattern/reusable block' );
 
 		// Set title.
 		const nameInput = await page.waitForSelector(
@@ -212,7 +212,7 @@ describe( 'Reusable blocks', () => {
 
 		// Wait for creation to finish.
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Synced Pattern created."]'
+			'//*[contains(@class, "components-snackbar")]/*[contains(text(),"Pattern created:")]'
 		);
 
 		await clearAllBlocks();
@@ -221,7 +221,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Multi-selection reusable block' );
 
 		// Convert block to a regular block.
-		await clickBlockToolbarButton( 'Convert to regular blocks' );
+		await clickBlockToolbarButton( 'Detach patterns' );
 
 		// Check that we have two paragraph blocks on the page.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -352,8 +352,8 @@ describe( 'Reusable blocks', () => {
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
 		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select Pattern' );
-		await clickBlockToolbarButton( 'Convert to regular block' );
+		await clickBlockToolbarButton( 'Select Edited block' );
+		await clickBlockToolbarButton( 'Detach pattern' );
 		await page.waitForXPath( selector, {
 			hidden: true,
 		} );
@@ -383,7 +383,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert to reusable.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create a Pattern' );
+		await clickMenuItem( 'Create pattern/reusable block' );
 		const nameInput = await page.waitForSelector(
 			reusableBlockNameInputSelector
 		);

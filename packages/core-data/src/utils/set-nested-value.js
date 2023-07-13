@@ -10,6 +10,8 @@
  *
  * @see https://lodash.com/docs/4.17.15#set
  *
+ * @todo Needs to be deduplicated with its copy in `@wordpress/edit-site`.
+ *
  * @param {Object} object Object to modify
  * @param {Array}  path   Path of the property to set.
  * @param {*}      value  Value to set.

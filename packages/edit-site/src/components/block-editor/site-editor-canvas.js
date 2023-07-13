@@ -96,6 +96,8 @@ export default function SiteEditorCanvas() {
 			? false
 			: undefined;
 
+	const forceFullHeight = isNavigationFocusMode;
+
 	return (
 		<>
 			<EditorCanvasContainer.Slot>
@@ -123,7 +125,11 @@ export default function SiteEditorCanvas() {
 							<BackButton />
 							<ResizableEditor
 								enableResizing={ enableResizing }
-								height={ sizes.height ?? '100%' }
+								height={
+									sizes.height && ! forceFullHeight
+										? sizes.height
+										: '100%'
+								}
 							>
 								<EditorCanvas
 									enableResizing={ enableResizing }

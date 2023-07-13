@@ -5,14 +5,14 @@ import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export const convertDescription = __(
-	'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking "Edit" below.'
+	'This page list is synced with the published pages on your site. Detach the page list to add, delete, or reorder pages yourself.'
 );
 
 export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
 	return (
 		<Modal
 			onRequestClose={ onClose }
-			title={ __( 'Edit this menu' ) }
+			title={ __( 'Edit Page List' ) }
 			className={ 'wp-block-page-list-modal' }
 			aria={ {
 				describedby: 'wp-block-page-list-modal__description',
@@ -30,7 +30,7 @@ export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
 					disabled={ disabled }
 					onClick={ onClick }
 				>
-					{ __( 'Edit' ) }
+					{ __( 'Detach' ) }
 				</Button>
 			</div>
 		</Modal>

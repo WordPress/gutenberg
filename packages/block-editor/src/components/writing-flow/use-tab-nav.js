@@ -11,6 +11,7 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 
 export default function useTabNav() {
 	const container = useRef();
@@ -116,17 +117,29 @@ export default function useTabNav() {
 				return;
 			}
 
+			const nextTabbable = focus.tabbable[ direction ]( event.target );
+
+			// We want to constrain the tabbing to the block and its child blocks.
+			// If the preceding form element is within a different block,
+			// such as two sibling image blocks in the placeholder state,
+			// we want shift + tab from the first form element to move to the image
+			// block toolbar and not the previous image block's form element.
+			const currentBlock = event.target.closest( '[data-block]' );
+			const isElementPartOfSelectedBlock =
+				currentBlock &&
+				nextTabbable &&
+				( isInSameBlock( currentBlock, nextTabbable ) ||
+					isInsideRootBlock( currentBlock, nextTabbable ) );
+
 			// Allow tabbing from the block wrapper to a form element,
-			// and between form elements rendered in a block,
+			// and between form elements rendered in a block and its child blocks,
 			// such as inside a placeholder. Form elements are generally
 			// meant to be UI rather than part of the content. Ideally
 			// these are not rendered in the content and perhaps in the
 			// future they can be rendered in an iframe or shadow DOM.
 			if (
-				( isFormElement( event.target ) ||
-					event.target.getAttribute( 'data-block' ) ===
-						getSelectedBlockClientId() ) &&
-				isFormElement( focus.tabbable[ direction ]( event.target ) )
+				isFormElement( nextTabbable ) &&
+				isElementPartOfSelectedBlock
 			) {
 				return;
 			}
