@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `TextControl`: Add `id` prop to allow for custom IDs in `TextControl`s ([#52028](https://github.com/WordPress/gutenberg/pull/52028)).
+-   `Navigator`: Add `replace` option to `navigator.goTo()` and `navigator.goToParent()` ([#52456](https://github.com/WordPress/gutenberg/pull/52456)).
 
 ### Bug Fix
 
