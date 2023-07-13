@@ -24,7 +24,7 @@ if ( gutenberg_should_block_use_interactivity_api( 'core/file' ) ) {
 }
 
 /**
- * When the `core/file` block is rendering, check if we need to enqueue the `'wp-block-file-view` script.
+ * When the `core/file` block is rendering, check if we need to enqueue the `wp-block-file-view` script.
  *
  * @param array    $attributes The block attributes.
  * @param string   $content    The block content.
@@ -35,7 +35,7 @@ if ( gutenberg_should_block_use_interactivity_api( 'core/file' ) ) {
 function render_block_core_file( $attributes, $content, $block ) {
 	$should_load_view_script = ! empty( $attributes['displayPreview'] );
 	$view_js_file            = 'wp-block-file-view';
-	wp_script_add_data( $view_js_file, 'strategy', 'defer' );
+	wp_script_add_data( $view_js_file, 'strategy', 'defer' ); // TODO: This should be specified in block.json.
 	// If the script already exists, there is no point in removing it from viewScript.
 	if ( ! wp_script_is( $view_js_file ) ) {
 		$script_handles = $block->block_type->view_script_handles;

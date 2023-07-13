@@ -8,11 +8,13 @@
 /**
  * Dynamically renders the `core/search` block.
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block content.
+ * @param WP_Block $block      The parsed block.
  *
- * @return string The search block markup.
+ * @return string Returns the block content.
  */
-function render_block_core_search( $attributes ) {
+function render_block_core_search( $attributes, $content, $block ) {
 	// Older versions of the Search block defaulted the label and buttonText
 	// attributes to `__( 'Search' )` meaning that many posts contain `<!--
 	// wp:search /-->`. Support these by defaulting an undefined label and
@@ -65,6 +67,11 @@ function render_block_core_search( $attributes ) {
 	if ( ! empty( $typography_classes ) ) {
 		$input_classes[] = $typography_classes;
 	}
+
+	$view_js_file = 'wp-block-search-view';
+	wp_script_add_data( $view_js_file, 'strategy', 'defer' ); // TODO: This should be specified in block.json.
+	$should_load_view_script = false;
+
 	if ( $input->next_tag() ) {
 		$input->add_class( implode( ' ', $input_classes ) );
 		$input->set_attribute( 'id', $input_id );
@@ -73,16 +80,21 @@ function render_block_core_search( $attributes ) {
 		if ( 'button-only' === $button_position && 'expand-searchfield' === $button_behavior ) {
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
+			$should_load_view_script = true;
+		}
+	}
 
-			// See logic in gutenberg_register_packages_scripts().
-			$asset_file      = plugin_dir_path( __FILE__ ) . '/search/view.min.asset.php';
-			$script_url      = plugins_url( 'search/view.min.js', __FILE__ );
-			$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
-			$asset           = file_exists( $asset_file ) ? require $asset_file : null;
-			$dependencies    = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
-			$version         = isset( $asset['version'] ) ? $asset['version'] : $default_version;
-			wp_enqueue_script( 'wp-block--search-view', $script_url, $dependencies, $version );
-			wp_script_add_data( 'wp-block--search-view', 'strategy', 'defer' );
+	// If the script already exists, there is no point in removing it from viewScript.
+	if ( ! wp_script_is( $view_js_file ) ) {
+		$script_handles = $block->block_type->view_script_handles;
+
+		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		}
+		// If the script is needed, but it was previously removed, add it again.
+		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
 		}
 	}
 
