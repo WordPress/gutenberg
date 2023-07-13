@@ -135,6 +135,7 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
+	// Preference is supplied by the relevant editor.
 	const settingsDrawerStatePreference = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings()
