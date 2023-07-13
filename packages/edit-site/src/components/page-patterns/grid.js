@@ -108,7 +108,7 @@ export default function Grid( { categoryId, items, ...props } ) {
 		const scrollContainer =
 			document.getElementsByClassName( 'edit-site-patterns' );
 
-		scrollContainer[ 0 ].scrollTo( 0, 0 );
+		scrollContainer[ 0 ]?.scrollTo( 0, 0 );
 
 		setCurrentPage( page );
 	};
