@@ -189,9 +189,7 @@ export type PromisifiedActionCreators<
 	>;
 };
 
-// Wraps action creator return types with a Promise -- also handles thunks by
-// extracting the return type of the inner function of the thunk's action creator,
-// and by accounting for thunks that return a Promise.
+// Wraps action creator return types with a Promise and handles thunks.
 export type PromisifyActionCreator< Action extends ActionCreator > = (
 	...args: Parameters< Action >
 ) => Promise<
