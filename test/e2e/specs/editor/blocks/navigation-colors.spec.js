@@ -73,7 +73,7 @@ test.describe( 'Navigation colors', () => {
 	} ) => {
 		const expectedNavigationColors = {
 			textColor: colorControl.black,
-			backgroundColor: colorControl.transparent, // There should be no background color set even though the body background is black
+			backgroundColor: colorControl.transparent, // There should be no background color set even though the body background is black.
 			submenuTextColor: colorControl.black,
 			submenuBackgroundColor: colorControl.white,
 		};
