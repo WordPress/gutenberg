@@ -14,6 +14,9 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+env:
+    BROWSERSLIST_IGNORE_OLD_DATA: true
+
 jobs:
     performance:
         name: Run performance tests

@@ -25,6 +25,9 @@ jobs:
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
+        env:
+            BROWSERSLIST_IGNORE_OLD_DATA: true
+
         strategy:
             fail-fast: false
             matrix:
