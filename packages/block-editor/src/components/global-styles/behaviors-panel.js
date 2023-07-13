@@ -5,7 +5,7 @@ import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export function __experimentalUseHasBehaviorsPanel( settings ) {
-	if ( ! settings?.behaviors ) {
+	if ( ! settings?.behaviors || ! window?.__experimentalInteractivityAPI ) {
 		return false;
 	}
 	// If every behavior is disabled, do not show the behaviors inspector control.

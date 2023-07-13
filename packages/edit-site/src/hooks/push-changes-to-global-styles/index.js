@@ -188,7 +188,9 @@ function PushChangesToGlobalStylesControl( {
 	const [ inheritedBehaviors, setBehavior ] =
 		__experimentalUseGlobalBehaviors( name );
 
-	const userHasEditedBehaviors = attributes.hasOwnProperty( 'behaviors' );
+	const userHasEditedBehaviors =
+		attributes.hasOwnProperty( 'behaviors' ) &&
+		window?.__experimentalInteractivityAPI;
 
 	const pushChanges = useCallback( () => {
 		if ( changes.length === 0 && ! userHasEditedBehaviors ) {
