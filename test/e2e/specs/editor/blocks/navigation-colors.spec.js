@@ -264,7 +264,7 @@ test.describe( 'Navigation colors', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 
-		// In the inspector sidebar, we change the nav block colors
+		// In the inspector sidebar, we change the nav block colors.
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		// Pale pink for the text color
 		await page
