@@ -202,6 +202,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              `--wp--style--root--padding-*`, and `box-shadow` properties,
 	 *              removed the `--wp--style--block-gap` property.
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
+	 * @since 6.3.0 Added `writing-mode` property.
 	 *
 	 * @var array
 	 */
@@ -260,6 +261,7 @@ class WP_Theme_JSON_Gutenberg {
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
+		'writing-mode'                      => array( 'typography', 'writingMode' ),
 	);
 
 	/**
@@ -339,7 +341,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added `layout.definitions` and `useRootPaddingAwareAlignments`.
 	 * @since 6.2.0 Added `dimensions.minHeight`, 'shadow.presets', 'shadow.defaultPresets',
 	 *              `position.fixed` and `position.sticky`.
-	 * @since 6.3.0 Removed `layout.definitions`.
+	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -406,6 +408,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
+			'writingMode'    => null,
 		),
 		'behaviors'                     => null,
 	);
@@ -468,6 +471,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
+			'writingMode'    => null,
 		),
 		'css'        => null,
 	);
@@ -3646,4 +3650,78 @@ class WP_Theme_JSON_Gutenberg {
 
 		return $tree;
 	}
+
+	/**
+	 * Replaces CSS variables with their values in place.
+	 *
+	 * @since 6.3.0
+	 * @param array $styles CSS declarations to convert.
+	 * @param array $values key => value pairs to use for replacement.
+	 * @return array
+	 */
+	private static function convert_variables_to_value( $styles, $values ) {
+		foreach ( $styles as $key => $style ) {
+			if ( is_array( $style ) ) {
+				$styles[ $key ] = self::convert_variables_to_value( $style, $values );
+				continue;
+			}
+
+			if ( 0 <= strpos( $style, 'var(' ) ) {
+				// find all the variables in the string in the form of var(--variable-name, fallback), with fallback in the second capture group.
+
+				$has_matches = preg_match_all( '/var\(([^),]+)?,?\s?(\S+)?\)/', $style, $var_parts );
+
+				if ( $has_matches ) {
+					$resolved_style = $styles[ $key ];
+					foreach ( $var_parts[1] as $index => $var_part ) {
+						$key_in_values   = 'var(' . $var_part . ')';
+						$rule_to_replace = $var_parts[0][ $index ]; // the css rule to replace e.g. var(--wp--preset--color--vivid-green-cyan).
+						$fallback        = $var_parts[2][ $index ]; // the fallback value.
+						$resolved_style  = str_replace(
+							array(
+								$rule_to_replace,
+								$fallback,
+							),
+							array(
+								isset( $values[ $key_in_values ] ) ? $values[ $key_in_values ] : $rule_to_replace,
+								isset( $values[ $fallback ] ) ? $values[ $fallback ] : $fallback,
+							),
+							$resolved_style
+						);
+					}
+					$styles[ $key ] = $resolved_style;
+				}
+			}
+		}
+
+		return $styles;
+	}
+
+	/**
+	 * Resolves the values of CSS variables in the given styles.
+	 *
+	 * @since 6.3.0
+	 * @param WP_Theme_JSON_Gutenberg $theme_json The theme json resolver.
+	 *
+	 * @return WP_Theme_JSON_Gutenberg The $theme_json with resolved variables.
+	 */
+	public static function resolve_variables( $theme_json ) {
+		$settings    = $theme_json->get_settings();
+		$styles      = $theme_json->get_raw_data()['styles'];
+		$preset_vars = static::compute_preset_vars( $settings, static::VALID_ORIGINS );
+		$theme_vars  = static::compute_theme_vars( $settings );
+		$vars        = array_reduce(
+			array_merge( $preset_vars, $theme_vars ),
+			function( $carry, $item ) {
+				$name                    = $item['name'];
+				$carry[ "var({$name})" ] = $item['value'];
+				return  $carry;
+			},
+			array()
+		);
+
+		$theme_json->theme_json['styles'] = self::convert_variables_to_value( $styles, $vars );
+		return $theme_json;
+	}
+
 }

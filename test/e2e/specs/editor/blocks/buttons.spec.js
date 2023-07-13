@@ -10,6 +10,9 @@ test.describe( 'Buttons', () => {
 
 	test( 'has focus on button content', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await page.keyboard.type( 'Content' );
 
 		// Check the content.
@@ -50,9 +53,12 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="URL"i]' )
+			page.locator( 'role=combobox[name="Link"i]' )
 		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 		await expect(
@@ -78,9 +84,12 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="URL"i]' )
+			page.locator( 'role=combobox[name="Link"i]' )
 		).toBeFocused();
 		await page.keyboard.type( 'https://example.com' );
 		await page.keyboard.press( 'Enter' );
@@ -107,9 +116,12 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 
-		const urlInput = page.locator( 'role=combobox[name="URL"i]' );
+		const urlInput = page.locator( 'role=combobox[name="Link"i]' );
 
 		await expect( urlInput ).toBeFocused();
 		await page.keyboard.type( 'example.com' );

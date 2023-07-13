@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -53,9 +54,22 @@ function EditorCanvasContainer( {
 	onClose,
 	enableResizing = false,
 } ) {
-	const editorCanvasContainerView = useSelect(
-		( select ) =>
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+	const { editorCanvasContainerView, showListViewByDefault } = useSelect(
+		( select ) => {
+			const _editorCanvasContainerView = unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView();
+
+			const _showListViewByDefault = select( preferencesStore ).get(
+				'core/edit-site',
+				'showListViewByDefault'
+			);
+
+			return {
+				editorCanvasContainerView: _editorCanvasContainerView,
+				showListViewByDefault: _showListViewByDefault,
+			};
+		},
 		[]
 	);
 	const [ isClosed, setIsClosed ] = useState( false );
@@ -69,10 +83,13 @@ function EditorCanvasContainer( {
 		[ editorCanvasContainerView ]
 	);
 
+	const { setIsListViewOpened } = useDispatch( editSiteStore );
+
 	function onCloseContainer() {
 		if ( typeof onClose === 'function' ) {
 			onClose();
 		}
+		setIsListViewOpened( showListViewByDefault );
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
 	}

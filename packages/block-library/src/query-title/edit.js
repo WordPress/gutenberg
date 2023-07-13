@@ -12,14 +12,10 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
@@ -98,7 +94,7 @@ export default function QueryTitleEdit( {
 		<>
 			<BlockControls group="block">
 				<HeadingLevelDropdown
-					selectedLevel={ level }
+					value={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

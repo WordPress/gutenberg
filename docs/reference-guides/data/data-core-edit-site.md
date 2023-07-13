@@ -268,6 +268,19 @@ _Parameters_
 -   _options_ `[Object]`:
 -   _options.allowUndo_ `[boolean]`: Whether to allow the user to undo reverting the template. Default true.
 
+### setEditedEntity
+
+Action that sets an edited entity.
+
+_Parameters_
+
+-   _postType_ `string`: The entity's post type.
+-   _postId_ `string`: The entity's ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setEditedPostContext
 
 Set's the current block editor context.

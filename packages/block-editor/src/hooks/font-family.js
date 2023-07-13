@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -15,6 +10,7 @@ import TokenList from '@wordpress/token-list';
  */
 import { shouldSkipSerialization } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
+import { kebabCase } from '../utils/object';
 
 export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
 

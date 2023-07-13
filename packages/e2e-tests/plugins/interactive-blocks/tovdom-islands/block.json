@@ -1,0 +1,14 @@
+{
+	"apiVersion": 2,
+	"name": "test/tovdom-islands",
+	"title": "E2E Interactivity tests - tovdom islands",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScript": "tovdom-islands-view",
+	"render": "file:./render.php"
+}

@@ -136,9 +136,12 @@ class UserGlobalStylesRevisions {
 
 	async openRevisions() {
 		await this.page
-			.getByRole( 'button', { name: 'Styles actions' } )
+			.getByRole( 'menubar', { name: 'Styles actions' } )
 			.click();
-		await this.page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
+		await this.page.getByRole( 'button', { name: 'Revisions' } ).click();
+		await this.page
+			.getByRole( 'menuitem', { name: /^Revision history/ } )
+			.click();
 	}
 
 	async openStylesPanel() {

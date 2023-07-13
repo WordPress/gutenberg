@@ -20,39 +20,29 @@ import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import DocumentTitle from './document-title';
 
+const slideY = {
+	hidden: { y: '-50px' },
+	hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
+};
+
+const slideX = {
+	hidden: { x: '-100%' },
+	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
+};
+
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const isLargeViewport = useViewportMatch( 'large' );
-	const {
-		hasActiveMetaboxes,
-		isPublishSidebarOpened,
-		isSaving,
-		showIconLabels,
-		isDistractionFreeMode,
-	} = useSelect(
-		( select ) => ( {
-			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isPublishSidebarOpened:
-				select( editPostStore ).isPublishSidebarOpened(),
-			isSaving: select( editPostStore ).isSavingMetaBoxes(),
-			showIconLabels:
-				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			isDistractionFreeMode:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ),
-		} ),
-		[]
-	);
-
-	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
-
-	const slideY = {
-		hidden: isDistractionFree ? { y: '-50' } : { y: 0 },
-		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
-	};
-
-	const slideX = {
-		hidden: isDistractionFree ? { x: '-100%' } : { x: 0 },
-		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
-	};
+	const { hasActiveMetaboxes, isPublishSidebarOpened, showIconLabels } =
+		useSelect(
+			( select ) => ( {
+				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+				isPublishSidebarOpened:
+					select( editPostStore ).isPublishSidebarOpened(),
+				showIconLabels:
+					select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			} ),
+			[]
+		);
 
 	return (
 		<div className="edit-post-header">
@@ -87,19 +77,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					// when the publish sidebar has been closed.
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
-						forceIsSaving={ isSaving }
 						showIconLabels={ showIconLabels }
 					/>
 				) }
-				<ViewLink />
 				<DevicePreview />
-				<PostPreviewButton
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
+				<PostPreviewButton forceIsAutosaveable={ hasActiveMetaboxes } />
+				<ViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
 					setEntitiesSavedStatesCallback={
 						setEntitiesSavedStatesCallback
 					}

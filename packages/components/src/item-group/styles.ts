@@ -23,6 +23,16 @@ export const unstyledButton = css`
 	&:hover {
 		color: ${ COLORS.ui.theme };
 	}
+
+	&:focus-visible {
+		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+			var(
+				--wp-components-color-accent,
+				var( --wp-admin-theme-color, ${ COLORS.ui.theme } )
+			);
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+	}
 `;
 
 export const itemWrapper = css`

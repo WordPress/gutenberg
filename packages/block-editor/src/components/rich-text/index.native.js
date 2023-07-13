@@ -6,13 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	RawHTML,
-	Platform,
-	useRef,
-	useCallback,
-	forwardRef,
-} from '@wordpress/element';
+import { Platform, useRef, useCallback, forwardRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	pasteHandler,
@@ -55,6 +49,7 @@ import {
 	createLinkInParagraph,
 } from './utils';
 import EmbedHandlerPicker from './embed-handler-picker';
+import { Content } from './content';
 
 const classes = 'block-editor-rich-text__editable';
 
@@ -707,32 +702,7 @@ function RichTextWrapper(
 
 const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
 
-ForwardedRichTextContainer.Content = ( {
-	value,
-	tagName: Tag,
-	multiline,
-	...props
-} ) => {
-	// Handle deprecated `children` and `node` sources.
-	if ( Array.isArray( value ) ) {
-		value = childrenSource.toHTML( value );
-	}
-
-	const MultilineTag = getMultilineTag( multiline );
-
-	if ( ! value && MultilineTag ) {
-		value = `<${ MultilineTag }></${ MultilineTag }>`;
-	}
-
-	const content = <RawHTML>{ value }</RawHTML>;
-
-	if ( Tag ) {
-		const { format, ...restProps } = props;
-		return <Tag { ...restProps }>{ content }</Tag>;
-	}
-
-	return content;
-};
+ForwardedRichTextContainer.Content = Content;
 
 ForwardedRichTextContainer.isEmpty = ( value ) => {
 	return ! value || value.length === 0;

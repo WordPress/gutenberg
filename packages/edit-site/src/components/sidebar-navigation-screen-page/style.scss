@@ -30,6 +30,7 @@
 
 .edit-site-sidebar-navigation-screen-page__excerpt {
 	font-size: $helptext-font-size;
+	margin-bottom: $grid-unit-30;
 }
 
 .edit-site-sidebar-navigation-screen-page__modified {
@@ -60,21 +61,3 @@
 		fill: $alert-green;
 	}
 }
-
-.edit-site-sidebar-navigation-screen-page__footer {
-	padding-top: $grid-unit-10;
-	padding-bottom: $grid-unit-10;
-	padding-left: $grid-unit-20;
-}
-
-.edit-site-sidebar-navigation-screen-page__details {
-	.edit-site-sidebar-navigation-screen-page__details-label {
-		color: $gray-600;
-		width: 100px;
-	}
-
-	.edit-site-sidebar-navigation-screen-page__details-value.edit-site-sidebar-navigation-screen-page__details-value {
-		color: $gray-200;
-	}
-}
-

@@ -13,6 +13,7 @@ import {
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
 	EditorSnackbars,
+	PostSyncStatusModal,
 	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -291,6 +292,7 @@ function Layout( { styles } ) {
 			<EditPostPreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
+			<PostSyncStatusModal />
 			<StartPageOptions />
 			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />
