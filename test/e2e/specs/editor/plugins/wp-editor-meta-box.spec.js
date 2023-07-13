@@ -17,10 +17,13 @@ test.describe( 'WP Editor Meta Boxes', () => {
 	} );
 
 	test( 'Should save the changes', async ( { admin, editor, page } ) => {
-		await admin.createNewPost();
+		await admin.createNewPost( { legacyCanvas: true } );
 
 		// Add title to enable valid non-empty post save.
-		await page.type( 'role=textbox[name="Add title"i]', 'Hello Meta' );
+		await editor.canvas.type(
+			'role=textbox[name="Add title"i]',
+			'Hello Meta'
+		);
 
 		// Type something.
 		await page.click( 'role=button[name="Text"i]' );

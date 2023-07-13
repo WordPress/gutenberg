@@ -122,7 +122,7 @@ function getdave_sbe_render_block_editor() {
 
 Here we simply output some basic placeholder HTML.
 
-Note that we've included an `id` attribute `getdave-sbe-block-editor`. Keep a note of that, a we'll be using it shortly.
+Note that we've included an `id` attribute `getdave-sbe-block-editor`. Keep a note of that, as we'll be using it shortly.
 
 ### Enqueuing JavaScript and CSS
 

@@ -17,15 +17,9 @@ const transforms = {
 						fontSize,
 						style,
 					},
-					createBlock( 'core/paragraph', { content: value } )
+					[ createBlock( 'core/paragraph', { content: value } ) ]
 				);
 			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/group' ],
-			transform: ( { anchor }, innerBlocks ) =>
-				createBlock( 'core/quote', { anchor }, innerBlocks ),
 		},
 		{
 			type: 'prefix',
@@ -64,6 +58,16 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ '*' ],
 			isMatch: ( {}, blocks ) => {
+				// When a single block is selected make the tranformation
+				// available only to specific blocks that make sense.
+				if ( blocks.length === 1 ) {
+					return [
+						'core/paragraph',
+						'core/heading',
+						'core/list',
+						'core/pullquote',
+					].includes( blocks[ 0 ].name );
+				}
 				return ! blocks.some( ( { name } ) => name === 'core/quote' );
 			},
 			__experimentalConvert: ( blocks ) =>
@@ -107,6 +111,19 @@ const transforms = {
 		},
 		{
 			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { citation }, innerBlocks ) =>
+				citation
+					? [
+							...innerBlocks,
+							createBlock( 'core/paragraph', {
+								content: citation,
+							} ),
+					  ]
+					: innerBlocks,
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/group' ],
 			transform: ( { citation, anchor }, innerBlocks ) =>
 				createBlock(
@@ -122,20 +139,16 @@ const transforms = {
 						: innerBlocks
 				),
 		},
-		{
-			type: 'block',
-			blocks: [ '*' ],
-			transform: ( { citation }, innerBlocks ) =>
-				citation
-					? [
-							...innerBlocks,
-							createBlock( 'core/paragraph', {
-								content: citation,
-							} ),
-					  ]
-					: innerBlocks,
-		},
 	],
+	ungroup: ( { citation }, innerBlocks ) =>
+		citation
+			? [
+					...innerBlocks,
+					createBlock( 'core/paragraph', {
+						content: citation,
+					} ),
+			  ]
+			: innerBlocks,
 };
 
 export default transforms;

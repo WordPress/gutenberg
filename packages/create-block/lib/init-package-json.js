@@ -24,6 +24,7 @@ module.exports = async ( {
 	npmDevDependencies,
 	customScripts,
 	isDynamicVariant,
+	customPackageJSON,
 } ) => {
 	const cwd = join( process.cwd(), slug );
 
@@ -58,6 +59,7 @@ module.exports = async ( {
 					...( wpEnv && { env: 'wp-env' } ),
 					...customScripts,
 				},
+				...customPackageJSON,
 			} ).filter( ( [ , value ] ) => !! value )
 		)
 	);

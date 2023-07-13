@@ -11,6 +11,7 @@
 @import "./comments-pagination/style.scss";
 @import "./comment-template/style.scss";
 @import "./cover/style.scss";
+@import "./details/style.scss";
 @import "./embed/style.scss";
 @import "./file/style.scss";
 @import "./gallery/style.scss";
@@ -30,7 +31,9 @@
 @import "./post-date/style.scss";
 @import "./post-excerpt/style.scss";
 @import "./post-featured-image/style.scss";
+@import "./post-navigation-link/style.scss";
 @import "./post-terms/style.scss";
+@import "./post-time-to-read/style.scss";
 @import "./post-title/style.scss";
 @import "./preformatted/style.scss";
 @import "./pullquote/style.scss";
@@ -43,12 +46,15 @@
 @import "./search/style.scss";
 @import "./separator/style.scss";
 @import "./site-logo/style.scss";
+@import "./site-title/style.scss";
 @import "./social-links/style.scss";
 @import "./spacer/style.scss";
 @import "./tag-cloud/style.scss";
 @import "./table/style.scss";
+@import "./term-description/style.scss";
 @import "./text-columns/style.scss";
 @import "./verse/style.scss";
 @import "./video/style.scss";
+@import "./footnotes/style.scss";
 
 @import "common.scss";

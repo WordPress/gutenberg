@@ -1,10 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/avatar",
 	"title": "Avatar",
 	"category": "theme",
-	"description": "Add a user's avatar.",
+	"description": "Add a user’s avatar.",
 	"textdomain": "default",
 	"attributes": {
 		"userId": {
@@ -48,6 +48,6 @@
 			"__experimentalDuotone": "img"
 		}
 	},
-	"editorStyle": "wp-block-avatar",
+	"editorStyle": "wp-block-avatar-editor",
 	"style": "wp-block-avatar"
 }

@@ -47,6 +47,7 @@ const { console } = window;
  */
 function filterInlineHTML( HTML, preserveWhiteSpace ) {
 	HTML = deepFilterHTML( HTML, [
+		headRemover,
 		googleDocsUIDRemover,
 		phrasingContentReducer,
 		commentRemover,

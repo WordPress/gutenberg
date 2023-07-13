@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, reduce, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -15,6 +10,8 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
+import deprecated from '@wordpress/deprecated';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -47,27 +44,39 @@ export const closeGeneralSidebar =
 /**
  * Returns an action object used in signalling that the user opened a modal.
  *
+ * @deprecated since WP 6.3 use `core/interface` store's action with the same name instead.
+ *
+ *
  * @param {string} name A string that uniquely identifies the modal.
  *
  * @return {Object} Action object.
  */
-export function openModal( name ) {
-	return {
-		type: 'OPEN_MODAL',
-		name,
+export const openModal =
+	( name ) =>
+	( { registry } ) => {
+		deprecated( "select( 'core/edit-post' ).openModal( name )", {
+			since: '6.3',
+			alternative: "select( 'core/interface').openModal( name )",
+		} );
+		return registry.dispatch( interfaceStore ).openModal( name );
 	};
-}
 
 /**
  * Returns an action object signalling that the user closed a modal.
  *
+ * @deprecated since WP 6.3 use `core/interface` store's action with the same name instead.
+ *
  * @return {Object} Action object.
  */
-export function closeModal() {
-	return {
-		type: 'CLOSE_MODAL',
+export const closeModal =
+	() =>
+	( { registry } ) => {
+		deprecated( "select( 'core/edit-post' ).closeModal()", {
+			since: '6.3',
+			alternative: "select( 'core/interface').closeModal()",
+		} );
+		return registry.dispatch( interfaceStore ).closeModal();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user opened the publish
@@ -295,9 +304,11 @@ export const showBlockTypes =
 				.select( preferencesStore )
 				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
 
-		const newBlockNames = without(
-			existingBlockNames,
-			...castArray( blockNames )
+		const newBlockNames = existingBlockNames.filter(
+			( type ) =>
+				! (
+					Array.isArray( blockNames ) ? blockNames : [ blockNames ]
+				).includes( type )
 		);
 
 		registry
@@ -320,7 +331,7 @@ export const hideBlockTypes =
 
 		const mergedBlockNames = new Set( [
 			...existingBlockNames,
-			...castArray( blockNames ),
+			...( Array.isArray( blockNames ) ? blockNames : [ blockNames ] ),
 		] );
 
 		registry
@@ -331,18 +342,16 @@ export const hideBlockTypes =
 	};
 
 /**
- * Returns an action object used in signaling
- * what Meta boxes are available in which location.
+ * Stores info about which Meta boxes are available in which location.
  *
  * @param {Object} metaBoxesPerLocation Meta boxes per location.
  */
-export const setAvailableMetaBoxesPerLocation =
-	( metaBoxesPerLocation ) =>
-	( { dispatch } ) =>
-		dispatch( {
-			type: 'SET_META_BOXES_PER_LOCATIONS',
-			metaBoxesPerLocation,
-		} );
+export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
+	return {
+		type: 'SET_META_BOXES_PER_LOCATIONS',
+		metaBoxesPerLocation,
+	};
+}
 
 /**
  * Update a metabox.
@@ -385,16 +394,12 @@ export const requestMetaBoxUpdates =
 		];
 
 		// Merge all form data objects into a single one.
-		const formData = reduce(
-			formDataToMerge,
-			( memo, currentFormData ) => {
-				for ( const [ key, value ] of currentFormData ) {
-					memo.append( key, value );
-				}
-				return memo;
-			},
-			new window.FormData()
-		);
+		const formData = formDataToMerge.reduce( ( memo, currentFormData ) => {
+			for ( const [ key, value ] of currentFormData ) {
+				memo.append( key, value );
+			}
+			return memo;
+		}, new window.FormData() );
 		additionalData.forEach( ( [ key, value ] ) =>
 			formData.append( key, value )
 		);
@@ -563,39 +568,23 @@ export const initializeMetaBoxes =
 
 		metaBoxesInitialized = true;
 
-		let wasSavingPost = registry.select( editorStore ).isSavingPost();
-		let wasAutosavingPost = registry
-			.select( editorStore )
-			.isAutosavingPost();
-		const hasMetaBoxes = select.hasMetaBoxes();
+		// Save metaboxes on save completion, except for autosaves.
+		addFilter(
+			'editor.__unstableSavePost',
+			'core/edit-post/save-metaboxes',
+			( previous, options ) =>
+				previous.then( () => {
+					if ( options.isAutosave ) {
+						return;
+					}
 
-		// Save metaboxes when performing a full save on the post.
-		registry.subscribe( async () => {
-			const isSavingPost = registry.select( editorStore ).isSavingPost();
-			const isAutosavingPost = registry
-				.select( editorStore )
-				.isAutosavingPost();
+					if ( ! select.hasMetaBoxes() ) {
+						return;
+					}
 
-			// Save metaboxes on save completion, except for autosaves that are not a post preview.
-			//
-			// Meta boxes are initialized once at page load. It is not necessary to
-			// account for updates on each state change.
-			//
-			// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309.
-			const shouldTriggerMetaboxesSave =
-				hasMetaBoxes &&
-				wasSavingPost &&
-				! isSavingPost &&
-				! wasAutosavingPost;
-
-			// Save current state for next inspection.
-			wasSavingPost = isSavingPost;
-			wasAutosavingPost = isAutosavingPost;
-
-			if ( shouldTriggerMetaboxesSave ) {
-				await dispatch.requestMetaBoxUpdates();
-			}
-		} );
+					return dispatch.requestMetaBoxUpdates();
+				} )
+		);
 
 		dispatch( {
 			type: 'META_BOXES_INITIALIZED',

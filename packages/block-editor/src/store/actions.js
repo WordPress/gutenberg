@@ -1,3 +1,4 @@
+/* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
 /**
  * WordPress dependencies
  */
@@ -25,36 +26,15 @@ import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
+import {
+	__experimentalUpdateSettings,
+	privateRemoveBlocks,
+} from './private-actions';
+
+/** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
-
-/**
- * Action which will insert a default block insert action if there
- * are no other blocks at the root of the editor. This action should be used
- * in actions which may result in no blocks remaining in the editor (removal,
- * replacement, etc).
- */
-const ensureDefaultBlock =
-	() =>
-	( { select, dispatch } ) => {
-		// To avoid a focus loss when removing the last block, assure there is
-		// always a default block if the last of the blocks have been removed.
-		const count = select.getBlockCount();
-		if ( count > 0 ) {
-			return;
-		}
-
-		// If there's an custom appender, don't insert default block.
-		// We have to remember to manually move the focus elsewhere to
-		// prevent it from being lost though.
-		const { __unstableHasCustomAppender } = select.getSettings();
-		if ( __unstableHasCustomAppender ) {
-			return;
-		}
-
-		dispatch.insertDefaultBlock();
-	};
 
 /**
  * Action that resets blocks state to the specified array of blocks, taking precedence
@@ -72,7 +52,7 @@ export const resetBlocks =
 /**
  * Block validity is a function of blocks state (at the point of a
  * reset) and the template setting. As a compromise to its placement
- * across distinct parts of state, it is implemented here as a side-
+ * across distinct parts of state, it is implemented here as a side
  * effect of the block reset action.
  *
  * @param {Array} blocks Array of blocks.
@@ -229,17 +209,24 @@ export function selectBlock( clientId, initialPosition = 0 ) {
 
 /**
  * Yields action objects used in signalling that the block preceding the given
- * clientId should be selected.
+ * clientId (or optionally, its first parent from bottom to top)
+ * should be selected.
  *
- * @param {string} clientId Block client ID.
+ * @param {string}  clientId         Block client ID.
+ * @param {boolean} fallbackToParent If true, select the first parent if there is no previous block.
  */
 export const selectPreviousBlock =
-	( clientId ) =>
+	( clientId, fallbackToParent = false ) =>
 	( { select, dispatch } ) => {
 		const previousBlockClientId =
 			select.getPreviousBlockClientId( clientId );
 		if ( previousBlockClientId ) {
 			dispatch.selectBlock( previousBlockClientId, -1 );
+		} else if ( fallbackToParent ) {
+			const firstParentClientId = select.getBlockRootClientId( clientId );
+			if ( firstParentClientId ) {
+				dispatch.selectBlock( firstParentClientId, -1 );
+			}
 		}
 	};
 
@@ -415,7 +402,7 @@ export const replaceBlocks =
 			initialPosition,
 			meta,
 		} );
-		dispatch( ensureDefaultBlock() );
+		dispatch.ensureDefaultBlock();
 	};
 
 /**
@@ -533,6 +520,9 @@ export function moveBlockToPosition(
 /**
  * Action that inserts a single block, optionally at a specific index respective a root block list.
  *
+ * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
+ * a templateLock is active on the block list.
+ *
  * @param {Object}   block           Block object to insert.
  * @param {?number}  index           Index at which block should be inserted.
  * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
@@ -562,12 +552,16 @@ export function insertBlock(
 /**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
+ * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
+ * a templateLock is active on the block list.
+ *
  * @param {Object[]}  blocks          Block objects to insert.
  * @param {?number}   index           Index at which block should be inserted.
  * @param {?string}   rootClientId    Optional root client ID of block list on which to insert.
  * @param {?boolean}  updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
  * @param {0|-1|null} initialPosition Initial focus position. Setting it to null prevent focusing the inserted block.
  * @param {?Object}   meta            Optional Meta values to be passed to the action object.
+ *
  * @return {Object} Action object.
  */
 export const insertBlocks =
@@ -624,10 +618,13 @@ export const insertBlocks =
 /**
  * Action that shows the insertion point.
  *
- * @param {?string} rootClientId      Optional root client ID of block list on
- *                                    which to insert.
- * @param {?number} index             Index at which block should be inserted.
- * @param {Object}  __unstableOptions Whether or not to show an inserter button.
+ * @param    {?string}         rootClientId           Optional root client ID of block list on
+ *                                                    which to insert.
+ * @param    {?number}         index                  Index at which block should be inserted.
+ * @param    {?Object}         __unstableOptions      Additional options.
+ * @property {boolean}         __unstableWithInserter Whether or not to show an inserter button.
+ * @property {WPDropOperation} operation              The operation to perform when applied,
+ *                                                    either 'insert' or 'replace' for now.
  *
  * @return {Object} Action object.
  */
@@ -636,25 +633,28 @@ export function showInsertionPoint(
 	index,
 	__unstableOptions = {}
 ) {
-	const { __unstableWithInserter } = __unstableOptions;
+	const { __unstableWithInserter, operation } = __unstableOptions;
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
 		__unstableWithInserter,
+		operation,
 	};
 }
-
 /**
  * Action that hides the insertion point.
- *
- * @return {Object} Action object.
  */
-export function hideInsertionPoint() {
-	return {
-		type: 'HIDE_INSERTION_POINT',
+export const hideInsertionPoint =
+	() =>
+	( { select, dispatch } ) => {
+		if ( ! select.isBlockInsertionPointVisible() ) {
+			return;
+		}
+		dispatch( {
+			type: 'HIDE_INSERTION_POINT',
+		} );
 	};
-}
 
 /**
  * Action that resets the template validity.
@@ -1166,37 +1166,14 @@ export const mergeBlocks =
  * the set of specified client IDs are to be removed.
  *
  * @param {string|string[]} clientIds      Client IDs of blocks to remove.
- * @param {boolean}         selectPrevious True if the previous block should be
- *                                         selected when a block is removed.
+ * @param {boolean}         selectPrevious True if the previous block
+ *                                         or the immediate parent
+ *                                         (if no previous block exists)
+ *                                         should be selected
+ *                                         when a block is removed.
  */
-export const removeBlocks =
-	( clientIds, selectPrevious = true ) =>
-	( { select, dispatch } ) => {
-		if ( ! clientIds || ! clientIds.length ) {
-			return;
-		}
-
-		clientIds = castArray( clientIds );
-		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
-		const canRemoveBlocks = select.canRemoveBlocks(
-			clientIds,
-			rootClientId
-		);
-
-		if ( ! canRemoveBlocks ) {
-			return;
-		}
-
-		if ( selectPrevious ) {
-			dispatch.selectPreviousBlock( clientIds[ 0 ] );
-		}
-
-		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
-
-		// To avoid a focus loss when removing the last block, assure there is
-		// always a default block if the last of the blocks have been removed.
-		dispatch( ensureDefaultBlock() );
-	};
+export const removeBlocks = ( clientIds, selectPrevious = true ) =>
+	privateRemoveBlocks( clientIds, selectPrevious );
 
 /**
  * Returns an action object used in signalling that the block with the
@@ -1412,10 +1389,9 @@ export function updateBlockListSettings( clientId, settings ) {
  * @return {Object} Action object
  */
 export function updateSettings( settings ) {
-	return {
-		type: 'UPDATE_SETTINGS',
-		settings,
-	};
+	return __experimentalUpdateSettings( settings, {
+		stripExperimentalSettings: true,
+	} );
 }
 
 /**
@@ -1704,6 +1680,10 @@ export function setBlockVisibility( updates ) {
 /**
  * Action that sets whether a block is being temporaritly edited as blocks.
  *
+ * DO-NOT-USE in production.
+ * This action is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
  * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporaritly edited as blocks.
  */
 export function __unstableSetTemporarilyEditingAsBlocks(
@@ -1714,3 +1694,193 @@ export function __unstableSetTemporarilyEditingAsBlocks(
 		temporarilyEditingAsBlocks,
 	};
 }
+
+/**
+ * Interface for inserter media requests.
+ *
+ * @typedef {Object} InserterMediaRequest
+ * @property {number} per_page How many items to fetch per page.
+ * @property {string} search   The search term to use for filtering the results.
+ */
+
+/**
+ * Interface for inserter media responses. Any media resource should
+ * map their response to this interface, in order to create the core
+ * WordPress media blocks (image, video, audio).
+ *
+ * @typedef {Object} InserterMediaItem
+ * @property {string}        title        The title of the media item.
+ * @property {string}        url          The source url of the media item.
+ * @property {string}        [previewUrl] The preview source url of the media item to display in the media list.
+ * @property {number}        [id]         The WordPress id of the media item.
+ * @property {number|string} [sourceId]   The id of the media item from external source.
+ * @property {string}        [alt]        The alt text of the media item.
+ * @property {string}        [caption]    The caption of the media item.
+ */
+
+/**
+ * Registers a new inserter media category. Once registered, the media category is
+ * available in the inserter's media tab.
+ *
+ * The following interfaces are used:
+ *
+ * _Type Definition_
+ *
+ * - _InserterMediaRequest_ `Object`: Interface for inserter media requests.
+ *
+ * _Properties_
+ *
+ * - _per_page_ `number`: How many items to fetch per page.
+ * - _search_ `string`: The search term to use for filtering the results.
+ *
+ * _Type Definition_
+ *
+ * - _InserterMediaItem_ `Object`: Interface for inserter media responses. Any media resource should
+ * map their response to this interface, in order to create the core
+ * WordPress media blocks (image, video, audio).
+ *
+ * _Properties_
+ *
+ * - _title_ `string`: The title of the media item.
+ * - _url_ `string: The source url of the media item.
+ * - _previewUrl_ `[string]`: The preview source url of the media item to display in the media list.
+ * - _id_ `[number]`: The WordPress id of the media item.
+ * - _sourceId_ `[number|string]`: The id of the media item from external source.
+ * - _alt_ `[string]`: The alt text of the media item.
+ * - _caption_ `[string]`: The caption of the media item.
+ *
+ * @param    {InserterMediaCategory}                                  category                       The inserter media category to register.
+ *
+ * @example
+ * ```js
+ *
+ * wp.data.dispatch('core/block-editor').registerInserterMediaCategory( {
+ * 	 name: 'openverse',
+ * 	 labels: {
+ * 	 	name: 'Openverse',
+ * 	 	search_items: 'Search Openverse',
+ * 	 },
+ * 	 mediaType: 'image',
+ * 	 async fetch( query = {} ) {
+ * 	 	const defaultArgs = {
+ * 	 		mature: false,
+ * 	 		excluded_source: 'flickr,inaturalist,wikimedia',
+ * 	 		license: 'pdm,cc0',
+ * 	 	};
+ * 	 	const finalQuery = { ...query, ...defaultArgs };
+ * 	 	// Sometimes you might need to map the supported request params according to `InserterMediaRequest`.
+ * 	 	// interface. In this example the `search` query param is named `q`.
+ * 	 	const mapFromInserterMediaRequest = {
+ * 	 		per_page: 'page_size',
+ * 	 		search: 'q',
+ * 	 	};
+ * 	 	const url = new URL( 'https://api.openverse.engineering/v1/images/' );
+ * 	 	Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
+ * 	 		const queryKey = mapFromInserterMediaRequest[ key ] || key;
+ * 	 		url.searchParams.set( queryKey, value );
+ * 	 	} );
+ * 	 	const response = await window.fetch( url, {
+ * 	 		headers: {
+ * 	 			'User-Agent': 'WordPress/inserter-media-fetch',
+ * 	 		},
+ * 	 	} );
+ * 	 	const jsonResponse = await response.json();
+ * 	 	const results = jsonResponse.results;
+ * 	 	return results.map( ( result ) => ( {
+ * 	 		...result,
+ * 	 		// If your response result includes an `id` prop that you want to access later, it should
+ * 	 		// be mapped to `InserterMediaItem`'s `sourceId` prop. This can be useful if you provide
+ * 	 		// a report URL getter.
+ * 	 		// Additionally you should always clear the `id` value of your response results because
+ * 	 		// it is used to identify WordPress media items.
+ * 	 		sourceId: result.id,
+ * 	 		id: undefined,
+ * 	 		caption: result.caption,
+ * 	 		previewUrl: result.thumbnail,
+ * 	 	} ) );
+ * 	 },
+ * 	 getReportUrl: ( { sourceId } ) =>
+ * 	 	`https://wordpress.org/openverse/image/${ sourceId }/report/`,
+ * 	 isExternalResource: true,
+ * } );
+ * ```
+ *
+ * @typedef {Object} InserterMediaCategory Interface for inserter media category.
+ * @property {string}                                                 name                           The name of the media category, that should be unique among all media categories.
+ * @property {Object}                                                 labels                         Labels for the media category.
+ * @property {string}                                                 labels.name                    General name of the media category. It's used in the inserter media items list.
+ * @property {string}                                                 [labels.search_items='Search'] Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
+ * @property {('image'|'audio'|'video')}                              mediaType                      The media type of the media category.
+ * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]>} fetch                          The function to fetch media items for the category.
+ * @property {(InserterMediaItem) => string}                          [getReportUrl]                 If the media category supports reporting media items, this function should return
+ *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
+ * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
+ *                                                                                                   This is used to avoid making a request to the external resource when the user
+ *
+ */
+export const registerInserterMediaCategory =
+	( category ) =>
+	( { select, dispatch } ) => {
+		if ( ! category || typeof category !== 'object' ) {
+			console.error(
+				'Category should be an `InserterMediaCategory` object.'
+			);
+			return;
+		}
+		if ( ! category.name ) {
+			console.error(
+				'Category should have a `name` that should be unique among all media categories.'
+			);
+			return;
+		}
+		if ( ! category.labels?.name ) {
+			console.error( 'Category should have a `labels.name`.' );
+			return;
+		}
+		if ( ! [ 'image', 'audio', 'video' ].includes( category.mediaType ) ) {
+			console.error(
+				'Category should have `mediaType` property that is one of `image|audio|video`.'
+			);
+			return;
+		}
+		if ( ! category.fetch || typeof category.fetch !== 'function' ) {
+			console.error(
+				'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]>`.'
+			);
+			return;
+		}
+		const { inserterMediaCategories = [] } = select.getSettings();
+		if (
+			inserterMediaCategories.some(
+				( { name } ) => name === category.name
+			)
+		) {
+			console.error(
+				`A category is already registered with the same name: "${ category.name }".`
+			);
+			return;
+		}
+		if (
+			inserterMediaCategories.some(
+				( { labels: { name } } ) => name === category.labels?.name
+			)
+		) {
+			console.error(
+				`A category is already registered with the same labels.name: "${ category.labels.name }".`
+			);
+			return;
+		}
+		// `inserterMediaCategories` is a private block editor setting, which means it cannot
+		// be updated through the public `updateSettings` action. We preserve this setting as
+		// private, so extenders can only add new inserter media categories and don't have any
+		// control over the core media categories.
+		dispatch( {
+			type: 'UPDATE_SETTINGS',
+			settings: {
+				inserterMediaCategories: [
+					...inserterMediaCategories,
+					{ ...category, isExternalResource: true },
+				],
+			},
+		} );
+	};

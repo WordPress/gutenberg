@@ -48,6 +48,7 @@ const Template: ComponentStory< typeof ToggleGroupControl > = ( {
 
 	return (
 		<ToggleGroupControl
+			__nextHasNoMarginBottom
 			{ ...props }
 			onChange={ ( ...changeArgs ) => {
 				setValue( ...changeArgs );
@@ -81,6 +82,7 @@ Default.args = {
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
 	].map( mapPropsToOptionComponent ),
+	isBlock: true,
 	label: 'Label',
 };
 
@@ -121,14 +123,15 @@ WithIcons.args = {
 		{ value: 'uppercase', label: 'Uppercase', icon: formatUppercase },
 		{ value: 'lowercase', label: 'Lowercase', icon: formatLowercase },
 	].map( mapPropsToOptionIconComponent ),
+	isBlock: false,
 };
 
 /**
- * A borderless style may be preferred in some contexts.
+ * When the `isDeselectable` prop is true, the option can be deselected by clicking on it again.
  */
-export const Borderless: ComponentStory< typeof ToggleGroupControl > =
+export const Deselectable: ComponentStory< typeof ToggleGroupControl > =
 	Template.bind( {} );
-Borderless.args = {
+Deselectable.args = {
 	...WithIcons.args,
-	__experimentalIsBorderless: true,
+	isDeselectable: true,
 };

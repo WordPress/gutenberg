@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { mergeWith, pickBy, isEmpty, mapValues } from 'lodash';
+import deepmerge from 'deepmerge';
+import { isPlainObject } from 'is-plain-object';
 
 /**
  * WordPress dependencies
@@ -9,59 +10,65 @@ import { mergeWith, pickBy, isEmpty, mapValues } from 'lodash';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { GlobalStylesContext } from './context';
+import { unlock } from '../../lock-unlock';
 
-const identity = ( x ) => x;
-
-function mergeTreesCustomizer( _, srcValue ) {
-	// We only pass as arrays the presets,
-	// in which case we want the new array of values
-	// to override the old array (no merging).
-	if ( Array.isArray( srcValue ) ) {
-		return srcValue;
-	}
-}
+const { GlobalStylesContext, cleanEmptyObject } = unlock(
+	blockEditorPrivateApis
+);
 
 export function mergeBaseAndUserConfigs( base, user ) {
-	return mergeWith( {}, base, user, mergeTreesCustomizer );
+	return deepmerge( base, user, {
+		// We only pass as arrays the presets,
+		// in which case we want the new array of values
+		// to override the old array (no merging).
+		isMergeableObject: isPlainObject,
+	} );
 }
 
-const cleanEmptyObject = ( object ) => {
-	if (
-		object === null ||
-		typeof object !== 'object' ||
-		Array.isArray( object )
-	) {
-		return object;
-	}
-	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
-		identity
-	);
-	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
-};
-
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, settings, styles } = useSelect( ( select ) => {
-		const _globalStylesId =
-			select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-		const record = _globalStylesId
-			? select( coreStore ).getEditedEntityRecord(
-					'root',
-					'globalStyles',
-					_globalStylesId
-			  )
-			: undefined;
-		return {
-			globalStylesId: _globalStylesId,
-			settings: record?.settings,
-			styles: record?.styles,
-		};
-	}, [] );
+	const { globalStylesId, isReady, settings, styles } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const _globalStylesId =
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
+			const record = _globalStylesId
+				? getEditedEntityRecord(
+						'root',
+						'globalStyles',
+						_globalStylesId
+				  )
+				: undefined;
+
+			let hasResolved = false;
+			if (
+				hasFinishedResolution(
+					'__experimentalGetCurrentGlobalStylesId'
+				)
+			) {
+				hasResolved = _globalStylesId
+					? hasFinishedResolution( 'getEditedEntityRecord', [
+							'root',
+							'globalStyles',
+							_globalStylesId,
+					  ] )
+					: true;
+			}
+
+			return {
+				globalStylesId: _globalStylesId,
+				isReady: hasResolved,
+				settings: record?.settings,
+				styles: record?.styles,
+			};
+		},
+		[]
+	);
 
 	const { getEditedEntityRecord } = useSelect( coreStore );
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -73,7 +80,7 @@ function useGlobalStylesUserConfig() {
 	}, [ settings, styles ] );
 
 	const setConfig = useCallback(
-		( callback ) => {
+		( callback, options = {} ) => {
 			const record = getEditedEntityRecord(
 				'root',
 				'globalStyles',
@@ -84,15 +91,21 @@ function useGlobalStylesUserConfig() {
 				settings: record?.settings ?? {},
 			};
 			const updatedConfig = callback( currentConfig );
-			editEntityRecord( 'root', 'globalStyles', globalStylesId, {
-				styles: cleanEmptyObject( updatedConfig.styles ) || {},
-				settings: cleanEmptyObject( updatedConfig.settings ) || {},
-			} );
+			editEntityRecord(
+				'root',
+				'globalStyles',
+				globalStylesId,
+				{
+					styles: cleanEmptyObject( updatedConfig.styles ) || {},
+					settings: cleanEmptyObject( updatedConfig.settings ) || {},
+				},
+				options
+			);
 		},
 		[ globalStylesId ]
 	);
 
-	return [ !! settings || !! styles, config, setConfig ];
+	return [ isReady, config, setConfig ];
 }
 
 function useGlobalStylesBaseConfig() {

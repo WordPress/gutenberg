@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/navigation",
 	"title": "Navigation",
 	"category": "theme",
@@ -67,6 +67,10 @@
 		"maxNestingLevel": {
 			"type": "number",
 			"default": 5
+		},
+		"templateLock": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "all", "insert", "contentOnly", false ]
 		}
 	},
 	"providesContext": {
@@ -83,12 +87,10 @@
 		"showSubmenuIcon": "showSubmenuIcon",
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
-		"orientation": "orientation",
 		"maxNestingLevel": "maxNestingLevel"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
-		"anchor": true,
 		"html": false,
 		"inserter": true,
 		"typography": {
@@ -112,23 +114,16 @@
 				"blockGap": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"allowVerticalAlignment": false,
+			"allowSizingOnChildren": true,
 			"default": {
 				"type": "flex"
 			}
 		},
-		"__experimentalStyle": {
-			"elements": {
-				"link": {
-					"color": {
-						"text": "inherit"
-					}
-				}
-			}
-		}
+		"interactivity": true
 	},
 	"viewScript": [ "file:./view.min.js", "file:./view-modal.min.js" ],
 	"editorStyle": "wp-block-navigation-editor",

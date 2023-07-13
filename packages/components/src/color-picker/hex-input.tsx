@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { colord, Colord } from 'colord';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -17,12 +17,7 @@ import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
 import { COLORS } from '../utils/colors-values';
 import type { StateReducer } from '../input-control/reducer/state';
-
-interface HexInputProps {
-	color: Colord;
-	onChange: ( nextColor: Colord ) => void;
-	enableAlpha: boolean;
-}
+import type { HexInputProps } from './types';
 
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	const handleChange = ( nextValue: string | undefined ) => {

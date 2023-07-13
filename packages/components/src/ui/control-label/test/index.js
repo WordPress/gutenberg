@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -12,15 +12,13 @@ describe( 'props', () => {
 	test( 'should render correctly', () => {
 		const { container } = render( <ControlLabel>Label</ControlLabel> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render htmlFor', () => {
-		const { container } = render(
-			<ControlLabel htmlFor="Field">Label</ControlLabel>
-		);
+		render( <ControlLabel htmlFor="Field">Label</ControlLabel> );
 
-		expect( container.firstChild ).toHaveAttribute( 'for', 'Field' );
+		expect( screen.getByText( 'Label' ) ).toHaveAttribute( 'for', 'Field' );
 	} );
 
 	test( 'should render size', () => {
@@ -28,7 +26,7 @@ describe( 'props', () => {
 			<ControlLabel size="small">Label</ControlLabel>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render no truncate', () => {
@@ -36,6 +34,6 @@ describe( 'props', () => {
 			<ControlLabel truncate={ false }>Label</ControlLabel>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

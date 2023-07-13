@@ -1,6 +1,6 @@
 # DropZone
 
-`DropZone` is a Component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
+`DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
 
 ## Usage
 
@@ -30,7 +30,7 @@ The component accepts the following props:
 
 ### className
 
-A CSS `class` to be _appended_ after the default `components-drop-zone` class.
+A CSS `class` to give to the wrapper element.
 
 -   Type: `String`
 -   Default: `undefined`
@@ -52,7 +52,7 @@ The function is called when dropping a file into the `DropZone`. It receives an 
 
 ### onHTMLDrop
 
-The function is called when dropping a file into the `DropZone`. It receives the HTML being dropped as an argument.
+The function is called when dropping HTML into the `DropZone`. It receives the HTML being dropped as an argument.
 
 -   Type: `Function`
 -   Required: No

@@ -41,17 +41,11 @@ const transforms = {
 					'core/group',
 					{
 						align: widestAlignment,
+						layout: { type: 'constrained' },
 					},
 					groupInnerBlocks
 				);
 			},
-		},
-	],
-	to: [
-		{
-			type: 'block',
-			blocks: [ '*' ],
-			transform: ( attributes, innerBlocks ) => innerBlocks,
 		},
 	],
 };

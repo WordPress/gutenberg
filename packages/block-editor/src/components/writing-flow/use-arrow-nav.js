@@ -17,7 +17,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, isInSameBlock } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -32,19 +32,32 @@ import { store as blockEditorStore } from '../../store';
  */
 export function isNavigationCandidate( element, keyCode, hasModifier ) {
 	const isVertical = keyCode === UP || keyCode === DOWN;
+	const { tagName } = element;
+	const elementType = element.getAttribute( 'type' );
 
-	// Currently, all elements support unmodified vertical navigation.
+	// Native inputs should not navigate vertically, unless they are simple types that don't need up/down arrow keys.
 	if ( isVertical && ! hasModifier ) {
+		if ( tagName === 'INPUT' ) {
+			const verticalInputTypes = [
+				'date',
+				'datetime-local',
+				'month',
+				'number',
+				'range',
+				'time',
+				'week',
+			];
+			return ! verticalInputTypes.includes( elementType );
+		}
 		return true;
 	}
-
-	const { tagName } = element;
 
 	// Native inputs should not navigate horizontally, unless they are simple types that don't need left/right arrow keys.
 	if ( tagName === 'INPUT' ) {
 		const simpleInputTypes = [
 			'button',
 			'checkbox',
+			'number',
 			'color',
 			'file',
 			'image',
@@ -52,7 +65,7 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 			'reset',
 			'submit',
 		];
-		return simpleInputTypes.includes( element.getAttribute( 'type' ) );
+		return simpleInputTypes.includes( elementType );
 	}
 
 	// Native textareas should not navigate horizontally.
@@ -101,6 +114,16 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
+		// Skip if there's only one child that is content editable (and thus a
+		// better candidate).
+		if (
+			node.children.length === 1 &&
+			isInSameBlock( node, node.firstElementChild ) &&
+			node.firstElementChild.getAttribute( 'contenteditable' ) === 'true'
+		) {
+			return;
+		}
+
 		// Not a candidate if the node is not tabbable.
 		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
 			return false;
@@ -157,7 +180,14 @@ export default function useArrowNav() {
 		}
 
 		function onKeyDown( event ) {
-			const { keyCode, target } = event;
+			// Abort if navigation has already been handled (e.g. RichText
+			// inline boundaries).
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
+				event;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
@@ -166,31 +196,25 @@ export default function useArrowNav() {
 			const isHorizontal = isLeft || isRight;
 			const isVertical = isUp || isDown;
 			const isNav = isHorizontal || isVertical;
-			const isShift = event.shiftKey;
-			const hasModifier =
-				isShift || event.ctrlKey || event.altKey || event.metaKey;
+			const hasModifier = shiftKey || ctrlKey || altKey || metaKey;
 			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
+			if ( ! isNav ) {
+				return;
+			}
+
 			// If there is a multi-selection, the arrow keys should collapse the
 			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
+				if ( shiftKey ) {
+					return;
+				}
+
 				// Only handle if we have a full selection (not a native partial
 				// selection).
 				if ( ! __unstableIsFullySelected() ) {
-					return;
-				}
-
-				if ( event.defaultPrevented ) {
-					return;
-				}
-
-				if ( ! isNav ) {
-					return;
-				}
-
-				if ( isShift ) {
 					return;
 				}
 
@@ -202,6 +226,12 @@ export default function useArrowNav() {
 					selectBlock( getMultiSelectedBlocksEndClientId(), -1 );
 				}
 
+				return;
+			}
+
+			// Abort if our current target is not a candidate for navigation
+			// (e.g. preserve native input behaviors).
+			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
 				return;
 			}
 
@@ -218,28 +248,12 @@ export default function useArrowNav() {
 				verticalRect = computeCaretRect( defaultView );
 			}
 
-			// Abort if navigation has already been handled (e.g. RichText
-			// inline boundaries).
-			if ( event.defaultPrevented ) {
-				return;
-			}
-
-			if ( ! isNav ) {
-				return;
-			}
-
-			// Abort if our current target is not a candidate for navigation
-			// (e.g. preserve native input behaviors).
-			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
-				return;
-			}
-
 			// In the case of RTL scripts, right means previous and left means
 			// next, which is the exact reverse of LTR.
 			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
 			const { keepCaretInsideBlock } = getSettings();
 
-			if ( isShift ) {
+			if ( shiftKey ) {
 				if (
 					isClosestTabbableABlock( target, isReverse ) &&
 					isNavEdge( target, isReverse )
@@ -251,6 +265,9 @@ export default function useArrowNav() {
 			} else if (
 				isVertical &&
 				isVerticalEdge( target, isReverse ) &&
+				// When Alt is pressed, only intercept if the caret is also at
+				// the horizontal edge.
+				( altKey ? isHorizontalEdge( target, isReverseDir ) : true ) &&
 				! keepCaretInsideBlock
 			) {
 				const closestTabbable = getClosestTabbable(
@@ -263,8 +280,10 @@ export default function useArrowNav() {
 				if ( closestTabbable ) {
 					placeCaretAtVerticalEdge(
 						closestTabbable,
-						isReverse,
-						verticalRect
+						// When Alt is pressed, place the caret at the furthest
+						// horizontal edge and the furthest vertical edge.
+						altKey ? ! isReverse : isReverse,
+						altKey ? undefined : verticalRect
 					);
 					event.preventDefault();
 				}

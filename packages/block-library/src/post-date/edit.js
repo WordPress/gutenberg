@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useRef } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import {
 	AlignmentControl,
@@ -37,9 +37,19 @@ export default function PostDateEdit( {
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
+			[ `wp-block-post-date__modified-date` ]: displayType === 'modified',
 		} ),
 	} );
-	const timeRef = useRef();
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( { anchor: popoverAnchor } ),
+		[ popoverAnchor ]
+	);
+
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const dateSettings = getDateSettings();
 	const [ siteFormat = dateSettings.formats.date ] = useEntityProp(
@@ -67,12 +77,15 @@ export default function PostDateEdit( {
 		[ postTypeSlug ]
 	);
 
+	const dateLabel =
+		displayType === 'date' ? __( 'Post Date' ) : __( 'Post Modified Date' );
+
 	let postDate = date ? (
-		<time dateTime={ dateI18n( 'c', date ) } ref={ timeRef }>
+		<time dateTime={ dateI18n( 'c', date ) } ref={ setPopoverAnchor }>
 			{ dateI18n( format || siteFormat, date ) }
 		</time>
 	) : (
-		__( 'Post Date' )
+		dateLabel
 	);
 
 	if ( isLink && date ) {
@@ -98,7 +111,7 @@ export default function PostDateEdit( {
 				{ date && ! isDescendentOfQueryLoop && (
 					<ToolbarGroup>
 						<Dropdown
-							popoverProps={ { anchorRef: timeRef.current } }
+							popoverProps={ popoverProps }
 							renderContent={ ( { onClose } ) => (
 								<PublishDateTimePicker
 									currentDate={ date }
@@ -141,6 +154,7 @@ export default function PostDateEdit( {
 						}
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={
 							postType?.labels.singular_name
 								? sprintf(
@@ -154,6 +168,7 @@ export default function PostDateEdit( {
 						checked={ isLink }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display last modified date' ) }
 						onChange={ ( value ) =>
 							setAttributes( {
@@ -161,6 +176,9 @@ export default function PostDateEdit( {
 							} )
 						}
 						checked={ displayType === 'modified' }
+						help={ __(
+							'Only shows if the post has been modified'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>

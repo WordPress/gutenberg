@@ -17,7 +17,7 @@ import warning from '@wordpress/warning';
 import { EnablePluginDocumentSettingPanelOption } from '../../preferences-modal/options';
 import { store as editPostStore } from '../../../store';
 
-export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
+const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
 const PluginDocumentSettingFill = ( {
 	isEnabled,

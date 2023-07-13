@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,14 +13,13 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { BlockControls, BlockAlignmentControl } from '../components';
 import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
-import { store as blockEditorStore } from '../store';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
  * An array which includes all possible valid alignments,
@@ -74,7 +72,9 @@ export function getValidAlignments(
 		! hasWideEnabled ||
 		( blockAlign === true && ! hasWideBlockSupport )
 	) {
-		return without( validAlignments, ...WIDE_ALIGNMENTS );
+		return validAlignments.filter(
+			( alignment ) => ! WIDE_ALIGNMENTS.includes( alignment )
+		);
 	}
 
 	return validAlignments;
@@ -118,7 +118,7 @@ export function addAttribute( settings ) {
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const blockEdit = <BlockEdit { ...props } />;
+		const blockEdit = <BlockEdit key="edit" { ...props } />;
 		const { name: blockName } = props;
 		// Compute the block valid alignments by taking into account,
 		// if the theme supports wide alignments or not and the layout's
@@ -132,15 +132,8 @@ export const withToolbarControls = createHigherOrderComponent(
 		const validAlignments = useAvailableAlignments(
 			blockAllowedAlignments
 		).map( ( { name } ) => name );
-		const isContentLocked = useSelect(
-			( select ) => {
-				return select(
-					blockEditorStore
-				).__unstableGetContentLockingParent( props.clientId );
-			},
-			[ props.clientId ]
-		);
-		if ( ! validAlignments.length || isContentLocked ) {
+		const blockEditingMode = useBlockEditingMode();
+		if ( ! validAlignments.length || blockEditingMode !== 'default' ) {
 			return blockEdit;
 		}
 
@@ -204,7 +197,8 @@ export const withDataAlign = createHigherOrderComponent(
 		}
 
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	}
+	},
+	'withDataAlign'
 );
 
 /**

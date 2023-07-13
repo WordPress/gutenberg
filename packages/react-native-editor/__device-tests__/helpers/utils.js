@@ -12,12 +12,11 @@ const path = require( 'path' );
 const serverConfigs = require( './serverConfigs' );
 const { iosServer, iosLocal, android } = require( './caps' );
 const AppiumLocal = require( './appium-local' );
-// eslint-disable-next-line import/no-extraneous-dependencies
-const _ = require( 'underscore' );
 
 // Platform setup.
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
+const iPadDevice = process.env.IPAD;
 
 // Environment setup, local environment or Sauce Labs.
 const defaultEnvironment = 'local';
@@ -79,7 +78,7 @@ const setupDriver = async () => {
 		try {
 			appiumProcess = await AppiumLocal.start( localAppiumPort );
 		} catch ( err ) {
-			// Ignore error here, Appium is probably already running (Appium desktop has its own server for instance)
+			// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
 			// eslint-disable-next-line no-console
 			await console.log(
 				'Could not start Appium server',
@@ -95,7 +94,7 @@ const setupDriver = async () => {
 
 	let desiredCaps;
 	if ( isAndroid() ) {
-		desiredCaps = _.clone( android );
+		desiredCaps = { ...android };
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = path.resolve( localAndroidAppPath );
 			try {
@@ -117,10 +116,10 @@ const setupDriver = async () => {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
 		}
 	} else {
-		desiredCaps = _.clone( iosServer );
+		desiredCaps = iosServer( { iPadDevice } );
 		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
 		if ( isLocalEnvironment() ) {
-			desiredCaps = _.clone( iosLocal );
+			desiredCaps = iosLocal( { iPadDevice } );
 
 			const iosPlatformVersions = getIOSPlatformVersions();
 			if ( iosPlatformVersions.length === 0 ) {
@@ -315,15 +314,21 @@ const clickElementOutsideOfTextInput = async ( driver, element ) => {
 };
 
 // Long press to activate context menu.
-const longPressMiddleOfElement = async ( driver, element ) => {
+const longPressMiddleOfElement = async (
+	driver,
+	element,
+	waitTime = 5000, // Setting to wait a bit longer because this is failing more frequently on the CI
+	customElementSize
+) => {
 	const location = await element.getLocation();
-	const size = await element.getSize();
+	const size = customElementSize || ( await element.getSize() );
 
 	const x = location.x + size.width / 2;
 	const y = location.y + size.height / 2;
+
 	const action = new wd.TouchAction( driver )
 		.longPress( { x, y } )
-		.wait( 5000 ) // Setting to wait a bit longer because this is failing more frequently on the CI
+		.wait( waitTime )
 		.release();
 	await action.perform();
 };
@@ -368,6 +373,19 @@ const tapPasteAboveElement = async ( driver, element ) => {
 		const pasteButtonLocator = '//XCUIElementTypeMenuItem[@name="Paste"]';
 		await clickIfClickable( driver, pasteButtonLocator );
 		await driver.sleep( 3000 ); // Wait for paste notification to disappear.
+	}
+};
+
+const selectTextFromElement = async ( driver, element ) => {
+	if ( isAndroid() ) {
+		await longPressMiddleOfElement( driver, element, 0 );
+	} else {
+		await doubleTap( driver, element );
+		await driver.waitForElementByXPath(
+			'//XCUIElementTypeMenuItem[@name="Copy"]',
+			wd.asserters.isDisplayed,
+			4000
+		);
 	}
 };
 
@@ -458,18 +476,21 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
 	if ( isAndroid() ) {
-		// Hit the "Menu" key.
-		await driver.pressKeycode( 82 );
+		const moreOptionsButton = await driver.elementByAccessibilityId(
+			'More options'
+		);
+		await moreOptionsButton.click();
 
 		const showHtmlButtonXpath =
 			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
 	} else if ( toggleOn ) {
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="..."]'
+		const moreOptionsButton = await driver.elementByAccessibilityId(
+			'editor-menu-button'
 		);
+		await moreOptionsButton.click();
+
 		await clickIfClickable(
 			driver,
 			'//XCUIElementTypeButton[@name="Switch to HTML"]'
@@ -477,10 +498,10 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 	} else {
 		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
 		await driver.sleep( 3000 );
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="..."]'
+		const moreOptionsButton = await driver.elementByAccessibilityId(
+			'editor-menu-button'
 		);
+		await moreOptionsButton.click();
 		await clickIfClickable(
 			driver,
 			'//XCUIElementTypeButton[@name="Switch To Visual"]'
@@ -495,6 +516,26 @@ const toggleOrientation = async ( driver ) => {
 	} else {
 		await driver.setOrientation( 'LANDSCAPE' );
 	}
+};
+
+/**
+ * Toggle the device dark mode.
+ *
+ * @param {Object}  driver   Driver
+ * @param {boolean} darkMode Whether to enable dark mode or not
+ */
+const toggleDarkMode = ( driver, darkMode = true ) => {
+	if ( isAndroid() ) {
+		return driver.execute( 'mobile: shell', [
+			{
+				command: `cmd uimode night  ${ darkMode ? 'yes' : 'no' }`,
+			},
+		] );
+	}
+
+	return driver.execute( 'mobile: setAppearance', {
+		style: darkMode ? 'dark' : 'light',
+	} );
 };
 
 const isEditorVisible = async ( driver ) => {
@@ -680,6 +721,7 @@ module.exports = {
 	longPressMiddleOfElement,
 	setClipboard,
 	setupDriver,
+	selectTextFromElement,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,
@@ -688,6 +730,7 @@ module.exports = {
 	tapPasteAboveElement,
 	tapSelectAllAboveElement,
 	timer,
+	toggleDarkMode,
 	toggleHtmlMode,
 	toggleOrientation,
 	typeString,

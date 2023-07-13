@@ -18,11 +18,7 @@ import {
  * Internal dependencies
  */
 import useAvailableAlignments from './use-available-alignments';
-import {
-	BLOCK_ALIGNMENTS_CONTROLS,
-	DEFAULT_CONTROL,
-	POPOVER_PROPS,
-} from './constants';
+import { BLOCK_ALIGNMENTS_CONTROLS, DEFAULT_CONTROL } from './constants';
 
 function BlockAlignmentUI( {
 	value,
@@ -48,12 +44,10 @@ function BlockAlignmentUI( {
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
 	const commonProps = {
-		popoverProps: POPOVER_PROPS,
 		icon: activeAlignmentControl
 			? activeAlignmentControl.icon
 			: defaultAlignmentControl.icon,
 		label: __( 'Align' ),
-		toggleProps: { describedBy: __( 'Change alignment' ) },
 	};
 	const extraProps = isToolbar
 		? {
@@ -70,6 +64,7 @@ function BlockAlignmentUI( {
 				} ),
 		  }
 		: {
+				toggleProps: { describedBy: __( 'Change alignment' ) },
 				children: ( { onClose } ) => {
 					return (
 						<>

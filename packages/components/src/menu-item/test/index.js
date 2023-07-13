@@ -83,7 +83,6 @@ describe( 'MenuItem', () => {
 
 		const menuItem = screen.getByRole( 'menuitem' );
 		expect( menuItem ).not.toBeChecked();
-		expect( menuItem ).not.toHaveAttribute( 'aria-checked' );
 	} );
 
 	it( 'should use aria-checked if menuitemradio or menuitemcheckbox is set as aria-role', () => {
@@ -95,7 +94,6 @@ describe( 'MenuItem', () => {
 
 		const radioMenuItem = screen.getByRole( 'menuitemradio' );
 		expect( radioMenuItem ).toBeChecked();
-		expect( radioMenuItem ).toHaveAttribute( 'aria-checked', 'true' );
 
 		rerender(
 			<MenuItem role="menuitemcheckbox" isSelected>
@@ -105,6 +103,41 @@ describe( 'MenuItem', () => {
 
 		const checkboxMenuItem = screen.getByRole( 'menuitemcheckbox' );
 		expect( checkboxMenuItem ).toBeChecked();
-		expect( checkboxMenuItem ).toHaveAttribute( 'aria-checked', 'true' );
+	} );
+
+	it( 'should not render shortcut or right icon if suffix provided', () => {
+		render(
+			<MenuItem
+				icon={ <span>Icon</span> }
+				iconPosition="right"
+				role="menuitemcheckbox"
+				shortcut="Shortcut"
+				suffix="Suffix"
+			>
+				My item
+			</MenuItem>
+		);
+
+		expect( screen.getByText( 'Suffix' ) ).toBeInTheDocument();
+		expect( screen.queryByText( 'Shortcut' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Icon' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should render left icon despite suffix being provided', () => {
+		render(
+			<MenuItem
+				icon={ <span>Icon</span> }
+				iconPosition="left"
+				role="menuitemcheckbox"
+				shortcut="Shortcut"
+				suffix="Suffix"
+			>
+				My item
+			</MenuItem>
+		);
+
+		expect( screen.getByText( 'Icon' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Suffix' ) ).toBeInTheDocument();
+		expect( screen.queryByText( 'Shortcut' ) ).not.toBeInTheDocument();
 	} );
 } );

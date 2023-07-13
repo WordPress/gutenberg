@@ -60,14 +60,14 @@ import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, RichText } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
-	apiVersion: 2,
+	apiVersion: 3,
 	title: 'Example: Editable (esnext)',
 	icon: 'universal-access-alt',
 	category: 'design',
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 	},
@@ -117,15 +117,15 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 	var useBlockProps = blockEditor.useBlockProps;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-03-editable', {
-		apiVersion: 2,
+		apiVersion: 3,
 		title: 'Example: Editable',
 		icon: 'universal-access-alt',
 		category: 'design',
 
 		attributes: {
 			content: {
-				type: 'array',
-				source: 'children',
+				type: 'string',
+				source: 'html',
 				selector: 'p',
 			},
 		},

@@ -29,13 +29,8 @@ function render_block_core_comments( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$comment_args = array(
-		'post_id' => $post_id,
-		'count'   => true,
-		'status'  => 'approve',
-	);
 	// Return early if there are no comments and comments are closed.
-	if ( ! comments_open( $post_id ) && get_comments( $comment_args ) === 0 ) {
+	if ( ! comments_open( $post_id ) && (int) get_comments_number( $post_id ) === 0 ) {
 		return '';
 	}
 
@@ -109,7 +104,7 @@ add_action( 'init', 'register_block_core_comments' );
  */
 function comments_block_form_defaults( $fields ) {
 	if ( wp_is_block_theme() ) {
-		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="%3$s wp-block-button__link ' . WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' ) . '" value="%4$s" />';
+		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="%3$s wp-block-button__link ' . wp_theme_get_element_class_name( 'button' ) . '" value="%4$s" />';
 		$fields['submit_field']  = '<p class="form-submit wp-block-button">%1$s %2$s</p>';
 	}
 
@@ -202,7 +197,6 @@ function register_legacy_post_comments_block() {
 			'wp-block-buttons',
 			'wp-block-button',
 		),
-		'editorStyle'       => 'wp-block-post-comments-editor',
 		'render_callback'   => 'render_block_core_comments',
 		'skip_inner_blocks' => true,
 	);
@@ -213,6 +207,7 @@ function register_legacy_post_comments_block() {
 	 * like `_wp_multiple_block_styles`, which is required in this case because
 	 * the block has multiple styles.
 	 */
+	/** This filter is documented in wp-includes/blocks.php */
 	$metadata = apply_filters( 'block_type_metadata', $metadata );
 
 	register_block_type( 'core/post-comments', $metadata );

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { every } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
@@ -157,8 +152,7 @@ const transforms = {
 						}
 					);
 				}
-				return every(
-					files,
+				return files.every(
 					( file ) => file.type.indexOf( 'image/' ) === 0
 				);
 			},

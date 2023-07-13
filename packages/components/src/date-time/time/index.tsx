@@ -51,7 +51,7 @@ function from12hTo24h( hours: number, isPm: boolean ) {
  * given width. For example, the hours and minutes inputs are padded to 2 so
  * that '4' appears as '04'.
  *
- * @param  pad How many digits the value should be.
+ * @param pad How many digits the value should be.
  */
 function buildPadInputStateReducer( pad: number ) {
 	return ( state: InputState, action: InputAction ) => {
@@ -180,7 +180,7 @@ export function TimePicker( {
 			min={ 1 }
 			max={ 31 }
 			required
-			hideHTMLArrows
+			spinControls="none"
 			isPressEnterToChange
 			isDragEnabled={ false }
 			isShiftStepEnabled={ false }
@@ -246,7 +246,7 @@ export function TimePicker( {
 							min={ is12Hour ? 1 : 0 }
 							max={ is12Hour ? 12 : 23 }
 							required
-							hideHTMLArrows
+							spinControls="none"
 							isPressEnterToChange
 							isDragEnabled={ false }
 							isShiftStepEnabled={ false }
@@ -273,7 +273,7 @@ export function TimePicker( {
 							min={ 0 }
 							max={ 59 }
 							required
-							hideHTMLArrows
+							spinControls="none"
 							isPressEnterToChange
 							isDragEnabled={ false }
 							isShiftStepEnabled={ false }
@@ -344,7 +344,7 @@ export function TimePicker( {
 						min={ 1 }
 						max={ 9999 }
 						required
-						hideHTMLArrows
+						spinControls="none"
 						isPressEnterToChange
 						isDragEnabled={ false }
 						isShiftStepEnabled={ false }

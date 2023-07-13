@@ -30,7 +30,7 @@ describe( 'props', () => {
 			</ContextSystemProvider>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render context props', () => {
@@ -60,8 +60,8 @@ describe( 'props', () => {
 			</ContextSystemProvider>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
-		expect( container.firstChild.innerHTML ).toContain( 'Code is Poetry' );
+		expect( container ).toMatchSnapshot();
+		expect( screen.getByText( 'Code is Poetry' ) ).toBeVisible();
 	} );
 
 	test( 'should render _override props', () => {
@@ -98,12 +98,13 @@ describe( 'props', () => {
 			</>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 
-		const el = container.querySelector( '.test-component' );
+		const element = screen.getByText( 'Code is Poetry' );
+		expect( element ).toBeVisible();
+		expect( element ).toHaveClass( 'test-component' );
 
-		expect( el.innerHTML ).toContain( 'Code is Poetry' );
-		expect( el.innerHTML ).not.toContain( 'WordPress.org' );
+		expect( screen.queryByText( 'WordPress.org' ) ).not.toBeInTheDocument();
 	} );
 } );
 

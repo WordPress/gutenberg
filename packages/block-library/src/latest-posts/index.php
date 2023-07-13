@@ -48,6 +48,14 @@ function render_block_core_latest_posts( $attributes ) {
 	$block_core_latest_posts_excerpt_length = $attributes['excerptLength'];
 	add_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
 
+	$filter_latest_posts_excerpt_more = static function( $more ) use ( $attributes ) {
+		$use_excerpt = 'excerpt' === $attributes['displayPostContentRadio'];
+		/* translators: %1$s is a URL to a post, excerpt truncation character, default … */
+		return $use_excerpt ? sprintf( __( ' … <a href="%1$s" rel="noopener noreferrer">Read more</a>' ), esc_url( get_permalink() ) ) : $more;
+	};
+
+	add_filter( 'excerpt_more', $filter_latest_posts_excerpt_more );
+
 	if ( isset( $attributes['categories'] ) ) {
 		$args['category__in'] = array_column( $attributes['categories'], 'id' );
 	}
@@ -55,7 +63,7 @@ function render_block_core_latest_posts( $attributes ) {
 		$args['author'] = $attributes['selectedAuthor'];
 	}
 
-	$query        = new WP_Query;
+	$query        = new WP_Query();
 	$recent_posts = $query->query( $args );
 
 	if ( isset( $attributes['displayFeaturedImage'] ) && $attributes['displayFeaturedImage'] ) {
@@ -173,25 +181,24 @@ function render_block_core_latest_posts( $attributes ) {
 
 	remove_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
 
-	$class = 'wp-block-latest-posts__list';
-
+	$classes = array( 'wp-block-latest-posts__list' );
 	if ( isset( $attributes['postLayout'] ) && 'grid' === $attributes['postLayout'] ) {
-		$class .= ' is-grid';
+		$classes[] = 'is-grid';
 	}
-
 	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['postLayout'] ) {
-		$class .= ' columns-' . $attributes['columns'];
+		$classes[] = 'columns-' . $attributes['columns'];
 	}
-
 	if ( isset( $attributes['displayPostDate'] ) && $attributes['displayPostDate'] ) {
-		$class .= ' has-dates';
+		$classes[] = 'has-dates';
 	}
-
 	if ( isset( $attributes['displayAuthor'] ) && $attributes['displayAuthor'] ) {
-		$class .= ' has-author';
+		$classes[] = 'has-author';
+	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',

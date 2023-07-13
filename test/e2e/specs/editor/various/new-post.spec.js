@@ -26,13 +26,15 @@ test.describe( 'new editor state', () => {
 		await expect( page ).toHaveURL( /post-new.php/ );
 
 		// Should display the blank title.
-		const title = page.locator( 'role=textbox[name="Add title"i]' );
+		const title = editor.canvas.locator(
+			'role=textbox[name="Add title"i]'
+		);
 		await expect( title ).toBeEditable();
 		await expect( title ).toHaveText( '' );
 
-		// Should display the View button.
+		// Should display the Preview button.
 		await expect(
-			page.locator( 'role=button[name="View"i]' )
+			page.locator( 'role=button[name="Preview"i]' )
 		).toBeVisible();
 
 		// Should display the Post Formats UI.
@@ -55,23 +57,24 @@ test.describe( 'new editor state', () => {
 
 	test( 'should focus the title if the title is empty', async ( {
 		admin,
-		page,
+		editor,
 	} ) => {
 		await admin.createNewPost();
 
 		await expect(
-			page.locator( 'role=textbox[name="Add title"i]' )
+			editor.canvas.locator( 'role=textbox[name="Add title"i]' )
 		).toBeFocused();
 	} );
 
 	test( 'should not focus the title if the title exists', async ( {
 		admin,
 		page,
+		editor,
 	} ) => {
 		await admin.createNewPost();
 
 		// Enter a title for this post.
-		await page.type(
+		await editor.canvas.type(
 			'role=textbox[name="Add title"i]',
 			'Here is the title'
 		);

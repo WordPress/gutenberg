@@ -31,6 +31,7 @@ import {
 	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import { link } from '@wordpress/icons';
+// eslint-disable-next-line no-restricted-imports
 import { store as editPostStore } from '@wordpress/edit-post';
 
 /**

@@ -66,7 +66,9 @@ export default function ImageCropper( {
 				crop={ position }
 				zoom={ zoom / 100 }
 				aspect={ aspect }
-				onCropChange={ setPosition }
+				onCropChange={ ( pos ) => {
+					setPosition( pos );
+				} }
 				onCropComplete={ ( newCropPercent ) => {
 					setCrop( newCropPercent );
 				} }

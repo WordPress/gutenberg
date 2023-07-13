@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -15,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '../';
+import { VisuallyHidden } from '../visually-hidden';
 import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
 import SelectControlChevronDown from '../select-control/chevron-down';
 import { InputBaseWithBackCompatMinWidth } from './styles';
@@ -60,21 +61,29 @@ const stateReducer = (
 			return changes;
 	}
 };
-export default function CustomSelectControl( {
-	/** Start opting into the larger default height that will become the default size in a future version. */
-	__next36pxDefaultSize = false,
-	/** Start opting into the unconstrained width that will become the default in a future version. */
-	__nextUnconstrainedWidth = false,
-	className,
-	hideLabelFromVision,
-	label,
-	describedBy,
-	options: items,
-	onChange: onSelectedItemChange,
-	/** @type {import('../select-control/types').SelectControlProps.size} */
-	size = 'default',
-	value: _selectedItem,
-} ) {
+
+export default function CustomSelectControl( props ) {
+	const {
+		/** Start opting into the larger default height that will become the default size in a future version. */
+		__next36pxDefaultSize = false,
+		/** Start opting into the unconstrained width that will become the default in a future version. */
+		__nextUnconstrainedWidth = false,
+		className,
+		hideLabelFromVision,
+		label,
+		describedBy,
+		options: items,
+		onChange: onSelectedItemChange,
+		/** @type {import('../select-control/types').SelectControlProps.size} */
+		size = 'default',
+		value: _selectedItem,
+		onMouseOver,
+		onMouseOut,
+		onFocus,
+		onBlur,
+		__experimentalShowSelectedHint = false,
+	} = props;
+
 	const {
 		getLabelProps,
 		getToggleButtonProps,
@@ -95,6 +104,16 @@ export default function CustomSelectControl( {
 	} );
 
 	const [ isFocused, setIsFocused ] = useState( false );
+
+	function handleOnFocus( e ) {
+		setIsFocused( true );
+		onFocus?.( e );
+	}
+
+	function handleOnBlur( e ) {
+		setIsFocused( false );
+		onBlur?.( e );
+	}
 
 	if ( ! __nextUnconstrainedWidth ) {
 		deprecated(
@@ -172,9 +191,11 @@ export default function CustomSelectControl( {
 				suffix={ <SelectControlChevronDown /> }
 			>
 				<SelectControlSelect
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
 					as="button"
-					onFocus={ () => setIsFocused( true ) }
-					onBlur={ () => setIsFocused( false ) }
+					onFocus={ handleOnFocus }
+					onBlur={ handleOnBlur }
 					selectSize={ size }
 					__next36pxDefaultSize={ __next36pxDefaultSize }
 					{ ...getToggleButtonProps( {
@@ -186,6 +207,12 @@ export default function CustomSelectControl( {
 					} ) }
 				>
 					{ itemToString( selectedItem ) }
+					{ __experimentalShowSelectedHint &&
+						selectedItem.__experimentalHint && (
+							<span className="components-custom-select-control__hint">
+								{ selectedItem.__experimentalHint }
+							</span>
+						) }
 				</SelectControlSelect>
 			</InputBaseWithBackCompatMinWidth>
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
@@ -228,5 +255,14 @@ export default function CustomSelectControl( {
 					) ) }
 			</ul>
 		</div>
+	);
+}
+
+export function StableCustomSelectControl( props ) {
+	return (
+		<CustomSelectControl
+			{ ...props }
+			__experimentalShowSelectedHint={ false }
+		/>
 	);
 }

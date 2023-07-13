@@ -75,10 +75,6 @@ selectorNames.forEach( ( name ) => {
 				};
 			},
 
-			isSavingEntityRecord() {
-				return state.saving && state.saving.requesting;
-			},
-
 			getLastEntitySaveError() {
 				const saving = state.saving;
 				const successful = saving && saving.successful;
@@ -148,7 +144,6 @@ const {
 	hasEditorUndo,
 	hasEditorRedo,
 	isEditedPostNew,
-	hasChangedContent,
 	isEditedPostDirty,
 	hasNonPostEntityChanges,
 	isCleanNewPost,
@@ -389,57 +384,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostNew( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'hasChangedContent', () => {
-		it( 'should return false if no dirty blocks nor content property edit', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							isDirty: false,
-						},
-						edits: {},
-					},
-				},
-			};
-
-			expect( hasChangedContent( state ) ).toBe( false );
-		} );
-
-		it( 'should return true if dirty blocks', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							isDirty: true,
-							value: [],
-						},
-						edits: {},
-					},
-				},
-			};
-
-			expect( hasChangedContent( state ) ).toBe( true );
-		} );
-
-		it( 'should return true if content property edit', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							isDirty: false,
-							value: [],
-						},
-						edits: {
-							content: 'text mode edited',
-						},
-					},
-				},
-			};
-
-			expect( hasChangedContent( state ) ).toBe( true );
 		} );
 	} );
 
@@ -1306,7 +1250,7 @@ describe( 'selectors', () => {
 					title: 'sassel',
 				},
 				saving: {
-					requesting: true,
+					pending: true,
 				},
 			};
 
@@ -1455,9 +1399,8 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
-				saving: {
-					requesting: true,
-				},
+				postAutosavingLock: {},
+				saving: {},
 				getCurrentUser() {},
 				hasFetchedAutosaves() {
 					return false;
@@ -1486,9 +1429,8 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
-				saving: {
-					requesting: true,
-				},
+				postAutosavingLock: {},
+				saving: {},
 				getCurrentUser() {},
 				hasFetchedAutosaves() {
 					return true;
@@ -1566,11 +1508,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocks: {
-							value: [],
-							isDirty: true,
+						edits: {
+							content: () => 'new-content',
 						},
-						edits: {},
 					},
 				},
 				currentPost: {
@@ -2071,7 +2011,7 @@ describe( 'selectors', () => {
 		it( 'should return true if the post is currently being saved', () => {
 			const state = {
 				saving: {
-					requesting: true,
+					pending: true,
 				},
 			};
 
@@ -2081,7 +2021,7 @@ describe( 'selectors', () => {
 		it( 'should return false if the post is not currently being saved', () => {
 			const state = {
 				saving: {
-					requesting: false,
+					pending: false,
 				},
 			};
 

@@ -234,4 +234,4 @@ Reference documentation used in this guide:
 
 The guide showed you how to add a button to the toolbar and have it apply a format to the selected text. Try it out and see what you can build with it in your next plugin.
 
-Download the [format-api example](https://github.com/WordPress/gutenberg-examples/tree/trunk/format-api) from the [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository.
+Download the [format-api example](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/format-api) from the [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository.

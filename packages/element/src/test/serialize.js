@@ -1,3 +1,5 @@
+/* eslint-disable testing-library/render-result-naming-convention */
+
 /**
  * Internal dependencies
  */
@@ -717,3 +719,5 @@ describe( 'renderStyle()', () => {
 		} );
 	} );
 } );
+
+/* eslint-enable testing-library/render-result-naming-convention */

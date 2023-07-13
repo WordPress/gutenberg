@@ -79,6 +79,8 @@ class AztecView extends Component {
 	}
 
 	_onContentSizeChange( event ) {
+		this.updateCaretData( event );
+
 		if ( ! this.props.onContentSizeChange ) {
 			return;
 		}
@@ -197,16 +199,19 @@ class AztecView extends Component {
 			onSelectionChange( selectionStart, selectionEnd, text, event );
 		}
 
+		this.updateCaretData( event );
+	}
+
+	updateCaretData( event ) {
 		if (
-			this.props.onCaretVerticalPositionChange &&
-			this.selectionEndCaretY !== event.nativeEvent.selectionEndCaretY
+			this.isFocused() &&
+			this.selectionEndCaretY !== event?.nativeEvent?.selectionEndCaretY
 		) {
 			const caretY = event.nativeEvent.selectionEndCaretY;
-			this.props.onCaretVerticalPositionChange(
-				event.nativeEvent.target,
+			AztecInputState.setCurrentCaretData( {
 				caretY,
-				this.selectionEndCaretY
-			);
+				caretHeight: event.nativeEvent?.selectionEndCaretHeight,
+			} );
 			this.selectionEndCaretY = caretY;
 		}
 	}
@@ -237,6 +242,8 @@ class AztecView extends Component {
 		// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
 		// For iOS, this is necessary to let the system know when Aztec was focused programatically.
 		if ( Platform.OS === 'ios' ) {
+			this.updateCaretData( event );
+
 			this._onPress( event );
 		}
 	}
@@ -252,8 +259,17 @@ class AztecView extends Component {
 			window.console.warn(
 				"Removing lineHeight style as it's not supported by native AztecView"
 			);
-			// Prevents passing line-heigth within styles to avoid a crash due to values without units
+			// Prevents passing line-height within styles to avoid a crash due to values without units
 			// We now support this but passing line-height as a prop instead.
+		}
+
+		// Remove Font size rendering for pre elements until we fix an issue with AztecAndroid.
+		if (
+			Platform.OS === 'android' &&
+			this.props.text?.tag === 'pre' &&
+			style.hasOwnProperty( 'fontSize' )
+		) {
+			delete style.fontSize;
 		}
 
 		return (
@@ -284,5 +300,6 @@ class AztecView extends Component {
 const RCTAztecView = requireNativeComponent( 'RCTAztecView', AztecView );
 
 AztecView.InputState = AztecInputState;
+AztecView.KeyCodes = KEYCODES;
 
 export default AztecView;

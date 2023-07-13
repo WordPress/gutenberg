@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -17,46 +18,124 @@ describe( 'AlignmentUI', () => {
 	const alignment = 'left';
 	const onChangeSpy = jest.fn();
 
-	const wrapper = shallow(
-		<AlignmentUI isToolbar value={ alignment } onChange={ onChangeSpy } />
-	);
-
-	const controls = wrapper.props().controls;
-
 	afterEach( () => {
 		onChangeSpy.mockClear();
 	} );
 
-	test( 'should match snapshot', () => {
-		expect( wrapper ).toMatchSnapshot();
+	test( 'should match snapshot when controls are hidden', () => {
+		const { container } = render(
+			<AlignmentUI
+				isToolbar
+				value={ alignment }
+				onChange={ onChangeSpy }
+			/>
+		);
+
+		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should call on change with undefined when a control is already active', () => {
-		const activeControl = controls.find( ( { isActive } ) => isActive );
-		activeControl.onClick();
+	test( 'should match snapshot when controls are visible', () => {
+		const { container } = render(
+			<AlignmentUI
+				isToolbar
+				value={ alignment }
+				onChange={ onChangeSpy }
+				isCollapsed={ false }
+			/>
+		);
 
-		expect( activeControl.align ).toBe( alignment );
+		expect( container ).toMatchSnapshot();
+	} );
+
+	test( 'should expand controls when toggled', async () => {
+		const user = userEvent.setup();
+
+		const { unmount } = render(
+			<AlignmentUI
+				isToolbar
+				value={ alignment }
+				onChange={ onChangeSpy }
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'menuitemradio', {
+				name: /^Align text \w+$/,
+			} )
+		).not.toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Align text',
+			} )
+		);
+
+		expect(
+			screen.getAllByRole( 'menuitemradio', {
+				name: /^Align text \w+$/,
+			} )
+		).toHaveLength( 3 );
+
+		// Cancel running effects, like delayed dropdown menu popover positioning.
+		unmount();
+	} );
+
+	test( 'should call on change with undefined when a control is already active', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<AlignmentUI
+				isToolbar
+				value={ alignment }
+				onChange={ onChangeSpy }
+				isCollapsed={ false }
+			/>
+		);
+
+		const activeControl = screen.getByRole( 'button', {
+			name: /^Align text \w+$/,
+			pressed: true,
+		} );
+
+		await user.click( activeControl );
+
+		expect( activeControl ).toHaveAttribute( 'align', alignment );
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( undefined );
 	} );
 
-	test( 'should call on change a new value when the control is not active', () => {
-		const inactiveControl = controls.find(
-			( { align } ) => align === 'center'
-		);
-		inactiveControl.onClick();
+	test( 'should call on change a new value when the control is not active', async () => {
+		const user = userEvent.setup();
 
-		expect( inactiveControl.isActive ).toBe( false );
+		render(
+			<AlignmentUI
+				isToolbar
+				value={ alignment }
+				onChange={ onChangeSpy }
+				isCollapsed={ false }
+			/>
+		);
+
+		const inactiveControl = screen.getByRole( 'button', {
+			name: 'Align text center',
+			pressed: false,
+		} );
+
+		await user.click( inactiveControl );
+
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( 'center' );
 	} );
 
-	test( 'should allow custom alignment controls to be specified', () => {
-		const wrapperCustomControls = shallow(
+	test( 'should allow custom alignment controls to be specified', async () => {
+		const user = userEvent.setup();
+
+		const { container } = render(
 			<AlignmentUI
 				isToolbar
 				value={ 'custom-right' }
 				onChange={ onChangeSpy }
+				isCollapsed={ false }
 				alignmentControls={ [
 					{
 						icon: alignLeft,
@@ -71,26 +150,33 @@ describe( 'AlignmentUI', () => {
 				] }
 			/>
 		);
-		expect( wrapperCustomControls ).toMatchSnapshot();
-		const customControls = wrapperCustomControls.props().controls;
-		expect( customControls ).toHaveLength( 2 );
+
+		expect( container ).toMatchSnapshot();
+
+		expect(
+			screen.getAllByRole( 'button', {
+				name: /^My custom \w+$/,
+			} )
+		).toHaveLength( 2 );
 
 		// Should correctly call on change when right alignment is pressed (active alignment)
-		const rightControl = customControls.find(
-			( { align } ) => align === 'custom-right'
-		);
-		expect( rightControl.title ).toBe( 'My custom right' );
-		rightControl.onClick();
+		const rightControl = screen.getByRole( 'button', {
+			name: 'My custom right',
+		} );
+
+		await user.click( rightControl );
+
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( undefined );
 		onChangeSpy.mockClear();
 
 		// Should correctly call on change when right alignment is pressed (inactive alignment)
-		const leftControl = customControls.find(
-			( { align } ) => align === 'custom-left'
-		);
-		expect( leftControl.title ).toBe( 'My custom left' );
-		leftControl.onClick();
+		const leftControl = screen.getByRole( 'button', {
+			name: 'My custom left',
+		} );
+
+		await user.click( leftControl );
+
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( 'custom-left' );
 	} );

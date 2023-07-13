@@ -7,9 +7,17 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { forwardRef, useEffect } from '@wordpress/element';
-import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
+import {
+	__unstableUseNavigateRegions as useNavigateRegions,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import NavigableRegion from '../navigable-region';
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -25,18 +33,31 @@ function useHTMLClass( className ) {
 	}, [ className ] );
 }
 
+const headerVariants = {
+	hidden: { opacity: 0 },
+	hover: {
+		opacity: 1,
+		transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
+	},
+	distractionFreeInactive: { opacity: 1, transition: { delay: 0 } },
+};
+
 function InterfaceSkeleton(
 	{
+		isDistractionFree,
 		footer,
 		header,
+		editorNotices,
 		sidebar,
 		secondarySidebar,
 		notices,
 		content,
-		drawer,
 		actions,
 		labels,
 		className,
+		enableRegionNavigation = true,
+		// Todo: does this need to be a prop.
+		// Can we use a dependency to keyboard-shortcuts directly?
 		shortcuts,
 	},
 	ref
@@ -46,8 +67,6 @@ function InterfaceSkeleton(
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
-		/* translators: accessibility text for the nav bar landmark region. */
-		drawer: __( 'Drawer' ),
 		/* translators: accessibility text for the top bar landmark region. */
 		header: __( 'Header' ),
 		/* translators: accessibility text for the content landmark region. */
@@ -66,8 +85,11 @@ function InterfaceSkeleton(
 
 	return (
 		<div
-			{ ...navigateRegionsProps }
-			ref={ useMergeRefs( [ ref, navigateRegionsProps.ref ] ) }
+			{ ...( enableRegionNavigation ? navigateRegionsProps : {} ) }
+			ref={ useMergeRefs( [
+				ref,
+				enableRegionNavigation ? navigateRegionsProps.ref : undefined,
+			] ) }
 			className={ classnames(
 				className,
 				'interface-interface-skeleton',
@@ -75,82 +97,87 @@ function InterfaceSkeleton(
 				!! footer && 'has-footer'
 			) }
 		>
-			{ !! drawer && (
-				<div
-					className="interface-interface-skeleton__drawer"
-					role="region"
-					aria-label={ mergedLabels.drawer }
-					tabIndex="-1"
-				>
-					{ drawer }
-				</div>
-			) }
 			<div className="interface-interface-skeleton__editor">
 				{ !! header && (
-					<div
+					<NavigableRegion
+						as={ motion.div }
 						className="interface-interface-skeleton__header"
-						role="region"
 						aria-label={ mergedLabels.header }
-						tabIndex="-1"
+						initial={
+							isDistractionFree
+								? 'hidden'
+								: 'distractionFreeInactive'
+						}
+						whileHover={
+							isDistractionFree
+								? 'hover'
+								: 'distractionFreeInactive'
+						}
+						animate={
+							isDistractionFree
+								? 'hidden'
+								: 'distractionFreeInactive'
+						}
+						variants={ headerVariants }
+						transition={
+							isDistractionFree
+								? { type: 'tween', delay: 0.8 }
+								: undefined
+						}
 					>
 						{ header }
+					</NavigableRegion>
+				) }
+				{ isDistractionFree && (
+					<div className="interface-interface-skeleton__header">
+						{ editorNotices }
 					</div>
 				) }
 				<div className="interface-interface-skeleton__body">
 					{ !! secondarySidebar && (
-						<div
+						<NavigableRegion
 							className="interface-interface-skeleton__secondary-sidebar"
-							role="region"
-							aria-label={ mergedLabels.secondarySidebar }
-							tabIndex="-1"
+							ariaLabel={ mergedLabels.secondarySidebar }
 						>
 							{ secondarySidebar }
-						</div>
+						</NavigableRegion>
 					) }
 					{ !! notices && (
 						<div className="interface-interface-skeleton__notices">
 							{ notices }
 						</div>
 					) }
-					<div
+					<NavigableRegion
 						className="interface-interface-skeleton__content"
-						role="region"
-						aria-label={ mergedLabels.body }
-						tabIndex="-1"
+						ariaLabel={ mergedLabels.body }
 					>
 						{ content }
-					</div>
+					</NavigableRegion>
 					{ !! sidebar && (
-						<div
+						<NavigableRegion
 							className="interface-interface-skeleton__sidebar"
-							role="region"
-							aria-label={ mergedLabels.sidebar }
-							tabIndex="-1"
+							ariaLabel={ mergedLabels.sidebar }
 						>
 							{ sidebar }
-						</div>
+						</NavigableRegion>
 					) }
 					{ !! actions && (
-						<div
+						<NavigableRegion
 							className="interface-interface-skeleton__actions"
-							role="region"
-							aria-label={ mergedLabels.actions }
-							tabIndex="-1"
+							ariaLabel={ mergedLabels.actions }
 						>
 							{ actions }
-						</div>
+						</NavigableRegion>
 					) }
 				</div>
 			</div>
 			{ !! footer && (
-				<div
+				<NavigableRegion
 					className="interface-interface-skeleton__footer"
-					role="region"
-					aria-label={ mergedLabels.footer }
-					tabIndex="-1"
+					ariaLabel={ mergedLabels.footer }
 				>
 					{ footer }
-				</div>
+				</NavigableRegion>
 			) }
 		</div>
 	);

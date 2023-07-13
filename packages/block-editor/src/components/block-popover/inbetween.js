@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { useSelect } from '@wordpress/data';
 import {
-	useCallback,
 	useMemo,
 	createContext,
 	useReducer,
@@ -24,6 +23,8 @@ import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 
+const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
+
 export const InsertionPointOpenRef = createContext();
 
 function BlockPopoverInbetween( {
@@ -35,8 +36,9 @@ function BlockPopoverInbetween( {
 	...props
 } ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
-	const [ positionRecompute, forceRecompute ] = useReducer(
-		( s ) => s + 1,
+	const [ popoverRecomputeCounter, forcePopoverRecompute ] = useReducer(
+		// Module is there to make sure that the counter doesn't overflow.
+		( s ) => ( s + 1 ) % MAX_POPOVER_RECOMPUTE_COUNTER,
 		0
 	);
 
@@ -66,116 +68,96 @@ function BlockPopoverInbetween( {
 	const previousElement = useBlockElement( previousClientId );
 	const nextElement = useBlockElement( nextClientId );
 	const isVertical = orientation === 'vertical';
-	const style = useMemo( () => {
-		if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
-			return {};
-		}
 
-		const previousRect = previousElement
-			? previousElement.getBoundingClientRect()
-			: null;
-		const nextRect = nextElement
-			? nextElement.getBoundingClientRect()
-			: null;
-
-		if ( isVertical ) {
-			return {
-				width: previousRect ? previousRect.width : nextRect.width,
-				height:
-					nextRect && previousRect
-						? nextRect.top - previousRect.bottom
-						: 0,
-			};
-		}
-
-		let width = 0;
-		if ( previousRect && nextRect ) {
-			width = isRTL()
-				? previousRect.left - nextRect.right
-				: nextRect.left - previousRect.right;
-		}
-
-		return {
-			width,
-			height: previousRect ? previousRect.height : nextRect.height,
-		};
-	}, [
-		previousElement,
-		nextElement,
-		isVertical,
-		positionRecompute,
-		isVisible,
-	] );
-
-	const getAnchorRect = useCallback( () => {
-		if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
-			return {};
+	const popoverAnchor = useMemo( () => {
+		if (
+			// popoverRecomputeCounter is by definition always equal or greater than 0.
+			// This check is only there to satisfy the correctness of the
+			// exhaustive-deps rule for the `useMemo` hook.
+			popoverRecomputeCounter < 0 ||
+			( ! previousElement && ! nextElement ) ||
+			! isVisible
+		) {
+			return undefined;
 		}
 
 		const { ownerDocument } = previousElement || nextElement;
 
-		const previousRect = previousElement
-			? previousElement.getBoundingClientRect()
-			: null;
-		const nextRect = nextElement
-			? nextElement.getBoundingClientRect()
-			: null;
-
-		if ( isVertical ) {
-			if ( isRTL() ) {
-				return {
-					top: previousRect ? previousRect.bottom : nextRect.top,
-					left: previousRect ? previousRect.right : nextRect.right,
-					right: previousRect ? previousRect.right : nextRect.right,
-					bottom: previousRect ? previousRect.bottom : nextRect.top,
-					height: 0,
-					width: 0,
-					ownerDocument,
-				};
-			}
-
-			return {
-				top: previousRect ? previousRect.bottom : nextRect.top,
-				left: previousRect ? previousRect.left : nextRect.left,
-				right: previousRect ? previousRect.left : nextRect.left,
-				bottom: previousRect ? previousRect.bottom : nextRect.top,
-				height: 0,
-				width: 0,
-				ownerDocument,
-			};
-		}
-
-		if ( isRTL() ) {
-			return {
-				top: previousRect ? previousRect.top : nextRect.top,
-				left: previousRect ? previousRect.left : nextRect.right,
-				right: previousRect ? previousRect.left : nextRect.right,
-				bottom: previousRect ? previousRect.top : nextRect.top,
-				height: 0,
-				width: 0,
-				ownerDocument,
-			};
-		}
-
 		return {
-			top: previousRect ? previousRect.top : nextRect.top,
-			left: previousRect ? previousRect.right : nextRect.left,
-			right: previousRect ? previousRect.right : nextRect.left,
-			bottom: previousRect ? previousRect.left : nextRect.right,
-			height: 0,
-			width: 0,
 			ownerDocument,
+			getBoundingClientRect() {
+				const previousRect = previousElement
+					? previousElement.getBoundingClientRect()
+					: null;
+				const nextRect = nextElement
+					? nextElement.getBoundingClientRect()
+					: null;
+
+				let left = 0;
+				let top = 0;
+				let width = 0;
+				let height = 0;
+
+				if ( isVertical ) {
+					// vertical
+					top = previousRect ? previousRect.bottom : nextRect.top;
+					width = previousRect ? previousRect.width : nextRect.width;
+					height =
+						nextRect && previousRect
+							? nextRect.top - previousRect.bottom
+							: 0;
+					left = previousRect ? previousRect.left : nextRect.left;
+				} else {
+					top = previousRect ? previousRect.top : nextRect.top;
+					height = previousRect
+						? previousRect.height
+						: nextRect.height;
+
+					if ( isRTL() ) {
+						// non vertical, rtl
+						left = nextRect ? nextRect.right : previousRect.left;
+						width =
+							previousRect && nextRect
+								? previousRect.left - nextRect.right
+								: 0;
+					} else {
+						// non vertical, ltr
+						left = previousRect
+							? previousRect.right
+							: nextRect.left;
+						width =
+							previousRect && nextRect
+								? nextRect.left - previousRect.right
+								: 0;
+					}
+				}
+
+				return new window.DOMRect( left, top, width, height );
+			},
 		};
-	}, [ previousElement, nextElement, positionRecompute, isVisible ] );
+	}, [
+		previousElement,
+		nextElement,
+		popoverRecomputeCounter,
+		isVertical,
+		isVisible,
+	] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
 	// This is only needed for a smooth transition when moving blocks.
+	// When blocks are moved up/down, their position can be set by
+	// updating the `transform` property manually (i.e. without using CSS
+	// transitions or animations). The animation, which can also scroll the block
+	// editor, can sometimes cause the position of the Popover to get out of sync.
+	// A MutationObserver is therefore used to make sure that changes to the
+	// selectedElement's attribute (i.e. `transform`) can be tracked and used to
+	// trigger the Popover to rerender.
 	useLayoutEffect( () => {
 		if ( ! previousElement ) {
 			return;
 		}
-		const observer = new window.MutationObserver( forceRecompute );
+		const observer = new window.MutationObserver( forcePopoverRecompute );
 		observer.observe( previousElement, { attributes: true } );
 
 		return () => {
@@ -187,7 +169,7 @@ function BlockPopoverInbetween( {
 		if ( ! nextElement ) {
 			return;
 		}
-		const observer = new window.MutationObserver( forceRecompute );
+		const observer = new window.MutationObserver( forcePopoverRecompute );
 		observer.observe( nextElement, { attributes: true } );
 
 		return () => {
@@ -201,12 +183,12 @@ function BlockPopoverInbetween( {
 		}
 		previousElement.ownerDocument.defaultView.addEventListener(
 			'resize',
-			forceRecompute
+			forcePopoverRecompute
 		);
 		return () => {
-			previousElement.ownerDocument.defaultView.removeEventListener(
+			previousElement.ownerDocument.defaultView?.removeEventListener(
 				'resize',
-				forceRecompute
+				forcePopoverRecompute
 			);
 		};
 	}, [ previousElement ] );
@@ -229,7 +211,7 @@ function BlockPopoverInbetween( {
 		<Popover
 			ref={ popoverScrollRef }
 			animate={ false }
-			getAnchorRect={ getAnchorRect }
+			anchor={ popoverAnchor }
 			focusOnMount={ false }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
@@ -245,12 +227,10 @@ function BlockPopoverInbetween( {
 			) }
 			resize={ false }
 			flip={ false }
-			placement="bottom-start"
+			placement="overlay"
+			variant="unstyled"
 		>
-			<div
-				className="block-editor-block-popover__inbetween-container"
-				style={ style }
-			>
+			<div className="block-editor-block-popover__inbetween-container">
 				{ children }
 			</div>
 		</Popover>

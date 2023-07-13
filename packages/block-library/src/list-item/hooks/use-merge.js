@@ -3,7 +3,6 @@
  */
 import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getDefaultBlockName, switchToBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -12,7 +11,7 @@ import useOutdentListItem from './use-outdent-list-item';
 
 import { name as listItemName } from '../block.json';
 
-export default function useMerge( clientId ) {
+export default function useMerge( clientId, onMerge ) {
 	const registry = useRegistry();
 	const {
 		getPreviousBlockClientId,
@@ -20,9 +19,8 @@ export default function useMerge( clientId ) {
 		getBlockOrder,
 		getBlockRootClientId,
 		getBlockName,
-		getBlock,
 	} = useSelect( blockEditorStore );
-	const { mergeBlocks, moveBlocksToPosition, replaceBlock, selectBlock } =
+	const { mergeBlocks, moveBlocksToPosition } =
 		useDispatch( blockEditorStore );
 	const [ , outdentListItem ] = useOutdentListItem( clientId );
 
@@ -79,29 +77,12 @@ export default function useMerge( clientId ) {
 		return getBlockOrder( order[ 0 ] )[ 0 ];
 	}
 
-	function switchToDefaultBlockType( forward ) {
-		const rootClientId = getBlockRootClientId( clientId );
-		const replacement = switchToBlockType(
-			getBlock( rootClientId ),
-			getDefaultBlockName()
-		);
-		const indexToSelect = forward ? replacement.length - 1 : 0;
-		const initialPosition = forward ? -1 : 0;
-		registry.batch( () => {
-			replaceBlock( rootClientId, replacement );
-			selectBlock(
-				replacement[ indexToSelect ].clientId,
-				initialPosition
-			);
-		} );
-	}
-
 	return ( forward ) => {
 		if ( forward ) {
 			const nextBlockClientId = getNextId( clientId );
 
 			if ( ! nextBlockClientId ) {
-				switchToDefaultBlockType( forward );
+				onMerge( forward );
 				return;
 			}
 
@@ -134,7 +115,7 @@ export default function useMerge( clientId ) {
 					mergeBlocks( trailingId, clientId );
 				} );
 			} else {
-				switchToDefaultBlockType( forward );
+				onMerge( forward );
 			}
 		}
 	};

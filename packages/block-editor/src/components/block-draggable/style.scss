@@ -15,6 +15,7 @@
 	height: $block-toolbar-height;
 	padding: 0 ( $grid-unit-15 + $border-width );
 	user-select: none;
+	width: max-content;
 
 	svg {
 		fill: currentColor;
@@ -42,26 +43,5 @@
 	.components-flex__item {
 		font-family: $default-font;
 		font-size: $default-font-size;
-	}
-}
-
-// This creates a "slot" where the block you're dragging appeared.
-// We use !important as one of the rules are meant to be overriden.
-.block-editor-block-list__layout .is-dragging {
-	background-color: currentColor !important;
-	opacity: 0.05 !important;
-	border-radius: $radius-block-ui !important;
-
-	// Disabling pointer events during the drag event is necessary,
-	// lest the block might affect your drag operation.
-	pointer-events: none !important;
-
-	// Hide the multi selection indicator when dragging.
-	&::selection {
-		background: transparent !important;
-	}
-
-	&::after {
-		content: none !important;
 	}
 }

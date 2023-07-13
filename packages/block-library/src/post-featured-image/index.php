@@ -19,45 +19,147 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 	$post_ID = $block->context['postId'];
 
-	$is_link    = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$size_slug  = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
-	$post_title = trim( strip_tags( get_the_title( $post_ID ) ) );
-	$attr       = get_block_core_post_featured_image_border_attributes( $attributes );
+	// Check is needed for backward compatibility with third-party plugins
+	// that might rely on the `in_the_loop` check; calling `the_post` sets it to true.
+	if ( ! in_the_loop() && have_posts() ) {
+		the_post();
+	}
+
+	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
+	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
+	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
 	if ( $is_link ) {
-		$attr['alt'] = $post_title;
+		if ( get_the_title( $post_ID ) ) {
+			$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
+		} else {
+			$attr['alt'] = sprintf(
+				// translators: %d is the post ID.
+				__( 'Untitled post %d' ),
+				$post_ID
+			);
+		}
+	}
+
+	$extra_styles = '';
+
+	// Aspect ratio with a height set needs to override the default width/height.
+	if ( ! empty( $attributes['aspectRatio'] ) ) {
+		$extra_styles .= 'width:100%;height:100%;';
+	} elseif ( ! empty( $attributes['height'] ) ) {
+		$extra_styles .= "height:{$attributes['height']};";
+	}
+
+	if ( ! empty( $attributes['scale'] ) ) {
+		$extra_styles .= "object-fit:{$attributes['scale']};";
+	}
+
+	if ( ! empty( $extra_styles ) ) {
+		$attr['style'] = empty( $attr['style'] ) ? $extra_styles : $attr['style'] . $extra_styles;
 	}
 
 	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
 	if ( ! $featured_image ) {
 		return '';
 	}
-	$wrapper_attributes = get_block_wrapper_attributes();
 	if ( $is_link ) {
 		$link_target    = $attributes['linkTarget'];
 		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
-		$featured_image = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', get_the_permalink( $post_ID ), esc_attr( $link_target ), $rel, $featured_image );
+		$height         = ! empty( $attributes['height'] ) ? 'style="' . esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . '"' : '';
+		$featured_image = sprintf(
+			'<a href="%1$s" target="%2$s" %3$s %4$s>%5$s%6$s</a>',
+			get_the_permalink( $post_ID ),
+			esc_attr( $link_target ),
+			$rel,
+			$height,
+			$featured_image,
+			$overlay_markup
+		);
+	} else {
+		$featured_image = $featured_image . $overlay_markup;
 	}
 
-	$has_width  = ! empty( $attributes['width'] );
-	$has_height = ! empty( $attributes['height'] );
-	if ( ! $has_height && ! $has_width ) {
-		return "<figure $wrapper_attributes>$featured_image</figure>";
+	$aspect_ratio = ! empty( $attributes['aspectRatio'] )
+		? esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';'
+		: '';
+	$width        = ! empty( $attributes['width'] )
+		? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';'
+		: '';
+	$height       = ! empty( $attributes['height'] )
+		? esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';'
+		: '';
+	if ( ! $height && ! $width && ! $aspect_ratio ) {
+		$wrapper_attributes = get_block_wrapper_attributes();
+	} else {
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => $aspect_ratio . $width . $height ) );
+	}
+	return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
+}
+
+/**
+ * Generate markup for the HTML element that will be used for the overlay.
+ *
+ * @param array $attributes Block attributes.
+ *
+ * @return string HTML markup in string format.
+ */
+function get_block_core_post_featured_image_overlay_element_markup( $attributes ) {
+	$has_dim_background  = isset( $attributes['dimRatio'] ) && $attributes['dimRatio'];
+	$has_gradient        = isset( $attributes['gradient'] ) && $attributes['gradient'];
+	$has_custom_gradient = isset( $attributes['customGradient'] ) && $attributes['customGradient'];
+	$has_solid_overlay   = isset( $attributes['overlayColor'] ) && $attributes['overlayColor'];
+	$has_custom_overlay  = isset( $attributes['customOverlayColor'] ) && $attributes['customOverlayColor'];
+	$class_names         = array( 'wp-block-post-featured-image__overlay' );
+	$styles              = array();
+
+	if ( ! $has_dim_background ) {
+		return '';
 	}
 
-	if ( $has_width ) {
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => "width:{$attributes['width']};" ) );
+	// Apply border classes and styles.
+	$border_attributes = get_block_core_post_featured_image_border_attributes( $attributes );
+
+	if ( ! empty( $border_attributes['class'] ) ) {
+		$class_names[] = $border_attributes['class'];
 	}
 
-	if ( $has_height ) {
-		$image_styles = "height:{$attributes['height']};";
-		if ( ! empty( $attributes['scale'] ) ) {
-			$image_styles .= "object-fit:{$attributes['scale']};";
-		}
-		$featured_image = str_replace( 'src=', 'style="' . esc_attr( $image_styles ) . '" src=', $featured_image );
+	if ( ! empty( $border_attributes['style'] ) ) {
+		$styles[] = $border_attributes['style'];
 	}
 
-	return "<figure $wrapper_attributes>$featured_image</figure>";
+	// Apply overlay and gradient classes.
+	if ( $has_dim_background ) {
+		$class_names[] = 'has-background-dim';
+		$class_names[] = "has-background-dim-{$attributes['dimRatio']}";
+	}
+
+	if ( $has_solid_overlay ) {
+		$class_names[] = "has-{$attributes['overlayColor']}-background-color";
+	}
+
+	if ( $has_gradient || $has_custom_gradient ) {
+		$class_names[] = 'has-background-gradient';
+	}
+
+	if ( $has_gradient ) {
+		$class_names[] = "has-{$attributes['gradient']}-gradient-background";
+	}
+
+	// Apply background styles.
+	if ( $has_custom_gradient ) {
+		$styles[] = sprintf( 'background-image: %s;', $attributes['customGradient'] );
+	}
+
+	if ( $has_custom_overlay ) {
+		$styles[] = sprintf( 'background-color: %s;', $attributes['customOverlayColor'] );
+	}
+
+	return sprintf(
+		'<span class="%s" style="%s" aria-hidden="true"></span>',
+		esc_attr( implode( ' ', $class_names ) ),
+		esc_attr( safecss_filter_attr( implode( ' ', $styles ) ) )
+	);
 }
 
 /**
@@ -101,7 +203,7 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
 		);
 	}
 
-	$styles     = gutenberg_style_engine_get_styles( array( 'border' => $border_styles ) );
+	$styles     = wp_style_engine_get_styles( array( 'border' => $border_styles ) );
 	$attributes = array();
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];

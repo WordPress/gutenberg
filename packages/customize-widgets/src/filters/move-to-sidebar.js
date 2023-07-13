@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -63,7 +58,7 @@ const withMoveToSidebarToolbarItem = createHigherOrderComponent(
 				const oldSetting = activeSidebarControl.setting;
 				const newSetting = newSidebarControl.setting;
 
-				oldSetting( without( oldSetting(), widgetId ) );
+				oldSetting( oldSetting().filter( ( id ) => id !== widgetId ) );
 				newSetting( [ ...newSetting(), widgetId ] );
 			} else {
 				/**

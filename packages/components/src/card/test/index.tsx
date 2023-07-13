@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ import {
 describe( 'Card', () => {
 	describe( 'Card component', () => {
 		it( 'should render correctly', () => {
-			const wrapper = render(
+			const { container } = render(
 				<Card>
 					<CardHeader>Card Header</CardHeader>
 					<CardBody>Card Body 1</CardBody>
@@ -34,31 +34,43 @@ describe( 'Card', () => {
 					<CardFooter>Card Footer</CardFooter>
 				</Card>
 			);
-			expect( wrapper ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should remove borders when the isBorderless prop is true', () => {
-			const { rerender, container } = render(
-				<Card>Code is Poetry</Card>
+			const { rerender } = render(
+				<Card data-testid="card-wrapper">Code is Poetry</Card>
 			);
-			expect( container.firstChild ).not.toHaveStyle(
+
+			expect( screen.getByTestId( 'card-wrapper' ) ).not.toHaveStyle(
 				'box-shadow: none'
 			);
 
-			rerender( <Card isBorderless={ true }>Code is Poetry</Card> );
-			expect( container.firstChild ).toHaveStyle( 'box-shadow: none' );
+			rerender(
+				<Card data-testid="card-wrapper" isBorderless>
+					Code is Poetry
+				</Card>
+			);
+
+			expect( screen.getByTestId( 'card-wrapper' ) ).toHaveStyle(
+				'box-shadow: none'
+			);
 		} );
 
 		it( 'should add rounded border when the isRounded prop is true', () => {
-			const { container: containerRounded } = render(
-				<Card isRounded={ true }>Code is Poetry</Card>
+			render(
+				<Card data-testid="card-rounded" isRounded>
+					Code is Poetry
+				</Card>
 			);
-			const { container: containerSquared } = render(
-				<Card isRounded={ false }>Code is Poetry</Card>
+			render(
+				<Card data-testid="card-squared" isRounded={ false }>
+					Code is Poetry
+				</Card>
 			);
 			expect(
-				containerRounded.firstElementChild
-			).toMatchStyleDiffSnapshot( containerSquared.firstElementChild );
+				screen.getByTestId( 'card-rounded' )
+			).toMatchStyleDiffSnapshot( screen.getByTestId( 'card-squared' ) );
 		} );
 
 		it( 'should show a box shadow when the elevation prop is greater than 0', () => {
@@ -70,9 +82,7 @@ describe( 'Card', () => {
 				<Card>Code is Poetry</Card>
 			);
 
-			expect( withElevation.firstChild ).toMatchDiffSnapshot(
-				withoutElevation.firstChild
-			);
+			expect( withElevation ).toMatchDiffSnapshot( withoutElevation );
 		} );
 
 		it( 'should add different amounts of white space when using the size prop', () => {
@@ -90,15 +100,13 @@ describe( 'Card', () => {
 				</Card>
 			);
 
-			expect( withSizeDefault.firstChild ).toMatchDiffSnapshot(
-				withSizeLarge.firstChild
-			);
+			expect( withSizeDefault ).toMatchDiffSnapshot( withSizeLarge );
 		} );
 
 		it( 'should warn when the isElevated prop is passed', () => {
 			// `isElevated` is automatically converted to `elevation="2"`
 			const { container } = render(
-				<Card isElevated={ true }>Code is Poetry</Card>
+				<Card isElevated>Code is Poetry</Card>
 			);
 			expect( container ).toMatchSnapshot();
 
@@ -107,7 +115,7 @@ describe( 'Card', () => {
 
 		it( 'should pass the isBorderless and isSize props from its context to its sub-components', () => {
 			const { container: withoutBorderLarge } = render(
-				<Card isBorderless={ true } size="large">
+				<Card isBorderless size="large">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Body</CardBody>
 					<CardFooter>Footer</CardFooter>
@@ -125,14 +133,14 @@ describe( 'Card', () => {
 
 		it( 'should get the isBorderless and isSize props (passed from its context) overriddenwhen the same props is specified directly on the component', () => {
 			const { container: withoutBorder } = render(
-				<Card isBorderless={ true } size="large">
+				<Card isBorderless size="large">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Body</CardBody>
 					<CardFooter>Footer</CardFooter>
 				</Card>
 			);
 			const { container: withBorder } = render(
-				<Card isBorderless={ true } size="large">
+				<Card isBorderless size="large">
 					<CardHeader isBorderless={ false } size="small">
 						Header
 					</CardHeader>
@@ -169,7 +177,7 @@ describe( 'Card', () => {
 			it( 'should render with a darker background color when isShady is true', () => {
 				const { container } = render( <CardHeader>Header</CardHeader> );
 				const { container: containerShady } = render(
-					<CardHeader isShady={ true }>Header</CardHeader>
+					<CardHeader isShady>Header</CardHeader>
 				);
 				expect( container ).toMatchDiffSnapshot( containerShady );
 			} );
@@ -179,7 +187,7 @@ describe( 'Card', () => {
 			it( 'should render with a darker background color when isShady is true', () => {
 				const { container } = render( <CardFooter>Footer</CardFooter> );
 				const { container: containerShady } = render(
-					<CardFooter isShady={ true }>Footer</CardFooter>
+					<CardFooter isShady>Footer</CardFooter>
 				);
 				expect( container ).toMatchDiffSnapshot( containerShady );
 			} );
@@ -197,14 +205,14 @@ describe( 'Card', () => {
 			it( 'should render with a darker background color when isShady is true', () => {
 				const { container } = render( <CardBody>Body</CardBody> );
 				const { container: containerShady } = render(
-					<CardBody isShady={ true }>Body</CardBody>
+					<CardBody isShady>Body</CardBody>
 				);
 				expect( container ).toMatchDiffSnapshot( containerShady );
 			} );
 
 			it( 'should allow scrolling content with the scrollable prop is true', () => {
 				const { container: containerScrollable } = render(
-					<CardBody isScrollable={ true }>Body</CardBody>
+					<CardBody isScrollable>Body</CardBody>
 				);
 				const { container } = render( <CardBody>Body</CardBody> );
 				expect( container ).toMatchDiffSnapshot( containerScrollable );

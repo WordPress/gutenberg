@@ -21,7 +21,7 @@ When writing tests consider the following:
 
 Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
 
-_It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) should be used for new tests instead, and over time old tests should be refactored to use RTL too (typically when working on code that touches an old test)._
+_It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) is now used for all existing and new tests instead._
 
 Assuming you've followed the [instructions](/docs/contributors/code/getting-started-with-code-contribution.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
@@ -290,7 +290,30 @@ test('fires onChange when a new value is typed', async () => {
 })
 ```
 
+### Integration testing for block UI
 
+Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using the Jest library. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.js#L60).
+
+The advantage of this approach is that the bulk of a block editor's functionality (block toolbar and inspector panel interactions, etc.) can be tested without having to fire up the full e2e test framework. This means the tests can run much faster and more reliably. It is suggested that as much of a block's UI functionality as possible is covered with integration tests, with e2e tests used for interactions that require a full browser environment, eg. file uploads, drag and drop, etc.
+
+[`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
+
+To set up a jest file for integration tests:
+
+```js
+import {
+	initializeEditor
+} from 'test/integration/helpers/integration-test-editor';
+
+async function setup( attributes ) {
+	const testBlock = { name: 'core/cover', attributes };
+	return initializeEditor( testBlock );
+}
+```
+
+The `initializeEditor` function returns the output of the `@testing-library/react` `render` method. It will also accept an array of block metadata objects, allowing you to set up the editor with multiple blocks.
+
+The integration test editor module also exports a `selectBlock` which can be used to select the block to be tested by the aria-label on the block wrapper, eg. "Block: Cover".
 
 ### Snapshot testing
 
@@ -367,13 +390,13 @@ describe( 'SolarSystem', () => {
 	test( 'should render', () => {
 		const { container } = render( <SolarSystem /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should contain mars if planets is true', () => {
 		const { container } = render( <SolarSystem planets /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 		expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
 	} );
 } );
@@ -422,7 +445,7 @@ test( 'should contain mars if planets is true', () => {
 	const { container } = render( <SolarSystem planets /> );
 
 	// Snapshot will catch unintended changes
-	expect( container.firstChild ).toMatchSnapshot();
+	expect( container ).toMatchSnapshot();
 
 	// This is what we actually expect to find in our test
 	expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
@@ -447,8 +470,8 @@ Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the d
 test( 'should render margin', () => {
 	const { container: spacer } = render( <Spacer /> );
 	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
-	expect( spacerWithMargin.firstChild ).toMatchStyleDiffSnapshot(
-		spacer.firstChild
+	expect( spacerWithMargin ).toMatchStyleDiffSnapshot(
+		spacer
 	);
 } );
 ```
@@ -474,7 +497,7 @@ Part of the unit-tests suite is a set of Jest tests run exercise native-mobile c
 To locally run the tests in debug mode, follow these steps:
 
 0. Make sure you have ran `npm ci` to install all the packages
-1. Run `npm run native test:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
+1. Run `npm run test:native:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
 2. Open `chrome://inspect` in Chrome
 3. Under the "Remote Target" section, look for a `../../node_modules/.bin/jest` target and click on the "inspect" link. That will open a new window with the Chrome DevTools debugger attached to the process and stopped at the beginning of the `jest.js` file. Alternatively, if the targets are not visible, click on the `Open dedicated DevTools for Node` link in the same page.
 4. You can place breakpoints or `debugger;` statements throughout the code, including the tests code, to stop and inspect
@@ -491,9 +514,9 @@ There is an ongoing effort to add integration tests to the native mobile project
 
 ## End-to-end Testing
 
-End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
+Most existing End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
-> There's a ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. See the [README](https://github.com/WordPress/gutenberg/tree/HEAD/test/e2e/README.md) of the new E2E tests for the updated guideline and best practices.
+There's an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. **It's recommended to write new e2e tests in Playwright whenever possible**. The sections below mostly apply to the old Jest + Puppeteer framework. See the dedicated [guide](/docs/contributors/code/e2e/README.md) if you're writing tests with Playwright.**
 
 ### Using wp-env
 

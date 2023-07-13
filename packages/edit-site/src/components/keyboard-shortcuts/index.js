@@ -1,24 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
-import {
-	useShortcut,
-	store as keyboardShortcutsStore,
-} from '@wordpress/keyboard-shortcuts';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { SIDEBAR_BLOCK } from '../sidebar/constants';
+import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 import { STORE_NAME } from '../../store/constants';
 
-function KeyboardShortcuts( { openEntitiesSavedStates } ) {
+function KeyboardShortcuts() {
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
 	const { getEditorMode } = useSelect( editSiteStore );
@@ -38,6 +35,39 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		useDispatch( editSiteStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
+	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
+
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
+		useSelect( blockEditorStore );
+
+	const handleTextLevelShortcut = ( event, level ) => {
+		event.preventDefault();
+		const destinationBlockName =
+			level === 0 ? 'core/paragraph' : 'core/heading';
+		const currentClientId = getSelectedBlockClientId();
+		if ( currentClientId === null ) {
+			return;
+		}
+		const blockName = getBlockName( currentClientId );
+		if ( blockName !== 'core/paragraph' && blockName !== 'core/heading' ) {
+			return;
+		}
+		const attributes = getBlockAttributes( currentClientId );
+		const textAlign =
+			blockName === 'core/paragraph' ? 'align' : 'textAlign';
+		const destinationTextAlign =
+			destinationBlockName === 'core/paragraph' ? 'align' : 'textAlign';
+
+		replaceBlocks(
+			currentClientId,
+			createBlock( destinationBlockName, {
+				level,
+				content: attributes.content,
+				...{ [ destinationTextAlign ]: attributes[ textAlign ] },
+			} )
+		);
+	};
 
 	useShortcut( 'core/edit-site/save', ( event ) => {
 		event.preventDefault();
@@ -49,7 +79,7 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		);
 
 		if ( ! isSaving && isDirty ) {
-			openEntitiesSavedStates();
+			setIsSaveViewOpened( true );
 		}
 	} );
 
@@ -63,8 +93,12 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		event.preventDefault();
 	} );
 
+	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
 	useShortcut( 'core/edit-site/toggle-list-view', () => {
-		setIsListViewOpened( ! isListViewOpen );
+		if ( ! isListViewOpen ) {
+			return;
+		}
+		setIsListViewOpened( true );
 	} );
 
 	useShortcut( 'core/edit-site/toggle-block-settings-sidebar', ( event ) => {
@@ -83,117 +117,21 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );
 	} );
 
-	return null;
-}
+	useShortcut( 'core/edit-site/transform-heading-to-paragraph', ( event ) =>
+		handleTextLevelShortcut( event, 0 )
+	);
 
-function KeyboardShortcutsRegister() {
-	// Registering the shortcuts.
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	useEffect( () => {
-		registerShortcut( {
-			name: 'core/edit-site/save',
-			category: 'global',
-			description: __( 'Save your changes.' ),
-			keyCombination: {
-				modifier: 'primary',
-				character: 's',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/undo',
-			category: 'global',
-			description: __( 'Undo your last changes.' ),
-			keyCombination: {
-				modifier: 'primary',
-				character: 'z',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/redo',
-			category: 'global',
-			description: __( 'Redo your last undo.' ),
-			keyCombination: {
-				modifier: 'primaryShift',
-				character: 'z',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/toggle-list-view',
-			category: 'global',
-			description: __( 'Open the block list view.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'o',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/toggle-block-settings-sidebar',
-			category: 'global',
-			description: __( 'Show or hide the block settings sidebar.' ),
-			keyCombination: {
-				modifier: 'primaryShift',
-				character: ',',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/keyboard-shortcuts',
-			category: 'main',
-			description: __( 'Display these keyboard shortcuts.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'h',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/next-region',
-			category: 'global',
-			description: __( 'Navigate to the next part of the editor.' ),
-			keyCombination: {
-				modifier: 'ctrl',
-				character: '`',
-			},
-			aliases: [
-				{
-					modifier: 'access',
-					character: 'n',
-				},
-			],
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/previous-region',
-			category: 'global',
-			description: __( 'Navigate to the previous part of the editor.' ),
-			keyCombination: {
-				modifier: 'ctrlShift',
-				character: '`',
-			},
-			aliases: [
-				{
-					modifier: 'access',
-					character: 'p',
-				},
-			],
-		} );
-		registerShortcut( {
-			name: 'core/edit-site/toggle-mode',
-			category: 'global',
-			description: __( 'Switch between visual editor and code editor.' ),
-			keyCombination: {
-				modifier: 'secondary',
-				character: 'm',
-			},
-		} );
-	}, [ registerShortcut ] );
+	[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+		//the loop is based off on a constant therefore
+		//the hook will execute the same way every time
+		//eslint-disable-next-line react-hooks/rules-of-hooks
+		useShortcut(
+			`core/edit-site/transform-paragraph-to-heading-${ level }`,
+			( event ) => handleTextLevelShortcut( event, level )
+		);
+	} );
 
 	return null;
 }
 
-KeyboardShortcuts.Register = KeyboardShortcutsRegister;
 export default KeyboardShortcuts;

@@ -29,6 +29,7 @@ show "Mixed" placeholder text.
 ```jsx
 import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 const colors = [
 	{ name: 'Blue 20', color: '#72aee6' },
@@ -68,7 +69,7 @@ a `SlotFillProvider` overall.
 
 ## Props
 
-### `colors`: `Array`
+### `colors`: `( PaletteObject | ColorObject )[]`
 
 An array of color definitions. This may also be a multi-dimensional array where
 colors are organized by multiple origins.
@@ -76,6 +77,7 @@ colors are organized by multiple origins.
 Each color may be an object containing a `name` and `color` value.
 
 - Required: No
+- Default: `[]`
 
 ### `disableCustomColors`: `boolean`
 
@@ -89,6 +91,7 @@ This controls whether the alpha channel will be offered when selecting
 custom colors.
 
 - Required: No
+- Default: `false`
 
 ### `enableStyle`: `boolean`
 
@@ -124,7 +127,7 @@ _Note: The will be `undefined` if a user clears all borders._
 
 ### `popoverPlacement`: `string`
 
-The position of the color popover relative to the control wrapper.
+The position of the color popovers relative to the control wrapper.
 
 By default, popovers are displayed relative to the button that initiated the popover. By supplying a popover placement, you force the popover to display in a specific location.
 
@@ -134,9 +137,17 @@ The available base placements are 'top', 'right', 'bottom', 'left'. Each of thes
 
 ### `popoverOffset`: `number`
 
-Works in conjunctions with `popoverPlacement` and allows leaving a space between the color popover and the control wrapper.
+The space between the popover and the control wrapper.
 
 - Required: No
+
+### `size`: `string`
+
+Size of the control.
+
+- Required: No
+- Default: `default`
+- Allowed values: `default`, `__unstable-large`
 
 ### `value`: `Object`
 
@@ -156,19 +167,5 @@ const splitBorders = {
 	left: { color: '#f2d675', style: 'dotted', width: '1em' },
 };
 ```
-
-- Required: No
-
-### `__experimentalHasMultipleOrigins`: `boolean`
-
-This is passed on to the color related sub-components which need to be made
-aware of whether the colors prop contains multiple origins.
-
-- Required: No
-
-### `__experimentalIsRenderedInSidebar`: `boolean`
-
-This is passed on to the color related sub-components so they may render more
-effectively when used within a sidebar.
 
 - Required: No

@@ -21,7 +21,8 @@ function UnconnectedCardMedia(
 }
 
 /**
- * `CardMedia` provides a container for media elements within a `Card`.
+ * `CardMedia` provides a container for full-bleed content within a `Card`,
+ * such as images, video, or even just a background color.
  *
  * @example
  * ```jsx

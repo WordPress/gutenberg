@@ -1,19 +1,19 @@
 # Metadata in block.json
 
-Starting in WordPress 5.8 release, we encourage using the `block.json` metadata file as the canonical way to register block types. Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
+Starting in WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
 
 **Example:**
 
 ```json
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "my-plugin/notice",
 	"title": "Notice",
 	"category": "text",
 	"parent": [ "core/group" ],
 	"icon": "star",
-	"description": "Shows warning, error or success notices…",
+	"description": "Shows warning, error or success notices...",
 	"keywords": [ "alert", "message" ],
 	"version": "1.0.3",
 	"textdomain": "my-plugin",
@@ -28,6 +28,9 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 		"my-plugin/message": "message"
 	},
 	"usesContext": [ "groupId" ],
+	"selectors": {
+		"root": ".wp-block-my-plugin-notice"
+	},
 	"supports": {
 		"align": true
 	},
@@ -51,9 +54,9 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 	],
 	"editorScript": "file:./index.js",
 	"script": "file:./script.js",
-	"viewScript": "file:./view.js",
+	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
 	"editorStyle": "file:./index.css",
-	"style": "file:./style.css",
+	"style": [ "file:./style.css", "example-shared-style" ],
 	"render": "file:./render.php"
 }
 ```
@@ -147,10 +150,10 @@ This section describes all the properties that can be added to the `block.json` 
 -   Default: `1`
 
 ```json
-{ "apiVersion": 2 }
+{ "apiVersion": 3 }
 ```
 
-The version of the Block API used by the block. The most recent version is `2` and it was introduced in WordPress 5.6.
+The version of the Block API used by the block. The most recent version is `3` and it was introduced in WordPress 6.3.
 
 See the [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
 
@@ -237,7 +240,7 @@ Setting `parent` lets a block require that it is only available when nested with
 { "ancestor": [ "my-block/product" ] }
 ```
 
-The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block. In comparrison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
+The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block. In comparison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
 
 ### Icon
 
@@ -252,7 +255,7 @@ The `ancestor` property makes a block available inside the specified block types
 
 An icon property should be specified to make it easier to identify a block. These can be any of WordPress' Dashicons (slug serving also as a fallback in non-js contexts).
 
-**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. This colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/packages-primitives) component to add accessibility attributes (aria-hidden, role, and focusable).
+**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. This colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/primitives/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
 
 ### Description
 
@@ -379,6 +382,38 @@ See [the block context documentation](/docs/reference-guides/block-api/block-con
 }
 ```
 
+### Selectors
+
+-   Type: `object`
+-   Optional
+-   Localized: No
+-   Property: `selectors`
+-   Default: `{}`
+-   Since: `WordPress 6.3.0`
+
+Any custom CSS selectors, keyed by `root`, feature, or sub-feature, to be used
+when generating block styles for theme.json (global styles) stylesheets.
+Providing custom selectors allows more fine grained control over which styles
+apply to what block elements, e.g. applying typography styles only to an inner
+heading while colors are still applied on the outer block wrapper etc.
+
+See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
+
+```json
+{
+	"selectors": {
+		"root": ".my-custom-block-selector",
+		"color": {
+			"text": ".my-custom-block-selector p"
+		},
+		"typography": {
+			"root": ".my-custom-block-selector > h2",
+			"text-decoration": ".my-custom-block-selector > h2 span"
+		}
+	}
+}
+```
+
 ### Supports
 
 -   Type: `object`
@@ -408,7 +443,7 @@ It contains as set of options to control features used in the editor. See the [t
 
 Block styles can be used to provide alternative styles to block. It works by adding a class name to the block's wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.
 
-Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-styles) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
 
 ### Example
 
@@ -464,7 +499,7 @@ See the [the variations documentation](/docs/reference-guides/block-api/block-va
 
 ### Editor Script
 
--   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorScript`
@@ -473,11 +508,15 @@ See the [the variations documentation](/docs/reference-guides/block-api/block-va
 { "editorScript": "file:./index.js" }
 ```
 
-Block type editor script definition. It will only be enqueued in the context of the editor.
+Block type editor scripts definition. They will only be enqueued in the context of the editor.
+
+It's possible to pass a script handle registered with the [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) function, a path to a JavaScript file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
+_Note: An option to pass also an array of editor scripts exists since WordPress `6.1.0`._
 
 ### Script
 
--   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `script`
@@ -486,7 +525,11 @@ Block type editor script definition. It will only be enqueued in the context of 
 { "script": "file:./script.js" }
 ```
 
-Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+Block type frontend and editor scripts definition. They will be enqueued both in the editor and when viewing the content on the front of the site.
+
+It's possible to pass a script handle registered with the [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) function, a path to a JavaScript file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
+_Note: An option to pass also an array of scripts exists since WordPress `6.1.0`._
 
 ### View Script
 
@@ -497,10 +540,12 @@ Block type frontend and editor script definition. It will be enqueued both in th
 -   Since: `WordPress 5.9.0`
 
 ```json
-{ "viewScript": "file:./view.js" }
+{ "viewScript": [ "file:./view.js", "example-shared-view-script" ] }
 ```
 
-Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.
+Block type frontend scripts definition. They will be enqueued only when viewing the content on the front of the site.
+
+It's possible to pass a script handle registered with the [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) function, a path to a JavaScript file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
 
@@ -515,7 +560,9 @@ _Note: An option to pass also an array of view scripts exists since WordPress `6
 { "editorStyle": "file:./index.css" }
 ```
 
-Block type editor style definition. It will only be enqueued in the context of the editor.
+Block type editor styles definition. They will only be enqueued in the context of the editor.
+
+It's possible to pass a style handle registered with the [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of editor styles exists since WordPress `5.9.0`._
 
@@ -527,10 +574,12 @@ _Note: An option to pass also an array of editor styles exists since WordPress `
 -   Property: `style`
 
 ```json
-{ "style": "file:./style.css" }
+{ "style": [ "file:./style.css", "example-shared-style" ] }
 ```
 
-Block type frontend and editor style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+Block type frontend and editor styles definition. They will be enqueued both in the editor and when viewing the content on the front of the site.
+
+It's possible to pass a style handle registered with the [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of styles exists since WordPress `5.9.0`._
 
@@ -579,10 +628,10 @@ In `block.json`:
 ```json
 {
 	"editorScript": "file:./index.js",
-	"script": "my-script-handle",
-	"viewScript": "file:./view.js",
-	"editorStyle": "my-editor-style-handle",
-	"style": [ "file:./style.css", "my-style-handle" ]
+	"script": "file:./script.js",
+	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
+	"editorStyle": "file:./index.css",
+	"style": [ "file:./style.css", "example-shared-style" ]
 }
 ```
 
@@ -632,7 +681,7 @@ return array(
 Starting in the WordPress 5.8 release, it is possible to instruct WordPress to enqueue scripts and styles for a block type only when rendered on the frontend. It applies to the following asset fields in the `block.json` file:
 
 -   `script`
--   `viewScript` (when the block defines `render_callback` during registration in PHP or a `render` field in its `block.json`, then the script is registered but the block author is responsible for enqueuing it)
+-   `viewScript`
 -   `style`
 
 ## Internationalization

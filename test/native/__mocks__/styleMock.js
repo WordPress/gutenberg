@@ -92,6 +92,7 @@ module.exports = {
 	},
 	defaultBlock: {
 		marginTop: 16,
+		marginLeft: 16,
 	},
 	scrollableContent: {
 		paddingBottom: 20,
@@ -170,5 +171,23 @@ module.exports = {
 	},
 	'wp-block-list-item__list-item-placeholder': {
 		color: '#87a6bc',
+	},
+	innerAppender: {
+		marginLeft: 8,
+	},
+	mediaAreaPadding: {
+		width: 12,
+	},
+	defaultAppender: {
+		marginLeft: 16,
+	},
+	'components-picker__button-title': {
+		color: 'white',
+	},
+	placeholderColor: {
+		color: 'gray',
+	},
+	'rich-text-selection': {
+		color: 'black',
 	},
 };

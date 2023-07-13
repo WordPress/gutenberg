@@ -4,7 +4,7 @@
  * @see https://github.com/chalk/strip-ansi
  * Licensed under MIT license.
  *
- * @param  string The ansi string.
+ * @param string The ansi string.
  */
 function stripAnsi( string: string ) {
 	return string.replace(

@@ -88,9 +88,7 @@ describe( 'DimensionControl', () => {
 
 	describe( 'callbacks', () => {
 		it( 'should call onChange handler with correct args on size change', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<DimensionControl
@@ -112,9 +110,7 @@ describe( 'DimensionControl', () => {
 		} );
 
 		it( 'should call onChange handler with undefined value when no size is provided on change', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<DimensionControl

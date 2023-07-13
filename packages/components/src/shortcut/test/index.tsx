@@ -11,7 +11,7 @@ import Shortcut from '..';
 describe( 'Shortcut', () => {
 	it( 'does not render anything if no shortcut prop is provided', () => {
 		const { container } = render( <Shortcut /> );
-		expect( container.firstChild ).toBe( null );
+		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'renders the shortcut display text when a string is passed as the shortcut', () => {

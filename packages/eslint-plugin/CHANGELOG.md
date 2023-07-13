@@ -2,6 +2,60 @@
 
 ## Unreleased
 
+## 14.10.0 (2023-07-05)
+
+## 14.9.0 (2023-06-23)
+
+## 14.8.0 (2023-06-07)
+
+## 14.7.0 (2023-05-24)
+
+## 14.6.0 (2023-05-10)
+
+### Enhancement
+
+-   Validate dependencies in `useSelect` and `useSuspenseSelect` hooks. ([#49900](https://github.com/WordPress/gutenberg/pull/49900)).
+
+## 14.5.0 (2023-04-26)
+
+## 14.4.0 (2023-04-12)
+
+## 14.3.0 (2023-03-29)
+
+## 14.2.0 (2023-03-15)
+
+## 14.1.0 (2023-03-01)
+
+## 14.0.0 (2023-02-15)
+
+### Breaking Changes
+
+-   Increase the severity of the rule `jsdoc/check-line-alignment` from `warn` to `error`. ([#47878](https://github.com/WordPress/gutenberg/pull/47878)).
+
+## 13.10.0 (2023-02-01)
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^37.0.3` to requiring `^39.6.9`
+
+### Enhancement
+
+-   Bump `eslint-plugin-jest` version to 27.2.1.
+
+## 13.9.0 (2023-01-11)
+
+## 13.8.0 (2023-01-02)
+
+## 13.7.0 (2022-12-14)
+
+## 13.6.0 (2022-11-16)
+
+## 13.5.0 (2022-11-02)
+
+## 13.4.0 (2022-10-19)
+
+## 13.3.0 (2022-10-05)
+
+## 13.2.0 (2022-09-21)
+
 ## 13.0.0 (2022-08-24)
 
 ### Breaking Change
@@ -142,6 +196,10 @@
 -   The bundled `eslint-plugin-prettier` dependency has been updated from requiring `^3.1.2` to requiring `^3.3.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
 -   The bundled `eslint-plugin-react` dependency has been updated from requiring `^7.20.0` to requiring `^7.22.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
 -   The bundled `eslint-plugin-react-hooks` dependency has been updated from requiring `^4.0.4` to requiring `^4.2.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+
+### New Features
+
+-   Enable `react-hooks/exhaustive-deps` rules in the react config in "warn" mode ([#24914](https://github.com/WordPress/gutenberg/pull/24914)).
 
 ## 7.4.0 (2020-12-17)
 
@@ -327,7 +385,7 @@
 
 ### New Features
 
--   The bundled `eslint-plugin-jsx-a11y` dependency has been updated from requiring `^6.0.2` to requiring `^6.2.1` (see new features added in [6.2.0](https://github.com/evcohen/eslint-plugin-jsx-a11y/releases/tag/v6.2.0) and [6.1.0](https://github.com/evcohen/eslint-plugin-jsx-a11y/releases/tag/v6.1.0)).
+-   The bundled `eslint-plugin-jsx-a11y` dependency has been updated from requiring `^6.0.2` to requiring `^6.2.1` (see new features added in [6.2.0](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/releases/tag/v6.2.0) and [6.1.0](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/releases/tag/v6.1.0)).
 -   The bundled `eslint-plugin-react` dependency has been updated from requiring `7.7.0` to requiring `^7.12.4` (see new features added in [7.12.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.12.0), [7.11.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.11.0), [7.10.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.10.0), [7.9.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.9.0) and [7.8.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.8.0)).
 
 ## 2.0.0 (2019-03-06)

@@ -11,7 +11,6 @@ import {
 	useBlockProps,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
 
 export default function save( { attributes } ) {
 	const {
@@ -26,13 +25,7 @@ export default function save( { attributes } ) {
 		previewHeight,
 	} = attributes;
 
-	const pdfEmbedLabel = RichText.isEmpty( fileName )
-		? __( 'PDF embed' )
-		: sprintf(
-				/* translators: %s: filename. */
-				__( 'Embed of %s.' ),
-				fileName
-		  );
+	const pdfEmbedLabel = RichText.isEmpty( fileName ) ? 'PDF embed' : fileName;
 
 	const hasFilename = ! RichText.isEmpty( fileName );
 

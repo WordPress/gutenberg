@@ -95,16 +95,7 @@ export function isEditedPostNew( state ) {
  */
 export function hasChangedContent( state ) {
 	const edits = getPostEdits( state );
-
-	return (
-		'blocks' in edits ||
-		// `edits` is intended to contain only values which are different from
-		// the saved post, so the mere presence of a property is an indicator
-		// that the value is different than what is known to be saved. While
-		// content in Visual mode is represented by the blocks state, in Text
-		// mode it is tracked by `edits.content`.
-		'content' in edits
-	);
+	return 'content' in edits;
 }
 
 /**
@@ -673,21 +664,26 @@ export function isEditedPostDateFloating( state ) {
 }
 
 /**
+ * Returns true if the post is currently being deleted, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether post is being deleted.
+ */
+export function isDeletingPost( state ) {
+	return !! state.deleting.pending;
+}
+
+/**
  * Returns true if the post is currently being saved, or false otherwise.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether post is being saved.
  */
-export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	return select( coreStore ).isSavingEntityRecord(
-		'postType',
-		postType,
-		postId
-	);
-} );
+export function isSavingPost( state ) {
+	return !! state.saving.pending;
+}
 
 /**
  * Returns true if non-post entities are currently being saved, or false otherwise.
@@ -758,10 +754,7 @@ export const didPostSaveRequestFail = createRegistrySelector(
  * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
-	if ( ! isSavingPost( state ) ) {
-		return false;
-	}
-	return Boolean( state.saving.options?.isAutosave );
+	return isSavingPost( state ) && Boolean( state.saving.options?.isAutosave );
 }
 
 /**
@@ -772,10 +765,7 @@ export function isAutosavingPost( state ) {
  * @return {boolean} Whether the post is being previewed.
  */
 export function isPreviewingPost( state ) {
-	if ( ! isSavingPost( state ) ) {
-		return false;
-	}
-	return Boolean( state.saving.options?.isPreview );
+	return isSavingPost( state ) && Boolean( state.saving.options?.isPreview );
 }
 
 /**
@@ -783,7 +773,7 @@ export function isPreviewingPost( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {string?} Preview Link.
+ * @return {string | undefined} Preview Link.
  */
 export function getEditedPostPreviewLink( state ) {
 	if ( state.saving.pending || isSavingPost( state ) ) {

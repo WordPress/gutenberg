@@ -2,6 +2,67 @@
 
 ## Unreleased
 
+## 6.14.0 (2023-07-05)
+
+## 6.13.0 (2023-06-23)
+
+## 6.12.0 (2023-06-07)
+
+## 6.11.0 (2023-05-24)
+
+## 6.10.0 (2023-05-10)
+
+## 6.9.0 (2023-04-26)
+
+## 6.8.0 (2023-04-12)
+
+## 6.7.0 (2023-03-29)
+
+## 6.6.0 (2023-03-15)
+
+## 6.5.0 (2023-03-01)
+
+## 6.4.0 (2023-02-15)
+
+## 6.3.0 (2023-02-01)
+
+## 6.2.0 (2023-01-11)
+
+## 6.1.0 (2023-01-02)
+
+## 6.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 5.20.0 (2022-11-16)
+
+## 5.19.0 (2022-11-02)
+
+### Internal
+
+-   `useDisabled`: Refactor the component to rely on the HTML `inert` attribute ([#44865](https://github.com/WordPress/gutenberg/pull/44865)).
+-   `useFocusOutside`: Refactor the hook to TypeScript, rewrite tests using modern RTL and jest features ([#45317](https://github.com/WordPress/gutenberg/pull/45317)).
+-   `useFocusableIframe`: Refactor to TypeScript ([#45428](https://github.com/WordPress/gutenberg/pull/45428)).
+
+## 5.18.0 (2022-10-19)
+
+## 5.17.0 (2022-10-05)
+
+## 5.16.0 (2022-09-21)
+
+### New Features
+
+-   Compose: Introduce an in-house `debounce()` utility, deprecate Lodash version ([#43943](https://github.com/WordPress/gutenberg/pull/43943)).
+-   Compose: Introduce in-house `compose` and `pipe` utils ([#44112](https://github.com/WordPress/gutenberg/pull/44112)).
+
+### Internal
+
+-   `useInstanceId`: refactor to TypeScript ([#43790](https://github.com/WordPress/gutenberg/pull/43790)).
+
+## 5.15.0 (2022-09-13)
+
 ### Internal
 
 -   `useDialog`: refactor to TypeScript ([#43823](https://github.com/WordPress/gutenberg/pull/43823)).

@@ -24,14 +24,14 @@ import {
 } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
-	apiVersion: 2,
+	apiVersion: 3,
 	title: 'Example: Controls (esnext)',
 	icon: 'universal-access-alt',
 	category: 'design',
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 		alignment: {
@@ -109,8 +109,8 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 
 		attributes: {
 			content: {
-				type: 'array',
-				source: 'children',
+				type: 'string',
+				source: 'html',
 				selector: 'p',
 			},
 			alignment: {
@@ -208,7 +208,7 @@ import {
 } from '@wordpress/block-editor';
 
 registerBlockType( 'create-block/gutenpride', {
-	apiVersion: 2,
+	apiVersion: 3,
 	attributes: {
 		message: {
 			type: 'string',

@@ -20,6 +20,17 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 
+function selector( select ) {
+	const { __unstableGetEditorMode, getSettings, isTyping } =
+		select( blockEditorStore );
+
+	return {
+		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+		hasFixedToolbar: getSettings().hasFixedToolbar,
+		isTyping: isTyping(),
+	};
+}
+
 /**
  * Renders block tools (the block toolbar, select/navigation mode toolbar, the
  * insertion point and a slot for the inline rich text toolbar). Must be wrapped
@@ -35,15 +46,10 @@ export default function BlockTools( {
 	...props
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { hasFixedToolbar, isZoomOutMode } = useSelect( ( select ) => {
-		const { __unstableGetEditorMode, getSettings } =
-			select( blockEditorStore );
-
-		return {
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-			hasFixedToolbar: getSettings().hasFixedToolbar,
-		};
-	}, [] );
+	const { hasFixedToolbar, isZoomOutMode, isTyping } = useSelect(
+		selector,
+		[]
+	);
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -53,6 +59,7 @@ export default function BlockTools( {
 		insertAfterBlock,
 		insertBeforeBlock,
 		clearSelectedBlock,
+		selectBlock,
 		moveBlocksUp,
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
@@ -102,7 +109,15 @@ export default function BlockTools( {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
-				clearSelectedBlock();
+
+				// If there is more than one block selected, select the first
+				// block so that focus is directed back to the beginning of the selection.
+				// In effect, to the user this feels like deselecting the multi-selection.
+				if ( clientIds.length > 1 ) {
+					selectBlock( clientIds[ 0 ] );
+				} else {
+					clearSelectedBlock();
+				}
 				event.target.ownerDocument.defaultView
 					.getSelection()
 					.removeAllRanges();
@@ -118,7 +133,7 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-				{ ! isZoomOutMode && (
+				{ ! isTyping && (
 					<InsertionPoint
 						__unstableContentRef={ __unstableContentRef }
 					/>

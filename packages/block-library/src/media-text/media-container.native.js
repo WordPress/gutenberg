@@ -26,12 +26,12 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { media as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import icon from './media-container-icon';
 import SvgIconRetry from './icon-retry';
 
 /**

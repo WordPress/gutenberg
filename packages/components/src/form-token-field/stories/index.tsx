@@ -123,3 +123,16 @@ WithCustomRenderItem.args = {
 		<div>{ `${ item } — a nice place to visit` }</div>
 	),
 };
+
+/**
+ * Only values for which the `__experimentalValidateInput` function returns
+ * `true` will be tokenized. (This is still an experimental feature and is
+ * subject to change.)
+ */
+export const WithValidatedInput: ComponentStory< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
+WithValidatedInput.args = {
+	...Default.args,
+	__experimentalValidateInput: ( input: string ) =>
+		continents.includes( input ),
+};

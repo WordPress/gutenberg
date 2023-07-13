@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { debounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**

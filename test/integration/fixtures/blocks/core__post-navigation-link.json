@@ -5,7 +5,8 @@
 		"attributes": {
 			"type": "next",
 			"showTitle": false,
-			"linkLabel": false
+			"linkLabel": false,
+			"arrow": "none"
 		},
 		"innerBlocks": []
 	}

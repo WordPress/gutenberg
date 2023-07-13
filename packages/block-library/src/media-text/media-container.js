@@ -20,11 +20,7 @@ import { useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
-import icon from './media-container-icon';
+import { media as icon } from '@wordpress/icons';
 
 /**
  * Constants
@@ -113,6 +109,7 @@ function MediaContainer( props, ref ) {
 		mediaWidth,
 		onSelectMedia,
 		onWidthChange,
+		enableResize,
 	} = props;
 
 	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
@@ -131,8 +128,8 @@ function MediaContainer( props, ref ) {
 			commitWidthChange( parseInt( elt.style.width ) );
 		};
 		const enablePositions = {
-			right: mediaPosition === 'left',
-			left: mediaPosition === 'right',
+			right: enableResize && mediaPosition === 'left',
+			left: enableResize && mediaPosition === 'right',
 		};
 
 		const backgroundStyles =

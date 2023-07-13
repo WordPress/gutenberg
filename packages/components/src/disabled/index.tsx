@@ -1,13 +1,7 @@
 /**
- * External dependencies
- */
-import type { HTMLProps } from 'react';
-
-/**
  * WordPress dependencies
  */
-import { useDisabled } from '@wordpress/compose';
-import { createContext, forwardRef } from '@wordpress/element';
+import { createContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,17 +14,15 @@ import { useCx } from '../utils';
 const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;
 
-// Extracting this ContentWrapper component in order to make it more explicit
-// the same 'ContentWrapper' component is needed so that React can reconcile
-// the dom correctly when switching between disabled/non-disabled (instead
-// of thrashing the previous DOM and therefore losing the form fields values).
-const ContentWrapper = forwardRef<
-	HTMLDivElement,
-	HTMLProps< HTMLDivElement >
->( ( props, ref ) => <div { ...props } ref={ ref } /> );
-
 /**
- * `Disabled` is a component which disables descendant tabbable elements and prevents pointer interaction.
+ * `Disabled` is a component which disables descendant tabbable elements and
+ * prevents pointer interaction.
+ *
+ * _Note: this component may not behave as expected in browsers that don't
+ * support the `inert` HTML attribute. We recommend adding the official WICG
+ * polyfill when using this component in your project._
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert
  *
  * ```jsx
  * import { Button, Disabled, TextControl } from '@wordpress/components';
@@ -65,29 +57,22 @@ function Disabled( {
 	isDisabled = true,
 	...props
 }: WordPressComponentProps< DisabledProps, 'div' > ) {
-	const ref = useDisabled();
 	const cx = useCx();
-	if ( ! isDisabled ) {
-		return (
-			<Provider value={ false }>
-				<ContentWrapper>{ children }</ContentWrapper>
-			</Provider>
-		);
-	}
 
 	return (
-		<Provider value={ true }>
-			<ContentWrapper
-				ref={ ref }
-				className={ cx(
-					disabledStyles,
-					className,
-					'components-disabled'
-				) }
+		<Provider value={ isDisabled }>
+			<div
+				// @ts-ignore Reason: inert is a recent HTML attribute
+				inert={ isDisabled ? 'true' : undefined }
+				className={
+					isDisabled
+						? cx( disabledStyles, className, 'components-disabled' )
+						: undefined
+				}
 				{ ...props }
 			>
 				{ children }
-			</ContentWrapper>
+			</div>
 		</Provider>
 	);
 }

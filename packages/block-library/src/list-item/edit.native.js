@@ -35,6 +35,7 @@ export default function ListItemEdit( {
 	onReplace,
 	clientId,
 	style,
+	mergeBlocks,
 } ) {
 	const [ contentWidth, setContentWidth ] = useState();
 	const { placeholder, content } = attributes;
@@ -90,7 +91,7 @@ export default function ListItemEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
-		useCompactList: true,
+		renderAppender: false,
 	} );
 
 	// Set default placeholder text color from light/dark scheme or base colors
@@ -119,7 +120,7 @@ export default function ListItemEdit( {
 	const preventDefault = useRef( false );
 	const { onEnter } = useEnter( { content, clientId }, preventDefault );
 	const onSplit = useSplit( clientId );
-	const onMerge = useMerge( clientId );
+	const onMerge = useMerge( clientId, mergeBlocks );
 	const onSplitList = useCallback(
 		( value ) => {
 			if ( ! preventDefault.current ) {

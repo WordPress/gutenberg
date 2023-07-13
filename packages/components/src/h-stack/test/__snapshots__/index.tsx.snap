@@ -13,6 +13,7 @@ exports[`props should render alignment 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   -webkit-justify-content: center;
@@ -20,25 +21,23 @@ exports[`props should render alignment 1`] = `
   width: 100%;
 }
 
-.emotion-0>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
-}
-
 .emotion-0>* {
   min-width: 0;
 }
 
-<div
-  class="components-flex components-h-stack emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="HStack"
->
+<div>
   <div
-    class="emotion-2 emotion-1"
-  />
-  <div
-    class="emotion-2 emotion-1"
-  />
+    class="components-flex components-h-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="HStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
 </div>
 `;
 
@@ -55,31 +54,30 @@ exports[`props should render correctly 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
 }
 
-.emotion-0>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
-}
-
 .emotion-0>* {
   min-width: 0;
 }
 
-<div
-  class="components-flex components-h-stack emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="HStack"
->
+<div>
   <div
-    class="emotion-2 emotion-1"
-  />
-  <div
-    class="emotion-2 emotion-1"
-  />
+    class="components-flex components-h-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="HStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
 </div>
 `;
 
@@ -96,30 +94,29 @@ exports[`props should render spacing 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 5);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
 }
 
-.emotion-0>*+*:not( marquee ) {
-  margin-left: calc(4px * 5);
-}
-
 .emotion-0>* {
   min-width: 0;
 }
 
-<div
-  class="components-flex components-h-stack emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="HStack"
->
+<div>
   <div
-    class="emotion-2 emotion-1"
-  />
-  <div
-    class="emotion-2 emotion-1"
-  />
+    class="components-flex components-h-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="HStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
 </div>
 `;

@@ -20,7 +20,7 @@ const GRID_BASE = '4px';
  * When given a unit value or one of the named CSS values like `auto`,
  * it will simply return the value back.
  *
- * @param  value A number, numeric string, or a unit value.
+ * @param value A number, numeric string, or a unit value.
  */
 export function space( value?: SpaceInput ): string | undefined {
 	if ( typeof value === 'undefined' ) {

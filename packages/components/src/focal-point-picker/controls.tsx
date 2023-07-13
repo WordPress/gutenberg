@@ -22,6 +22,8 @@ const TEXTCONTROL_MAX = 100;
 const noop = () => {};
 
 export default function FocalPointPickerControls( {
+	__nextHasNoMarginBottom,
+	hasHelpText,
 	onChange = noop,
 	point = {
 		x: 0.5,
@@ -45,9 +47,14 @@ export default function FocalPointPickerControls( {
 	};
 
 	return (
-		<ControlWrapper className="focal-point-picker__controls">
+		<ControlWrapper
+			className="focal-point-picker__controls"
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			hasHelpText={ hasHelpText }
+		>
 			<FocalPointUnitControl
 				label={ __( 'Left' ) }
+				aria-label={ __( 'Focal point left position' ) }
 				value={ [ valueX, '%' ].join( '' ) }
 				onChange={
 					( ( next ) =>
@@ -60,6 +67,7 @@ export default function FocalPointPickerControls( {
 			/>
 			<FocalPointUnitControl
 				label={ __( 'Top' ) }
+				aria-label={ __( 'Focal point top position' ) }
 				value={ [ valueY, '%' ].join( '' ) }
 				onChange={
 					( ( next ) =>

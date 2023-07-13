@@ -58,10 +58,10 @@ export interface Options {
  *
  * @since 6.1.0 Introduced in WordPress core.
  *
- * @param  kind     Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
- * @param  name     Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
- * @param  recordId ID of the requested entity record.
- * @param  options  Optional hook options.
+ * @param    kind     Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+ * @param    name     Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+ * @param    recordId ID of the requested entity record.
+ * @param    options  Optional hook options.
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -160,7 +160,7 @@ export default function useEntityRecord< RecordType >(
 					...saveOptions,
 				} ),
 		} ),
-		[ recordId ]
+		[ editEntityRecord, kind, name, recordId, saveEditedEntityRecord ]
 	);
 
 	const { editedRecord, hasEdits } = useSelect(
@@ -182,7 +182,9 @@ export default function useEntityRecord< RecordType >(
 	const { data: record, ...querySelectRest } = useQuerySelect(
 		( query ) => {
 			if ( ! options.enabled ) {
-				return null;
+				return {
+					data: null,
+				};
 			}
 			return query( coreStore ).getEntityRecord( kind, name, recordId );
 		},
