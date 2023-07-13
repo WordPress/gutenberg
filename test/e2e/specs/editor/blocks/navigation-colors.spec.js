@@ -521,7 +521,7 @@ class ColorControl {
 		await this.pageUtils.setBrowserViewport( { width: 599, height: 700 } );
 		await this.page.getByRole( 'button', { name: 'Open menu' } ).click();
 
-		// All of the mobile menu navigation links should be the same color as the submenuTextColor
+		// All of the mobile menu navigation links should be the same color as the submenuTextColor.
 		await expect( customLink ).toHaveCSS( 'color', submenuTextColor );
 		await expect( submenuLink ).toHaveCSS( 'color', submenuTextColor );
 		await expect( pageLink ).toHaveCSS( 'color', submenuTextColor );
