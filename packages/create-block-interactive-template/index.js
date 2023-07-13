@@ -13,12 +13,11 @@ module.exports = {
 		supports: {
 			interactivity: true,
 		},
+		render: 'file:./render.php',
+		viewScript: 'file:./view.js',
 	},
 	variants: {
-		basic: {
-			render: 'file:./render.php',
-			viewScript: 'file:./view.js',
-		},
+		basic: {},
 	},
 	pluginTemplatesPath: join( __dirname, 'plugin-templates' ),
 	blockTemplatesPath: join( __dirname, 'block-templates' ),
