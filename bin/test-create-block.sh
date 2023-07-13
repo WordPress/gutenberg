@@ -49,7 +49,7 @@ npx wp-create-block example-static --no-wp-scripts
 cd example-static
 
 status "Verifying project..."
-expected=5
+expected=7
 actual=$( find . -maxdepth 1 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
 	error "Expected $expected files in the project root, but found $actual."
