@@ -511,7 +511,7 @@ class ColorControl {
 		// Submenu link color
 		await expect( submenuLink ).toHaveCSS( 'color', submenuTextColor );
 
-		// Submenu background color
+		// Submenu background color.
 		await expect( submenuWrapper ).toHaveCSS(
 			'background-color',
 			submenuBackgroundColor
