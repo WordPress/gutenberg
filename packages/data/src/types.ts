@@ -190,13 +190,22 @@ export type PromisifiedActionCreators<
 };
 
 // Wraps action creator return types with a Promise -- also handles thunks by
-// extracting the return type of the inner function of the thunk's action creator.
+// extracting the return type of the inner function of the thunk's action creator,
+// and by accounting for thunks that return a Promise.
 export type PromisifyActionCreator< Action extends ActionCreator > = (
 	...args: Parameters< Action >
 ) => Promise<
 	ReturnType< Action > extends ( ..._args: any[] ) => any
-		? ReturnType< ReturnType< Action > > // Thunks need to be unwrapped twice.
+		? ThunkReturnType< Action >
 		: ReturnType< Action >
+>;
+
+// A thunk is an action creator which returns a function, which can optionally
+// return a Promise. The double ReturnType unwraps the innermost function's
+// return type, and Awaited gets the type the Promise resolves to. If the return
+// type is not a Promise, Awaited returns that original type.
+export type ThunkReturnType< Action extends ActionCreator > = Awaited<
+	ReturnType< ReturnType< Action > >
 >;
 
 type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
