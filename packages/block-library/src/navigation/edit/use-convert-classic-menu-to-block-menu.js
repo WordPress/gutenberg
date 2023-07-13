@@ -20,7 +20,10 @@ export const CLASSIC_MENU_CONVERSION_IDLE = 'idle';
 // do not import the same classic menu twice.
 let classicMenuBeingConvertedId = null;
 
-function useConvertClassicToBlockMenu( createNavigationMenu ) {
+function useConvertClassicToBlockMenu(
+	createNavigationMenu,
+	{ throwOnError = false } = {}
+) {
 	const registry = useRegistry();
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -149,19 +152,21 @@ function useConvertClassicToBlockMenu( createNavigationMenu ) {
 					classicMenuBeingConvertedId = null;
 
 					// Rethrow error for debugging.
-					throw new Error(
-						sprintf(
-							// translators: %s: the name of a menu (e.g. Header navigation).
-							__( `Unable to create Navigation Menu "%s".` ),
-							menuName
-						),
-						{
-							cause: err,
-						}
-					);
+					if ( throwOnError ) {
+						throw new Error(
+							sprintf(
+								// translators: %s: the name of a menu (e.g. Header navigation).
+								__( `Unable to create Navigation Menu "%s".` ),
+								menuName
+							),
+							{
+								cause: err,
+							}
+						);
+					}
 				} );
 		},
-		[ convertClassicMenuToBlockMenu ]
+		[ convertClassicMenuToBlockMenu, throwOnError ]
 	);
 
 	return {
