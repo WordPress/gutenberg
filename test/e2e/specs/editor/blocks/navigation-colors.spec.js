@@ -517,7 +517,7 @@ class ColorControl {
 			submenuBackgroundColor
 		);
 
-		// Open the frontend overlay so we can test the colors
+		// Open the frontend overlay so we can test the colors.
 		await this.pageUtils.setBrowserViewport( { width: 599, height: 700 } );
 		await this.page.getByRole( 'button', { name: 'Open menu' } ).click();
 
