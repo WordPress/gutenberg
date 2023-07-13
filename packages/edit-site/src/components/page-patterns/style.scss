@@ -1,6 +1,8 @@
 .edit-site-patterns {
-	background: rgba(0, 0, 0, 0.15);
+	border: 1px solid $gray-800;
+	background: none;
 	margin: $header-height 0 0;
+	border-radius: 0;
 	.components-base-control {
 		width: 100%;
 		@include break-medium {
@@ -59,6 +61,23 @@
 		background: $gray-700;
 		color: $gray-100;
 	}
+
+	.edit-site-patterns__grid-pagination {
+		width: fit-content;
+		.components-button.is-tertiary {
+			width: $button-size-compact;
+			height: $button-size-compact;
+			color: $gray-100;
+			background-color: $gray-800;
+			&:disabled {
+				color: $gray-600;
+				background: none;
+			}
+			&:hover:not(:disabled) {
+				background-color: $gray-700;
+			}
+		}
+	}
 }
 
 .edit-site-patterns__section-header {
@@ -74,6 +93,7 @@
 	// Small top padding required to avoid cutting off the visible outline
 	// when hovering items.
 	padding-top: $border-width-focus-fallback;
+	margin-top: 0;
 	margin-bottom: $grid-unit-40;
 	@include break-large {
 		grid-template-columns: 1fr 1fr;

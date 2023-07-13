@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { scopeSelector } from './utils';
+import { getValueFromObjectPath } from '../../utils/object';
 
 /**
  * Determine the CSS selector for the block type and target provided, returning
@@ -69,15 +65,15 @@ export function getBlockCSSSelector(
 		if ( hasSelectors ) {
 			// Get selector from either `feature.root` or shorthand path.
 			const featureSelector =
-				get( selectors, `${ path }.root`, null ) ||
-				get( selectors, path, null );
+				getValueFromObjectPath( selectors, `${ path }.root`, null ) ||
+				getValueFromObjectPath( selectors, path, null );
 
 			// Return feature selector if found or any available fallback.
 			return featureSelector || fallbackSelector;
 		}
 
 		// Try getting old experimental supports selector value.
-		const featureSelector = get(
+		const featureSelector = getValueFromObjectPath(
 			supports,
 			`${ path }.__experimentalSelector`,
 			null
@@ -98,7 +94,7 @@ export function getBlockCSSSelector(
 
 	// Use selectors API if available.
 	if ( hasSelectors ) {
-		subfeatureSelector = get( selectors, path, null );
+		subfeatureSelector = getValueFromObjectPath( selectors, path, null );
 	}
 
 	// Only return if we have a subfeature selector.

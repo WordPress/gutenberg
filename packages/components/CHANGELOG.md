@@ -5,10 +5,12 @@
 ### Enhancements
 
 -   `TextControl`: Add `id` prop to allow for custom IDs in `TextControl`s ([#52028](https://github.com/WordPress/gutenberg/pull/52028)).
+-   `Navigator`: Add `replace` option to `navigator.goTo()` and `navigator.goToParent()` ([#52456](https://github.com/WordPress/gutenberg/pull/52456)).
 
 ### Bug Fix
 
--   `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([52356](https://github.com/WordPress/gutenberg/pull/52356)).
+-   `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([#52356](https://github.com/WordPress/gutenberg/pull/52356)).
+-   `Item`: Unify focus style and add default font styles. ([#52495](https://github.com/WordPress/gutenberg/pull/52495)).
 
 ## 25.3.0 (2023-07-05)
 

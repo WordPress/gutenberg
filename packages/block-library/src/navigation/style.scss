@@ -31,6 +31,7 @@ $navigation-icon-size: 24px;
 
 	// Menu item container.
 	.wp-block-navigation-item {
+		background-color: inherit;
 		display: flex;
 		align-items: center;
 		position: relative;
@@ -398,15 +399,26 @@ button.wp-block-navigation-item__content {
 }
 
 // Default background and font color.
-.wp-block-navigation:not(.has-background) {
+.wp-block-navigation:not(.has-background) .wp-block-navigation__submenu-container {
+	// Set a background color for submenus so that they're not transparent.
+	// NOTE TO DEVS - if refactoring this code, please double-check that
+	// submenus have a default background color, this feature has regressed
+	// several times, so care needs to be taken.
+	background-color: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+// If we do have a background color selected, inherit it from the navigation block
+.wp-block-navigation.has-background {
 	.wp-block-navigation__submenu-container {
-		// Set a background color for submenus so that they're not transparent.
-		// NOTE TO DEVS - if refactoring this code, please double-check that
-		// submenus have a default background color, this feature has regressed
-		// several times, so care needs to be taken.
-		background-color: #fff;
+		background-color: inherit;
+	}
+}
+
+.wp-block-navigation:not(.has-text-color) {
+	.wp-block-navigation__submenu-container {
+		// Set a default color for submenu text if none is selected
 		color: #000;
-		border: 1px solid rgba(0, 0, 0, 0.15);
 	}
 }
 
@@ -458,7 +470,8 @@ button.wp-block-navigation-item__content {
 	right: 0;
 	bottom: 0;
 
-	.wp-block-navigation-link a {
+	// Low specificity so that themes can override.
+	& :where(.wp-block-navigation-item a) {
 		color: inherit;
 	}
 
@@ -579,6 +592,7 @@ button.wp-block-navigation-item__content {
 		// Remove background colors for items inside the overlay menu.
 		// Has to be !important to override global styles.
 		.wp-block-navigation-item .wp-block-navigation__submenu-container,
+		.wp-block-navigation__container,
 		.wp-block-navigation-item,
 		.wp-block-page-list {
 			color: inherit !important;
@@ -620,8 +634,13 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation:not(.has-background)
 .wp-block-navigation__responsive-container.is-menu-open {
 	background-color: #fff;
+}
+
+.wp-block-navigation:not(.has-text-color)
+.wp-block-navigation__responsive-container.is-menu-open {
 	color: #000;
 }
+
 
 // Overlay menu toggle button label
 .wp-block-navigation__toggle_button_label {
