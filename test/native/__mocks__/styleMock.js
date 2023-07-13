@@ -190,6 +190,9 @@ module.exports = {
 	'rich-text-selection': {
 		color: 'black',
 	},
+	'header-toolbar__keyboard-hide-shadow--light': {
+		color: 'black',
+	},
 	'header-toolbar__keyboard-hide-shadow--solid': {
 		color: 'black',
 	},
