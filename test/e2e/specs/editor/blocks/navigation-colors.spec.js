@@ -116,7 +116,7 @@ test.describe( 'Navigation colors', () => {
 
 		// Save them so we can check on the frontend later too.
 		await editor.saveSiteEditorEntities();
-		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas
+		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
 		await page
 			.getByRole( 'button', { name: 'Close Settings' } )
 			.click( { force: true } );
