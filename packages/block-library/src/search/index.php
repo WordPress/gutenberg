@@ -73,7 +73,15 @@ function render_block_core_search( $attributes ) {
 		if ( 'button-only' === $button_position && 'expand-searchfield' === $button_behavior ) {
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
-			wp_enqueue_script( 'wp-block--search-view', plugins_url( 'search/view.min.js', __FILE__ ) );
+
+			// See logic in gutenberg_register_packages_scripts().
+			$asset_file      = plugin_dir_path( __FILE__ ) . '/search/view.min.asset.php';
+			$script_url      = plugins_url( 'search/view.min.js', __FILE__ );
+			$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+			$asset           = file_exists( $asset_file ) ? require $asset_file : null;
+			$dependencies    = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
+			$version         = isset( $asset['version'] ) ? $asset['version'] : $default_version;
+			wp_enqueue_script( 'wp-block--search-view', $script_url, $dependencies, $version );
 			wp_script_add_data( 'wp-block--search-view', 'strategy', 'defer' );
 		}
 	}
