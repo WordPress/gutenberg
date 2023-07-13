@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation colors', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		// We want emptytheme because it doesn't have any styles
+		// We want emptytheme because it doesn't have any styles.
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.deleteAllMenus();
