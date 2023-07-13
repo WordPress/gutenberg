@@ -464,7 +464,7 @@ export function useGradientsPerOrigin( settings ) {
 export function __experimentalUseGlobalBehaviors(
 	blockName,
 	source = 'all',
-	{ shouldDecodeEncode = true, shouldReturnBehaviors = true } = {}
+	{ shouldReturnBehaviors = true } = {}
 ) {
 	const {
 		merged: mergedConfig,
@@ -480,21 +480,15 @@ export function __experimentalUseGlobalBehaviors(
 	switch ( source ) {
 		case 'all':
 			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( mergedConfig, blockName, rawResult )
-				: rawResult;
+			result = getValueFromVariable( mergedConfig, blockName, rawResult );
 			break;
 		case 'user':
 			rawResult = getValueFromObjectPath( userConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( mergedConfig, blockName, rawResult )
-				: rawResult;
+			result = getValueFromVariable( mergedConfig, blockName, rawResult );
 			break;
 		case 'base':
 			rawResult = getValueFromObjectPath( baseConfig, finalPath );
-			result = shouldDecodeEncode
-				? getValueFromVariable( baseConfig, blockName, rawResult )
-				: rawResult;
+			result = getValueFromVariable( baseConfig, blockName, rawResult );
 			break;
 		default:
 			throw 'Unsupported source';
