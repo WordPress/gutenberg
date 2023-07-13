@@ -167,7 +167,7 @@ test.describe( 'Navigation colors', () => {
 			.click();
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Color Link styles' } ).click();
-		// rga(207, 46 ,46) is the color of the "vivid red" color preset
+		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
 		await page
 			.getByRole( 'button', { name: 'Color: Vivid red' } )
 			.click( { force: true } );
