@@ -16,6 +16,7 @@ import {
 	__unstableCompositeItem as CompositeItem,
 	Tooltip,
 	Flex,
+	Button,
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { useState, useId } from '@wordpress/element';
@@ -160,7 +161,19 @@ export default function GridItem( { categoryId, composite, icon, item } ) {
 							/>
 						) }
 						<Flex as="span" gap={ 0 } justify="left">
-							{ item.title }
+							{ item.type === PATTERNS ? (
+								item.title
+							) : (
+								<Button
+									variant="link"
+									onClick={ onClick }
+									// Required for the grid's roving tab index system.
+									// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
+									tabIndex="-1"
+								>
+									{ item.title }
+								</Button>
+							) }
 							{ item.type === PATTERNS && (
 								<Tooltip
 									position="top center"
