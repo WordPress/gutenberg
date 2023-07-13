@@ -1,5 +1,26 @@
 == Changelog ==
 
+= 16.2.1 =
+
+## Changelog
+
+### Enhancements
+
+#### Footnotes
+- Footnotes: show in inserter and placeholder. ([52445](https://github.com/WordPress/gutenberg/pull/52445))
+
+### Bug Fixes
+
+#### Patterns
+- Make Pattern title text clickable. ([52599](https://github.com/WordPress/gutenberg/pull/52599))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@getdave @mcsf 
+
+
 = 16.2.0 =
 
 ## Changelog
