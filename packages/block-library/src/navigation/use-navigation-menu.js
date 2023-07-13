@@ -16,19 +16,13 @@ import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 export default function useNavigationMenu( ref ) {
 	const permissions = useResourcePermissions( 'navigation', ref );
 
-	const useSelectResult = useSelect(
+	const {
+		navigationMenu,
+		isNavigationMenuResolved,
+		isNavigationMenuMissing,
+	} = useSelect(
 		( select ) => {
-			const {
-				navigationMenu,
-				isNavigationMenuResolved,
-				isNavigationMenuMissing,
-			} = selectExistingMenu( select, ref );
-
-			return {
-				navigationMenu,
-				isNavigationMenuResolved,
-				isNavigationMenuMissing,
-			};
+			return selectExistingMenu( select, ref );
 		},
 		[ ref ]
 	);
@@ -51,7 +45,9 @@ export default function useNavigationMenu( ref ) {
 		: navigationMenus?.length > 0;
 
 	return {
-		...useSelectResult,
+		navigationMenu,
+		isNavigationMenuResolved,
+		isNavigationMenuMissing,
 		navigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
