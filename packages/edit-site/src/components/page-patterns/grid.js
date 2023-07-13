@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
+	Button,
+} from '@wordpress/components';
 import { useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -10,48 +14,59 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import GridItem from './grid-item';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 30;
 
 function Pagination( { currentPage, numPages, changePage, totalItems } ) {
 	return (
-		<HStack className="edit-site-patterns__grid-pagination">
-			<div className="edit-site-patterns__grid-pagination-label">
+		<HStack
+			expanded={ false }
+			spacing={ 3 }
+			className="edit-site-patterns__grid-pagination"
+		>
+			<Text variant="muted">
 				{
 					// translators: %s: Total number of patterns.
 					sprintf( __( '%s items' ), totalItems )
 				}
-			</div>
-
-			<button
-				onClick={ () => changePage( 1 ) }
-				disabled={ currentPage === 1 }
-			>
-				«
-			</button>
-			<button
-				onClick={ () => changePage( currentPage - 1 ) }
-				disabled={ currentPage === 1 }
-			>
-				‹
-			</button>
-			<div className="edit-site-patterns__grid-pagination-label">
+			</Text>
+			<HStack expanded={ false } spacing={ 1 }>
+				<Button
+					variant="tertiary"
+					onClick={ () => changePage( 1 ) }
+					disabled={ currentPage === 1 }
+				>
+					«
+				</Button>
+				<Button
+					variant="tertiary"
+					onClick={ () => changePage( currentPage - 1 ) }
+					disabled={ currentPage === 1 }
+				>
+					‹
+				</Button>
+			</HStack>
+			<Text variant="muted">
 				{
 					// translators: %1$s: Current page number, %2$s: Total number of pages.
 					sprintf( __( '%1$s of %2$s' ), currentPage, numPages )
 				}
-			</div>
-			<button
-				onClick={ () => changePage( currentPage + 1 ) }
-				disabled={ currentPage === numPages }
-			>
-				›
-			</button>
-			<button
-				onClick={ () => changePage( numPages ) }
-				disabled={ currentPage === numPages }
-			>
-				»
-			</button>
+			</Text>
+			<HStack expanded={ false } spacing={ 1 }>
+				<Button
+					variant="tertiary"
+					onClick={ () => changePage( currentPage + 1 ) }
+					disabled={ currentPage === numPages }
+				>
+					›
+				</Button>
+				<Button
+					variant="tertiary"
+					onClick={ () => changePage( numPages ) }
+					disabled={ currentPage === numPages }
+				>
+					»
+				</Button>
+			</HStack>
 		</HStack>
 	);
 }
@@ -63,12 +78,6 @@ export default function Grid( { categoryId, items, ...props } ) {
 	if ( ! items?.length ) {
 		return null;
 	}
-	items.sort( ( a, b ) =>
-		a.title.localeCompare( b.title, undefined, {
-			numeric: true,
-			sensitivity: 'base',
-		} )
-	);
 	const numPages = Math.ceil( items.length / PAGE_SIZE );
 	const totalItems = items.length;
 	const pageIndex = currentPage - 1;
@@ -88,11 +97,6 @@ export default function Grid( { categoryId, items, ...props } ) {
 
 	return (
 		<>
-			{ numPages > 1 && (
-				<Pagination
-					{ ...{ currentPage, numPages, changePage, totalItems } }
-				/>
-			) }
 			<ul
 				role="listbox"
 				className="edit-site-patterns__grid"

@@ -131,7 +131,7 @@ export default function PatternsList( { categoryId, type } ) {
 			</Flex>
 			{ syncFilter !== 'all' && (
 				<VStack className="edit-site-patterns__section-header">
-					<Heading as="h3" level={ 4 } id={ titleId }>
+					<Heading as="h3" level={ 5 } id={ titleId }>
 						{ title }
 					</Heading>
 					{ description ? (
