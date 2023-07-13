@@ -16,6 +16,13 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    test-run-id:
+        runs-on: ubuntu-latest
+        outputs:
+            testRunId: ${{ steps.testRunId.outputs.testRunId }}
+        steps:
+            - id: testRunId
+              run: echo testRunId=$(npx uuid) >> "$GITHUB_OUTPUT"
     e2e-puppeteer:
         name: Puppeteer - ${{ matrix.part }}
         runs-on: ubuntu-latest
@@ -59,9 +66,9 @@ jobs:
                   name: flaky-tests-report
                   path: flaky-tests
                   if-no-files-found: ignore
-
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
+        needs: test-run-id
         runs-on: ubuntu-latest
         # TODO: Remove later once we file the official PR -jvv
         # if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -94,6 +101,8 @@ jobs:
             - name: Run the tests
               run: |
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright:replay -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
+              env:
+                  RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.test-run-id.outputs.testRunId }}
 
             - name: Archive debug artifacts (screenshots, traces)
               uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
