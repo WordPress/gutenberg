@@ -530,7 +530,7 @@ class ColorControl {
 			.locator( '.wp-block-navigation__responsive-container' )
 			.filter( { hasText: 'Submenu Link' } );
 
-		// The mobile menu background should be the same color as the submenu background
+		// The mobile menu background should be the same color as the submenu background.
 		await expect( overlayFront ).toHaveCSS(
 			'background-color',
 			submenuBackgroundColor
