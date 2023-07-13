@@ -151,7 +151,7 @@ test.describe( 'Navigation colors', () => {
 		editor,
 		colorControl,
 	} ) => {
-		// Wrap the nav block inside a group block
+		// Wrap the nav block inside a group block.
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
