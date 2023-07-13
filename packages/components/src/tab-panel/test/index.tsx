@@ -169,7 +169,7 @@ describe.each( [
 			expect( await getSelectedTab() ).not.toHaveTextContent( 'Alpha' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
-			await expect( await getSelectedTab() ).not.toHaveFocus();
+			expect( await getSelectedTab() ).not.toHaveFocus();
 
 			// Tab to focus the tablist. Make sure alpha is focused, and that the
 			// corresponding tooltip is shown.
@@ -177,7 +177,7 @@ describe.each( [
 			await user.keyboard( '[Tab]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure beta is focused, and that
 			// the corresponding tooltip is shown.
@@ -186,7 +186,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure gamma is focused, and that
 			// the corresponding tooltip is shown.
@@ -195,7 +195,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 			expect( screen.getByText( 'Gamma' ) ).toBeInTheDocument();
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure beta is focused, and that
 			// the corresponding tooltip is shown.
@@ -204,7 +204,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 		} );
 	} );
 
@@ -651,15 +651,15 @@ describe.each( [
 
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).not.toHaveFocus();
+			expect( await getSelectedTab() ).not.toHaveFocus();
 			await user.keyboard( '[Tab]' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Navigate forward with arrow keys and make sure the Beta tab is
 			// selected automatically.
 			await user.keyboard( '[ArrowRight]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
@@ -667,7 +667,7 @@ describe.each( [
 			// selected automatically.
 			await user.keyboard( '[ArrowLeft]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
@@ -689,15 +689,15 @@ describe.each( [
 
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).not.toHaveFocus();
+			expect( await getSelectedTab() ).not.toHaveFocus();
 			await user.keyboard( '[Tab]' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Navigate backwards with arrow keys and make sure that the Gamma tab
 			// (the last tab) is selected automatically.
 			await user.keyboard( '[ArrowLeft]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
@@ -705,7 +705,7 @@ describe.each( [
 			// selected automatically.
 			await user.keyboard( '[ArrowRight]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
@@ -727,21 +727,21 @@ describe.each( [
 
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).not.toHaveFocus();
+			expect( await getSelectedTab() ).not.toHaveFocus();
 			await user.keyboard( '[Tab]' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Press the arrow up key, nothing happens.
 			await user.keyboard( '[ArrowUp]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Press the arrow down key, nothing happens
 			await user.keyboard( '[ArrowDown]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
@@ -763,13 +763,13 @@ describe.each( [
 
 			// Make sure alpha is still focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Navigate forward with arrow keys and make sure the Beta tab is
 			// selected automatically.
 			await user.keyboard( '[ArrowDown]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
@@ -777,7 +777,7 @@ describe.each( [
 			// selected automatically.
 			await user.keyboard( '[ArrowUp]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
@@ -785,7 +785,7 @@ describe.each( [
 			// selected automatically.
 			await user.keyboard( '[ArrowUp]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
@@ -793,7 +793,7 @@ describe.each( [
 			// selected automatically.
 			await user.keyboard( '[ArrowDown]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 5 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
@@ -823,9 +823,9 @@ describe.each( [
 
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			await expect( await getSelectedTab() ).not.toHaveFocus();
+			expect( await getSelectedTab() ).not.toHaveFocus();
 			await user.keyboard( '[Tab]' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
 			// Press the right arrow key three times. Since the delta tab is disabled:
@@ -835,7 +835,7 @@ describe.each( [
 			// - it will receive focus, when using arrow keys
 			await user.keyboard( '[ArrowRight][ArrowRight][ArrowRight]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			await expect(
+			expect(
 				screen.getByRole( 'tab', { name: 'Delta' } )
 			).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
@@ -846,7 +846,7 @@ describe.each( [
 			// already selected.
 			await user.keyboard( '[ArrowLeft]' );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 
 			// Click on the disabled tab. Compared to using arrow keys to move the
@@ -854,7 +854,7 @@ describe.each( [
 			// receive focus, nor they cause the `mockOnSelect` function to fire.
 			await user.click( screen.getByRole( 'tab', { name: 'Delta' } ) );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			await expect( await getSelectedTab() ).toHaveFocus();
+			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 		} );
 
