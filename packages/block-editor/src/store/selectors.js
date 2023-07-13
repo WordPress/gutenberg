@@ -2018,7 +2018,7 @@ export const getInserterItems = createSelector(
 				title: reusableBlock.title.raw,
 				icon,
 				category: 'reusable',
-				keywords: [],
+				keywords: [ 'reusable' ],
 				isDisabled: false,
 				utility: 1, // Deprecated.
 				frecency,

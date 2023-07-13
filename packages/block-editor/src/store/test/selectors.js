@@ -3351,7 +3351,7 @@ describe( 'selectors', () => {
 				id: 'core/block/1',
 				initialAttributes: { ref: 1 },
 				isDisabled: false,
-				keywords: [],
+				keywords: [ 'reusable' ],
 				name: 'core/block',
 				syncStatus: undefined,
 				title: 'Reusable Block 1',
