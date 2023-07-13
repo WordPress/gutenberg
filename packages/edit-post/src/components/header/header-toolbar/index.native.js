@@ -55,7 +55,6 @@ function HeaderToolbar( {
 	showKeyboardHideButton,
 	insertBlock,
 	onHideKeyboard,
-	onOpenBlockSettings,
 	isRTL,
 	noContentSelected,
 } ) {
@@ -193,10 +192,7 @@ function HeaderToolbar( {
 				<Inserter disabled={ ! showInserter } />
 
 				{ noContentSelected && renderMediaButtons }
-				<BlockToolbar
-					anchorNodeRef={ anchorNodeRef.current }
-					onOpenBlockSettings={ onOpenBlockSettings }
-				/>
+				<BlockToolbar anchorNodeRef={ anchorNodeRef.current } />
 			</ScrollView>
 			{ showKeyboardHideButton && (
 				<ToolbarGroup passedStyle={ showKeyboardButtonStyles }>
@@ -243,7 +239,6 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock, insertBlock } =
 			dispatch( blockEditorStore );
-		const { openGeneralSidebar } = dispatch( editPostStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );
 
 		return {
@@ -254,9 +249,6 @@ export default compose( [
 				togglePostTitleSelection( false );
 			},
 			insertBlock,
-			onOpenBlockSettings() {
-				openGeneralSidebar( 'edit-post/block' );
-			},
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
