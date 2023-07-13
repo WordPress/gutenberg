@@ -80,7 +80,7 @@ test.describe( 'Navigation colors', () => {
 
 		await colorControl.testEditorColors( expectedNavigationColors );
 
-		// And finally we check the colors of the links on the frontend
+		// And finally we check the colors of the links on the frontend.
 		await page.goto( '/' );
 
 		await colorControl.testFrontendColors( expectedNavigationColors );
