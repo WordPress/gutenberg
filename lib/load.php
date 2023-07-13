@@ -133,7 +133,7 @@ if ( ! class_exists( 'WP_Fonts' ) ) {
 }
 
 // Fonts Library
-require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
+require __DIR__ . '/experimental/fonts-library/class-wp-rest-fonts-library-controller.php';
 
 // Plugin specific code.
 require __DIR__ . '/script-loader.php';
