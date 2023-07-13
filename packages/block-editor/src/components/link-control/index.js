@@ -12,7 +12,6 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -26,6 +25,7 @@ import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Default properties associated with a link control value.
@@ -135,22 +135,12 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
-	const { settingsDrawerStatePreference } = useSelect( ( select ) => {
-		const prefsStore = select( preferencesStore );
-
-		const postEditorEnabled =
-			prefsStore.get( 'core/edit-post', 'linkControlSettingsDrawer' ) ??
-			false;
-
-		const siteEditorEnabled =
-			prefsStore.get( 'core/edit-site', 'linkControlSettingsDrawer' ) ??
-			false;
-
-		return {
-			settingsDrawerStatePreference:
-				postEditorEnabled || siteEditorEnabled,
-		};
-	}, [] );
+	const settingsDrawerStatePreference = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.linkControlAdvancedSettingsPreference,
+		[]
+	);
 
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();

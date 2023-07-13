@@ -10,6 +10,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import inserterMediaCategories from './inserter-media-categories';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 export default function useSiteEditorSettings( templateType ) {
 	const { storedSettings, canvasMode } = useSelect( ( select ) => {
@@ -19,6 +20,18 @@ export default function useSiteEditorSettings( templateType ) {
 		return {
 			storedSettings: getSettings(),
 			canvasMode: getCanvasMode(),
+		};
+	}, [] );
+
+	const { linkControlAdvancedSettingsPreference } = useSelect( ( select ) => {
+		const prefsStore = select( preferencesStore );
+
+		return {
+			linkControlAdvancedSettingsPreference:
+				prefsStore.get(
+					'core/edit-site',
+					'linkControlSettingsDrawer'
+				) ?? false,
 		};
 	}, [] );
 
@@ -82,6 +95,13 @@ export default function useSiteEditorSettings( templateType ) {
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
+			linkControlAdvancedSettingsPreference,
 		};
-	}, [ storedSettings, blockPatterns, blockPatternCategories, canvasMode ] );
+	}, [
+		storedSettings,
+		blockPatterns,
+		blockPatternCategories,
+		canvasMode,
+		linkControlAdvancedSettingsPreference,
+	] );
 }
