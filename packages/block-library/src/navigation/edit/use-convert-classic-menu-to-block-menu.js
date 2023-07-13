@@ -9,7 +9,6 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useCreateNavigationMenu from './use-create-navigation-menu';
 import menuItemsToBlocks from '../menu-items-to-blocks';
 
 export const CLASSIC_MENU_CONVERSION_SUCCESS = 'success';
@@ -21,15 +20,7 @@ export const CLASSIC_MENU_CONVERSION_IDLE = 'idle';
 // do not import the same classic menu twice.
 let classicMenuBeingConvertedId = null;
 
-function useConvertClassicToBlockMenu( clientId ) {
-	/*
-	 * The wp_navigation post is created as a draft so the changes on the frontend and
-	 * the site editor are not permanent without a save interaction done by the user.
-	 */
-	const { create: createNavigationMenu } = useCreateNavigationMenu(
-		clientId,
-		'draft'
-	);
+function useConvertClassicToBlockMenu( createNavigationMenu ) {
 	const registry = useRegistry();
 	const { editEntityRecord } = useDispatch( coreStore );
 
