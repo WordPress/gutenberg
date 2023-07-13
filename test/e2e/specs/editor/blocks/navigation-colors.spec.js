@@ -172,7 +172,7 @@ test.describe( 'Navigation colors', () => {
 			.getByRole( 'button', { name: 'Color: Vivid red' } )
 			.click( { force: true } );
 		await page.getByRole( 'tab', { name: 'Hover' } ).click();
-		// rgb(155, 81, 224) is the color of the "vivid purple" color preset
+		// rgb(155, 81, 224) is the color of the "vivid purple" color preset.
 		await page
 			.getByRole( 'button', { name: 'Color: Vivid purple' } )
 			.click( { force: true } );
