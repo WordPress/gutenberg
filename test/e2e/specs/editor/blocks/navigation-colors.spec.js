@@ -270,7 +270,7 @@ test.describe( 'Navigation colors', () => {
 		await page
 			.getByRole( 'button', { name: 'Background', exact: true } )
 			.click();
-		// 142, 209, 252 is the color of the "Pale cyan blue" color preset
+		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
 		const paleCyan = 'rgb(142, 209, 252)';
 		await page
 			.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
