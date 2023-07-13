@@ -6,8 +6,9 @@ import {
 	__experimentalText as Text,
 	Button,
 } from '@wordpress/components';
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -74,18 +75,25 @@ function Pagination( { currentPage, numPages, changePage, totalItems } ) {
 export default function Grid( { categoryId, items, ...props } ) {
 	const [ currentPage, setCurrentPage ] = useState( 1 );
 	const gridRef = useRef();
-
-	if ( ! items?.length ) {
-		return null;
-	}
-	const numPages = Math.ceil( items.length / PAGE_SIZE );
 	const totalItems = items.length;
 	const pageIndex = currentPage - 1;
-	const list = items.slice(
-		pageIndex * PAGE_SIZE,
-		pageIndex * PAGE_SIZE + PAGE_SIZE
+
+	const list = useMemo(
+		() =>
+			items.slice(
+				pageIndex * PAGE_SIZE,
+				pageIndex * PAGE_SIZE + PAGE_SIZE
+			),
+		[ pageIndex, items ]
 	);
 
+	const asyncList = useAsyncList( list, { step: 10 } );
+
+	if ( ! list?.length ) {
+		return null;
+	}
+
+	const numPages = Math.ceil( items.length / PAGE_SIZE );
 	const changePage = ( page ) => {
 		const scrollContainer =
 			document.getElementsByClassName( 'edit-site-patterns' );
@@ -103,7 +111,7 @@ export default function Grid( { categoryId, items, ...props } ) {
 				{ ...props }
 				ref={ gridRef }
 			>
-				{ list.map( ( item ) => (
+				{ asyncList.map( ( item ) => (
 					<GridItem
 						key={ item.name }
 						item={ item }
