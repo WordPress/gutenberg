@@ -1,15 +1,21 @@
+/*eslint-env browser*/
 /**
  * External dependencies
  */
 import MicroModal from 'micromodal';
 
 // Responsive navigation toggle.
-function navigationToggleModal( modal ) {
+
+/**
+ * Toggles responsive navigation.
+ *
+ * @param {HTMLDivElement} modal
+ * @param {boolean}        isHidden
+ */
+function navigationToggleModal( modal, isHidden ) {
 	const dialogContainer = modal.querySelector(
 		`.wp-block-navigation__responsive-dialog`
 	);
-
-	const isHidden = 'true' === modal.getAttribute( 'aria-hidden' );
 
 	modal.classList.toggle( 'has-modal-open', ! isHidden );
 	dialogContainer.toggleAttribute( 'aria-modal', ! isHidden );
@@ -23,10 +29,15 @@ function navigationToggleModal( modal ) {
 	}
 
 	// Add a class to indicate the modal is open.
-	const htmlElement = document.documentElement;
-	htmlElement.classList.toggle( 'has-modal-open' );
+	document.documentElement.classList.toggle( 'has-modal-open' );
 }
 
+/**
+ * Checks whether the provided link is an anchor on the current page.
+ *
+ * @param {HTMLAnchorElement} node
+ * @return {boolean} Is anchor.
+ */
 function isLinkToAnchorOnCurrentPage( node ) {
 	return (
 		node.hash &&
@@ -37,42 +48,72 @@ function isLinkToAnchorOnCurrentPage( node ) {
 	);
 }
 
-document.addEventListener( 'DOMContentLoaded', () => {
-	MicroModal.init( {
-		onShow: navigationToggleModal,
-		onClose: navigationToggleModal,
-		openClass: 'is-menu-open',
+/**
+ * Handles effects after opening the modal.
+ *
+ * @param {HTMLDivElement} modal
+ */
+function onShow( modal ) {
+	navigationToggleModal( modal, false );
+	modal.addEventListener( 'click', handleAnchorLinkClicksInsideModal, {
+		passive: true,
 	} );
+}
 
-	// Close modal automatically on clicking anchor links inside modal.
-	const navigationLinks = document.querySelectorAll(
-		'.wp-block-navigation-item__content'
-	);
-
-	navigationLinks.forEach( function ( link ) {
-		// Ignore non-anchor links and anchor links which open on a new tab.
-		if (
-			! isLinkToAnchorOnCurrentPage( link ) ||
-			link.attributes?.target === '_blank'
-		) {
-			return;
-		}
-
-		// Find the specific parent modal for this link
-		// since .close() won't work without an ID if there are
-		// multiple navigation menus in a post/page.
-		const modal = link.closest(
-			'.wp-block-navigation__responsive-container'
-		);
-		const modalId = modal?.getAttribute( 'id' );
-
-		link.addEventListener( 'click', () => {
-			// check if modal exists and is open before trying to close it
-			// otherwise Micromodal will toggle the `has-modal-open` class
-			// on the html tag which prevents scrolling
-			if ( modalId && modal.classList.contains( 'has-modal-open' ) ) {
-				MicroModal.close( modalId );
-			}
-		} );
+/**
+ * Handles effects after closing the modal.
+ *
+ * @param {HTMLDivElement} modal
+ */
+function onClose( modal ) {
+	navigationToggleModal( modal, true );
+	modal.removeEventListener( 'click', handleAnchorLinkClicksInsideModal, {
+		passive: true,
 	} );
+}
+
+/**
+ * Handle clicks to anchor links in modal using event delegation by closing modal automatically
+ *
+ * @param {UIEvent} event
+ */
+function handleAnchorLinkClicksInsideModal( event ) {
+	if ( ! event.target.closest ) {
+		return;
+	}
+
+	const link = event.target.closest( '.wp-block-navigation-item__content' );
+	if ( ! ( link instanceof HTMLAnchorElement ) ) {
+		return;
+	}
+
+	// Ignore non-anchor links and anchor links which open on a new tab.
+	if (
+		! isLinkToAnchorOnCurrentPage( link ) ||
+		link.attributes?.target === '_blank'
+	) {
+		return;
+	}
+
+	// Find the specific parent modal for this link
+	// since .close() won't work without an ID if there are
+	// multiple navigation menus in a post/page.
+	const modal = link.closest( '.wp-block-navigation__responsive-container' );
+	const modalId = modal?.getAttribute( 'id' );
+	if ( ! modalId ) {
+		return;
+	}
+
+	// check if modal exists and is open before trying to close it
+	// otherwise Micromodal will toggle the `has-modal-open` class
+	// on the html tag which prevents scrolling
+	if ( modalId && modal.classList.contains( 'has-modal-open' ) ) {
+		MicroModal.close( modalId );
+	}
+}
+
+MicroModal.init( {
+	onShow,
+	onClose,
+	openClass: 'is-menu-open',
 } );

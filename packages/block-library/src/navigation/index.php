@@ -676,7 +676,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$view_js_file            = 'wp-block-navigation-view';
 	$view_js_file2           = 'wp-block-navigation-view-2';
 	wp_script_add_data( $view_js_file, 'strategy', 'async' );
-	wp_script_add_data( $view_js_file2, 'strategy', 'defer' );
+	wp_script_add_data( $view_js_file2, 'strategy', 'async' );
 	if ( ! wp_script_is( $view_js_file ) ) {
 		$script_handles = $block->block_type->view_script_handles;
 
