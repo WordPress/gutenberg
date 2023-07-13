@@ -79,6 +79,17 @@ $preview-image-height: 140px;
 	margin: -$grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
 }
 
+.block-editor-link-control__search-enter {
+	position: absolute;
+	right: 19px; // specific to place the button properly.
+	top: 3px;
+
+	svg {
+		position: relative;
+		top: -2px; // the icon itself is not centered within the bounds; this centers it.
+	}
+}
+
 .block-editor-link-control__search-actions {
 	display: flex;
 	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
@@ -452,7 +463,7 @@ $preview-image-height: 140px;
 		left: auto;
 		bottom: auto;
 		top: calc(50% - #{$spinner-size} / 2);
-		right: $grid-unit-20;
+		right: $grid-unit-50;
 	}
 }
 
