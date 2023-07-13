@@ -57,9 +57,9 @@ export default function ScreenNavigationMoreMenu( props ) {
 							>
 								{ __( 'Duplicate' ) }
 							</MenuItem>
-						</MenuGroup>
-						<MenuGroup>
 							<MenuItem
+								isDestructive
+								isTertiary
 								onClick={ () => {
 									openDeleteModal();
 

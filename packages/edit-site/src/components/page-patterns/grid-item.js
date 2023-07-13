@@ -254,6 +254,8 @@ function GridItem( { categoryId, item, ...props } ) {
 							/>
 							{ isCustomPattern && (
 								<MenuItem
+									isDestructive={ ! hasThemeFile }
+									isTertiary={ ! hasThemeFile }
 									onClick={ () =>
 										setIsDeleteDialogOpen( true )
 									}
