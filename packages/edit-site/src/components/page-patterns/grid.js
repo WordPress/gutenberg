@@ -27,7 +27,11 @@ function Pagination( { currentPage, numPages, changePage, totalItems } ) {
 			<Text variant="muted">
 				{
 					// translators: %s: Total number of patterns.
-					sprintf( _n( '%s items' ), totalItems )
+					sprintf(
+						// translators: %s: Total number of patterns.
+						_n( '%s item', '%s items', totalItems ),
+						totalItems
+					)
 				}
 			</Text>
 			<HStack expanded={ false } spacing={ 1 }>
