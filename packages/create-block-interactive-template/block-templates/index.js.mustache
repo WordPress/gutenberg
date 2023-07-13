@@ -20,9 +20,6 @@ import './editor.scss';
  * Internal dependencies
  */
 import Edit from './edit';
-{{#isBasicVariant}}
-import save from './save';
-{{/isBasicVariant}}
 import metadata from './block.json';
 
 /**
@@ -43,11 +40,4 @@ registerBlockType( metadata.name, {
 	 * @see ./edit.js
 	 */
 	edit: Edit,
-	{{#isStaticVariant}}
-
-	/**
-	 * @see ./save.js
-	 */
-	save,
-	{{/isStaticVariant}}
 } );
