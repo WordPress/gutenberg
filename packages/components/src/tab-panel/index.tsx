@@ -24,6 +24,17 @@ import Button from '../button';
 import type { TabPanelProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
+// Separate the actual tab name from the instance ID. This is
+// necessary because Ariakit internally uses the element ID when
+// a new tab is selected, but our implementation looks specifically
+// for the tab name to be passed to the `onSelect` callback.
+const extractTabName = ( id: string | undefined | null ) => {
+	if ( typeof id === 'undefined' || id === null ) {
+		return;
+	}
+	return id.match( /^tab-panel-[0-9]*-(.*)/ )?.[ 1 ];
+};
+
 /**
  * TabPanel is an ARIA-compliant tabpanel.
  *
@@ -84,17 +95,6 @@ const UnforwardedTabPanel = (
 		},
 		[ instanceId ]
 	);
-
-	// Separate the actual tab name from the instance ID. This is
-	// necessary because Ariakit internally uses the element ID when
-	// a new tab is selected, but our implementation looks specifically
-	// for the tab name to be passed to the `onSelect` callback.
-	const extractTabName = useCallback( ( id: string | undefined | null ) => {
-		if ( typeof id === 'undefined' || id === null ) {
-			return;
-		}
-		return id.match( /^tab-panel-[0-9]*-(.*)/ )?.[ 1 ];
-	}, [] );
 
 	const tabStore = Ariakit.useTabStore( {
 		setSelectedId: ( newTabValue ) => {
