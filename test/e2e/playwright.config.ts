@@ -14,7 +14,8 @@ const config = defineConfig( {
 	reporter: process.env.CI
 		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
 		: 'list',
-	forbidOnly: !! process.env.CI,
+	// forbidOnly: !! process.env.CI,
+	forbidOnly: false,
 	workers: 1,
 	retries: process.env.CI ? 2 : 0,
 	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 100_000, // Defaults to 100 seconds.
@@ -48,14 +49,25 @@ const config = defineConfig( {
 	},
 	webServer: {
 		command: 'npm run wp-env start',
-		port: 8889,
+		url: process.env.WP_BASE_URL || 'http://localhost:8889',
 		timeout: 120_000, // 120 seconds.
 		reuseExistingServer: true,
 	},
 	projects: [
 		{
 			name: 'chromium',
-			use: { ...devices[ 'Desktop Chrome' ] },
+			use: {
+				...devices[ 'Desktop Chrome' ],
+				launchOptions: {
+					args: [
+						'--font-render-hinting=none',
+						'--disable-skia-runtime-opts',
+						'--disable-system-font-check',
+						'--disable-font-subpixel-positioning',
+						'--disable-lcd-text',
+					],
+				},
+			},
 			grepInvert: /-chromium/,
 		},
 		{

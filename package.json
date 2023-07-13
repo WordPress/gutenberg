@@ -311,6 +311,8 @@
 		"test:e2e:debug": "wp-scripts --inspect-brk test-e2e  --runInBand --no-cache --verbose --config packages/e2e-tests/jest.config.js --puppeteer-devtools",
 		"test:e2e:playwright": "playwright test --config test/e2e/playwright.config.ts",
 		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
+		"test:e2e:ci": "xvfb-run --auto-servernum --server-args=\"-screen 0 1280x960x24\" -- npm run test:e2e:playwright",
+		"test:e2e:docker": "docker run --rm -e WP_BASE_URL=http://host.docker.internal:8889 -v $(pwd):/work/ -w /work/ mcr.microsoft.com/playwright:v1.32.0-jammy npm run test:e2e:ci",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:native": "cross-env NODE_ENV=test jest --verbose --config test/native/jest.config.js",
 		"test:native:clean": "jest --clearCache --config test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
