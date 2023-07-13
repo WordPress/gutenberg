@@ -3,7 +3,7 @@
  */
 import { useResizeObserver, pure, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState, useRef } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
 
 /**
@@ -29,8 +29,21 @@ function ScaledBlockPreview( {
 		viewportWidth = containerWidth;
 	}
 
-	const [ contentResizeListener, { height: contentHeight } ] =
-		useResizeObserver();
+	const [ hasMore, setHasMore ] = useState( false );
+	const resizedHeightRef = useRef( null );
+	const [ contentResizeListener ] = useResizeObserver( {
+		onResize( sizes ) {
+			if ( sizes.height ) {
+				resizedHeightRef.current = sizes.height;
+				setHasMore(
+					contentHeight > 0 &&
+						resizedHeightRef.current > contentHeight
+				);
+			}
+		},
+	} );
+	const [ contentHeight, setContentHeight ] = useState( null );
+
 	const { styles } = useSelect( ( select ) => {
 		const settings = select( store ).getSettings();
 		return {
@@ -59,53 +72,82 @@ function ScaledBlockPreview( {
 
 	const scale = containerWidth / viewportWidth;
 	return (
-		<Disabled
-			className="block-editor-block-preview__content"
-			style={ {
-				transform: `scale(${ scale })`,
-				height: contentHeight * scale,
-				maxHeight:
-					contentHeight > MAX_HEIGHT ? MAX_HEIGHT * scale : undefined,
-				minHeight,
-			} }
-		>
-			<Iframe
-				contentRef={ useRefEffect( ( bodyElement ) => {
-					const {
-						ownerDocument: { documentElement },
-					} = bodyElement;
-					documentElement.classList.add(
-						'block-editor-block-preview__content-iframe'
-					);
-					documentElement.style.position = 'absolute';
-					documentElement.style.width = '100%';
-
-					// Necessary for contentResizeListener to work.
-					bodyElement.style.boxSizing = 'border-box';
-					bodyElement.style.position = 'absolute';
-					bodyElement.style.width = '100%';
-				}, [] ) }
-				aria-hidden
-				tabIndex={ -1 }
+		<>
+			<Disabled
+				className="block-editor-block-preview__content"
 				style={ {
-					position: 'absolute',
-					width: viewportWidth,
-					height: contentHeight,
-					pointerEvents: 'none',
-					// This is a catch-all max-height for patterns.
-					// See: https://github.com/WordPress/gutenberg/pull/38175.
-					maxHeight: MAX_HEIGHT,
-					minHeight:
-						scale !== 0 && scale < 1 && minHeight
-							? minHeight / scale
-							: minHeight,
+					position: 'relative',
+					transform: `scale(${ scale })`,
+					height: contentHeight * scale,
+					maxHeight:
+						contentHeight > MAX_HEIGHT
+							? MAX_HEIGHT * scale
+							: undefined,
+					minHeight,
 				} }
 			>
-				<EditorStyles styles={ editorStyles } />
-				{ contentResizeListener }
-				<MemoizedBlockList renderAppender={ false } />
-			</Iframe>
-		</Disabled>
+				<Iframe
+					contentRef={ useRefEffect( ( bodyElement ) => {
+						const {
+							ownerDocument: { defaultView, documentElement },
+						} = bodyElement;
+						documentElement.classList.add(
+							'block-editor-block-preview__content-iframe'
+						);
+						documentElement.style.position = 'absolute';
+						documentElement.style.width = '100%';
+
+						// Necessary for contentResizeListener to work.
+						bodyElement.style.boxSizing = 'border-box';
+						bodyElement.style.position = 'absolute';
+						bodyElement.style.width = '100%';
+
+						const id = defaultView.requestIdleCallback( () => {
+							setContentHeight( resizedHeightRef.current );
+						} );
+
+						return () => {
+							defaultView.cancelIdleCallback( id );
+						};
+					}, [] ) }
+					onLoad={ () => {
+						setContentHeight( resizedHeightRef.current );
+					} }
+					aria-hidden
+					tabIndex={ -1 }
+					style={ {
+						position: 'absolute',
+						width: viewportWidth,
+						height: contentHeight,
+						pointerEvents: 'none',
+						// This is a catch-all max-height for patterns.
+						// See: https://github.com/WordPress/gutenberg/pull/38175.
+						maxHeight: MAX_HEIGHT,
+						minHeight:
+							scale !== 0 && scale < 1 && minHeight
+								? minHeight / scale
+								: minHeight,
+					} }
+				>
+					<EditorStyles styles={ editorStyles } />
+					{ contentResizeListener }
+					<MemoizedBlockList renderAppender={ false } />
+				</Iframe>
+			</Disabled>
+			{ hasMore && (
+				<div
+					style={ {
+						position: 'absolute',
+						bottom: 0,
+						left: 0,
+						right: 0,
+						height: '20%',
+						background:
+							'linear-gradient(0deg, #f0f0f0, transparent)',
+					} }
+				/>
+			) }
+		</>
 	);
 }
 

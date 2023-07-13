@@ -319,6 +319,9 @@ function useResizeObserver< T extends HTMLElement >(
  * Hook which allows to listen the resize event of any target element when it changes sizes.
  * _Note: `useResizeObserver` will report `null` until after first render.
  *
+ * @param options          - Options to configure the hook.
+ * @param options.onResize - Callback to be called when the size changes.
+ *
  * @example
  *
  * ```js
@@ -334,11 +337,10 @@ function useResizeObserver< T extends HTMLElement >(
  * };
  * ```
  */
-export default function useResizeAware(): [
-	WPElement,
-	{ width: number | null; height: number | null }
-] {
-	const { ref, width, height } = useResizeObserver();
+export default function useResizeAware( options?: {
+	onResize?: ResizeHandler;
+} ): [ WPElement, { width: number | null; height: number | null } ] {
+	const { ref, width, height } = useResizeObserver( options );
 	const sizes = useMemo( () => {
 		return { width: width ?? null, height: height ?? null };
 	}, [ width, height ] );
