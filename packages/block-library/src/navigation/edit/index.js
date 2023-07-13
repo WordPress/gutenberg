@@ -197,7 +197,7 @@ function Navigation( {
 		convert: convertClassicMenu,
 		status: classicMenuConversionStatus,
 		error: classicMenuConversionError,
-	} = useConvertClassicToBlockMenu( clientId, createNavigationMenu );
+	} = useConvertClassicToBlockMenu( createNavigationMenu );
 
 	const isConvertingClassicMenu =
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
