@@ -99,7 +99,7 @@ test.describe( 'Navigation colors', () => {
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
-		// In the sidebar inspector we add a link color and link hover color to the group block
+		// In the sidebar inspector we add a link color and link hover color to the group block.
 		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Color Text styles' } ).click();
