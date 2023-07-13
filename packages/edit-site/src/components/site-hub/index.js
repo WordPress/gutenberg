@@ -32,26 +32,34 @@ import { unlock } from '../../lock-unlock';
 const HUB_ANIMATION_DURATION = 0.3;
 
 const SiteHub = forwardRef( ( props, ref ) => {
-	const { canvasMode, dashboardLink, homeUrl } = useSelect( ( select ) => {
-		const { getCanvasMode, getSettings } = unlock(
-			select( editSiteStore )
-		);
+	const { canvasMode, dashboardLink, homeUrl, siteTitle } = useSelect(
+		( select ) => {
+			const { getCanvasMode, getSettings } = unlock(
+				select( editSiteStore )
+			);
 
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
+			const {
+				getSite,
+				getUnstableBase, // Site index.
+			} = select( coreStore );
 
-		return {
-			canvasMode: getCanvasMode(),
-			dashboardLink:
-				getSettings().__experimentalDashboardLink || 'index.php',
-			homeUrl: getUnstableBase()?.home,
-		};
-	}, [] );
+			return {
+				canvasMode: getCanvasMode(),
+				dashboardLink:
+					getSettings().__experimentalDashboardLink || 'index.php',
+				homeUrl: getUnstableBase()?.home,
+				siteTitle: getSite()?.title,
+			};
+		},
+		[]
+	);
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 
 	const disableMotion = useReducedMotion();
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const {
+		setCanvasMode,
+		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
+	} = unlock( useDispatch( editSiteStore ) );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const isBackToDashboardButton = canvasMode === 'view';
 	const siteIconButtonProps = isBackToDashboardButton
@@ -67,16 +75,11 @@ const SiteHub = forwardRef( ( props, ref ) => {
 					event.preventDefault();
 					if ( canvasMode === 'edit' ) {
 						clearSelectedBlock();
+						setPreviewDeviceType( 'desktop' );
 						setCanvasMode( 'view' );
 					}
 				},
 		  };
-
-	const siteTitle = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', 'site' )?.title,
-		[]
-	);
 
 	return (
 		<motion.div
