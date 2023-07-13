@@ -43,6 +43,7 @@ export interface ReduxStoreConfig<
 	controls?: MapOf< Function >;
 }
 
+// Return type for the useSelect() hook.
 export type UseSelectReturn< F extends MapSelect | StoreDescriptor< any > > =
 	F extends MapSelect
 		? ReturnType< F >
@@ -50,6 +51,7 @@ export type UseSelectReturn< F extends MapSelect | StoreDescriptor< any > > =
 		? CurriedSelectorsOf< F >
 		: never;
 
+// Return type for the useDispatch() hook.
 export type UseDispatchReturn< StoreNameOrDescriptor > =
 	StoreNameOrDescriptor extends StoreDescriptor< any >
 		? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > >
@@ -59,9 +61,12 @@ export type UseDispatchReturn< StoreNameOrDescriptor > =
 
 export type DispatchFunction = < StoreNameOrDescriptor >(
 	store: StoreNameOrDescriptor
-) => StoreNameOrDescriptor extends StoreDescriptor< any >
-	? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > >
-	: any;
+) => DispatchReturn< StoreNameOrDescriptor >;
+
+export type DispatchReturn< StoreNameOrDescriptor > =
+	StoreNameOrDescriptor extends StoreDescriptor< any >
+		? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > >
+		: unknown;
 
 export type MapSelect = (
 	select: SelectFunction,
@@ -185,7 +190,12 @@ export type PromisifiedActionCreators<
 // creator, so that consumers know that they are dealing with a Promise.
 export type PromisifyActionCreator< Action extends ActionCreator > = (
 	...args: Parameters< Action >
-) => Promise< ReturnType< Action > >;
+) => Promise<
+	ReturnType< Action > extends ( ..._args: any[] ) => any
+		? // Thunks return another function, so we unwrap the return type twice in that scenario.
+		  ReturnType< ReturnType< Action > >
+		: ReturnType< Action >
+>;
 
 type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 	any,
