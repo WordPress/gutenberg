@@ -92,7 +92,7 @@ export default function NavigationInnerBlocks( {
 	// If the `defaultBlock` attribute is set and itself has an attributes object with values then use it
 	// otherwise fallback to the DEFAULT_BLOCK constant.
 	// This allows site owners to set the default `core/navigation-link` variation to use.
-	const navDefaultBlock = defaultBlock && defaultBlock.attributes && Object.keys(defaultBlock.attributes).length > 0 ? defaultBlock : DEFAULT_BLOCK;
+	const navDefaultBlock = defaultBlock?.attributes && Object.keys(defaultBlock.attributes).length > 0 ? defaultBlock : DEFAULT_BLOCK;
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
