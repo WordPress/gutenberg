@@ -37,7 +37,7 @@ function isLinkToAnchorOnCurrentPage( node ) {
 	);
 }
 
-window.addEventListener( 'load', () => {
+document.addEventListener( 'DOMContentLoaded', () => {
 	MicroModal.init( {
 		onShow: navigationToggleModal,
 		onClose: navigationToggleModal,

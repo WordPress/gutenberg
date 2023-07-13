@@ -35,7 +35,7 @@ function toggleSubmenuOnClick( event ) {
 
 // Necessary for some themes such as TT1 Blocks, where
 // scripts could be loaded before the body.
-window.addEventListener( 'load', () => {
+document.addEventListener( 'DOMContentLoaded', () => {
 	const submenuButtons = document.querySelectorAll(
 		'.wp-block-navigation-submenu__toggle'
 	);
