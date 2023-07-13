@@ -374,7 +374,10 @@ function LinkControl( {
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
-					onRemove={ onRemove }
+					onRemove={ () => {
+						onRemove();
+						setIsEditingLink( true );
+					} }
 				/>
 			) }
 

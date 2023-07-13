@@ -35,7 +35,6 @@ function TemplatePartGroup( { areas, currentArea, currentType } ) {
 		<>
 			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
 				<Heading level={ 2 }>{ __( 'Template parts' ) }</Heading>
-				<p>{ __( 'Synced patterns for use in template building.' ) }</p>
 			</div>
 			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 				{ Object.entries( areas ).map(
@@ -64,11 +63,6 @@ function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 		<>
 			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
 				<Heading level={ 2 }>{ __( 'Theme patterns' ) }</Heading>
-				<p>
-					{ __(
-						'For insertion into documents where they can then be customized.'
-					) }
-				</p>
 			</div>
 			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 				{ categories.map( ( category ) => (
@@ -113,7 +107,7 @@ export default function SidebarNavigationScreenPatterns() {
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
 	const { patternCategories, hasPatterns } = usePatternCategories();
-	const { myPatterns, hasPatterns: hasMyPatterns } = useMyPatterns();
+	const { myPatterns } = useMyPatterns();
 
 	const isTemplatePartsMode = useSelect( ( select ) => {
 		const settings = select( editSiteStore ).getSettings();
@@ -159,23 +153,25 @@ export default function SidebarNavigationScreenPatterns() {
 									</Item>
 								</ItemGroup>
 							) }
-							{ hasMyPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									<CategoryItem
-										key={ myPatterns.name }
-										count={ myPatterns.count }
-										label={ myPatterns.label }
-										icon={ starFilled }
-										id={ myPatterns.name }
-										type="wp_block"
-										isActive={
-											currentCategory ===
-												`${ myPatterns.name }` &&
-											currentType === 'wp_block'
-										}
-									/>
-								</ItemGroup>
-							) }
+							<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+								<CategoryItem
+									key={ myPatterns.name }
+									count={
+										! myPatterns.count
+											? '0'
+											: myPatterns.count
+									}
+									label={ myPatterns.label }
+									icon={ starFilled }
+									id={ myPatterns.name }
+									type="wp_block"
+									isActive={
+										currentCategory ===
+											`${ myPatterns.name }` &&
+										currentType === 'wp_block'
+									}
+								/>
+							</ItemGroup>
 							{ hasTemplateParts && (
 								<TemplatePartGroup
 									areas={ templatePartAreas }

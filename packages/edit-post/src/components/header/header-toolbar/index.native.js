@@ -6,7 +6,7 @@ import { Platform, ScrollView, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useRef, useEffect } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -23,11 +23,15 @@ import {
 	media as imageIcon,
 	video as videoIcon,
 	gallery as galleryIcon,
-	undo as undoIcon,
-	redo as redoIcon,
 } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
 import { createBlock } from '@wordpress/blocks';
+import {
+	toggleUndoButton,
+	toggleRedoButton,
+	subscribeOnUndoPressed,
+	subscribeOnRedoPressed,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -50,8 +54,28 @@ function HeaderToolbar( {
 	noContentSelected,
 } ) {
 	const anchorNodeRef = useRef();
-	const wasNoContentSelected = useRef( noContentSelected );
-	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
+	const containerStyle = getStylesFromColorScheme(
+		styles[ 'header-toolbar__container' ],
+		styles[ 'header-toolbar__container--dark' ]
+	);
+
+	useEffect( () => {
+		const onUndoSubscription = subscribeOnUndoPressed( undo );
+		const onRedoSubscription = subscribeOnRedoPressed( redo );
+
+		return () => {
+			onUndoSubscription?.remove();
+			onRedoSubscription?.remove();
+		};
+	}, [ undo, redo ] );
+
+	useEffect( () => {
+		toggleUndoButton( ! hasUndo );
+	}, [ hasUndo ] );
+
+	useEffect( () => {
+		toggleRedoButton( ! hasRedo );
+	}, [ hasRedo ] );
 
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
@@ -62,34 +86,6 @@ function HeaderToolbar( {
 		} else {
 			scrollViewRef.current.scrollTo( { x: 0 } );
 		}
-	};
-
-	const renderHistoryButtons = () => {
-		const buttons = [
-			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo. */
-			<ToolbarButton
-				key="undoButton"
-				title={ __( 'Undo' ) }
-				icon={ ! isRTL ? undoIcon : redoIcon }
-				isDisabled={ ! hasUndo }
-				onClick={ undo }
-				extraProps={ {
-					hint: __( 'Double tap to undo last change' ),
-				} }
-			/>,
-			<ToolbarButton
-				key="redoButton"
-				title={ __( 'Redo' ) }
-				icon={ ! isRTL ? redoIcon : undoIcon }
-				isDisabled={ ! hasRedo }
-				onClick={ redo }
-				extraProps={ {
-					hint: __( 'Double tap to redo last change' ),
-				} }
-			/>,
-		];
-
-		return isRTL ? buttons.reverse() : buttons;
 	};
 
 	const onInsertBlock = useCallback(
@@ -146,22 +142,6 @@ function HeaderToolbar( {
 		</ToolbarGroup>
 	);
 
-	const onToggleInserter = useCallback(
-		( isOpen ) => {
-			if ( isOpen ) {
-				wasNoContentSelected.current = noContentSelected;
-			}
-			setIsInserterOpen( isOpen );
-		},
-		[ noContentSelected ]
-	);
-
-	// Expanded mode should be preserved while the inserter is open.
-	// This way we prevent style updates during the opening transition.
-	const useExpandedMode = isInserterOpen
-		? wasNoContentSelected.current
-		: noContentSelected;
-
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
@@ -170,14 +150,7 @@ function HeaderToolbar( {
 			ref={ anchorNodeRef }
 			testID={ toolbarAriaLabel }
 			accessibilityLabel={ toolbarAriaLabel }
-			style={ [
-				getStylesFromColorScheme(
-					styles[ 'header-toolbar__container' ],
-					styles[ 'header-toolbar__container--dark' ]
-				),
-				useExpandedMode &&
-					styles[ 'header-toolbar__container--expanded' ],
-			] }
+			style={ containerStyle }
 		>
 			<ScrollView
 				ref={ scrollViewRef }
@@ -190,14 +163,9 @@ function HeaderToolbar( {
 					styles[ 'header-toolbar__scrollable-content' ]
 				}
 			>
-				<Inserter
-					disabled={ ! showInserter }
-					useExpandedMode={ useExpandedMode }
-					onToggle={ onToggleInserter }
-				/>
+				<Inserter disabled={ ! showInserter } />
 
 				{ noContentSelected && renderMediaButtons }
-				{ renderHistoryButtons() }
 				<BlockToolbar
 					anchorNodeRef={ anchorNodeRef.current }
 					onOpenBlockSettings={ onOpenBlockSettings }

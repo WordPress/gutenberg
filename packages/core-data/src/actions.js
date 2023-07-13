@@ -18,7 +18,6 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { getUndoEdits, getRedoEdits } from './private-selectors';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -407,8 +406,7 @@ export const editEntityRecord =
 export const undo =
 	() =>
 	( { select, dispatch } ) => {
-		// Todo: we shouldn't have to pass "root" here.
-		const undoEdit = select( ( state ) => getUndoEdits( state.root ) );
+		const undoEdit = select.getUndoEdits();
 		if ( ! undoEdit ) {
 			return;
 		}
@@ -425,8 +423,7 @@ export const undo =
 export const redo =
 	() =>
 	( { select, dispatch } ) => {
-		// Todo: we shouldn't have to pass "root" here.
-		const redoEdit = select( ( state ) => getRedoEdits( state.root ) );
+		const redoEdit = select.getRedoEdits();
 		if ( ! redoEdit ) {
 			return;
 		}

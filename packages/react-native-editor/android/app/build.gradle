@@ -241,6 +241,7 @@ dependencies {
 
     implementation "org.wordpress-mobile.gutenberg-mobile:react-native-bridge"
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation "com.google.android.material:material:1.9.0"
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:${extractPackageVersion(packageJson, 'react-native', 'dependencies')}"
 

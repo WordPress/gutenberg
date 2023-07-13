@@ -59,10 +59,8 @@ The user may change the state of this block by applying different styles: a text
 After some user modifications to the block, the initial markup may become something like this:
 
 ```html
-<p
-	class="has-color has-green-color has-font-size has-small-font-size my-custom-class"
-	style="line-height: 1em"
-></p>
+<p class="has-color has-green-color has-font-size has-small-font-size my-custom-class"
+	style="line-height: 1em"></p>
 ```
 
 This is what we refer to as "user-provided block styles", also know as "local styles" or "serialized styles". Essentially, each tool (font size, color, etc) ends up adding some classes and/or inline styles to the block markup. The CSS styling for these classes is part of the block, global, or theme stylesheets.
