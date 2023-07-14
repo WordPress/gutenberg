@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -9,9 +8,10 @@ import { __ } from '@wordpress/i18n';
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useLink } from '../routes/link';
+import useEditedEntityRecord from '../use-edited-entity-record';
 
 export default function TemplatePartNavigationMenuListItem( { id } ) {
-	const [ title ] = useEntityProp( 'postType', 'wp_navigation', 'title', id );
+	const { getTitle } = useEditedEntityRecord( 'wp_navigation', id );
 
 	const linkInfo = useLink( {
 		postId: id,
@@ -22,7 +22,7 @@ export default function TemplatePartNavigationMenuListItem( { id } ) {
 
 	return (
 		<SidebarNavigationItem withChevron { ...linkInfo }>
-			{ title || __( '(no title)' ) }
+			{ getTitle() || __( '(no title)' ) }
 		</SidebarNavigationItem>
 	);
 }
