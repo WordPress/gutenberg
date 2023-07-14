@@ -40,24 +40,30 @@ export const format = {
 		} = useSelect( blockEditorStore );
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
+
 		function onClick() {
 			registry.batch( () => {
-				const id = createId();
-				const newValue = insertObject(
-					value,
-					{
-						type: formatName,
-						attributes: {
-							'data-fn': id,
+				let id;
+				if ( isObjectActive ) {
+					const object = value.replacements[ value.start ];
+					id = object?.attributes?.[ 'data-fn' ];
+				} else {
+					id = createId();
+					const newValue = insertObject(
+						value,
+						{
+							type: formatName,
+							attributes: {
+								'data-fn': id,
+							},
+							innerHTML: `<a href="#${ id }" id="${ id }-link">*</a>`,
 						},
-						innerHTML: `<a href="#${ id }" id="${ id }-link">*</a>`,
-					},
-					value.end,
-					value.end
-				);
-				newValue.start = newValue.end - 1;
-
-				onChange( newValue );
+						value.end,
+						value.end
+					);
+					newValue.start = newValue.end - 1;
+					onChange( newValue );
+				}
 
 				// BFS search to find the first footnote block.
 				let fnBlock = null;
