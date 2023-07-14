@@ -61,9 +61,6 @@ function TemplatePartGroup( { areas, currentArea, currentType } ) {
 function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 	return (
 		<>
-			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
-				<Heading level={ 2 }>{ __( 'Theme patterns' ) }</Heading>
-			</div>
 			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 				{ categories.map( ( category ) => (
 					<CategoryItem
@@ -117,15 +114,15 @@ export default function SidebarNavigationScreenPatterns() {
 	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
 	const footer = ! isMobileViewport ? (
 		<ItemGroup>
-			<SidebarNavigationItem withChevron { ...templatePartsLink }>
-				{ __( 'Manage all template parts' ) }
-			</SidebarNavigationItem>
 			<SidebarNavigationItem
 				as="a"
 				href="edit.php?post_type=wp_block"
 				withChevron
 			>
 				{ __( 'Manage all of my patterns' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem withChevron { ...templatePartsLink }>
+				{ __( 'Manage all template parts' ) }
 			</SidebarNavigationItem>
 		</ItemGroup>
 	) : undefined;
@@ -172,17 +169,17 @@ export default function SidebarNavigationScreenPatterns() {
 									}
 								/>
 							</ItemGroup>
-							{ hasTemplateParts && (
-								<TemplatePartGroup
-									areas={ templatePartAreas }
-									currentArea={ currentCategory }
-									currentType={ currentType }
-								/>
-							) }
 							{ hasPatterns && (
 								<ThemePatternsGroup
 									categories={ patternCategories }
 									currentCategory={ currentCategory }
+									currentType={ currentType }
+								/>
+							) }
+							{ hasTemplateParts && (
+								<TemplatePartGroup
+									areas={ templatePartAreas }
+									currentArea={ currentCategory }
 									currentType={ currentType }
 								/>
 							) }
