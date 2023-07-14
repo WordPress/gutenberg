@@ -208,11 +208,9 @@ test.describe( 'Navigation block', () => {
 			} );
 			await addSubmenuButton.click();
 
-			await editor.publishPost();
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
 
-			await page.locator( 'role=button[name="Close panel"i]' ).click();
-
-			await page.goto( '/' );
 			await expect(
 				page.locator(
 					`role=navigation >> role=button[name="example.com submenu "i]`
