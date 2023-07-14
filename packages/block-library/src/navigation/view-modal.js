@@ -78,10 +78,6 @@ function onClose( modal ) {
  * @param {UIEvent} event
  */
 function handleAnchorLinkClicksInsideModal( event ) {
-	if ( ! event.target.closest ) {
-		return;
-	}
-
 	const link = event.target.closest( '.wp-block-navigation-item__content' );
 	if ( ! ( link instanceof HTMLAnchorElement ) ) {
 		return;

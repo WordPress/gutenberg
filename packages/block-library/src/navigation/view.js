@@ -56,9 +56,6 @@ document.addEventListener(
 	'click',
 	function ( event ) {
 		const target = event.target;
-		if ( ! ( target instanceof Element ) ) {
-			return;
-		}
 
 		const button = target.closest( '.wp-block-navigation-submenu__toggle' );
 		if ( button instanceof HTMLButtonElement ) {
