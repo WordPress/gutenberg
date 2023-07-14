@@ -139,6 +139,73 @@ export default () => {
 		}
 	);
 
+	const newRule =
+		/(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?);|([^;}{]*?) *{)|(}\s*)/g;
+	const ruleClean = /\/\*[^]*?\*\/|  +/g;
+	const ruleNewline = /\n+/g;
+	const empty = ' ';
+
+	/**
+	 * Convert a css style string into a object.
+	 *
+	 * Made by Cristian Bote (@cristianbote) for Goober.
+	 * https://github.com/cristianbote/goober/blob/a849b2d644146d96fa1dd1c560f6418ee1e1c469/src/core/astish.js
+	 *
+	 * @param {string} val CSS string.
+	 * @return {Object} CSS object.
+	 */
+	const astish = ( val ) => {
+		const tree = [ {} ];
+		let block, left;
+
+		while ( ( block = newRule.exec( val.replace( ruleClean, '' ) ) ) ) {
+			if ( block[ 4 ] ) {
+				tree.shift();
+			} else if ( block[ 3 ] ) {
+				left = block[ 3 ].replace( ruleNewline, empty ).trim();
+				tree.unshift( ( tree[ 0 ][ left ] = tree[ 0 ][ left ] || {} ) );
+			} else {
+				tree[ 0 ][ block[ 1 ] ] = block[ 2 ]
+					.replace( ruleNewline, empty )
+					.trim();
+			}
+		}
+
+		return tree[ 0 ];
+	};
+
+	// data-wp-style--[style-key]
+	directive(
+		'style',
+		( { directives: { style }, element, evaluate, context } ) => {
+			const contextValue = useContext( context );
+			Object.keys( style )
+				.filter( ( n ) => n !== 'default' )
+				.forEach( ( key ) => {
+					const result = evaluate( style[ key ], {
+						key,
+						context: contextValue,
+					} );
+					element.props.style = element.props.style || {};
+					if ( typeof element.props.style === 'string' )
+						element.props.style = astish( element.props.style );
+					if ( ! result ) delete element.props.style[ key ];
+					else element.props.style[ key ] = result;
+
+					useEffect( () => {
+						// This seems necessary because Preact doesn't change the styles on
+						// the hydration, so we have to do it manually. It doesn't need deps
+						// because it only needs to do it the first time.
+						if ( ! result ) {
+							element.ref.current.style.removeProperty( key );
+						} else {
+							element.ref.current.style[ key ] = result;
+						}
+					}, [] );
+				} );
+		}
+	);
+
 	// data-wp-bind--[attribute]
 	directive(
 		'bind',
