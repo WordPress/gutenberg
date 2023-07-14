@@ -21,13 +21,6 @@
 		Switch Color to False
 	</button>
 
-	<button
-		data-wp-on--click="actions.toggleBorder"
-		data-testid="toggle border"
-	>
-		Toggle Border
-	</button>
-
 	<div
 		style="color: red; background: green;"
 		data-wp-style--color="state.color"
