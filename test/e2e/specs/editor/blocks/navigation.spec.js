@@ -75,17 +75,17 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible();
 
 			// Check the markup of the block is correct.
-			await editor.publishPost();
+			const postId = await editor.publishPost();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/navigation',
 					attributes: { ref: createdMenu.id },
 				},
 			] );
-			await page.locator( 'role=button[name="Close panel"i]' ).click();
 
 			// Check the block in the frontend.
-			await page.goto( '/' );
+			await page.goto( `/?p=${ postId }` );
+
 			await expect(
 				page.locator(
 					`role=navigation >> role=link[name="WordPress"i]`
@@ -119,7 +119,8 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible( { timeout: 10000 } ); // allow time for network request.
 
 			// Check the block in the frontend.
-			await page.goto( '/' );
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
 
 			await expect(
 				page.locator(
@@ -154,14 +155,13 @@ test.describe( 'Navigation block', () => {
 			await editor.insertBlock( { name: 'core/navigation' } );
 
 			// Check the markup of the block is correct.
-			await editor.publishPost();
+			const postId = await editor.publishPost();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/navigation',
 					attributes: { ref: latestMenu.id },
 				},
 			] );
-			await page.locator( 'role=button[name="Close panel"i]' ).click();
 
 			// Check the block in the canvas.
 			await expect(
@@ -171,7 +171,8 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible();
 
 			// Check the block in the frontend.
-			await page.goto( '/' );
+			await page.goto( `/?p=${ postId }` );
+
 			await expect(
 				page.locator(
 					`role=navigation >> role=link[name="Menu 2 Link"i]`
