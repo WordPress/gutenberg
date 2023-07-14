@@ -56,7 +56,11 @@ export default function DeletePageMenuItem( { postId, onRemove } ) {
 	}
 	return (
 		<>
-			<MenuItem onClick={ () => setIsModalOpen( true ) } isDestructive>
+			<MenuItem
+				onClick={ () => setIsModalOpen( true ) }
+				isDestructive
+				isTertiary
+			>
 				{ __( 'Delete' ) }
 			</MenuItem>
 			<ConfirmDialog
