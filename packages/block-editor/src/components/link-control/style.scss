@@ -46,7 +46,8 @@ $preview-image-height: 140px;
 }
 
 // Provides positioning context for search actions
-.block-editor-link-control__search-input-container {
+.block-editor-link-control__search-input-container,
+.block-editor-link-control__search-input-wrapper {
 	position: relative;
 }
 
@@ -465,6 +466,11 @@ $preview-image-height: 140px;
 		top: calc(50% - #{$spinner-size} / 2);
 		right: $grid-unit-50;
 	}
+}
+
+.block-editor-link-control .block-editor-link-control__search-input-wrapper.has-actions .components-spinner {
+	top: calc(50% + #{$spinner-size} / 4); // Add top spacing because this input has a visual label.
+	right: $grid-unit-15;
 }
 
 .block-editor-link-control__search-item-action {

@@ -356,6 +356,7 @@ function LinkControl( {
 						className={ classnames( {
 							'block-editor-link-control__search-input-wrapper': true,
 							'has-text-control': showTextControl,
+							'has-actions': showActions,
 						} ) }
 					>
 						{ showTextControl && (
@@ -389,15 +390,17 @@ function LinkControl( {
 							}
 							hideLabelFromVision={ ! showTextControl }
 						/>
-						<div className="block-editor-link-control__search-enter">
-							<Button
-								onClick={ isDisabled ? noop : handleSubmit }
-								label={ __( 'Submit' ) }
-								icon={ keyboardReturn }
-								className="block-editor-link-control__search-submit"
-								aria-disabled={ isDisabled }
-							/>
-						</div>
+						{ ! showActions && (
+							<div className="block-editor-link-control__search-enter">
+								<Button
+									onClick={ isDisabled ? noop : handleSubmit }
+									label={ __( 'Submit' ) }
+									icon={ keyboardReturn }
+									className="block-editor-link-control__search-submit"
+									aria-disabled={ isDisabled }
+								/>
+							</div>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
