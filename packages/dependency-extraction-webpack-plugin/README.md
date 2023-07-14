@@ -64,10 +64,10 @@ For example:
 // Source file entrypoint.js
 import { Component } from '@wordpress/element';
 
-// Webpack will produce the output output/entrypoint.js
+// Webpack will produce the output `output/path/name.ext`
 /* bundled JavaScript output */
 
-// Webpack will also produce output/entrypoint.asset.php declaring script dependencies
+// Webpack will also produce `output/path/name.asset.php` declaring script dependencies
 <?php return array('dependencies' => array('wp-element'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
 ```
 
