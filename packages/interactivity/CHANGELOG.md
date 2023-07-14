@@ -4,4 +4,4 @@
 
 ### New Features
 
--   Runtime support for the `data-wp-style` directive. ([#XX](XX))
+-   Runtime support for the `data-wp-style` directive. ([#52645](https://github.com/WordPress/gutenberg/pull/52645))
