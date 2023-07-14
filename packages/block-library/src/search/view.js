@@ -90,11 +90,11 @@ function expandSearchBlock( block ) {
 	const searchField = getSearchInput( block );
 	const searchButton = getSearchButton( block );
 
-	searchField.removeAttribute( 'aria-hidden' );
-	searchField.removeAttribute( 'tabindex' );
-	searchButton.removeAttribute( 'aria-expanded' );
-	searchButton.removeAttribute( 'aria-controls' );
 	searchButton.type = 'submit';
+	searchField.ariaHidden = 'false';
+	searchField.tabIndex = 0;
+	searchButton.ariaExpanded = 'true';
+	searchButton.removeAttribute( 'aria-controls' ); // Note: Seemingly not mirrored with searchButton.ariaControls.
 	toggleAriaLabel( searchButton );
 	block.classList.remove( hiddenClass );
 
@@ -123,11 +123,12 @@ function collapseExpandedSearchBlock() {
 	const block = expandedSearchBlock;
 	const searchField = getSearchInput( block );
 	const searchButton = getSearchButton( block );
+
 	searchButton.type = 'button';
 	searchField.ariaHidden = 'true';
 	searchField.tabIndex = -1;
 	searchButton.ariaExpanded = 'false';
-	searchButton.ariaControls = searchField.getAttribute( 'id' );
+	searchButton.setAttribute( 'aria-controls', searchField.id ); // Note: Seemingly not mirrored with searchButton.ariaControls.
 	toggleAriaLabel( searchButton );
 	block.classList.add( hiddenClass );
 
