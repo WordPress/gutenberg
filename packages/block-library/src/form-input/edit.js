@@ -93,7 +93,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					placeholder={ __( 'Type the label for this input' ) }
 				/>
 				<TagName
-					type={ type }
+					type={ 'textarea' === type ? undefined : type }
 					className={ classNames(
 						className,
 						'wp-block-form-input__input',

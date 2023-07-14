@@ -66,7 +66,7 @@ export default function save( { attributes } ) {
 			</span>
 			<TagName
 				className={ inputClasses }
-				type={ type }
+				type={ 'textarea' === type ? undefined : type }
 				name={ name || getNameFromLabel( label ) }
 				required={ required }
 				aria-required={ required }
