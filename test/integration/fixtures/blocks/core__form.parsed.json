@@ -10,9 +10,9 @@
 					"required": true
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n",
+				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><span class=\"wp-block-form-input-label__content\">Name</span><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n",
 				"innerContent": [
-					"\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n"
+					"\n<label class=\"wp-block-form-input-label\"><span class=\"wp-block-form-input-label__content\">Name</span><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n"
 				]
 			},
 			{
@@ -23,9 +23,9 @@
 					"required": true
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Email</div><input class=\"wp-block-form-input\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>\n",
+				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><span class=\"wp-block-form-input-label__content\">Email</span><input class=\"wp-block-form-input\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>\n",
 				"innerContent": [
-					"\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Email</div><input class=\"wp-block-form-input\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>\n"
+					"\n<label class=\"wp-block-form-input-label\"><span class=\"wp-block-form-input-label__content\">Email</span><input class=\"wp-block-form-input\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>\n"
 				]
 			},
 			{
@@ -35,9 +35,9 @@
 					"label": "Website"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Website</div><input class=\"wp-block-form-input\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>\n",
+				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><span class=\"wp-block-form-input-label__content\">Website</span><input class=\"wp-block-form-input\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>\n",
 				"innerContent": [
-					"\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Website</div><input class=\"wp-block-form-input\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>\n"
+					"\n<label class=\"wp-block-form-input-label\"><span class=\"wp-block-form-input-label__content\">Website</span><input class=\"wp-block-form-input\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>\n"
 				]
 			},
 			{
@@ -48,9 +48,9 @@
 					"required": true
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Comment</div><textarea class=\"wp-block-form-input\" name=\"Comment\" required aria-required=\"true\"></textarea></label>\n",
+				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><span class=\"wp-block-form-input-label__content\">Comment</span><textarea class=\"wp-block-form-input\" name=\"Comment\" required aria-required=\"true\"></textarea></label>\n",
 				"innerContent": [
-					"\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Comment</div><textarea class=\"wp-block-form-input\" name=\"Comment\" required aria-required=\"true\"></textarea></label>\n"
+					"\n<label class=\"wp-block-form-input-label\"><span class=\"wp-block-form-input-label__content\">Comment</span><textarea class=\"wp-block-form-input\" name=\"Comment\" required aria-required=\"true\"></textarea></label>\n"
 				]
 			},
 			{
