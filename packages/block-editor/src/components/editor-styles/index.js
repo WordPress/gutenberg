@@ -96,7 +96,9 @@ export default function EditorStyles( { styles } ) {
 			     but this could be any element. */ }
 			<style ref={ useDarkThemeBodyClassName( stylesArray ) } />
 			{ transformedStyles.map( ( css, index ) => (
-				<style key={ index }>{ css }</style>
+				<style data-global-style="preset" key={ index }>
+					{ css }
+				</style>
 			) ) }
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"

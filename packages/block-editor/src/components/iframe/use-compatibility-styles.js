@@ -45,6 +45,11 @@ export function useCompatibilityStyles() {
 					return accumulator;
 				}
 
+				// Don't try to add global style presets; they're directly rendered in iframe.
+				if ( ownerNode.dataset.globalStyle === 'preset' ) {
+					return accumulator;
+				}
+
 				function matchFromRules( _cssRules ) {
 					return Array.from( _cssRules ).find(
 						( {
