@@ -53,8 +53,4 @@ module.exports = {
 			},
 		],
 	},
-	watchOptions: {
-		ignored: [ '**/node_modules' ],
-		aggregateTimeout: 500,
-	},
 };
