@@ -30,6 +30,7 @@ async function initBlockJSON( {
 	editorStyle,
 	style,
 	render,
+	viewScript,
 	customBlockJSON,
 } ) {
 	info( '' );
@@ -59,6 +60,7 @@ async function initBlockJSON( {
 					editorStyle,
 					style,
 					render,
+					viewScript,
 					...customBlockJSON,
 				} ).filter( ( [ , value ] ) => !! value )
 			),
