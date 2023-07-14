@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Navigation Block - List view editing', () => {
+test.describe( 'Navigation block - List view editing', () => {
 	const navMenuBlocksFixture = {
 		title: 'Test Menu',
 		content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
