@@ -5,6 +5,7 @@ import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig, devices } from '@playwright/test';
+require( 'dotenv' ).config();
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
