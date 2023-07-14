@@ -69,7 +69,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 	}
 
 	$view_js_file = 'wp-block-search-view';
-	wp_script_add_data( $view_js_file, 'strategy', 'async' ); // TODO: This should be specified in block.json.
+	wp_script_add_data( $view_js_file, 'strategy', 'async' ); // TODO: This should be able to be specified in block.json. See Core-54018.
 	$should_load_view_script = false;
 
 	if ( $input->next_tag() ) {
