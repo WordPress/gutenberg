@@ -75,7 +75,7 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible();
 
 			// Check the markup of the block is correct.
-			const postId = await editor.publishPost();
+			await editor.publishPost();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/navigation',
@@ -84,7 +84,7 @@ test.describe( 'Navigation block', () => {
 			] );
 
 			// Check the block in the frontend.
-			await page.goto( `/?p=${ postId }` );
+			await page.goto( `/` );
 
 			await expect(
 				page.locator(
@@ -119,8 +119,7 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible( { timeout: 10000 } ); // allow time for network request.
 
 			// Check the block in the frontend.
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
+			await page.goto( `/` );
 
 			await expect(
 				page.locator(
@@ -155,7 +154,7 @@ test.describe( 'Navigation block', () => {
 			await editor.insertBlock( { name: 'core/navigation' } );
 
 			// Check the markup of the block is correct.
-			const postId = await editor.publishPost();
+			await editor.publishPost();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/navigation',
@@ -171,7 +170,7 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible();
 
 			// Check the block in the frontend.
-			await page.goto( `/?p=${ postId }` );
+			await page.goto( `/` );
 
 			await expect(
 				page.locator(
@@ -209,8 +208,8 @@ test.describe( 'Navigation block', () => {
 			} );
 			await addSubmenuButton.click();
 
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
+			await editor.publishPost();
+			await page.goto( `/` );
 
 			await expect(
 				page.locator(
