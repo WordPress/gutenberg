@@ -38,7 +38,7 @@ export const createReusableBlock = async ( content, title ) => {
 
 	// Wait for creation to finish
 	await page.waitForXPath(
-		'//*[contains(@class, "components-snackbar")]/*[text()="Synced Pattern created."]'
+		'//*[contains(@class, "components-snackbar")]/*[contains(text(),"Pattern created:")]'
 	);
 
 	// Check that we have a reusable block on the page

@@ -65,6 +65,9 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 
 		return $menu_items_by_parent_id;
 	}
+}
+
+if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) ) {
 
 	/**
 	 * Add Interactivity API directives to the navigation-submenu and page-list blocks markup using the Tag Processor
@@ -138,8 +141,23 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		}
 		return $w->get_updated_html();
 	};
-}
 
+	/**
+	 * Replaces view script for the Navigation block with version using Interactivity API.
+	 *
+	 * @param array $metadata Block metadata as read in via block.json.
+	 *
+	 * @return array Filtered block type metadata.
+	 */
+	function gutenberg_block_core_navigation_update_interactive_view_script( $metadata ) {
+		if ( 'core/navigation' === $metadata['name'] ) {
+			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
+			$metadata['supports']['interactivity'] = true;
+		}
+		return $metadata;
+	}
+	add_filter( 'block_type_metadata', 'gutenberg_block_core_navigation_update_interactive_view_script', 10, 1 );
+}
 
 
 /**
@@ -670,7 +688,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	// Add directives to the submenu if needed.
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $has_submenus && $should_load_view_script ) {
+	if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) && $has_submenus && $should_load_view_script ) {
 		$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
 		$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $w, $attributes );
 	}
@@ -718,7 +736,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$responsive_container_directives = '';
 	$responsive_dialog_directives    = '';
 	$close_button_directives         = '';
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $should_load_view_script ) {
+	if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) && $should_load_view_script ) {
 		$nav_element_directives          = '
 			data-wp-interactive
 			data-wp-context=\'{ "core": { "navigation": { "overlayOpenedBy": {}, "type": "overlay", "roleAttribute": "" } } }\'
@@ -746,11 +764,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" %3$s class="%6$s" %11$s>%9$s</button>
+		'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s" %11$s>%9$s</button>
 			<div class="%5$s" style="%7$s" id="%1$s" %12$s>
-				<div class="wp-block-navigation__responsive-close" tabindex="-1">
+				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s" %13$s>
-							<button %4$s class="wp-block-navigation__responsive-container-close" %14$s>%10$s</button>
+							<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close" %14$s>%10$s</button>
 						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
 							%2$s
 						</div>

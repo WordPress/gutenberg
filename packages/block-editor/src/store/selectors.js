@@ -2018,7 +2018,7 @@ export const getInserterItems = createSelector(
 				title: reusableBlock.title.raw,
 				icon,
 				category: 'reusable',
-				keywords: [],
+				keywords: [ 'reusable' ],
 				isDisabled: false,
 				utility: 1, // Deprecated.
 				frecency,
@@ -2214,15 +2214,24 @@ export const getAllowedBlocks = createSelector(
 			return;
 		}
 
-		return getBlockTypes().filter( ( blockType ) =>
+		const blockTypes = getBlockTypes().filter( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
+		const hasReusableBlock =
+			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) &&
+			getReusableBlocks( state ).length > 0;
+
+		return [
+			...blockTypes,
+			...( hasReusableBlock ? [ 'core/block' ] : [] ),
+		];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
+		getReusableBlocks( state ),
 		getBlockTypes(),
 	]
 );
@@ -2258,15 +2267,15 @@ export const __experimentalGetAllowedBlocks = createSelector(
  * @property {?Object}        attributes       Attributes to pass to the newly created block.
  * @property {?Array<string>} attributesToCopy Attributes to be copied from adjecent blocks when inserted.
  */
-export const __experimentalGetDirectInsertBlock = createSelector(
+export const getDirectInsertBlock = createSelector(
 	( state, rootClientId = null ) => {
 		if ( ! rootClientId ) {
 			return;
 		}
 		const defaultBlock =
-			state.blockListSettings[ rootClientId ]?.__experimentalDefaultBlock;
+			state.blockListSettings[ rootClientId ]?.defaultBlock;
 		const directInsert =
-			state.blockListSettings[ rootClientId ]?.__experimentalDirectInsert;
+			state.blockListSettings[ rootClientId ]?.directInsert;
 		if ( ! defaultBlock || ! directInsert ) {
 			return;
 		}
@@ -2276,6 +2285,25 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 				: null;
 		}
 		return defaultBlock;
+	},
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.tree.get( rootClientId ),
+	]
+);
+
+export const __experimentalGetDirectInsertBlock = createSelector(
+	( state, rootClientId = null ) => {
+		deprecated(
+			'wp.data.select( "core/block-editor" ).__experimentalGetDirectInsertBlock',
+			{
+				alternative:
+					'wp.data.select( "core/block-editor" ).getDirectInsertBlock',
+				since: '6.3',
+				version: '6.4',
+			}
+		);
+		return getDirectInsertBlock( state, rootClientId );
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],

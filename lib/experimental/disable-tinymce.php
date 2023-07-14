@@ -71,6 +71,14 @@ function gutenberg_post_being_edited_requires_classic_block() {
 		$content = $current_post->post_content;
 	}
 
+	// Check if block editor is disabled by "Classic Editor" or another plugin.
+	if (
+		function_exists( 'use_block_editor_for_post_type' ) &&
+		! use_block_editor_for_post_type( $current_post->post_type )
+	) {
+		return true;
+	}
+
 	if ( empty( $content ) ) {
 		return false;
 	}

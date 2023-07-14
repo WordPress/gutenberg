@@ -212,7 +212,7 @@ describe( 'Reusable blocks', () => {
 
 		// Wait for creation to finish.
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Synced Pattern created."]'
+			'//*[contains(@class, "components-snackbar")]/*[contains(text(),"Pattern created:")]'
 		);
 
 		await clearAllBlocks();
@@ -352,7 +352,7 @@ describe( 'Reusable blocks', () => {
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
 		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select Pattern' );
+		await clickBlockToolbarButton( 'Select Edited block' );
 		await clickBlockToolbarButton( 'Detach pattern' );
 		await page.waitForXPath( selector, {
 			hidden: true,
