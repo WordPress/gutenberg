@@ -28,10 +28,11 @@ function closeSubmenus( navigationItem ) {
  * @param {HTMLButtonElement} buttonToggle
  */
 function toggleSubmenuOnClick( buttonToggle ) {
-	const isSubmenuOpen = buttonToggle.getAttribute( 'aria-expanded' );
+	const isSubmenuOpen =
+		buttonToggle.getAttribute( 'aria-expanded' ) === 'true';
 	const navigationItem = buttonToggle.closest( '.wp-block-navigation-item' );
 
-	if ( isSubmenuOpen === 'true' ) {
+	if ( isSubmenuOpen ) {
 		closeSubmenus( navigationItem );
 	} else {
 		// Close all sibling submenus.
@@ -40,11 +41,12 @@ function toggleSubmenuOnClick( buttonToggle ) {
 		);
 		navigationParent
 			.querySelectorAll( '.wp-block-navigation-item' )
-			.forEach( function ( child ) {
+			.forEach( ( child ) => {
 				if ( child !== navigationItem ) {
 					closeSubmenus( child );
 				}
 			} );
+
 		// Open submenu.
 		buttonToggle.setAttribute( 'aria-expanded', 'true' );
 		hasOpenSubmenu = true;
@@ -56,11 +58,7 @@ document.addEventListener(
 	'click',
 	function ( event ) {
 		const target = event.target;
-
 		const button = target.closest( '.wp-block-navigation-submenu__toggle' );
-		if ( button instanceof HTMLButtonElement ) {
-			toggleSubmenuOnClick( button );
-		}
 
 		// Close any other open submenus.
 		if ( hasOpenSubmenu ) {
@@ -68,10 +66,15 @@ document.addEventListener(
 				'.wp-block-navigation'
 			);
 			navigationBlocks.forEach( function ( block ) {
-				if ( ! block.contains( event.target ) ) {
+				if ( ! block.contains( target ) ) {
 					closeSubmenus( block );
 				}
 			} );
+		}
+
+		// Now open the submenu if one was clicked.
+		if ( button instanceof HTMLButtonElement ) {
+			toggleSubmenuOnClick( button );
 		}
 	},
 	{ passive: true }
