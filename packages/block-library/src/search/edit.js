@@ -19,7 +19,7 @@ import {
 	useSetting,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
@@ -80,10 +80,8 @@ export default function SearchEdit( {
 		buttonPosition,
 		buttonUseIcon,
 		buttonBehavior,
-		isSearchFieldHidden,
 		style,
 	} = attributes;
-
 	const insertedInNavigationBlock = useSelect(
 		( select ) => {
 			const { getBlockParentsByBlockName, wasBlockJustInserted } =
@@ -137,14 +135,13 @@ export default function SearchEdit( {
 	const hasOnlyButton = 'button-only' === buttonPosition;
 	const searchFieldRef = useRef();
 	const buttonRef = useRef();
+	const [ isSearchFieldHidden, setIsSearchFieldHidden ] = useState(
+		hasOnlyButton && ! isSelected
+	);
 
 	const units = useCustomUnits( {
 		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
-	} );
-
-	setAttributes( {
-		isSearchFieldHidden: hasOnlyButton && ! isSelected,
 	} );
 
 	const getBlockClassNames = () => {
@@ -182,7 +179,6 @@ export default function SearchEdit( {
 			onClick: () => {
 				setAttributes( {
 					buttonPosition: 'button-outside',
-					isSearchFieldHidden: false,
 				} );
 			},
 		},
@@ -194,7 +190,6 @@ export default function SearchEdit( {
 			onClick: () => {
 				setAttributes( {
 					buttonPosition: 'button-inside',
-					isSearchFieldHidden: false,
 				} );
 			},
 		},
@@ -206,7 +201,6 @@ export default function SearchEdit( {
 			onClick: () => {
 				setAttributes( {
 					buttonPosition: 'no-button',
-					isSearchFieldHidden: false,
 				} );
 			},
 		},
@@ -218,7 +212,6 @@ export default function SearchEdit( {
 			onClick: () => {
 				setAttributes( {
 					buttonPosition: 'button-only',
-					isSearchFieldHidden: true,
 				} );
 			},
 		},
@@ -303,9 +296,7 @@ export default function SearchEdit( {
 		};
 		const handleButtonClick = () => {
 			if ( hasOnlyButton && BUTTON_BEHAVIOR_EXPAND === buttonBehavior ) {
-				setAttributes( {
-					isSearchFieldHidden: ! isSearchFieldHidden,
-				} );
+				setIsSearchFieldHidden( ! isSearchFieldHidden );
 			}
 		};
 
