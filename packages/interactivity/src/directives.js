@@ -154,7 +154,7 @@ export default () => {
 	 * @param {string} val CSS string.
 	 * @return {Object} CSS object.
 	 */
-	const astish = ( val ) => {
+	const cssStringToObject = ( val ) => {
 		const tree = [ {} ];
 		let block, left;
 
@@ -188,7 +188,9 @@ export default () => {
 					} );
 					element.props.style = element.props.style || {};
 					if ( typeof element.props.style === 'string' )
-						element.props.style = astish( element.props.style );
+						element.props.style = cssStringToObject(
+							element.props.style
+						);
 					if ( ! result ) delete element.props.style[ key ];
 					else element.props.style[ key ] = result;
 
