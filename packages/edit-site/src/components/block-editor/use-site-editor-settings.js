@@ -11,16 +11,17 @@ import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import inserterMediaCategories from './inserter-media-categories';
 
-export default function useSiteEditorSettings( templateType ) {
+export default function useSiteEditorSettings() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, canvasMode } = useSelect(
+	const { storedSettings, canvasMode, templateType } = useSelect(
 		( select ) => {
-			const { getSettings, getCanvasMode } = unlock(
+			const { getSettings, getCanvasMode, getEditedPostType } = unlock(
 				select( editSiteStore )
 			);
 			return {
 				storedSettings: getSettings( setIsInserterOpened ),
 				canvasMode: getCanvasMode(),
+				templateType: getEditedPostType(),
 			};
 		},
 		[ setIsInserterOpened ]
