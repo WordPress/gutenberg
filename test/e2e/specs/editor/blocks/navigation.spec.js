@@ -294,69 +294,67 @@ test.describe( 'Navigation block', () => {
 		await expect( warningMessage ).toBeVisible();
 	} );
 
-	test.describe( 'Existing blocks', () => {
-		test( 'adding new links to a block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
-			admin,
-			page,
-			editor,
-			requestUtils,
-		} ) => {
-			// As this test depends on there being no menus,
-			// we need to delete any existing menus as an explicit
-			// precondition rather than rely on global test setup.
-			await requestUtils.deleteAllMenus();
+	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
+		admin,
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		// As this test depends on there being no menus,
+		// we need to delete any existing menus as an explicit
+		// precondition rather than rely on global test setup.
+		await requestUtils.deleteAllMenus();
 
-			// Ensure that there are no menus before beginning the test.
-			expect(
-				await requestUtils.getNavigationMenus( {
-					status: [ 'publish', 'draft' ],
-				} )
-			).toHaveLength( 0 );
+		// Ensure that there are no menus before beginning the test.
+		expect(
+			await requestUtils.getNavigationMenus( {
+				status: [ 'publish', 'draft' ],
+			} )
+		).toHaveLength( 0 );
 
-			await admin.createNewPost();
+		await admin.createNewPost();
 
-			await editor.insertBlock( {
-				name: 'core/navigation',
-				attributes: {},
-				innerBlocks: [
-					{
-						name: 'core/page-list',
-					},
-				],
-			} );
-
-			const navBlock = editor.canvas.getByRole( 'document', {
-				name: 'Block: Navigation',
-			} );
-
-			await expect(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Page List',
-				} )
-			).toBeVisible();
-
-			await expect( navBlock ).toBeVisible();
-
-			await editor.selectBlocks( navBlock );
-
-			await navBlock.getByRole( 'button', { name: 'Add block' } ).click();
-
-			// This relies on network so allow additional time for
-			// the request to complete.
-			await expect(
-				page.getByRole( 'button', {
-					name: 'Dismiss this notice',
-					text: 'Navigation Menu successfully created',
-				} )
-			).toBeVisible( { timeout: 10000 } );
-
-			// The creattion Navigaiton Menu will be a draft
-			// so we need to check for both publish and draft.
-			expect(
-				await requestUtils.getNavigationMenus( {
-					status: [ 'publish', 'draft' ],
-				} )
-			).toHaveLength( 1 );
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {},
+			innerBlocks: [
+				{
+					name: 'core/page-list',
+				},
+			],
 		} );
+
+		const navBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Page List',
+			} )
+		).toBeVisible();
+
+		await expect( navBlock ).toBeVisible();
+
+		await editor.selectBlocks( navBlock );
+
+		await navBlock.getByRole( 'button', { name: 'Add block' } ).click();
+
+		// This relies on network so allow additional time for
+		// the request to complete.
+		await expect(
+			page.getByRole( 'button', {
+				name: 'Dismiss this notice',
+				text: 'Navigation Menu successfully created',
+			} )
+		).toBeVisible( { timeout: 10000 } );
+
+		// The creation Navigation Menu will be a draft
+		// so we need to check for both publish and draft.
+		expect(
+			await requestUtils.getNavigationMenus( {
+				status: [ 'publish', 'draft' ],
+			} )
+		).toHaveLength( 1 );
 	} );
 } );
