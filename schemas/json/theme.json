@@ -513,6 +513,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"textOrientation": {
+							"description": "Allow users to set the text-orientation.",
+							"type": "boolean",
+							"default": false
+						},
 						"textTransform": {
 							"description": "Allow users to set custom text transforms.",
 							"type": "boolean",
@@ -1584,6 +1589,17 @@
 						},
 						"writingMode": {
 							"description": "Sets the `writing-mode` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"textOrientation": {
+							"description": "Sets the `text-orientation` CSS property.",
 							"oneOf": [
 								{
 									"type": "string"

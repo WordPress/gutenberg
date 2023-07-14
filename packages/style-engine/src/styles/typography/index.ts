@@ -124,6 +124,18 @@ const writingMode = {
 	},
 };
 
+const textOrientation = {
+	name: 'textOrientation',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textOrientation' ],
+			'textOrientation'
+		);
+	},
+};
+
 export default [
 	fontFamily,
 	fontSize,
@@ -135,4 +147,5 @@ export default [
 	textDecoration,
 	textTransform,
 	writingMode,
+	textOrientation,
 ];

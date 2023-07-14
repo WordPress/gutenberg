@@ -20,6 +20,7 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
+import TextOrientationControl from '../text-orientation-control';
 import { getValueFromVariable } from './utils';
 import { setImmutably } from '../../utils/object';
 
@@ -34,6 +35,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
 	const hasWritingMode = useHasWritingModeControl( settings );
+	const hasTextOrientation = useHasTextOrientationControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
 
@@ -46,6 +48,7 @@ export function useHasTypographyPanel( settings ) {
 		hasFontSize ||
 		hasTextDecoration ||
 		hasWritingMode ||
+		hasTextOrientation ||
 		hasTextColumns
 	);
 }
@@ -108,6 +111,10 @@ function useHasTextDecorationControl( settings ) {
 
 function useHasWritingModeControl( settings ) {
 	return settings?.typography?.writingMode;
+}
+
+function useHasTextOrientationControl( settings ) {
+	return settings?.typography?.textOrientation;
 }
 
 function useHasTextColumnsControl( settings ) {
@@ -330,7 +337,7 @@ export default function TypographyPanel( {
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );
 
-	// Text Orientation
+	// Writing Mode
 	const hasWritingModeControl = useHasWritingModeControl( settings );
 	const writingMode = decodeValue( inheritedValue?.typography?.writingMode );
 	const setWritingMode = ( newValue ) => {
@@ -344,6 +351,23 @@ export default function TypographyPanel( {
 	};
 	const hasWritingMode = () => !! value?.typography?.writingMode;
 	const resetWritingMode = () => setWritingMode( undefined );
+
+	// Text Orientation
+	const hasTextOrientationControl = useHasTextOrientationControl( settings );
+	const textOrientation = decodeValue(
+		inheritedValue?.typography?.textOrientation
+	);
+	const setTextOrientation = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textOrientation' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasTextOrientation = () => !! value?.typography?.textOrientation;
+	const resetTextOrientation = () => setTextOrientation( undefined );
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -491,23 +515,6 @@ export default function TypographyPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ hasWritingModeControl && (
-				<ToolsPanelItem
-					className="single-column"
-					label={ __( 'Text orientation' ) }
-					hasValue={ hasWritingMode }
-					onDeselect={ resetWritingMode }
-					isShownByDefault={ defaultControls.writingMode }
-					panelId={ panelId }
-				>
-					<WritingModeControl
-						value={ writingMode }
-						onChange={ setWritingMode }
-						size="__unstable-large"
-						__nextHasNoMarginBottom
-					/>
-				</ToolsPanelItem>
-			) }
 			{ hasTextTransformControl && (
 				<ToolsPanelItem
 					label={ __( 'Letter case' ) }
@@ -524,6 +531,41 @@ export default function TypographyPanel( {
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>
+				</ToolsPanelItem>
+			) }
+			{ hasWritingModeControl && (
+				<ToolsPanelItem
+					className={
+						! hasTextOrientationControl ? 'single-column' : ''
+					}
+					style={
+						hasTextOrientationControl ? { display: 'grid' } : {}
+					}
+					label={ __( 'Text orientation' ) }
+					hasValue={ hasWritingMode && hasTextOrientation }
+					onDeselect={ resetWritingMode && resetTextOrientation }
+					isShownByDefault={ defaultControls.writingMode }
+					panelId={ panelId }
+				>
+					<WritingModeControl
+						value={ writingMode }
+						onChange={ setWritingMode }
+						size="__unstable-large"
+						__nextHasNoMarginBottom
+						style={
+							hasTextOrientationControl
+								? { gridColumn: '1/2' }
+								: {}
+						}
+					/>
+					{ hasTextOrientationControl && (
+						<TextOrientationControl
+							value={ textOrientation }
+							onChange={ setTextOrientation }
+							size="__unstable-large"
+							__nextHasNoMarginBottom
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 		</Wrapper>

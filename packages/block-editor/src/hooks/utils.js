@@ -135,6 +135,7 @@ export function useBlockSettings( name, parentLayout ) {
 	const textColumns = useSetting( 'typography.textColumns' );
 	const textDecoration = useSetting( 'typography.textDecoration' );
 	const writingMode = useSetting( 'typography.writingMode' );
+	const textOrientation = useSetting( 'typography.textOrientation' );
 	const textTransform = useSetting( 'typography.textTransform' );
 	const letterSpacing = useSetting( 'typography.letterSpacing' );
 	const padding = useSetting( 'spacing.padding' );
@@ -215,6 +216,7 @@ export function useBlockSettings( name, parentLayout ) {
 				textTransform,
 				letterSpacing,
 				writingMode,
+				textOrientation,
 			},
 			spacing: {
 				spacingSizes: {
@@ -249,6 +251,7 @@ export function useBlockSettings( name, parentLayout ) {
 		textTransform,
 		letterSpacing,
 		writingMode,
+		textOrientation,
 		padding,
 		margin,
 		blockGap,

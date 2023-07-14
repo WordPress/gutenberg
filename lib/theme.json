@@ -265,7 +265,8 @@
 			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true,
-			"writingMode": false
+			"writingMode": false,
+			"textOrientation": false
 		},
 		"blocks": {
 			"core/button": {
