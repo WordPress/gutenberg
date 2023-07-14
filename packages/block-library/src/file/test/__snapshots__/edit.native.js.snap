@@ -94,6 +94,7 @@ exports[`File block renders file error state without crashing 1`] = `
           onStartShouldSetResponder={[Function]}
           placeholder="File name"
           placeholderTextColor="gray"
+          selectionColor="black"
           style={
             {
               "backgroundColor": undefined,
@@ -322,6 +323,7 @@ exports[`File block renders file without crashing 1`] = `
           onStartShouldSetResponder={[Function]}
           placeholder="File name"
           placeholderTextColor="gray"
+          selectionColor="black"
           style={
             {
               "backgroundColor": undefined,
