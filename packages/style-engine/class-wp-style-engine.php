@@ -231,7 +231,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				),
 			),
 			'typography' => array(
-				'fontSize'       => array(
+				'fontSize'        => array(
 					'property_keys' => array(
 						'default' => 'font-size',
 					),
@@ -243,7 +243,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-$slug-font-size' => 'font-size',
 					),
 				),
-				'fontFamily'     => array(
+				'fontFamily'      => array(
 					'property_keys' => array(
 						'default' => 'font-family',
 					),
@@ -255,53 +255,59 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-$slug-font-family' => 'font-family',
 					),
 				),
-				'fontStyle'      => array(
+				'fontStyle'       => array(
 					'property_keys' => array(
 						'default' => 'font-style',
 					),
 					'path'          => array( 'typography', 'fontStyle' ),
 				),
-				'fontWeight'     => array(
+				'fontWeight'      => array(
 					'property_keys' => array(
 						'default' => 'font-weight',
 					),
 					'path'          => array( 'typography', 'fontWeight' ),
 				),
-				'lineHeight'     => array(
+				'lineHeight'      => array(
 					'property_keys' => array(
 						'default' => 'line-height',
 					),
 					'path'          => array( 'typography', 'lineHeight' ),
 				),
-				'textColumns'    => array(
+				'textColumns'     => array(
 					'property_keys' => array(
 						'default' => 'column-count',
 					),
 					'path'          => array( 'typography', 'textColumns' ),
 				),
-				'textDecoration' => array(
+				'textDecoration'  => array(
 					'property_keys' => array(
 						'default' => 'text-decoration',
 					),
 					'path'          => array( 'typography', 'textDecoration' ),
 				),
-				'textTransform'  => array(
+				'textTransform'   => array(
 					'property_keys' => array(
 						'default' => 'text-transform',
 					),
 					'path'          => array( 'typography', 'textTransform' ),
 				),
-				'letterSpacing'  => array(
+				'letterSpacing'   => array(
 					'property_keys' => array(
 						'default' => 'letter-spacing',
 					),
 					'path'          => array( 'typography', 'letterSpacing' ),
 				),
-				'writingMode'    => array(
+				'writingMode'     => array(
 					'property_keys' => array(
 						'default' => 'writing-mode',
 					),
 					'path'          => array( 'typography', 'writingMode' ),
+				),
+				'textOrientation' => array(
+					'property_keys' => array(
+						'default' => 'text-orientation',
+					),
+					'path'          => array( 'typography', 'textOrientation' ),
 				),
 			),
 		);

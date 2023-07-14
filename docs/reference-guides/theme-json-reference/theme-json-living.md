@@ -180,6 +180,7 @@ Settings related to spacing.
 
 Settings related to typography.
 
+<<<<<<< HEAD
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
 | defaultFontSizes | Allow users to choose font sizes from the default font size presets. | `boolean` | `true` |
@@ -197,6 +198,25 @@ Settings related to typography.
 | dropCap | Enable drop cap. | `boolean` | `true` |
 | fontSizes | Font size presets for the font size selector. | `[ { name, slug, size, fluid } ]` |  |
 | fontFamilies | Font family presets for the font family selector. | `[ { name, slug, fontFamily, fontFace } ]` |  |
+=======
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| customFontSize | boolean | true |  |
+| fontStyle | boolean | true |  |
+| fontWeight | boolean | true |  |
+| fluid | undefined | false |  |
+| letterSpacing | boolean | true |  |
+| lineHeight | boolean | false |  |
+| textAlign | boolean | true |  |
+| textColumns | boolean | false |  |
+| textDecoration | boolean | true |  |
+| writingMode | boolean | false |  |
+| textOrientation | boolean | false |  |
+| textTransform | boolean | true |  |
+| dropCap | boolean | true |  |
+| fontSizes | array |  | fluid, name, size, slug |
+| fontFamilies | array |  | fontFace, fontFamily, name, slug |
+>>>>>>> 61fbd2e1ea (Add text-orientation to the typography block support)
 
 ---
 
@@ -245,11 +265,93 @@ Border styles.
 
 Color styles.
 
+<<<<<<< HEAD
 | Property | Description | Type |
 | -------- | ----------- | ---- |
 | background | Sets the `background-color` CSS property. | `string`, `{ ref }` |
 | gradient | Sets the `background` CSS property. | `string`, `{ ref }` |
 | text | Sets the `color` CSS property. | `string`, `{ ref }` |
+=======
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| background | string, object |  |
+| gradient | string, object |  |
+| text | string, object |  |
+
+---
+
+### dimensions
+
+Dimensions styles
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| aspectRatio | string, object |  |
+| minHeight | string, object |  |
+
+---
+
+### spacing
+
+Spacing styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| blockGap | string, object |  |
+| margin | object | bottom, left, right, top |
+| padding | object | bottom, left, right, top |
+
+---
+
+### typography
+
+Typography styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| fontFamily | string, object |  |
+| fontSize | string, object |  |
+| fontStyle | string, object |  |
+| fontWeight | string, object |  |
+| letterSpacing | string, object |  |
+| lineHeight | string, object |  |
+| textAlign | string |  |
+| textColumns | string |  |
+| textDecoration | string, object |  |
+| writingMode | string, object |  |
+| textOrientation | string, object |  |
+| textTransform | string, object |  |
+
+---
+
+### filter
+
+CSS and SVG filter styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| duotone | string, object |  |
+
+---
+
+### shadow
+
+Box shadow styles.
+
+
+---
+
+### outline
+
+Outline styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| color | string, object |  |
+| offset | string, object |  |
+| style | string, object |  |
+| width | string, object |  |
+>>>>>>> 61fbd2e1ea (Add text-orientation to the typography block support)
 
 ---
 

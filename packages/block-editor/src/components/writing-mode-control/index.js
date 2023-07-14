@@ -7,7 +7,13 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
-import { textHorizontal, textVertical } from '@wordpress/icons';
+import {
+	textHorizontal,
+	textHorizontalRTL,
+	textUpright,
+	textVertical,
+	textVerticalRTL,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -16,14 +22,19 @@ import SegmentedTextControl from '../segmented-text-control';
 
 const WRITING_MODES = [
 	{
-		label: __( 'Horizontal' ),
-		value: 'horizontal-tb',
-		icon: textHorizontal,
+		name: __( 'Horizontal' ),
+		value: 'horizontal',
+		icon: isRTL() ? textHorizontalRTL : textHorizontal,
 	},
 	{
-		label: __( 'Vertical' ),
-		value: isRTL() ? 'vertical-lr' : 'vertical-rl',
-		icon: textVertical,
+		name: __( 'Top to bottom' ),
+		value: 'top-to-bottom',
+		icon: isRTL() ? textVerticalRTL : textVertical,
+	},
+	{
+		name: __( 'Upright' ),
+		value: 'upright',
+		icon: textUpright,
 	},
 ];
 

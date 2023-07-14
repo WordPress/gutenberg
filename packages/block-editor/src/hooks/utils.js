@@ -237,6 +237,7 @@ export function useBlockSettings( name, parentLayout ) {
 		textColumns,
 		textDecoration,
 		writingMode,
+		textOrientation,
 		textTransform,
 		letterSpacing,
 		padding,
@@ -294,6 +295,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'typography.textColumns',
 		'typography.textDecoration',
 		'typography.writingMode',
+		'typography.textOrientation',
 		'typography.textTransform',
 		'typography.letterSpacing',
 		'spacing.padding',
@@ -391,6 +393,7 @@ export function useBlockSettings( name, parentLayout ) {
 				textTransform,
 				letterSpacing,
 				writingMode,
+				textOrientation,
 			},
 			spacing: {
 				spacingSizes: {
@@ -439,6 +442,7 @@ export function useBlockSettings( name, parentLayout ) {
 		textTransform,
 		letterSpacing,
 		writingMode,
+		textOrientation,
 		padding,
 		margin,
 		blockGap,

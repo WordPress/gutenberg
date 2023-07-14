@@ -41,6 +41,11 @@ const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
  */
 const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
 /**
+ * Key within block settings' supports array indicating support for text orientation
+ * e.g. settings found in `block.json`.
+ */
+const TEXT_ORIENTATION_SUPPORT_KEY = 'typography.__experimentalTextOrientation';
+/**
  * Key within block settings' supports array indicating support for text
  * transforms e.g. settings found in `block.json`.
  */
@@ -63,6 +68,7 @@ const TYPOGRAPHY_SUPPORT_KEYS = [
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	WRITING_MODE_SUPPORT_KEY,
+	TEXT_ORIENTATION_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
 ];
 const EFFECTS_SUPPORT_KEYS = [ 'shadow' ];
