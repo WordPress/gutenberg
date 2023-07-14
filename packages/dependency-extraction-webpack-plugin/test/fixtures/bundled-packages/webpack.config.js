@@ -9,7 +9,7 @@ module.exports = {
 	},
 	plugins: [
 		new DependencyExtractionWebpackPlugin( {
-			excludedExternals: [ 'lodash' ],
+			excludedExternals: [ 'react-dom' ],
 		} ),
 	],
 };

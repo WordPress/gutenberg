@@ -1,15 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`bundled-packages\` should produce expected output: Asset file 'index.min.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob'), 'version' => 'e46beb725c995b0c555a');
+"<?php return array('dependencies' => array('react', 'wp-blob'), 'version' => '8df4ae5a12b83b01dbc3');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`bundled-packages\` should produce expected output: External modules should match snapshot 1`] = `
-Array [
-  Object {
+[
+  {
     "externalType": "window",
-    "request": Array [
+    "request": "React",
+    "userRequest": "react",
+  },
+  {
+    "externalType": "window",
+    "request": [
       "wp",
       "blob",
     ],

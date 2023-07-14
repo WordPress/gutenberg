@@ -1,11 +1,11 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
+import { ReactDOM } from 'react-dom';
 
 /**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
 
-isEmpty( isBlobURL( '' ) );
+isBlobURL( ReactDOM.version );
