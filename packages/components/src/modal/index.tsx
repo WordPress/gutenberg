@@ -170,6 +170,15 @@ function UnforwardedModal(
 		[ hasScrolledContent ]
 	);
 
+	const onOverlayPress: React.PointerEventHandler< HTMLDivElement > = (
+		event
+	) => {
+		if ( event.target === event.currentTarget ) {
+			event.preventDefault();
+			onRequestClose( event );
+		}
+	};
+
 	return createPortal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
@@ -179,6 +188,9 @@ function UnforwardedModal(
 				overlayClassName
 			) }
 			onKeyDown={ handleEscapeKeyDown }
+			onPointerDown={
+				shouldCloseOnClickOutside ? onOverlayPress : undefined
+			}
 		>
 			<StyleProvider document={ document }>
 				<div
