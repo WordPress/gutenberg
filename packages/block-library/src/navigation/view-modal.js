@@ -112,8 +112,20 @@ function handleAnchorLinkClicksInsideModal( event ) {
 	}
 }
 
-MicroModal.init( {
-	onShow,
-	onClose,
-	openClass: 'is-menu-open',
-} );
+// MicroModal.init() does not support event delegation for the open trigger, so here MicroModal.show() is called manually.
+document.addEventListener(
+	'click',
+	( event ) => {
+		/** @type {HTMLElement} */
+		const target = event.target;
+
+		if ( target.dataset.micromodalTrigger ) {
+			MicroModal.show( target.dataset.micromodalTrigger, {
+				onShow,
+				onClose,
+				openClass: 'is-menu-open',
+			} );
+		}
+	},
+	{ passive: true }
+);
