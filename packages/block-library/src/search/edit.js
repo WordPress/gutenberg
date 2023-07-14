@@ -143,6 +143,10 @@ export default function SearchEdit( {
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
 	} );
 
+	setAttributes( {
+		isSearchFieldHidden: hasOnlyButton && ! isSelected,
+	} );
+
 	const getBlockClassNames = () => {
 		return classnames(
 			className,
@@ -245,10 +249,6 @@ export default function SearchEdit( {
 	};
 
 	const renderTextField = () => {
-		if ( hasOnlyButton && ! isSelected ) {
-			return;
-		}
-
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = classnames(
 			'wp-block-search__input',
