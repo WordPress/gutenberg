@@ -61,9 +61,6 @@ function TemplatePartGroup( { areas, currentArea, currentType } ) {
 function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 	return (
 		<>
-			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
-				<Heading level={ 2 }>{ __( 'Additional patterns' ) }</Heading>
-			</div>
 			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 				{ categories.map( ( category ) => (
 					<CategoryItem
@@ -75,7 +72,7 @@ function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 								<Tooltip
 									position="top center"
 									text={ __(
-										'Included patterns cannot be edited.'
+										'Theme and plugin patterns cannot be edited.'
 									) }
 								>
 									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
