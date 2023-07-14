@@ -61,9 +61,9 @@ export default function save( { attributes } ) {
 				'is-label-inline': inlineLabel,
 			} ) }
 		>
-			<div className="wp-block-form-input__label-content">
+			<span className="wp-block-form-input__label-content">
 				<RichText.Content value={ label } />
-			</div>
+			</span>
 			<TagName
 				className={ inputClasses }
 				type={ type }

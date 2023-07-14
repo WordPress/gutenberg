@@ -76,7 +76,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 	return (
 		<div { ...blockProps }>
 			{ controls }
-			<div
+			<span
 				className={ classNames( 'wp-block-form-input__label', {
 					'is-label-inline': inlineLabel,
 				} ) }
@@ -117,7 +117,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 						...colorProps.style,
 					} }
 				/>
-			</div>
+			</span>
 		</div>
 	);
 }
