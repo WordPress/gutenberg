@@ -181,26 +181,6 @@ test.describe( 'Navigation block', () => {
 	} );
 
 	test.describe( 'As a user I want to create submenus using the navigation block', () => {
-		test.beforeAll( async ( { requestUtils } ) => {
-			//TT3 is preferable to emptytheme because it already has the navigation block on its templates.
-			await requestUtils.activateTheme( 'twentytwentythree' );
-		} );
-
-		test.beforeEach( async ( { requestUtils } ) => {
-			await Promise.all( [ requestUtils.deleteAllMenus() ] );
-		} );
-
-		test.afterAll( async ( { requestUtils } ) => {
-			await Promise.all( [
-				requestUtils.deleteAllMenus(),
-				requestUtils.activateTheme( 'twentytwentyone' ),
-			] );
-		} );
-
-		test.afterEach( async ( { requestUtils } ) => {
-			await requestUtils.deleteAllPosts();
-		} );
-
 		test( 'create a submenu', async ( {
 			admin,
 			page,
