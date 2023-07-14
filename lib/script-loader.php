@@ -63,7 +63,7 @@ add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
  * @since 6.2.0
  */
 function gutenberg_enqueue_global_styles_custom_css() {
-	if ( ! wp_is_block_theme() ) {
+	if ( ! wp_theme_has_theme_json() ) {
 		return;
 	}
 
