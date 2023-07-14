@@ -17,7 +17,7 @@
 			toggleBorder: ( { state } ) => {
 				state.color = state.color === "2px solid yellow" ? "1px solid black" : "2px solid yellow";
 			},
-			toggleContextValue: ( { context } ) => {
+			toggleContext: ( { context } ) => {
 				context.color = context.color === "red" ? "blue" : "red";
 			},
 		},
