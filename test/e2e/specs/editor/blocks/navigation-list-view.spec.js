@@ -33,7 +33,11 @@ test.describe( 'Navigation Block - List view editing', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPages();
+		await Promise.all( [
+			requestUtils.deleteAllPages(),
+			requestUtils.deleteAllPosts(),
+			requestUtils.deleteAllMenus(),
+		] );
 	} );
 
 	test.use( {
