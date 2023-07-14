@@ -222,9 +222,6 @@ export function CommandMenu() {
 			} else {
 				open();
 			}
-		},
-		{
-			bindGlobal: true,
 		}
 	);
 
