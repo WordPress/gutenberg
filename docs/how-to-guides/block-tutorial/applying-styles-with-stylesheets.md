@@ -2,7 +2,7 @@
 
 ## Overview
 
-A block typically inserts markup (HTML) into post content that you want to style in someway. This guides walks through a few different ways you can use CSS with the block editor and how to work with styles and stylesheets.
+A block typically inserts markup (HTML) into post content that you want to style in some way. This guide walks through a few different ways you can use CSS with the block editor and how to work with styles and stylesheets.
 
 ## Before you start
 
@@ -162,7 +162,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 
 ### Build or add dependency
 
-In order to include the blockEditor as a dependancy, make sure to run the build step, or update the asset php file.
+In order to include the blockEditor as a dependency, make sure to run the build step, or update the asset php file.
 
 {% codetabs %}
 {% JSX %}
@@ -174,7 +174,7 @@ npm run build
 
 {% Plain %}
 
-Edit the asset file to include the block-editor dependancy for the scripts.
+Edit the asset file to include the block-editor dependency for the scripts.
 
 ```php
 <?php return
@@ -197,11 +197,15 @@ Like scripts, you can enqueue your block's styles using the `block.json` file.
 
 Use the `editorStyle` property to a CSS file you want to load in the editor view, and use the `style` property for a CSS file you want to load on the frontend when the block is used.
 
+It is worth noting that, if the editor content is iframed, both of these will
+load in the iframe. `editorStyle` will also load outside the iframe, so it can
+be used for editor content as well as UI. 
+
 For example:
 
 ```json
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "gutenberg-examples/example-02-stylesheets",
 	"title": "Example: Stylesheets",
 	"icon": "universal-access-alt",

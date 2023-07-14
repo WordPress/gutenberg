@@ -18,54 +18,62 @@ describe( 'Disabled', () => {
 	);
 
 	it( 'will disable all fields', () => {
-		const { container } = render(
-			<Disabled>
+		render(
+			<Disabled data-testid="disabled-wrapper">
 				<Form />
 			</Disabled>
 		);
 
-		expect( container.firstChild ).toHaveAttribute( 'inert' );
+		expect( screen.getByTestId( 'disabled-wrapper' ) ).toHaveAttribute(
+			'inert'
+		);
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
 		const MaybeDisable = ( { isDisabled = true } ) =>
 			isDisabled ? (
-				<Disabled>
+				<Disabled data-testid="disabled-wrapper">
 					<Form />
 				</Disabled>
 			) : (
 				<Form />
 			);
 
-		const { container, rerender } = render( <MaybeDisable /> );
+		const { rerender } = render( <MaybeDisable /> );
 
-		expect( container.firstChild ).toHaveAttribute( 'inert' );
+		expect( screen.getByTestId( 'disabled-wrapper' ) ).toHaveAttribute(
+			'inert'
+		);
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
-		expect( container.firstChild ).not.toHaveAttribute( 'inert' );
+		expect(
+			screen.queryByTestId( 'disabled-wrapper' )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
 		const MaybeDisable = ( { isDisabled = true } ) => (
-			<Disabled isDisabled={ isDisabled }>
+			<Disabled isDisabled={ isDisabled } data-testid="disabled-wrapper">
 				<Form />
 			</Disabled>
 		);
 
-		const { rerender, container } = render( <MaybeDisable /> );
+		const { rerender } = render( <MaybeDisable /> );
 
-		expect( container.firstChild ).toHaveAttribute( 'inert' );
+		expect( screen.getByTestId( 'disabled-wrapper' ) ).toHaveAttribute(
+			'inert'
+		);
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
-		expect( container.firstChild ).not.toHaveAttribute( 'inert' );
+		expect( screen.getByTestId( 'disabled-wrapper' ) ).not.toHaveAttribute(
+			'inert'
+		);
 	} );
 
 	it( 'should preserve input values when toggling the isDisabled prop', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const MaybeDisable = ( { isDisabled = true } ) => (
 			<Disabled isDisabled={ isDisabled }>

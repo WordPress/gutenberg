@@ -7,15 +7,7 @@ import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
 import { RangeControl, NumberControlWrapper } from './styles';
 import { COLORS } from '../utils/colors-values';
-
-interface InputWithSliderProps {
-	min: number;
-	max: number;
-	value: number;
-	label: string;
-	abbreviation: string;
-	onChange: ( value: number ) => void;
-}
+import type { InputWithSliderProps } from './types';
 
 export const InputWithSlider = ( {
 	min,
@@ -60,6 +52,7 @@ export const InputWithSlider = ( {
 				size="__unstable-large"
 			/>
 			<RangeControl
+				__nextHasNoMarginBottom
 				label={ label }
 				hideLabelFromVision
 				min={ min }

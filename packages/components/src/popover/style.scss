@@ -1,7 +1,13 @@
 $arrow-triangle-base-size: 14px;
 
+$shadow-popover-border-default: 0 0 0 $border-width $gray-400;
+$shadow-popover-border-default-alternate: 0 0 0 $border-width $gray-900;
+$shadow-popover-border-top-only: 0 #{-$border-width} 0 0 $gray-400;
+$shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+
 .components-popover {
 	z-index: z-index(".components-popover");
+	will-change: transform;
 
 	&.is-expanded {
 		position: fixed;
@@ -15,26 +21,20 @@ $arrow-triangle-base-size: 14px;
 
 .components-popover__content {
 	background: $white;
-	// Using outline instead of border to avoid impacting
-	// popover computations.
-	outline: $border-width solid $gray-400;
-	box-shadow: $shadow-popover;
+	box-shadow: $shadow-popover-border-default, $shadow-popover;
 	border-radius: $radius-block-ui;
 	box-sizing: border-box;
 	width: min-content;
 
 	// Alternate treatment for popovers that put them at elevation zero with high contrast.
 	.is-alternate & {
-		outline: $border-width solid $gray-900;
-		box-shadow: none;
+		box-shadow: $shadow-popover-border-default-alternate;
 	}
 
 	// A style that gives the popover no visible ui.
 	.is-unstyled & {
 		background: none;
-		border: none;
 		border-radius: 0;
-		outline: none;
 		box-shadow: none;
 	}
 
@@ -43,9 +43,10 @@ $arrow-triangle-base-size: 14px;
 		height: calc(100% - #{ $panel-header-height });
 		overflow-y: visible;
 		width: auto;
-		border: none;
-		outline: none;
-		border-top: $border-width solid $gray-900;
+		box-shadow: $shadow-popover-border-top-only;
+	}
+	.components-popover.is-expanded.is-alternate & {
+		box-shadow: $shadow-popover-border-top-only-alternate;
 	}
 }
 

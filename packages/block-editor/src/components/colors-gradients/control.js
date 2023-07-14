@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -45,7 +44,6 @@ function ColorGradientControlInner( {
 	gradients,
 	disableCustomColors,
 	disableCustomGradients,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	className,
 	label,
@@ -56,12 +54,14 @@ function ColorGradientControlInner( {
 	clearable,
 	showTitle = true,
 	enableAlpha,
+	headingLevel,
 } ) {
 	const canChooseAColor =
-		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
+		onColorChange &&
+		( ( colors && colors.length > 0 ) || ! disableCustomColors );
 	const canChooseAGradient =
 		onGradientChange &&
-		( ! isEmpty( gradients ) || ! disableCustomGradients );
+		( ( gradients && gradients.length > 0 ) || ! disableCustomGradients );
 
 	if ( ! canChooseAColor && ! canChooseAGradient ) {
 		return null;
@@ -80,14 +80,12 @@ function ColorGradientControlInner( {
 						: onColorChange
 				}
 				{ ...{ colors, disableCustomColors } }
-				__experimentalHasMultipleOrigins={
-					__experimentalHasMultipleOrigins
-				}
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
 				}
 				clearable={ clearable }
 				enableAlpha={ enableAlpha }
+				headingLevel={ headingLevel }
 			/>
 		),
 		[ TAB_GRADIENT.value ]: (
@@ -103,13 +101,11 @@ function ColorGradientControlInner( {
 						: onGradientChange
 				}
 				{ ...{ gradients, disableCustomGradients } }
-				__experimentalHasMultipleOrigins={
-					__experimentalHasMultipleOrigins
-				}
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
 				}
 				clearable={ clearable }
+				headingLevel={ headingLevel }
 			/>
 		),
 	};

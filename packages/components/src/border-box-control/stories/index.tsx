@@ -43,7 +43,7 @@ const colors = [
 
 const Template: ComponentStory< typeof BorderBoxControl > = ( props ) => {
 	const { onChange, ...otherProps } = props;
-	const [ borders, setBorders ] = useState< typeof props[ 'value' ] >();
+	const [ borders, setBorders ] = useState< ( typeof props )[ 'value' ] >();
 
 	const onChangeMerged: ComponentProps<
 		typeof BorderBoxControl

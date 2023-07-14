@@ -20,7 +20,7 @@ export function useBlockSelectionClearer() {
 	const { getSettings, hasSelectedBlock, hasMultiSelection } =
 		useSelect( blockEditorStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const { __experimentalClearBlockSelection: isEnabled } = getSettings();
+	const { clearBlockSelection: isEnabled } = getSettings();
 
 	return useRefEffect(
 		( node ) => {

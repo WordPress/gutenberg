@@ -8,15 +8,21 @@ SauceLabs is a cloud hosting platform that provides access to a variety of simul
 
 ## Getting set up to run the tests
 
-### Emulators && Simulators
+### Emulators & Simulators
 
-iOS: Once you've already set up XCode and the simulators you should be good to go to run the tests on an iOS simulator.
+> **Note**
+>
+> Visual regression tests that rely upon screenshots require specific devices and OS versions for Android and iOS, respectively, otherwise the tests will fail due to subtle OS differences. To run or update visual regression tests, install the emulators/simulators listed in the test suite [configuration files](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/__device-tests__/helpers/caps.js#L30-L31).
 
-Android: You'll need to have created the emulator images and fired up the desired emulator before running the tests against an Android emulator.
+**iOS:** If you have completed the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide you should already have Xcode installed and the simulators set up.
 
-### Real Devices
+**Android:** If you have completed the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide you should already have Android Studio installed and the Android SDK installed. You'll also need to have the [Android Emulator](https://developer.android.com/studio/run/emulator) installed and set up. The emulator needs to be running prior to running the tests.
 
-TBA
+### Physical Devices
+
+**iOS:** Currently unsupported.
+
+**Android:** Connect your device to your computer via USB and [enable USB debugging](https://developer.android.com/studio/debug/dev-options).
 
 ## Running the tests locally
 
@@ -53,7 +59,7 @@ Appium uses a config object that contains `capabilities` to define how it will c
 -   `platformVersion` which is the platform version of a connected adb device. e.g `9.0` for Android or `12.2` for iOS. The version used here is upper bounded by the max allowed on CI but feel free to change this value locally as needed.
 -   `app` which is the absolute path to the `.app` or `.apk` file or the path relative to the **Appium root**. It's important to note that when using the relative paths it's not to the project folder but to the appium server, since by default we start up appium in the project root when running the paths appear relative to the root but if you were using another instance of the Appium server the relative path would need to come from there.
 
-A full spec on the capabilities can be found [here](http://appium.io/docs/en/writing-running-appium/caps/). If you'd like to change configurations like
+A full spec on the capabilities can be found [here](https://github.com/appium/appium/blob/1.x/docs/en/writing-running-appium/caps.md). If you'd like to change configurations like
 what port appium runs on or what device or emulator the tests should be executed on that file would be where you'd like to make that update.
 
 ## The run process
@@ -69,4 +75,4 @@ After the build is complete, an appium server is fired up on port 4723 and the d
 
 ---
 
-To read more about writing your own tests please read the [contributing guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/react-native-editor/__device-tests__/CONTRIBUTING.md)
+To read more about writing your own tests please read the [contributing guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/react-native-editor/__device-tests__/CONTRIBUTING.md).

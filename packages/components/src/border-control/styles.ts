@@ -8,10 +8,7 @@ import { css } from '@emotion/react';
  */
 import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
 import { space } from '../ui/utils/space';
-import {
-	StyledField,
-	StyledLabel,
-} from '../base-control/styles/base-control-styles';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
 import {
 	ValueInput as UnitControlWrapper,
 	UnitSelect,
@@ -193,10 +190,4 @@ export const borderStyleButton = css`
 export const borderSlider = () => css`
 	flex: 1 1 60%;
 	${ rtl( { marginRight: space( 3 ) } )() }
-
-	${ StyledField } {
-		margin-bottom: 0;
-		font-size: 0;
-		display: flex;
-	}
 `;

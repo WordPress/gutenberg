@@ -12,6 +12,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -63,16 +64,19 @@ export const setTemplate =
 	( templateId, templateSlug ) =>
 	async ( { dispatch, registry } ) => {
 		if ( ! templateSlug ) {
-			const template = await registry
-				.resolveSelect( coreStore )
-				.getEntityRecord( 'postType', 'wp_template', templateId );
-			templateSlug = template?.slug;
+			try {
+				const template = await registry
+					.resolveSelect( coreStore )
+					.getEntityRecord( 'postType', 'wp_template', templateId );
+				templateSlug = template?.slug;
+			} catch ( error ) {}
 		}
 
 		dispatch( {
-			type: 'SET_TEMPLATE',
-			templateId,
-			page: { context: { templateSlug } },
+			type: 'SET_EDITED_POST',
+			postType: 'wp_template',
+			id: templateId,
+			context: { templateSlug },
 		} );
 	};
 
@@ -103,9 +107,10 @@ export const addTemplate =
 		}
 
 		dispatch( {
-			type: 'SET_TEMPLATE',
-			templateId: newTemplate.id,
-			page: { context: { templateSlug: newTemplate.slug } },
+			type: 'SET_EDITED_POST',
+			postType: 'wp_template',
+			id: newTemplate.id,
+			context: { templateSlug: newTemplate.slug },
 		} );
 	};
 
@@ -136,13 +141,20 @@ export const removeTemplate =
 				throw lastError;
 			}
 
+			// Depending on how the entity was retrieved it's title might be
+			// an object or simple string.
+			const templateTitle =
+				typeof template.title === 'string'
+					? template.title
+					: template.title?.rendered;
+
 			registry.dispatch( noticesStore ).createSuccessNotice(
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" deleted.' ),
-					template.title.rendered
+					decodeEntities( templateTitle )
 				),
-				{ type: 'snackbar' }
+				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
 			);
 		} catch ( error ) {
 			const errorMessage =
@@ -165,21 +177,68 @@ export const removeTemplate =
  */
 export function setTemplatePart( templatePartId ) {
 	return {
-		type: 'SET_TEMPLATE_PART',
-		templatePartId,
+		type: 'SET_EDITED_POST',
+		postType: 'wp_template_part',
+		id: templatePartId,
 	};
 }
 
 /**
- * Action that sets the home template ID to the template ID of the page resolved
- * from a given path.
+ * Action that sets a navigation menu.
  *
- * @param {number} homeTemplateId The template ID for the homepage.
+ * @param {string} navigationMenuId The Navigation Menu Post ID.
+ *
+ * @return {Object} Action object.
  */
-export function setHomeTemplateId( homeTemplateId ) {
+export function setNavigationMenu( navigationMenuId ) {
 	return {
-		type: 'SET_HOME_TEMPLATE',
-		homeTemplateId,
+		type: 'SET_EDITED_POST',
+		postType: 'wp_navigation',
+		id: navigationMenuId,
+	};
+}
+
+/**
+ * Action that sets an edited entity.
+ *
+ * @param {string} postType The entity's post type.
+ * @param {string} postId   The entity's ID.
+ *
+ * @return {Object} Action object.
+ */
+export function setEditedEntity( postType, postId ) {
+	return {
+		type: 'SET_EDITED_POST',
+		postType,
+		id: postId,
+	};
+}
+
+/**
+ * @deprecated
+ */
+export function setHomeTemplateId() {
+	deprecated( "dispatch( 'core/edit-site' ).setHomeTemplateId", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
+	return {
+		type: 'NOTHING',
+	};
+}
+
+/**
+ * Set's the current block editor context.
+ *
+ * @param {Object} context The context object.
+ *
+ * @return {number} The resolved template ID for the page route.
+ */
+export function setEditedPostContext( context ) {
+	return {
+		type: 'SET_EDITED_POST_CONTEXT',
+		context,
 	};
 }
 
@@ -219,17 +278,13 @@ export const setPage =
 		}
 
 		dispatch( {
-			type: 'SET_PAGE',
-			page: template.slug
-				? {
-						...page,
-						context: {
-							...page.context,
-							templateSlug: template.slug,
-						},
-				  }
-				: page,
-			templateId: template.id,
+			type: 'SET_EDITED_POST',
+			postType: 'wp_template',
+			id: template.id,
+			context: {
+				...page.context,
+				templateSlug: template.slug,
+			},
 		} );
 
 		return template.id;
@@ -238,40 +293,45 @@ export const setPage =
 /**
  * Action that sets the active navigation panel menu.
  *
- * @param {string} menu Menu prop of active menu.
+ * @deprecated
  *
  * @return {Object} Action object.
  */
-export function setNavigationPanelActiveMenu( menu ) {
-	return {
-		type: 'SET_NAVIGATION_PANEL_ACTIVE_MENU',
-		menu,
-	};
+export function setNavigationPanelActiveMenu() {
+	deprecated( "dispatch( 'core/edit-site' ).setNavigationPanelActiveMenu", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
+	return { type: 'NOTHING' };
 }
 
 /**
  * Opens the navigation panel and sets its active menu at the same time.
  *
- * @param {string} menu Identifies the menu to open.
+ * @deprecated
  */
-export function openNavigationPanelToMenu( menu ) {
-	return {
-		type: 'OPEN_NAVIGATION_PANEL_TO_MENU',
-		menu,
-	};
+export function openNavigationPanelToMenu() {
+	deprecated( "dispatch( 'core/edit-site' ).openNavigationPanelToMenu", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
+	return { type: 'NOTHING' };
 }
 
 /**
  * Sets whether the navigation panel should be open.
  *
- * @param {boolean} isOpen If true, opens the nav panel. If false, closes it. It
- *                         does not toggle the state, but sets it directly.
+ * @deprecated
  */
-export function setIsNavigationPanelOpened( isOpen ) {
-	return {
-		type: 'SET_IS_NAVIGATION_PANEL_OPENED',
-		isOpen,
-	};
+export function setIsNavigationPanelOpened() {
+	deprecated( "dispatch( 'core/edit-site' ).setIsNavigationPanelOpened", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
+	return { type: 'NOTHING' };
 }
 
 /**
@@ -344,6 +404,8 @@ export function setIsSaveViewOpened( isOpen ) {
 export const revertTemplate =
 	( template, { allowUndo = true } = {} ) =>
 	async ( { registry } ) => {
+		const noticeId = 'edit-site-template-reverted';
+		registry.dispatch( noticesStore ).removeNotice( noticeId );
 		if ( ! isTemplateRevertable( template ) ) {
 			registry
 				.dispatch( noticesStore )
@@ -445,6 +507,7 @@ export const revertTemplate =
 					.dispatch( noticesStore )
 					.createSuccessNotice( __( 'Template reverted.' ), {
 						type: 'snackbar',
+						id: noticeId,
 						actions: [
 							{
 								label: __( 'Undo' ),
@@ -452,10 +515,6 @@ export const revertTemplate =
 							},
 						],
 					} );
-			} else {
-				registry
-					.dispatch( noticesStore )
-					.createSuccessNotice( __( 'Template reverted.' ) );
 			}
 		} catch ( error ) {
 			const errorMessage =
@@ -505,7 +564,26 @@ export const switchEditorMode =
 
 		if ( mode === 'visual' ) {
 			speak( __( 'Visual editor selected' ), 'assertive' );
-		} else if ( mode === 'mosaic' ) {
-			speak( __( 'Mosaic view selected' ), 'assertive' );
+		} else if ( mode === 'text' ) {
+			speak( __( 'Code editor selected' ), 'assertive' );
 		}
+	};
+
+/**
+ * Sets whether or not the editor allows only page content to be edited.
+ *
+ * @param {boolean} hasPageContentFocus True to allow only page content to be
+ *                                      edited, false to allow template to be
+ *                                      edited.
+ */
+export const setHasPageContentFocus =
+	( hasPageContentFocus ) =>
+	( { dispatch, registry } ) => {
+		if ( hasPageContentFocus ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+		dispatch( {
+			type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+			hasPageContentFocus,
+		} );
 	};

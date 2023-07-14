@@ -31,6 +31,7 @@ export default function LinkEditor( {
 			{ ...props }
 		>
 			<URLInput
+				__nextHasNoMarginBottom
 				value={ value }
 				onChange={ onChangeInputValue }
 				autocompleteRef={ autocompleteRef }

@@ -19,6 +19,8 @@ Upcoming tasks on the roadmap include, but are not limited to, the following:
 
 For more information about the roadmap, please refer to [Block editor styles: initiatives and goals](https://make.wordpress.org/core/2022/06/24/block-editor-styles-initiatives-and-goals/) and the [Github project board](https://github.com/orgs/WordPress/projects/19).
 
+If you're making changes or additions to the Style Engine, please take a moment to read the [notes on contributing](https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/CONTRIBUTING.md).
+
 ## Backend API
 
 ### wp_style_engine_get_styles()

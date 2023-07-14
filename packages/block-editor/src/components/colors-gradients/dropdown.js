@@ -111,7 +111,6 @@ export default function ColorGradientSettingsDropdown( {
 	enableAlpha,
 	gradients,
 	settings,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	...props
 } ) {
@@ -140,7 +139,6 @@ export default function ColorGradientSettingsDropdown( {
 					onColorChange: setting.onColorChange,
 					onGradientChange: setting.onGradientChange,
 					showTitle: false,
-					__experimentalHasMultipleOrigins,
 					__experimentalIsRenderedInSidebar,
 					...setting,
 				};

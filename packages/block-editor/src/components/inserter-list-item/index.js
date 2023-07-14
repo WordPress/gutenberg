@@ -10,6 +10,8 @@ import { useMemo, useRef, memo } from '@wordpress/element';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
+	isReusableBlock,
+	isTemplatePart,
 } from '@wordpress/blocks';
 import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { ENTER, isAppleOS } from '@wordpress/keycodes';
@@ -47,6 +49,8 @@ function InserterListItem( {
 		];
 	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
 
+	const isSynced = isReusableBlock( item ) || isTemplatePart( item );
+
 	return (
 		<InserterDraggableBlocks
 			isEnabled={ isDraggable && ! item.disabled }
@@ -55,7 +59,13 @@ function InserterListItem( {
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className="block-editor-block-types-list__list-item"
+					className={ classnames(
+						'block-editor-block-types-list__list-item',
+
+						{
+							'is-synced': isSynced,
+						}
+					) }
 					draggable={ draggable }
 					onDragStart={ ( event ) => {
 						isDragging.current = true;
@@ -97,12 +107,6 @@ function InserterListItem( {
 								onHover( null );
 							}
 						} }
-						onFocus={ () => {
-							if ( isDragging.current ) {
-								return;
-							}
-							onHover( item );
-						} }
 						onMouseEnter={ () => {
 							if ( isDragging.current ) {
 								return;
@@ -110,7 +114,6 @@ function InserterListItem( {
 							onHover( item );
 						} }
 						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
 						{ ...props }
 					>
 						<span

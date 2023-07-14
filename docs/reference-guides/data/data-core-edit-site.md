@@ -20,16 +20,7 @@ _Returns_
 
 ### getCurrentTemplateNavigationPanelSubMenu
 
-Returns the current template or template part's corresponding
-navigation panel's sub menu, to be used with `openNavigationPanelToMenu`.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `string`: The current template or template part's sub menu.
+> **Deprecated**
 
 ### getCurrentTemplateTemplateParts
 
@@ -42,6 +33,20 @@ _Parameters_
 _Returns_
 
 -   `Array`: Template parts and their blocks in an array.
+
+### getEditedPostContext
+
+> **Deprecated**
+
+Returns the edited post's context object.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: Page.
 
 ### getEditedPostId
 
@@ -81,29 +86,15 @@ _Returns_
 
 ### getHomeTemplateId
 
-Returns the current home template ID.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `number?`: Home template ID.
+> **Deprecated**
 
 ### getNavigationPanelActiveMenu
 
-Returns the active menu in the navigation panel.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `string`: Active menu.
+> **Deprecated**
 
 ### getPage
+
+> **Deprecated**
 
 Returns the current page object.
 
@@ -140,7 +131,21 @@ _Returns_
 
 -   `Object`: Settings.
 
+### hasPageContentFocus
+
+Whether or not the editor allows only page content to be edited.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether or not focus is on editing page content.
+
 ### isFeatureActive
+
+> **Deprecated**
 
 Returns whether the given feature is enabled or not.
 
@@ -179,7 +184,15 @@ _Returns_
 
 ### isNavigationOpened
 
-Returns the current opened/closed state of the navigation panel.
+> **Deprecated**
+
+### isPage
+
+Whether or not the editor has a page loaded into it.
+
+_Related_
+
+-   setPage
 
 _Parameters_
 
@@ -187,7 +200,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: True if the navigation panel should be open; false if closed.
+-   `boolean`: Whether or not the editor has a page loaded into it.
 
 ### isSaveViewOpened
 
@@ -233,11 +246,9 @@ _Parameters_
 
 ### openNavigationPanelToMenu
 
+> **Deprecated**
+
 Opens the navigation panel and sets its active menu at the same time.
-
-_Parameters_
-
--   _menu_ `string`: Identifies the menu to open.
 
 ### removeTemplate
 
@@ -257,14 +268,42 @@ _Parameters_
 -   _options_ `[Object]`:
 -   _options.allowUndo_ `[boolean]`: Whether to allow the user to undo reverting the template. Default true.
 
-### setHomeTemplateId
+### setEditedEntity
 
-Action that sets the home template ID to the template ID of the page resolved
-from a given path.
+Action that sets an edited entity.
 
 _Parameters_
 
--   _homeTemplateId_ `number`: The template ID for the homepage.
+-   _postType_ `string`: The entity's post type.
+-   _postId_ `string`: The entity's ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setEditedPostContext
+
+Set's the current block editor context.
+
+_Parameters_
+
+-   _context_ `Object`: The context object.
+
+_Returns_
+
+-   `number`: The resolved template ID for the page route.
+
+### setHasPageContentFocus
+
+Sets whether or not the editor allows only page content to be edited.
+
+_Parameters_
+
+-   _hasPageContentFocus_ `boolean`: True to allow only page content to be edited, false to allow template to be edited.
+
+### setHomeTemplateId
+
+> **Deprecated**
 
 ### setIsInserterOpened
 
@@ -290,11 +329,9 @@ _Parameters_
 
 ### setIsNavigationPanelOpened
 
+> **Deprecated**
+
 Sets whether the navigation panel should be open.
-
-_Parameters_
-
--   _isOpen_ `boolean`: If true, opens the nav panel. If false, closes it. It does not toggle the state, but sets it directly.
 
 ### setIsSaveViewOpened
 
@@ -304,13 +341,23 @@ _Parameters_
 
 -   _isOpen_ `boolean`: If true, opens the save view. If false, closes it. It does not toggle the state, but sets it directly.
 
-### setNavigationPanelActiveMenu
+### setNavigationMenu
 
-Action that sets the active navigation panel menu.
+Action that sets a navigation menu.
 
 _Parameters_
 
--   _menu_ `string`: Menu prop of active menu.
+-   _navigationMenuId_ `string`: The Navigation Menu Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setNavigationPanelActiveMenu
+
+> **Deprecated**
+
+Action that sets the active navigation panel menu.
 
 _Returns_
 
@@ -318,8 +365,7 @@ _Returns_
 
 ### setPage
 
-Resolves the template for a page and displays both. If no path is given, attempts
-to use the postId to generate a path like `?p=${ postId }`.
+Resolves the template for a page and displays both. If no path is given, attempts to use the postId to generate a path like `?p=${ postId }`.
 
 _Parameters_
 

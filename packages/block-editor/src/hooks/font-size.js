@@ -15,7 +15,6 @@ import {
 	getFontSizeClass,
 	getFontSizeObjectByValue,
 	FontSizePicker,
-	getComputedFluidTypographyValue,
 } from '../components/font-sizes';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 import {
@@ -25,6 +24,10 @@ import {
 } from './utils';
 import useSetting from '../components/use-setting';
 import { store as blockEditorStore } from '../store';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from '../components/global-styles/typography-utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -158,41 +161,6 @@ export function FontSizeEdit( props ) {
 }
 
 /**
- * Checks if there is a current value set for the font size block support.
- *
- * @param {Object} props Block props.
- * @return {boolean}     Whether or not the block has a font size value set.
- */
-export function hasFontSizeValue( props ) {
-	const { fontSize, style } = props.attributes;
-	return !! fontSize || !! style?.typography?.fontSize;
-}
-
-/**
- * Resets the font size block support attribute. This can be used when
- * disabling the font size support controls for a block via a progressive
- * discovery panel.
- *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
- */
-export function resetFontSize( { attributes = {}, setAttributes } ) {
-	const { style } = attributes;
-
-	setAttributes( {
-		fontSize: undefined,
-		style: cleanEmptyObject( {
-			...style,
-			typography: {
-				...style?.typography,
-				fontSize: undefined,
-			},
-		} ),
-	} );
-}
-
-/**
  * Custom hook that checks if font-size settings have been disabled.
  *
  * @param {string} name The name of the block.
@@ -268,7 +236,7 @@ const MIGRATION_PATHS = {
 	fontSize: [ [ 'fontSize' ], [ 'style', 'typography', 'fontSize' ] ],
 };
 
-export function addTransforms( result, source, index, results ) {
+function addTransforms( result, source, index, results ) {
 	const destinationBlockType = result.name;
 	const activeSupports = {
 		fontSize: hasBlockSupport(
@@ -324,14 +292,15 @@ function addEditPropsForFluidCustomFontSizes( blockType ) {
 		// BlockListContext.Provider. If we set fontSize using editor.
 		// BlockListBlock instead of using getEditWrapperProps then the value is
 		// clobbered when the core/style/addEditProps filter runs.
-		const isFluidTypographyEnabled =
-			!! select( blockEditorStore ).getSettings().__experimentalFeatures
-				?.typography?.fluid;
-
-		const newFontSize =
-			fontSize && isFluidTypographyEnabled
-				? getComputedFluidTypographyValue( { fontSize } )
-				: null;
+		const fluidTypographySettings = getFluidTypographyOptionsFromSettings(
+			select( blockEditorStore ).getSettings().__experimentalFeatures
+		);
+		const newFontSize = fontSize
+			? getTypographyFontSizeValue(
+					{ size: fontSize },
+					fluidTypographySettings
+			  )
+			: null;
 
 		if ( newFontSize === null ) {
 			return wrapperProps;

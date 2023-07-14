@@ -315,10 +315,10 @@ export class MediaUpload extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
+		const { capabilities } = select( blockEditorStore ).getSettings();
 		return {
 			isAudioBlockMediaUploadEnabled:
-				select( blockEditorStore ).getSettings( 'capabilities' )
-					.isAudioBlockMediaUploadEnabled === true,
+				capabilities?.isAudioBlockMediaUploadEnabled === true,
 		};
 	} ),
 ] )( MediaUpload );

@@ -15,19 +15,11 @@ import { useState } from '@wordpress/element';
 import ColorPalette from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
-import type { ColorObject, PaletteObject } from '../types';
 
 const meta: ComponentMeta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
 	component: ColorPalette,
 	argTypes: {
-		// Removing the control because setting this prop without changing the
-		// format of the `colors` prop can break the component.
-		__experimentalHasMultipleOrigins: {
-			control: {
-				type: null,
-			},
-		},
 		as: { control: { type: null } },
 		onChange: { action: 'onChange', control: { type: null } },
 		value: { control: { type: null } },
@@ -43,10 +35,7 @@ const Template: ComponentStory< typeof ColorPalette > = ( {
 	onChange,
 	...args
 } ) => {
-	const firstColor =
-		( args.colors as ColorObject[] )[ 0 ].color ||
-		( args.colors as PaletteObject[] )[ 0 ].colors[ 0 ].color;
-	const [ color, setColor ] = useState< string | undefined >( firstColor );
+	const [ color, setColor ] = useState< string | undefined >();
 
 	return (
 		<SlotFillProvider>
@@ -73,14 +62,8 @@ Default.args = {
 	],
 };
 
-/**
- * When setting the `__experimentalHasMultipleOrigins` prop to `true`,
- * the `colors` prop is expected to be an array of color palettes, rather
- * than an array of color objects.
- */
 export const MultipleOrigins = Template.bind( {} );
 MultipleOrigins.args = {
-	__experimentalHasMultipleOrigins: true,
 	colors: [
 		{
 			name: 'Primary colors',

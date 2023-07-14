@@ -11,8 +11,15 @@ import { displayShortcut } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
-export default function SaveButton() {
+export default function SaveButton( {
+	className = 'edit-site-save-button__button',
+	variant = 'primary',
+	showTooltip = true,
+	defaultLabel,
+	icon,
+} ) {
 	const { isDirty, isSaving, isSaveViewOpen } = useSelect( ( select ) => {
 		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 			select( coreStore );
@@ -28,14 +35,36 @@ export default function SaveButton() {
 	}, [] );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 
-	const disabled = ! isDirty || isSaving;
+	const activateSaveEnabled = isPreviewingTheme() || isDirty;
+	const disabled = isSaving || ! activateSaveEnabled;
 
-	const label = __( 'Save' );
+	const getLabel = () => {
+		if ( isPreviewingTheme() ) {
+			if ( isSaving ) {
+				return __( 'Activating' );
+			} else if ( disabled ) {
+				return __( 'Saved' );
+			} else if ( isDirty ) {
+				return __( 'Activate & Save' );
+			}
+			return __( 'Activate' );
+		}
+
+		if ( isSaving ) {
+			return __( 'Saving' );
+		} else if ( disabled ) {
+			return __( 'Saved' );
+		} else if ( defaultLabel ) {
+			return defaultLabel;
+		}
+		return __( 'Save' );
+	};
+	const label = getLabel();
 
 	return (
 		<Button
-			variant="primary"
-			className="edit-site-save-button__button"
+			variant={ variant }
+			className={ className }
 			aria-disabled={ disabled }
 			aria-expanded={ isSaveViewOpen }
 			isBusy={ isSaving }
@@ -52,7 +81,8 @@ export default function SaveButton() {
 			 * of the button that we want to avoid. By setting `showTooltip`,
 			 & the tooltip is always rendered even when there's no keyboard shortcut.
 			 */
-			showTooltip
+			showTooltip={ showTooltip }
+			icon={ icon }
 		>
 			{ label }
 		</Button>

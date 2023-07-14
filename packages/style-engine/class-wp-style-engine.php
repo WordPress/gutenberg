@@ -136,6 +136,17 @@ final class WP_Style_Engine {
 				),
 			),
 		),
+		'shadow'     => array(
+			'shadow' => array(
+				'property_keys' => array(
+					'default' => 'box-shadow',
+				),
+				'path'          => array( 'shadow' ),
+				'css_vars'      => array(
+					'shadow' => '--wp--preset--shadow--$slug',
+				),
+			),
+		),
 		'dimensions' => array(
 			'minHeight' => array(
 				'property_keys' => array(
@@ -206,6 +217,12 @@ final class WP_Style_Engine {
 				),
 				'path'          => array( 'typography', 'lineHeight' ),
 			),
+			'textColumns'    => array(
+				'property_keys' => array(
+					'default' => 'column-count',
+				),
+				'path'          => array( 'typography', 'textColumns' ),
+			),
 			'textDecoration' => array(
 				'property_keys' => array(
 					'default' => 'text-decoration',
@@ -223,6 +240,12 @@ final class WP_Style_Engine {
 					'default' => 'letter-spacing',
 				),
 				'path'          => array( 'typography', 'letterSpacing' ),
+			),
+			'writingMode'    => array(
+				'property_keys' => array(
+					'default' => 'writing-mode',
+				),
+				'path'          => array( 'typography', 'writingMode' ),
 			),
 		),
 	);

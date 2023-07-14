@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
@@ -20,47 +15,37 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
+import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
-import TemplateTitle from './template-title';
+import DocumentTitle from './document-title';
+
+const slideY = {
+	hidden: { y: '-50px' },
+	hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
+};
+
+const slideX = {
+	hidden: { x: '-100%' },
+	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
+};
 
 function Header( { setEntitiesSavedStatesCallback } ) {
-	const {
-		hasActiveMetaboxes,
-		isPublishSidebarOpened,
-		isSaving,
-		showIconLabels,
-		isDistractionFree,
-	} = useSelect(
-		( select ) => ( {
-			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isPublishSidebarOpened:
-				select( editPostStore ).isPublishSidebarOpened(),
-			isSaving: select( editPostStore ).isSavingMetaBoxes(),
-			showIconLabels:
-				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ),
-		} ),
-		[]
-	);
-
 	const isLargeViewport = useViewportMatch( 'large' );
-
-	const classes = classnames( 'edit-post-header' );
-
-	const slideY = {
-		hidden: isDistractionFree ? { y: '-50' } : { y: 0 },
-		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
-	};
-
-	const slideX = {
-		hidden: isDistractionFree ? { x: '-100%' } : { x: 0 },
-		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
-	};
+	const { hasActiveMetaboxes, isPublishSidebarOpened, showIconLabels } =
+		useSelect(
+			( select ) => ( {
+				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+				isPublishSidebarOpened:
+					select( editPostStore ).isPublishSidebarOpened(),
+				showIconLabels:
+					select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			} ),
+			[]
+		);
 
 	return (
-		<div className={ classes }>
+		<div className="edit-post-header">
 			<MainDashboardButton.Slot>
 				<motion.div
 					variants={ slideX }
@@ -75,7 +60,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				className="edit-post-header__toolbar"
 			>
 				<HeaderToolbar />
-				<TemplateTitle />
+				<div className="edit-post-header__document-title">
+					<DocumentTitle />
+				</div>
 			</motion.div>
 			<motion.div
 				variants={ slideY }
@@ -90,18 +77,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					// when the publish sidebar has been closed.
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
-						forceIsSaving={ isSaving }
 						showIconLabels={ showIconLabels }
 					/>
 				) }
 				<DevicePreview />
-				<PostPreviewButton
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
+				<PostPreviewButton forceIsAutosaveable={ hasActiveMetaboxes } />
+				<ViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
 					setEntitiesSavedStatesCallback={
 						setEntitiesSavedStatesCallback
 					}

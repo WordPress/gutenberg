@@ -109,7 +109,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 			return $this->add_additional_fields_schema( $this->schema );
 		}
 
-		$this->schema = array(
+		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
 			'title'      => 'block-editor-settings-item',
 			'type'       => 'object',
@@ -189,6 +189,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				'blockCategories'                        => array(
 					'description' => __( 'Returns all the categories for block types that will be shown in the block editor.', 'gutenberg' ),
 					'type'        => 'array',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+
+				'blockInspectorTabs'                     => array(
+					'description' => __( 'Block inspector tab display overrides.', 'gutenberg' ),
+					'type'        => 'object',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
 
@@ -304,6 +310,8 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				),
 			),
 		);
+
+		$this->schema = $schema;
 
 		return $this->add_additional_fields_schema( $this->schema );
 	}

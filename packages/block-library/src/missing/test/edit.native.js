@@ -68,7 +68,7 @@ describe( 'Missing block', () => {
 			beforeEach( () => {
 				// By default we set the web editor as available.
 				storeConfig.selectors.getSettings.mockReturnValue( {
-					unsupportedBlockEditor: true,
+					capabilities: { unsupportedBlockEditor: true },
 				} );
 			} );
 
@@ -86,7 +86,7 @@ describe( 'Missing block', () => {
 
 			it( 'does not render edit action if UBE is not available', () => {
 				storeConfig.selectors.getSettings.mockReturnValue( {
-					unsupportedBlockEditor: false,
+					capabilities: { unsupportedBlockEditor: false },
 				} );
 
 				const testInstance = getTestComponentWithContent();

@@ -30,9 +30,7 @@ describe( 'EnableCustomFieldsOption', () => {
 	} );
 
 	it( 'renders an unchecked checkbox and a confirmation message when toggled off', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const { container } = render(
 			<EnableCustomFieldsOption areCustomFieldsEnabled />
@@ -44,9 +42,7 @@ describe( 'EnableCustomFieldsOption', () => {
 	} );
 
 	it( 'renders a checked checkbox and a confirmation message when toggled on', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const { container } = render(
 			<EnableCustomFieldsOption areCustomFieldsEnabled={ false } />
@@ -60,9 +56,7 @@ describe( 'EnableCustomFieldsOption', () => {
 
 describe( 'CustomFieldsConfirmation', () => {
 	it( 'submits the toggle-custom-fields-form', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const submit = jest.fn();
 		const getElementById = jest
 			.spyOn( document, 'getElementById' )

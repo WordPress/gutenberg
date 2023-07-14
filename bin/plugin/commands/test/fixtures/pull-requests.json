@@ -5099,24 +5099,6 @@
 				"color": "d93f0b",
 				"default": false,
 				"description": "An existing feature is broken."
-			},
-			{
-				"id": 2074073931,
-				"node_id": "MDU6TGFiZWwyMDc0MDczOTMx",
-				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Feature]%20Navigation%20Screen",
-				"name": "[Feature] Navigation Screen",
-				"color": "fbca04",
-				"default": false,
-				"description": "A new block-based screen intended to replace nav-menus.php."
-			},
-			{
-				"id": 2536082965,
-				"node_id": "MDU6TGFiZWwyNTM2MDgyOTY1",
-				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Package]%20Edit%20Navigation",
-				"name": "[Package] Edit Navigation",
-				"color": "ed2572",
-				"default": false,
-				"description": "/packages/edit-navigation"
 			}
 		],
 		"state": "closed",
@@ -8617,15 +8599,6 @@
 				"color": "fbca04",
 				"default": false,
 				"description": "A new block-based screen intended to replace nav-menus.php."
-			},
-			{
-				"id": 2536082965,
-				"node_id": "MDU6TGFiZWwyNTM2MDgyOTY1",
-				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Package]%20Edit%20Navigation",
-				"name": "[Package] Edit Navigation",
-				"color": "ed2572",
-				"default": false,
-				"description": "/packages/edit-navigation"
 			}
 		],
 		"state": "closed",

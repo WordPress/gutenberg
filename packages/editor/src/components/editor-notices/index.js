@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { NoticeList } from '@wordpress/components';
@@ -17,14 +12,12 @@ import { store as noticesStore } from '@wordpress/notices';
 import TemplateValidationNotice from '../template-validation-notice';
 
 export function EditorNotices( { notices, onRemove } ) {
-	const dismissibleNotices = filter( notices, {
-		isDismissible: true,
-		type: 'default',
-	} );
-	const nonDismissibleNotices = filter( notices, {
-		isDismissible: false,
-		type: 'default',
-	} );
+	const dismissibleNotices = notices.filter(
+		( { isDismissible, type } ) => isDismissible && type === 'default'
+	);
+	const nonDismissibleNotices = notices.filter(
+		( { isDismissible, type } ) => ! isDismissible && type === 'default'
+	);
 
 	return (
 		<>

@@ -21,7 +21,7 @@ exports[`List block changes the indentation level 1`] = `
 `;
 
 exports[`List block changes to ordered list 1`] = `
-"<!-- wp:list {\\"ordered\\":true} -->
+"<!-- wp:list {"ordered":true} -->
 <ol><!-- wp:list-item -->
 <li>Item 1</li>
 <!-- /wp:list-item -->
@@ -37,7 +37,7 @@ exports[`List block changes to ordered list 1`] = `
 `;
 
 exports[`List block changes to reverse ordered list 1`] = `
-"<!-- wp:list {\\"ordered\\":true,\\"reversed\\":true} -->
+"<!-- wp:list {"ordered":true,"reversed":true} -->
 <ol reversed><!-- wp:list-item -->
 <li>Item 1</li>
 <!-- /wp:list-item -->
@@ -73,8 +73,8 @@ exports[`List block removes the indentation level 1`] = `
 `;
 
 exports[`List block sets a start value to an ordered list 1`] = `
-"<!-- wp:list {\\"ordered\\":true,\\"start\\":25} -->
-<ol start=\\"25\\"><!-- wp:list-item -->
+"<!-- wp:list {"ordered":true,"start":25} -->
+<ol start="25"><!-- wp:list-item -->
 <li>Item 1</li>
 <!-- /wp:list-item -->
 

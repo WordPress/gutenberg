@@ -5,6 +5,7 @@
 		convertErrorsToExceptions="true"
 		convertNoticesToExceptions="true"
 		convertWarningsToExceptions="true"
+		convertDeprecationsToExceptions="true"
 >
 	<php>
 		<env name="WP_MULTISITE" value="1" />

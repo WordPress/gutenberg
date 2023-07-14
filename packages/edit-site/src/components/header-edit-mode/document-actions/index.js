@@ -7,186 +7,196 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	__experimentalGetBlockLabel as getBlockLabel,
-	getBlockType,
-} from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
-import {
-	Dropdown,
 	Button,
 	VisuallyHidden,
 	__experimentalText as Text,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { chevronDown } from '@wordpress/icons';
-import { useState, useMemo } from '@wordpress/element';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { BlockIcon } from '@wordpress/block-editor';
+import { store as commandsStore } from '@wordpress/commands';
+import {
+	chevronLeftSmall as chevronLeftSmallIcon,
+	page as pageIcon,
+	navigation as navigationIcon,
+	symbol,
+} from '@wordpress/icons';
+import { displayShortcut } from '@wordpress/keycodes';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
-import { store as preferencesStore } from '@wordpress/preferences';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
-import TemplateDetails from '../../template-details';
+import useEditedEntityRecord from '../../use-edited-entity-record';
 import { store as editSiteStore } from '../../../store';
 
-function getBlockDisplayText( block ) {
-	if ( block ) {
-		const blockType = getBlockType( block.name );
-		return blockType ? getBlockLabel( blockType, block.attributes ) : null;
-	}
-	return null;
+export default function DocumentActions() {
+	const isPage = useSelect( ( select ) => select( editSiteStore ).isPage() );
+	return isPage ? <PageDocumentActions /> : <TemplateDocumentActions />;
 }
 
-function useSecondaryText() {
-	const { getBlock } = useSelect( blockEditorStore );
-	const activeEntityBlockId = useSelect(
-		( select ) =>
-			select(
-				blockEditorStore
-			).__experimentalGetActiveBlockIdByBlockNames( [
-				'core/template-part',
-			] ),
+function PageDocumentActions() {
+	const { hasPageContentFocus, hasResolved, isFound, title } = useSelect(
+		( select ) => {
+			const {
+				hasPageContentFocus: _hasPageContentFocus,
+				getEditedPostContext,
+			} = select( editSiteStore );
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const context = getEditedPostContext();
+			const queryArgs = [ 'postType', context.postType, context.postId ];
+			const page = getEditedEntityRecord( ...queryArgs );
+			return {
+				hasPageContentFocus: _hasPageContentFocus(),
+				hasResolved: hasFinishedResolution(
+					'getEditedEntityRecord',
+					queryArgs
+				),
+				isFound: !! page,
+				title: page?.title,
+			};
+		},
 		[]
 	);
 
-	if ( activeEntityBlockId ) {
-		return {
-			label: getBlockDisplayText( getBlock( activeEntityBlockId ) ),
-			isActive: true,
-		};
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+
+	const [ hasEditedTemplate, setHasEditedTemplate ] = useState( false );
+	const prevHasPageContentFocus = useRef( false );
+	useEffect( () => {
+		if ( prevHasPageContentFocus.current && ! hasPageContentFocus ) {
+			setHasEditedTemplate( true );
+		}
+		prevHasPageContentFocus.current = hasPageContentFocus;
+	}, [ hasPageContentFocus ] );
+
+	if ( ! hasResolved ) {
+		return null;
 	}
 
-	return {};
+	if ( ! isFound ) {
+		return (
+			<div className="edit-site-document-actions">
+				{ __( 'Document not found' ) }
+			</div>
+		);
+	}
+
+	return hasPageContentFocus ? (
+		<BaseDocumentActions
+			className={ classnames( 'is-page', {
+				'is-animated': hasEditedTemplate,
+			} ) }
+			icon={ pageIcon }
+		>
+			{ title }
+		</BaseDocumentActions>
+	) : (
+		<TemplateDocumentActions
+			className="is-animated"
+			onBack={ () => setHasPageContentFocus( true ) }
+		/>
+	);
 }
 
-export default function DocumentActions() {
-	const { showIconLabels, entityTitle, template, templateType, isLoaded } =
-		useSelect( ( select ) => {
-			const { getEditedPostType, getEditedPostId } =
-				select( editSiteStore );
-			const { getEditedEntityRecord } = select( coreStore );
-			const { __experimentalGetTemplateInfo: getTemplateInfo } =
-				select( editorStore );
-			const postType = getEditedPostType();
-			const postId = getEditedPostId();
-			const record = getEditedEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
-			const _isLoaded = !! postId;
+function TemplateDocumentActions( { className, onBack } ) {
+	const { isLoaded, record, getTitle, icon } = useEditedEntityRecord();
 
-			return {
-				showIconLabels: select( preferencesStore ).get(
-					'core/edit-site',
-					'showIconLabels'
-				),
-				entityTitle: getTemplateInfo( record ).title,
-				isLoaded: _isLoaded,
-				template: record,
-				templateType: postType,
-			};
-		}, [] );
-	const entityLabel =
-		templateType === 'wp_template_part' ? 'template part' : 'template';
-	const { label } = useSecondaryText();
-
-	// Use internal state instead of a ref to make sure that the component
-	// re-renders when the popover's anchor updates.
-	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-
-	// Memoize popoverProps to avoid returning a new object every time.
-	const popoverProps = useMemo(
-		() => ( {
-			// Use the title wrapper as the popover anchor so that the dropdown is
-			// centered over the whole title area rather than just one part of it.
-			anchor: popoverAnchor,
-		} ),
-		[ popoverAnchor ]
-	);
-
-	// Return a simple loading indicator until we have information to show.
 	if ( ! isLoaded ) {
+		return null;
+	}
+
+	if ( ! record ) {
 		return (
 			<div className="edit-site-document-actions">
-				{ __( 'Loading…' ) }
+				{ __( 'Document not found' ) }
 			</div>
 		);
 	}
 
-	// Return feedback that the template does not seem to exist.
-	if ( ! entityTitle ) {
-		return (
-			<div className="edit-site-document-actions">
-				{ __( 'Template not found' ) }
-			</div>
-		);
+	const entityLabel = getEntityLabel( record.type );
+
+	let typeIcon = icon;
+	if ( record.type === 'wp_navigation' ) {
+		typeIcon = navigationIcon;
+	} else if ( record.type === 'wp_block' ) {
+		typeIcon = symbol;
 	}
 
 	return (
-		<div
-			className={ classnames( 'edit-site-document-actions', {
-				'has-secondary-label': !! label,
-			} ) }
+		<BaseDocumentActions
+			className={ className }
+			icon={ typeIcon }
+			onBack={ onBack }
 		>
-			<div
-				ref={ setPopoverAnchor }
-				className="edit-site-document-actions__title-wrapper"
+			<VisuallyHidden as="span">
+				{ sprintf(
+					/* translators: %s: the entity being edited, like "template"*/
+					__( 'Editing %s: ' ),
+					entityLabel
+				) }
+			</VisuallyHidden>
+			{ getTitle() }
+		</BaseDocumentActions>
+	);
+}
+
+function BaseDocumentActions( { className, icon, children, onBack } ) {
+	const { open: openCommandCenter } = useDispatch( commandsStore );
+	return (
+		<div
+			className={ classnames( 'edit-site-document-actions', className ) }
+		>
+			{ onBack && (
+				<Button
+					className="edit-site-document-actions__back"
+					icon={ chevronLeftSmallIcon }
+					onClick={ ( event ) => {
+						event.stopPropagation();
+						onBack();
+					} }
+				>
+					{ __( 'Back' ) }
+				</Button>
+			) }
+			<Button
+				className="edit-site-document-actions__command"
+				onClick={ () => openCommandCenter() }
 			>
-				<Text
-					size="body"
+				<HStack
 					className="edit-site-document-actions__title"
-					as="h1"
+					spacing={ 1 }
+					justify="center"
 				>
-					<VisuallyHidden as="span">
-						{ sprintf(
-							/* translators: %s: the entity being edited, like "template"*/
-							__( 'Editing %s: ' ),
-							entityLabel
-						) }
-					</VisuallyHidden>
-					{ decodeEntities( entityTitle ) }
-				</Text>
-
-				<Text
-					size="body"
-					className="edit-site-document-actions__secondary-item"
-				>
-					{ label ?? '' }
-				</Text>
-
-				<Dropdown
-					popoverProps={ popoverProps }
-					position="bottom center"
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button
-							className="edit-site-document-actions__get-info"
-							icon={ chevronDown }
-							aria-expanded={ isOpen }
-							aria-haspopup="true"
-							onClick={ onToggle }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							label={ sprintf(
-								/* translators: %s: the entity to see details about, like "template"*/
-								__( 'Show %s details' ),
-								entityLabel
-							) }
-						>
-							{ showIconLabels && __( 'Details' ) }
-						</Button>
-					) }
-					contentClassName="edit-site-document-actions__info-dropdown"
-					renderContent={ ( { onClose } ) => (
-						<TemplateDetails
-							template={ template }
-							onClose={ onClose }
-						/>
-					) }
-				/>
-			</div>
+					<BlockIcon icon={ icon } />
+					<Text size="body" as="h1">
+						{ children }
+					</Text>
+				</HStack>
+				<span className="edit-site-document-actions__shortcut">
+					{ displayShortcut.primary( 'k' ) }
+				</span>
+			</Button>
 		</div>
 	);
+}
+
+function getEntityLabel( entityType ) {
+	let label = '';
+	switch ( entityType ) {
+		case 'wp_navigation':
+			label = 'navigation menu';
+			break;
+		case 'wp_template_part':
+			label = 'template part';
+			break;
+		default:
+			label = 'template';
+			break;
+	}
+
+	return label;
 }

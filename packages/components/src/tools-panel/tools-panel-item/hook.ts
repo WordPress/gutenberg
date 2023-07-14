@@ -13,16 +13,18 @@ import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
 
+const noop = () => {};
+
 export function useToolsPanelItem(
 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
 ) {
 	const {
 		className,
 		hasValue,
-		isShownByDefault,
+		isShownByDefault = false,
 		label,
 		panelId,
-		resetAllFilter,
+		resetAllFilter = noop,
 		onDeselect,
 		onSelect,
 		...otherProps
@@ -31,6 +33,8 @@ export function useToolsPanelItem(
 	const {
 		panelId: currentPanelId,
 		menuItems,
+		registerResetAllFilter,
+		deregisterResetAllFilter,
 		registerPanelItem,
 		deregisterPanelItem,
 		flagItemCustomization,
@@ -60,7 +64,6 @@ export function useToolsPanelItem(
 				hasValue: hasValueCallback,
 				isShownByDefault,
 				label,
-				resetAllFilter: resetAllFilterCallback,
 				panelId,
 			} );
 		}
@@ -81,26 +84,24 @@ export function useToolsPanelItem(
 		hasValueCallback,
 		panelId,
 		previousPanelId,
-		resetAllFilterCallback,
 		registerPanelItem,
 		deregisterPanelItem,
 	] );
 
-	const isValueSet = hasValue();
-	const wasValueSet = usePrevious( isValueSet );
-
-	// If this item represents a default control it will need to notify the
-	// panel when a custom value has been set.
 	useEffect( () => {
-		if ( isShownByDefault && isValueSet && ! wasValueSet ) {
-			flagItemCustomization( label );
+		if ( hasMatchingPanel ) {
+			registerResetAllFilter( resetAllFilterCallback );
 		}
+		return () => {
+			if ( hasMatchingPanel ) {
+				deregisterResetAllFilter( resetAllFilterCallback );
+			}
+		};
 	}, [
-		isValueSet,
-		wasValueSet,
-		isShownByDefault,
-		label,
-		flagItemCustomization,
+		registerResetAllFilter,
+		deregisterResetAllFilter,
+		resetAllFilterCallback,
+		hasMatchingPanel,
 	] );
 
 	// Note: `label` is used as a key when building menu item state in
@@ -109,6 +110,33 @@ export function useToolsPanelItem(
 	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
 	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
 	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
+
+	const isValueSet = hasValue();
+	const wasValueSet = usePrevious( isValueSet );
+	const newValueSet = isValueSet && ! wasValueSet;
+
+	// Notify the panel when an item's value has been set.
+	//
+	// 1. For default controls, this is so "reset" appears beside its menu item.
+	// 2. For optional controls, when the panel ID is `null`, it allows the
+	// panel to ensure the item is toggled on for display in the menu, given the
+	// value has been set external to the control.
+	useEffect( () => {
+		if ( ! newValueSet ) {
+			return;
+		}
+
+		if ( isShownByDefault || currentPanelId === null ) {
+			flagItemCustomization( label, menuGroup );
+		}
+	}, [
+		currentPanelId,
+		newValueSet,
+		isShownByDefault,
+		menuGroup,
+		label,
+		flagItemCustomization,
+	] );
 
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.

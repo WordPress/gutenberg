@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -68,5 +69,17 @@ describe( 'Modal', () => {
 		const dialog = screen.getByRole( 'dialog' );
 		const title = within( dialog ).queryByText( 'Test Title' );
 		expect( title ).not.toBeInTheDocument();
+	} );
+
+	it( 'should call onRequestClose when the escape key is pressed', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = jest.fn();
+		render(
+			<Modal onRequestClose={ onRequestClose }>
+				<p>Modal content</p>
+			</Modal>
+		);
+		await user.keyboard( '[Escape]' );
+		expect( onRequestClose ).toHaveBeenCalled();
 	} );
 } );

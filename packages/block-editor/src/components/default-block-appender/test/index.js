@@ -21,9 +21,7 @@ describe( 'DefaultBlockAppender', () => {
 	} );
 
 	it( 'should append a default block when input focused', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onAppend = jest.fn();
 
 		const { container } = render(
@@ -42,9 +40,7 @@ describe( 'DefaultBlockAppender', () => {
 	} );
 
 	it( 'should optionally show without prompt', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onAppend = jest.fn();
 
 		const { container } = render(

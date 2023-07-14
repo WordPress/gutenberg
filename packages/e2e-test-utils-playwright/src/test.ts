@@ -26,13 +26,13 @@ const OBSERVED_CONSOLE_MESSAGE_TYPES = [ 'warn', 'error' ] as const;
  * Adds a page event handler to emit uncaught exception to process if one of
  * the observed console logging types is encountered.
  *
- * @param  message The console message.
+ * @param message The console message.
  */
 function observeConsoleLogging( message: ConsoleMessage ) {
 	const type = message.type();
 	if (
 		! OBSERVED_CONSOLE_MESSAGE_TYPES.includes(
-			type as typeof OBSERVED_CONSOLE_MESSAGE_TYPES[ number ]
+			type as ( typeof OBSERVED_CONSOLE_MESSAGE_TYPES )[ number ]
 		)
 	) {
 		return;
@@ -85,7 +85,8 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 		return;
 	}
 
-	const logFunction = type as typeof OBSERVED_CONSOLE_MESSAGE_TYPES[ number ];
+	const logFunction =
+		type as ( typeof OBSERVED_CONSOLE_MESSAGE_TYPES )[ number ];
 
 	// Disable reason: We intentionally bubble up the console message
 	// which, unless the test explicitly anticipates the logging via
@@ -135,39 +136,9 @@ const test = base.extend<
 				storageStatePath: STORAGE_STATE_PATH,
 			} );
 
-			await Promise.all( [
-				requestUtils.activateTheme( 'twentytwentyone' ),
-				// Disable this test plugin as it's conflicting with some of the tests.
-				// We already have reduced motion enabled and Playwright will wait for most of the animations anyway.
-				requestUtils.deactivatePlugin(
-					'gutenberg-test-plugin-disables-the-css-animations'
-				),
-				requestUtils.deleteAllPosts(),
-				requestUtils.deleteAllBlocks(),
-				requestUtils.resetPreferences(),
-			] );
-
 			await use( requestUtils );
 		},
-		{ scope: 'worker' },
-	],
-	// An automatic fixture to configure snapshot settings globally.
-	snapshotConfig: [
-		async ( {}, use, testInfo ) => {
-			// A work-around to remove the default snapshot suffix.
-			// See https://github.com/microsoft/playwright/issues/11134
-			testInfo.snapshotSuffix = '';
-			// Normalize snapshots into the same `__snapshots__` folder to minimize
-			// the file name length on Windows.
-			// See https://github.com/WordPress/gutenberg/issues/40291
-			testInfo.snapshotDir = path.join(
-				path.dirname( testInfo.file ),
-				'__snapshots__'
-			);
-
-			await use();
-		},
-		{ auto: true },
+		{ scope: 'worker', auto: true },
 	],
 } );
 

@@ -31,6 +31,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 	'left',
 	'left-start',
 	'left-end',
+	'overlay',
 ];
 
 const meta: ComponentMeta< typeof Popover > = {
@@ -127,19 +128,6 @@ Default.args = {
 	),
 };
 
-export const Toolbar: ComponentStory< typeof Popover > = Template.bind( {} );
-Toolbar.args = {
-	children: (
-		<div style={ { width: '280px', whiteSpace: 'normal' } }>
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-			aliquip ex ea commodo consequat.
-		</div>
-	),
-	variant: 'toolbar',
-};
-
 export const Unstyled: ComponentStory< typeof Popover > = Template.bind( {} );
 Unstyled.args = {
 	children: (
@@ -170,7 +158,12 @@ export const AllPlacements: ComponentStory< typeof Popover > = ( {
 		</h2>
 		<div>
 			{ AVAILABLE_PLACEMENTS.map( ( p ) => (
-				<PopoverWithAnchor key={ p } placement={ p } { ...args }>
+				<PopoverWithAnchor
+					key={ p }
+					placement={ p }
+					{ ...args }
+					resize={ p === 'overlay' ? true : args.resize }
+				>
 					{ children }
 					<div>
 						<small>(placement: { p })</small>

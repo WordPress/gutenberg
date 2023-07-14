@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -44,8 +39,7 @@ const enhance = compose(
 		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
 		const blocks = select( blockEditorStore ).getBlocks();
-		const firstOfSameType = find(
-			blocks,
+		const firstOfSameType = blocks.find(
 			( { name } ) => block.name === name
 		);
 		const isInvalid =

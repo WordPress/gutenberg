@@ -22,7 +22,7 @@ How to manage block updates depends on the nature of the block itself. If the bl
 
 ### Patterns
 
-**For content that you want updated later on, do not use patterns and instead rely on reusable blocks or template parts.** Patterns cannot be updated after you insert one into your site. For context, you can think of Patterns as more like sample/example/starter content. While Patterns exposed in the Inserter might evolve over time, those changes won't be automatically applied to any current useage of the pattern. Once inserted, patterns become completely detached from the original pattern unlike Reusable block or Template Part block.
+**For content that you want updated later on, do not use patterns and instead rely on reusable blocks or template parts.** Patterns cannot be updated after you insert one into your site. For context, you can think of Patterns as more like sample/example/starter content. While Patterns exposed in the Inserter might evolve over time, those changes won't be automatically applied to any current usage of the pattern. Once inserted, patterns become completely detached from the original pattern unlike Reusable block or Template Part block.
 
 If needed, one potential workaround for patterns with custom styles is to add a class name to the wrapping block for a pattern. For example, the following adds a themeslug-special class to a Group block:
 
@@ -55,7 +55,7 @@ Likewise, it is generally poor practice to delete template parts in theme update
 
 ### Resources
 
-- [Comparing Patterns, Template Parts, and Reusable Blocks](https://wordpress.org/support/article/comparing-patterns-template-parts-and-reusable-blocks/)
+- [Comparing Patterns, Template Parts, and Reusable Blocks](https://wordpress.org/documentation/article/comparing-patterns-template-parts-and-reusable-blocks/)
 - [Block deprecation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/)
 - [Create Block tool](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/)
 

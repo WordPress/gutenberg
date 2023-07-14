@@ -113,7 +113,7 @@ module.exports = {
 		'jsdoc/check-access': 'error',
 		'jsdoc/check-alignment': 'error',
 		'jsdoc/check-line-alignment': [
-			'warn',
+			'error',
 			'always',
 			{
 				tags: [ 'param', 'arg', 'argument', 'property', 'prop' ],

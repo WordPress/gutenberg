@@ -11,6 +11,7 @@ import TextHighlight from '..';
 const getMarks = ( container: Element ) =>
 	// Use querySelectorAll because the `mark` role is not officially supported
 	// yet. This should be changed to `getByRole` when it is.
+	// eslint-disable-next-line testing-library/no-node-access
 	Array.from( container.querySelectorAll( 'mark' ) );
 
 const defaultText =

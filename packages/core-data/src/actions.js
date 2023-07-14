@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, find } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -211,6 +211,25 @@ export function receiveThemeSupports() {
 }
 
 /**
+ * Returns an action object used in signalling that the theme global styles CPT post revisions have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {number} currentId The post id.
+ * @param {Array}  revisions The global styles revisions.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveThemeGlobalStyleRevisions( currentId, revisions ) {
+	return {
+		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
+		currentId,
+		revisions,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the preview data for
  * a given URl has been received.
  * Ignored from documentation as it's internal to the data store.
@@ -255,7 +274,9 @@ export const deleteEntityRecord =
 	) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		let error;
 		let deletedRecord = false;
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
@@ -317,12 +338,12 @@ export const deleteEntityRecord =
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string}  kind                 Kind of the edited entity record.
- * @param {string}  name                 Name of the edited entity record.
- * @param {number}  recordId             Record ID of the edited entity record.
- * @param {Object}  edits                The edits.
- * @param {Object}  options              Options for the edit.
- * @param {boolean} [options.undoIgnore] Whether to ignore the edit in undo history or not.
+ * @param {string}        kind                 Kind of the edited entity record.
+ * @param {string}        name                 Name of the edited entity record.
+ * @param {number|string} recordId             Record ID of the edited entity record.
+ * @param {Object}        edits                The edits.
+ * @param {Object}        options              Options for the edit.
+ * @param {boolean}       [options.undoIgnore] Whether to ignore the edit in undo history or not.
  *
  * @return {Object} Action object.
  */
@@ -335,7 +356,7 @@ export const editEntityRecord =
 				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 			);
 		}
-		const { transientEdits = {}, mergedEdits = {} } = entityConfig;
+		const { mergedEdits = {} } = entityConfig;
 		const record = select.getRawEntityRecord( kind, name, recordId );
 		const editedRecord = select.getEditedEntityRecord(
 			kind,
@@ -355,10 +376,11 @@ export const editEntityRecord =
 				const value = mergedEdits[ key ]
 					? { ...editedRecordValue, ...edits[ key ] }
 					: edits[ key ];
-				acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
+				acc[ key ] = fastDeepEqual( recordValue, value )
+					? undefined
+					: value;
 				return acc;
 			}, {} ),
-			transientEdits,
 		};
 		dispatch( {
 			type: 'EDIT_ENTITY_RECORD',
@@ -371,6 +393,7 @@ export const editEntityRecord =
 						acc[ key ] = editedRecord[ key ];
 						return acc;
 					}, {} ),
+					isCached: options.isCached,
 				},
 			},
 		} );
@@ -383,14 +406,13 @@ export const editEntityRecord =
 export const undo =
 	() =>
 	( { select, dispatch } ) => {
-		const undoEdit = select.getUndoEdit();
+		const undoEdit = select.getUndoEdits();
 		if ( ! undoEdit ) {
 			return;
 		}
 		dispatch( {
-			type: 'EDIT_ENTITY_RECORD',
-			...undoEdit,
-			meta: { isUndo: true },
+			type: 'UNDO',
+			stackedEdits: undoEdit,
 		} );
 	};
 
@@ -401,14 +423,13 @@ export const undo =
 export const redo =
 	() =>
 	( { select, dispatch } ) => {
-		const redoEdit = select.getRedoEdit();
+		const redoEdit = select.getRedoEdits();
 		if ( ! redoEdit ) {
 			return;
 		}
 		dispatch( {
-			type: 'EDIT_ENTITY_RECORD',
-			...redoEdit,
-			meta: { isRedo: true },
+			type: 'REDO',
+			stackedEdits: redoEdit,
 		} );
 	};
 
@@ -448,7 +469,9 @@ export const saveEntityRecord =
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -720,7 +743,9 @@ export const saveEditedEntityRecord =
 			return;
 		}
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -761,6 +786,22 @@ export const __experimentalSaveSpecifiedEntityEdits =
 				editsToSave[ edit ] = edits[ edit ];
 			}
 		}
+
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+
+		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
+
+		// If a record key is provided then update the existing record.
+		// This necessitates providing `recordKey` to saveEntityRecord as part of the
+		// `record` argument (here called `editsToSave`) to stop that action creating
+		// a new record and instead cause it to update the existing record.
+		if ( recordId ) {
+			editsToSave[ entityIdKey ] = recordId;
+		}
+
 		return await dispatch.saveEntityRecord(
 			kind,
 			name,
@@ -824,5 +865,19 @@ export function receiveAutosaves( postId, autosaves ) {
 		type: 'RECEIVE_AUTOSAVES',
 		postId,
 		autosaves: Array.isArray( autosaves ) ? autosaves : [ autosaves ],
+	};
+}
+
+/**
+ * Returns an action object signalling that the fallback Navigation
+ * Menu id has been received.
+ *
+ * @param {integer} fallbackId the id of the fallback Navigation Menu
+ * @return {Object} Action object.
+ */
+export function receiveNavigationFallbackId( fallbackId ) {
+	return {
+		type: 'RECEIVE_NAVIGATION_FALLBACK_ID',
+		fallbackId,
 	};
 }

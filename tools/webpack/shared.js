@@ -66,6 +66,9 @@ const plugins = [
 		// Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
 		'process.env.IS_GUTENBERG_PLUGIN':
 			process.env.npm_package_config_IS_GUTENBERG_PLUGIN,
+		// Inject the `IS_WORDPRESS_CORE` global, used for feature flagging.
+		'process.env.IS_WORDPRESS_CORE':
+			process.env.npm_package_config_IS_WORDPRESS_CORE,
 	} ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];

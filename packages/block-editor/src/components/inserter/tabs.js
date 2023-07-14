@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { symbol as reusableBlockIcon } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { TabPanel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -12,19 +13,26 @@ const blocksTab = {
 };
 const patternsTab = {
 	name: 'patterns',
-	/* translators: Patterns tab title in the block inserter. */
+	/* translators: Theme and Directory Patterns tab title in the block inserter. */
 	title: __( 'Patterns' ),
 };
 const reusableBlocksTab = {
 	name: 'reusable',
-	/* translators: Reusable blocks tab title in the block inserter. */
-	title: __( 'Reusable' ),
+	/* translators: Locally created Patterns tab title in the block inserter. */
+	title: __( 'Synced patterns' ),
+	icon: reusableBlockIcon,
+};
+const mediaTab = {
+	name: 'media',
+	/* translators: Media tab title in the block inserter. */
+	title: __( 'Media' ),
 };
 
 function InserterTabs( {
 	children,
 	showPatterns = false,
 	showReusableBlocks = false,
+	showMedia = false,
 	onSelect,
 	prioritizePatterns,
 } ) {
@@ -37,19 +45,14 @@ function InserterTabs( {
 		if ( ! prioritizePatterns && showPatterns ) {
 			tempTabs.push( patternsTab );
 		}
+		if ( showMedia ) {
+			tempTabs.push( mediaTab );
+		}
 		if ( showReusableBlocks ) {
 			tempTabs.push( reusableBlocksTab );
 		}
-
 		return tempTabs;
-	}, [
-		prioritizePatterns,
-		blocksTab,
-		showPatterns,
-		patternsTab,
-		showReusableBlocks,
-		reusableBlocksTab,
-	] );
+	}, [ prioritizePatterns, showPatterns, showReusableBlocks, showMedia ] );
 
 	return (
 		<TabPanel

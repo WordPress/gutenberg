@@ -18,6 +18,10 @@ module.exports = {
 		'/node_modules/',
 		'e2e-tests/specs/performance/',
 	],
+	snapshotFormat: {
+		escapeString: false,
+		printBasicPrototype: false,
+	},
 	reporters: [
 		...baseConfig.reporters,
 		// Report flaky tests results into artifacts for used in `report-flaky-tests` action.

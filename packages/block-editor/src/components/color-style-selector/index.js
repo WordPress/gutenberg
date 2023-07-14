@@ -87,7 +87,7 @@ const BlockColorsStyleSelector = ( { children, ...other } ) => {
 
 	return (
 		<Dropdown
-			position="bottom right"
+			popoverProps={ { placement: 'bottom-start' } }
 			className="block-library-colors-selector"
 			contentClassName="block-library-colors-selector__popover"
 			renderToggle={ renderToggleComponent( other ) }

@@ -13,24 +13,38 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import TemplateActions from '../template-actions';
 import Link from '../routes/link';
-import Actions from './actions';
 import AddedBy from './added-by';
 
 export default function Table( { templateType } ) {
-	const { records: templates, isResolving: isLoading } = useEntityRecords(
+	const { records: allTemplates } = useEntityRecords(
 		'postType',
 		templateType,
 		{
 			per_page: -1,
 		}
 	);
+
+	const templates = useSelect(
+		( select ) =>
+			allTemplates?.filter(
+				( template ) =>
+					! select( coreStore ).isDeletingEntityRecord(
+						'postType',
+						templateType,
+						template.id
+					)
+			),
+		[ allTemplates ]
+	);
+
 	const postType = useSelect(
 		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]
 	);
 
-	if ( ! templates || isLoading ) {
+	if ( ! templates ) {
 		return null;
 	}
 
@@ -45,6 +59,11 @@ export default function Table( { templateType } ) {
 			</div>
 		);
 	}
+
+	const sortedTemplates = [ ...templates ];
+	sortedTemplates.sort( ( a, b ) =>
+		a.title.rendered.localeCompare( b.title.rendered )
+	);
 
 	return (
 		// These explicit aria roles are needed for Safari.
@@ -74,7 +93,7 @@ export default function Table( { templateType } ) {
 			</thead>
 
 			<tbody>
-				{ templates.map( ( template ) => (
+				{ sortedTemplates.map( ( template ) => (
 					<tr
 						key={ template.id }
 						className="edit-site-list-table-row"
@@ -86,6 +105,7 @@ export default function Table( { templateType } ) {
 									params={ {
 										postId: template.id,
 										postType: template.type,
+										canvas: 'edit',
 									} }
 								>
 									{ decodeEntities(
@@ -98,13 +118,19 @@ export default function Table( { templateType } ) {
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">
-							<AddedBy
-								templateType={ templateType }
-								template={ template }
-							/>
+							{ template ? (
+								<AddedBy
+									postType={ template.type }
+									postId={ template.id }
+								/>
+							) : null }
 						</td>
 						<td className="edit-site-list-table-column" role="cell">
-							<Actions template={ template } />
+							<TemplateActions
+								postType={ template.type }
+								postId={ template.id }
+								className="edit-site-list-table__actions"
+							/>
 						</td>
 					</tr>
 				) ) }

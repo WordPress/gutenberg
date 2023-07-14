@@ -5,6 +5,7 @@ import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import {
 	BlockSettingsMenuControls,
 	store as blockEditorStore,
+	ReusableBlocksRenameHint,
 } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
@@ -12,12 +13,13 @@ import {
 	Modal,
 	Button,
 	TextControl,
-	Flex,
-	FlexItem,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	ToggleControl,
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -38,6 +40,7 @@ export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
 } ) {
+	const [ syncType, setSyncType ] = useState( 'unsynced' );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 	const canConvert = useSelect(
@@ -77,7 +80,7 @@ export default function ReusableBlockConvertButton( {
 
 			return _canConvert;
 		},
-		[ clientIds ]
+		[ clientIds, rootClientId ]
 	);
 
 	const { __experimentalConvertBlocksToReusable: convertBlocksToReusable } =
@@ -88,17 +91,42 @@ export default function ReusableBlockConvertButton( {
 	const onConvert = useCallback(
 		async function ( reusableBlockTitle ) {
 			try {
-				await convertBlocksToReusable( clientIds, reusableBlockTitle );
-				createSuccessNotice( __( 'Reusable block created.' ), {
-					type: 'snackbar',
-				} );
+				await convertBlocksToReusable(
+					clientIds,
+					reusableBlockTitle,
+					syncType
+				);
+				createSuccessNotice(
+					syncType === 'fully'
+						? sprintf(
+								// translators: %s: the name the user has given to the pattern.
+								__( 'Synced Pattern created: %s' ),
+								reusableBlockTitle
+						  )
+						: sprintf(
+								// translators: %s: the name the user has given to the pattern.
+								__( 'Unsynced Pattern created: %s' ),
+								reusableBlockTitle
+						  ),
+					{
+						type: 'snackbar',
+						id: 'convert-to-reusable-block-success',
+					}
+				);
 			} catch ( error ) {
 				createErrorNotice( error.message, {
 					type: 'snackbar',
+					id: 'convert-to-reusable-block-error',
 				} );
 			}
 		},
-		[ clientIds ]
+		[
+			convertBlocksToReusable,
+			clientIds,
+			syncType,
+			createSuccessNotice,
+			createErrorNotice,
+		]
 	);
 
 	if ( ! canConvert ) {
@@ -111,16 +139,13 @@ export default function ReusableBlockConvertButton( {
 				<>
 					<MenuItem
 						icon={ symbol }
-						onClick={ () => {
-							setIsModalOpen( true );
-						} }
+						onClick={ () => setIsModalOpen( true ) }
 					>
-						{ __( 'Create Reusable block' ) }
+						{ __( 'Create pattern/reusable block' ) }
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
-							title={ __( 'Create Reusable block' ) }
-							closeLabel={ __( 'Close' ) }
+							title={ __( 'Create pattern' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );
@@ -136,16 +161,31 @@ export default function ReusableBlockConvertButton( {
 									onClose();
 								} }
 							>
-								<TextControl
-									label={ __( 'Name' ) }
-									value={ title }
-									onChange={ setTitle }
-								/>
-								<Flex
-									className="reusable-blocks-menu-items__convert-modal-actions"
-									justify="flex-end"
-								>
-									<FlexItem>
+								<VStack spacing="5">
+									<ReusableBlocksRenameHint />
+									<TextControl
+										__nextHasNoMarginBottom
+										label={ __( 'Name' ) }
+										value={ title }
+										onChange={ setTitle }
+										placeholder={ __( 'My pattern' ) }
+									/>
+
+									<ToggleControl
+										label={ __( 'Synced' ) }
+										help={ __(
+											'Editing the pattern will update it anywhere it is used.'
+										) }
+										checked={ syncType === 'fully' }
+										onChange={ () => {
+											setSyncType(
+												syncType === 'fully'
+													? 'unsynced'
+													: 'fully'
+											);
+										} }
+									/>
+									<HStack justify="right">
 										<Button
 											variant="tertiary"
 											onClick={ () => {
@@ -155,13 +195,12 @@ export default function ReusableBlockConvertButton( {
 										>
 											{ __( 'Cancel' ) }
 										</Button>
-									</FlexItem>
-									<FlexItem>
+
 										<Button variant="primary" type="submit">
-											{ __( 'Save' ) }
+											{ __( 'Create' ) }
 										</Button>
-									</FlexItem>
-								</Flex>
+									</HStack>
+								</VStack>
 							</form>
 						</Modal>
 					) }

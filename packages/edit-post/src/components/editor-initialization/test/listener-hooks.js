@@ -152,6 +152,7 @@ describe( 'listener hook tests', () => {
 		const setAttribute = jest.fn();
 		const mockSelector = jest.fn();
 		beforeEach( () => {
+			// eslint-disable-next-line testing-library/no-node-access
 			document.querySelector = mockSelector.mockReturnValue( {
 				setAttribute,
 			} );

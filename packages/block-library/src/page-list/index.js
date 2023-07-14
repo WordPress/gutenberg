@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { pages as icon } from '@wordpress/icons';
+import { pages } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon,
+	icon: pages,
 	example: {},
 	edit,
 };

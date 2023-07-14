@@ -13,7 +13,7 @@ notMinified();
 ;"
 `;
 
-exports[`ReadableJsAssetsWebpackPlugin should produce the expected output: Asset file index.min.js should match snapshot 1`] = `"console.log(\\"hello\\");"`;
+exports[`ReadableJsAssetsWebpackPlugin should produce the expected output: Asset file index.min.js should match snapshot 1`] = `"console.log("hello");"`;
 
 exports[`ReadableJsAssetsWebpackPlugin should produce the expected output: Asset file view.js should match snapshot 1`] = `
 "/******/ (() => { // webpackBootstrap
@@ -28,4 +28,4 @@ notMinified();
 ;"
 `;
 
-exports[`ReadableJsAssetsWebpackPlugin should produce the expected output: Asset file view.min.js should match snapshot 1`] = `"console.log(\\"hello\\");"`;
+exports[`ReadableJsAssetsWebpackPlugin should produce the expected output: Asset file view.min.js should match snapshot 1`] = `"console.log("hello");"`;

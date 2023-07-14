@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { search as icon } from '@wordpress/icons';
 
 /**
@@ -17,7 +18,10 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	example: {},
+	example: {
+		attributes: { buttonText: __( 'Search' ), label: __( 'Search' ) },
+		viewportWidth: 400,
+	},
 	variations,
 	edit,
 };

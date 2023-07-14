@@ -70,15 +70,18 @@ function KeyboardShortcuts() {
 		if ( blockName !== 'core/paragraph' && blockName !== 'core/heading' ) {
 			return;
 		}
-		const currentAttributes = getBlockAttributes( currentClientId );
-		const { content: currentContent, align: currentAlign } =
-			currentAttributes;
+		const attributes = getBlockAttributes( currentClientId );
+		const textAlign =
+			blockName === 'core/paragraph' ? 'align' : 'textAlign';
+		const destinationTextAlign =
+			destinationBlockName === 'core/paragraph' ? 'align' : 'textAlign';
+
 		replaceBlocks(
 			currentClientId,
 			createBlock( destinationBlockName, {
 				level,
-				content: currentContent,
-				align: currentAlign,
+				content: attributes.content,
+				...{ [ destinationTextAlign ]: attributes[ textAlign ] },
 			} )
 		);
 	};
@@ -127,7 +130,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-sidebar',
 			category: 'global',
-			description: __( 'Show or hide the settings sidebar.' ),
+			description: __( 'Show or hide the Settings sidebar.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: ',',
@@ -181,7 +184,7 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: `core/block-editor/transform-heading-to-paragraph`,
+			name: 'core/edit-post/transform-heading-to-paragraph',
 			category: 'block-library',
 			description: __( 'Transform heading to paragraph.' ),
 			keyCombination: {
@@ -192,7 +195,7 @@ function KeyboardShortcuts() {
 
 		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
 			registerShortcut( {
-				name: `core/block-editor/transform-paragraph-to-heading-${ level }`,
+				name: `core/edit-post/transform-paragraph-to-heading-${ level }`,
 				category: 'block-library',
 				description: __( 'Transform paragraph to heading.' ),
 				keyCombination: {
@@ -220,8 +223,6 @@ function KeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
-		closeGeneralSidebar();
-		setIsListViewOpened( false );
 		toggleDistractionFree();
 		toggleFeature( 'distractionFree' );
 		createInfoNotice(
@@ -250,13 +251,15 @@ function KeyboardShortcuts() {
 		}
 	} );
 
-	useShortcut( 'core/edit-post/toggle-list-view', () =>
-		setIsListViewOpened( ! isListViewOpened() )
-	);
+	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
+	useShortcut( 'core/edit-post/toggle-list-view', () => {
+		if ( ! isListViewOpened() ) {
+			setIsListViewOpened( true );
+		}
+	} );
 
-	useShortcut(
-		'core/block-editor/transform-heading-to-paragraph',
-		( event ) => handleTextLevelShortcut( event, 0 )
+	useShortcut( 'core/edit-post/transform-heading-to-paragraph', ( event ) =>
+		handleTextLevelShortcut( event, 0 )
 	);
 
 	[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
@@ -264,7 +267,7 @@ function KeyboardShortcuts() {
 		//the hook will execute the same way every time
 		//eslint-disable-next-line react-hooks/rules-of-hooks
 		useShortcut(
-			`core/block-editor/transform-paragraph-to-heading-${ level }`,
+			`core/edit-post/transform-paragraph-to-heading-${ level }`,
 			( event ) => handleTextLevelShortcut( event, level )
 		);
 	} );

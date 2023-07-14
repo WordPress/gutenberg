@@ -2,12 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import {
+	forwardRef,
+	useState,
+	useEffect,
+	useLayoutEffect,
+	useCallback,
+} from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -20,17 +26,16 @@ import type { WordPressComponentProps } from '../ui/context';
 
 const TabButton = ( {
 	tabId,
-	onClick,
 	children,
 	selected,
 	...rest
 }: TabButtonProps ) => (
 	<Button
 		role="tab"
-		tabIndex={ selected ? null : -1 }
+		tabIndex={ selected ? undefined : -1 }
 		aria-selected={ selected }
 		id={ tabId }
-		onClick={ onClick }
+		__experimentalIsFocusable
 		{ ...rest }
 	>
 		{ children }
@@ -73,15 +78,19 @@ const TabButton = ( {
  * );
  * ```
  */
-export function TabPanel( {
-	className,
-	children,
-	tabs,
-	initialTabName,
-	orientation = 'horizontal',
-	activeClass = 'is-active',
-	onSelect,
-}: WordPressComponentProps< TabPanelProps, 'div', false > ) {
+const UnforwardedTabPanel = (
+	{
+		className,
+		children,
+		tabs,
+		selectOnMove = true,
+		initialTabName,
+		orientation = 'horizontal',
+		activeClass = 'is-active',
+		onSelect,
+	}: WordPressComponentProps< TabPanelProps, 'div', false >,
+	ref: ForwardedRef< any >
+) => {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
 	const [ selected, setSelected ] = useState< string >();
 
@@ -93,24 +102,67 @@ export function TabPanel( {
 		[ onSelect ]
 	);
 
-	const onNavigate = ( _childIndex: number, child: HTMLButtonElement ) => {
+	// Simulate a click on the newly focused tab, which causes the component
+	// to show the `tab-panel` associated with the clicked tab.
+	const activateTabAutomatically = (
+		_childIndex: number,
+		child: HTMLElement
+	) => {
 		child.click();
 	};
-	const selectedTab = find( tabs, { name: selected } );
+	const selectedTab = tabs.find( ( { name } ) => name === selected );
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
-	useEffect( () => {
-		if ( ! selectedTab?.name && tabs.length > 0 ) {
-			handleTabSelection( initialTabName || tabs[ 0 ].name );
+	// Handle selecting the initial tab.
+	useLayoutEffect( () => {
+		// If there's a selected tab, don't override it.
+		if ( selectedTab ) {
+			return;
 		}
-	}, [ tabs, selectedTab?.name, initialTabName, handleTabSelection ] );
+
+		const initialTab = tabs.find( ( tab ) => tab.name === initialTabName );
+
+		// Wait for the denoted initial tab to be declared before making a
+		// selection. This ensures that if a tab is declared lazily it can
+		// still receive initial selection.
+		if ( initialTabName && ! initialTab ) {
+			return;
+		}
+
+		if ( initialTab && ! initialTab.disabled ) {
+			// Select the initial tab if it's not disabled.
+			handleTabSelection( initialTab.name );
+		} else {
+			// Fallback to the first enabled tab when the initial is disabled.
+			const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
+			if ( firstEnabledTab ) handleTabSelection( firstEnabledTab.name );
+		}
+	}, [ tabs, selectedTab, initialTabName, handleTabSelection ] );
+
+	// Handle the currently selected tab becoming disabled.
+	useEffect( () => {
+		// This effect only runs when the selected tab is defined and becomes disabled.
+		if ( ! selectedTab?.disabled ) {
+			return;
+		}
+
+		const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
+
+		// If the currently selected tab becomes disabled, select the first enabled tab.
+		// (if there is one).
+		if ( firstEnabledTab ) {
+			handleTabSelection( firstEnabledTab.name );
+		}
+	}, [ tabs, selectedTab?.disabled, handleTabSelection ] );
 
 	return (
-		<div className={ className }>
+		<div className={ className } ref={ ref }>
 			<NavigableMenu
 				role="tablist"
 				orientation={ orientation }
-				onNavigate={ onNavigate }
+				onNavigate={
+					selectOnMove ? activateTabAutomatically : undefined
+				}
 				className="components-tab-panel__tabs"
 			>
 				{ tabs.map( ( tab ) => (
@@ -127,8 +179,12 @@ export function TabPanel( {
 						selected={ tab.name === selected }
 						key={ tab.name }
 						onClick={ () => handleTabSelection( tab.name ) }
+						disabled={ tab.disabled }
+						label={ tab.icon && tab.title }
+						icon={ tab.icon }
+						showTooltip={ !! tab.icon }
 					>
-						{ tab.title }
+						{ ! tab.icon && tab.title }
 					</TabButton>
 				) ) }
 			</NavigableMenu>
@@ -145,6 +201,7 @@ export function TabPanel( {
 			) }
 		</div>
 	);
-}
+};
 
+export const TabPanel = forwardRef( UnforwardedTabPanel );
 export default TabPanel;

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+const path = require( 'path' );
+
+/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -10,8 +15,16 @@ test.use( {
 } );
 
 test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
+		// To do: some drag an drop tests are failing, so run them without
+		// iframe for now.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -34,7 +47,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Dummy text' },
 		} );
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -93,7 +106,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->` );
 	} );
 
@@ -111,7 +124,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -171,7 +184,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -239,7 +252,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -283,6 +296,75 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await page.mouse.up();
 
 		await expect.poll( editor.getEditedPostContent ).toBe( beforeContent );
+	} );
+
+	// A test for https://github.com/WordPress/gutenberg/issues/43090.
+	test( 'should close the inserter when clicking on the toggle button', async ( {
+		page,
+		editor,
+	} ) => {
+		const inserterButton = page.getByRole( 'button', {
+			name: 'Toggle block inserter',
+		} );
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+
+		await inserterButton.click();
+
+		await blockLibrary.getByRole( 'option', { name: 'Buttons' } ).click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/buttons' } ] );
+
+		await inserterButton.click();
+
+		await expect( blockLibrary ).toBeHidden();
+	} );
+} );
+
+test.describe( 'insert media from inserter', () => {
+	let uploadedMedia;
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		uploadedMedia = await requestUtils.uploadMedia(
+			path.resolve(
+				process.cwd(),
+				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+			)
+		);
+	} );
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPosts(),
+		] );
+	} );
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+	test( 'insert media from the global inserter', async ( {
+		page,
+		editor,
+	} ) => {
+		await page.click(
+			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+		);
+		await page.click(
+			'role=region[name="Block Library"i] >> role=tab[name="Media"i]'
+		);
+		await page.click(
+			'[aria-label="Media categories"i] >> role=button[name="Images"i]'
+		);
+		await page.click(
+			`role=listbox[name="Media List"i] >> role=option[name="${ uploadedMedia.title.raw }"]`
+		);
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:image {"id":${ uploadedMedia.id }} -->
+<figure class="wp-block-image"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
+<!-- /wp:image -->`
+		);
 	} );
 } );
 

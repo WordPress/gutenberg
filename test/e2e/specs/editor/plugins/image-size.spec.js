@@ -46,16 +46,16 @@ test.describe( 'changing image size', () => {
 
 		// Select the new size updated with the plugin.
 		await editor.openDocumentSettingsSidebar();
-		await page.selectOption( 'role=combobox[name="Image size"i]', {
+		await page.selectOption( 'role=combobox[name="Resolution"i]', {
 			label: 'Custom Size One',
 		} );
 
 		// Verify that the custom size was applied to the image.
 		await expect(
-			page.locator( `role=img[name="${ filename }"]` )
+			editor.canvas.locator( `role=img[name="${ filename }"]` )
 		).toHaveCSS( 'width', '499px' );
 		await expect(
 			page.locator( 'role=spinbutton[name="Width"i]' )
-		).toHaveValue( '499' );
+		).toHaveValue( '' );
 	} );
 } );

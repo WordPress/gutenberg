@@ -1,31 +1,43 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Spacer block decrements height 1`] = `
-"<!-- wp:spacer {\\"height\\":\\"99px\\"} -->
-<div style=\\"height:99px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+"<!-- wp:spacer {"height":"99px"} -->
+<div style="height:99px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->"
 `;
 
 exports[`Spacer block increments height 1`] = `
-"<!-- wp:spacer {\\"height\\":\\"101px\\"} -->
-<div style=\\"height:101px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+"<!-- wp:spacer {"height":"101px"} -->
+<div style="height:101px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->"
 `;
 
 exports[`Spacer block inserts block 1`] = `
 "<!-- wp:spacer -->
-<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->"
+`;
+
+exports[`Spacer block inserts block with spacingSizes preset 1`] = `
+"<!-- wp:spacer {"height":"70px"} -->
+<div style="height:70px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->"
+`;
+
+exports[`Spacer block inserts block with spacingSizes preset without matching global styles values 1`] = `
+"<!-- wp:spacer {"height":"120px"} -->
+<div style="height:120px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->"
 `;
 
 exports[`Spacer block updates height to 25vh 1`] = `
-"<!-- wp:spacer {\\"height\\":\\"25vh\\"} -->
-<div style=\\"height:25vh\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+"<!-- wp:spacer {"height":"25vh"} -->
+<div style="height:25vh" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->"
 `;
 
 exports[`Spacer block updates height to 50px 1`] = `
-"<!-- wp:spacer {\\"height\\":\\"50px\\"} -->
-<div style=\\"height:50px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+"<!-- wp:spacer {"height":"50px"} -->
+<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->"
 `;

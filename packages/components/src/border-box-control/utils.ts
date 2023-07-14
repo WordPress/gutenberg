@@ -171,7 +171,7 @@ export const getMostCommonUnit = (
  * Finds the mode value out of the array passed favouring the first value
  * as a tiebreaker.
  *
- * @param  values Values to determine the mode from.
+ * @param values Values to determine the mode from.
  *
  * @return The mode value.
  */

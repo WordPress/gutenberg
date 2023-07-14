@@ -10,6 +10,10 @@
 		width: 100%;
 		height: $grid-unit-60;
 
+		// Unset inherited values.
+		margin-left: 0;
+		margin-right: 0;
+
 		/* Fonts smaller than 16px causes mobile safari to zoom. */
 		font-size: $mobile-text-min-font-size;
 		@include break-small {
@@ -37,10 +41,12 @@
 .components-search-control__icon {
 	position: absolute;
 	top: 0;
+	width: $icon-size;
 	right: ( $grid-unit-60 - $icon-size ) * 0.5;
 	bottom: 0;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 
 	> svg {
 		margin: $grid-unit-10 0;

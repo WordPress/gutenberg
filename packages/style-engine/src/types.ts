@@ -52,8 +52,10 @@ export interface Style {
 		fontStyle?: CSSProperties[ 'fontStyle' ];
 		letterSpacing?: CSSProperties[ 'letterSpacing' ];
 		lineHeight?: CSSProperties[ 'lineHeight' ];
+		textColumns?: CSSProperties[ 'columnCount' ];
 		textDecoration?: CSSProperties[ 'textDecoration' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
+		writingMode?: CSSProperties[ 'writingMode' ];
 	};
 	color?: {
 		text?: CSSProperties[ 'color' ];
