@@ -4,6 +4,8 @@
 /**
  * Keep track of whether a submenu is open to short-circuit delegated event listeners.
  *
+ * TODO: What if there are multiple nav menus? Can multiple submenus be expanded at once from separate Navigation blocks?
+ *
  * @type {boolean}
  */
 let hasOpenSubmenu = false;
