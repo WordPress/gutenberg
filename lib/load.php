@@ -56,6 +56,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.3/navigation-block-preloading.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/link-template.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/block-patterns.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-blocks-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/footnotes.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
@@ -98,15 +100,20 @@ require __DIR__ . '/compat/wordpress-6.3/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.3/blocks.php';
 require __DIR__ . '/compat/wordpress-6.3/navigation-fallback.php';
 require __DIR__ . '/compat/wordpress-6.3/block-editor-settings.php';
+require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
 // Experimental features.
-remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/behaviors.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
+
+if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
+	require __DIR__ . '/experimental/disable-tinymce.php';
+}
+
 if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) ) {
 	require __DIR__ . '/experimental/interactivity-api/blocks.php';
 }
@@ -122,9 +129,22 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
 
+// Fonts API / Font Face.
+remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.
 
-// Fonts API.
-if ( ! class_exists( 'WP_Fonts' ) ) {
+/*
+ * If the Fonts Library is available, load the Font Face files, else load the Fonts API.
+ * This strategy is temporary until the Fonts Library is merged. It's used here to allow
+ * the Font Face (redesigned Fonts API) to be merged before the Fonts Library while
+ * keeping Fonts API available for sites that are using it.
+ */
+if ( class_exists( 'WP_Fonts_Library' ) || class_exists( 'WP_Fonts_Library_Controller' ) ) {
+	if ( ! class_exists( 'WP_Font_Face' ) ) {
+		require __DIR__ . '/experimental/fonts/class-wp-font-face.php';
+		require __DIR__ . '/experimental/fonts/class-wp-font-face-resolver.php';
+		require __DIR__ . '/experimental/fonts/fonts.php';
+	}
+} elseif ( ! class_exists( 'WP_Fonts' ) ) {
 	// Fonts API files.
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';

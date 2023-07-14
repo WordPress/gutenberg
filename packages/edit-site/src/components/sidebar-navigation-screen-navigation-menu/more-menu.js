@@ -33,6 +33,7 @@ export default function ScreenNavigationMoreMenu( props ) {
 		<>
 			<DropdownMenu
 				className="sidebar-navigation__more-menu"
+				label={ __( 'Actions' ) }
 				icon={ moreVertical }
 				popoverProps={ POPOVER_PROPS }
 			>

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 /**
@@ -11,14 +11,21 @@ import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import inserterMediaCategories from './inserter-media-categories';
 
-export default function useSiteEditorSettings( templateType ) {
-	const { storedSettings } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-
-		return {
-			storedSettings: getSettings(),
-		};
-	}, [] );
+export default function useSiteEditorSettings() {
+	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const { storedSettings, canvasMode, templateType } = useSelect(
+		( select ) => {
+			const { getSettings, getCanvasMode, getEditedPostType } = unlock(
+				select( editSiteStore )
+			);
+			return {
+				storedSettings: getSettings( setIsInserterOpened ),
+				canvasMode: getCanvasMode(),
+				templateType: getEditedPostType(),
+			};
+		},
+		[ setIsInserterOpened ]
+	);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -70,6 +77,7 @@ export default function useSiteEditorSettings( templateType ) {
 		const {
 			__experimentalAdditionalBlockPatterns,
 			__experimentalAdditionalBlockPatternCategories,
+			focusMode,
 			...restStoredSettings
 		} = storedSettings;
 
@@ -78,6 +86,7 @@ export default function useSiteEditorSettings( templateType ) {
 			inserterMediaCategories,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
+			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 		};
-	}, [ storedSettings, blockPatterns, blockPatternCategories ] );
+	}, [ storedSettings, blockPatterns, blockPatternCategories, canvasMode ] );
 }

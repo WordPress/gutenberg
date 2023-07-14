@@ -9,6 +9,7 @@ import { Platform, findNodeHandle } from 'react-native';
 import {
 	getClipboard,
 	setClipboard,
+	ToolbarGroup,
 	ToolbarButton,
 	Picker,
 } from '@wordpress/components';
@@ -99,9 +100,11 @@ const BlockActionsMenu = ( {
 	} = getMoversSetup( isStackedHorizontally, moversOptions );
 
 	// Check if selected block is Groupable and/or Ungroupable.
-	const convertToGroupButtonProps = useConvertToGroupButtonProps( [
-		selectedBlockClientId,
-	] );
+	const convertToGroupButtonProps = useConvertToGroupButtonProps(
+		// `selectedBlockClientId` can be undefined in some cases where this
+		// component gets re-rendered right after the block is removed.
+		selectedBlockClientId ? [ selectedBlockClientId ] : []
+	);
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton =
 		( isGroupable || isUngroupable ) && canRemove;
@@ -254,11 +257,13 @@ const BlockActionsMenu = ( {
 	// End early if there are no options to show.
 	if ( ! options.length ) {
 		return (
-			<ToolbarButton
-				title={ __( 'Open Block Actions Menu' ) }
-				icon={ moreHorizontalMobile }
-				disabled={ true }
-			/>
+			<ToolbarGroup>
+				<ToolbarButton
+					title={ __( 'Open Block Actions Menu' ) }
+					icon={ moreHorizontalMobile }
+					disabled={ true }
+				/>
+			</ToolbarGroup>
 		);
 	}
 
@@ -294,7 +299,7 @@ const BlockActionsMenu = ( {
 		anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined;
 
 	return (
-		<>
+		<ToolbarGroup>
 			<ToolbarButton
 				title={ __( 'Open Block Actions Menu' ) }
 				onClick={ onPickerPresent }
@@ -324,7 +329,7 @@ const BlockActionsMenu = ( {
 				selectedBlock={ getBlocksByClientId( selectedBlockClientId ) }
 				selectedBlockClientId={ selectedBlockClientId }
 			/>
-		</>
+		</ToolbarGroup>
 	);
 };
 
