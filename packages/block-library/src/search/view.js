@@ -94,7 +94,7 @@ function expandSearchBlock( block ) {
 	searchField.ariaHidden = 'false';
 	searchField.tabIndex = 0;
 	searchButton.ariaExpanded = 'true';
-	searchButton.removeAttribute( 'aria-controls' ); // Note: Seemingly not mirrored with searchButton.ariaControls.
+	searchButton.removeAttribute( 'aria-controls' ); // Note: Seemingly not reflected with searchButton.ariaControls.
 	toggleAriaLabel( searchButton );
 	block.classList.remove( hiddenClass );
 
@@ -128,7 +128,7 @@ function collapseExpandedSearchBlock() {
 	searchField.ariaHidden = 'true';
 	searchField.tabIndex = -1;
 	searchButton.ariaExpanded = 'false';
-	searchButton.setAttribute( 'aria-controls', searchField.id ); // Note: Seemingly not mirrored with searchButton.ariaControls.
+	searchButton.setAttribute( 'aria-controls', searchField.id ); // Note: Seemingly not reflected with searchButton.ariaControls.
 	toggleAriaLabel( searchButton );
 	block.classList.add( hiddenClass );
 
