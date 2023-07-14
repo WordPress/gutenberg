@@ -1,9 +1,9 @@
 /**
- * WordPress components that create the necessary UI elements for the block
+ * Retrieves the translation of text.
  *
- * @see https://developer.wordpress.org/block-editor/packages/packages-components/
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/
  */
-import { TextControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * React hook that is used to mark the block wrapper element.
@@ -27,12 +27,10 @@ import { useBlockProps } from '@wordpress/block-editor';
  */
 export default function Edit( { attributes, setAttributes } ) {
 	const blockProps = useBlockProps();
+	
 	return (
-		<div { ...blockProps }>
-			<TextControl
-				value={ attributes.message }
-				onChange={ ( val ) => setAttributes( { message: val } ) }
-			/>
-		</div>
+		<p { ...blockProps }>
+			{ __( '{{title}} – hello from the editor!', '{{textdomain}}' ) }
+		</p>
 	);
 }
