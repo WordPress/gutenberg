@@ -7,7 +7,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
 
 /**
@@ -315,20 +315,75 @@ export default function TypographyPanel( {
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );
 
-	// Text Orientation
+	// Writing Mode
 	const hasWritingModeControl = useHasWritingModeControl( settings );
 	const writingMode = decodeValue( inheritedValue?.typography?.writingMode );
-	const setWritingMode = ( newValue ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'typography', 'writingMode' ],
-				newValue || undefined
-			)
-		);
-	};
 	const hasWritingMode = () => !! value?.typography?.writingMode;
-	const resetWritingMode = () => setWritingMode( undefined );
+	const resetWritingMode = () =>
+		setWritingModeAndTextOrientation( undefined );
+
+	// Text Orientation
+	const textOrientation = decodeValue(
+		inheritedValue?.typography?.textOrientation
+	);
+
+	// Returns the new text orientation and writing mode based on the value from the control.
+	const getTextOrientationAndWritingMode = ( valueFromControl ) => {
+		switch ( valueFromControl ) {
+			case 'top-to-bottom':
+				return {
+					newTextOrientation: 'mixed',
+					newWritingMode: isRTL() ? 'vertical-lr' : 'vertical-rl',
+				};
+
+			case 'upright':
+				return {
+					newTextOrientation: 'upright',
+					newWritingMode: isRTL() ? 'vertical-lr' : 'vertical-rl',
+				};
+
+			case 'horizontal':
+				return {
+					newTextOrientation: undefined,
+					newWritingMode: 'horizontal-tb',
+				};
+
+			default:
+				return {
+					newTextOrientation: undefined,
+					newWritingMode: undefined,
+				};
+		}
+	};
+
+	function getValuefromWritingModeAndTextOrientation() {
+		if ( writingMode === 'horizontal-tb' ) {
+			return 'horizontal';
+		}
+		if ( writingMode === 'vertical-lr' || writingMode === 'vertical-rl' ) {
+			if ( textOrientation === 'upright' ) {
+				return 'upright';
+			}
+			return 'top-to-bottom';
+		}
+	}
+
+	const setWritingModeAndTextOrientation = useCallback(
+		( newValue ) => {
+			const { newTextOrientation, newWritingMode } =
+				getTextOrientationAndWritingMode( newValue );
+
+			return onChange( {
+				...value,
+				typography: {
+					...value?.typography,
+					textOrientation: newTextOrientation,
+					writingMode: newWritingMode,
+				},
+			} );
+		},
+		[ onChange, value ]
+	);
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -475,23 +530,6 @@ export default function TypographyPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ hasWritingModeControl && (
-				<ToolsPanelItem
-					className="single-column"
-					label={ __( 'Text orientation' ) }
-					hasValue={ hasWritingMode }
-					onDeselect={ resetWritingMode }
-					isShownByDefault={ defaultControls.writingMode }
-					panelId={ panelId }
-				>
-					<WritingModeControl
-						value={ writingMode }
-						onChange={ setWritingMode }
-						size="__unstable-large"
-						__nextHasNoMarginBottom
-					/>
-				</ToolsPanelItem>
-			) }
 			{ hasTextTransformControl && (
 				<ToolsPanelItem
 					label={ __( 'Letter case' ) }
@@ -507,6 +545,20 @@ export default function TypographyPanel( {
 						isBlock
 						size="__unstable-large"
 						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasWritingModeControl && (
+				<ToolsPanelItem
+					label={ __( 'Text orientation' ) }
+					hasValue={ hasWritingMode }
+					onDeselect={ resetWritingMode }
+					isShownByDefault={ defaultControls.writingMode }
+					panelId={ panelId }
+				>
+					<WritingModeControl
+						value={ getValuefromWritingModeAndTextOrientation() }
+						onChange={ setWritingModeAndTextOrientation }
 					/>
 				</ToolsPanelItem>
 			) }
