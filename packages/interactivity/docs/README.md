@@ -2,16 +2,10 @@
 
 👋 Hi! Welcome to the Interactivity API documentation.
 
-The documentation consists of two major sections:
-
--   [Documentation]() (you're here) – Introduction, concepts, and guides
--   [API reference]() – All the APIs exposed by the Interactivity API
-
-This site (Documentation) is where you will find all the information you need to start doing something awesome things with the Interactivity API.
-
 ## Quick start
 
-<!-- Links to get started -->
+The best place to start with the Interactivity API is this [**Getting started guide**](1-getting-started.md). There you'll will find a very quick start guide and the current requirements of the Interactivity API.
+
 
 ## Take a deep dive
 

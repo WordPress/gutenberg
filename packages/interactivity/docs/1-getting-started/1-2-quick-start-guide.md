@@ -1,2 +1,0 @@
-# Quick Start Guide
-
