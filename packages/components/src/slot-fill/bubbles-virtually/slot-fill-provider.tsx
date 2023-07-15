@@ -16,14 +16,14 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import SlotFillContext from './slot-fill-context';
 import type {
 	SlotFillProviderProps,
-	BubblesVirtuallySlotFillContext,
+	SlotFillBubblesVirtuallyContext,
 } from '../types';
 
-function createSlotRegistry(): BubblesVirtuallySlotFillContext {
-	const slots: BubblesVirtuallySlotFillContext[ 'slots' ] = proxyMap();
-	const fills: BubblesVirtuallySlotFillContext[ 'fills' ] = proxyMap();
+function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
+	const slots: SlotFillBubblesVirtuallyContext[ 'slots' ] = proxyMap();
+	const fills: SlotFillBubblesVirtuallyContext[ 'fills' ] = proxyMap();
 
-	const registerSlot: BubblesVirtuallySlotFillContext[ 'registerSlot' ] = (
+	const registerSlot: SlotFillBubblesVirtuallyContext[ 'registerSlot' ] = (
 		name,
 		ref,
 		fillProps
@@ -43,7 +43,7 @@ function createSlotRegistry(): BubblesVirtuallySlotFillContext {
 		);
 	};
 
-	const unregisterSlot: BubblesVirtuallySlotFillContext[ 'unregisterSlot' ] =
+	const unregisterSlot: SlotFillBubblesVirtuallyContext[ 'unregisterSlot' ] =
 		( name, ref ) => {
 			// Make sure we're not unregistering a slot registered by another element
 			// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
@@ -52,7 +52,7 @@ function createSlotRegistry(): BubblesVirtuallySlotFillContext {
 			}
 		};
 
-	const updateSlot: BubblesVirtuallySlotFillContext[ 'updateSlot' ] = (
+	const updateSlot: SlotFillBubblesVirtuallyContext[ 'updateSlot' ] = (
 		name,
 		fillProps
 	) => {
@@ -73,14 +73,14 @@ function createSlotRegistry(): BubblesVirtuallySlotFillContext {
 		}
 	};
 
-	const registerFill: BubblesVirtuallySlotFillContext[ 'registerFill' ] = (
+	const registerFill: SlotFillBubblesVirtuallyContext[ 'registerFill' ] = (
 		name,
 		ref
 	) => {
 		fills.set( name, valRef( [ ...( fills.get( name ) || [] ), ref ] ) );
 	};
 
-	const unregisterFill: BubblesVirtuallySlotFillContext[ 'registerFill' ] = (
+	const unregisterFill: SlotFillBubblesVirtuallyContext[ 'registerFill' ] = (
 		name,
 		ref
 	) => {
