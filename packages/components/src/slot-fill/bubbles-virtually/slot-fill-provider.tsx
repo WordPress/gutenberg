@@ -28,9 +28,9 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 		ref,
 		fillProps
 	) => {
-		const slot = ( slots.get( name ) || {} ) as {
-			ref: typeof ref;
-			fillProps: typeof fillProps;
+		const slot = slots.get( name ) || {
+			ref: undefined,
+			fillProps: undefined,
 		};
 
 		slots.set(
