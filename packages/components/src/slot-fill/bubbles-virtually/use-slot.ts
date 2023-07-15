@@ -12,7 +12,12 @@ import { useMemo, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import SlotFillContext from './slot-fill-context';
-import type { SlotKey } from '../types';
+import type {
+	SlotFillBubblesVirtuallyFillRef,
+	SlotFillBubblesVirtuallySlotRef,
+	FillProps,
+	SlotKey,
+} from '../types';
 
 export default function useSlot( name: SlotKey ) {
 	const registry = useContext( SlotFillContext );
@@ -24,18 +29,14 @@ export default function useSlot( name: SlotKey ) {
 
 	const api = useMemo(
 		() => ( {
-			updateSlot: (
-				fillProps: Parameters< typeof registry.updateSlot >[ 1 ]
-			) => registry.updateSlot( name, fillProps ),
-			unregisterSlot: (
-				ref: Parameters< typeof registry.unregisterSlot >[ 1 ]
-			) => registry.unregisterSlot( name, ref ),
-			registerFill: (
-				ref: Parameters< typeof registry.registerFill >[ 1 ]
-			) => registry.registerFill( name, ref ),
-			unregisterFill: (
-				ref: Parameters< typeof registry.unregisterFill >[ 1 ]
-			) => registry.unregisterFill( name, ref ),
+			updateSlot: ( fillProps: FillProps ) =>
+				registry.updateSlot( name, fillProps ),
+			unregisterSlot: ( ref: SlotFillBubblesVirtuallySlotRef ) =>
+				registry.unregisterSlot( name, ref ),
+			registerFill: ( ref: SlotFillBubblesVirtuallyFillRef ) =>
+				registry.registerFill( name, ref ),
+			unregisterFill: ( ref: SlotFillBubblesVirtuallyFillRef ) =>
+				registry.unregisterFill( name, ref ),
 		} ),
 		[ name, registry ]
 	);

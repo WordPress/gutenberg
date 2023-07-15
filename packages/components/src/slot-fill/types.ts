@@ -1,9 +1,11 @@
 /**
  * External dependencies
  */
-import type { Component, MutableRefObject, ReactNode } from 'react';
+import type { Component, MutableRefObject, ReactNode, RefObject } from 'react';
 
 export type SlotKey = string | symbol;
+
+export type FillProps = any;
 
 type SlotPropBase = {
 	/**
@@ -15,7 +17,7 @@ type SlotPropBase = {
 	 *
 	 * @default {}
 	 */
-	fillProps?: any;
+	fillProps?: FillProps;
 
 	/**
 	 * By default, events will bubble to their parents on the DOM hierarchy (native event bubbling).
@@ -48,7 +50,7 @@ export type FillComponentProps = {
 	/**
 	 * Children elements or render function.
 	 */
-	children?: ReactNode | ( ( fillProps: any ) => ReactNode );
+	children?: ReactNode | ( ( fillProps: FillProps ) => ReactNode );
 };
 
 export type SlotFillProviderProps = {
@@ -58,32 +60,37 @@ export type SlotFillProviderProps = {
 	children: ReactNode;
 };
 
-export type BubblesVirtuallySlotFillContext = {
+export type SlotFillBubblesVirtuallySlotRef = RefObject< HTMLElement >;
+export type SlotFillBubblesVirtuallyFillRef = MutableRefObject< {
+	rerender: () => void;
+} >;
+
+export type SlotFillBubblesVirtuallyContext = {
 	slots: Map<
 		SlotKey,
 		{
-			ref: MutableRefObject< HTMLElement | undefined >;
-			fillProps: any;
+			ref: SlotFillBubblesVirtuallySlotRef;
+			fillProps: FillProps;
 		}
 	>;
-	fills: Map< SlotKey, MutableRefObject< { rerender: () => void } >[] >;
+	fills: Map< SlotKey, SlotFillBubblesVirtuallyFillRef[] >;
 	registerSlot: (
 		name: SlotKey,
-		ref: MutableRefObject< HTMLElement | undefined >,
-		fillProps: any
+		ref: SlotFillBubblesVirtuallySlotRef,
+		fillProps: FillProps
 	) => void;
 	unregisterSlot: (
 		name: SlotKey,
-		ref: MutableRefObject< HTMLElement | undefined >
+		ref: SlotFillBubblesVirtuallySlotRef
 	) => void;
-	updateSlot: ( name: SlotKey, fillProps: any ) => void;
+	updateSlot: ( name: SlotKey, fillProps: FillProps ) => void;
 	registerFill: (
 		name: SlotKey,
-		ref: MutableRefObject< { rerender: () => void } >
+		ref: SlotFillBubblesVirtuallyFillRef
 	) => void;
 	unregisterFill: (
 		name: SlotKey,
-		ref: MutableRefObject< { rerender: () => void } >
+		ref: SlotFillBubblesVirtuallyFillRef
 	) => void;
 };
 
