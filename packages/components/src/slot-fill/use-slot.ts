@@ -17,8 +17,8 @@ import type { SlotKey } from './types';
 /**
  * React hook returning the active slot given a name.
  *
- * @param {string} name Slot name.
- * @return {Component|undefined} Slot object.
+ * @param name Slot name.
+ * @return Slot object.
  */
 const useSlot = ( name: SlotKey ) => {
 	const { getSlot, subscribe } = useContext( SlotFillContext );
