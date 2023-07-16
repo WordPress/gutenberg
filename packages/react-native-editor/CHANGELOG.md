@@ -15,6 +15,9 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Move the undo/redo buttons to the navigation bar [#51766]
 -   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
 
+## 1.99.1
+- [**] Fix crash related to removing a block under certain conditions [#52595]
+
 ## 1.99.0
 -   [*] Rename "Reusable blocks" to "Synced patterns", aligning with the web editor. [#51704]
 -   [**] Fix a crash related to Reanimated when closing the editor [#52320]

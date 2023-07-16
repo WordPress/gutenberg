@@ -1506,6 +1506,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/create-block-interactive-template",
+		"slug": "packages-create-block-interactive-template",
+		"markdown_source": "../packages/create-block-interactive-template/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/create-block-tutorial-template",
 		"slug": "packages-create-block-tutorial-template",
 		"markdown_source": "../packages/create-block-tutorial-template/README.md",
