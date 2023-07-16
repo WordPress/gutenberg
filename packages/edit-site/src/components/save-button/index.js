@@ -84,7 +84,7 @@ export default function SaveButton( {
 			showTooltip={ showTooltip }
 			icon={ icon }
 		>
-			{ label }
+			{ __( 'Save' ) }
 		</Button>
 	);
 }
