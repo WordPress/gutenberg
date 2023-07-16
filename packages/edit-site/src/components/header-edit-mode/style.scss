@@ -196,9 +196,3 @@ $header-toolbar-min-width: 335px;
 		margin-left: $grid-unit-10;
 	}
 }
-
-// Some margins and padding have to be adjusted so the buttons can still fit on smaller screens.
-.edit-site-save-button__button {
-	justify-content: center;
-	min-width: 66px;
-}
