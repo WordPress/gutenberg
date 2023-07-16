@@ -3,6 +3,15 @@
 	background: none;
 	margin: $header-height 0 0;
 	border-radius: 0;
+	padding: 0;
+	overflow-x: auto;
+
+	.edit-site-page-content {
+		height: 100%;
+		position: relative;
+		padding: 0 0 $grid-unit-40;
+	}
+
 	.components-base-control {
 		width: 100%;
 		@include break-medium {
@@ -78,6 +87,18 @@
 			}
 		}
 	}
+}
+
+.edit-site-patterns__header {
+	position: sticky;
+	top: 0;
+	background: $gray-900;
+	padding: $grid-unit-40 $grid-unit-40 $grid-unit-20;
+	z-index: z-index(".edit-site-patterns__header");
+}
+
+.edit-site-patterns__section {
+	padding: $grid-unit-20 $grid-unit-40 0;
 }
 
 .edit-site-patterns__section-header {

@@ -72,84 +72,89 @@ export default function PatternsList( { categoryId, type } ) {
 	const description = SYNC_DESCRIPTIONS[ syncFilter ];
 
 	return (
-		<VStack spacing={ 6 }>
-			<PatternsHeader
-				categoryId={ categoryId }
-				type={ type }
-				titleId={ titleId }
-				descriptionId={ descriptionId }
-			/>
-
-			<Flex alignment="stretch" wrap>
-				{ isMobileViewport && (
-					<SidebarButton
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						label={ __( 'Back' ) }
-						onClick={ () => {
-							// Go back in history if we came from the Patterns page.
-							// Otherwise push a stack onto the history.
-							if ( location.state?.backPath === '/patterns' ) {
-								history.back();
-							} else {
-								history.push( { path: '/patterns' } );
-							}
-						} }
-					/>
-				) }
-				<FlexBlock className="edit-site-patterns__search-block">
-					<SearchControl
-						className="edit-site-patterns__search"
-						onChange={ ( value ) => setFilterValue( value ) }
-						placeholder={ __( 'Search patterns' ) }
-						label={ __( 'Search patterns' ) }
-						value={ filterValue }
-						__nextHasNoMarginBottom
-					/>
-				</FlexBlock>
-				{ categoryId === USER_PATTERN_CATEGORY && (
-					<ToggleGroupControl
-						className="edit-site-patterns__sync-status-filter"
-						hideLabelFromVision
-						label={ __( 'Filter by sync status' ) }
-						value={ syncFilter }
-						isBlock
-						onChange={ ( value ) => setSyncFilter( value ) }
-						__nextHasNoMarginBottom
-					>
-						{ Object.entries( SYNC_FILTERS ).map(
-							( [ key, label ] ) => (
-								<ToggleGroupControlOption
-									className="edit-site-patterns__sync-status-filter-option"
-									key={ key }
-									value={ key }
-									label={ label }
-								/>
-							)
-						) }
-					</ToggleGroupControl>
-				) }
-			</Flex>
-			{ syncFilter !== 'all' && (
-				<VStack className="edit-site-patterns__section-header">
-					<Heading as="h3" level={ 5 } id={ titleId }>
-						{ title }
-					</Heading>
-					{ description ? (
-						<Text variant="muted" as="p" id={ descriptionId }>
-							{ description }
-						</Text>
-					) : null }
-				</VStack>
-			) }
-			{ hasPatterns && (
-				<Grid
+		<>
+			<VStack className="edit-site-patterns__header" spacing={ 6 }>
+				<PatternsHeader
 					categoryId={ categoryId }
-					items={ patterns }
-					aria-labelledby={ titleId }
-					aria-describedby={ descriptionId }
+					type={ type }
+					titleId={ titleId }
+					descriptionId={ descriptionId }
 				/>
-			) }
-			{ ! isResolving && ! hasPatterns && <NoPatterns /> }
-		</VStack>
+				<Flex alignment="stretch" wrap>
+					{ isMobileViewport && (
+						<SidebarButton
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							label={ __( 'Back' ) }
+							onClick={ () => {
+								// Go back in history if we came from the Patterns page.
+								// Otherwise push a stack onto the history.
+								if (
+									location.state?.backPath === '/patterns'
+								) {
+									history.back();
+								} else {
+									history.push( { path: '/patterns' } );
+								}
+							} }
+						/>
+					) }
+					<FlexBlock className="edit-site-patterns__search-block">
+						<SearchControl
+							className="edit-site-patterns__search"
+							onChange={ ( value ) => setFilterValue( value ) }
+							placeholder={ __( 'Search patterns' ) }
+							label={ __( 'Search patterns' ) }
+							value={ filterValue }
+							__nextHasNoMarginBottom
+						/>
+					</FlexBlock>
+					{ categoryId === USER_PATTERN_CATEGORY && (
+						<ToggleGroupControl
+							className="edit-site-patterns__sync-status-filter"
+							hideLabelFromVision
+							label={ __( 'Filter by sync status' ) }
+							value={ syncFilter }
+							isBlock
+							onChange={ ( value ) => setSyncFilter( value ) }
+							__nextHasNoMarginBottom
+						>
+							{ Object.entries( SYNC_FILTERS ).map(
+								( [ key, label ] ) => (
+									<ToggleGroupControlOption
+										className="edit-site-patterns__sync-status-filter-option"
+										key={ key }
+										value={ key }
+										label={ label }
+									/>
+								)
+							) }
+						</ToggleGroupControl>
+					) }
+				</Flex>
+			</VStack>
+			<VStack className="edit-site-patterns__section" spacing={ 6 }>
+				{ syncFilter !== 'all' && (
+					<VStack className="edit-site-patterns__section-header">
+						<Heading as="h3" level={ 5 } id={ titleId }>
+							{ title }
+						</Heading>
+						{ description ? (
+							<Text variant="muted" as="p" id={ descriptionId }>
+								{ description }
+							</Text>
+						) : null }
+					</VStack>
+				) }
+				{ hasPatterns && (
+					<Grid
+						categoryId={ categoryId }
+						items={ patterns }
+						aria-labelledby={ titleId }
+						aria-describedby={ descriptionId }
+					/>
+				) }
+				{ ! isResolving && ! hasPatterns && <NoPatterns /> }
+			</VStack>
+		</>
 	);
 }
