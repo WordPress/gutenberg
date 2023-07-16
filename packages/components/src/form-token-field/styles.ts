@@ -27,6 +27,7 @@ const deprecatedPaddings = ( {
 
 export const TokensAndInputWrapperFlex = styled( Flex )`
 	padding: 7px;
+	box-sizing: border-box;
 
 	${ deprecatedPaddings }
 `;
