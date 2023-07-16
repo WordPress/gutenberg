@@ -169,4 +169,7 @@ export { default as useSetting } from './use-setting';
 /*
  * The following rename hint component can be removed in 6.4.
  */
-export { default as ReusableBlocksRenameHint } from './inserter/reusable-block-rename-hint';
+export {
+	default as ReusableBlocksRenameHint,
+	useReusableBlocksRenameHint,
+} from './inserter/reusable-block-rename-hint';

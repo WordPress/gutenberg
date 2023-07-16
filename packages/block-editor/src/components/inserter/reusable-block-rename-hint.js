@@ -11,6 +11,14 @@ import { store as preferencesStore } from '@wordpress/preferences';
 
 const PREFERENCE_NAME = 'isResuableBlocksrRenameHintVisible';
 
+export function useReusableBlocksRenameHint() {
+	return useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', PREFERENCE_NAME ) ?? true,
+		[]
+	);
+}
+
 export default function ReusableBlocksRenameHint() {
 	const isReusableBlocksRenameHint = useSelect(
 		( select ) =>

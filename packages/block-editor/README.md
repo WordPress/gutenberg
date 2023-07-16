@@ -854,6 +854,10 @@ _Parameters_
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Optional. Inner blocks options.
 
+### useReusableBlocksRenameHint
+
+Undocumented declaration.
+
 ### useSetting
 
 Hook that retrieves the given setting for the block instance in use.
