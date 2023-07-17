@@ -213,11 +213,11 @@ class WP_Font_Family {
 
 		$merged_font_faces = array_merge( $font_faces_1, $font_faces_2 );
 
-		$serialized_faces = array_map('serialize', $merged_font_faces);
-		$unique_serialized_faces = array_unique($serialized_faces);
-		$unique_faces = array_map('unserialize', $unique_serialized_faces);
+		$serialized_faces        = array_map( 'serialize', $merged_font_faces );
+		$unique_serialized_faces = array_unique( $serialized_faces );
+		$unique_faces            = array_map( 'unserialize', $unique_serialized_faces );
 
-		$merged_font = array_merge( $font1, $font2 );
+		$merged_font             = array_merge( $font1, $font2 );
 		$merged_font['fontFace'] = $unique_faces;
 
 		return $merged_font;
