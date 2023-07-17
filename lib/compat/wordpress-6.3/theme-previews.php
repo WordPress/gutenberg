@@ -51,14 +51,15 @@ function gutenberg_attach_theme_preview_middleware() {
 	);
 }
 
-/**
- * Temporary function to add a live preview button to block themes.
- * Remove when https://core.trac.wordpress.org/ticket/58190 lands.
- */
-function add_live_preview_button() {
-	global $pagenow;
-	if ( 'themes.php' === $pagenow ) {
-		?>
+if ( ! function_exists( 'add_live_preview_button' ) ) {
+	/**
+	 * Temporary function to add a live preview button to block themes.
+	 * Remove when https://core.trac.wordpress.org/ticket/58190 lands.
+	 */
+	function add_live_preview_button() {
+		global $pagenow;
+		if ( 'themes.php' === $pagenow ) {
+			?>
 <script type="text/javascript">
 	jQuery( document ).ready( function() {
 		addLivePreviewButton();
@@ -95,9 +96,9 @@ function add_live_preview_button() {
 		});
 	}
 </script>
-		<?php
+			<?php
+		}
 	}
-
 }
 
 /**
