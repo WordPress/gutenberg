@@ -17,12 +17,10 @@ class WP_Font_Family {
 	);
 
     private $data;
-    private $post_id;
     private $relative_fonts_path;
 
     public function __construct( $font_family = array() ) {
         $this->data = $font_family;
-        $this->post_id = $font_family['post_id'] ?? null;
         $this->relative_fonts_path = content_url('/fonts/');
 	}
 
@@ -53,7 +51,7 @@ class WP_Font_Family {
         return ( 
             isset( $this->data['fontFace'] )
             && is_array( $this->data['fontFace'] )
-            && ! empty( $this->data['fontFace'] )
+            && !empty( $this->data['fontFace'] )
         );
     }
 
@@ -109,12 +107,13 @@ class WP_Font_Family {
      * @return bool|WP_Error True if the font family was uninstalled, WP_Error otherwise.
      */
     public function uninstall () {
-        if ( !$this->post_id ) {
-            $post = $this->get_font_post();
+        $post = $this->get_data_from_post();
+        if ( $post === null ) {
+            return new WP_Error( 'font_family_not_found', __( 'The font family could not be found.') );
         }
         $were_assets_removed = $this->remove_font_family_assets();
         if ( $were_assets_removed === true ) {
-            $was_post_deleted = wp_delete_post ( $this->post_id, true );
+            $was_post_deleted = wp_delete_post ( $post->ID, true );
             if ( $was_post_deleted === null ) {
                 return new WP_Error( 'font_family_not_deleted', __( 'The font family could not be deleted.') );
             }
@@ -363,8 +362,7 @@ class WP_Font_Family {
     /**
      * Get the post for a font family
      *
-     * @param array $font_family
-     * @return WP_Post|null
+     * @return WP_Post|null The post for this font family object or null if the post does not exist
      */
     private function get_font_post () {
         $args = array (
@@ -378,10 +376,24 @@ class WP_Font_Family {
 
         if ( $posts_query->have_posts() ) {
             $post = $posts_query->posts[0];
-            $this->post_id = $post->ID;
             return $post;
         }
 
+        return null;
+    }
+
+    /**
+     * Get the data for this object from the database and set it to the data property
+     *
+     * @return WP_Post|null The post for this font family object or null if the post does not exist
+     */
+    private function get_data_from_post () {
+        $post = $this->get_font_post();
+        if ( $post ) {
+            $data = json_decode( $post->post_content, true );
+            $this->data = $data;
+            return $post;
+        }
         return null;
     }
 

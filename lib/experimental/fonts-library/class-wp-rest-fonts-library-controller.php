@@ -60,19 +60,10 @@ class WP_Fonts_Library_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
     function uninstall_font_family ( $request ) {
-        $post = get_post( $request['id'] );
-        if ( ! $post ) {
-            return new WP_Error(
-                'font_family_invalid_id',
-                __( 'Invalid font family ID.' ),
-                array(
-                    'status' => 404,
-                )
-            );
-        }
-        $font_family_data = json_decode( $post->post_content, true );
-        $font_family_data['post_id'] = $post->ID;
-        $font = new WP_Font_Family ( $font_family_data );
+        $data = array (
+            'slug' => $request['slug'],
+        );
+        $font = new WP_Font_Family ( $data );
         return new WP_REST_Response( $font->uninstall() );
     }
 

@@ -40,13 +40,9 @@ function FontLibraryProvider( { children } ) {
 		{ refreshKey }
 	);
 
-	const libraryFonts = ( posts || [] ).map( post => {
-		const post_content = JSON.parse( post.content.raw )
-		return {
-			...post_content,
-			postId: post.id,
-		}
-	}) || [];
+	const libraryFonts = ( posts || [] ).map( post => (
+		JSON.parse( post.content.raw )
+	)) || [];
 	
 
 	// Global Styles (settings) font families
@@ -194,7 +190,7 @@ function FontLibraryProvider( { children } ) {
 	}
 
 	async function uninstallFont( font ) {
-		await fetchUninstallFonts( { id: font.postId } );
+		await fetchUninstallFonts( font );
 		refreshLibrary();
 	}
 
