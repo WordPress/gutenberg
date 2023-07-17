@@ -383,7 +383,7 @@ export const editEntityRecord =
 				return acc;
 			}, {} ),
 		};
-		if ( entityConfig.syncConfig ) {
+		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
 			const objectId = entityConfig.getSyncObjectId( recordId );
 			getSyncProvider().update(
 				entityConfig.syncObjectType + '--edit',
