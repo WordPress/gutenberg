@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef, useEffect } from '@wordpress/element';
+import { useCallback, useRef, useEffect, Platform } from '@wordpress/element';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -59,7 +59,6 @@ function HeaderToolbar( {
 	noContentSelected,
 } ) {
 	const anchorNodeRef = useRef();
-	const isAndroid = Platform.OS === 'android';
 
 	const containerStyle = [
 		usePreferredColorSchemeStyle(
@@ -90,7 +89,7 @@ function HeaderToolbar( {
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
 		// scrollview doesn't seem to automatically adjust to RTL on Android so, scroll to end when Android
-		if ( isAndroid && isRTL ) {
+		if ( Platform.isAndroid && isRTL ) {
 			scrollViewRef.current.scrollToEnd();
 		} else {
 			scrollViewRef.current.scrollTo( { x: 0 } );
@@ -165,7 +164,7 @@ function HeaderToolbar( {
 		),
 		shadowStyle,
 		{
-			shadowColor: isAndroid
+			shadowColor: Platform.isAndroid
 				? styles[ 'header-toolbar__keyboard-hide-shadow--solid' ].color
 				: shadowColor.color,
 		},
