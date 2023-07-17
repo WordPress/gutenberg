@@ -59,13 +59,20 @@ export default function useNavigationMenuContent( postType, postId ) {
 		record?.blocks
 	);
 
+	if ( ! navigationBlocks.length ) {
+		return;
+	}
+
 	const navigationMenuIds = navigationBlocks?.map(
 		( block ) => block.attributes.ref
 	);
 
-	if ( ! navigationMenuIds?.length ) {
+	// Dedupe the Navigation blocks, as you can have multiple in the same template part.
+	const uniqueNavigationMenuIds = [ ...new Set( navigationMenuIds ) ];
+
+	if ( ! uniqueNavigationMenuIds?.length ) {
 		return;
 	}
 
-	return <TemplatePartNavigationMenus menus={ navigationMenuIds } />;
+	return <TemplatePartNavigationMenus menus={ uniqueNavigationMenuIds } />;
 }
