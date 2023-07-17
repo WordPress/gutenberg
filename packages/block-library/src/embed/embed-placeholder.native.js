@@ -123,9 +123,21 @@ const EmbedPlaceholder = ( {
 						>
 							{ __( 'Unable to embed media' ) }
 						</Text>
-						<Text style={ actionStyle }>
-							{ __( 'More options' ) }
-						</Text>
+						<TouchableOpacity
+							activeOpacity={ 0.5 }
+							accessibilityRole={ 'button' }
+							accessibilityHint={ __(
+								'Double tap to view embed options.'
+							) }
+							style={ buttonStyles }
+							hitSlop={ hitSlop }
+							onPress={ resolveOnPressEvent }
+							disabled={ ! isSelected }
+						>
+							<Text style={ actionStyle }>
+								{ __( 'More options' ) }
+							</Text>
+						</TouchableOpacity>
 						<Picker
 							title={ __( 'Embed options' ) }
 							ref={ cannotEmbedMenuPickerRef }
@@ -144,11 +156,9 @@ const EmbedPlaceholder = ( {
 						<TouchableOpacity
 							activeOpacity={ 0.5 }
 							accessibilityRole={ 'button' }
-							accessibilityHint={
-								cannotEmbed
-									? __( 'Double tap to view embed options.' )
-									: __( 'Double tap to add a link.' )
-							}
+							accessibilityHint={ __(
+								'Double tap to add a link.'
+							) }
 							style={ buttonStyles }
 							hitSlop={ hitSlop }
 							onPress={ resolveOnPressEvent }
