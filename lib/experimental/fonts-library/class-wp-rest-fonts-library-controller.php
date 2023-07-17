@@ -1,18 +1,21 @@
 <?php
 /**
- * Fonts Library Backend Controller
+ * Rest Fonts Library Controller
+ *
+ * This file contains the class for the REST API Fonts Library Controller.
  *
  * @package    Gutenberg
- * @subpackage Fonts API's BC Layer
+ * @subpackage Fonts Library
  * @since      X.X.X
  */
 
+/**
+ * Include admin functions.
+ */
 include( ABSPATH . 'wp-admin/includes/admin.php' );
 
 /**
  * Fonts Library Controller class
- *
- * @package gutenberg
  */
 class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
@@ -75,21 +78,20 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		$data = array(
 			'slug' => $request['slug'],
 		);
-		$font = new WP_Font_Family( $data );
+		$font = new WP_Fonts_Family( $data );
 		return new WP_REST_Response( $font->uninstall() );
 	}
 
 	/**
 	 * Check if user has permissions to update the fonts library
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
-	function update_fonts_library_permissions_check( $request ) {
+	function update_fonts_library_permissions_check() {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_update_fonts_library',
-				__( 'Sorry, you are not allowed to update the fonts library on this site.' ),
+				__( 'Sorry, you are not allowed to update the fonts library on this site.', 'gutenberg' ),
 				array(
 					'status' => rest_authorization_required_code(),
 				)
@@ -104,7 +106,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( WP_FONTS_DIR ) ) {
 			return new WP_Error(
 				'rest_cannot_write_fonts_folder',
-				__( 'Error: WordPress does not have permission to write the fonts folder on your server.' ),
+				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' ),
 				array(
 					'status' => 500,
 				)
@@ -117,7 +119,6 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Check if user has permissions to read the fonts library
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
 	function read_fonts_library_permissions_check() {
@@ -172,7 +173,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		$fonts_to_install = json_decode( $fonts_to_install, true );
 
 		if ( empty( $fonts_to_install ) ) {
-			return new WP_Error( 'no_fonts_to_install', __( 'No fonts to install' ), array( 'status' => 400 ) );
+			return new WP_Error( 'no_fonts_to_install', __( 'No fonts to install', 'gutenberg' ), array( 'status' => 400 ) );
 		}
 
 		// Get uploaded files (used when installing local fonts).
@@ -191,7 +192,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			return new WP_REST_Response( $response );
 		}
 
-		return new WP_Error( 'error_installing_fonts', __( 'Error installing fonts. No font was installed.' ), array( 'status' => 500 ) );
+		return new WP_Error( 'error_installing_fonts', __( 'Error installing fonts. No font was installed.', 'gutenberg' ), array( 'status' => 500 ) );
 	}
 
 	/**
@@ -205,10 +206,10 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	function download_or_move_fonts( $font_families, $files ) {
 		$new_fonts = array();
 		foreach ( $font_families as $font_family ) {
-			$font                = new WP_Font_Family( $font_family );
+			$font                = new WP_Fonts_Family( $font_family );
 			$were_assets_written = $font->download_or_move_font_faces( $files );
 			// If the font face assets were successfully downloaded, we add the font to the new fonts array.
-			// Fonts without no font faces successfully downloaded are not added to the new fonts array
+			// Fonts without no font faces successfully downloaded are not added to the new fonts array.
 			if ( $were_assets_written ) {
 				$new_fonts[] = $font;
 			}
