@@ -74,7 +74,11 @@ export const getEntityRecord =
 		try {
 			// Entity supports configs,
 			// use the sync algorithm instead of the old fetch behavior.
-			if ( entityConfig.syncConfig && ! query ) {
+			if (
+				window.__experimentalEnableSync &&
+				entityConfig.syncConfig &&
+				! query
+			) {
 				const objectId = entityConfig.getSyncObjectId( key );
 
 				// Loads the persisted document.
