@@ -303,7 +303,10 @@ async function loadPostTypeEntities() {
 				applyChangesToDoc: ( doc, changes ) => {
 					const document = doc.getMap( 'document' );
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if ( document.get( key ) !== value ) {
+						if (
+							document.get( key ) !== value &&
+							typeof value !== 'function'
+						) {
 							document.set( key, value );
 						}
 					} );
@@ -379,6 +382,9 @@ export const getMethodName = (
 function registerSyncConfigs( configs ) {
 	configs.forEach( ( { syncObjectType, syncConfig } ) => {
 		getSyncProvider().register( syncObjectType, syncConfig );
+		const editSyncConfig = { ...syncConfig };
+		delete editSyncConfig.fetch;
+		getSyncProvider().register( syncObjectType + '--edit', editSyncConfig );
 	} );
 }
 

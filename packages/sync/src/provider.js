@@ -7,6 +7,7 @@ import * as Y from 'yjs';
 /** @typedef {import('./types').ObjectType} ObjectType */
 /** @typedef {import('./types').ObjectID} ObjectID */
 /** @typedef {import('./types').ObjectConfig} ObjectConfig */
+/** @typedef {import('./types').CRDTDoc} CRDTDoc */
 /** @typedef {import('./types').ConnectDoc} ConnectDoc */
 /** @typedef {import('./types').SyncProvider} SyncProvider */
 
@@ -29,6 +30,11 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 	const listeners = {};
 
 	/**
+	 * @type {Record<string,Record<string,CRDTDoc>>}
+	 */
+	const docs = {};
+
+	/**
 	 * Registeres an object type.
 	 *
 	 * @param {ObjectType}   objectType   Object type to register.
@@ -47,12 +53,14 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 	 */
 	async function bootstrap( objectType, objectId, handleChanges ) {
 		const doc = new Y.Doc();
+		docs[ objectType ] = docs[ objectType ] || {};
+		docs[ objectType ][ objectId ] = doc;
 
-		const update = () => {
+		const updateHandler = () => {
 			const data = config[ objectType ].fromCRDTDoc( doc );
 			handleChanges( data );
 		};
-		doc.on( 'update', update );
+		doc.on( 'update', updateHandler );
 
 		// connect to locally saved database.
 		const destroyLocalConnection = await connectLocal(
@@ -78,8 +86,25 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 		listeners[ objectType ] = listeners[ objectType ] || {};
 		listeners[ objectType ][ objectId ] = () => {
 			destroyLocalConnection();
-			doc.off( 'update', update );
+			doc.off( 'update', updateHandler );
 		};
+	}
+
+	/**
+	 * Fetch data from local database or remote source.
+	 *
+	 * @param {ObjectType} objectType Object type to load.
+	 * @param {ObjectID}   objectId   Object ID to load.
+	 * @param {any}        data       Updates to make.
+	 */
+	async function update( objectType, objectId, data ) {
+		const doc = docs[ objectType ][ objectId ];
+		if ( ! doc ) {
+			throw 'Error doc ' + objectType + ' ' + objectId + ' not found';
+		}
+		doc.transact( () => {
+			config[ objectType ].applyChangesToDoc( doc, data );
+		} );
 	}
 
 	/**
@@ -97,6 +122,7 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 	return {
 		register,
 		bootstrap,
+		update,
 		discard,
 	};
 };
