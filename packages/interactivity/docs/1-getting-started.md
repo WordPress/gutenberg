@@ -42,12 +42,12 @@ To start working with the Interactivity API you'll need to have a [proper WordPr
 
 You can use [the tools to set your local WordPress environment](https://developer.wordpress.org/block-editor/getting-started/devenv/#wordpress-development-site) you feel more comfortable with. 
 
-To get quickly started, [`wp-now`](https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now) is the easiest way to get a WordPress site up and running locally. 
+To get quickly started, [`wp-now`](https://www.npmjs.com/package/@wp-now/wp-now) is the easiest way to get a WordPress site up and running locally. 
 
-### Gutenberg 16.2 or superior
+### Latest vesion of Gutenberg (v16.2 or superior)
 
-The Interactivity API is currently only available as an experimental feature from Gutenberg 16.2, so you'll need to have the Gutenberg plugin with this version or a superior one, installed and activated in your WordPress installation.
+The Interactivity API is currently only available as an experimental feature from Gutenberg 16.2, so you'll need to have the latest version of the Gutenberg plugin (or at least v16.2) installed and activated in your WordPress installation.
 
-### Node v14
+### Node
 
-Block development requires Node, so you also need to ensure you have [the proper version of Node](https://developer.wordpress.org/block-editor/getting-started/devenv/#node-development-tools) installed and running on your machine
+Block development requires [Node](https://nodejs.org/en), so you'll need to have Node installed and running on your machine. Any version should work, but please check the minimum version requirements if you run into any issues with any of the Node.js tools used in WordPress development.
