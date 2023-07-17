@@ -18,6 +18,10 @@ import { BlockRemovalWarningModal } from './components/block-removal-warning-mod
 import { useLayoutClasses, useLayoutStyles } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
+import {
+	default as ReusableBlocksRenameHint,
+	useReusableBlocksRenameHint,
+} from './components/inserter/reusable-block-rename-hint';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -41,4 +45,6 @@ lock( privateApis, {
 	useLayoutStyles,
 	DimensionsTool,
 	ResolutionTool,
+	ReusableBlocksRenameHint,
+	useReusableBlocksRenameHint,
 } );
