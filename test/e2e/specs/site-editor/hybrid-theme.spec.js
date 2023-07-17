@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Hybrid theme', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'gutenberg-test-themes/emptyhybrid' );
+		await requestUtils.activateTheme( 'emptyhybrid' );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
