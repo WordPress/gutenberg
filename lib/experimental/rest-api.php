@@ -119,9 +119,7 @@ if ( ! function_exists( 'wp_api_template_revision_args' ) ) {
 		if ( 'wp_template' === $post_type || 'wp_template_part' === $post_type ) {
 			$args['rest_controller_class'] = 'Gutenberg_REST_Template_Revision_Count';
 		}
-
 		return $args;
 	}
-
-	add_filter( 'register_post_type_args', 'wp_api_template_revision_args', 10, 2 );
 }
+add_filter( 'register_post_type_args', 'wp_api_template_revision_args', 10, 2 );

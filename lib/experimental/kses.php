@@ -84,9 +84,7 @@ if ( ! function_exists( 'allow_filter_in_styles' ) ) {
 		) ) {
 			return true;
 		}
-
 		return $allow_css;
 	}
-
-	add_filter( 'safecss_filter_attr_allow_css', 'allow_filter_in_styles', 10, 2 );
 }
+add_filter( 'safecss_filter_attr_allow_css', 'allow_filter_in_styles', 10, 2 );

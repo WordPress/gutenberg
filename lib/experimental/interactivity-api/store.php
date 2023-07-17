@@ -18,7 +18,6 @@ if ( ! function_exists( 'wp_store' ) ) {
 		if ( $data ) {
 			WP_Interactivity_Store::merge_data( $data );
 		}
-
 		return WP_Interactivity_Store::get_data();
 	}
 }

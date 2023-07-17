@@ -23,7 +23,6 @@ if ( ! function_exists( 'allow_grid_functions_in_styles' ) ) {
 		) ) {
 			return true;
 		}
-
 		return $allow_css;
 	}
 }

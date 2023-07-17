@@ -77,7 +77,6 @@ if ( ! function_exists( 'add_modified_wp_template_schema' ) ) {
 							return mysql_to_rfc3339( $post->post_modified );
 						}
 					}
-
 					return null;
 				},
 			)

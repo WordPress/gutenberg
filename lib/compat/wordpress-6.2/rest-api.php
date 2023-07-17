@@ -129,7 +129,6 @@ if ( ! function_exists( 'filter_block_pattern_response' ) ) {
 		$data                = $response->get_data();
 		$data['block_types'] = array_map( 'sanitize_text_field', $raw_pattern->meta->wpop_block_types );
 		$response->set_data( $data );
-
 		return $response;
 	}
 }
