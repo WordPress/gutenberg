@@ -66,7 +66,7 @@ function gutenberg_override_core_kses_init_filters() {
 add_action( 'init', 'gutenberg_override_core_kses_init_filters', 20 );
 add_action( 'set_current_user', 'gutenberg_override_core_kses_init_filters' );
 
-if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
+if ( ! function_exists( 'allow_filter_in_styles' ) ) {
 	/**
 	 * See https://github.com/WordPress/wordpress-develop/pull/4108
 	 *

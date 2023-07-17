@@ -6,7 +6,7 @@
  * @subpackage REST_API
  */
 
-if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
+if ( class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 	return;
 }
 
