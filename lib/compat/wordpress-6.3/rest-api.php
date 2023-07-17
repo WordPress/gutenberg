@@ -24,12 +24,12 @@
 function gutenberg_update_templates_template_parts_rest_controller( $args, $post_type ) {
 	if ( in_array( $post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
 		$template_edit_link = 'site-editor.php?' . build_query(
-			array(
-				'postType' => $post_type,
-				'postId'   => '%s',
-				'canvas'   => 'edit',
-			)
-		);
+				array(
+					'postType' => $post_type,
+					'postId'   => '%s',
+					'canvas'   => 'edit',
+				)
+			);
 		$args['_edit_link'] = $template_edit_link;
 	}
 
@@ -39,12 +39,12 @@ function gutenberg_update_templates_template_parts_rest_controller( $args, $post
 
 	if ( 'wp_navigation' === $post_type ) {
 		$navigation_edit_link = 'site-editor.php?' . build_query(
-			array(
-				'postId'   => '%s',
-				'postType' => 'wp_navigation',
-				'canvas'   => 'edit',
-			)
-		);
+				array(
+					'postId'   => '%s',
+					'postType' => 'wp_navigation',
+					'canvas'   => 'edit',
+				)
+			);
 		$args['_edit_link']   = $navigation_edit_link;
 	}
 
@@ -52,12 +52,13 @@ function gutenberg_update_templates_template_parts_rest_controller( $args, $post
 }
 add_filter( 'register_post_type_args', 'gutenberg_update_templates_template_parts_rest_controller', 10, 2 );
 
-/**
- * Add the `modified` value to the `wp_template` schema.
- *
- * @since 6.3.0 Added 'modified' property and response value.
- */
-function add_modified_wp_template_schema() {
+if ( ! function_exists( 'add_modified_wp_template_schema' ) ) {
+	/**
+	 * Add the `modified` value to the `wp_template` schema.
+	 *
+	 * @since 6.3.0 Added 'modified' property and response value.
+	 */
+	function add_modified_wp_template_schema() {
 		register_rest_field(
 			array( 'wp_template', 'wp_template_part' ),
 			'modified',
@@ -76,10 +77,12 @@ function add_modified_wp_template_schema() {
 							return mysql_to_rfc3339( $post->post_modified );
 						}
 					}
+
 					return null;
 				},
 			)
 		);
+	}
 }
 add_filter( 'rest_api_init', 'add_modified_wp_template_schema' );
 
