@@ -45,8 +45,8 @@ export function useCompatibilityStyles() {
 					return accumulator;
 				}
 
-				// Don't try to add global style presets; they're directly rendered in iframe.
-				if ( ownerNode.dataset.globalStyle === 'preset' ) {
+				// Don't try to add styles without ID. Styles enqueued via the WP dependency system will always have IDs.
+				if ( ! ownerNode.id ) {
 					return accumulator;
 				}
 
