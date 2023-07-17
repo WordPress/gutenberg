@@ -38,19 +38,16 @@ export default function SaveButton( {
 	const activateSaveEnabled = isPreviewingTheme() || isDirty;
 	const disabled = isSaving || ! activateSaveEnabled;
 
-	const getLabel = () => {
-		if ( isPreviewingTheme() ) {
-			if ( isSaving ) {
-				return __( 'Activating' );
-			} else if ( disabled ) {
-				return __( 'Saved' );
-			} else if ( isDirty ) {
-				return __( 'Activate & Save' );
-			}
-			return __( 'Activate' );
-		}
-
-		if ( isSaving ) {
+	/**
+	 * Get text or aria-label for the button while editing site.
+	 *
+	 * @param {boolean} getScreenReader Whether to return aria-label or button text
+	 * @return {string} Button state as string
+	 */
+	const getLabel = ( getScreenReader ) => {
+		if ( getScreenReader === false ) {
+			return __( 'Save' );
+		} else if ( isSaving ) {
 			return __( 'Saving' );
 		} else if ( disabled ) {
 			return __( 'Saved' );
@@ -59,7 +56,29 @@ export default function SaveButton( {
 		}
 		return __( 'Save' );
 	};
-	const label = getLabel();
+
+	/**
+	 * Get text and aria-label for the button while previewing the theme
+	 *
+	 * @return {string} Button state as string
+	 */
+	const getLabelPreviewing = () => {
+		if ( isSaving ) {
+			return __( 'Activating' );
+		} else if ( disabled ) {
+			return __( 'Saved' );
+		} else if ( isDirty ) {
+			return __( 'Activate & Save' );
+		}
+		return __( 'Activate' );
+	};
+
+	const buttonLabel = isPreviewingTheme()
+		? getLabelPreviewing()
+		: getLabel( true );
+	const buttonText = isPreviewingTheme()
+		? getLabelPreviewing()
+		: getLabel( false );
 
 	return (
 		<Button
@@ -69,7 +88,7 @@ export default function SaveButton( {
 			aria-expanded={ isSaveViewOpen }
 			isBusy={ isSaving }
 			onClick={ disabled ? undefined : () => setIsSaveViewOpened( true ) }
-			label={ label }
+			label={ buttonLabel }
 			/*
 			 * We want the tooltip to show the keyboard shortcut only when the
 			 * button does something, i.e. when it's not disabled.
@@ -84,7 +103,7 @@ export default function SaveButton( {
 			showTooltip={ showTooltip }
 			icon={ icon }
 		>
-			{ __( 'Save' ) }
+			{ buttonText }
 		</Button>
 	);
 }
