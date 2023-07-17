@@ -294,7 +294,7 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 -	**Category:** common
 -	**Parent:** core/form
 -	**Supports:** anchor, spacing (margin), ~~reusable~~
--	**Attributes:** inlineLabel, label, name, placeholder, required, type
+-	**Attributes:** inlineLabel, label, name, placeholder, required, type, visibilityPermissions
 
 ## Form submit button
 

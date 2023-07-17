@@ -22,6 +22,7 @@ const variations = [
 					name: 'author',
 					label: __( 'Name' ),
 					required: true,
+					visibilityPermissions: 'logged-out',
 				},
 			],
 			[
@@ -31,6 +32,7 @@ const variations = [
 					name: 'email',
 					label: __( 'Email' ),
 					required: true,
+					visibilityPermissions: 'logged-out',
 				},
 			],
 			[
@@ -40,6 +42,7 @@ const variations = [
 					name: 'comment',
 					label: __( 'Comment' ),
 					required: true,
+					visibilityPermissions: 'all',
 				},
 			],
 			[ 'core/form-submit-button', {} ],

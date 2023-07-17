@@ -41,6 +41,10 @@
 			"source": "attribute",
 			"attribute": "placeholder",
 			"__experimentalRole": "content"
+		},
+		"visibilityPermissions": {
+			"type": "string",
+			"default": "all"
 		}
 	},
 	"supports": {
