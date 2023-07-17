@@ -74,7 +74,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 	return (
 		<>
-			<InspectorControls group="advanced">
+			<InspectorControls>
 				<TextControl
 					__nextHasNoMarginBottom
 					autoComplete="off"
