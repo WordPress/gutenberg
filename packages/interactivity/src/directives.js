@@ -149,7 +149,7 @@ export default () => {
 	 * Convert a css style string into a object.
 	 *
 	 * Made by Cristian Bote (@cristianbote) for Goober.
-	 * https://github.com/cristianbote/goober/blob/a849b2d644146d96fa1dd1c560f6418ee1e1c469/src/core/astish.js
+	 * https://unpkg.com/browse/goober@2.1.13/src/core/astish.js
 	 *
 	 * @param {string} val CSS string.
 	 * @return {Object} CSS object.
