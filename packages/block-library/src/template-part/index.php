@@ -72,7 +72,9 @@ function render_block_core_template_part( $attributes ) {
 					$template_part_file_path = $block_template_file['path'];
 					$content                 = (string) file_get_contents( $template_part_file_path );
 					$content                 = '' !== $content ? _inject_theme_attribute_in_block_template_content( $content ) : '';
-					$area                    = isset( $block_template_file['area'] ) ? $block_template_file['area'] : WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+					if ( isset( $block_template_file['area'] ) ) {
+						$area = $block_template_file['area'];
+					}
 				}
 			}
 
