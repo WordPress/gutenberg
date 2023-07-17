@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 const variations = [
 	{
 		name: 'comment-form',
-		title: __( 'Comment form' ),
+		title: __( 'Experimental Comment form' ),
 		description: __( 'A comment form for posts and pages.' ),
 		attributes: {
 			action: '{SITE_URL}/wp-comments-post.php',
