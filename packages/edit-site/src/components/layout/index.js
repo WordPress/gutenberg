@@ -18,7 +18,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useMemo } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
@@ -121,6 +121,13 @@ export default function Layout() {
 	const [ fullResizer ] = useResizeObserver();
 	const [ isResizing ] = useState( false );
 	const isEditorLoading = useIsSiteEditorLoading();
+
+	const resizableFrameDefaultSize = useMemo( () => {
+		return {
+			width: canvasSize.width - 24 /* $canvas-padding */,
+			height: canvasSize.height,
+		};
+	}, [ canvasSize.width, canvasSize.height ] );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -331,6 +338,9 @@ export default function Layout() {
 														! isEditorLoading
 													}
 													isFullWidth={ isEditing }
+													defaultSize={
+														resizableFrameDefaultSize
+													}
 													oversizedClassName="edit-site-layout__resizable-frame-oversized"
 													innerContentStyle={ {
 														background:
