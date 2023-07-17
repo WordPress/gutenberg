@@ -10,7 +10,7 @@ import TemplatePartNavigationMenuListItem from './template-part-navigation-menu-
 export default function TemplatePartNavigationMenuList( { menus } ) {
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-template-part-navigation-menu-list">
-			{ [ ...new Set( menus ) ].map( ( menuId, index ) => (
+			{ [ ...new Set( menus ) ].map( ( menuId ) => (
 				<TemplatePartNavigationMenuListItem
 					key={ menuId }
 					id={ menuId }
