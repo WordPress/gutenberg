@@ -269,7 +269,7 @@ class WP_Font_Family {
 				),
 			),
 		);
-		// Creates a new WP_Theme_JSON object with the new fonts to mmake profit of the sanitization and validation
+		// Creates a new WP_Theme_JSON object with the new fonts to leverage sanitization and validation
 		$theme_json     = new WP_Theme_JSON( $fonts_json );
 		$theme_data     = $theme_json->get_data();
 		$sanitized_font = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
