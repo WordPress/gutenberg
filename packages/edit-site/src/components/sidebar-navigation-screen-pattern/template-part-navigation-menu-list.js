@@ -12,7 +12,7 @@ export default function TemplatePartNavigationMenuList( { menus } ) {
 		<ItemGroup className="edit-site-sidebar-navigation-screen-template-part-navigation-menu-list">
 			{ [ ...new Set( menus ) ].map( ( menuId, index ) => (
 				<TemplatePartNavigationMenuListItem
-					key={ index }
+					key={ menuId }
 					id={ menuId }
 				/>
 			) ) }
