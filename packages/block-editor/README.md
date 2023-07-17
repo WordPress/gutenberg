@@ -680,10 +680,6 @@ _Related_
 
 Private @wordpress/block-editor APIs.
 
-### ReusableBlocksRenameHint
-
-Undocumented declaration.
-
 ### RichText
 
 _Related_
@@ -853,10 +849,6 @@ _Parameters_
 
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Optional. Inner blocks options.
-
-### useReusableBlocksRenameHint
-
-Undocumented declaration.
 
 ### useSetting
 

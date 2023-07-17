@@ -165,11 +165,3 @@ export { default as __experimentalInspectorPopoverHeader } from './inspector-pop
 
 export { default as BlockEditorProvider } from './provider';
 export { default as useSetting } from './use-setting';
-
-/*
- * The following rename hint component can be removed in 6.4.
- */
-export {
-	default as ReusableBlocksRenameHint,
-	useReusableBlocksRenameHint,
-} from './inserter/reusable-block-rename-hint';

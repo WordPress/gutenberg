@@ -5,8 +5,7 @@ import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import {
 	BlockSettingsMenuControls,
 	store as blockEditorStore,
-	ReusableBlocksRenameHint,
-	useReusableBlocksRenameHint,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
@@ -28,6 +27,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store } from '../../store';
+import { unlock } from '../../private-apis';
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -41,6 +41,9 @@ export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
 } ) {
+	const { useReusableBlocksRenameHint, ReusableBlocksRenameHint } = unlock(
+		blockEditorPrivateApis
+	);
 	const showRenameHint = useReusableBlocksRenameHint();
 	const [ syncType, setSyncType ] = useState( undefined );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
