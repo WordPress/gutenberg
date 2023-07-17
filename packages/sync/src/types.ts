@@ -22,5 +22,6 @@ export type SyncProvider = {
 		id: ObjectID,
 		handleChanges: ( data: any ) => void
 	) => Promise< CRDTDoc >;
+	update: ( type: ObjectType, id: ObjectID, data: any ) => void;
 	discard: ( type: ObjectType, id: ObjectID ) => Promise< CRDTDoc >;
 };
