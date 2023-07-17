@@ -337,7 +337,7 @@
 					"default": true
 				},
 				"layout": {
-					"type": "object",
+					"type": [ "boolean", "object" ],
 					"description": "This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.",
 					"default": null,
 					"properties": {
