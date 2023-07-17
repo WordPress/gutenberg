@@ -349,6 +349,54 @@
 									"type": "string",
 									"description": "The layout type.",
 									"enum": [ "constrained", "grid", "flex" ]
+								},
+								"contentSize": {
+									"type": "string",
+									"description": "The content size used on all children."
+								},
+								"wideSize": {
+									"type": "string",
+									"description": "The wide size used on alignwide children."
+								},
+								"justifyContent": {
+									"type": "string",
+									"description": "Content justification value.",
+									"enum": [
+										"right",
+										"center",
+										"space-between",
+										"left",
+										"stretch"
+									]
+								},
+								"orientation": {
+									"type": "string",
+									"description": "The orientation of the layout.",
+									"enum": [ "horizontal", "vertical" ]
+								},
+								"flexWrap": {
+									"type": "string",
+									"description": "The flex wrap value.",
+									"enum": [ "wrap", "nowrap" ]
+								},
+								"verticalAlignment": {
+									"type": "string",
+									"description": "The vertical alignment value.",
+									"enum": [
+										"top",
+										"center",
+										"bottom",
+										"space-between",
+										"stretch"
+									]
+								},
+								"minimumColumnWidth": {
+									"type": "string",
+									"description": "The minimum column width value."
+								},
+								"columnCount": {
+									"type": "number",
+									"description": "The column count value."
 								}
 							}
 						},
