@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useDeferredValue, useId } from '@wordpress/element';
+import { useState, useDeferredValue, useId, useMemo } from '@wordpress/element';
 import {
 	SearchControl,
 	__experimentalVStack as VStack,
@@ -15,7 +15,7 @@ import {
 import { __, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useViewportMatch } from '@wordpress/compose';
+import { useAsyncList, useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -28,6 +28,7 @@ import SidebarButton from '../sidebar-button';
 import useDebouncedInput from '../../utils/use-debounced-input';
 import { unlock } from '../../lock-unlock';
 import { SYNC_TYPES, USER_PATTERN_CATEGORY } from './utils';
+import Pagination from './pagination';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -47,6 +48,8 @@ const SYNC_DESCRIPTIONS = {
 	),
 };
 
+const PAGE_SIZE = 20;
+
 export default function PatternsList( { categoryId, type } ) {
 	const location = useLocation();
 	const history = useHistory();
@@ -56,6 +59,8 @@ export default function PatternsList( { categoryId, type } ) {
 	const deferredFilterValue = useDeferredValue( delayedFilterValue );
 
 	const [ syncFilter, setSyncFilter ] = useState( 'all' );
+	const [ currentPage, setCurrentPage ] = useState( 1 );
+
 	const deferredSyncedFilter = useDeferredValue( syncFilter );
 	const { patterns, isResolving } = usePatterns( type, categoryId, {
 		search: deferredFilterValue,
@@ -70,6 +75,28 @@ export default function PatternsList( { categoryId, type } ) {
 	const hasPatterns = patterns.length;
 	const title = SYNC_FILTERS[ syncFilter ];
 	const description = SYNC_DESCRIPTIONS[ syncFilter ];
+
+	const totalItems = patterns.length;
+	const pageIndex = currentPage - 1;
+	const numPages = Math.ceil( patterns.length / PAGE_SIZE );
+
+	const list = useMemo(
+		() =>
+			patterns.slice(
+				pageIndex * PAGE_SIZE,
+				pageIndex * PAGE_SIZE + PAGE_SIZE
+			),
+		[ pageIndex, patterns ]
+	);
+
+	const asyncList = useAsyncList( list, { step: 10 } );
+
+	const changePage = ( page ) => {
+		const scrollContainer = document.querySelector( '.edit-site-patterns' );
+		scrollContainer?.scrollTo( 0, 0 );
+
+		setCurrentPage( page );
+	};
 
 	return (
 		<>
@@ -132,7 +159,11 @@ export default function PatternsList( { categoryId, type } ) {
 					) }
 				</Flex>
 			</VStack>
-			<VStack className="edit-site-patterns__section" spacing={ 6 }>
+			<VStack
+				className="edit-site-patterns__section"
+				justify="flex-start"
+				spacing={ 6 }
+			>
 				{ syncFilter !== 'all' && (
 					<VStack className="edit-site-patterns__section-header">
 						<Heading as="h3" level={ 5 } id={ titleId }>
@@ -148,13 +179,21 @@ export default function PatternsList( { categoryId, type } ) {
 				{ hasPatterns && (
 					<Grid
 						categoryId={ categoryId }
-						items={ patterns }
+						items={ asyncList }
 						aria-labelledby={ titleId }
 						aria-describedby={ descriptionId }
 					/>
 				) }
 				{ ! isResolving && ! hasPatterns && <NoPatterns /> }
 			</VStack>
+			{ numPages > 1 && (
+				<Pagination
+					currentPage={ currentPage }
+					numPages={ numPages }
+					changePage={ changePage }
+					totalItems={ totalItems }
+				/>
+			) }
 		</>
 	);
 }

@@ -9,7 +9,9 @@
 	.edit-site-page-content {
 		height: 100%;
 		position: relative;
-		padding: 0 0 $grid-unit-40;
+		padding: 0;
+		display: flex;
+		flex-flow: column;
 	}
 
 	.components-base-control {
@@ -72,16 +74,24 @@
 	}
 
 	.edit-site-patterns__grid-pagination {
-		width: fit-content;
+		background: $gray-900;
+		padding: $grid-unit-20 $grid-unit-40 $grid-unit-40;
+		position: sticky;
+		bottom: 0;
+		z-index: z-index(".edit-site-patterns__grid-pagination");
+
 		.components-button.is-tertiary {
 			width: $button-size-compact;
 			height: $button-size-compact;
 			color: $gray-100;
 			background-color: $gray-800;
+			justify-content: center;
+
 			&:disabled {
 				color: $gray-600;
 				background: none;
 			}
+
 			&:hover:not(:disabled) {
 				background-color: $gray-700;
 			}
@@ -98,7 +108,8 @@
 }
 
 .edit-site-patterns__section {
-	padding: $grid-unit-20 $grid-unit-40 0;
+	padding: $grid-unit-20 $grid-unit-40;
+	flex: 1;
 }
 
 .edit-site-patterns__section-header {
@@ -111,11 +122,8 @@
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: $grid-unit-40;
-	// Small top padding required to avoid cutting off the visible outline
-	// when hovering items.
-	padding-top: $border-width-focus-fallback;
 	margin-top: 0;
-	margin-bottom: $grid-unit-40;
+	margin-bottom: 0;
 	@include break-large {
 		grid-template-columns: 1fr 1fr;
 	}
