@@ -119,17 +119,18 @@ async function fetchPRs() {
 		number,
 		title,
 		closed_at,
-	} ) )
-		.sort( ( a, b ) => {
-			/*
-			 * `closed_at` and `pull_request.merged_at` are _usually_ the same,
-			 * but let's prefer the latter if it's available.
-			 */
-			if ( a?.pull_request?.merged_at && b?.pull_request?.merged_at ) {
-				return new Date(  a?.pull_request?.merged_at ) - new Date( b?.pull_request?.merged_at );
-			}
-			return new Date( a.closed_at ) - new Date( b.closed_at );
-		} );
+		pull_request,
+	} ) ).sort( ( a, b ) => {
+		/*
+		 * `closed_at` and `pull_request.merged_at` are _usually_ the same,
+		 * but let's prefer the latter if it's available.
+		 */
+		if ( a?.pull_request?.merged_at && b?.pull_request?.merged_at ) {
+			return new Date(  a?.pull_request?.merged_at ) - new Date( b?.pull_request?.merged_at );
+		}
+		return new Date( a.closed_at ) - new Date( b.closed_at );
+	} )
+
 
 	console.log( 'Found the following PRs to cherry-pick (sorted by closed date in ascending order): ' );
 	PRs.forEach( ( { number, title } ) =>
