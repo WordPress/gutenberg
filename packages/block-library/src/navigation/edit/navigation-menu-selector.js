@@ -102,7 +102,7 @@ function NavigationMenuSelector( {
 		selectorLabel = __( 'Choose or create a Navigation menu' );
 	} else {
 		// Current Menu's title.
-		selectorLabel = currentTitle;
+		selectorLabel = currentTitle?.rendered || currentTitle;
 	}
 
 	useEffect( () => {
