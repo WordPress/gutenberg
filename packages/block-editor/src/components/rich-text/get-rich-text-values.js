@@ -40,7 +40,9 @@ function addValuesForElement( element, ...args ) {
 		case Fragment:
 			return addValuesForElements( props.children, ...args );
 		case RawHTML:
-			return;
+			// `useInnerBlocksProps.save()` will return a `RawHTML` element,
+			// so use this as an indicator to recurse into the children.
+			return addValuesForBlocks( ...args );
 		case InnerBlocks.Content:
 			return addValuesForBlocks( ...args );
 		case Content:
@@ -81,7 +83,7 @@ function addValuesForElements( children, ...args ) {
 function addValuesForBlocks( values, blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {
 		const { name, attributes, innerBlocks } = blocks[ i ];
-		const saveElement = getSaveElement( name, attributes );
+		const saveElement = getSaveElement( name, attributes, innerBlocks );
 		addValuesForElement( saveElement, values, innerBlocks );
 	}
 }
