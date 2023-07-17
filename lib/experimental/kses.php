@@ -74,7 +74,7 @@ if ( ! function_exists( 'allow_filter_in_styles' ) ) {
 	 *
 	 * This function should not be backported to core.
 	 *
-	 * @param bool $allow_css Whether the CSS is allowed.
+	 * @param bool   $allow_css Whether the CSS is allowed.
 	 * @param string $css_test_string The CSS to test.
 	 */
 	function allow_filter_in_styles( $allow_css, $css_test_string ) {
