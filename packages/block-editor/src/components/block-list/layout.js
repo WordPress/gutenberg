@@ -32,7 +32,7 @@ export function LayoutStyle( { layout = {}, css, ...props } ) {
 
 	if ( layoutType ) {
 		if ( css ) {
-			return <style data-global-style="preset">{ css }</style>;
+			return <style>{ css }</style>;
 		}
 		const layoutStyle = layoutType.getLayoutStyle?.( {
 			hasBlockGapSupport,
@@ -40,7 +40,7 @@ export function LayoutStyle( { layout = {}, css, ...props } ) {
 			...props,
 		} );
 		if ( layoutStyle ) {
-			return <style data-global-style="preset">{ layoutStyle }</style>;
+			return <style>{ layoutStyle }</style>;
 		}
 	}
 	return null;
