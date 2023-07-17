@@ -139,7 +139,7 @@ function gutenberg_register_remote_theme_patterns() {
 		return;
 	}
 
-	$pattern_settings = gutenberg_get_remote_theme_patterns();
+	$pattern_settings = gutenberg_get_theme_directory_pattern_slugs();
 	if ( empty( $pattern_settings ) ) {
 		return;
 	}

@@ -287,6 +287,6 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
  *
  * @return string[]
  */
-function gutenberg_get_remote_theme_patterns() {
+function gutenberg_get_theme_directory_pattern_slugs() {
 	return WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) )->get_patterns();
 }

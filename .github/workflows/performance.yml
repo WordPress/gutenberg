@@ -87,7 +87,7 @@ jobs:
               env:
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
               run: |
-                  COMMITTED_AT=$(git show -s $GITHUB_SHA --format="%ct")
+                  COMMITTED_AT=$(git show -s $GITHUB_SHA --format="%cI")
                   ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA 34af5829ac9edb31833167ff6a3b51bea982999c $COMMITTED_AT
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)

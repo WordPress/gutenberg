@@ -149,6 +149,16 @@ function KeyboardShortcutsRegister() {
 				},
 			} );
 		} );
+
+		registerShortcut( {
+			name: 'core/edit-site/toggle-distraction-free',
+			category: 'global',
+			description: __( 'Toggle distraction free mode.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: '\\',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;

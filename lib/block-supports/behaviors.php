@@ -79,18 +79,27 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	}
 	$content = $processor->get_updated_html();
 
-	$lightbox_animation = '';
-	if ( isset( $lightbox_settings['animation'] ) ) {
+	// If we don't set a default, it won't work if Lightbox is set to enabled by default.
+	$lightbox_animation = 'zoom';
+	if ( isset( $lightbox_settings['animation'] ) && '' !== $lightbox_settings['animation'] ) {
 		$lightbox_animation = $lightbox_settings['animation'];
 	}
 
 	// We want to store the src in the context so we can set it dynamically when the lightbox is opened.
 	$z = new WP_HTML_Tag_Processor( $content );
 	$z->next_tag( 'img' );
+
 	if ( isset( $block['attrs']['id'] ) ) {
-		$img_src = wp_get_attachment_url( $block['attrs']['id'] );
+		$img_uploaded_src    = wp_get_attachment_url( $block['attrs']['id'] );
+		$img_metadata        = wp_get_attachment_metadata( $block['attrs']['id'] );
+		$img_width           = $img_metadata['width'];
+		$img_height          = $img_metadata['height'];
+		$img_uploaded_srcset = wp_get_attachment_image_srcset( $block['attrs']['id'] );
 	} else {
-		$img_src = $z->get_attribute( 'src' );
+		$img_uploaded_src    = $z->get_attribute( 'src' );
+		$img_width           = 'none';
+		$img_height          = 'none';
+		$img_uploaded_srcset = '';
 	}
 
 	$w = new WP_HTML_Tag_Processor( $content );
@@ -99,24 +108,59 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$w->set_attribute( 'data-wp-interactive', true );
 	$w->set_attribute(
 		'data-wp-context',
-		sprintf( '{ "core":{ "image": { "initialized": false, "imageSrc": "%s", "lightboxEnabled": false, "lightboxAnimation": "%s", "hideAnimationEnabled": false } } }', $img_src, $lightbox_animation )
+		sprintf(
+			'{ "core":
+				{ "image":
+					{   "imageLoaded": false,
+						"initialized": false,
+						"lightboxEnabled": false,
+						"hideAnimationEnabled": false,
+						"preloadInitialized": false,
+						"lightboxAnimation": "%s",
+						"imageUploadedSrc": "%s",
+						"imageCurrentSrc": "",
+						"imageSrcSet": "%s",
+						"targetWidth": "%s",
+						"targetHeight": "%s"
+					}
+				}
+			}',
+			$lightbox_animation,
+			$img_uploaded_src,
+			$img_uploaded_srcset,
+			$img_width,
+			$img_height
+		)
 	);
+	$w->next_tag( 'img' );
+	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setCurrentSrc' );
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
 	$img = null;
-	preg_match( '/<img[^>]+>/', $content, $img );
+	preg_match( '/<img[^>]+>/', $body_content, $img );
 	$button       = '<div class="img-container">
-                             <button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox"></button>'
+                             <button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox" data-wp-on--mouseenter="actions.core.image.preloadLightboxImage"></button>'
 		. $img[0] .
 		'</div>';
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
 	// Add src to the modal image.
 	$m = new WP_HTML_Tag_Processor( $content );
+	$m->next_tag( 'figure' );
+	$m->add_class( 'responsive-image' );
 	$m->next_tag( 'img' );
-	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.imageSrc' );
-	$modal_content = $m->get_updated_html();
+	$m->set_attribute( 'src', '' );
+	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.responsiveImgSrc' );
+	$initial_image_content = $m->get_updated_html();
+
+	$q = new WP_HTML_Tag_Processor( $content );
+	$q->next_tag( 'figure' );
+	$q->add_class( 'enlarged-image' );
+	$q->next_tag( 'img' );
+	$q->set_attribute( 'src', '' );
+	$q->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
+	$enlarged_image_content = $q->get_updated_html();
 
 	$background_color = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
 
@@ -142,7 +186,8 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
                     $close_button_icon
                 </button>
-                $modal_content
+                $initial_image_content
+				$enlarged_image_content
                 <div class="scrim" style="background-color: $background_color"></div>
         </div>
 HTML;

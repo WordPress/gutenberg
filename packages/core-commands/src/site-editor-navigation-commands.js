@@ -203,7 +203,7 @@ function useSiteEditorBasicNavigationCommands() {
 			icon: symbolFilled,
 			callback: ( { close } ) => {
 				const args = {
-					path: '/wp_template_part',
+					path: '/patterns',
 				};
 				const targetUrl = addQueryArgs( 'site-editor.php', args );
 				if ( isSiteEditor ) {

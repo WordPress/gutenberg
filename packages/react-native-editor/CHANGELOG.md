@@ -10,8 +10,25 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
--   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]
+-   [**] Add media inserter buttons to editor toolbar [#51827]
+-   [**] Update native BlockOutline component styles to remove blue border from blocks [#51222]
+-   [**] Move the undo/redo buttons to the navigation bar [#51766]
+-   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
 -   [*] Display custom color value in mobile Cover Block color picker [#51414]
+
+## 1.99.1
+- [**] Fix crash related to removing a block under certain conditions [#52595]
+
+## 1.99.0
+-   [*] Rename "Reusable blocks" to "Synced patterns", aligning with the web editor. [#51704]
+-   [**] Fix a crash related to Reanimated when closing the editor [#52320]
+
+## 1.98.1
+-   [*] fix: Display heading level dropdown icons and labels [#52004]
+
+## 1.98.0
+-   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]
+-   [*] Fix cursor positioning when dictating text on iOS [#51227]
 
 ## 1.97.1
 -   [**] Fix crash when using the delete key to remove a single button [#51435]

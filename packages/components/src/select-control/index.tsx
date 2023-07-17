@@ -135,6 +135,7 @@ function UnforwardedSelectControl(
 									key={ key }
 									value={ option.value }
 									disabled={ option.disabled }
+									hidden={ option.hidden }
 								>
 									{ option.label }
 								</option>

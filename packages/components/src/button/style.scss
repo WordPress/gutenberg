@@ -257,25 +257,26 @@
 		/* stylelint-enable */
 	}
 
+	&.is-compact {
+		height: $button-size-compact;
+
+		&.has-icon:not(.has-text) {
+			padding: 0;
+			width: $button-size-compact;
+			min-width: $button-size-compact;
+		}
+	}
+
 	&.is-small {
-		height: $button-size-small-next-default-32px;
+		height: $button-size-small;
 		line-height: 22px;
 		padding: 0 8px;
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
-			width: $button-size-small-next-default-32px;
-			min-width: $button-size-small-next-default-32px;
-		}
-
-		&:not(.is-next-32px-small-size) {
-			height: $button-size-small;
-
-			&.has-icon:not(.has-text) {
-				width: $button-size-small;
-				min-width: $button-size-small;
-			}
+			width: $button-size-small;
+			min-width: $button-size-small;
 		}
 	}
 

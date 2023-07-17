@@ -4,7 +4,6 @@
 import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -41,7 +40,7 @@ export default function SidebarNavigationScreen( {
 		};
 	}, [] );
 	const { getTheme } = useSelect( coreStore );
-	const { goTo } = useNavigator();
+	const navigator = useNavigator();
 	const theme = getTheme( currentlyPreviewingTheme() );
 	const icon = isRTL() ? chevronRight : chevronLeft;
 
@@ -58,17 +57,27 @@ export default function SidebarNavigationScreen( {
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
 					{ ! isRoot && ! backPath && (
-						<NavigatorToParentButton
-							as={ SidebarButton }
-							icon={ isRTL() ? chevronRight : chevronLeft }
-							aria-label={ __( 'Back' ) }
+						<SidebarButton
+							onClick={ () => {
+								if ( navigator.location.isInitial ) {
+									navigator.goToParent( { replace: true } );
+								} else {
+									navigator.goBack();
+								}
+							} }
+							icon={ icon }
+							label={ __( 'Back' ) }
+							showTooltip={ false }
 						/>
 					) }
 					{ ! isRoot && backPath && (
 						<SidebarButton
-							onClick={ () => goTo( backPath, { isBack: true } ) }
+							onClick={ () =>
+								navigator.goTo( backPath, { isBack: true } )
+							}
 							icon={ icon }
 							label={ __( 'Back' ) }
+							showTooltip={ false }
 						/>
 					) }
 					{ isRoot && (
@@ -76,7 +85,7 @@ export default function SidebarNavigationScreen( {
 							icon={ icon }
 							label={
 								! isPreviewingTheme()
-									? __( 'Go back to the Dashboard' )
+									? __( 'Go to the Dashboard' )
 									: __( 'Go back to the theme showcase' )
 							}
 							href={
@@ -88,7 +97,7 @@ export default function SidebarNavigationScreen( {
 					) }
 					<Heading
 						className="edit-site-sidebar-navigation-screen__title"
-						color={ 'white' }
+						color={ '#e0e0e0' /* $gray-200 */ }
 						level={ 1 }
 						size={ 20 }
 					>

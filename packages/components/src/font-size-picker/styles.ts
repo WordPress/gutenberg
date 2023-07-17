@@ -11,7 +11,6 @@ import Button from '../button';
 import { HStack } from '../h-stack';
 import { space } from '../ui/utils/space';
 import { COLORS } from '../utils';
-import type { FontSizePickerProps } from './types';
 
 export const Container = styled.fieldset`
 	border: 0;
@@ -43,13 +42,4 @@ export const Controls = styled.div< {
 } >`
 	${ ( props ) =>
 		! props.__nextHasNoMarginBottom && `margin-bottom: ${ space( 6 ) };` }
-`;
-
-export const ResetButton = styled( Button )< {
-	size: FontSizePickerProps[ 'size' ];
-} >`
-	&&& {
-		height: ${ ( props ) =>
-			props.size === '__unstable-large' ? '40px' : '30px' };
-	}
 `;

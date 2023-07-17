@@ -56,7 +56,7 @@ jobs:
                 github.event.inputs.version == 'rc' ||
                 github.event.inputs.version == 'stable'
               ) || (
-                endsWith( github.ref, needs.compute-stable-branches.outputs.current_stable_branch ) &&
+                startsWith( github.ref, 'refs/heads/release/' ) &&
                 github.event.inputs.version == 'stable'
               )
             )

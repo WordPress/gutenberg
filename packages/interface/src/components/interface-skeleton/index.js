@@ -33,6 +33,15 @@ function useHTMLClass( className ) {
 	}, [ className ] );
 }
 
+const headerVariants = {
+	hidden: { opacity: 0 },
+	hover: {
+		opacity: 1,
+		transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
+	},
+	distractionFreeInactive: { opacity: 1, transition: { delay: 0 } },
+};
+
 function InterfaceSkeleton(
 	{
 		isDistractionFree,
@@ -73,15 +82,6 @@ function InterfaceSkeleton(
 	};
 
 	const mergedLabels = { ...defaultLabels, ...labels };
-
-	const headerVariants = {
-		hidden: { opacity: 0 },
-		hover: {
-			opacity: 1,
-			transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
-		},
-		distractionFreeInactive: { opacity: 1, transition: { delay: 0 } },
-	};
 
 	return (
 		<div
