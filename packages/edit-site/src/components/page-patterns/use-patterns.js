@@ -86,6 +86,7 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 			( pattern ) => ! CORE_PATTERN_SOURCES.includes( pattern.source )
 		)
 		.filter( filterOutDuplicatesByName )
+		.filter( ( pattern ) => pattern.inserter !== false )
 		.map( ( pattern ) => ( {
 			...pattern,
 			keywords: pattern.keywords || [],
