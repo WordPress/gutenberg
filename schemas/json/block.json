@@ -337,105 +337,114 @@
 					"default": true
 				},
 				"layout": {
-					"type": [ "boolean", "object" ],
+					"default": false,
 					"description": "This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.",
-					"default": null,
-					"properties": {
-						"default": {
+					"oneOf": [
+						{ "type": "boolean" },
+						{
 							"type": "object",
-							"description": "Allows setting the `type` property to define what layout type is default for the block, and also default values for any properties inherent to that layout type, e.g., for a `flex` layout, a default value can be set for `flexWrap`.",
 							"properties": {
-								"type": {
-									"type": "string",
-									"description": "The layout type.",
-									"enum": [ "constrained", "grid", "flex" ]
+								"default": {
+									"type": "object",
+									"description": "Allows setting the `type` property to define what layout type is default for the block, and also default values for any properties inherent to that layout type, e.g., for a `flex` layout, a default value can be set for `flexWrap`.",
+									"properties": {
+										"type": {
+											"type": "string",
+											"description": "The layout type.",
+											"enum": [
+												"constrained",
+												"grid",
+												"flex"
+											]
+										},
+										"contentSize": {
+											"type": "string",
+											"description": "The content size used on all children."
+										},
+										"wideSize": {
+											"type": "string",
+											"description": "The wide size used on alignwide children."
+										},
+										"justifyContent": {
+											"type": "string",
+											"description": "Content justification value.",
+											"enum": [
+												"right",
+												"center",
+												"space-between",
+												"left",
+												"stretch"
+											]
+										},
+										"orientation": {
+											"type": "string",
+											"description": "The orientation of the layout.",
+											"enum": [ "horizontal", "vertical" ]
+										},
+										"flexWrap": {
+											"type": "string",
+											"description": "The flex wrap value.",
+											"enum": [ "wrap", "nowrap" ]
+										},
+										"verticalAlignment": {
+											"type": "string",
+											"description": "The vertical alignment value.",
+											"enum": [
+												"top",
+												"center",
+												"bottom",
+												"space-between",
+												"stretch"
+											]
+										},
+										"minimumColumnWidth": {
+											"type": "string",
+											"description": "The minimum column width value."
+										},
+										"columnCount": {
+											"type": "number",
+											"description": "The column count value."
+										}
+									}
 								},
-								"contentSize": {
-									"type": "string",
-									"description": "The content size used on all children."
+								"allowSwitching": {
+									"type": "boolean",
+									"description": "Exposes a switcher control that allows toggling between all existing layout types.",
+									"default": false
 								},
-								"wideSize": {
-									"type": "string",
-									"description": "The wide size used on alignwide children."
+								"allowEditing": {
+									"type": "boolean",
+									"description": "Determines display of layout controls in the block sidebar. If set to false, layout controls will be hidden.",
+									"default": true
 								},
-								"justifyContent": {
-									"type": "string",
-									"description": "Content justification value.",
-									"enum": [
-										"right",
-										"center",
-										"space-between",
-										"left",
-										"stretch"
-									]
+								"allowInheriting": {
+									"type": "boolean",
+									"description": "For the `flow` layout type only, determines display of the `Inner blocks use content width` toggle.",
+									"default": true
 								},
-								"orientation": {
-									"type": "string",
-									"description": "The orientation of the layout.",
-									"enum": [ "horizontal", "vertical" ]
+								"allowSizingOnChildren": {
+									"type": "boolean",
+									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.",
+									"default": false
 								},
-								"flexWrap": {
-									"type": "string",
-									"description": "The flex wrap value.",
-									"enum": [ "wrap", "nowrap" ]
+								"allowVerticalAlignment": {
+									"type": "boolean",
+									"description": "For the `flex` layout type only, determines display of vertical alignment controls in the block toolbar.",
+									"default": true
 								},
-								"verticalAlignment": {
-									"type": "string",
-									"description": "The vertical alignment value.",
-									"enum": [
-										"top",
-										"center",
-										"bottom",
-										"space-between",
-										"stretch"
-									]
+								"allowJustification": {
+									"type": "boolean",
+									"description": "For the `flex` layout type, determines display of justification controls in the block toolbar and block sidebar. For the `constrained` layout type, determines display of justification control in the block sidebar.",
+									"default": true
 								},
-								"minimumColumnWidth": {
-									"type": "string",
-									"description": "The minimum column width value."
-								},
-								"columnCount": {
-									"type": "number",
-									"description": "The column count value."
+								"allowOrientation": {
+									"type": "boolean",
+									"description": "For the `flex` layout type only, determines display of the orientation control in the block toolbar.",
+									"default": true
 								}
 							}
-						},
-						"allowSwitching": {
-							"type": "boolean",
-							"description": "Exposes a switcher control that allows toggling between all existing layout types.",
-							"default": false
-						},
-						"allowEditing": {
-							"type": "boolean",
-							"description": "Determines display of layout controls in the block sidebar. If set to false, layout controls will be hidden.",
-							"default": true
-						},
-						"allowInheriting": {
-							"type": "boolean",
-							"description": "For the `flow` layout type only, determines display of the `Inner blocks use content width` toggle.",
-							"default": true
-						},
-						"allowSizingOnChildren": {
-							"type": "boolean",
-							"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.",
-							"default": false
-						},
-						"allowVerticalAlignment": {
-							"type": "boolean",
-							"description": "For the `flex` layout type only, determines display of vertical alignment controls in the block toolbar.",
-							"default": true
-						},
-						"allowJustification": {
-							"type": "boolean",
-							"description": "For the `flex` layout type, determines display of justification controls in the block toolbar and block sidebar. For the `constrained` layout type, determines display of justification control in the block sidebar.",
-							"default": true
-						},
-						"allowOrientation": {
-							"type": "boolean",
-							"description": "For the `flex` layout type only, determines display of the orientation control in the block toolbar.",
-							"default": true
 						}
-					}
+					]
 				},
 				"multiple": {
 					"type": "boolean",
