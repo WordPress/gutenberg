@@ -1,6 +1,6 @@
 # Sync
 
-Sync data between frontend and backend.
+Sync data between multiple peers and persist in a local database.
 
 ## Installation
 
