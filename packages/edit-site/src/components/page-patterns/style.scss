@@ -1,5 +1,5 @@
 .edit-site-patterns {
-	border: 1px solid $gray-800;
+	border-left: 1px solid $gray-800;
 	background: none;
 	margin: $header-height 0 0;
 	border-radius: 0;
@@ -74,16 +74,16 @@
 	}
 
 	.edit-site-patterns__grid-pagination {
+		border-top: 1px solid $gray-800;
 		background: $gray-900;
-		padding: $grid-unit-20 $grid-unit-40 $grid-unit-40;
+		padding: $grid-unit-30 $grid-unit-40 $grid-unit-30;
 		position: sticky;
 		bottom: 0;
 		z-index: z-index(".edit-site-patterns__grid-pagination");
 
 		.components-button.is-tertiary {
-			width: $button-size-compact;
-			height: $button-size-compact;
 			color: $gray-100;
+			width: $button-size;
 			background-color: $gray-800;
 			justify-content: center;
 
@@ -108,7 +108,7 @@
 }
 
 .edit-site-patterns__section {
-	padding: $grid-unit-20 $grid-unit-40;
+	padding: $grid-unit-30 $grid-unit-40;
 	flex: 1;
 }
 
