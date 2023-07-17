@@ -106,6 +106,10 @@ _Returns_
 
 -   `Object`: Page.
 
+### getPageContentFocusMode
+
+Undocumented declaration.
+
 ### getReusableBlocks
 
 Returns any available Reusable blocks.
@@ -378,6 +382,10 @@ _Parameters_
 _Returns_
 
 -   `number`: The resolved template ID for the page route.
+
+### setPageContentFocusMode
+
+Undocumented declaration.
 
 ### setTemplate
 

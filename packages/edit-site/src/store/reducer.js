@@ -166,12 +166,12 @@ function editorCanvasContainerView( state = undefined, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function hasPageContentFocus( state = false, action ) {
+export function pageContentFocusMode( state = null, action ) {
 	switch ( action.type ) {
 		case 'SET_EDITED_POST':
-			return !! action.context?.postId;
-		case 'SET_HAS_PAGE_CONTENT_FOCUS':
-			return action.hasPageContentFocus;
+			return action.context?.postId ? 'withTemplate' : null;
+		case 'SET_PAGE_CONTENT_FOCUS_MODE':
+			return action.pageContentFocusMode;
 	}
 
 	return state;
@@ -186,5 +186,5 @@ export default combineReducers( {
 	saveViewPanel,
 	canvasMode,
 	editorCanvasContainerView,
-	hasPageContentFocus,
+	pageContentFocusMode,
 } );

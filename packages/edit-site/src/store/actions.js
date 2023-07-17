@@ -578,12 +578,20 @@ export const switchEditorMode =
  */
 export const setHasPageContentFocus =
 	( hasPageContentFocus ) =>
+	( { dispatch } ) => {
+		dispatch.setPageContentFocusMode(
+			hasPageContentFocus ? 'withTemplate' : null
+		);
+	};
+
+export const setPageContentFocusMode =
+	( pageContentFocusMode ) =>
 	( { dispatch, registry } ) => {
-		if ( hasPageContentFocus ) {
+		if ( pageContentFocusMode ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		}
 		dispatch( {
-			type: 'SET_HAS_PAGE_CONTENT_FOCUS',
-			hasPageContentFocus,
+			type: 'SET_PAGE_CONTENT_FOCUS_MODE',
+			pageContentFocusMode,
 		} );
 	};

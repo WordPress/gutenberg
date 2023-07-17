@@ -19,7 +19,13 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus, external, chevronUpDown } from '@wordpress/icons';
+import {
+	listView,
+	plus,
+	external,
+	chevronUpDown,
+	postContent,
+} from '@wordpress/icons';
 import {
 	__unstableMotion as motion,
 	Button,
@@ -67,6 +73,8 @@ export default function HeaderEditMode() {
 		showIconLabels,
 		editorCanvasView,
 		hasFixedToolbar,
+		isPage,
+		pageContentFocusMode,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -74,6 +82,8 @@ export default function HeaderEditMode() {
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
+			isPage: _isPage,
+			getPageContentFocusMode,
 		} = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
@@ -112,6 +122,8 @@ export default function HeaderEditMode() {
 				editSiteStore.name,
 				'fixedToolbar'
 			),
+			isPage: _isPage(),
+			pageContentFocusMode: getPageContentFocusMode(),
 		};
 	}, [] );
 
@@ -119,6 +131,7 @@ export default function HeaderEditMode() {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
 		setIsListViewOpened,
+		setPageContentFocusMode,
 	} = useDispatch( editSiteStore );
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const disableMotion = useReducedMotion();
@@ -259,6 +272,44 @@ export default function HeaderEditMode() {
 										label={ __( 'List View' ) }
 										onClick={ toggleListView }
 										shortcut={ listViewShortcut }
+										showTooltip={ ! showIconLabels }
+										variant={
+											showIconLabels
+												? 'tertiary'
+												: undefined
+										}
+									/>
+								) }
+								{ ! isDistractionFree && isPage && (
+									<ToolbarItem
+										as={ Button }
+										className="edit-site-header-edit-mode__list-view-toggle"
+										disabled={
+											! isVisualMode ||
+											isZoomedOutView ||
+											! pageContentFocusMode
+										}
+										icon={ postContent }
+										isPressed={
+											pageContentFocusMode ===
+											'withTemplate'
+										}
+										/* translators: button label text should, if possible, be under 16 characters. */
+										label={ __( 'Show Template' ) }
+										onClick={ () => {
+											if (
+												pageContentFocusMode ===
+												'withTemplate'
+											) {
+												setPageContentFocusMode(
+													'withoutTemplate'
+												);
+											} else {
+												setPageContentFocusMode(
+													'withTemplate'
+												);
+											}
+										} }
 										showTooltip={ ! showIconLabels }
 										variant={
 											showIconLabels
