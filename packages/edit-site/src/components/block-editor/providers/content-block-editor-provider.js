@@ -16,12 +16,7 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const noop = () => {};
 
 export default function ContentBlockEditorProvider( { children } ) {
-	const defaultSettings = useSiteEditorSettings();
-	const settings = useMemo( () => {
-		return {
-			...defaultSettings,
-		};
-	}, [ defaultSettings ] );
+	const settings = useSiteEditorSettings();
 
 	const blocks = useMemo( () => {
 		return [

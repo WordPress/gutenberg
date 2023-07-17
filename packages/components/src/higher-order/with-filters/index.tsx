@@ -52,7 +52,7 @@ export default function withFilters( hookName: string ) {
 		 * reuse this shared reference as an optimization to avoid excessive
 		 * calls to `applyFilters` when many instances exist.
 		 */
-		let FilteredComponent: React.ComponentType | undefined;
+		let FilteredComponent: React.ComponentType;
 
 		/**
 		 * Initializes the FilteredComponent variable once, if not already
@@ -94,19 +94,15 @@ export default function withFilters( hookName: string ) {
 					);
 
 				// If this was the last of the mounted components filtered on
-				// this hook, remove the hook handler and reset the shared
-				// FilteredComponent reference so that it's recreated on next
-				// mount.
+				// this hook, remove the hook handler.
 				if ( FilteredComponentRenderer.instances.length === 0 ) {
 					removeAction( 'hookRemoved', namespace );
 					removeAction( 'hookAdded', namespace );
-					// FilteredComponent = undefined;
 				}
 			}
 
 			render() {
-				const NonNullFilteredComponent = FilteredComponent!;
-				return <NonNullFilteredComponent { ...this.props } />;
+				return <FilteredComponent { ...this.props } />;
 			}
 		}
 
