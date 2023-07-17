@@ -30,6 +30,8 @@ export default withSelect( ( select ) => {
 	const clientIds = getSelectedBlockClientIds();
 	return {
 		clientIds,
-		rootClientId: getBlockRootClientId( clientIds[ 0 ] ),
+		rootClientId: clientIds?.length
+			? getBlockRootClientId( clientIds[ 0 ] )
+			: undefined,
 	};
 } )( ReusableBlocksMenuItems );
