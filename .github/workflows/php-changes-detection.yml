@@ -22,7 +22,6 @@ jobs:
                       *.{php}
                       lib/**
                       phpunit/**
-                      packages/block-library/src/**
 
             - name: List all changed files
               if: steps.changed-files-php.outputs.any_changed == 'true'
