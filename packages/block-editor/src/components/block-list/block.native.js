@@ -35,6 +35,7 @@ import { compose, ifCondition, pure } from '@wordpress/compose';
 import BlockEdit from '../block-edit';
 import BlockDraggable from '../block-draggable';
 import BlockInvalidWarning from './block-invalid-warning';
+import BlockOutline from './block-outline';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import useSetting from '../use-setting';
@@ -59,11 +60,14 @@ function getWrapperProps( value, getWrapperPropsFunction ) {
 
 function BlockWrapper( {
 	accessibilityLabel,
+	blockCategory,
 	children,
 	clientId,
 	draggingClientId,
 	draggingEnabled,
+	hasInnerBlocks,
 	isDescendentBlockSelected,
+	isRootList,
 	isSelected,
 	isTouchable,
 	marginHorizontal,
@@ -89,6 +93,12 @@ function BlockWrapper( {
 			onPress={ onFocus }
 			style={ blockWrapperStyle }
 		>
+			<BlockOutline
+				blockCategory={ blockCategory }
+				hasInnerBlocks={ hasInnerBlocks }
+				isRootList={ isRootList }
+				isSelected={ isSelected }
+			/>
 			<BlockDraggable
 				clientId={ clientId }
 				draggingClientId={ draggingClientId }
@@ -127,9 +137,11 @@ function BlockListBlock( {
 } ) {
 	const {
 		baseGlobalStyles,
+		blockCategory,
 		blockType,
 		draggingClientId,
 		draggingEnabled,
+		hasInnerBlocks,
 		isDescendantOfParentSelected,
 		isDescendentBlockSelected,
 		isParentSelected,
@@ -146,6 +158,7 @@ function BlockListBlock( {
 				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
 			const currentBlockType = getBlockType( name || 'core/missing' );
+			const currentBlockCategory = currentBlockType?.category;
 			const blockOrder = getBlockIndex( clientId );
 			const descendentBlockSelected = hasSelectedInnerBlock(
 				clientId,
@@ -162,13 +175,15 @@ function BlockListBlock( {
 			const selectedParents = clientId ? parents : [];
 			const descendantOfParentSelected =
 				selectedParents.includes( rootClientId );
-			const hasInnerBlocks = getBlockCount( clientId ) > 0;
+			const blockHasInnerBlocks = getBlockCount( clientId ) > 0;
 
 			// For blocks with inner blocks, we only enable the dragging in the nested
 			// blocks if any of them are selected. This way we prevent the long-press
 			// gesture from being disabled for elements within the block UI.
 			const isDraggingEnabled =
-				! hasInnerBlocks || isSelected || ! descendentBlockSelected;
+				! blockHasInnerBlocks ||
+				isSelected ||
+				! descendentBlockSelected;
 			// Dragging nested blocks is not supported yet. For this reason, the block to be dragged
 			// will be the top in the hierarchy.
 			const currentDraggingClientId =
@@ -179,9 +194,11 @@ function BlockListBlock( {
 
 			return {
 				baseGlobalStyles: globalStylesBaseStyles,
+				blockCategory: currentBlockCategory,
 				blockType: currentBlockType,
 				draggingClientId: currentDraggingClientId,
 				draggingEnabled: isDraggingEnabled,
+				hasInnerBlocks: blockHasInnerBlocks,
 				isDescendantOfParentSelected: descendantOfParentSelected,
 				isDescendentBlockSelected: descendentBlockSelected,
 				isParentSelected: parentSelected,
@@ -279,11 +296,14 @@ function BlockListBlock( {
 	return (
 		<BlockWrapper
 			accessibilityLabel={ accessibilityLabel }
+			blockCategory={ blockCategory }
 			clientId={ clientId }
 			draggingClientId={ draggingClientId }
 			draggingEnabled={ draggingEnabled }
 			isFocused={ isFocused }
+			hasInnerBlocks={ hasInnerBlocks }
 			isDescendentBlockSelected={ isDescendentBlockSelected }
+			isRootList={ ! rootClientId }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
 			isTouchable={ isTouchable }

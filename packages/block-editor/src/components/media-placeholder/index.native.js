@@ -43,6 +43,7 @@ function MediaPlaceholder( props ) {
 	const {
 		addToGallery,
 		allowedTypes = [],
+		className = '',
 		labels = {},
 		icon,
 		onSelect,
@@ -196,7 +197,9 @@ function MediaPlaceholder( props ) {
 			styles[ 'media-placeholder__container' ],
 			styles[ 'media-placeholder__container--dark' ]
 		),
-		blockEditContext?.isSelected && containerSelectedStyle,
+		blockEditContext?.isSelected &&
+			! className.includes( 'no-block-outline' ) &&
+			containerSelectedStyle,
 	];
 
 	if ( isAppender && disableMediaButtons ) {
