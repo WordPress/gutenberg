@@ -176,7 +176,7 @@ function GridItem( { categoryId, item, ...props } ) {
 					spacing={ 3 }
 					className="edit-site-patterns__pattern-title"
 				>
-					{ itemIcon && (
+					{ itemIcon && ! isNonUserPattern && (
 						<Tooltip
 							position="top center"
 							text={ __(
