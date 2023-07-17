@@ -78,6 +78,8 @@ function calculateNewHeight( width, initialAspectRatio ) {
 
 function ResizableFrame( {
 	isFullWidth,
+	isOversized,
+	setIsOversized,
 	isReady,
 	children,
 	oversizedClassName,
@@ -88,7 +90,6 @@ function ResizableFrame( {
 	const [ startingWidth, setStartingWidth ] = useState();
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ shouldShowHandle, setShouldShowHandle ] = useState( false );
-	const [ isOversized, setIsOversized ] = useState( false );
 	const [ resizeRatio, setResizeRatio ] = useState( 1 );
 	const canvasMode = useSelect(
 		( select ) => unlock( select( editSiteStore ) ).getCanvasMode(),
