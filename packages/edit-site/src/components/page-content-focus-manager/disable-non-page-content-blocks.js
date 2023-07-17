@@ -36,11 +36,12 @@ export function useDisableNonPageContentBlocks() {
 			'core/edit-site/disable-non-content-blocks',
 			withDisableNonPageContentBlocks
 		);
-		return () =>
+		return () => {
 			removeFilter(
 				'editor.BlockEdit',
 				'core/edit-site/disable-non-content-blocks'
 			);
+		};
 	}, [] );
 }
 

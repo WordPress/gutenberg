@@ -373,5 +373,9 @@ export function isPage( state ) {
  * @return {boolean} Whether or not focus is on editing page content.
  */
 export function hasPageContentFocus( state ) {
-	return isPage( state ) ? state.hasPageContentFocus : false;
+	return !! getPageContentFocusMode( state );
+}
+
+export function getPageContentFocusMode( state ) {
+	return isPage( state ) ? state.pageContentFocusMode : null;
 }
