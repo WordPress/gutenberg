@@ -100,10 +100,9 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 				item.categories?.includes( currentCategory ),
 		} );
 	} else {
-		// If there is no category id, select uncategorized patterns.
-		patterns = patterns.filter(
-			( item ) => ! item.hasOwnProperty( 'categories' )
-		);
+		patterns = searchItems( patterns, search, {
+			hasCategory: ( item ) => ! item.hasOwnProperty( 'categories' ),
+		} );
 	}
 
 	return { patterns, isResolving: false };
