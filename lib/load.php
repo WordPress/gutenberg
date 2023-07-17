@@ -28,7 +28,7 @@ function gutenberg_is_experiment_enabled( $name ) {
 	return ! empty( $experiments[ $name ] );
 }
 
-// These files only need to be loaded if within a rest server instance
+// These files only need to be loaded if within a rest server instance.
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
@@ -163,7 +163,7 @@ if ( class_exists( 'WP_Fonts_Library' ) || class_exists( 'WP_Fonts_Library_Contr
 	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-web-fonts.php';
 }
 
-// Fonts Library
+// Fonts Library.
 require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
 require __DIR__ . '/experimental/fonts-library/class-wp-rest-fonts-library-controller.php';
 
