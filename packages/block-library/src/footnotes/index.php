@@ -84,39 +84,62 @@ add_action( 'init', 'register_block_core_footnotes' );
 remove_action( 'post_updated', 'wp_save_post_revision', 10, 1 );
 add_action( 'wp_after_insert_post', 'wp_save_post_revision', 10, 1 );
 
+/**
+ * Saves the footnotes meta value to the revision.
+ *
+ * @param int $revision_id The revision ID.
+ */
 function gutenberg_save_footnotes_meta( $revision_id ) {
-    $post_id = wp_is_post_revision( $revision_id );
+	$post_id = wp_is_post_revision( $revision_id );
 
-    if ( $post_id ) {
-        $footnotes = get_post_meta( $post_id, 'footnotes', true );
+	if ( $post_id ) {
+		$footnotes = get_post_meta( $post_id, 'footnotes', true );
 
-        if ( $footnotes ) {
+		if ( $footnotes ) {
 			// Can't use update_post_meta() because it doesn't allow revisions.
-            update_metadata( 'post', $revision_id, 'footnotes', $footnotes );
-        }
-    }
+			update_metadata( 'post', $revision_id, 'footnotes', $footnotes );
+		}
+	}
 }
 add_action( 'wp_after_insert_post', 'gutenberg_save_footnotes_meta' );
 
+/**
+ * Restores the footnotes meta value from the revision.
+ *
+ * @param int $post_id      The post ID.
+ * @param int $revision_id  The revision ID.
+ */
 function gutenberg_restore_footnotes_meta( $post_id, $revision_id ) {
-    $footnotes = get_post_meta( $revision_id, 'footnotes', true );
+	$footnotes = get_post_meta( $revision_id, 'footnotes', true );
 
-    if ( $footnotes ) {
-        update_post_meta( $post_id, 'footnotes', $footnotes );
-    } else {
-        delete_post_meta( $post_id, 'footnotes' );
-    }
+	if ( $footnotes ) {
+		update_post_meta( $post_id, 'footnotes', $footnotes );
+	} else {
+		delete_post_meta( $post_id, 'footnotes' );
+	}
 }
 add_action( 'wp_restore_post_revision', 'gutenberg_restore_footnotes_meta', 10, 2 );
 
+/**
+ * Adds the footnotes field to the revision.
+ *
+ * @param array $fields The revision fields.
+ *
+ * @return array The revision fields.
+ */
 function gutenberg_revision_fields( $fields ) {
-    $fields['footnotes'] = __( 'Footnotes' );
-    return $fields;
+	$fields['footnotes'] = __( 'Footnotes' );
+	return $fields;
 }
 add_filter( '_wp_post_revision_fields', 'gutenberg_revision_fields' );
 
-function gutenberg_revision_field_footnotes( $value, $field ) {
-    global $revision;
-    return get_metadata( 'post', $revision->ID, $field, true );
+/**
+ * Gets the footnotes field from the revision.
+ *
+ * @return string The field value.
+ */
+function gutenberg_revision_field_footnotes() {
+	global $revision;
+	return get_metadata( 'post', $revision->ID, 'footnotes', true );
 }
-add_filter( 'wp_post_revision_field_footnotes', 'gutenberg_revision_field_footnotes', 10, 2 );
+add_filter( 'wp_post_revision_field_footnotes', 'gutenberg_revision_field_footnotes' );
