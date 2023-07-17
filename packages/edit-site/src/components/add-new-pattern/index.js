@@ -5,6 +5,7 @@ import { DropdownMenu } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plus, symbol, symbolFilled } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -14,6 +15,7 @@ import CreatePatternModal from '../create-pattern-modal';
 import CreateTemplatePartModal from '../create-template-part-modal';
 import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
+import { store as editSiteStore } from '../../store';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -22,6 +24,10 @@ export default function AddNewPattern() {
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
+	const isTemplatePartsMode = useSelect( ( select ) => {
+		const settings = select( editSiteStore ).getSettings();
+		return !! settings.supportsTemplatePartsMode;
+	}, [] );
 
 	function handleCreatePattern( { pattern, categoryId } ) {
 		setShowPatternModal( false );
@@ -55,7 +61,7 @@ export default function AddNewPattern() {
 		<>
 			<DropdownMenu
 				controls={ [
-					{
+					! isTemplatePartsMode && {
 						icon: symbolFilled,
 						onClick: () => setShowTemplatePartModal( true ),
 						title: __( 'Create template part' ),
@@ -65,7 +71,7 @@ export default function AddNewPattern() {
 						onClick: () => setShowPatternModal( true ),
 						title: __( 'Create pattern' ),
 					},
-				] }
+				].filter( Boolean ) }
 				toggleProps={ {
 					as: SidebarButton,
 				} }
