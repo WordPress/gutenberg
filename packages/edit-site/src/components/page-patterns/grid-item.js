@@ -114,7 +114,9 @@ function GridItem( { categoryId, item, ...props } ) {
 	}
 
 	if ( isNonUserPattern ) {
-		ariaDescriptions.push( __( 'Theme patterns cannot be edited.' ) );
+		ariaDescriptions.push(
+			__( 'Theme & plugin patterns cannot be edited.' )
+		);
 	}
 
 	const itemIcon =
@@ -208,9 +210,7 @@ function GridItem( { categoryId, item, ...props } ) {
 						{ item.type === PATTERNS && (
 							<Tooltip
 								position="top center"
-								text={ __(
-									'Theme patterns cannot be edited.'
-								) }
+								text={ __( 'This pattern cannot be edited.' ) }
 							>
 								<span className="edit-site-patterns__pattern-lock-icon">
 									<Icon icon={ lockSmall } size={ 24 } />
