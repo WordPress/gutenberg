@@ -104,6 +104,15 @@ export default function SaveHub() {
 		label = __( 'Saving' );
 	}
 
+	const { homeUrl } = useSelect( ( select ) => {
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
+		return {
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
+
 	const saveCurrentEntity = async () => {
 		if ( ! dirtyCurrentEntity ) return;
 
@@ -132,6 +141,12 @@ export default function SaveHub() {
 
 			createSuccessNotice( __( 'Site updated.' ), {
 				type: 'snackbar',
+				actions: [
+					{
+						label: __( 'View site' ),
+						url: homeUrl,
+					},
+				],
 			} );
 		} catch ( error ) {
 			createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` );
