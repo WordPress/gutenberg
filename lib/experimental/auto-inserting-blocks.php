@@ -124,6 +124,7 @@ function gutenberg_register_auto_inserted_block( $inserted_block, $position, $an
 			'innerContent' => array(),
 			'innerBlocks'  => array(),
 		);
+
 		$inserter = gutenberg_auto_insert_block( $inserted_block, $position, $anchor_block );
 		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
 }
