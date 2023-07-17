@@ -57,6 +57,9 @@
 			width: 300px;
 		}
 	}
+	.edit-site-patterns__sync-status-filter-option:not([aria-checked="true"]) {
+		color: $gray-400;
+	}
 	.edit-site-patterns__sync-status-filter-option:active {
 		background: $gray-700;
 		color: $gray-100;
