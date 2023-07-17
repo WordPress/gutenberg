@@ -67,8 +67,11 @@ export default function useNavigationMenuContent( postType, postId ) {
 		( block ) => block.attributes.ref
 	);
 
-	// Dedupe the Navigation blocks, as you can have multiple in the same template part.
-	const uniqueNavigationMenuIds = [ ...new Set( navigationMenuIds ) ];
+	// Dedupe the Navigation blocks, as you can have multiple navigation blocks in the template.
+	// Also, filter out undefined values, as blocks don't have an id when initially added.
+	const uniqueNavigationMenuIds = [ ...new Set( navigationMenuIds ) ].filter(
+		( menuId ) => menuId
+	);
 
 	if ( ! uniqueNavigationMenuIds?.length ) {
 		return;
