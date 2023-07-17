@@ -15,9 +15,24 @@ class WP_Font_Family {
 		'woff2' => 'font/woff2',
 	);
 
+	/**
+	 * Font family data
+	 *
+	 * @var array
+	 */
 	private $data;
+	/**
+	 * Relative path to the fonts directory
+	 *
+	 * @var string
+	 */
 	private $relative_fonts_path;
 
+	/**
+	 * WP_Font_Family constructor.
+	 *
+	 * @param array $font_family Font family data.
+	 */
 	public function __construct( $font_family = array() ) {
 		$this->data                = $font_family;
 		$this->relative_fonts_path = content_url( '/fonts/' );
@@ -84,7 +99,7 @@ class WP_Font_Family {
 	/**
 	 * Removes font family assets
 	 *
-	 * @param array $font_family
+	 * @param array $font_family    The font family data.
 	 * @return bool True if assets were removed, false otherwise.
 	 */
 	private function remove_font_family_assets() {
@@ -106,7 +121,7 @@ class WP_Font_Family {
 	 */
 	public function uninstall() {
 		$post = $this->get_data_from_post();
-		if ( $post === null ) {
+		if ( null === $post ) {
 			return new WP_Error( 'font_family_not_found', __( 'The font family could not be found.' ) );
 		}
 		$were_assets_removed = $this->remove_font_family_assets();
@@ -174,28 +189,28 @@ class WP_Font_Family {
 	private function download_asset( $src, $filename ) {
 		$file_path = path_join( WP_FONTS_DIR, $filename );
 
-		// Checks if the file to be downloaded has a font mime type
+		// Checks if the file to be downloaded has a font mime type.
 		if ( ! self::has_font_mime_type( $file_path ) ) {
 			return false;
 		}
 
-		// Downloads the font asset or returns false
+		// Downloads the font asset or returns false.
 		$temp_file = download_url( $src );
 		if ( is_wp_error( $temp_file ) ) {
 			@unlink( $temp_file );
 			return false;
 		}
 
-		// Moves the file to the fonts directory or return false
+		// Moves the file to the fonts directory or return false.
 		$renamed_file = rename( $temp_file, $file_path );
-		// Cleans the temp file
+		// Cleans the temp file.
 		@unlink( $temp_file );
 
 		if ( ! $renamed_file ) {
 			return false;
 		}
 
-		// Returns the relative path to the downloaded font asset to be used as font face src
+		// Returns the relative path to the downloaded font asset to be used as font face src.
 		return "{$this->relative_fonts_path}{$filename}";
 	}
 
@@ -229,6 +244,7 @@ class WP_Font_Family {
 	 * This is used when uploading local fonts
 	 *
 	 * @param array $font_face Font face to download.
+	 * @param array $file Uploaded file.
 	 * @return array New font face with all assets downloaded and referenced in the font face definition.
 	 */
 	private function move_font_face_asset( $font_face, $file ) {
@@ -258,11 +274,10 @@ class WP_Font_Family {
 	/**
 	 * Sanitizes the font family data using WP_Theme_JSON.
 	 *
-	 * @param array $font A font family definition.
 	 * @return array A sanitized font family defintion.
 	 */
 	private function sanitize() {
-		// Creates the structure of theme.json array with the new fonts
+		// Creates the structure of theme.json array with the new fonts.
 		$fonts_json = array(
 			'version'  => '2',
 			'settings' => array(
@@ -271,7 +286,7 @@ class WP_Font_Family {
 				),
 			),
 		);
-		// Creates a new WP_Theme_JSON object with the new fonts to leverage sanitization and validation
+		// Creates a new WP_Theme_JSON object with the new fonts to mmake profit of the sanitization and validation.
 		$theme_json     = new WP_Theme_JSON( $fonts_json );
 		$theme_data     = $theme_json->get_data();
 		$sanitized_font = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
@@ -333,19 +348,25 @@ class WP_Font_Family {
 	}
 
 
+	/**
+	 * Downloads font face assets if the font family is a Google font, or moves them if it is a local font.
+	 *
+	 * @param array $files An array of files to be installed.
+	 * @return bool|WP_Error
+	 */
 	public function download_or_move_font_faces( $files ) {
 		if ( $this->has_font_faces() ) {
 			$new_font_faces = array();
 			foreach ( $this->data['fontFace'] as $font_face ) {
 				if ( empty( $files ) ) {
-					// If we are installing local fonts, we need to move the font face assets from the temp folder to the wp fonts directory
+					// If we are installing local fonts, we need to move the font face assets from the temp folder to the wp fonts directory.
 					$new_font_face = $this->download_font_face_assets( $font_face );
 				} else {
-					// If we are installing google fonts, we need to download the font face assets
+					// If we are installing google fonts, we need to download the font face assets.
 					$new_font_face = $this->move_font_face_asset( $font_face, $files[ $font_face['file'] ] );
 				}
 				// If the font face assets were successfully downloaded, we add the font face to the new font.
-				// Font faces with failed downloads are not added to the new font
+				// Font faces with failed downloads are not added to the new font.
 				if ( ! empty( $new_font_face['src'] ) ) {
 					$new_font_faces[] = $new_font_face;
 				}
@@ -400,7 +421,6 @@ class WP_Font_Family {
 	/**
 	 * Create a post for a font family
 	 *
-	 * @param array $font_family
 	 * @return int
 	 */
 	private function create_font_post() {
@@ -419,8 +439,9 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * @param array   $font_family
-	 * @param WP_Post $post
+	 * Update a post for a font family
+	 *
+	 * @param WP_Post $post The post to update.
 	 * @return int
 	 */
 	private function update_font_post( $post ) {
@@ -440,7 +461,6 @@ class WP_Font_Family {
 	/**
 	 * Creates a post for a font in the fonts library if it doesn't exist, or updates it if it does.
 	 *
-	 * @param array $font_family
 	 * @return WP_Post
 	 */
 	public function create_or_update_font_post() {
