@@ -25,8 +25,11 @@ function ReusableBlocksMenuItems( { clientIds, rootClientId } ) {
 }
 
 export default withSelect( ( select ) => {
-	const { getSelectedBlockClientIds } = select( blockEditorStore );
+	const { getSelectedBlockClientIds, getBlockRootClientId } =
+		select( blockEditorStore );
+	const clientIds = getSelectedBlockClientIds();
 	return {
-		clientIds: getSelectedBlockClientIds(),
+		clientIds,
+		rootClientId: getBlockRootClientId( clientIds[ 0 ] ),
 	};
 } )( ReusableBlocksMenuItems );
