@@ -1,6 +1,6 @@
 # Getting started with the Interactivity API
 
-To get started with the Interactivity API, you can follow this [**Quick Start Guide**](#) by taking into account the [current requirements of the Interactivity API](#) (especially the need for Gutenberg 16.2 or superior).
+To get started with the Interactivity API, you can follow this [**Quick Start Guide**](#quick-start-guide) by taking into account the [current requirements of the Interactivity API](#requirements-of-the-interactivity-api) (especially the need for Gutenberg 16.2 or superior).
 
 ## Quick Start Guide
 
@@ -28,7 +28,7 @@ If you have a local WordPress installation already running, you can launch the c
 npx @wp-now/wp-now start 
 ```
 
-At this point you should be able to insert the "Example Interactive" block into any post, and see how it behaves in the frontent when published. 
+At this point you should be able to insert the "Example Interactive" block into any post, and see how it behaves in the frontend when published. 
 
 ## Requirements of the Interactivity API
 
@@ -36,7 +36,7 @@ To start working with the Interactivity API you'll need to have a [proper WordPr
 
 - A local WordPress installation
 - Gutenberg 16.2 or superior
-- Node v14
+- Node.js
 
 ### A local WordPress installation
 
