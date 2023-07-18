@@ -478,13 +478,15 @@ class WP_Font_Family {
 	/**
 	 * Install the font family into the library
 	 *
+	 * @param array $files Array of font files to be installed.
+	 *
 	 * @return WP_Post|WP_Error
 	 */
-	public function install ( $files = null ) {
+	public function install( $files = null ) {
 		$were_assets_written = $this->download_or_move_font_faces( $files );
 		if ( $were_assets_written ) {
 			$post_id = $this->create_or_update_font_post();
-			if ( $post_id ){
+			if ( $post_id ) {
 				return $this->get_data();
 			}
 			return WP_Error( 'font_post_creation_failed', __( 'Font post creation failed', 'gutenberg' ) );
