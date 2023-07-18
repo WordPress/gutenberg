@@ -59,7 +59,7 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
  * Registers the `core/footnotes` block on the server.
  */
 function register_block_core_footnotes() {
-	foreach ( array( 'post', 'page', 'revision' ) as $post_type ) {
+	foreach ( array( 'post', 'page' ) as $post_type ) {
 		register_post_meta(
 			$post_type,
 			'footnotes',
