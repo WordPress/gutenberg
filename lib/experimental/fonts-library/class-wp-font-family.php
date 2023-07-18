@@ -483,8 +483,7 @@ class WP_Font_Family {
 	/**
 	 * Install the font family into the library
 	 *
-	 * @param array $files Array of font files to be installed.
-	 *
+	 * @param array $files An array of files to be installed, default is null.
 	 * @return WP_Post|WP_Error
 	 */
 	public function install( $files = null ) {
