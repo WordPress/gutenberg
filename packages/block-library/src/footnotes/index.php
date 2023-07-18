@@ -79,11 +79,6 @@ function register_block_core_footnotes() {
 }
 add_action( 'init', 'register_block_core_footnotes' );
 
-// Revisions must be created after post meta is updated, otherwise we don't have
-// access to the meta.
-remove_action( 'post_updated', 'wp_save_post_revision', 10, 1 );
-add_action( 'wp_after_insert_post', 'wp_save_post_revision', 10, 1 );
-
 /**
  * Saves the footnotes meta value to the revision.
  *
@@ -102,6 +97,55 @@ function gutenberg_save_footnotes_meta( $revision_id ) {
 	}
 }
 add_action( 'wp_after_insert_post', 'gutenberg_save_footnotes_meta' );
+
+$_gutenberg_revision_id = null;
+
+/**
+ * Keeps track of the revision ID for "rest_after_insert_{$post_type}".
+ *
+ * @param int $revision_id The revision ID.
+ */
+function gutenberg_wp_put_post_revision( $revision_id ) {
+	global $_gutenberg_revision_id;
+	$_gutenberg_revision_id = $revision_id;
+}
+
+add_action( '_wp_put_post_revision', 'gutenberg_wp_put_post_revision' );
+
+/**
+ * This is a specific fix for the REST API. The REST API doesn't update the post
+ * and post meta in one go (through `meta_input`). While it does fix the
+ * `wp_after_insert_post` hook to be called correctly after updating meta, it
+ * does NOT fix hooks such as post_updated and save_post, which are normally
+ * also fired after post meta is updated in `wp_insert_post()`. Unfortunately,
+ * `wp_save_post_revision` is added to the `post_updated` action, which means
+ * the meta is not available at the time, so we have to add it afterwards
+ * through the `"rest_after_insert_{$post_type}"` action.
+ *
+ * @param WP_Post $post The post object.
+ */
+function gutenberg_save_footnotes_meta_rest_api( $post ) {
+	global $_gutenberg_revision_id;
+
+	if ( $_gutenberg_revision_id ) {
+		$revision = get_post( $_gutenberg_revision_id );
+		$post_id = $revision->post_parent;
+
+		// Just making sure we're updating the right revision.
+		if ( $post->ID === $post_id ) {
+			$footnotes = get_post_meta( $post_id, 'footnotes', true );
+
+			if ( $footnotes ) {
+				// Can't use update_post_meta() because it doesn't allow revisions.
+				update_metadata( 'post', $_gutenberg_revision_id, 'footnotes', $footnotes );
+			}
+		}
+	}
+}
+
+foreach ( array( 'post', 'page' ) as $post_type ) {
+	add_action( "rest_after_insert_{$post_type}", 'gutenberg_save_footnotes_meta_rest_api' );
+}
 
 /**
  * Restores the footnotes meta value from the revision.
