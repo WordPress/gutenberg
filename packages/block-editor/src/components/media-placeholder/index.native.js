@@ -15,7 +15,7 @@ import {
 	MEDIA_TYPE_AUDIO,
 } from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { cloneElement, useRef } from '@wordpress/element';
+import { cloneElement, useCallback, useRef } from '@wordpress/element';
 import { Icon, plusCircleFilled } from '@wordpress/icons';
 
 /**
@@ -66,6 +66,14 @@ function MediaPlaceholder( props ) {
 	mediaRef.current = value;
 
 	const blockEditContext = useBlockEditContext();
+
+	const onButtonPress = useCallback(
+		( open ) => ( event ) => {
+			onFocus?.( event );
+			open();
+		},
+		[ onFocus ]
+	);
 
 	// Append and deduplicate media array for gallery use case.
 	const setMedia =
@@ -138,6 +146,11 @@ function MediaPlaceholder( props ) {
 	const placeholderIcon = cloneElement( icon, {
 		fill: iconStyles.fill,
 	} );
+	const accessibilityLabel = sprintf(
+		/* translators: accessibility text for the media block empty state. %s: media type */
+		__( '%s block. Empty' ),
+		placeholderTitle
+	);
 
 	const renderContent = ( open ) => {
 		if ( isAppender === undefined || ! isAppender ) {
@@ -150,19 +163,12 @@ function MediaPlaceholder( props ) {
 					{ children }
 					<TouchableOpacity
 						activeOpacity={ 0.5 }
-						accessibilityLabel={ sprintf(
-							/* translators: accessibility text for the media block empty state. %s: media type */
-							__( '%s block. Empty' ),
-							placeholderTitle
-						) }
+						accessibilityLabel={ accessibilityLabel }
 						style={ buttonStyles }
 						accessibilityRole={ 'button' }
 						accessibilityHint={ accessibilityHint }
 						hitSlop={ hitSlop }
-						onPress={ ( event ) => {
-							onFocus?.( event );
-							open();
-						} }
+						onPress={ onButtonPress( open ) }
 					>
 						<Text style={ emptyStateDescriptionStyles }>
 							{ sentenceCase( instructions ) }
@@ -172,14 +178,24 @@ function MediaPlaceholder( props ) {
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
 			return (
-				<View testID="media-placeholder-appender-icon">
-					<Icon
-						icon={ plusCircleFilled }
-						style={ addMediaButtonStyle }
-						color={ addMediaButtonStyle.color }
-						size={ addMediaButtonStyle.size }
-					/>
-				</View>
+				<TouchableOpacity
+					activeOpacity={ 0.5 }
+					accessibilityLabel={ accessibilityLabel }
+					style={ styles[ 'media-placeholder__appender' ] }
+					accessibilityRole={ 'button' }
+					accessibilityHint={ accessibilityHint }
+					hitSlop={ hitSlop }
+					onPress={ onButtonPress( open ) }
+				>
+					<View testID="media-placeholder-appender-icon">
+						<Icon
+							icon={ plusCircleFilled }
+							style={ addMediaButtonStyle }
+							color={ addMediaButtonStyle.color }
+							size={ addMediaButtonStyle.size }
+						/>
+					</View>
+				</TouchableOpacity>
 			);
 		}
 	};
