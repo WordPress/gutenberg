@@ -31,9 +31,8 @@ function BlockOutline( {
 			styles.solidBorderColor,
 			styles.solidBorderColorDark
 		),
-		( ( hasBlockMediaCategory && ! hasInnerBlocks ) ||
-			hasBlockTextCategory ) &&
-			styles.solidBorderCompact,
+		hasBlockMediaCategory && ! hasInnerBlocks && styles.solidBorderCompact,
+		hasBlockTextCategory && styles.solidBorderTextContent,
 	];
 
 	const shoudlShowOutline =
