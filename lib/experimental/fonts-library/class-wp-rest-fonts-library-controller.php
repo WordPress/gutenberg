@@ -1,6 +1,6 @@
 <?php
 /**
- * Rest Fonts Library Controller
+ * Rest Fonts Library Controller.
  *
  * This file contains the class for the REST API Fonts Library Controller.
  *
@@ -15,7 +15,7 @@
 include( ABSPATH . 'wp-admin/includes/admin.php' );
 
 /**
- * Fonts Library Controller class
+ * Fonts Library Controller class.
  */
 class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
@@ -69,7 +69,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Removes a font family from the fonts library and all their assets
+	 * Removes a font family from the fonts library and all their assets.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -83,7 +83,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Check if user has permissions to update the fonts library
+	 * Check if user has permissions to update the fonts library.
 	 *
 	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
@@ -117,7 +117,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Check if user has permissions to read the fonts library
+	 * Check if user has permissions to read the fonts library.
 	 *
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
@@ -196,7 +196,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Download or move new font assets to the fonts folder
+	 * Download or move new font assets to the fonts folder.
 	 *
 	 * @param array $font_families Font families to install.
 	 * @param array $files Uploaded files (used when installing local fonts).
@@ -209,7 +209,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			$font                = new WP_Fonts_Family( $font_family );
 			$were_assets_written = $font->download_or_move_font_faces( $files );
 			// If the font face assets were successfully downloaded, we add the font to the new fonts array.
-			// Fonts without no font faces successfully downloaded are not added to the new fonts array.
+			// Fonts without font faces successfully downloaded are not added to the new fonts array.
 			if ( $were_assets_written ) {
 				$new_fonts[] = $font;
 			}

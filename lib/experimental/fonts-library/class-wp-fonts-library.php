@@ -4,9 +4,9 @@
  *
  * This file contains functions and definitions for the Gutenberg Fonts Library.
  *
- * @package     Gutenberg
- * @subpackage  Fonts-Library
- * @since x.x.x
+ * @package    Gutenberg
+ * @subpackage Fonts Library
+ * @since      X.X.X
  */
 
 /**
@@ -28,7 +28,7 @@ class WP_Fonts_Library {
 	 */
 	private $data;
 	/**
-	 * Relative path to the fonts directory
+	 * Relative path to the fonts directory.
 	 *
 	 * @var string
 	 */
@@ -45,7 +45,7 @@ class WP_Fonts_Library {
 	}
 
 	/**
-	 * Returns the font family data
+	 * Returns the font family data.
 	 *
 	 * @return array An array in fontFamily theme.json format.
 	 */
@@ -54,7 +54,7 @@ class WP_Fonts_Library {
 	}
 
 	/**
-	 * Returns the font family data
+	 * Returns the font family data.
 	 *
 	 * @return string fontFamily in theme.json format as stringified JSON.
 	 */
@@ -63,7 +63,7 @@ class WP_Fonts_Library {
 	}
 
 	/**
-	 * Returns if the font family has font faces defined
+	 * Returns if the font family has font faces defined.
 	 *
 	 * @return bool true if the font family has font faces defined, false otherwise.
 	 */
@@ -103,7 +103,7 @@ class WP_Fonts_Library {
 	}
 
 	/**
-	 * Removes font family assets
+	 * Removes font family assets.
 	 *
 	 * @return bool True if assets were removed, false otherwise.
 	 */
@@ -243,9 +243,9 @@ class WP_Fonts_Library {
 	}
 
 	/**
-	 * Move an uploaded font face asset from temp folder to the wp fonts directory
+	 * Move an uploaded font face asset from temp folder to the wp fonts directory.
 	 *
-	 * This is used when uploading local fonts
+	 * This is used when uploading local fonts.
 	 *
 	 * @param array $font_face Font face to download.
 	 * @param array $file Uploaded file.
@@ -385,9 +385,9 @@ class WP_Fonts_Library {
 	}
 
 	/**
-	 * Get the post for a font family
+	 * Get the post for a font family.
 	 *
-	 * @return WP_Post|null The post for this font family object or null if the post does not exist
+	 * @return WP_Post|null The post for this font family object or null if the post does not exist.
 	 */
 	private function get_font_post() {
 		$args = array(
@@ -408,9 +408,9 @@ class WP_Fonts_Library {
 	}
 
 	/**
-	 * Get the data for this object from the database and set it to the data property
+	 * Get the data for this object from the database and set it to the data property.
 	 *
-	 * @return WP_Post|null The post for this font family object or null if the post does not exist
+	 * @return WP_Post|null The post for this font family object or null if the post does not exist.
 	 */
 	private function get_data_from_post() {
 		$post = $this->get_font_post();
@@ -423,7 +423,7 @@ class WP_Fonts_Library {
 	}
 
 	/**
-	 * Create a post for a font family
+	 * Create a post for a font family.
 	 *
 	 * @return int
 	 */
@@ -443,7 +443,7 @@ class WP_Fonts_Library {
 	}
 
 	/**
-	 * Update a post for a font family
+	 * Update a post for a font family.
 	 *
 	 * @param WP_Post $post The post to update.
 	 * @return int
