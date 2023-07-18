@@ -179,42 +179,23 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		// Get uploaded files (used when installing local fonts).
 		$files = $request->get_file_params();
 
-		// Download or move the new fonts assets to the fonts folder.
-		$fonts = $this->download_or_move_fonts( $fonts_to_install, $files );
+		// iterates the fonts data received and creates a new WP_Fonts_Library_Family object for each one.
+		$fonts_installed = array();
+		foreach ( $fonts_to_install as $font_data ) {
+			$font = new WP_Fonts_Library( $font_data );
+			$font->install( $files );
+			$fonts_installed[] = $font;
+		}
 
 		$response = array();
-		if ( ! empty( $fonts ) ) {
-			foreach ( $fonts as $font ) {
-				$font->create_or_update_font_post();
+		if ( ! empty( $fonts_installed ) ) {
+			foreach ( $fonts_installed as $font ) {
 				$response[] = $font->get_data();
 			}
-
 			return new WP_REST_Response( $response );
 		}
 
 		return new WP_Error( 'error_installing_fonts', __( 'Error installing fonts. No font was installed.', 'gutenberg' ), array( 'status' => 500 ) );
-	}
-
-	/**
-	 * Download or move new font assets to the fonts folder.
-	 *
-	 * @param array $font_families Font families to install.
-	 * @param array $files Uploaded files (used when installing local fonts).
-	 *
-	 * @return array New fonts with all assets downloaded referenced in the font families definition.
-	 */
-	function download_or_move_fonts( $font_families, $files ) {
-		$new_fonts = array();
-		foreach ( $font_families as $font_family ) {
-			$font                = new WP_Fonts_Family( $font_family );
-			$were_assets_written = $font->download_or_move_font_faces( $files );
-			// If the font face assets were successfully downloaded, we add the font to the new fonts array.
-			// Fonts without font faces successfully downloaded are not added to the new fonts array.
-			if ( $were_assets_written ) {
-				$new_fonts[] = $font;
-			}
-		}
-		return $new_fonts;
 	}
 
 	/**
