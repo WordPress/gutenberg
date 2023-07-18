@@ -138,7 +138,7 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
  * the Font Face (redesigned Fonts API) to be merged before the Fonts Library while
  * keeping Fonts API available for sites that are using it.
  */
-if ( class_exists( 'WP_Fonts_Library' ) || class_exists( 'WP_Fonts_Library_Controller' ) ) {
+if ( class_exists( 'WP_Fonts_Library' ) || class_exists( 'WP_REST_Fonts_Library_Controller' ) ) {
 	if ( ! class_exists( 'WP_Font_Face' ) ) {
 		require __DIR__ . '/experimental/fonts/class-wp-font-face.php';
 		require __DIR__ . '/experimental/fonts/class-wp-font-face-resolver.php';
