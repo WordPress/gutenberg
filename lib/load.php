@@ -164,6 +164,7 @@ if ( class_exists( 'WP_Font_Family' ) || class_exists( 'WP_REST_Fonts_Library_Co
 }
 
 // Fonts Library.
+require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
 require __DIR__ . '/experimental/fonts-library/class-wp-font-family.php';
 require __DIR__ . '/experimental/fonts-library/class-wp-rest-fonts-library-controller.php';
 

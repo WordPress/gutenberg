@@ -27,12 +27,7 @@ class WP_Font_Family {
 	 * @var array
 	 */
 	private $data;
-	/**
-	 * Relative path to the fonts directory.
-	 *
-	 * @var string
-	 */
-	private $relative_fonts_path;
+	
 
 	/**
 	 * WP_Font_Family constructor.
@@ -41,7 +36,6 @@ class WP_Font_Family {
 	 */
 	public function __construct( $font_family = array() ) {
 		$this->data                = $font_family;
-		$this->relative_fonts_path = content_url( '/fonts/' );
 	}
 
 	/**
@@ -75,21 +69,7 @@ class WP_Font_Family {
 		);
 	}
 
-	/**
-	 * Returns the absolute path to the fonts directory.
-	 *
-	 * @return string Path to the fonts directory.
-	 */
-	static public function get_fonts_directory() {
-		return path_join( WP_CONTENT_DIR, 'fonts' );
-	}
 
-	/**
-	 * Define WP_FONTS_DIR constant to make it available to the rest of the code.
-	 */
-	static public function define_fonts_directory() {
-		define( 'WP_FONTS_DIR', self::get_fonts_directory() );
-	}
 
 	/**
 	 * Returns whether the given file has a font MIME type.
@@ -221,7 +201,7 @@ class WP_Font_Family {
 		}
 
 		// Returns the relative path to the downloaded font asset to be used as font face src.
-		return "{$this->relative_fonts_path}{$filename}";
+		return "{WP_Fonts_Library::get_relative_fonts_path()}{$filename}";
 	}
 
 	/**
@@ -274,7 +254,7 @@ class WP_Font_Family {
 
 		if ( $file_was_moved ) {
 			// If the file was successfully moved, we update the font face definition to reference the new file location.
-			$new_font_face['src'] = "{$this->relative_fonts_path}{$filename}";
+			$new_font_face['src'] = "{WP_Fonts_Library::get_relative_fonts_path()}{$filename}";
 		}
 
 		return $new_font_face;
@@ -499,5 +479,3 @@ class WP_Font_Family {
 	}
 
 }
-
-add_action( 'init', array( 'WP_Font_Family', 'define_fonts_directory' ) );
