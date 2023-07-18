@@ -51,8 +51,16 @@ export default function ReusableBlockConvertButton( {
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getBlocksByClientId, canInsertBlockType } =
-				select( blockEditorStore );
+			const {
+				getBlocksByClientId,
+				canInsertBlockType,
+				getBlockRootClientId,
+			} = select( blockEditorStore );
+
+			const rootId =
+				rootClientId || clientIds.length > 0
+					? getBlockRootClientId( clientIds[ 0 ] )
+					: undefined;
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
@@ -70,7 +78,7 @@ export default function ReusableBlockConvertButton( {
 				// Hide when this is already a reusable block.
 				! isReusable &&
 				// Hide when reusable blocks are disabled.
-				canInsertBlockType( 'core/block', rootClientId ) &&
+				canInsertBlockType( 'core/block', rootId ) &&
 				blocks.every(
 					( block ) =>
 						// Guard against the case where a regular block has *just* been converted.
