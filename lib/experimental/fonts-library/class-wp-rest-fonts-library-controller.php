@@ -10,11 +10,6 @@
  */
 
 /**
- * Include admin functions.
- */
-include( ABSPATH . 'wp-admin/includes/admin.php' );
-
-/**
  * Fonts Library Controller class.
  */
 class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {

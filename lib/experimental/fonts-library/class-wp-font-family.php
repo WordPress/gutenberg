@@ -199,6 +199,11 @@ class WP_Font_Family {
 			return false;
 		}
 
+		// Include file with download_url() if function doesn't exist.
+		if ( ! function_exists( 'download_url' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
 		// Downloads the font asset or returns false.
 		$temp_file = download_url( $src );
 		if ( is_wp_error( $temp_file ) ) {
@@ -478,8 +483,7 @@ class WP_Font_Family {
 	/**
 	 * Install the font family into the library
 	 *
-	 * @param array $files Array of font files to be installed.
-	 *
+	 * @param array $files An array of files to be installed, default is null.
 	 * @return WP_Post|WP_Error
 	 */
 	public function install( $files = null ) {
