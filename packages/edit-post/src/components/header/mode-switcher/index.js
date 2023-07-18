@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
+import { MenuItemsChoice, MenuGroup, Notice } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
@@ -55,8 +55,24 @@ function ModeSwitcher() {
 		return null;
 	}
 
-	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
-		return null;
+	if ( ! isRichEditingEnabled ) {
+		return (
+			<MenuGroup label={ __( 'Editor' ) }>
+				<Notice isDismissible={ false }>
+					{ __( 'Visual editor is disabled.' ) }
+				</Notice>
+			</MenuGroup>
+		);
+	}
+
+	if ( ! isCodeEditingEnabled ) {
+		return (
+			<MenuGroup label={ __( 'Editor' ) }>
+				<Notice isDismissible={ false }>
+					{ __( 'Code editor is disabled.' ) }
+				</Notice>
+			</MenuGroup>
+		);
 	}
 
 	const choices = MODES.map( ( choice ) => {
