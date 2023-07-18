@@ -282,14 +282,16 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 		$fields = $this->get_fields_for_response( $request );
 		$data   = array();
 
-		// Should we include behaviors here?
-		if ( ! empty( $global_styles_config['styles'] ) || ! empty( $global_styles_config['settings'] ) ) {
+		if ( ! empty( $global_styles_config['styles'] ) || ! empty( $global_styles_config['settings'] ) || ! empty( $global_styles_config['behaviors'] ) ) {
 			$global_styles_config = ( new WP_Theme_JSON_Gutenberg( $global_styles_config, 'custom' ) )->get_raw_data();
 			if ( rest_is_field_included( 'settings', $fields ) ) {
 				$data['settings'] = ! empty( $global_styles_config['settings'] ) ? $global_styles_config['settings'] : new stdClass();
 			}
 			if ( rest_is_field_included( 'styles', $fields ) ) {
 				$data['styles'] = ! empty( $global_styles_config['styles'] ) ? $global_styles_config['styles'] : new stdClass();
+			}
+			if ( rest_is_field_included( 'behaviors', $fields ) ) {
+				$data['behaviors'] = ! empty( $global_styles_config['behaviors'] ) ? $global_styles_config['behaviors'] : new stdClass();
 			}
 		}
 
@@ -402,7 +404,11 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
-				// Should we include behaviors here?
+				'behaviors'    => array(
+					'description' => __( 'Global behaviors.', 'gutenberg' ),
+					'type'        => array( 'object' ),
+					'context'     => array( 'view', 'edit' ),
+				),
 			),
 		);
 
