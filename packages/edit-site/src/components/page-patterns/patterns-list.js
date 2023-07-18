@@ -57,11 +57,18 @@ export default function PatternsList( { categoryId, type } ) {
 
 	const [ syncFilter, setSyncFilter ] = useState( 'all' );
 	const deferredSyncedFilter = useDeferredValue( syncFilter );
-	const { patterns, isResolving } = usePatterns( type, categoryId, {
-		search: deferredFilterValue,
-		syncStatus:
-			deferredSyncedFilter === 'all' ? undefined : deferredSyncedFilter,
-	} );
+
+	const { patterns, isResolving } = usePatterns(
+		type,
+		categoryId !== 'uncategorized' ? categoryId : '',
+		{
+			search: deferredFilterValue,
+			syncStatus:
+				deferredSyncedFilter === 'all'
+					? undefined
+					: deferredSyncedFilter,
+		}
+	);
 
 	const id = useId();
 	const titleId = `${ id }-title`;
