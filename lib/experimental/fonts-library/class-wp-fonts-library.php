@@ -2,6 +2,13 @@
 
 class WP_Fonts_Library {
 
+    const ALLOWED_FONT_MIME_TYPES = array(
+		'otf'   => 'font/otf',
+		'ttf'   => 'font/ttf',
+		'woff'  => 'font/woff',
+		'woff2' => 'font/woff2',
+	);
+
 	/**
 	 * Returns the absolute path to the fonts directory.
 	 *
@@ -25,6 +32,17 @@ class WP_Fonts_Library {
 	 */
 	static public function define_fonts_directory() {
 		define( 'WP_FONTS_DIR', self::get_fonts_directory() );
+	}
+
+    /**
+	 * Returns whether the given file has a font MIME type.
+	 *
+	 * @param string $filepath The file to check.
+	 * @return bool True if the file has a font MIME type, false otherwise.
+	 */
+	static public function has_font_mime_type( $filepath ) {
+		$filetype = wp_check_filetype( $filepath, self::ALLOWED_FONT_MIME_TYPES );
+		return in_array( $filetype['type'], self::ALLOWED_FONT_MIME_TYPES, true );
 	}
 
 }

@@ -14,13 +14,6 @@
  */
 class WP_Font_Family {
 
-	const ALLOWED_FONT_MIME_TYPES = array(
-		'otf'   => 'font/otf',
-		'ttf'   => 'font/ttf',
-		'woff'  => 'font/woff',
-		'woff2' => 'font/woff2',
-	);
-
 	/**
 	 * Font family data
 	 *
@@ -35,7 +28,7 @@ class WP_Font_Family {
 	 * @param array $font_family Font family data.
 	 */
 	public function __construct( $font_family = array() ) {
-		$this->data                = $font_family;
+		$this->data = $font_family;
 	}
 
 	/**
@@ -67,19 +60,6 @@ class WP_Font_Family {
 			&& is_array( $this->data['fontFace'] )
 			&& ! empty( $this->data['fontFace'] )
 		);
-	}
-
-
-
-	/**
-	 * Returns whether the given file has a font MIME type.
-	 *
-	 * @param string $filepath The file to check.
-	 * @return bool True if the file has a font MIME type, false otherwise.
-	 */
-	static private function has_font_mime_type( $filepath ) {
-		$filetype = wp_check_filetype( $filepath, self::ALLOWED_FONT_MIME_TYPES );
-		return in_array( $filetype['type'], self::ALLOWED_FONT_MIME_TYPES, true );
 	}
 
 	/**
@@ -175,7 +155,7 @@ class WP_Font_Family {
 		$file_path = path_join( WP_FONTS_DIR, $filename );
 
 		// Checks if the file to be downloaded has a font mime type.
-		if ( ! self::has_font_mime_type( $file_path ) ) {
+		if ( ! WP_Fonts_Library::has_font_mime_type( $file_path ) ) {
 			return false;
 		}
 
@@ -245,7 +225,7 @@ class WP_Font_Family {
 		unset( $new_font_face['file'] );
 
 		// If the filepath has not a font mime type, we don't move the file and return the font face definition without src to be ignored later.
-		if ( ! self::has_font_mime_type( $filepath ) ) {
+		if ( ! WP_Fonts_Library::has_font_mime_type( $filepath ) ) {
 			return $new_font_face;
 		}
 
