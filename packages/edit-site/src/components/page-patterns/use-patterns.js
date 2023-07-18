@@ -93,11 +93,17 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 			blocks: parse( pattern.content ),
 		} ) );
 
-	patterns = searchItems( patterns, search, {
-		categoryId,
-		hasCategory: ( item, currentCategory ) =>
-			item.categories?.includes( currentCategory ),
-	} );
+	if ( categoryId ) {
+		patterns = searchItems( patterns, search, {
+			categoryId,
+			hasCategory: ( item, currentCategory ) =>
+				item.categories?.includes( currentCategory ),
+		} );
+	} else {
+		patterns = searchItems( patterns, search, {
+			hasCategory: ( item ) => ! item.hasOwnProperty( 'categories' ),
+		} );
+	}
 
 	return { patterns, isResolving: false };
 };
