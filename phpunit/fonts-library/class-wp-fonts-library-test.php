@@ -11,4 +11,5 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
         $this->assertTrue( str_contains( WP_Font_Family::get_fonts_directory(), '/wp-content/fonts' ) );
     }
 
+
 }
