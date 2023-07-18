@@ -78,9 +78,10 @@ function calculateNewHeight( width, initialAspectRatio ) {
 
 function ResizableFrame( {
 	isFullWidth,
+	isOversized,
+	setIsOversized,
 	isReady,
 	children,
-	oversizedClassName,
 	innerContentStyle,
 } ) {
 	const [ frameSize, setFrameSize ] = useState( INITIAL_FRAME_SIZE );
@@ -88,7 +89,6 @@ function ResizableFrame( {
 	const [ startingWidth, setStartingWidth ] = useState();
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ shouldShowHandle, setShouldShowHandle ] = useState( false );
-	const [ isOversized, setIsOversized ] = useState( false );
 	const [ resizeRatio, setResizeRatio ] = useState( 1 );
 	const canvasMode = useSelect(
 		( select ) => unlock( select( editSiteStore ) ).getCanvasMode(),
@@ -314,7 +314,6 @@ function ResizableFrame( {
 			onResizeStop={ handleResizeStop }
 			className={ classnames( 'edit-site-resizable-frame__inner', {
 				'is-resizing': isResizing,
-				[ oversizedClassName ]: isOversized,
 			} ) }
 		>
 			<motion.div
