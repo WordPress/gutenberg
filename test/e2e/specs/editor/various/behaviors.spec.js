@@ -228,7 +228,7 @@ test.describe( 'Testing behaviors functionality', () => {
 <!-- /wp:image -->` );
 	} );
 
-	test( 'Should load the view script if the lightbox is enabled', async ( {
+	test( 'Should load the view script if the lightbox is disabled in theme.json but enabled via block settings', async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -263,7 +263,38 @@ test.describe( 'Testing behaviors functionality', () => {
 		await expect( interactivityScript ).toHaveCount( 1 );
 	} );
 
-	test( 'Should NOT load the view script if the lightbox is disabled', async ( {
+	test( 'Should load the view script if the lightbox is enabled via theme.json', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		await requestUtils.activateTheme( 'behaviors-enabled' );
+
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+			},
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		// The view script should be loaded !!!
+		const interactivityScript = page.locator(
+			'script#wp-block-image-view-js'
+		);
+		await expect( interactivityScript ).toHaveCount( 1 );
+	} );
+
+	test( 'Should NOT load the view script if the lightbox is disabled in theme.json and in block settings', async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -271,6 +302,41 @@ test.describe( 'Testing behaviors functionality', () => {
 		behaviorUtils,
 	} ) => {
 		await requestUtils.activateTheme( 'twentytwentythree' );
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+				behaviors: {
+					lightbox: {
+						enabled: false,
+					},
+				},
+			},
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		// The view script should NOT be loaded !!!
+		const interactivityScript = page.locator(
+			'script#wp-block-image-view-js'
+		);
+		await expect( interactivityScript ).toHaveCount( 0 );
+	} );
+
+	test( 'Should NOT load the view script if the lightbox is enabled in theme.json but disabled in block settings', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		await requestUtils.activateTheme( 'behaviors-enabled' );
 		await admin.createNewPost();
 		const media = await behaviorUtils.createMedia();
 
