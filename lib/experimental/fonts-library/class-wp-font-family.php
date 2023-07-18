@@ -12,7 +12,7 @@
 /**
  * Fonts Library class.
  */
-class WP_Fonts_Library_Family {
+class WP_Font_Family {
 
 	const ALLOWED_FONT_MIME_TYPES = array(
 		'otf'   => 'font/otf',
@@ -35,7 +35,7 @@ class WP_Fonts_Library_Family {
 	private $relative_fonts_path;
 
 	/**
-	 * WP_Fonts_Library_Family constructor.
+	 * WP_Font_Family constructor.
 	 *
 	 * @param array $font_family Font family data.
 	 */
@@ -494,4 +494,4 @@ class WP_Fonts_Library_Family {
 
 }
 
-add_action( 'init', array( 'WP_Fonts_Library_Family', 'define_fonts_directory' ) );
+add_action( 'init', array( 'WP_Font_Family', 'define_fonts_directory' ) );

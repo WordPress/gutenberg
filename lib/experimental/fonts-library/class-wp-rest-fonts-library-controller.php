@@ -78,7 +78,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		$data = array(
 			'slug' => $request['slug'],
 		);
-		$font = new WP_Fonts_Family( $data );
+		$font = new WP_Font_Family( $data );
 		return new WP_REST_Response( $font->uninstall() );
 	}
 
@@ -179,10 +179,10 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		// Get uploaded files (used when installing local fonts).
 		$files = $request->get_file_params();
 
-		// iterates the fonts data received and creates a new WP_Fonts_Library_Family object for each one.
+		// iterates the fonts data received and creates a new WP_Font_Family object for each one.
 		$fonts_installed = array();
 		foreach ( $fonts_to_install as $font_data ) {
-			$font = new WP_Fonts_Library_Family( $font_data );
+			$font = new WP_Font_Family( $font_data );
 			$font->install( $files );
 			$fonts_installed[] = $font;
 		}
