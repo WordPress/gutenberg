@@ -78,10 +78,20 @@ function addValuesForElements( children, ...args ) {
 	}
 }
 
+function _getSaveElement( name, attributes, innerBlocks ) {
+	return getSaveElement(
+		name,
+		attributes,
+		innerBlocks.map( ( block ) =>
+			_getSaveElement( block.name, block.attributes, block.innerBlocks )
+		)
+	);
+}
+
 function addValuesForBlocks( values, blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {
 		const { name, attributes, innerBlocks } = blocks[ i ];
-		const saveElement = getSaveElement( name, attributes );
+		const saveElement = _getSaveElement( name, attributes, innerBlocks );
 		addValuesForElement( saveElement, values, innerBlocks );
 	}
 }

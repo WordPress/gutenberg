@@ -12,7 +12,7 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { getTemplatePartIcon } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
 import { file, starFilled, lockSmall } from '@wordpress/icons';
 
@@ -71,8 +71,10 @@ function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 								{ category.label }
 								<Tooltip
 									position="top center"
-									text={ __(
-										'Theme patterns cannot be edited.'
+									text={ sprintf(
+										// translators: %s: The pattern category name.
+										'"%s" patterns cannot be edited.',
+										category.label
 									) }
 								>
 									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">

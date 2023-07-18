@@ -3,17 +3,12 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	MenuItem,
-	__experimentalConfirmDialog as ConfirmDialog,
-} from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 
-export default function DeletePageMenuItem( { postId, onRemove } ) {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
+export default function TrashPageMenuItem( { postId, onRemove } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const { deleteEntityRecord } = useDispatch( coreStore );
@@ -34,12 +29,12 @@ export default function DeletePageMenuItem( { postId, onRemove } ) {
 			createSuccessNotice(
 				sprintf(
 					/* translators: The page's title. */
-					__( '"%s" deleted.' ),
+					__( '"%s" moved to the Trash.' ),
 					decodeEntities( page.title.rendered )
 				),
 				{
 					type: 'snackbar',
-					id: 'edit-site-page-removed',
+					id: 'edit-site-page-trashed',
 				}
 			);
 			onRemove?.();
@@ -47,26 +42,18 @@ export default function DeletePageMenuItem( { postId, onRemove } ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while deleting the page.' );
+					: __(
+							'An error occurred while moving the page to the trash.'
+					  );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
-		} finally {
-			setIsModalOpen( false );
 		}
 	}
 	return (
 		<>
-			<MenuItem onClick={ () => setIsModalOpen( true ) } isDestructive>
-				{ __( 'Delete' ) }
+			<MenuItem onClick={ () => removePage() } isDestructive>
+				{ __( 'Move to Trash' ) }
 			</MenuItem>
-			<ConfirmDialog
-				isOpen={ isModalOpen }
-				onConfirm={ removePage }
-				onCancel={ () => setIsModalOpen( false ) }
-				confirmButtonText={ __( 'Delete' ) }
-			>
-				{ __( 'Are you sure you want to delete this page?' ) }
-			</ConfirmDialog>
 		</>
 	);
 }
