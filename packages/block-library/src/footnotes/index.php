@@ -98,8 +98,6 @@ function gutenberg_save_footnotes_meta( $revision_id ) {
 }
 add_action( 'wp_after_insert_post', 'gutenberg_save_footnotes_meta' );
 
-$_gutenberg_revision_id = null;
-
 /**
  * Keeps track of the revision ID for "rest_after_insert_{$post_type}".
  *
@@ -129,7 +127,7 @@ function gutenberg_save_footnotes_meta_rest_api( $post ) {
 
 	if ( $_gutenberg_revision_id ) {
 		$revision = get_post( $_gutenberg_revision_id );
-		$post_id = $revision->post_parent;
+		$post_id  = $revision->post_parent;
 
 		// Just making sure we're updating the right revision.
 		if ( $post->ID === $post_id ) {
