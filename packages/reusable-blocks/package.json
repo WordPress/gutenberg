@@ -37,7 +37,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
-		"@wordpress/private-apis": "^0.19.0",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url"
 	},
 	"peerDependencies": {
