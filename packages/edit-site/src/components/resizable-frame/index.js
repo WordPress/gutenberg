@@ -82,7 +82,6 @@ function ResizableFrame( {
 	setIsOversized,
 	isReady,
 	children,
-	oversizedClassName,
 	innerContentStyle,
 } ) {
 	const [ frameSize, setFrameSize ] = useState( INITIAL_FRAME_SIZE );
@@ -315,7 +314,6 @@ function ResizableFrame( {
 			onResizeStop={ handleResizeStop }
 			className={ classnames( 'edit-site-resizable-frame__inner', {
 				'is-resizing': isResizing,
-				[ oversizedClassName ]: isOversized,
 			} ) }
 		>
 			<motion.div

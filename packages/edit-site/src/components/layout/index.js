@@ -340,7 +340,6 @@ export default function Layout() {
 														! isEditorLoading
 													}
 													isFullWidth={ isEditing }
-													oversizedClassName="edit-site-layout__resizable-frame-oversized"
 													isOversized={
 														isResizableFrameOversized
 													}
