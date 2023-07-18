@@ -10,9 +10,9 @@ import { __, _x, _n, sprintf } from '@wordpress/i18n';
 
 export default function Pagination( {
 	currentPage,
-	numPages = 1,
+	numPages,
 	changePage,
-	totalItems = 10,
+	totalItems,
 } ) {
 	return (
 		<HStack
