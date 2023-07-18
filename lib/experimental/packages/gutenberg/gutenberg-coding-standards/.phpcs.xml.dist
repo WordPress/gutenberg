@@ -51,7 +51,7 @@
 		<!-- Linting is done in a separate CI job, no need to duplicate it. -->
 		<exclude name="Generic.PHP.Syntax"/>
 		<!--This rule should only be applied to code that is intended to be merged into Core. -->
-		<exclude name="WordPress.CodeAnalysis.GuardedFunctionAndClassNames"/>
+		<exclude name="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames"/>
 	</rule>
 
 	<!-- Check code for cross-version PHP compatibility. -->
@@ -71,14 +71,6 @@
 
 	<!-- Enforce PSR1 compatible namespaces. -->
 	<rule ref="PSR1.Classes.ClassDeclaration"/>
-
-	<!-- Enforce that classes are abstract or final. -->
-	<rule ref="Universal.Classes.RequireFinalClass">
-		<!-- ... with the exception of four sniffs which are known to be extended by external standards. -->
-		<exclude-pattern>/WordPress/Sniffs/NamingConventions/ValidHookNameSniff\.php$</exclude-pattern>
-		<exclude-pattern>/WordPress/Sniffs/Security/(EscapeOutput|NonceVerification|ValidatedSanitizedInput)Sniff\.php$</exclude-pattern>
-	</rule>
-
 
 	<!--
 	#############################################################################

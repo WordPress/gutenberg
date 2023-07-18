@@ -11,6 +11,9 @@ namespace GutenbergCS\Gutenberg\Tests\CodeAnalysis;
 
 use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest;
 
+/**
+ * Unit test class for the GuardedFunctionAndClassNames sniff.
+ */
 final class GuardedFunctionAndClassNamesUnitTest extends AbstractSniffUnitTest {
 
 	/**

@@ -7,7 +7,6 @@
  * @license https://opensource.org/licenses/MIT MIT
  */
 
-
 namespace GutenbergCS\Gutenberg\Sniffs\CodeAnalysis;
 
 use PHP_CodeSniffer\Files\File;
