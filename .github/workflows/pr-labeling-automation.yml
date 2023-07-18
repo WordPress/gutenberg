@@ -1,0 +1,18 @@
+name: "Pull Request Labeler"
+on:
+  workflow_dispatch:
+  pull_request_target:
+    types: [opened, closed, reopened, edited, ready_for_review, synchronized]
+
+jobs:
+  auto_label_pull_request:
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/labeler@v4
+      with:        
+        dot: true
+        sync-labels: true
