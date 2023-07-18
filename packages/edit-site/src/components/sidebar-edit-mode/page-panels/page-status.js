@@ -218,7 +218,7 @@ export default function PageStatus( {
 												placeholder={ __(
 													'Enter a secure password'
 												) }
-												type="password"
+												type="text"
 											/>
 										) }
 									</BaseControl>

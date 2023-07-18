@@ -9,10 +9,10 @@
  * Dynamically renders the `core/search` block.
  *
  * @param array    $attributes The block attributes.
- * @param string   $content    The block content.
+ * @param string   $content    The saved content.
  * @param WP_Block $block      The parsed block.
  *
- * @return string Returns the block content.
+ * @return string The search block markup.
  */
 function render_block_core_search( $attributes, $content, $block ) {
 	// Older versions of the Search block defaulted the label and buttonText
@@ -67,34 +67,32 @@ function render_block_core_search( $attributes, $content, $block ) {
 	if ( ! empty( $typography_classes ) ) {
 		$input_classes[] = $typography_classes;
 	}
-
-	$view_js_file = 'wp-block-search-view';
-	wp_script_add_data( $view_js_file, 'strategy', 'async' ); // TODO: This should be able to be specified in block.json. See Core-54018.
-	$should_load_view_script = false;
-
 	if ( $input->next_tag() ) {
 		$input->add_class( implode( ' ', $input_classes ) );
 		$input->set_attribute( 'id', $input_id );
 		$input->set_attribute( 'value', get_search_query() );
 		$input->set_attribute( 'placeholder', $attributes['placeholder'] );
-		if ( 'button-only' === $button_position && 'expand-searchfield' === $button_behavior ) {
+
+		$is_expandable_searchfield = 'button-only' === $button_position && 'expand-searchfield' === $button_behavior;
+		if ( $is_expandable_searchfield ) {
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
-			$should_load_view_script = true;
 		}
-	}
 
-	// If the script already exists, there is no point in removing it from viewScript.
-	if ( ! wp_script_is( $view_js_file ) ) {
-		$script_handles = $block->block_type->view_script_handles;
+		// If the script already exists, there is no point in removing it from viewScript.
+		$view_js_file = 'wp-block-search-view';
+		wp_script_add_data( $view_js_file, 'strategy', 'async' ); // TODO: This should be able to be specified in block.json. See Core-54018.
+		if ( ! wp_script_is( $view_js_file ) ) {
+			$script_handles = $block->block_type->view_script_handles;
 
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
-		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+			if ( ! $is_expandable_searchfield && in_array( $view_js_file, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+			}
+			// If the script is needed, but it was previously removed, add it again.
+			if ( $is_expandable_searchfield && ! in_array( $view_js_file, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+			}
 		}
 	}
 
