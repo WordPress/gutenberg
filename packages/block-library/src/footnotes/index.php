@@ -178,10 +178,14 @@ add_filter( '_wp_post_revision_fields', 'gutenberg_revision_fields' );
 /**
  * Gets the footnotes field from the revision.
  *
+ * @param string $revision_field The field value, but $revision->$field
+ *                               (footnotes) does not exist.
+ * @param string $field          The field name, in this case "footnotes".
+ * @param object $revision       The revision object to compare against.
+ *
  * @return string The field value.
  */
-function gutenberg_revision_field_footnotes() {
-	global $revision;
-	return get_metadata( 'post', $revision->ID, 'footnotes', true );
+function gutenberg_revision_field_footnotes( $revision_field, $field, $revision ) {
+	return get_metadata( 'post', $revision->ID, $field, true );
 }
 add_filter( 'wp_post_revision_field_footnotes', 'gutenberg_revision_field_footnotes' );
