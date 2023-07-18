@@ -2,11 +2,7 @@
 
 The `TextTransformControl` component is responsible for rendering a control element that allows users to select and apply text transformation options to blocks or elements in the Gutenberg editor. It provides an intuitive interface for changing the text appearance by applying different transformations such as `none`, `uppercase`, `lowercase`, `capitalize`.
  
-<<<<<<< Updated upstream
-![TextTransformConrol Element in Inspector Control](https://i.ibb.co/zHWg2V7/wp-texttransform-doc.png)
-=======
 ![TextTransformConrol Element in Inspector Control](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/text-transform-component.png?raw=true)
->>>>>>> Stashed changes
 
 ## Table of contents
 
