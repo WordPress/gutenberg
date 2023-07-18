@@ -90,13 +90,13 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should fall back to the freeform content handler if block type not specified', () => {
-			registerBlockType( 'core/freeform-block', unknownBlockSettings );
-			setFreeformContentHandlerName( 'core/freeform-block' );
+			registerBlockType( 'core/freeform', unknownBlockSettings );
+			setFreeformContentHandlerName( 'core/freeform' );
 
 			const block = parseRawBlock( {
 				innerHTML: 'content',
 			} );
-			expect( block.name ).toEqual( 'core/freeform-block' );
+			expect( block.name ).toEqual( 'core/freeform' );
 			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
 
@@ -112,8 +112,8 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'skips adding paragraph tags if __unstableSkipAutop is passed as an option', () => {
-			registerBlockType( 'core/freeform-block', unknownBlockSettings );
-			setFreeformContentHandlerName( 'core/freeform-block' );
+			registerBlockType( 'core/freeform', unknownBlockSettings );
+			setFreeformContentHandlerName( 'core/freeform' );
 
 			const block = parseRawBlock(
 				{
@@ -123,7 +123,7 @@ describe( 'block parser', () => {
 					__unstableSkipAutop: true,
 				}
 			);
-			expect( block.name ).toEqual( 'core/freeform-block' );
+			expect( block.name ).toEqual( 'core/freeform' );
 			expect( block.attributes ).toEqual( { content: 'content' } );
 		} );
 
