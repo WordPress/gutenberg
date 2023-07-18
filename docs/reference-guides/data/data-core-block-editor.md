@@ -485,6 +485,29 @@ _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
 
+### getDirectInsertBlock
+
+Returns the block to be directly inserted by the block appender.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `?WPDirectInsertBlock`: The block type to be directly inserted.
+
+_Type Definition_
+
+-   _WPDirectInsertBlock_ `Object`
+
+_Properties_
+
+-   _name_ `string`: The type of block.
+-   _attributes_ `?Object`: Attributes to pass to the newly created block.
+-   _attributesToCopy_ `?Array<string>`: Attributes to be copied from adjecent blocks when inserted.
+
 ### getDraggedBlockClientIds
 
 Returns the client ids of any blocks being directly dragged.

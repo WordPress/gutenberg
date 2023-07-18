@@ -70,6 +70,9 @@ const blockRemovalRules = {
 	'core/post-content': __(
 		'Post Content displays the content of a post or page.'
 	),
+	'core/post-template': __(
+		'Post Template displays each post or page in a Query Loop.'
+	),
 };
 
 export default function Editor( { isLoading } ) {

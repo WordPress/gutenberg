@@ -11,6 +11,10 @@
 	&[aria-current] {
 		color: $gray-200;
 		background: $gray-800;
+
+		.edit-site-sidebar-navigation-item__drilldown-indicator {
+			fill: $gray-200;
+		}
 	}
 
 	&[aria-current] {
@@ -19,18 +23,7 @@
 	}
 
 	.edit-site-sidebar-navigation-item__drilldown-indicator {
-		fill: $gray-700;
-	}
-
-	&:is(a) {
-		text-decoration: none;
-		display: flex;
-		align-items: center;
-
-		&:focus {
-			box-shadow: none;
-			outline: none;
-		}
+		fill: $gray-600;
 	}
 
 	&.with-suffix {

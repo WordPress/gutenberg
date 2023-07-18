@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { useState, useEffect, Children, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
-import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -59,8 +58,16 @@ function Guide( {
 	onFinish,
 	pages = [],
 }: GuideProps ) {
-	const guideContainer = useRef< HTMLDivElement >( null );
+	const ref = useRef< HTMLDivElement >( null );
 	const [ currentPage, setCurrentPage ] = useState( 0 );
+
+	useEffect( () => {
+		// Place focus at the top of the guide on mount and when the page changes.
+		const frame = ref.current?.querySelector( '.components-guide' );
+		if ( frame instanceof HTMLElement ) {
+			frame.focus();
+		}
+	}, [ currentPage ] );
 
 	useEffect( () => {
 		if ( Children.count( children ) ) {
@@ -70,16 +77,6 @@ function Guide( {
 			} );
 		}
 	}, [ children ] );
-
-	useEffect( () => {
-		// Each time we change the current page, start from the first element of the page.
-		// This also solves any focus loss that can happen.
-		if ( guideContainer.current ) {
-			(
-				focus.tabbable.find( guideContainer.current ) as HTMLElement[]
-			 )[ 0 ]?.focus();
-		}
-	}, [ currentPage ] );
 
 	if ( Children.count( children ) ) {
 		pages =
@@ -124,7 +121,7 @@ function Guide( {
 					event.preventDefault();
 				}
 			} }
-			ref={ guideContainer }
+			ref={ ref }
 		>
 			<div className="components-guide__container">
 				<div className="components-guide__page">
