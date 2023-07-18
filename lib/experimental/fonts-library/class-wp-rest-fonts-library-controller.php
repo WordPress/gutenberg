@@ -182,7 +182,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		// iterates the fonts data received and creates a new WP_Fonts_Library_Family object for each one.
 		$fonts_installed = array();
 		foreach ( $fonts_to_install as $font_data ) {
-			$font = new WP_Fonts_Library( $font_data );
+			$font = new WP_Fonts_Library_Family( $font_data );
 			$font->install( $files );
 			$fonts_installed[] = $font;
 		}

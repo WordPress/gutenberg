@@ -1,6 +1,6 @@
 <?php
 /**
- * Fonts Library.
+ * Fonts Library Family class.
  *
  * This file contains functions and definitions for the Gutenberg Fonts Library.
  *
@@ -12,7 +12,7 @@
 /**
  * Fonts Library class.
  */
-class WP_Fonts_Library {
+class WP_Fonts_Library_Family {
 
 	const ALLOWED_FONT_MIME_TYPES = array(
 		'otf'   => 'font/otf',
@@ -35,7 +35,7 @@ class WP_Fonts_Library {
 	private $relative_fonts_path;
 
 	/**
-	 * WP_Fonts_Library constructor.
+	 * WP_Fonts_Library_Family constructor.
 	 *
 	 * @param array $font_family Font family data.
 	 */
@@ -494,4 +494,4 @@ class WP_Fonts_Library {
 
 }
 
-add_action( 'init', array( 'WP_Fonts_Library', 'define_fonts_directory' ) );
+add_action( 'init', array( 'WP_Fonts_Library_Family', 'define_fonts_directory' ) );
