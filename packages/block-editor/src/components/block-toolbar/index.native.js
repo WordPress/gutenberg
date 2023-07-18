@@ -3,7 +3,6 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-import { ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -94,17 +93,15 @@ export default function BlockToolbar( { anchorNodeRef } ) {
 		<>
 			{ isValidAndVisual && (
 				<>
-					<ToolbarGroup>
-						<BlockSettingsButton.Slot>
-							{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls. */ }
-							{ ( fills = [ null ] ) => {
-								if ( ! fills?.length > 0 ) {
-									return null;
-								}
-								return fills[ 0 ];
-							} }
-						</BlockSettingsButton.Slot>
-					</ToolbarGroup>
+					<BlockSettingsButton.Slot>
+						{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls. */ }
+						{ ( fills = [ null ] ) => {
+							if ( ! fills?.length > 0 ) {
+								return null;
+							}
+							return fills[ 0 ];
+						} }
+					</BlockSettingsButton.Slot>
 					<BlockControls.Slot group="block" />
 					<BlockControls.Slot />
 					<BlockControls.Slot group="inline" />
