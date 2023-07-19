@@ -34,11 +34,7 @@ store( {
 
 					context.core.image.lightboxEnabled = true;
 					if ( context.core.image.lightboxAnimation === 'zoom' ) {
-						setZoomStyles(
-							event.target.nextElementSibling,
-							context,
-							event
-						);
+						setZoomStyles( context, event );
 					}
 					// Hide overflow only when the animation is in progress,
 					// otherwise the removal of the scrollbars will draw attention
@@ -204,7 +200,7 @@ store( {
 	},
 } );
 
-function setZoomStyles( imgDom, context, event ) {
+function setZoomStyles( context, event ) {
 	// Typically, we use the image's full-sized dimensions. If those
 	// dimensions have not been set (i.e. an external image with only one size),
 	// the image's dimensions in the lightbox are the same
@@ -263,8 +259,14 @@ function setZoomStyles( imgDom, context, event ) {
 	const widthOverflow = targetWidth - containerInnerWidth;
 	const heightOverflow = targetHeight - containerInnerHeight;
 
+	// If the image is larger than the container, let's resize
+	// it along the greater axis relative to the container
 	if ( widthOverflow > 0 || heightOverflow > 0 ) {
-		if ( widthOverflow > heightOverflow ) {
+		const containerInnerAspectRatio =
+			containerInnerWidth / containerInnerHeight;
+		const imageAspectRatio = targetWidth / targetHeight;
+
+		if ( imageAspectRatio > containerInnerAspectRatio ) {
 			targetWidth = containerInnerWidth;
 			targetHeight = containerInnerWidth / offsetRatio;
 		} else {
@@ -272,32 +274,6 @@ function setZoomStyles( imgDom, context, event ) {
 			targetWidth = containerInnerHeight * offsetRatio;
 		}
 	}
-
-	// Check difference between the image and figure dimensions
-	// const widthOverflow = Math.abs(
-	// 	Math.min( containerInnerWidth - targetWidth, 0 )
-	// );
-	// const heightOverflow = Math.abs(
-	// 	Math.min( containerInnerHeight - targetHeight, 0 )
-	// );
-
-	// If the image is larger than the container, let's resize
-	// it along the greater axis relative to the container
-	// if ( widthOverflow > 0 || heightOverflow > 0 ) {
-	// 	const containerInnerAspectRatio =
-	// 		containerInnerWidth / containerInnerHeight;
-	// 	const imageAspectRatio = targetWidth / targetHeight;
-
-	// 	if ( imageAspectRatio > containerInnerAspectRatio ) {
-	// 		targetWidth = containerInnerWidth;
-	// 		targetHeight =
-	// 			( targetWidth * imgDom.naturalHeight ) / imgDom.naturalWidth;
-	// 	} else {
-	// 		targetHeight = containerInnerHeight;
-	// 		targetWidth =
-	// 			( targetHeight * imgDom.naturalWidth ) / imgDom.naturalHeight;
-	// 	}
-	// }
 
 	// The reference img element lies adjacent to the event target button in the DOM
 	const { x: originLeft, y: originTop } =
