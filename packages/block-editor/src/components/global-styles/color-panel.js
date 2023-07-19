@@ -328,22 +328,6 @@ export default function ColorPanel( {
 			: gradientValue;
 	};
 
-	// Text Color
-	const showTextPanel = useHasTextPanel( settings );
-	const textColor = decodeValue( inheritedValue?.color?.text );
-	const userTextColor = decodeValue( value?.color?.text );
-	const hasTextColor = () => !! userTextColor;
-	const setTextColor = ( newColor ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'color', 'text' ],
-				encodeColorValue( newColor )
-			)
-		);
-	};
-	const resetTextColor = () => setTextColor( undefined );
-
 	// BackgroundColor
 	const showBackgroundPanel = useHasBackgroundPanel( settings );
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
@@ -423,6 +407,29 @@ export default function ColorPanel( {
 		);
 		onChange( newValue );
 	};
+
+	// Text Color
+	const showTextPanel = useHasTextPanel( settings );
+	const textColor = decodeValue( inheritedValue?.color?.text );
+	const userTextColor = decodeValue( value?.color?.text );
+	const hasTextColor = () => !! userTextColor;
+	const setTextColor = ( newColor ) => {
+		let changedObject = setImmutably(
+			value,
+			[ 'color', 'text' ],
+			encodeColorValue( newColor )
+		);
+		if ( textColor === linkColor ) {
+			changedObject = setImmutably(
+				changedObject,
+				[ 'elements', 'link', 'color', 'text' ],
+				encodeColorValue( newColor )
+			);
+		}
+
+		onChange( changedObject );
+	};
+	const resetTextColor = () => setTextColor( undefined );
 
 	// Elements
 	const elements = [
