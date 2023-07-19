@@ -369,7 +369,7 @@ class WP_Font_Family {
 	 */
 	private function update_font_post( $post ) {
 		$post_font_data = json_decode( $post->post_content, true );
-		$new_data       = WP_Font_Family_Utils->merge_fonts_data( $post_font_data, $this->data );
+		$new_data       = WP_Font_Family_Utils::merge_fonts_data( $post_font_data, $this->data );
 		$this->data     = $new_data;
 
 		$post = array(
