@@ -15,13 +15,12 @@
 
 	.edit-site-site-hub__site-view-link {
 		flex-grow: 0;
+		margin-right: var(--wp-admin-border-width-focus);
 		@include break-mobile() {
 			opacity: 0;
 			transition: opacity 0.2s ease-in-out;
 		}
 		&:focus {
-			outline: none;
-			box-shadow: none;
 			opacity: 1;
 		}
 		svg {
