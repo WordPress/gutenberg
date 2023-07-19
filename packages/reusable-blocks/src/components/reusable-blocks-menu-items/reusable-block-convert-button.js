@@ -58,9 +58,10 @@ export default function ReusableBlockConvertButton( {
 			} = select( blockEditorStore );
 
 			const rootId =
-				rootClientId || clientIds.length > 0
+				rootClientId ||
+				( clientIds.length > 0
 					? getBlockRootClientId( clientIds[ 0 ] )
-					: undefined;
+					: undefined );
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 

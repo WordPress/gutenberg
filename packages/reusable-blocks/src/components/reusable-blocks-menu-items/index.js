@@ -11,8 +11,9 @@ import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlocksManageButton from './reusable-blocks-manage-button';
 
 export default function ReusableBlocksMenuItems( { rootClientId } ) {
-	const clientIds = useSelect( ( select ) =>
-		select( blockEditorStore ).getSelectedBlockClientIds()
+	const clientIds = useSelect(
+		( select ) => select( blockEditorStore ).getSelectedBlockClientIds(),
+		[]
 	);
 
 	return (
