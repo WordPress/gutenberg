@@ -14,8 +14,8 @@ const context = createContext( {} );
 // WordPress Directives.
 const directiveCallbacks = {};
 const directivePriorities = {};
-export const directive = ( name, cb, { priority = 10 } = {} ) => {
-	directiveCallbacks[ name ] = cb;
+export const directive = ( name, callback, { priority = 10 } = {} ) => {
+	directiveCallbacks[ name ] = callback;
 	directivePriorities[ name ] = priority;
 };
 
@@ -48,21 +48,17 @@ const getEvaluate =
 // Separate directives by priority. The resulting array contains objects
 // of directives grouped by same priority, and sorted in ascending order.
 const getPriorityLevels = ( directives ) => {
-	const byPriority = Object.entries( directives ).reduce(
-		( acc, [ name, values ] ) => {
-			if ( directiveCallbacks[ name ] ) {
-				const priority = directivePriorities[ name ];
-				if ( ! acc[ priority ] ) acc[ priority ] = {};
-				acc[ priority ][ name ] = values;
-			}
-			return acc;
-		},
-		{}
-	);
+	const byPriority = Object.keys( directives ).reduce( ( obj, name ) => {
+		if ( directiveCallbacks[ name ] ) {
+			const priority = directivePriorities[ name ];
+			( obj[ priority ] = obj[ priority ] || [] ).push( name );
+		}
+		return obj;
+	}, {} );
 
 	return Object.entries( byPriority )
 		.sort( ( [ p1 ], [ p2 ] ) => p1 - p2 )
-		.map( ( [ , obj ] ) => obj );
+		.map( ( [ , arr ] ) => arr );
 };
 
 // Priority level wrapper.
@@ -74,10 +70,14 @@ const Directives = ( {
 	originalProps,
 	elemRef,
 } ) => {
+	// Initialize the DOM reference.
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	elemRef = elemRef || useRef( null );
+
+	// Create a reference to the evaluate function using the DOM reference.
 	// eslint-disable-next-line react-hooks/rules-of-hooks, react-hooks/exhaustive-deps
 	evaluate = evaluate || useCallback( getEvaluate( { ref: elemRef } ), [] );
+
 	// Create a fresh copy of the vnode element.
 	element = cloneElement( element, { ref: elemRef } );
 
@@ -99,8 +99,8 @@ const Directives = ( {
 	const props = { ...originalProps, children };
 	const directiveArgs = { directives, props, element, context, evaluate };
 
-	for ( const d in thisPriorityLevel ) {
-		const wrapper = directiveCallbacks[ d ]?.( directiveArgs );
+	for ( const directiveName of thisPriorityLevel ) {
+		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
 		if ( wrapper !== undefined ) props.children = wrapper;
 	}
 
