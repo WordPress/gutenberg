@@ -344,7 +344,7 @@ class WP_Font_Family {
 	/**
 	 * Create a post for a font family.
 	 *
-	 * @return int
+	 * @return int post id
 	 */
 	private function create_font_post() {
 		$post    = array(
@@ -365,7 +365,7 @@ class WP_Font_Family {
 	 * Update a post for a font family.
 	 *
 	 * @param WP_Post $post The post to update.
-	 * @return int
+	 * @return int post id
 	 */
 	private function update_font_post( $post ) {
 		$post_font_data = json_decode( $post->post_content, true );
