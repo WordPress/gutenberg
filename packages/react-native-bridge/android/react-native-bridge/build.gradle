@@ -8,6 +8,9 @@ buildscript {
 
         // react native
         facebookFrescoVersion = '2.0.0'
+
+        // test
+        junitVersion = '4.13'
     }
 }
 
@@ -75,7 +78,7 @@ dependencies {
     implementation "com.google.android.material:material:$googleMaterialVersion"
     implementation "org.wordpress:utils:$wordpressUtilsVersion"
 
-    testImplementation "junit:junit:4.13"
+    testImplementation "junit:junit:$junitVersion"
 
     def rnVersion = readReactNativeVersion('../../../../package.json', 'devDependencies')
     println "react-native version for react-native-bridge: $rnVersion"
