@@ -297,7 +297,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 			$theme_style_handle = "wp-block-{$block_name}-theme";
 			if ( wp_style_is( $theme_style_handle, 'registered' ) ) {
 				wp_deregister_style( $theme_style_handle );
-				if ( file_exists( $stylesheet_path ) ) {
+				if ( file_exists( $theme_style_path ) ) {
 					// If there is a main stylesheet for this block, append the theme styles to main styles.
 					wp_register_style(
 						$theme_style_handle,
