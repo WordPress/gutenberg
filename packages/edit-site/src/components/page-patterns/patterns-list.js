@@ -63,9 +63,12 @@ export default function PatternsList( { categoryId, type } ) {
 
 	const deferredSyncedFilter = useDeferredValue( syncFilter );
 
+	const isUncategorizedThemePatterns =
+		type === PATTERNS && categoryId === 'uncategorized';
+
 	const { patterns, isResolving } = usePatterns(
 		type,
-		type !== PATTERNS || categoryId !== 'uncategorized' ? categoryId : '',
+		isUncategorizedThemePatterns ? '' : categoryId,
 		{
 			search: deferredFilterValue,
 			syncStatus:
