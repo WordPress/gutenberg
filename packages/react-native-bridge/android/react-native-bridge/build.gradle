@@ -59,6 +59,10 @@ android {
             assets.srcDirs += '../../../../../resources/unsupported-block-editor'
         }
     }
+
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 repositories {
