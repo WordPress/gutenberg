@@ -72,6 +72,7 @@ function BlockWrapper( {
 	isTouchable,
 	marginHorizontal,
 	marginVertical,
+	name,
 	onFocus,
 } ) {
 	const blockWrapperStyles = { flex: 1 };
@@ -98,6 +99,7 @@ function BlockWrapper( {
 				hasInnerBlocks={ hasInnerBlocks }
 				isRootList={ isRootList }
 				isSelected={ isSelected }
+				name={ name }
 			/>
 			<BlockDraggable
 				clientId={ clientId }
@@ -300,15 +302,16 @@ function BlockListBlock( {
 			clientId={ clientId }
 			draggingClientId={ draggingClientId }
 			draggingEnabled={ draggingEnabled }
-			isFocused={ isFocused }
 			hasInnerBlocks={ hasInnerBlocks }
 			isDescendentBlockSelected={ isDescendentBlockSelected }
+			isFocused={ isFocused }
 			isRootList={ ! rootClientId }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
 			isTouchable={ isTouchable }
 			marginHorizontal={ marginHorizontal }
 			marginVertical={ marginVertical }
+			name={ name }
 			onFocus={ onFocus }
 		>
 			{ () =>

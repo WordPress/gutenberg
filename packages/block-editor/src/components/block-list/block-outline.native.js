@@ -13,17 +13,24 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './block.scss';
 
+const TEXT_BLOCKS_WITH_OUTLINE = [ 'core/missing' ];
+
 function BlockOutline( {
 	blockCategory,
 	hasInnerBlocks,
 	isRootList,
 	isSelected,
+	name,
 } ) {
-	const hasBlockTextCategory = blockCategory === 'text';
+	const textBlockWithOutline = TEXT_BLOCKS_WITH_OUTLINE.includes( name );
+	const hasBlockTextCategory =
+		blockCategory === 'text' && ! textBlockWithOutline;
 	const hasBlockMediaCategory =
 		blockCategory === 'media' ||
 		blockCategory === 'embed' ||
 		! blockCategory;
+	const shouldShowCompactOutline =
+		( hasBlockMediaCategory && ! hasInnerBlocks ) || textBlockWithOutline;
 
 	const styleSolidBorder = [
 		styles.solidBorder,
@@ -31,7 +38,7 @@ function BlockOutline( {
 			styles.solidBorderColor,
 			styles.solidBorderColorDark
 		),
-		hasBlockMediaCategory && ! hasInnerBlocks && styles.solidBorderCompact,
+		shouldShowCompactOutline && styles.solidBorderCompact,
 		hasBlockTextCategory && styles.solidBorderTextContent,
 	];
 
@@ -39,7 +46,8 @@ function BlockOutline( {
 		isSelected &&
 		( ( hasBlockTextCategory && hasInnerBlocks ) ||
 			( ! hasBlockTextCategory && hasInnerBlocks ) ||
-			( ! hasBlockTextCategory && isRootList ) );
+			( ! hasBlockTextCategory && isRootList ) ||
+			textBlockWithOutline );
 
 	return (
 		shoudlShowOutline && (
