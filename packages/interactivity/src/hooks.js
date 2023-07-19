@@ -12,10 +12,10 @@ import { rawStore as store } from './store';
 const context = createContext( {} );
 
 // WordPress Directives.
-const directiveMap = {};
+const directiveCallbacks = {};
 const directivePriorities = {};
 export const directive = ( name, cb, { priority = 10 } = {} ) => {
-	directiveMap[ name ] = cb;
+	directiveCallbacks[ name ] = cb;
 	directivePriorities[ name ] = priority;
 };
 
@@ -50,10 +50,11 @@ const getEvaluate =
 const getPriorityLevels = ( directives ) => {
 	const byPriority = Object.entries( directives ).reduce(
 		( acc, [ name, values ] ) => {
-			const priority = directivePriorities[ name ];
-			if ( ! acc[ priority ] ) acc[ priority ] = {};
-			acc[ priority ][ name ] = values;
-
+			if ( directiveCallbacks[ name ] ) {
+				const priority = directivePriorities[ name ];
+				if ( ! acc[ priority ] ) acc[ priority ] = {};
+				acc[ priority ][ name ] = values;
+			}
 			return acc;
 		},
 		{}
@@ -99,7 +100,7 @@ const Directives = ( {
 	const directiveArgs = { directives, props, element, context, evaluate };
 
 	for ( const d in thisPriorityLevel ) {
-		const wrapper = directiveMap[ d ]?.( directiveArgs );
+		const wrapper = directiveCallbacks[ d ]?.( directiveArgs );
 		if ( wrapper !== undefined ) props.children = wrapper;
 	}
 
@@ -114,15 +115,17 @@ options.vnode = ( vnode ) => {
 		const directives = props.__directives;
 		delete props.__directives;
 		const priorityLevels = getPriorityLevels( directives );
-		vnode.props = {
-			directives,
-			priorityLevels,
-			originalProps: props,
-			type: vnode.type,
-			element: h( vnode.type, props ),
-			top: true,
-		};
-		vnode.type = Directives;
+		if ( priorityLevels.length > 0 ) {
+			vnode.props = {
+				directives,
+				priorityLevels,
+				originalProps: props,
+				type: vnode.type,
+				element: h( vnode.type, props ),
+				top: true,
+			};
+			vnode.type = Directives;
+		}
 	}
 
 	if ( old ) old( vnode );
