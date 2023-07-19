@@ -461,11 +461,7 @@ export function useGradientsPerOrigin( settings ) {
 	] );
 }
 
-export function __experimentalUseGlobalBehaviors(
-	blockName,
-	source = 'all',
-	{ shouldReturnBehaviors = true } = {}
-) {
+export function __experimentalUseGlobalBehaviors( blockName, source = 'all' ) {
 	const {
 		merged: mergedConfig,
 		base: baseConfig,
@@ -543,18 +539,11 @@ export function __experimentalUseGlobalBehaviors(
 			setImmutably( currentConfig, finalPath.split( '.' ), newBehavior )
 		);
 	};
-	if ( shouldReturnBehaviors ) {
-		return [ result, setBehavior ];
-	}
-	let behaviorValue = '';
-	if ( result === undefined ) {
-		behaviorValue = 'default';
-	}
-	if ( result?.lightbox.enabled ) {
-		behaviorValue = 'lightbox';
-	}
+	let behavior = '';
+	if ( result === undefined ) behavior = 'default';
+	if ( result?.lightbox.enabled ) behavior = 'lightbox';
 
-	return [ behaviorValue, setBehavior ];
+	return { behavior, inheritedBehaviors: result, setBehavior };
 }
 
 export function __experimentalUseHasBehaviorsPanel(

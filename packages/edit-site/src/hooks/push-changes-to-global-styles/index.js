@@ -189,7 +189,7 @@ function PushChangesToGlobalStylesControl( {
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const [ inheritedBehaviors, setBehavior ] = useGlobalBehaviors( name );
+	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
 
 	const userHasEditedBehaviors =
 		attributes.hasOwnProperty( 'behaviors' ) && hasBehaviorsPanel;

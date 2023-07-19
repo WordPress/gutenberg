@@ -94,10 +94,8 @@ function ScreenBlock( { name, variation } ) {
 	} );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
-	const [ inheritedBehaviors, setBehavior ] = useGlobalBehaviors( name );
-	const [ behavior ] = useGlobalBehaviors( name, 'user', {
-		shouldReturnBehaviors: false,
-	} );
+	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
+	const { behavior } = useGlobalBehaviors( name, 'user' );
 
 	const blockType = getBlockType( name );
 	const blockVariations = useBlockVariations( name );
