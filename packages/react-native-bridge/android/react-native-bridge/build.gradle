@@ -1,5 +1,8 @@
 buildscript {
     ext {
+        // libs
+        wordpressUtilsVersion = '3.3.0'
+
         // main
         googleMaterialVersion = '1.2.1'
 
@@ -70,7 +73,7 @@ dependencies {
     // For animated GIF support
     implementation "com.facebook.fresco:animated-gif:$facebookFrescoVersion"
     implementation "com.google.android.material:material:$googleMaterialVersion"
-    implementation "org.wordpress:utils:3.3.0"
+    implementation "org.wordpress:utils:$wordpressUtilsVersion"
 
     testImplementation "junit:junit:4.13"
 
