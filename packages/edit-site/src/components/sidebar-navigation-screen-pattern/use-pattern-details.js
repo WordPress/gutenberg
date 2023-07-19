@@ -3,6 +3,7 @@
  */
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -26,6 +27,11 @@ export default function usePatternDetails( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
 		postType,
 		postId
+	);
+	const templatePartAreas = useSelect(
+		( select ) =>
+			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
+		[]
 	);
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme(),
@@ -71,17 +77,14 @@ export default function usePatternDetails( postType, postId ) {
 		} );
 	}
 
-	const templatePartAreaLabels = {
-		header: __( 'Header' ),
-		footer: __( 'Footer' ),
-		sidebar: __( 'Sidebar' ),
-		uncategorized: __( 'General' ),
-	};
-
 	if ( postType === 'wp_template_part' ) {
+		const templatePartArea = templatePartAreas.find(
+			( area ) => area.area === record.area
+		);
+
 		details.push( {
 			label: __( 'Area' ),
-			value: templatePartAreaLabels[ record.area ],
+			value: templatePartArea?.label,
 		} );
 	}
 
