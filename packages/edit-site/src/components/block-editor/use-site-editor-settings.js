@@ -17,6 +17,8 @@ function useArchiveLabel( templateSlug ) {
 	);
 	let taxonomy;
 	let term;
+	let isAuthor = false;
+	let authorSlug;
 	if ( taxonomyMatches ) {
 		// If is for a all taxonomies of a type
 		if ( taxonomyMatches[ 1 ] ) {
@@ -35,10 +37,19 @@ function useArchiveLabel( templateSlug ) {
 
 		//getTaxonomy( 'category' );
 		//wp.data.select('core').getEntityRecords( 'taxonomy', 'category', {slug: 'newcat'} );
+	} else {
+		const authorMatches = templateSlug?.match( /^(author)$|^author-(.+)$/ );
+		if ( authorMatches ) {
+			isAuthor = true;
+			if ( authorMatches[ 2 ] ) {
+				authorSlug = authorMatches[ 2 ];
+			}
+		}
 	}
 	return useSelect(
 		( select ) => {
-			const { getEntityRecords, getTaxonomy } = select( coreStore );
+			const { getEntityRecords, getTaxonomy, getAuthors } =
+				select( coreStore );
 			let archiveTypeLabel;
 			let archiveNameLabel;
 			if ( taxonomy ) {
@@ -54,12 +65,21 @@ function useArchiveLabel( templateSlug ) {
 					archiveNameLabel = records[ 0 ].name;
 				}
 			}
+			if ( isAuthor ) {
+				archiveTypeLabel = 'Author';
+				if ( authorSlug ) {
+					const authorRecords = getAuthors( { slug: authorSlug } );
+					if ( authorRecords && authorRecords[ 0 ] ) {
+						archiveNameLabel = authorRecords[ 0 ].name;
+					}
+				}
+			}
 			return {
 				archiveTypeLabel,
 				archiveNameLabel,
 			};
 		},
-		[ taxonomy, term ]
+		[ authorSlug, isAuthor, taxonomy, term ]
 	);
 }
 
