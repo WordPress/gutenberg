@@ -145,7 +145,11 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		'</div>';
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
-	// Add src to the modal image.
+	// We need both a responsive image and an enlarged image to animate
+	// the zoom seamlessly on slow internet connections; the responsive
+	// image is a copy of the one in the body, which animates immediately
+	// as the lightbox is opened, while the enlarged one is a full-sized
+	// version that will likely still be loading as the animation begins.
 	$m = new WP_HTML_Tag_Processor( $content );
 	$m->next_tag( 'figure' );
 	$m->add_class( 'responsive-image' );
@@ -190,7 +194,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
                     $close_button_icon
                 </button>
-                <!-- $initial_image_content -->
+                $initial_image_content
 				$enlarged_image_content
                 <div class="scrim" style="background-color: $background_color"></div>
         </div>

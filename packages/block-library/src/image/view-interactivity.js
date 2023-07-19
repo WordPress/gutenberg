@@ -226,7 +226,7 @@ function setZoomStyles( context, event ) {
 		targetHeight = offsetHeight;
 	}
 
-	// Change the targetRatio if it the original aspect ratio has been changed.
+	// Change the target dimensions if the original aspect ratio has been changed.
 	const targetRatio = targetWidth / targetHeight;
 	const offsetRatio =
 		event.target.nextElementSibling.offsetWidth /
@@ -241,7 +241,7 @@ function setZoomStyles( context, event ) {
 	// ignores its parent's padding, so we need to set padding here
 	// to calculate dimensions and positioning.
 
-	// As per the design, let's constrain the height with fixed padding
+	// As per the design, let's constrain the height with fixed padding.
 	const containerOuterHeight = window.innerHeight;
 	const verticalPadding = 40;
 	const containerInnerHeight = containerOuterHeight - verticalPadding * 2;
@@ -260,12 +260,18 @@ function setZoomStyles( context, event ) {
 	const heightOverflow = targetHeight - containerInnerHeight;
 
 	// If the image is larger than the container, let's resize
-	// it along the greater axis relative to the container
+	// it along the greater axis relative to the container.
 	if ( widthOverflow > 0 || heightOverflow > 0 ) {
 		const containerInnerAspectRatio =
 			containerInnerWidth / containerInnerHeight;
 		const imageAspectRatio = targetWidth / targetHeight;
 
+		// The larger the aspect ratio, the wider the image.
+		// If the image is wider than the container, then resize
+		// it along the width; if the image is narrower than the
+		// container, resize it along the height. Doing this, we
+		// can always be sure that the image will be placed within
+		// the bounds of the container.
 		if ( imageAspectRatio > containerInnerAspectRatio ) {
 			targetWidth = containerInnerWidth;
 			targetHeight = containerInnerWidth / offsetRatio;
@@ -313,6 +319,10 @@ function setZoomStyles( context, event ) {
 		'--lightbox-initial-top-position',
 		originTop + 'px'
 	);
+
+	// We need to center the image with manual values
+	// rather than using percentages because otherwise the
+	// animation does not function properly on iPhone and iPad.
 	root.style.setProperty(
 		'--lightbox-target-left-position',
 		targetLeft + 'px'
