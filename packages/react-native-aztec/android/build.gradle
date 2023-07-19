@@ -13,6 +13,9 @@ buildscript {
         // libs
         aztecVersion = 'v1.6.4'
         wordpressUtilsVersion = '3.3.0'
+
+        // main
+        androidxLegacyVersion = '1.0.0'
     }
 }
 
@@ -94,7 +97,7 @@ dependencies {
     api "org.wordpress.aztec:glide-loader:$aztecVersion"
     implementation "org.wordpress:utils:$wordpressUtilsVersion"
 
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "androidx.legacy:legacy-support-v4:$androidxLegacyVersion"
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
