@@ -40,7 +40,7 @@ android {
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
-    lintOptions {
+    lint {
         abortOnError false
     }
 
