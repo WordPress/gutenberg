@@ -163,6 +163,9 @@ store( {
 						? context.core.image.imageUploadedSrc
 						: '';
 				},
+				inheritSize: ( { context } ) => {
+					return context.core.image.lightboxEnabled && 'inherit';
+				},
 			},
 		},
 	},
