@@ -151,7 +151,7 @@ foreach ( array( 'post', 'page' ) as $post_type ) {
 }
 
 add_action(
-	'wp_restore_post_revision', 
+	'wp_restore_post_revision',
 	/**
 	 * Restores the footnotes meta value from the revision.
 	 *
