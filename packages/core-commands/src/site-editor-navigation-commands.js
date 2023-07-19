@@ -13,6 +13,7 @@ import {
 	symbolFilled,
 	styles,
 	navigation,
+	symbol,
 } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
@@ -199,8 +200,8 @@ function useSiteEditorBasicNavigationCommands() {
 
 		result.push( {
 			name: 'core/edit-site/open-template-parts',
-			label: __( 'Open library' ),
-			icon: symbolFilled,
+			label: __( 'Open patterns' ),
+			icon: symbol,
 			callback: ( { close } ) => {
 				const args = {
 					path: '/patterns',

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
@@ -11,6 +10,7 @@ import {
 	getTypographyFontSizeValue,
 	getFluidTypographyOptionsFromSettings,
 } from './typography-utils';
+import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
@@ -168,8 +168,12 @@ function findInPresetsBy(
 ) {
 	// Block presets take priority above root level presets.
 	const orderedPresetsByOrigin = [
-		get( features, [ 'blocks', blockName, ...presetPath ] ),
-		get( features, presetPath ),
+		getValueFromObjectPath( features, [
+			'blocks',
+			blockName,
+			...presetPath,
+		] ),
+		getValueFromObjectPath( features, presetPath ),
 	];
 
 	for ( const presetByOrigin of orderedPresetsByOrigin ) {
@@ -282,8 +286,13 @@ function getValueFromPresetVariable(
 
 function getValueFromCustomVariable( features, blockName, variable, path ) {
 	const result =
-		get( features.settings, [ 'blocks', blockName, 'custom', ...path ] ) ??
-		get( features.settings, [ 'custom', ...path ] );
+		getValueFromObjectPath( features.settings, [
+			'blocks',
+			blockName,
+			'custom',
+			...path,
+		] ) ??
+		getValueFromObjectPath( features.settings, [ 'custom', ...path ] );
 	if ( ! result ) {
 		return variable;
 	}
@@ -303,7 +312,7 @@ export function getValueFromVariable( features, blockName, variable ) {
 	if ( ! variable || typeof variable !== 'string' ) {
 		if ( variable?.ref && typeof variable?.ref === 'string' ) {
 			const refPath = variable.ref.split( '.' );
-			variable = get( features, refPath );
+			variable = getValueFromObjectPath( features, refPath );
 			// Presence of another ref indicates a reference to another dynamic value.
 			// Pointing to another dynamic value is not supported.
 			if ( ! variable || !! variable?.ref ) {

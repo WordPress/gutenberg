@@ -75,10 +75,10 @@ The simplest way to add a production dependency to one of the packages is to run
 _Example:_
 
 ```bash
-lerna add lodash packages/a11y
+lerna add change-case packages/a11y
 ```
 
-This command adds the latest version of `lodash` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
+This command adds the latest version of `change-case` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
 
 #### Removing Existing Dependencies
 

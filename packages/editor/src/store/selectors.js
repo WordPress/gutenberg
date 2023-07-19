@@ -10,6 +10,7 @@ import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	__unstableSerializeAndClean,
+	parse,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
@@ -41,15 +42,6 @@ import { getTemplatePartIcon } from '../utils/get-template-part-icon';
  * maintained by the reducer result in state.
  */
 const EMPTY_OBJECT = {};
-
-/**
- * Shared reference to an empty array for cases where it is important to avoid
- * returning a new array reference on every invocation, as in a connected or
- * other pure component which performs `shouldComponentUpdate` check on props.
- * This should be used as a last resort, since the normalized data should be
- * maintained by the reducer result in state.
- */
-const EMPTY_ARRAY = [];
 
 /**
  * Returns true if any past editor history snapshots exist, or false otherwise.
@@ -1088,9 +1080,18 @@ export const isPublishSidebarEnabled = createRegistrySelector(
  * @param {Object} state
  * @return {Array} Block list.
  */
-export function getEditorBlocks( state ) {
-	return getEditedPostAttribute( state, 'blocks' ) || EMPTY_ARRAY;
-}
+export const getEditorBlocks = createSelector(
+	( state ) => {
+		return (
+			getEditedPostAttribute( state, 'blocks' ) ||
+			parse( getEditedPostContent( state ) )
+		);
+	},
+	( state ) => [
+		getEditedPostAttribute( state, 'blocks' ),
+		getEditedPostContent( state ),
+	]
+);
 
 /**
  * A block selection object.
