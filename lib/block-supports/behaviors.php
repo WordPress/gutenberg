@@ -89,14 +89,14 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$z->next_tag( 'img' );
 
 	if ( isset( $block['attrs']['id'] ) ) {
-		$img_uploaded_src    = wp_get_attachment_url( $block['attrs']['id'] );
-		$img_metadata        = wp_get_attachment_metadata( $block['attrs']['id'] );
-		$img_width           = $img_metadata['width'];
-		$img_height          = $img_metadata['height'];
+		$img_uploaded_src = wp_get_attachment_url( $block['attrs']['id'] );
+		$img_metadata     = wp_get_attachment_metadata( $block['attrs']['id'] );
+		$img_width        = $img_metadata['width'];
+		$img_height       = $img_metadata['height'];
 	} else {
-		$img_uploaded_src    = $z->get_attribute( 'src' );
-		$img_width           = 'none';
-		$img_height          = 'none';
+		$img_uploaded_src = $z->get_attribute( 'src' );
+		$img_width        = 'none';
+		$img_height       = 'none';
 	}
 
 	$w = new WP_HTML_Tag_Processor( $content );
