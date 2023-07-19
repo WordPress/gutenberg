@@ -340,18 +340,18 @@ html.has-lightbox-open {
 		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
 	}
 	100% {
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%) scale(1, 1);
+		left: var(--lightbox-target-left-position);
+		top: var(--lightbox-target-top-position);
+		transform: scale(1, 1);
 	}
 }
 
 @keyframes lightbox-zoom-out {
 	0% {
 		visibility: visible;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%) scale(1, 1);
+		left: var(--lightbox-target-left-position);
+		top: var(--lightbox-target-top-position);
+		transform: scale(1, 1);
 	}
 	99% {
 		visibility: visible;
