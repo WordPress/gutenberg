@@ -1010,6 +1010,7 @@ const blockNames = {
 	buttons: 'Buttons',
 	button: 'Button',
 	preformatted: 'Preformatted',
+	unsupported: 'Unsupported',
 };
 
 module.exports = { initializeEditorPage, blockNames };

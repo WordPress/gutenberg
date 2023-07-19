@@ -129,7 +129,7 @@ export function useEntityProp( kind, name, prop, _id ) {
 				[ prop ]: newValue,
 			} );
 		},
-		[ kind, name, id, prop ]
+		[ editEntityRecord, kind, name, id, prop ]
 	);
 
 	return [ value, setValue, fullValue ];
