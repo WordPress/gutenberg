@@ -93,9 +93,6 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			);
 		}
 
-		// Create fonts directory if it doesn't exist.
-		wp_mkdir_p( WP_FONTS_DIR );
-
 		// The update endpoints requires write access to the temp and the fonts directories.
 		$temp_dir = get_temp_dir();
 		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( WP_FONTS_DIR ) ) {
