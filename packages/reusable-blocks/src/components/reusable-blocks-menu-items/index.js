@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -10,7 +10,12 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlocksManageButton from './reusable-blocks-manage-button';
 
-function ReusableBlocksMenuItems( { clientIds, rootClientId } ) {
+export default function ReusableBlocksMenuItems( { rootClientId } ) {
+	const clientIds = useSelect(
+		( select ) => select( blockEditorStore ).getSelectedBlockClientIds(),
+		[]
+	);
+
 	return (
 		<>
 			<ReusableBlockConvertButton
@@ -23,16 +28,3 @@ function ReusableBlocksMenuItems( { clientIds, rootClientId } ) {
 		</>
 	);
 }
-
-export default withSelect( ( select ) => {
-	const { getSelectedBlockClientIds, getBlockRootClientId } =
-		select( blockEditorStore );
-	const clientIds = getSelectedBlockClientIds();
-	return {
-		clientIds,
-		rootClientId:
-			clientIds?.length > 0
-				? getBlockRootClientId( clientIds[ 0 ] )
-				: undefined,
-	};
-} )( ReusableBlocksMenuItems );
