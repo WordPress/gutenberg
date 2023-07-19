@@ -10,7 +10,7 @@
  */
 
 /**
- * Fonts Library class.
+ * A class of utilities for working with the Font Library.
  */
 class WP_Font_Family_Utils {
 
