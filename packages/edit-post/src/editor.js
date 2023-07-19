@@ -9,7 +9,6 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -28,7 +27,6 @@ import { unlock } from './lock-unlock';
 import useCommonCommands from './hooks/commands/use-common-commands';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
-const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
@@ -39,7 +37,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		focusMode,
 		isDistractionFree,
 		hasInlineToolbar,
-		hasThemeStyles,
 		post,
 		preferredStyleVariations,
 		hiddenBlockTypes,
@@ -86,7 +83,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				focusMode: isFeatureActive( 'focusMode' ),
 				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
-				hasThemeStyles: isFeatureActive( 'themeStyles' ),
 				preferredStyleVariations: select( preferencesStore ).get(
 					'core/edit-post',
 					'preferredStyleVariations'
@@ -143,43 +139,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			);
 		}
 
-		const themeStyles = [];
-		const presetStyles = [];
-		settings.styles?.forEach( ( style ) => {
-			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
-				themeStyles.push( style );
-			} else {
-				presetStyles.push( style );
-			}
-		} );
-
-		const defaultEditorStyles = [
-			...settings.defaultEditorStyles,
-			...presetStyles,
-		];
-
-		// If theme styles are not present or displayed, ensure that
-		// base layout styles are still present in the editor.
-		if (
-			! settings.disableLayoutStyles &&
-			! ( hasThemeStyles && themeStyles.length )
-		) {
-			defaultEditorStyles.push( {
-				css: getLayoutStyles( {
-					style: {},
-					selector: 'body',
-					hasBlockGapSupport: false,
-					hasFallbackGapSupport: true,
-					fallbackGapValue: '0.5em',
-				} ),
-			} );
-		}
-
-		result.styles =
-			hasThemeStyles && themeStyles.length
-				? settings.styles
-				: defaultEditorStyles;
-
 		return result;
 	}, [
 		settings,
@@ -193,7 +152,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
-		hasThemeStyles,
 	] );
 
 	if ( ! post ) {
