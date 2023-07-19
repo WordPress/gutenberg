@@ -322,12 +322,15 @@
 	// for the block inserter the publish button
 	@include break-large() {
 		&.is-fixed {
+			width: auto;
+		}
+		.is-fullscreen-mode &.is-fixed {
+			// in full screen mode we need to account for
 			// the combined with of the tools at the right of the header and the margin left
 			// of the toolbar which includes four buttons
 			width: calc(100% - 240px - #{4 * $grid-unit-80});
 		}
 	}
-
 }
 
 /**
