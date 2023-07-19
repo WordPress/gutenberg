@@ -61,6 +61,7 @@
 .edit-site-layout__sidebar {
 	z-index: z-index(".edit-site-layout__sidebar");
 	width: 100vw;
+	flex-shrink: 0;
 
 	@include break-medium {
 		width: $nav-sidebar-width;
@@ -120,7 +121,7 @@
 	justify-content: center;
 	align-items: center;
 
-	&:has(.edit-site-layout__resizable-frame-oversized) {
+	&.is-right-aligned {
 		justify-content: flex-end;
 	}
 

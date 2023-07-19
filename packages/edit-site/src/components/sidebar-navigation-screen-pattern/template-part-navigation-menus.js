@@ -22,8 +22,9 @@ export default function TemplatePartNavigationMenus( { menus } ) {
 		<>
 			<Heading
 				className="edit-site-sidebar-navigation-screen-template-part-navigation-menu__title"
-				size="12"
+				size="11"
 				upperCase={ true }
+				weight={ 500 }
 			>
 				{ __( 'Navigation' ) }
 			</Heading>

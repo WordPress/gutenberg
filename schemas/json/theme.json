@@ -690,9 +690,7 @@
 			"type": "object",
 			"properties": {
 				"core/archives": {
-					"type": "object",
-					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings",
-					"additionalProperties": false
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/audio": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -704,35 +702,7 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
-					"type": "object",
-					"allOf": [
-						{
-							"$ref": "#/definitions/settingsPropertiesAppearanceTools"
-						},
-						{
-							"type": "object",
-							"properties": {
-								"border": {
-									"description": "Settings related to borders.",
-									"type": "object",
-									"properties": {
-										"radius": {
-											"description": "Allow users to set custom border radius.",
-											"type": "boolean",
-											"default": false
-										}
-									}
-								}
-							}
-						},
-						{ "$ref": "#/definitions/settingsPropertiesColor" },
-						{ "$ref": "#/definitions/settingsPropertiesLayout" },
-						{ "$ref": "#/definitions/settingsPropertiesSpacing" },
-						{
-							"$ref": "#/definitions/settingsPropertiesTypography"
-						},
-						{ "$ref": "#/definitions/settingsPropertiesCustom" }
-					]
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/buttons": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -752,6 +722,9 @@
 				"core/columns": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/comment-author-name": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -767,13 +740,31 @@
 				"core/comment-reply-link": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/comment-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
 				"core/comments": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/comments-pagination": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-next": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-numbers": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-previous": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/cover": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/details": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/embed": {
@@ -812,6 +803,9 @@
 				"core/list": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/list-item": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/loginout": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -830,10 +824,16 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/navigation-submenu": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/nextpage": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/page-list": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/page-list-item": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/paragraph": {
@@ -842,7 +842,13 @@
 				"core/post-author": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/post-comments": {
+				"core/post-author-biography": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-author-name": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comment": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-comments-count": {
@@ -875,6 +881,9 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/post-time-to-read": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/post-title": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -885,6 +894,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/query": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-no-results": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/query-pagination": {
@@ -903,6 +915,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/quote": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/read-more": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/rss": {
@@ -1789,6 +1804,9 @@
 				"core/columns": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/comment-author-name": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1804,13 +1822,31 @@
 				"core/comment-reply-link": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/comment-template": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
 				"core/comments": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/comments-pagination": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-next": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-numbers": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-previous": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/cover": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/details": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/embed": {
@@ -1849,6 +1885,9 @@
 				"core/list": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/list-item": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/loginout": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1867,10 +1906,16 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/navigation-submenu": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/nextpage": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/page-list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/page-list-item": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/paragraph": {
@@ -1879,7 +1924,13 @@
 				"core/post-author": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/post-comments": {
+				"core/post-author-biography": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-author-name": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comment": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-comments-count": {
@@ -1912,6 +1963,9 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/post-time-to-read": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/post-title": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1922,6 +1976,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/query": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-no-results": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/query-pagination": {
@@ -1940,6 +1997,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/quote": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/read-more": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/rss": {

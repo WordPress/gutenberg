@@ -19,8 +19,11 @@ import {
 	SidebarNavigationScreenDetailsPanelLabel,
 	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
+import normalizeRecordKey from '../../utils/normalize-record-key';
 
 export default function usePatternDetails( postType, postId ) {
+	postId = normalizeRecordKey( postId );
+
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
 		postType,
 		postId

@@ -405,6 +405,32 @@ describe( 'Basic rendering', () => {
 
 			expect( mockOnRemove ).toHaveBeenCalled();
 		} );
+
+		it( 'should revert to "editing" mode when onRemove is triggered', async () => {
+			const user = userEvent.setup();
+			const mockOnRemove = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: 'https://example.com' } }
+					onRemove={ mockOnRemove }
+				/>
+			);
+
+			const unLinkButton = screen.queryByRole( 'button', {
+				name: 'Unlink',
+			} );
+			expect( unLinkButton ).toBeVisible();
+
+			await user.click( unLinkButton );
+
+			expect( mockOnRemove ).toHaveBeenCalled();
+
+			// Should revert back to editing mode.
+			expect(
+				screen.getByRole( 'combobox', { name: 'Link' } )
+			).toBeVisible();
+		} );
 	} );
 } );
 
