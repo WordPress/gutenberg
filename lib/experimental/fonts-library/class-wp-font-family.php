@@ -384,7 +384,7 @@ class WP_Font_Family {
 	/**
 	 * Creates a post for a font in the fonts library if it doesn't exist, or updates it if it does.
 	 *
-	 * @return WP_Post
+	 * @return int post id
 	 */
 	private function create_or_update_font_post() {
 		$post = $this->get_font_post();
