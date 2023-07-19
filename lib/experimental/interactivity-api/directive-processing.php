@@ -17,7 +17,7 @@
  */
 function gutenberg_interactivity_process_directives_in_root_blocks( $block_content, $block ) {
 	// Don't process inner blocks or root blocks that don't contain directives.
-	if ( isset( $block['is_inner_block'] ) || strpos( $block_content, 'data-wp-' ) === false ) {
+	if ( ! WP_Directive_Processor::is_root_block( $block ) || strpos( $block_content, 'data-wp-' ) === false ) {
 		return $block_content;
 	}
 
@@ -47,8 +47,8 @@ add_filter( 'render_block', 'gutenberg_interactivity_process_directives_in_root_
  * @return array The parsed block.
  */
 function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block, $parent_block ) {
-	if ( isset( $parent_block ) ) {
-		$parsed_block['is_inner_block'] = true;
+	if ( ! isset( $parent_block ) ) {
+		WP_Directive_Processor::add_root_block( $parsed_block );
 	}
 	return $parsed_block;
 }

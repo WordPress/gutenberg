@@ -98,6 +98,20 @@
 	border-top: 1px solid $gray-800;
 }
 
+.edit-site-sidebar__notice {
+	background: $gray-800;
+	color: $gray-300;
+	margin: $grid-unit-30 0;
+	&.is-dismissible {
+		padding-right: $grid-unit-10;
+	}
+	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):focus,
+	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
+	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
+		color: $gray-100;
+	}
+}
+
 /* In general style overrides are discouraged.
  * This is a temporary solution to override the InputControl component's styles.
  * The `Theme` component will potentially be the more appropriate approach

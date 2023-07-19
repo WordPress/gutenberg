@@ -4,7 +4,7 @@
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
-import { getRichTextValues } from './components/rich-text/content';
+import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import { kebabCase } from './utils/object';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
@@ -19,6 +19,10 @@ import { BlockRemovalWarningModal } from './components/block-removal-warning-mod
 import { useLayoutClasses, useLayoutStyles } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
+import {
+	default as ReusableBlocksRenameHint,
+	useReusableBlocksRenameHint,
+} from './components/inserter/reusable-block-rename-hint';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -43,4 +47,6 @@ lock( privateApis, {
 	useLayoutStyles,
 	DimensionsTool,
 	ResolutionTool,
+	ReusableBlocksRenameHint,
+	useReusableBlocksRenameHint,
 } );

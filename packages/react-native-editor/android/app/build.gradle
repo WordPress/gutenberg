@@ -126,6 +126,7 @@ dependencies {
 
     implementation "org.wordpress-mobile.gutenberg-mobile:react-native-bridge"
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation "com.google.android.material:material:1.9.0"
     // The version of react-native is set by the React Native Gradle Plugin
     implementation "com.facebook.react:react-android"
 

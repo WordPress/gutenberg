@@ -67,8 +67,11 @@ export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) return null;
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
+			const {
+				getBlockName,
+				getBlockAttributes,
+				__experimentalGetReusableBlockTitle,
+			} = select( blockEditorStore );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -76,12 +79,16 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! blockType ) return null;
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
-			const isSynced =
-				isReusableBlock( blockType ) || isTemplatePart( blockType );
+			const isReusable = isReusableBlock( blockType );
+			const resusableTitle = isReusable
+				? __experimentalGetReusableBlockTitle( attributes.ref )
+				: undefined;
+			const title = resusableTitle || blockType.title;
+			const isSynced = isReusable || isTemplatePart( blockType );
 			const positionLabel = getPositionTypeLabel( attributes );
 			const blockTypeInfo = {
 				isSynced,
-				title: blockType.title,
+				title,
 				icon: blockType.icon,
 				description: blockType.description,
 				anchor: attributes?.anchor,

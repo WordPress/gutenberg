@@ -23,7 +23,10 @@ export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 	const margin = attributes?.style?.spacing?.margin;
 
 	useEffect( () => {
-		if ( ! blockElement ) {
+		if (
+			! blockElement ||
+			null === blockElement.ownerDocument.defaultView
+		) {
 			return;
 		}
 
