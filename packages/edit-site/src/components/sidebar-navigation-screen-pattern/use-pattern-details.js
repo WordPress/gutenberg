@@ -35,25 +35,23 @@ export default function usePatternDetails( postType, postId ) {
 	const isAddedByActiveTheme =
 		addedBy.type === 'theme' && record.theme === currentTheme?.stylesheet;
 	const title = getTitle();
-	let descriptionText = getDescription();
+	let description = getDescription();
 
-	if ( ! descriptionText && addedBy.text ) {
-		descriptionText = sprintf(
+	if ( ! description && addedBy.text ) {
+		description = sprintf(
 			// translators: %s: pattern title e.g: "Header".
 			__( 'This is the %s pattern.' ),
 			getTitle()
 		);
 	}
 
-	if ( ! descriptionText && postType === 'wp_block' && record?.title ) {
-		descriptionText = sprintf(
+	if ( ! description && postType === 'wp_block' && record?.title ) {
+		description = sprintf(
 			// translators: %s: user created pattern title e.g. "Footer".
 			__( 'This is the %s pattern.' ),
 			record.title
 		);
 	}
-
-	const description = <>{ descriptionText }</>;
 
 	const footer = !! record?.modified ? (
 		<SidebarNavigationScreenDetailsFooter
@@ -95,11 +93,9 @@ export default function usePatternDetails( postType, postId ) {
 		details.push( {
 			label: __( 'Added by' ),
 			value: (
-				<>
-					<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-author">
-						{ addedBy.text }
-					</span>
-				</>
+				<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-author">
+					{ addedBy.text }
+				</span>
 			),
 		} );
 	}
@@ -112,17 +108,11 @@ export default function usePatternDetails( postType, postId ) {
 		details.push( {
 			label: __( 'Customized' ),
 			value: (
-				<>
-					{ addedBy.isCustomized ? (
-						<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-customized">
-							{ _x( 'Yes', 'pattern' ) }
-						</span>
-					) : (
-						<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-customized">
-							{ _x( 'No', 'pattern' ) }
-						</span>
-					) }
-				</>
+				<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-customized">
+					{ addedBy.isCustomized
+						? _x( 'Yes', 'pattern' )
+						: _x( 'No', 'pattern' ) }
+				</span>
 			),
 		} );
 	}
