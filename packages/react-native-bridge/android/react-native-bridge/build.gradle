@@ -1,5 +1,8 @@
 buildscript {
     ext {
+        // main
+        googleMaterialVersion = '1.2.1'
+
         // react native
         facebookFrescoVersion = '2.0.0'
     }
@@ -66,7 +69,7 @@ repositories {
 dependencies {
     // For animated GIF support
     implementation "com.facebook.fresco:animated-gif:$facebookFrescoVersion"
-    implementation 'com.google.android.material:material:1.2.1'
+    implementation "com.google.android.material:material:$googleMaterialVersion"
     implementation "org.wordpress:utils:3.3.0"
 
     testImplementation "junit:junit:4.13"
