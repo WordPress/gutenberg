@@ -21,7 +21,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 	 * @since 6.3.0
 	 * @var string
 	 */
-	private $parent_post_type;
+	protected $parent_post_type;
 
 	/**
 	 * The base of the parent controller's route.
@@ -102,7 +102,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 	 * @param string $raw_json Encoded JSON from global styles custom post content.
 	 * @return Array|WP_Error
 	 */
-	private function get_decoded_global_styles_json( $raw_json ) {
+	protected function get_decoded_global_styles_json( $raw_json ) {
 		$decoded_json = json_decode( $raw_json, true );
 
 		if ( is_array( $decoded_json ) && isset( $decoded_json['isGlobalStylesUserThemeJSON'] ) && true === $decoded_json['isGlobalStylesUserThemeJSON'] ) {
@@ -282,16 +282,13 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 		$fields = $this->get_fields_for_response( $request );
 		$data   = array();
 
-		if ( ! empty( $global_styles_config['styles'] ) || ! empty( $global_styles_config['settings'] ) || ! empty( $global_styles_config['behaviors'] ) ) {
+		if ( ! empty( $global_styles_config['styles'] ) || ! empty( $global_styles_config['settings'] ) ) {
 			$global_styles_config = ( new WP_Theme_JSON_Gutenberg( $global_styles_config, 'custom' ) )->get_raw_data();
 			if ( rest_is_field_included( 'settings', $fields ) ) {
 				$data['settings'] = ! empty( $global_styles_config['settings'] ) ? $global_styles_config['settings'] : new stdClass();
 			}
 			if ( rest_is_field_included( 'styles', $fields ) ) {
 				$data['styles'] = ! empty( $global_styles_config['styles'] ) ? $global_styles_config['styles'] : new stdClass();
-			}
-			if ( rest_is_field_included( 'behaviors', $fields ) ) {
-				$data['behaviors'] = ! empty( $global_styles_config['behaviors'] ) ? $global_styles_config['behaviors'] : new stdClass();
 			}
 		}
 
@@ -401,11 +398,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 				),
 				'settings'     => array(
 					'description' => __( 'Global settings.', 'gutenberg' ),
-					'type'        => array( 'object' ),
-					'context'     => array( 'view', 'edit' ),
-				),
-				'behaviors'    => array(
-					'description' => __( 'Global behaviors.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
