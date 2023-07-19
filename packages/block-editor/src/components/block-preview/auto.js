@@ -38,13 +38,13 @@ function ScaledBlockPreview( {
 		};
 	}, [] );
 
-	// Avoid scrollbars for pattern previews.
+	// Avoid scrollbars for pattern previews and also remove any padding on the root container.
 	const editorStyles = useMemo( () => {
 		if ( styles ) {
 			return [
 				...styles,
 				{
-					css: 'body{height:auto;overflow:hidden;border:none;padding:0;}',
+					css: 'body{height:auto;overflow:hidden;border:none;padding:0;}.is-root-container{padding:0!important} ',
 					__unstableType: 'presets',
 				},
 				...additionalStyles,
