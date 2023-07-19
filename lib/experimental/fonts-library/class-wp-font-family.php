@@ -155,7 +155,7 @@ class WP_Font_Family {
 		$file_path = path_join( WP_FONTS_DIR, $filename );
 
 		// Checks if the file to be downloaded has a font mime type.
-		if ( ! WP_Fonts_Library::has_font_mime_type( $file_path ) ) {
+		if ( ! WP_Font_Family_Utils::has_font_mime_type( $file_path ) ) {
 			return false;
 		}
 
@@ -185,29 +185,6 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Merges two fonts and their font faces.
-	 *
-	 * @param array $font1 The first font to merge.
-	 * @param array $font2 The second font to merge.
-	 *
-	 * @return array The merged font.
-	 */
-	static private function merge_fonts( $font1, $font2 ) {
-		$font_faces_1      = isset( $font1['fontFace'] ) ? $font1['fontFace'] : array();
-		$font_faces_2      = isset( $font2['fontFace'] ) ? $font2['fontFace'] : array();
-		$merged_font_faces = array_merge( $font_faces_1, $font_faces_2 );
-
-		$serialized_faces        = array_map( 'serialize', $merged_font_faces );
-		$unique_serialized_faces = array_unique( $serialized_faces );
-		$unique_faces            = array_map( 'unserialize', $unique_serialized_faces );
-
-		$merged_font             = array_merge( $font1, $font2 );
-		$merged_font['fontFace'] = $unique_faces;
-
-		return $merged_font;
-	}
-
-	/**
 	 * Move an uploaded font face asset from temp folder to the wp fonts directory.
 	 *
 	 * This is used when uploading local fonts.
@@ -218,14 +195,14 @@ class WP_Font_Family {
 	 */
 	private function move_font_face_asset( $font_face, $file ) {
 		$new_font_face = $font_face;
-		$filename      = self::get_filename_from_font_face( $font_face, $file['name'] );
+		$filename      = WP_Font_Family_Utils::get_filename_from_font_face( $font_face, $file['name'] );
 		$filepath      = path_join( WP_FONTS_DIR, $filename );
 
 		// Remove the uploaded font asset reference from the font face definition because it is no longer needed.
 		unset( $new_font_face['file'] );
 
 		// If the filepath has not a font mime type, we don't move the file and return the font face definition without src to be ignored later.
-		if ( ! WP_Fonts_Library::has_font_mime_type( $filepath ) ) {
+		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filepath ) ) {
 			return $new_font_face;
 		}
 
@@ -266,28 +243,6 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Generates a filename for a font face asset.
-	 *
-	 * Creates a filename for a font face asset using font family, style, weight and extension information.
-	 *
-	 * @param array  $font_face The font face array containing 'fontFamily', 'fontStyle', and 'fontWeight' attributes.
-	 * @param string $url The URL of the font face asset, used to derive the file extension.
-	 * @param int    $i Optional counter for appending to the filename, default is 1.
-	 * @return string The generated filename for the font face asset.
-	 */
-	static private function get_filename_from_font_face( $font_face, $url, $i = 1 ) {
-		$extension = pathinfo( $url, PATHINFO_EXTENSION );
-		$family    = sanitize_title( $font_face['fontFamily'] );
-		$style     = sanitize_title( $font_face['fontStyle'] );
-		$weight    = sanitize_title( $font_face['fontWeight'] );
-		$filename  = "{$family}_{$style}_{$weight}";
-		if ( $i > 1 ) {
-			$filename .= "_{$i}";
-		}
-		return "{$filename}.{$extension}";
-	}
-
-	/**
 	 * Downloads font face assets.
 	 *
 	 * Downloads the font face asset(s) associated with a font face. It works with both single
@@ -304,7 +259,7 @@ class WP_Font_Family {
 		$new_font_face['src'] = array();
 		$i                    = 0;
 		foreach ( $srcs as $src ) {
-			$filename = self::get_filename_from_font_face( $font_face, $src, $i++ );
+			$filename = WP_Font_Family_Utils::get_filename_from_font_face( $font_face, $src, $i++ );
 			$new_src  = $this->download_asset( $src, $filename );
 			if ( $new_src ) {
 				$new_font_face['src'][] = $new_src;
@@ -415,7 +370,7 @@ class WP_Font_Family {
 	 */
 	private function update_font_post( $post ) {
 		$post_font_data = json_decode( $post->post_content, true );
-		$new_data       = $this->merge_fonts( $post_font_data, $this->data );
+		$new_data       = WP_Font_Family_Utils->merge_fonts_data( $post_font_data, $this->data );
 		$this->data     = $new_data;
 
 		$post = array(
