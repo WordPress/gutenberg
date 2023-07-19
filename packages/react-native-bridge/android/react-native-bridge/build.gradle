@@ -30,6 +30,8 @@ group='org.wordpress-mobile.gutenberg-mobile'
 def buildAssetsFolder = 'build/assets'
 
 android {
+    namespace "org.wordpress.mobile.ReactNativeGutenbergBridge"
+
     compileSdkVersion 33
 
     defaultConfig {
