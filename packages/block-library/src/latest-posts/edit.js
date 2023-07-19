@@ -528,6 +528,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 											.split( ' ', excerptLength )
 											.join( ' ' ) }
 										{ /* translators: excerpt truncation character, default …  */ }
+										{ <br></br> }
 										<a
 											href={ post.link }
 											rel="noopener noreferrer"

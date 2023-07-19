@@ -163,7 +163,7 @@ function render_block_core_latest_posts( $attributes ) {
 				'<a class="wp-block-latest-posts__post-read-more" href="%1$s" aria-label="%2$s">%3$s</a>',
 				esc_url( $post_link ),
 				esc_attr( __( 'Read more about ' . $title ) ),
-+				__( 'Read more' )
+				__( 'Read more' )
 			);
 		}
 
