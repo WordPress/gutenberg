@@ -216,6 +216,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlock( 'chicken', block )( { select, dispatch } );
 
@@ -281,6 +282,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlocks( [ 'chicken' ], blocks )( { select, dispatch } );
 
@@ -314,6 +316,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlocks(
 				[ 'chicken' ],

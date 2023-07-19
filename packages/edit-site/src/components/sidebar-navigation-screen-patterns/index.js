@@ -7,11 +7,12 @@ import {
 	Flex,
 	Icon,
 	Tooltip,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { getTemplatePartIcon } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
 import { file, starFilled, lockSmall } from '@wordpress/icons';
 
@@ -29,12 +30,72 @@ import usePatternCategories from './use-pattern-categories';
 import useMyPatterns from './use-my-patterns';
 import useTemplatePartAreas from './use-template-part-areas';
 
-const templatePartAreaLabels = {
-	header: __( 'Headers' ),
-	footer: __( 'Footers' ),
-	sidebar: __( 'Sidebar' ),
-	uncategorized: __( 'Uncategorized' ),
-};
+function TemplatePartGroup( { areas, currentArea, currentType } ) {
+	return (
+		<>
+			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
+				<Heading level={ 2 }>{ __( 'Template parts' ) }</Heading>
+			</div>
+			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+				{ Object.entries( areas ).map(
+					( [ area, { label, templateParts } ] ) => (
+						<CategoryItem
+							key={ area }
+							count={ templateParts?.length }
+							icon={ getTemplatePartIcon( area ) }
+							label={ label }
+							id={ area }
+							type="wp_template_part"
+							isActive={
+								currentArea === area &&
+								currentType === 'wp_template_part'
+							}
+						/>
+					)
+				) }
+			</ItemGroup>
+		</>
+	);
+}
+
+function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
+	return (
+		<>
+			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+				{ categories.map( ( category ) => (
+					<CategoryItem
+						key={ category.name }
+						count={ category.count }
+						label={
+							<Flex justify="left" align="center" gap={ 0 }>
+								{ category.label }
+								<Tooltip
+									position="top center"
+									text={ sprintf(
+										// translators: %s: The pattern category name.
+										'"%s" patterns cannot be edited.',
+										category.label
+									) }
+								>
+									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
+										<Icon icon={ lockSmall } size={ 24 } />
+									</span>
+								</Tooltip>
+							</Flex>
+						}
+						icon={ file }
+						id={ category.name }
+						type="pattern"
+						isActive={
+							currentCategory === `${ category.name }` &&
+							currentType === 'pattern'
+						}
+					/>
+				) ) }
+			</ItemGroup>
+		</>
+	);
+}
 
 export default function SidebarNavigationScreenPatterns() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -45,7 +106,7 @@ export default function SidebarNavigationScreenPatterns() {
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
 	const { patternCategories, hasPatterns } = usePatternCategories();
-	const { myPatterns, hasPatterns: hasMyPatterns } = useMyPatterns();
+	const { myPatterns } = useMyPatterns();
 
 	const isTemplatePartsMode = useSelect( ( select ) => {
 		const settings = select( editSiteStore ).getSettings();
@@ -55,15 +116,15 @@ export default function SidebarNavigationScreenPatterns() {
 	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
 	const footer = ! isMobileViewport ? (
 		<ItemGroup>
-			<SidebarNavigationItem withChevron { ...templatePartsLink }>
-				{ __( 'Manage all template parts' ) }
-			</SidebarNavigationItem>
 			<SidebarNavigationItem
 				as="a"
 				href="edit.php?post_type=wp_block"
 				withChevron
 			>
 				{ __( 'Manage all of my patterns' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem withChevron { ...templatePartsLink }>
+				{ __( 'Manage all template parts' ) }
 			</SidebarNavigationItem>
 		</ItemGroup>
 	) : undefined;
@@ -73,7 +134,7 @@ export default function SidebarNavigationScreenPatterns() {
 			isRoot={ isTemplatePartsMode }
 			title={ __( 'Patterns' ) }
 			description={ __(
-				'Manage what patterns are available when editing your site.'
+				'Manage what patterns are available when editing the site.'
 			) }
 			actions={ <AddNewPattern /> }
 			footer={ footer }
@@ -91,94 +152,38 @@ export default function SidebarNavigationScreenPatterns() {
 									</Item>
 								</ItemGroup>
 							) }
-							{ hasMyPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									<CategoryItem
-										key={ myPatterns.name }
-										count={ myPatterns.count }
-										label={ myPatterns.label }
-										icon={ starFilled }
-										id={ myPatterns.name }
-										type="wp_block"
-										isActive={
-											currentCategory ===
-												`${ myPatterns.name }` &&
-											currentType === 'wp_block'
-										}
-									/>
-								</ItemGroup>
+							<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+								<CategoryItem
+									key={ myPatterns.name }
+									count={
+										! myPatterns.count
+											? '0'
+											: myPatterns.count
+									}
+									label={ myPatterns.label }
+									icon={ starFilled }
+									id={ myPatterns.name }
+									type="wp_block"
+									isActive={
+										currentCategory ===
+											`${ myPatterns.name }` &&
+										currentType === 'wp_block'
+									}
+								/>
+							</ItemGroup>
+							{ hasPatterns && (
+								<ThemePatternsGroup
+									categories={ patternCategories }
+									currentCategory={ currentCategory }
+									currentType={ currentType }
+								/>
 							) }
 							{ hasTemplateParts && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									{ Object.entries( templatePartAreas ).map(
-										( [ area, parts ] ) => (
-											<CategoryItem
-												key={ area }
-												count={ parts.length }
-												icon={ getTemplatePartIcon(
-													area
-												) }
-												label={
-													templatePartAreaLabels[
-														area
-													]
-												}
-												id={ area }
-												type="wp_template_part"
-												isActive={
-													currentCategory === area &&
-													currentType ===
-														'wp_template_part'
-												}
-											/>
-										)
-									) }
-								</ItemGroup>
-							) }
-							{ hasPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									{ patternCategories.map( ( category ) => (
-										<CategoryItem
-											key={ category.name }
-											count={ category.count }
-											label={
-												<Flex
-													justify="left"
-													align="center"
-													gap={ 0 }
-												>
-													{ category.label }
-													<Tooltip
-														position="top center"
-														text={ __(
-															'Theme patterns cannot be edited.'
-														) }
-													>
-														<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
-															<Icon
-																style={ {
-																	fill: 'currentcolor',
-																} }
-																icon={
-																	lockSmall
-																}
-																size={ 24 }
-															/>
-														</span>
-													</Tooltip>
-												</Flex>
-											}
-											icon={ file }
-											id={ category.name }
-											type="pattern"
-											isActive={
-												currentCategory ===
-													`${ category.name }` &&
-												currentType === 'pattern'
-											}
-										/>
-									) ) }
-								</ItemGroup>
+								<TemplatePartGroup
+									areas={ templatePartAreas }
+									currentArea={ currentCategory }
+									currentType={ currentType }
+								/>
 							) }
 						</>
 					) }

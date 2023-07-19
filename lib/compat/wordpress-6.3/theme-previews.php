@@ -88,7 +88,7 @@ function add_live_preview_button() {
 			livePreviewButton.setAttribute('class', 'button button-primary');
 			livePreviewButton.setAttribute(
 				'href',
-				`/wp-admin/site-editor.php?wp_theme_preview=${themePath}&return=themes.php`
+				`<?php echo esc_url( admin_url( '/site-editor.php' ) ); ?>?wp_theme_preview=${themePath}&return=themes.php`
 			);
 			livePreviewButton.innerHTML = '<?php echo esc_html_e( 'Live Preview' ); ?>';
 			themeInfo.querySelector('.theme-actions').appendChild(livePreviewButton);
@@ -107,7 +107,7 @@ function block_theme_activate_nonce() {
 	$nonce_handle = 'switch-theme_' . gutenberg_get_theme_preview_path();
 	?>
 <script type="text/javascript">
-	window.BLOCK_THEME_ACTIVATE_NONCE = '<?php echo wp_create_nonce( $nonce_handle ); ?>';
+	window.WP_BLOCK_THEME_ACTIVATE_NONCE = '<?php echo wp_create_nonce( $nonce_handle ); ?>';
 </script>
 	<?php
 }

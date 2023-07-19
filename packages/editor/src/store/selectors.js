@@ -10,6 +10,7 @@ import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	__unstableSerializeAndClean,
+	parse,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
@@ -41,15 +42,6 @@ import { getTemplatePartIcon } from '../utils/get-template-part-icon';
  * maintained by the reducer result in state.
  */
 const EMPTY_OBJECT = {};
-
-/**
- * Shared reference to an empty array for cases where it is important to avoid
- * returning a new array reference on every invocation, as in a connected or
- * other pure component which performs `shouldComponentUpdate` check on props.
- * This should be used as a last resort, since the normalized data should be
- * maintained by the reducer result in state.
- */
-const EMPTY_ARRAY = [];
 
 /**
  * Returns true if any past editor history snapshots exist, or false otherwise.
@@ -681,15 +673,9 @@ export function isDeletingPost( state ) {
  *
  * @return {boolean} Whether post is being saved.
  */
-export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	return select( coreStore ).isSavingEntityRecord(
-		'postType',
-		postType,
-		postId
-	);
-} );
+export function isSavingPost( state ) {
+	return !! state.saving.pending;
+}
 
 /**
  * Returns true if non-post entities are currently being saved, or false otherwise.
@@ -760,10 +746,7 @@ export const didPostSaveRequestFail = createRegistrySelector(
  * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
-	if ( ! isSavingPost( state ) ) {
-		return false;
-	}
-	return Boolean( state.saving.options?.isAutosave );
+	return isSavingPost( state ) && Boolean( state.saving.options?.isAutosave );
 }
 
 /**
@@ -774,10 +757,7 @@ export function isAutosavingPost( state ) {
  * @return {boolean} Whether the post is being previewed.
  */
 export function isPreviewingPost( state ) {
-	if ( ! isSavingPost( state ) ) {
-		return false;
-	}
-	return Boolean( state.saving.options?.isPreview );
+	return isSavingPost( state ) && Boolean( state.saving.options?.isPreview );
 }
 
 /**
@@ -1100,9 +1080,18 @@ export const isPublishSidebarEnabled = createRegistrySelector(
  * @param {Object} state
  * @return {Array} Block list.
  */
-export function getEditorBlocks( state ) {
-	return getEditedPostAttribute( state, 'blocks' ) || EMPTY_ARRAY;
-}
+export const getEditorBlocks = createSelector(
+	( state ) => {
+		return (
+			getEditedPostAttribute( state, 'blocks' ) ||
+			parse( getEditedPostContent( state ) )
+		);
+	},
+	( state ) => [
+		getEditedPostAttribute( state, 'blocks' ),
+		getEditedPostContent( state ),
+	]
+);
 
 /**
  * A block selection object.
