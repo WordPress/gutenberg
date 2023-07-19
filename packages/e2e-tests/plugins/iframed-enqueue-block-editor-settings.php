@@ -14,17 +14,3 @@ add_action(
 		return $settings;
 	}
 );
-
-add_action(
-	'init',
-	function() {
-		wp_enqueue_script(
-			'iframed-enqueue-block-editor-settings-script',
-			plugin_dir_url( __FILE__ ) . 'iframed-enqueue-block-editor-settings/editor.js',
-			array(
-				'wp-editor',
-			),
-			filemtime( plugin_dir_path( __FILE__ ) . 'iframed-enqueue-block-editor-settings/editor.js' )
-		);
-	}
-);

@@ -41,6 +41,22 @@ describe( 'iframed block editor settings styles', () => {
 		expect( await getComputedStyle( canvas(), 'p', 'border-color' ) ).toBe(
 			'rgb(255, 0, 0)'
 		);
+
+		await page.evaluate( () => {
+			const settings = window.wp.data
+				.select( 'core/editor' )
+				.getEditorSettings();
+			wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+				...settings,
+				styles: [
+					...settings.styles,
+					{
+						css: 'p { border-width: 2px; }',
+					},
+				],
+			} );
+		} );
+
 		// Expect a 2px border (added in JS).
 		expect( await getComputedStyle( canvas(), 'p', 'border-width' ) ).toBe(
 			'2px'
