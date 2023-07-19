@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { options, createContext, cloneElement } from 'preact';
+import { h, options, createContext, cloneElement } from 'preact';
+import { useRef, useCallback } from 'preact/hooks';
 /**
  * Internal dependencies
  */
@@ -69,12 +70,23 @@ const RecursivePriorityLevel = ( {
 	element,
 	evaluate,
 	originalProps,
+	elementRef,
 } ) => {
+	if ( ! elementRef ) {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		elementRef = useRef( null );
+	}
+
+	if ( ! evaluate ) {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		evaluate = useCallback( getEvaluate( { ref: elementRef } ), [] );
+	}
+
 	// This element needs to be a fresh copy so we are not modifying an already
 	// rendered element with Preact's internal properties initialized. This
 	// prevents an error with changes in `element.props.children` not being
 	// reflected in `element.__k`.
-	element = cloneElement( element );
+	element = cloneElement( element, { ref: elementRef } );
 
 	// Recursively render the wrapper for the next priority level.
 	//
@@ -90,6 +102,7 @@ const RecursivePriorityLevel = ( {
 				element={ element }
 				evaluate={ evaluate }
 				originalProps={ originalProps }
+				elementRef={ elementRef }
 			/>
 		) : (
 			element
@@ -113,17 +126,11 @@ options.vnode = ( vnode ) => {
 		const props = vnode.props;
 		const priorityLevels = getPriorityLevels( props.__directives );
 		delete props.__directives;
-		const ref = { current: props.__node };
-		delete props.__node;
 		vnode.props = {
 			directives: priorityLevels,
 			originalProps: props,
-			evaluate: getEvaluate( { ref } ),
-			element: {
-				type: vnode.type,
-				ref,
-				props,
-			},
+			type: vnode.type,
+			element: h( vnode.type, props ),
 		};
 		vnode.type = RecursivePriorityLevel;
 	}
