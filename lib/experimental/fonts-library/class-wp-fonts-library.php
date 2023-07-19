@@ -34,8 +34,10 @@ class WP_Fonts_Library {
 		define( 'WP_FONTS_DIR', self::get_fonts_directory() );
 	}
 
+    /**
+     * Create fonts directory if it doesn't exist.
+     */
 	static public function create_fonts_directory() {
-		// Create fonts directory if it doesn't exist.
 		wp_mkdir_p( self::get_fonts_directory() );
 	}
 
