@@ -1,5 +1,6 @@
 buildscript {
     ext {
+        // node modules
         supportLibVersion = '29.0.2'
         tagSoupVersion = '1.2.1'
         glideVersion = '3.7.0'
@@ -7,9 +8,11 @@ buildscript {
         robolectricVersion = '3.5.1'
         jUnitVersion = '4.12'
         jSoupVersion = '1.10.3'
-        wordpressUtilsVersion = '3.3.0'
         espressoVersion = '3.0.1'
+
+        // libs
         aztecVersion = 'v1.6.4'
+        wordpressUtilsVersion = '3.3.0'
     }
 }
 
