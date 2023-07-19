@@ -333,16 +333,6 @@
 	}
 }
 
-body.site-editor-php {
-	.block-editor-block-contextual-toolbar {
-		@include break-large() {
-			&.is-fixed {
-				width: calc(100% - 240px - #{4 * $grid-unit-80});
-			}
-		}
-	}
-}
-
 /**
  * Block Label for Navigation/Selection Mode
  */
