@@ -6,15 +6,15 @@ import { __ } from '@wordpress/i18n';
 import { navigation, Icon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { useEffect } from '@wordpress/element';
-import {
-	useNavigationEntities,
-	NavigationSelector,
-} from '@wordpress/navigation';
+import { privateApis as navigationPrivateApis } from '@wordpress/navigation';
 
 /**
  * Internal dependencies
  */
 import PlaceholderPreview from './placeholder-preview';
+import useNavigationEntities from '../../use-navigation-entities';
+import { unlock } from '../../../lock-unlock';
+const { NavigationSelector } = unlock( navigationPrivateApis );
 
 export default function NavigationPlaceholder( {
 	isSelected,

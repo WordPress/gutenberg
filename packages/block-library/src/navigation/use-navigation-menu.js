@@ -6,11 +6,13 @@ import {
 	useResourcePermissions,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { privateApis as navigationPrivateApis } from '@wordpress/navigation';
 
 /**
  * Internal dependencies
  */
-import { SELECT_NAVIGATION_MENUS_ARGS } from './constants';
+import { unlock } from '../lock-unlock';
+const { SELECT_NAVIGATION_MENUS_ARGS } = unlock( navigationPrivateApis );
 
 export default function useNavigationMenu( ref ) {
 	const permissions = useResourcePermissions( 'navigation', ref );
