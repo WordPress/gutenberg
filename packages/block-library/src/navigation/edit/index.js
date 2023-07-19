@@ -178,6 +178,7 @@ function Navigation( {
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
 	const {
+		navigationMenus,
 		hasResolvedNavigationMenus,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
@@ -226,16 +227,18 @@ function Navigation( {
 
 	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
-	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
-		? getNavigationFallbackId()
-		: null;
-
 	useEffect( () => {
 		// If:
+		// - we haven't resolved the menus request and there isn't one missing, OR
 		// - there is an existing menu, OR
 		// - there are existing (uncontrolled) inner blocks
 		// ...then don't request a fallback menu.
-		if ( ref || hasUnsavedBlocks || ! navigationFallbackId ) {
+		if (
+			! navMenuResolvedButMissing ||
+			navigationMenus.length > 0 ||
+			ref ||
+			hasUnsavedBlocks
+		) {
 			return;
 		}
 
@@ -244,14 +247,15 @@ function Navigation( {
 		 *  The fallback should not request a save (entity dirty state)
 		 *  nor to be undoable, hence why it is marked as non persistent
 		 */
-
 		__unstableMarkNextChangeAsNotPersistent();
-		setRef( navigationFallbackId );
+		setRef( getNavigationFallbackId() );
 	}, [
 		ref,
 		setRef,
 		hasUnsavedBlocks,
-		navigationFallbackId,
+		navigationMenus,
+		navMenuResolvedButMissing,
+		getNavigationFallbackId,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
