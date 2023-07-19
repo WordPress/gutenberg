@@ -65,7 +65,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout( { styles } ) {
+function Layout() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isLargeViewport = useViewportMatch( 'large' );
@@ -89,6 +89,7 @@ function Layout( { styles } ) {
 		showBlockBreadcrumbs,
 		isTemplateMode,
 		documentLabel,
+		styles,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
 		const editorSettings = getEditorSettings();
@@ -125,6 +126,7 @@ function Layout( { styles } ) {
 			),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
+			styles: editorSettings.styles,
 		};
 	}, [] );
 

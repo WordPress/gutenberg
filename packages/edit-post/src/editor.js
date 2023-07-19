@@ -143,22 +143,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			);
 		}
 
-		return result;
-	}, [
-		settings,
-		hasFixedToolbar,
-		hasInlineToolbar,
-		focusMode,
-		isDistractionFree,
-		hiddenBlockTypes,
-		blockTypes,
-		preferredStyleVariations,
-		setIsInserterOpened,
-		updatePreferredStyleVariations,
-		keepCaretInsideBlock,
-	] );
-
-	const styles = useMemo( () => {
 		const themeStyles = [];
 		const presetStyles = [];
 		settings.styles?.forEach( ( style ) => {
@@ -191,10 +175,26 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			} );
 		}
 
-		return hasThemeStyles && themeStyles.length
-			? settings.styles
-			: defaultEditorStyles;
-	}, [ settings, hasThemeStyles ] );
+		result.styles =
+			hasThemeStyles && themeStyles.length
+				? settings.styles
+				: defaultEditorStyles;
+
+		return result;
+	}, [
+		settings,
+		hasFixedToolbar,
+		hasInlineToolbar,
+		focusMode,
+		isDistractionFree,
+		hiddenBlockTypes,
+		blockTypes,
+		preferredStyleVariations,
+		setIsInserterOpened,
+		updatePreferredStyleVariations,
+		keepCaretInsideBlock,
+		hasThemeStyles,
+	] );
 
 	if ( ! post ) {
 		return null;
@@ -214,7 +214,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 					<ErrorBoundary>
 						<CommandMenu />
 						<EditorInitialization postId={ postId } />
-						<Layout styles={ styles } />
+						<Layout />
 					</ErrorBoundary>
 					<PostLockedModal />
 				</ExperimentalEditorProvider>
