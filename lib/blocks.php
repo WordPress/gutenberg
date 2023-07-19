@@ -254,85 +254,82 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	$stylesheet_path    = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
 	$block_style_handle = "wp-block-{$block_name}";
 
-	if ( file_exists( $stylesheet_path ) ) {
-		wp_deregister_style( $block_style_handle );
-		wp_register_style(
-			$block_style_handle,
-			$stylesheet_url,
-			array(),
-			$default_version
-		);
-		wp_style_add_data( $block_style_handle, 'rtl', 'replace' );
+if ( file_exists( $stylesheet_path ) ) {
+	wp_deregister_style( $block_style_handle );
+	wp_register_style(
+		$block_style_handle,
+		$stylesheet_url,
+		array(),
+		$default_version
+	);
+	wp_style_add_data( $block_style_handle, 'rtl', 'replace' );
 
-		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
-		wp_style_add_data( $block_style_handle, 'path', $stylesheet_path );
-	} else {
-		wp_register_style( $block_style_handle, false, array() );
-	}
+	// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
+	wp_style_add_data( $block_style_handle, 'path', $stylesheet_path );
+} else {
+	wp_register_style( $block_style_handle, false, array() );
+}
 
 	// If the current theme supports wp-block-styles, dequeue the full stylesheet
 	// and instead attach each block's theme-styles to their block styles stylesheet.
-	if ( current_theme_supports( 'wp-block-styles' ) ) {
+if ( current_theme_supports( 'wp-block-styles' ) ) {
 
-		// Dequeue the full stylesheet.
-		// Make sure this only runs once, it doesn't need to run for every block.
-		static $stylesheet_removed;
-		if ( ! $stylesheet_removed ) {
-			add_action(
-				'wp_enqueue_scripts',
-				static function () {
-					wp_dequeue_style( 'wp-block-library-theme' );
-				}
-			);
-			$stylesheet_removed = true;
-		}
-
-		// Get the path to the block's stylesheet.
-		$theme_style_path = is_rtl()
-			? "build/block-library/blocks/$block_name/theme-rtl.css"
-			: "build/block-library/blocks/$block_name/theme.css";
-
-		// If the file exists, enqueue it.
-		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
-			$theme_style_handle = "wp-block-{$block_name}-theme";
-			if ( wp_style_is( $theme_style_handle, 'registered' ) ) {
-				wp_deregister_style( $theme_style_handle );
-				if ( file_exists( $theme_style_path ) ) {
-					// If there is a main stylesheet for this block, append the theme styles to main styles.
-					wp_register_style(
-						$theme_style_handle,
-						false,
-						array(),
-						$default_version
-					);
-				} else {
-					// If there is no main stylesheet for this block, register theme style.
-					wp_register_style(
-						$theme_style_handle,
-						gutenberg_url( $theme_style_path ),
-						array(),
-						$default_version
-					);
-					wp_style_add_data( $theme_style_handle, 'path', gutenberg_dir_path() . $theme_style_path );
-				}
-			} else {
-				if ( file_exists( $stylesheet_path ) ) {
-					// If there is a main stylesheet for this block, append the theme styles to main styles.
-					wp_add_inline_style(
-						$block_style_handle,
-						file_get_contents( gutenberg_dir_path() . $theme_style_path )
-					);
-				} else {
-					// If there is no main stylesheet for this block, register theme style.
-					wp_register_style(
-						$block_style_handle,
-						gutenberg_url( $theme_style_path ),
-						array(),
-						$default_version
-					);
-					wp_style_add_data( $block_style_handle, 'path', gutenberg_dir_path() . $theme_style_path );
-				}
+	// Dequeue the full stylesheet.
+	// Make sure this only runs once, it doesn't need to run for every block.
+	static $stylesheet_removed;
+	if ( ! $stylesheet_removed ) {
+		add_action(
+			'wp_enqueue_scripts',
+			static function() {
+				wp_dequeue_style( 'wp-block-library-theme' );
 			}
+		);
+		$stylesheet_removed = true;
+	}
+
+	// Get the path to the block's stylesheet.
+	$theme_style_path      = is_rtl()
+		? "build/block-library/blocks/$block_name/theme-rtl.css"
+		: "build/block-library/blocks/$block_name/theme.css";
+	$theme_style_file_path = gutenberg_dir_path() . $theme_style_path;
+	$theme_style_handle    = "wp-block-{$block_name}-theme";
+
+	if ( wp_style_is( $theme_style_handle, 'registered' ) ) {
+		wp_deregister_style( $theme_style_handle );
+		if ( file_exists( $theme_style_file_path ) ) {
+			// If there is a main stylesheet for this block, append the theme styles to main styles.
+			wp_register_style(
+				$theme_style_handle,
+				false,
+				array(),
+				$default_version
+			);
+		} else {
+			// If there is no main stylesheet for this block, register theme style.
+			wp_register_style(
+				$theme_style_handle,
+				gutenberg_url( $theme_style_path ),
+				array(),
+				$default_version
+			);
+			wp_style_add_data( $theme_style_handle, 'path', $theme_style_file_path );
+		}
+	} elseif ( file_exists( $theme_style_file_path ) ) {
+		if ( file_exists( $stylesheet_path ) ) {
+			// If there is a main stylesheet for this block, append the theme styles to main styles.
+			wp_add_inline_style(
+				$block_style_handle,
+				file_get_contents( $theme_style_file_path )
+			);
+		} else {
+			// If there is no main stylesheet for this block, register theme style.
+			wp_register_style(
+				$block_style_handle,
+				gutenberg_url( $theme_style_path ),
+				array(),
+				$default_version
+			);
+			wp_style_add_data( $block_style_handle, 'path', $theme_style_file_path );
 		}
 	}
 
