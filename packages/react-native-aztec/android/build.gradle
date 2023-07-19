@@ -15,6 +15,7 @@ buildscript {
         wordpressUtilsVersion = '3.3.0'
 
         // main
+        androidxCardviewVersion = '1.0.0'
         androidxGridlayoutVersion = '1.0.0'
         androidxLegacyVersion = '1.0.0'
     }
@@ -100,7 +101,7 @@ dependencies {
 
     implementation "androidx.legacy:legacy-support-v4:$androidxLegacyVersion"
     implementation "androidx.gridlayout:gridlayout:$androidxGridlayoutVersion"
-    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation "androidx.cardview:cardview:$androidxCardviewVersion"
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     testImplementation 'junit:junit:4.13'
