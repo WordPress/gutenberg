@@ -398,7 +398,7 @@ class WP_Font_Family {
 	 * Install the font family into the library
 	 *
 	 * @param array $files An array of files to be installed, default is null.
-	 * @return WP_Post|WP_Error
+	 * @return array|WP_Error
 	 */
 	public function install( $files = null ) {
 		$were_assets_written = $this->download_or_move_font_faces( $files );
