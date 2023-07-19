@@ -1,3 +1,10 @@
+buildscript {
+    ext {
+        // react native
+        facebookFrescoVersion = '2.0.0'
+    }
+}
+
 plugins {
     id "com.android.library"
     id "org.jetbrains.kotlin.android"
@@ -58,7 +65,7 @@ repositories {
 
 dependencies {
     // For animated GIF support
-    implementation 'com.facebook.fresco:animated-gif:2.0.0'
+    implementation "com.facebook.fresco:animated-gif:$facebookFrescoVersion"
     implementation 'com.google.android.material:material:1.2.1'
     implementation "org.wordpress:utils:3.3.0"
 
