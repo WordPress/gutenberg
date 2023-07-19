@@ -94,12 +94,10 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		$img_metadata        = wp_get_attachment_metadata( $block['attrs']['id'] );
 		$img_width           = $img_metadata['width'];
 		$img_height          = $img_metadata['height'];
-		$img_uploaded_srcset = wp_get_attachment_image_srcset( $block['attrs']['id'] );
 	} else {
 		$img_uploaded_src    = $z->get_attribute( 'src' );
 		$img_width           = 'none';
 		$img_height          = 'none';
-		$img_uploaded_srcset = '';
 	}
 
 	$w = new WP_HTML_Tag_Processor( $content );
@@ -119,7 +117,6 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 						"lightboxAnimation": "%s",
 						"imageUploadedSrc": "%s",
 						"imageCurrentSrc": "",
-						"imageSrcSet": "%s",
 						"targetWidth": "%s",
 						"targetHeight": "%s"
 					}
@@ -127,7 +124,6 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 			}',
 			$lightbox_animation,
 			$img_uploaded_src,
-			$img_uploaded_srcset,
 			$img_width,
 			$img_height
 		)
