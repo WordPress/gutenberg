@@ -270,11 +270,6 @@
 	}
 
 	&.zoom {
-		img {
-			width: inherit !important;
-			height: inherit !important;
-		}
-
 		&.active {
 			opacity: 1;
 			visibility: visible;
