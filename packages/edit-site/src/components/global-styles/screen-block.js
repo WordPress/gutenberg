@@ -96,7 +96,6 @@ function ScreenBlock( { name, variation } ) {
 	const settings = useSettingsForBlockElement( rawSettings, name );
 	const [ inheritedBehaviors, setBehavior ] = useGlobalBehaviors( name );
 	const [ behavior ] = useGlobalBehaviors( name, 'user', {
-		shouldDecodeEncode: true,
 		shouldReturnBehaviors: false,
 	} );
 
