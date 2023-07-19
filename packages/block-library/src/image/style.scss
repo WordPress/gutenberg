@@ -270,6 +270,10 @@
 	}
 
 	&.zoom {
+		img {
+			object-fit: cover;
+		}
+
 		&.active {
 			opacity: 1;
 			visibility: visible;
