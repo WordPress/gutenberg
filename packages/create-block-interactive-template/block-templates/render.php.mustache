@@ -15,7 +15,7 @@ $unique_id = uniqid( 'p-' );
 ?>
 
 <div
-	<?php echo wp_kses_data( get_block_wrapper_attributes() ); ?>
+	<?php echo get_block_wrapper_attributes(); ?>
 	data-wp-interactive
 	data-wp-context='{ "{{namespace}}": { "isOpen": false } }'
 	data-wp-effect="effects.{{namespace}}.logIsOpen"
