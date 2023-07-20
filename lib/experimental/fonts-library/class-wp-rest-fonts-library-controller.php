@@ -73,7 +73,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	function uninstall_font_family( $request ) {
+	public function uninstall_font_family( $request ) {
 		$data = array(
 			'slug' => $request['slug'],
 		);
@@ -86,7 +86,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
-	function update_fonts_library_permissions_check() {
+	public function update_fonts_library_permissions_check() {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_update_fonts_library',
@@ -117,7 +117,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
-	function read_fonts_library_permissions_check() {
+	public function read_fonts_library_permissions_check() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error(
 				'rest_cannot_read_fonts_library',
@@ -138,7 +138,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response|WP_Error The content of the "google-fonts.json" file wrapped in a WP_REST_Response object.
 	 */
-	function get_google_fonts() {
+	public function get_google_fonts() {
 		$file = file_get_contents(
 			path_join( dirname( __FILE__ ), 'google-fonts.json' )
 		);
@@ -160,7 +160,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request The request object containing the new fonts to install in the request parameters.
 	 * @return WP_REST_Response|WP_Error The updated fonts library post content.
 	 */
-	function install_fonts( $request ) {
+	public function install_fonts( $request ) {
 		// Get new fonts to install.
 		$fonts_to_install = $request->get_param( 'fontFamilies' );
 
@@ -197,7 +197,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Registers the fonts library post type.
 	 */
-	function register_post_type() {
+	public function register_post_type() {
 		$args = array(
 			'public'       => true,
 			'label'        => 'Font Library',
