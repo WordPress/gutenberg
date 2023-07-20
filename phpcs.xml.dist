@@ -122,7 +122,6 @@
 			</property>
 			<property name="classesWhiteList" type="array">
 				<element value="/^Gutenberg.+/"/>
-				<element value="/^WP_.+_Gutenberg$/"/>
 			</property>
 		</properties>
 	</rule>
