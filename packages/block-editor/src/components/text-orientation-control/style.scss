@@ -1,10 +1,10 @@
-.block-editor-writing-mode-control {
-	grid-column: 1/2;
+.block-editor-text-orientation-control {
+	grid-column: 2/2;
 	border: 0;
 	margin: 0;
 	padding: 0;
 
-	.block-editor-writing-mode-control__buttons {
+	.block-editor-text-orientation-control__buttons {
 		// 4px of padding makes the row 40px high, same as an input.
 		padding: $grid-unit-05 0;
 		display: flex;

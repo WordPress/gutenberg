@@ -7,19 +7,19 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { BaseControl, Button } from '@wordpress/components';
-import { __, isRTL } from '@wordpress/i18n';
-import { textHorizontal, textVertical } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
+import { textMixed, textUpright } from '@wordpress/icons';
 
-const WRITING_MODES = [
+const TEXT_ORIENTATIONS = [
 	{
-		name: __( 'Horizontal' ),
-		value: 'horizontal-tb',
-		icon: textHorizontal,
+		name: __( 'Upright' ),
+		value: 'upright',
+		icon: textUpright,
 	},
 	{
-		name: __( 'Vertical' ),
-		value: isRTL() ? 'vertical-lr' : 'vertical-rl',
-		icon: textVertical,
+		name: __( 'Mixed' ),
+		value: 'mixed',
+		icon: textMixed,
 	},
 ];
 
@@ -33,30 +33,35 @@ const WRITING_MODES = [
  *
  * @return {WPElement} Writing Mode control.
  */
-export default function WritingModeControl( { className, value, onChange } ) {
+export default function textOrientationControl( {
+	className,
+	value,
+	onChange,
+} ) {
 	return (
 		<fieldset
 			className={ classnames(
-				'block-editor-writing-mode-control',
+				'block-editor-text-orientation-control',
 				className
 			) }
 		>
 			<BaseControl.VisualLabel as="legend">
-				{ __( 'Writing mode' ) }
+				{ __( 'Orientation' ) }
 			</BaseControl.VisualLabel>
-			<div className="block-editor-writing-mode-control__buttons">
-				{ WRITING_MODES.map( ( writingMode ) => {
+
+			<div className="block-editor-text-orientation-control__buttons">
+				{ TEXT_ORIENTATIONS.map( ( textOrientation ) => {
 					return (
 						<Button
-							key={ writingMode.value }
-							icon={ writingMode.icon }
-							label={ writingMode.name }
-							isPressed={ writingMode.value === value }
+							key={ textOrientation.value }
+							icon={ textOrientation.icon }
+							label={ textOrientation.name }
+							isPressed={ textOrientation.value === value }
 							onClick={ () => {
 								onChange(
-									writingMode.value === value
+									textOrientation.value === value
 										? undefined
-										: writingMode.value
+										: textOrientation.value
 								);
 							} }
 						/>

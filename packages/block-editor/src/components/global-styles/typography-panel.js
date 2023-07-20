@@ -20,6 +20,7 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
+import TextOrientationControl from '../text-orientation-control';
 import { getValueFromVariable } from './utils';
 import { setImmutably } from '../../utils/object';
 
@@ -330,7 +331,7 @@ export default function TypographyPanel( {
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );
 
-	// Text Orientation
+	// Writing Mode
 	const hasWritingModeControl = useHasWritingModeControl( settings );
 	const writingMode = decodeValue( inheritedValue?.typography?.writingMode );
 	const setWritingMode = ( newValue ) => {
@@ -343,7 +344,22 @@ export default function TypographyPanel( {
 		);
 	};
 	const hasWritingMode = () => !! value?.typography?.writingMode;
-	const resetWritingMode = () => setWritingMode( undefined );
+	const resetWritingMode = () =>
+		setWritingMode( undefined ) && setTextOrientation( undefined );
+
+	// Text Orientation
+	const textOrientation = decodeValue(
+		inheritedValue?.typography?.textOrientation
+	);
+	const setTextOrientation = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textOrientation' ],
+				newValue || undefined
+			)
+		);
+	};
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -491,23 +507,6 @@ export default function TypographyPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ hasWritingModeControl && (
-				<ToolsPanelItem
-					className="single-column"
-					label={ __( 'Text orientation' ) }
-					hasValue={ hasWritingMode }
-					onDeselect={ resetWritingMode }
-					isShownByDefault={ defaultControls.writingMode }
-					panelId={ panelId }
-				>
-					<WritingModeControl
-						value={ writingMode }
-						onChange={ setWritingMode }
-						size="__unstable-large"
-						__nextHasNoMarginBottom
-					/>
-				</ToolsPanelItem>
-			) }
 			{ hasTextTransformControl && (
 				<ToolsPanelItem
 					label={ __( 'Letter case' ) }
@@ -524,6 +523,31 @@ export default function TypographyPanel( {
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>
+				</ToolsPanelItem>
+			) }
+			{ hasWritingModeControl && (
+				<ToolsPanelItem
+					label={ __( 'Text orientation' ) }
+					hasValue={ hasWritingMode }
+					onDeselect={ resetWritingMode }
+					isShownByDefault={ defaultControls.writingMode }
+					panelId={ panelId }
+					style={ { display: 'grid' } }
+				>
+					<WritingModeControl
+						value={ writingMode }
+						onChange={ setWritingMode }
+						size="__unstable-large"
+						__nextHasNoMarginBottom
+					/>
+					{ writingMode === 'vertical-rl' && (
+						<TextOrientationControl
+							value={ textOrientation }
+							onChange={ setTextOrientation }
+							size="__unstable-large"
+							__nextHasNoMarginBottom
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 		</Wrapper>
