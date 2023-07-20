@@ -105,7 +105,7 @@ class WP_Font_Family {
 	 * @param string $src The path of the font asset file to delete.
 	 * @return bool Whether the file was deleted.
 	 */
-	static private function delete_asset( $src ) {
+	private static function delete_asset( $src ) {
 		$filename  = basename( $src );
 		$file_path = path_join( WP_FONTS_DIR, $filename );
 
@@ -128,7 +128,7 @@ class WP_Font_Family {
 	 *
 	 * @param array $font_face The font face array containing the 'src' attribute with the file path(s) to be deleted.
 	 */
-	static private function delete_font_face_assets( $font_face ) {
+	private static function delete_font_face_assets( $font_face ) {
 		$srcs = ! empty( $font_face['src'] ) && is_array( $font_face['src'] )
 			? $font_face['src']
 			: array( $font_face['src'] );

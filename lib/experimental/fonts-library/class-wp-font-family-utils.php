@@ -24,7 +24,7 @@ class WP_Font_Family_Utils {
 	 * @param int    $i Optional counter for appending to the filename, default is 1.
 	 * @return string The generated filename for the font face asset.
 	 */
-	static public function get_filename_from_font_face( $font_face, $url, $i = 1 ) {
+	public static function get_filename_from_font_face( $font_face, $url, $i = 1 ) {
 		$extension = pathinfo( $url, PATHINFO_EXTENSION );
 		$filename  = sanitize_title( "{$font_face['fontFamily']}_{$font_face['fontStyle']}_{$font_face['fontWeight']}" );
 		if ( $i > 1 ) {
@@ -41,7 +41,7 @@ class WP_Font_Family_Utils {
 	 *
 	 * @return array|WP_Error The merged font or WP_Error if the fonts have different slugs.
 	 */
-	static public function merge_fonts_data( $font1, $font2 ) {
+	public static function merge_fonts_data( $font1, $font2 ) {
 		if ( $font1['slug'] !== $font2['slug'] ) {
 			return new WP_Error( 'fonts_must_have_same_slug', __( 'Fonts must have the same slug to be merged.', 'gutenberg' ) );
 		}
@@ -65,7 +65,7 @@ class WP_Font_Family_Utils {
 	 * @param string $filepath The file to check.
 	 * @return bool True if the file has a font MIME type, false otherwise.
 	 */
-	static public function has_font_mime_type( $filepath ) {
+	public static function has_font_mime_type( $filepath ) {
 		$filetype = wp_check_filetype( $filepath, WP_Fonts_Library::ALLOWED_FONT_MIME_TYPES );
 		return in_array( $filetype['type'], WP_Fonts_Library::ALLOWED_FONT_MIME_TYPES, true );
 	}

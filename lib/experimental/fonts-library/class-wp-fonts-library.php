@@ -14,7 +14,7 @@ class WP_Fonts_Library {
 	 *
 	 * @return string Path to the fonts directory.
 	 */
-	static public function get_fonts_directory() {
+	public static function get_fonts_directory() {
 		return path_join( WP_CONTENT_DIR, 'fonts' );
 	}
 
@@ -23,21 +23,21 @@ class WP_Fonts_Library {
 	 *
 	 * @return string Relative path to the fonts directory.
 	 */
-	static public function get_relative_fonts_path() {
+	public static function get_relative_fonts_path() {
 		return content_url( '/fonts/' );
 	}
 
 	/**
 	 * Define WP_FONTS_DIR constant to make it available to the rest of the code.
 	 */
-	static public function define_fonts_directory() {
+	public static function define_fonts_directory() {
 		define( 'WP_FONTS_DIR', self::get_fonts_directory() );
 	}
 
     /**
      * Create fonts directory if it doesn't exist.
      */
-	static public function create_fonts_directory() {
+	public static function create_fonts_directory() {
 		wp_mkdir_p( self::get_fonts_directory() );
 	}
 
