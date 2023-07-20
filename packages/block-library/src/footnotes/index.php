@@ -86,7 +86,7 @@ add_action(
 	 *
 	 * @param int $revision_id The revision ID.
 	 */
-	function( $revision_id ) {
+	static function( $revision_id ) {
 		$post_id = wp_is_post_revision( $revision_id );
 
 		if ( $post_id ) {
@@ -107,7 +107,7 @@ add_action(
 	 *
 	 * @param int $revision_id The revision ID.
 	 */
-	function( $revision_id ) {
+	static function( $revision_id ) {
 		global $_gutenberg_revision_id;
 		$_gutenberg_revision_id = $revision_id;
 	}
@@ -129,7 +129,7 @@ foreach ( array( 'post', 'page' ) as $post_type ) {
 		 *
 		 * @param WP_Post $post The post object.
 		 */
-		function( $post ) {
+		static function( $post ) {
 			global $_gutenberg_revision_id;
 
 			if ( $_gutenberg_revision_id ) {
@@ -158,7 +158,7 @@ add_action(
 	 * @param int $post_id      The post ID.
 	 * @param int $revision_id  The revision ID.
 	 */
-	function( $post_id, $revision_id ) {
+	static function( $post_id, $revision_id ) {
 		$footnotes = get_post_meta( $revision_id, 'footnotes', true );
 
 		if ( $footnotes ) {
@@ -180,7 +180,7 @@ add_filter(
 	 *
 	 * @return array The revision fields.
 	 */
-	function( $fields ) {
+	static function( $fields ) {
 		$fields['footnotes'] = __( 'Footnotes' );
 		return $fields;
 	}
@@ -198,7 +198,7 @@ add_filter(
 	 *
 	 * @return string The field value.
 	 */
-	function( $revision_field, $field, $revision ) {
+	static function( $revision_field, $field, $revision ) {
 		return get_metadata( 'post', $revision->ID, $field, true );
 	},
 	10,
