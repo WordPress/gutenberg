@@ -168,6 +168,7 @@ require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
 require __DIR__ . '/experimental/fonts-library/class-wp-font-family-utils.php';
 require __DIR__ . '/experimental/fonts-library/class-wp-font-family.php';
 require __DIR__ . '/experimental/fonts-library/class-wp-rest-fonts-library-controller.php';
+require __DIR__ . '/experimental/fonts-library/fonts-library.php';
 
 // Plugin specific code.
 require __DIR__ . '/script-loader.php';

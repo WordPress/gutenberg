@@ -55,6 +55,3 @@ class WP_Fonts_Library {
 	}
 
 }
-
-add_action( 'init', array( 'WP_Fonts_Library', 'define_fonts_directory' ) );
-add_action( 'init', array( 'WP_Fonts_Library', 'create_fonts_directory' ) );

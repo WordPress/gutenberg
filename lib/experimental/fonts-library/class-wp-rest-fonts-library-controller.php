@@ -207,14 +207,3 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	}
 
 }
-
-/**
- * Registers the routes for the objects of the controller.
- */
-function fonts_library_register_routes() {
-	$fonts_library = new WP_REST_Fonts_Library_Controller();
-	$fonts_library->register_routes();
-	$fonts_library->register_post_type();
-}
-
-add_action( 'rest_api_init', 'fonts_library_register_routes' );
