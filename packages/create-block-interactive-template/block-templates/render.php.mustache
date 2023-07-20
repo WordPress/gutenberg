@@ -8,7 +8,7 @@ $unique_id = uniqid( 'p-' );
 ?>
 
 <div
-	<?php echo get_block_wrapper_attributes(); ?>
+	<?php echo wp_kses_data( get_block_wrapper_attributes() ); ?>
 	data-wp-interactive
 	data-wp-context='{ "{{namespace}}": { "isOpen": false } }'
 	data-wp-effect="effects.{{namespace}}.logIsOpen"
@@ -16,17 +16,17 @@ $unique_id = uniqid( 'p-' );
 	<button
 		data-wp-on--click="actions.{{namespace}}.toggle"
 		data-wp-bind--aria-expanded="context.{{namespace}}.isOpen"
-		aria-controls="p-<?php echo $unique_id; ?>"
+		aria-controls="p-<?php cho esc_attr( $unique_id ); ?>"
 	>
-		<?php _e( 'Toggle', '{{textdomain}}' ); ?>
+		<?php esc_html_e( 'Toggle', '{{textdomain}}' ); ?>
 	</button>
 
 	<p
-		id="p-<?php echo $unique_id; ?>"
+		id="p-<?php echo esc_attr( $unique_id ); ?>"
 		data-wp-bind--hidden="!context.{{namespace}}.isOpen"
 	>
 		<?php
-			_e( '{{title}} - hello from an interactive block!', '{{textdomain}}' );
+			esc_html_e( '{{title}} - hello from an interactive block!', '{{textdomain}}' );
 		?>
 	</p>
 </div>
