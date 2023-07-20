@@ -189,7 +189,7 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 		$this->assertArrayHasKey( 'content', $data, 'Response should contain a "content" field.' );
 		$this->assertArrayHasKey( 'raw', $data['content'], 'Response title should contain a "raw" key.' );
 		$this->assertArrayHasKey( 'rendered', $data['content'], 'Response title should contain a "raw" key.' );
-		$this->assertArrayHasKey( 'block_version', $data['content'], 'Response title should contain a "raw" key.' );
+		$this->assertArrayHasKey( 'block_version', $data['content'], 'Response should contain a "block_version" field.' );
 		$this->assertArrayHasKey( 'raw', $data['title'], 'Response title should contain a "raw" key.' );
 	}
 
