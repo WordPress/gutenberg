@@ -16,11 +16,7 @@ module.exports = {
 		render: 'file:./render.php',
 		viewScript: 'file:./view.js',
 		customBlockJSON: {
-			example: {
-				attributes: {
-					message: 'Example Interactive',
-				},
-			},
+			example: {},
 		},
 	},
 	variants: {
