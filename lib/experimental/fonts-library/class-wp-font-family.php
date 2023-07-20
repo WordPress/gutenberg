@@ -387,6 +387,7 @@ class WP_Font_Family {
 	 * @return int post id
 	 */
 	private function create_or_update_font_post() {
+		$this->sanitize();
 		$post = $this->get_font_post();
 		if ( $post ) {
 			return $this->update_font_post( $post );
