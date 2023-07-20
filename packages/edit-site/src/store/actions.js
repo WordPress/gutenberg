@@ -233,7 +233,7 @@ export function setHomeTemplateId() {
  *
  * @param {Object} context The context object.
  *
- * @return {number} The resolved template ID for the page route.
+ * @return {Object} Action object.
  */
 export function setEditedPostContext( context ) {
 	return {
@@ -268,7 +268,6 @@ export const setPage =
 			// If the entity is undefined for some reason, path will resolve to "/"
 			page.path = getPathAndQueryString( entity?.link );
 		}
-
 		const template = await registry
 			.resolveSelect( coreStore )
 			.__experimentalGetTemplateForLink( page.path );
