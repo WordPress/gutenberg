@@ -1,4 +1,13 @@
 <?php
+/**
+ * Fonts Library class.
+ *
+ * This file contains the Fonts Library class definition.
+ *
+ * @package    Gutenberg
+ * @subpackage Fonts Library
+ * @since      X.X.X
+ */
 
 if ( class_exists( 'WP_Fonts_Library' ) ) {
 	return;

@@ -1,8 +1,8 @@
 <?php
 /**
- * Fonts Library Family class.
+ * Font Family class.
  *
- * This file contains functions and definitions for the Gutenberg Fonts Library.
+ * This file contains the Font Family class definition.
  *
  * @package    Gutenberg
  * @subpackage Fonts Library
