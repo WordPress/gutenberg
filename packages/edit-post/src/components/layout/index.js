@@ -12,6 +12,7 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
+	EditorKeyboardShortcuts,
 	EditorSnackbars,
 	PostSyncStatusModal,
 	store as editorStore,
@@ -203,6 +204,7 @@ function Layout( { styles } ) {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
+			<EditorKeyboardShortcuts />
 			<SettingsSidebar />
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isLargeViewport }

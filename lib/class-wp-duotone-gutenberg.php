@@ -32,6 +32,10 @@
  * @since 6.3.0
  */
 
+if ( class_exists( 'WP_Duotone_Gutenberg' ) ) {
+	return;
+}
+
 /**
  * Manages duotone block supports and global styles.
  *

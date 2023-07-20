@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.4.0 (2023-07-20)
+
 ### Enhancements
 
 -   `TextControl`: Add `id` prop to allow for custom IDs in `TextControl`s ([#52028](https://github.com/WordPress/gutenberg/pull/52028)).
@@ -12,6 +14,7 @@
 -   `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([#52356](https://github.com/WordPress/gutenberg/pull/52356)).
 -   `Item`: Unify focus style and add default font styles. ([#52495](https://github.com/WordPress/gutenberg/pull/52495)).
 -   `Toolbar`: Fix toolbar items not being tabbable on the first render. ([#52613](https://github.com/WordPress/gutenberg/pull/52613))
+-   `FormTokenField`: Fix token overflow when moving cursor left or right. ([#52662](https://github.com/WordPress/gutenberg/pull/52662))
 
 ## 25.3.0 (2023-07-05)
 

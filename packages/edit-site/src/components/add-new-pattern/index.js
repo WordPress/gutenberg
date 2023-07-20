@@ -57,21 +57,26 @@ export default function AddNewPattern() {
 		setShowTemplatePartModal( false );
 	}
 
+	const controls = [
+		{
+			icon: symbol,
+			onClick: () => setShowPatternModal( true ),
+			title: __( 'Create pattern' ),
+		},
+	];
+
+	if ( ! isTemplatePartsMode ) {
+		controls.push( {
+			icon: symbolFilled,
+			onClick: () => setShowTemplatePartModal( true ),
+			title: __( 'Create template part' ),
+		} );
+	}
+
 	return (
 		<>
 			<DropdownMenu
-				controls={ [
-					! isTemplatePartsMode && {
-						icon: symbolFilled,
-						onClick: () => setShowTemplatePartModal( true ),
-						title: __( 'Create template part' ),
-					},
-					{
-						icon: symbol,
-						onClick: () => setShowPatternModal( true ),
-						title: __( 'Create pattern' ),
-					},
-				].filter( Boolean ) }
+				controls={ controls }
 				toggleProps={ {
 					as: SidebarButton,
 				} }

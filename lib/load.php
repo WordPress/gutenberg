@@ -59,12 +59,16 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-blocks-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/footnotes.php';
 
+	// WordPress 6.4 compat.
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-controller-6-4.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-revisions-controller-6-4.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
+
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
-
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
@@ -103,7 +107,6 @@ require __DIR__ . '/compat/wordpress-6.3/block-editor-settings.php';
 require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
 // Experimental features.
-require __DIR__ . '/experimental/behaviors.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
@@ -143,6 +146,20 @@ if ( class_exists( 'WP_Fonts_Library' ) || class_exists( 'WP_Fonts_Library_Contr
 		require __DIR__ . '/experimental/fonts/class-wp-font-face.php';
 		require __DIR__ . '/experimental/fonts/class-wp-font-face-resolver.php';
 		require __DIR__ . '/experimental/fonts/fonts.php';
+
+		// Load the BC Layer. Do no backport to WP Core.
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts-provider.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts-utils.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts-provider-local.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts-resolver.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-gutenberg-fonts-api-bc-layer.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/webfonts-deprecations.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-webfonts-utils.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-webfonts-provider.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-webfonts-provider-local.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-webfonts.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-web-fonts.php';
 	}
 } elseif ( ! class_exists( 'WP_Fonts' ) ) {
 	// Fonts API files.

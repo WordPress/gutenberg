@@ -19,6 +19,7 @@ export default function SaveButton( {
 	showTooltip = true,
 	defaultLabel,
 	icon,
+	__next40pxDefaultSize = false,
 } ) {
 	const { isDirty, isSaving, isSaveViewOpen } = useSelect( ( select ) => {
 		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
@@ -81,6 +82,7 @@ export default function SaveButton( {
 			 */
 			showTooltip={ showTooltip }
 			icon={ icon }
+			__next40pxDefaultSize={ __next40pxDefaultSize }
 		>
 			{ label }
 		</Button>
