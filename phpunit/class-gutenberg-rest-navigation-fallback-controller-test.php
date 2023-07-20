@@ -162,7 +162,7 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 	 *
 	 * By default, the REST response for the Posts Controller will not return all fields
 	 * when the context is set to 'embed'. Assert that correct additional fields are added
-	 * to the embedded Navigation Post, when the navigation fallback endpoint 
+	 * to the embedded Navigation Post, when the navigation fallback endpoint
 	 * is called with the `_embed` param.
 	 *
 	 * @covers wp_add_fields_to_navigation_fallback_embeded_links
@@ -184,12 +184,16 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		// Verify that the additional fields are present.
+		// Verify that the additional status field is present.
 		$this->assertArrayHasKey( 'status', $data, 'Response title should contain a "status" field.' );
+
+		// Verify that the additional content fields are present.
 		$this->assertArrayHasKey( 'content', $data, 'Response should contain a "content" field.' );
 		$this->assertArrayHasKey( 'raw', $data['content'], 'Response content should contain a "raw" field.' );
 		$this->assertArrayHasKey( 'rendered', $data['content'], 'Response content should contain a "rendered" field.' );
 		$this->assertArrayHasKey( 'block_version', $data['content'], 'Response should contain a "block_version" field.' );
+
+		// Verify that the additional title.raw field is present.
 		$this->assertArrayHasKey( 'raw', $data['title'], 'Response title should contain a "raw" key.' );
 	}
 
