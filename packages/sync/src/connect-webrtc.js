@@ -9,7 +9,7 @@ import { WebrtcProvider } from 'y-webrtc';
 /** @typedef {import('./types').CRDTDoc} CRDTDoc */
 
 /**
- * Connect function to the IndexedDB persistence provider.
+ * Connect function to the WebRTC provider.
  *
  * @param {ObjectID}   objectId   The object ID.
  * @param {ObjectType} objectType The object type.
