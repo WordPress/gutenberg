@@ -200,6 +200,13 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 	/**
 	 * @doesNotPerformAssertions
 	 */
+	public function test_context_param() {
+		// Covered by the core test.
+	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_items() {
 		// Covered by the core test.
 	}
