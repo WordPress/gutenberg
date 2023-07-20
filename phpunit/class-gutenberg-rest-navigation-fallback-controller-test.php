@@ -185,7 +185,7 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 		$data     = $response->get_data();
 
 		// Verify that the additional fields are present.
-		$this->assertArrayHasKey( 'status', $data, 'Response title should contain a "raw" key.' );
+		$this->assertArrayHasKey( 'status', $data, 'Response title should contain a "status" field.' );
 		$this->assertArrayHasKey( 'content', $data, 'Response title should contain a "raw" key.' );
 		$this->assertArrayHasKey( 'raw', $data['content'], 'Response title should contain a "raw" key.' );
 		$this->assertArrayHasKey( 'rendered', $data['content'], 'Response title should contain a "raw" key.' );
