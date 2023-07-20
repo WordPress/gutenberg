@@ -160,10 +160,10 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 	/**
 	 * Tests that the correct filters are applied to the context parameter.
 	 *
-	 * The REST response for the Posts Controller doesn't return all fields,
-	 * when the context is set to embed. We need to add additional fields
-	 * for the navigation fallback, so that when it embeds a navigation,
-	 * the required fields are present.
+	 * By default, the REST response for the Posts Controller will not return all fields
+	 * when the context is set to 'embed'. Assert that correct additional fields are added
+	 * to the embedded Navigation Post, when the navigation fallback endpoint 
+	 * is called with the `_embed` param.
 	 *
 	 * @covers wp_add_fields_to_navigation_fallback_embeded_links
 	 */
