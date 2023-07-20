@@ -174,7 +174,7 @@ const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 						<Button
 							href={ homeUrl }
 							target="_blank"
-							label={ __( 'View site' ) }
+							label={ __( 'View site (opens in a new tab)' ) }
 							aria-label={ __(
 								'View site (opens in a new tab)'
 							) }
