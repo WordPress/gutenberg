@@ -135,8 +135,7 @@ function useDuplicateNavigationMenu() {
 		useDispatch( noticesStore );
 
 	const handleDuplicate = async ( navigationMenu ) => {
-		const menuTitle =
-			navigationMenu?.title?.rendered || navigationMenu?.slug;
+		const menuTitle = navigationMenu?.title || navigationMenu?.slug;
 
 		try {
 			const savedRecord = await saveEntityRecord(
