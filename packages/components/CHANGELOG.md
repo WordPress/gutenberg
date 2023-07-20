@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.4.0 (2023-07-20)
+
 ### Enhancements
 
 -   `TextControl`: Add `id` prop to allow for custom IDs in `TextControl`s ([#52028](https://github.com/WordPress/gutenberg/pull/52028)).
