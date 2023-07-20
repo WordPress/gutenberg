@@ -9,6 +9,11 @@
  * @since      X.X.X
  */
 
+ if ( class_exists( 'WP_Font_Family' ) ) {
+	return;
+}
+
+
 /**
  * Fonts Library class.
  */

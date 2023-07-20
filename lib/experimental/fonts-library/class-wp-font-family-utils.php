@@ -9,6 +9,10 @@
  * @since      X.X.X
  */
 
+ if ( class_exists( 'WP_Font_Family_Utils' ) ) {
+	return;
+}
+
 /**
  * A class of utilities for working with the Font Library.
  */

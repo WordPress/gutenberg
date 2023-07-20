@@ -9,6 +9,10 @@
  * @since      X.X.X
  */
 
+ if ( class_exists( 'WP_REST_Fonts_Library_Controller' ) ) {
+	return;
+}
+
 /**
  * Fonts Library Controller class.
  */
