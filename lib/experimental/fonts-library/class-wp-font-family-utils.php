@@ -26,10 +26,7 @@ class WP_Font_Family_Utils {
 	 */
 	static public function get_filename_from_font_face( $font_face, $url, $i = 1 ) {
 		$extension = pathinfo( $url, PATHINFO_EXTENSION );
-		$family    = sanitize_title( $font_face['fontFamily'] );
-		$style     = sanitize_title( $font_face['fontStyle'] );
-		$weight    = sanitize_title( $font_face['fontWeight'] );
-		$filename  = "{$family}_{$style}_{$weight}";
+		$filename  = sanitize_title( "{$font_face['fontFamily']}_{$font_face['fontStyle']}_{$font_face['fontWeight']}" );
 		if ( $i > 1 ) {
 			$filename .= "_{$i}";
 		}
