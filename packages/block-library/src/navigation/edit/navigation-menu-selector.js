@@ -73,7 +73,7 @@ function NavigationMenuSelector( {
 		return (
 			navigationMenus?.map( ( { id, title, status }, index ) => {
 				const label = buildMenuLabel(
-					title.rendered,
+					title?.rendered,
 					index + 1,
 					status
 				);

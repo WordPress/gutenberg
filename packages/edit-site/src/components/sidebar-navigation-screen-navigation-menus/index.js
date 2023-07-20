@@ -124,7 +124,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 						withChevron
 						icon={ navigation }
 					>
-						{ buildMenuLabel( title.rendered, index + 1, status ) }
+						{ buildMenuLabel( title?.rendered, index + 1, status ) }
 					</NavMenuItem>
 				) ) }
 			</ItemGroup>
