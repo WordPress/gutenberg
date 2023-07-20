@@ -190,7 +190,7 @@ class WP_Font_Family {
 	 *
 	 * @param array $font_face Font face to download.
 	 * @param array $file Uploaded file.
-	 * @return array New font face with all assets downloaded and referenced in the font face definition.
+	 * @return array|bool New font face with all assets downloaded and referenced in the font face definition or false is something failed
 	 */
 	private function move_font_face_asset( $font_face, $file ) {
 		$new_font_face = $font_face;
@@ -298,7 +298,7 @@ class WP_Font_Family {
 				$this->data['fontFace'] = $new_font_faces;
 				return true;
 			}
-			return new WP_Error( 'font_face_download_failed', __( 'The font face assets could not be written.', 'gutenberg' ) );
+			return false;
 		}
 		return true;
 	}
