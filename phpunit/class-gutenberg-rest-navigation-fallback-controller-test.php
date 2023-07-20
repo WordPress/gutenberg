@@ -167,7 +167,7 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 	 *
 	 * @covers wp_add_fields_to_navigation_fallback_embeded_links
 	 */
-	public function test_context_param() {
+	public function test_embedded_navigation_post_contains_required_fields() {
 		// First we'll use the navigation fallback to get a link to the navigation endpoint.
 		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallback' );
 		$response = rest_get_server()->dispatch( $request );
