@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.100.0
 -   [**] Add media inserter buttons to editor toolbar [#51827]
 -   [**] Update native BlockOutline component styles to remove blue border from blocks [#51222]
 -   [**] Move the undo/redo buttons to the navigation bar [#51766]
