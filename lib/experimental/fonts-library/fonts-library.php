@@ -1,4 +1,13 @@
 <?php
+/**
+ * Fonts Library initialization.
+ *
+ * This file contains fonts library init calls.
+ *
+ * @package    Gutenberg
+ * @subpackage Fonts Library
+ * @since      X.X.X
+ */
 
 add_action( 'init', array( 'WP_Fonts_Library', 'define_fonts_directory' ) );
 add_action( 'init', array( 'WP_Fonts_Library', 'create_fonts_directory' ) );
