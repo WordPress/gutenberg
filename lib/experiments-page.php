@@ -48,7 +48,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Elable the live collaboration and offline persistence between peers', 'gutenberg' ),
+			'label' => __( 'Enable the live collaboration and offline persistence between peers', 'gutenberg' ),
 			'id'    => 'gutenberg-sync-collaboration',
 		)
 	);
