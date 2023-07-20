@@ -175,7 +175,7 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 
 		// Extract the navigation endpoint URL from the response.
 		$embedded_navigation_href = $links['self'][0]['href'];
-		preg_match('/\?rest_route=(.*)/', $embedded_navigation_href, $matches );
+		preg_match( '/\?rest_route=(.*)/', $embedded_navigation_href, $matches );
 		$navigation_endpoint = $matches[1];
 
 		// Fetch a navigation from the endpoint, with the context parameter set to embed.
