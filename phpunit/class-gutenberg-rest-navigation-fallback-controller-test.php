@@ -178,7 +178,7 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 		preg_match( '/\?rest_route=(.*)/', $embedded_navigation_href, $matches );
 		$navigation_endpoint = $matches[1];
 
-		// Fetch a navigation from the endpoint, with the context parameter set to embed.
+		// Fetch the "linked" navigation post from the endpoint, with the context parameter set to 'embed' to simulate fetching embedded links.
 		$request  = new WP_REST_Request( 'GET', $navigation_endpoint );
 		$request->set_param( 'context', 'embed' );
 		$response = rest_get_server()->dispatch( $request );
