@@ -442,7 +442,7 @@ describe( 'Image Block', () => {
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
 
-		fireEvent.press( screen.getByText( 'ADD IMAGE' ) );
+		fireEvent.press( screen.getByText( 'Add image' ) );
 		fireEvent.press( screen.getByText( 'WordPress Media Library' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":${ IMAGE.id },"sizeSlug":"large","linkDestination":"none"} -->

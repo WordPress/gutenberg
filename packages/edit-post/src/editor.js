@@ -51,7 +51,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		( select ) => {
 			const {
 				isFeatureActive,
-				__experimentalGetPreviewDeviceType,
 				isEditingTemplate,
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
@@ -80,9 +79,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			const canEditTemplate = canUser( 'create', 'templates' );
 
 			return {
-				hasFixedToolbar:
-					isFeatureActive( 'fixedToolbar' ) ||
-					__experimentalGetPreviewDeviceType() !== 'Desktop',
+				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 				focusMode: isFeatureActive( 'focusMode' ),
 				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),

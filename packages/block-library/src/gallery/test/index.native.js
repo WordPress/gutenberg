@@ -134,7 +134,7 @@ describe( 'Gallery block', () => {
 		// Tap on Gallery block
 		const block = await getBlock( screen, 'Gallery' );
 		fireEvent.press( block );
-		fireEvent.press( within( block ).getByText( 'ADD MEDIA' ) );
+		fireEvent.press( within( block ).getByText( 'Add media' ) );
 
 		// Observe that media options picker is displayed
 		/* eslint-disable jest/no-conditional-expect */
@@ -169,7 +169,7 @@ describe( 'Gallery block', () => {
 			} );
 
 		// Tap on Gallery block
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 
 		// Observe that media options picker is displayed
 		expect( getByText( 'Choose images' ) ).toBeVisible();
@@ -283,7 +283,7 @@ describe( 'Gallery block', () => {
 		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		selectOption( 'Choose from device' );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -321,7 +321,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Choose from device' ) );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -375,7 +375,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Take a photo
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Take a Photo' ) );
 		expectMediaPickerCall( 'DEVICE_CAMERA', [ 'image' ], true );
 
@@ -429,7 +429,7 @@ describe( 'Gallery block', () => {
 		);
 
 		// Upload images from free photo library
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Free Photo Library' ) );
 		expectMediaPickerCall( 'stock-photo-library', [ 'image' ], true );
 
@@ -469,7 +469,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Choose from device' ) );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -569,7 +569,7 @@ describe( 'Gallery block', () => {
 		);
 
 		// Upload images from other apps
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Other Apps' ) );
 		expectMediaPickerCall( 'other-files', [ 'image' ], true );
 

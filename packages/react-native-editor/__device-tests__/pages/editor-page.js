@@ -296,7 +296,7 @@ class EditorPage {
 					'Hide keyboard, Tap to hide the keyboard'
 			  )
 			: await this.waitForElementToBeDisplayedByXPath(
-					'//XCUIElementTypeButton[@name="Hide keyboard"]'
+					'(//XCUIElementTypeOther[@name="Hide keyboard"])[1]'
 			  );
 
 		await hideKeyboardButton.click();
@@ -1014,6 +1014,7 @@ const blockNames = {
 	buttons: 'Buttons',
 	button: 'Button',
 	preformatted: 'Preformatted',
+	unsupported: 'Unsupported',
 };
 
 module.exports = { initializeEditorPage, blockNames };

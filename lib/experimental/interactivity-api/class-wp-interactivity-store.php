@@ -9,6 +9,10 @@
  * @subpackage Interactivity API
  */
 
+if ( class_exists( 'WP_Interactivity_Store' ) ) {
+	return;
+}
+
 /**
  * Manages the initial state of the Interactivity API store in the server and
  * its serialization so it can be restored in the browser upon hydration.

@@ -121,7 +121,7 @@
 	justify-content: center;
 	align-items: center;
 
-	&:has(.edit-site-layout__resizable-frame-oversized) {
+	&.is-right-aligned {
 		justify-content: flex-end;
 	}
 

@@ -1316,7 +1316,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1591,14 +1593,13 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocks: {
-							value: [],
-						},
 						edits: {},
 					},
 				},
 				initialEdits: {},
-				currentPost: {},
+				currentPost: {
+					content: '',
+				},
 			};
 
 			expect( isEditedPostEmpty( state ) ).toBe( true );
@@ -1620,7 +1621,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1650,7 +1653,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1660,7 +1665,7 @@ describe( 'selectors', () => {
 			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
-		it( 'should return false if blocks, but empty content edit', () => {
+		it( 'should return true if blocks, but empty content edit', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1687,7 +1692,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostEmpty( state ) ).toBe( false );
+			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if the post has an empty content property', () => {
@@ -1709,7 +1714,7 @@ describe( 'selectors', () => {
 			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if edits include a non-empty content property, but blocks are empty', () => {
+		it( 'should return false if edits include a non-empty content property', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1725,7 +1730,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( isEditedPostEmpty( state ) ).toBe( true );
+			expect( isEditedPostEmpty( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if empty classic block', () => {
@@ -1744,7 +1749,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -2150,6 +2157,7 @@ describe( 'selectors', () => {
 									attributes: {
 										providerNameSlug: 'instagram',
 									},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2172,6 +2180,7 @@ describe( 'selectors', () => {
 									clientId: 567,
 									name: 'core/embed',
 									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2194,11 +2203,13 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/image',
 									attributes: {},
+									innerBlocks: [],
 								},
 								{
 									clientId: 456,
 									name: 'core/quote',
 									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2222,6 +2233,7 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/image',
 									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2245,6 +2257,7 @@ describe( 'selectors', () => {
 									clientId: 456,
 									name: 'core/quote',
 									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2270,6 +2283,7 @@ describe( 'selectors', () => {
 									attributes: {
 										providerNameSlug: 'youtube',
 									},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2295,6 +2309,7 @@ describe( 'selectors', () => {
 									attributes: {
 										providerNameSlug: 'soundcloud',
 									},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2318,11 +2333,13 @@ describe( 'selectors', () => {
 									clientId: 456,
 									name: 'core/quote',
 									attributes: {},
+									innerBlocks: [],
 								},
 								{
 									clientId: 789,
 									name: 'core/paragraph',
 									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},

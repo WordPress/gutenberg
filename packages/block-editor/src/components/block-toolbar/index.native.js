@@ -102,7 +102,6 @@ export default function BlockToolbar( { anchorNodeRef } ) {
 							return fills[ 0 ];
 						} }
 					</BlockSettingsButton.Slot>
-
 					<BlockControls.Slot group="block" />
 					<BlockControls.Slot />
 					<BlockControls.Slot group="inline" />
