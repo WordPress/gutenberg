@@ -682,7 +682,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$should_load_view_script = count( array_filter( $needed_script_map ) ) > 0;
 	} else {
 		foreach ( $needed_script_map as $view_script_handle => $is_view_script_needed ) {
-			wp_script_add_data( $view_script_handle, 'strategy', 'defer' ); // TODO: This should be able to be specified in block.json. See Core-54018.
 
 			// If the script already exists, there is no point in removing it from viewScript.
 			if ( wp_script_is( $view_script_handle ) ) {

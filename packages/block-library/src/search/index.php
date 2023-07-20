@@ -81,7 +81,6 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		// If the script already exists, there is no point in removing it from viewScript.
 		$view_js_file = 'wp-block-search-view';
-		wp_script_add_data( $view_js_file, 'strategy', 'defer' ); // TODO: This should be able to be specified in block.json. See Core-54018.
 		if ( ! wp_script_is( $view_js_file ) ) {
 			$script_handles = $block->block_type->view_script_handles;
 
