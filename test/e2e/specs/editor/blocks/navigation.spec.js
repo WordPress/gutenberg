@@ -75,7 +75,7 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible();
 
 			// Check the markup of the block is correct.
-			await editor.publishPost();
+			const postId = await editor.publishPost();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/navigation',
@@ -84,13 +84,15 @@ test.describe( 'Navigation block', () => {
 			] );
 
 			// Check the block in the frontend.
-			await page.goto( `/` );
+			await page.goto( `/?p=${ postId }` );
 
 			await expect(
 				page.locator(
 					`role=navigation >> role=link[name="WordPress"i]`
 				)
 			).toBeVisible();
+
+			expect( true ).toBe( false );
 		} );
 
 		test( 'default to the only existing classic menu if there are no block menus', async ( {
@@ -126,6 +128,8 @@ test.describe( 'Navigation block', () => {
 					`role=navigation >> role=link[name="Custom link"i]`
 				)
 			).toBeVisible();
+
+			expect( true ).toBe( false );
 		} );
 
 		test( 'default to my most recently created menu', async ( {
@@ -154,7 +158,7 @@ test.describe( 'Navigation block', () => {
 			await editor.insertBlock( { name: 'core/navigation' } );
 
 			// Check the markup of the block is correct.
-			await editor.publishPost();
+			const postId = await editor.publishPost();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/navigation',
@@ -170,13 +174,15 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible();
 
 			// Check the block in the frontend.
-			await page.goto( `/` );
+			await page.goto( `/?p=${ postId }` );
 
 			await expect(
 				page.locator(
 					`role=navigation >> role=link[name="Menu 2 Link"i]`
 				)
 			).toBeVisible();
+
+			expect( true ).toBe( false );
 		} );
 	} );
 
@@ -216,6 +222,8 @@ test.describe( 'Navigation block', () => {
 					`role=navigation >> role=button[name="example.com submenu "i]`
 				)
 			).toBeVisible();
+
+			expect( true ).toBe( false );
 		} );
 
 		test( 'submenu converts to link automatically', async ( {
