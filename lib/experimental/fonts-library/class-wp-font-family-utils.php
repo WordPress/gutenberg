@@ -9,7 +9,7 @@
  * @since      X.X.X
  */
 
- if ( class_exists( 'WP_Font_Family_Utils' ) ) {
+if ( class_exists( 'WP_Font_Family_Utils' ) ) {
 	return;
 }
 
