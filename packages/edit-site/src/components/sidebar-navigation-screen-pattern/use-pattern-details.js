@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
@@ -112,9 +112,7 @@ export default function usePatternDetails( postType, postId ) {
 			label: __( 'Customized' ),
 			value: (
 				<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-customized">
-					{ addedBy.isCustomized
-						? _x( 'Yes', 'pattern' )
-						: _x( 'No', 'pattern' ) }
+					{ addedBy.isCustomized ? __( 'Yes' ) : __( 'No' ) }
 				</span>
 			),
 		} );
