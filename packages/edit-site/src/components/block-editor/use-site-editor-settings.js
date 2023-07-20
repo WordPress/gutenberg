@@ -10,6 +10,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import inserterMediaCategories from './inserter-media-categories';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 function useArchiveLabel( templateSlug ) {
 	const taxonomyMatches = templateSlug?.match(
@@ -99,6 +100,18 @@ export default function useSiteEditorSettings() {
 		[ setIsInserterOpened ]
 	);
 
+	const { linkControlAdvancedSettingsPreference } = useSelect( ( select ) => {
+		const prefsStore = select( preferencesStore );
+
+		return {
+			linkControlAdvancedSettingsPreference:
+				prefsStore.get(
+					'core/edit-site',
+					'linkControlSettingsDrawer'
+				) ?? false,
+		};
+	}, [] );
+
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
 		storedSettings.__experimentalBlockPatterns; // WP 5.9
@@ -174,6 +187,7 @@ export default function useSiteEditorSettings() {
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
+			linkControlAdvancedSettingsPreference,
 		};
 	}, [
 		storedSettings,
@@ -182,5 +196,6 @@ export default function useSiteEditorSettings() {
 		canvasMode,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
+		linkControlAdvancedSettingsPreference,
 	] );
 }

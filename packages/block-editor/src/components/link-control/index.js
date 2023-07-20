@@ -12,6 +12,8 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -24,6 +26,7 @@ import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Default properties associated with a link control value.
@@ -133,14 +136,27 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
+	// Preference is supplied by the relevant editor.
+	const settingsOpenWithPreference = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.linkControlAdvancedSettingsPreference,
+		[]
+	);
+
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const setSettingsOpenWithPreference = ( isOpen ) => {
+		// Should we set both?
+		setPreference( 'core/edit-site', 'linkControlSettingsDrawer', isOpen );
+		setPreference( 'core/edit-post', 'linkControlSettingsDrawer', isOpen );
+	};
+
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
 	const settingsKeys = settings.map( ( { id } ) => id );
-
-	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
 	const [
 		internalControlValue,
@@ -207,7 +223,7 @@ function LinkControl( {
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
-		setSettingsOpen( false );
+		setSettingsOpenWithPreference( false );
 		setIsEditingLink( false );
 	};
 
@@ -292,7 +308,6 @@ function LinkControl( {
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
-	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 	const showActions = isEditingLink && hasLinkValue;
 
 	// Only show text control once a URL value has been committed
@@ -381,24 +396,22 @@ function LinkControl( {
 				/>
 			) }
 
-			{ showSettings && (
-				<div className="block-editor-link-control__tools">
-					{ ! currentInputIsEmpty && (
-						<LinkControlSettingsDrawer
-							settingsOpen={ settingsOpen }
-							setSettingsOpen={ setSettingsOpen }
-						>
-							<LinkSettings
-								value={ internalControlValue }
-								settings={ settings }
-								onChange={ createSetInternalSettingValueHandler(
-									settingsKeys
-								) }
-							/>
-						</LinkControlSettingsDrawer>
-					) }
-				</div>
-			) }
+			<div className="block-editor-link-control__tools">
+				{ ! currentInputIsEmpty && (
+					<LinkControlSettingsDrawer
+						settingsOpen={ settingsOpenWithPreference }
+						setSettingsOpen={ setSettingsOpenWithPreference }
+					>
+						<LinkSettings
+							value={ internalControlValue }
+							settings={ settings }
+							onChange={ createSetInternalSettingValueHandler(
+								settingsKeys
+							) }
+						/>
+					</LinkControlSettingsDrawer>
+				) }
+			</div>
 
 			{ showActions && (
 				<div className="block-editor-link-control__search-actions">

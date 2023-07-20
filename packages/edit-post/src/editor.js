@@ -44,6 +44,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		keepCaretInsideBlock,
 		isTemplateMode,
 		template,
+		linkControlAdvancedSettingsPreference,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -75,15 +76,23 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			const isViewable = getPostType( postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
 
+			const prefsStore = select( preferencesStore );
+
 			return {
 				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 				focusMode: isFeatureActive( 'focusMode' ),
 				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
-				preferredStyleVariations: select( preferencesStore ).get(
+				hasThemeStyles: isFeatureActive( 'themeStyles' ),
+				preferredStyleVariations: prefsStore.get(
 					'core/edit-post',
 					'preferredStyleVariations'
 				),
+				linkControlAdvancedSettingsPreference:
+					prefsStore.get(
+						'core/edit-post',
+						'linkControlSettingsDrawer'
+					) ?? false,
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
@@ -119,6 +128,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
 			// where we need to differentiate if a block is disabled by the user or some plugin.
 			defaultAllowedBlockTypes: settings.allowedBlockTypes,
+			linkControlAdvancedSettingsPreference,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -149,6 +159,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
+		linkControlAdvancedSettingsPreference,
 	] );
 
 	if ( ! post ) {
