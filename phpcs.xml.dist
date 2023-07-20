@@ -50,7 +50,7 @@
 
 	<!-- Exclude third party libraries -->
 	<exclude-pattern>./vendor/*</exclude-pattern>
-	<exclude-pattern>./lib/experimental/packages/gutenberg/gutenberg-coding-standards/*</exclude-pattern>
+	<exclude-pattern>./test/php/gutenberg-coding-standards/*</exclude-pattern>
 
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">

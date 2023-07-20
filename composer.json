@@ -38,7 +38,7 @@
 	"repositories": [
 		{
 			"type": "path",
-			"url": "./lib/experimental/packages/gutenberg/gutenberg-coding-standards",
+			"url": "./test/php/gutenberg-coding-standards",
 			"options": {
 				"symlink": false
 			}
