@@ -134,7 +134,7 @@ describe( 'Gallery block', () => {
 		// Tap on Gallery block
 		const block = await getBlock( screen, 'Gallery' );
 		fireEvent.press( block );
-		fireEvent.press( within( block ).getByText( 'ADD MEDIA' ) );
+		fireEvent.press( within( block ).getByText( 'Add media' ) );
 
 		// Observe that media options picker is displayed
 		/* eslint-disable jest/no-conditional-expect */
@@ -161,7 +161,7 @@ describe( 'Gallery block', () => {
 
 	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
 	// is addressed.
-	it.skip( 'block remains selected after dimissing the media options picker', async () => {
+	it.skip( 'block remains selected after dismissing the media options picker', async () => {
 		// Initialize with an empty gallery
 		const { getByLabelText, getByText, getByTestId } =
 			await initializeEditor( {
@@ -169,13 +169,13 @@ describe( 'Gallery block', () => {
 			} );
 
 		// Tap on Gallery block
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 
 		// Observe that media options picker is displayed
 		expect( getByText( 'Choose images' ) ).toBeVisible();
 		expect( getByText( 'WordPress Media Library' ) ).toBeVisible();
 
-		// Dimiss the picker
+		// Dismiss the picker
 		if ( Platform.isIOS ) {
 			fireEvent.press( getByText( 'Cancel' ) );
 		} else {
@@ -283,7 +283,7 @@ describe( 'Gallery block', () => {
 		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		selectOption( 'Choose from device' );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -321,7 +321,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Choose from device' ) );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -375,7 +375,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Take a photo
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Take a Photo' ) );
 		expectMediaPickerCall( 'DEVICE_CAMERA', [ 'image' ], true );
 
@@ -429,7 +429,7 @@ describe( 'Gallery block', () => {
 		);
 
 		// Upload images from free photo library
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Free Photo Library' ) );
 		expectMediaPickerCall( 'stock-photo-library', [ 'image' ], true );
 
@@ -469,7 +469,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Choose from device' ) );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -511,10 +511,11 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc010
 	it( 'rearranges gallery items', async () => {
 		// Initialize with a gallery that contains three items
-		const { galleryBlock } = await initializeWithGalleryBlock( {
-			numberOfItems: 3,
-			media,
-		} );
+		const { getByLabelText, galleryBlock } =
+			await initializeWithGalleryBlock( {
+				numberOfItems: 3,
+				media,
+			} );
 
 		// Rearrange items (final disposition will be: Image 3 - Image 1 - Image 2)
 		const galleryItem1 = getGalleryItem( galleryBlock, 1 );
@@ -523,7 +524,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem3 );
 		await act( () =>
 			fireEvent.press(
-				within( galleryItem3 ).getByLabelText(
+				getByLabelText(
 					/Move block left from position 3 to position 2/
 				)
 			)
@@ -532,7 +533,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem1 );
 		await act( () =>
 			fireEvent.press(
-				within( galleryItem1 ).getByLabelText(
+				getByLabelText(
 					/Move block right from position 1 to position 2/
 				)
 			)
@@ -568,7 +569,7 @@ describe( 'Gallery block', () => {
 		);
 
 		// Upload images from other apps
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Other Apps' ) );
 		expectMediaPickerCall( 'other-files', [ 'image' ], true );
 

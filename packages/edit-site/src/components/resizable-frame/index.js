@@ -9,9 +9,12 @@ import classnames from 'classnames';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	ResizableBox,
+	Tooltip,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,7 +36,7 @@ const HANDLE_STYLES_OVERRIDE = {
 };
 
 // The minimum width of the frame (in px) while resizing.
-const FRAME_MIN_WIDTH = 340;
+const FRAME_MIN_WIDTH = 320;
 // The reference width of the frame (in px) used to calculate the aspect ratio.
 const FRAME_REFERENCE_WIDTH = 1300;
 // 9 : 19.5 is the target aspect ratio enforced (when possible) while resizing.
@@ -42,6 +45,8 @@ const FRAME_TARGET_ASPECT_RATIO = 9 / 19.5;
 // viewport's edge. If the frame is resized to be closer to the viewport's edge
 // than this distance, then "canvas mode" will be enabled.
 const SNAP_TO_EDIT_CANVAS_MODE_THRESHOLD = 200;
+// Default size for the `frameSize` state.
+const INITIAL_FRAME_SIZE = { width: '100%', height: '100%' };
 
 function calculateNewHeight( width, initialAspectRatio ) {
 	const lerp = ( a, b, amount ) => {
@@ -73,27 +78,32 @@ function calculateNewHeight( width, initialAspectRatio ) {
 
 function ResizableFrame( {
 	isFullWidth,
+	isOversized,
+	setIsOversized,
 	isReady,
 	children,
-	oversizedClassName,
 	innerContentStyle,
 } ) {
-	const [ frameSize, setFrameSize ] = useState( {
-		width: '100%',
-		height: '100%',
-	} );
+	const [ frameSize, setFrameSize ] = useState( INITIAL_FRAME_SIZE );
 	// The width of the resizable frame when a new resize gesture starts.
 	const [ startingWidth, setStartingWidth ] = useState();
 	const [ isResizing, setIsResizing ] = useState( false );
-	const [ isHovering, setIsHovering ] = useState( false );
-	const [ isOversized, setIsOversized ] = useState( false );
+	const [ shouldShowHandle, setShouldShowHandle ] = useState( false );
 	const [ resizeRatio, setResizeRatio ] = useState( 1 );
+	const canvasMode = useSelect(
+		( select ) => unlock( select( editSiteStore ) ).getCanvasMode(),
+		[]
+	);
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const initialAspectRatioRef = useRef( null );
 	// The width of the resizable frame on initial render.
 	const initialComputedWidthRef = useRef( null );
 	const FRAME_TRANSITION = { type: 'tween', duration: isResizing ? 0 : 0.5 };
 	const frameRef = useRef( null );
+	const resizableHandleHelpId = useInstanceId(
+		ResizableFrame,
+		'edit-site-resizable-frame-handle-help'
+	);
 
 	// Remember frame dimensions on initial render.
 	useEffect( () => {
@@ -154,11 +164,38 @@ function ResizableFrame( {
 		if ( remainingWidth > SNAP_TO_EDIT_CANVAS_MODE_THRESHOLD ) {
 			// Reset the initial aspect ratio if the frame is resized slightly
 			// above the sidebar but not far enough to trigger full screen.
-			setFrameSize( { width: '100%', height: '100%' } );
+			setFrameSize( INITIAL_FRAME_SIZE );
 		} else {
 			// Trigger full screen if the frame is resized far enough to the left.
 			setCanvasMode( 'edit' );
 		}
+	};
+
+	// Handle resize by arrow keys
+	const handleResizableHandleKeyDown = ( event ) => {
+		if ( ! [ 'ArrowLeft', 'ArrowRight' ].includes( event.key ) ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		const step = 20 * ( event.shiftKey ? 5 : 1 );
+		const delta = step * ( event.key === 'ArrowLeft' ? 1 : -1 );
+		const newWidth = Math.min(
+			Math.max(
+				FRAME_MIN_WIDTH,
+				frameRef.current.resizable.offsetWidth + delta
+			),
+			initialComputedWidthRef.current
+		);
+
+		setFrameSize( {
+			width: newWidth,
+			height: calculateNewHeight(
+				newWidth,
+				initialAspectRatioRef.current
+			),
+		} );
 	};
 
 	const frameAnimationVariants = {
@@ -173,16 +210,26 @@ function ResizableFrame( {
 	};
 
 	const resizeHandleVariants = {
-		default: {
+		hidden: {
+			opacity: 0,
+			left: 0,
+		},
+		visible: {
 			opacity: 1,
 			left: -16,
 		},
-		resizing: {
+		active: {
 			opacity: 1,
 			left: -16,
 			scaleY: 1.3,
 		},
 	};
+	const currentResizeHandleVariant = ( () => {
+		if ( isResizing ) {
+			return 'active';
+		}
+		return shouldShowHandle ? 'visible' : 'hidden';
+	} )();
 
 	return (
 		<ResizableBox
@@ -217,35 +264,56 @@ function ResizableFrame( {
 			minWidth={ FRAME_MIN_WIDTH }
 			maxWidth={ isFullWidth ? '100%' : '150%' }
 			maxHeight={ '100%' }
-			onMouseOver={ () => setIsHovering( true ) }
-			onMouseOut={ () => setIsHovering( false ) }
+			onFocus={ () => setShouldShowHandle( true ) }
+			onBlur={ () => setShouldShowHandle( false ) }
+			onMouseOver={ () => setShouldShowHandle( true ) }
+			onMouseOut={ () => setShouldShowHandle( false ) }
 			handleComponent={ {
-				left:
-					isHovering || isResizing ? (
-						<motion.div
-							key="handle"
-							className="edit-site-resizable-frame__handle"
-							variants={ resizeHandleVariants }
-							animate={ isResizing ? 'resizing' : 'default' }
-							title="Drag to resize"
-							initial={ {
-								opacity: 0,
-								left: 0,
-							} }
-							exit={ {
-								opacity: 0,
-								left: 0,
-							} }
-							whileHover={ { scaleY: 1.3 } }
-						/>
-					) : null,
+				left: canvasMode === 'view' && (
+					<>
+						<Tooltip text={ __( 'Drag to resize' ) }>
+							{ /* Disable reason: role="separator" does in fact support aria-valuenow */ }
+							{ /* eslint-disable-next-line jsx-a11y/role-supports-aria-props */ }
+							<motion.button
+								key="handle"
+								role="separator"
+								aria-orientation="vertical"
+								className={ classnames(
+									'edit-site-resizable-frame__handle',
+									{ 'is-resizing': isResizing }
+								) }
+								variants={ resizeHandleVariants }
+								animate={ currentResizeHandleVariant }
+								aria-label={ __( 'Drag to resize' ) }
+								aria-describedby={ resizableHandleHelpId }
+								aria-valuenow={
+									frameRef.current?.resizable?.offsetWidth ||
+									undefined
+								}
+								aria-valuemin={ FRAME_MIN_WIDTH }
+								aria-valuemax={
+									initialComputedWidthRef.current
+								}
+								onKeyDown={ handleResizableHandleKeyDown }
+								initial="hidden"
+								exit="hidden"
+								whileFocus="active"
+								whileHover="active"
+							/>
+						</Tooltip>
+						<div hidden id={ resizableHandleHelpId }>
+							{ __(
+								'Use left and right arrow keys to resize the canvas. Hold shift to resize in larger increments.'
+							) }
+						</div>
+					</>
+				),
 			} }
 			onResizeStart={ handleResizeStart }
 			onResize={ handleResize }
 			onResizeStop={ handleResizeStop }
 			className={ classnames( 'edit-site-resizable-frame__inner', {
 				'is-resizing': isResizing,
-				[ oversizedClassName ]: isOversized,
 			} ) }
 		>
 			<motion.div

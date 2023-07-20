@@ -102,7 +102,7 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
  */
 export function getPresetValueFromCustomValue( value, spacingSizes ) {
 	// Return value as-is if it is already a preset;
-	if ( isValueSpacingPreset( value ) ) {
+	if ( isValueSpacingPreset( value ) || value === '0' ) {
 		return value;
 	}
 

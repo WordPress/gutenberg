@@ -23,7 +23,10 @@ export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
 	const padding = attributes?.style?.spacing?.padding;
 
 	useEffect( () => {
-		if ( ! blockElement ) {
+		if (
+			! blockElement ||
+			null === blockElement.ownerDocument.defaultView
+		) {
 			return;
 		}
 

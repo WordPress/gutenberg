@@ -70,8 +70,8 @@ const blockRemovalRules = {
 	'core/post-content': __(
 		'Post Content displays the content of a post or page.'
 	),
-	'core/footnotes': __(
-		'The Footnotes block displays all footnotes found in the content. Note that any footnotes in the content will persist after removing this block.'
+	'core/post-template': __(
+		'Post Template displays each post or page in a Query Loop.'
 	),
 };
 

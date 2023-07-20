@@ -39,6 +39,10 @@ class Gutenberg_REST_Blocks_Controller extends WP_REST_Blocks_Controller {
 		unset( $data['title']['rendered'] );
 		unset( $data['content']['rendered'] );
 
+		// If `$data['wp_pattern_sync_status']` is already set core 6.3 + has already done the job of setting this so return early.
+		if ( isset( $data['wp_pattern_sync_status'] ) ) {
+			return $data;
+		}
 		// Add the core wp_pattern_sync_status meta as top level property to the response.
 		$data['wp_pattern_sync_status'] = isset( $data['meta']['wp_pattern_sync_status'] ) ? $data['meta']['wp_pattern_sync_status'] : '';
 		unset( $data['meta']['wp_pattern_sync_status'] );
