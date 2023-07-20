@@ -171,7 +171,7 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 		// First we'll use the navigation fallback to get a link to the navigation endpoint.
 		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallback' );
 		$response = rest_get_server()->dispatch( $request );
-		$links = $response->get_links();
+		$links    = $response->get_links();
 
 		// Extract the navigation endpoint URL from the response.
 		$embedded_navigation_href = $links['self'][0]['href'];
@@ -179,7 +179,7 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 		$navigation_endpoint = $matches[1];
 
 		// Fetch the "linked" navigation post from the endpoint, with the context parameter set to 'embed' to simulate fetching embedded links.
-		$request  = new WP_REST_Request( 'GET', $navigation_endpoint );
+		$request = new WP_REST_Request( 'GET', $navigation_endpoint );
 		$request->set_param( 'context', 'embed' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
