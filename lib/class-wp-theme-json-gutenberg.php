@@ -203,6 +203,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              removed the `--wp--style--block-gap` property.
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
 	 * @since 6.3.0 Added `writing-mode` property.
+	 * @since 6.4.0 Added `width`.
 	 *
 	 * @var array
 	 */
@@ -261,6 +262,7 @@ class WP_Theme_JSON_Gutenberg {
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
+		'width'                             => array( 'dimensions', 'width' ),
 		'writing-mode'                      => array( 'typography', 'writingMode' ),
 	);
 
@@ -342,6 +344,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added `dimensions.minHeight`, 'shadow.presets', 'shadow.defaultPresets',
 	 *              `position.fixed` and `position.sticky`.
 	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
+	 * @since 6.4.0 Added `dimensions.width` and `dimensions.customWidth`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -372,7 +375,9 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'custom'                        => null,
 		'dimensions'                    => array(
-			'minHeight' => null,
+			'widths'      => null,
+			'customWidth' => null,
+			'minHeight'   => null,
 		),
 		'layout'                        => array(
 			'contentSize' => null,
@@ -424,6 +429,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              added new property `shadow`,
 	 *              updated `blockGap` to be allowed at any level.
 	 * @since 6.2.0 Added `outline`, and `minHeight` properties.
+	 * @since 6.4.0 Added `dimensions.idth`.
 	 *
 	 * @var array
 	 */
@@ -444,6 +450,7 @@ class WP_Theme_JSON_Gutenberg {
 			'text'       => null,
 		),
 		'dimensions' => array(
+			'width'     => null,
 			'minHeight' => null,
 		),
 		'filter'     => array(

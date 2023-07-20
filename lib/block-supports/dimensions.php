@@ -50,8 +50,7 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
 
 	$attributes = array();
 
-	// Width support to be added in near future.
-
+	$has_width_support      = block_has_support( $block_type, array( 'dimensions', 'width' ), false );
 	$has_min_height_support = block_has_support( $block_type, array( 'dimensions', 'minHeight' ), false );
 	$block_styles           = isset( $block_attributes['style'] ) ? $block_attributes['style'] : null;
 
@@ -59,8 +58,10 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
 		return $attributes;
 	}
 
+	$skip_width                           = wp_should_skip_block_supports_serialization( $block_type, 'dimensions', 'width' );
 	$skip_min_height                      = wp_should_skip_block_supports_serialization( $block_type, 'dimensions', 'minHeight' );
 	$dimensions_block_styles              = array();
+	$dimensions_block_styles['width']     = $has_width_support && ! $skip_width ? _wp_array_get( $block_styles, array( 'dimensions', 'width' ), null ) : null;
 	$dimensions_block_styles['minHeight'] = $has_min_height_support && ! $skip_min_height ? _wp_array_get( $block_styles, array( 'dimensions', 'minHeight' ), null ) : null;
 	$styles                               = gutenberg_style_engine_get_styles( array( 'dimensions' => $dimensions_block_styles ) );
 

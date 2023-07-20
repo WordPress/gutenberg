@@ -142,6 +142,8 @@ export function useBlockSettings( name, parentLayout ) {
 	const blockGap = useSetting( 'spacing.blockGap' );
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 	const units = useSetting( 'spacing.units' );
+	const widths = useSetting( 'dimensions.widths' );
+	const customWidth = useSetting( 'dimensions.customWidth' );
 	const minHeight = useSetting( 'dimensions.minHeight' );
 	const layout = useSetting( 'layout' );
 	const borderColor = useSetting( 'border.color' );
@@ -228,6 +230,8 @@ export function useBlockSettings( name, parentLayout ) {
 				width: borderWidth,
 			},
 			dimensions: {
+				widths,
+				customWidth,
 				minHeight,
 			},
 			layout,
@@ -250,6 +254,8 @@ export function useBlockSettings( name, parentLayout ) {
 		blockGap,
 		spacingSizes,
 		units,
+		widths,
+		customWidth,
 		minHeight,
 		layout,
 		parentLayout,

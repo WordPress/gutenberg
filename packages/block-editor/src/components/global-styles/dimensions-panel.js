@@ -25,6 +25,7 @@ import { useCallback, Platform } from '@wordpress/element';
  */
 import { getValueFromVariable } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
+import WidthControl from '../width-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
 import { cleanEmptyObject } from '../../hooks/utils';
@@ -38,6 +39,7 @@ export function useHasDimensionsPanel( settings ) {
 	const hasPadding = useHasPadding( settings );
 	const hasMargin = useHasMargin( settings );
 	const hasGap = useHasGap( settings );
+	const hasWidth = useHasWidth( settings );
 	const hasMinHeight = useHasMinHeight( settings );
 	const hasChildLayout = useHasChildLayout( settings );
 
@@ -48,6 +50,7 @@ export function useHasDimensionsPanel( settings ) {
 			hasPadding ||
 			hasMargin ||
 			hasGap ||
+			hasWidth ||
 			hasMinHeight ||
 			hasChildLayout )
 	);
@@ -71,6 +74,12 @@ function useHasMargin( settings ) {
 
 function useHasGap( settings ) {
 	return settings?.spacing?.blockGap;
+}
+
+function useHasWidth( settings ) {
+	const widths = settings?.dimensions?.widths ?? [];
+	const enableCustomWidth = !! settings?.dimensions?.customWidth;
+	return !! widths.length || enableCustomWidth;
 }
 
 function useHasMinHeight( settings ) {
@@ -190,6 +199,7 @@ const DEFAULT_CONTROLS = {
 	padding: true,
 	margin: true,
 	blockGap: true,
+	width: true,
 	minHeight: true,
 	childLayout: true,
 };
@@ -340,6 +350,19 @@ export default function DimensionsPanel( {
 	};
 	const resetGapValue = () => setGapValue( undefined );
 	const hasGapValue = () => !! value?.spacing?.blockGap;
+
+	// Width
+	const showWidthControl = useHasWidth( settings );
+	const widthValue = decodeValue( inheritedValue?.dimensions?.width );
+	const widths = settings?.dimensions?.widths ?? [];
+	const enableCustomWidth = !! settings?.dimensions?.customWidth;
+	const setWidthValue = ( newValue ) => {
+		onChange( setImmutably( value, [ 'dimensions', 'width' ], newValue ) );
+	};
+	const resetWidthValue = () => {
+		setWidthValue( undefined );
+	};
+	const hasWidthValue = () => !! value?.dimensions?.width;
 
 	// Min Height
 	const showMinHeightControl = useHasMinHeight( settings );
@@ -597,6 +620,24 @@ export default function DimensionsPanel( {
 							allowReset={ false }
 						/>
 					) }
+				</ToolsPanelItem>
+			) }
+			{ showWidthControl && (
+				<ToolsPanelItem
+					hasValue={ hasWidthValue }
+					label={ __( 'Width' ) }
+					onDeselect={ resetWidthValue }
+					isShownByDefault={
+						defaultControls.width ?? DEFAULT_CONTROLS.width
+					}
+					panelId={ panelId }
+				>
+					<WidthControl
+						value={ widthValue }
+						widths={ widths }
+						enableCustomWidth={ enableCustomWidth }
+						onChange={ setWidthValue }
+					/>
 				</ToolsPanelItem>
 			) }
 			{ showMinHeightControl && (

@@ -277,6 +277,10 @@
 			"textTransform": true,
 			"writingMode": false
 		},
+		"dimensions": {
+			"widths": [ "25%", "50%", "75%", "100%" ],
+			"customWidth": true
+		},
 		"blocks": {
 			"core/button": {
 				"border": {

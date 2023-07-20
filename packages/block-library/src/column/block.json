@@ -11,9 +11,6 @@
 		"verticalAlignment": {
 			"type": "string"
 		},
-		"width": {
-			"type": "string"
-		},
 		"allowedBlocks": {
 			"type": "array"
 		},
@@ -65,6 +62,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"dimensions": {
+			"width": true
 		},
 		"layout": true
 	}
