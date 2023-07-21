@@ -549,6 +549,110 @@ const v5 = {
  * @see https://github.com/WordPress/gutenberg/pull/31366
  */
 const v6 = {
+	attributes: {
+		align: {
+			type: 'string',
+		},
+		url: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'src',
+			__experimentalRole: 'content',
+		},
+		alt: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
+			default: '',
+			__experimentalRole: 'content',
+		},
+		caption: {
+			type: 'string',
+			source: 'html',
+			selector: 'figcaption',
+			__experimentalRole: 'content',
+		},
+		title: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'title',
+			__experimentalRole: 'content',
+		},
+		href: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'href',
+			__experimentalRole: 'content',
+		},
+		rel: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'rel',
+		},
+		linkClass: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'class',
+		},
+		id: {
+			type: 'number',
+			__experimentalRole: 'content',
+		},
+		width: {
+			type: 'number',
+		},
+		height: {
+			type: 'number',
+		},
+		aspectRatio: {
+			type: 'string',
+		},
+		scale: {
+			type: 'string',
+		},
+		sizeSlug: {
+			type: 'string',
+		},
+		linkDestination: {
+			type: 'string',
+		},
+		linkTarget: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'target',
+		},
+	},
+	supports: {
+		anchor: true,
+		behaviors: {
+			lightbox: true,
+		},
+		color: {
+			text: false,
+			background: false,
+		},
+		filter: {
+			duotone: true,
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			width: true,
+			__experimentalSkipSerialization: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				width: true,
+			},
+		},
+	},
 	save( { attributes } ) {
 		const {
 			url,
