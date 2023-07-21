@@ -8,6 +8,51 @@ test.describe( 'Links', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( `will use Post title as link text if link to existing post is created without any text selected`, async ( {
+		admin,
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const titleText = 'Post to create a link to';
+		await admin.createNewPost( { title: titleText } );
+		const postId = await editor.publishPost();
+		await admin.createNewPost();
+
+		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'Here comes a link: ' );
+
+		// Press Cmd+K to insert a link.
+		await pageUtils.pressKeys( 'primary+K' );
+
+		// Trigger the autocomplete suggestion list and select the first suggestion.
+		await page.keyboard.type( titleText.substr( 0, titleText.length - 2 ) );
+		await page.getByRole( 'option', { name: titleText } ).click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'Here comes a link: <a href="http://localhost:8889/?p=' +
+						postId +
+						'" data-type="post" data-id="' +
+						postId +
+						'">' +
+						titleText +
+						'</a>',
+				},
+			},
+		] );
+	} );
+
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
 		page,
 		editor,
