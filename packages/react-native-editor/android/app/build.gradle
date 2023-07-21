@@ -118,6 +118,7 @@ def reactNativeArchitectures() {
 }
 
 android {
+    namespace "com.gutenberg"
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
