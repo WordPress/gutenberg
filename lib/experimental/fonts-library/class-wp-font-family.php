@@ -355,7 +355,7 @@ class WP_Font_Family {
 	 * Update a post for a font family.
 	 *
 	 * @param WP_Post $post The post to update.
-	 * @return int post id
+	 * @return int| post id if the update was successful, WP_Error otherwise.
 	 */
 	private function update_font_post( $post ) {
 		$post_font_data = json_decode( $post->post_content, true );
@@ -368,6 +368,11 @@ class WP_Font_Family {
 		);
 
 		$post_id = wp_update_post( $post );
+
+		if ( 0 === $post_id || is_wp_error( $post_id ) ) {
+			return new WP_Error( 'font_post_update_failed', __( 'Font post update failed', 'gutenberg' ) );
+		}
+
 		return $post_id;
 	}
 
@@ -393,14 +398,18 @@ class WP_Font_Family {
 	 */
 	public function install( $files = null ) {
 		$were_assets_written = $this->download_or_move_font_faces( $files );
-		if ( $were_assets_written ) {
-			$post_id = $this->create_or_update_font_post();
-			if ( $post_id ) {
-				return $this->get_data();
-			}
-			return new WP_Error( 'font_post_creation_failed', __( 'Font post creation failed', 'gutenberg' ) );
+
+		if ( !$were_assets_written ) {
+			return new WP_Error( 'font_face_download_failed', __( 'The font face assets could not be written.', 'gutenberg' ) );
 		}
-		return new WP_Error( 'font_face_download_failed', __( 'The font face assets could not be written.', 'gutenberg' ) );
+
+		$post_id = $this->create_or_update_font_post();
+
+		if ( is_wp_error( $post_id ) ){
+			return $post_id;
+		}
+
+		return $this->get_data();
 	}
 
 }
