@@ -14,9 +14,9 @@
 			"className": "is-style-rounded"
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<figure class=\"wp-block-image alignleft size-large is-resized has-custom-border is-style-rounded\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" style=\"border-radius:100%;width:164px;height:164px\" width=\"164\" height=\"164\"/></figure>\n",
+		"innerHTML": "\n<figure class=\"wp-block-image alignleft size-large is-resized has-custom-border is-style-rounded\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" style=\"border-radius:100%\" width=\"164\" height=\"164\"/></figure>\n",
 		"innerContent": [
-			"\n<figure class=\"wp-block-image alignleft size-large is-resized has-custom-border is-style-rounded\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" style=\"border-radius:100%;width:164px;height:164px\" width=\"164\" height=\"164\"/></figure>\n"
+			"\n<figure class=\"wp-block-image alignleft size-large is-resized has-custom-border is-style-rounded\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" style=\"border-radius:100%\" width=\"164\" height=\"164\"/></figure>\n"
 		]
 	}
 ]
