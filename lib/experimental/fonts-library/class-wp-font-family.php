@@ -113,19 +113,8 @@ class WP_Font_Family {
 	private static function delete_asset( $src ) {
 		$filename  = basename( $src );
 		$file_path = path_join( WP_FONTS_DIR, $filename );
-
-		if ( ! file_exists( $file_path ) ) {
-			return false;
-		}
 		wp_delete_file( $file_path );
-
-		// If the file still exists after trying to delete it, return false.
-		if ( file_exists( $file_path ) ) {
-			return false;
-		}
-
-		// return true if the file was deleted.
-		return true;
+		return ! file_exists( $file_path );
 	}
 
 	/**
