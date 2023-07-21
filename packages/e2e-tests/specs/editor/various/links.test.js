@@ -30,28 +30,6 @@ describe( 'Links', () => {
 		} );
 	};
 
-	it( 'will not automatically create a link if selected text is not a valid HTTP based URL', async () => {
-		// Create a block with some text.
-		await clickBlockAppender();
-		await page.keyboard.type( 'This: is not a link' );
-
-		// Select some text.
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-
-		// Click on the Link button.
-		await page.click( 'button[aria-label="Link"]' );
-
-		// Wait for the URL field to auto-focus.
-		await waitForURLFieldAutoFocus();
-
-		const urlInputValue = await page.evaluate(
-			() =>
-				document.querySelector( '.block-editor-url-input__input' ).value
-		);
-
-		expect( urlInputValue ).toBe( '' );
-	} );
-
 	it( 'can be created without any text selected', async () => {
 		// Create a block with some text.
 		await clickBlockAppender();

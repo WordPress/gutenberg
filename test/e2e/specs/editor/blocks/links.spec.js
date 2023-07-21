@@ -88,6 +88,29 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	test( `will not automatically create a link if selected text is not a valid HTTP based URL`, async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This: is not a link' );
+
+		// Select some text.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Click on the Link button.
+		await page.getByRole( 'button', { name: 'Link' } ).click();
+		const urlInput = await page
+			.getByPlaceholder( 'Search or type url' )
+			.inputValue();
+
+		expect( urlInput ).toBe( '' );
+	} );
+
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
 		page,
 		editor,
