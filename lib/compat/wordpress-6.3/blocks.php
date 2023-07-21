@@ -45,7 +45,7 @@ function gutenberg_rename_reusable_block_cpt_to_pattern( $args, $post_type ) {
 		$args['labels']['singular_name']            = _x( 'Pattern', 'post type singular name' );
 		$args['labels']['add_new_item']             = __( 'Add new Pattern' );
 		$args['labels']['new_item']                 = __( 'New Pattern' );
-		$args['labels']['edit_item']                = __( 'Edit Pattern' );
+		$args['labels']['edit_item']                = __( 'Edit Block Pattern' );
 		$args['labels']['view_item']                = __( 'View Pattern' );
 		$args['labels']['view_items']               = __( 'View Patterns' );
 		$args['labels']['all_items']                = __( 'All Patterns' );

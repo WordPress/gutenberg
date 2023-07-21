@@ -301,6 +301,7 @@ const SiteLogo = ( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
 							setAttributes( { width: newWidth } )

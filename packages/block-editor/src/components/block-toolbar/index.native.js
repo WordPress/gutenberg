@@ -20,7 +20,7 @@ const REMOVE_EMPY_PARENT_BLOCKS = [
 	'core/social-links',
 ];
 
-export default function BlockToolbar( { anchorNodeRef, onOpenBlockSettings } ) {
+export default function BlockToolbar( { anchorNodeRef } ) {
 	const {
 		rootClientId,
 		blockClientId,
@@ -93,10 +93,15 @@ export default function BlockToolbar( { anchorNodeRef, onOpenBlockSettings } ) {
 		<>
 			{ isValidAndVisual && (
 				<>
-					<BlockSettingsButton
-						onOpenBlockSettings={ onOpenBlockSettings }
-					/>
-
+					<BlockSettingsButton.Slot>
+						{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls. */ }
+						{ ( fills = [ null ] ) => {
+							if ( ! fills?.length > 0 ) {
+								return null;
+							}
+							return fills[ 0 ];
+						} }
+					</BlockSettingsButton.Slot>
 					<BlockControls.Slot group="block" />
 					<BlockControls.Slot />
 					<BlockControls.Slot group="inline" />

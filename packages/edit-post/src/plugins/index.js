@@ -41,7 +41,7 @@ function ManagePatternsMenuItem() {
 
 	return (
 		<MenuItem role="menuitem" href={ url }>
-			{ __( 'Manage Patterns' ) }
+			{ __( 'Manage patterns' ) }
 		</MenuItem>
 	);
 }

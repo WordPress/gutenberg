@@ -372,8 +372,8 @@ export default function NavigationLinkEdit( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			__experimentalDefaultBlock: DEFAULT_BLOCK,
-			__experimentalDirectInsert: true,
+			defaultBlock: DEFAULT_BLOCK,
+			directInsert: true,
 			renderAppender: false,
 		}
 	);

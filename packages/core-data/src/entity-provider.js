@@ -5,7 +5,7 @@ import {
 	createContext,
 	useContext,
 	useCallback,
-	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
@@ -129,7 +129,7 @@ export function useEntityProp( kind, name, prop, _id ) {
 				[ prop ]: newValue,
 			} );
 		},
-		[ kind, name, id, prop ]
+		[ editEntityRecord, kind, name, id, prop ]
 	);
 
 	return [ value, setValue, fullValue ];
@@ -156,12 +156,12 @@ export function useEntityProp( kind, name, prop, _id ) {
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, blocks, meta } = useSelect(
+	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord } = select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
-				blocks: editedRecord.blocks,
+				editedBlocks: editedRecord.blocks,
 				content: editedRecord.content,
 				meta: editedRecord.meta,
 			};
@@ -171,23 +171,15 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const { __unstableCreateUndoLevel, editEntityRecord } =
 		useDispatch( STORE_NAME );
 
-	useEffect( () => {
-		// Load the blocks from the content if not already in state
-		// Guard against other instances that might have
-		// set content to a function already or the blocks are already in state.
-		if ( content && typeof content !== 'function' && ! blocks ) {
-			const parsedContent = parse( content );
-			editEntityRecord(
-				kind,
-				name,
-				id,
-				{
-					blocks: parsedContent,
-				},
-				{ undoIgnore: true }
-			);
+	const blocks = useMemo( () => {
+		if ( editedBlocks ) {
+			return editedBlocks;
 		}
-	}, [ content ] );
+
+		return content && typeof content !== 'function'
+			? parse( content )
+			: EMPTY_ARRAY;
+	}, [ editedBlocks, content ] );
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => {
@@ -356,5 +348,5 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		[ kind, name, id, updateFootnotes, editEntityRecord ]
 	);
 
-	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
+	return [ blocks, onInput, onChange ];
 }

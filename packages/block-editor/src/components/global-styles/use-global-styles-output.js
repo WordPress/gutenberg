@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -32,7 +27,11 @@ import { PresetDuotoneFilter } from '../duotone/components';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
-import { kebabCase, setImmutably } from '../../utils/object';
+import {
+	getValueFromObjectPath,
+	kebabCase,
+	setImmutably,
+} from '../../utils/object';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -69,7 +68,11 @@ function compileStyleValue( uncompiledValue ) {
 function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
 	return PRESET_METADATA.reduce(
 		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
-			const presetByOrigin = get( blockPresets, path, [] );
+			const presetByOrigin = getValueFromObjectPath(
+				blockPresets,
+				path,
+				[]
+			);
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( value ) => {
@@ -113,7 +116,11 @@ function getPresetsClasses( blockSelector = '*', blockPresets = {} ) {
 				return declarations;
 			}
 
-			const presetByOrigin = get( blockPresets, path, [] );
+			const presetByOrigin = getValueFromObjectPath(
+				blockPresets,
+				path,
+				[]
+			);
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( { slug } ) => {
@@ -147,7 +154,11 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 		// Duotone are the only type of filters for now.
 		( metadata ) => metadata.path.at( -1 ) === 'duotone'
 	).flatMap( ( metadata ) => {
-		const presetByOrigin = get( blockPresets, metadata.path, {} );
+		const presetByOrigin = getValueFromObjectPath(
+			blockPresets,
+			metadata.path,
+			{}
+		);
 		return [ 'default', 'theme' ]
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>
@@ -319,7 +330,10 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 
-			const styleValue = get( blockStyles, pathToValue );
+			const styleValue = getValueFromObjectPath(
+				blockStyles,
+				pathToValue
+			);
 
 			// Root-level padding styles don't currently support strings with CSS shorthand values.
 			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
@@ -334,7 +348,9 @@ export function getStylesDeclarations(
 				Object.entries( properties ).forEach( ( entry ) => {
 					const [ name, prop ] = entry;
 
-					if ( ! get( styleValue, [ prop ], false ) ) {
+					if (
+						! getValueFromObjectPath( styleValue, [ prop ], false )
+					) {
 						// Do not create a declaration
 						// for sub-properties that don't have any value.
 						return;
@@ -345,17 +361,19 @@ export function getStylesDeclarations(
 						: kebabCase( name );
 					declarations.push(
 						`${ cssProperty }: ${ compileStyleValue(
-							get( styleValue, [ prop ] )
+							getValueFromObjectPath( styleValue, [ prop ] )
 						) }`
 					);
 				} );
-			} else if ( get( blockStyles, pathToValue, false ) ) {
+			} else if (
+				getValueFromObjectPath( blockStyles, pathToValue, false )
+			) {
 				const cssProperty = key.startsWith( '--' )
 					? key
 					: kebabCase( key );
 				declarations.push(
 					`${ cssProperty }: ${ compileStyleValue(
-						get( blockStyles, pathToValue )
+						getValueFromObjectPath( blockStyles, pathToValue )
 					) }`
 				);
 			}
@@ -384,7 +402,7 @@ export function getStylesDeclarations(
 		let ruleValue = rule.value;
 		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
 			const refPath = ruleValue.ref.split( '.' );
-			ruleValue = get( tree, refPath );
+			ruleValue = getValueFromObjectPath( tree, refPath );
 			// Presence of another ref indicates a reference to another dynamic value.
 			// Pointing to another dynamic value is not supported.
 			if ( ! ruleValue || ruleValue?.ref ) {
@@ -680,7 +698,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	const pickPresets = ( treeToPickFrom ) => {
 		let presets = {};
 		PRESET_METADATA.forEach( ( { path } ) => {
-			const value = get( treeToPickFrom, path, false );
+			const value = getValueFromObjectPath( treeToPickFrom, path, false );
 			if ( value !== false ) {
 				presets = setImmutably( presets, path, value );
 			}
