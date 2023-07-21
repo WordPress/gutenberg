@@ -30,27 +30,6 @@ describe( 'Links', () => {
 		} );
 	};
 
-	it( 'is not created when we click away from the link input', async () => {
-		// Create a block with some text.
-		await clickBlockAppender();
-		await page.keyboard.type( 'This is Gutenberg' );
-
-		// Select some text.
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-
-		// Click on the Link button.
-		await page.click( 'button[aria-label="Link"]' );
-
-		// Wait for the URL field to auto-focus.
-		await waitForURLFieldAutoFocus();
-
-		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-		// Click somewhere else - it doesn't really matter where.
-		await canvas().click( '.editor-post-title' );
-	} );
-
 	const createAndReselectLink = async () => {
 		// Create a block with some text.
 		await clickBlockAppender();

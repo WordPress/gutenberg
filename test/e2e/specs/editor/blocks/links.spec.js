@@ -180,6 +180,41 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	test( `is not created when we click away from the link input`, async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg' );
+
+		// Select some text.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Click on the Link button.
+		await page.getByRole( 'button', { name: 'Link' } ).click();
+
+		// Type a URL.
+		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+
+		// Click somewhere else - it doesn't really matter where.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is Gutenberg',
+				},
+			},
+		] );
+	} );
+
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
 		page,
 		editor,
