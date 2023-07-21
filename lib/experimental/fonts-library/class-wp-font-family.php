@@ -134,9 +134,7 @@ class WP_Font_Family {
 	 * @param array $font_face The font face array containing the 'src' attribute with the file path(s) to be deleted.
 	 */
 	private static function delete_font_face_assets( $font_face ) {
-		$sources = ! empty( $font_face['src'] ) && is_array( $font_face['src'] )
-			? $font_face['src']
-			: array( $font_face['src'] );
+		$sources = (array) $font_face['src'];
 		foreach ( $sources as $src ) {
 			$was_asset_removed = self::delete_asset( $src );
 			if ( ! $was_asset_removed ) {
@@ -257,12 +255,10 @@ class WP_Font_Family {
 	 */
 	private function download_font_face_assets( $font_face ) {
 		$new_font_face        = $font_face;
-		$srcs                 = ! empty( $font_face['src'] ) && is_array( $font_face['src'] )
-			? $font_face['src']
-			: array( $font_face['src'] );
+		$sources              = (array) $font_face['src'];
 		$new_font_face['src'] = array();
 		$i                    = 0;
-		foreach ( $srcs as $src ) {
+		foreach ( $sources as $src ) {
 			$filename = WP_Font_Family_Utils::get_filename_from_font_face( $font_face, $src, $i++ );
 			$new_src  = $this->download_asset( $src, $filename );
 			if ( $new_src ) {
