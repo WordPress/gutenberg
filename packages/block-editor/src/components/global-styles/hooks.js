@@ -2,27 +2,28 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { get, set } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useContext, useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore, hasBlockSupport } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
 
-const EMPTY_CONFIG = { settings: {}, styles: {} };
+const EMPTY_CONFIG = { settings: {}, styles: {}, behaviors: {} };
 
 const VALID_SETTINGS = [
 	'appearanceTools',
+	'behaviors',
 	'useRootPaddingAwareAlignments',
 	'border.color',
 	'border.radius',
@@ -71,6 +72,7 @@ const VALID_SETTINGS = [
 	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textTransform',
+	'typography.writingMode',
 ];
 
 export const useGlobalStylesReset = () => {
@@ -87,7 +89,6 @@ export const useGlobalStylesReset = () => {
 
 export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
-
 	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
 	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
 	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
@@ -102,20 +103,21 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 
 		if ( propertyPath ) {
 			return (
-				get( configToUse, contextualPath ) ??
-				get( configToUse, globalPath )
+				getValueFromObjectPath( configToUse, contextualPath ) ??
+				getValueFromObjectPath( configToUse, globalPath )
 			);
 		}
 
-		const result = {};
+		let result = {};
 		VALID_SETTINGS.forEach( ( setting ) => {
 			const value =
-				get(
+				getValueFromObjectPath(
 					configToUse,
 					`settings${ appendedBlockPath }.${ setting }`
-				) ?? get( configToUse, `settings.${ setting }` );
+				) ??
+				getValueFromObjectPath( configToUse, `settings.${ setting }` );
 			if ( value ) {
-				set( result, setting, value );
+				result = setImmutably( result, setting.split( '.' ), value );
 			}
 		} );
 		return result;
@@ -129,15 +131,10 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	] );
 
 	const setSetting = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set( newUserConfig, contextualPath, newValue );
-
-			return newUserConfig;
-		} );
+		setUserConfig( ( currentConfig ) =>
+			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
+		);
 	};
-
 	return [ settingValue, setSetting ];
 }
 
@@ -159,12 +156,10 @@ export function useGlobalStyle(
 		: `styles.blocks.${ blockName }${ appendedPath }`;
 
 	const setStyle = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set(
-				newUserConfig,
-				finalPath,
+		setUserConfig( ( currentConfig ) =>
+			setImmutably(
+				currentConfig,
+				finalPath.split( '.' ),
 				shouldDecodeEncode
 					? getPresetVariableFromValue(
 							mergedConfig.settings,
@@ -173,27 +168,26 @@ export function useGlobalStyle(
 							newValue
 					  )
 					: newValue
-			);
-			return newUserConfig;
-		} );
+			)
+		);
 	};
 
 	let rawResult, result;
 	switch ( source ) {
 		case 'all':
-			rawResult = get( mergedConfig, finalPath );
+			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'user':
-			rawResult = get( userConfig, finalPath );
+			rawResult = getValueFromObjectPath( userConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'base':
-			rawResult = get( baseConfig, finalPath );
+			rawResult = getValueFromObjectPath( baseConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( baseConfig, blockName, rawResult )
 				: rawResult;
@@ -292,6 +286,7 @@ export function useSettingsForBlockElement(
 			'letterSpacing',
 			'textTransform',
 			'textDecoration',
+			'writingMode',
 		].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
 				updatedSettings.typography = {
@@ -464,4 +459,113 @@ export function useGradientsPerOrigin( settings ) {
 		defaultGradients,
 		shouldDisplayDefaultGradients,
 	] );
+}
+
+export function __experimentalUseGlobalBehaviors( blockName, source = 'all' ) {
+	const {
+		merged: mergedConfig,
+		base: baseConfig,
+		user: userConfig,
+		setUserConfig,
+	} = useContext( GlobalStylesContext );
+	const finalPath = ! blockName
+		? `behaviors`
+		: `behaviors.blocks.${ blockName }`;
+
+	let rawResult, result;
+	switch ( source ) {
+		case 'all':
+			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
+			result = getValueFromVariable( mergedConfig, blockName, rawResult );
+			break;
+		case 'user':
+			rawResult = getValueFromObjectPath( userConfig, finalPath );
+			result = getValueFromVariable( mergedConfig, blockName, rawResult );
+			break;
+		case 'base':
+			rawResult = getValueFromObjectPath( baseConfig, finalPath );
+			result = getValueFromVariable( baseConfig, blockName, rawResult );
+			break;
+		default:
+			throw 'Unsupported source';
+	}
+
+	const animation = result?.lightbox?.animation || 'zoom';
+
+	const setBehavior = ( newValue ) => {
+		let newBehavior;
+		// The user saves with Apply Globally option.
+		if ( typeof newValue === 'object' ) {
+			newBehavior = newValue;
+		} else {
+			switch ( newValue ) {
+				case 'lightbox':
+					newBehavior = {
+						lightbox: {
+							enabled: true,
+							animation,
+						},
+					};
+					break;
+				case 'fade':
+					newBehavior = {
+						lightbox: {
+							enabled: true,
+							animation: 'fade',
+						},
+					};
+					break;
+				case 'zoom':
+					newBehavior = {
+						lightbox: {
+							enabled: true,
+							animation: 'zoom',
+						},
+					};
+					break;
+				case '':
+					newBehavior = {
+						lightbox: {
+							enabled: false,
+							animation,
+						},
+					};
+					break;
+				default:
+					break;
+			}
+		}
+		setUserConfig( ( currentConfig ) =>
+			setImmutably( currentConfig, finalPath.split( '.' ), newBehavior )
+		);
+	};
+	let behavior = '';
+	if ( result === undefined ) behavior = 'default';
+	if ( result?.lightbox.enabled ) behavior = 'lightbox';
+
+	return { behavior, inheritedBehaviors: result, setBehavior };
+}
+
+export function __experimentalUseHasBehaviorsPanel(
+	settings,
+	name,
+	{ blockSupportOnly = false } = {}
+) {
+	if ( ! settings?.behaviors || ! window?.__experimentalInteractivityAPI ) {
+		return false;
+	}
+
+	// If every behavior is disabled on block supports, do not show the behaviors inspector control.
+	const hasSomeBlockSupport = Object.keys( settings?.behaviors ).some(
+		( key ) => hasBlockSupport( name, `behaviors.${ key }` )
+	);
+
+	if ( blockSupportOnly ) {
+		return hasSomeBlockSupport;
+	}
+
+	// If every behavior is disabled, do not show the behaviors inspector control.
+	return Object.values( settings?.behaviors ).some(
+		( value ) => value === true && hasSomeBlockSupport
+	);
 }

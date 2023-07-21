@@ -25,8 +25,11 @@ export default function BackToPageNotification() {
  * switches from focusing on editing page content to editing a template.
  */
 export function useBackToPageNotification() {
-	const hasPageContentFocus = useSelect(
-		( select ) => select( editSiteStore ).hasPageContentFocus(),
+	const { isPage, hasPageContentFocus } = useSelect(
+		( select ) => ( {
+			isPage: select( editSiteStore ).isPage(),
+			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
+		} ),
 		[]
 	);
 
@@ -39,6 +42,7 @@ export function useBackToPageNotification() {
 	useEffect( () => {
 		if (
 			! alreadySeen.current &&
+			isPage &&
 			prevHasPageContentFocus.current &&
 			! hasPageContentFocus
 		) {
@@ -57,6 +61,7 @@ export function useBackToPageNotification() {
 		prevHasPageContentFocus.current = hasPageContentFocus;
 	}, [
 		alreadySeen,
+		isPage,
 		prevHasPageContentFocus,
 		hasPageContentFocus,
 		createInfoNotice,

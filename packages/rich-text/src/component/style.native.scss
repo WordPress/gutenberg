@@ -12,9 +12,17 @@
 }
 
 .richTextPlaceholder {
-	color: $gray;
+	color: $gray-20;
 }
 
 .richTextPlaceholderDark {
 	color: $gray-50;
+}
+
+.rich-text-selection {
+	color: $black;
+}
+
+.rich-text-selection--dark {
+	color: $white;
 }

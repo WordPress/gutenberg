@@ -35,9 +35,9 @@ import __unstableBlockNameContext from './block-name-context';
 import { unlock } from '../../lock-unlock';
 
 const BlockToolbar = ( { hideDragHandle } ) => {
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const {
 		blockClientIds,
-		blockClientId,
 		blockType,
 		hasFixedToolbar,
 		isDistractionFree,
@@ -61,7 +61,6 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 		return {
 			blockClientIds: selectedBlockClientIds,
-			blockClientId: selectedBlockClientId,
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
@@ -78,6 +77,8 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		};
 	}, [] );
 
+	const toolbarWrapperRef = useRef( null );
+
 	// Handles highlighting the current block outline on hover or focus of the
 	// block type toolbar area.
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
@@ -89,7 +90,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				if ( isFocused && isDistractionFree ) {
 					return;
 				}
-				toggleBlockHighlight( blockClientId, isFocused );
+				toggleBlockHighlight( getSelectedBlockClientId(), isFocused );
 			},
 		}
 	);
@@ -123,7 +124,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 	} );
 
 	return (
-		<div className={ classes }>
+		<div className={ classes } ref={ toolbarWrapperRef }>
 			{ ! isMultiToolbar &&
 				isLargeViewport &&
 				blockEditingMode === 'default' && <BlockParentSelector /> }
@@ -135,6 +136,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 							{ ! isMultiToolbar && (
 								<BlockLockToolbar
 									clientId={ blockClientIds[ 0 ] }
+									wrapperRef={ toolbarWrapperRef }
 								/>
 							) }
 							<BlockMover

@@ -51,14 +51,15 @@ function gutenberg_attach_theme_preview_middleware() {
 	);
 }
 
-/**
- * Temporary function to add a live preview button to block themes.
- * Remove when https://core.trac.wordpress.org/ticket/58190 lands.
- */
-function add_live_preview_button() {
-	global $pagenow;
-	if ( 'themes.php' === $pagenow ) {
-		?>
+if ( ! function_exists( 'add_live_preview_button' ) ) {
+	/**
+	 * Temporary function to add a live preview button to block themes.
+	 * Remove when https://core.trac.wordpress.org/ticket/58190 lands.
+	 */
+	function add_live_preview_button() {
+		global $pagenow;
+		if ( 'themes.php' === $pagenow ) {
+			?>
 <script type="text/javascript">
 	jQuery( document ).ready( function() {
 		addLivePreviewButton();
@@ -88,28 +89,30 @@ function add_live_preview_button() {
 			livePreviewButton.setAttribute('class', 'button button-primary');
 			livePreviewButton.setAttribute(
 				'href',
-				`/wp-admin/site-editor.php?wp_theme_preview=${themePath}&return=themes.php`
+				`<?php echo esc_url( admin_url( '/site-editor.php' ) ); ?>?wp_theme_preview=${themePath}&return=themes.php`
 			);
 			livePreviewButton.innerHTML = '<?php echo esc_html_e( 'Live Preview' ); ?>';
 			themeInfo.querySelector('.theme-actions').appendChild(livePreviewButton);
 		});
 	}
 </script>
-		<?php
+			<?php
+		}
 	}
-
 }
 
-/**
- * Adds a nonce for the theme activation link.
- */
-function block_theme_activate_nonce() {
-	$nonce_handle = 'switch-theme_' . gutenberg_get_theme_preview_path();
-	?>
+if ( ! function_exists( 'block_theme_activate_nonce' ) ) {
+	/**
+	 * Adds a nonce for the theme activation link.
+	 */
+	function block_theme_activate_nonce() {
+		$nonce_handle = 'switch-theme_' . gutenberg_get_theme_preview_path();
+		?>
 <script type="text/javascript">
-	window.BLOCK_THEME_ACTIVATE_NONCE = '<?php echo wp_create_nonce( $nonce_handle ); ?>';
+	window.WP_BLOCK_THEME_ACTIVATE_NONCE = '<?php echo wp_create_nonce( $nonce_handle ); ?>';
 </script>
-	<?php
+		<?php
+	}
 }
 
 /**

@@ -48,19 +48,27 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-templates-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-global-styles-revisions-controller-6-3.php';
-	require_once __DIR__ . '/compat/wordpress-6.3/class-wp-rest-navigation-fallback-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-classic-to-block-menu-converter.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-navigation-fallback.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-navigation-fallback-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/rest-api.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/theme-previews.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/navigation-block-preloading.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/link-template.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/block-patterns.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-blocks-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/footnotes.php';
+
+	// WordPress 6.4 compat.
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-controller-6-4.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-revisions-controller-6-4.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
-
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
@@ -81,9 +89,6 @@ require __DIR__ . '/compat/wordpress-6.2/theme.php';
 require __DIR__ . '/compat/wordpress-6.2/widgets.php';
 require __DIR__ . '/compat/wordpress-6.2/menu.php';
 
-// WordPress 6.3 compat.
-require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
-
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-attribute-token.php';
 	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-span.php';
@@ -92,29 +97,71 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 }
 
 // WordPress 6.3 compat.
+require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-6.3/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.3/html-api/class-gutenberg-html-tag-processor-6-3.php';
 require __DIR__ . '/compat/wordpress-6.3/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.3/blocks.php';
 require __DIR__ . '/compat/wordpress-6.3/navigation-fallback.php';
+require __DIR__ . '/compat/wordpress-6.3/block-editor-settings.php';
+require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
 // Experimental features.
-remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
-require __DIR__ . '/experimental/behaviors.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
-require __DIR__ . '/experimental/block-editor-settings.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 
-require __DIR__ . '/experimental/interactivity-api/script-loader.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
+	require __DIR__ . '/experimental/disable-tinymce.php';
+}
+
 if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) ) {
 	require __DIR__ . '/experimental/interactivity-api/blocks.php';
 }
+require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
+require __DIR__ . '/experimental/interactivity-api/store.php';
+require __DIR__ . '/experimental/interactivity-api/scripts.php';
+require __DIR__ . '/experimental/interactivity-api/class-wp-directive-processor.php';
+require __DIR__ . '/experimental/interactivity-api/class-wp-directive-context.php';
+require __DIR__ . '/experimental/interactivity-api/directive-processing.php';
+require __DIR__ . '/experimental/interactivity-api/directives/wp-bind.php';
+require __DIR__ . '/experimental/interactivity-api/directives/wp-context.php';
+require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
+require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
+require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
 
+// Fonts API / Font Face.
+remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.
 
-// Fonts API.
-if ( ! class_exists( 'WP_Fonts' ) ) {
+/*
+ * If the Fonts Library is available, load the Font Face files, else load the Fonts API.
+ * This strategy is temporary until the Fonts Library is merged. It's used here to allow
+ * the Font Face (redesigned Fonts API) to be merged before the Fonts Library while
+ * keeping Fonts API available for sites that are using it.
+ */
+if ( class_exists( 'WP_Fonts_Library' ) || class_exists( 'WP_Fonts_Library_Controller' ) ) {
+	if ( ! class_exists( 'WP_Font_Face' ) ) {
+		require __DIR__ . '/experimental/fonts/class-wp-font-face.php';
+		require __DIR__ . '/experimental/fonts/class-wp-font-face-resolver.php';
+		require __DIR__ . '/experimental/fonts/fonts.php';
+
+		// Load the BC Layer. Do no backport to WP Core.
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts-provider.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts-utils.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts-provider-local.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-fonts-resolver.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-gutenberg-fonts-api-bc-layer.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/webfonts-deprecations.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-webfonts-utils.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-webfonts-provider.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-webfonts-provider-local.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-webfonts.php';
+		require __DIR__ . '/experimental/fonts/bc-layer/class-wp-web-fonts.php';
+	}
+} elseif ( ! class_exists( 'WP_Fonts' ) ) {
 	// Fonts API files.
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
 	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';

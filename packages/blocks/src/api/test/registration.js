@@ -28,7 +28,6 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
-	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
@@ -822,7 +821,6 @@ describe( 'blocks', () => {
 										styles: [],
 										variations: [],
 										save: () => null,
-										...serverSideBlockDefinitions[ name ],
 										...blockSettingsWithDeprecations,
 									},
 									DEPRECATED_ENTRY_KEYS
