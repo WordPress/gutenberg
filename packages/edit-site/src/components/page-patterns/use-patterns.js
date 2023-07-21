@@ -86,6 +86,7 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 			( pattern ) => ! CORE_PATTERN_SOURCES.includes( pattern.source )
 		)
 		.filter( filterOutDuplicatesByName )
+		.filter( ( pattern ) => pattern.inserter !== false )
 		.map( ( pattern ) => ( {
 			...pattern,
 			keywords: pattern.keywords || [],
@@ -93,11 +94,17 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 			blocks: parse( pattern.content ),
 		} ) );
 
-	patterns = searchItems( patterns, search, {
-		categoryId,
-		hasCategory: ( item, currentCategory ) =>
-			item.categories?.includes( currentCategory ),
-	} );
+	if ( categoryId ) {
+		patterns = searchItems( patterns, search, {
+			categoryId,
+			hasCategory: ( item, currentCategory ) =>
+				item.categories?.includes( currentCategory ),
+		} );
+	} else {
+		patterns = searchItems( patterns, search, {
+			hasCategory: ( item ) => ! item.hasOwnProperty( 'categories' ),
+		} );
+	}
 
 	return { patterns, isResolving: false };
 };

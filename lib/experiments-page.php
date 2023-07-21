@@ -5,26 +5,28 @@
  * @package gutenberg
  */
 
-/**
- * The main entry point for the Gutenberg experiments page.
- *
- * @since 6.3.0
- */
-function the_gutenberg_experiments() {
-	?>
-	<div
-		id="experiments-editor"
-		class="wrap"
-	>
-	<h1><?php echo __( 'Experimental settings', 'gutenberg' ); ?></h1>
-	<?php settings_errors(); ?>
-	<form method="post" action="options.php">
-		<?php settings_fields( 'gutenberg-experiments' ); ?>
-		<?php do_settings_sections( 'gutenberg-experiments' ); ?>
-		<?php submit_button(); ?>
-	</form>
-	</div>
-	<?php
+if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
+	/**
+	 * The main entry point for the Gutenberg experiments page.
+	 *
+	 * @since 6.3.0
+	 */
+	function the_gutenberg_experiments() {
+		?>
+		<div
+			id="experiments-editor"
+			class="wrap"
+		>
+		<h1><?php echo __( 'Experimental settings', 'gutenberg' ); ?></h1>
+		<?php settings_errors(); ?>
+		<form method="post" action="options.php">
+			<?php settings_fields( 'gutenberg-experiments' ); ?>
+			<?php do_settings_sections( 'gutenberg-experiments' ); ?>
+			<?php submit_button(); ?>
+		</form>
+		</div>
+		<?php
+	}
 }
 
 /**

@@ -174,8 +174,14 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await pageUtils.pressKeys( 'primary+z' );
-		const activeElementLocator = editor.canvas.locator( ':focus' );
-		await expect( activeElementLocator ).toHaveText( 'test' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'test',
+				},
+			},
+		] );
 	} );
 
 	test( 'Should undo/redo to expected level intervals', async ( {
@@ -353,7 +359,9 @@ test.describe( 'undo', () => {
 		// regression present was accurate, it would produce the correct
 		// content. The issue had manifested in the form of what was shown to
 		// the user since the blocks state failed to sync to block editor.
-		const activeElementLocator = editor.canvas.locator( ':focus' );
+		const activeElementLocator = editor.canvas.locator(
+			'[data-type="core/paragraph"] >> nth=0'
+		);
 		await expect( activeElementLocator ).toHaveText( 'original' );
 	} );
 
