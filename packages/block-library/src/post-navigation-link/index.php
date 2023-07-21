@@ -94,8 +94,9 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		}
 	}
 
-	$in_same_term = isset( $attributes['inSameTerm'] ) ? $attributes['inSameTerm'] : false;
-	$taxonomy     = isset( $attributes['taxonomy'] ) && $in_same_term ? $attributes['taxonomy'] : '';
+	$in_same_term   = isset( $attributes['inSameTerm'] ) ? $attributes['inSameTerm'] : false;
+	$taxonomy       = isset( $attributes['taxonomy'] ) && $in_same_term ? $attributes['taxonomy'] : '';
+	$excluded_terms = '';
 
 	// The dynamic portion of the function name, `$navigation_type`,
 	// refers to the type of adjacency, 'next' or 'previous'.
@@ -111,9 +112,9 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		$result = array();
 		foreach ( $excluded_terms as $term ) {
 			$term = trim( $term );
-			foreach ( $taxonomies as $taxonomy ) {
+			foreach ( $taxonomies as $tax ) {
 				foreach ( $types as $type ) {
-					$termid = get_term_by( $type, $term, $taxonomy );
+					$termid = get_term_by( $type, $term, $tax );
 					if ( $termid ) {
 						$result[] = $termid->term_taxonomy_id;
 					}
@@ -121,9 +122,12 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 			}
 		}
 		$excluded_terms = array_unique( $result );
-		$content        = $get_link_function( $format, $link, $in_same_term, $excluded_terms, $taxonomy );
+	}
+
+	if ( $in_same_term ) {
+		$content = $get_link_function( $format, $link, $in_same_term, $excluded_terms, $taxonomy );
 	} else {
-		$content = $get_link_function( $format, $link, $in_same_term, $taxonomy );
+		$content = $get_link_function( $format, $link, '', $excluded_terms );
 	}
 
 	return sprintf(

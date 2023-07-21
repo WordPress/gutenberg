@@ -33,7 +33,6 @@ export default function PostNavigationLinkEdit( {
 		textAlign,
 		linkLabel,
 		arrow,
-		inSameTerm,
 		taxonomy,
 		excludedTerms,
 	},
@@ -84,9 +83,8 @@ export default function PostNavigationLinkEdit( {
 	);
 	const getTaxonomyOptions = () => {
 		const selectOption = {
-			label: __( '- Select -' ),
+			label: __( 'Unfiltered' ),
 			value: '',
-			disabled: true,
 		};
 		const taxonomyOptions = ( taxonomies ?? [] )
 			.filter( ( tax ) => tax.slug !== 'nav_menu' )
@@ -167,25 +165,20 @@ export default function PostNavigationLinkEdit( {
 					</ToggleGroupControl>
 				</PanelBody>
 				<PanelBody title={ __( 'Filters' ) }>
-					<ToggleControl
+					<SelectControl
 						label={ __( 'Filter by taxonomy' ) }
-						checked={ !! inSameTerm }
-						onChange={ () =>
+						value={ taxonomy }
+						options={ getTaxonomyOptions() }
+						onChange={ ( value ) =>
 							setAttributes( {
-								inSameTerm: ! inSameTerm,
+								taxonomy: value,
+								inSameTerm: value === '' ? false : true,
 							} )
 						}
+						help={ __(
+							'Only link to posts that have the same taxonomy terms as the current post. For example the same categories.'
+						) }
 					/>
-					{ inSameTerm && (
-						<SelectControl
-							label={ __( 'Taxonomy' ) }
-							value={ taxonomy }
-							options={ getTaxonomyOptions() }
-							onChange={ ( value ) =>
-								setAttributes( { taxonomy: value } )
-							}
-						/>
-					) }
 					<InputControl
 						label={ __( 'Add terms to exclude' ) }
 						help={ __( 'Separate terms with comma.' ) }

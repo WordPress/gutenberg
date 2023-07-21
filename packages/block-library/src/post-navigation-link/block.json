@@ -37,7 +37,7 @@
 		},
 		"taxonomy": {
 			"type": "string",
-			"default": "category"
+			"default": ""
 		}
 	},
 	"supports": {
