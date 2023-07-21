@@ -201,13 +201,17 @@ store( {
 } );
 
 function setZoomStyles( context, event ) {
+	// The reference img element lies adjacent
+	// to the event target button in the DOM.
+	const { naturalWidth, naturalHeight, offsetWidth, offsetHeight } =
+		event.target.nextElementSibling;
+	const { x: screenPosX, y: screenPosY } =
+		event.target.nextElementSibling.getBoundingClientRect();
+
 	// Typically, we use the image's full-sized dimensions. If those
 	// dimensions have not been set (i.e. an external image with only one size),
 	// the image's dimensions in the lightbox are the same
 	// as those of the image in the content.
-	const { naturalWidth, naturalHeight, offsetWidth, offsetHeight } =
-		event.target.nextElementSibling;
-
 	let targetWidth =
 		context.core.image.targetWidth !== 'none'
 			? context.core.image.targetWidth
@@ -216,37 +220,32 @@ function setZoomStyles( context, event ) {
 		context.core.image.targetHeight !== 'none'
 			? context.core.image.targetHeight
 			: naturalHeight;
-
 	targetWidth = parseFloat( targetWidth );
 	targetHeight = parseFloat( targetHeight );
 
 	// If the image has been pixelated on purpose, keep that size.
-	if ( offsetWidth > naturalWidth || offsetHeight > naturalHeight ) {
+	if ( offsetWidth > targetWidth || offsetHeight > targetHeight ) {
 		targetWidth = offsetWidth;
 		targetHeight = offsetHeight;
 	}
 
 	// Change the target dimensions if the original aspect ratio has been changed.
 	const targetRatio = targetWidth / targetHeight;
-	const offsetRatio =
-		event.target.nextElementSibling.offsetWidth /
-		event.target.nextElementSibling.offsetHeight;
+	const offsetRatio = offsetWidth / offsetHeight;
 
 	if ( targetRatio.toFixed( 2 ) !== offsetRatio.toFixed( 2 ) ) {
 		if ( offsetRatio >= 1 ) targetWidth = targetHeight * offsetRatio;
 		if ( offsetRatio < 1 ) targetHeight = targetWidth / offsetRatio;
 	}
 
-	// Since the lightbox image has `position:absolute`, it
-	// ignores its parent's padding, so we need to set padding here
-	// to calculate dimensions and positioning.
-
-	// As per the design, let's constrain the height with fixed padding.
+	// To have more control over the styles for the zoom, let's account for padding
+	// while calculating the image dimensions. As per the design, we'll constrain
+	// the height with fixed padding.
 	const containerOuterHeight = window.innerHeight;
 	const verticalPadding = 40;
 	const containerInnerHeight = containerOuterHeight - verticalPadding * 2;
 
-	// Let's set a variable horizontal padding based on the container width
+	// Let's set a variable horizontal padding based on the container width.
 	const containerOuterWidth = window.innerWidth;
 	let horizontalPadding = 0;
 	if ( containerOuterWidth > 480 ) {
@@ -256,11 +255,11 @@ function setZoomStyles( context, event ) {
 	}
 	const containerInnerWidth = containerOuterWidth - horizontalPadding * 2;
 
+	// If the image is larger than the container, let's resize
+	// it along the greater axis relative to the container.
 	const widthOverflow = targetWidth - containerInnerWidth;
 	const heightOverflow = targetHeight - containerInnerHeight;
 
-	// If the image is larger than the container, let's resize
-	// it along the greater axis relative to the container.
 	if ( widthOverflow > 0 || heightOverflow > 0 ) {
 		const containerInnerAspectRatio =
 			containerInnerWidth / containerInnerHeight;
@@ -281,54 +280,45 @@ function setZoomStyles( context, event ) {
 		}
 	}
 
-	// The reference img element lies adjacent to the event target button in the DOM
-	const { x: originLeft, y: originTop } =
-		event.target.nextElementSibling.getBoundingClientRect();
-	const scaleWidth =
-		event.target.nextElementSibling.offsetWidth / targetWidth;
-	const scaleHeight =
-		event.target.nextElementSibling.offsetHeight / targetHeight;
-
-	// Get values used to center the image
-	let targetLeft = 0;
-	if ( targetWidth >= containerInnerWidth ) {
-		targetLeft = horizontalPadding;
-	} else {
-		targetLeft = ( containerOuterWidth - targetWidth ) / 2;
-	}
-	let targetTop = 0;
-	if ( targetHeight >= containerInnerHeight ) {
-		targetTop = verticalPadding;
-	} else {
-		targetTop = ( containerOuterHeight - targetHeight ) / 2;
-	}
-
+	// Set the origin values of the lightbox image
+	// from which we'll calculate our animation values.
 	const root = document.documentElement;
+	root.style.setProperty( '--lightbox-origin-width', offsetWidth + 'px' );
+	root.style.setProperty( '--lightbox-origin-height', offsetHeight + 'px' );
+	root.style.setProperty(
+		'--lightbox-origin-left-position',
+		screenPosX + 'px'
+	);
+	root.style.setProperty(
+		'--lightbox-origin-top-position',
+		screenPosY + 'px'
+	);
+
+	// Create a scaling factor based on the target dimensions,
+	// which reflect our desired padding and container size.
+	const scaleWidth = targetWidth / offsetWidth;
+	const scaleHeight = targetHeight / offsetHeight;
 	root.style.setProperty( '--lightbox-scale-width', scaleWidth );
 	root.style.setProperty( '--lightbox-scale-height', scaleHeight );
-	root.style.setProperty( '--lightbox-image-max-width', targetWidth + 'px' );
-	root.style.setProperty(
-		'--lightbox-image-max-height',
-		targetHeight + 'px'
-	);
-	root.style.setProperty(
-		'--lightbox-initial-left-position',
-		originLeft + 'px'
-	);
-	root.style.setProperty(
-		'--lightbox-initial-top-position',
-		originTop + 'px'
-	);
 
-	// We need to center the image with manual values
-	// rather than using percentages because otherwise the
-	// animation does not function properly on iPhone and iPad.
+	// Figure out the offset values of the image if
+	// it were placed in the center of the screen.
+	const centerLeft = ( containerOuterWidth - offsetWidth ) / 2;
+	const centerTop = ( containerOuterHeight - offsetHeight ) / 2;
+
+	// Calculate how much to translate by comparing the image's position
+	// in the content with its would-be values in the center — we need to
+	// center the image with manual values rather than using percentages
+	// because otherwise the animation does not function properly in Safari.
+	const translateLeft = centerLeft - screenPosX;
+	const translateTop = centerTop - screenPosY;
+
 	root.style.setProperty(
-		'--lightbox-target-left-position',
-		targetLeft + 'px'
+		'--lightbox-translate-left-position',
+		translateLeft + 'px'
 	);
 	root.style.setProperty(
-		'--lightbox-target-top-position',
-		targetTop + 'px'
+		'--lightbox-translate-top-position',
+		translateTop + 'px'
 	);
 }
