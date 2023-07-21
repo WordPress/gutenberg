@@ -30,29 +30,6 @@ describe( 'Links', () => {
 		} );
 	};
 
-	it( 'can be created instantly when a URL is selected', async () => {
-		// Create a block with some text.
-		await clickBlockAppender();
-		await page.keyboard.type(
-			'This is Gutenberg: https://wordpress.org/gutenberg'
-		);
-
-		// Select the URL.
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-
-		// Click on the Link button.
-		await page.click( 'button[aria-label="Link"]' );
-
-		// A link with the selected URL as its href should have been inserted.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'is not created when we click away from the link input', async () => {
 		// Create a block with some text.
 		await clickBlockAppender();

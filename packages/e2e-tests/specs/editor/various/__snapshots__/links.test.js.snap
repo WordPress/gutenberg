@@ -6,12 +6,6 @@ exports[`Links allows use of escape key to dismiss the url popover 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Links can be created instantly when a URL is selected 1`] = `
-"<!-- wp:paragraph -->
-<p>This is Gutenberg: <a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a></p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`Links can be edited 1`] = `
 "<!-- wp:paragraph -->
 <p>This is <a href="https://wordpress.org/gutenberg/handbook">Gutenberg</a></p>
