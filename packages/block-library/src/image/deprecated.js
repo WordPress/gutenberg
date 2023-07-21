@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import {
 	RichText,
 	useBlockProps,
-	__experimentalGetElementClassName as getBorderClassesAndStyles,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
 
 /**
