@@ -4,6 +4,7 @@
 import {
 	Tooltip,
 	TooltipAnchor,
+	TooltipArrow,
 	useTooltipStore,
 } from '@ariakit/react/tooltip';
 
@@ -80,6 +81,7 @@ function AriaToolTip( props: ToolTipProps ) {
 							shortcut={ shortcut }
 						/>
 					) }
+					<TooltipArrow size={ 0 } />
 				</Tooltip>
 			) }
 		</>
