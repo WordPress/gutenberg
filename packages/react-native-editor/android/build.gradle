@@ -2,7 +2,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 buildscript {
     ext {
-        gradlePluginVersion = '7.2.1'
+        gradlePluginVersion = '8.0.2'
         kotlinVersion = '1.6.10'
         buildToolsVersion = "33.0.0"
         minSdkVersion = 24
