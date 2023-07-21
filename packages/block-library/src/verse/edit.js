@@ -13,6 +13,7 @@ import {
 	AlignmentToolbar,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 export default function VerseEdit( {
 	attributes,
@@ -20,6 +21,7 @@ export default function VerseEdit( {
 	mergeBlocks,
 	onRemove,
 	style,
+	insertBlocksAfter,
 } ) {
 	const { textAlign, content } = attributes;
 	const blockProps = useBlockProps( {
@@ -56,6 +58,9 @@ export default function VerseEdit( {
 				textAlign={ textAlign }
 				{ ...blockProps }
 				__unstablePastePlainText
+				__unstableOnSplitAtEnd={ () =>
+					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+				}
 			/>
 		</>
 	);
