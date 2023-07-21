@@ -224,7 +224,7 @@ class WP_Font_Family {
 	/**
 	 * Sanitizes the font family data using WP_Theme_JSON.
 	 *
-	 * @return array A sanitized font family defintion.
+	 * @return array A sanitized font family definition.
 	 */
 	private function sanitize() {
 		// Creates the structure of theme.json array with the new fonts.
