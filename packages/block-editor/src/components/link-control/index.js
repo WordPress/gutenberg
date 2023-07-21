@@ -12,7 +12,7 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -26,7 +26,6 @@ import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
-import { store as blockEditorStore } from '../../store';
 
 /**
  * Default properties associated with a link control value.
@@ -135,14 +134,6 @@ function LinkControl( {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
 	}
-
-	// Preference is supplied by the relevant editor.
-	const settingsOpenWithPreference = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()
-				.linkControlAdvancedSettingsPreference,
-		[]
-	);
 
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const setSettingsOpenWithPreference = ( isOpen ) => {
@@ -399,7 +390,6 @@ function LinkControl( {
 			<div className="block-editor-link-control__tools">
 				{ ! currentInputIsEmpty && (
 					<LinkControlSettingsDrawer
-						settingsOpen={ settingsOpenWithPreference }
 						setSettingsOpen={ setSettingsOpenWithPreference }
 					>
 						<LinkSettings
