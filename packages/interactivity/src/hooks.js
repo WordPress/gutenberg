@@ -64,7 +64,7 @@ const getPriorityLevels = ( directives ) => {
 // Priority level wrapper.
 const Directives = ( {
 	directives,
-	priorityLevels: [ thisPriorityLevel, ...restPriorityLevels ],
+	priorityLevels: [ currentPriorityLevel, ...nextPriorityLevels ],
 	element,
 	evaluate,
 	originalProps,
@@ -83,10 +83,10 @@ const Directives = ( {
 
 	// Recursively render the wrapper for the next priority level.
 	const children =
-		restPriorityLevels.length > 0 ? (
+		nextPriorityLevels.length > 0 ? (
 			<Directives
 				directives={ directives }
-				priorityLevels={ restPriorityLevels }
+				priorityLevels={ nextPriorityLevels }
 				element={ element }
 				evaluate={ evaluate }
 				originalProps={ originalProps }
@@ -99,7 +99,7 @@ const Directives = ( {
 	const props = { ...originalProps, children };
 	const directiveArgs = { directives, props, element, context, evaluate };
 
-	for ( const directiveName of thisPriorityLevel ) {
+	for ( const directiveName of currentPriorityLevel ) {
 		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
 		if ( wrapper !== undefined ) props.children = wrapper;
 	}
