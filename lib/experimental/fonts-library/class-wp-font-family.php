@@ -283,31 +283,31 @@ class WP_Font_Family {
 	 * @return bool
 	 */
 	private function download_or_move_font_faces( $files ) {
-		if ( $this->has_font_faces() ) {
-			$new_font_faces = array();
-			foreach ( $this->data['fontFace'] as $font_face ) {
-				if ( empty( $files ) ) {
-					// If we are installing local fonts, we need to move the font face assets from the temp folder to the wp fonts directory.
-					$new_font_face = $this->download_font_face_assets( $font_face );
-				} else {
-					// If we are installing google fonts, we need to download the font face assets.
-					$new_font_face = $this->move_font_face_asset( $font_face, $files[ $font_face['file'] ] );
-				}
-				/*
-				 * If the font face assets were successfully downloaded, we add the font face to the new font.
-				 * Font faces with failed downloads are not added to the new font.
-				 */
-				if ( ! empty( $new_font_face['src'] ) ) {
-					$new_font_faces[] = $new_font_face;
-				}
-			}
-			if ( ! empty( $new_font_faces ) ) {
-				$this->data['fontFace'] = $new_font_faces;
-				return true;
-			}
-			return false;
+		if ( ! $this->has_font_faces() ) {
+			return true;
 		}
-		return true;
+		$new_font_faces = array();
+		foreach ( $this->data['fontFace'] as $font_face ) {
+			if ( empty( $files ) ) {
+				// If we are installing local fonts, we need to move the font face assets from the temp folder to the wp fonts directory.
+				$new_font_face = $this->download_font_face_assets( $font_face );
+			} else {
+				// If we are installing google fonts, we need to download the font face assets.
+				$new_font_face = $this->move_font_face_asset( $font_face, $files[ $font_face['file'] ] );
+			}
+			/*
+			* If the font face assets were successfully downloaded, we add the font face to the new font.
+			* Font faces with failed downloads are not added to the new font.
+			*/
+			if ( ! empty( $new_font_face['src'] ) ) {
+				$new_font_faces[] = $new_font_face;
+			}
+		}
+		if ( ! empty( $new_font_faces ) ) {
+			$this->data['fontFace'] = $new_font_faces;
+			return true;
+		}
+		return false;
 	}
 
 	/**
