@@ -326,8 +326,7 @@ class WP_Font_Family {
 		$posts_query = new WP_Query( $args );
 
 		if ( $posts_query->have_posts() ) {
-			$post = $posts_query->posts[0];
-			return $post;
+			return $posts_query->posts[0];
 		}
 
 		return null;
