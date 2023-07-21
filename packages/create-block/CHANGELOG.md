@@ -4,7 +4,7 @@
 
 ### Enhancement
 
--   Add support for the `example` property add template defaults ([#52803](https://github.com/WordPress/gutenberg/pull/52803)).
+-   Add support for the `example` property and add it to the default template ([#52803](https://github.com/WordPress/gutenberg/pull/52803)).
 
 ## 4.22.0 (2023-07-20)
 
