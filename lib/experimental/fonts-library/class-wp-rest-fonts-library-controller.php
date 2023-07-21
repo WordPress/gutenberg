@@ -78,7 +78,13 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			'slug' => $request['slug'],
 		);
 		$font = new WP_Font_Family( $data );
-		return new WP_REST_Response( $font->uninstall() );
+		$result = $font->uninstall();
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return new WP_REST_Response( __( 'Font family uninstalled successfully.', 'gutenberg' ), 200 );
 	}
 
 	/**
