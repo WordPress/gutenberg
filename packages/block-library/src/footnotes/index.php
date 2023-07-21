@@ -8,6 +8,8 @@
 /**
  * Renders the `core/footnotes` block on the server.
  *
+ * @since 6.3.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -57,6 +59,8 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/footnotes` block on the server.
+ *
+ * @since 6.3.0
  */
 function register_block_core_footnotes() {
 	foreach ( array( 'post', 'page' ) as $post_type ) {
@@ -83,6 +87,8 @@ add_action(
 	'wp_after_insert_post',
 	/**
 	 * Saves the footnotes meta value to the revision.
+	 *
+	 * @since 6.3.0
 	 *
 	 * @param int $revision_id The revision ID.
 	 */
@@ -127,6 +133,8 @@ foreach ( array( 'post', 'page' ) as $post_type ) {
 		 * available at the time, so we have to add it afterwards through the
 		 * `"rest_after_insert_{$post_type}"` action.
 		 *
+		 * @since 6.3.0
+		 *
 		 * @param WP_Post $post The post object.
 		 */
 		static function( $post ) {
@@ -155,6 +163,8 @@ add_action(
 	/**
 	 * Restores the footnotes meta value from the revision.
 	 *
+	 * @since 6.3.0
+	 *
 	 * @param int $post_id      The post ID.
 	 * @param int $revision_id  The revision ID.
 	 */
@@ -176,8 +186,9 @@ add_filter(
 	/**
 	 * Adds the footnotes field to the revision.
 	 *
-	 * @param array $fields The revision fields.
+	 * @since 6.3.0
 	 *
+	 * @param array $fields The revision fields.
 	 * @return array The revision fields.
 	 */
 	static function( $fields ) {
@@ -191,11 +202,12 @@ add_filter(
 	/**
 	 * Gets the footnotes field from the revision.
 	 *
+	 * @since 6.3.0
+	 *
 	 * @param string $revision_field The field value, but $revision->$field
 	 *                               (footnotes) does not exist.
 	 * @param string $field          The field name, in this case "footnotes".
 	 * @param object $revision       The revision object to compare against.
-	 *
 	 * @return string The field value.
 	 */
 	static function( $revision_field, $field, $revision ) {
