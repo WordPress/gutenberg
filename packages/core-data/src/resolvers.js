@@ -497,12 +497,7 @@ __experimentalGetTemplateForLink.shouldInvalidate = ( action ) => {
 		( action.type === 'RECEIVE_ITEMS' || action.type === 'REMOVE_ITEMS' ) &&
 		action.invalidateCache &&
 		action.kind === 'postType' &&
-		( action.name === 'wp_template' ||
-			// Invalidate when a template is updated.
-			( [ 'page', 'post' ].includes( action.name ) &&
-				Object.keys( action.persistedEdits || {} ).includes(
-					'template'
-				) ) )
+		action.name === 'wp_template'
 	);
 };
 
