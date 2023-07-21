@@ -6,12 +6,6 @@ exports[`Links allows use of escape key to dismiss the url popover 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Links can be edited 1`] = `
-"<!-- wp:paragraph -->
-<p>This is <a href="https://wordpress.org/gutenberg/handbook">Gutenberg</a></p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`Links can be edited with collapsed selection 1`] = `
 "<!-- wp:paragraph -->
 <p>This is <a href="https://wordpress.org/gutenberg/handbook">Gutenberg</a></p>

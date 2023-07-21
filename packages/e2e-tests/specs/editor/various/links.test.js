@@ -54,28 +54,6 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 	};
 
-	it( 'can be edited', async () => {
-		await createAndReselectLink();
-
-		// Click on the Edit button.
-		const [ editButton ] = await page.$x(
-			'//button[contains(@aria-label, "Edit")]'
-		);
-		await editButton.click();
-
-		// Wait for the URL field to auto-focus.
-		await waitForURLFieldAutoFocus();
-
-		// Change the URL.
-		await page.keyboard.type( '/handbook' );
-
-		// Submit the link.
-		await page.keyboard.press( 'Enter' );
-
-		// The link should have been updated.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'can be removed', async () => {
 		await createAndReselectLink();
 

@@ -215,6 +215,49 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	test( `can be edited`, async ( { page, editor, pageUtils } ) => {
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg' );
+
+		// Select some text.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Click on the Link button.
+		await page.getByRole( 'button', { name: 'Link' } ).click();
+
+		// Type a URL.
+		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+
+		// Click on the Submit button.
+		await pageUtils.pressKeys( 'Enter' );
+
+		// Reselect the link.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Click on the Edit button.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Change the URL.
+		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
+		await page.keyboard.type( '/handbook' );
+
+		// Submit the link.
+		await pageUtils.pressKeys( 'Enter' );
+
+		// The link should have been updated.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is <a href="/handbook">Gutenberg</a>',
+				},
+			},
+		] );
+	} );
+
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
 		page,
 		editor,
