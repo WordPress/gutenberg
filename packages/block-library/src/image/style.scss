@@ -184,10 +184,6 @@
 	width: 100vw;
 	height: 100vh;
 	box-sizing: border-box;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
 	visibility: hidden;
 	cursor: zoom-out;
 
@@ -202,22 +198,29 @@
 
 	.wp-block-image {
 		position: absolute;
-		transform-origin: top left;
-		width: var(--lightbox-image-max-width);
-		height: var(--lightbox-image-max-height);
-		z-index: 3000000;
+		width: 100%;
+		height: 100%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		box-sizing: border-box;
+		z-index: 3000000;
+		padding: 40px 0;
 
+		@media screen and (min-width: 480px) {
+			padding: 40px;
+		}
+
+		@media screen and (min-width: 1920px) {
+			padding: 40px 80px;
+		}
 
 		figcaption {
 			display: none;
 		}
 
 		img {
-			width: var(--lightbox-image-max-width);
-			height: var(--lightbox-image-max-height);
+			width: auto;
 			max-width: 100%;
 			max-height: 100%;
 		}
@@ -237,68 +240,72 @@
 		opacity: 0.9;
 	}
 
-	&.fade {
-		.wp-block-image {
-			padding: 40px 0;
+	&.active {
+		visibility: visible;
+		animation: both turn-on-visibility 0.25s;
 
-			@media screen and (min-width: 480px) {
-				padding: 40px;
-			}
-
-			@media screen and (min-width: 1920px) {
-				padding: 40px 80px;
-			}
+		img {
+			animation: both turn-on-visibility 0.3s;
 		}
+	}
 
-		&.active {
-			visibility: visible;
-			animation: both turn-on-visibility 0.25s;
+	&.hideanimationenabled {
+		&:not(.active) {
+			animation: both turn-off-visibility 0.3s;
 
 			img {
-				animation: both turn-on-visibility 0.3s;
-			}
-		}
-		&.hideanimationenabled {
-			&:not(.active) {
-				animation: both turn-off-visibility 0.3s;
-
-				img {
-					animation: both turn-off-visibility 0.25s;
-				}
+				animation: both turn-off-visibility 0.25s;
 			}
 		}
 	}
 
-	&.zoom {
-		img {
-			object-fit: cover;
-		}
-
-		&.active {
-			opacity: 1;
-			visibility: visible;
+	@media (prefers-reduced-motion: no-preference) {
+		&.zoom {
 			.wp-block-image {
-				animation: lightbox-zoom-in 0.4s forwards;
+				width: var(--lightbox-origin-width);
+				height: var(--lightbox-origin-height);
+				left: var(--lightbox-origin-left-position);
+				top: var(--lightbox-origin-top-position);
+				transform-origin: center center;
+				padding: 0;
 
-				@media (prefers-reduced-motion) {
-					animation: both turn-on-visibility 0.4s;
+				img {
+					object-fit: cover;
+					width: 100%;
+					height: 100%;
 				}
 			}
-			.scrim {
-				animation: turn-on-visibility 0.4s forwards;
-			}
-		}
-		&.hideanimationenabled {
-			&:not(.active) {
-				.wp-block-image {
-					animation: lightbox-zoom-out 0.4s forwards;
 
-					@media (prefers-reduced-motion) {
-						animation: both turn-off-visibility 0.4s;
+			&.active {
+				opacity: 1;
+				visibility: visible;
+				animation: none;
+
+				.wp-block-image {
+					animation: lightbox-zoom-in 0.4s forwards;
+
+					img {
+						animation: none;
 					}
 				}
 				.scrim {
-					animation: turn-off-visibility 0.4s forwards;
+					animation: turn-on-visibility 0.4s forwards;
+				}
+			}
+			&.hideanimationenabled {
+				&:not(.active) {
+					animation: none;
+
+					.wp-block-image {
+						animation: lightbox-zoom-out 0.4s forwards;
+
+						img {
+							animation: none;
+						}
+					}
+					.scrim {
+						animation: turn-off-visibility 0.4s forwards;
+					}
 				}
 			}
 		}
@@ -335,30 +342,22 @@ html.has-lightbox-open {
 
 @keyframes lightbox-zoom-in {
 	0% {
-		left: var(--lightbox-initial-left-position);
-		top: var(--lightbox-initial-top-position);
-		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
+		transform: translate(0, 0) scale(1, 1);
 	}
 	100% {
-		left: var(--lightbox-target-left-position);
-		top: var(--lightbox-target-top-position);
-		transform: scale(1, 1);
+		transform: translate(var(--lightbox-translate-left-position), var(--lightbox-translate-top-position)) scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
 	}
 }
 
 @keyframes lightbox-zoom-out {
 	0% {
 		visibility: visible;
-		left: var(--lightbox-target-left-position);
-		top: var(--lightbox-target-top-position);
-		transform: scale(1, 1);
+		transform: translate(var(--lightbox-translate-left-position), var(--lightbox-translate-top-position)) scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
 	}
 	99% {
 		visibility: visible;
 	}
 	100% {
-		left: var(--lightbox-initial-left-position);
-		top: var(--lightbox-initial-top-position);
-		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
+		transform: translate(0, 0) scale(1, 1);
 	}
 }
