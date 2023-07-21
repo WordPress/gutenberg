@@ -345,7 +345,7 @@ class WP_Font_Family {
 			'post_status'  => 'publish',
 		);
 		$post_id = wp_insert_post( $post );
-		if ( 0 === $post_id ) {
+		if ( 0 === $post_id || is_wp_error( $post_id ) ) {
 			return new WP_Error( 'font_post_creation_failed', __( 'Font post creation failed', 'gutenberg' ) );
 		}
 		return $post_id;
