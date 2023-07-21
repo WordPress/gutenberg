@@ -266,4 +266,26 @@ class Gutenberg_REST_Global_Styles_Controller_6_4 extends Gutenberg_REST_Global_
 		return $changes;
 	}
 
+	/**
+	 * Validate style.css as valid CSS.
+	 *
+	 * Currently just checks for invalid markup.
+	 *
+	 * @since 6.2.0
+	 * @since 6.4.0 Changed method visibility to protected.
+	 *
+	 * @param string $css CSS to validate.
+	 * @return true|WP_Error True if the input was validated, otherwise WP_Error.
+	 */
+	protected function validate_custom_css( $css ) {
+		if ( preg_match( '#</?\w+#', $css ) ) {
+			return new WP_Error(
+				'rest_custom_css_illegal_markup',
+				__( 'Markup is not allowed in CSS.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+		return true;
+	}
+
 }
