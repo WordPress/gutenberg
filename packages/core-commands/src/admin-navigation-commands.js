@@ -3,7 +3,7 @@
  */
 import { useCommand } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
-import { external, plus } from '@wordpress/icons';
+import { external, plus, symbol } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs, getPath } from '@wordpress/url';
@@ -23,6 +23,9 @@ export function useAdminNavigationCommands() {
 	);
 	const settings = getSettings();
 	const isBlockTheme = settings.__unstableIsBlockBasedTheme;
+	const isSiteEditor = getPath( window.location.href )?.includes(
+		'site-editor.php'
+	);
 
 	useCommand( {
 		name: 'core/add-new-post',
@@ -44,9 +47,6 @@ export function useAdminNavigationCommands() {
 		name: 'core/manage-reusable-blocks',
 		label: __( 'Manage all of my patterns' ),
 		callback: ( { close } ) => {
-			const isSiteEditor = getPath( window.location.href )?.includes(
-				'site-editor.php'
-			);
 			// __unstableIsBlockBasedTheme is not defined in the site editor so we need to check the context.
 			// If not the site editor and not a block based theme then redirect to the old wp-admin patterns page.
 			if ( ! isSiteEditor && ! isBlockTheme ) {
@@ -64,6 +64,6 @@ export function useAdminNavigationCommands() {
 				close();
 			}
 		},
-		icon: external,
+		icon: isSiteEditor ? symbol : external,
 	} );
 }
