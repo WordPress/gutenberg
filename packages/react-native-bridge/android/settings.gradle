@@ -24,11 +24,14 @@ pluginManagement {
 rootProject.name = '@wordpress_react-native-bridge'
 
 include ':react-native-bridge'
-include ':@wordpress_react-native-aztec'
-project(':@wordpress_react-native-aztec').projectDir = new File(rootProject.projectDir, '../../react-native-aztec/android')
-include ':react-native-aztec'
-project(':react-native-aztec').projectDir = new File(rootProject.projectDir, '../../../packages/react-native-aztec/android')
 
 if (hasProperty("willPublishReactNativeBridgeBinary")) {
     assert file("./react-native-bridge/build/assets/index.android.bundle").exists() : "index.android.bundle is necessary to publish a new version!"
+
+    include ':react-native-aztec'
+    project(':react-native-aztec').projectDir = new File(rootProject.projectDir, '../../../packages/react-native-aztec/android')
+}
+else {
+    include ':@wordpress_react-native-aztec'
+    project(':@wordpress_react-native-aztec').projectDir = new File(rootProject.projectDir, '../../react-native-aztec/android')
 }
