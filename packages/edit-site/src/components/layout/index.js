@@ -121,6 +121,8 @@ export default function Layout() {
 	const [ fullResizer ] = useResizeObserver();
 	const [ isResizing ] = useState( false );
 	const isEditorLoading = useIsSiteEditorLoading();
+	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
+		useState( false );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -218,6 +220,7 @@ export default function Layout() {
 							edit: { x: 0 },
 						} }
 						ref={ hubRef }
+						isTransparent={ isResizableFrameOversized }
 						className="edit-site-layout__hub"
 					/>
 
@@ -315,7 +318,13 @@ export default function Layout() {
 											}
 											initial={ false }
 											layout="position"
-											className="edit-site-layout__canvas"
+											className={ classnames(
+												'edit-site-layout__canvas',
+												{
+													'is-right-aligned':
+														isResizableFrameOversized,
+												}
+											) }
 											transition={ {
 												type: 'tween',
 												duration:
@@ -331,7 +340,12 @@ export default function Layout() {
 														! isEditorLoading
 													}
 													isFullWidth={ isEditing }
-													oversizedClassName="edit-site-layout__resizable-frame-oversized"
+													isOversized={
+														isResizableFrameOversized
+													}
+													setIsOversized={
+														setIsResizableFrameOversized
+													}
 													innerContentStyle={ {
 														background:
 															gradientValue ??

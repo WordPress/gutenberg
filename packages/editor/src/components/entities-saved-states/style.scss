@@ -1,18 +1,3 @@
-.entities-saved-states__find-entity {
-	display: none;
-
-	@include break-medium() {
-		display: block;
-	}
-}
-.entities-saved-states__find-entity-small {
-	display: block;
-
-	@include break-medium() {
-		display: none;
-	}
-}
-
 .entities-saved-states__panel-header {
 	box-sizing: border-box;
 	background: $white;

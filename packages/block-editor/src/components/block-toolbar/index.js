@@ -35,9 +35,9 @@ import __unstableBlockNameContext from './block-name-context';
 import { unlock } from '../../lock-unlock';
 
 const BlockToolbar = ( { hideDragHandle } ) => {
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const {
 		blockClientIds,
-		blockClientId,
 		blockType,
 		hasFixedToolbar,
 		isDistractionFree,
@@ -61,7 +61,6 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 		return {
 			blockClientIds: selectedBlockClientIds,
-			blockClientId: selectedBlockClientId,
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
@@ -91,7 +90,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				if ( isFocused && isDistractionFree ) {
 					return;
 				}
-				toggleBlockHighlight( blockClientId, isFocused );
+				toggleBlockHighlight( getSelectedBlockClientId(), isFocused );
 			},
 		}
 	);

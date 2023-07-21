@@ -6,6 +6,10 @@
  * @subpackage Interactivity API
  */
 
+if ( class_exists( 'WP_Directive_Processor' ) ) {
+	return;
+}
+
 /**
  * This processor is built on top of the HTML Tag Processor and augments its
  * capabilities to process the Interactivity API directives.

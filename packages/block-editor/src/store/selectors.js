@@ -2267,15 +2267,15 @@ export const __experimentalGetAllowedBlocks = createSelector(
  * @property {?Object}        attributes       Attributes to pass to the newly created block.
  * @property {?Array<string>} attributesToCopy Attributes to be copied from adjecent blocks when inserted.
  */
-export const __experimentalGetDirectInsertBlock = createSelector(
+export const getDirectInsertBlock = createSelector(
 	( state, rootClientId = null ) => {
 		if ( ! rootClientId ) {
 			return;
 		}
 		const defaultBlock =
-			state.blockListSettings[ rootClientId ]?.__experimentalDefaultBlock;
+			state.blockListSettings[ rootClientId ]?.defaultBlock;
 		const directInsert =
-			state.blockListSettings[ rootClientId ]?.__experimentalDirectInsert;
+			state.blockListSettings[ rootClientId ]?.directInsert;
 		if ( ! defaultBlock || ! directInsert ) {
 			return;
 		}
@@ -2285,6 +2285,25 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 				: null;
 		}
 		return defaultBlock;
+	},
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.tree.get( rootClientId ),
+	]
+);
+
+export const __experimentalGetDirectInsertBlock = createSelector(
+	( state, rootClientId = null ) => {
+		deprecated(
+			'wp.data.select( "core/block-editor" ).__experimentalGetDirectInsertBlock',
+			{
+				alternative:
+					'wp.data.select( "core/block-editor" ).getDirectInsertBlock',
+				since: '6.3',
+				version: '6.4',
+			}
+		);
+		return getDirectInsertBlock( state, rootClientId );
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
@@ -2556,30 +2575,6 @@ export function getBlockListSettings( state, clientId ) {
  */
 export function getSettings( state ) {
 	return state.settings;
-}
-
-/**
- * Returns the behaviors registered with the editor.
- *
- * Behaviors are named, reusable pieces of functionality that can be
- * attached to blocks. They are registered with the editor using the
- * `theme.json` file.
- *
- * @example
- *
- * ```js
- * const behaviors = select( blockEditorStore ).getBehaviors();
- * if ( behaviors?.lightbox ) {
- * 	 // Do something with the lightbox.
- * }
- *```
- *
- * @param {Object} state Editor state.
- *
- * @return {Object} The editor behaviors object.
- */
-export function getBehaviors( state ) {
-	return state.settings.behaviors;
 }
 
 /**

@@ -21,11 +21,9 @@ function getRevisionLabel( revision ) {
 
 	if ( 'unsaved' === revision?.id ) {
 		return sprintf(
-			/* translators: %(name)s author display name */
-			__( 'Unsaved changes by %(name)s' ),
-			{
-				name: authorDisplayName,
-			}
+			/* translators: %s author display name */
+			__( 'Unsaved changes by %s' ),
+			authorDisplayName
 		);
 	}
 	const formattedDate = dateI18n(
@@ -35,20 +33,16 @@ function getRevisionLabel( revision ) {
 
 	return revision?.isLatest
 		? sprintf(
-				/* translators: %(name)s author display name, %(date)s: revision creation date */
-				__( 'Changes saved by %(name)s on %(date)s (current)' ),
-				{
-					name: authorDisplayName,
-					date: formattedDate,
-				}
+				/* translators: %1$s author display name, %2$s: revision creation date */
+				__( 'Changes saved by %1$s on %2$s (current)' ),
+				authorDisplayName,
+				formattedDate
 		  )
 		: sprintf(
-				/* translators: %(name)s author display name, %(date)s: revision creation date */
-				__( 'Changes saved by %(name)s on %(date)s' ),
-				{
-					name: authorDisplayName,
-					date: formattedDate,
-				}
+				/* translators: %1$s author display name, %2$s: revision creation date */
+				__( 'Changes saved by %1$s on %2$s' ),
+				authorDisplayName,
+				formattedDate
 		  );
 }
 
@@ -104,22 +98,14 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 								<span className="edit-site-global-styles-screen-revisions__meta">
 									{ isUnsaved
 										? sprintf(
-												/* translators: %(name)s author display name */
-												__(
-													'Unsaved changes by %(name)s'
-												),
-												{
-													name: authorDisplayName,
-												}
+												/* translators: %s author display name */
+												__( 'Unsaved changes by %s' ),
+												authorDisplayName
 										  )
 										: sprintf(
-												/* translators: %(name)s author display name */
-												__(
-													'Changes saved by %(name)s'
-												),
-												{
-													name: authorDisplayName,
-												}
+												/* translators: %s author display name */
+												__( 'Changes saved by %s' ),
+												authorDisplayName
 										  ) }
 
 									<img
