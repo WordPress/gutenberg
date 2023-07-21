@@ -370,6 +370,15 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
+		'wp-nux',
+		gutenberg_url( 'build/nux/style.css' ),
+		array( 'wp-components' ),
+		$version
+	);
+	$styles->add_data( 'wp-nux', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
 		'wp-block-library-theme',
 		gutenberg_url( 'build/block-library/theme.css' ),
 		array(),

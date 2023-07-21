@@ -1,18 +1,16 @@
 .edit-site-sidebar-navigation-screen-patterns__group {
-	margin-bottom: $grid-unit-40;
-	&:last-of-type,
-	&:first-of-type {
+	margin-bottom: $grid-unit-30;
+
+	&:last-of-type {
 		border-bottom: 0;
 		padding-bottom: 0;
 		margin-bottom: 0;
 	}
-
-	&:first-of-type {
-		margin-bottom: $grid-unit-40;
-	}
 }
 
 .edit-site-sidebar-navigation-screen-patterns__group-header {
+	margin-top: $grid-unit-20;
+
 	p {
 		color: $gray-600;
 	}

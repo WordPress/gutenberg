@@ -148,6 +148,7 @@ export default function SaveHub() {
 					disabled={ isSaving }
 					aria-disabled={ isSaving }
 					className="edit-site-save-hub__button"
+					__next40pxDefaultSize
 				>
 					{ label }
 				</Button>
@@ -158,6 +159,7 @@ export default function SaveHub() {
 					showTooltip={ false }
 					icon={ disabled && ! isSaving ? check : null }
 					defaultLabel={ label }
+					__next40pxDefaultSize
 				/>
 			) }
 		</HStack>

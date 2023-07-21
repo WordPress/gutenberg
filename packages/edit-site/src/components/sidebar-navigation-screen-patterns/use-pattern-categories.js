@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -11,6 +12,10 @@ import useThemePatterns from './use-theme-patterns';
 
 export default function usePatternCategories() {
 	const defaultCategories = useDefaultPatternCategories();
+	defaultCategories.push( {
+		name: 'uncategorized',
+		label: __( 'Uncategorized' ),
+	} );
 	const themePatterns = useThemePatterns();
 
 	const patternCategories = useMemo( () => {
@@ -31,6 +36,10 @@ export default function usePatternCategories() {
 					categoryMap[ category ].count += 1;
 				}
 			} );
+			// If the pattern has no categories, add it to uncategorized.
+			if ( ! pattern.categories?.length ) {
+				categoryMap.uncategorized.count += 1;
+			}
 		} );
 
 		// Filter categories so we only have those containing patterns.

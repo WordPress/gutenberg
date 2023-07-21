@@ -3,9 +3,11 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-async function getFootnotes( page ) {
+async function getFootnotes( page, withoutSave = false ) {
 	// Save post so we can check meta.
-	await page.click( 'button:text("Save draft")' );
+	if ( ! withoutSave ) {
+		await page.click( 'button:text("Save draft")' );
+	}
 	await page.waitForSelector( 'button:text("Saved")' );
 	const footnotes = await page.evaluate( () => {
 		return window.wp.data
@@ -274,6 +276,86 @@ test.describe( 'Footnotes', () => {
 		expect( await getFootnotes( page ) ).toMatchObject( [
 			{
 				content: 'a',
+				id: id1,
+			},
+		] );
+	} );
+
+	test( 'works with revisions', async ( { editor, page } ) => {
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'first paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second paragraph' );
+
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.locator( 'button:text("Footnote")' ).click();
+
+		await page.keyboard.type( 'first footnote' );
+
+		const id1 = await editor.canvas.evaluate( () => {
+			return document.activeElement.id;
+		} );
+
+		await editor.canvas.click( 'p:text("first paragraph")' );
+
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.locator( 'button:text("Footnote")' ).click();
+
+		await page.keyboard.type( 'second footnote' );
+
+		const id2 = await editor.canvas.evaluate( () => {
+			return document.activeElement.id;
+		} );
+
+		// This also saves the post!
+		expect( await getFootnotes( page ) ).toMatchObject( [
+			{
+				content: 'second footnote',
+				id: id2,
+			},
+			{
+				content: 'first footnote',
+				id: id1,
+			},
+		] );
+
+		await editor.canvas.click( 'p:text("first paragraph")' );
+
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'Move down' );
+
+		// This also saves the post!
+		expect( await getFootnotes( page ) ).toMatchObject( [
+			{
+				content: 'first footnote',
+				id: id1,
+			},
+			{
+				content: 'second footnote',
+				id: id2,
+			},
+		] );
+
+		// Open revisions.
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Post' } )
+			.click();
+		await page.locator( 'a:text("2 Revisions")' ).click();
+		await page.locator( '.revisions-controls .ui-slider-handle' ).focus();
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.locator( 'input:text("Restore This Revision")' ).click();
+
+		expect( await getFootnotes( page, true ) ).toMatchObject( [
+			{
+				content: 'second footnote',
+				id: id2,
+			},
+			{
+				content: 'first footnote',
 				id: id1,
 			},
 		] );

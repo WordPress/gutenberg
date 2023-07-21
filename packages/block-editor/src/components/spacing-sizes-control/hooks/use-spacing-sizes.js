@@ -10,7 +10,7 @@ import useSetting from '../../use-setting';
 
 export default function useSpacingSizes() {
 	const spacingSizes = [
-		{ name: 0, slug: '0', side: 0 },
+		{ name: 0, slug: '0', size: 0 },
 		...( useSetting( 'spacing.spacingSizes' ) || [] ),
 	];
 
