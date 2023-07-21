@@ -50,8 +50,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	// If the lightbox is enabled, the image is not linked, and the Interactivity API is enabled, load the view script.
 	if ( isset( $lightbox_settings['enabled'] ) &&
 		true === $lightbox_settings['enabled'] &&
-		'none' === $link_destination &&
-		! empty( $experiments['gutenberg-interactivity-api-core-blocks'] )
+		'none' === $link_destination
 	) {
 		$should_load_view_script = true;
 	}

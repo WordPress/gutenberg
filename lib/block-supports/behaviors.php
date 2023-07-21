@@ -63,7 +63,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		return $block_content;
 	}
 
-	if ( ! $lightbox_settings || 'none' !== $link_destination || empty( $experiments['gutenberg-interactivity-api-core-blocks'] ) ) {
+	if ( ! $lightbox_settings || 'none' !== $link_destination ) {
 		return $block_content;
 	}
 
