@@ -172,6 +172,8 @@ function requestToExternal( request ) {
 		// Expect to find `my-module` as myModule in the global scope:
 		return 'myModule';
 	}
+
+	return request;
 }
 
 module.exports = {
@@ -204,6 +206,8 @@ function requestToHandle( request ) {
 		// `my-module` depends on the script with the 'my-module-script-handle' handle.
 		return 'my-module-script-handle';
 	}
+
+	return request;
 }
 
 module.exports = {
