@@ -32,7 +32,6 @@ function render_block_core_image( $attributes, $content, $block ) {
 	}
 
 	$should_load_view_script = false;
-	$experiments             = get_option( 'gutenberg-experiments' );
 	$link_destination        = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $attributes['behaviors']['lightbox'] ) ) {
