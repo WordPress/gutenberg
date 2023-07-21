@@ -6,6 +6,10 @@
  * @subpackage Interactivity API
  */
 
+if ( class_exists( 'WP_Directive_Context' ) ) {
+	return;
+}
+
 /**
  * This is a data structure to hold the current context.
  *

@@ -3,6 +3,7 @@
  */
 import { useLayoutEffect, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -25,9 +26,13 @@ const pendingSettingsUpdates = new WeakMap();
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
  * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
- * @param {?WPDirectInsertBlock} __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
- * @param {?Function|boolean}    __experimentalDirectInsert If a default block should be inserted directly by the
- *                                                          appender.
+ * @param {?WPDirectInsertBlock} defaultBlock               The default block to insert: [ blockName, { blockAttributes } ].
+ * @param {?Function|boolean}    directInsert               If a default block should be inserted directly by the appender.
+ *
+ * @param {?WPDirectInsertBlock} __experimentalDefaultBlock A deprecated prop for the default block to insert: [ blockName, { blockAttributes } ]. Use `defaultBlock` instead.
+ *
+ * @param {?Function|boolean}    __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
+ *
  * @param {string}               [templateLock]             The template lock specified for the inner
  *                                                          blocks component. (e.g. "all")
  * @param {boolean}              captureToolbars            Whether or children toolbars should be shown
@@ -41,6 +46,8 @@ export default function useNestedSettingsUpdate(
 	clientId,
 	allowedBlocks,
 	prioritizedInserterBlocks,
+	defaultBlock,
+	directInsert,
 	__experimentalDefaultBlock,
 	__experimentalDirectInsert,
 	templateLock,
@@ -108,11 +115,29 @@ export default function useNestedSettingsUpdate(
 		}
 
 		if ( __experimentalDefaultBlock !== undefined ) {
-			newSettings.__experimentalDefaultBlock = __experimentalDefaultBlock;
+			deprecated( '__experimentalDefaultBlock', {
+				alternative: 'defaultBlock',
+				since: '6.3',
+				version: '6.4',
+			} );
+			newSettings.defaultBlock = __experimentalDefaultBlock;
+		}
+
+		if ( defaultBlock !== undefined ) {
+			newSettings.defaultBlock = defaultBlock;
 		}
 
 		if ( __experimentalDirectInsert !== undefined ) {
-			newSettings.__experimentalDirectInsert = __experimentalDirectInsert;
+			deprecated( '__experimentalDirectInsert', {
+				alternative: 'directInsert',
+				since: '6.3',
+				version: '6.4',
+			} );
+			newSettings.directInsert = __experimentalDirectInsert;
+		}
+
+		if ( directInsert !== undefined ) {
+			newSettings.directInsert = directInsert;
 		}
 
 		// Batch updates to block list settings to avoid triggering cascading renders
@@ -144,6 +169,8 @@ export default function useNestedSettingsUpdate(
 		_allowedBlocks,
 		_prioritizedInserterBlocks,
 		_templateLock,
+		defaultBlock,
+		directInsert,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		captureToolbars,

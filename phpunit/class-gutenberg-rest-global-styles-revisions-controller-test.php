@@ -353,15 +353,18 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	 * @covers WP_REST_Global_Styles_Controller::get_item_schema
 	 */
 	public function test_get_item_schema() {
+		// See: https://github.com/WordPress/gutenberg/pull/52370#issuecomment-1643331655.
+		$this->markTestSkipped( 'Test already backported to Core' );
 		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertCount( 9, $properties, 'Schema properties array has exactly 9 elements.' );
+		$this->assertCount( 10, $properties, 'Schema properties array has exactly 10 elements.' );
 		$this->assertArrayHasKey( 'id', $properties, 'Schema properties array has "id" key.' );
 		$this->assertArrayHasKey( 'styles', $properties, 'Schema properties array has "styles" key.' );
 		$this->assertArrayHasKey( 'settings', $properties, 'Schema properties array has "settings" key.' );
+		$this->assertArrayHasKey( 'behaviors', $properties, 'Schema properties array has "behaviors" key.' );
 		$this->assertArrayHasKey( 'parent', $properties, 'Schema properties array has "parent" key.' );
 		$this->assertArrayHasKey( 'author', $properties, 'Schema properties array has "author" key.' );
 		$this->assertArrayHasKey( 'date', $properties, 'Schema properties array has "date" key.' );

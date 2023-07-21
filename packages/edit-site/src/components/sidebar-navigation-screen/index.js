@@ -4,7 +4,6 @@
 import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -41,7 +40,7 @@ export default function SidebarNavigationScreen( {
 		};
 	}, [] );
 	const { getTheme } = useSelect( coreStore );
-	const { goTo } = useNavigator();
+	const navigator = useNavigator();
 	const theme = getTheme( currentlyPreviewingTheme() );
 	const icon = isRTL() ? chevronRight : chevronLeft;
 
@@ -58,16 +57,24 @@ export default function SidebarNavigationScreen( {
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
 					{ ! isRoot && ! backPath && (
-						<NavigatorToParentButton
-							as={ SidebarButton }
-							icon={ isRTL() ? chevronRight : chevronLeft }
+						<SidebarButton
+							onClick={ () => {
+								if ( navigator.location.isInitial ) {
+									navigator.goToParent( { replace: true } );
+								} else {
+									navigator.goBack();
+								}
+							} }
+							icon={ icon }
 							label={ __( 'Back' ) }
 							showTooltip={ false }
 						/>
 					) }
 					{ ! isRoot && backPath && (
 						<SidebarButton
-							onClick={ () => goTo( backPath, { isBack: true } ) }
+							onClick={ () =>
+								navigator.goTo( backPath, { isBack: true } )
+							}
 							icon={ icon }
 							label={ __( 'Back' ) }
 							showTooltip={ false }

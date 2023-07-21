@@ -390,7 +390,8 @@ export function __unstableSerializeAndClean( blocks ) {
 	// pre-block-editor removep'd content formatting.
 	if (
 		blocks.length === 1 &&
-		blocks[ 0 ].name === getFreeformContentHandlerName()
+		blocks[ 0 ].name === getFreeformContentHandlerName() &&
+		blocks[ 0 ].name === 'core/freeform'
 	) {
 		content = removep( content );
 	}
