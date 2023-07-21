@@ -22,7 +22,7 @@ export const settings = {
 };
 
 export const init = () => {
-	// Would be good to remove the format and HoR if the block is unregistered.
+	// Would be good to remove the format if the block is unregistered.
 	registerFormatType( formatName, format );
 	initBlock( { name, metadata, settings } );
 };
