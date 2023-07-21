@@ -29,6 +29,8 @@ import './hooks';
 import { store as editSiteStore } from './store';
 import App from './components/app';
 
+const DISALLOWED_BLOCKS = [ 'core/freeform', 'core/footnotes' ];
+
 /**
  * Initializes the site editor screen.
  *
@@ -45,7 +47,7 @@ export function initializeEditor( id, settings ) {
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( { name } ) => name !== 'core/freeform'
+		( { name } ) => ! DISALLOWED_BLOCKS.includes( name )
 	);
 	registerCoreBlocks( coreBlocks );
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );

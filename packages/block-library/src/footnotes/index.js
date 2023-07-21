@@ -21,9 +21,8 @@ export const settings = {
 	edit,
 };
 
-// Would be good to remove the format and HoR if the block is unregistered.
-registerFormatType( formatName, format );
-
 export const init = () => {
+	// Would be good to remove the format and HoR if the block is unregistered.
+	registerFormatType( formatName, format );
 	initBlock( { name, metadata, settings } );
 };
