@@ -33,6 +33,7 @@ const predefinedPluginTemplates = {
 			editorScript: null,
 			editorStyle: null,
 			style: null,
+			viewScript: 'file:./view.js',
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
 		variants: {
@@ -53,6 +54,7 @@ const predefinedPluginTemplates = {
 			supports: {
 				html: false,
 			},
+			viewScript: 'file:./view.js',
 		},
 		variants: {
 			static: {},
@@ -220,7 +222,7 @@ const getPluginTemplate = async ( templateName ) => {
 const getDefaultValues = ( pluginTemplate, variant ) => {
 	return {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
-		apiVersion: 2,
+		apiVersion: 3,
 		namespace: 'create-block',
 		category: 'widgets',
 		author: 'The WordPress Contributors',

@@ -12,7 +12,7 @@ test.describe( 'Heading', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '### 3' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -27,7 +27,7 @@ test.describe( 'Heading', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '4' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '#### ' );
@@ -44,7 +44,7 @@ test.describe( 'Heading', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## 1. H' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -59,7 +59,7 @@ test.describe( 'Heading', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## `code`' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -115,7 +115,7 @@ test.describe( 'Heading', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '### Heading' );
 		await editor.openDocumentSettingsSidebar();
 
@@ -147,7 +147,7 @@ test.describe( 'Heading', () => {
 	} );
 
 	test( 'should correctly apply named colors', async ( { editor, page } ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
 		await editor.openDocumentSettingsSidebar();
 
@@ -185,7 +185,7 @@ test.describe( 'Heading', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
 
 		// Change text alignment
@@ -196,9 +196,9 @@ test.describe( 'Heading', () => {
 		await textAlignButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
-		await pageUtils.pressKeyWithModifier( 'access', '4' );
+		await pageUtils.pressKeys( 'access+4' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/heading',
@@ -216,7 +216,7 @@ test.describe( 'Heading', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Paragraph' );
 
 		// Change text alignment
@@ -227,9 +227,9 @@ test.describe( 'Heading', () => {
 		await textAlignButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
-		await pageUtils.pressKeyWithModifier( 'access', '2' );
+		await pageUtils.pressKeys( 'access+2' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/heading',
@@ -247,7 +247,7 @@ test.describe( 'Heading', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
 
 		// Change text alignment
@@ -259,9 +259,9 @@ test.describe( 'Heading', () => {
 		await textAlignButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
-		await pageUtils.pressKeyWithModifier( 'access', '0' );
+		await pageUtils.pressKeys( 'access+0' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{

@@ -142,7 +142,7 @@ function NonDefaultControls( { format, onChange } ) {
 							Link: (
 								<ExternalLink
 									href={ __(
-										'https://wordpress.org/support/article/formatting-date-and-time/'
+										'https://wordpress.org/documentation/article/customize-date-and-time-format/'
 									) }
 								/>
 							),

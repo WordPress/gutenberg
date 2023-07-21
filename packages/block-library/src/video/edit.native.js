@@ -172,7 +172,7 @@ class VideoEdit extends Component {
 				return;
 			}
 
-			setAttributes( { id: url, src: url } );
+			setAttributes( { src: url, id: undefined, poster: undefined } );
 		} else {
 			createErrorNotice( __( 'Invalid URL.' ) );
 		}
@@ -235,7 +235,7 @@ class VideoEdit extends Component {
 			></MediaUpload>
 		);
 
-		if ( ! id ) {
+		if ( ! src ) {
 			return (
 				<View style={ { flex: 1 } }>
 					<MediaPlaceholder

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { groupBy } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import type {
@@ -13,6 +8,11 @@ import type {
 	TermsByParent,
 } from './types';
 
+const ensureParentsAreDefined = (
+	terms: TermWithParentAndChildren[]
+): terms is ( TermWithParentAndChildren & { parent: number } )[] => {
+	return terms.every( ( term ) => term.parent !== null );
+};
 /**
  * Returns terms in a tree form.
  *
@@ -22,22 +22,33 @@ import type {
  */
 export function buildTermsTree( flatTerms: readonly ( Author | Category )[] ) {
 	const flatTermsWithParentAndChildren: TermWithParentAndChildren[] =
-		flatTerms.map( ( term ) => {
-			return {
-				children: [],
-				parent: null,
-				...term,
-				id: String( term.id ),
-			};
-		} );
+		flatTerms.map( ( term ) => ( {
+			children: [],
+			parent: null,
+			...term,
+			id: String( term.id ),
+		} ) );
 
-	const termsByParent: TermsByParent = groupBy(
-		flatTermsWithParentAndChildren,
-		'parent'
-	);
-	if ( termsByParent.null && termsByParent.null.length ) {
+	// We use a custom type guard here to ensure that the parent property is
+	// defined on all terms. The type of the `parent` property is `number | null`
+	// and we need to ensure that it is `number`. This is because we use the
+	// `parent` property as a key in the `termsByParent` object.
+	if ( ! ensureParentsAreDefined( flatTermsWithParentAndChildren ) ) {
 		return flatTermsWithParentAndChildren;
 	}
+
+	const termsByParent = flatTermsWithParentAndChildren.reduce(
+		( acc: TermsByParent, term ) => {
+			const { parent } = term;
+			if ( ! acc[ parent ] ) {
+				acc[ parent ] = [];
+			}
+			acc[ parent ].push( term );
+			return acc;
+		},
+		{}
+	);
+
 	const fillWithChildren = (
 		terms: TermWithParentAndChildren[]
 	): TermWithParentAndChildren[] => {

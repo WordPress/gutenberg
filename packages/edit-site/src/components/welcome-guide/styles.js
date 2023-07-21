@@ -34,11 +34,13 @@ export default function WelcomeGuideStyles() {
 		return null;
 	}
 
+	const welcomeLabel = __( 'Welcome to Styles' );
+
 	return (
 		<Guide
-			className="edit-site-welcome-guide"
-			contentLabel={ __( 'Welcome to styles' ) }
-			finishButtonText={ __( 'Get Started' ) }
+			className="edit-site-welcome-guide guide-styles"
+			contentLabel={ welcomeLabel }
+			finishButtonText={ __( 'Get started' ) }
 			onFinish={ () => toggle( 'core/edit-site', 'welcomeGuideStyles' ) }
 			pages={ [
 				{
@@ -51,7 +53,7 @@ export default function WelcomeGuideStyles() {
 					content: (
 						<>
 							<h1 className="edit-site-welcome-guide__heading">
-								{ __( 'Welcome to Styles' ) }
+								{ welcomeLabel }
 							</h1>
 							<p className="edit-site-welcome-guide__text">
 								{ __(
@@ -119,7 +121,7 @@ export default function WelcomeGuideStyles() {
 								) }
 								<ExternalLink
 									href={ __(
-										'https://wordpress.org/support/article/styles-overview/'
+										'https://wordpress.org/documentation/article/styles-overview/'
 									) }
 								>
 									{ __(

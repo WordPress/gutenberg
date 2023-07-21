@@ -135,6 +135,7 @@ function useInsertionPoint( {
 			destinationIndex,
 			onSelect,
 			shouldFocusBlock,
+			selectBlockOnInsert,
 		]
 	);
 

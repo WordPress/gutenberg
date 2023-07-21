@@ -12,7 +12,7 @@ import * as privateActions from './private-actions';
 import * as selectors from './selectors';
 import * as privateSelectors from './private-selectors';
 import { STORE_NAME } from './constants';
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 
 export const storeConfig = {
 	reducer,

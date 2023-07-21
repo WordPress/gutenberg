@@ -27,10 +27,10 @@ import type { ViewProps } from './types';
  * }
  * ```
  */
-// @ts-expect-error
 export const View: WordPressComponent<
 	'div',
-	ViewProps & RefAttributes< any >
+	ViewProps & RefAttributes< any >,
+	true
 > = styled.div``;
 
 View.selector = '.components-view';

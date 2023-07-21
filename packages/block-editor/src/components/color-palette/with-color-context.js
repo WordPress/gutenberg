@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -23,7 +18,8 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 			props.disableCustomColors === undefined
 				? disableCustomColorsFeature
 				: props.disableCustomColors;
-		const hasColorsToChoose = ! isEmpty( colors ) || ! disableCustomColors;
+		const hasColorsToChoose =
+			( colors && colors.length > 0 ) || ! disableCustomColors;
 		return (
 			<WrappedComponent
 				{ ...{

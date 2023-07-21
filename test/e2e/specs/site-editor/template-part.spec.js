@@ -147,7 +147,7 @@ test.describe( 'Template Part', () => {
 		await editor.selectBlocks( paragraphBlock1, paragraphBlock2 );
 
 		// Convert block to a template part.
-		await editor.clickBlockOptionsMenuItem( 'Create Template part' );
+		await editor.clickBlockOptionsMenuItem( 'Create template part' );
 		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Test' );
 		await page.keyboard.press( 'Enter' );
 
@@ -355,5 +355,53 @@ test.describe( 'Template Part', () => {
 		await expect(
 			page.getByRole( 'combobox', { name: 'Import widget area' } )
 		).not.toBeVisible();
+	} );
+
+	test( 'Keeps focus in place on undo in template parts', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//header',
+			postType: 'wp_template_part',
+		} );
+		await editor.canvas.click( 'body' );
+
+		// Select the site title block.
+		const siteTitle = editor.canvas.getByRole( 'document', {
+			name: 'Site title',
+		} );
+		await editor.selectBlocks( siteTitle );
+
+		// Remove the default site title block.
+		await pageUtils.pressKeys( 'access+z' );
+
+		// Insert a group block with a Site Title block inside.
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [ { name: 'core/site-title' } ],
+		} );
+
+		// Select the Site Title block inside the group.
+		const siteTitleInGroup = editor.canvas.getByRole( 'document', {
+			name: 'Site title',
+		} );
+		await editor.selectBlocks( siteTitleInGroup );
+
+		// Change heading level of the Site Title block.
+		await editor.clickBlockToolbarButton( 'Change level' );
+		const Heading3Button = page.getByRole( 'menuitemradio', {
+			name: 'Heading 3',
+		} );
+		await Heading3Button.click();
+
+		// Undo the change.
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect(
+			page.locator( 'role=button[name="Change level"i]' )
+		).toBeFocused();
 	} );
 } );

@@ -4,7 +4,6 @@
 import {
 	PostTextEditor,
 	PostTitle,
-	TextEditorGlobalKeyboardShortcuts,
 	store as editorStore,
 } from '@wordpress/editor';
 import { Button } from '@wordpress/components';
@@ -25,7 +24,6 @@ export default function TextEditor() {
 
 	return (
 		<div className="edit-post-text-editor">
-			<TextEditorGlobalKeyboardShortcuts />
 			{ isRichEditingEnabled && (
 				<div className="edit-post-text-editor__toolbar">
 					<h2>{ __( 'Editing code' ) }</h2>

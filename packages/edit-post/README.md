@@ -157,8 +157,7 @@ _Returns_
 
 ### PluginMoreMenuItem
 
-Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to as a button or link depending on the props provided.
-The text within the component appears as the menu item label.
+Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to as a button or link depending on the props provided. The text within the component appears as the menu item label.
 
 _Usage_
 
@@ -215,8 +214,7 @@ _Returns_
 
 ### PluginPostPublishPanel
 
-Renders provided content to the post-publish panel in the publish flow
-(side panel that opens after a user publishes the post).
+Renders provided content to the post-publish panel in the publish flow (side panel that opens after a user publishes the post).
 
 _Usage_
 
@@ -268,9 +266,7 @@ _Returns_
 
 ### PluginPostStatusInfo
 
-Renders a row in the Summary panel of the Document sidebar.
-It should be noted that this is named and implemented around the function it serves
-and not its location, which may change in future iterations.
+Renders a row in the Summary panel of the Document sidebar. It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
 
 _Usage_
 
@@ -314,8 +310,7 @@ _Returns_
 
 ### PluginPrePublishPanel
 
-Renders provided content to the pre-publish side panel in the publish flow
-(side panel that opens when a user first pushes "Publish" from the main editor).
+Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when a user first pushes "Publish" from the main editor).
 
 _Usage_
 
@@ -367,9 +362,7 @@ _Returns_
 
 ### PluginSidebar
 
-Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
-It also automatically renders a corresponding `PluginSidebarMenuItem` component when `isPinnable` flag is set to `true`.
-If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuItem` component or the `wp.data.dispatch` API:
+Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar. It also automatically renders a corresponding `PluginSidebarMenuItem` component when `isPinnable` flag is set to `true`. If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuItem` component or the `wp.data.dispatch` API:
 
 ```js
 wp.data
@@ -429,9 +422,7 @@ _Parameters_
 
 ### PluginSidebarMoreMenuItem
 
-Renders a menu item in `Plugins` group in `More Menu` drop down,
-and can be used to activate the corresponding `PluginSidebar` component.
-The text within the component appears as the menu item label.
+Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to activate the corresponding `PluginSidebar` component. The text within the component appears as the menu item label.
 
 _Usage_
 

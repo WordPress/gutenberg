@@ -2,12 +2,15 @@
  * External dependencies
  */
 import {
+	addBlock,
 	fireEvent,
 	getEditorHtml,
 	within,
 	getBlock,
 	initializeEditor,
-	changeTextOfRichText,
+	triggerBlockListLayout,
+	typeInRichText,
+	waitFor,
 } from 'test/helpers';
 
 /**
@@ -15,15 +18,7 @@ import {
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
-
-// Mock debounce to prevent potentially belated state updates.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
-	debounce: ( fn ) => {
-		fn.cancel = jest.fn();
-		return fn;
-	},
-} ) );
+import { BACKSPACE } from '@wordpress/keycodes';
 
 const BUTTONS_HTML = `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button /--></div>
@@ -86,7 +81,8 @@ describe( 'Buttons block', () => {
 			);
 
 			const incrementButton = await within( radiusStepper ).findByTestId(
-				'Increment'
+				'Increment',
+				{ hidden: true }
 			);
 			fireEvent( incrementButton, 'onPressIn' );
 
@@ -186,7 +182,7 @@ describe( 'Buttons block', () => {
 			expect( addBlockHerePlaceholders.length ).toBe( 0 );
 
 			// Add a new Button block
-			fireEvent.press( await screen.findByText( 'Button' ) );
+			fireEvent.press( within( blockList ).getByText( 'Button' ) );
 
 			// Get new button
 			const secondButtonBlock = await getBlock( screen, 'Button', {
@@ -196,7 +192,7 @@ describe( 'Buttons block', () => {
 				within( secondButtonBlock ).getByLabelText(
 					'Text input. Empty'
 				);
-			changeTextOfRichText( secondButtonInput, 'Hello!' );
+			typeInRichText( secondButtonInput, 'Hello!' );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
@@ -238,6 +234,32 @@ describe( 'Buttons block', () => {
 
 				expect( getEditorHtml() ).toMatchSnapshot();
 			} );
+
+			it( 'removes the button and buttons block when deleting the block using the delete (backspace) key', async () => {
+				const screen = await initializeEditor( {
+					initialHtml: BUTTONS_HTML,
+				} );
+
+				// Get block
+				const buttonsBlock = await getBlock( screen, 'Buttons' );
+				triggerBlockListLayout( buttonsBlock );
+
+				// Get inner button block
+				const buttonBlock = await getBlock( screen, 'Button' );
+				fireEvent.press( buttonBlock );
+
+				const buttonInput =
+					within( buttonBlock ).getByLabelText( 'Text input. Empty' );
+
+				// Delete block
+				fireEvent( buttonInput, 'onKeyDown', {
+					nativeEvent: {},
+					preventDefault() {},
+					keyCode: BACKSPACE,
+				} );
+
+				expect( getEditorHtml() ).toMatchSnapshot();
+			} );
 		} );
 	} );
 
@@ -270,5 +292,123 @@ describe( 'Buttons block', () => {
 				expect( getEditorHtml() ).toMatchSnapshot();
 			} )
 		);
+	} );
+
+	describe( 'color customization', () => {
+		it( 'sets a text color', async () => {
+			// Arrange
+			const screen = await initializeEditor();
+			await addBlock( screen, 'Buttons' );
+
+			// Act
+			const buttonsBlock = getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+
+			// Trigger onLayout for the list
+			await triggerBlockListLayout( buttonsBlock );
+
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open Block Settings.
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+			// Wait for Block Settings to be visible.
+			const blockSettingsModal = screen.getByTestId(
+				'block-settings-modal'
+			);
+			await waitFor( () => blockSettingsModal.props.isVisible );
+
+			// Open Text color settings
+			fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
+
+			// Tap one color
+			fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
+
+			// Dismiss the Block Settings modal.
+			fireEvent( blockSettingsModal, 'backdropPress' );
+
+			// Assert
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'sets a background color', async () => {
+			// Arrange
+			const screen = await initializeEditor();
+			await addBlock( screen, 'Buttons' );
+
+			// Act
+			const buttonsBlock = getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+
+			// Trigger onLayout for the list
+			await triggerBlockListLayout( buttonsBlock );
+
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open Block Settings.
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+			// Wait for Block Settings to be visible.
+			const blockSettingsModal = screen.getByTestId(
+				'block-settings-modal'
+			);
+			await waitFor( () => blockSettingsModal.props.isVisible );
+
+			// Open Text color settings
+			fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
+
+			// Tap one color
+			fireEvent.press( screen.getByLabelText( 'Luminous vivid amber' ) );
+
+			// Dismiss the Block Settings modal.
+			fireEvent( blockSettingsModal, 'backdropPress' );
+
+			// Assert
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'sets a gradient background color', async () => {
+			// Arrange
+			const screen = await initializeEditor();
+			await addBlock( screen, 'Buttons' );
+
+			// Act
+			const buttonsBlock = getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+
+			// Trigger onLayout for the list
+			await triggerBlockListLayout( buttonsBlock );
+
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open Block Settings.
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+			// Wait for Block Settings to be visible.
+			const blockSettingsModal = screen.getByTestId(
+				'block-settings-modal'
+			);
+			await waitFor( () => blockSettingsModal.props.isVisible );
+
+			// Open Text color settings
+			fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
+
+			// Tap on the gradient segment
+			fireEvent.press( screen.getByLabelText( 'Gradient' ) );
+
+			// Tap one gradient color
+			fireEvent.press(
+				screen.getByLabelText( 'Light green cyan to vivid green cyan' )
+			);
+
+			// Dismiss the Block Settings modal.
+			fireEvent( blockSettingsModal, 'backdropPress' );
+
+			// Assert
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
 	} );
 } );

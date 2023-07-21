@@ -9,8 +9,12 @@ import {
 	__experimentalUseHasRecursion as useHasRecursion,
 	Warning,
 } from '@wordpress/block-editor';
-import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
-
+import {
+	useEntityProp,
+	useEntityBlockEditor,
+	store as coreStore,
+} from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
@@ -45,12 +49,28 @@ function EditableContent( { context = {} } ) {
 		{ id: postId }
 	);
 
+	const entityRecord = useSelect(
+		( select ) => {
+			return select( coreStore ).getEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+		},
+		[ postType, postId ]
+	);
+
+	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
+
+	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
+
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
 			value: blocks,
 			onInput,
 			onChange,
+			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
 		}
 	);
 	return <div { ...props } />;

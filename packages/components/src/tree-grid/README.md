@@ -127,7 +127,25 @@ An integer value that represents the total number of items in the set, at this s
 
 An optional value that designates whether a row is expanded or collapsed. Currently this value only sets the correct aria-expanded property on a row, it has no other built-in behavior.
 
+If there is a need to implement `aria-expanded` elsewhere in the row, cell, or element within a cell, you may pass `isExpanded={ undefined }`. In order for keyboard navigation to continue working, add the `data-expanded` attribute with either `true`/`false`. This allows the `TreeGrid` component to still manage keyboard interactions while allowing the `aria-expanded` attribute to be placed elsewhere. See the example below.
+
 -   Required: No
+
+```jsx
+function TreeMenu() {
+	return (
+		<TreeGrid>
+			<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 2 } isExpanded={ undefined } data-expanded={ false }>
+				<TreeGridCell>
+					{ ( props ) => (
+						<Button aria-expanded="false" onClick={ onSelect } { ...props }>Select</Button>
+					) }
+				</TreeGridCell>
+			</TreeGridRow>
+		</TreeGrid>
+	);
+}
+```
 
 ### TreeGridCell
 

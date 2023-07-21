@@ -1,23 +1,28 @@
-## Styles in the block editor
+## Styles in the editor
 
 This document introduces the main concepts related to styles that affect the user content in the block editor. It points to the relevant reference guides and tutorials for readers to dig deeper into each one of the ideas presented. It's aimed to block authors and people working in the block editor project.
 
 1. [HTML and CSS](#html-and-css)
 2. [Block styles](#block-styles)
-  - [From UI controls to HTML markup](#from-ui-controls-to-html-markup)
-  - [Block Supports API](#block-supports-api)
-  - [Current limitations of the Block Supports API](#current-limitations-of-the-block-supports-api)
+
+-   [From UI controls to HTML markup](#from-ui-controls-to-html-markup)
+-   [Block Supports API](#block-supports-api)
+-   [Current limitations of the Block Supports API](#current-limitations-of-the-block-supports-api)
+
 3. [Global styles](#global-styles)
-  - [Gather data](#gather-data)
-  - [Consolidate data](#consolidate-data)
-  - [From data to styles](#from-data-to-styles)
-  - [Current limitations of the Global Styles API](#current-limitations-of-the-global-styles-api)
+
+-   [Gather data](#gather-data)
+-   [Consolidate data](#consolidate-data)
+-   [From data to styles](#from-data-to-styles)
+-   [Current limitations of the Global Styles API](#current-limitations-of-the-global-styles-api)
+
 4. [Layout styles](#layout-styles)
-  - [Base layout styles](#base-layout-styles)
-  - [Individual layout styles](#individual-layout-styles)
-  - [Available layout types](#available-layout-types)
-  - [Targeting layout or container blocks from themes](#targeting-layout-or-container-blocks-from-themes)
-  - [Opting out of generated layout styles](#opting-out-of-generated-layout-styles)
+
+-   [Base layout styles](#base-layout-styles)
+-   [Individual layout styles](#individual-layout-styles)
+-   [Available layout types](#available-layout-types)
+-   [Targeting layout or container blocks from themes](#targeting-layout-or-container-blocks-from-themes)
+-   [Opting out of generated layout styles](#opting-out-of-generated-layout-styles)
 
 ### HTML and CSS
 
@@ -54,10 +59,8 @@ The user may change the state of this block by applying different styles: a text
 After some user modifications to the block, the initial markup may become something like this:
 
 ```html
-<p
-	class="has-color has-green-color has-font-size has-small-font-size my-custom-class"
-	style="line-height: 1em"
-></p>
+<p class="has-color has-green-color has-font-size has-small-font-size my-custom-class"
+	style="line-height: 1em"></p>
 ```
 
 This is what we refer to as "user-provided block styles", also know as "local styles" or "serialized styles". Essentially, each tool (font size, color, etc) ends up adding some classes and/or inline styles to the block markup. The CSS styling for these classes is part of the block, global, or theme stylesheets.
@@ -506,9 +509,7 @@ The global styles UI in the site editor has a screen for per-block styles. The l
 
 In addition to styles at the individual block level and in global styles, there is the concept of layout styles that are output for both blocks-based and classic themes.
 
-The layout block support is an experimental approach for outputting common layout styles that are shared between blocks that are used for creating layouts. Layout styles are useful for providing common styling for any block that is a container for other blocks. Examples of blocks that depend on these layout styles include Group, Row, Columns, Buttons, and Social Icons.
-
-While the feature is part of WordPress core, it is still flagged as experimental in the sense that the features and output are still undergoing active development. It is therefore not yet a stable feature from the perspective of 3rd party blocks, as the API is likely to change. The feature is enabled in core blocks via the `__experimentalLayout` setting under `supports` in a block's `block.json` file.
+The layout block support outputs common layout styles that are shared between blocks used for creating layouts. Layout styles are useful for providing common styling for any block that is a container for other blocks. Examples of blocks that depend on these layout styles include Group, Row, Columns, Buttons, and Social Icons. The feature is enabled in core blocks via the `layout` setting under `supports` in a block's `block.json` file.
 
 There are two primary places where Layout styles are output:
 
@@ -518,22 +519,23 @@ Base layout styles are those styles that are common to all blocks that opt in to
 
 Base layout styles are output from within [the main PHP class](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/class-wp-theme-json.php) that handles global styles, and form part of the global styles stylesheet. In order to provide support for core blocks in classic themes, these styles are always output, irrespective of whether the theme provides its own `theme.json` file.
 
-Common layout definitions are stored in [the core `theme.json` file](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/theme.json), but are not intended to be extended or overridden by themes.
+Common layout definitions are stored in [the core layout block support file](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-supports/layout.php).
 
 #### Individual layout styles
 
-When a block that opts in to the experimental layout support is rendered, two things are processed and added to the output via [`layout.php`](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-supports/layout.php):
+When a block that opts in to layout support is rendered, two things are processed and added to the output via [`layout.php`](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-supports/layout.php):
 
-- Semantic class names are added to the block markup to indicate which layout settings are in use. For example, `is-layout-flow` is for blocks (such as Group) that use the default/flow layout, and `is-content-justification-right` is added when a user sets a block to use right justification.
-- Individual styles are generated for non-default layout values that are set on the individual block being rendered. These styles are attached to the block via a container class name using the form `wp-container-$id` where the `$id` is a [unique number](https://developer.wordpress.org/reference/functions/wp_unique_id/).
+-   Semantic class names are added to the block markup to indicate which layout settings are in use. For example, `is-layout-flow` is for blocks (such as Group) that use the default/flow layout, and `is-content-justification-right` is added when a user sets a block to use right justification.
+-   Individual styles are generated for non-default layout values that are set on the individual block being rendered. These styles are attached to the block via a container class name using the form `wp-container-$id` where the `$id` is a [unique number](https://developer.wordpress.org/reference/functions/wp_unique_id/).
 
 #### Available layout types
 
-There are currently three layout types in use:
+There are currently four layout types in use:
 
-* Default/Flow: Items are stacked vertically. The parent container block is set to `display: flow` and the spacing between children is handled via vertical margins.
-* Constrained: Items are stacked vertically, using the same spacing logic as the Flow layout. Features constrained widths for child content, outputting widths for standard content size and wide size. Defaults to using global `contentSize` and `wideSize` values set in `settings.layout` in the `theme.json`.
-* Flex: Items are displayed using a Flexbox layout. Defaults to a horizontal orientation. Spacing between children is handled via the `gap` CSS property.
+-   Default/Flow: Items are stacked vertically. The parent container block is set to `display: flow` and the spacing between children is handled via vertical margins.
+-   Constrained: Items are stacked vertically, using the same spacing logic as the Flow layout. Features constrained widths for child content, outputting widths for standard content size and wide size. Defaults to using global `contentSize` and `wideSize` values set in `settings.layout` in the `theme.json`.
+-   Flex: Items are displayed using a Flexbox layout. Defaults to a horizontal orientation. Spacing between children is handled via the `gap` CSS property.
+-   Grid: Items are displayed using a Grid layout. Defaults to an `auto-fill` approach to column generation but can also be set to a fixed number of columns. Spacing between children is handled via the `gap` CSS property.
 
 For controlling spacing between blocks, and enabling block spacing controls see: [What is blockGap and how can I use it?](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/#what-is-blockgap-and-how-can-i-use-it).
 
@@ -541,7 +543,7 @@ For controlling spacing between blocks, and enabling block spacing controls see:
 
 The layout block support is designed to enable control over layout features from within the block and site editors. Where possible, try to use the features of the blocks to determine particular layout requirements rather than relying upon additional stylesheets.
 
-For themes that wish to target container blocks in order to add or adjust particular styles, the block's class name is often the best class name to use. Class names such as `wp-block-group` or `wp-block-columns` are usually reliable class names for targeting a particular block.
+For themes that wish to target container blocks in order to add or adjust particular styles, the block's class name is often the best class name to use. Class names such as `wp-block-group` or `wp-block-columns` are usually reliable class names for targeting a particular block. In addition to block and layout classnames, there is also a classname composed of block and layout together: for example, for a Group block with a constrained layout it will be `wp-block-group-is-layout-constrained`.
 
 For targeting a block that uses a particular layout type, avoid targeting `wp-container-` as container classes may not always be present in the rendered markup.
 
@@ -551,17 +553,18 @@ Work is currently underway to expand stable semantic classnames in Layout block 
 
 The current semantic class names that can be output by the Layout block support are:
 
-* `is-layout-flow`: Blocks that use the Default/Flow layout type.
-* `is-layout-constrained`: Blocks that use the Constrained layout type.
-* `is-layout-flex`: Blocks that use the Flex layout type.
-* `wp-container-$id`: Where `$id` is a semi-random number. A container class that only exists when the block contains non-default Layout values. This class should not be used directly for any CSS targeting as it may or may not be present.
-* `is-horizontal`: When a block explicitly sets `orientation` to `horizontal`.
-* `is-vertical`: When a block explicitly sets `orientation` to `vertical`.
-* `is-content-justification-left`: When a block explicitly sets `justifyContent` to `left`.
-* `is-content-justification-center`: When a block explicitly sets `justifyContent` to `center`.
-* `is-content-justification-right`: When a block explicitly sets `justifyContent` to `right`.
-* `is-content-justification-space-between`: When a block explicitly sets `justifyContent` to `space-between`.
-* `is-nowrap`: When a block explicitly sets `flexWrap` to `nowrap`.
+-   `is-layout-flow`: Blocks that use the Default/Flow layout type.
+-   `is-layout-constrained`: Blocks that use the Constrained layout type.
+-   `is-layout-flex`: Blocks that use the Flex layout type.
+-   `is-layout-grid`: Blocks that used the Grid layout type.
+-   `wp-container-$id`: Where `$id` is a semi-random number. A container class that only exists when the block contains non-default Layout values. This class should not be used directly for any CSS targeting as it may or may not be present.
+-   `is-horizontal`: When a block explicitly sets `orientation` to `horizontal`.
+-   `is-vertical`: When a block explicitly sets `orientation` to `vertical`.
+-   `is-content-justification-left`: When a block explicitly sets `justifyContent` to `left`.
+-   `is-content-justification-center`: When a block explicitly sets `justifyContent` to `center`.
+-   `is-content-justification-right`: When a block explicitly sets `justifyContent` to `right`.
+-   `is-content-justification-space-between`: When a block explicitly sets `justifyContent` to `space-between`.
+-   `is-nowrap`: When a block explicitly sets `flexWrap` to `nowrap`.
 
 #### Opting out of generated layout styles
 

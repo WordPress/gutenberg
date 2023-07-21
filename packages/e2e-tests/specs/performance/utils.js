@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { existsSync, readFileSync, unlinkSync } from 'fs';
+import path from 'path';
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 
 export function readFile( filePath ) {
 	return existsSync( filePath )
@@ -13,6 +14,21 @@ export function deleteFile( filePath ) {
 	if ( existsSync( filePath ) ) {
 		unlinkSync( filePath );
 	}
+}
+
+export function getTraceFilePath() {
+	return path.join( process.env.WP_ARTIFACTS_PATH, '/trace.json' );
+}
+
+export function saveResultsFile( testFilename, results ) {
+	const resultsFilename =
+		process.env.RESULTS_FILENAME ||
+		path.basename( testFilename, '.js' ) + '.performance-results.json';
+
+	return writeFileSync(
+		path.join( process.env.WP_ARTIFACTS_PATH, resultsFilename ),
+		JSON.stringify( results, null, 2 )
+	);
 }
 
 function isEvent( item ) {

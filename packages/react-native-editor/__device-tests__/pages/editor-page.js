@@ -11,7 +11,6 @@ const {
 	doubleTap,
 	isAndroid,
 	isEditorVisible,
-	longPressMiddleOfElement,
 	setClipboard,
 	setupDriver,
 	stopDriver,
@@ -27,7 +26,7 @@ const {
 
 const ADD_BLOCK_ID = isAndroid()
 	? 'Add block, Double tap to add a block'
-	: 'Add block';
+	: 'add-block-button';
 
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
@@ -72,11 +71,11 @@ class EditorPage {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
-	async getAddBlockButton( options = { timeout: 3000 } ) {
-		return await this.waitForElementToBeDisplayedById(
-			ADD_BLOCK_ID,
-			options.timeout
+	async getAddBlockButton() {
+		const elements = await this.driver.elementsByAccessibilityId(
+			ADD_BLOCK_ID
 		);
+		return elements[ 0 ];
 	}
 
 	// ===============================
@@ -92,7 +91,7 @@ class EditorPage {
 		}
 
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "${ blockName } Block. Row ${ position }.")]//android.widget.EditText`
+			? `//android.widget.Button[contains(@content-desc, "${ blockName } Block. Row ${ position }.")]//android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }.")]//XCUIElementTypeTextView`;
 
 		return await waitForVisible( this.driver, blockLocator );
@@ -110,19 +109,9 @@ class EditorPage {
 		position = 1,
 		options = { autoscroll: false }
 	) {
-		let elementType;
-		switch ( blockName ) {
-			case blockNames.cover:
-				elementType = 'XCUIElementTypeButton';
-				break;
-			default:
-				elementType = 'XCUIElementTypeOther';
-				break;
-		}
-
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
-			: `(//${ elementType }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[1]`;
+			? `//android.widget.Button[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
+			: `(//XCUIElementTypeOther[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[2]`;
 
 		await waitForVisible( this.driver, blockLocator );
 
@@ -201,14 +190,19 @@ class EditorPage {
 		const titleElement = isAndroid()
 			? 'Post title. Welcome to Gutenberg!, Updates the title.'
 			: 'post-title';
+
+		if ( options.autoscroll ) {
+			await swipeDown( this.driver );
+		}
+
 		const elements = await this.driver.elementsByAccessibilityId(
 			titleElement
 		);
 
-		if ( elements.length === 0 || ! elements[ 0 ].isDisplayed() ) {
-			if ( options.autoscroll ) {
-				await swipeDown( this.driver );
-			}
+		if (
+			elements.length === 0 ||
+			! ( await elements[ 0 ].isDisplayed() )
+		) {
 			return await this.getTitleElement( options );
 		}
 		return elements[ 0 ];
@@ -302,7 +296,7 @@ class EditorPage {
 					'Hide keyboard, Tap to hide the keyboard'
 			  )
 			: await this.waitForElementToBeDisplayedByXPath(
-					'//XCUIElementTypeButton[@name="Hide keyboard"]'
+					'(//XCUIElementTypeOther[@name="Hide keyboard"])[1]'
 			  );
 
 		await hideKeyboardButton.click();
@@ -347,9 +341,51 @@ class EditorPage {
 		}
 	}
 
+	async swipeToolbarToElement( elementSelector, options ) {
+		const { byId, swipeRight } = options || {};
+		const offset = isAndroid() ? 300 : 50;
+		const maxLocatorAttempts = 5;
+		let locatorAttempts = 0;
+		let element;
+
+		const toolbar = await this.getToolbar();
+		const toolbarLocation = await toolbar.getLocation();
+		const toolbarSize = await toolbar.getSize();
+
+		while ( locatorAttempts < maxLocatorAttempts ) {
+			element = byId
+				? await this.driver.elementsByAccessibilityId( elementSelector )
+				: await this.driver.elementsByXPath( elementSelector );
+			if ( await element[ 0 ]?.isDisplayed() ) {
+				break;
+			}
+
+			swipeFromTo(
+				this.driver,
+				{
+					x: ! swipeRight
+						? toolbarSize.width - offset
+						: toolbarSize.width / 2,
+					y: toolbarLocation.y + toolbarSize.height / 2,
+				},
+				{
+					x: ! swipeRight
+						? toolbarSize.width / 2
+						: toolbarSize.width - offset,
+					y: toolbarLocation.y + toolbarSize.height / 2,
+				},
+				1000
+			);
+			locatorAttempts++;
+		}
+		return element;
+	}
+
 	async openBlockSettings() {
-		const settingsButtonElement = 'Open Settings';
-		const settingsButton = await this.waitForElementToBeDisplayedById(
+		const settingsButtonElement = isAndroid()
+			? '//android.widget.Button[@content-desc="Open Settings"]/android.view.ViewGroup'
+			: '//XCUIElementTypeButton[@name="Open Settings"]';
+		const settingsButton = await this.waitForElementToBeDisplayedByXPath(
 			settingsButtonElement
 		);
 
@@ -358,12 +394,12 @@ class EditorPage {
 
 	async removeBlock() {
 		const blockActionsButtonElement = isAndroid()
-			? 'Open Block Actions Menu, Double tap to open Bottom Sheet with available options'
-			: 'Open Block Actions Menu';
-		const blockActionsMenu = await this.waitForElementToBeDisplayedById(
+			? '//android.widget.Button[contains(@content-desc, "Open Block Actions Menu")]'
+			: '//XCUIElementTypeButton[@name="Open Block Actions Menu"]';
+		const blockActionsMenu = await this.swipeToolbarToElement(
 			blockActionsButtonElement
 		);
-		await blockActionsMenu.click();
+		await blockActionsMenu[ 0 ].click();
 
 		const removeElement = 'Remove block';
 		const removeBlockButton = await this.waitForElementToBeDisplayedById(
@@ -382,32 +418,16 @@ class EditorPage {
 	// =========================
 
 	async getToolbar() {
-		return await this.driver.elementsByAccessibilityId( 'Document tools' );
+		return this.waitForElementToBeDisplayedById( 'Document tools', 4000 );
 	}
 
-	async addNewBlock( blockName, relativePosition ) {
-		const addButton = await this.getAddBlockButton();
-
-		if ( relativePosition === 'before' ) {
-			// On Android it doesn't get the right size of the button
-			const customElementSize = {
-				width: 43,
-				height: 43,
-			};
-
-			await longPressMiddleOfElement(
-				this.driver,
-				addButton,
-				8000,
-				customElementSize
-			);
-			const addBlockBeforeButtonLocator = isAndroid()
-				? '//android.widget.Button[@content-desc="Add Block Before"]'
-				: '//XCUIElementTypeButton[@name="Add Block Before"]';
-
-			await clickIfClickable( this.driver, addBlockBeforeButtonLocator );
-		} else {
-			await addButton.click();
+	async addNewBlock( blockName, { skipInserterOpen = false } = {} ) {
+		if ( ! skipInserterOpen ) {
+			const addButton = await this.swipeToolbarToElement( ADD_BLOCK_ID, {
+				byId: true,
+				swipeRight: true,
+			} );
+			await addButton[ 0 ].click();
 		}
 
 		// Click on block of choice.
@@ -437,6 +457,11 @@ class EditorPage {
 			inserterElement,
 			4000
 		);
+	}
+
+	static async isElementOutOfBounds( element, { width, height } = {} ) {
+		const { x, y } = await element.getLocation();
+		return x > width || y > height;
 	}
 
 	// Attempts to find the given block button in the block inserter control.
@@ -494,7 +519,10 @@ class EditorPage {
 		// We start dragging a bit above it to not trigger home button.
 		const height = size.height - 50;
 
-		while ( ! ( await blockButton.isDisplayed() ) ) {
+		while (
+			! ( await blockButton.isDisplayed() ) ||
+			( await EditorPage.isElementOutOfBounds( blockButton, { height } ) )
+		) {
 			await this.driver.execute( 'mobile: dragFromToForDuration', {
 				fromX: 50,
 				fromY: height,
@@ -512,6 +540,22 @@ class EditorPage {
 			buttonName
 		);
 		await toolBarButton.click();
+	}
+
+	async moveBlockSelectionUp( options = { toRoot: false } ) {
+		let navigateUpElements = [];
+		do {
+			await this.driver.sleep( 2000 );
+			navigateUpElements = await this.driver.elementsByAccessibilityId(
+				'Navigate Up'
+			);
+			if ( navigateUpElements.length > 0 ) {
+				await navigateUpElements[ 0 ].click();
+			}
+			if ( ! options.toRoot ) {
+				break;
+			}
+		} while ( navigateUpElements.length > 0 );
 	}
 
 	// =========================
@@ -562,10 +606,6 @@ class EditorPage {
 			: '//XCUIElementTypeButton';
 		const blockActionsMenuButtonIdentifier = `Open Block Actions Menu`;
 		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
-		const blockActionsMenuButton = await waitForVisible(
-			this.driver,
-			blockActionsMenuButtonLocator
-		);
 		if ( isAndroid() ) {
 			const block = await this.getBlockAtPosition( blockName, position );
 			let checkList = await this.driver.elementsByXPath(
@@ -579,6 +619,10 @@ class EditorPage {
 			}
 		}
 
+		const blockActionsMenuButton = await waitForVisible(
+			this.driver,
+			blockActionsMenuButtonLocator
+		);
 		await blockActionsMenuButton.click();
 		const removeActionButtonIdentifier = 'Remove block';
 		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
@@ -598,10 +642,8 @@ class EditorPage {
 		const identifier = isAndroid()
 			? `//android.widget.Button[@content-desc="${ formatting }"]/android.view.ViewGroup`
 			: `//XCUIElementTypeButton[@name="${ formatting }"]`;
-		const toggleElement = await this.waitForElementToBeDisplayedByXPath(
-			identifier
-		);
-		return await toggleElement.click();
+		const toggleElement = await this.swipeToolbarToElement( identifier );
+		return await toggleElement[ 0 ].click();
 	}
 
 	async openLinkToSettings() {
@@ -615,15 +657,6 @@ class EditorPage {
 	// =========================
 	// Paragraph Block functions
 	// =========================
-
-	async getParagraphBlockWrapperAtPosition( position = 1 ) {
-		// iOS needs a click to get the text element
-		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row ${ position }")]`
-			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`;
-
-		return await waitForVisible( this.driver, blockLocator );
-	}
 
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
@@ -655,7 +688,7 @@ class EditorPage {
 
 	async getNumberOfParagraphBlocks() {
 		const paragraphBlockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]//android.widget.EditText`
+			? `//android.widget.Button[contains(@content-desc, "Paragraph Block. Row")]//android.widget.EditText`
 			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row")])`;
 
 		const locator = await this.driver.elementsByXPath(
@@ -709,7 +742,7 @@ class EditorPage {
 			: `//XCUIElementTypeButton[contains(@name, "List")]//XCUIElementTypeTextView`;
 
 		const listBlockTextLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "List Block. Row ${ position }")]//android.widget.EditText`
+			? `//android.widget.Button[contains(@content-desc, "List Block. Row ${ position }")]//android.widget.EditText`
 			: listBlockTextLocatorIOS;
 
 		return await waitForVisible( this.driver, listBlockTextLocator );
@@ -914,7 +947,7 @@ class EditorPage {
 		}
 
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[@content-desc="Shortcode Block. Row ${ position }"]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
+			? `//android.widget.Button[@content-desc="Shortcode Block. Row ${ position }"]//android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "Shortcode Block. Row ${ position }")]//XCUIElementTypeTextView`;
 
 		return await waitForVisible( this.driver, blockLocator );
@@ -926,7 +959,7 @@ class EditorPage {
 
 	async getButtonBlockTextInputAtPosition( position = 1 ) {
 		const blockLocator = isAndroid()
-			? `//android.view.ViewGroup[@content-desc="Button Block. Row ${ position }"]/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
+			? `//android.widget.Button[@content-desc="Button Block. Row ${ position }"]//android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "Button Block. Row ${ position }")]//XCUIElementTypeTextView`;
 
 		return await this.waitForElementToBeDisplayedByXPath( blockLocator );
@@ -935,7 +968,7 @@ class EditorPage {
 	async addButtonWithInlineAppender( position = 1 ) {
 		const appenderButton = isAndroid()
 			? await this.waitForElementToBeDisplayedByXPath(
-					`//android.view.ViewGroup[@content-desc="block-list"]/android.view.ViewGroup[${ position }]/android.widget.Button`
+					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.Button[${ position }]`
 			  )
 			: await this.waitForElementToBeDisplayedById( 'appender-button' );
 		await appenderButton.click();
@@ -980,6 +1013,8 @@ const blockNames = {
 	group: 'Group',
 	buttons: 'Buttons',
 	button: 'Button',
+	preformatted: 'Preformatted',
+	unsupported: 'Unsupported',
 };
 
 module.exports = { initializeEditorPage, blockNames };

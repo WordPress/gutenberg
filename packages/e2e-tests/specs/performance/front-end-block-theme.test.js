@@ -1,13 +1,12 @@
 /**
- * External dependencies
- */
-import { basename, join } from 'path';
-import { writeFileSync } from 'fs';
-
-/**
  * WordPress dependencies
  */
 import { activateTheme, createURL, logout } from '@wordpress/e2e-test-utils';
+
+/**
+ * Internal dependencies
+ */
+import { saveResultsFile } from './utils';
 
 describe( 'Front End Performance', () => {
 	const results = {
@@ -17,17 +16,12 @@ describe( 'Front End Performance', () => {
 	};
 
 	beforeAll( async () => {
-		await activateTheme( 'twentytwentythree' );
+		await activateTheme( 'gutenberg-test-themes/twentytwentythree' );
 		await logout();
 	} );
 
 	afterAll( async () => {
-		await activateTheme( 'twentytwentyone' );
-		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
-		writeFileSync(
-			join( __dirname, resultsFilename ),
-			JSON.stringify( results, null, 2 )
-		);
+		saveResultsFile( __filename, results );
 	} );
 
 	it( 'Report TTFB, LCP, and LCP-TTFB', async () => {

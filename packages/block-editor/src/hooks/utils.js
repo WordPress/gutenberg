@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, mapValues, get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
@@ -14,6 +9,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { useSetting } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
+import { getValueFromObjectPath, setImmutably } from '../utils/object';
 
 /**
  * Removed falsy values from nested object.
@@ -29,83 +25,14 @@ export const cleanEmptyObject = ( object ) => {
 	) {
 		return object;
 	}
-	const cleanedNestedObjects = Object.fromEntries(
-		Object.entries( mapValues( object, cleanEmptyObject ) ).filter(
-			( [ , value ] ) => Boolean( value )
-		)
-	);
-	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
+
+	const cleanedNestedObjects = Object.entries( object )
+		.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
+		.filter( ( [ , value ] ) => value !== undefined );
+	return ! cleanedNestedObjects.length
+		? undefined
+		: Object.fromEntries( cleanedNestedObjects );
 };
-
-/**
- * Converts a path to an array of its fragments.
- * Supports strings, numbers and arrays:
- *
- * 'foo' => [ 'foo' ]
- * 2 => [ '2' ]
- * [ 'foo', 'bar' ] => [ 'foo', 'bar' ]
- *
- * @param {string|number|Array} path Path
- * @return {Array} Normalized path.
- */
-function normalizePath( path ) {
-	if ( Array.isArray( path ) ) {
-		return path;
-	} else if ( typeof path === 'number' ) {
-		return [ path.toString() ];
-	}
-
-	return [ path ];
-}
-
-/**
- * Clones an object.
- * Non-object values are returned unchanged.
- *
- * @param {*} object Object to clone.
- * @return {*} Cloned object, or original literal non-object value.
- */
-function cloneObject( object ) {
-	if ( typeof object === 'object' ) {
-		return {
-			...Object.fromEntries(
-				Object.entries( object ).map( ( [ key, value ] ) => [
-					key,
-					cloneObject( value ),
-				] )
-			),
-		};
-	}
-
-	return object;
-}
-
-/**
- * Perform an immutable set.
- * Handles nullish initial values.
- * Clones all nested objects in the specified object.
- *
- * @param {Object}              object Object to set a value in.
- * @param {number|string|Array} path   Path in the object to modify.
- * @param {*}                   value  New value to set.
- * @return {Object} Cloned object with the new value set.
- */
-export function immutableSet( object, path, value ) {
-	const normalizedPath = normalizePath( path );
-	const newObject = object ? cloneObject( object ) : {};
-
-	normalizedPath.reduce( ( acc, key, i ) => {
-		if ( acc[ key ] === undefined ) {
-			acc[ key ] = {};
-		}
-		if ( i === normalizedPath.length - 1 ) {
-			acc[ key ] = value;
-		}
-		return acc[ key ];
-	}, newObject );
-
-	return newObject;
-}
 
 export function transformStyles(
 	activeSupports,
@@ -147,11 +74,14 @@ export function transformStyles(
 	Object.entries( activeSupports ).forEach( ( [ support, isActive ] ) => {
 		if ( isActive ) {
 			migrationPaths[ support ].forEach( ( path ) => {
-				const styleValue = get( referenceBlockAttributes, path );
+				const styleValue = getValueFromObjectPath(
+					referenceBlockAttributes,
+					path
+				);
 				if ( styleValue ) {
 					returnBlock = {
 						...returnBlock,
-						attributes: immutableSet(
+						attributes: setImmutably(
 							returnBlock.attributes,
 							path,
 							styleValue
@@ -204,6 +134,7 @@ export function useBlockSettings( name, parentLayout ) {
 	const lineHeight = useSetting( 'typography.lineHeight' );
 	const textColumns = useSetting( 'typography.textColumns' );
 	const textDecoration = useSetting( 'typography.textDecoration' );
+	const writingMode = useSetting( 'typography.writingMode' );
 	const textTransform = useSetting( 'typography.textTransform' );
 	const letterSpacing = useSetting( 'typography.letterSpacing' );
 	const padding = useSetting( 'spacing.padding' );
@@ -219,9 +150,22 @@ export function useBlockSettings( name, parentLayout ) {
 	const borderWidth = useSetting( 'border.width' );
 	const customColorsEnabled = useSetting( 'color.custom' );
 	const customColors = useSetting( 'color.palette.custom' );
+	const customDuotone = useSetting( 'color.customDuotone' );
 	const themeColors = useSetting( 'color.palette.theme' );
 	const defaultColors = useSetting( 'color.palette.default' );
 	const defaultPalette = useSetting( 'color.defaultPalette' );
+	const defaultDuotone = useSetting( 'color.defaultDuotone' );
+	const userDuotonePalette = useSetting( 'color.duotone.custom' );
+	const themeDuotonePalette = useSetting( 'color.duotone.theme' );
+	const defaultDuotonePalette = useSetting( 'color.duotone.default' );
+	const userGradientPalette = useSetting( 'color.gradients.custom' );
+	const themeGradientPalette = useSetting( 'color.gradients.theme' );
+	const defaultGradientPalette = useSetting( 'color.gradients.default' );
+	const defaultGradients = useSetting( 'color.defaultGradients' );
+	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
+	const isBackgroundEnabled = useSetting( 'color.background' );
+	const isLinkEnabled = useSetting( 'color.link' );
+	const isTextEnabled = useSetting( 'color.text' );
 
 	const rawSettings = useMemo( () => {
 		return {
@@ -231,8 +175,25 @@ export function useBlockSettings( name, parentLayout ) {
 					theme: themeColors,
 					default: defaultColors,
 				},
+				gradients: {
+					custom: userGradientPalette,
+					theme: themeGradientPalette,
+					default: defaultGradientPalette,
+				},
+				duotone: {
+					custom: userDuotonePalette,
+					theme: themeDuotonePalette,
+					default: defaultDuotonePalette,
+				},
+				defaultGradients,
 				defaultPalette,
+				defaultDuotone,
 				custom: customColorsEnabled,
+				customGradient: areCustomGradientsEnabled,
+				customDuotone,
+				background: isBackgroundEnabled,
+				link: isLinkEnabled,
+				text: isTextEnabled,
 			},
 			typography: {
 				fontFamilies: {
@@ -249,6 +210,7 @@ export function useBlockSettings( name, parentLayout ) {
 				textDecoration,
 				textTransform,
 				letterSpacing,
+				writingMode,
 			},
 			spacing: {
 				spacingSizes: {
@@ -282,6 +244,7 @@ export function useBlockSettings( name, parentLayout ) {
 		textDecoration,
 		textTransform,
 		letterSpacing,
+		writingMode,
 		padding,
 		margin,
 		blockGap,
@@ -296,9 +259,22 @@ export function useBlockSettings( name, parentLayout ) {
 		borderWidth,
 		customColorsEnabled,
 		customColors,
+		customDuotone,
 		themeColors,
 		defaultColors,
 		defaultPalette,
+		defaultDuotone,
+		userDuotonePalette,
+		themeDuotonePalette,
+		defaultDuotonePalette,
+		userGradientPalette,
+		themeGradientPalette,
+		defaultGradientPalette,
+		defaultGradients,
+		areCustomGradientsEnabled,
+		isBackgroundEnabled,
+		isLinkEnabled,
+		isTextEnabled,
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );

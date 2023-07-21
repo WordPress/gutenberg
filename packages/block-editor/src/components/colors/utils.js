@@ -1,10 +1,14 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
+
+/**
+ * Internal dependencies
+ */
+import { kebabCase } from '../../utils/object';
 
 extend( [ namesPlugin, a11yPlugin ] );
 

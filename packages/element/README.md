@@ -25,23 +25,33 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Usage
 
-Let's render a customized greeting into an empty element:
+Let's render a customized greeting into an empty element.
+
+**Note:** `createRoot` was introduced with React 18, which is bundled with WordPress 6.2. Therefore it may be necessary to mount your component depending on which version of WordPress (and therefore React) you are currently using. This is possible by checking for an undefined import and falling back to the React 17 method of mounting an app using `render`.
+
+Assuming the following root element is present in the page:
 
 ```html
 <div id="greeting"></div>
-<script>
-	function Greeting( props ) {
-		return wp.element.createElement(
-			'span',
-			null,
-			'Hello ' + props.toWhom + '!'
-		);
-	}
+```
 
-	wp.element
-		.createRoot( document.getElementById( 'greeting' ) )
-		.render( wp.element.createElement( Greeting, { toWhom: 'World' } ) );
-</script>
+We can mount our app:
+
+```js
+import { createRoot, render, createElement } from '@wordpress/element';
+
+function Greeting( props ) {
+	return createElement( 'span', null, 'Hello ' + props.toWhom + '!' );
+}
+
+const domElement = document.getElementById( 'greeting' );
+const uiElement = createElement( Greeting, { toWhom: 'World' } );
+
+if ( createRoot ) {
+	createRoot( domElement ).render( uiElement );
+} else {
+	render( uiElement, domElement );
+}
 ```
 
 Refer to the [official React Quick Start guide](https://reactjs.org/docs/hello-world.html) for a more thorough walkthrough, in most cases substituting `React` and `ReactDOM` with `wp.element` in code examples.
@@ -129,8 +139,7 @@ _Returns_
 
 ### createElement
 
-Returns a new element of given type. Type can be either a string tag name or
-another function which itself returns an element.
+Returns a new element of given type. Type can be either a string tag name or another function which itself returns an element.
 
 _Parameters_
 
@@ -144,9 +153,7 @@ _Returns_
 
 ### createInterpolateElement
 
-This function creates an interpolated element from a passed in string with
-specific tags matching how the string should be converted to an element via
-the conversion map value.
+This function creates an interpolated element from a passed in string with specific tags matching how the string should be converted to an element via the conversion map value.
 
 _Usage_
 
@@ -168,7 +175,7 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Object`: The map used to convert the string to a react element.
+-   _conversionMap_ `Record<string, WPElement>`: The map used to convert the string to a react element.
 
 _Returns_
 
@@ -189,9 +196,7 @@ _Parameters_
 
 ### createRef
 
-Returns an object tracking a reference to a rendered element via its
-`current` property as either a DOMElement or Element, dependent upon the
-type of element rendered with the ref attribute.
+Returns an object tracking a reference to a rendered element via its `current` property as either a DOMElement or Element, dependent upon the type of element rendered with the ref attribute.
 
 _Returns_
 
@@ -203,7 +208,11 @@ Creates a new React root for the target DOM node.
 
 _Related_
 
--   <https://reactjs.org/docs/react-dom-client.html#createroot>
+-   <https://react.dev/reference/react-dom/client/createRoot>
+
+_Changelog_
+
+`6.2.0` Introduced in WordPress core.
 
 ### findDOMNode
 
@@ -223,10 +232,7 @@ _Parameters_
 
 ### forwardRef
 
-Component enhancer used to enable passing a ref to its wrapped component.
-Pass a function argument which receives `props` and `ref` as its arguments,
-returning an element using the forwarded ref. The return value is a new
-component which forwards its ref.
+Component enhancer used to enable passing a ref to its wrapped component. Pass a function argument which receives `props` and `ref` as its arguments, returning an element using the forwarded ref. The return value is a new component which forwards its ref.
 
 _Parameters_
 
@@ -242,12 +248,13 @@ A component which renders its children without any wrapping element.
 
 ### hydrate
 
+> **Deprecated** since WordPress 6.2.0. Use `hydrateRoot` instead.
+
 Hydrates a given element into the target DOM node.
 
-_Parameters_
+_Related_
 
--   _element_ `import('./react').WPElement`: Element to hydrate.
--   _target_ `HTMLElement`: DOM node into which element should be hydrated.
+-   <https://react.dev/reference/react-dom/hydrate>
 
 ### hydrateRoot
 
@@ -255,7 +262,11 @@ Creates a new React root for the target DOM node and hydrates it with a pre-gene
 
 _Related_
 
--   <https://reactjs.org/docs/react-dom-client.html#hydrateroot>
+-   <https://react.dev/reference/react-dom/client/hydrateRoot>
+
+_Changelog_
+
+`6.2.0` Introduced in WordPress core.
 
 ### isEmptyElement
 
@@ -295,8 +306,7 @@ _Related_
 
 ### Platform
 
-Component used to detect the current Platform being used.
-Use Platform.OS === 'web' to detect if running on web enviroment.
+Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web enviroment.
 
 This is the same concept as the React Native implementation.
 
@@ -319,10 +329,7 @@ const placeholderLabel = Platform.select( {
 
 ### RawHTML
 
-Component used as equivalent of Fragment with unescaped HTML, in cases where
-it is desirable to render dangerous HTML without needing a wrapper element.
-To preserve additional props, a `div` wrapper _will_ be created if any props
-aside from `children` are passed.
+Component used as equivalent of Fragment with unescaped HTML, in cases where it is desirable to render dangerous HTML without needing a wrapper element. To preserve additional props, a `div` wrapper _will_ be created if any props aside from `children` are passed.
 
 _Parameters_
 
@@ -334,12 +341,13 @@ _Returns_
 
 ### render
 
+> **Deprecated** since WordPress 6.2.0. Use `createRoot` instead.
+
 Renders a given element into the target DOM node.
 
-_Parameters_
+_Related_
 
--   _element_ `import('./react').WPElement`: Element to render.
--   _target_ `HTMLElement`: DOM node into which element should be rendered.
+-   <https://react.dev/reference/react-dom/render>
 
 ### renderToString
 
@@ -386,11 +394,13 @@ _Returns_
 
 ### unmountComponentAtNode
 
+> **Deprecated** since WordPress 6.2.0. Use `root.unmount()` instead.
+
 Removes any mounted element from the target DOM node.
 
-_Parameters_
+_Related_
 
--   _target_ `Element`: DOM node in which element is to be removed
+-   <https://react.dev/reference/react-dom/unmountComponentAtNode>
 
 ### useCallback
 

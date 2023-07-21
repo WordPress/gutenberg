@@ -32,7 +32,7 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 	const type = message.type();
 	if (
 		! OBSERVED_CONSOLE_MESSAGE_TYPES.includes(
-			type as typeof OBSERVED_CONSOLE_MESSAGE_TYPES[ number ]
+			type as ( typeof OBSERVED_CONSOLE_MESSAGE_TYPES )[ number ]
 		)
 	) {
 		return;
@@ -85,7 +85,8 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 		return;
 	}
 
-	const logFunction = type as typeof OBSERVED_CONSOLE_MESSAGE_TYPES[ number ];
+	const logFunction =
+		type as ( typeof OBSERVED_CONSOLE_MESSAGE_TYPES )[ number ];
 
 	// Disable reason: We intentionally bubble up the console message
 	// which, unless the test explicitly anticipates the logging via
@@ -134,18 +135,6 @@ const test = base.extend<
 				baseURL: workerInfo.project.use.baseURL,
 				storageStatePath: STORAGE_STATE_PATH,
 			} );
-
-			await Promise.all( [
-				requestUtils.activateTheme( 'twentytwentyone' ),
-				// Disable this test plugin as it's conflicting with some of the tests.
-				// We already have reduced motion enabled and Playwright will wait for most of the animations anyway.
-				requestUtils.deactivatePlugin(
-					'gutenberg-test-plugin-disables-the-css-animations'
-				),
-				requestUtils.deleteAllPosts(),
-				requestUtils.deleteAllBlocks(),
-				requestUtils.resetPreferences(),
-			] );
 
 			await use( requestUtils );
 		},

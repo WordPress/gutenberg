@@ -17,7 +17,7 @@ This document outlines a typical flow of migrating a Jest + Puppeteer test to Pl
 
 ## Migration steps for test utils
 
-Before migrating a test utility function, think twice about whether it's necessary. Playwright offers a lot of readable and powerful APIs which make a lot of the utils obsolete. Try implementing the same thing inline directly in the test first. Only follow the below guide if that doesn't work for you. Some examples of utils that deserve to be implemented in the `e2e-test-utils-playwright` package include complex browser APIs (like `pageUtils.dragFiles` and `pageUtils.pressKeyWithModifier`) and APIs that set states (`requestUtils.*`).
+Before migrating a test utility function, think twice about whether it's necessary. Playwright offers a lot of readable and powerful APIs which make a lot of the utils obsolete. Try implementing the same thing inline directly in the test first. Only follow the below guide if that doesn't work for you. Some examples of utils that deserve to be implemented in the `e2e-test-utils-playwright` package include complex browser APIs (like `pageUtils.dragFiles` and `pageUtils.pressKeys`) and APIs that set states (`requestUtils.*`).
 
 > **Note**
 > The `e2e-test-utils-playwright` package is not meant to be a drop-in replacement of the Jest + Puppeteer's `e2e-test-utils` package. Some utils are only created to ease the migration process, but they are not necessarily required.
@@ -25,7 +25,7 @@ Before migrating a test utility function, think twice about whether it's necessa
 Playwright utilities are organized a little differently from those in the `e2e-test-utils` package. The `e2e-test-utils-playwright` package has the following folders that utils are divided up into:
 - `admin` - Utilities related to WordPress admin or WordPress admin's user interface (e.g. `visitAdminPage`).
 - `editor` - Utilities for the block editor (e.g. `clickBlockToolbarButton`).
-- `pageUtils` - General utilities for interacting with the browser (e.g. `pressKeyWithModifier`).
+- `pageUtils` - General utilities for interacting with the browser (e.g. `pressKeys`).
 - `requestUtils` - Utilities for making REST API requests (e.g. `activatePlugin`). These utilities are used for setup and teardown of tests.
 
 1. Copy the existing file in `e2e-test-utils` and paste it in the `admin`, `editor`, `page` or `request` folder in `e2e-test-utils-playwright` depending on the type of util.

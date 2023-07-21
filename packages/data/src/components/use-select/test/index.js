@@ -6,7 +6,7 @@ import { act, render, fireEvent, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { Component, useState, useReducer } from '@wordpress/element';
+import { useLayoutEffect, useState, useReducer } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,6 +18,19 @@ import {
 	AsyncModeProvider,
 } from '../../..';
 import useSelect from '..';
+
+function counterStore( initialCount = 0, step = 1 ) {
+	return {
+		reducer: ( state = initialCount, action ) =>
+			action.type === 'INC' ? state + step : state,
+		actions: {
+			inc: () => ( { type: 'INC' } ),
+		},
+		selectors: {
+			get: ( state ) => state,
+		},
+	};
+}
 
 describe( 'useSelect', () => {
 	let registry;
@@ -109,7 +122,7 @@ describe( 'useSelect', () => {
 		);
 
 		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
-		expect( selectSpyBar ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpyBar ).toHaveBeenCalledTimes( 1 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 
 		// Ensure expected state was rendered.
@@ -178,6 +191,81 @@ describe( 'useSelect', () => {
 		expect( mapSelectChild ).toHaveBeenCalledTimes( 3 );
 		expect( Parent ).toHaveBeenCalledTimes( 3 );
 		expect( Child ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'incrementally subscribes to newly selected stores', () => {
+		registry.registerStore( 'store-main', counterStore() );
+		registry.registerStore( 'store-even', counterStore( 0, 2 ) );
+		registry.registerStore( 'store-odd', counterStore( 1, 2 ) );
+
+		const mapSelect = jest.fn( ( select ) => {
+			const first = select( 'store-main' ).get();
+			// select from other stores depending on whether main value is even or odd
+			const secondStore = first % 2 === 1 ? 'store-odd' : 'store-even';
+			const second = select( secondStore ).get();
+			return first + ':' + second;
+		} );
+
+		const TestComponent = jest.fn( () => {
+			const data = useSelect( mapSelect, [] );
+			return <div role="status">{ data }</div>;
+		} );
+
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		expect( mapSelect ).toHaveBeenCalledTimes( 2 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:0' );
+
+		// check that increment in store-even triggers a render
+		act( () => {
+			registry.dispatch( 'store-even' ).inc();
+		} );
+
+		expect( mapSelect ).toHaveBeenCalledTimes( 3 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:2' );
+
+		// check that increment in store-odd doesn't trigger a render (not listening yet)
+		act( () => {
+			registry.dispatch( 'store-odd' ).inc();
+		} );
+
+		expect( mapSelect ).toHaveBeenCalledTimes( 3 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:2' );
+
+		// check that increment in main store switches to store-odd
+		act( () => {
+			registry.dispatch( 'store-main' ).inc();
+		} );
+
+		expect( mapSelect ).toHaveBeenCalledTimes( 4 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1:3' );
+
+		// check that increment in store-odd triggers a render
+		act( () => {
+			registry.dispatch( 'store-odd' ).inc();
+		} );
+
+		expect( mapSelect ).toHaveBeenCalledTimes( 5 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 4 );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1:5' );
+
+		// check that increment in store-even triggers a mapSelect call (still listening)
+		// but not a render (not used for selected value which doesn't change)
+		act( () => {
+			registry.dispatch( 'store-even' ).inc();
+		} );
+
+		expect( mapSelect ).toHaveBeenCalledTimes( 6 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 4 );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1:5' );
 	} );
 
 	describe( 'rerenders as expected with various mapSelect return types', () => {
@@ -254,40 +342,20 @@ describe( 'useSelect', () => {
 	} );
 
 	describe( 're-calls the selector as few times as possible', () => {
-		const counterStore = {
-			actions: {
-				increment: () => ( { type: 'INCREMENT' } ),
-			},
-			reducer: ( state, action ) => {
-				if ( ! state ) {
-					return { counter: 0 };
-				}
-				if ( action?.type === 'INCREMENT' ) {
-					return { counter: state.counter + 1 };
-				}
-				return state;
-			},
-			selectors: {
-				getCounter: ( state ) => state.counter,
-			},
-		};
-
 		it( 'only calls the selectors it has selected', () => {
-			registry.registerStore( 'store-1', counterStore );
-			registry.registerStore( 'store-2', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
+			registry.registerStore( 'store-2', counterStore() );
 
 			const selectCount1 = jest.fn();
 			const selectCount2 = jest.fn();
 
 			const TestComponent = jest.fn( () => {
 				const count1 = useSelect(
-					( select ) =>
-						selectCount1() || select( 'store-1' ).getCounter(),
+					( select ) => selectCount1() || select( 'store-1' ).get(),
 					[]
 				);
 				useSelect(
-					( select ) =>
-						selectCount2() || select( 'store-2' ).getCounter(),
+					( select ) => selectCount2() || select( 'store-2' ).get(),
 					[]
 				);
 
@@ -306,7 +374,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
-				registry.dispatch( 'store-2' ).increment();
+				registry.dispatch( 'store-2' ).inc();
 			} );
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
@@ -315,7 +383,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
-				registry.dispatch( 'store-1' ).increment();
+				registry.dispatch( 'store-1' ).inc();
 			} );
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 3 );
@@ -328,9 +396,9 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'can subscribe to multiple stores at once', () => {
-			registry.registerStore( 'store-1', counterStore );
-			registry.registerStore( 'store-2', counterStore );
-			registry.registerStore( 'store-3', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
+			registry.registerStore( 'store-2', counterStore() );
+			registry.registerStore( 'store-3', counterStore() );
 
 			const selectCount1And2 = jest.fn();
 
@@ -338,8 +406,8 @@ describe( 'useSelect', () => {
 				const { count1, count2 } = useSelect(
 					( select ) =>
 						selectCount1And2() || {
-							count1: select( 'store-1' ).getCounter(),
-							count2: select( 'store-2' ).getCounter(),
+							count1: select( 'store-1' ).get(),
+							count2: select( 'store-2' ).get(),
 						},
 					[]
 				);
@@ -361,14 +429,14 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0,0' );
 
 			act( () => {
-				registry.dispatch( 'store-2' ).increment();
+				registry.dispatch( 'store-2' ).inc();
 			} );
 
 			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0,1' );
 
 			act( () => {
-				registry.dispatch( 'store-3' ).increment();
+				registry.dispatch( 'store-3' ).inc();
 			} );
 
 			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
@@ -376,9 +444,9 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 're-calls the selector when deps changed', () => {
-			registry.registerStore( 'store-1', counterStore );
-			registry.registerStore( 'store-2', counterStore );
-			registry.registerStore( 'store-3', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
+			registry.registerStore( 'store-2', counterStore() );
+			registry.registerStore( 'store-3', counterStore() );
 
 			let dep, setDep;
 			const selectCount1AndDep = jest.fn();
@@ -388,7 +456,7 @@ describe( 'useSelect', () => {
 				const state = useSelect(
 					( select ) =>
 						selectCount1AndDep() || {
-							count1: select( 'store-1' ).getCounter(),
+							count1: select( 'store-1' ).get(),
 							dep,
 						},
 					[ dep ]
@@ -416,63 +484,40 @@ describe( 'useSelect', () => {
 				setDep( 1 );
 			} );
 
-			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 4 );
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 3 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count:0,dep:1'
 			);
 
 			act( () => {
-				registry.dispatch( 'store-1' ).increment();
+				registry.dispatch( 'store-1' ).inc();
 			} );
 
-			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 5 );
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 4 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count:1,dep:1'
 			);
 		} );
 
-		it( 'captures state changes scheduled between render and effect', () => {
-			registry.registerStore( 'store-1', counterStore );
+		it( 'captures state changes scheduled between render and subscription', () => {
+			registry.registerStore( 'store-1', counterStore() );
 
-			class ChildComponent extends Component {
-				componentDidUpdate( prevProps ) {
-					if (
-						this.props.childShouldDispatch &&
-						this.props.childShouldDispatch !==
-							prevProps.childShouldDispatch
-					) {
-						registry.dispatch( 'store-1' ).increment();
-					}
-				}
-
-				render() {
-					return null;
-				}
-			}
-
-			const selectCount1AndDep = jest.fn( ( select ) => ( {
-				count1: select( 'store-1' ).getCounter(),
+			const selectCount1 = jest.fn( ( select ) => ( {
+				count1: select( 'store-1' ).get(),
 			} ) );
 
-			const TestComponent = () => {
-				const [ childShouldDispatch, setChildShouldDispatch ] =
-					useState( false );
-				const state = useSelect( selectCount1AndDep, [] );
+			const TestComponent = jest.fn( () => {
+				const { count1 } = useSelect( selectCount1, [] );
 
-				return (
-					<>
-						<div role="status">count1:{ state.count1 }</div>
-						<ChildComponent
-							childShouldDispatch={ childShouldDispatch }
-						/>
-						<button
-							onClick={ () => setChildShouldDispatch( true ) }
-						>
-							triggerChildDispatch
-						</button>
-					</>
-				);
-			};
+				// Increment the store value from 0 to 1 after render and before subscription
+				useLayoutEffect( () => {
+					if ( count1 === 0 ) {
+						registry.dispatch( 'store-1' ).inc();
+					}
+				}, [ count1 ] );
+
+				return <div role="status">count1:{ count1 }</div>;
+			} );
 
 			render(
 				<RegistryProvider value={ registry }>
@@ -480,30 +525,93 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			fireEvent.click( screen.getByText( 'triggerChildDispatch' ) );
+			// One select on initial render, and one in `checkIfSnapshotChanged` after subscribing.
+			// There's a third selector call on the second render, but that one returns a memoized value.
+			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 
-			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 3 );
+			// Initial render and second render after counter increment (which is expected to be detected).
+			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+
+			// Finally rendered with the incremented counter's value.
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count1:1'
 			);
 		} );
 
+		it( 'captures state changes scheduled between render and effect after selector change', () => {
+			registry.registerStore( 'names', {
+				reducer: ( state = {}, action ) => {
+					if ( action.type === 'SET_NAME' ) {
+						return {
+							...state,
+							[ action.id ]: action.name,
+						};
+					}
+					return state;
+				},
+				actions: {
+					setName: ( id, name ) => ( { type: 'SET_NAME', id, name } ),
+				},
+				selectors: {
+					getName: ( state, id ) => state[ id ] ?? 'null',
+				},
+			} );
+
+			const renderedItems = [];
+
+			function TestComponent() {
+				const [ blockId, setBlockId ] = useState( 1 );
+
+				const name = useSelect(
+					( select ) => select( 'names' ).getName( blockId ),
+					[ blockId ]
+				);
+
+				// Change name of block 2. The store listener will still use the old selector
+				// for block 1, because a new one will be stored by an effect a moment later,
+				// but we're testing that it still won't miss the update, because one more check
+				// will happen in that effect.
+				useLayoutEffect( () => {
+					if ( blockId === 2 ) {
+						registry.dispatch( 'names' ).setName( 2, 'new2' );
+					}
+				}, [ blockId ] );
+
+				renderedItems.push( name );
+
+				return (
+					<button onClick={ () => setBlockId( 2 ) }>
+						change-block
+					</button>
+				);
+			}
+
+			render(
+				<RegistryProvider value={ registry }>
+					<TestComponent />
+				</RegistryProvider>
+			);
+			expect( renderedItems ).toEqual( [ 'null' ] );
+
+			fireEvent.click( screen.getByRole( 'button' ) );
+			// After click, there are two new renders:
+			// 1. With of block 2, after state update of `blockId` from 1 to 2
+			// 2. After dispatching an action to change 2's name to `new2`
+			expect( renderedItems ).toEqual( [ 'null', 'null', 'new2' ] );
+		} );
+
 		it( 'handles registry selectors', () => {
 			const getCount1And2 = createRegistrySelector(
 				( select ) => ( state ) => ( {
-					count1: state.counter,
-					count2: select( 'store-2' ).getCounter(),
+					count1: state,
+					count2: select( 'store-2' ).get(),
 				} )
 			);
 
-			registry.registerStore( 'store-1', {
-				...counterStore,
-				selectors: {
-					...counterStore.selectors,
-					getCount1And2,
-				},
-			} );
-			registry.registerStore( 'store-2', counterStore );
+			const store1Spec = counterStore();
+			Object.assign( store1Spec.selectors, { getCount1And2 } );
+			registry.registerStore( 'store-1', store1Spec );
+			registry.registerStore( 'store-2', counterStore() );
 
 			const selectCount1And2 = jest.fn();
 
@@ -534,7 +642,7 @@ describe( 'useSelect', () => {
 			);
 
 			act( () => {
-				registry.dispatch( 'store-2' ).increment();
+				registry.dispatch( 'store-2' ).inc();
 			} );
 
 			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
@@ -544,8 +652,8 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'handles conditional statements in selectors', () => {
-			registry.registerStore( 'store-1', counterStore );
-			registry.registerStore( 'store-2', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
+			registry.registerStore( 'store-2', counterStore() );
 
 			const selectCount1 = jest.fn();
 			const selectCount2 = jest.fn();
@@ -559,13 +667,11 @@ describe( 'useSelect', () => {
 					( select ) => {
 						if ( shouldSelectCount1 ) {
 							selectCount1();
-							select( 'store-1' ).getCounter();
-							return 'count1';
+							return 'count1:' + select( 'store-1' ).get();
 						}
 
 						selectCount2();
-						select( 'store-2' ).getCounter();
-						return 'count2';
+						return 'count2:' + select( 'store-2' ).get();
 					},
 					[ shouldSelectCount1 ]
 				);
@@ -587,29 +693,40 @@ describe( 'useSelect', () => {
 			expect( selectCount1 ).toHaveBeenCalledTimes( 0 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				'count2'
+				'count2:0'
 			);
 
 			act( () => screen.getByText( 'Toggle' ).click() );
 
+			expect( selectCount1 ).toHaveBeenCalledTimes( 1 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
+				'count1:0'
+			);
+
+			// Verify that the component subscribed to store-1 after selected from
+			act( () => {
+				registry.dispatch( 'store-1' ).inc();
+			} );
+
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				'count1'
+				'count1:1'
 			);
 		} );
 
 		it( "handles subscriptions to the parent's stores", () => {
-			registry.registerStore( 'parent-store', counterStore );
+			registry.registerStore( 'parent-store', counterStore() );
 
 			const subRegistry = createRegistry( {}, registry );
-			subRegistry.registerStore( 'child-store', counterStore );
+			subRegistry.registerStore( 'child-store', counterStore() );
 
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
 					( select ) => ( {
-						parentCount: select( 'parent-store' ).getCounter(),
-						childCount: select( 'child-store' ).getCounter(),
+						parentCount: select( 'parent-store' ).get(),
+						childCount: select( 'child-store' ).get(),
 					} ),
 					[]
 				);
@@ -634,7 +751,7 @@ describe( 'useSelect', () => {
 			);
 
 			act( () => {
-				registry.dispatch( 'parent-store' ).increment();
+				registry.dispatch( 'parent-store' ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
@@ -643,13 +760,13 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'handles non-existing stores', () => {
-			registry.registerStore( 'store-1', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
 
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
 					( select ) => ( {
-						count1: select( 'store-1' ).getCounter(),
-						count2: select( 'store-2' )?.getCounter() ?? 'blank',
+						count1: select( 'store-1' ).get(),
+						count2: select( 'store-2' )?.get() ?? 'blank',
 					} ),
 					[]
 				);
@@ -672,7 +789,7 @@ describe( 'useSelect', () => {
 			);
 
 			act( () => {
-				registry.dispatch( 'store-1' ).increment();
+				registry.dispatch( 'store-1' ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
@@ -687,8 +804,7 @@ describe( 'useSelect', () => {
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
 					( select ) =>
-						select( 'not-yet-registered-store' )?.getCounter() ??
-						'blank',
+						select( 'not-yet-registered-store' )?.get() ?? 'blank',
 					[]
 				);
 
@@ -706,7 +822,7 @@ describe( 'useSelect', () => {
 			act( () => {
 				registry.registerStore(
 					'not-yet-registered-store',
-					counterStore
+					counterStore()
 				);
 			} );
 
@@ -714,7 +830,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'blank' );
 
 			act( () => {
-				registry.dispatch( 'not-yet-registered-store' ).increment();
+				registry.dispatch( 'not-yet-registered-store' ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
@@ -729,9 +845,8 @@ describe( 'useSelect', () => {
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
 					( select ) =>
-						select(
-							'not-yet-registered-child-store'
-						)?.getCounter() ?? 'blank',
+						select( 'not-yet-registered-child-store' )?.get() ??
+						'blank',
 					[]
 				);
 
@@ -751,7 +866,7 @@ describe( 'useSelect', () => {
 			act( () => {
 				registry.registerStore(
 					'not-yet-registered-child-store',
-					counterStore
+					counterStore()
 				);
 			} );
 
@@ -759,9 +874,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'blank' );
 
 			act( () => {
-				registry
-					.dispatch( 'not-yet-registered-child-store' )
-					.increment();
+				registry.dispatch( 'not-yet-registered-child-store' ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
@@ -778,11 +891,11 @@ describe( 'useSelect', () => {
 					let counter = 0;
 
 					const selectors = {
-						getCounter: () => counter,
+						get: () => counter,
 					};
 
 					const actions = {
-						increment: () => {
+						inc: () => {
 							counter += 1;
 							storeChanged();
 						},
@@ -806,7 +919,7 @@ describe( 'useSelect', () => {
 
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
-					( select ) => select( customStore ).getCounter(),
+					( select ) => select( customStore ).get(),
 					[]
 				);
 
@@ -822,7 +935,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
-				registry.dispatch( customStore ).increment();
+				registry.dispatch( customStore ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
@@ -832,25 +945,8 @@ describe( 'useSelect', () => {
 	} );
 
 	describe( 'async mode', () => {
-		function registerCounterStore( reg, initialCount = 0 ) {
-			reg.registerStore( 'counter', {
-				reducer: ( state = initialCount, action ) => {
-					if ( action.type === 'INCREMENT' ) {
-						return state + 1;
-					}
-					return state;
-				},
-				actions: {
-					inc: () => ( { type: 'INCREMENT' } ),
-				},
-				selectors: {
-					get: ( state ) => state,
-				},
-			} );
-		}
-
 		beforeEach( () => {
-			registerCounterStore( registry );
+			registry.registerStore( 'counter', counterStore() );
 		} );
 
 		it( 'renders with async mode', async () => {
@@ -1030,7 +1126,7 @@ describe( 'useSelect', () => {
 
 		it( 'cancels scheduled updates when registry changes', async () => {
 			const registry2 = createRegistry();
-			registerCounterStore( registry2, 100 );
+			registry2.registerStore( 'counter', counterStore( 100 ) );
 
 			const selectSpy = jest.fn( ( select ) =>
 				select( 'counter' ).get()
@@ -1073,16 +1169,8 @@ describe( 'useSelect', () => {
 	} );
 
 	describe( 'usage without dependencies array', () => {
-		function registerStore( name, initial ) {
-			registry.registerStore( name, {
-				reducer: ( s = initial, a ) => ( a.type === 'inc' ? s + 1 : s ),
-				actions: { inc: () => ( { type: 'inc' } ) },
-				selectors: { get: ( s ) => s },
-			} );
-		}
-
 		it( 'does not memoize the callback when there are no deps', () => {
-			registerStore( 'store', 1 );
+			registry.registerStore( 'store', counterStore( 1 ) );
 
 			const Status = ( { multiple } ) => {
 				const count = useSelect(
@@ -1106,9 +1194,9 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '2' );
 		} );
 
-		it( 'subscribes only stores used by the initial callback', () => {
-			registerStore( 'counter-1', 1 );
-			registerStore( 'counter-2', 10 );
+		it( 'resubscribes when the set of selected stores changes', () => {
+			registry.registerStore( 'counter-1', counterStore( 1 ) );
+			registry.registerStore( 'counter-2', counterStore( 10 ) );
 
 			const Status = ( { store } ) => {
 				const count = useSelect( ( select ) => select( store ).get() );
@@ -1135,21 +1223,17 @@ describe( 'useSelect', () => {
 			rerender( <App store="counter-2" /> );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '10' );
 
-			// update from counter-2 is ignored because component is subcribed only to counter-1
+			// update from counter-2 is processed because component has subscribed to counter-2
 			act( () => {
 				registry.dispatch( 'counter-2' ).inc();
 			} );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '10' );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '11' );
 		} );
 	} );
 
 	describe( 'static store selection mode', () => {
 		it( 'can read the current value from store', () => {
-			registry.registerStore( 'testStore', {
-				reducer: ( s = 0, a ) => ( a.type === 'INC' ? s + 1 : s ),
-				actions: { inc: () => ( { type: 'INC' } ) },
-				selectors: { get: ( s ) => s },
-			} );
+			registry.registerStore( 'testStore', counterStore() );
 
 			const record = jest.fn();
 

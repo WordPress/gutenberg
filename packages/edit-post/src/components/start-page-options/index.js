@@ -113,6 +113,7 @@ export default function StartPageOptions() {
 		<Modal
 			className="edit-post-start-page-options__modal"
 			title={ __( 'Choose a pattern' ) }
+			isFullScreen={ true }
 			onRequestClose={ () => {
 				setModalState( START_PAGE_MODAL_STATES.CLOSED );
 			} }

@@ -4,31 +4,46 @@
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import normalizeRecordKey from '../../utils/normalize-record-key';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function useInitEditedEntityFromURL() {
-	const { params: { postId, postType } = {} } = useLocation();
+	const { params } = useLocation();
+
+	const { postType } = params;
+
+	const postId = normalizeRecordKey( params?.postId );
+
 	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
-		const { getSite } = select( coreDataStore );
+		const { getSite, getUnstableBase } = select( coreDataStore );
 		const siteData = getSite();
+		const base = getUnstableBase();
 
 		return {
-			isRequestingSite: ! siteData,
+			isRequestingSite: ! base,
 			homepageId:
 				siteData?.show_on_front === 'page'
 					? siteData.page_on_front
 					: null,
-			url: siteData?.url,
+			url: base?.home,
 		};
 	}, [] );
 
-	const { setTemplate, setTemplatePart, setPage } =
-		useDispatch( editSiteStore );
+	const {
+		setEditedEntity,
+		setTemplate,
+		setTemplatePart,
+		setPage,
+		setNavigationMenu,
+	} = useDispatch( editSiteStore );
 
 	useEffect( () => {
 		if ( postType && postId ) {
@@ -38,6 +53,12 @@ export default function useInitEditedEntityFromURL() {
 					break;
 				case 'wp_template_part':
 					setTemplatePart( postId );
+					break;
+				case 'wp_navigation':
+					setNavigationMenu( postId );
+					break;
+				case 'wp_block':
+					setEditedEntity( postType, postId );
 					break;
 				default:
 					setPage( {
@@ -51,7 +72,7 @@ export default function useInitEditedEntityFromURL() {
 		// In all other cases, we need to set the home page in the site editor view.
 		if ( homepageId ) {
 			setPage( {
-				context: { postType: 'page', postId: homepageId },
+				context: { postType: 'page', postId: Number( homepageId ) },
 			} );
 		} else if ( ! isRequestingSite ) {
 			setPage( {
@@ -64,8 +85,10 @@ export default function useInitEditedEntityFromURL() {
 		postType,
 		homepageId,
 		isRequestingSite,
+		setEditedEntity,
 		setPage,
 		setTemplate,
 		setTemplatePart,
+		setNavigationMenu,
 	] );
 }

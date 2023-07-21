@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */

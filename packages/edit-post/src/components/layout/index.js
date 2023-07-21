@@ -12,7 +12,9 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
+	EditorKeyboardShortcuts,
 	EditorSnackbars,
+	PostSyncStatusModal,
 	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -202,6 +204,7 @@ function Layout( { styles } ) {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
+			<EditorKeyboardShortcuts />
 			<SettingsSidebar />
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isLargeViewport }
@@ -291,6 +294,7 @@ function Layout( { styles } ) {
 			<EditPostPreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
+			<PostSyncStatusModal />
 			<StartPageOptions />
 			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />

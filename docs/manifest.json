@@ -438,6 +438,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Selectors",
+		"slug": "block-selectors",
+		"markdown_source": "../docs/reference-guides/block-api/block-selectors.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Styles",
 		"slug": "block-styles",
 		"markdown_source": "../docs/reference-guides/block-api/block-styles.md",
@@ -450,7 +456,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Block Templates",
+		"title": "Templates",
 		"slug": "block-templates",
 		"markdown_source": "../docs/reference-guides/block-api/block-templates.md",
 		"parent": "block-api"
@@ -588,13 +594,13 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Version 2 (living reference)",
+		"title": "Theme.json Version 2",
 		"slug": "theme-json-living",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-living.md",
 		"parent": "theme-json-reference"
 	},
 	{
-		"title": "Version 1 Reference",
+		"title": "Theme.json Version 1 Reference",
 		"slug": "theme-json-v1",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v1.md",
 		"parent": "theme-json-reference"
@@ -1470,6 +1476,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/commands",
+		"slug": "packages-commands",
+		"markdown_source": "../packages/commands/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/components",
 		"slug": "packages-components",
 		"markdown_source": "../packages/components/README.md",
@@ -1482,9 +1494,21 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/core-commands",
+		"slug": "packages-core-commands",
+		"markdown_source": "../packages/core-commands/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-data",
 		"slug": "packages-core-data",
 		"markdown_source": "../packages/core-data/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/create-block-interactive-template",
+		"slug": "packages-create-block-interactive-template",
+		"markdown_source": "../packages/create-block-interactive-template/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1557,6 +1581,12 @@
 		"title": "@wordpress/dom",
 		"slug": "packages-dom",
 		"markdown_source": "../packages/dom/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/e2e-test-utils-playwright",
+		"slug": "packages-e2e-test-utils-playwright",
+		"markdown_source": "../packages/e2e-test-utils-playwright/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1650,6 +1680,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/interactivity",
+		"slug": "packages-interactivity",
+		"markdown_source": "../packages/interactivity/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/interface",
 		"slug": "packages-interface",
 		"markdown_source": "../packages/interface/README.md",
@@ -1719,6 +1755,12 @@
 		"title": "@wordpress/npm-package-json-lint-config",
 		"slug": "packages-npm-package-json-lint-config",
 		"markdown_source": "../packages/npm-package-json-lint-config/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/nux",
+		"slug": "packages-nux",
+		"markdown_source": "../packages/nux/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1809,6 +1851,12 @@
 		"title": "@wordpress/rich-text",
 		"slug": "packages-rich-text",
 		"markdown_source": "../packages/rich-text/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/router",
+		"slug": "packages-router",
+		"markdown_source": "../packages/router/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1962,6 +2010,12 @@
 		"parent": "data"
 	},
 	{
+		"title": "The NUX (New User Experience) Data",
+		"slug": "data-core-nux",
+		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
+		"parent": "data"
+	},
+	{
 		"title": "Preferences",
 		"slug": "data-core-preferences",
 		"markdown_source": "../docs/reference-guides/data/data-core-preferences.md",
@@ -2010,6 +2064,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Entities and Undo/Redo.",
+		"slug": "entities",
+		"markdown_source": "../docs/explanations/architecture/entities.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Modularity",
 		"slug": "modularity",
 		"markdown_source": "../docs/explanations/architecture/modularity.md",
@@ -2028,7 +2088,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Full Site Editing Templates",
+		"title": "Site Editing Templates",
 		"slug": "full-site-editing-templates",
 		"markdown_source": "../docs/explanations/architecture/full-site-editing-templates.md",
 		"parent": "architecture"
@@ -2134,12 +2194,6 @@
 		"slug": "overusing-snapshots",
 		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
 		"parent": "e2e"
-	},
-	{
-		"title": "Block Grammar",
-		"slug": "grammar",
-		"markdown_source": "../docs/contributors/code/grammar.md",
-		"parent": "code"
 	},
 	{
 		"title": "Scripts",
@@ -2250,7 +2304,7 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Localizing Gutenberg Plugin",
+		"title": "Localizing Gutenberg",
 		"slug": "localizing",
 		"markdown_source": "../docs/contributors/localizing.md",
 		"parent": "contributors"
@@ -2277,12 +2331,6 @@
 		"title": "Versions in WordPress",
 		"slug": "versions-in-wordpress",
 		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Upcoming Projects & Roadmap",
-		"slug": "roadmap",
-		"markdown_source": "../docs/contributors/roadmap.md",
 		"parent": "contributors"
 	}
 ]

@@ -2,12 +2,12 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { get } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { getBlockType } from './selectors';
+import { getValueFromObjectPath } from './utils';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
 
 const ROOT_BLOCK_SUPPORTS = [
@@ -15,7 +15,9 @@ const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'captionColor',
 	'buttonColor',
+	'headingColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -133,7 +135,7 @@ export const getSupportedStyles = createSelector(
 				if (
 					STYLE_PROPERTY[ styleName ].support[ 0 ] in
 						blockType.supports &&
-					get(
+					getValueFromObjectPath(
 						blockType.supports,
 						STYLE_PROPERTY[ styleName ].support
 					) !== false
@@ -144,7 +146,7 @@ export const getSupportedStyles = createSelector(
 			}
 
 			if (
-				get(
+				getValueFromObjectPath(
 					blockType.supports,
 					STYLE_PROPERTY[ styleName ].support,
 					false

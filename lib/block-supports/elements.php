@@ -39,13 +39,18 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		$link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', 'color', 'text' ), null );
 	}
 
+	$hover_link_color = null;
+	if ( ! empty( $block['attrs'] ) ) {
+		$hover_link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', ':hover', 'color', 'text' ), null );
+	}
+
 	/*
-	* For now we only care about link color.
+	* For now we only care about link colors.
 	* This code in the future when we have a public API
 	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
 	* and work for any element and style.
 	*/
-	if ( null === $link_color ) {
+	if ( null === $link_color && null === $hover_link_color ) {
 		return $block_content;
 	}
 
@@ -93,6 +98,16 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 			'context'  => 'block-supports',
 		)
 	);
+
+	if ( isset( $link_block_styles[':hover'] ) ) {
+		gutenberg_style_engine_get_styles(
+			$link_block_styles[':hover'],
+			array(
+				'selector' => ".$class_name a:hover",
+				'context'  => 'block-supports',
+			)
+		);
+	}
 
 	return null;
 }
