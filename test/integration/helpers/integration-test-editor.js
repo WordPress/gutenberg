@@ -18,7 +18,10 @@ import {
 	ObserveTyping,
 } from '@wordpress/block-editor';
 import { Popover, SlotFillProvider } from '@wordpress/components';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import {
+	registerCoreBlocks,
+	__experimentalGetCoreBlocks,
+} from '@wordpress/block-library';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import '@wordpress/format-library';
 import {
@@ -100,14 +103,19 @@ export function Editor( { testBlocks, settings = {} } ) {
  * @param {Object | Array} testBlocks    Block or array of block settings for blocks to be tested.
  * @param {boolean}        useCoreBlocks Defaults to true. If false, core blocks will not be registered.
  * @param {Object}         settings      Any additional editor settings to be passed to the editor.
+ * @param {Array}          skippedBlocks Blocks that should be skipped during registration.
  */
 export async function initializeEditor(
 	testBlocks,
 	useCoreBlocks = true,
-	settings
+	settings,
+	skippedBlocks = []
 ) {
 	if ( useCoreBlocks ) {
-		registerCoreBlocks();
+		const coreBlocks = __experimentalGetCoreBlocks().filter(
+			( { name } ) => ! skippedBlocks.includes( name )
+		);
+		registerCoreBlocks( coreBlocks );
 	}
 	const blocks = Array.isArray( testBlocks ) ? testBlocks : [ testBlocks ];
 	const newBlocks = blocks.map( ( testBlock ) =>
