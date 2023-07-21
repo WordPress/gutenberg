@@ -61,6 +61,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 				),
 				{
 					type: 'snackbar',
+					id: 'block-pattern-inserted-notice',
 				}
 			);
 		},
