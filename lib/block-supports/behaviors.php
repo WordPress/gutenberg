@@ -70,7 +70,11 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 
 	$aria_label = __( 'Enlarge image', 'gutenberg' );
 
-	$alt_attribute = trim( $processor->get_attribute( 'alt' ) );
+	$alt_attribute = $processor->get_attribute( 'alt' );
+
+	if ( null !== $alt_attribute  ) {
+		$alt_attribute = trim( $alt_attribute );
+	}
 
 	if ( $alt_attribute ) {
 		/* translators: %s: Image alt text. */
@@ -151,8 +155,11 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$m->next_tag( 'img' );
 	$m->set_attribute( 'src', '' );
 	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.responsiveImgSrc' );
-	$m->set_attribute( 'data-wp-style--width', 'selectors.core.image.inheritSize' );
-	$m->set_attribute( 'data-wp-style--height', 'selectors.core.image.inheritSize' );
+	$m->set_attribute( 'width', $img_width );
+	$m->set_attribute( 'height', $img_height );
+	if ( 'fade' === $lightbox_animation ) {
+		$m->set_attribute( 'style', '' );
+	}
 	$initial_image_content = $m->get_updated_html();
 
 	$q = new WP_HTML_Tag_Processor( $content );
@@ -161,8 +168,11 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$q->next_tag( 'img' );
 	$q->set_attribute( 'src', '' );
 	$q->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
-	$q->set_attribute( 'data-wp-style--width', 'selectors.core.image.inheritSize' );
-	$q->set_attribute( 'data-wp-style--height', 'selectors.core.image.inheritSize' );
+	$q->set_attribute( 'width', $img_width );
+	$q->set_attribute( 'height', $img_height );
+	if ( 'fade' === $lightbox_animation  ) {
+		$q->set_attribute( 'style', '' );
+	}
 	$enlarged_image_content = $q->get_updated_html();
 
 	$background_color = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
