@@ -293,8 +293,10 @@ class WP_Font_Family {
 					// If we are installing google fonts, we need to download the font face assets.
 					$new_font_face = $this->move_font_face_asset( $font_face, $files[ $font_face['file'] ] );
 				}
-				// If the font face assets were successfully downloaded, we add the font face to the new font.
-				// Font faces with failed downloads are not added to the new font.
+				/*
+				 * If the font face assets were successfully downloaded, we add the font face to the new font.
+				 * Font faces with failed downloads are not added to the new font.
+				 */
 				if ( ! empty( $new_font_face['src'] ) ) {
 					$new_font_faces[] = $new_font_face;
 				}
