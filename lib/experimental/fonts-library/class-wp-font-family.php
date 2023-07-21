@@ -134,10 +134,10 @@ class WP_Font_Family {
 	 * @param array $font_face The font face array containing the 'src' attribute with the file path(s) to be deleted.
 	 */
 	private static function delete_font_face_assets( $font_face ) {
-		$srcs = ! empty( $font_face['src'] ) && is_array( $font_face['src'] )
+		$sources = ! empty( $font_face['src'] ) && is_array( $font_face['src'] )
 			? $font_face['src']
 			: array( $font_face['src'] );
-		foreach ( $srcs as $src ) {
+		foreach ( $sources as $src ) {
 			$was_asset_removed = self::delete_asset( $src );
 			if ( ! $was_asset_removed ) {
 				// Bail if any of the assets could not be removed.
