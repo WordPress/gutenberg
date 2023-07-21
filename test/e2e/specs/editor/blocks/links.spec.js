@@ -111,6 +111,38 @@ test.describe( 'Links', () => {
 		expect( urlInput ).toBe( '' );
 	} );
 
+	test( `can be created without any text selected`, async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg: ' );
+
+		// Press Cmd+K to insert a link.
+		await pageUtils.pressKeys( 'primary+K' );
+
+		// Type a URL.
+		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+
+		// Press Enter to apply the link.
+		await pageUtils.pressKeys( 'Enter' );
+
+		// A link with the URL as its text should have been inserted.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'This is Gutenberg: <a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
+				},
+			},
+		] );
+	} );
+
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
 		page,
 		editor,

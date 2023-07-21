@@ -30,27 +30,6 @@ describe( 'Links', () => {
 		} );
 	};
 
-	it( 'can be created without any text selected', async () => {
-		// Create a block with some text.
-		await clickBlockAppender();
-		await page.keyboard.type( 'This is Gutenberg: ' );
-
-		// Press Cmd+K to insert a link.
-		await pressKeyWithModifier( 'primary', 'K' );
-
-		// Wait for the URL field to auto-focus.
-		await waitForURLFieldAutoFocus();
-
-		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-		// Press Enter to apply the link.
-		await page.keyboard.press( 'Enter' );
-
-		// A link with the URL as its text should have been inserted.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'can be created instantly when a URL is selected', async () => {
 		// Create a block with some text.
 		await clickBlockAppender();
