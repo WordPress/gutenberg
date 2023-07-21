@@ -87,4 +87,12 @@ export type TabPanelProps = {
 	 * @see https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/
 	 */
 	selectOnMove?: boolean;
+
+	/**
+	 * When `true` the tab panel will grow to fill its container.
+	 * .
+	 *
+	 * @default false
+	 */
+	fitted?: boolean;
 };

@@ -5,6 +5,12 @@
 	&[aria-orientation="vertical"] {
 		flex-direction: column;
 	}
+	&.is-fitted {
+		.components-tab-panel__tabs-item {
+			flex: 1;
+			justify-content: center;
+		}
+	}
 }
 
 // This tab style CSS is duplicated verbatim in

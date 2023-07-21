@@ -82,6 +82,7 @@ const UnforwardedTabPanel = (
 	{
 		className,
 		children,
+		fitted = false,
 		tabs,
 		selectOnMove = true,
 		initialTabName,
@@ -163,7 +164,11 @@ const UnforwardedTabPanel = (
 				onNavigate={
 					selectOnMove ? activateTabAutomatically : undefined
 				}
-				className="components-tab-panel__tabs"
+				//className="components-tab-panel__tabs"
+				className={ classnames(
+					'components-tab-panel__tabs',
+					fitted ? 'is-fitted' : null
+				) }
 			>
 				{ tabs.map( ( tab ) => (
 					<TabButton
