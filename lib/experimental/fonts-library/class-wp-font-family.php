@@ -340,8 +340,7 @@ class WP_Font_Family {
 	private function get_data_from_post() {
 		$post = $this->get_font_post();
 		if ( $post ) {
-			$data       = json_decode( $post->post_content, true );
-			$this->data = $data;
+			$this->data = json_decode( $post->post_content, true );
 			return $post;
 		}
 		return null;
