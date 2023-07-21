@@ -11,6 +11,7 @@ import {
 	initializeEditor,
 	render,
 	setupCoreBlocks,
+	waitFor,
 	within,
 } from 'test/helpers';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -39,9 +40,9 @@ const getTestComponentWithContent = ( content ) => {
 };
 
 describe( 'Paragraph block', () => {
-	it( 'renders without crashing', () => {
+	it( 'should render without crashing and match snapshot', () => {
 		const screen = getTestComponentWithContent( '' );
-		expect( screen.container ).toBeTruthy();
+		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 
 	it( 'should bold text', async () => {
@@ -250,7 +251,7 @@ describe( 'Paragraph block', () => {
 			'wordpress.org'
 		);
 		fireEvent.changeText(
-			screen.getByPlaceholderText( 'Add link text' ),
+			screen.getByPlaceholderText( 'Add link text', { hidden: true } ),
 			'WordPress'
 		);
 		jest.useFakeTimers();
@@ -371,6 +372,296 @@ describe( 'Paragraph block', () => {
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
 		<p>     <em>some text</em>      </p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
+
+	it( 'should set a text color', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Open Text color settings
+		fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
+
+		// Tap one color
+		fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
+
+		// Dismiss the Block Settings modal.
+		fireEvent( blockSettingsModal, 'backdropPress' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph {"textColor":"pale-pink"} -->
+		<p class="has-pale-pink-color has-text-color">A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+		` );
+	} );
+
+	it( 'should set a background color', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Open Background color settings
+		fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
+
+		// Tap one color
+		fireEvent.press( screen.getByLabelText( 'Luminous vivid orange' ) );
+
+		// Dismiss the Block Settings modal.
+		fireEvent( blockSettingsModal, 'backdropPress' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph {"backgroundColor":"luminous-vivid-orange"} -->
+		<p class="has-luminous-vivid-orange-background-color has-background">A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+		` );
+	} );
+
+	it( 'should set a text and background color', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Open Text color settings
+		fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
+
+		// Tap one color
+		fireEvent.press( screen.getByLabelText( 'White' ) );
+
+		// Go back to the settings menu
+		fireEvent.press( screen.getByLabelText( 'Go back' ) );
+
+		// Open Background color settings
+		fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
+
+		// Tap one color
+		fireEvent.press( screen.getByLabelText( 'Luminous vivid orange' ) );
+
+		// Dismiss the Block Settings modal.
+		fireEvent( blockSettingsModal, 'backdropPress' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph {"backgroundColor":"luminous-vivid-orange","textColor":"white"} -->
+		<p class="has-white-color has-luminous-vivid-orange-background-color has-text-color has-background">A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+		` );
+	} );
+
+	it( 'should remove text and background colors', async () => {
+		// Arrange
+		const screen = await initializeEditor( {
+			initialHtml: `<!-- wp:paragraph {"backgroundColor":"luminous-vivid-orange","textColor":"white"} -->
+			<p class="has-white-color has-luminous-vivid-orange-background-color has-text-color has-background">A quick brown fox jumps over the lazy dog.</p>
+			<!-- /wp:paragraph -->`,
+		} );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Open Text color settings
+		fireEvent.press( screen.getByLabelText( 'Text. Empty' ) );
+
+		// Reset color
+		fireEvent.press( await screen.findByText( 'Reset' ) );
+
+		// Go back to the settings menu
+		fireEvent.press( screen.getByLabelText( 'Go back' ) );
+
+		// Open Background color settings
+		fireEvent.press( screen.getByLabelText( 'Background. Empty' ) );
+
+		// Reset color
+		fireEvent.press( await screen.findByText( 'Reset' ) );
+
+		// Dismiss the Block Settings modal.
+		fireEvent( blockSettingsModal, 'backdropPress' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+		` );
+	} );
+
+	it( 'should not have a gradient background color option', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Open Background color settings
+		fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
+
+		// Assert
+		const colorButton = screen.getByLabelText( 'Luminous vivid orange' );
+		expect( colorButton ).toBeDefined();
+
+		const gradientButton = screen.queryByLabelText( 'Gradient' );
+		expect( gradientButton ).toBeNull();
+	} );
+
+	it( 'should set a theme text color', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Open Text color settings
+		fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
+
+		// Tap one color
+		fireEvent.press( screen.getByLabelText( 'Tertiary' ) );
+
+		// Dismiss the Block Settings modal.
+		fireEvent( blockSettingsModal, 'backdropPress' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph {"textColor":"tertiary"} -->
+		<p class="has-tertiary-color has-text-color">A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+		` );
+	} );
+
+	it( 'should show the contrast check warning', async () => {
+		// Arrange
+		const screen = await initializeEditor( {
+			initialHtml: `<!-- wp:paragraph {"backgroundColor":"white","textColor":"white"} -->
+			<p class="has-white-color has-white-background-color has-text-color has-background">A quick brown fox jumps over the lazy dog.</p>
+			<!-- /wp:paragraph -->`,
+		} );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Assert
+		const contrastCheckElement = screen.getByText(
+			/This color combination/
+		);
+		expect( contrastCheckElement ).toBeDefined();
+	} );
+
+	it( 'should highlight text with selection', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
+		);
+		fireEvent.press( screen.getByLabelText( 'Text color' ) );
+		fireEvent.press( await screen.findByLabelText( 'Tertiary' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <mark style="background-color:rgba(0, 0, 0, 0);color:#2411a4" class="has-inline-color has-tertiary-color">quick</mark> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );

@@ -10,7 +10,7 @@ import { useDispatch } from '@wordpress/data';
 import { store as commandsStore } from '../store';
 
 /**
- * Attach a command to the Global command menu.
+ * Attach a command to the command palette.
  *
  * @param {import('../store/actions').WPCommandConfig} command command config.
  */
@@ -24,17 +24,21 @@ export default function useCommand( command ) {
 	useEffect( () => {
 		registerCommand( {
 			name: command.name,
-			group: command.group,
+			context: command.context,
 			label: command.label,
-			callback: currentCallback.current,
+			searchLabel: command.searchLabel,
+			icon: command.icon,
+			callback: ( ...args ) => currentCallback.current( ...args ),
 		} );
 		return () => {
-			unregisterCommand( command.name, command.group );
+			unregisterCommand( command.name );
 		};
 	}, [
 		command.name,
 		command.label,
-		command.group,
+		command.searchLabel,
+		command.icon,
+		command.context,
 		registerCommand,
 		unregisterCommand,
 	] );

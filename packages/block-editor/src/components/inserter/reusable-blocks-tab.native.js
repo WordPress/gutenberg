@@ -28,11 +28,11 @@ function ReusableBlocksTab( { onSelect, rootClientId, listProps } ) {
 
 	return (
 		<BlockTypesList
-			name="ReusableBlocks"
+			name="SyncedPatterns"
 			sections={ sections }
 			onSelect={ onSelect }
 			listProps={ listProps }
-			label={ __( 'Reusable blocks' ) }
+			label={ __( 'Synced patterns' ) }
 		/>
 	);
 }

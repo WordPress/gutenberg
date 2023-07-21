@@ -98,6 +98,34 @@ export function initializeEditor(
 		}
 	);
 
+	/*
+	 * Prevent adding post content block (except in query block) in the post editor.
+	 * Only add the filter when the post editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removePostContentFromInserter',
+		(
+			canInsert,
+			blockType,
+			rootClientId,
+			{ getBlockParentsByBlockName }
+		) => {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/post-content'
+			) {
+				return (
+					getBlockParentsByBlockName( rootClientId, 'core/query' )
+						.length > 0
+				);
+			}
+			return canInsert;
+		}
+	);
+
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =
 		document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks';

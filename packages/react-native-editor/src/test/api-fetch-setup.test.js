@@ -93,4 +93,17 @@ describe( 'shouldEnableCaching', () => {
 			expect( shouldEnableCaching( path ) ).toBe( false );
 		} );
 	} );
+
+	it( 'does not enable caching for endpoints provided to filter', () => {
+		addFilter(
+			'native.disabled_caching_endpoints',
+			'gutenberg-mobile',
+			( endpoints ) => {
+				return [ ...endpoints, /wp\/v2\/categories/i ];
+			}
+		);
+
+		// Filter was used to stop caching an endpoint from `enabledCachingPaths` array.
+		expect( shouldEnableCaching( 'wp/v2/categories' ) ).toBe( false );
+	} );
 } );

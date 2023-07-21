@@ -82,32 +82,28 @@ Default.args = {
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
-					{
-						// @ts-expect-error TODO: Remove when ToolbarItem/DropdownMenu is typed
-						( toggleProps ) => (
-							<DropdownMenu
-								hasArrowIndicator
-								icon={ alignLeft }
-								label="Align"
-								controls={ [
-									{
-										icon: alignLeft,
-										title: 'Align left',
-										isActive: true,
-									},
-									{
-										icon: alignCenter,
-										title: 'Align center',
-									},
-									{
-										icon: alignRight,
-										title: 'Align right',
-									},
-								] }
-								toggleProps={ toggleProps }
-							/>
-						)
-					}
+					{ ( toggleProps ) => (
+						<DropdownMenu
+							icon={ alignLeft }
+							label="Align"
+							controls={ [
+								{
+									icon: alignLeft,
+									title: 'Align left',
+									isActive: true,
+								},
+								{
+									icon: alignCenter,
+									title: 'Align center',
+								},
+								{
+									icon: alignRight,
+									title: 'Align right',
+								},
+							] }
+							toggleProps={ toggleProps }
+						/>
+					) }
 				</ToolbarItem>
 			</ToolbarGroup>
 			<ToolbarGroup>

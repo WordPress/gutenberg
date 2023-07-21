@@ -89,6 +89,9 @@
  * Block Toolbar when contextual.
  */
 
+// Base left position for the toolbar when fixed.
+@include editor-left(".block-editor-block-contextual-toolbar.is-fixed");
+
 .block-editor-block-contextual-toolbar {
 	// Block UI appearance.
 	display: inline-flex;
@@ -104,11 +107,9 @@
 	&.is-fixed {
 		position: sticky;
 		top: 0;
-		width: 100%;
 		z-index: z-index(".block-editor-block-popover");
-		// Fill up when empty
-		min-height: $block-toolbar-height;
 		display: block;
+		width: 100%;
 
 		border: none;
 		border-bottom: $border-width solid $gray-200;
@@ -117,6 +118,217 @@
 		.block-editor-block-toolbar .components-toolbar-group,
 		.block-editor-block-toolbar .components-toolbar {
 			border-right-color: $gray-200;
+		}
+	}
+
+	&:has(.block-editor-block-toolbar:empty) {
+		display: none;
+	}
+
+	// on desktop and tablet viewports the toolbar is fixed
+	// on top of interface header
+
+	@include break-medium() {
+		&.is-fixed {
+
+			// leave room for block inserter, undo and redo, list view
+			margin-left: $grid-unit-80 * 3 - 2 * $grid-unit + $grid-unit-05;
+			// position on top of interface header
+			position: fixed;
+			top: $admin-bar-height + $grid-unit - $border-width;
+			// Don't fill up when empty
+			min-height: initial;
+			// remove the border
+			border-bottom: none;
+			// has to be flex for collapse button to fit
+			display: flex;
+
+			&.is-collapsed {
+				width: initial;
+			}
+
+			.is-fullscreen-mode & {
+				// leave room for block inserter, undo and redo, list view
+				// and some margin left
+				margin-left: $grid-unit-80 * 4 - 2 * $grid-unit;
+				top: $grid-unit - $border-width;
+				&.is-collapsed {
+					width: initial;
+				}
+			}
+
+			& > .block-editor-block-toolbar.is-showing-movers {
+				flex-grow: initial;
+				width: initial;
+
+				// Add a border as separator in the block toolbar.
+				&::before {
+					content: "";
+					width: $border-width;
+					height: 3 * $grid-unit;
+					margin-top: $grid-unit + $grid-unit-05;
+					margin-right: 0;
+					background-color: $gray-300;
+					position: relative;
+					left: math.div(-$grid-unit-05, 2);
+					top: -1px;
+				}
+			}
+
+			& > .block-editor-block-toolbar__group-collapse-fixed-toolbar {
+				border: none;
+
+				.show-icon-labels & {
+					.components-button.has-icon {
+						// Hide the button icons when labels are set to display...
+						svg {
+							display: none;
+						}
+						// ... and display labels.
+						&::after {
+							content: attr(aria-label);
+							font-size: $helptext-font-size;
+						}
+					}
+				}
+
+				// Add a border as separator in the block toolbar.
+				&::before {
+					content: "";
+					width: $border-width;
+					height: 3 * $grid-unit;
+					margin-top: $grid-unit + $grid-unit-05;
+					margin-right: $grid-unit-10;
+					background-color: $gray-300;
+					position: relative;
+					left: 0;
+					top: -1px;
+				}
+			}
+
+			& > .block-editor-block-toolbar__group-expand-fixed-toolbar {
+				border: none;
+
+				.show-icon-labels & {
+					width: $grid-unit-80 * 4;
+					.components-button.has-icon {
+						// Hide the button icons when labels are set to display...
+						svg {
+							display: none;
+						}
+						// ... and display labels.
+						&::after {
+							content: attr(aria-label);
+							font-size: $helptext-font-size;
+						}
+					}
+				}
+
+				// Add a border as separator in the block toolbar.
+				&::before {
+					content: "";
+					width: $border-width;
+					margin-top: $grid-unit + $grid-unit-05;
+					margin-bottom: $grid-unit + $grid-unit-05;
+					background-color: $gray-300;
+					position: relative;
+					left: -8px;
+					height: 3 * $grid-unit;
+					top: -1px;
+				}
+			}
+
+			.show-icon-labels & {
+
+				margin-left: $grid-unit-80 + 2 * $grid-unit; // inserter and margin ;
+
+				.is-fullscreen-mode & {
+					margin-left: $grid-unit * 18; // site hub, inserter and margin
+				}
+
+				.block-editor-block-parent-selector .block-editor-block-parent-selector__button::after {
+					left: 0;
+				}
+
+				.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+					border-left: none;
+					&::before {
+						content: "";
+						width: $border-width;
+						margin-top: $grid-unit + $grid-unit-05;
+						margin-bottom: $grid-unit + $grid-unit-05;
+						background-color: $gray-300;
+						position: relative;
+					}
+				}
+			}
+
+			.blocks-widgets-container & {
+				margin-left: $grid-unit-80 * 2.4;
+
+				&.is-collapsed {
+					margin-left: $grid-unit-80 * 4.2;
+				}
+			}
+		}
+
+		&.is-fixed .block-editor-block-parent-selector {
+
+			.block-editor-block-parent-selector__button {
+				position: relative;
+				top: -1px;
+				border: 0;
+				padding-right: 6px;
+				padding-left: 6px;
+
+				&::after {
+					content: "\00B7";
+					font-size: 16px;
+					line-height: $grid-unit-40 + $grid-unit-10;
+					position: absolute;
+					left: $grid-unit-40 + $grid-unit-15 + 2px;
+					bottom: $grid-unit-05;
+				}
+			}
+		}
+
+		&:not(.is-fixed) .block-editor-block-parent-selector {
+			position: absolute;
+			top: -$border-width;
+			left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+			.show-icon-labels & {
+				position: relative;
+				left: auto;
+				top: auto;
+				margin-top: -$border-width;
+				margin-left: -$border-width;
+				margin-bottom: -$border-width;
+			}
+		}
+	}
+
+	// on tablet vewports the toolbar is fixed
+	// on top of interface header and covers the whole header
+	// except for the inserter on the left
+	@include break-medium() {
+		&.is-fixed {
+			width: 100%;
+		}
+	}
+
+	// on desktop viewports the toolbar is fixed
+	// on top of interface header and leaves room
+	// for the block inserter the publish button
+	@include break-large() {
+		&.is-fixed {
+			width: auto;
+		}
+		.is-fullscreen-mode &.is-fixed {
+			// in full screen mode we need to account for
+			// the combined with of the tools at the right of the header and the margin left
+			// of the toolbar which includes four buttons
+			width: calc(100% - 240px - #{4 * $grid-unit-80});
 		}
 	}
 }

@@ -36,6 +36,9 @@
 }
 
 .commands-command-menu__container {
+	// the style here is a hack to force safari to repaint to avoid a style glitch
+	will-change: transform;
+
 	[cmdk-input] {
 		border: none;
 		width: 100%;
@@ -90,7 +93,10 @@
 	[cmdk-root] > [cmdk-list] {
 		max-height: 400px;
 		overflow: auto;
-		padding: $grid-unit;
+
+		& > [cmdk-list-sizer] :has([cmdk-group-items]:not(:empty)) {
+			padding: $grid-unit;
+		}
 	}
 
 	[cmdk-empty] {
@@ -108,6 +114,10 @@
 
 	[cmdk-list-sizer] {
 		position: relative;
+	}
+
+	[cmdk-group]:has([cmdk-group-items]:not(:empty)) + [cmdk-group]:has([cmdk-group-items]:not(:empty)) {
+		border-top: 1px solid $gray-200;
 	}
 }
 

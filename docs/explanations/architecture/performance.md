@@ -6,9 +6,9 @@ Performance is a key feature for editor applications and the Block editor is not
 
 To ensure the block editor stays performant across releases and development, we monitor some key metrics using [performance benchmark job](#the-performance-benchmark-job).
 
-**Loading Time:** The time it takes to load an editor page. This includes time the server takes to respond, times to first paint, first contentful paint, DOM content load complete, load complete and first block render.
-**Typing Time:** The time it takes for the browser to respond while typing on the editor.
-**Block Selection Time:** The time it takes for the browser to respond after a user selects block. (Inserting a block is also equivalent to selecting a block. Monitoring the selection is sufficient to cover both metrics).
+- **Loading Time:** The time it takes to load an editor page. This includes time the server takes to respond, times to first paint, first contentful paint, DOM content load complete, load complete and first block render.
+- **Typing Time:** The time it takes for the browser to respond while typing on the editor.
+- **Block Selection Time:** The time it takes for the browser to respond after a user selects block. (Inserting a block is also equivalent to selecting a block. Monitoring the selection is sufficient to cover both metrics).
 
 ## Key Performance Decisions and Solutions
 
@@ -53,12 +53,12 @@ To achieve that the command first prepares the following folder structure:
 
 Once the directory above is in place, the performance command loop over the performance test suites (post editor and site editor) and does the following:
 
- 1- Start the environment for branch1
- 2- Run the performance test for the current suite
- 3- Stop the environment for branch1
- 4- Repeat the first 3 steps for all other branches
- 5- Repeat the previous 4 steps 3 times.
- 6- Compute medians for all the performance metrics of the current suite.
+1. Start the environment for `branch1`
+2. Run the performance test for the current suite
+3. Stop the environment for `branch1`
+4. Repeat the first 3 steps for all other branches
+5. Repeat the previous 4 steps 3 times.
+6. Compute medians for all the performance metrics of the current suite.
 
 Once all the test suites are executed, a summary report is printed.
 

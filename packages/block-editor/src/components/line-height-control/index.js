@@ -85,12 +85,17 @@ const LineHeightControl = ( {
 		: { marginBottom: 24 };
 
 	const handleOnChange = ( nextValue, { event } ) => {
-		if ( event.type === 'click' ) {
-			onChange( adjustNextValue( nextValue, false ) );
+		if ( nextValue === '' ) {
+			onChange();
 			return;
 		}
 
-		onChange( nextValue );
+		if ( event.type === 'click' ) {
+			onChange( adjustNextValue( `${ nextValue }`, false ) );
+			return;
+		}
+
+		onChange( `${ nextValue }` );
 	};
 
 	return (

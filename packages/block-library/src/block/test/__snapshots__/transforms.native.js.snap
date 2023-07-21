@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Reusable block block transforms to Columns block 1`] = `
+exports[`Pattern block transforms to Columns block 1`] = `
 "<!-- wp:columns -->
 <div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
 <div class="wp-block-column" style="flex-basis:100%"><!-- wp:block {"ref":130} /--></div>
@@ -8,7 +8,7 @@ exports[`Reusable block block transforms to Columns block 1`] = `
 <!-- /wp:columns -->"
 `;
 
-exports[`Reusable block block transforms to Group block 1`] = `
+exports[`Pattern block transforms to Group block 1`] = `
 "<!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:block {"ref":130} /--></div>
 <!-- /wp:group -->"

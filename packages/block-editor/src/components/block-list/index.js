@@ -142,7 +142,7 @@ function Items( {
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
-	__experimentalLayout: layout = defaultLayout,
+	layout = defaultLayout,
 } ) {
 	const { order, selectedBlocks, visibleBlocks } = useSelect(
 		( select ) => {

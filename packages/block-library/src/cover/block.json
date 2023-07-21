@@ -1,10 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/cover",
 	"title": "Cover",
 	"category": "media",
-	"description": "Add an image or video with a text overlay — great for headers.",
+	"description": "Add an image or video with a text overlay.",
 	"textdomain": "default",
 	"attributes": {
 		"url": {
@@ -108,6 +108,7 @@
 		},
 		"color": {
 			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
+			"heading": true,
 			"text": true,
 			"background": false,
 			"__experimentalSkipSerialization": [ "gradients" ]
@@ -125,7 +126,7 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowJustification": false
 		}
 	},

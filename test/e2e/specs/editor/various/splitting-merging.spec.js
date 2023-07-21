@@ -306,11 +306,11 @@ test.describe( 'splitting and merging blocks', () => {
 
 		// There is a default block and post title:
 		await expect(
-			page.locator( 'role=document[name=/Empty block/i]' )
+			editor.canvas.locator( 'role=document[name=/Empty block/i]' )
 		).toBeVisible();
 
 		await expect(
-			page.locator( 'role=textbox[name="Add title"i]' )
+			editor.canvas.locator( 'role=textbox[name="Add title"i]' )
 		).toBeVisible();
 
 		// But the effective saved content is still empty:
@@ -318,7 +318,7 @@ test.describe( 'splitting and merging blocks', () => {
 
 		// And focus is retained:
 		await expect(
-			page.locator( 'role=document[name=/Empty block/i]' )
+			editor.canvas.locator( 'role=document[name=/Empty block/i]' )
 		).toBeFocused();
 	} );
 

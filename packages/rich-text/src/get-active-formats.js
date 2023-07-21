@@ -1,5 +1,5 @@
-/** @typedef {import('./create').RichTextValue} RichTextValue */
-/** @typedef {import('./create').RichTextFormatList} RichTextFormatList */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextFormatList} RichTextFormatList */
 
 /**
  * Internal dependencies

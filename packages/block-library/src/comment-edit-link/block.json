@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/comment-edit-link",
 	"title": "Comment Edit Link",
 	"category": "theme",
@@ -18,7 +18,6 @@
 		}
 	},
 	"supports": {
-		"anchor": true,
 		"html": false,
 		"color": {
 			"link": true,

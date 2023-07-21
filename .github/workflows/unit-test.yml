@@ -85,7 +85,6 @@ jobs:
             fail-fast: true
             matrix:
                 php:
-                    - '5.6'
                     - '7.0'
                     - '7.1'
                     - '7.2'
@@ -171,20 +170,44 @@ jobs:
 
             - name: Docker container debug information
               run: |
-                  npm run wp-env run tests-mysql "mysql --version"
-                  npm run wp-env run tests-wordpress "php --version"
-                  npm run wp-env run tests-wordpress "php -m"
-                  npm run wp-env run tests-wordpress "php -i"
-                  npm run wp-env run tests-wordpress "/var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit --version"
-                  npm run wp-env run tests-wordpress "locale -a"
+                  npm run wp-env run tests-mysql mysql -- --version
+                  npm run wp-env run tests-wordpress php -- --version
+                  npm run wp-env run tests-wordpress php -m
+                  npm run wp-env run tests-wordpress php -i
+                  npm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
+                  npm run wp-env run tests-wordpress locale -a
 
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
-              run: npm run test:unit:php
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php | tee phpunit.log
 
             - name: Running multisite unit tests
               if: ${{ matrix.multisite }}
-              run: npm run test:unit:php:multisite
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php:multisite | tee phpunit.log
+
+            # Verifies that PHPUnit actually runs in the first place. We want visibility
+            # into issues which can cause it to fail silently, so we check the output
+            # to verify that at least 500 tests have passed. This is an arbitrary
+            # number, but makes sure a drastic change doesn't happen without us noticing.
+            - name: Check number of passed tests
+              run: |
+                  # Note: relies on PHPUnit execution to fail on test failure.
+                  # Extract the number of executed tests from the log file.
+                  if ! num_tests=$(grep -Eo 'OK \([0-9]+ tests' phpunit.log) ; then
+                    if ! num_tests=$(grep -Eo 'Tests: [0-9]+, Assertions:' phpunit.log) ; then
+                      echo "PHPUnit failed or did not run. Check the PHPUnit output in the previous step to debug." && exit 1
+                    fi
+                  fi
+                  # Extract just the number of tests from the string.
+                  num_tests=$(echo "$num_tests" | grep -Eo '[0-9]+')
+                  if [ $num_tests -lt 500 ] ; then
+                    echo "Only $num_tests tests passed, which is much fewer than expected." && exit 1
+                  fi
+                  echo "$num_tests tests passed."
 
     phpcs:
         name: PHP coding standards
@@ -273,4 +296,4 @@ jobs:
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

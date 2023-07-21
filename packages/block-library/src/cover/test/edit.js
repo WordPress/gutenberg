@@ -12,9 +12,34 @@ import {
 	selectBlock,
 } from 'test/integration/helpers/integration-test-editor';
 
-async function setup( attributes ) {
+const defaultSettings = {
+	__experimentalFeatures: {
+		color: {
+			defaultPalette: true,
+			defaultGradients: true,
+			palette: {
+				default: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+			},
+		},
+	},
+	colors: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+	disableCustomColors: false,
+	disableCustomGradients: false,
+};
+
+const disabledColorSettings = {
+	color: {
+		defaultPalette: false,
+		defaultGradients: false,
+	},
+	disableCustomColors: true,
+	disableCustomGradients: true,
+};
+
+async function setup( attributes, useCoreBlocks, customSettings ) {
 	const testBlock = { name: 'core/cover', attributes };
-	return initializeEditor( testBlock );
+	const settings = customSettings || defaultSettings;
+	return initializeEditor( testBlock, useCoreBlocks, settings );
 }
 
 async function createAndSelectBlock() {
@@ -295,6 +320,35 @@ describe( 'Cover block', () => {
 				);
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-30' );
+			} );
+
+			describe( 'when colors are disabled', () => {
+				test( 'does not render overlay control', async () => {
+					await setup( undefined, true, disabledColorSettings );
+					await createAndSelectBlock();
+					await userEvent.click(
+						screen.getByRole( 'tab', { name: 'Styles' } )
+					);
+
+					const overlayControl = screen.queryByRole( 'button', {
+						name: 'Overlay',
+					} );
+
+					expect( overlayControl ).not.toBeInTheDocument();
+				} );
+				test( 'does not render opacity control', async () => {
+					await setup( undefined, true, disabledColorSettings );
+					await createAndSelectBlock();
+					await userEvent.click(
+						screen.getByRole( 'tab', { name: 'Styles' } )
+					);
+
+					const opacityControl = screen.queryByRole( 'slider', {
+						name: 'Overlay opacity',
+					} );
+
+					expect( opacityControl ).not.toBeInTheDocument();
+				} );
 			} );
 		} );
 

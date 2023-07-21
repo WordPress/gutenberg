@@ -27,6 +27,7 @@ This issue is to provide visibility on the progress of the release process of Gu
 -   [ ] Organize and Label PRs on the relevant milestone
 -   [ ] Start the release process by triggering the `rc` [workflow](https://developer.wordpress.org/block-editor/contributors/code/release/#running-workflow)
 -   [ ] [Update the created Draft Release accordingly](https://developer.wordpress.org/block-editor/contributors/code/release/#view-the-release-draft)
+-   [ ] [Curate the changelog](https://developer.wordpress.org/block-editor/contributors/code/release/#1-curating-the-changelog) before publishing
 -   [ ] Publish Release
 -   [ ] Announce in `#core-editor` channel that RC1 has been released and is ready for testing
 -   [ ] Ping any other relevant channels announcing that the RC is available
@@ -34,17 +35,19 @@ This issue is to provide visibility on the progress of the release process of Gu
 
 ### Between RC and Release
 
+-   [ ] Post a reminder in #core-editor for backporting PRs to RC (~Label Backport to Gutenberg RC)
+-   [ ] If there are any PRs marked as [Backport to RC](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed), run the [cherry-pick command to apply them](https://developer.wordpress.org/block-editor/contributors/code/release/auto-cherry-picking/#how-can-i-use-it-for-a-gutenberg-plugin-release) to the release branch. **This needs to be run locally**
 -   [ ] [Draft Release Post Highlights and Change Log](https://docs.google.com/document/d/1D-MTOCmL9eMlP9TDTXqlzuKVOg_ghCPm9_whHFViqMk/edit)
 -   [ ] Get assets from [Design Team](https://make.wordpress.org/design/) for the post
+-   [ ] Reach out to Highlight Authors to draft sections (if necessary)
 
 ### Release Day - {Weekday, Month, Date}
 
--   [ ] If there are any PRs marked as [Backport to RC](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed), run the [cherry-pick command to apply them](https://developer.wordpress.org/block-editor/contributors/code/release/auto-cherry-picking/#how-can-i-use-it-for-a-gutenberg-plugin-release) to the release branch. **This needs to be run locally**
 -   [ ] Post a message in `#core-editor` channel to let folks know you are starting the release process
 -   [ ] Start the release process by triggering the `stable` [workflow](https://developer.wordpress.org/block-editor/contributors/code/release/#running-workflow)
 -   [ ] Update the created Draft Release accordingly. Typically by copy/pasting the last RC release notes and add any changes/updates as needed.
 -   [ ] Publish Release
--   [ ] Trigger the update to the plugin directory - SVN _(get approval from member of Core team if necessary)_
+-   [ ] Trigger the update to the plugin directory. _(Get approval from a member of [Gutenberg Release team](https://github.com/orgs/WordPress/teams/gutenberg-release/members) if necessary)_
 -   [ ] Announce in `#core-editor` channel that the plugin has been released
 -   [ ] Reach out to other contributors to help get the post reviewed
 -   [ ] Publish Release post on Make Core blog

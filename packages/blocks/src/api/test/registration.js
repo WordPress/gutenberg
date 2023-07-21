@@ -28,7 +28,6 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
-	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
@@ -362,7 +361,7 @@ describe( 'blocks', () => {
 			const blockName = 'core/test-block-with-incompatible-keys';
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					api_version: 2,
+					api_version: 3,
 					provides_context: {
 						fontSize: 'fontSize',
 					},
@@ -375,7 +374,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 2,
+				apiVersion: 3,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
@@ -403,7 +402,7 @@ describe( 'blocks', () => {
 			} );
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					apiVersion: 2,
+					apiVersion: 3,
 					category: 'ignored',
 				},
 			} );
@@ -413,7 +412,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 2,
+				apiVersion: 3,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
@@ -822,7 +821,6 @@ describe( 'blocks', () => {
 										styles: [],
 										variations: [],
 										save: () => null,
-										...serverSideBlockDefinitions[ name ],
 										...blockSettingsWithDeprecations,
 									},
 									DEPRECATED_ENTRY_KEYS
