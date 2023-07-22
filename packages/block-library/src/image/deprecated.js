@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import {
 	RichText,
 	useBlockProps,
+	__experimentalGetElementClassName,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
 
@@ -721,7 +722,9 @@ const v6 = {
 				) }
 				{ ! RichText.isEmpty( caption ) && (
 					<RichText.Content
-						className={ getBorderClassesAndStyles( 'caption' ) }
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
 						tagName="figcaption"
 						value={ caption }
 					/>
