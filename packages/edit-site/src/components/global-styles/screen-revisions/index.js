@@ -144,7 +144,7 @@ function ScreenRevisions() {
 						'Loading this revision will discard all unsaved changes.'
 					) }
 					isOpen={ isLoadingRevisionWithUnsavedChanges }
-					confirmButtonText={ __( ' Discard unsaved changes' ) }
+					confirmButtonText={ __( 'Discard unsaved changes' ) }
 					onConfirm={ () => restoreRevision( globalStylesRevision ) }
 					onCancel={ () =>
 						setIsLoadingRevisionWithUnsavedChanges( false )
