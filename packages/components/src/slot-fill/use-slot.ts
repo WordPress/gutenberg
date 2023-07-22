@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { Component } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { useContext, useSyncExternalStore } from '@wordpress/element';
@@ -22,7 +17,7 @@ import type { SlotKey } from './types';
  */
 const useSlot = ( name: SlotKey ) => {
 	const { getSlot, subscribe } = useContext( SlotFillContext );
-	return useSyncExternalStore< Component | undefined >(
+	return useSyncExternalStore(
 		subscribe,
 		() => getSlot( name ),
 		() => getSlot( name )
