@@ -19,6 +19,6 @@
 	&:focus,
 	&:not([aria-disabled="true"]):active,
 	&[aria-expanded="true"] {
-		color: $white;
+		color: $gray-100;
 	}
 }

@@ -155,11 +155,13 @@ if ( require.main === module ) {
 	const domains = [ 'gutenberg' ];
 	const otherPluginArgs = process.argv.slice( 3 );
 	const otherPlugins = [];
-	for ( let index = 0; index < otherPluginArgs.length; index += 2 ) {
+	for ( let index = 0; index < otherPluginArgs.length; index += 3 ) {
 		const pluginName = otherPluginArgs[ index ];
-		const pluginPath = path.resolve( otherPluginArgs[ index + 1 ] );
+		const projectSlug = otherPluginArgs[ index + 1 ];
+		const pluginPath = path.resolve( otherPluginArgs[ index + 2 ] );
 		otherPlugins.push( {
 			name: pluginName,
+			projectSlug,
 			sourcePath: pluginPath,
 		} );
 		domains.push( pluginName );

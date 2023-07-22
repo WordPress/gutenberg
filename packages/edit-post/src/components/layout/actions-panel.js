@@ -31,18 +31,17 @@ export default function ActionsPanel( {
 	const {
 		publishSidebarOpened,
 		hasActiveMetaboxes,
-		isSavingMetaBoxes,
 		hasNonPostEntityChanges,
-	} = useSelect( ( select ) => {
-		return {
+	} = useSelect(
+		( select ) => ( {
 			publishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isSavingMetaBoxes: select( editPostStore ).isSavingMetaBoxes(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),
-		};
-	}, [] );
+		} ),
+		[]
+	);
 
 	const openEntitiesSavedStates = useCallback(
 		() => setEntitiesSavedStatesCallback( true ),
@@ -57,7 +56,6 @@ export default function ActionsPanel( {
 			<PostPublishPanel
 				onClose={ closePublishSidebar }
 				forceIsDirty={ hasActiveMetaboxes }
-				forceIsSaving={ isSavingMetaBoxes }
 				PrePublishExtension={ PluginPrePublishPanel.Slot }
 				PostPublishExtension={ PluginPostPublishPanel.Slot }
 			/>

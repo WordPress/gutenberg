@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Add support for the `example` property and add it to the default template ([#52803](https://github.com/WordPress/gutenberg/pull/52803)).
+
+## 4.22.0 (2023-07-20)
+
+### Enhancement
+
+-   Add support for the `viewScript` property ([#52612](https://github.com/WordPress/gutenberg/pull/52612)).
+
+## 4.21.0 (2023-07-05)
+
+## 4.20.0 (2023-06-23)
+
+## 4.19.0 (2023-06-07)
+
+## 4.18.0 (2023-05-24)
+
+## 4.17.0 (2023-05-10)
+
+## 4.16.0 (2023-04-26)
+
+## 4.15.0 (2023-04-12)
+
+## 4.14.0 (2023-03-29)
+
+## 4.13.0 (2023-03-15)
+
 ## 4.12.0 (2023-03-01)
 
 ## 4.11.0 (2023-02-15)

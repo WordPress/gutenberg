@@ -478,12 +478,130 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( toStyles( tree, blockSelectors ) ).toEqual(
-				'body {margin: 0;}' +
+				'body {margin: 0;}body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }body .is-layout-grid { display:grid; }body .is-layout-grid > * { margin: 0; }' +
 					'body{background-color: red;margin: 10px;padding: 10px;}a{color: blue;}a:hover{color: orange;}a:focus{color: orange;}h1{font-size: 42px;}.wp-block-group{margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}h1,h2,h3,h4,h5,h6{color: orange;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: hotpink;}h1 a:hover,h2 a:hover,h3 a:hover,h4 a:hover,h5 a:hover,h6 a:hover{color: red;}h1 a:focus,h2 a:focus,h3 a:focus,h4 a:focus,h5 a:focus,h6 a:focus{color: red;}' +
-					'.wp-block-image img, .wp-block-image .wp-crop-area{border-radius: 9999px }.wp-block-image{color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }' +
+					'.wp-block-image img, .wp-block-image .wp-crop-area{border-radius: 9999px;}.wp-block-image{color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }' +
 					'.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}h1.has-blue-color,h2.has-blue-color,h3.has-blue-color,h4.has-blue-color,h5.has-blue-color,h6.has-blue-color{color: var(--wp--preset--color--blue) !important;}h1.has-blue-background-color,h2.has-blue-background-color,h3.has-blue-background-color,h4.has-blue-background-color,h5.has-blue-background-color,h6.has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}h1.has-blue-border-color,h2.has-blue-border-color,h3.has-blue-border-color,h4.has-blue-border-color,h5.has-blue-border-color,h6.has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
 			);
 		} );
+
+		it( 'should handle feature selectors', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/image': {
+							color: {
+								text: 'red',
+							},
+							spacing: {
+								padding: {
+									top: '1px',
+								},
+							},
+							border: {
+								color: 'red',
+								radius: '9999px',
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/image': {
+					selector: '.wp-image',
+					featureSelectors: {
+						spacing: '.wp-image-spacing',
+						border: {
+							root: '.wp-image-border',
+							color: '.wp-image-border-color',
+						},
+					},
+				},
+			};
+
+			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
+				'body {margin: 0;}body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }body .is-layout-grid { display:grid; }body .is-layout-grid > * { margin: 0; }' +
+					'.wp-image-spacing{padding-top: 1px;}.wp-image-border-color{border-color: red;}.wp-image-border{border-radius: 9999px;}.wp-image{color: red;}' +
+					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+			);
+		} );
+
+		it( 'should handle block variations', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/image': {
+							variations: {
+								foo: {
+									color: {
+										text: 'blue',
+									},
+									spacing: {
+										padding: {
+											top: '2px',
+										},
+									},
+									border: {
+										color: 'blue',
+									},
+								},
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/image': {
+					selector: '.wp-image',
+					featureSelectors: {
+						spacing: '.wp-image-spacing',
+						border: {
+							root: '.wp-image-border',
+							color: '.wp-image-border-color',
+						},
+					},
+					styleVariationSelectors: {
+						foo: '.is-style-foo.wp-image',
+					},
+				},
+			};
+
+			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
+				'body {margin: 0;}body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }body .is-layout-grid { display:grid; }body .is-layout-grid > * { margin: 0; }' +
+					'.is-style-foo.wp-image.wp-image-spacing{padding-top: 2px;}.is-style-foo.wp-image.wp-image-border-color{border-color: blue;}.is-style-foo.wp-image{color: blue;}' +
+					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+			);
+		} );
+
+		it( 'should handle duotone filter', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/image': {
+							filter: {
+								duotone: 'blur(5px)',
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/image': {
+					selector: '.wp-image',
+					duotoneSelector: '.wp-image img',
+				},
+			};
+
+			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
+				'body {margin: 0;}body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }body .is-layout-grid { display:grid; }body .is-layout-grid > * { margin: 0; }' +
+					'.wp-image img{filter: blur(5px);}' +
+					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+			);
+		} );
+
 		it( 'should output content and wide size variables if values are specified', () => {
 			const tree = {
 				settings: {
@@ -493,7 +611,7 @@ describe( 'global styles renderer', () => {
 					},
 				},
 			};
-			expect( toStyles( tree, 'body' ) ).toEqual(
+			expect( toStyles( Object.freeze( tree ), 'body' ) ).toEqual(
 				'body {margin: 0; --wp--style--global--content-size: 840px; --wp--style--global--wide-size: 1100px;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
 			);
 		} );
@@ -588,7 +706,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: 'body',
 				hasBlockGapSupport: false,
@@ -604,7 +723,8 @@ describe( 'global styles renderer', () => {
 			const style = {};
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: 'body',
 				hasBlockGapSupport: true,
@@ -612,7 +732,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'body .is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }body .is-layout-flow > * + * { margin-block-start: 0.5em; margin-block-end: 0; }body .is-layout-flex { gap: 0.5em; }body { --wp--style--block-gap: 0.5em; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+				':where(body .is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:where(body .is-layout-flow) > * + * { margin-block-start: 0.5em; margin-block-end: 0; }:where(body .is-layout-flex) { gap: 0.5em; }body { --wp--style--block-gap: 0.5em; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
 			);
 		} );
 
@@ -620,7 +740,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: 'body',
 				hasBlockGapSupport: true,
@@ -628,7 +749,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'body .is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }body .is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }body .is-layout-flex { gap: 12px; }body { --wp--style--block-gap: 12px; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+				':where(body .is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:where(body .is-layout-flow) > * + * { margin-block-start: 12px; margin-block-end: 0; }:where(body .is-layout-flex) { gap: 12px; }body { --wp--style--block-gap: 12px; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
 			);
 		} );
 
@@ -636,7 +757,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: '.wp-block-group',
 				hasBlockGapSupport: true,
@@ -644,7 +766,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'.wp-block-group-is-layout-flow.wp-block-group-is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }.wp-block-group-is-layout-flow.wp-block-group-is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }.wp-block-group-is-layout-flex.wp-block-group-is-layout-flex { gap: 12px; }'
+				'.wp-block-group-is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }.wp-block-group-is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }.wp-block-group-is-layout-flex { gap: 12px; }'
 			);
 		} );
 
@@ -652,7 +774,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: '.wp-block-group',
 				hasBlockGapSupport: false, // This means that the fallback value will be used instead of the "real" one.
@@ -668,6 +791,38 @@ describe( 'global styles renderer', () => {
 
 	describe( 'getBlockSelectors', () => {
 		it( 'should return block selectors data', () => {
+			const imageSelectors = {
+				root: '.my-image',
+				border: '.my-image img, .my-image .crop-area',
+				filter: { duotone: 'img' },
+			};
+			const imageBlock = {
+				name: 'core/image',
+				selectors: imageSelectors,
+			};
+			const blockTypes = [ imageBlock ];
+			const getBlockStyles = () => [ { name: 'foo' } ];
+
+			expect( getBlockSelectors( blockTypes, getBlockStyles ) ).toEqual( {
+				'core/image': {
+					name: imageBlock.name,
+					selector: imageSelectors.root,
+					duotoneSelector: imageSelectors.filter.duotone,
+					fallbackGapValue: undefined,
+					featureSelectors: {
+						root: '.my-image',
+						border: '.my-image img, .my-image .crop-area',
+						filter: { duotone: 'img' },
+					},
+					styleVariationSelectors: {
+						foo: '.is-style-foo.my-image',
+					},
+					hasLayoutSupport: false,
+				},
+			} );
+		} );
+
+		it( 'should return block selectors data with old experimental selectors', () => {
 			const imageSupports = {
 				__experimentalBorder: {
 					radius: true,
@@ -685,9 +840,10 @@ describe( 'global styles renderer', () => {
 				'core/image': {
 					name: imageBlock.name,
 					selector: imageSupports.__experimentalSelector,
-					duotoneSelector: imageSupports.color.__experimentalDuotone,
+					duotoneSelector: '.my-image img',
 					fallbackGapValue: undefined,
 					featureSelectors: {
+						root: '.my-image',
 						border: '.my-image img, .my-image .crop-area',
 					},
 					hasLayoutSupport: false,
@@ -782,7 +938,7 @@ describe( 'global styles renderer', () => {
 				'padding-bottom: 33px',
 				'padding-left: 33px',
 				'font-family: sans-serif',
-				'font-size: clamp(14px, 0.875rem + ((1vw - 7.68px) * 0.12), 15px)',
+				'font-size: clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.078), 15px)',
 			] );
 		} );
 

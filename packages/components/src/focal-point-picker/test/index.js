@@ -120,7 +120,9 @@ describe( 'FocalPointPicker', () => {
 			const { rerender } = render(
 				<Picker value={ { x: 0.25, y: 0.5 } } />
 			);
-			const xInput = screen.getByRole( 'spinbutton', { name: 'Left' } );
+			const xInput = screen.getByRole( 'spinbutton', {
+				name: 'Focal point left position',
+			} );
 			rerender( <Picker value={ { x: 0.93, y: 0.5 } } /> );
 			expect( xInput.value ).toBe( '93' );
 		} );
@@ -155,10 +157,14 @@ describe( 'FocalPointPicker', () => {
 			);
 
 			expect(
-				screen.getByRole( 'spinbutton', { name: 'Left' } ).value
+				screen.getByRole( 'spinbutton', {
+					name: 'Focal point left position',
+				} ).value
 			).toBe( '10' );
 			expect(
-				screen.getByRole( 'spinbutton', { name: 'Top' } ).value
+				screen.getByRole( 'spinbutton', {
+					name: 'Focal point top position',
+				} ).value
 			).toBe( '20' );
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );

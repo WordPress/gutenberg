@@ -10,11 +10,14 @@
 }
 
 .block-editor-media-flow__url-input {
-	border-top: $border-width solid $gray-900;
-	margin-top: $grid-unit-10;
 	margin-right: -$grid-unit-10;
 	margin-left: -$grid-unit-10;
 	padding: $grid-unit-20;
+
+	&.has-siblings {
+		border-top: $border-width solid $gray-900;
+		margin-top: $grid-unit-10;
+	}
 
 	.block-editor-media-replace-flow__image-url-label {
 		display: block;

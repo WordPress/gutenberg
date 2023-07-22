@@ -9,7 +9,7 @@ import {
 	within,
 	getEditorHtml,
 	render,
-	changeTextOfRichText,
+	typeInRichText,
 } from 'test/helpers';
 
 /**
@@ -24,26 +24,7 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import { BlockMover } from '../index';
 
 describe( 'Block Mover Picker', () => {
-	it( 'renders without crashing', () => {
-		const props = {
-			isFirst: false,
-			isLast: true,
-			canMove: true,
-			numberOfBlocks: 2,
-			firstIndex: 1,
-
-			onMoveDown: jest.fn(),
-			onMoveUp: jest.fn(),
-			onLongPress: jest.fn(),
-
-			rootClientId: '',
-			isStackedHorizontally: true,
-		};
-		const screen = render( <BlockMover { ...props } /> );
-		expect( screen.container ).toBeTruthy();
-	} );
-
-	it( 'should match snapshot', () => {
+	it( 'should render without crashing and match snapshot', () => {
 		const props = {
 			isFirst: false,
 			isLast: true,
@@ -89,7 +70,7 @@ describe( 'Block Mover Picker', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -138,7 +119,7 @@ describe( 'Block Mover Picker', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );
@@ -176,7 +157,7 @@ describe( 'Block Mover Picker', () => {
 				within( paragraphBlock ).getByPlaceholderText(
 					'Start writing…'
 				);
-			changeTextOfRichText( paragraphField, 'Hello!' );
+			typeInRichText( paragraphField, 'Hello!' );
 
 			// Add Spacer block
 			await addBlock( screen, 'Spacer' );

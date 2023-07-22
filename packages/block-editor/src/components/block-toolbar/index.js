@@ -32,17 +32,18 @@ import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowMoversGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
+import { unlock } from '../../lock-unlock';
 
 const BlockToolbar = ( { hideDragHandle } ) => {
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const {
 		blockClientIds,
-		blockClientId,
 		blockType,
 		hasFixedToolbar,
 		isDistractionFree,
 		isValid,
 		isVisual,
-		isContentLocked,
+		blockEditingMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -51,8 +52,8 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			isBlockValid,
 			getBlockRootClientId,
 			getSettings,
-			__unstableGetContentLockingParent,
-		} = select( blockEditorStore );
+			getBlockEditingMode,
+		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
@@ -60,7 +61,6 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 		return {
 			blockClientIds: selectedBlockClientIds,
-			blockClientId: selectedBlockClientId,
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
@@ -73,11 +73,11 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
 			),
-			isContentLocked: !! __unstableGetContentLockingParent(
-				selectedBlockClientId
-			),
+			blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
 		};
 	}, [] );
+
+	const toolbarWrapperRef = useRef( null );
 
 	// Handles highlighting the current block outline on hover or focus of the
 	// block type toolbar area.
@@ -90,7 +90,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				if ( isFocused && isDistractionFree ) {
 					return;
 				}
-				toggleBlockHighlight( blockClientId, isFocused );
+				toggleBlockHighlight( getSelectedBlockClientId(), isFocused );
 			},
 		}
 	);
@@ -99,6 +99,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 	// header area and not contextually to the block.
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
+	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
@@ -123,18 +124,19 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 	} );
 
 	return (
-		<div className={ classes }>
+		<div className={ classes } ref={ toolbarWrapperRef }>
 			{ ! isMultiToolbar &&
-				! displayHeaderToolbar &&
-				! isContentLocked && <BlockParentSelector /> }
-			<div ref={ nodeRef } { ...showMoversGestures }>
-				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					! isContentLocked && (
+				isLargeViewport &&
+				blockEditingMode === 'default' && <BlockParentSelector /> }
+			{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
+				blockEditingMode === 'default' && (
+					<div ref={ nodeRef } { ...showMoversGestures }>
 						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 							<BlockSwitcher clientIds={ blockClientIds } />
 							{ ! isMultiToolbar && (
 								<BlockLockToolbar
 									clientId={ blockClientIds[ 0 ] }
+									wrapperRef={ toolbarWrapperRef }
 								/>
 							) }
 							<BlockMover
@@ -142,8 +144,8 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 								hideDragHandle={ hideDragHandle }
 							/>
 						</ToolbarGroup>
-					) }
-			</div>
+					</div>
+				) }
 			{ shouldShowVisualToolbar && isMultiToolbar && (
 				<BlockGroupToolbar />
 			) }
@@ -174,7 +176,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				</>
 			) }
 			<BlockEditVisuallyButton clientIds={ blockClientIds } />
-			{ ! isContentLocked && (
+			{ blockEditingMode === 'default' && (
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			) }
 		</div>

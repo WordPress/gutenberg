@@ -8,11 +8,9 @@ Namespace: `core`.
 
 ### canUser
 
-Returns whether the current user can perform the given action on the given
-REST resource.
+Returns whether the current user can perform the given action on the given REST resource.
 
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
+Calling this may trigger an OPTIONS request to the REST API via the `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
 
@@ -31,8 +29,7 @@ _Returns_
 
 Returns whether the current user can edit the given entity.
 
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
+Calling this may trigger an OPTIONS request to the REST API via the `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
 
@@ -56,7 +53,7 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request.
+-   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request. For valid query parameters see the [Users page](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and see the arguments for [List Users](https://developer.wordpress.org/rest-api/reference/users/#list-users) and [Retrieve a User](https://developer.wordpress.org/rest-api/reference/users/#retrieve-a-user).
 
 _Returns_
 
@@ -81,8 +78,7 @@ _Returns_
 
 Returns the latest autosaves for the post.
 
-May return multiple autosaves since the backend stores one autosave per
-author for each post.
+May return multiple autosaves since the backend stores one autosave per author for each post.
 
 _Parameters_
 
@@ -129,6 +125,18 @@ _Parameters_
 _Returns_
 
 -   `any`: The current theme.
+
+### getCurrentThemeGlobalStylesRevisions
+
+Returns the revisions of the current global styles theme.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Object | null`: The current global styles.
 
 ### getCurrentUser
 
@@ -230,9 +238,7 @@ _Returns_
 
 ### getEntityRecord
 
-Returns the Entity's record object by key. Returns `null` if the value is not
-yet received, undefined if the value entity is known to not exist, or the
-entity object if it exists and is received.
+Returns the Entity's record object by key. Returns `null` if the value is not yet received, undefined if the value entity is known to not exist, or the entity object if it exists and is received.
 
 _Parameters_
 
@@ -240,7 +246,7 @@ _Parameters_
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _key_ `EntityRecordKey`: Record's key
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
 
 _Returns_
 
@@ -265,9 +271,7 @@ _Returns_
 
 Returns the specified entity record's non transient edits.
 
-Transient edits don't create an undo level, and
-are not considered for change detection.
-They are defined in the entity's config.
+Transient edits don't create an undo level, and are not considered for change detection. They are defined in the entity's config.
 
 _Parameters_
 
@@ -289,7 +293,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
@@ -327,8 +331,7 @@ _Returns_
 
 ### getRawEntityRecord
 
-Returns the entity's record object by key,
-with its attributes mapped to their raw values.
+Returns the entity's record object by key, with its attributes mapped to their raw values.
 
 _Parameters_
 
@@ -343,8 +346,9 @@ _Returns_
 
 ### getRedoEdit
 
-Returns the next edit from the current undo offset
-for the entity records edits history, if any.
+> **Deprecated** since 6.3
+
+Returns the next edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
 
@@ -356,9 +360,7 @@ _Returns_
 
 ### getReferenceByDistinctEdits
 
-Returns a new reference when edited values have changed. This is useful in
-inferring where an edit has been made between states by comparison of the
-return values using strict equality.
+Returns a new reference when edited values have changed. This is useful in inferring where an edit has been made between states by comparison of the return values using strict equality.
 
 _Usage_
 
@@ -389,8 +391,9 @@ _Returns_
 
 ### getUndoEdit
 
-Returns the previous edit from the current undo offset
-for the entity records edits history, if any.
+> **Deprecated** since 6.3
+
+Returns the previous edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
 
@@ -415,8 +418,7 @@ _Returns_
 
 ### hasEditsForEntityRecord
 
-Returns true if the specified entity record has edits,
-and false otherwise.
+Returns true if the specified entity record has edits, and false otherwise.
 
 _Parameters_
 
@@ -431,15 +433,14 @@ _Returns_
 
 ### hasEntityRecords
 
-Returns true if records have been received for the given set of parameters,
-or false otherwise.
+Returns true if records have been received for the given set of parameters, or false otherwise.
 
 _Parameters_
 
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
@@ -461,8 +462,7 @@ _Returns_
 
 ### hasRedo
 
-Returns true if there is a next edit from the current undo offset
-for the entity records edits history, and false otherwise.
+Returns true if there is a next edit from the current undo offset for the entity records edits history, and false otherwise.
 
 _Parameters_
 
@@ -474,8 +474,7 @@ _Returns_
 
 ### hasUndo
 
-Returns true if there is a previous edit from the current undo offset
-for the entity records edits history, and false otherwise.
+Returns true if there is a previous edit from the current undo offset for the entity records edits history, and false otherwise.
 
 _Parameters_
 
@@ -519,9 +518,7 @@ _Returns_
 
 Determines if the returned preview is an oEmbed link fallback.
 
-WordPress can be configured to return a simple link to a URL if it is not embeddable.
-We need to be able to determine if a URL is embeddable or not, based on what we
-get back from the oEmbed preview API.
+WordPress can be configured to return a simple link to a URL if it is not embeddable. We need to be able to determine if a URL is embeddable or not, based on what we get back from the oEmbed preview API.
 
 _Parameters_
 
@@ -534,8 +531,7 @@ _Returns_
 
 ### isRequestingEmbedPreview
 
-Returns true if a request is in progress for embed preview data, or false
-otherwise.
+Returns true if a request is in progress for embed preview data, or false otherwise.
 
 _Parameters_
 
@@ -595,8 +591,7 @@ _Parameters_
 
 ### editEntityRecord
 
-Returns an action object that triggers an
-edit to an entity record.
+Returns an action object that triggers an edit to an entity record.
 
 _Parameters_
 
@@ -628,6 +623,18 @@ _Returns_
 
 -   `Object`: Action object.
 
+### receiveNavigationFallbackId
+
+Returns an action object signalling that the fallback Navigation Menu id has been received.
+
+_Parameters_
+
+-   _fallbackId_ `integer`: the id of the fallback Navigation Menu
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### receiveThemeSupports
 
 > **Deprecated** since WP 5.9, this is not useful anymore, use the selector direclty.
@@ -654,8 +661,7 @@ _Returns_
 
 ### redo
 
-Action triggered to redo the last undoed
-edit to an entity record, if any.
+Action triggered to redo the last undoed edit to an entity record, if any.
 
 ### saveEditedEntityRecord
 
@@ -684,7 +690,6 @@ _Parameters_
 
 ### undo
 
-Action triggered to undo the last edit to
-an entity record, if any.
+Action triggered to undo the last edit to an entity record, if any.
 
 <!-- END TOKEN(Autogenerated actions|../../../packages/core-data/src/actions.js) -->

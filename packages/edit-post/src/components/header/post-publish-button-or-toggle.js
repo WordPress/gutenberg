@@ -12,7 +12,6 @@ import { store as editPostStore } from '../../store';
 
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
-	forceIsSaving,
 	hasPublishAction,
 	isBeingScheduled,
 	isPending,
@@ -32,7 +31,7 @@ export function PostPublishButtonOrToggle( {
 	 * Conditions to show a BUTTON (publish directly) or a TOGGLE (open publish sidebar):
 	 *
 	 * 1) We want to show a BUTTON when the post status is at the _final stage_
-	 * for a particular role (see https://wordpress.org/support/article/post-status/):
+	 * for a particular role (see https://wordpress.org/documentation/article/post-status/):
 	 *
 	 * - is published
 	 * - is scheduled to be published
@@ -67,7 +66,6 @@ export function PostPublishButtonOrToggle( {
 	return (
 		<PostPublishButton
 			forceIsDirty={ forceIsDirty }
-			forceIsSaving={ forceIsSaving }
 			isOpen={ isPublishSidebarOpened }
 			isToggle={ component === IS_TOGGLE }
 			onToggle={ togglePublishSidebar }

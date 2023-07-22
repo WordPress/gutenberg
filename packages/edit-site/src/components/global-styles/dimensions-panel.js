@@ -7,7 +7,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const {
 	useGlobalStyle,
@@ -16,19 +16,25 @@ const {
 	DimensionsPanel: StylesDimensionsPanel,
 } = unlock( blockEditorPrivateApis );
 
-export default function DimensionsPanel( { name, variation = '' } ) {
-	let prefixParts = [];
-	if ( variation ) {
-		prefixParts = [ 'variations', variation ].concat( prefixParts );
-	}
-	const prefix = prefixParts.join( '.' );
+const DEFAULT_CONTROLS = {
+	contentSize: true,
+	wideSize: true,
+	padding: true,
+	margin: true,
+	blockGap: true,
+	minHeight: true,
+	childLayout: false,
+};
 
-	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
-	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
+export default function DimensionsPanel() {
+	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
 	} );
-	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
-	const settings = useSettingsForBlockElement( rawSettings, name );
+	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
+		shouldDecodeEncode: false,
+	} );
+	const [ rawSettings, setSettings ] = useGlobalSetting( '' );
+	const settings = useSettingsForBlockElement( rawSettings );
 
 	// These intermediary objects are needed because the "layout" property is stored
 	// in settings rather than styles.
@@ -52,10 +58,14 @@ export default function DimensionsPanel( { name, variation = '' } ) {
 		setStyle( updatedStyle );
 
 		if ( newStyle.layout !== settings.layout ) {
-			setSettings( {
-				...rawSettings,
-				layout: newStyle.layout,
-			} );
+			const updatedSettings = { ...rawSettings, layout: newStyle.layout };
+
+			// Ensure any changes to layout definitions are not persisted.
+			if ( updatedSettings.layout?.definitions ) {
+				delete updatedSettings.layout.definitions;
+			}
+
+			setSettings( updatedSettings );
 		}
 	};
 
@@ -66,6 +76,7 @@ export default function DimensionsPanel( { name, variation = '' } ) {
 			onChange={ onChange }
 			settings={ settings }
 			includeLayoutControls
+			defaultControls={ DEFAULT_CONTROLS }
 		/>
 	);
 }

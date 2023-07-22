@@ -125,13 +125,16 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 
 		const { height } = await coverBlock.getSize();
 		// Height is set to 20rem, where 1rem is 16.
-		// There is also block's vertical padding equal 32.
-		// Finally, the total height should be 20 * 16 + 32 = 352.
-		expect( height ).toBe( 352 );
+		// There is also block's vertical padding equal 16.
+		// Finally, the total height should be 20 * 16 + 16 = 336.
+		expect( height ).toBe( 336 );
 
 		await coverBlock.click();
 		expect( coverBlock ).toBeTruthy();
-		await editorPage.removeBlockAtPosition( blockNames.cover );
+
+		// Navigate upwards to select parent block
+		await editorPage.moveBlockSelectionUp();
+		await editorPage.removeBlock();
 	} );
 
 	// Testing this for iOS on a device is valuable to ensure that it properly
@@ -144,6 +147,8 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 			blockNames.cover
 		);
 		await coverBlock.click();
+		// Navigate upwards to select parent block
+		await editorPage.moveBlockSelectionUp();
 
 		await editorPage.openBlockSettings();
 		await editorPage.clickAddMediaFromCoverBlock();
@@ -160,6 +165,6 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 		await editorPage.chooseMediaLibrary();
 
 		expect( coverBlock ).toBeTruthy();
-		await editorPage.removeBlockAtPosition( blockNames.cover );
+		await editorPage.removeBlock();
 	} );
 } );

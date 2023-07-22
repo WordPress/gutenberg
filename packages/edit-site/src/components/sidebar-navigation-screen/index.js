@@ -3,26 +3,35 @@
  */
 import {
 	__experimentalHStack as HStack,
+	__experimentalHeading as Heading,
+	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 } from '@wordpress/components';
-import { isRTL, __ } from '@wordpress/i18n';
+import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import SidebarButton from '../sidebar-button';
+import {
+	isPreviewingTheme,
+	currentlyPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 export default function SidebarNavigationScreen( {
 	isRoot,
 	title,
 	actions,
+	meta,
 	content,
+	footer,
 	description,
+	backPath,
 } ) {
 	const { dashboardLink } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -30,42 +39,104 @@ export default function SidebarNavigationScreen( {
 			dashboardLink: getSettings().__experimentalDashboardLink,
 		};
 	}, [] );
+	const { getTheme } = useSelect( coreStore );
+	const navigator = useNavigator();
+	const theme = getTheme( currentlyPreviewingTheme() );
+	const icon = isRTL() ? chevronRight : chevronLeft;
 
 	return (
-		<VStack spacing={ 2 }>
-			<HStack
-				spacing={ 4 }
+		<>
+			<VStack
+				className="edit-site-sidebar-navigation-screen__main"
+				spacing={ 0 }
 				justify="flex-start"
-				className="edit-site-sidebar-navigation-screen__title-icon"
 			>
-				{ ! isRoot ? (
-					<NavigatorToParentButton
-						as={ SidebarButton }
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						aria-label={ __( 'Back' ) }
-					/>
-				) : (
-					<SidebarButton
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						aria-label={ __( 'Navigate to the Dashboard' ) }
-						href={ dashboardLink || 'index.php' }
-						label={ __( 'Dashboard' ) }
-					/>
+				<HStack
+					spacing={ 4 }
+					alignment="flex-start"
+					className="edit-site-sidebar-navigation-screen__title-icon"
+				>
+					{ ! isRoot && ! backPath && (
+						<SidebarButton
+							onClick={ () => {
+								if ( navigator.location.isInitial ) {
+									navigator.goToParent( { replace: true } );
+								} else {
+									navigator.goBack();
+								}
+							} }
+							icon={ icon }
+							label={ __( 'Back' ) }
+							showTooltip={ false }
+						/>
+					) }
+					{ ! isRoot && backPath && (
+						<SidebarButton
+							onClick={ () =>
+								navigator.goTo( backPath, { isBack: true } )
+							}
+							icon={ icon }
+							label={ __( 'Back' ) }
+							showTooltip={ false }
+						/>
+					) }
+					{ isRoot && (
+						<SidebarButton
+							icon={ icon }
+							label={
+								! isPreviewingTheme()
+									? __( 'Go to the Dashboard' )
+									: __( 'Go back to the theme showcase' )
+							}
+							href={
+								! isPreviewingTheme()
+									? dashboardLink || 'index.php'
+									: 'themes.php'
+							}
+						/>
+					) }
+					<Heading
+						className="edit-site-sidebar-navigation-screen__title"
+						color={ '#e0e0e0' /* $gray-200 */ }
+						level={ 1 }
+						size={ 20 }
+					>
+						{ ! isPreviewingTheme()
+							? title
+							: sprintf(
+									'Previewing %1$s: %2$s',
+									theme?.name?.rendered,
+									title
+							  ) }
+					</Heading>
+					{ actions && (
+						<div className="edit-site-sidebar-navigation-screen__actions">
+							{ actions }
+						</div>
+					) }
+				</HStack>
+				{ meta && (
+					<>
+						<div className="edit-site-sidebar-navigation-screen__meta">
+							{ meta }
+						</div>
+					</>
 				) }
-				<h2 className="edit-site-sidebar-navigation-screen__title">
-					{ title }
-				</h2>
-				{ actions }
-			</HStack>
 
-			<nav className="edit-site-sidebar-navigation-screen__content">
-				{ description && (
-					<p className="edit-site-sidebar-navigation-screen__description">
-						{ description }
-					</p>
-				) }
-				{ content }
-			</nav>
-		</VStack>
+				<div className="edit-site-sidebar-navigation-screen__content">
+					{ description && (
+						<p className="edit-site-sidebar-navigation-screen__description">
+							{ description }
+						</p>
+					) }
+					{ content }
+				</div>
+			</VStack>
+			{ footer && (
+				<footer className="edit-site-sidebar-navigation-screen__footer">
+					{ footer }
+				</footer>
+			) }
+		</>
 	);
 }

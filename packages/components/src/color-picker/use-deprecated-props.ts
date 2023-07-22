@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	colord,
-	HslColor,
-	HslaColor,
-	HsvColor,
-	HsvaColor,
-	RgbColor,
-	RgbaColor,
-} from 'colord';
-import type { ComponentProps } from 'react';
+import { colord } from 'colord';
 import memoize from 'memize';
 
 /**
@@ -21,49 +12,7 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type ColorPicker from './component';
-
-type ColorPickerProps = ComponentProps< typeof ColorPicker >;
-
-/**
- * @deprecated
- */
-type LegacyColor =
-	| string
-	| {
-			hex: string;
-			hsl: HslColor | HslaColor;
-			hsv: HsvColor | HsvaColor;
-			rgb: RgbColor | RgbaColor;
-			/**
-			 * @deprecated
-			 */
-			oldHue: number;
-			/**
-			 * @deprecated
-			 */
-			source: 'hex';
-	  };
-
-/**
- * @deprecated
- */
-export interface LegacyProps {
-	color?: LegacyColor;
-	/**
-	 * @deprecated
-	 */
-	onChangeComplete: ( colors: LegacyColor ) => void;
-	/**
-	 * @deprecated
-	 */
-	oldHue: string;
-	className: string;
-	/**
-	 * @deprecated
-	 */
-	disableAlpha: boolean;
-}
+import type { ColorPickerProps, LegacyColor, LegacyProps } from './types';
 
 function isLegacyProps( props: any ): props is LegacyProps {
 	return (

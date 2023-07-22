@@ -25,7 +25,7 @@ export default function PreferenceToggleMenuItem( {
 } ) {
 	const isActive = useSelect(
 		( select ) => !! select( preferencesStore ).get( scope, name ),
-		[ name ]
+		[ scope, name ]
 	);
 	const { toggle } = useDispatch( preferencesStore );
 	const speakMessage = () => {

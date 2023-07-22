@@ -18,10 +18,13 @@
 		}
 	}
 
-	// Reset unexpected margin-bottom from being applied to the `BaseControl`
-	// component of the `FocalPointPicker` component.
-	.components-focal-point-picker-control .components-base-control {
-		margin-bottom: 0;
+	// Reset unwanted margin-bottom from being applied to BaseControls within certain components.
+	.components-focal-point-picker-control,
+	.components-query-controls,
+	.components-range-control {
+		.components-base-control {
+			margin-bottom: 0;
+		}
 	}
 
 	.components-panel__body {
@@ -52,9 +55,4 @@
 
 .block-editor-block-inspector__tab-item {
 	flex: 1 1 0px;
-}
-
-.block-editor-block-inspector__block-buttons-container {
-	border-top: $border-width solid $gray-200;
-	padding: $grid-unit-20;
 }

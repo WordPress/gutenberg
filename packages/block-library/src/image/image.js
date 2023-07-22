@@ -1,20 +1,18 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
-	PanelBody,
 	ResizableBox,
 	Spinner,
 	TextareaControl,
 	TextControl,
 	ToolbarButton,
+	ToolbarGroup,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -22,7 +20,6 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
@@ -30,6 +27,7 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	useEffect,
@@ -38,7 +36,7 @@ import {
 	useRef,
 	useCallback,
 } from '@wordpress/element';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import {
 	createBlock,
@@ -57,6 +55,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import { isExternalImage } from './edit';
@@ -65,6 +64,22 @@ import { isExternalImage } from './edit';
  * Module constants
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
+import { evalAspectRatio } from './utils';
+
+const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
+
+const scaleOptions = [
+	{
+		value: 'cover',
+		label: _x( 'Cover', 'Scale option for dimensions control' ),
+		help: __( 'Image covers the space evenly.' ),
+	},
+	{
+		value: 'contain',
+		label: _x( 'Contain', 'Scale option for dimensions control' ),
+		help: __( 'Image is contained without distortion.' ),
+	},
+];
 
 export default function Image( {
 	temporaryURL,
@@ -79,7 +94,7 @@ export default function Image( {
 	containerRef,
 	context,
 	clientId,
-	isContentLocked,
+	blockEditingMode,
 } ) {
 	const {
 		url = '',
@@ -94,6 +109,8 @@ export default function Image( {
 		title,
 		width,
 		height,
+		aspectRatio,
+		scale,
 		linkTarget,
 		sizeSlug,
 	} = attributes;
@@ -122,7 +139,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected, clientId ]
+		[ id, isSelected ]
 	);
 	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
 		useSelect(
@@ -161,31 +178,41 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
+	const hasNonContentControls = blockEditingMode === 'default';
 	const isResizable =
 		allowResize &&
-		! isContentLocked &&
+		hasNonContentControls &&
 		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+	const canUploadMedia = !! mediaUpload;
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
 	// we can enable a button in the toolbar to upload the image.
 	useEffect( () => {
-		if ( ! isExternalImage( id, url ) || ! isSelected || externalBlob ) {
+		if (
+			! isExternalImage( id, url ) ||
+			! isSelected ||
+			! canUploadMedia
+		) {
+			setExternalBlob();
 			return;
 		}
 
+		if ( externalBlob ) return;
+
 		window
-			.fetch( url )
+			// Avoid cache, which seems to help avoid CORS problems.
+			.fetch( url.includes( '?' ) ? url : url + '?' )
 			.then( ( response ) => response.blob() )
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
 			.catch( () => {} );
-	}, [ id, url, isSelected, externalBlob ] );
+	}, [ id, url, isSelected, externalBlob, canUploadMedia ] );
 
 	// We need to show the caption when changes come from
 	// history navigation(undo/redo).
@@ -266,8 +293,6 @@ export default function Image( {
 
 		setAttributes( {
 			url: newUrl,
-			width: undefined,
-			height: undefined,
 			sizeSlug: newSizeSlug,
 		} );
 	}
@@ -323,16 +348,23 @@ export default function Image( {
 		);
 	}
 
+	// TODO: Can allow more units after figuring out how they should interact
+	// with the ResizableBox and ImageEditor components. Calculations later on
+	// for those components are currently assuming px units.
+	const dimensionsUnitsOptions = useCustomUnits( {
+		availableUnits: [ 'px' ],
+	} );
+
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ ! isContentLocked && (
+				{ hasNonContentControls && (
 					<BlockAlignmentControl
 						value={ align }
 						onChange={ updateAlignment }
 					/>
 				) }
-				{ ! isContentLocked && (
+				{ hasNonContentControls && (
 					<ToolbarButton
 						onClick={ () => {
 							setShowCaption( ! showCaption );
@@ -368,13 +400,6 @@ export default function Image( {
 						label={ __( 'Crop' ) }
 					/>
 				) }
-				{ externalBlob && (
-					<ToolbarButton
-						onClick={ uploadExternal }
-						icon={ upload }
-						label={ __( 'Upload external image' ) }
-					/>
-				) }
 				{ ! multiImageSelection && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
@@ -396,40 +421,90 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					{ ! multiImageSelection && (
-						<TextareaControl
-							__nextHasNoMarginBottom
-							label={ __( 'Alt text (alternative text)' ) }
-							value={ alt }
-							onChange={ updateAlt }
-							help={
-								<>
-									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-										{ __(
-											'Describe the purpose of the image'
-										) }
-									</ExternalLink>
-									{ __(
-										'Leave empty if the image is purely decorative.'
-									) }
-								</>
-							}
+			{ ! multiImageSelection && externalBlob && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ uploadExternal }
+							icon={ upload }
+							label={ __( 'Upload external image' ) }
 						/>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () =>
+						setAttributes( {
+							width: undefined,
+							height: undefined,
+							scale: undefined,
+							aspectRatio: undefined,
+						} )
+					}
+				>
+					{ ! multiImageSelection && (
+						<ToolsPanelItem
+							label={ __( 'Alternative text' ) }
+							isShownByDefault={ true }
+							hasValue={ () => alt !== '' }
+							onDeselect={ () =>
+								setAttributes( { alt: undefined } )
+							}
+						>
+							<TextareaControl
+								label={ __( 'Alternative text' ) }
+								value={ alt }
+								onChange={ updateAlt }
+								help={
+									<>
+										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											{ __(
+												'Describe the purpose of the image.'
+											) }
+										</ExternalLink>
+										<br />
+										{ __( 'Leave empty if decorative.' ) }
+									</>
+								}
+								__nextHasNoMarginBottom
+							/>
+						</ToolsPanelItem>
 					) }
-					<ImageSizeControl
-						onChangeImage={ updateImage }
-						onChange={ ( value ) => setAttributes( value ) }
-						slug={ sizeSlug }
-						width={ width }
-						height={ height }
-						imageSizeOptions={ imageSizeOptions }
-						isResizable={ isResizable }
-						imageWidth={ naturalWidth }
-						imageHeight={ naturalHeight }
+					<DimensionsTool
+						value={ {
+							width: width && `${ width }px`,
+							height: height && `${ height }px`,
+							scale,
+							aspectRatio,
+						} }
+						onChange={ ( newValue ) => {
+							// Rebuilding the object forces setting `undefined`
+							// for values that are removed since setAttributes
+							// doesn't do anything with keys that aren't set.
+							setAttributes( {
+								width:
+									newValue.width &&
+									parseInt( newValue.width, 10 ),
+								height:
+									newValue.height &&
+									parseInt( newValue.height, 10 ),
+								scale: newValue.scale,
+								aspectRatio: newValue.aspectRatio,
+							} );
+						} }
+						defaultScale="cover"
+						defaultAspectRatio="auto"
+						scaleOptions={ scaleOptions }
+						unitsOptions={ dimensionsUnitsOptions }
 					/>
-				</PanelBody>
+					<ResolutionTool
+						value={ sizeSlug }
+						onChange={ updateImage }
+						options={ imageSizeOptions }
+					/>
+				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
@@ -471,8 +546,6 @@ export default function Image( {
 
 	const borderProps = useBorderProps( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
-	const hasCustomBorder =
-		!! borderProps.className || ! isEmpty( borderProps.style );
 
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
@@ -491,24 +564,23 @@ export default function Image( {
 				} }
 				ref={ imageRef }
 				className={ borderProps.className }
-				style={ borderProps.style }
+				style={ {
+					width:
+						( width && height ) || aspectRatio ? '100%' : 'inherit',
+					height:
+						( width && height ) || aspectRatio ? '100%' : 'inherit',
+					objectFit: scale,
+					...borderProps.style,
+				} }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
 
-	let imageWidthWithinContainer;
-	let imageHeightWithinContainer;
-
-	if ( clientWidth && naturalWidth && naturalHeight ) {
-		const exceedMaxWidth = naturalWidth > clientWidth;
-		const ratio = naturalHeight / naturalWidth;
-		imageWidthWithinContainer = exceedMaxWidth ? clientWidth : naturalWidth;
-		imageHeightWithinContainer = exceedMaxWidth
-			? clientWidth * ratio
-			: naturalHeight;
-	}
+	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
+	// So we try using the imageRef width first and fallback to clientWidth.
+	const fallbackClientWidth = imageRef.current?.width || clientWidth;
 
 	if ( canEditImage && isEditingImage ) {
 		img = (
@@ -517,7 +589,7 @@ export default function Image( {
 				url={ url }
 				width={ width }
 				height={ height }
-				clientWidth={ clientWidth }
+				clientWidth={ fallbackClientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) =>
@@ -529,13 +601,18 @@ export default function Image( {
 				borderProps={ isRounded ? undefined : borderProps }
 			/>
 		);
-	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
-		img = <div style={ { width, height } }>{ img }</div>;
+	} else if ( ! isResizable ) {
+		img = <div style={ { width, height, aspectRatio } }>{ img }</div>;
 	} else {
-		const currentWidth = width || imageWidthWithinContainer;
-		const currentHeight = height || imageHeightWithinContainer;
+		const ratio =
+			( aspectRatio && evalAspectRatio( aspectRatio ) ) ||
+			( width && height && width / height ) ||
+			naturalWidth / naturalHeight ||
+			1;
 
-		const ratio = naturalWidth / naturalHeight;
+		const currentWidth = ! width && height ? height * ratio : width;
+		const currentHeight = ! height && width ? width / ratio : height;
+
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
 		const minHeight =
@@ -583,16 +660,24 @@ export default function Image( {
 
 		img = (
 			<ResizableBox
+				style={ {
+					display: 'block',
+					objectFit: scale,
+					aspectRatio:
+						! width && ! height && aspectRatio
+							? aspectRatio
+							: undefined,
+				} }
 				size={ {
-					width: width ?? 'auto',
-					height: height && ! hasCustomBorder ? height : 'auto',
+					width: currentWidth ?? 'auto',
+					height: currentHeight ?? 'auto',
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
 				minHeight={ minHeight }
 				maxHeight={ maxWidthBuffer / ratio }
-				lockAspectRatio
+				lockAspectRatio={ ratio }
 				enable={ {
 					top: false,
 					right: showRightHandle,
@@ -600,11 +685,12 @@ export default function Image( {
 					left: showLeftHandle,
 				} }
 				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt, delta ) => {
+				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
 					setAttributes( {
-						width: parseInt( currentWidth + delta.width, 10 ),
-						height: parseInt( currentHeight + delta.height, 10 ),
+						width: elt.offsetWidth,
+						height: elt.offsetHeight,
+						aspectRatio: undefined,
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }

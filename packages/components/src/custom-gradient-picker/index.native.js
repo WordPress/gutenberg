@@ -25,7 +25,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	const [ currentColor, setCurrentColor ] = useState( currentValue );
 
 	const { getGradientType, gradients, gradientOptions } = colorsUtils;
-	const gradientAST = getGradientAstWithDefault( currentColor );
+	const { gradientAST } = getGradientAstWithDefault( currentColor );
 	const gradientType = getGradientType( currentColor );
 
 	function isLinearGradient( type ) {

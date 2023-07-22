@@ -1,6 +1,4 @@
 .wp-block-file {
-	margin-bottom: 1.5em;
-
 	&:not(.wp-element-button) {
 		font-size: 0.8em;
 	}
@@ -17,6 +15,11 @@
 	* + .wp-block-file__button {
 		margin-left: 0.75em;
 	}
+}
+
+// Lowest specificity to avoid overriding layout styles.
+:where(.wp-block-file) {
+	margin-bottom: 1.5em;
 }
 
 .wp-block-file__embed {

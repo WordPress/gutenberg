@@ -381,7 +381,7 @@ This is how you execute the script with presented setup:
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
--   `--hot` – enables "Fast Refresh". The page will automatically reload if you make changes to the code. _For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed._
+-   `--hot` – enables "Fast Refresh". The page will automatically reload if you make changes to the code. _For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed._
 -   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
 -   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
 -   `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
@@ -416,8 +416,8 @@ This is how you execute those scripts using the presented setup:
 
 -   `npm run test:e2e` - runs all e2e tests.
 -   `npm run test:e2e:help` - prints all available options to configure e2e test runner.
--   `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
--   `npm run test-e2e FILE_NAME -- --puppeteer-interactive` - runs one test file interactively.
+-   `npm run test:e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
+-   `npm run test:e2e FILE_NAME -- --puppeteer-interactive` - runs one test file interactively.
 -   `npm run test:e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
 -   `npm run test:e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
 

@@ -1,25 +1,5 @@
 .edit-site-sidebar-navigation-screen__description {
-	margin: 0 0 $grid-unit-40 $grid-unit-20;
-}
-
-.edit-site-sidebar-navigation-screen-navigation-menus__placeholder {
-	padding: $grid-unit-10;
-	margin: $grid-unit-10;
-	background-color: $gray-100;
-	animation: loadingpulse 1s linear infinite;
-	animation-delay: 0.5s; // avoid animating for fast network responses
-}
-
-@keyframes loadingpulse {
-	0% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.5;
-	}
-	100% {
-		opacity: 1;
-	}
+	margin: 0 0 $grid-unit-40 0;
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__content {
@@ -111,5 +91,15 @@
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__content .popover-slot .wp-block-navigation-submenu {
+	display: none;
+}
+
+.edit-site-sidebar-navigation-screen-navigation-menus__loading.components-spinner {
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+}
+
+.edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor {
 	display: none;
 }

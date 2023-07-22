@@ -74,6 +74,11 @@
 					"description": "Settings related to shadows.",
 					"type": "object",
 					"properties": {
+						"defaultPresets": {
+							"description": "Allow users to choose shadows from the default shadow presets.",
+							"type": "boolean",
+							"default": true
+						},
 						"presets": {
 							"description": "Shadow presets for the shadow picker.\nGenerates a single custom property (`--wp--preset--shadow--{slug}`) per preset value.",
 							"type": "array",
@@ -97,7 +102,8 @@
 								"additionalProperties": false
 							}
 						}
-					}
+					},
+					"additionalProperties": false
 				}
 			}
 		},
@@ -260,7 +266,7 @@
 							"type": "string"
 						},
 						"wideSize": {
-							"description": "Sets the max-width of wide (`.alignwide`) content.",
+							"description": "Sets the max-width of wide (`.alignwide`) content. Also used as the maximum viewport when calculating fluid font sizes",
 							"type": "string"
 						}
 					},
@@ -452,6 +458,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"writingMode": {
+							"description": "Allow users to set the writing mode.",
+							"type": "boolean",
+							"default": false
+						},
 						"textTransform": {
 							"description": "Allow users to set custom text transforms.",
 							"type": "boolean",
@@ -481,7 +492,7 @@
 										"type": "string"
 									},
 									"fluid": {
-										"description": "Specifics the minimum and maximum font size value of a fluid font size. Set to `false` to bypass fluid calculations and use the static `size` value.",
+										"description": "Specifies the minimum and maximum font size value of a fluid font size. Set to `false` to bypass fluid calculations and use the static `size` value.",
 										"oneOf": [
 											{
 												"type": "object",
@@ -679,9 +690,7 @@
 			"type": "object",
 			"properties": {
 				"core/archives": {
-					"type": "object",
-					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings",
-					"additionalProperties": false
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/audio": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -693,35 +702,7 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
-					"type": "object",
-					"allOf": [
-						{
-							"$ref": "#/definitions/settingsPropertiesAppearanceTools"
-						},
-						{
-							"type": "object",
-							"properties": {
-								"border": {
-									"description": "Settings related to borders.\nGutenberg plugin required.",
-									"type": "object",
-									"properties": {
-										"radius": {
-											"description": "Allow users to set custom border radius.\nGutenberg plugin required.",
-											"type": "boolean",
-											"default": false
-										}
-									}
-								}
-							}
-						},
-						{ "$ref": "#/definitions/settingsPropertiesColor" },
-						{ "$ref": "#/definitions/settingsPropertiesLayout" },
-						{ "$ref": "#/definitions/settingsPropertiesSpacing" },
-						{
-							"$ref": "#/definitions/settingsPropertiesTypography"
-						},
-						{ "$ref": "#/definitions/settingsPropertiesCustom" }
-					]
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/buttons": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -741,6 +722,9 @@
 				"core/columns": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/comment-author-name": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -756,13 +740,31 @@
 				"core/comment-reply-link": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/comment-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
 				"core/comments": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/comments-pagination": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-next": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-numbers": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-previous": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/cover": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/details": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/embed": {
@@ -801,6 +803,9 @@
 				"core/list": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/list-item": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/loginout": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -819,10 +824,16 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/navigation-submenu": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/nextpage": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/page-list": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/page-list-item": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/paragraph": {
@@ -831,7 +842,13 @@
 				"core/post-author": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/post-comments": {
+				"core/post-author-biography": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-author-name": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comment": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-comments-count": {
@@ -864,6 +881,9 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/post-time-to-read": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/post-title": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -874,6 +894,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/query": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-no-results": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/query-pagination": {
@@ -892,6 +915,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/quote": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/read-more": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/rss": {
@@ -1502,6 +1528,17 @@
 								}
 							]
 						},
+						"writingMode": {
+							"description": "Sets the `writing-mode` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
 						"textTransform": {
 							"description": "Sets the `text-transform` CSS property.",
 							"oneOf": [
@@ -1654,6 +1691,12 @@
 								},
 								":visited": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":link": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":any-link": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
 							"additionalProperties": false
@@ -1682,6 +1725,12 @@
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
 								":visited": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":link": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":any-link": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
@@ -1755,6 +1804,9 @@
 				"core/columns": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/comment-author-name": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1770,13 +1822,31 @@
 				"core/comment-reply-link": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/comment-template": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
 				"core/comments": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/comments-pagination": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-next": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-numbers": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-previous": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/cover": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/details": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/embed": {
@@ -1815,6 +1885,9 @@
 				"core/list": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/list-item": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/loginout": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1833,10 +1906,16 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/navigation-submenu": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/nextpage": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/page-list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/page-list-item": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/paragraph": {
@@ -1845,7 +1924,13 @@
 				"core/post-author": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/post-comments": {
+				"core/post-author-biography": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-author-name": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comment": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-comments-count": {
@@ -1878,6 +1963,9 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/post-time-to-read": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/post-title": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1888,6 +1976,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/query": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-no-results": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/query-pagination": {
@@ -1906,6 +1997,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/quote": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/read-more": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/rss": {
@@ -2031,6 +2125,10 @@
 			"type": "string",
 			"description": "Title of the global styles variation. If not defined, the file name will be used."
 		},
+		"description": {
+			"type": "string",
+			"description": "Description of the global styles variation."
+		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
 			"type": "object",
@@ -2050,6 +2148,8 @@
 						"typography": {},
 						"border": {},
 						"shadow": {},
+						"position": {},
+						"dimensions": {},
 						"custom": {},
 						"blocks": {
 							"description": "Settings defined on a per-block basis.",

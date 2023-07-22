@@ -17,9 +17,9 @@
 		},
 		"apiVersion": {
 			"type": "integer",
-			"description": "The version of the Block API used by the block. The most recent version is 2 and it was introduced in WordPress 5.6.\n\n See the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
+			"description": "The version of the Block API used by the block. The most recent version is 3 and it was introduced in WordPress 6.3.\n\n See the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
 			"default": 1,
-			"enum": [ 1, 2 ]
+			"enum": [ 1, 2, 3 ]
 		},
 		"name": {
 			"type": "string",
@@ -315,6 +315,17 @@
 						}
 					}
 				},
+				"filter": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the properties related to filters. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific filter property, its attributes definition is extended to include the style attribute.",
+					"properties": {
+						"duotone": {
+							"type": "boolean",
+							"description": "Allow blocks to define a duotone filter.",
+							"default": false
+						}
+					}
+				},
 				"html": {
 					"type": "boolean",
 					"description": "By default, a block’s markup can be edited individually. To disable this behavior, set html to false.",
@@ -324,6 +335,116 @@
 					"type": "boolean",
 					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set inserter to false.",
 					"default": true
+				},
+				"layout": {
+					"default": false,
+					"description": "This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.",
+					"oneOf": [
+						{ "type": "boolean" },
+						{
+							"type": "object",
+							"properties": {
+								"default": {
+									"type": "object",
+									"description": "Allows setting the `type` property to define what layout type is default for the block, and also default values for any properties inherent to that layout type, e.g., for a `flex` layout, a default value can be set for `flexWrap`.",
+									"properties": {
+										"type": {
+											"type": "string",
+											"description": "The layout type.",
+											"enum": [
+												"constrained",
+												"grid",
+												"flex"
+											]
+										},
+										"contentSize": {
+											"type": "string",
+											"description": "The content size used on all children."
+										},
+										"wideSize": {
+											"type": "string",
+											"description": "The wide size used on alignwide children."
+										},
+										"justifyContent": {
+											"type": "string",
+											"description": "Content justification value.",
+											"enum": [
+												"right",
+												"center",
+												"space-between",
+												"left",
+												"stretch"
+											]
+										},
+										"orientation": {
+											"type": "string",
+											"description": "The orientation of the layout.",
+											"enum": [ "horizontal", "vertical" ]
+										},
+										"flexWrap": {
+											"type": "string",
+											"description": "The flex wrap value.",
+											"enum": [ "wrap", "nowrap" ]
+										},
+										"verticalAlignment": {
+											"type": "string",
+											"description": "The vertical alignment value.",
+											"enum": [
+												"top",
+												"center",
+												"bottom",
+												"space-between",
+												"stretch"
+											]
+										},
+										"minimumColumnWidth": {
+											"type": "string",
+											"description": "The minimum column width value."
+										},
+										"columnCount": {
+											"type": "number",
+											"description": "The column count value."
+										}
+									}
+								},
+								"allowSwitching": {
+									"type": "boolean",
+									"description": "Exposes a switcher control that allows toggling between all existing layout types.",
+									"default": false
+								},
+								"allowEditing": {
+									"type": "boolean",
+									"description": "Determines display of layout controls in the block sidebar. If set to false, layout controls will be hidden.",
+									"default": true
+								},
+								"allowInheriting": {
+									"type": "boolean",
+									"description": "For the `flow` layout type only, determines display of the `Inner blocks use content width` toggle.",
+									"default": true
+								},
+								"allowSizingOnChildren": {
+									"type": "boolean",
+									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.",
+									"default": false
+								},
+								"allowVerticalAlignment": {
+									"type": "boolean",
+									"description": "For the `flex` layout type only, determines display of vertical alignment controls in the block toolbar.",
+									"default": true
+								},
+								"allowJustification": {
+									"type": "boolean",
+									"description": "For the `flex` layout type, determines display of justification controls in the block toolbar and block sidebar. For the `constrained` layout type, determines display of justification control in the block sidebar.",
+									"default": true
+								},
+								"allowOrientation": {
+									"type": "boolean",
+									"description": "For the `flex` layout type only, determines display of the orientation control in the block toolbar.",
+									"default": true
+								}
+							}
+						}
+					]
 				},
 				"multiple": {
 					"type": "boolean",
@@ -427,6 +548,104 @@
 				}
 			},
 			"additionalProperties": true
+		},
+		"selectors": {
+			"type": "object",
+			"description": "Provides custom CSS selectors and mappings for the block. Selectors may be set for the block itself or per-feature e.g. typography. Custom selectors per feature or sub-feature, allow different block styles to be applied to different elements within the block.",
+			"properties": {
+				"root": {
+					"type": "string",
+					"description": "The primary CSS class to apply to the block. This replaces the `.wp-block-name` class if set."
+				},
+				"border": {
+					"description": "Custom CSS selector used to generate rules for the block's theme.json border styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" },
+								"color": { "type": "string" },
+								"radius": { "type": "string" },
+								"style": { "type": "string" },
+								"width": { "type": "string" }
+							}
+						}
+					]
+				},
+				"color": {
+					"description": "Custom CSS selector used to generate rules for the block's theme.json color styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" },
+								"text": { "type": "string" },
+								"background": { "type": "string" }
+							}
+						}
+					]
+				},
+				"dimensions": {
+					"description": "Custom CSS selector used to generate rules for the block's theme.json dimensions styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" },
+								"minHeight": { "type": "string" }
+							}
+						}
+					]
+				},
+				"spacing": {
+					"description": "Custom CSS selector used to generate rules for the block's theme.json spacing styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" },
+								"blockGap": { "type": "string" },
+								"padding": { "type": "string" },
+								"margin": { "type": "string" }
+							}
+						}
+					]
+				},
+				"typography": {
+					"description": "Custom CSS selector used to generate rules for the block's theme.json typography styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"root": { "type": "string" },
+								"fontFamily": { "type": "string" },
+								"fontSize": { "type": "string" },
+								"fontStyle": { "type": "string" },
+								"fontWeight": { "type": "string" },
+								"lineHeight": { "type": "string" },
+								"letterSpacing": { "type": "string" },
+								"textDecoration": { "type": "string" },
+								"textTransform": { "type": "string" }
+							}
+						}
+					]
+				}
+			}
 		},
 		"styles": {
 			"type": "array",

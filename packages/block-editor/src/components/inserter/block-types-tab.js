@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { groupBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
@@ -59,7 +54,15 @@ export function BlockTypesTab( {
 				itemList.filter(
 					( item ) => item.category && item.category !== 'reusable'
 				),
-			( itemList ) => groupBy( itemList, 'category' )
+			( itemList ) =>
+				itemList.reduce( ( acc, item ) => {
+					const { category } = item;
+					if ( ! acc[ category ] ) {
+						acc[ category ] = [];
+					}
+					acc[ category ].push( item );
+					return acc;
+				}, {} )
 		)( items );
 	}, [ items ] );
 

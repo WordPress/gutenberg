@@ -35,8 +35,8 @@ test.describe( 'Multi-block selection', () => {
 		}
 
 		// Multiselect via keyboard.
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
@@ -67,10 +67,10 @@ test.describe( 'Multi-block selection', () => {
 			.getByRole( 'document', { name: 'Empty block' } )
 			.click();
 		// Move to the middle of the first line.
-		await pageUtils.pressKeyTimes( 'ArrowUp', 4 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 4 } );
 		await page.keyboard.press( 'ArrowRight' );
 		// Select mid line one to mid line four.
-		await pageUtils.pressKeyTimes( 'Shift+ArrowDown', 3 );
+		await pageUtils.pressKeys( 'Shift+ArrowDown', { times: 3 } );
 		// Delete the text to see if the selection was correct.
 		await page.keyboard.press( 'Backspace' );
 
@@ -227,8 +227,8 @@ test.describe( 'Multi-block selection', () => {
 				attributes: { content: `${ i }` },
 			} );
 		}
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
@@ -247,6 +247,13 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 		multiBlockSelectionUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
@@ -292,6 +299,13 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 		pageUtils,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'test' },
@@ -304,11 +318,18 @@ test.describe( 'Multi-block selection', () => {
 				.filter( { hasText: 'Draft saved' } )
 		).toBeVisible();
 		await page.reload();
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Paragraph block' } )
 			.click( { modifiers: [ 'Shift' ] } );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 		await page.keyboard.type( 'new content' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -468,13 +489,13 @@ test.describe( 'Multi-block selection', () => {
 			attributes: { content: '2' },
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+x' );
 
 		await expect.poll( editor.getBlocks ).toEqual( [] );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+v' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: '1' } },
@@ -492,16 +513,16 @@ test.describe( 'Multi-block selection', () => {
 			attributes: { content: 'second paragraph' },
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'c' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+c' );
 
 		await page.keyboard.press( 'Backspace' );
 		await expect
 			.poll( editor.getBlocks, 'should select all blocks after copying' )
 			.toEqual( [] );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+v' );
 		await expect
 			.poll( editor.getBlocks, 'should copy and paste multiple blocks' )
 			.toMatchObject( [
@@ -520,9 +541,9 @@ test.describe( 'Multi-block selection', () => {
 				{ attributes: { content: 'second paragraph|' } },
 			] );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+v' );
 		await page.keyboard.type( '|' );
 		await expect
 			.poll( editor.getBlocks, 'should replace blocks' )
@@ -532,8 +553,8 @@ test.describe( 'Multi-block selection', () => {
 			] );
 		await page.keyboard.press( 'Backspace' );
 
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 3 );
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 3 } );
+		await pageUtils.pressKeys( 'primary+v' );
 		await page.keyboard.type( '|' );
 		await expect
 			.poll( editor.getBlocks, 'should paste mid-block' )
@@ -689,8 +710,8 @@ test.describe( 'Multi-block selection', () => {
 				attributes: { content: `${ i }` },
 			} );
 		}
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
@@ -720,8 +741,8 @@ test.describe( 'Multi-block selection', () => {
 			.click();
 		await page.keyboard.type( '1' );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
 		await page.keyboard.press( 'Enter' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -761,8 +782,8 @@ test.describe( 'Multi-block selection', () => {
 			.nth( 1 )
 			.click();
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
@@ -771,13 +792,13 @@ test.describe( 'Multi-block selection', () => {
 				{ name: 'core/paragraph' },
 			] );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
 			.toMatchObject( [ { name: 'core/column' } ] );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
@@ -818,17 +839,17 @@ test.describe( 'Multi-block selection', () => {
 			.getByRole( 'textbox' )
 			.click();
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
 			.toMatchObject( [ { name: 'core/list-item' } ] );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
 			.toMatchObject( [ { name: 'core/list' } ] );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
 			.toMatchObject( [
@@ -858,7 +879,7 @@ test.describe( 'Multi-block selection', () => {
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
 			.toEqual( [] );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await page.keyboard.press( 'Backspace' );
 
@@ -867,7 +888,6 @@ test.describe( 'Multi-block selection', () => {
 	} );
 
 	test( 'should select title if the cursor is on title', async ( {
-		page,
 		editor,
 		pageUtils,
 		multiBlockSelectionUtils,
@@ -883,14 +903,14 @@ test.describe( 'Multi-block selection', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.type( 'Post title' );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
 			.toEqual( [] );
 		await expect
 			.poll( () =>
-				page.evaluate( () => window.getSelection().toString() )
+				editor.canvas.evaluate( () => window.getSelection().toString() )
 			)
 			.toBe( 'Post title' );
 	} );
@@ -916,8 +936,8 @@ test.describe( 'Multi-block selection', () => {
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
-		const navButtons = listView.getByRole( 'gridcell', {
-			name: 'Paragraph link',
+		const navButtons = listView.getByRole( 'link', {
+			name: 'Paragraph',
 		} );
 
 		await navButtons.nth( 1 ).click();
@@ -954,11 +974,9 @@ test.describe( 'Multi-block selection', () => {
 
 		// Move focus to the list view link to prepare for the keyboard navigation.
 		await navButtons.nth( 3 ).click();
-		await expect(
-			navButtons.nth( 3 ).getByRole( 'link', { includeHidden: true } )
-		).toBeFocused();
+		await expect( navButtons.nth( 3 ) ).toBeFocused();
 		// Press Up twice to highlight the second block.
-		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 
 		await page.keyboard.press( 'Shift+ArrowDown' );
 		await expect
@@ -976,7 +994,7 @@ test.describe( 'Multi-block selection', () => {
 			)
 			.toEqual( [ 2, 3, 4 ] );
 
-		await pageUtils.pressKeyTimes( 'Shift+ArrowUp', 3 );
+		await pageUtils.pressKeys( 'Shift+ArrowUp', { times: 3 } );
 		await expect
 			.poll(
 				multiBlockSelectionUtils.getSelectedFlatIndices,
@@ -985,7 +1003,7 @@ test.describe( 'Multi-block selection', () => {
 			.toEqual( [ 1, 2 ] );
 
 		// Navigate to the bottom of the list of blocks.
-		await pageUtils.pressKeyTimes( 'ArrowDown', 3 );
+		await pageUtils.pressKeys( 'ArrowDown', { times: 3 } );
 
 		// This tests that shift selecting blocks by keyboard that are not adjacent
 		// to an existing selection resets the selection.
@@ -1022,7 +1040,7 @@ test.describe( 'Multi-block selection', () => {
 
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeyTimes( 'Shift+ArrowLeft', 5 );
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 5 } );
 
 		await page.keyboard.press( 'Delete' );
 
@@ -1049,7 +1067,7 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.type( ']2' );
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeyTimes( 'Shift+ArrowLeft', 3 );
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 3 } );
 
 		// Ensure selection is in the correct place.
 		await page.keyboard.type( '|' );
@@ -1084,7 +1102,7 @@ test.describe( 'Multi-block selection', () => {
 			.click();
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeyTimes( 'Shift+ArrowLeft', 5 );
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 5 } );
 
 		await page.keyboard.press( 'Enter' );
 
@@ -1127,7 +1145,7 @@ test.describe( 'Multi-block selection', () => {
 			.filter( { hasText: 'a' } )
 			.click();
 
-		await pageUtils.pressKeyTimes( 'Shift+ArrowDown', 2 );
+		await pageUtils.pressKeys( 'Shift+ArrowDown', { times: 2 } );
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure selection is in the correct place.
@@ -1144,6 +1162,13 @@ test.describe( 'Multi-block selection', () => {
 		page,
 		editor,
 	} ) => {
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: '<strong>1</strong>[' },

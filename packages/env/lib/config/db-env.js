@@ -1,3 +1,4 @@
+'use strict';
 // Username and password used in all databases.
 const credentials = {
 	WORDPRESS_DB_USER: 'root',

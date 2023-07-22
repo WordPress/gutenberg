@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -75,11 +70,14 @@ export default function TemplatePartEdit( {
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
-				isMissing: hasResolvedEntity && isEmpty( entityRecord ),
+				isMissing:
+					hasResolvedEntity &&
+					( ! entityRecord ||
+						Object.keys( entityRecord ).length === 0 ),
 				area: _area,
 			};
 		},
-		[ templatePartId, clientId ]
+		[ templatePartId, attributes.area, clientId ]
 	);
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
@@ -205,6 +203,7 @@ export default function TemplatePartEdit( {
 					onRequestClose={ () =>
 						setIsTemplatePartSelectionOpen( false )
 					}
+					isFullScreen={ true }
 				>
 					<TemplatePartSelectionModal
 						templatePartId={ templatePartId }
