@@ -5,6 +5,7 @@ import { useCommand } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
 import { external, plus, symbol } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -18,11 +19,19 @@ const { useHistory } = unlock( routerPrivateApis );
 
 export function useAdminNavigationCommands() {
 	const history = useHistory();
-	const getSettings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings
-	);
-	const settings = getSettings();
-	const isBlockTheme = settings.__unstableIsBlockBasedTheme;
+
+	const { isBlockTheme, canAccessSiteEditor } = useSelect( ( select ) => {
+		return {
+			isBlockTheme:
+				select( blockEditorStore ).getSettings()
+					.__unstableIsBlockBasedTheme,
+			canAccessSiteEditor: select( coreStore ).canUser(
+				'read',
+				'templates'
+			),
+		};
+	}, [] );
+
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
@@ -47,9 +56,10 @@ export function useAdminNavigationCommands() {
 		name: 'core/manage-reusable-blocks',
 		label: __( 'Manage all of my patterns' ),
 		callback: ( { close } ) => {
-			// __unstableIsBlockBasedTheme is not defined in the site editor so we need to check the context.
-			// If not the site editor and not a block based theme then redirect to the old wp-admin patterns page.
-			if ( ! isSiteEditor && ! isBlockTheme ) {
+			if (
+				( ! isSiteEditor && ! isBlockTheme ) ||
+				! canAccessSiteEditor
+			) {
 				document.location.href = 'edit.php?post_type=wp_block';
 			} else {
 				const args = {
