@@ -142,7 +142,12 @@ foreach ( array( 'post', 'page' ) as $post_type ) {
 
 			if ( $_gutenberg_revision_id ) {
 				$revision = get_post( $_gutenberg_revision_id );
-				$post_id  = $revision->post_parent;
+
+				if ( ! $revision ) {
+					return;
+				}
+
+				$post_id = $revision->post_parent;
 
 				// Just making sure we're updating the right revision.
 				if ( $post->ID === $post_id ) {
