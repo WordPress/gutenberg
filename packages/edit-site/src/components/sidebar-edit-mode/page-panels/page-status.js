@@ -11,6 +11,7 @@ import {
 	__experimentalVStack as VStack,
 	TextControl,
 	RadioControl,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
@@ -18,6 +19,8 @@ import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
+import { useInstanceId } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
@@ -85,6 +88,7 @@ export default function PageStatus( {
 	date,
 } ) {
 	const [ showPassword, setShowPassword ] = useState( !! password );
+	const instanceId = useInstanceId( PageStatus );
 
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -205,18 +209,27 @@ export default function PageStatus( {
 											onChange={ handleTogglePassword }
 										/>
 										{ showPassword && (
-											<TextControl
-												onChange={ ( value ) =>
-													saveStatus( {
-														password: value,
-													} )
-												}
-												value={ password }
-												placeholder={ __(
-													'Use a secure password'
-												) }
-												type="text"
-											/>
+											<div className="edit-site-change-status__password-input">
+												<VisuallyHidden
+													as="label"
+													htmlFor={ `edit-site-change-status__password-input-${ instanceId }` }
+												>
+													{ __( 'Create password' ) }
+												</VisuallyHidden>
+												<TextControl
+													onChange={ ( value ) =>
+														saveStatus( {
+															password: value,
+														} )
+													}
+													value={ password }
+													placeholder={ __(
+														'Use a secure password'
+													) }
+													type="text"
+													id={ `edit-site-change-status__password-input-${ instanceId }` }
+												/>
+											</div>
 										) }
 									</BaseControl>
 								) }
