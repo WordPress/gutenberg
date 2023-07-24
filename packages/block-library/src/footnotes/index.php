@@ -142,11 +142,10 @@ foreach ( array( 'post', 'page' ) as $post_type ) {
 
 			if ( $_gutenberg_revision_id ) {
 				$revision = get_post( $_gutenberg_revision_id );
-				$post_id  = $revision->post_parent;
 
 				// Just making sure we're updating the right revision.
-				if ( $post->ID === $post_id ) {
-					$footnotes = get_post_meta( $post_id, 'footnotes', true );
+				if ( $revision->post_parent && $post->ID === $revision->post_parent ) {
+					$footnotes = get_post_meta( $post->ID, 'footnotes', true );
 
 					if ( $footnotes ) {
 						// Can't use update_post_meta() because it doesn't allow revisions.
