@@ -7,7 +7,7 @@ jobs:
     detect_php_changes:
         name: Detect PHP changes
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && github.event_name == 'pull_request' }}
         steps:
             - name: Check out code
               uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
@@ -49,7 +49,6 @@ jobs:
               uses: peter-evans/create-or-update-comment@v3
               with:
                   issue-number: ${{ github.event.pull_request.number }}
-                  token: ${{ secrets.token }}
                   body: |
                       <!-- pr-contains-php-changes -->
                       This pull request has changed or added PHP files. Please confirm whether these changes need to be synced to WordPress Core, and therefore featured in the next release of WordPress.
@@ -72,7 +71,6 @@ jobs:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
                   edit-mode: replace
-                  token: ${{ secrets.token }}
                   body: |
                       <!-- pr-contains-php-changes -->
                       This pull request has changed or added PHP files. Please confirm whether these changes need to be synced to WordPress Core, and therefore featured in the next release of WordPress.
@@ -95,7 +93,6 @@ jobs:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
                   edit-mode: replace
-                  token: ${{ secrets.token }}
                   body: |
                       <!-- pr-contains-php-changes -->
                       This pull request changed or added PHP files in previous commits, but none have been detected in the latest commit.
