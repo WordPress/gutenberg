@@ -190,7 +190,6 @@ const UnforwardedTabPanel = (
 			setTabStoreSelectedId( firstEnabledTab.name );
 		}
 	}, [ tabs, selectedTab?.disabled, setTabStoreSelectedId, instanceId ] );
-
 	return (
 		<div className={ className } ref={ ref }>
 			<Ariakit.TabList
@@ -224,17 +223,17 @@ const UnforwardedTabPanel = (
 					);
 				} ) }
 			</Ariakit.TabList>
-			{ tabs.map( ( tab ) => (
+			{ selectedTab && (
 				<Ariakit.TabPanel
-					id={ `${ prependInstanceId( tab.name ) }-view` }
+					id={ `${ prependInstanceId( selectedTab.name ) }-view` }
 					store={ tabStore }
-					key={ tab.name }
-					tabId={ prependInstanceId( tab.name ) }
+					key={ selectedTab.name }
+					tabId={ prependInstanceId( selectedTab.name ) }
 					className={ 'components-tab-panel__tab-content' }
 				>
-					{ children( tab ) }
+					{ children( selectedTab ) }
 				</Ariakit.TabPanel>
-			) ) }
+			) }
 		</div>
 	);
 };
