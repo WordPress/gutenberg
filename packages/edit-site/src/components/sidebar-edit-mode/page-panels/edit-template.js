@@ -62,7 +62,7 @@ export default function EditTemplate() {
 				popoverProps={ POPOVER_PROPS }
 				focusOnMount
 				toggleProps={ { variant: 'tertiary' } }
-				label={ decodeEntities( template.title ) }
+				label={ __( 'Template options' ) }
 				text={ decodeEntities( template.title ) }
 				icon={ null }
 			>
