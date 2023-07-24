@@ -19,6 +19,7 @@ function render_block_core_categories( $attributes ) {
 	$args = array(
 		'echo'         => false,
 		'hierarchical' => ! empty( $attributes['showHierarchy'] ),
+		'taxonomy'     => $attributes['taxonomy'],
 		'orderby'      => 'name',
 		'show_count'   => ! empty( $attributes['showPostCounts'] ),
 		'title_li'     => '',
