@@ -32,7 +32,6 @@ function render_block_core_image( $attributes, $content, $block ) {
 	}
 
 	$should_load_view_script = false;
-	$experiments             = get_option( 'gutenberg-experiments' );
 	$link_destination        = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $attributes['behaviors']['lightbox'] ) ) {
@@ -50,8 +49,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	// If the lightbox is enabled, the image is not linked, and the Interactivity API is enabled, load the view script.
 	if ( isset( $lightbox_settings['enabled'] ) &&
 		true === $lightbox_settings['enabled'] &&
-		'none' === $link_destination &&
-		! empty( $experiments['gutenberg-interactivity-api-core-blocks'] )
+		'none' === $link_destination
 	) {
 		$should_load_view_script = true;
 	}

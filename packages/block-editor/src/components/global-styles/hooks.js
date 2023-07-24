@@ -551,7 +551,7 @@ export function __experimentalUseHasBehaviorsPanel(
 	name,
 	{ blockSupportOnly = false } = {}
 ) {
-	if ( ! settings?.behaviors || ! window?.__experimentalInteractivityAPI ) {
+	if ( ! settings?.behaviors ) {
 		return false;
 	}
 
