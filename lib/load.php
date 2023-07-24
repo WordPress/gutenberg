@@ -1,6 +1,6 @@
 <?php
 /**
- * Load API functions, register scripts and actions, etc.
+ * Loads API functions, register scripts and actions, etc.
  *
  * @package gutenberg
  */
