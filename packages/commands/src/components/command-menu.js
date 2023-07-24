@@ -199,6 +199,9 @@ export function CommandMenu() {
 	useShortcut(
 		'core/commands',
 		( event ) => {
+			// Bails to avoid obscuring the effect of the preceding handler(s).
+			if ( event.isDefaultPrevented() ) return;
+
 			event.preventDefault();
 			if ( isOpen ) {
 				close();
