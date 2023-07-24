@@ -259,6 +259,7 @@
 					"default": false
 				},
 				"behaviors": {
+					"type": "object",
 					"description": "Behaviors are a way to add additional functionality to a block. They are defined as an object with a name and a set of properties. Curently, only one behavior is supported: lightbox.",
 					"additionalProperties": false,
 					"properties": {
