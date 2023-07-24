@@ -181,7 +181,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		// Get uploaded files (used when installing local fonts).
 		$files = $request->get_file_params();
 
-		// iterates the fonts data received and creates a new WP_Font_Family object for each one.
+		// Iterates the fonts data received and creates a new WP_Font_Family object for each one.
 		$fonts_installed = array();
 		foreach ( $fonts_to_install as $font_data ) {
 			$font = new WP_Font_Family( $font_data );
