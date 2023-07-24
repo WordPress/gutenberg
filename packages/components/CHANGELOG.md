@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `TabPanel`: Introduce a new version of `TabPanel` with updated internals while maintaining the same functionality and API surface   ([#52133](https://github.com/WordPress/gutenberg/pull/52133)).
+
 ## 25.4.0 (2023-07-20)
 
 ### Enhancements
@@ -15,10 +19,6 @@
 -   `Item`: Unify focus style and add default font styles. ([#52495](https://github.com/WordPress/gutenberg/pull/52495)).
 -   `Toolbar`: Fix toolbar items not being tabbable on the first render. ([#52613](https://github.com/WordPress/gutenberg/pull/52613))
 -   `FormTokenField`: Fix token overflow when moving cursor left or right. ([#52662](https://github.com/WordPress/gutenberg/pull/52662))
-
-### Internal
-
--   `TabPanel`: Introduce a new version of `TabPanel` with updated internals while maintaining the same functionality and API surface   ([#52133](https://github.com/WordPress/gutenberg/pull/52133)).
 
 ## 25.3.0 (2023-07-05)
 
