@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { parse } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import TemplatePartNavigationMenus from './template-part-navigation-menus';
@@ -47,6 +52,11 @@ function getBlocksOfTypeFromBlocks( targetBlockType, blocks ) {
 export default function useNavigationMenuContent( postType, postId ) {
 	const { record } = useEditedEntityRecord( postType, postId );
 
+	const blocks =
+		record && record.content && typeof record.content !== 'function'
+			? parse( record.content )
+			: [];
+
 	// Only managing navigation menus in template parts is supported
 	// to match previous behaviour. This could potentially be expanded
 	// to patterns as well.
@@ -56,7 +66,7 @@ export default function useNavigationMenuContent( postType, postId ) {
 
 	const navigationBlocks = getBlocksOfTypeFromBlocks(
 		'core/navigation',
-		record?.blocks
+		blocks
 	);
 
 	if ( ! navigationBlocks.length ) {
