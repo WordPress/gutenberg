@@ -71,7 +71,7 @@ export default function SidebarNavigationScreenTemplates() {
 			}
 			content={
 				<>
-					{ isLoading && __( 'Loading templates' ) }
+					{ isLoading && __( 'Loading…' ) }
 					{ ! isLoading && (
 						<ItemGroup>
 							{ ! templates?.length && (

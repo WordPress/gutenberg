@@ -140,7 +140,7 @@ export default function SidebarNavigationScreenPatterns() {
 			footer={ footer }
 			content={
 				<>
-					{ isLoading && __( 'Loading patterns' ) }
+					{ isLoading && __( 'Loading…' ) }
 					{ ! isLoading && (
 						<>
 							{ ! hasTemplateParts && ! hasPatterns && (

@@ -610,7 +610,7 @@ function GalleryEdit( props ) {
 							</BaseControl.VisualLabel>
 							<View className={ 'gallery-image-sizes__loading' }>
 								<Spinner />
-								{ __( 'Loading options…' ) }
+								{ __( 'Loading…' ) }
 							</View>
 						</BaseControl>
 					) }
