@@ -3,7 +3,6 @@
  */
 import {
 	Button,
-	BaseControl,
 	ToggleControl,
 	Dropdown,
 	__experimentalText as Text,
@@ -197,10 +196,17 @@ export default function PageStatus( {
 									selected={ status }
 								/>
 								{ status !== 'private' && (
-									<BaseControl
-										id={ `edit-site-change-status__password` }
-										label={ __( 'Password' ) }
-									>
+									<fieldset className="edit-site-change-status__password-fieldset">
+										<Text
+											as="legend"
+											className="edit-site-change-status__password-legend"
+											size="11"
+											lineHeight={ 1.4 }
+											weight={ 500 }
+											upperCase={ true }
+										>
+											{ __( 'Password' ) }
+										</Text>
 										<ToggleControl
 											label={ __(
 												'Hide this page behind a password'
@@ -231,7 +237,7 @@ export default function PageStatus( {
 												/>
 											</div>
 										) }
-									</BaseControl>
+									</fieldset>
 								) }
 							</VStack>
 						</form>
