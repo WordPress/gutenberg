@@ -210,6 +210,9 @@ const UnforwardedTabPanel = (
 								}
 							) }
 							disabled={ tab.disabled }
+							aria-controls={ `${ prependInstanceId(
+								tab.name
+							) }-view` }
 							render={
 								<Button
 									icon={ tab.icon }
