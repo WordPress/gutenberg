@@ -30,8 +30,7 @@ if (hasProperty("willPublishReactNativeBridgeBinary")) {
 
     include ':react-native-aztec'
     project(':react-native-aztec').projectDir = new File(rootProject.projectDir, '../../../packages/react-native-aztec/android')
-}
-else {
+} else {
     include ':@wordpress_react-native-aztec'
     project(':@wordpress_react-native-aztec').projectDir = new File(rootProject.projectDir, '../../react-native-aztec/android')
 }
