@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 import { external, plus, symbol } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -23,7 +22,9 @@ export function useAdminNavigationCommands() {
 	const { isBlockTheme, canAccessSiteEditor } = useSelect( ( select ) => {
 		return {
 			isBlockTheme:
-				select( blockEditorStore ).getSettings()
+				// Avoid making core-commands dependent on block-editor at this point.
+				// eslint-disable-next-line @wordpress/data-no-store-string-literals
+				select( 'core/block-editor' )?.getSettings()
 					.__unstableIsBlockBasedTheme,
 			canAccessSiteEditor: select( coreStore ).canUser(
 				'read',
