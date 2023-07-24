@@ -113,10 +113,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 		$this->assertWPError( $merged_font instanceof WP_Error );
 
 		// Total of font faces without duplicates
-		$this->assertSame(
-			count( $merged_font['fontFace'] ),
-			4
-		);
+		$this->assertCount( 4, $merged_font['fontFace'] );
 
 		// Missing keys should be added to the merged result
 		$this->assertSame(

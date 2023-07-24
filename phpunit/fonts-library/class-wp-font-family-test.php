@@ -29,13 +29,13 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 
 	function test_get_data() {
 		$font = new WP_Font_Family( self::FONT_DATA_1 );
-		$this->assertEquals( 'piazzolla', $font->get_data()['slug'] );
-		$this->assertEquals( 1, count( $font->get_data()['fontFace'] ) );
+		$this->assertSame( 'piazzolla', $font->get_data()['slug'] );
+		$this->assertCount( 1, $font->get_data()['fontFace'] );
 	}
 
 	function test_get_data_as_json() {
 		$font = new WP_Font_Family( self::FONT_DATA_1 );
-		$this->assertEquals( wp_json_encode( self::FONT_DATA_1 ), $font->get_data_as_json() );
+		$this->assertSame( wp_json_encode( self::FONT_DATA_1 ), $font->get_data_as_json() );
 	}
 
 	function test_has_font_faces() {
@@ -55,14 +55,14 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertInstanceof( 'WP_Post', $post );
 
 		// Check that the post has the correct data
-		$this->assertEquals( 'Piazzolla' , $post->post_title );
-		$this->assertEquals( 'piazzolla' , $post->post_name );
+		$this->assertSame( 'Piazzolla' , $post->post_title );
+		$this->assertSame( 'piazzolla' , $post->post_name );
 		$content = json_decode( $post->post_content, true );
-		$this->assertEquals( 'Piazzolla' , $content['fontFamily'] );
-		$this->assertEquals( 'piazzolla' , $content['slug'] );
-		$this->assertEquals( 'Piazzolla' , $content['fontFace'][0]['fontFamily'] );
-		$this->assertEquals( 'italic' , $content['fontFace'][0]['fontStyle'] );
-		$this->assertEquals( '400' , $content['fontFace'][0]['fontWeight'] );
+		$this->assertSame( 'Piazzolla' , $content['fontFamily'] );
+		$this->assertSame( 'piazzolla' , $content['slug'] );
+		$this->assertSame( 'Piazzolla' , $content['fontFace'][0]['fontFamily'] );
+		$this->assertSame( 'italic' , $content['fontFace'][0]['fontStyle'] );
+		$this->assertSame( '400' , $content['fontFace'][0]['fontWeight'] );
 
 		// Check that the font file src was updated to the local font asset
 		$this->assertStringEndsWith( '/piazzolla_italic_400.ttf', $content['fontFace'][0]['src'] );
@@ -89,11 +89,11 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertInstanceof( 'WP_Post', $post );
 
 		// Check that the post has the correct data
-		$this->assertEquals( 'Arial', $post->post_title );
-		$this->assertEquals( 'arial', $post->post_name );
+		$this->assertSame( 'Arial', $post->post_title );
+		$this->assertSame( 'arial', $post->post_name );
 		$content = json_decode( $post->post_content, true );
-		$this->assertEquals( 'Arial', $content['fontFamily'] );
-		$this->assertEquals( 'arial', $content['slug'] );
+		$this->assertSame( 'Arial', $content['fontFamily'] );
+		$this->assertSame( 'arial', $content['slug'] );
 		$this->assertArrayNotHasKey( 'fontFace', $content );
 
 		$font->uninstall();
@@ -154,11 +154,11 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertInstanceof( 'WP_Post', $post );
 
 		// Check that the post has the correct data
-		$this->assertEquals( 'Inter', $post->post_title );
-		$this->assertEquals( 'inter', $post->post_name );
+		$this->assertSame( 'Inter', $post->post_title );
+		$this->assertSame( 'inter', $post->post_name );
 		$content = json_decode( $post->post_content, true );
-		$this->assertEquals( 'Inter', $content['fontFamily'] );
-		$this->assertEquals( 'inter', $content['slug'] );
+		$this->assertSame( 'Inter', $content['fontFamily'] );
+		$this->assertSame( 'inter', $content['slug'] );
 
 		// Check that the font file src was updated to the local font asset
 		$this->assertStringEndsWith( '/inter_normal_400.ttf', $content['fontFace'][0]['src'] );
