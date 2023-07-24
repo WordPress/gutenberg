@@ -1,5 +1,9 @@
 export const BASE_DEFAULT_VALUE = 1.5;
-export const STEP = 0.1;
+/**
+ * A step value of 0.01 allows for a more granular control of the line height.
+ * For example, this allows for a value of 1.55, rather than rounding up to a value of 1.6.
+ */
+export const STEP = 0.01;
 /**
  * There are varying value types within LineHeightControl:
  *
