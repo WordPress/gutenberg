@@ -24,6 +24,11 @@ function render_block_core_categories( $attributes ) {
 		'title_li'     => '',
 		'hide_empty'   => empty( $attributes['showEmpty'] ),
 	);
+	
+	if( isset( $attributes['taxonomy'] ) ){
+		$args['taxonomy'] = $attributes['taxonomy'];
+	}
+	
 	if ( ! empty( $attributes['showOnlyTopLevel'] ) && $attributes['showOnlyTopLevel'] ) {
 		$args['parent'] = 0;
 	}
