@@ -49,7 +49,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 		$default_template_types['singular'] = array(
 			'title'       => _x( 'Single Entries', 'Template name', 'gutenberg' ),
 			'description' => __(
-				'Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g., Single Post, Page, or Attachment) cannot be found.',
+				'Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g. Single Post, Page, or Attachment) cannot be found.',
 				'gutenberg'
 			),
 		);
@@ -70,7 +70,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 		$default_template_types['archive'] = array(
 			'title'       => _x( 'All Archives', 'Template name', 'gutenberg' ),
 			'description' => __(
-				'Displays any archive, including posts by a single author, category, tag, taxonomy, custom post type, and date. This template will serve as a fallback when more specific templates (e.g., Category or Tag) cannot be found.',
+				'Displays any archive, including posts by a single author, category, tag, taxonomy, custom post type, and date. This template will serve as a fallback when more specific templates (e.g. Category or Tag) cannot be found.',
 				'gutenberg'
 			),
 		);
@@ -79,7 +79,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 		$default_template_types['author'] = array(
 			'title'       => _x( 'Author Archives', 'Template name', 'gutenberg' ),
 			'description' => __(
-				"Displays a single author's post archive. This template will serve as a fallback when a more a specific template (e.g., Author: Admin) cannot be found.",
+				"Displays a single author's post archive. This template will serve as a fallback when a more a specific template (e.g. Author: Admin) cannot be found.",
 				'gutenberg'
 			),
 		);
@@ -88,7 +88,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 		$default_template_types['category'] = array(
 			'title'       => _x( 'Category Archives', 'Template name', 'gutenberg' ),
 			'description' => __(
-				'Displays a post category archive. This template will serve as a fallback when more specific template (e.g., Category: Recipes) cannot be found.',
+				'Displays a post category archive. This template will serve as a fallback when more specific template (e.g. Category: Recipes) cannot be found.',
 				'gutenberg'
 			),
 		);
@@ -97,7 +97,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 		$default_template_types['taxonomy'] = array(
 			'title'       => _x( 'Taxonomy', 'Template name', 'gutenberg' ),
 			'description' => __(
-				'Displays a custom taxonomy archive. Like categories and tags, taxonomies have terms which you use to classify things. For example: a taxonomy named "Art" can have multiple terms, such as "Modern" and "18th Century." This template will serve as a fallback when a more specific template (e.g, Taxonomy: Art) cannot be found.',
+				'Displays a custom taxonomy archive. Like categories and tags, taxonomies have terms which you use to classify things. For example: a taxonomy named "Art" can have multiple terms, such as "Modern" and "18th Century." This template will serve as a fallback when a more specific template (e.g. Taxonomy: Art) cannot be found.',
 				'gutenberg'
 			),
 		);
@@ -105,14 +105,14 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 	if ( isset( $default_template_types['date'] ) ) {
 		$default_template_types['date'] = array(
 			'title'       => _x( 'Date Archives', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a post archive when a specific date is visited (e.g., example.com/2023/).', 'gutenberg' ),
+			'description' => __( 'Displays a post archive when a specific date is visited (e.g. example.com/2023/).', 'gutenberg' ),
 		);
 	}
 	if ( isset( $default_template_types['tag'] ) ) {
 		$default_template_types['tag'] = array(
 			'title'       => _x( 'Tag Archives', 'Template name', 'gutenberg' ),
 			'description' => __(
-				'Displays a post tag archive. This template will serve as a fallback when more specific template (e.g., Tag: Pizza) cannot be found.',
+				'Displays a post tag archive. This template will serve as a fallback when more specific template (e.g. Tag: Pizza) cannot be found.',
 				'gutenberg'
 			),
 		);
