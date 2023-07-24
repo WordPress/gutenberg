@@ -8,15 +8,11 @@
 class WP_Fonts_Library_Test extends WP_UnitTestCase {
 
 	function test_get_fonts_directory() {
-		$this->assertTrue(
-			str_ends_with( WP_Fonts_Library::get_fonts_directory(), '/wp-content/fonts' )
-		);
+		$this->assertStringEndsWith( '/wp-content/fonts', WP_Fonts_Library::get_fonts_directory() );
 	}
 
 	function test_get_relative_fonts_path() {
-		$this->assertTrue(
-			str_ends_with( WP_Fonts_Library::get_relative_fonts_path(), '/wp-content/fonts/' )
-		);
+		$this->assertStringEndsWith( '/wp-content/fonts/', WP_Fonts_Library::get_relative_fonts_path() );
 	}
 
 }

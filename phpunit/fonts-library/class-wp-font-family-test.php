@@ -65,7 +65,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertEquals( '400' , $content['fontFace'][0]['fontWeight'] );
 
 		// Check that the font file src was updated to the local font asset
-		$this->assertTrue( str_ends_with( $content['fontFace'][0]['src'], '/piazzolla_italic_400.ttf' ) );
+		$this->assertStringEndsWith( '/piazzolla_italic_400.ttf', $content['fontFace'][0]['src'] );
 
 		// Check that the font file was created
 		$this->assertTrue( file_exists( WP_FONTS_DIR . '/piazzolla_italic_400.ttf' ) );
@@ -161,8 +161,8 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'inter', $content['slug'] );
 
 		// Check that the font file src was updated to the local font asset
-		$this->assertTrue( str_ends_with( $content['fontFace'][0]['src'], '/inter_normal_400.ttf' ) );
-		$this->assertTrue( str_ends_with( $content['fontFace'][1]['src'], '/inter_normal_500.ttf' ) );
+		$this->assertStringEndsWith( '/inter_normal_400.ttf', $content['fontFace'][0]['src'] );
+		$this->assertStringEndsWith( '/inter_normal_500.ttf', $content['fontFace'][1]['src'] );
 
 		// Check that the font file was created
 		$this->assertTrue( file_exists( WP_FONTS_DIR . '/inter_normal_400.ttf' ) );
