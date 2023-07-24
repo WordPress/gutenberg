@@ -61,13 +61,6 @@
 			"margin": true,
 			"padding": true
 		},
-		"__experimentalStyle": {
-			"spacing": {
-				"margin": {
-					"bottom": "1.5em"
-				}
-			}
-		},
 		"color": {
 			"gradients": true,
 			"link": true,
