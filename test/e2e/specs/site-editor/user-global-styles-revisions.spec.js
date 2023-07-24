@@ -37,7 +37,7 @@ test.describe( 'Global styles revisions', () => {
 			.click();
 		await expect(
 			page.getByTestId( 'global-styles-no-revisions' )
-		).toHaveText( 'There are currently no style revisions.' );
+		).toHaveText( 'No results found.' );
 	} );
 
 	test( 'should display revisions UI when there is more than 1 revision', async ( {
