@@ -170,8 +170,10 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		// Get new fonts to install.
 		$fonts_to_install = $request->get_param( 'fontFamilies' );
 
-		// As we are receiving form data, the font families are encoded as a string.
-		// We are using form data because local fonts need to use that format to attach the files in the request.
+		/*
+		 * As we are receiving form data, the font families are encoded as a string.
+		 * We are using form data because local fonts need to use that format to attach the files in the request.
+		 */
 		$fonts_to_install = json_decode( $fonts_to_install, true );
 
 		if ( empty( $fonts_to_install ) ) {
