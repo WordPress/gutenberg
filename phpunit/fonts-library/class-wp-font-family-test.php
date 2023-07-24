@@ -68,7 +68,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertStringEndsWith( '/piazzolla_italic_400.ttf', $content['fontFace'][0]['src'] );
 
 		// Check that the font file was created
-		$this->assertTrue( file_exists( WP_FONTS_DIR . '/piazzolla_italic_400.ttf' ) );
+		$this->assertFileExists( WP_FONTS_DIR . '/piazzolla_italic_400.ttf' );
 
 		$font->uninstall();
 
@@ -165,8 +165,8 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertStringEndsWith( '/inter_normal_500.ttf', $content['fontFace'][1]['src'] );
 
 		// Check that the font file was created
-		$this->assertTrue( file_exists( WP_FONTS_DIR . '/inter_normal_400.ttf' ) );
-		$this->assertTrue( file_exists( WP_FONTS_DIR . '/inter_normal_500.ttf' ) );
+		$this->assertFileExists( WP_FONTS_DIR . '/inter_normal_400.ttf' );
+		$this->assertFileExists( WP_FONTS_DIR . '/inter_normal_500.ttf' );
 
 		$font->uninstall();
 
