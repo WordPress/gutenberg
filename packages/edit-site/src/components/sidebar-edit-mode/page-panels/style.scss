@@ -57,11 +57,18 @@
 
 .edit-site-summary-field {
 	.components-dropdown {
-		flex-grow: 1;
+		width: 70%;
 	}
 
 	.edit-site-summary-field__trigger {
-		width: 100%;
+		max-width: 100%;
+
+		// Truncate
+		display: block;
+		text-align: left;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.edit-site-summary-field__label {

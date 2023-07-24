@@ -61,7 +61,10 @@ export default function EditTemplate() {
 			<DropdownMenu
 				popoverProps={ POPOVER_PROPS }
 				focusOnMount
-				toggleProps={ { variant: 'tertiary' } }
+				toggleProps={ {
+					variant: 'tertiary',
+					className: 'edit-site-summary-field__trigger',
+				} }
 				label={ __( 'Template options' ) }
 				text={ decodeEntities( template.title ) }
 				icon={ null }
