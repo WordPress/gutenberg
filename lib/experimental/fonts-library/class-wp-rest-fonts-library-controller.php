@@ -119,7 +119,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Check if user has permissions to read the fonts library.
+	 * Checks whether the user has permissions to read the fonts library.
 	 *
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
