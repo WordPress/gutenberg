@@ -1,4 +1,4 @@
-name: OPTIONAL - Confirm if PHP changes require backporting to WordPress Core
+name: OPTIONAL - Confirm if PHP changes require porting to WordPress Core
 
 on:
     pull_request:
