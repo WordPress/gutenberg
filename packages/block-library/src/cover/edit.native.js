@@ -370,15 +370,13 @@ const Cover = ( {
 		styles.selectedColorTextDark
 	);
 
-	function getBottomLabelText() {
-		return customOverlayColor ? (
-			<Text style={ selectedColorText }>
-				{ customOverlayColor.toUpperCase() }
-			</Text>
-		) : (
-			__( 'Select a color' )
-		);
-	}
+	const bottomLabelText = customOverlayColor ? (
+		<Text style={ selectedColorText }>
+			{ customOverlayColor.toUpperCase() }
+		</Text>
+	) : (
+		__( 'Select a color' )
+	);
 
 	const colorPickerControls = (
 		<InspectorControls>
@@ -409,7 +407,7 @@ const Cover = ( {
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
-						bottomLabelText={ getBottomLabelText() }
+						bottomLabelText={ bottomLabelText }
 					/>
 				) }
 			</BottomSheetConsumer>
