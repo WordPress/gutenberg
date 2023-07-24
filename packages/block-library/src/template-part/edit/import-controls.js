@@ -163,7 +163,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 						isBusy={ isBusy }
 						aria-disabled={ isBusy || ! selectedSidebar }
 					>
-						{ __( 'Import' ) }
+						{ _x( 'Import', 'button label' ) }
 					</Button>
 				</FlexItem>
 			</HStack>
