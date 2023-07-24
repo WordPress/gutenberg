@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItemsChoice, MenuGroup, Notice } from '@wordpress/components';
+import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
@@ -55,28 +55,32 @@ function ModeSwitcher() {
 		return null;
 	}
 
-	if ( ! isRichEditingEnabled ) {
-		return (
-			<MenuGroup label={ __( 'Editor' ) }>
-				<Notice isDismissible={ false }>
-					{ __( 'Visual editor is disabled.' ) }
-				</Notice>
-			</MenuGroup>
-		);
+	let selectedMode = mode;
+	if ( ! isRichEditingEnabled && mode === 'visual' ) {
+		selectedMode = 'text';
 	}
-
-	if ( ! isCodeEditingEnabled ) {
-		return (
-			<MenuGroup label={ __( 'Editor' ) }>
-				<Notice isDismissible={ false }>
-					{ __( 'Code editor is disabled.' ) }
-				</Notice>
-			</MenuGroup>
-		);
+	if ( ! isCodeEditingEnabled && mode === 'text' ) {
+		selectedMode = 'visual';
 	}
 
 	const choices = MODES.map( ( choice ) => {
-		if ( choice.value !== mode ) {
+		if ( ! isCodeEditingEnabled && choice.value === 'text' ) {
+			choice = {
+				...choice,
+				disabled: true,
+				info: __( 'Code editor is disabled for this site.' ),
+			};
+		}
+		if ( ! isRichEditingEnabled && choice.value === 'visual' ) {
+			choice = {
+				...choice,
+				disabled: true,
+				info: __(
+					'Enable the visual editor in your profile settings.'
+				),
+			};
+		}
+		if ( choice.value !== selectedMode && ! choice.disabled ) {
 			return { ...choice, shortcut };
 		}
 		return choice;
@@ -86,7 +90,7 @@ function ModeSwitcher() {
 		<MenuGroup label={ __( 'Editor' ) }>
 			<MenuItemsChoice
 				choices={ choices }
-				value={ mode }
+				value={ selectedMode }
 				onSelect={ switchEditorMode }
 			/>
 		</MenuGroup>

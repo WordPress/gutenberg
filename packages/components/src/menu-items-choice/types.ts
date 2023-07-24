@@ -39,6 +39,10 @@ export type MenuItemChoice = {
 	 */
 	value: string;
 	/**
+	 * Unique value for choice.
+	 */
+	disabled?: boolean;
+	/**
 	 * Additional information which will be rendered below the given label.
 	 */
 	info?: string;
