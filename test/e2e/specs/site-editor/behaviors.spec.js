@@ -65,15 +65,32 @@ test.describe( 'Site editor behaviors', () => {
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Styles' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 
-		// Reset to defaults if the button is available
+		const revisionsMenu = page.getByRole( 'button', { name: 'Revisions' } );
+
+		// If the button is disabled, it means that there are no revisions so we can skip
+		if ( await revisionsMenu.isDisabled() ) return;
+		await revisionsMenu.click();
+
 		const resetButton = page.getByRole( 'menuitem', {
 			name: 'Reset to defaults',
 		} );
-		if ( ! ( await resetButton.isDisabled() ) ) {
-			await resetButton.click();
-		}
+
+		// If the button is disabled, it means that there is no revision to reset to so we can skip
+		if ( await resetButton.isDisabled() ) return;
+		await resetButton.click();
+
+		// Save the changes
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		// Confirm saving the changes
+		await page
+			.getByRole( 'region', { name: 'Save panel' } )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
 	} );
 
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -98,10 +115,17 @@ test.describe( 'Site editor behaviors', () => {
 
 	test( 'Behaviors should be set to "default" by default', async ( {
 		page,
+		admin,
+		editor,
 	} ) => {
+		await admin.visitSiteEditor();
+		await editor.canvas.click( 'body' );
+
 		// Navigate to Styles -> Blocks -> Image
-		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
-		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
 		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Image block styles', exact: true } )
