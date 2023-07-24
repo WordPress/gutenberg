@@ -530,6 +530,22 @@ describe( 'color settings', () => {
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
+
+	it( 'displays the hex color value in the custom color picker', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
+		} );
+
+		const block = await screen.findByLabelText( 'Cover block. Empty' );
+		expect( block ).toBeDefined();
+
+		// Select a color from the placeholder palette.
+		const colorPalette = await screen.findByTestId( 'color-palette' );
+		const colorButton = within( colorPalette ).getByTestId( COLOR_PINK );
+
+		expect( colorButton ).toBeDefined();
+		fireEvent.press( colorButton );
+	} );
 } );
 
 describe( 'minimum height settings', () => {

@@ -319,6 +319,7 @@ function ColorPalette( {
 								selected: isSelectedCustom(),
 							} }
 							accessibilityHint={ accessibilityHint }
+							testID={ 'custom-color-picker' }
 						>
 							<View style={ customIndicatorWrapperStyle }>
 								<ColorIndicator
