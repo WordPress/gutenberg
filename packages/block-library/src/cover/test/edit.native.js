@@ -65,6 +65,7 @@ const COVER_BLOCK_CUSTOM_HEIGHT_HTML = `<!-- wp:cover {"url":"https://cldup.com/
 const COLOR_PINK = '#f78da7';
 const COLOR_RED = '#cf2e2e';
 const COLOR_GRAY = '#abb8c3';
+const COLOR_WHITE = '#ffffff';
 const GRADIENT_GREEN =
 	'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)';
 
@@ -541,10 +542,29 @@ describe( 'color settings', () => {
 
 		// Select a color from the placeholder palette.
 		const colorPalette = await screen.findByTestId( 'color-palette' );
-		const colorButton = within( colorPalette ).getByTestId( COLOR_PINK );
+		const colorButton = within( colorPalette ).getByTestId(
+			'custom-color-picker'
+		);
 
 		expect( colorButton ).toBeDefined();
 		fireEvent.press( colorButton );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Assertion to check the text content of bottomLabelText before tapping color picker
+		const bottomLabelText = screen.getByTestId(
+			'color-picker-bottom-label-text'
+		);
+		expect( bottomLabelText ).toHaveTextContent( 'Select a color' );
+
+		// Tap color picker
+		const colorPicker = screen.getByTestId( 'color-picker' );
+		fireEvent.press( colorPicker );
+
+		// Assertion to check the hex value in bottomLabelText
+		expect( bottomLabelText ).toHaveTextContent( COLOR_WHITE );
 	} );
 } );
 
