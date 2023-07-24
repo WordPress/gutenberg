@@ -190,4 +190,16 @@ module.exports = {
 	'rich-text-selection': {
 		color: 'black',
 	},
+	'header-toolbar__keyboard-hide-shadow--light': {
+		color: 'black',
+	},
+	'header-toolbar__keyboard-hide-shadow--solid': {
+		color: 'black',
+	},
+	'media-placeholder__header-icon': {
+		fill: 'black',
+	},
+	embed__icon: {
+		fill: 'black',
+	},
 };

@@ -680,10 +680,6 @@ _Related_
 
 Private @wordpress/block-editor APIs.
 
-### ReusableBlocksRenameHint
-
-Undocumented declaration.
-
 ### RichText
 
 _Related_

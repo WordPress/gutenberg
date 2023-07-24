@@ -36,7 +36,8 @@ export default function useThemePatterns() {
 					( pattern ) =>
 						! CORE_PATTERN_SOURCES.includes( pattern.source )
 				)
-				.filter( filterOutDuplicatesByName ),
+				.filter( filterOutDuplicatesByName )
+				.filter( ( pattern ) => pattern.inserter !== false ),
 		[ blockPatterns, restBlockPatterns ]
 	);
 

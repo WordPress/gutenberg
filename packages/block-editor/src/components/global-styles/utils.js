@@ -415,6 +415,7 @@ export function areGlobalStyleConfigsEqual( original, variation ) {
 	}
 	return (
 		fastDeepEqual( original?.styles, variation?.styles ) &&
-		fastDeepEqual( original?.settings, variation?.settings )
+		fastDeepEqual( original?.settings, variation?.settings ) &&
+		fastDeepEqual( original?.behaviors, variation?.behaviors )
 	);
 }

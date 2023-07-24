@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { Platform, ScrollView, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef, useEffect } from '@wordpress/element';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { useCallback, useRef, useEffect, Platform } from '@wordpress/element';
+import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { __ } from '@wordpress/i18n';
@@ -39,6 +39,13 @@ import {
 import styles from './style.scss';
 import { store as editPostStore } from '../../../store';
 
+const shadowStyle = {
+	shadowOffset: { width: 2, height: 2 },
+	shadowOpacity: 1,
+	shadowRadius: 6,
+	elevation: 18,
+};
+
 function HeaderToolbar( {
 	hasRedo,
 	hasUndo,
@@ -46,18 +53,20 @@ function HeaderToolbar( {
 	undo,
 	showInserter,
 	showKeyboardHideButton,
-	getStylesFromColorScheme,
 	insertBlock,
 	onHideKeyboard,
-	onOpenBlockSettings,
 	isRTL,
 	noContentSelected,
 } ) {
 	const anchorNodeRef = useRef();
-	const containerStyle = getStylesFromColorScheme(
-		styles[ 'header-toolbar__container' ],
-		styles[ 'header-toolbar__container--dark' ]
-	);
+
+	const containerStyle = [
+		usePreferredColorSchemeStyle(
+			styles[ 'header-toolbar__container' ],
+			styles[ 'header-toolbar__container--dark' ]
+		),
+		{ borderTopWidth: StyleSheet.hairlineWidth },
+	];
 
 	useEffect( () => {
 		const onUndoSubscription = subscribeOnUndoPressed( undo );
@@ -80,8 +89,7 @@ function HeaderToolbar( {
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
 		// scrollview doesn't seem to automatically adjust to RTL on Android so, scroll to end when Android
-		const isAndroid = Platform.OS === 'android';
-		if ( isAndroid && isRTL ) {
+		if ( Platform.isAndroid && isRTL ) {
 			scrollViewRef.current.scrollToEnd();
 		} else {
 			scrollViewRef.current.scrollTo( { x: 0 } );
@@ -92,6 +100,7 @@ function HeaderToolbar( {
 		( blockType ) => () => {
 			insertBlock( createBlock( blockType ), undefined, undefined, true, {
 				source: 'inserter_menu',
+				inserterMethod: 'quick-inserter',
 			} );
 		},
 		[ insertBlock ]
@@ -145,6 +154,23 @@ function HeaderToolbar( {
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
+	const shadowColor = usePreferredColorSchemeStyle(
+		styles[ 'header-toolbar__keyboard-hide-shadow--light' ],
+		styles[ 'header-toolbar__keyboard-hide-shadow--dark' ]
+	);
+	const showKeyboardButtonStyles = [
+		usePreferredColorSchemeStyle(
+			styles[ 'header-toolbar__keyboard-hide-container' ],
+			styles[ 'header-toolbar__keyboard-hide-container--dark' ]
+		),
+		shadowStyle,
+		{
+			shadowColor: Platform.isAndroid
+				? styles[ 'header-toolbar__keyboard-hide-shadow--solid' ].color
+				: shadowColor.color,
+		},
+	];
+
 	return (
 		<View
 			ref={ anchorNodeRef }
@@ -166,17 +192,10 @@ function HeaderToolbar( {
 				<Inserter disabled={ ! showInserter } />
 
 				{ noContentSelected && renderMediaButtons }
-				<BlockToolbar
-					anchorNodeRef={ anchorNodeRef.current }
-					onOpenBlockSettings={ onOpenBlockSettings }
-				/>
+				<BlockToolbar anchorNodeRef={ anchorNodeRef.current } />
 			</ScrollView>
 			{ showKeyboardHideButton && (
-				<ToolbarGroup
-					passedStyle={
-						styles[ 'header-toolbar__keyboard-hide-container' ]
-					}
-				>
+				<ToolbarGroup passedStyle={ showKeyboardButtonStyles }>
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
 						icon={ keyboardClose }
@@ -220,7 +239,6 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock, insertBlock } =
 			dispatch( blockEditorStore );
-		const { openGeneralSidebar } = dispatch( editPostStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );
 
 		return {
@@ -231,11 +249,7 @@ export default compose( [
 				togglePostTitleSelection( false );
 			},
 			insertBlock,
-			onOpenBlockSettings() {
-				openGeneralSidebar( 'edit-post/block' );
-			},
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withPreferredColorScheme,
 ] )( HeaderToolbar );
