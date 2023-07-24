@@ -18,10 +18,7 @@ import {
 	ObserveTyping,
 } from '@wordpress/block-editor';
 import { Popover, SlotFillProvider } from '@wordpress/components';
-import {
-	registerCoreBlocks,
-	__experimentalGetCoreBlocks,
-} from '@wordpress/block-library';
+import { registerCoreBlocks } from '@wordpress/block-library';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import '@wordpress/format-library';
 import {
@@ -29,6 +26,8 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import { store as richTextStore } from '@wordpress/rich-text';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -63,13 +62,22 @@ export async function selectBlock( name ) {
 export function Editor( { testBlocks, settings = {} } ) {
 	const [ currentBlocks, updateBlocks ] = useState( testBlocks );
 
+	// Some blocks may register formats, eg. core/footnotes, so we need to also
+	// unregister those formats along with core blocks when the test is complete.
+	const availableFormats = useSelect(
+		( select ) => select( richTextStore ).getFormatTypes(),
+		[]
+	);
+	const { removeFormatTypes } = useDispatch( richTextStore );
+
 	useEffect( () => {
 		return () => {
-			getBlockTypes().forEach( ( { name } ) =>
-				unregisterBlockType( name )
-			);
+			getBlockTypes().forEach( ( { name } ) => {
+				unregisterBlockType( name );
+			} );
+			removeFormatTypes( availableFormats.map( ( { name } ) => name ) );
 		};
-	}, [] );
+	}, [ availableFormats, removeFormatTypes ] );
 
 	return (
 		<ShortcutProvider>
@@ -103,19 +111,14 @@ export function Editor( { testBlocks, settings = {} } ) {
  * @param {Object | Array} testBlocks    Block or array of block settings for blocks to be tested.
  * @param {boolean}        useCoreBlocks Defaults to true. If false, core blocks will not be registered.
  * @param {Object}         settings      Any additional editor settings to be passed to the editor.
- * @param {Array}          skippedBlocks Blocks that should be skipped during registration.
  */
 export async function initializeEditor(
 	testBlocks,
 	useCoreBlocks = true,
-	settings,
-	skippedBlocks = []
+	settings
 ) {
 	if ( useCoreBlocks ) {
-		const coreBlocks = __experimentalGetCoreBlocks().filter(
-			( { name } ) => ! skippedBlocks.includes( name )
-		);
-		registerCoreBlocks( coreBlocks );
+		registerCoreBlocks();
 	}
 	const blocks = Array.isArray( testBlocks ) ? testBlocks : [ testBlocks ];
 	const newBlocks = blocks.map( ( testBlock ) =>

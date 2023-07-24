@@ -39,13 +39,7 @@ const disabledColorSettings = {
 async function setup( attributes, useCoreBlocks, customSettings ) {
 	const testBlock = { name: 'core/cover', attributes };
 	const settings = customSettings || defaultSettings;
-	const skippedBlocks = [ 'core/footnotes' ];
-	return initializeEditor(
-		testBlock,
-		useCoreBlocks,
-		settings,
-		skippedBlocks
-	);
+	return initializeEditor( testBlock, useCoreBlocks, settings );
 }
 
 async function createAndSelectBlock() {
