@@ -77,7 +77,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertNull( $post );
 
 		// Check that the font asset was deleted
-		$this->assertFalse( file_exists( WP_FONTS_DIR . '/piazzolla_italic_400.ttf' ) );
+		$this->assertFileDoesNotExist( WP_FONTS_DIR . '/piazzolla_italic_400.ttf' );
 	}
 
 	function test_install_and_uninstall_font_without_faces() {
@@ -175,8 +175,8 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertNull( $post );
 
 		// Check that the font asset was deleted
-		$this->assertFalse( file_exists( WP_FONTS_DIR . '/inter_normal_400.ttf' ) );
-		$this->assertFalse( file_exists( WP_FONTS_DIR . '/inter_normal_500.ttf' ) );
+		$this->assertFileDoesNotExist( WP_FONTS_DIR . '/inter_normal_400.ttf' );
+		$this->assertFileDoesNotExist( WP_FONTS_DIR . '/inter_normal_500.ttf' );
 	}
 
 }
