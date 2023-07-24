@@ -27,6 +27,19 @@ test.describe( 'Global styles revisions', () => {
 		await editor.canvas.click( 'body' );
 	} );
 
+	test( 'should display no revisions message if landing via command center', async ( {
+		page,
+	} ) => {
+		await page.keyboard.press( 'Meta+k' );
+		await page.keyboard.type( 'styles revisions' );
+		await page
+			.getByRole( 'option', { name: 'Open styles revisions' } )
+			.click();
+		await expect(
+			page.getByTestId( 'global-styles-no-revisions' )
+		).toHaveText( 'There are currently no style revisions.' );
+	} );
+
 	test( 'should display revisions UI when there is more than 1 revision', async ( {
 		page,
 		editor,
