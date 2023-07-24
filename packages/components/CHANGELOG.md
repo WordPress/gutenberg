@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
--   `Autocomplete`: Update `onReplace` to allow for `value` to already be an array. ([#52866](https://github.com/WordPress/gutenberg/pull/52866)).
-
 ## 25.4.0 (2023-07-20)
 
 ### Enhancements

@@ -108,11 +108,7 @@ export function useAutocomplete( {
 				  } as InsertOption );
 
 			if ( 'replace' === completionObject.action ) {
-				onReplace(
-					Array.isArray( completionObject.value )
-						? completionObject.value
-						: [ completionObject.value ]
-				);
+				onReplace( [ completionObject.value ] );
 				// When replacing, the component will unmount, so don't reset
 				// state (below) on an unmounted component.
 				return;
