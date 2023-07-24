@@ -188,6 +188,10 @@ function UnforwardedModal(
 				overlayClassName
 			) }
 			onKeyDown={ handleEscapeKeyDown }
+			// Avoids loss of focus from clicking the overlay and also obviates
+			// `useFocusOutside` aside from cases of focus programmatically
+			// moving outside. TODO ideally both the hook and this handler
+			// won't be needed and one can be removed.
 			onPointerDown={
 				shouldCloseOnClickOutside ? onOverlayPress : undefined
 			}
