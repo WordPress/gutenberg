@@ -40,17 +40,17 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			WP_Font_Family_Utils::get_filename_from_font_face( $font_face, $font_face['src'][0] ),
 			'piazzolla_italic_400.ttf'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			WP_Font_Family_Utils::get_filename_from_font_face( $font_face, $font_face['src'][1], 2 ),
 			'piazzolla_italic_400_2.ttf'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			WP_Font_Family_Utils::get_filename_from_font_face( $font_face, $font_face['src'][2], 3 ),
 			'piazzolla_italic_400_3.ttf'
 		);
@@ -110,23 +110,23 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 
 		// Fonts with same slug should be merged
 		$merged_font = WP_Font_Family_Utils::merge_fonts_data( $font1, $font2 );
-		$this->assertFalse( $merged_font instanceof WP_Error );
+		$this->assertWPError( $merged_font instanceof WP_Error );
 
 		// Total of font faces without duplicates
-		$this->assertEquals(
+		$this->assertSame(
 			count( $merged_font['fontFace'] ),
 			4
 		);
 
 		// Missing keys should be added to the merged result
-		$this->assertEquals(
+		$this->assertSame(
 			$merged_font['name'],
 			'Piazzolla'
 		);
 
 		// Fonts with different slugs should not be merged
 		$merged_font = WP_Font_Family_Utils::merge_fonts_data( $font1, $font3 );
-		$this->assertTrue( $merged_font instanceof WP_Error );
+		$this->assertWPError( $merged_font instanceof WP_Error );
 	}
 
 }
