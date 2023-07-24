@@ -22,7 +22,7 @@ export function useAdminNavigationCommands() {
 	const { isBlockTheme, canAccessSiteEditor } = useSelect( ( select ) => {
 		return {
 			isBlockTheme:
-				// Avoid making core-commands dependent on block-editor at this point.
+				// To avoid making core-commands dependent on block-editor using store string literal name.
 				// eslint-disable-next-line @wordpress/data-no-store-string-literals
 				select( 'core/block-editor' )?.getSettings()
 					.__unstableIsBlockBasedTheme,
