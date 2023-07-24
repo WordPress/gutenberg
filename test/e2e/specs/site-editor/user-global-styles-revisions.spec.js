@@ -22,9 +22,24 @@ test.describe( 'Global styles revisions', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+	} );
+
+	test( 'should display no revisions message if landing via command center', async ( {
+		page,
+	} ) => {
+		await page
+			.getByRole( 'button', { name: 'Open command palette' } )
+			.focus();
+		await page.keyboard.press( 'Meta+k' );
+		await page.keyboard.type( 'styles revisions' );
+		await page
+			.getByRole( 'option', { name: 'Open styles revisions' } )
+			.click();
+		await expect(
+			page.getByTestId( 'global-styles-no-revisions' )
+		).toHaveText( 'No results found.' );
 	} );
 
 	test( 'should display revisions UI when there is more than 1 revision', async ( {
@@ -32,6 +47,7 @@ test.describe( 'Global styles revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
+		await editor.canvas.click( 'body' );
 		const currentRevisions =
 			await userGlobalStylesRevisions.getGlobalStylesRevisions();
 		await userGlobalStylesRevisions.openStylesPanel();
@@ -78,6 +94,7 @@ test.describe( 'Global styles revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
+		await editor.canvas.click( 'body' );
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Colors styles' } ).click();
 		await page

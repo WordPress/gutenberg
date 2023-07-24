@@ -19,6 +19,7 @@ import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -137,8 +138,13 @@ function useManipulateDocumentCommands() {
 }
 
 function useEditUICommands() {
-	const { openGeneralSidebar, closeGeneralSidebar, switchEditorMode } =
-		useDispatch( editSiteStore );
+	const {
+		openGeneralSidebar,
+		closeGeneralSidebar,
+		setIsInserterOpened,
+		setIsListViewOpened,
+		switchEditorMode,
+	} = useDispatch( editSiteStore );
 	const { canvasMode, editorMode, activeSidebar } = useSelect(
 		( select ) => ( {
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
@@ -150,7 +156,9 @@ function useEditUICommands() {
 		[]
 	);
 	const { openModal } = useDispatch( interfaceStore );
-	const { toggle } = useDispatch( preferencesStore );
+	const { get: getPreference } = useSelect( preferencesStore );
+	const { set: setPreference, toggle } = useDispatch( preferencesStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
 
 	if ( canvasMode !== 'edit' ) {
 		return { isLoading: false, commands: [] };
@@ -192,6 +200,29 @@ function useEditUICommands() {
 		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'focusMode' );
+			close();
+		},
+	} );
+
+	commands.push( {
+		name: 'core/toggle-distraction-free',
+		label: __( 'Toggle distraction free' ),
+		icon: cog,
+		callback: ( { close } ) => {
+			setPreference( 'core/edit-site', 'fixedToolbar', false );
+			setIsInserterOpened( false );
+			setIsListViewOpened( false );
+			closeGeneralSidebar();
+			toggle( 'core/edit-site', 'distractionFree' );
+			createInfoNotice(
+				getPreference( 'core/edit-site', 'distractionFree' )
+					? __( 'Distraction free mode turned on.' )
+					: __( 'Distraction free mode turned off.' ),
+				{
+					id: 'core/edit-site/distraction-free-mode/notice',
+					type: 'snackbar',
+				}
+			);
 			close();
 		},
 	} );
