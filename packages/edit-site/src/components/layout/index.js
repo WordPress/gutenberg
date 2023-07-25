@@ -340,6 +340,12 @@ export default function Layout() {
 														! isEditorLoading
 													}
 													isFullWidth={ isEditing }
+													defaultSize={ {
+														width:
+															canvasSize.width -
+															24 /* $canvas-padding */,
+														height: canvasSize.height,
+													} }
 													isOversized={
 														isResizableFrameOversized
 													}
