@@ -178,7 +178,7 @@ class WP_Font_Family {
 	 */
 	private function move_font_face_asset( $font_face, $file ) {
 		$new_font_face = $font_face;
-		$filename      = WP_Font_Family_Utils::get_filename_from_font_face( $font_face, $file['name'] );
+		$filename      = WP_Font_Family_Utils::get_filename_from_font_face( $this->data['slug'], $font_face, $file['name'] );
 		$filepath      = path_join( WP_FONTS_DIR, $filename );
 
 		// Remove the uploaded font asset reference from the font face definition because it is no longer needed.
@@ -241,7 +241,7 @@ class WP_Font_Family {
 		$index                = 0;
 		foreach ( $sources as $src ) {
 			$suffix = $index++ > 0 ? $index : '';
-			$filename = WP_Font_Family_Utils::get_filename_from_font_face( $font_face, $src, $suffix );
+			$filename = WP_Font_Family_Utils::get_filename_from_font_face( $this->data['slug'], $font_face, $src, $suffix );
 			$new_src  = $this->download_asset( $src, $filename );
 			if ( $new_src ) {
 				$new_font_face['src'][] = $new_src;

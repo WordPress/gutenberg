@@ -25,12 +25,12 @@ class WP_Font_Family_Utils {
 	 *
 	 * @param array  $font_face The font face array containing 'fontFamily', 'fontStyle', and 'fontWeight' attributes.
 	 * @param string $url The URL of the font face asset, used to derive the file extension.
-	 * @param int    $i Optional counter for appending to the filename, default is 1.
+	 * @param string $suffix Optional suffix added to the resulting filename
 	 * @return string The generated filename for the font face asset.
 	 */
-	public static function get_filename_from_font_face( $font_face, $url, $suffix = '' ) {
+	public static function get_filename_from_font_face( $font_slug, $font_face, $url, $suffix = '' ) {
 		$extension = pathinfo( $url, PATHINFO_EXTENSION );
-		$filename  = "{$font_face['fontFamily']}_{$font_face['fontStyle']}_{$font_face['fontWeight']}";
+		$filename  = "{$font_slug}_{$font_face['fontStyle']}_{$font_face['fontWeight']}";
 		if ( $suffix ) {
 			$filename .= "_{$suffix}";
 		}
