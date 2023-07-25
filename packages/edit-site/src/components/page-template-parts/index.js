@@ -39,7 +39,6 @@ export default function PageTemplateParts() {
 							params={ {
 								postId: templatePart.id,
 								postType: templatePart.type,
-								canvas: 'edit',
 							} }
 							state={ { backPath: '/wp_template_part/all' } }
 						>
