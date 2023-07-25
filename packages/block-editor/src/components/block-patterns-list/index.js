@@ -8,8 +8,6 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 	Tooltip,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -20,15 +18,8 @@ import { Icon, symbolFilled } from '@wordpress/icons';
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
-const SYNC_TYPES = {
-	full: 'fully',
-	unsynced: 'unsynced',
-};
-const SYNC_FILTERS = {
-	all: __( 'All' ),
-	[ SYNC_TYPES.full ]: __( 'Synced' ),
-	[ SYNC_TYPES.unsynced ]: __( 'Standard' ),
-};
+import BlockPatternsSyncFilter from '../block-patterns-sync-filter';
+
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
 		return <Tooltip text={ title }>{ children }</Tooltip>;
@@ -121,7 +112,7 @@ function BlockPattern( {
 								>
 									<span>
 										<Icon
-											className="edit-site-patterns__pattern-icon"
+											className="block-editor-patterns__pattern-icon"
 											icon={ symbolFilled }
 										/>
 									</span>
@@ -162,26 +153,10 @@ function BlockPatternList( {
 			aria-label={ label }
 		>
 			{ category === 'custom' && (
-				<ToggleGroupControl
-					className="edit-site-patterns__sync-status-filter"
-					hideLabelFromVision
-					label={ __( 'Filter by sync status' ) }
-					value={ syncFilter }
-					isBlock
-					onChange={ ( value ) => setSyncFilter( value ) }
-					__nextHasNoMarginBottom
-				>
-					{ Object.entries( SYNC_FILTERS ).map(
-						( [ key, optionLabel ] ) => (
-							<ToggleGroupControlOption
-								className="edit-site-patterns__sync-status-filter-option"
-								key={ key }
-								value={ key }
-								label={ optionLabel }
-							/>
-						)
-					) }
-				</ToggleGroupControl>
+				<BlockPatternsSyncFilter
+					syncFilter={ syncFilter }
+					setSyncFilter={ setSyncFilter }
+				/>
 			) }
 			{ blockPatterns.map( ( pattern ) => {
 				const isShown = shownPatterns.includes( pattern );

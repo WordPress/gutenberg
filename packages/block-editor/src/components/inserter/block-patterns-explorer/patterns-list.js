@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
@@ -16,6 +16,8 @@ import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
 import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
+import BlockPatternsSyncFilter from '../../block-patterns-sync-filter';
+import BlockPatternsPaging from '../../block-patterns-paging';
 
 const INITIAL_INSERTER_RESULTS = 2;
 
@@ -44,6 +46,7 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 }
 
 function PatternList( { filterValue, selectedCategory, patternCategories } ) {
+	const [ syncFilter, setSyncFilter ] = useState( 'all' );
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
@@ -112,6 +115,12 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 			) }
 			<InserterListbox>
 				{ ! hasItems && <InserterNoResults /> }
+				{ selectedCategory === 'custom' && (
+					<BlockPatternsSyncFilter
+						syncFilter={ syncFilter }
+						setSyncFilter={ setSyncFilter }
+					/>
+				) }
 				{ hasItems && (
 					<BlockPatternsList
 						shownPatterns={ currentShownPatterns }
@@ -120,6 +129,12 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 						isDraggable={ false }
 					/>
 				) }
+				<BlockPatternsPaging
+					currentPage={ 1 }
+					numPages={ 2 }
+					changePage={ () => {} }
+					totalItems={ 40 }
+				/>
 			</InserterListbox>
 		</div>
 	);

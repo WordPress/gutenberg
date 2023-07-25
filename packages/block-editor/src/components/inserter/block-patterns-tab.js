@@ -27,6 +27,7 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
+import BlockPatternsPaging from '../block-patterns-paging';
 
 const noop = () => {};
 
@@ -193,6 +194,12 @@ export function BlockPatternsCategoryPanel( {
 				category={ category.name }
 				isDraggable
 				showTitlesAsTooltip={ showTitlesAsTooltip }
+			/>
+			<BlockPatternsPaging
+				currentPage={ 1 }
+				numPages={ 2 }
+				changePage={ () => {} }
+				totalItems={ 40 }
 			/>
 		</div>
 	);
