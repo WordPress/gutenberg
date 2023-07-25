@@ -19,7 +19,6 @@ import { useViewportMatch } from '@wordpress/compose';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import getIsListPage from '../../utils/get-is-list-page';
-import useGlobalStylesRevisions from '../../components/global-styles/screen-revisions/use-global-styles-revisions';
 
 const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -123,7 +122,11 @@ function useGlobalStylesOpenRevisionsCommands() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const history = useHistory();
-	const { revisions } = useGlobalStylesRevisions();
+	const revisions = useSelect(
+		( select ) =>
+			select( coreStore ).getCurrentThemeGlobalStylesRevisions(),
+		[]
+	);
 	const commands = useMemo( () => {
 		if ( ! revisions?.length ) {
 			return [];
