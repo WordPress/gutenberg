@@ -28,8 +28,8 @@ jobs:
             - name: Use desired version of Java
               uses: actions/setup-java@3f07048e3d294f56e9b90ac5ea2c6f74e9ad0f98 # v3.10.0
               with:
-                  distribution: 'temurin'
-                  java-version: '11'
+                  distribution: 'corretto'
+                  java-version: '17'
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
