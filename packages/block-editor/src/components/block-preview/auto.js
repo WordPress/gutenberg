@@ -67,7 +67,7 @@ function ScaledBlockPreview( {
 				// Using width + aspect-ratio instead of height here triggers browsers' native
 				// handling of scrollbar's visibility. It prevents the flickering issue seen
 				// in https://github.com/WordPress/gutenberg/issues/52027.
-				width: '100%',
+				// See https://github.com/WordPress/gutenberg/pull/52921 for more info.
 				aspectRatio,
 				maxHeight:
 					contentHeight > MAX_HEIGHT ? MAX_HEIGHT * scale : undefined,
