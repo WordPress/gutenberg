@@ -33,7 +33,7 @@ const LineHeightControl = ( {
 		 * The following logic handles the initial step up/down action
 		 * (from an undefined value state) so that the next values are better suited for
 		 * line-height rendering. For example, the first step up should immediately
-		 * go to 1.6, rather than the normally expected 0.1.
+		 * go to 1.51, rather than the normally expected 0.01.
 		 *
 		 * Step up/down actions can be triggered by keydowns of the up/down arrow keys,
 		 * or by clicking the spin buttons.
