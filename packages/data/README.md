@@ -1028,6 +1028,52 @@ function Component() {
 }
 ```
 
+## Selectors
+
+The following selectors are available on the object returned by `wp.data.select( 'core' )`:
+
+### hasFinishedResolution
+
+Returns true if resolution has completed for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution has completed.
+
+### hasStartedResolution
+
+Returns true if resolution has already been triggered for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution has been triggered.
+
+### isResolving
+
+Returns true if resolution has been triggered but has not yet completed for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution is in progress.
+
 ## Going further
 
 -   [What is WordPress Data?](https://unfoldingneurons.com/2020/what-is-wordpress-data/)
