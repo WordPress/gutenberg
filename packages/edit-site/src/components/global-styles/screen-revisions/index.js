@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalUseNavigator as useNavigator,
@@ -94,31 +94,48 @@ function ScreenRevisions() {
 		setSelectedRevisionId( revision?.id );
 	};
 
-	function deepCompare( obj1, obj2, depth = 0, parentPath = '' ) {
+	function deepCompare(
+		revisionValue,
+		configValue,
+		depth = 0,
+		parentPath = ''
+	) {
 		if (
-			typeof obj1 !== 'object' ||
-			obj1 === null ||
-			typeof obj2 !== 'object' ||
-			obj2 === null
+			typeof revisionValue !== 'object' ||
+			revisionValue === null ||
+			typeof configValue !== 'object' ||
+			configValue === null
 		) {
-			return [ { path: parentPath, value1: obj1, value2: obj2 } ];
+			return [
+				{
+					path: parentPath,
+					revisionValue,
+					configValue,
+				},
+			];
 		}
 
-		const keys1 = Object.keys( obj1 );
-		const keys2 = Object.keys( obj2 );
+		const keys1 = Object.keys( revisionValue );
+		const keys2 = Object.keys( configValue );
 		const allKeys = new Set( [ ...keys1, ...keys2 ] );
 
 		let diffs = [];
 		for ( const key of allKeys ) {
 			const path = parentPath ? parentPath + '.' + key : key;
 			const subDiffs = deepCompare(
-				obj1[ key ],
-				obj2[ key ],
+				revisionValue[ key ],
+				configValue[ key ],
 				depth + 1,
 				path
 			);
 			diffs = diffs.concat( subDiffs );
 		}
+		diffs = diffs.filter(
+			( diff ) =>
+				diff.path.includes( 'behaviors' ) ||
+				diff.path.includes( 'settings' ) ||
+				diff.path.includes( 'styles' )
+		);
 		return diffs;
 	}
 
@@ -218,24 +235,16 @@ function ScreenRevisions() {
 						<ConfirmDialog
 							title={ __( 'Changes:' ) }
 							isOpen={ diffModal }
-							confirmButtonText={ __( 'Apply' ) }
-							onConfirm={ () =>
-								restoreRevision( globalStylesRevision )
-							}
-							onCancel={ () => setDiffModal( false ) }
+							confirmButtonText={ __( 'Close modal' ) }
+							onConfirm={ () => setDiffModal( false ) }
 						>
 							<>
 								<h2>
-									{ __(
-										'Loading this revision will discard all unsaved changes.'
+									{ sprintf(
+										'We will show the %s changes as soon as possible.',
+										globalStylesDiffs.length
 									) }
 								</h2>
-								<p>
-									{ __(
-										'Do you want to replace your unsaved changes in the editor?'
-									) }
-								</p>
-								{ globalStylesDiffs.length }
 							</>
 						</ConfirmDialog>
 					) }
