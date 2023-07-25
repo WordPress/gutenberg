@@ -38,7 +38,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	public function test_get_data() {
 		$font = new WP_Font_Family( self::FONT_DATA_1 );
 		$this->assertSame( 'piazzolla', $font->get_data()['slug'] );
-		$this->assertCount( 1, $font->get_data()['fontFace'] );
+		$this->assertEquals( self::FONT_DATA_1, $font->get_data() );
 	}
 
 	/**
