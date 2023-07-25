@@ -107,11 +107,14 @@ export default function useMerge( clientId, onMerge ) {
 			} else if ( previousBlockClientId ) {
 				const trailingId = getTrailingId( previousBlockClientId );
 				registry.batch( () => {
-					moveBlocksToPosition(
-						getBlockOrder( clientId ),
-						clientId,
-						previousBlockClientId
-					);
+					const [ nestedListClientId ] = getBlockOrder( clientId );
+					if ( nestedListClientId ) {
+						moveBlocksToPosition(
+							getBlockOrder( nestedListClientId ),
+							nestedListClientId,
+							getBlockRootClientId( trailingId )
+						);
+					}
 					mergeBlocks( trailingId, clientId );
 				} );
 			} else {
