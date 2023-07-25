@@ -8,6 +8,9 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Spinner,
 	__experimentalSpacer as Spacer,
+	MenuItem,
+	VisuallyHidden,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext, useState, useEffect } from '@wordpress/element';
@@ -15,6 +18,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,6 +30,7 @@ import SidebarFixedBottom from '../../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../../store';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsButtons from './revisions-buttons';
+import { addQueryArgs } from '@wordpress/url';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
@@ -118,27 +123,51 @@ function ScreenRevisions() {
 						/>
 						{ isLoadButtonEnabled && (
 							<SidebarFixedBottom>
-								<Button
-									variant="primary"
-									className="edit-site-global-styles-screen-revisions__button"
-									disabled={
-										! globalStylesRevision?.id ||
-										globalStylesRevision?.id === 'unsaved'
-									}
-									onClick={ () => {
-										if ( hasUnsavedChanges ) {
-											setIsLoadingRevisionWithUnsavedChanges(
-												true
-											);
-										} else {
-											restoreRevision(
-												globalStylesRevision
-											);
+								<VStack>
+									<MenuItem
+										href={ addQueryArgs( 'revision.php', {
+											revision: globalStylesRevision?.id,
+											gutenberg: true,
+										} ) }
+										target="_blank"
+										icon={ external }
+										disabled={
+											! globalStylesRevision?.id ||
+											globalStylesRevision?.id ===
+												'unsaved'
 										}
-									} }
-								>
-									{ __( 'Apply' ) }
-								</Button>
+									>
+										{ __( 'View revision changes' ) }
+										<VisuallyHidden as="span">
+											{
+												/* translators: accessibility text */
+												__( '(opens in a new tab)' )
+											}
+										</VisuallyHidden>
+									</MenuItem>
+									<Button
+										variant="primary"
+										className="edit-site-global-styles-screen-revisions__button"
+										disabled={
+											! globalStylesRevision?.id ||
+											globalStylesRevision?.id ===
+												'unsaved'
+										}
+										onClick={ () => {
+											if ( hasUnsavedChanges ) {
+												setIsLoadingRevisionWithUnsavedChanges(
+													true
+												);
+											} else {
+												restoreRevision(
+													globalStylesRevision
+												);
+											}
+										} }
+									>
+										{ __( 'Apply' ) }
+									</Button>
+								</VStack>
 							</SidebarFixedBottom>
 						) }
 					</div>
