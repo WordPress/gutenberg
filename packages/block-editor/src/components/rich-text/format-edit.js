@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
-
 import { useContext, useMemo } from '@wordpress/element';
 
 /**

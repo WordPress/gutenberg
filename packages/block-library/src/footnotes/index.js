@@ -21,7 +21,8 @@ export const settings = {
 	edit,
 };
 
+registerFormatType( formatName, format );
+
 export const init = () => {
 	initBlock( { name, metadata, settings } );
-	registerFormatType( formatName, format );
 };

@@ -37,9 +37,7 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 				<Placeholder
 					icon={ <BlockIcon icon={ icon } /> }
 					label={ __( 'Footnotes' ) }
-					instructions={ __(
-						'Footnotes found in blocks within this document will be displayed here.'
-					) }
+					// To do: add instructions. We can't add new string in RC.
 				/>
 			</div>
 		);
