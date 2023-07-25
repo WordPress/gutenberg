@@ -2,7 +2,9 @@
 /**
  * Tests for Fonts Library class
  *
- * @package Gutenberg
+ * @package    Gutenberg
+ * @subpackage Fonts Library
+ * 
  */
 
 class WP_Fonts_Library_Test extends WP_UnitTestCase {
