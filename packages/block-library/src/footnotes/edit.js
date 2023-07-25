@@ -23,9 +23,7 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 				<Placeholder
 					icon={ <BlockIcon icon={ icon } /> }
 					label={ __( 'Footnotes' ) }
-					instructions={ __(
-						'Footnotes are not supported here. Add this block to post or page content.'
-					) }
+					// To do: add instructions. We can't add new string in RC.
 				/>
 			</div>
 		);
@@ -37,7 +35,9 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 				<Placeholder
 					icon={ <BlockIcon icon={ icon } /> }
 					label={ __( 'Footnotes' ) }
-					// To do: add instructions. We can't add new string in RC.
+					instructions={ __(
+						'Footnotes found in blocks within this document will be displayed here.'
+					) }
 				/>
 			</div>
 		);
