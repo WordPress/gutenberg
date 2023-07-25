@@ -1241,17 +1241,19 @@ test.describe( 'List (@firefox)', () => {
 
 	test( 'can be created by pasting an empty list (-firefox)', async ( {
 		editor,
+		page,
 		pageUtils,
 	} ) => {
 		// Open code editor
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
-		// Paste empty list block
-		pageUtils.setClipboardData( {
-			plainText:
-				'<!-- wp:list -->\n<ul><li></li></ul>\n<!-- /wp:list -->',
-		} );
-		await pageUtils.pressKeys( 'primary+v' );
+		// Add empty list block
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
 
 		// Go back to normal editor
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor

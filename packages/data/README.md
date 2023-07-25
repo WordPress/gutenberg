@@ -499,11 +499,11 @@ dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string | T`: The store descriptor. The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `StoreNameOrDescriptor`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `ActionCreatorsOf< ConfigOf< T > >`: Object containing the action creators.
+-   `DispatchReturn< StoreNameOrDescriptor >`: Object containing the action creators.
 
 ### plugins
 
