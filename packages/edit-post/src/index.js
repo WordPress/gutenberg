@@ -65,7 +65,11 @@ export function initializeEditor(
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 
 	// Check if the block list view should be open by default.
-	if ( select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) ) {
+	// If `distractionFree` mode is enabled, the block list view should not be open.
+	if (
+		select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) &&
+		! select( editPostStore ).isFeatureActive( 'distractionFree' )
+	) {
 		dispatch( editPostStore ).setIsListViewOpened( true );
 	}
 
