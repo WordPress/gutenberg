@@ -2023,6 +2023,7 @@ export const getInserterItems = createSelector(
 				utility: 1, // Deprecated.
 				frecency,
 				content: reusableBlock.content.raw,
+				syncStatus: reusableBlock.wp_pattern_sync_status,
 			};
 		};
 
@@ -2031,18 +2032,7 @@ export const getInserterItems = createSelector(
 			'core/block',
 			rootClientId
 		)
-			? getReusableBlocks( state )
-					.filter(
-						( reusableBlock ) =>
-							// Reusable blocks that are fully synced should have no sync status set
-							// for backwards compat between patterns and old reusable blocks, but
-							// some in release 16.1 may have had sync status inadvertantly set to
-							// 'fully' if created in the site editor.
-							reusableBlock.wp_pattern_sync_status === 'fully' ||
-							reusableBlock.wp_pattern_sync_status === '' ||
-							! reusableBlock.wp_pattern_sync_status
-					)
-					.map( buildReusableBlockInserterItem )
+			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
 			: [];
 
 		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
