@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { h, options, createContext, cloneElement } from 'preact';
-import { useRef, useMemo } from 'preact/hooks';
+import { useRef, useCallback } from 'preact/hooks';
 /**
  * Internal dependencies
  */
@@ -12,10 +12,10 @@ import { rawStore as store } from './store';
 const context = createContext( {} );
 
 // WordPress Directives.
-const directiveMap = {};
+const directiveCallbacks = {};
 const directivePriorities = {};
-export const directive = ( name, cb, { priority = 10 } = {} ) => {
-	directiveMap[ name ] = cb;
+export const directive = ( name, callback, { priority = 10 } = {} ) => {
+	directiveCallbacks[ name ] = callback;
 	directivePriorities[ name ] = priority;
 };
 
@@ -47,69 +47,50 @@ const getEvaluate =
 
 // Separate directives by priority. The resulting array contains objects
 // of directives grouped by same priority, and sorted in ascending order.
-const usePriorityLevels = ( directives ) =>
-	useMemo( () => {
-		const byPriority = Object.entries( directives ).reduce(
-			( acc, [ name, values ] ) => {
-				const priority = directivePriorities[ name ];
-				if ( ! acc[ priority ] ) acc[ priority ] = {};
-				acc[ priority ][ name ] = values;
+const getPriorityLevels = ( directives ) => {
+	const byPriority = Object.keys( directives ).reduce( ( obj, name ) => {
+		if ( directiveCallbacks[ name ] ) {
+			const priority = directivePriorities[ name ];
+			( obj[ priority ] = obj[ priority ] || [] ).push( name );
+		}
+		return obj;
+	}, {} );
 
-				return acc;
-			},
-			{}
-		);
-
-		return Object.entries( byPriority )
-			.sort( ( [ p1 ], [ p2 ] ) => p1 - p2 )
-			.map( ( [ , obj ] ) => obj );
-	}, [ directives ] );
-
-// Directive wrapper.
-const Directive = ( { type, directives, props: originalProps } ) => {
-	const ref = useRef( null );
-	const element = h( type, { ...originalProps, ref } );
-	const evaluate = useMemo( () => getEvaluate( { ref } ), [] );
-
-	// Add wrappers recursively for each priority level.
-	const byPriorityLevel = usePriorityLevels( directives );
-	return (
-		<RecursivePriorityLevel
-			directives={ byPriorityLevel }
-			element={ element }
-			evaluate={ evaluate }
-			originalProps={ originalProps }
-		/>
-	);
+	return Object.entries( byPriority )
+		.sort( ( [ p1 ], [ p2 ] ) => p1 - p2 )
+		.map( ( [ , arr ] ) => arr );
 };
 
 // Priority level wrapper.
-const RecursivePriorityLevel = ( {
-	directives: [ directives, ...rest ],
+const Directives = ( {
+	directives,
+	priorityLevels: [ currentPriorityLevel, ...nextPriorityLevels ],
 	element,
 	evaluate,
 	originalProps,
+	elemRef,
 } ) => {
-	// This element needs to be a fresh copy so we are not modifying an already
-	// rendered element with Preact's internal properties initialized. This
-	// prevents an error with changes in `element.props.children` not being
-	// reflected in `element.__k`.
-	element = cloneElement( element );
+	// Initialize the DOM reference.
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	elemRef = elemRef || useRef( null );
+
+	// Create a reference to the evaluate function using the DOM reference.
+	// eslint-disable-next-line react-hooks/rules-of-hooks, react-hooks/exhaustive-deps
+	evaluate = evaluate || useCallback( getEvaluate( { ref: elemRef } ), [] );
+
+	// Create a fresh copy of the vnode element.
+	element = cloneElement( element, { ref: elemRef } );
 
 	// Recursively render the wrapper for the next priority level.
-	//
-	// Note that, even though we're instantiating a vnode with a
-	// `RecursivePriorityLevel` here, its render function will not be executed
-	// just yet. Actually, it will be delayed until the current render function
-	// has finished. That ensures directives in the current priorty level have
-	// run (and thus modified the passed `element`) before the next level.
 	const children =
-		rest.length > 0 ? (
-			<RecursivePriorityLevel
-				directives={ rest }
+		nextPriorityLevels.length > 0 ? (
+			<Directives
+				directives={ directives }
+				priorityLevels={ nextPriorityLevels }
 				element={ element }
 				evaluate={ evaluate }
 				originalProps={ originalProps }
+				elemRef={ elemRef }
 			/>
 		) : (
 			element
@@ -118,8 +99,8 @@ const RecursivePriorityLevel = ( {
 	const props = { ...originalProps, children };
 	const directiveArgs = { directives, props, element, context, evaluate };
 
-	for ( const d in directives ) {
-		const wrapper = directiveMap[ d ]?.( directiveArgs );
+	for ( const directiveName of currentPriorityLevel ) {
+		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
 		if ( wrapper !== undefined ) props.children = wrapper;
 	}
 
@@ -133,12 +114,18 @@ options.vnode = ( vnode ) => {
 		const props = vnode.props;
 		const directives = props.__directives;
 		delete props.__directives;
-		vnode.props = {
-			type: vnode.type,
-			directives,
-			props,
-		};
-		vnode.type = Directive;
+		const priorityLevels = getPriorityLevels( directives );
+		if ( priorityLevels.length > 0 ) {
+			vnode.props = {
+				directives,
+				priorityLevels,
+				originalProps: props,
+				type: vnode.type,
+				element: h( vnode.type, props ),
+				top: true,
+			};
+			vnode.type = Directives;
+		}
 	}
 
 	if ( old ) old( vnode );

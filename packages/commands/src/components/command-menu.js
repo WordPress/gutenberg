@@ -201,6 +201,20 @@ export function CommandMenu() {
 	if ( ! isOpen ) {
 		return false;
 	}
+
+	const onKeyDown = ( event ) => {
+		if (
+			// Ignore keydowns from IMEs
+			event.nativeEvent.isComposing ||
+			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+			// is `isComposing=false`, even though it's technically still part of the composition.
+			// These can only be detected by keyCode.
+			event.keyCode === 229
+		) {
+			event.preventDefault();
+		}
+	};
+
 	const isLoading = Object.values( loaders ).some( Boolean );
 
 	return (
@@ -211,7 +225,10 @@ export function CommandMenu() {
 			__experimentalHideHeader
 		>
 			<div className="commands-command-menu__container">
-				<Command label={ __( 'Command palette' ) }>
+				<Command
+					label={ __( 'Command palette' ) }
+					onKeyDown={ onKeyDown }
+				>
 					<div className="commands-command-menu__header">
 						<Command.Input
 							ref={ commandMenuInput }

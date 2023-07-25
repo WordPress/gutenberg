@@ -196,4 +196,10 @@ module.exports = {
 	'header-toolbar__keyboard-hide-shadow--solid': {
 		color: 'black',
 	},
+	'media-placeholder__header-icon': {
+		fill: 'black',
+	},
+	embed__icon: {
+		fill: 'black',
+	},
 };
