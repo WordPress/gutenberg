@@ -115,6 +115,9 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_bl
  * Register a block for auto-insertion into the frontend and into the markup
  * returned by the templates and patterns REST API endpoints.
  *
+ * This is currently done by filtering parsed blocks as obtained from a block template
+ * template part, or pattern and injecting the auto-inserted block where applicable.
+ *
  * @todo In the long run, we'd likely want some sort of registry for auto-inserted blocks.
  *
  * @param string $inserted_block  The name of the block to insert.
@@ -137,7 +140,11 @@ function gutenberg_register_auto_inserted_block( $inserted_block, $position, $an
 }
 
 /**
- * Parse and serialize block templates to allow running filters.
+ * Parse and reserialize block templates to allow running filters.
+ *
+ * By parsing a block template's content and then reserializing it
+ * via `gutenberg_serialize_blocks()`, we are able to run filters
+ * on the parsed blocks.
  *
  * @param WP_Block_Template[] $query_result Array of found block templates.
  * @return WP_Block_Template[] Updated array of found block templates.
@@ -158,6 +165,10 @@ add_filter( 'get_block_templates', 'gutenberg_parse_and_serialize_block_template
 /**
  * Filters the block template object after it has been (potentially) fetched from the theme file.
  *
+ * By parsing a block template's content and then reserializing it
+ * via `gutenberg_serialize_blocks()`, we are able to run filters
+ * on the parsed blocks.
+ *
  * @param WP_Block_Template|null $block_template The found block template, or null if there is none.
  */
 function gutenberg_parse_and_serialize_blocks( $block_template ) {
@@ -168,6 +179,14 @@ function gutenberg_parse_and_serialize_blocks( $block_template ) {
 	return $block_template;
 }
 add_filter( 'get_block_file_template', 'gutenberg_parse_and_serialize_blocks', 10, 1 );
+
+// Helper functions.
+// -----------------
+// The sole purpose of the following two functions (`gutenberg_serialize_block`
+// and `gutenberg_serialize_blocks`), which are otherwise copies of their unprefixed
+// counterparts (`serialize_block` and `serialize_blocks`) is to apply a filter
+// (also called `gutenberg_serialize_block`) as an entry point for modifications
+// to the parsed blocks.
 
 /**
  * Filterable version of `serialize_block()`.
