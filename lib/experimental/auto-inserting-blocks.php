@@ -69,6 +69,12 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 	}
 	$auto_insert = $metadata['__experimentalAutoInsert'];
 
+	/**
+	 * Map the camelCased position string from block.json to the snake_cased block type position
+	 * used in the auto-inserting block registration function.
+	 *
+	 * @var array
+	 */
 	$property_mappings = array(
 		'before'     => 'before',
 		'after'      => 'after',
@@ -113,6 +119,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_bl
  *
  * @param string $inserted_block  The name of the block to insert.
  * @param string $position        The desired position of the auto-inserted block, relative to its anchor block.
+ *                                Can be 'before', 'after', 'first_child', or 'last_child'.
  * @param string $anchor_block    The name of the block to insert the auto-inserted block next to.
  * @return void
  */
