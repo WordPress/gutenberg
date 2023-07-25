@@ -58,7 +58,9 @@ function ScaledBlockPreview( {
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
 	const scale = containerWidth / viewportWidth;
-	const aspectRatio = containerWidth / ( contentHeight * scale );
+	const aspectRatio = contentHeight
+		? containerWidth / ( contentHeight * scale )
+		: 0;
 	return (
 		<Disabled
 			className="block-editor-block-preview__content"
