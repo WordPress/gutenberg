@@ -232,6 +232,7 @@ function setZoomStyles( context, event ) {
 	// Change the target dimensions if the original aspect ratio has been changed.
 	const targetRatio = targetWidth / targetHeight;
 	const offsetRatio = offsetWidth / offsetHeight;
+	const naturalRatio = naturalWidth / naturalHeight;
 
 	if ( targetRatio.toFixed( 2 ) !== offsetRatio.toFixed( 2 ) ) {
 		if ( offsetRatio >= 1 ) targetWidth = targetHeight * offsetRatio;
@@ -283,8 +284,14 @@ function setZoomStyles( context, event ) {
 	// Set the origin values of the lightbox image
 	// from which we'll calculate our animation values.
 	const root = document.documentElement;
+	root.style.setProperty( '--lightbox-image-max-width', targetWidth + 'px' );
+	root.style.setProperty(
+		'--lightbox-image-max-height',
+		targetHeight + 'px'
+	);
 	root.style.setProperty( '--lightbox-origin-width', offsetWidth + 'px' );
 	root.style.setProperty( '--lightbox-origin-height', offsetHeight + 'px' );
+
 	root.style.setProperty(
 		'--lightbox-origin-left-position',
 		screenPosX + 'px'
@@ -296,10 +303,78 @@ function setZoomStyles( context, event ) {
 
 	// Create a scaling factor based on the target dimensions,
 	// which reflect our desired padding and container size.
+
 	const scaleWidth = targetWidth / offsetWidth;
 	const scaleHeight = targetHeight / offsetHeight;
-	root.style.setProperty( '--lightbox-scale-width', scaleWidth );
-	root.style.setProperty( '--lightbox-scale-height', scaleHeight );
+
+	if ( targetRatio.toFixed( 2 ) === naturalRatio.toFixed( 2 ) ) {
+		root.style.setProperty( '--lightbox-outer-overflow', 'visible' );
+		root.style.setProperty( '--lightbox-outer-scale-width', 1 );
+		root.style.setProperty( '--lightbox-outer-scale-height', 1 );
+		root.style.setProperty( '--lightbox-inner-width', '100%' );
+		root.style.setProperty( '--lightbox-inner-height', '100%' );
+		root.style.setProperty( '--lightbox-inner-initial-scale-width', 1 );
+		root.style.setProperty( '--lightbox-inner-initial-scale-height', 1 );
+		root.style.setProperty(
+			'--lightbox-inner-target-scale-width',
+			scaleWidth
+		);
+		root.style.setProperty(
+			'--lightbox-inner-target-scale-height',
+			scaleHeight
+		);
+	} else {
+		root.style.setProperty( '--lightbox-outer-overflow', 'hidden' );
+		root.style.setProperty( '--lightbox-outer-scale-width', scaleWidth );
+		root.style.setProperty( '--lightbox-outer-scale-height', scaleHeight );
+
+		let innerWidth;
+		let innerHeight;
+
+		let offsetScale = 0;
+		if ( offsetRatio >= 1 ) {
+			root.style.setProperty(
+				'--lightbox-inner-width',
+				offsetHeight + 'px'
+			);
+			root.style.setProperty(
+				'--lightbox-inner-height',
+				offsetHeight + 'px'
+			);
+			innerHeight = offsetWidth;
+			innerWidth = offsetRatio * offsetWidth;
+			offsetScale = innerHeight / offsetHeight;
+		} else {
+			root.style.setProperty(
+				'--lightbox-inner-width',
+				offsetWidth + 'px'
+			);
+			root.style.setProperty(
+				'--lightbox-inner-height',
+				offsetWidth + 'px'
+			);
+			innerWidth = offsetHeight;
+			innerHeight = offsetWidth / offsetRatio;
+			offsetScale = innerWidth / offsetWidth;
+		}
+
+		root.style.setProperty(
+			'--lightbox-inner-initial-scale-width',
+			offsetScale
+		);
+		root.style.setProperty(
+			'--lightbox-inner-initial-scale-height',
+			offsetScale
+		);
+		root.style.setProperty(
+			'--lightbox-inner-target-scale-width',
+			offsetScale
+		);
+		root.style.setProperty(
+			'--lightbox-inner-target-scale-height',
+			offsetScale
+		);
+	}
 
 	// Figure out the offset values of the image if
 	// it were placed in the center of the screen.

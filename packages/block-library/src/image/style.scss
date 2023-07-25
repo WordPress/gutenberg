@@ -262,17 +262,18 @@
 	@media (prefers-reduced-motion: no-preference) {
 		&.zoom {
 			.wp-block-image {
-				width: var(--lightbox-origin-width);
-				height: var(--lightbox-origin-height);
 				left: var(--lightbox-origin-left-position);
 				top: var(--lightbox-origin-top-position);
-				transform-origin: center center;
+				width: var(--lightbox-origin-width);
+				height: var(--lightbox-origin-height);
 				padding: 0;
+				overflow: var(--lightbox-outer-overflow);
 
 				img {
 					object-fit: cover;
-					width: 100%;
-					height: 100%;
+					width: var(--lightbox-inner-width);
+					height: var(--lightbox-inner-height);
+					transform-origin: center center;
 				}
 			}
 
@@ -282,10 +283,10 @@
 				animation: none;
 
 				.wp-block-image {
-					animation: lightbox-zoom-in 0.4s forwards;
+					animation: lightbox-outer-zoom-in 0.4s forwards;
 
 					img {
-						animation: none;
+						animation: lightbox-inner-zoom-in 0.4s forwards;
 					}
 				}
 				.scrim {
@@ -297,10 +298,10 @@
 					animation: none;
 
 					.wp-block-image {
-						animation: lightbox-zoom-out 0.4s forwards;
+						animation: lightbox-outer-zoom-out 0.4s forwards;
 
 						img {
-							animation: none;
+							animation: lightbox-inner-zoom-out 0.4s forwards;
 						}
 					}
 					.scrim {
@@ -340,24 +341,42 @@ html.has-lightbox-open {
 	}
 }
 
-@keyframes lightbox-zoom-in {
+@keyframes lightbox-outer-zoom-in {
 	0% {
 		transform: translate(0, 0) scale(1, 1);
 	}
 	100% {
-		transform: translate(var(--lightbox-translate-left-position), var(--lightbox-translate-top-position)) scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
+		transform: translate(var(--lightbox-translate-left-position), var(--lightbox-translate-top-position)) scale(var(--lightbox-outer-scale-width), var(--lightbox-outer-scale-height));
 	}
 }
 
-@keyframes lightbox-zoom-out {
+@keyframes lightbox-outer-zoom-out {
 	0% {
 		visibility: visible;
-		transform: translate(var(--lightbox-translate-left-position), var(--lightbox-translate-top-position)) scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
+		transform: translate(var(--lightbox-translate-left-position), var(--lightbox-translate-top-position)) scale(var(--lightbox-outer-scale-width), var(--lightbox-outer-scale-height));
 	}
 	99% {
 		visibility: visible;
 	}
 	100% {
 		transform: translate(0, 0) scale(1, 1);
+	}
+}
+
+@keyframes lightbox-inner-zoom-in {
+	0% {
+		transform: scale(var(--lightbox-inner-initial-scale-width), var(--lightbox-inner-initial-scale-height));
+	}
+	100% {
+		transform: scale(var(--lightbox-inner-target-scale-width), var(--lightbox-inner-target-scale-height));
+	}
+}
+
+@keyframes lightbox-inner-zoom-out {
+	0% {
+		transform: scale(var(--lightbox-inner-target-scale-width), var(--lightbox-inner-target-scale-height));
+	}
+	100% {
+		transform: scale(var(--lightbox-inner-initial-scale-width), var(--lightbox-inner-initial-scale-height));
 	}
 }
