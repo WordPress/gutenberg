@@ -1030,7 +1030,49 @@ function Component() {
 
 ## Selectors
 
-The following selectors are available on the object returned by `wp.data.select( 'core' )`:
+The following selectors are available on the object returned by `wp.data.select( 'core' )`.
+
+_Example_
+
+```js
+import { store as coreDataStore } from "@wordpress/core-data";
+
+function Component() {
+
+  const result = useSelect(
+
+    (select) => {
+
+      const query = { per_page: 20 };
+      const selectorArgs = ["postType", "page", query];
+
+      return {
+        pages: select(coreDataStore).getEntityRecords(...selectorArgs),
+        hasStartedResolution: select(coreDataStore).hasStartedResolution(
+          "getEntityRecords", // _selectorName_
+          selectorArgs
+        ),
+        hasFinishedResolution: select(coreDataStore).hasFinishedResolution(
+          "getEntityRecords",
+          selectorArgs
+        ),
+        isResolving: select(coreDataStore).isResolving(
+          "getEntityRecords",
+          selectorArgs
+        )
+      };
+    };
+  );
+
+  console.log(result.hasStartedResolution);
+  console.log(result.hasFinishedResolution);
+  console.log(result.isResolving);
+
+  return (
+    // use the result properties here
+  )
+}
+```
 
 ### hasFinishedResolution
 
