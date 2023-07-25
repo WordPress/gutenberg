@@ -145,7 +145,6 @@ export function BlockPatternsCategoryPanel( {
 		onInsert,
 		rootClientId
 	);
-
 	const availableCategories = usePatternsCategories( rootClientId );
 	const currentCategoryPatterns = useMemo(
 		() =>
@@ -191,7 +190,7 @@ export function BlockPatternsCategoryPanel( {
 				onHover={ onHover }
 				label={ category.label }
 				orientation="vertical"
-				category={ category.label }
+				category={ category.name }
 				isDraggable
 				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>

@@ -8,16 +8,27 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 	Tooltip,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { Icon, symbolFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
-
+const SYNC_TYPES = {
+	full: 'fully',
+	unsynced: 'unsynced',
+};
+const SYNC_FILTERS = {
+	all: __( 'All' ),
+	[ SYNC_TYPES.full ]: __( 'Synced' ),
+	[ SYNC_TYPES.unsynced ]: __( 'Standard' ),
+};
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
 		return <Tooltip text={ title }>{ children }</Tooltip>;
@@ -101,6 +112,21 @@ function BlockPattern( {
 									{ pattern.description }
 								</VisuallyHidden>
 							) }
+							{ pattern.id && ! pattern.syncStatus && (
+								<Tooltip
+									position="top center"
+									text={ __(
+										'Editing this pattern will also update anywhere it is used'
+									) }
+								>
+									<span>
+										<Icon
+											className="edit-site-patterns__pattern-icon"
+											icon={ symbolFilled }
+										/>
+									</span>
+								</Tooltip>
+							) }
 						</CompositeItem>
 					</WithToolTip>
 				</div>
@@ -124,8 +150,10 @@ function BlockPatternList( {
 	orientation,
 	label = __( 'Block Patterns' ),
 	showTitlesAsTooltip,
+	category,
 } ) {
 	const composite = useCompositeState( { orientation } );
+	const [ syncFilter, setSyncFilter ] = useState( 'all' );
 	return (
 		<Composite
 			{ ...composite }
@@ -133,6 +161,28 @@ function BlockPatternList( {
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
 		>
+			{ category === 'custom' && (
+				<ToggleGroupControl
+					className="edit-site-patterns__sync-status-filter"
+					hideLabelFromVision
+					label={ __( 'Filter by sync status' ) }
+					value={ syncFilter }
+					isBlock
+					onChange={ ( value ) => setSyncFilter( value ) }
+					__nextHasNoMarginBottom
+				>
+					{ Object.entries( SYNC_FILTERS ).map(
+						( [ key, optionLabel ] ) => (
+							<ToggleGroupControlOption
+								className="edit-site-patterns__sync-status-filter-option"
+								key={ key }
+								value={ key }
+								label={ optionLabel }
+							/>
+						)
+					) }
+				</ToggleGroupControl>
+			) }
 			{ blockPatterns.map( ( pattern ) => {
 				const isShown = shownPatterns.includes( pattern );
 				return isShown ? (
