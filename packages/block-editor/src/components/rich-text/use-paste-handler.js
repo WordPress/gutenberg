@@ -10,7 +10,7 @@ import {
 	getBlockTransforms,
 	htmlToBlocks,
 	hasBlockSupport,
-	getBlockInnerHTML,
+	getBlockContent,
 } from '@wordpress/blocks';
 import {
 	isEmpty,
@@ -53,7 +53,7 @@ function maybeInline( blocks, mode ) {
 	const [ block ] = blocks;
 	if ( ! hasBlockSupport( block.name, '__unstablePasteTextInline', false ) )
 		return blocks;
-	return getBlockInnerHTML( block );
+	return getBlockContent( block );
 }
 
 export function usePasteHandler( props ) {
