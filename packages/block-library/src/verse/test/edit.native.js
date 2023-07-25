@@ -64,15 +64,13 @@ describe( 'Verse block', () => {
 		const verseTextInput = await screen.findByPlaceholderText(
 			'Write verse…'
 		);
-		typeInRichText( verseTextInput, 'A great statement.Again', {
-			finalSelectionStart: 18,
-			finalSelectionEnd: 18,
-		} );
+		typeInRichText( verseTextInput, 'A great statement.' );
 		fireEvent( verseTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
+		typeInRichText( verseTextInput, 'Again' );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
