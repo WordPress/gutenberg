@@ -264,7 +264,10 @@ export default function Layout() {
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
-					<NavigableRegion ariaLabel={ __( 'Navigation' ) }>
+					<NavigableRegion
+						ariaLabel={ __( 'Navigation' ) }
+						className="edit-site-layout__sidebar-region"
+					>
 						<motion.div
 							// The sidebar is needed for routing on mobile
 							// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
