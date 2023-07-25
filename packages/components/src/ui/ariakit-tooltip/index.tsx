@@ -81,7 +81,7 @@ function AriaToolTip( props: ToolTipProps ) {
 							shortcut={ shortcut }
 						/>
 					) }
-					<TooltipArrow size={ 0 } />
+					<TooltipArrow size={ 0.0001 } />
 				</Tooltip>
 			) }
 		</>
