@@ -7,8 +7,14 @@
  * 
  */
 
+ /**
+ * @coversDefaultClass WP_Font_Family_Utils
+ */
 class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 
+	/**
+     * @covers ::has_font_mime_type
+     */
 	public function test_has_font_mime_type() {
 		$this->assertFalse(
 			WP_Font_Family_Utils::has_font_mime_type( '/temp/not-a-font.ttf.exe' )
@@ -30,6 +36,9 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+     * @covers ::get_filename_from_font_face
+     */
 	public function test_get_filename_from_font_face() {
 		$font_face = array(
 			'fontFamily' => 'Piazzolla',
@@ -58,6 +67,9 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+     * @covers ::merge_fonts_data
+     */
 	public function test_merge_fonts_data() {
 		$font1 = array(
 			'slug'       => 'Piazzolla',
