@@ -28,13 +28,13 @@ class WP_Font_Family_Utils {
 	 * @param int    $i Optional counter for appending to the filename, default is 1.
 	 * @return string The generated filename for the font face asset.
 	 */
-	public static function get_filename_from_font_face( $font_face, $url, $i = 1 ) {
+	public static function get_filename_from_font_face( $font_face, $url, $suffix = '' ) {
 		$extension = pathinfo( $url, PATHINFO_EXTENSION );
-		$filename  = sanitize_title( "{$font_face['fontFamily']}_{$font_face['fontStyle']}_{$font_face['fontWeight']}" );
-		if ( $i > 1 ) {
-			$filename .= "_{$i}";
+		$filename  = "{$font_face['fontFamily']}_{$font_face['fontStyle']}_{$font_face['fontWeight']}";
+		if ( $suffix ) {
+			$filename .= "_{$suffix}";
 		}
-		return "{$filename}.{$extension}";
+		return sanitize_file_name( "{$filename}.{$extension}" );
 	}
 
 	/**

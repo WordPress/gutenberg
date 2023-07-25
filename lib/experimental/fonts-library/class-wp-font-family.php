@@ -242,9 +242,10 @@ class WP_Font_Family {
 		$new_font_face        = $font_face;
 		$sources              = (array) $font_face['src'];
 		$new_font_face['src'] = array();
-		$i                    = 0;
+		$index                = 0;
 		foreach ( $sources as $src ) {
-			$filename = WP_Font_Family_Utils::get_filename_from_font_face( $font_face, $src, $i++ );
+			$suffix = $index++ > 0 ? $index : '';
+			$filename = WP_Font_Family_Utils::get_filename_from_font_face( $font_face, $src, $suffix );
 			$new_src  = $this->download_asset( $src, $filename );
 			if ( $new_src ) {
 				$new_font_face['src'][] = $new_src;
