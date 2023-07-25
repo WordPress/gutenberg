@@ -9,6 +9,12 @@
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
+		"color": {
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true
+			}
+		},
 		"html": false,
 		"multiple": false,
 		"reusable": false
