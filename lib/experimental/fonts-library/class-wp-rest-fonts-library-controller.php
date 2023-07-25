@@ -190,16 +190,16 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			$font->install( $files );
 			$fonts_installed[] = $font;
 		}
-
-		$response = array();
-		if ( ! empty( $fonts_installed ) ) {
-			foreach ( $fonts_installed as $font ) {
-				$response[] = $font->get_data();
-			}
-			return new WP_REST_Response( $response );
+		
+		if ( empty( $fonts_installed ) ) {
+			return new WP_Error( 'error_installing_fonts', __( 'Error installing fonts. No font was installed.', 'gutenberg' ), array( 'status' => 500 ) );
 		}
 
-		return new WP_Error( 'error_installing_fonts', __( 'Error installing fonts. No font was installed.', 'gutenberg' ), array( 'status' => 500 ) );
+		$response = array();
+		foreach ( $fonts_installed as $font ) {
+			$response[] = $font->get_data();
+		}
+		return new WP_REST_Response( $response );
 	}
 
 	/**
