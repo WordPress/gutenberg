@@ -17,6 +17,20 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 	const footnotes = meta?.footnotes ? JSON.parse( meta.footnotes ) : [];
 	const blockProps = useBlockProps();
 
+	if ( postType !== 'post' && postType !== 'page' ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ <BlockIcon icon={ icon } /> }
+					label={ __( 'Footnotes' ) }
+					instructions={ __(
+						'Footnotes are not supported here. Add this block to post or page content.'
+					) }
+				/>
+			</div>
+		);
+	}
+
 	if ( ! footnotes.length ) {
 		return (
 			<div { ...blockProps }>

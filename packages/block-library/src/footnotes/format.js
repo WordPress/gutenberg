@@ -30,7 +30,13 @@ export const format = {
 		'data-fn': 'data-fn',
 	},
 	contentEditable: false,
-	edit: function Edit( { value, onChange, isObjectActive } ) {
+	usesContext: [ 'postType' ],
+	edit: function Edit( {
+		value,
+		onChange,
+		isObjectActive,
+		context: { postType },
+	} ) {
 		const registry = useRegistry();
 		const {
 			getSelectedBlockClientId,
@@ -40,6 +46,10 @@ export const format = {
 		} = useSelect( blockEditorStore );
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
+
+		if ( postType !== 'post' && postType !== 'page' ) {
+			return null;
+		}
 
 		function onClick() {
 			registry.batch( () => {
