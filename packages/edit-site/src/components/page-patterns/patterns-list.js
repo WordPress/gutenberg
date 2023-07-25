@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useDeferredValue,
-	useEffect,
-	useId,
-	useMemo,
-} from '@wordpress/element';
+import { useState, useDeferredValue, useId, useMemo } from '@wordpress/element';
 import {
 	SearchControl,
 	__experimentalVStack as VStack,
@@ -84,12 +78,15 @@ export default function PatternsList( { categoryId, type } ) {
 		}
 	);
 
-	// If the search term or sync filter is changing, we need to reset the
-	// current page back to zero so results are still within the set displayed.
-	useEffect(
-		() => setCurrentPage( 1 ),
-		[ deferredFilterValue, deferredSyncedFilter ]
-	);
+	const updateSearchFilter = ( value ) => {
+		setCurrentPage( 1 );
+		setFilterValue( value );
+	};
+
+	const updateSyncFilter = ( value ) => {
+		setCurrentPage( 1 );
+		setSyncFilter( value );
+	};
 
 	const id = useId();
 	const titleId = `${ id }-title`;
@@ -149,7 +146,9 @@ export default function PatternsList( { categoryId, type } ) {
 					<FlexBlock className="edit-site-patterns__search-block">
 						<SearchControl
 							className="edit-site-patterns__search"
-							onChange={ ( value ) => setFilterValue( value ) }
+							onChange={ ( value ) =>
+								updateSearchFilter( value )
+							}
 							placeholder={ __( 'Search patterns' ) }
 							label={ __( 'Search patterns' ) }
 							value={ filterValue }
@@ -163,7 +162,7 @@ export default function PatternsList( { categoryId, type } ) {
 							label={ __( 'Filter by sync status' ) }
 							value={ syncFilter }
 							isBlock
-							onChange={ ( value ) => setSyncFilter( value ) }
+							onChange={ ( value ) => updateSyncFilter( value ) }
 							__nextHasNoMarginBottom
 						>
 							{ Object.entries( SYNC_FILTERS ).map(
