@@ -109,13 +109,15 @@ add_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' );
  *
  * @since 6.3.0
  *
+ * @global int $wp_temporary_footnote_revision_id The footnote revision ID.
+ *
  * @param int $revision_id The revision ID.
  */
-function wp_keep_revision_id( $revision_id ) {
+function wp_keep_footnotes_revision_id( $revision_id ) {
 	global $wp_temporary_footnote_revision_id;
 	$wp_temporary_footnote_revision_id = $revision_id;
 }
-add_action( '_wp_put_post_revision', 'wp_keep_revision_id' );
+add_action( '_wp_put_post_revision', 'wp_keep_footnotes_revision_id' );
 
 /**
  * This is a specific fix for the REST API. The REST API doesn't update
@@ -134,7 +136,7 @@ add_action( '_wp_put_post_revision', 'wp_keep_revision_id' );
  *
  * @param WP_Post $post The post object.
  */
-function wp_add_revisions_to_post_meta( $post ) {
+function wp_add_footnotes_revisions_to_post_meta( $post ) {
 	global $wp_temporary_footnote_revision_id;
 
 	if ( $wp_temporary_footnote_revision_id ) {
@@ -159,7 +161,7 @@ function wp_add_revisions_to_post_meta( $post ) {
 }
 
 foreach ( array( 'post', 'page' ) as $post_type ) {
-	add_action( "rest_after_insert_{$post_type}", 'wp_add_revisions_to_post_meta' );
+	add_action( "rest_after_insert_{$post_type}", 'wp_add_footnotes_revisions_to_post_meta' );
 }
 
 /**
