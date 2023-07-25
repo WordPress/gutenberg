@@ -60,7 +60,7 @@ export default function useNavigationMenuContent( postType, postId ) {
 	}
 
 	const blocks =
-		record && record.content && typeof record.content !== 'function'
+		record?.content && typeof record.content !== 'function'
 			? parse( record.content )
 			: [];
 
