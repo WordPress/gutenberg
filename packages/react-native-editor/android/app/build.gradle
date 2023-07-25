@@ -118,6 +118,9 @@ def reactNativeArchitectures() {
 }
 
 android {
+    // IMPORTANT: Any updates to the namespace should be reflected in
+    // the `package` attribute of the main `AndroidManifest.xml` file.
+    // File reference: `react-native-editor/android/app/src/main/AndroidManifest.xml`
     namespace "com.gutenberg"
     ndkVersion rootProject.ext.ndkVersion
 

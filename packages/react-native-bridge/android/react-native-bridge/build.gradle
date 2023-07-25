@@ -30,6 +30,9 @@ group='org.wordpress-mobile.gutenberg-mobile'
 def buildAssetsFolder = 'build/assets'
 
 android {
+    // IMPORTANT: Any updates to the namespace should be reflected in
+    // the `package` attribute of the main `AndroidManifest.xml` file.
+    // File reference: `react-native-bridge/android/react-native-bridge/src/main/AndroidManifest.xml`
     namespace "org.wordpress.mobile.ReactNativeGutenbergBridge"
 
     compileSdkVersion 33
