@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useState, useDeferredValue, useId, useMemo } from '@wordpress/element';
+import {
+	useState,
+	useDeferredValue,
+	useEffect,
+	useId,
+	useMemo,
+} from '@wordpress/element';
 import {
 	SearchControl,
 	__experimentalVStack as VStack,
@@ -78,6 +84,13 @@ export default function PatternsList( { categoryId, type } ) {
 		}
 	);
 
+	// If the search term or sync filter is changing, we need to reset the
+	// current page back to zero so results are still within the set displayed.
+	useEffect(
+		() => setCurrentPage( 1 ),
+		[ deferredFilterValue, deferredSyncedFilter ]
+	);
+
 	const id = useId();
 	const titleId = `${ id }-title`;
 	const descriptionId = `${ id }-description`;
@@ -90,14 +103,12 @@ export default function PatternsList( { categoryId, type } ) {
 	const pageIndex = currentPage - 1;
 	const numPages = Math.ceil( patterns.length / PAGE_SIZE );
 
-	const list = useMemo(
-		() =>
-			patterns.slice(
-				pageIndex * PAGE_SIZE,
-				pageIndex * PAGE_SIZE + PAGE_SIZE
-			),
-		[ pageIndex, patterns ]
-	);
+	const list = useMemo( () => {
+		return patterns.slice(
+			pageIndex * PAGE_SIZE,
+			pageIndex * PAGE_SIZE + PAGE_SIZE
+		);
+	}, [ pageIndex, patterns ] );
 
 	const asyncList = useAsyncList( list, { step: 10 } );
 
