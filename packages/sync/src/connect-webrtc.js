@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-// @ts-ignore
-import { WebrtcProvider } from 'y-webrtc';
+// import { WebrtcProvider } from 'y-webrtc';
+
+/**
+ * Internal dependencies
+ */
+import { WebrtcProviderWithHttpSignaling } from './webrtc-http-stream-signaling';
 
 /** @typedef {import('./types').ObjectType} ObjectType */
 /** @typedef {import('./types').ObjectID} ObjectID */
@@ -19,7 +23,12 @@ import { WebrtcProvider } from 'y-webrtc';
  */
 export function connectWebRTC( objectId, objectType, doc ) {
 	const roomName = `${ objectType }-${ objectId }`;
-	new WebrtcProvider( roomName, doc, {
+	new WebrtcProviderWithHttpSignaling( roomName, doc, {
+		signaling: [
+			//'ws://localhost:4444',
+			// @ts-ignore
+			window.wp.ajax.settings.url,
+		],
 		// @ts-ignore
 		password: window.__experimentalCollaborativeEditingSecret,
 	} );
