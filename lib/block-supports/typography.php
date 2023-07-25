@@ -102,7 +102,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_columns_support    = isset( $typography_supports['textColumns'] ) && $typography_supports['textColumns'];
 	$has_text_decoration_support = isset( $typography_supports['__experimentalTextDecoration'] ) && $typography_supports['__experimentalTextDecoration'];
 	$has_text_transform_support  = isset( $typography_supports['__experimentalTextTransform'] ) && $typography_supports['__experimentalTextTransform'];
-	$has_writing_mode_support.   = isset( $typography_supports['__experimentalWritingMode'] ) && $typography_supports['__experimentalWritingMode'];
+	$has_writing_mode_support    = isset( $typography_supports['__experimentalWritingMode'] ) && $typography_supports['__experimentalWritingMode'];
 
 	// Whether to skip individual block support features.
 	$should_skip_font_size       = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
