@@ -87,7 +87,8 @@ function gutenberg_post_being_edited_requires_classic_block() {
 
 	$parsed_blocks = parse_blocks( $content );
 	foreach ( $parsed_blocks as $block ) {
-		if ( empty( $block['blockName'] ) && strlen( trim( $block['innerHTML'] ) ) > 0 ) {
+		$is_freeform_block = empty( $block['blockName'] ) || 'core/freeform' === $block['blockName'];
+		if ( $is_freeform_block && strlen( trim( $block['innerHTML'] ) ) > 0 ) {
 			return true;
 		}
 	}
