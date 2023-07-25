@@ -27,18 +27,18 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		'fontFamily' => 'Arial',
 	);
 
-	function test_get_data() {
+	public function test_get_data() {
 		$font = new WP_Font_Family( self::FONT_DATA_1 );
 		$this->assertSame( 'piazzolla', $font->get_data()['slug'] );
 		$this->assertCount( 1, $font->get_data()['fontFace'] );
 	}
 
-	function test_get_data_as_json() {
+	public function test_get_data_as_json() {
 		$font = new WP_Font_Family( self::FONT_DATA_1 );
 		$this->assertSame( wp_json_encode( self::FONT_DATA_1 ), $font->get_data_as_json() );
 	}
 
-	function test_has_font_faces() {
+	public function test_has_font_faces() {
 		$font1 = new WP_Font_Family( self::FONT_DATA_1 );
 		$this->assertTrue( $font1->has_font_faces() );
 
@@ -46,7 +46,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertFalse( $font2->has_font_faces() );
 	}
 
-	function test_install_and_uninstall_google_font() {
+	public function test_install_and_uninstall_google_font() {
 		$font = new WP_Font_Family( self::FONT_DATA_1 );
 		$font->install();
 
@@ -80,7 +80,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertFileDoesNotExist( WP_FONTS_DIR . '/piazzolla_italic_400.ttf' );
 	}
 
-	function test_install_and_uninstall_font_without_faces() {
+	public function test_install_and_uninstall_font_without_faces() {
 		$font = new WP_Font_Family( self::FONT_DATA_2 );
 		$font->install();
 
@@ -104,7 +104,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	}
 
 
-	function test_install_and_uninstall_local_fonts() {
+	public function test_install_and_uninstall_local_fonts() {
 		// TODO: Fix this test. Is failing because the font file is not being copied from the temp dir to the fonts folder
 		// We need to figure out why move_uploaded_file call in the WP_Font_Family::move_font_face_asset function is not working while testing
 		$local_font = array(
