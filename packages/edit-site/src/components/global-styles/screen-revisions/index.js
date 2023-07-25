@@ -30,7 +30,6 @@ import SidebarFixedBottom from '../../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../../store';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsButtons from './revisions-buttons';
-import { addQueryArgs } from '@wordpress/url';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
@@ -60,6 +59,8 @@ function ScreenRevisions() {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const [ globalStylesDiffs, setGlobalStylesDiffs ] = useState( [] );
+	const [ diffModal, setDiffModal ] = useState( false );
 
 	useEffect( () => {
 		if ( editorCanvasContainerView !== 'global-styles-revisions' ) {
@@ -83,6 +84,7 @@ function ScreenRevisions() {
 	};
 
 	const selectRevision = ( revision ) => {
+		setGlobalStylesDiffs( deepCompare( revision, userConfig ) );
 		setGlobalStylesRevision( {
 			styles: revision?.styles,
 			settings: revision?.settings,
@@ -91,6 +93,34 @@ function ScreenRevisions() {
 		} );
 		setSelectedRevisionId( revision?.id );
 	};
+
+	function deepCompare( obj1, obj2, depth = 0, parentPath = '' ) {
+		if (
+			typeof obj1 !== 'object' ||
+			obj1 === null ||
+			typeof obj2 !== 'object' ||
+			obj2 === null
+		) {
+			return [ { path: parentPath, value1: obj1, value2: obj2 } ];
+		}
+
+		const keys1 = Object.keys( obj1 );
+		const keys2 = Object.keys( obj2 );
+		const allKeys = new Set( [ ...keys1, ...keys2 ] );
+
+		let diffs = [];
+		for ( const key of allKeys ) {
+			const path = parentPath ? parentPath + '.' + key : key;
+			const subDiffs = deepCompare(
+				obj1[ key ],
+				obj2[ key ],
+				depth + 1,
+				path
+			);
+			diffs = diffs.concat( subDiffs );
+		}
+		return diffs;
+	}
 
 	const isLoadButtonEnabled =
 		!! globalStylesRevision?.id &&
@@ -125,10 +155,7 @@ function ScreenRevisions() {
 							<SidebarFixedBottom>
 								<VStack>
 									<MenuItem
-										href={ addQueryArgs( 'revision.php', {
-											revision: globalStylesRevision?.id,
-											gutenberg: true,
-										} ) }
+										onClick={ () => setDiffModal( true ) }
 										target="_blank"
 										icon={ external }
 										disabled={
@@ -185,6 +212,31 @@ function ScreenRevisions() {
 							{ __(
 								'Any unsaved changes will be lost when you apply this revision.'
 							) }
+						</ConfirmDialog>
+					) }
+					{ diffModal && (
+						<ConfirmDialog
+							title={ __( 'Changes:' ) }
+							isOpen={ diffModal }
+							confirmButtonText={ __( 'Apply' ) }
+							onConfirm={ () =>
+								restoreRevision( globalStylesRevision )
+							}
+							onCancel={ () => setDiffModal( false ) }
+						>
+							<>
+								<h2>
+									{ __(
+										'Loading this revision will discard all unsaved changes.'
+									) }
+								</h2>
+								<p>
+									{ __(
+										'Do you want to replace your unsaved changes in the editor?'
+									) }
+								</p>
+								{ globalStylesDiffs.length }
+							</>
 						</ConfirmDialog>
 					) }
 				</>
