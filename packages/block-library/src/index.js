@@ -282,7 +282,7 @@ export const registerCoreBlocks = (
 	blocks.forEach( ( { init } ) => init() );
 
 	setDefaultBlockName( paragraph.name );
-	if ( window.wp && window.wp.oldEditor ) {
+	if ( window.wp && window.wp.oldEditor && blocks.includes( classic ) ) {
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
