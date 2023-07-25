@@ -115,6 +115,10 @@
 	[cmdk-list-sizer] {
 		position: relative;
 	}
+
+	[cmdk-group]:has([cmdk-group-items]:not(:empty)):not([hidden]) + [cmdk-group]:has([cmdk-group-items]:not(:empty)) {
+		border-top: 1px solid $gray-200;
+	}
 }
 
 .commands-command-menu__item mark {
