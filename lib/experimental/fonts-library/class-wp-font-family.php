@@ -90,12 +90,8 @@ class WP_Font_Family {
 		if ( null === $post ) {
 			return new WP_Error( 'font_family_not_found', __( 'The font family could not be found.', 'gutenberg' ) );
 		}
-		$were_assets_removed = $this->remove_font_family_assets();
-		if ( true === $were_assets_removed ) {
-			$was_post_deleted = wp_delete_post( $post->ID, true );
-			if ( null === $was_post_deleted ) {
-				return new WP_Error( 'font_family_not_deleted', __( 'The font family could not be deleted.', 'gutenberg' ) );
-			}
+		if ( !$this->remove_font_family_assets() || !wp_delete_post( $post->ID, true ) ) {
+			return new WP_Error( 'font_family_not_deleted', __( 'The font family could not be deleted.', 'gutenberg' ) );
 		}
 		return true;
 	}
