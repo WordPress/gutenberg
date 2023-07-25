@@ -12,6 +12,7 @@ import { insertObject } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	store as blockEditorStore,
+	privateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -20,6 +21,9 @@ import { createBlock, store as blocksStore } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { name } from './block.json';
+import { unlock } from '../lock-unlock';
+
+const { usesContextKey } = unlock( privateApis );
 
 export const formatName = 'core/footnote';
 export const format = {
@@ -30,7 +34,7 @@ export const format = {
 		'data-fn': 'data-fn',
 	},
 	contentEditable: false,
-	usesContext: [ 'postType' ],
+	[ usesContextKey ]: [ 'postType' ],
 	edit: function Edit( {
 		value,
 		onChange,

@@ -11,8 +11,15 @@ import BlockContext from '../block-context';
 
 const DEFAULT_BLOCK_CONTEXT = {};
 
+// eslint-disable-next-line no-restricted-syntax
+export const usesContextKey = 'usesContext' + Math.random();
+
 function Edit( { onChange, onFocus, value, forwardedRef, settings } ) {
-	const { name, edit: EditFunction, usesContext } = settings;
+	const {
+		name,
+		edit: EditFunction,
+		[ usesContextKey ]: usesContext,
+	} = settings;
 
 	const blockContext = useContext( BlockContext );
 
