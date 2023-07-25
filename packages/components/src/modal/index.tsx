@@ -171,13 +171,28 @@ function UnforwardedModal(
 		[ hasScrolledContent ]
 	);
 
-	const onOverlayPress: React.PointerEventHandler< HTMLDivElement > = (
-		event
-	) => {
-		if ( event.target === event.currentTarget ) {
-			event.preventDefault();
-			onRequestClose( event );
-		}
+	let pressTarget: EventTarget | null = null;
+	const overlayPressHandlers: {
+		onPointerDown: React.PointerEventHandler< HTMLDivElement >;
+		onPointerUp: React.PointerEventHandler< HTMLDivElement >;
+	} = {
+		onPointerDown: ( event ) => {
+			if ( event.isPrimary && event.target === event.currentTarget ) {
+				pressTarget = event.target;
+				// Avoids loss of focus yet also leaves `useFocusOutside`
+				// practically useless with its only potential trigger being
+				// programmatic focus movement. TODO opt for either removing
+				// the hook or enhancing it such that this isn't needed.
+				event.preventDefault();
+			}
+		},
+		// Requests closing only for primary pointer/button and if the
+		// target was the same as the one that was pressed.
+		onPointerUp: ( { target, isPrimary, button } ) => {
+			const isSameTarget = target === pressTarget;
+			pressTarget = null;
+			if ( isPrimary && button === 0 && isSameTarget ) onRequestClose();
+		},
 	};
 
 	return createPortal(
@@ -189,13 +204,7 @@ function UnforwardedModal(
 				overlayClassName
 			) }
 			onKeyDown={ handleEscapeKeyDown }
-			// Avoids loss of focus from clicking the overlay and also obviates
-			// `useFocusOutside` aside from cases of focus programmatically
-			// moving outside. TODO ideally both the hook and this handler
-			// won't be needed and one can be removed.
-			onPointerDown={
-				shouldCloseOnClickOutside ? onOverlayPress : undefined
-			}
+			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
 		>
 			<StyleProvider document={ document }>
 				<div
