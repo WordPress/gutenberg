@@ -55,7 +55,7 @@ export function useAdminNavigationCommands() {
 	} );
 	useCommand( {
 		name: 'core/manage-reusable-blocks',
-		label: __( 'Manage all of my patterns' ),
+		label: __( 'Open patterns' ),
 		callback: ( { close } ) => {
 			if (
 				( ! isSiteEditor && ! isBlockTheme ) ||
