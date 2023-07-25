@@ -38,6 +38,7 @@ function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
 	const actions = [];
 	let messageHTML;
 
+	const blockProps = useBlockProps( { className: 'has-warning' } );
 	const convertToHtmlButton = (
 		<Button key="convert" onClick={ convertToHTML } variant="primary">
 			{ __( 'Keep as HTML' ) }
@@ -64,6 +65,12 @@ function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
 			originalName
 		);
 		actions.push( convertToHtmlButton );
+	} else if (
+		! hasContent &&
+		! hasFreeformBlock &&
+		originalName === 'core/freeform'
+	) {
+		return null;
 	} else {
 		messageHTML = sprintf(
 			/* translators: %s: block name */
@@ -75,7 +82,7 @@ function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
 	}
 
 	return (
-		<div { ...useBlockProps( { className: 'has-warning' } ) }>
+		<div { ...blockProps }>
 			<Warning actions={ actions }>{ messageHTML }</Warning>
 			<RawHTML>{ safeHTML( originalUndelimitedContent ) }</RawHTML>
 		</div>
