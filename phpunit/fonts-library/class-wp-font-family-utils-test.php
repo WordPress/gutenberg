@@ -110,7 +110,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 
 		// Fonts with same slug should be merged
 		$merged_font = WP_Font_Family_Utils::merge_fonts_data( $font1, $font2 );
-		$this->assertWPError( $merged_font instanceof WP_Error );
+		$this->assertNotWPError( $merged_font );
 
 		// Total of font faces without duplicates
 		$this->assertCount( 4, $merged_font['fontFace'] );
@@ -123,7 +123,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 
 		// Fonts with different slugs should not be merged
 		$merged_font = WP_Font_Family_Utils::merge_fonts_data( $font1, $font3 );
-		$this->assertWPError( $merged_font instanceof WP_Error );
+		$this->assertWPError( $merged_font );
 	}
 
 }
