@@ -62,5 +62,21 @@ describe( 'gap', () => {
 				'88px 1px'
 			);
 		} );
+
+		it( 'should unwrap var: values from a string into a CSS var() function', () => {
+			expect( getGapCSSValue( 'var:preset|spacing|60' ) ).toEqual(
+				'var(--wp--preset--spacing--60)'
+			);
+		} );
+
+		it( 'should unwrap var: values from an object into a CSS var() function and return shorthand values', () => {
+			const blockGapValue = {
+				top: 'var:preset|spacing|20',
+				left: 'var:preset|spacing|60',
+			};
+			expect( getGapCSSValue( blockGapValue ) ).toEqual(
+				'var(--wp--preset--spacing--20) var(--wp--preset--spacing--60)'
+			);
+		} );
 	} );
 } );

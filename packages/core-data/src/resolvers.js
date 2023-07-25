@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { camelCase, find, get, includes, map, mapKeys, uniq } from 'lodash';
+import { camelCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -57,7 +57,9 @@ export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -75,11 +77,13 @@ export const getEntityRecord =
 				// the ID.
 				query = {
 					...query,
-					_fields: uniq( [
-						...( getNormalizedCommaSeparable( query._fields ) ||
-							[] ),
-						entityConfig.key || DEFAULT_ENTITY_KEY,
-					] ).join(),
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.key || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
 				};
 			}
 
@@ -139,7 +143,9 @@ export const getEntityRecords =
 	( kind, name, query = {} ) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -157,11 +163,13 @@ export const getEntityRecords =
 				// the ID.
 				query = {
 					...query,
-					_fields: uniq( [
-						...( getNormalizedCommaSeparable( query._fields ) ||
-							[] ),
-						entityConfig.key || DEFAULT_ENTITY_KEY,
-					] ).join(),
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.key || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
 				};
 			}
 
@@ -172,7 +180,7 @@ export const getEntityRecords =
 
 			let records = Object.values( await apiFetch( { path } ) );
 			// If we request fields but the result doesn't contain the fields,
-			// explicitely set these fields as "undefined"
+			// explicitly set these fields as "undefined"
 			// that way we consider the query "fullfilled".
 			if ( query._fields ) {
 				records = records.map( ( record ) => {
@@ -265,34 +273,42 @@ export const getEmbedPreview =
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string}  action   Action to check. One of: 'create', 'read', 'update',
- *                           'delete'.
- * @param {string}  resource REST resource to check, e.g. 'media' or 'posts'.
- * @param {?string} id       ID of the rest resource to check.
+ * @param {string}  requestedAction Action to check. One of: 'create', 'read', 'update',
+ *                                  'delete'.
+ * @param {string}  resource        REST resource to check, e.g. 'media' or 'posts'.
+ * @param {?string} id              ID of the rest resource to check.
  */
 export const canUser =
-	( action, resource, id ) =>
-	async ( { dispatch } ) => {
-		const methods = {
-			create: 'POST',
-			read: 'GET',
-			update: 'PUT',
-			delete: 'DELETE',
-		};
+	( requestedAction, resource, id ) =>
+	async ( { dispatch, registry } ) => {
+		const { hasStartedResolution } = registry.select( STORE_NAME );
 
-		const method = methods[ action ];
-		if ( ! method ) {
-			throw new Error( `'${ action }' is not a valid action.` );
+		const resourcePath = id ? `${ resource }/${ id }` : resource;
+		const retrievedActions = [ 'create', 'read', 'update', 'delete' ];
+
+		if ( ! retrievedActions.includes( requestedAction ) ) {
+			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
 
-		const path = id
-			? `/wp/v2/${ resource }/${ id }`
-			: `/wp/v2/${ resource }`;
+		// Prevent resolving the same resource twice.
+		for ( const relatedAction of retrievedActions ) {
+			if ( relatedAction === requestedAction ) {
+				continue;
+			}
+			const isAlreadyResolving = hasStartedResolution( 'canUser', [
+				relatedAction,
+				resource,
+				id,
+			] );
+			if ( isAlreadyResolving ) {
+				return;
+			}
+		}
 
 		let response;
 		try {
 			response = await apiFetch( {
-				path,
+				path: `/wp/v2/${ resourcePath }`,
 				method: 'OPTIONS',
 				parse: false,
 			} );
@@ -306,9 +322,25 @@ export const canUser =
 		// return the expected result in the native version. Instead, API requests
 		// only return the result, without including response properties like the headers.
 		const allowHeader = response.headers?.get( 'allow' );
-		const key = [ action, resource, id ].filter( Boolean ).join( '/' );
-		const isAllowed = includes( allowHeader, method );
-		dispatch.receiveUserPermission( key, isAllowed );
+		const allowedMethods = allowHeader?.allow || allowHeader || '';
+
+		const permissions = {};
+		const methods = {
+			create: 'POST',
+			read: 'GET',
+			update: 'PUT',
+			delete: 'DELETE',
+		};
+		for ( const [ actionName, methodName ] of Object.entries( methods ) ) {
+			permissions[ actionName ] = allowedMethods.includes( methodName );
+		}
+
+		for ( const action of retrievedActions ) {
+			dispatch.receiveUserPermission(
+				`${ action }/${ resourcePath }`,
+				permissions[ action ]
+			);
+		}
 	};
 
 /**
@@ -323,7 +355,9 @@ export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -375,15 +409,15 @@ export const getAutosave =
 export const __experimentalGetTemplateForLink =
 	( link ) =>
 	async ( { dispatch, resolveSelect } ) => {
-		// Ideally this should be using an apiFetch call
-		// We could potentially do so by adding a "filter" to the `wp_template` end point.
-		// Also it seems the returned object is not a regular REST API post type.
 		let template;
 		try {
-			template = await window
-				.fetch( addQueryArgs( link, { '_wp-find-template': true } ) )
-				.then( ( res ) => res.json() )
-				.then( ( { data } ) => data );
+			// This is NOT calling a REST endpoint but rather ends up with a response from
+			// an Ajax function which has a different shape from a WP_REST_Response.
+			template = await apiFetch( {
+				url: addQueryArgs( link, {
+					'_wp-find-template': true,
+				} ),
+			} ).then( ( { data } ) => data );
 		} catch ( e ) {
 			// For non-FSE themes, it is possible that this request returns an error.
 		}
@@ -427,13 +461,9 @@ export const __experimentalGetCurrentGlobalStylesId =
 			'theme',
 			{ status: 'active' }
 		);
-		const globalStylesURL = get( activeThemes, [
-			0,
-			'_links',
-			'wp:user-global-styles',
-			0,
-			'href',
-		] );
+		const globalStylesURL =
+			activeThemes?.[ 0 ]?._links?.[ 'wp:user-global-styles' ]?.[ 0 ]
+				?.href;
 		if ( globalStylesURL ) {
 			const globalStylesObject = await apiFetch( {
 				url: globalStylesURL,
@@ -470,14 +500,64 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 		);
 	};
 
+/**
+ * Fetches and returns the revisions of the current global styles theme.
+ */
+export const getCurrentThemeGlobalStylesRevisions =
+	() =>
+	async ( { resolveSelect, dispatch } ) => {
+		const globalStylesId =
+			await resolveSelect.__experimentalGetCurrentGlobalStylesId();
+		const record = globalStylesId
+			? await resolveSelect.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId
+			  )
+			: undefined;
+		const revisionsURL = record?._links?.[ 'version-history' ]?.[ 0 ]?.href;
+
+		if ( revisionsURL ) {
+			const resetRevisions = await apiFetch( {
+				url: revisionsURL,
+			} );
+			const revisions = resetRevisions?.map( ( revision ) =>
+				Object.fromEntries(
+					Object.entries( revision ).map( ( [ key, value ] ) => [
+						camelCase( key ),
+						value,
+					] )
+				)
+			);
+			dispatch.receiveThemeGlobalStyleRevisions(
+				globalStylesId,
+				revisions
+			);
+		}
+	};
+
+getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
+	return (
+		action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
+		action.kind === 'root' &&
+		! action.error &&
+		action.name === 'globalStyles'
+	);
+};
+
 export const getBlockPatterns =
 	() =>
 	async ( { dispatch } ) => {
 		const restPatterns = await apiFetch( {
 			path: '/wp/v2/block-patterns/patterns',
 		} );
-		const patterns = map( restPatterns, ( pattern ) =>
-			mapKeys( pattern, ( value, key ) => camelCase( key ) )
+		const patterns = restPatterns?.map( ( pattern ) =>
+			Object.fromEntries(
+				Object.entries( pattern ).map( ( [ key, value ] ) => [
+					camelCase( key ),
+					value,
+				] )
+			)
 		);
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
@@ -489,4 +569,44 @@ export const getBlockPatternCategories =
 			path: '/wp/v2/block-patterns/categories',
 		} );
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
+	};
+
+export const getNavigationFallbackId =
+	() =>
+	async ( { dispatch, select } ) => {
+		const fallback = await apiFetch( {
+			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
+				_embed: true,
+			} ),
+		} );
+
+		const record = fallback?._embedded?.self;
+
+		dispatch.receiveNavigationFallbackId( fallback?.id );
+
+		if ( record ) {
+			// If the fallback is already in the store, don't invalidate navigation queries.
+			// Otherwise, invalidate the cache for the scenario where there were no Navigation
+			// posts in the state and the fallback created one.
+			const existingFallbackEntityRecord = select.getEntityRecord(
+				'postType',
+				'wp_navigation',
+				fallback?.id
+			);
+			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
+			dispatch.receiveEntityRecords(
+				'postType',
+				'wp_navigation',
+				record,
+				undefined,
+				invalidateNavigationQueries
+			);
+
+			// Resolve to avoid further network requests.
+			dispatch.finishResolution( 'getEntityRecord', [
+				'postType',
+				'wp_navigation',
+				fallback?.id,
+			] );
+		}
 	};

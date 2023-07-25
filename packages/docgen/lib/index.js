@@ -3,7 +3,6 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { last } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -60,7 +59,10 @@ const processFile = ( rootDir, inputFile ) => {
 		const result = engine(
 			relativePath,
 			data,
-			getIRFromRelativePath( rootDir, last( currentFileStack ) )
+			getIRFromRelativePath(
+				rootDir,
+				currentFileStack[ currentFileStack.length - 1 ]
+			)
 		);
 		currentFileStack.pop();
 		return result;

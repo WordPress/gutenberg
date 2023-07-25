@@ -2,6 +2,68 @@
 
 ## Unreleased
 
+## 6.15.0 (2023-07-20)
+
+## 6.14.0 (2023-07-05)
+
+## 6.13.0 (2023-06-23)
+
+## 6.12.0 (2023-06-07)
+
+## 6.11.0 (2023-05-24)
+
+## 6.10.0 (2023-05-10)
+
+## 6.9.0 (2023-04-26)
+
+## 6.8.0 (2023-04-12)
+
+## 6.7.0 (2023-03-29)
+
+## 6.6.0 (2023-03-15)
+
+## 6.5.0 (2023-03-01)
+
+## 6.4.0 (2023-02-15)
+
+## 6.3.0 (2023-02-01)
+
+## 6.2.0 (2023-01-11)
+
+## 6.1.0 (2023-01-02)
+
+## 6.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 5.20.0 (2022-11-16)
+
+## 5.19.0 (2022-11-02)
+
+### Deprecations
+
+-   Update deprecation message for the `useAnchorRef` hook ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
+
+## 5.18.0 (2022-10-19)
+
+## 5.17.0 (2022-10-05)
+
+## 5.16.0 (2022-09-21)
+
+### Deprecations
+
+-   Introduced new `useAnchor` hook, which works better with the new `Popover` component APIs. The previous `useAnchorRef` hook is now marked as deprecated, and is scheduled to be removed in WordPress 6.3 ([#43691](https://github.com/WordPress/gutenberg/pull/43691)).
+
+## 5.15.0 (2022-09-13)
+
+## 5.14.0 (2022-08-24)
+
+## 5.13.0 (2022-08-10)
+
+## 5.12.0 (2022-07-27)
+
 ## 5.11.0 (2022-07-13)
 
 ## 5.10.0 (2022-06-29)

@@ -8,6 +8,8 @@ import { createHigherOrderComponent, pure } from '@wordpress/compose';
  */
 import useSelect from '../use-select';
 
+/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+
 /**
  * Higher-order component used to inject state-derived props using registered
  * selectors.

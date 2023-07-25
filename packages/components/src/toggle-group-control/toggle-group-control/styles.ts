@@ -11,13 +11,14 @@ import { CONFIG, COLORS, reduceMotion } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
 export const ToggleGroupControl = ( {
+	isBlock,
+	isDeselectable,
 	size,
-}: {
+}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
 	background: ${ COLORS.ui.background };
-	border: 1px solid;
-	border-color: ${ COLORS.ui.border };
+	border: 1px solid transparent;
 	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
 	min-width: 0;
@@ -27,18 +28,31 @@ export const ToggleGroupControl = ( {
 	${ reduceMotion( 'transition' ) }
 
 	${ toggleGroupControlSize( size ) }
-
-	&:hover {
-		border-color: ${ COLORS.ui.borderHover };
-	}
-
-	&:focus-within {
-		border-color: ${ COLORS.ui.borderFocus };
-		box-shadow: ${ CONFIG.controlBoxShadowFocus };
-		outline: none;
-		z-index: 1;
-	}
+	${ ! isDeselectable && enclosingBorders( isBlock ) }
 `;
+
+const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+	const enclosingBorder = css`
+		border-color: ${ COLORS.ui.border };
+	`;
+
+	return css`
+		${ isBlock && enclosingBorder }
+
+		&:hover {
+			border-color: ${ COLORS.ui.borderHover };
+		}
+
+		&:focus-within {
+			border-color: ${ COLORS.ui.borderFocus };
+			box-shadow: ${ CONFIG.controlBoxShadowFocus };
+			z-index: 1;
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+		}
+	`;
+};
 
 export const toggleGroupControlSize = (
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
@@ -61,7 +75,6 @@ export const block = css`
 export const BackdropView = styled.div`
 	background: ${ COLORS.gray[ 900 ] };
 	border-radius: ${ CONFIG.controlBorderRadius };
-	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
 	left: 0;
 	position: absolute;
 	top: 2px;
@@ -69,4 +82,12 @@ export const BackdropView = styled.div`
 	transition: transform ${ CONFIG.transitionDurationFast } ease;
 	${ reduceMotion( 'transition' ) }
 	z-index: 1;
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+	outline-offset: -3px;
+`;
+
+export const VisualLabelWrapper = styled.div`
+	// Makes the inline label be the correct height, equivalent to setting line-height: 0
+	display: flex;
 `;

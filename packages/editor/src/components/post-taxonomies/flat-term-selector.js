@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { escape as escapeString, find, get, uniqBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -12,15 +7,13 @@ import { FormTokenField, withFilters } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { unescapeString, unescapeTerm, unescapeTerms } from '../../utils/terms';
+import { unescapeString, unescapeTerm } from '../../utils/terms';
 import MostUsedTerms from './most-used-terms';
 
 /**
@@ -37,8 +30,6 @@ const EMPTY_ARRAY = [];
 const MAX_TERMS_SUGGESTIONS = 20;
 const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
-	orderby: 'count',
-	order: 'desc',
 	_fields: 'id,name',
 	context: 'view',
 };
@@ -50,41 +41,9 @@ const isSameTermName = ( termA, termB ) =>
 const termNamesToIds = ( names, terms ) => {
 	return names.map(
 		( termName ) =>
-			find( terms, ( term ) => isSameTermName( term.name, termName ) ).id
+			terms.find( ( term ) => isSameTermName( term.name, termName ) ).id
 	);
 };
-
-// Tries to create a term or fetch it if it already exists.
-function findOrCreateTerm( termName, restBase, namespace ) {
-	const escapedTermName = escapeString( termName );
-
-	return apiFetch( {
-		path: `/${ namespace }/${ restBase }`,
-		method: 'POST',
-		data: { name: escapedTermName },
-	} )
-		.catch( ( error ) => {
-			const errorCode = error.code;
-			if ( errorCode === 'term_exists' ) {
-				// If the terms exist, fetch it instead of creating a new one.
-				const addRequest = apiFetch( {
-					path: addQueryArgs( `/${ namespace }/${ restBase }`, {
-						...DEFAULT_QUERY,
-						search: escapedTermName,
-					} ),
-				} ).then( unescapeTerms );
-
-				return addRequest.then( ( searchResult ) => {
-					return find( searchResult, ( result ) =>
-						isSameTermName( result.name, termName )
-					);
-				} );
-			}
-
-			return Promise.reject( error );
-		} )
-		.then( unescapeTerm );
-}
 
 export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
@@ -118,24 +77,14 @@ export function FlatTermSelector( { slug } ) {
 
 			return {
 				hasCreateAction: _taxonomy
-					? get(
-							post,
-							[
-								'_links',
-								'wp:action-create-' + _taxonomy.rest_base,
-							],
-							false
-					  )
+					? post._links?.[
+							'wp:action-create-' + _taxonomy.rest_base
+					  ] ?? false
 					: false,
 				hasAssignAction: _taxonomy
-					? get(
-							post,
-							[
-								'_links',
-								'wp:action-assign-' + _taxonomy.rest_base,
-							],
-							false
-					  )
+					? post._links?.[
+							'wp:action-assign-' + _taxonomy.rest_base
+					  ] ?? false
 					: false,
 				taxonomy: _taxonomy,
 				termIds: _termIds,
@@ -165,7 +114,7 @@ export function FlatTermSelector( { slug } ) {
 					: EMPTY_ARRAY,
 			};
 		},
-		[ search ]
+		[ search, slug ]
 	);
 
 	// Update terms state only after the selectors are resolved.
@@ -188,9 +137,28 @@ export function FlatTermSelector( { slug } ) {
 	}, [ searchResults ] );
 
 	const { editPost } = useDispatch( editorStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
 
 	if ( ! hasAssignAction ) {
 		return null;
+	}
+
+	async function findOrCreateTerm( term ) {
+		try {
+			const newTerm = await saveEntityRecord( 'taxonomy', slug, term, {
+				throwOnError: true,
+			} );
+			return unescapeTerm( newTerm );
+		} catch ( error ) {
+			if ( error.code !== 'term_exists' ) {
+				throw error;
+			}
+
+			return {
+				id: error.data.term_id,
+				name: term.name,
+			};
+		}
 	}
 
 	function onUpdateTerms( newTermIds ) {
@@ -202,10 +170,18 @@ export function FlatTermSelector( { slug } ) {
 			...( terms ?? [] ),
 			...( searchResults ?? [] ),
 		];
-		const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
+		const uniqueTerms = termNames.reduce( ( acc, name ) => {
+			if (
+				! acc.some( ( n ) => n.toLowerCase() === name.toLowerCase() )
+			) {
+				acc.push( name );
+			}
+			return acc;
+		}, [] );
+
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>
-				! find( availableTerms, ( term ) =>
+				! availableTerms.find( ( term ) =>
 					isSameTermName( term.name, termName )
 				)
 		);
@@ -224,10 +200,9 @@ export function FlatTermSelector( { slug } ) {
 			return;
 		}
 
-		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		Promise.all(
 			newTermNames.map( ( termName ) =>
-				findOrCreateTerm( termName, taxonomy.rest_base, namespace )
+				findOrCreateTerm( { name: termName } )
 			)
 		).then( ( newTerms ) => {
 			const newAvailableTerms = availableTerms.concat( newTerms );
@@ -243,30 +218,23 @@ export function FlatTermSelector( { slug } ) {
 		}
 
 		const newTermIds = [ ...termIds, newTerm.id ];
+		const defaultName = slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' );
 		const termAddedMessage = sprintf(
 			/* translators: %s: term name. */
 			_x( '%s added', 'term' ),
-			get(
-				taxonomy,
-				[ 'labels', 'singular_name' ],
-				slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
-			)
+			taxonomy?.labels?.singular_name ?? defaultName
 		);
 
 		speak( termAddedMessage, 'assertive' );
 		onUpdateTerms( newTermIds );
 	}
 
-	const newTermLabel = get(
-		taxonomy,
-		[ 'labels', 'add_new_item' ],
-		slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' )
-	);
-	const singularName = get(
-		taxonomy,
-		[ 'labels', 'singular_name' ],
-		slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
-	);
+	const newTermLabel =
+		taxonomy?.labels?.add_new_item ??
+		( slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' ) );
+	const singularName =
+		taxonomy?.labels?.singular_name ??
+		( slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' ) );
 	const termAddedLabel = sprintf(
 		/* translators: %s: term name. */
 		_x( '%s added', 'term' ),

@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/post-author-biography",
 	"title": "Post Author Biography",
 	"category": "theme",
@@ -32,6 +32,7 @@
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true

@@ -5,7 +5,7 @@ import {
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
-	waitFor,
+	waitForModalVisible,
 } from 'test/helpers';
 
 /**
@@ -28,12 +28,11 @@ afterAll( () => {
 
 describe( 'Spacer block', () => {
 	it( 'inserts block', async () => {
-		const { getByA11yLabel, getByTestId, getByText } =
-			await initializeEditor();
+		const screen = await initializeEditor();
 
-		fireEvent.press( getByA11yLabel( 'Add block' ) );
+		fireEvent.press( screen.getByLabelText( 'Add block' ) );
 
-		const blockList = getByTestId( 'InserterUI-Blocks' );
+		const blockList = screen.getByTestId( 'InserterUI-Blocks' );
 		// onScroll event used to force the FlatList to render all items
 		fireEvent.scroll( blockList, {
 			nativeEvent: {
@@ -43,9 +42,11 @@ describe( 'Spacer block', () => {
 			},
 		} );
 
-		fireEvent.press( await waitFor( () => getByText( 'Spacer' ) ) );
+		fireEvent.press( screen.getByText( 'Spacer' ) );
 
-		expect( getByA11yLabel( /Spacer Block\. Row 1/ ) ).toBeVisible();
+		const [ spacerBlock ] =
+			screen.getAllByLabelText( /Spacer Block\. Row 1/ );
+		expect( spacerBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
@@ -53,24 +54,25 @@ describe( 'Spacer block', () => {
 		const initialHtml = `<!-- wp:spacer -->
 		<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->`;
-		const { getByA11yLabel, getByDisplayValue, getByTestId, getByText } =
-			await initializeEditor( {
-				initialHtml,
-			} );
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
 
 		// Select Spacer block
-		const spacerBlock = getByA11yLabel( /Spacer Block\. Row 1/ );
+		const [ spacerBlock ] =
+			screen.getAllByLabelText( /Spacer Block\. Row 1/ );
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Update height attribute
-		fireEvent.press( getByText( '100' ) );
-		const heightTextInput = getByDisplayValue( '100' );
+		fireEvent.press( screen.getByText( '100', { hidden: true } ) );
+		const heightTextInput = screen.getByDisplayValue( '100', {
+			hidden: true,
+		} );
 		fireEvent.changeText( heightTextInput, '50' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -80,28 +82,31 @@ describe( 'Spacer block', () => {
 		const initialHtml = `<!-- wp:spacer -->
 		<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->`;
-		const { getByA11yLabel, getByDisplayValue, getByTestId, getByText } =
-			await initializeEditor( {
-				initialHtml,
-			} );
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
 
 		// Select Spacer block
-		const spacerBlock = getByA11yLabel( /Spacer Block\. Row 1/ );
+		const [ spacerBlock ] =
+			screen.getAllByLabelText( /Spacer Block\. Row 1/ );
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Set vh unit
-		fireEvent.press( getByText( 'px' ) );
-		fireEvent.press( getByText( 'Viewport height (vh)' ) );
+		fireEvent.press( screen.getByText( 'px', { hidden: true } ) );
+		fireEvent.press(
+			screen.getByText( 'Viewport height (vh)', { hidden: true } )
+		);
 
 		// Update height attribute
-		fireEvent.press( getByText( '100' ) );
-		const heightTextInput = getByDisplayValue( '100' );
+		fireEvent.press( screen.getByText( '100', { hidden: true } ) );
+		const heightTextInput = screen.getByDisplayValue( '100', {
+			hidden: true,
+		} );
 		fireEvent.changeText( heightTextInput, '25' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -111,23 +116,23 @@ describe( 'Spacer block', () => {
 		const initialHtml = `<!-- wp:spacer -->
 		<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->`;
-		const { getByA11yLabel, getByTestId } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select Spacer block
-		const spacerBlock = getByA11yLabel( /Spacer Block\. Row 1/ );
+		const [ spacerBlock ] =
+			screen.getAllByLabelText( /Spacer Block\. Row 1/ );
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Increment height
 		fireEvent(
-			getByA11yLabel( /Height\. Value is 100 Pixels \(px\)/ ),
+			screen.getByLabelText( /Height\. Value is 100 Pixels \(px\)/ ),
 			'accessibilityAction',
 			{
 				nativeEvent: { actionName: 'increment' },
@@ -141,28 +146,111 @@ describe( 'Spacer block', () => {
 		const initialHtml = `<!-- wp:spacer -->
 		<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->`;
-		const { getByA11yLabel, getByTestId } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select Spacer block
-		const spacerBlock = getByA11yLabel( /Spacer Block\. Row 1/ );
+		const [ spacerBlock ] =
+			screen.getAllByLabelText( /Spacer Block\. Row 1/ );
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Increment height
 		fireEvent(
-			getByA11yLabel( /Height\. Value is 100 Pixels \(px\)/ ),
+			screen.getByLabelText( /Height\. Value is 100 Pixels \(px\)/ ),
 			'accessibilityAction',
 			{
 				nativeEvent: { actionName: 'decrement' },
 			}
 		);
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'inserts block with spacingSizes preset', async () => {
+		// Mock spacingSizes presets
+		const RAW_STYLES = {
+			typography: {
+				fontSize: 16,
+			},
+		};
+		const RAW_FEATURES = {
+			spacing: {
+				spacingSizes: {
+					theme: [
+						{
+							size: '3.125rem',
+							slug: '100',
+							name: '100',
+						},
+						{
+							size: '3.75rem',
+							slug: '110',
+							name: '110',
+						},
+					],
+				},
+			},
+		};
+
+		const initialHtml = `<!-- wp:spacer {"height":"var:preset|spacing|110"} -->
+		<div style="height:var(--wp--preset--spacing--110)" aria-hidden="true" class="wp-block-spacer"></div>
+		<!-- /wp:spacer -->`;
+		const screen = await initializeEditor( {
+			initialHtml,
+			rawStyles: JSON.stringify( RAW_STYLES ),
+			rawFeatures: JSON.stringify( RAW_FEATURES ),
+		} );
+
+		// Select Spacer block
+		const [ spacerBlock ] =
+			screen.getAllByLabelText( /Spacer Block\. Row 1/ );
+		fireEvent.press( spacerBlock );
+
+		// Open block settings
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Update height attribute
+		fireEvent.press( screen.getByText( '60', { hidden: true } ) );
+		const heightTextInput = screen.getByDisplayValue( '60', {
+			hidden: true,
+		} );
+		fireEvent.changeText( heightTextInput, '70' );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'inserts block with spacingSizes preset without matching global styles values', async () => {
+		const initialHtml = `<!-- wp:spacer {"height":"var:preset|spacing|30"} -->
+		<div style="height:var(--wp--preset--spacing--30)" aria-hidden="true" class="wp-block-spacer"></div>
+		<!-- /wp:spacer -->`;
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		// Select Spacer block
+		const [ spacerBlock ] =
+			screen.getAllByLabelText( /Spacer Block\. Row 1/ );
+		fireEvent.press( spacerBlock );
+
+		// Open block settings
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Update height attribute
+		fireEvent.press( screen.getByText( '100', { hidden: true } ) );
+		const heightTextInput = screen.getByDisplayValue( '100', {
+			hidden: true,
+		} );
+		fireEvent.changeText( heightTextInput, '120' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );

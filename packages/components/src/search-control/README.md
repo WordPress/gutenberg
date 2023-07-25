@@ -14,7 +14,8 @@ SearchControl components let users display a search control.
 
 Render a user interface to input the name of an additional css class.
 
-```js
+```jsx
+import { __ } from '@wordpress/i18n';
 import { SearchControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -23,6 +24,7 @@ function MySearchControl( { className, setState } ) {
 
     return (
         <SearchControl
+            label={ __( 'Search posts' ) }
             value={ searchInput }
             onChange={ setSearchInput }
         />
@@ -39,6 +41,9 @@ Props not included in this set will be applied to the input element.
 
 If this property is added, a label will be generated using label property as the content.
 
+A label should always be provided as an accessibility best practice, even when a placeholder is defined
+and `hideLabelFromVision` is `true`.
+
 -   Type: `String`
 -   Required: Yes
 
@@ -48,12 +53,14 @@ If this property is added, a specific placeholder will be used for the input.
 
 -   Type: `String`
 -   Required: No
+-   Default: `__( 'Search' )`
+
 #### value
 
 The current value of the input.
 
--   Type: `String | Number`
--   Required: Yes
+-   Type: `String`
+-   Required: No
 
 #### className
 
@@ -75,9 +82,10 @@ If this property is added, a help text will be generated using help property as 
 
 -   Type: `String|WPElement`
 -   Required: No
+
 ### hideLabelFromVision
 
-If true, the label will only be visible to screen readers.
+If true, the label will not be visible, but will be read by screen readers. Defaults to `true`.
 
 -   Type: `Boolean`
 -   Required: No

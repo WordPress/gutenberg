@@ -23,6 +23,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	background: {
 		value: [ 'color', 'gradient' ],
 		support: [ 'color', 'gradients' ],
+		useEngine: true,
 	},
 	backgroundColor: {
 		value: [ 'color', 'background' ],
@@ -122,13 +123,22 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		requiresOptOut: true,
 		useEngine: true,
 	},
+	columnCount: {
+		value: [ 'typography', 'textColumns' ],
+		support: [ 'typography', 'textColumns' ],
+		useEngine: true,
+	},
 	filter: {
 		value: [ 'filter', 'duotone' ],
-		support: [ 'color', '__experimentalDuotone' ],
+		support: [ 'filter', 'duotone' ],
 	},
 	linkColor: {
 		value: [ 'elements', 'link', 'color', 'text' ],
 		support: [ 'color', 'link' ],
+	},
+	captionColor: {
+		value: [ 'elements', 'caption', 'color', 'text' ],
+		support: [ 'color', 'caption' ],
 	},
 	buttonColor: {
 		value: [ 'elements', 'button', 'color', 'text' ],
@@ -138,9 +148,18 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'elements', 'button', 'color', 'background' ],
 		support: [ 'color', 'button' ],
 	},
+	headingColor: {
+		value: [ 'elements', 'heading', 'color', 'text' ],
+		support: [ 'color', 'heading' ],
+	},
+	headingBackgroundColor: {
+		value: [ 'elements', 'heading', 'color', 'background' ],
+		support: [ 'color', 'heading' ],
+	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
 		support: [ 'typography', '__experimentalFontFamily' ],
+		useEngine: true,
 	},
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
@@ -173,6 +192,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
+	minHeight: {
+		value: [ 'dimensions', 'minHeight' ],
+		support: [ 'dimensions', 'minHeight' ],
+		useEngine: true,
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
@@ -197,6 +221,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	letterSpacing: {
 		value: [ 'typography', 'letterSpacing' ],
 		support: [ 'typography', '__experimentalLetterSpacing' ],
+		useEngine: true,
+	},
+	writingMode: {
+		value: [ 'typography', 'writingMode' ],
+		support: [ 'typography', '__experimentalWritingMode' ],
 		useEngine: true,
 	},
 	'--wp--style--root--padding': {
@@ -224,6 +253,7 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	button: '.wp-element-button, .wp-block-button__link',
 	caption:
 		'.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
+	cite: 'cite',
 };
 
 export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
@@ -232,4 +262,5 @@ export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
 	'color.palette': true,
 	'typography.fontFamilies': true,
 	'typography.fontSizes': true,
+	'spacing.spacingSizes': true,
 };

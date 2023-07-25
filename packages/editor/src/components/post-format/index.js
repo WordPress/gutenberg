@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find, includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -66,11 +61,10 @@ export default function PostFormat() {
 		// Ensure current format is always in the set.
 		// The current format may not be a format supported by the theme.
 		return (
-			includes( supportedFormats, format.id ) || postFormat === format.id
+			supportedFormats?.includes( format.id ) || postFormat === format.id
 		);
 	} );
-	const suggestion = find(
-		formats,
+	const suggestion = formats.find(
 		( format ) => format.id === suggestedFormat
 	);
 
@@ -82,6 +76,7 @@ export default function PostFormat() {
 		<PostFormatCheck>
 			<div className="editor-post-format">
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __( 'Post Format' ) }
 					value={ postFormat }
 					onChange={ ( format ) => onUpdatePostFormat( format ) }

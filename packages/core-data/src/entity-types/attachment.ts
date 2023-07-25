@@ -13,7 +13,6 @@ import type {
 } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import type { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -142,6 +141,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Attachment<
-	C extends Context = DefaultContextOf< 'root', 'media' >
-> = OmitNevers< _BaseEntityRecords.Attachment< C > >;
+export type Attachment< C extends Context = 'edit' > = OmitNevers<
+	_BaseEntityRecords.Attachment< C >
+>;

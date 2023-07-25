@@ -58,43 +58,70 @@ function ToggleGroupControlOptionBase(
 		'ToggleGroupControlOptionBase'
 	);
 	const {
-		className,
 		isBlock = false,
+		isDeselectable = false,
+		size = 'default',
+		...otherContextProps /* context props for Ariakit Radio */
+	} = toggleGroupControlContext;
+	const {
+		className,
+		isIcon = false,
 		value,
 		children,
 		showTooltip = false,
-		...radioProps
-	} = {
-		...toggleGroupControlContext,
-		...buttonProps,
-	};
+		...otherButtonProps
+	} = buttonProps;
 
-	const isActive = radioProps.state === value;
+	const isPressed = otherContextProps.state === value;
 	const cx = useCx();
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
 	const classes = cx(
-		styles.buttonView,
-		className,
-		isActive && styles.buttonActive
+		styles.buttonView( { isDeselectable, isIcon, isPressed, size } ),
+		className
 	);
 
+	const buttonOnClick = () => {
+		if ( isDeselectable && isPressed ) {
+			otherContextProps.setState( undefined );
+		} else {
+			otherContextProps.setState( value );
+		}
+	};
+
+	const commonProps = {
+		...otherButtonProps,
+		className: classes,
+		'data-value': value,
+		ref: forwardedRef,
+	};
+
 	return (
-		<LabelView className={ labelViewClasses } data-active={ isActive }>
+		<LabelView className={ labelViewClasses }>
 			<WithToolTip
 				showTooltip={ showTooltip }
-				text={ radioProps[ 'aria-label' ] }
+				text={ otherButtonProps[ 'aria-label' ] }
 			>
-				<Radio
-					{ ...radioProps }
-					as="button"
-					aria-label={ radioProps[ 'aria-label' ] }
-					className={ classes }
-					data-value={ value }
-					ref={ forwardedRef }
-					value={ value }
-				>
-					<ButtonContentView>{ children }</ButtonContentView>
-				</Radio>
+				{ isDeselectable ? (
+					<button
+						{ ...commonProps }
+						aria-pressed={ isPressed }
+						type="button"
+						onClick={ buttonOnClick }
+					>
+						<ButtonContentView>{ children }</ButtonContentView>
+					</button>
+				) : (
+					<Radio
+						{ ...commonProps }
+						{
+							...otherContextProps /* these are only for Ariakit Radio */
+						}
+						as="button"
+						value={ value }
+					>
+						<ButtonContentView>{ children }</ButtonContentView>
+					</Radio>
+				) }
 			</WithToolTip>
 		</LabelView>
 	);

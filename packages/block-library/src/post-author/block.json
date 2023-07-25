@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/post-author",
 	"title": "Post Author",
 	"category": "theme",
@@ -23,6 +23,14 @@
 		},
 		"byline": {
 			"type": "string"
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self"
 		}
 	},
 	"usesContext": [ "postType", "postId", "queryId" ],
@@ -35,10 +43,12 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -53,6 +63,5 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-post-author-editor",
 	"style": "wp-block-post-author"
 }

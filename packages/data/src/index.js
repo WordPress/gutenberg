@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import combineReducers from 'turbo-combine-reducers';
+import turboCombineReducers from 'turbo-combine-reducers';
 
 /**
  * Internal dependencies
@@ -29,6 +29,8 @@ export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
+export { dispatch } from './dispatch';
+export { select } from './select';
 
 /**
  * Object of available plugins to use with a registry.
@@ -43,6 +45,7 @@ export { plugins };
  * The combineReducers helper function turns an object whose values are different
  * reducing functions into a single reducing function you can pass to registerReducer.
  *
+ * @type  {import('./types').combineReducers}
  * @param {Object} reducers An object whose values correspond to different reducing
  *                          functions that need to be combined into one.
  *
@@ -77,28 +80,7 @@ export { plugins };
  * @return {Function} A reducer that invokes every reducer inside the reducers
  *                    object, and constructs a state object with the same shape.
  */
-export { combineReducers };
-
-/**
- * Given a store descriptor, returns an object of the store's selectors.
- * The selector functions are been pre-bound to pass the current state automatically.
- * As a consumer, you need only pass arguments of the selector, if applicable.
- *
- * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
- *                                                       convention of passing the store name is
- *                                                       also supported.
- *
- * @example
- * ```js
- * import { select } from '@wordpress/data';
- * import { store as myCustomStore } from 'my-custom-store';
- *
- * select( myCustomStore ).getPrice( 'hammer' );
- * ```
- *
- * @return {Object} Object containing the store's selectors.
- */
-export const select = defaultRegistry.select;
+export const combineReducers = turboCombineReducers;
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state
@@ -135,33 +117,15 @@ export const resolveSelect = defaultRegistry.resolveSelect;
 export const suspendSelect = defaultRegistry.suspendSelect;
 
 /**
- * Given a store descriptor, returns an object of the store's action creators.
- * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
- *
- * Note: Action creators returned by the dispatch will return a promise when
- * they are called.
- *
- * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
- *                                                       convention of passing the store name is
- *                                                       also supported.
- *
- * @example
- * ```js
- * import { dispatch } from '@wordpress/data';
- * import { store as myCustomStore } from 'my-custom-store';
- *
- * dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
- * ```
- * @return {Object} Object containing the action creators.
- */
-export const dispatch = defaultRegistry.dispatch;
-
-/**
  * Given a listener function, the function will be called any time the state value
- * of one of the registered stores has changed. This function returns a `unsubscribe`
- * function used to stop the subscription.
+ * of one of the registered stores has changed. If you specify the optional
+ * `storeNameOrDescriptor` parameter, the listener function will be called only
+ * on updates on that one specific registered store.
  *
- * @param {Function} listener Callback function.
+ * This function returns an `unsubscribe` function used to stop the subscription.
+ *
+ * @param {Function}                listener              Callback function.
+ * @param {string|StoreDescriptor?} storeNameOrDescriptor Optional store name.
  *
  * @example
  * ```js

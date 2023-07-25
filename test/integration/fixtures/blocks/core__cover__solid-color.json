@@ -10,7 +10,8 @@
 			"dimRatio": 100,
 			"overlayColor": "primary",
 			"backgroundType": "image",
-			"isDark": true
+			"isDark": true,
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

@@ -9,6 +9,7 @@ import {
 	openPublishPanel,
 	pressKeyWithModifier,
 	publishPost,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'PostPublishPanel', () => {
@@ -28,7 +29,7 @@ describe( 'PostPublishPanel', () => {
 	} );
 
 	it( 'PrePublish: publish button should have the focus', async () => {
-		await page.type( '.editor-post-title__input', 'E2E Test Post' );
+		await canvas().type( '.editor-post-title__input', 'E2E Test Post' );
 		await openPublishPanel();
 
 		const focusedElementClassList = await page.$eval(
@@ -44,7 +45,7 @@ describe( 'PostPublishPanel', () => {
 
 	it( 'PostPublish: post link should have the focus', async () => {
 		const postTitle = 'E2E Test Post';
-		await page.type( '.editor-post-title__input', postTitle );
+		await canvas().type( '.editor-post-title__input', postTitle );
 		await publishPost();
 
 		const focusedElementTag = await page.$eval(
@@ -64,7 +65,7 @@ describe( 'PostPublishPanel', () => {
 	} );
 
 	it( 'should retain focus within the panel', async () => {
-		await page.type( '.editor-post-title__input', 'E2E Test Post' );
+		await canvas().type( '.editor-post-title__input', 'E2E Test Post' );
 		await openPublishPanel();
 		await pressKeyWithModifier( 'shift', 'Tab' );
 

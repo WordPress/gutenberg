@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject } from 'lodash';
+import { isPlainObject } from 'is-plain-object';
+import deepmerge from 'deepmerge';
 
 /**
  * Internal dependencies
@@ -192,7 +193,9 @@ function persistencePlugin( registry, pluginOptions ) {
 					//   subset of keys.
 					// - New keys in what would otherwise be used as initial
 					//   state are deeply merged as base for persisted value.
-					initialState = merge( {}, initialState, persistedState );
+					initialState = deepmerge( initialState, persistedState, {
+						isMergeableObject: isPlainObject,
+					} );
 				} else {
 					// If there is a mismatch in object-likeness of default
 					// initial or persisted state, defer to persisted value.

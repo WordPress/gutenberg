@@ -1,0 +1,37 @@
+[
+	{
+		"name": "core/list",
+		"isValid": true,
+		"attributes": {
+			"ordered": false,
+			"values": "<li>one</li><li>two</li><li>three</li>",
+			"fontFamily": "cambria-georgia"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "one"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "two"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "three"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

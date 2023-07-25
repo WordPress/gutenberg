@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -17,6 +12,7 @@ import { Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
@@ -42,7 +38,7 @@ const ANCHOR_SCHEMA = {
  */
 export function addAttribute( settings ) {
 	// Allow blocks to specify their own attribute definition with default values if needed.
-	if ( has( settings.attributes, [ 'anchor', 'type' ] ) ) {
+	if ( 'type' in ( settings.attributes?.anchor ?? {} ) ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
@@ -68,11 +64,13 @@ export const withInspectorControl = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
 			const hasAnchor = hasBlockSupport( props.name, 'anchor' );
+			const blockEditingMode = useBlockEditingMode();
 
 			if ( hasAnchor && props.isSelected ) {
 				const isWeb = Platform.OS === 'web';
 				const textControl = (
 					<TextControl
+						__nextHasNoMarginBottom
 						className="html-anchor-control"
 						label={ __( 'HTML anchor' ) }
 						help={
@@ -84,7 +82,7 @@ export const withInspectorControl = createHigherOrderComponent(
 								{ isWeb && (
 									<ExternalLink
 										href={ __(
-											'https://wordpress.org/support/article/page-jumps/'
+											'https://wordpress.org/documentation/article/page-jumps/'
 										) }
 									>
 										{ __( 'Learn more about anchors' ) }
@@ -108,8 +106,8 @@ export const withInspectorControl = createHigherOrderComponent(
 				return (
 					<>
 						<BlockEdit { ...props } />
-						{ isWeb && (
-							<InspectorControls __experimentalGroup="advanced">
+						{ isWeb && blockEditingMode === 'default' && (
+							<InspectorControls group="advanced">
 								{ textControl }
 							</InspectorControls>
 						) }

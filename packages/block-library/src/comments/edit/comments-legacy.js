@@ -57,11 +57,10 @@ export default function CommentsLegacy( {
 			<div { ...blockProps }>
 				<Warning actions={ actions }>
 					{ __(
-						"Comments block: You're currently using this block in legacy mode. " +
-							'The following is just a placeholder, not a real comment. ' +
-							'The final styling may differ because it also depends on the current theme. ' +
-							'For better compatibility with the Block Editor, ' +
-							'please consider switching the block to its editable mode.'
+						'Comments block: You’re currently using the legacy version of the block. ' +
+							'The following is just a placeholder - the final styling will likely look different. ' +
+							'For a better representation and more customization options, ' +
+							'switch the block to its editable mode.'
 					) }
 				</Warning>
 				<Placeholder postId={ postId } postType={ postType } />

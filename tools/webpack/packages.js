@@ -2,8 +2,8 @@
  * External dependencies
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const MomentTimezoneDataPlugin = require( 'moment-timezone-data-webpack-plugin' );
 const { join } = require( 'path' );
-const { flatMap } = require( 'lodash' );
 
 /**
  * WordPress dependencies
@@ -24,11 +24,7 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
 // Experimental or other packages that should be private are bundled when used.
 // That way, we can iterate on these package without making them part of the public API.
 // See: https://github.com/WordPress/gutenberg/pull/19809
-const BUNDLED_PACKAGES = [
-	'@wordpress/icons',
-	'@wordpress/interface',
-	'@wordpress/style-engine',
-];
+const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
 
 // PHP files in packages that have to be copied during build.
 const bundledPackagesPhpConfig = [
@@ -80,7 +76,8 @@ const gutenbergPackages = Object.keys( dependencies )
 		( packageName ) =>
 			! BUNDLED_PACKAGES.includes( packageName ) &&
 			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
-			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'interactivity' )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
@@ -104,10 +101,13 @@ const vendors = {
 		'react-dom/umd/react-dom.development.js',
 		'react-dom/umd/react-dom.production.min.js',
 	],
+	'inert-polyfill': [
+		'wicg-inert/dist/inert.js',
+		'wicg-inert/dist/inert.min.js',
+	],
 };
-const vendorsCopyConfig = flatMap(
-	vendors,
-	( [ devFilename, prodFilename ], key ) => {
+const vendorsCopyConfig = Object.entries( vendors ).flatMap(
+	( [ key, [ devFilename, prodFilename ] ] ) => {
 		return [
 			{
 				from: `node_modules/${ devFilename }`,
@@ -120,7 +120,6 @@ const vendorsCopyConfig = flatMap(
 		];
 	}
 );
-
 module.exports = {
 	...baseConfig,
 	name: 'packages',
@@ -158,6 +157,10 @@ module.exports = {
 				} ) )
 				.concat( bundledPackagesPhpConfig )
 				.concat( vendorsCopyConfig ),
+		} ),
+		new MomentTimezoneDataPlugin( {
+			startYear: 2000,
+			endYear: 2040,
 		} ),
 	].filter( Boolean ),
 };

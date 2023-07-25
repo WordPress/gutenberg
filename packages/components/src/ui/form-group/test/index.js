@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -20,44 +20,43 @@ const TextInput = ( { id: idProp, ...props } ) => {
 /* eslint-disable no-restricted-syntax */
 describe( 'props', () => {
 	test( 'should render correctly', () => {
-		const { container } = render(
+		render(
 			<FormGroup id="fname" label="First name">
 				<TextInput />
 			</FormGroup>
 		);
 
-		const label = container.querySelector( 'label' );
-		expect( label ).toHaveAttribute( 'for', 'fname' );
-		expect( label ).toContainHTML( 'First name' );
-
-		const input = container.querySelector( 'input' );
-		expect( input ).toHaveAttribute( 'id', 'fname' );
+		expect(
+			screen.getByRole( 'textbox', { name: 'First name' } )
+		).toBeVisible();
 	} );
 
 	test( 'should render label without prop correctly', () => {
-		const { container } = render(
+		render(
 			<FormGroup id="fname">
 				<ControlLabel htmlFor="fname">First name</ControlLabel>
 				<TextInput />
 			</FormGroup>
 		);
 
-		const label = container.querySelector( 'label' );
-		expect( label ).toHaveAttribute( 'for', 'fname' );
-		expect( label ).toContainHTML( 'First name' );
+		expect(
+			screen.getByRole( 'textbox', { name: 'First name' } )
+		).toBeVisible();
 	} );
 
 	test( 'should render labelHidden', () => {
-		const { container } = render(
+		render(
 			<FormGroup labelHidden id="fname" label="First name">
 				<TextInput />
 			</FormGroup>
 		);
 
-		const label = container.querySelector( 'label' );
-		expect( label ).toContainHTML( 'First name' );
-		// @todo: Refactor this after adding next VisuallyHidden.
-		expect( label ).toHaveClass( 'components-visually-hidden' );
+		expect(
+			screen.getByRole( 'textbox', { name: 'First name' } )
+		).toBeVisible();
+		expect( screen.getByText( 'First name' ) ).toHaveClass(
+			'components-visually-hidden'
+		);
 	} );
 
 	test( 'should render alignLabel', () => {
@@ -67,7 +66,7 @@ describe( 'props', () => {
 			</FormGroup>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render vertically', () => {
@@ -77,7 +76,7 @@ describe( 'props', () => {
 			</FormGroup>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );
 /* eslint-enable no-restricted-syntax */

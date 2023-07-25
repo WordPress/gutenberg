@@ -8,11 +8,9 @@ Namespace: `core`.
 
 ### canUser
 
-Returns whether the current user can perform the given action on the given
-REST resource.
+Returns whether the current user can perform the given action on the given REST resource.
 
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
+Calling this may trigger an OPTIONS request to the REST API via the `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
 
@@ -41,7 +39,7 @@ _Parameters_
 -   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
 -   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
--   _id_ `GenericRecordKey`: Optional ID of the rest resource to check.
+-   _id_ `EntityRecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
 
@@ -51,8 +49,7 @@ _Returns_
 
 Returns whether the current user can edit the given entity.
 
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
+Calling this may trigger an OPTIONS request to the REST API via the `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
 
@@ -79,9 +76,9 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record's id.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record's id.
 
 _Returns_
 
@@ -96,11 +93,11 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _query_ `EntityQuery< any >`: Optional object of query parameters to include with request.
+-   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request. For valid query parameters see the [Users page](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and see the arguments for [List Users](https://developer.wordpress.org/rest-api/reference/users/#list-users) and [Retrieve a User](https://developer.wordpress.org/rest-api/reference/users/#retrieve-a-user).
 
 _Returns_
 
--   `User< 'edit' >[]`: Authors list.
+-   `ET.User[]`: Authors list.
 
 ### getAutosave
 
@@ -132,8 +129,8 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `GenericRecordKey`: The id of the parent post.
--   _authorId_ `GenericRecordKey`: The id of the author.
+-   _postId_ `EntityRecordKey`: The id of the parent post.
+-   _authorId_ `EntityRecordKey`: The id of the author.
 
 _Returns_
 
@@ -143,8 +140,7 @@ _Returns_
 
 Returns the latest autosaves for the post.
 
-May return multiple autosaves since the backend stores one autosave per
-author for each post.
+May return multiple autosaves since the backend stores one autosave per author for each post.
 
 _Usage_
 
@@ -175,7 +171,7 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `GenericRecordKey`: The id of the parent post.
+-   _postId_ `EntityRecordKey`: The id of the parent post.
 
 _Returns_
 
@@ -286,6 +282,18 @@ _Returns_
 
 -   `any`: The current theme.
 
+### getCurrentThemeGlobalStylesRevisions
+
+Returns the revisions of the current global styles theme.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< object > | null`: The current global styles.
+
 ### getCurrentUser
 
 Returns the current user.
@@ -316,7 +324,7 @@ _Parameters_
 
 _Returns_
 
--   `User< 'edit' >`: Current user object.
+-   `undefined< 'edit' >`: Current user object.
 
 ### getEditedEntityRecord
 
@@ -325,13 +333,13 @@ Returns the specified entity record, merged with its edits.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
--   `EntityRecord | undefined`: The entity record, merged with its edits.
+-   `undefined< EntityRecord > | undefined`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -376,7 +384,7 @@ Returns the loaded entities for the given kind.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
+-   _kind_ `string`: Entity kind.
 
 _Returns_
 
@@ -389,7 +397,7 @@ Returns the loaded entities for the given kind.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
+-   _kind_ `string`: Entity kind.
 
 _Returns_
 
@@ -404,8 +412,8 @@ Returns the entity config given its kind and name.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
 
 _Returns_
 
@@ -418,8 +426,8 @@ Returns the entity config given its kind and name.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
 
 _Returns_
 
@@ -427,9 +435,7 @@ _Returns_
 
 ### getEntityRecord
 
-Returns the Entity's record object by key. Returns `null` if the value is not
-yet received, undefined if the value entity is known to not exist, or the
-entity object if it exists and is received.
+Returns the Entity's record object by key. Returns `null` if the value is not yet received, undefined if the value entity is known to not exist, or the entity object if it exists and is received.
 
 _Usage_
 
@@ -469,14 +475,14 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _key_ `KeyOf< R >`: Record's key
--   _query_ Optional query. If requesting specific fields, fields must always include the ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `EntityRecordKey`: Record's key
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
 
 _Returns_
 
--   Record.
+-   `EntityRecord | undefined`: Record.
 
 ### getEntityRecordEdits
 
@@ -485,9 +491,9 @@ Returns the specified entity record's edits.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -497,16 +503,14 @@ _Returns_
 
 Returns the specified entity record's non transient edits.
 
-Transient edits don't create an undo level, and
-are not considered for change detection.
-They are defined in the entity's config.
+Transient edits don't create an undo level, and are not considered for change detection. They are defined in the entity's config.
 
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -544,13 +548,13 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _query_ Optional terms query. If requesting specific fields, fields must always include the ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
--   Records.
+-   `EntityRecord[] | null`: Records.
 
 ### getLastEntityDeleteError
 
@@ -559,9 +563,9 @@ Returns the specified entity record's last delete error.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -574,9 +578,9 @@ Returns the specified entity record's last save error.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -584,15 +588,14 @@ _Returns_
 
 ### getRawEntityRecord
 
-Returns the entity's record object by key,
-with its attributes mapped to their raw values.
+Returns the entity's record object by key, with its attributes mapped to their raw values.
 
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _key_ `KeyOf< K, N >`: Record's key.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `EntityRecordKey`: Record's key.
 
 _Returns_
 
@@ -600,8 +603,9 @@ _Returns_
 
 ### getRedoEdit
 
-Returns the next edit from the current undo offset
-for the entity records edits history, if any.
+> **Deprecated** since 6.3
+
+Returns the next edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
 
@@ -613,9 +617,7 @@ _Returns_
 
 ### getReferenceByDistinctEdits
 
-Returns a new reference when edited values have changed. This is useful in
-inferring where an edit has been made between states by comparison of the
-return values using strict equality.
+Returns a new reference when edited values have changed. This is useful in inferring where an edit has been made between states by comparison of the return values using strict equality.
 
 _Usage_
 
@@ -646,8 +648,9 @@ _Returns_
 
 ### getUndoEdit
 
-Returns the previous edit from the current undo offset
-for the entity records edits history, if any.
+> **Deprecated** since 6.3
+
+Returns the previous edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
 
@@ -668,19 +671,18 @@ _Parameters_
 
 _Returns_
 
--   `User< 'edit' >[]`: Users list.
+-   `undefined< 'edit' >[]`: Users list.
 
 ### hasEditsForEntityRecord
 
-Returns true if the specified entity record has edits,
-and false otherwise.
+Returns true if the specified entity record has edits, and false otherwise.
 
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -688,15 +690,14 @@ _Returns_
 
 ### hasEntityRecords
 
-Returns true if records have been received for the given set of parameters,
-or false otherwise.
+Returns true if records have been received for the given set of parameters, or false otherwise.
 
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _query_ `EntityQuery< C >`: Optional terms query.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
@@ -710,7 +711,7 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `GenericRecordKey`: The id of the parent post.
+-   _postId_ `EntityRecordKey`: The id of the parent post.
 
 _Returns_
 
@@ -718,8 +719,7 @@ _Returns_
 
 ### hasRedo
 
-Returns true if there is a next edit from the current undo offset
-for the entity records edits history, and false otherwise.
+Returns true if there is a next edit from the current undo offset for the entity records edits history, and false otherwise.
 
 _Parameters_
 
@@ -731,8 +731,7 @@ _Returns_
 
 ### hasUndo
 
-Returns true if there is a previous edit from the current undo offset
-for the entity records edits history, and false otherwise.
+Returns true if there is a previous edit from the current undo offset for the entity records edits history, and false otherwise.
 
 _Parameters_
 
@@ -749,9 +748,9 @@ Returns true if the specified entity record is autosaving, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -764,9 +763,9 @@ Returns true if the specified entity record is deleting, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -776,9 +775,7 @@ _Returns_
 
 Determines if the returned preview is an oEmbed link fallback.
 
-WordPress can be configured to return a simple link to a URL if it is not embeddable.
-We need to be able to determine if a URL is embeddable or not, based on what we
-get back from the oEmbed preview API.
+WordPress can be configured to return a simple link to a URL if it is not embeddable. We need to be able to determine if a URL is embeddable or not, based on what we get back from the oEmbed preview API.
 
 _Parameters_
 
@@ -791,8 +788,7 @@ _Returns_
 
 ### isRequestingEmbedPreview
 
-Returns true if a request is in progress for embed preview data, or false
-otherwise.
+Returns true if a request is in progress for embed preview data, or false otherwise.
 
 _Usage_
 
@@ -838,9 +834,9 @@ Returns true if the specified entity record is saving, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -880,14 +876,13 @@ _Parameters_
 
 ### editEntityRecord
 
-Returns an action object that triggers an
-edit to an entity record.
+Returns an action object that triggers an edit to an entity record.
 
 _Parameters_
 
 -   _kind_ `string`: Kind of the edited entity record.
 -   _name_ `string`: Name of the edited entity record.
--   _recordId_ `number`: Record ID of the edited entity record.
+-   _recordId_ `number|string`: Record ID of the edited entity record.
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
@@ -908,6 +903,18 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### receiveNavigationFallbackId
+
+Returns an action object signalling that the fallback Navigation Menu id has been received.
+
+_Parameters_
+
+-   _fallbackId_ `integer`: the id of the fallback Navigation Menu
 
 _Returns_
 
@@ -939,8 +946,7 @@ _Returns_
 
 ### redo
 
-Action triggered to redo the last undoed
-edit to an entity record, if any.
+Action triggered to redo the last undoed edit to an entity record, if any.
 
 ### saveEditedEntityRecord
 
@@ -969,7 +975,6 @@ _Parameters_
 
 ### undo
 
-Action triggered to undo the last edit to
-an entity record, if any.
+Action triggered to undo the last edit to an entity record, if any.
 
 <!-- END TOKEN(Autogenerated actions|../../../packages/core-data/src/actions.js) -->

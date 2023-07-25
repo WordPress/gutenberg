@@ -5,26 +5,28 @@
  * @package gutenberg
  */
 
-/**
- * The main entry point for the Gutenberg experiments page.
- *
- * @since 6.3.0
- */
-function the_gutenberg_experiments() {
-	?>
-	<div
-		id="experiments-editor"
-		class="wrap"
-	>
-	<h1><?php echo __( 'Experimental settings', 'gutenberg' ); ?></h1>
-	<?php settings_errors(); ?>
-	<form method="post" action="options.php">
-		<?php settings_fields( 'gutenberg-experiments' ); ?>
-		<?php do_settings_sections( 'gutenberg-experiments' ); ?>
-		<?php submit_button(); ?>
-	</form>
-	</div>
-	<?php
+if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
+	/**
+	 * The main entry point for the Gutenberg experiments page.
+	 *
+	 * @since 6.3.0
+	 */
+	function the_gutenberg_experiments() {
+		?>
+		<div
+			id="experiments-editor"
+			class="wrap"
+		>
+		<h1><?php echo __( 'Experimental settings', 'gutenberg' ); ?></h1>
+		<?php settings_errors(); ?>
+		<form method="post" action="options.php">
+			<?php settings_fields( 'gutenberg-experiments' ); ?>
+			<?php do_settings_sections( 'gutenberg-experiments' ); ?>
+			<?php submit_button(); ?>
+		</form>
+		</div>
+		<?php
+	}
 }
 
 /**
@@ -42,16 +44,53 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-list-v2',
-		__( 'List block v2', 'gutenberg' ),
+		'gutenberg-zoomed-out-view',
+		__( 'Zoomed out view ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new list block that uses nested list item blocks (Warning: The new block is not ready. You may experience content loss, avoid using it on production sites)', 'gutenberg' ),
-			'id'    => 'gutenberg-list-v2',
+			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
+			'id'    => 'gutenberg-zoomed-out-view',
 		)
 	);
+
+	add_settings_field(
+		'gutenberg-color-randomizer',
+		__( 'Color randomizer ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Global Styles color randomizer; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
+			'id'    => 'gutenberg-color-randomizer',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-group-grid-variation',
+		__( 'Grid variation for Group block ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
+			'id'    => 'gutenberg-group-grid-variation',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-no-tinymce',
+		__( 'Disable TinyMCE and Classic block', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
+			'id'    => 'gutenberg-no-tinymce',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -89,22 +128,3 @@ function gutenberg_display_experiment_section() {
 
 	<?php
 }
-
-/**
- * Extends default editor settings with experiments settings.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_experiments_editor_settings( $settings ) {
-	// The refactored gallery currently can't be run on sites with use_balanceTags option set.
-	// This bypass needs to remain in place until this is resolved and a patch released.
-	// https://core.trac.wordpress.org/ticket/54130.
-	$experiments_settings = array(
-		'__unstableGalleryWithImageBlocks' => (int) get_option( 'use_balanceTags' ) !== 1 || is_wp_version_compatible( '5.9' ),
-	);
-	return array_merge( $settings, $experiments_settings );
-}
-
-add_filter( 'block_editor_settings_all', 'gutenberg_experiments_editor_settings' );

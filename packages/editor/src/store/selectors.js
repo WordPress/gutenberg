@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { find, get, has, includes, some } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -11,6 +10,7 @@ import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	__unstableSerializeAndClean,
+	parse,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
@@ -42,15 +42,6 @@ import { getTemplatePartIcon } from '../utils/get-template-part-icon';
  * maintained by the reducer result in state.
  */
 const EMPTY_OBJECT = {};
-
-/**
- * Shared reference to an empty array for cases where it is important to avoid
- * returning a new array reference on every invocation, as in a connected or
- * other pure component which performs `shouldComponentUpdate` check on props.
- * This should be used as a last resort, since the normalized data should be
- * maintained by the reducer result in state.
- */
-const EMPTY_ARRAY = [];
 
 /**
  * Returns true if any past editor history snapshots exist, or false otherwise.
@@ -96,16 +87,7 @@ export function isEditedPostNew( state ) {
  */
 export function hasChangedContent( state ) {
 	const edits = getPostEdits( state );
-
-	return (
-		'blocks' in edits ||
-		// `edits` is intended to contain only values which are different from
-		// the saved post, so the mere presence of a property is an indicator
-		// that the value is different than what is known to be saved. While
-		// content in Visual mode is represented by the blocks state, in Text
-		// mode it is tracked by `edits.content`.
-		'content' in edits
-	);
+	return 'content' in edits;
 }
 
 /**
@@ -149,8 +131,7 @@ export const hasNonPostEntityChanges = createRegistrySelector(
 		const dirtyEntityRecords =
 			select( coreStore ).__experimentalGetDirtyEntityRecords();
 		const { type, id } = getCurrentPost( state );
-		return some(
-			dirtyEntityRecords,
+		return dirtyEntityRecords.some(
 			( entityRecord ) =>
 				entityRecord.kind !== 'postType' ||
 				entityRecord.name !== type ||
@@ -232,10 +213,8 @@ export function getCurrentPostId( state ) {
  * @return {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
-	return get(
-		getCurrentPost( state ),
-		[ '_links', 'version-history', 0, 'count' ],
-		0
+	return (
+		getCurrentPost( state )._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0
 	);
 }
 
@@ -248,9 +227,8 @@ export function getCurrentPostRevisionsCount( state ) {
  * @return {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
-	return get(
-		getCurrentPost( state ),
-		[ '_links', 'predecessor-version', 0, 'id' ],
+	return (
+		getCurrentPost( state )._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ??
 		null
 	);
 }
@@ -371,7 +349,7 @@ export function getEditedPostAttribute( state, attributeName ) {
 export const getAutosaveAttribute = createRegistrySelector(
 	( select ) => ( state, attributeName ) => {
 		if (
-			! includes( AUTOSAVE_PROPERTIES, attributeName ) &&
+			! AUTOSAVE_PROPERTIES.includes( attributeName ) &&
 			attributeName !== 'preview_link'
 		) {
 			return;
@@ -379,9 +357,7 @@ export const getAutosaveAttribute = createRegistrySelector(
 
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		const currentUserId = get( select( coreStore ).getCurrentUser(), [
-			'id',
-		] );
+		const currentUserId = select( coreStore ).getCurrentUser()?.id;
 		const autosave = select( coreStore ).getAutosave(
 			postType,
 			postId,
@@ -523,16 +499,31 @@ export function isEditedPostSaveable( state ) {
  *
  * @return {boolean} Whether post has content.
  */
-export function isEditedPostEmpty( state ) {
-	// While the condition of truthy content string is sufficient to determine
-	// emptiness, testing saveable blocks length is a trivial operation. Since
-	// this function can be called frequently, optimize for the fast case as a
-	// condition of the mere existence of blocks. Note that the value of edited
-	// content takes precedent over block content, and must fall through to the
-	// default logic.
-	const blocks = getEditorBlocks( state );
+export const isEditedPostEmpty = createRegistrySelector(
+	( select ) => ( state ) => {
+		// While the condition of truthy content string is sufficient to determine
+		// emptiness, testing saveable blocks length is a trivial operation. Since
+		// this function can be called frequently, optimize for the fast case as a
+		// condition of the mere existence of blocks. Note that the value of edited
+		// content takes precedent over block content, and must fall through to the
+		// default logic.
+		const postId = getCurrentPostId( state );
+		const postType = getCurrentPostType( state );
+		const record = select( coreStore ).getEditedEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
+		if ( typeof record.content !== 'function' ) {
+			return ! record.content;
+		}
 
-	if ( blocks.length ) {
+		const blocks = getEditedPostAttribute( state, 'blocks' );
+
+		if ( blocks.length === 0 ) {
+			return true;
+		}
+
 		// Pierce the abstraction of the serializer in knowing that blocks are
 		// joined with newlines such that even if every individual block
 		// produces an empty save result, the serialized content is non-empty.
@@ -558,10 +549,10 @@ export function isEditedPostEmpty( state ) {
 		) {
 			return false;
 		}
-	}
 
-	return ! getEditedPostContent( state );
-}
+		return ! getEditedPostContent( state );
+	}
+);
 
 /**
  * Returns true if the post can be autosaved, or false otherwise.
@@ -589,9 +580,7 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 			postType,
 			postId
 		);
-		const currentUserId = get( select( coreStore ).getCurrentUser(), [
-			'id',
-		] );
+		const currentUserId = select( coreStore ).getCurrentUser()?.id;
 
 		// Disable reason - this line causes the side-effect of fetching the autosave
 		// via a resolver, moving below the return would result in the autosave never
@@ -682,21 +671,26 @@ export function isEditedPostDateFloating( state ) {
 }
 
 /**
+ * Returns true if the post is currently being deleted, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether post is being deleted.
+ */
+export function isDeletingPost( state ) {
+	return !! state.deleting.pending;
+}
+
+/**
  * Returns true if the post is currently being saved, or false otherwise.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether post is being saved.
  */
-export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
-	const postType = getCurrentPostType( state );
-	const postId = getCurrentPostId( state );
-	return select( coreStore ).isSavingEntityRecord(
-		'postType',
-		postType,
-		postId
-	);
-} );
+export function isSavingPost( state ) {
+	return !! state.saving.pending;
+}
 
 /**
  * Returns true if non-post entities are currently being saved, or false otherwise.
@@ -710,8 +704,7 @@ export const isSavingNonPostEntityChanges = createRegistrySelector(
 		const entitiesBeingSaved =
 			select( coreStore ).__experimentalGetEntitiesBeingSaved();
 		const { type, id } = getCurrentPost( state );
-		return some(
-			entitiesBeingSaved,
+		return entitiesBeingSaved.some(
 			( entityRecord ) =>
 				entityRecord.kind !== 'postType' ||
 				entityRecord.name !== type ||
@@ -768,10 +761,7 @@ export const didPostSaveRequestFail = createRegistrySelector(
  * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
-	if ( ! isSavingPost( state ) ) {
-		return false;
-	}
-	return !! get( state.saving, [ 'options', 'isAutosave' ] );
+	return isSavingPost( state ) && Boolean( state.saving.options?.isAutosave );
 }
 
 /**
@@ -782,10 +772,7 @@ export function isAutosavingPost( state ) {
  * @return {boolean} Whether the post is being previewed.
  */
 export function isPreviewingPost( state ) {
-	if ( ! isSavingPost( state ) ) {
-		return false;
-	}
-	return !! get( state.saving, [ 'options', 'isPreview' ] );
+	return isSavingPost( state ) && Boolean( state.saving.options?.isPreview );
 }
 
 /**
@@ -793,7 +780,7 @@ export function isPreviewingPost( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {string?} Preview Link.
+ * @return {string | undefined} Preview Link.
  */
 export function getEditedPostPreviewLink( state ) {
 	if ( state.saving.pending || isSavingPost( state ) ) {
@@ -1081,10 +1068,11 @@ export function getActivePostLock( state ) {
  * @return {boolean} Whether the user can or can't post unfiltered HTML.
  */
 export function canUserUseUnfilteredHTML( state ) {
-	return has( getCurrentPost( state ), [
-		'_links',
-		'wp:action-unfiltered-html',
-	] );
+	return Boolean(
+		getCurrentPost( state )._links?.hasOwnProperty(
+			'wp:action-unfiltered-html'
+		)
+	);
 }
 
 /**
@@ -1107,9 +1095,18 @@ export const isPublishSidebarEnabled = createRegistrySelector(
  * @param {Object} state
  * @return {Array} Block list.
  */
-export function getEditorBlocks( state ) {
-	return getEditedPostAttribute( state, 'blocks' ) || EMPTY_ARRAY;
-}
+export const getEditorBlocks = createSelector(
+	( state ) => {
+		return (
+			getEditedPostAttribute( state, 'blocks' ) ||
+			parse( getEditedPostContent( state ) )
+		);
+	},
+	( state ) => [
+		getEditedPostAttribute( state, 'blocks' ),
+		getEditedPostContent( state ),
+	]
+);
 
 /**
  * A block selection object.
@@ -1583,8 +1580,18 @@ export const __experimentalGetDefaultTemplatePartAreas = createSelector(
  * @return {Object} The template type.
  */
 export const __experimentalGetDefaultTemplateType = createSelector(
-	( state, slug ) =>
-		find( __experimentalGetDefaultTemplateTypes( state ), { slug } ) || {},
+	( state, slug ) => {
+		const templateTypes = __experimentalGetDefaultTemplateTypes( state );
+		if ( ! templateTypes ) {
+			return EMPTY_OBJECT;
+		}
+
+		return (
+			Object.values( templateTypes ).find(
+				( type ) => type.slug === slug
+			) ?? EMPTY_OBJECT
+		);
+	},
 	( state, slug ) => [ __experimentalGetDefaultTemplateTypes( state ), slug ]
 );
 
@@ -1598,7 +1605,7 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  */
 export function __experimentalGetTemplateInfo( state, template ) {
 	if ( ! template ) {
-		return {};
+		return EMPTY_OBJECT;
 	}
 
 	const { description, slug, title, area } = template;

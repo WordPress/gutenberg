@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -14,6 +14,7 @@ import { Grid } from '../../grid';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderBoxControlSplitControls } from './hook';
 
+import type { BorderControlProps } from '../../border-control/types';
 import type { SplitControlsProps } from '../types';
 
 const BorderBoxControlSplitControls = (
@@ -30,22 +31,32 @@ const BorderBoxControlSplitControls = (
 		popoverPlacement,
 		popoverOffset,
 		rightAlignedClassName,
+		size = 'default',
 		value,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize,
 		...otherProps
 	} = useBorderBoxControlSplitControls( props );
-	const containerRef = useRef();
-	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
-	const popoverProps = popoverPlacement
-		? {
-				placement: popoverPlacement,
-				offset: popoverOffset,
-				anchorRef: containerRef,
-				__unstableShift: true,
-		  }
-		: undefined;
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
+		null
+	);
+
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
+		useMemo(
+			() =>
+				popoverPlacement
+					? {
+							placement: popoverPlacement,
+							offset: popoverOffset,
+							anchor: popoverAnchor,
+							shift: true,
+					  }
+					: undefined,
+			[ popoverPlacement, popoverOffset, popoverAnchor ]
+		);
 
 	const sharedBorderControlProps = {
 		colors,
@@ -53,17 +64,15 @@ const BorderBoxControlSplitControls = (
 		enableAlpha,
 		enableStyle,
 		isCompact: true,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize,
+		size,
 	};
+
+	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
 	return (
 		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>
-			<BorderBoxControlVisualizer
-				value={ value }
-				__next36pxDefaultSize={ __next36pxDefaultSize }
-			/>
+			<BorderBoxControlVisualizer value={ value } size={ size } />
 			<BorderControl
 				className={ centeredClassName }
 				hideLabelFromVision={ true }

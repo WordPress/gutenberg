@@ -1,10 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/site-tagline",
 	"title": "Site Tagline",
 	"category": "theme",
-	"description": "Describe in a few words what the site is about. The tagline can be used in search results or when sharing on social networks even if it's not displayed in the theme design.",
+	"description": "Describe in a few words what the site is about. The tagline can be used in search results or when sharing on social networks even if it’s not displayed in the theme design.",
 	"keywords": [ "description" ],
 	"textdomain": "default",
 	"attributes": {
@@ -12,6 +12,7 @@
 			"type": "string"
 		}
 	},
+	"example": {},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
@@ -24,13 +25,18 @@
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,

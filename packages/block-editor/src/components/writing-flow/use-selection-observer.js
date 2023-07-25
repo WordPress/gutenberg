@@ -25,7 +25,11 @@ function extractSelectionStartNode( selection ) {
 		return anchorNode;
 	}
 
-	return anchorNode.childNodes[ anchorOffset ];
+	if ( anchorOffset === 0 ) {
+		return anchorNode;
+	}
+
+	return anchorNode.childNodes[ anchorOffset - 1 ];
 }
 
 /**
@@ -44,7 +48,11 @@ function extractSelectionEndNode( selection ) {
 		return focusNode;
 	}
 
-	return focusNode.childNodes[ focusOffset - 1 ];
+	if ( focusOffset === focusNode.childNodes.length ) {
+		return focusNode;
+	}
+
+	return focusNode.childNodes[ focusOffset ];
 }
 
 function findDepth( a, b ) {
@@ -64,7 +72,11 @@ function findDepth( a, b ) {
  * @param {boolean}     value `contentEditable` value (true or false)
  */
 function setContentEditableWrapper( node, value ) {
-	node.contentEditable = value;
+	// Since we are calling this on every selection change, check if the value
+	// needs to be updated first because it trigger the browser to recalculate
+	// style.
+	if ( node.contentEditable !== String( value ) )
+		node.contentEditable = value;
 	// Firefox doesn't automatically move focus.
 	if ( value ) node.focus();
 }

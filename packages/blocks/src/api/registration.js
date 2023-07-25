@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { camelCase, isEmpty, mapKeys, pick, pickBy } from 'lodash';
+import { camelCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -129,7 +129,7 @@ import { store as blocksStore } from '../store';
  *                                              then no preview is shown.
  */
 
-export const serverSideBlockDefinitions = {};
+const serverSideBlockDefinitions = {};
 
 function isObject( object ) {
 	return object !== null && typeof object === 'object';
@@ -169,14 +169,26 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 				serverSideBlockDefinitions[ blockName ].ancestor =
 					definitions[ blockName ].ancestor;
 			}
+			// The `selectors` prop is not yet included in the server provided
+			// definitions. Polyfill it as well. This can be removed when the
+			// minimum supported WordPress is >= 6.3.
+			if (
+				serverSideBlockDefinitions[ blockName ].selectors ===
+					undefined &&
+				definitions[ blockName ].selectors
+			) {
+				serverSideBlockDefinitions[ blockName ].selectors =
+					definitions[ blockName ].selectors;
+			}
 			continue;
 		}
-		serverSideBlockDefinitions[ blockName ] = mapKeys(
-			pickBy(
-				definitions[ blockName ],
-				( value ) => value !== null && value !== undefined
-			),
-			( value, key ) => camelCase( key )
+
+		serverSideBlockDefinitions[ blockName ] = Object.fromEntries(
+			Object.entries( definitions[ blockName ] )
+				.filter(
+					( [ , value ] ) => value !== null && value !== undefined
+				)
+				.map( ( [ key, value ] ) => [ camelCase( key ), value ] )
 		);
 	}
 }
@@ -202,13 +214,18 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'attributes',
 		'providesContext',
 		'usesContext',
+		'selectors',
 		'supports',
 		'styles',
 		'example',
 		'variations',
 	];
 
-	const settings = pick( metadata, allowedFields );
+	const settings = Object.fromEntries(
+		Object.entries( metadata ).filter( ( [ key ] ) =>
+			allowedFields.includes( key )
+		)
+	);
 
 	if ( textdomain ) {
 		Object.keys( i18nBlockSchema ).forEach( ( key ) => {
@@ -231,10 +248,25 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
  *
+ * For more in-depth information on registering a custom block see the
+ * [Create a block tutorial](https://developer.wordpress.org/block-editor/getting-started/create-block/).
+ *
  * @param {string|Object} blockNameOrMetadata Block type name or its metadata.
  * @param {Object}        settings            Block settings.
  *
- * @return {?WPBlockType} The block, if it has been successfully registered;
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { registerBlockType } from '@wordpress/blocks'
+ *
+ * registerBlockType( 'namespace/block-name', {
+ *     title: __( 'My First Block' ),
+ *     edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+ *     save: () => <div>Hello from the saved content!</div>,
+ * } );
+ * ```
+ *
+ * @return {WPBlockType | undefined} The block, if it has been successfully registered;
  *                    otherwise `undefined`.
  */
 export function registerBlockType( blockNameOrMetadata, settings ) {
@@ -271,6 +303,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		attributes: {},
 		providesContext: {},
 		usesContext: [],
+		selectors: {},
 		supports: {},
 		styles: [],
 		variations: [],
@@ -304,7 +337,7 @@ function translateBlockSettingUsingI18nSchema(
 	}
 	if (
 		Array.isArray( i18nSchema ) &&
-		! isEmpty( i18nSchema ) &&
+		i18nSchema.length &&
 		Array.isArray( settingValue )
 	) {
 		return settingValue.map( ( value ) =>
@@ -317,7 +350,7 @@ function translateBlockSettingUsingI18nSchema(
 	}
 	if (
 		isObject( i18nSchema ) &&
-		! isEmpty( i18nSchema ) &&
+		Object.entries( i18nSchema ).length &&
 		isObject( settingValue )
 	) {
 		return Object.keys( settingValue ).reduce( ( accumulator, key ) => {
@@ -343,6 +376,24 @@ function translateBlockSettingUsingI18nSchema(
  * @param {Object} settings        The block collection settings.
  * @param {string} settings.title  The title to display in the block inserter.
  * @param {Object} [settings.icon] The icon to display in the block inserter.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { registerBlockCollection, registerBlockType } from '@wordpress/blocks';
+ *
+ * // Register the collection.
+ * registerBlockCollection( 'my-collection', {
+ *     title: __( 'Custom Collection' ),
+ * } );
+ *
+ * // Register a block in the same namespace to add it to the collection.
+ * registerBlockType( 'my-collection/block-name', {
+ *     title: __( 'My First Block' ),
+ *     edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+ *     save: () => <div>'Hello from the saved content!</div>,
+ * } );
+ * ```
  */
 export function registerBlockCollection( namespace, { title, icon } ) {
 	dispatch( blocksStore ).addBlockCollection( namespace, title, icon );
@@ -353,6 +404,12 @@ export function registerBlockCollection( namespace, { title, icon } ) {
  *
  * @param {string} namespace The namespace to group blocks by in the inserter; corresponds to the block namespace
  *
+ * @example
+ * ```js
+ * import { unregisterBlockCollection } from '@wordpress/blocks';
+ *
+ * unregisterBlockCollection( 'my-collection' );
+ * ```
  */
 export function unregisterBlockCollection( namespace ) {
 	dispatch( blocksStore ).removeBlockCollection( namespace );
@@ -363,7 +420,25 @@ export function unregisterBlockCollection( namespace ) {
  *
  * @param {string} name Block name.
  *
- * @return {?WPBlockType} The previous block value, if it has been successfully
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { unregisterBlockType } from '@wordpress/blocks';
+ *
+ * const ExampleComponent = () => {
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 unregisterBlockType( 'my-collection/block-name' )
+ *             }
+ *         >
+ *             { __( 'Unregister my custom block.' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
+ *
+ * @return {WPBlockType | undefined} The previous block value, if it has been successfully
  *                    unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
@@ -427,6 +502,20 @@ export function getUnregisteredTypeHandlerName() {
  * Assigns the default block name.
  *
  * @param {string} name Block name.
+ *
+ * @example
+ * ```js
+ * import { setDefaultBlockName } from '@wordpress/blocks';
+ *
+ * const ExampleComponent = () => {
+ *
+ *     return (
+ *         <Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
+ *             { __( 'Set the default block to Heading' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  */
 export function setDefaultBlockName( name ) {
 	dispatch( blocksStore ).setDefaultBlockName( name );
@@ -435,7 +524,25 @@ export function setDefaultBlockName( name ) {
 /**
  * Assigns name of block for handling block grouping interactions.
  *
+ * This function lets you select a different block to group other blocks in instead of the
+ * default `core/group` block. This function must be used in a component or when the DOM is fully
+ * loaded. See https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dom-ready/
+ *
  * @param {string} name Block name.
+ *
+ * @example
+ * ```js
+ * import { setGroupingBlockName } from '@wordpress/blocks';
+ *
+ * const ExampleComponent = () => {
+ *
+ *     return (
+ *         <Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
+ *             { __( 'Wrap in columns' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  */
 export function setGroupingBlockName( name ) {
 	dispatch( blocksStore ).setGroupingBlockName( name );
@@ -529,7 +636,7 @@ export function isReusableBlock( blockOrType ) {
  * @return {boolean} Whether the given block is a template part.
  */
 export function isTemplatePart( blockOrType ) {
-	return blockOrType.name === 'core/template-part';
+	return blockOrType?.name === 'core/template-part';
 }
 
 /**
@@ -567,20 +674,65 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
 };
 
 /**
- * Registers a new block style variation for the given block.
+ * Registers a new block style for the given block.
+ *
+ * For more information on connecting the styles with CSS
+ * [the official documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/#styles).
  *
  * @param {string} blockName      Name of block (example: “core/latest-posts”).
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { registerBlockStyle } from '@wordpress/blocks';
+ * import { Button } from '@wordpress/components';
+ *
+ *
+ * const ExampleComponent = () => {
+ *     return (
+ *         <Button
+ *             onClick={ () => {
+ *                 registerBlockStyle( 'core/quote', {
+ *                     name: 'fancy-quote',
+ *                     label: __( 'Fancy Quote' ),
+ *                 } );
+ *             } }
+ *         >
+ *             { __( 'Add a new block style for core/quote' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  */
 export const registerBlockStyle = ( blockName, styleVariation ) => {
 	dispatch( blocksStore ).addBlockStyles( blockName, styleVariation );
 };
 
 /**
- * Unregisters a block style variation for the given block.
+ * Unregisters a block style for the given block.
  *
  * @param {string} blockName          Name of block (example: “core/latest-posts”).
  * @param {string} styleVariationName Name of class applied to the block.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { unregisterBlockStyle } from '@wordpress/blocks';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     return (
+ *     <Button
+ *         onClick={ () => {
+ *             unregisterBlockStyle( 'core/quote', 'plain' );
+ *         } }
+ *     >
+ *         { __( 'Remove the "Plain" block style for core/quote' ) }
+ *     </Button>
+ *     );
+ * };
+ * ```
  */
 export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 	dispatch( blocksStore ).removeBlockStyles( blockName, styleVariationName );
@@ -588,6 +740,9 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 
 /**
  * Returns an array with the variations of a given block type.
+ * Ignored from documentation as the recommended usage is via useSelect from @wordpress/data.
+ *
+ * @ignore
  *
  * @param {string}                blockName Name of block (example: “core/columns”).
  * @param {WPBlockVariationScope} [scope]   Block variation scope name.
@@ -601,8 +756,34 @@ export const getBlockVariations = ( blockName, scope ) => {
 /**
  * Registers a new block variation for the given block type.
  *
+ * For more information on block variations see
+ * [the official documentation ](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/).
+ *
  * @param {string}           blockName Name of the block (example: “core/columns”).
  * @param {WPBlockVariation} variation Object describing a block variation.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { registerBlockVariation } from '@wordpress/blocks';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     return (
+ *         <Button
+ *             onClick={ () => {
+ *                 registerBlockVariation( 'core/embed', {
+ *                     name: 'custom',
+ *                     title: __( 'My Custom Embed' ),
+ *                     attributes: { providerNameSlug: 'custom' },
+ *                 } );
+ *             } }
+ *          >
+ *              __( 'Add a custom variation for core/embed' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  */
 export const registerBlockVariation = ( blockName, variation ) => {
 	dispatch( blocksStore ).addBlockVariations( blockName, variation );
@@ -613,6 +794,25 @@ export const registerBlockVariation = ( blockName, variation ) => {
  *
  * @param {string} blockName     Name of the block (example: “core/columns”).
  * @param {string} variationName Name of the variation defined for the block.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { unregisterBlockVariation } from '@wordpress/blocks';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     return (
+ *         <Button
+ *             onClick={ () => {
+ *                 unregisterBlockVariation( 'core/embed', 'youtube' );
+ *             } }
+ *         >
+ *             { __( 'Remove the YouTube variation from core/embed' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  */
 export const unregisterBlockVariation = ( blockName, variationName ) => {
 	dispatch( blocksStore ).removeBlockVariations( blockName, variationName );

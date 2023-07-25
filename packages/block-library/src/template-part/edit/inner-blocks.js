@@ -37,7 +37,7 @@ export default function TemplatePartInnerBlocks( {
 		renderAppender: hasInnerBlocks
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
-		__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
+		layout: themeSupportsLayout ? usedLayout : undefined,
 	} );
 
 	return <TagName { ...innerBlocksProps } />;

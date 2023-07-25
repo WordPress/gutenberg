@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -27,10 +28,11 @@ function ReusableBlocksTab( { onSelect, rootClientId, listProps } ) {
 
 	return (
 		<BlockTypesList
-			name="ReusableBlocks"
+			name="SyncedPatterns"
 			sections={ sections }
 			onSelect={ onSelect }
 			listProps={ listProps }
+			label={ __( 'Synced patterns' ) }
 		/>
 	);
 }

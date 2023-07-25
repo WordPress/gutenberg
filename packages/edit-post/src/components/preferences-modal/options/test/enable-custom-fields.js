@@ -1,13 +1,8 @@
 /**
  * External dependencies
  */
-import { default as TestRenderer, act } from 'react-test-renderer';
-
-/**
- * WordPress dependencies
- */
-import { Button } from '@wordpress/components';
-import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -19,42 +14,49 @@ import {
 
 describe( 'EnableCustomFieldsOption', () => {
 	it( 'renders a checked checkbox when custom fields are enabled', () => {
-		const renderer = TestRenderer.create(
+		const { container } = render(
 			<EnableCustomFieldsOption areCustomFieldsEnabled />
 		);
-		expect( renderer ).toMatchSnapshot();
+
+		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'renders an unchecked checkbox when custom fields are disabled', () => {
-		const renderer = TestRenderer.create(
+		const { container } = render(
 			<EnableCustomFieldsOption areCustomFieldsEnabled={ false } />
 		);
-		expect( renderer ).toMatchSnapshot();
+
+		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'renders an unchecked checkbox and a confirmation message when toggled off', () => {
-		const renderer = new TestRenderer.create(
+	it( 'renders an unchecked checkbox and a confirmation message when toggled off', async () => {
+		const user = userEvent.setup();
+
+		const { container } = render(
 			<EnableCustomFieldsOption areCustomFieldsEnabled />
 		);
-		act( () => {
-			renderer.root.findByType( BaseOption ).props.onChange( false );
-		} );
-		expect( renderer ).toMatchSnapshot();
+
+		await user.click( screen.getByRole( 'checkbox' ) );
+
+		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'renders a checked checkbox and a confirmation message when toggled on', () => {
-		const renderer = new TestRenderer.create(
+	it( 'renders a checked checkbox and a confirmation message when toggled on', async () => {
+		const user = userEvent.setup();
+
+		const { container } = render(
 			<EnableCustomFieldsOption areCustomFieldsEnabled={ false } />
 		);
-		act( () => {
-			renderer.root.findByType( BaseOption ).props.onChange( true );
-		} );
-		expect( renderer ).toMatchSnapshot();
+
+		await user.click( screen.getByRole( 'checkbox' ) );
+
+		expect( container ).toMatchSnapshot();
 	} );
 } );
 
 describe( 'CustomFieldsConfirmation', () => {
-	it( 'submits the toggle-custom-fields-form', () => {
+	it( 'submits the toggle-custom-fields-form', async () => {
+		const user = userEvent.setup();
 		const submit = jest.fn();
 		const getElementById = jest
 			.spyOn( document, 'getElementById' )
@@ -62,12 +64,9 @@ describe( 'CustomFieldsConfirmation', () => {
 				submit,
 			} ) );
 
-		const renderer = new TestRenderer.create(
-			<CustomFieldsConfirmation />
-		);
-		act( () => {
-			renderer.root.findByType( Button ).props.onClick();
-		} );
+		render( <CustomFieldsConfirmation /> );
+
+		await user.click( screen.getByRole( 'button' ) );
 
 		expect( getElementById ).toHaveBeenCalledWith(
 			'toggle-custom-fields-form'

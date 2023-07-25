@@ -101,3 +101,38 @@ Async.args = {
 	label: 'Type a continent',
 	suggestions: continents,
 };
+
+export const DropdownSelector: ComponentStory< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
+DropdownSelector.args = {
+	...Default.args,
+	__experimentalExpandOnFocus: true,
+	__experimentalAutoSelectFirstMatch: true,
+};
+
+/**
+ * The rendered output of each suggestion can be customized by passing a
+ * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
+ * and is subject to change.)
+ */
+export const WithCustomRenderItem: ComponentStory< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
+WithCustomRenderItem.args = {
+	...Default.args,
+	__experimentalRenderItem: ( { item } ) => (
+		<div>{ `${ item } — a nice place to visit` }</div>
+	),
+};
+
+/**
+ * Only values for which the `__experimentalValidateInput` function returns
+ * `true` will be tokenized. (This is still an experimental feature and is
+ * subject to change.)
+ */
+export const WithValidatedInput: ComponentStory< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
+WithValidatedInput.args = {
+	...Default.args,
+	__experimentalValidateInput: ( input: string ) =>
+		continents.includes( input ),
+};

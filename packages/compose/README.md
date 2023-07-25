@@ -2,7 +2,7 @@
 
 The `compose` package is a collection of handy [Hooks](https://reactjs.org/docs/hooks-intro.html) and [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
-The `compose` function is an alias to [flowRight](https://lodash.com/docs/#flowRight) from Lodash. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
+The `compose` function is inspired by [flowRight](https://lodash.com/docs/#flowRight) from Lodash and works the same way. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
 
 An example that illustrates it for two functions:
 
@@ -63,10 +63,9 @@ For more details, you can refer to each Higher Order Component's README file. [A
 
 ### compose
 
-Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
-composition, where each successive invocation is supplied the return value of the previous.
+Composes multiple higher-order components into a single higher-order component. Performs right-to-left function composition, where each successive invocation is supplied the return value of the previous.
 
-This is just a re-export of `lodash`'s `flowRight` function.
+This is inspired by `lodash`'s `flowRight` function.
 
 _Related_
 
@@ -74,8 +73,7 @@ _Related_
 
 ### createHigherOrderComponent
 
-Given a function mapping a component to an enhanced component and modifier
-name, returns the enhanced component augmented with a generated displayName.
+Given a function mapping a component to an enhanced component and modifier name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
@@ -86,10 +84,32 @@ _Returns_
 
 -   Component class with generated display name assigned.
 
+### debounce
+
+A simplified and properly typed version of lodash's `debounce`, that always uses timers instead of sometimes using rAF.
+
+Creates a debounced function that delays invoking `func` until after `wait` milliseconds have elapsed since the last time the debounced function was invoked. The debounced function comes with a `cancel` method to cancel delayed `func` invocations and a `flush` method to immediately invoke them. Provide `options` to indicate whether `func` should be invoked on the leading and/or trailing edge of the `wait` timeout. The `func` is invoked with the last arguments provided to the debounced function. Subsequent calls to the debounced function return the result of the last `func` invocation.
+
+**Note:** If `leading` and `trailing` options are `true`, `func` is invoked on the trailing edge of the timeout only if the debounced function is invoked more than once during the `wait` timeout.
+
+If `wait` is `0` and `leading` is `false`, `func` invocation is deferred until the next tick, similar to `setTimeout` with a timeout of `0`.
+
+_Parameters_
+
+-   _func_ `Function`: The function to debounce.
+-   _wait_ `number`: The number of milliseconds to delay.
+-   _options_ `Partial< DebounceOptions >`: The options object.
+-   _options.leading_ `boolean`: Specify invoking on the leading edge of the timeout.
+-   _options.maxWait_ `number`: The maximum time `func` is allowed to be delayed before it's invoked.
+-   _options.trailing_ `boolean`: Specify invoking on the trailing edge of the timeout.
+
+_Returns_
+
+-   Returns the new debounced function.
+
 ### ifCondition
 
-Higher-order component creator, creating a new component which renders if
-the given condition is satisfied or with the given optional prop name.
+Higher-order component creator, creating a new component which renders if the given condition is satisfied or with the given optional prop name.
 
 _Usage_
 
@@ -111,15 +131,45 @@ _Returns_
 
 -   Higher-order component.
 
+### pipe
+
+Composes multiple higher-order components into a single higher-order component. Performs left-to-right function composition, where each successive invocation is supplied the return value of the previous.
+
+This is inspired by `lodash`'s `flow` function.
+
+_Related_
+
+-   <https://docs-lodash.com/v4/flow/>
+
 ### pure
 
-Given a component returns the enhanced component augmented with a component
-only re-rendering when its props/state change
+Given a component returns the enhanced component augmented with a component only re-rendering when its props/state change
+
+### throttle
+
+A simplified and properly typed version of lodash's `throttle`, that always uses timers instead of sometimes using rAF.
+
+Creates a throttled function that only invokes `func` at most once per every `wait` milliseconds. The throttled function comes with a `cancel` method to cancel delayed `func` invocations and a `flush` method to immediately invoke them. Provide `options` to indicate whether `func` should be invoked on the leading and/or trailing edge of the `wait` timeout. The `func` is invoked with the last arguments provided to the throttled function. Subsequent calls to the throttled function return the result of the last `func` invocation.
+
+**Note:** If `leading` and `trailing` options are `true`, `func` is invoked on the trailing edge of the timeout only if the throttled function is invoked more than once during the `wait` timeout.
+
+If `wait` is `0` and `leading` is `false`, `func` invocation is deferred until the next tick, similar to `setTimeout` with a timeout of `0`.
+
+_Parameters_
+
+-   _func_ `Function`: The function to throttle.
+-   _wait_ `number`: The number of milliseconds to throttle invocations to.
+-   _options_ `Partial< ThrottleOptions >`: The options object.
+-   _options.leading_ `boolean`: Specify invoking on the leading edge of the timeout.
+-   _options.trailing_ `boolean`: Specify invoking on the trailing edge of the timeout.
+
+_Returns_
+
+-   Returns the new throttled function.
 
 ### useAsyncList
 
-React hook returns an array which items get asynchronously appended from a source array.
-This behavior is useful if we want to render a list of items asynchronously for performance reasons.
+React hook returns an array which items get asynchronously appended from a source array. This behavior is useful if we want to render a list of items asynchronously for performance reasons.
 
 _Parameters_
 
@@ -132,8 +182,7 @@ _Returns_
 
 ### useConstrainedTabbing
 
-In Dialogs/modals, the tabbing must be constrained to the content of
-the wrapper element. This hook adds the behavior to the returned ref.
+In Dialogs/modals, the tabbing must be constrained to the content of the wrapper element. This hook adds the behavior to the returned ref.
 
 _Usage_
 
@@ -186,10 +235,7 @@ _Returns_
 
 ### useDebounce
 
-Debounces a function with Lodash's `debounce`. A new debounced function will
-be returned and any scheduled calls cancelled if any of the arguments change,
-including the function to debounce, so please wrap functions created on
-render in components in `useCallback`.
+Debounces a function similar to Lodash's `debounce`. A new debounced function will be returned and any scheduled calls cancelled if any of the arguments change, including the function to debounce, so please wrap functions created on render in components in `useCallback`.
 
 _Related_
 
@@ -199,22 +245,23 @@ _Parameters_
 
 -   _fn_ `TFunc`: The function to debounce.
 -   _wait_ `[number]`: The number of milliseconds to delay.
--   _options_ `[import('lodash').DebounceSettings]`: The options object.
+-   _options_ `[import('../../utils/debounce').DebounceOptions]`: The options object.
 
 _Returns_
 
--   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
+-   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Debounced function.
 
 ### useDisabled
 
-In some circumstances, such as block previews, all focusable DOM elements
-(input fields, links, buttons, etc.) need to be disabled. This hook adds the
-behavior to disable nested DOM elements to the returned ref.
+In some circumstances, such as block previews, all focusable DOM elements (input fields, links, buttons, etc.) need to be disabled. This hook adds the behavior to disable nested DOM elements to the returned ref.
+
+If you can, prefer the use of the inert HTML attribute.
 
 _Usage_
 
 ```js
 import { useDisabled } from '@wordpress/compose';
+
 const DisabledExample = () => {
 	const disabledRef = useDisabled();
 	return (
@@ -240,12 +287,11 @@ _Returns_
 
 ### useFocusableIframe
 
-Dispatches a bubbling focus event when the iframe receives focus. Use
-`onFocus` as usual on the iframe or a parent element.
+Dispatches a bubbling focus event when the iframe receives focus. Use `onFocus` as usual on the iframe or a parent element.
 
 _Returns_
 
--   `Object`: Ref to pass to the iframe.
+-   `RefCallback< HTMLIFrameElement >`: Ref to pass to the iframe.
 
 ### useFocusOnMount
 
@@ -277,10 +323,7 @@ _Returns_
 
 ### useFocusReturn
 
-When opening modals/sidebars/dialogs, the focus
-must move to the opened area and return to the
-previously focused element when closed.
-The current hook implements the returning behavior.
+Adds the unmount behavior of returning focus to the element which had it previously as is expected for roles like menus or dialogs.
 
 _Usage_
 
@@ -322,9 +365,7 @@ _Returns_
 
 ### useIsomorphicLayoutEffect
 
-Preferred over direct usage of `useLayoutEffect` when supporting
-server rendered components (SSR) because currently React
-throws a warning when using useLayoutEffect in that environment.
+Preferred over direct usage of `useLayoutEffect` when supporting server rendered components (SSR) because currently React throws a warning when using useLayoutEffect in that environment.
 
 ### useKeyboardShortcut
 
@@ -356,25 +397,15 @@ _Returns_
 
 Merges refs into one ref callback.
 
-It also ensures that the merged ref callbacks are only called when they
-change (as a result of a `useCallback` dependency update) OR when the ref
-value changes, just as React does when passing a single ref callback to the
-component.
+It also ensures that the merged ref callbacks are only called when they change (as a result of a `useCallback` dependency update) OR when the ref value changes, just as React does when passing a single ref callback to the component.
 
-As expected, if you pass a new function on every render, the ref callback
-will be called after every render.
+As expected, if you pass a new function on every render, the ref callback will be called after every render.
 
-If you don't wish a ref callback to be called after every render, wrap it
-with `useCallback( callback, dependencies )`. When a dependency changes, the
-old ref callback will be called with `null` and the new ref callback will be
-called with the same value.
+If you don't wish a ref callback to be called after every render, wrap it with `useCallback( callback, dependencies )`. When a dependency changes, the old ref callback will be called with `null` and the new ref callback will be called with the same value.
 
-To make ref callbacks easier to use, you can also pass the result of
-`useRefEffect`, which makes cleanup easier by allowing you to return a
-cleanup function instead of handling `null`.
+To make ref callbacks easier to use, you can also pass the result of `useRefEffect`, which makes cleanup easier by allowing you to return a cleanup function instead of handling `null`.
 
-It's also possible to _disable_ a ref (and its behaviour) by simply not
-passing the ref.
+It's also possible to _disable_ a ref (and its behaviour) by simply not passing the ref.
 
 ```jsx
 const ref = useRefEffect( ( node ) => {
@@ -401,8 +432,7 @@ _Returns_
 
 ### usePrevious
 
-Use something's value from the previous render.
-Based on <https://usehooks.com/usePrevious/>.
+Use something's value from the previous render. Based on <https://usehooks.com/usePrevious/>.
 
 _Parameters_
 
@@ -422,18 +452,9 @@ _Returns_
 
 ### useRefEffect
 
-Effect-like ref callback. Just like with `useEffect`, this allows you to
-return a cleanup function to be run if the ref changes or one of the
-dependencies changes. The ref is provided as an argument to the callback
-functions. The main difference between this and `useEffect` is that
-the `useEffect` callback is not called when the ref changes, but this is.
-Pass the returned ref callback as the component's ref and merge multiple refs
-with `useMergeRefs`.
+Effect-like ref callback. Just like with `useEffect`, this allows you to return a cleanup function to be run if the ref changes or one of the dependencies changes. The ref is provided as an argument to the callback functions. The main difference between this and `useEffect` is that the `useEffect` callback is not called when the ref changes, but this is. Pass the returned ref callback as the component's ref and merge multiple refs with `useMergeRefs`.
 
-It's worth noting that if the dependencies array is empty, there's not
-strictly a need to clean up event handlers for example, because the node is
-to be removed. It _is_ necessary if you add dependencies because the ref
-callback will be called multiple times for the same node.
+It's worth noting that if the dependencies array is empty, there's not strictly a need to clean up event handlers for example, because the node is to be removed. It _is_ necessary if you add dependencies because the ref callback will be called multiple times for the same node.
 
 _Parameters_
 
@@ -446,8 +467,7 @@ _Returns_
 
 ### useResizeObserver
 
-Hook which allows to listen the resize event of any target element when it changes sizes.
-\_Note: `useResizeObserver` will report `null` until after first render.
+Hook which allows to listen the resize event of any target element when it changes sizes. \_Note: `useResizeObserver` will report `null` until after first render.
 
 _Usage_
 
@@ -466,10 +486,7 @@ const App = () => {
 
 ### useThrottle
 
-Throttles a function with Lodash's `throttle`. A new throttled function will
-be returned and any scheduled calls cancelled if any of the arguments change,
-including the function to throttle, so please wrap functions created on
-render in components in `useCallback`.
+Throttles a function similar to Lodash's `throttle`. A new throttled function will be returned and any scheduled calls cancelled if any of the arguments change, including the function to throttle, so please wrap functions created on render in components in `useCallback`.
 
 _Related_
 
@@ -479,11 +496,11 @@ _Parameters_
 
 -   _fn_ `TFunc`: The function to throttle.
 -   _wait_ `[number]`: The number of milliseconds to throttle invocations to.
--   _options_ `[import('lodash').ThrottleSettings]`: The options object. See linked documentation for details.
+-   _options_ `[import('../../utils/throttle').ThrottleOptions]`: The options object. See linked documentation for details.
 
 _Returns_
 
--   `import('lodash').DebouncedFunc<TFunc>`: Throttled function.
+-   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Throttled function.
 
 ### useViewportMatch
 
@@ -507,9 +524,7 @@ _Returns_
 
 ### useWarnOnChange
 
-Hook that performs a shallow comparison between the preview value of an object
-and the new one, if there's a difference, it prints it to the console.
-this is useful in performance related work, to check why a component re-renders.
+Hook that performs a shallow comparison between the preview value of an object and the new one, if there's a difference, it prints it to the console. this is useful in performance related work, to check why a component re-renders.
 
 _Usage_
 
@@ -530,12 +545,7 @@ _Parameters_
 
 > **Deprecated**
 
-Higher-order component creator which, given an object of DOM event types and
-values corresponding to a callback function name on the component, will
-create or update a window event handler to invoke the callback when an event
-occurs. On behalf of the consuming developer, the higher-order component
-manages unbinding when the component unmounts, and binding at most a single
-event handler for the entire application.
+Higher-order component creator which, given an object of DOM event types and values corresponding to a callback function name on the component, will create or update a window event handler to invoke the callback when an event occurs. On behalf of the consuming developer, the higher-order component manages unbinding when the component unmounts, and binding at most a single event handler for the entire application.
 
 _Parameters_
 
@@ -547,20 +557,17 @@ _Returns_
 
 ### withInstanceId
 
-A Higher Order Component used to be provide a unique instance ID by
-component.
+A Higher Order Component used to be provide a unique instance ID by component.
 
 ### withSafeTimeout
 
-A higher-order component used to provide and manage delayed function calls
-that ought to be bound to a component's lifecycle.
+A higher-order component used to provide and manage delayed function calls that ought to be bound to a component's lifecycle.
 
 ### withState
 
 > **Deprecated** Use `useState` instead.
 
-A Higher Order Component used to provide and manage internal component state
-via props.
+A Higher Order Component used to provide and manage internal component state via props.
 
 _Parameters_
 

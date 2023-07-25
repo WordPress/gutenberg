@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/query-pagination-previous",
 	"title": "Previous Page",
 	"category": "theme",
@@ -12,7 +12,7 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [ "queryId", "query", "paginationArrow" ],
+	"usesContext": [ "queryId", "query", "paginationArrow", "showLabel" ],
 	"supports": {
 		"reusable": false,
 		"html": false,
@@ -26,10 +26,12 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

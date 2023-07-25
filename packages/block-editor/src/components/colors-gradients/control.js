@@ -2,11 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import {
 	BaseControl,
 	__experimentalVStack as VStack,
@@ -29,12 +29,12 @@ const colorsAndGradientKeys = [
 
 const TAB_COLOR = {
 	name: 'color',
-	title: 'Solid color',
+	title: __( 'Solid' ),
 	value: 'color',
 };
 const TAB_GRADIENT = {
 	name: 'gradient',
-	title: 'Gradient',
+	title: __( 'Gradient' ),
 	value: 'gradient',
 };
 
@@ -45,7 +45,6 @@ function ColorGradientControlInner( {
 	gradients,
 	disableCustomColors,
 	disableCustomGradients,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	className,
 	label,
@@ -56,12 +55,14 @@ function ColorGradientControlInner( {
 	clearable,
 	showTitle = true,
 	enableAlpha,
+	headingLevel,
 } ) {
 	const canChooseAColor =
-		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
+		onColorChange &&
+		( ( colors && colors.length > 0 ) || ! disableCustomColors );
 	const canChooseAGradient =
 		onGradientChange &&
-		( ! isEmpty( gradients ) || ! disableCustomGradients );
+		( ( gradients && gradients.length > 0 ) || ! disableCustomGradients );
 
 	if ( ! canChooseAColor && ! canChooseAGradient ) {
 		return null;
@@ -80,18 +81,17 @@ function ColorGradientControlInner( {
 						: onColorChange
 				}
 				{ ...{ colors, disableCustomColors } }
-				__experimentalHasMultipleOrigins={
-					__experimentalHasMultipleOrigins
-				}
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
 				}
 				clearable={ clearable }
 				enableAlpha={ enableAlpha }
+				headingLevel={ headingLevel }
 			/>
 		),
 		[ TAB_GRADIENT.value ]: (
 			<GradientPicker
+				__nextHasNoMargin
 				value={ gradientValue }
 				onChange={
 					canChooseAColor
@@ -102,19 +102,24 @@ function ColorGradientControlInner( {
 						: onGradientChange
 				}
 				{ ...{ gradients, disableCustomGradients } }
-				__experimentalHasMultipleOrigins={
-					__experimentalHasMultipleOrigins
-				}
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
 				}
 				clearable={ clearable }
+				headingLevel={ headingLevel }
 			/>
 		),
 	};
 
+	const renderPanelType = ( type ) => (
+		<div className="block-editor-color-gradient-control__panel">
+			{ tabPanels[ type ] }
+		</div>
+	);
+
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom
 			className={ classnames(
 				'block-editor-color-gradient-control',
 				className
@@ -141,15 +146,13 @@ function ColorGradientControlInner( {
 									: !! canChooseAColor && TAB_COLOR.value
 							}
 						>
-							{ ( tab ) => (
-								<div className="block-editor-color-gradient-control__tab-panel">
-									{ tabPanels[ tab.value ] }
-								</div>
-							) }
+							{ ( tab ) => renderPanelType( tab.value ) }
 						</TabPanel>
 					) }
-					{ ! canChooseAGradient && tabPanels[ TAB_COLOR.value ] }
-					{ ! canChooseAColor && tabPanels[ TAB_GRADIENT.value ] }
+					{ ! canChooseAGradient &&
+						renderPanelType( TAB_COLOR.value ) }
+					{ ! canChooseAColor &&
+						renderPanelType( TAB_GRADIENT.value ) }
 				</VStack>
 			</fieldset>
 		</BaseControl>
@@ -174,7 +177,7 @@ function ColorGradientControlSelect( props ) {
 
 function ColorGradientControl( props ) {
 	if (
-		every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) )
+		colorsAndGradientKeys.every( ( key ) => props.hasOwnProperty( key ) )
 	) {
 		return <ColorGradientControlInner { ...props } />;
 	}

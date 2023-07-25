@@ -17,6 +17,6 @@ describe( 'props', () => {
 				<Button>WordPress.org</Button>
 			</ControlGroup>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

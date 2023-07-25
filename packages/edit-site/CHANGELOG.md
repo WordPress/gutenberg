@@ -2,6 +2,79 @@
 
 ## Unreleased
 
+## 5.15.0 (2023-07-20)
+
+## 5.14.0 (2023-07-05)
+
+## 5.13.0 (2023-06-23)
+
+### Enhancements
+-   Site editor sidebar: add home template details and controls [#51223](https://github.com/WordPress/gutenberg/pull/51223).
+-   Site editor sidebar: add footer to template part and ensure nested template areas display [#51669](https://github.com/WordPress/gutenberg/pull/51669).
+-   Global styles: split styles menus into revisions and other styles actions ([#51318](https://github.com/WordPress/gutenberg/pull/51318)).
+
+## 5.12.0 (2023-06-07)
+
+## 5.11.0 (2023-05-24)
+
+## 5.10.0 (2023-05-10)
+
+## 5.9.0 (2023-04-26)
+
+## 5.8.0 (2023-04-12)
+
+## 5.7.0 (2023-03-29)
+
+## 5.6.0 (2023-03-15)
+
+## 5.5.0 (2023-03-01)
+
+## 5.4.0 (2023-02-15)
+
+## 5.3.0 (2023-02-01)
+
+### Bug Fix
+
+-   Force visual editor in browse mode ([#47329](https://github.com/WordPress/gutenberg/pull/47329)).
+-   Style Book: Exclude blocks that are not allowed to insert ([#47461](https://github.com/WordPress/gutenberg/pull/47461)).
+
+## 5.2.0 (2023-01-11)
+
+## 5.1.0 (2023-01-02)
+
+## 5.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235)).
+
+### Enhancements
+
+-   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
+
+### Bug Fix
+
+-   Don't show block inserter when the canvas is view mode ([#46763](https://github.com/WordPress/gutenberg/pull/46763)).
+
+
+## 4.19.0 (2022-11-16)
+
+## 4.18.0 (2022-11-02)
+
+## 4.17.0 (2022-10-19)
+
+## 4.16.0 (2022-10-05)
+
+## 4.15.0 (2022-09-21)
+
+## 4.14.0 (2022-09-13)
+
+## 4.13.0 (2022-08-24)
+
+## 4.12.0 (2022-08-10)
+
+## 4.11.0 (2022-07-27)
+
 ## 4.10.0 (2022-07-13)
 
 ## 4.9.0 (2022-06-29)

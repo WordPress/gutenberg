@@ -6,7 +6,7 @@ import type { Reducer, SyntheticEvent } from 'react';
 /**
  * Internal dependencies
  */
-import type { InputAction } from './actions';
+import type { Action, InputAction } from './actions';
 
 export interface InputState {
 	_event?: SyntheticEvent;
@@ -19,7 +19,12 @@ export interface InputState {
 	value?: string;
 }
 
-export type StateReducer = Reducer< InputState, InputAction >;
+export type StateReducer< SpecializedAction = {} > = Reducer<
+	InputState,
+	SpecializedAction extends Action
+		? InputAction | SpecializedAction
+		: InputAction
+>;
 
 export const initialStateReducer: StateReducer = ( state: InputState ) => state;
 

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -13,8 +8,8 @@ import {
 	useBlockProps,
 	Warning,
 	store as blockEditorStore,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 } from '@wordpress/block-editor';
 import { Spinner, Modal, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -43,8 +38,7 @@ export default function TemplatePartEdit( {
 } ) {
 	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = createTemplatePartId( theme, slug );
-	const [ hasAlreadyRendered, RecursionProvider ] =
-		useNoRecursiveRenders( templatePartId );
+	const hasAlreadyRendered = useHasRecursion( templatePartId );
 	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
 		useState( false );
 
@@ -76,11 +70,14 @@ export default function TemplatePartEdit( {
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
-				isMissing: hasResolvedEntity && isEmpty( entityRecord ),
+				isMissing:
+					hasResolvedEntity &&
+					( ! entityRecord ||
+						Object.keys( entityRecord ).length === 0 ),
 				area: _area,
 			};
 		},
-		[ templatePartId, clientId ]
+		[ templatePartId, attributes.area, clientId ]
 	);
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
@@ -89,15 +86,7 @@ export default function TemplatePartEdit( {
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
 	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const areaObject = useTemplatePartArea( area );
-	const hasBlockOverlay = useBlockOverlayActive( clientId );
-	const blockProps = useBlockProps(
-		{
-			className: hasBlockOverlay
-				? 'block-editor-block-content-overlay'
-				: undefined,
-		},
-		{ __unstableIsDisabled: hasBlockOverlay }
-	);
+	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
@@ -142,64 +131,67 @@ export default function TemplatePartEdit( {
 	}
 
 	return (
-		<RecursionProvider>
-			<TemplatePartAdvancedControls
-				tagName={ tagName }
-				setAttributes={ setAttributes }
-				isEntityAvailable={ isEntityAvailable }
-				templatePartId={ templatePartId }
-				defaultWrapper={ areaObject.tagName }
-			/>
-			{ isPlaceholder && (
-				<TagName { ...blockProps }>
-					<TemplatePartPlaceholder
-						area={ attributes.area }
-						templatePartId={ templatePartId }
-						clientId={ clientId }
-						setAttributes={ setAttributes }
-						onOpenSelectionModal={ () =>
-							setIsTemplatePartSelectionOpen( true )
-						}
-					/>
-				</TagName>
-			) }
-			{ canReplace && (
-				<BlockSettingsMenuControls>
-					{ () => (
-						<MenuItem
-							onClick={ () => {
-								setIsTemplatePartSelectionOpen( true );
-							} }
-						>
-							{ createInterpolateElement(
-								__( 'Replace <BlockTitle />' ),
-								{
-									BlockTitle: (
-										<BlockTitle
-											clientId={ clientId }
-											maximumLength={ 25 }
-										/>
-									),
-								}
-							) }
-						</MenuItem>
-					) }
-				</BlockSettingsMenuControls>
-			) }
-			{ isEntityAvailable && (
-				<TemplatePartInnerBlocks
-					tagName={ TagName }
-					blockProps={ blockProps }
-					postId={ templatePartId }
+		<>
+			<RecursionProvider uniqueId={ templatePartId }>
+				<TemplatePartAdvancedControls
+					tagName={ tagName }
+					setAttributes={ setAttributes }
+					isEntityAvailable={ isEntityAvailable }
+					templatePartId={ templatePartId }
+					defaultWrapper={ areaObject.tagName }
 					hasInnerBlocks={ innerBlocks.length > 0 }
-					layout={ layout }
 				/>
-			) }
-			{ ! isPlaceholder && ! isResolved && (
-				<TagName { ...blockProps }>
-					<Spinner />
-				</TagName>
-			) }
+				{ isPlaceholder && (
+					<TagName { ...blockProps }>
+						<TemplatePartPlaceholder
+							area={ attributes.area }
+							templatePartId={ templatePartId }
+							clientId={ clientId }
+							setAttributes={ setAttributes }
+							onOpenSelectionModal={ () =>
+								setIsTemplatePartSelectionOpen( true )
+							}
+						/>
+					</TagName>
+				) }
+				{ canReplace && (
+					<BlockSettingsMenuControls>
+						{ () => (
+							<MenuItem
+								onClick={ () => {
+									setIsTemplatePartSelectionOpen( true );
+								} }
+							>
+								{ createInterpolateElement(
+									__( 'Replace <BlockTitle />' ),
+									{
+										BlockTitle: (
+											<BlockTitle
+												clientId={ clientId }
+												maximumLength={ 25 }
+											/>
+										),
+									}
+								) }
+							</MenuItem>
+						) }
+					</BlockSettingsMenuControls>
+				) }
+				{ isEntityAvailable && (
+					<TemplatePartInnerBlocks
+						tagName={ TagName }
+						blockProps={ blockProps }
+						postId={ templatePartId }
+						hasInnerBlocks={ innerBlocks.length > 0 }
+						layout={ layout }
+					/>
+				) }
+				{ ! isPlaceholder && ! isResolved && (
+					<TagName { ...blockProps }>
+						<Spinner />
+					</TagName>
+				) }
+			</RecursionProvider>
 			{ isTemplatePartSelectionOpen && (
 				<Modal
 					overlayClassName="block-editor-template-part__selection-modal"
@@ -208,10 +200,10 @@ export default function TemplatePartEdit( {
 						__( 'Choose a %s' ),
 						areaObject.label.toLowerCase()
 					) }
-					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () =>
 						setIsTemplatePartSelectionOpen( false )
 					}
+					isFullScreen={ true }
 				>
 					<TemplatePartSelectionModal
 						templatePartId={ templatePartId }
@@ -224,6 +216,6 @@ export default function TemplatePartEdit( {
 					/>
 				</Modal>
 			) }
-		</RecursionProvider>
+		</>
 	);
 }

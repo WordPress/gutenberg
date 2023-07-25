@@ -39,7 +39,7 @@ function gutenberg_register_spacing_support( $block_type ) {
  * @return array Block spacing CSS classes and inline styles.
  */
 function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
-	if ( gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing' ) ) {
+	if ( wp_should_skip_block_supports_serialization( $block_type, 'spacing' ) ) {
 		return array();
 	}
 
@@ -52,12 +52,12 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 		return $attributes;
 	}
 
-	$skip_padding                    = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' );
-	$skip_margin                     = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' );
+	$skip_padding                    = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' );
+	$skip_margin                     = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' );
 	$spacing_block_styles            = array();
 	$spacing_block_styles['padding'] = $has_padding_support && ! $skip_padding ? _wp_array_get( $block_styles, array( 'spacing', 'padding' ), null ) : null;
 	$spacing_block_styles['margin']  = $has_margin_support && ! $skip_margin ? _wp_array_get( $block_styles, array( 'spacing', 'margin' ), null ) : null;
-	$styles                          = gutenberg_style_engine_get_block_supports_styles( array( 'spacing' => $spacing_block_styles ) );
+	$styles                          = gutenberg_style_engine_get_styles( array( 'spacing' => $spacing_block_styles ) );
 
 	if ( ! empty( $styles['css'] ) ) {
 		$attributes['style'] = $styles['css'];

@@ -96,8 +96,6 @@ describe( 'Sidebar', () => {
 
 		// Region navigate to Sidebar.
 		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
 
 		// Tab lands at first (presumed selected) option "Post".
 		await page.keyboard.press( 'Tab' );

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { existsSync, readFileSync, unlinkSync } from 'fs';
+import path from 'path';
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 
 export function readFile( filePath ) {
 	return existsSync( filePath )
@@ -13,6 +14,21 @@ export function deleteFile( filePath ) {
 	if ( existsSync( filePath ) ) {
 		unlinkSync( filePath );
 	}
+}
+
+export function getTraceFilePath() {
+	return path.join( process.env.WP_ARTIFACTS_PATH, '/trace.json' );
+}
+
+export function saveResultsFile( testFilename, results ) {
+	const resultsFilename =
+		process.env.RESULTS_FILENAME ||
+		path.basename( testFilename, '.js' ) + '.performance-results.json';
+
+	return writeFileSync(
+		path.join( process.env.WP_ARTIFACTS_PATH, resultsFilename ),
+		JSON.stringify( results, null, 2 )
+	);
 }
 
 function isEvent( item ) {
@@ -39,6 +55,10 @@ function isKeyUpEvent( item ) {
 
 function isFocusEvent( item ) {
 	return isEvent( item ) && item.args.data.type === 'focus';
+}
+
+function isFocusInEvent( item ) {
+	return isEvent( item ) && item.args.data.type === 'focusin';
 }
 
 function isClickEvent( item ) {
@@ -68,7 +88,10 @@ export function getTypingEventDurations( trace ) {
 }
 
 export function getSelectionEventDurations( trace ) {
-	return [ getEventDurationsForType( trace, isFocusEvent ) ];
+	return [
+		getEventDurationsForType( trace, isFocusEvent ),
+		getEventDurationsForType( trace, isFocusInEvent ),
+	];
 }
 
 export function getClickEventDurations( trace ) {
@@ -112,4 +135,12 @@ export async function getLoadingDurations() {
 			firstBlock: performance.now() - responseEnd,
 		};
 	} );
+}
+
+export function sum( arr ) {
+	return arr.reduce( ( a, b ) => a + b, 0 );
+}
+
+export function sequence( start, length ) {
+	return Array.from( { length }, ( _, i ) => i + start );
 }

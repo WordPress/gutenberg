@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	BaseControl,
 	RangeControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -24,10 +25,10 @@ import {
 } from './utils';
 
 const DEFAULT_VALUES = {
-	topLeft: null,
-	topRight: null,
-	bottomLeft: null,
-	bottomRight: null,
+	topLeft: undefined,
+	topRight: undefined,
+	bottomLeft: undefined,
+	bottomRight: undefined,
 };
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUES = {
@@ -50,11 +51,27 @@ export default function BorderRadiusControl( { onChange, values } ) {
 		! hasDefinedValues( values ) || ! hasMixedValues( values )
 	);
 
+	// Tracking selected units via internal state allows filtering of CSS unit
+	// only values from being saved while maintaining preexisting unit selection
+	// behaviour. Filtering CSS unit only values prevents invalid style values.
+	const [ selectedUnits, setSelectedUnits ] = useState( {
+		flat:
+			typeof values === 'string'
+				? parseQuantityAndUnitFromRawValue( values )[ 1 ]
+				: undefined,
+		topLeft: parseQuantityAndUnitFromRawValue( values?.topLeft )[ 1 ],
+		topRight: parseQuantityAndUnitFromRawValue( values?.topRight )[ 1 ],
+		bottomLeft: parseQuantityAndUnitFromRawValue( values?.bottomLeft )[ 1 ],
+		bottomRight: parseQuantityAndUnitFromRawValue(
+			values?.bottomRight
+		)[ 1 ],
+	} );
+
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
 
-	const unit = getAllUnit( values );
+	const unit = getAllUnit( selectedUnits );
 	const unitConfig = units && units.find( ( item ) => item.value === unit );
 	const step = unitConfig?.step || 1;
 
@@ -70,7 +87,9 @@ export default function BorderRadiusControl( { onChange, values } ) {
 
 	return (
 		<fieldset className="components-border-radius-control">
-			<legend>{ __( 'Radius' ) }</legend>
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Radius' ) }
+			</BaseControl.VisualLabel>
 			<div className="components-border-radius-control__wrapper">
 				{ isLinked ? (
 					<>
@@ -79,6 +98,8 @@ export default function BorderRadiusControl( { onChange, values } ) {
 							values={ values }
 							min={ MIN_BORDER_RADIUS_VALUE }
 							onChange={ onChange }
+							selectedUnits={ selectedUnits }
+							setSelectedUnits={ setSelectedUnits }
 							units={ units }
 						/>
 						<RangeControl
@@ -92,12 +113,15 @@ export default function BorderRadiusControl( { onChange, values } ) {
 							withInputField={ false }
 							onChange={ handleSliderChange }
 							step={ step }
+							__nextHasNoMarginBottom
 						/>
 					</>
 				) : (
 					<InputControls
 						min={ MIN_BORDER_RADIUS_VALUE }
 						onChange={ onChange }
+						selectedUnits={ selectedUnits }
+						setSelectedUnits={ setSelectedUnits }
 						values={ values || DEFAULT_VALUES }
 						units={ units }
 					/>

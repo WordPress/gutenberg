@@ -19,13 +19,21 @@ export default function useSpace( clientId ) {
 	return useRefEffect(
 		( element ) => {
 			function onKeyDown( event ) {
+				const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
+
 				if (
 					event.defaultPrevented ||
-					event.keyCode !== SPACE ||
-					! canIndent
+					! canIndent ||
+					keyCode !== SPACE ||
+					// Only override when no modifiers are pressed.
+					shiftKey ||
+					altKey ||
+					metaKey ||
+					ctrlKey
 				) {
 					return;
 				}
+
 				const selectionStart = getSelectionStart();
 				const selectionEnd = getSelectionEnd();
 				if (

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { difference } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
@@ -26,7 +21,6 @@ export default function useBlockSelection() {
 		getBlockName,
 		getBlockParents,
 		getBlockSelectionStart,
-		getBlockSelectionEnd,
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		hasSelectedBlock,
@@ -35,10 +29,9 @@ export default function useBlockSelection() {
 	const { getBlockType } = useSelect( blocksStore );
 
 	const updateBlockSelection = useCallback(
-		async ( event, clientId, destinationClientId ) => {
+		async ( event, clientId, destinationClientId, focusPosition ) => {
 			if ( ! event?.shiftKey ) {
-				await clearSelectedBlock();
-				selectBlock( clientId );
+				selectBlock( clientId, focusPosition );
 				return;
 			}
 
@@ -126,9 +119,8 @@ export default function useBlockSelection() {
 				return;
 			}
 
-			const selectionDiff = difference(
-				selectedBlocks,
-				updatedSelectedBlocks
+			const selectionDiff = selectedBlocks.filter(
+				( blockId ) => ! updatedSelectedBlocks.includes( blockId )
 			);
 
 			let label;
@@ -152,7 +144,7 @@ export default function useBlockSelection() {
 			}
 
 			if ( label ) {
-				speak( label );
+				speak( label, 'assertive' );
 			}
 		},
 		[
@@ -161,7 +153,6 @@ export default function useBlockSelection() {
 			getBlockType,
 			getBlockParents,
 			getBlockSelectionStart,
-			getBlockSelectionEnd,
 			getSelectedBlockClientIds,
 			hasMultiSelection,
 			hasSelectedBlock,

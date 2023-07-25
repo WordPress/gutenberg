@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	registerBlockType,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -46,6 +45,7 @@ import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as commentsTitle from './comments-title';
 import * as cover from './cover';
+import * as details from './details';
 import * as embed from './embed';
 import * as file from './file';
 import * as gallery from './gallery';
@@ -68,6 +68,7 @@ import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
 import * as pattern from './pattern';
 import * as pageList from './page-list';
+import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
@@ -83,6 +84,7 @@ import * as postFeaturedImage from './post-featured-image';
 import * as postNavigationLink from './post-navigation-link';
 import * as postTemplate from './post-template';
 import * as postTerms from './post-terms';
+import * as postTimeToRead from './post-time-to-read';
 import * as postTitle from './post-title';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
@@ -114,127 +116,138 @@ import * as termDescription from './term-description';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as footnotes from './footnotes';
 
-import isBlockMetadataExperimental from './is-block-metadata-experimental';
-
-/**
- * Function to register an individual block.
- *
- * @param {Object} block The block to be registered.
- *
- */
-const registerBlock = ( block ) => {
-	if ( ! block ) {
-		return;
-	}
-	const { metadata, settings, name } = block;
-	registerBlockType( { name, ...metadata }, settings );
-};
+import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
 
 /**
  * Function to get all the block-library blocks in an array
  */
-const getAllBlocks = () => [
-	// Common blocks are grouped at the top to prioritize their display
-	// in various contexts — like the inserter and auto-complete components.
-	paragraph,
-	image,
-	heading,
-	gallery,
-	list,
-	listItem,
-	quote,
+const getAllBlocks = () => {
+	const blocks = [
+		// Common blocks are grouped at the top to prioritize their display
+		// in various contexts — like the inserter and auto-complete components.
+		paragraph,
+		image,
+		heading,
+		gallery,
+		list,
+		listItem,
+		quote,
 
-	// Register all remaining core blocks.
-	archives,
-	audio,
-	button,
-	buttons,
-	calendar,
-	categories,
-	...( window.wp && window.wp.oldEditor ? [ classic ] : [] ), // Only add the classic block in WP Context.
-	code,
-	column,
-	columns,
-	commentAuthorAvatar,
-	cover,
-	embed,
-	file,
-	group,
-	html,
-	latestComments,
-	latestPosts,
-	mediaText,
-	missing,
-	more,
-	nextpage,
-	pageList,
-	pattern,
-	preformatted,
-	pullquote,
-	reusableBlock,
-	rss,
-	search,
-	separator,
-	shortcode,
-	socialLink,
-	socialLinks,
-	spacer,
-	table,
-	tagCloud,
-	textColumns,
-	verse,
-	video,
+		// Register all remaining core blocks.
+		archives,
+		audio,
+		button,
+		buttons,
+		calendar,
+		categories,
+		code,
+		column,
+		columns,
+		commentAuthorAvatar,
+		cover,
+		details,
+		embed,
+		file,
+		group,
+		html,
+		latestComments,
+		latestPosts,
+		mediaText,
+		missing,
+		more,
+		nextpage,
+		pageList,
+		pageListItem,
+		pattern,
+		preformatted,
+		pullquote,
+		reusableBlock,
+		rss,
+		search,
+		separator,
+		shortcode,
+		socialLink,
+		socialLinks,
+		spacer,
+		table,
+		tagCloud,
+		textColumns,
+		verse,
+		video,
+		footnotes,
 
-	// theme blocks
-	navigation,
-	navigationLink,
-	navigationSubmenu,
-	siteLogo,
-	siteTitle,
-	siteTagline,
-	query,
-	templatePart,
-	avatar,
-	postTitle,
-	postExcerpt,
-	postFeaturedImage,
-	postContent,
-	postAuthor,
-	postAuthorName,
-	postComment,
-	postCommentsCount,
-	postCommentsLink,
-	postDate,
-	postTerms,
-	postNavigationLink,
-	postTemplate,
-	queryPagination,
-	queryPaginationNext,
-	queryPaginationNumbers,
-	queryPaginationPrevious,
-	queryNoResults,
-	readMore,
-	comments,
-	commentAuthorName,
-	commentContent,
-	commentDate,
-	commentEditLink,
-	commentReplyLink,
-	commentTemplate,
-	commentsTitle,
-	commentsPagination,
-	commentsPaginationNext,
-	commentsPaginationNumbers,
-	commentsPaginationPrevious,
-	postCommentsForm,
-	tableOfContents,
-	homeLink,
-	logInOut,
-	termDescription,
-	queryTitle,
-	postAuthorBiography,
-];
+		// theme blocks
+		navigation,
+		navigationLink,
+		navigationSubmenu,
+		siteLogo,
+		siteTitle,
+		siteTagline,
+		query,
+		templatePart,
+		avatar,
+		postTitle,
+		postExcerpt,
+		postFeaturedImage,
+		postContent,
+		postAuthor,
+		postAuthorName,
+		postComment,
+		postCommentsCount,
+		postCommentsLink,
+		postDate,
+		postTerms,
+		postNavigationLink,
+		postTemplate,
+		postTimeToRead,
+		queryPagination,
+		queryPaginationNext,
+		queryPaginationNumbers,
+		queryPaginationPrevious,
+		queryNoResults,
+		readMore,
+		comments,
+		commentAuthorName,
+		commentContent,
+		commentDate,
+		commentEditLink,
+		commentReplyLink,
+		commentTemplate,
+		commentsTitle,
+		commentsPagination,
+		commentsPaginationNext,
+		commentsPaginationNumbers,
+		commentsPaginationPrevious,
+		postCommentsForm,
+		tableOfContents,
+		homeLink,
+		logInOut,
+		termDescription,
+		queryTitle,
+		postAuthorBiography,
+	];
+
+	// When in a WordPress context, conditionally
+	// add the classic block and TinyMCE editor
+	// under any of the following conditions:
+	//   - the current post contains a classic block
+	//   - the experiment to disable TinyMCE isn't active.
+	//   - a query argument specifies that TinyMCE should be loaded
+	if (
+		window?.wp?.oldEditor &&
+		( window?.wp?.needsClassicBlock ||
+			! window?.__experimentalDisableTinymce ||
+			!! new URLSearchParams( window?.location?.search ).get(
+				'requiresTinymce'
+			) )
+	) {
+		blocks.push( classic );
+	}
+
+	return blocks.filter( Boolean );
+};
 
 /**
  * Function to get all the core blocks in an array.
@@ -266,7 +279,7 @@ export const __experimentalGetCoreBlocks = () =>
 export const registerCoreBlocks = (
 	blocks = __experimentalGetCoreBlocks()
 ) => {
-	blocks.forEach( registerBlock );
+	blocks.forEach( ( { init } ) => init() );
 
 	setDefaultBlockName( paragraph.name );
 	if ( window.wp && window.wp.oldEditor ) {
@@ -290,10 +303,7 @@ export const registerCoreBlocks = (
 export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	.IS_GUTENBERG_PLUGIN
 	? ( { enableFSEBlocks } = {} ) => {
-			const enabledExperiments = [
-				window.__experimentalEnableListBlockV2 ? 'list-v2' : null,
-				enableFSEBlocks ? 'fse' : null,
-			];
+			const enabledExperiments = [ enableFSEBlocks ? 'fse' : null ];
 			getAllBlocks()
 				.filter( ( { metadata } ) =>
 					isBlockMetadataExperimental( metadata )
@@ -303,6 +313,6 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 						__experimental === true ||
 						enabledExperiments.includes( __experimental )
 				)
-				.forEach( registerBlock );
+				.forEach( ( { init } ) => init() );
 	  }
 	: undefined;

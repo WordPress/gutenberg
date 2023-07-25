@@ -8,6 +8,7 @@
 			// Ensure unchecked items have clearance for consistency
 			// with checked items containing an icon or shortcut.
 			padding-right: $grid-unit-60;
+			box-sizing: initial;
 		}
 	}
 
@@ -44,7 +45,7 @@
 		// Override the button component's tertiary background and color.
 		&.is-tertiary {
 			background: none;
-			color: var(--wp-admin-theme-color-darker-10);
+			color: $components-color-accent-darker-10;
 			opacity: 0.3;
 		}
 	}

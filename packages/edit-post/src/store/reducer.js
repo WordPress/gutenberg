@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -19,28 +14,9 @@ import { combineReducers } from '@wordpress/data';
 export function removedPanels( state = [], action ) {
 	switch ( action.type ) {
 		case 'REMOVE_PANEL':
-			if ( ! includes( state, action.panelName ) ) {
+			if ( ! state.includes( action.panelName ) ) {
 				return [ ...state, action.panelName ];
 			}
-	}
-
-	return state;
-}
-
-/**
- * Reducer for storing the name of the open modal, or null if no modal is open.
- *
- * @param {Object} state  Previous state.
- * @param {Object} action Action object containing the `name` of the modal
- *
- * @return {Object} Updated state
- */
-export function activeModal( state = null, action ) {
-	switch ( action.type ) {
-		case 'OPEN_MODAL':
-			return action.name;
-		case 'CLOSE_MODAL':
-			return null;
 	}
 
 	return state;
@@ -80,6 +56,21 @@ export function isSavingMetaBoxes( state = false, action ) {
 	}
 }
 
+function mergeMetaboxes( metaboxes = [], newMetaboxes ) {
+	const mergedMetaboxes = [ ...metaboxes ];
+	for ( const metabox of newMetaboxes ) {
+		const existing = mergedMetaboxes.findIndex(
+			( box ) => box.id === metabox.id
+		);
+		if ( existing !== -1 ) {
+			mergedMetaboxes[ existing ] = metabox;
+		} else {
+			mergedMetaboxes.push( metabox );
+		}
+	}
+	return mergedMetaboxes;
+}
+
 /**
  * Reducer keeping track of the meta boxes per location.
  *
@@ -90,8 +81,18 @@ export function isSavingMetaBoxes( state = false, action ) {
  */
 export function metaBoxLocations( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_META_BOXES_PER_LOCATIONS':
-			return action.metaBoxesPerLocation;
+		case 'SET_META_BOXES_PER_LOCATIONS': {
+			const newState = { ...state };
+			for ( const [ location, metaboxes ] of Object.entries(
+				action.metaBoxesPerLocation
+			) ) {
+				newState[ location ] = mergeMetaboxes(
+					newState[ location ],
+					metaboxes
+				);
+			}
+			return newState;
+		}
 	}
 
 	return state;
@@ -153,7 +154,7 @@ export function listViewPanel( state = false, action ) {
 }
 
 /**
- * Reducer tracking whether the inserter is open.
+ * Reducer tracking whether template editing is on or off.
  *
  * @param {boolean} state
  * @param {Object}  action
@@ -189,7 +190,6 @@ const metaBoxes = combineReducers( {
 } );
 
 export default combineReducers( {
-	activeModal,
 	metaBoxes,
 	publishSidebarActive,
 	removedPanels,

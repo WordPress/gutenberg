@@ -25,29 +25,26 @@ export default function PostTemplateForm( { onClose } ) {
 		canCreate,
 		canEdit,
 	} = useSelect( ( select ) => {
+		const { canUser, getEntityRecord, getEntityRecords } =
+			select( coreStore );
 		const editorSettings = select( editorStore ).getEditorSettings();
-		const siteSettings = select( coreStore ).getEntityRecord(
-			'root',
-			'site'
-		);
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
 		const _isPostsPage =
 			select( editorStore ).getCurrentPostId() ===
 			siteSettings?.page_for_posts;
-		const canCreateTemplates = select( coreStore ).canUser(
-			'create',
-			'templates'
-		);
+		const canCreateTemplates = canUser( 'create', 'templates' );
+
 		return {
 			isPostsPage: _isPostsPage,
 			availableTemplates: editorSettings.availableTemplates,
-			fetchedTemplates: select( coreStore ).getEntityRecords(
-				'postType',
-				'wp_template',
-				{
-					post_type: select( editorStore ).getCurrentPostType(),
-					per_page: -1,
-				}
-			),
+			fetchedTemplates: canCreateTemplates
+				? getEntityRecords( 'postType', 'wp_template', {
+						post_type: select( editorStore ).getCurrentPostType(),
+						per_page: -1,
+				  } )
+				: undefined,
 			selectedTemplateSlug:
 				select( editorStore ).getEditedPostAttribute( 'template' ),
 			canCreate:
@@ -114,6 +111,7 @@ export default function PostTemplateForm( { onClose } ) {
 				</Notice>
 			) : (
 				<SelectControl
+					__nextHasNoMarginBottom
 					hideLabelFromVision
 					label={ __( 'Template' ) }
 					value={ selectedOption?.value ?? '' }

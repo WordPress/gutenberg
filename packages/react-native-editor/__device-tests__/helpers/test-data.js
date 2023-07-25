@@ -95,13 +95,9 @@ exports.imageCompletehtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <p>The finer continuum interprets the polynomial rabbit. When can the geology runs? An astronomer runs. Should a communist consent?</p>
 <!-- /wp:paragraph -->`;
 
-exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
+exports.imageShortHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground" class="wp-image-1"/><figcaption class="wp-element-caption">C'est la vie my friends</figcaption></figure>
-<!-- /wp:image -->
-
-<!-- wp:paragraph -->
-<p>rock music approaches at high velocity.</p>
-<!-- /wp:paragraph -->`;
+<!-- /wp:image -->`;
 
 exports.unsupportedBlockHtml = `<!-- wp:jetpack/gif {"giphyUrl":"https://giphy.com/embed/3orieS4jfHJaKwkeli","searchText":"example"} /-->`;
 
@@ -143,7 +139,7 @@ exports.audioBlockPlaceholder = `<!-- wp:audio {"id":5} -->
 <!-- /wp:audio -->`;
 
 exports.headerBlockEmpty = `<!-- wp:heading -->
-<h2></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->`;
 
 exports.separatorBlockEmpty = `<!-- wp:separator -->
@@ -151,7 +147,9 @@ exports.separatorBlockEmpty = `<!-- wp:separator -->
 <!-- /wp:separator -->`;
 
 exports.listBlockEmpty = `<!-- wp:list -->
-<ul><li></li></ul>
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`;
 
 exports.imageBlockEmpty = `<!-- wp:image -->
@@ -185,3 +183,22 @@ exports.lettersInParagraphBlock = `<!-- wp:paragraph -->
 exports.spacerBlock = `<!-- wp:spacer -->
 <div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->`;
+
+exports.galleryBlock = `<!-- wp:gallery {"columns":8,"linkTo":"none","className":"alignfull"} -->
+<figure class="wp-block-gallery has-nested-images columns-8 is-cropped alignfull"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon.png" alt=""/><figcaption class="wp-element-caption">Paragraph</figcaption></figure>
+<!-- /wp:image -->
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Heading.png" alt=""/><figcaption class="wp-element-caption">Heading</figcaption></figure>
+<!-- /wp:image -->
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Subheading.png" alt=""/><figcaption class="wp-element-caption">Subheading</figcaption></figure>
+<!-- /wp:image -->
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Quote.png" alt=""/><figcaption class="wp-element-caption">Quote</figcaption></figure>
+<!-- /wp:image -->
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Image.png" alt=""/><figcaption class="wp-element-caption">Image</figcaption></figure>
+<!-- /wp:image -->
+</figure>
+<!-- /wp:gallery -->`;

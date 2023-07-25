@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, reduce, castArray, startsWith } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -86,12 +81,14 @@ const innerBlocksPropsProvider = {};
  */
 export function getBlockProps( props = {} ) {
 	const { blockType, attributes } = blockPropsProvider;
-	return applyFilters(
-		'blocks.getSaveContent.extraProps',
-		{ ...props },
-		blockType,
-		attributes
-	);
+	return getBlockProps.skipFilters
+		? props
+		: applyFilters(
+				'blocks.getSaveContent.extraProps',
+				{ ...props },
+				blockType,
+				attributes
+		  );
 }
 
 /**
@@ -101,6 +98,12 @@ export function getBlockProps( props = {} ) {
  */
 export function getInnerBlocksProps( props = {} ) {
 	const { innerBlocks } = innerBlocksPropsProvider;
+	const [ firstBlock ] = innerBlocks ?? [];
+	if ( ! firstBlock ) return props;
+	// If the innerBlocks passed to `getSaveElement` are not blocks but already
+	// components, return the props as is. This is the case for
+	// `getRichTextValues`.
+	if ( ! firstBlock.clientId ) return { ...props, children: innerBlocks };
 	// Value is an array of blocks, so defer to block serializer.
 	const html = serialize( innerBlocks, { isInnerBlocks: true } );
 	// Use special-cased raw HTML tag to avoid default escaping.
@@ -125,6 +128,9 @@ export function getSaveElement(
 	innerBlocks = []
 ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
+
+	if ( ! blockType?.save ) return null;
+
 	let { save } = blockType;
 
 	// Component classes are unsupported for save since serialization must
@@ -216,9 +222,8 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( blockType, attributes ) {
-	return reduce(
-		blockType.attributes,
-		( accumulator, attributeSchema, key ) => {
+	return Object.entries( blockType.attributes ?? {} ).reduce(
+		( accumulator, [ key, attributeSchema ] ) => {
 			const value = attributes[ key ];
 			// Ignore undefined values.
 			if ( undefined === value ) {
@@ -315,12 +320,13 @@ export function getCommentDelimitedContent(
 	attributes,
 	content
 ) {
-	const serializedAttributes = ! isEmpty( attributes )
-		? serializeAttributes( attributes ) + ' '
-		: '';
+	const serializedAttributes =
+		attributes && Object.entries( attributes ).length
+			? serializeAttributes( attributes ) + ' '
+			: '';
 
 	// Strip core blocks of their namespace prefix.
-	const blockName = startsWith( rawBlockName, 'core/' )
+	const blockName = rawBlockName?.startsWith( 'core/' )
 		? rawBlockName.slice( 5 )
 		: rawBlockName;
 
@@ -384,7 +390,8 @@ export function __unstableSerializeAndClean( blocks ) {
 	// pre-block-editor removep'd content formatting.
 	if (
 		blocks.length === 1 &&
-		blocks[ 0 ].name === getFreeformContentHandlerName()
+		blocks[ 0 ].name === getFreeformContentHandlerName() &&
+		blocks[ 0 ].name === 'core/freeform'
 	) {
 		content = removep( content );
 	}
@@ -401,7 +408,8 @@ export function __unstableSerializeAndClean( blocks ) {
  * @return {string} The post content.
  */
 export default function serialize( blocks, options ) {
-	return castArray( blocks )
+	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
+	return blocksArray
 		.map( ( block ) => serializeBlock( block, options ) )
 		.join( '\n\n' );
 }

@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { BlockList } from '@wordpress/block-editor';
+import {
+	BlockList,
+	__experimentalGetGapCSSValue as getGapCSSValue,
+} from '@wordpress/block-editor';
 import { useContext, createPortal } from '@wordpress/element';
 
 export default function GapStyles( { blockGap, clientId } ) {
@@ -17,17 +20,18 @@ export default function GapStyles( { blockGap, clientId } ) {
 	if ( !! blockGap ) {
 		row =
 			typeof blockGap === 'string'
-				? blockGap
-				: blockGap?.top || fallbackValue;
+				? getGapCSSValue( blockGap )
+				: getGapCSSValue( blockGap?.top ) || fallbackValue;
 		column =
 			typeof blockGap === 'string'
-				? blockGap
-				: blockGap?.left || fallbackValue;
+				? getGapCSSValue( blockGap )
+				: getGapCSSValue( blockGap?.left ) || fallbackValue;
 		gapValue = row === column ? row : `${ row } ${ column }`;
 	}
 
+	// The unstable gallery gap calculation requires a real value (such as `0px`) and not `0`.
 	const gap = `#block-${ clientId } {
-		--wp--style--unstable-gallery-gap: ${ column };
+		--wp--style--unstable-gallery-gap: ${ column === '0' ? '0px' : column };
 		gap: ${ gapValue }
 	}`;
 

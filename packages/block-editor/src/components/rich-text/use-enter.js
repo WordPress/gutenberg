@@ -1,9 +1,6 @@
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
@@ -31,6 +28,10 @@ export function useEnter( props ) {
 				return;
 			}
 
+			if ( event.keyCode !== ENTER ) {
+				return;
+			}
+
 			const {
 				removeEditorOnlyFormats,
 				value,
@@ -42,10 +43,6 @@ export function useEnter( props ) {
 				disableLineBreaks,
 				onSplitAtEnd,
 			} = propsRef.current;
-
-			if ( event.keyCode !== ENTER ) {
-				return;
-			}
 
 			event.preventDefault();
 

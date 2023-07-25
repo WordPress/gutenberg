@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { startCase } from 'lodash';
+import { capitalCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import { enhanceTemplatePartVariations } from './variations';
@@ -41,43 +42,49 @@ export const settings = {
 		}
 
 		return (
-			decodeEntities( entity.title?.rendered ) || startCase( entity.slug )
+			decodeEntities( entity.title?.rendered ) ||
+			capitalCase( entity.slug )
 		);
 	},
 	edit,
 };
 
-// Importing this file includes side effects. This is added in block-library/package.json under sideEffects
-addFilter(
-	'blocks.registerBlockType',
-	'core/template-part',
-	enhanceTemplatePartVariations
-);
+export const init = () => {
+	addFilter(
+		'blocks.registerBlockType',
+		'core/template-part',
+		enhanceTemplatePartVariations
+	);
 
-// Prevent adding template parts inside post templates.
-const DISALLOWED_PARENTS = [ 'core/post-template', 'core/post-content' ];
-addFilter(
-	'blockEditor.__unstableCanInsertBlockType',
-	'removeTemplatePartsFromPostTemplates',
-	(
-		can,
-		blockType,
-		rootClientId,
-		{ getBlock, getBlockParentsByBlockName }
-	) => {
-		if ( blockType.name !== 'core/template-part' ) {
-			return can;
-		}
-
-		for ( const disallowedParentType of DISALLOWED_PARENTS ) {
-			const hasDisallowedParent =
-				getBlock( rootClientId )?.name === disallowedParentType ||
-				getBlockParentsByBlockName( rootClientId, disallowedParentType )
-					.length;
-			if ( hasDisallowedParent ) {
-				return false;
+	// Prevent adding template parts inside post templates.
+	const DISALLOWED_PARENTS = [ 'core/post-template', 'core/post-content' ];
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removeTemplatePartsFromPostTemplates',
+		(
+			canInsert,
+			blockType,
+			rootClientId,
+			{ getBlock, getBlockParentsByBlockName }
+		) => {
+			if ( blockType.name !== 'core/template-part' ) {
+				return canInsert;
 			}
+
+			for ( const disallowedParentType of DISALLOWED_PARENTS ) {
+				const hasDisallowedParent =
+					getBlock( rootClientId )?.name === disallowedParentType ||
+					getBlockParentsByBlockName(
+						rootClientId,
+						disallowedParentType
+					).length;
+				if ( hasDisallowedParent ) {
+					return false;
+				}
+			}
+			return true;
 		}
-		return true;
-	}
-);
+	);
+
+	return initBlock( { name, metadata, settings } );
+};

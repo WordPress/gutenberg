@@ -2,14 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, has, isEmpty, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withNotices } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { Placeholder } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
 	BlockControls,
@@ -18,15 +17,18 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import Image from './image';
+import { unlock } from '../lock-unlock';
 
 /**
  * Module constants
@@ -39,11 +41,18 @@ import {
 	ALLOWED_MEDIA_TYPES,
 } from './constants';
 
+const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
+
 export const pickRelevantMediaFiles = ( image, size ) => {
-	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
+	const imageProps = Object.fromEntries(
+		Object.entries( image ?? {} ).filter( ( [ key ] ) =>
+			[ 'alt', 'id', 'link', 'caption' ].includes( key )
+		)
+	);
+
 	imageProps.url =
-		get( image, [ 'sizes', size, 'url' ] ) ||
-		get( image, [ 'media_details', 'sizes', size, 'source_url' ] ) ||
+		image?.sizes?.[ size ]?.url ||
+		image?.media_details?.sizes?.[ size ]?.source_url ||
 		image.url;
 	return imageProps;
 };
@@ -81,8 +90,8 @@ export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
  */
 function hasDefaultSize( image, defaultSize ) {
 	return (
-		has( image, [ 'sizes', defaultSize, 'url' ] ) ||
-		has( image, [ 'media_details', 'sizes', defaultSize, 'source_url' ] )
+		'url' in ( image?.sizes?.[ defaultSize ] ?? {} ) ||
+		'source_url' in ( image?.media_details?.sizes?.[ defaultSize ] ?? {} )
 	);
 }
 
@@ -91,9 +100,7 @@ export function ImageEdit( {
 	setAttributes,
 	isSelected,
 	className,
-	noticeUI,
 	insertBlocksAfter,
-	noticeOperations,
 	onReplace,
 	context,
 	clientId,
@@ -123,12 +130,17 @@ export function ImageEdit( {
 	const ref = useRef();
 	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
+		const settings = getSettings();
+		return {
+			imageDefaultSize: settings.imageDefaultSize,
+			mediaUpload: settings.mediaUpload,
+		};
 	}, [] );
+	const blockEditingMode = useBlockEditingMode();
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 		setAttributes( {
 			src: undefined,
 			id: undefined,
@@ -161,16 +173,16 @@ export function ImageEdit( {
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+		if ( captionRef.current && ! mediaAttributes.caption ) {
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		let additionalAttributes;
 		// Reset the dimension attributes if changing to a different image.
 		if ( ! media.id || media.id !== id ) {
 			additionalAttributes = {
-				width: undefined,
-				height: undefined,
 				// Fallback to size "full" if there's no default image size.
 				// It means the image is smaller, and the block will use a full-size URL.
 				sizeSlug: hasDefaultSize( media, imageDefaultSize )
@@ -178,7 +190,7 @@ export function ImageEdit( {
 					: 'full',
 			};
 		} else {
-			// Keep the same url when selecting the same file, so "Image Size"
+			// Keep the same url when selecting the same file, so "Resolution"
 			// option is not changed.
 			additionalAttributes = { url };
 		}
@@ -234,8 +246,6 @@ export function ImageEdit( {
 			setAttributes( {
 				url: newURL,
 				id: undefined,
-				width: undefined,
-				height: undefined,
 				sizeSlug: imageDefaultSize,
 			} );
 		}
@@ -304,13 +314,36 @@ export function ImageEdit( {
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
-			!! borderProps.className || ! isEmpty( borderProps.style ),
+			!! borderProps.className ||
+			( borderProps.style &&
+				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
 	const blockProps = useBlockProps( {
 		ref,
 		className: classes,
 	} );
+
+	// Much of this description is duplicated from MediaPlaceholder.
+	const placeholder = ( content ) => {
+		return (
+			<Placeholder
+				className={ classnames( 'block-editor-media-placeholder', {
+					[ borderProps.className ]:
+						!! borderProps.className && ! isSelected,
+				} ) }
+				withIllustration={ true }
+				icon={ icon }
+				label={ __( 'Image' ) }
+				instructions={ __(
+					'Upload an image file, pick one from your media library, or add one with a URL.'
+				) }
+				style={ isSelected ? undefined : borderProps.style }
+			>
+				{ content }
+			</Placeholder>
+		);
+	};
 
 	return (
 		<figure { ...blockProps }>
@@ -328,9 +361,10 @@ export function ImageEdit( {
 					containerRef={ ref }
 					context={ context }
 					clientId={ clientId }
+					blockEditingMode={ blockEditingMode }
 				/>
 			) }
-			{ ! url && (
+			{ ! url && blockEditingMode === 'default' && (
 				<BlockControls group="block">
 					<BlockAlignmentControl
 						value={ align }
@@ -342,8 +376,8 @@ export function ImageEdit( {
 				icon={ <BlockIcon icon={ icon } /> }
 				onSelect={ onSelectImage }
 				onSelectURL={ onSelectURL }
-				notices={ noticeUI }
 				onError={ onUploadError }
+				placeholder={ placeholder }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
@@ -354,4 +388,4 @@ export function ImageEdit( {
 	);
 }
 
-export default withNotices( ImageEdit );
+export default ImageEdit;

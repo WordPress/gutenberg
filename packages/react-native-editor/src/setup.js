@@ -7,10 +7,11 @@ import { I18nManager, LogBox } from 'react-native';
  * WordPress dependencies
  */
 import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
-import { addAction, addFilter } from '@wordpress/hooks';
+import { addAction, addFilter, doAction } from '@wordpress/hooks';
 import * as wpData from '@wordpress/data';
-import { initializeEditor } from '@wordpress/edit-post';
 import { registerCoreBlocks } from '@wordpress/block-library';
+// eslint-disable-next-line no-restricted-imports
+import { initializeEditor } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -58,9 +59,9 @@ const gutenbergSetup = () => {
 
 const setupInitHooks = () => {
 	addAction( 'native.pre-render', 'core/react-native-editor', ( props ) => {
-		registerBlocks();
-
 		const capabilities = props.capabilities ?? {};
+
+		registerBlocks();
 
 		// Unregister non-supported blocks by capabilities
 		if (
@@ -69,6 +70,8 @@ const setupInitHooks = () => {
 		) {
 			unregisterBlockType( 'core/block' );
 		}
+
+		doAction( 'native.post-register-core-blocks', props );
 	} );
 
 	// Map native props to Editor props
@@ -82,6 +85,7 @@ const setupInitHooks = () => {
 				initialData,
 				initialTitle,
 				postType,
+				hostAppNamespace,
 				featuredImageId,
 				rawStyles,
 				rawFeatures,
@@ -104,6 +108,7 @@ const setupInitHooks = () => {
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
 				initialTitle,
 				postType,
+				hostAppNamespace,
 				featuredImageId,
 				capabilities,
 				rawStyles,

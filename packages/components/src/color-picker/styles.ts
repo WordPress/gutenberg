@@ -9,8 +9,8 @@ import styled from '@emotion/styled';
 import NumberControl from '../number-control';
 import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
-import { StyledField } from '../base-control/styles/base-control-styles';
 import { space } from '../ui/utils/space';
+import { boxSizingReset } from '../utils';
 import Button from '../button';
 import { Flex } from '../flex';
 import { HStack } from '../h-stack';
@@ -29,18 +29,19 @@ export const NumberControlWrapper = styled( NumberControl )`
 export const SelectControl = styled( InnerSelectControl )`
 	margin-left: ${ space( -2 ) };
 	width: 5em;
-	${ BackdropUI } {
-		display: none;
+	/*
+	 * Remove border, but preserve focus styles
+	 * TODO: this override should be removed,
+	 * see https://github.com/WordPress/gutenberg/pull/50609
+	 */
+	select:not( :focus ) ~ ${ BackdropUI }${ BackdropUI }${ BackdropUI } {
+		border-color: transparent;
 	}
 `;
 
 export const RangeControl = styled( InnerRangeControl )`
 	flex: 1;
 	margin-right: ${ space( 2 ) };
-
-	${ StyledField } {
-		margin-bottom: 0;
-	}
 `;
 
 // Make the Hue circle picker not go out of the bar.
@@ -70,6 +71,8 @@ export const ColorInputWrapper = styled( Flex )`
 `;
 
 export const ColorfulWrapper = styled.div`
+	${ boxSizingReset };
+
 	width: 216px;
 
 	.react-colorful {
@@ -112,10 +115,6 @@ export const ColorfulWrapper = styled.div`
 	}
 
 	${ interactiveHueStyles }
-
-	${ StyledField } {
-		margin-bottom: 0;
-	}
 `;
 
 export const CopyButton = styled( Button )`

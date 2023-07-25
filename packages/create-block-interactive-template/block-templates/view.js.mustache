@@ -1,0 +1,26 @@
+{{#isBasicVariant}}
+
+/**
+ * WordPress dependencies
+ */
+import { store } from "@wordpress/interactivity";
+
+store( {
+	actions: {
+		'{{namespace}}': {
+			toggle: ( { context } ) => {
+				context[ '{{namespace}}' ].isOpen = !context[ '{{namespace}}' ].isOpen;
+			},
+		},
+	},
+	effects: {
+		'{{namespace}}': {
+			logIsOpen: ( { context } ) => {
+				// Log the value of `isOpen` each time it changes.
+				console.log( `Is open: ${ context[ '{{namespace}}' ].isOpen }` );
+			},
+		},
+	},
+} );
+
+{{/isBasicVariant}}

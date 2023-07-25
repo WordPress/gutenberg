@@ -10,15 +10,10 @@
 		{ "path": "../compose" },
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
+		{ "path": "../private-apis" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../priority-queue" },
 		{ "path": "../redux-routine" }
 	],
-	"include": [
-		"src/redux-store/metadata/**/*",
-		"src/promise-middleware.js",
-		"src/utils",
-		"src/*.ts",
-		"src/**/*.js"
-	]
+	"include": [ "src/**/*" ]
 }

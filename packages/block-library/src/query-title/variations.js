@@ -17,6 +17,19 @@ const variations = [
 		},
 		scope: [ 'inserter' ],
 	},
+	{
+		isDefault: false,
+		name: 'search-title',
+		title: __( 'Search Results Title' ),
+		description: __(
+			'Display the search results title based on the queried object.'
+		),
+		icon: title,
+		attributes: {
+			type: 'search',
+		},
+		scope: [ 'inserter' ],
+	},
 ];
 
 /**

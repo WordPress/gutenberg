@@ -1,19 +1,9 @@
 /**
- * External dependencies
- */
-
-import { JSDOM } from 'jsdom';
-
-/**
  * Internal dependencies
  */
-
 import { toDom, applyValue } from '../to-dom';
 import { createElement } from '../create-element';
 import { spec } from './helpers';
-
-const { window } = new JSDOM();
-const { document } = window;
 
 describe( 'recordToDom', () => {
 	beforeAll( () => {

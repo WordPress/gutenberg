@@ -11,6 +11,149 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.100.1
+-   [**] Add WP hook for registering non-core blocks [#52791]
+
+## 1.100.0
+-   [**] Add media inserter buttons to editor toolbar [#51827]
+-   [**] Update native BlockOutline component styles to remove blue border from blocks [#51222]
+-   [**] Move the undo/redo buttons to the navigation bar [#51766]
+-   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
+-   [**] Update Editor toolbar icons and colors [#52336]
+-   [*] Update Block Settings button border [#52715]
+
+## 1.99.1
+- [**] Fix crash related to removing a block under certain conditions [#52595]
+
+## 1.99.0
+-   [*] Rename "Reusable blocks" to "Synced patterns", aligning with the web editor. [#51704]
+-   [**] Fix a crash related to Reanimated when closing the editor [#52320]
+
+## 1.98.1
+-   [*] fix: Display heading level dropdown icons and labels [#52004]
+
+## 1.98.0
+-   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]
+-   [*] Fix cursor positioning when dictating text on iOS [#51227]
+
+## 1.97.1
+-   [**] Fix crash when using the delete key to remove a single button [#51435]
+-   [*] Ensure text input field is not editable when Bottom sheet cell is disabled [#51567]
+
+## 1.97.0
+-   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
+-   [*] [internal] Upgrade compile and target sdk version to Android API 33 [#50731]
+-   [*] Display lock icon in disabled state of `Cell` component [#50907]
+
+## 1.96.1
+-   [**] Fix Android-only issue related to block toolbar not being displayed on some blocks in UBE [#51131]
+
+## 1.96.0
+-   [**] Tapping on all nested blocks gets focus directly instead of having to tap multiple times depending on the nesting levels. [#50672]
+-   [*] Add disabled style to `Cell` component [#50665]
+-   [**] Fix undo/redo history when inserting a link configured to open in a new tab [#50460]
+-   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
+
+## 1.95.0
+-   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
+-   [**] Tapping on nested text blocks gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
+-   [*] Use host app namespace in reusable block message [#50478]
+-   [**] Configuring a link to open in a new tab no longer results in a partial loss of edit history (undo and redo) [#50460]
+
+## 1.94.0
+-   [*] Split pasted content between title and body. [#37169]
+
+## 1.93.1
+-   [**] Fix regression with the Color hook and ColorPanel. [#49917]
+
+## 1.93.0
+-   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
+
+## 1.92.1
+-   [*] Avoid empty Gallery block error [#49557]
+
+## 1.92.0
+* No User facing changes *
+
+## 1.91.0
+-   [*] Allow new block transformations for most blocks. [#48792]
+
+## 1.90.0
+-   [*] Fix parsing of css units for null matched values [#48484]
+-   [*] Spacer block - Add initial support for spacing presets [#47258]
+-   [*] Support Visual Regression testing [#47845]
+-   [*] Add metadata parameter to media upload events [#48103]  
+
+## 1.89.1 
+-   [*] Fix inaccessible block settings within the unsupported block editor [#48435]
+
+## 1.89.0 
+* No User facing changes *
+
+## 1.88.0 
+-   [*] Bump Android `minSdkVersion` to 24 [#47604]
+-   [*] Update React Native Reanimated to 2.9.1-wp-3 [#47574]
+-   [*] Bump Aztec version to `1.6.3` [#47610]
+
+## 1.87.3
+-   [*] Fix insert blocks not handling raw string properly in unsupported block editor [#47472]
+
+## 1.87.2
+-   [*] Add boolean contentStyle and clientId check to Column Edit InnerBlocks [#47234]
+-   [*] Line-height and font-size regression fixes [#47284]
+
+## 1.87.1
+-   [**] Gallery block: Address styling regression, in which negative margin was added [#47086]
+-   [*] RichText - Parse CSS values and avoid setting undefined ones [#47080]
+
+## 1.87.0
+-   [*] Add capabilities to force only Core blocks and control Support section [#46215]
+
+## 1.86.1
+-   [*] Block Actions Menu - Fix block title regression and adds integration tests [#46699]
+
+## 1.86.0
+-   [**] Upgrade React Native to 0.69.4 [#43485]
+-   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
+
+## 1.85.1
+-   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
+
+## 1.85.0
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
+
+## 1.84.1
+-   [**] Native inner blocks merge where appropriate [#45048]
+
+## 1.84.0
+-   [*] Upgrade compile and target sdk version to Android API 31 [#44610]
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
+
+## 1.83.0
+* No User facing changes *
+
+## 1.82.1
+-   [**] List block v2: Fix issues splitting or merging paragraphs into the block [#43949]
+
+## 1.82.0
+-   [*] [iOS] Explicitly set tint color for action sheets to always be blue [#43759]
+
+## 1.81.2
+-   [**] List V2 - Prevent error when list is empty [#43861]
+
+## 1.81.1
+-   [*] List block v2: Fix text color inconsistencies with list items [#43244]
+-   [*] Use default placeholder text color for native List Item [#43353]
+-   [**] Add BlockListCompact [#43431]
+-   [*] Fix dynamic React Native version [#43058]
+-   [**] Disable FastImage on Android [#43322]
+
+## 1.81.0
+-   [***] List block V2 [#42702]
+
+## 1.80.1
+-   [*] Image - Workaround for Android and orientation changes [#42900]
+
 ## 1.80.0
 -   [*] Add React Native FastImage [#42009]
 -   [*] Block inserter displays block collections [#42405]

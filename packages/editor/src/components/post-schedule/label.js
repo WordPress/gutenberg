@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
-import { __experimentalGetSettings, getDate, dateI18n } from '@wordpress/date';
+import { getSettings, getDate, dateI18n } from '@wordpress/date';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -33,7 +33,7 @@ export function getFullPostScheduleLabel( dateAttribute ) {
 
 	const timezoneAbbreviation = getTimezoneAbbreviation();
 	const formattedDate = dateI18n(
-		// translators: If using a space between 'g:i' and 'a', use a non-breaking sapce.
+		// translators: If using a space between 'g:i' and 'a', use a non-breaking space.
 		_x( 'F j, Y g:i\xa0a', 'post schedule full date format' ),
 		date
 	);
@@ -62,7 +62,7 @@ export function getPostScheduleLabel(
 		return sprintf(
 			// translators: %s: Time of day the post is scheduled for.
 			__( 'Today at %s' ),
-			// translators: If using a space between 'g:i' and 'a', use a non-breaking sapce.
+			// translators: If using a space between 'g:i' and 'a', use a non-breaking space.
 			dateI18n( _x( 'g:i\xa0a', 'post schedule time format' ), date )
 		);
 	}
@@ -74,14 +74,14 @@ export function getPostScheduleLabel(
 		return sprintf(
 			// translators: %s: Time of day the post is scheduled for.
 			__( 'Tomorrow at %s' ),
-			// translators: If using a space between 'g:i' and 'a', use a non-breaking sapce.
+			// translators: If using a space between 'g:i' and 'a', use a non-breaking space.
 			dateI18n( _x( 'g:i\xa0a', 'post schedule time format' ), date )
 		);
 	}
 
 	if ( date.getFullYear() === now.getFullYear() ) {
 		return dateI18n(
-			// translators: If using a space between 'g:i' and 'a', use a non-breaking sapce.
+			// translators: If using a space between 'g:i' and 'a', use a non-breaking space.
 			_x( 'F j g:i\xa0a', 'post schedule date format without year' ),
 			date
 		);
@@ -95,7 +95,7 @@ export function getPostScheduleLabel(
 }
 
 function getTimezoneAbbreviation() {
-	const { timezone } = __experimentalGetSettings();
+	const { timezone } = getSettings();
 
 	if ( timezone.abbr && isNaN( Number( timezone.abbr ) ) ) {
 		return timezone.abbr;
@@ -106,7 +106,7 @@ function getTimezoneAbbreviation() {
 }
 
 function isTimezoneSameAsSiteTimezone( date ) {
-	const { timezone } = __experimentalGetSettings();
+	const { timezone } = getSettings();
 
 	const siteOffset = Number( timezone.offset );
 	const dateOffset = -1 * ( date.getTimezoneOffset() / 60 );

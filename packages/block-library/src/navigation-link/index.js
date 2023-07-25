@@ -9,6 +9,7 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
@@ -88,9 +89,12 @@ export const settings = {
 	transforms,
 };
 
-// importing this file includes side effects. This is added in block-library/package.json under sideEffects
-addFilter(
-	'blocks.registerBlockType',
-	'core/navigation-link',
-	enhanceNavigationLinkVariations
-);
+export const init = () => {
+	addFilter(
+		'blocks.registerBlockType',
+		'core/navigation-link',
+		enhanceNavigationLinkVariations
+	);
+
+	return initBlock( { name, metadata, settings } );
+};

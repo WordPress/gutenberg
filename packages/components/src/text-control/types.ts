@@ -1,16 +1,15 @@
 /**
- * External dependencies
- */
-import type { HTMLInputTypeAttribute } from 'react';
-
-/**
  * Internal dependencies
  */
 import type { BaseControlProps } from '../base-control/types';
 
 export type TextControlProps = Pick<
 	BaseControlProps,
-	'className' | 'hideLabelFromVision' | 'help' | 'label'
+	| 'className'
+	| 'hideLabelFromVision'
+	| 'help'
+	| 'label'
+	| '__nextHasNoMarginBottom'
 > & {
 	/**
 	 * A function that receives the value of the input.
@@ -25,5 +24,5 @@ export type TextControlProps = Pick<
 	 *
 	 * @default 'text'
 	 */
-	type?: HTMLInputTypeAttribute;
+	type?: 'email' | 'number' | 'password' | 'tel' | 'text' | 'search' | 'url';
 };

@@ -784,6 +784,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {},
 					},
@@ -808,6 +809,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {
 							class: 'test',
@@ -834,6 +836,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'core/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {
 							class: 'custom-format',
@@ -899,6 +902,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {},
 					},
@@ -906,6 +910,31 @@ export const specWithRegistration = [
 			],
 			replacements: [ , ],
 			text: 'a',
+		},
+	},
+	{
+		description: 'should be non editable',
+		formatName: 'my-plugin/non-editable',
+		formatType: {
+			title: 'Non Editable',
+			tagName: 'a',
+			className: 'non-editable',
+			contentEditable: false,
+			edit() {},
+		},
+		html: '<a class="non-editable">a</a>',
+		value: {
+			formats: [ , ],
+			replacements: [
+				{
+					type: 'my-plugin/non-editable',
+					tagName: 'a',
+					attributes: {},
+					unregisteredAttributes: {},
+					innerHTML: 'a',
+				},
+			],
+			text: OBJECT_REPLACEMENT_CHARACTER,
 		},
 	},
 ];

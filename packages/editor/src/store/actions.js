@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -16,6 +11,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { applyFilters } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -48,7 +44,7 @@ export const setupEditor =
 			// included as part of editor setup action. Assume edited content as
 			// canonical if provided, falling back to post.
 			let content;
-			if ( has( edits, [ 'content' ] ) ) {
+			if ( 'content' in edits ) {
 				content = edits.content;
 			} else {
 				content = post.content.raw;
@@ -182,15 +178,26 @@ export const savePost =
 				edits,
 				options
 			);
-		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
-		const error = registry
+		let error = registry
 			.select( coreStore )
 			.getLastEntitySaveError(
 				'postType',
 				previousRecord.type,
 				previousRecord.id
 			);
+
+		if ( ! error ) {
+			await applyFilters(
+				'editor.__unstableSavePost',
+				Promise.resolve(),
+				options
+			).catch( ( err ) => {
+				error = err;
+			} );
+		}
+		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
 		if ( error ) {
 			const args = getNotificationArgumentsForSaveFail( {
 				post: previousRecord,
@@ -252,6 +259,7 @@ export const trashPost =
 		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
 		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
 			postType;
+		dispatch( { type: 'REQUEST_POST_DELETE_START' } );
 		try {
 			const post = select.getCurrentPost();
 			await apiFetch( {
@@ -267,6 +275,7 @@ export const trashPost =
 					...getNotificationArgumentsForTrashFail( { error } )
 				);
 		}
+		dispatch( { type: 'REQUEST_POST_DELETE_FINISH' } );
 	};
 
 /**
@@ -290,6 +299,26 @@ export const autosave =
 		} else {
 			await dispatch.savePost( { isAutosave: true, ...options } );
 		}
+	};
+
+export const __unstableSaveForPreview =
+	( { forceIsAutosaveable } ) =>
+	async ( { select, dispatch } ) => {
+		if (
+			( forceIsAutosaveable || select.isEditedPostAutosaveable() ) &&
+			! select.isPostLocked()
+		) {
+			const isDraft = [ 'draft', 'auto-draft' ].includes(
+				select.getEditedPostAttribute( 'status' )
+			);
+			if ( isDraft ) {
+				await dispatch.savePost( { isPreview: true } );
+			} else {
+				await dispatch.autosave( { isPreview: true } );
+			}
+		}
+
+		return select.getEditedPostPreviewLink();
 	};
 
 /**

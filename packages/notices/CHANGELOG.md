@@ -2,6 +2,65 @@
 
 ## Unreleased
 
+## 4.6.0 (2023-07-20)
+
+## 4.5.0 (2023-07-05)
+
+## 4.4.0 (2023-06-23)
+
+## 4.3.0 (2023-06-07)
+
+### New Feature
+
+-   Add a new action `removeNotices` which allows bulk removal of notices by their IDs. ([#39940](https://github.com/WordPress/gutenberg/pull/39940))
+-   Add a new action `removeAllNotices` which removes all notices from a given context. ([#44059](https://github.com/WordPress/gutenberg/pull/44059))
+
+## 4.2.0 (2023-05-24)
+
+## 4.1.0 (2023-05-10)
+
+## 4.0.0 (2023-04-26)
+
+### Breaking Change
+
+-   Publish Typescript build types to npm. ([#49650](https://github.com/WordPress/gutenberg/pull/49650))
+
+## 3.31.0 (2023-04-12)
+
+## 3.30.0 (2023-03-29)
+
+## 3.29.0 (2023-03-15)
+
+## 3.28.0 (2023-03-01)
+
+## 3.27.0 (2023-02-15)
+
+## 3.26.0 (2023-02-01)
+
+## 3.25.0 (2023-01-11)
+
+## 3.24.0 (2023-01-02)
+
+## 3.23.0 (2022-12-14)
+
+## 3.22.0 (2022-11-16)
+
+## 3.21.0 (2022-11-02)
+
+## 3.20.0 (2022-10-19)
+
+## 3.19.0 (2022-10-05)
+
+## 3.18.0 (2022-09-21)
+
+## 3.17.0 (2022-09-13)
+
+## 3.16.0 (2022-08-24)
+
+## 3.15.0 (2022-08-10)
+
+## 3.14.0 (2022-07-27)
+
 ## 3.13.0 (2022-07-13)
 
 ## 3.12.0 (2022-06-29)

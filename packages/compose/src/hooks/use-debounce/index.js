@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { debounce } from 'lodash';
 import { useMemoOne } from 'use-memo-one';
 
 /**
@@ -9,9 +8,13 @@ import { useMemoOne } from 'use-memo-one';
  */
 import { useEffect } from '@wordpress/element';
 
-/* eslint-disable jsdoc/valid-types */
 /**
- * Debounces a function with Lodash's `debounce`. A new debounced function will
+ * Internal dependencies
+ */
+import { debounce } from '../../utils/debounce';
+
+/**
+ * Debounces a function similar to Lodash's `debounce`. A new debounced function will
  * be returned and any scheduled calls cancelled if any of the arguments change,
  * including the function to debounce, so please wrap functions created on
  * render in components in `useCallback`.
@@ -20,15 +23,14 @@ import { useEffect } from '@wordpress/element';
  *
  * @template {(...args: any[]) => void} TFunc
  *
- * @param {TFunc}                             fn        The function to debounce.
- * @param {number}                            [wait]    The number of milliseconds to delay.
- * @param {import('lodash').DebounceSettings} [options] The options object.
- * @return {import('lodash').DebouncedFunc<TFunc>} Debounced function.
+ * @param {TFunc}                                          fn        The function to debounce.
+ * @param {number}                                         [wait]    The number of milliseconds to delay.
+ * @param {import('../../utils/debounce').DebounceOptions} [options] The options object.
+ * @return {import('../../utils/debounce').DebouncedFunc<TFunc>} Debounced function.
  */
 export default function useDebounce( fn, wait, options ) {
-	/* eslint-enable jsdoc/valid-types */
 	const debounced = useMemoOne(
-		() => debounce( fn, wait, options ),
+		() => debounce( fn, wait ?? 0, options ),
 		[ fn, wait, options ]
 	);
 	useEffect( () => () => debounced.cancel(), [ debounced ] );

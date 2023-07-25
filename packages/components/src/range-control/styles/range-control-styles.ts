@@ -18,6 +18,7 @@ import type {
 	TooltipProps,
 	TrackProps,
 	WrapperProps,
+	RangeControlProps,
 } from '../types';
 
 const rangeHeightValue = 30;
@@ -26,27 +27,37 @@ const rangeHeight = () =>
 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
 const thumbSize = 12;
 
-export const Root = styled.div`
+const deprecatedHeight = ( {
+	__next40pxDefaultSize,
+}: Pick< RangeControlProps, '__next40pxDefaultSize' > ) =>
+	! __next40pxDefaultSize && css( { minHeight: rangeHeightValue } );
+
+type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' >;
+export const Root = styled.div< RootProps >`
 	-webkit-tap-highlight-color: transparent;
-	box-sizing: border-box;
-	align-items: flex-start;
-	display: inline-flex;
+	align-items: center;
+	display: flex;
 	justify-content: flex-start;
 	padding: 0;
 	position: relative;
 	touch-action: none;
 	width: 100%;
+	min-height: 40px;
+	/* TODO: remove after removing the __next40pxDefaultSize prop */
+	${ deprecatedHeight };
 `;
 
 const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
 	css( { color } );
 
-const wrapperMargin = ( { marks }: WrapperProps ) =>
-	css( { marginBottom: marks ? 16 : undefined } );
+const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
+	if ( ! __nextHasNoMarginBottom ) {
+		return css( { marginBottom: marks ? 16 : undefined } );
+	}
+	return '';
+};
 
 export const Wrapper = styled.div< WrapperProps >`
-	box-sizing: border-box;
-	color: ${ COLORS.blue.medium.focus };
 	display: block;
 	flex: 1;
 	position: relative;
@@ -58,12 +69,14 @@ export const Wrapper = styled.div< WrapperProps >`
 `;
 
 export const BeforeIconWrapper = styled.span`
+	display: flex; // ensures the height isn't affected by line-height
 	margin-top: ${ railHeight }px;
 
 	${ rtl( { marginRight: 6 } ) }
 `;
 
 export const AfterIconWrapper = styled.span`
+	display: flex; // ensures the height isn't affected by line-height
 	margin-top: ${ railHeight }px;
 
 	${ rtl( { marginLeft: 6 } ) }
@@ -73,15 +86,14 @@ const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
 	let background = railColor || '';
 
 	if ( disabled ) {
-		background = COLORS.lightGray[ 400 ];
+		background = COLORS.ui.backgroundDisabled;
 	}
 
 	return css( { background } );
 };
 
 export const Rail = styled.span`
-	background-color: ${ COLORS.lightGray[ 600 ] };
-	box-sizing: border-box;
+	background-color: ${ COLORS.gray[ 300 ] };
 	left: 0;
 	pointer-events: none;
 	right: 0;
@@ -99,7 +111,7 @@ const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
 	let background = trackColor || 'currentColor';
 
 	if ( disabled ) {
-		background = COLORS.lightGray[ 800 ];
+		background = COLORS.gray[ 400 ];
 	}
 
 	return css( { background } );
@@ -108,7 +120,6 @@ const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
 export const Track = styled.span`
 	background-color: currentColor;
 	border-radius: ${ railHeight }px;
-	box-sizing: border-box;
 	height: ${ railHeight }px;
 	pointer-events: none;
 	display: block;
@@ -120,7 +131,6 @@ export const Track = styled.span`
 `;
 
 export const MarksWrapper = styled.span`
-	box-sizing: border-box;
 	display: block;
 	pointer-events: none;
 	position: relative;
@@ -129,10 +139,10 @@ export const MarksWrapper = styled.span`
 `;
 
 const markFill = ( { disabled, isFilled }: RangeMarkProps ) => {
-	let backgroundColor = isFilled ? 'currentColor' : COLORS.lightGray[ 600 ];
+	let backgroundColor = isFilled ? 'currentColor' : COLORS.gray[ 300 ];
 
 	if ( disabled ) {
-		backgroundColor = COLORS.lightGray[ 800 ];
+		backgroundColor = COLORS.gray[ 400 ];
 	}
 
 	return css( {
@@ -141,7 +151,6 @@ const markFill = ( { disabled, isFilled }: RangeMarkProps ) => {
 };
 
 export const Mark = styled.span`
-	box-sizing: border-box;
 	height: ${ thumbSize }px;
 	left: 0;
 	position: absolute;
@@ -153,13 +162,12 @@ export const Mark = styled.span`
 
 const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 	return css( {
-		color: isFilled ? COLORS.darkGray[ 300 ] : COLORS.lightGray[ 600 ],
+		color: isFilled ? COLORS.gray[ 700 ] : COLORS.gray[ 300 ],
 	} );
 };
 
 export const MarkLabel = styled.span`
-	box-sizing: border-box;
-	color: ${ COLORS.lightGray[ 600 ] };
+	color: ${ COLORS.gray[ 300 ] };
 	left: 0;
 	font-size: 11px;
 	position: absolute;
@@ -173,15 +181,14 @@ export const MarkLabel = styled.span`
 const thumbColor = ( { disabled }: ThumbProps ) =>
 	disabled
 		? css`
-				background-color: ${ COLORS.lightGray[ 800 ] };
+				background-color: ${ COLORS.gray[ 400 ] };
 		  `
 		: css`
-				background-color: var( --wp-admin-theme-color );
+				background-color: ${ COLORS.ui.theme };
 		  `;
 
 export const ThumbWrapper = styled.span`
 	align-items: center;
-	box-sizing: border-box;
 	display: flex;
 	height: ${ thumbSize }px;
 	justify-content: center;
@@ -208,7 +215,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 				&::before {
 					content: ' ';
 					position: absolute;
-					background-color: var( --wp-admin-theme-color );
+					background-color: ${ COLORS.ui.theme };
 					opacity: 0.4;
 					border-radius: 50%;
 					height: ${ thumbSize + 8 }px;
@@ -223,7 +230,6 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 export const Thumb = styled.span< ThumbProps >`
 	align-items: center;
 	border-radius: 50%;
-	box-sizing: border-box;
 	height: 100%;
 	outline: 0;
 	position: absolute;
@@ -272,7 +278,6 @@ const tooltipPosition = ( { position }: TooltipProps ) => {
 export const Tooltip = styled.span< TooltipProps >`
 	background: rgba( 0, 0, 0, 0.8 );
 	border-radius: 2px;
-	box-sizing: border-box;
 	color: white;
 	display: inline-block;
 	font-size: 12px;
@@ -298,11 +303,9 @@ export const Tooltip = styled.span< TooltipProps >`
 // @todo: Refactor RangeControl with latest HStack configuration
 // @wordpress/components/ui/hstack.
 export const InputNumber = styled( NumberControl )`
-	box-sizing: border-box;
 	display: inline-block;
 	font-size: 13px;
 	margin-top: 0;
-	width: ${ space( 16 ) } !important;
 
 	input[type='number']& {
 		${ rangeHeight };
@@ -312,7 +315,6 @@ export const InputNumber = styled( NumberControl )`
 `;
 
 export const ActionRightWrapper = styled.span`
-	box-sizing: border-box;
 	display: block;
 	margin-top: 0;
 

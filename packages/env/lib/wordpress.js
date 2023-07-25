@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -5,6 +6,7 @@ const dockerCompose = require( 'docker-compose' );
 const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
+const got = require( 'got' );
 
 /**
  * Promisified dependencies
@@ -13,7 +15,7 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./config').WPEnvironmentConfig} WPEnvironmentConfig
  * @typedef {import('./config').WPSource} WPSource
  * @typedef {'development'|'tests'} WPEnvironment
  * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
@@ -43,20 +45,7 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  * @param {Object}        spinner     A CLI spinner which indicates progress.
  */
 async function configureWordPress( environment, config, spinner ) {
-	const url = ( () => {
-		const port = config.env[ environment ].port;
-		const domain =
-			environment === 'tests'
-				? config.env.tests.config.WP_TESTS_DOMAIN
-				: config.env.development.config.WP_SITEURL;
-		if ( port === 80 ) {
-			return domain;
-		}
-
-		return `${ domain }:${ port }`;
-	} )();
-
-	const installCommand = `wp core install --url="${ url }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	const installCommand = `wp core install --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [ 'set -eo pipefail', installCommand ];
@@ -98,6 +87,7 @@ async function configureWordPress( environment, config, spinner ) {
 		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
 		{
 			config: config.dockerComposeConfigPath,
+			commandOptions: [ '--rm' ],
 			log: config.debug,
 		}
 	);
@@ -159,30 +149,13 @@ async function setupWordPressDirectories( config ) {
 			config.env.development.coreSource.path,
 			config.env.development.coreSource.testsPath
 		);
-		await createUploadsDir( config.env.development.coreSource.testsPath );
 	}
-
-	const checkedPaths = {};
-	for ( const { coreSource } of Object.values( config.env ) ) {
-		if ( coreSource && ! checkedPaths[ coreSource.path ] ) {
-			await createUploadsDir( coreSource.path );
-			checkedPaths[ coreSource.path ] = true;
-		}
-	}
-}
-
-async function createUploadsDir( corePath ) {
-	// Ensure the tests uploads folder is writeable for travis,
-	// creating the folder if necessary.
-	const uploadPath = path.join( corePath, 'wp-content/uploads' );
-	await fs.mkdir( uploadPath, { recursive: true } );
-	await fs.chmod( uploadPath, 0o0767 );
 }
 
 /**
  * Returns true if all given environment configs have the same core source.
  *
- * @param {WPServiceConfig[]} envs An array of environments to check.
+ * @param {WPEnvironmentConfig[]} envs An array of environments to check.
  *
  * @return {boolean} True if all the environments have the same core source.
  */
@@ -246,11 +219,6 @@ async function copyCoreFiles( fromPath, toPath ) {
  * @return {string} The version of WordPress the source is for.
  */
 async function readWordPressVersion( coreSource, spinner, debug ) {
-	// No source means they're using the bleeding edge.
-	if ( coreSource === null ) {
-		return null;
-	}
-
 	const versionFilePath = path.join(
 		coreSource.path,
 		'wp-includes',
@@ -275,6 +243,31 @@ async function readWordPressVersion( coreSource, spinner, debug ) {
 	return versionMatch[ 1 ];
 }
 
+/**
+ * Returns the latest stable version of WordPress by requesting the stable-check
+ * endpoint on WordPress.org.
+ *
+ * @return {string} The latest stable version of WordPress, like "6.0.1"
+ */
+let CACHED_WP_VERSION;
+async function getLatestWordPressVersion() {
+	// Avoid extra network requests.
+	if ( CACHED_WP_VERSION ) {
+		return CACHED_WP_VERSION;
+	}
+
+	const versions = await got(
+		'https://api.wordpress.org/core/stable-check/1.0/'
+	).json();
+
+	for ( const [ version, status ] of Object.entries( versions ) ) {
+		if ( status === 'latest' ) {
+			CACHED_WP_VERSION = version;
+			return version;
+		}
+	}
+}
+
 module.exports = {
 	hasSameCoreSource,
 	checkDatabaseConnection,
@@ -282,4 +275,5 @@ module.exports = {
 	resetDatabase,
 	setupWordPressDirectories,
 	readWordPressVersion,
+	getLatestWordPressVersion,
 };

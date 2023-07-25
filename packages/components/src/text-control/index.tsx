@@ -21,22 +21,24 @@ function UnforwardedTextControl(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
+		__nextHasNoMarginBottom,
 		label,
 		hideLabelFromVision,
 		value,
 		help,
+		id: idProp,
 		className,
 		onChange,
 		type = 'text',
 		...additionalProps
 	} = props;
-	const instanceId = useInstanceId( TextControl );
-	const id = `inspector-text-control-${ instanceId }`;
+	const id = useInstanceId( TextControl, 'inspector-text-control', idProp );
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
@@ -60,8 +62,6 @@ function UnforwardedTextControl(
 /**
  * TextControl components let users enter and edit text.
  *
- *
- * @example
  * ```jsx
  * import { TextControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';

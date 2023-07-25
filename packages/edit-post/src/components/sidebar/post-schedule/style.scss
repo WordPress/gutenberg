@@ -7,15 +7,16 @@
 		display: block;
 		width: 45%;
 		flex-shrink: 0;
+		// Match padding on tertiary buttons for alignment.
+		padding: $grid-unit-15 * 0.5 0;
 	}
 }
 
 .components-button.edit-post-post-schedule__toggle {
 	text-align: left;
 	white-space: normal;
-	height: auto;
 
-	// This span is added by the Popover in Tooltip when no anchorRef is
+	// This span is added by the Popover in Tooltip when no anchor is
 	// provided. We set its width to 0 so that it does not cause the button text
 	// to wrap to a new line when displaying the tooltip. A better fix would be
 	// to pass anchorRef and avoid the need for a span alltogether, which is

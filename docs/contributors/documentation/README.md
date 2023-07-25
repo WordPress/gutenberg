@@ -14,7 +14,7 @@ The Gutenberg project uses GitHub for managing code and tracking issues. The mai
 
 There are two major sets of documentation for the Gutenberg project:
 
-1. [User documentation](https://wordpress.org/support/article/wordpress-editor/) is information on how to use the Editor as an author publishing posts. For contributing to user docs, follow the docs blog, or ask in the #docs Slack channel, to understand the current priorities.
+1. [User documentation](https://wordpress.org/documentation/article/wordpress-block-editor/) is information on how to use the Editor as an author publishing posts. For contributing to user docs, follow the docs blog, or ask in the #docs Slack channel, to understand the current priorities.
 2. [Block editor handbook](https://developer.wordpress.org/block-editor/) is everything related to the Gutenberg project including: developing, extending, and—what you are reading right now—contributing specific to Gutenberg.
 
 The rest of this document covers contributing to the block editor handbook.
@@ -50,7 +50,7 @@ To update an existing page:
 2. Create a branch to work, for example `docs/update-contrib-guide`.
 3. Make the necessary changes to the existing document.
 4. Commit your changes.
-5. Create a pull request using "\[Type\] Documentation" label.
+5. Create a pull request using the [\[Type\] Developer Documentation](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Developer%20Documentation) label.
 
 ### Create a new document
 
@@ -63,6 +63,25 @@ To add a new document requires a working JavaScript development environment to b
 5. Commit `manifest.json` with other files updated.
 
 If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommitted local change that must be committed.
+
+### Documenting Packages
+
+Package documentation is generated automatically by the documentation tool by pulling the contents of the README.md file located in the root of the package. Sometimes however, it is preferable to split the contents of the README out into smaller, easier to read portions.
+
+This can be accomplished by creating a `docs` directory in the package and adding `toc.json` file that contains references other markdown files also contained in the `docs` directory. The `toc.json` file should contain an array of pages to be added as sub-pages of the main README file. The formatting follows the [`manifest.json`](https://github.com/WordPress/gutenberg/blob/HEAD/docs/manifest.json) file that is generated automatically.
+
+In order for these pages to be nested under the main package name, be sure to set the `parent` property correctly. See the example below that adds child pages to the [`@wordpress/create-block` section](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/).
+
+```json
+[
+	{
+		"title": "@wordpress/create-block External Template",
+		"slug": "packages-create-block-external-template",
+		"markdown_source": "../packages/create-block/docs/external-template.md",
+		"parent": "packages-create-block"
+	}
+]
+```
 
 ### Using links
 
@@ -83,6 +102,10 @@ This way they will be properly handled in all three aforementioned contexts.
 Use the full directory and filename from the Gutenberg repository, not the published path; the Block Editor Handbook creates short URLs—you can see this in the tutorials section. Likewise, the `readme.md` portion is dropped in the handbook, but should be included in links.
 
 An example, the link to this page is: `/docs/contributors/documentation/README.md`
+
+<div class="callout callout-warning">
+<b>Note:</b> The usual link transformation is not applied to links in callouts. See below. 
+</div>
 
 ### Code examples
 
@@ -113,7 +136,7 @@ The preferred format for code examples is JSX, this should be the default view. 
 
 The Block Editor handbook supports the same [notice styles as other WordPress handbooks](https://make.wordpress.org/docs/handbook/documentation-team-handbook/handbooks-style-and-formatting-guide/#formatting). However, the shortcode implementation is not ideal with the different locations the block editor handbook documentation is published (npm, GitHub).
 
-The recommended way to implement in markdown is to use the raw HTML and `callout callout-LEVEL` classes. For example:
+The recommended way to implement in markdown is to use the raw HTML and`callout callout-LEVEL` classes. For example:
 
 ```html
 <div class="callout callout-info">This is an **info** callout.</div>
@@ -137,6 +160,14 @@ This is an **alert** callout.
 This is a **warning** callout.
 </div>
 
+<div class="callout callout-warning">
+Note: In callout notices, links also need to be HTML `&lt;a href>&lt;/a>` notations. 
+The usual link transformation is not applied to links in callouts.
+For instance, to reach the Getting started > Create Block page the URL in GitHub is
+https://developer.wordpress.org/docs/getting-started/create-block/README.md
+and will have to be hardcoded for the endpoint in the Block Editor Handbook as 
+<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a> to link correctly in the handbook. 
+</div>
 ### Editor config
 
 You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for complete details.

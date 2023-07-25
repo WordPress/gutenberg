@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -36,19 +31,22 @@ import {
  * @return {Function} Higher-order component.
  */
 const withViewportMatch = ( queries ) => {
+	const queryEntries = Object.entries( queries );
 	const useViewPortQueriesResult = () =>
-		mapValues( queries, ( query ) => {
-			let [ operator, breakpointName ] = query.split( ' ' );
-			if ( breakpointName === undefined ) {
-				breakpointName = operator;
-				operator = '>=';
-			}
-			// Hooks should unconditionally execute in the same order,
-			// we are respecting that as from the static query of the HOC we generate
-			// a hook that calls other hooks always in the same order (because the query never changes).
-			// eslint-disable-next-line react-hooks/rules-of-hooks
-			return useViewportMatch( breakpointName, operator );
-		} );
+		Object.fromEntries(
+			queryEntries.map( ( [ key, query ] ) => {
+				let [ operator, breakpointName ] = query.split( ' ' );
+				if ( breakpointName === undefined ) {
+					breakpointName = operator;
+					operator = '>=';
+				}
+				// Hooks should unconditionally execute in the same order,
+				// we are respecting that as from the static query of the HOC we generate
+				// a hook that calls other hooks always in the same order (because the query never changes).
+				// eslint-disable-next-line react-hooks/rules-of-hooks
+				return [ key, useViewportMatch( breakpointName, operator ) ];
+			} )
+		);
 	return createHigherOrderComponent( ( WrappedComponent ) => {
 		return pure( ( props ) => {
 			const queriesResult = useViewPortQueriesResult();

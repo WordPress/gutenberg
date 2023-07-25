@@ -2,8 +2,10 @@
 <ruleset name="WordPress Coding Standards for Gutenberg Plugin">
 	<description>Sniffs for WordPress plugins, with minor modifications for Gutenberg</description>
 
-	<rule ref="PHPCompatibility"/>
 	<config name="testVersion" value="5.6-"/>
+	<rule ref="PHPCompatibilityWP">
+		<include-pattern>*\.php$</include-pattern>
+	</rule>
 
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
@@ -24,11 +26,16 @@
 	</rule>
 
 	<rule ref="WordPress.WP.I18n.MissingArgDomainDefault">
+		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>packages/block-library/src/*</exclude-pattern>
+		<exclude-pattern>build/block-library/*</exclude-pattern>
 	</rule>
 
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
+
+	<!-- Cache the scan results and re-use those for unchanged files on the next scan. -->
+	<arg name="cache" value=".cache/phpcs.json"/>
 
 	<file>./bin</file>
 	<file>./gutenberg.php</file>
@@ -39,6 +46,11 @@
 
 	<!-- Exclude generated files -->
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
+	<exclude-pattern>node_modules/*</exclude-pattern>
+
+	<!-- Exclude third party libraries -->
+	<exclude-pattern>./vendor/*</exclude-pattern>
+	<exclude-pattern>./test/php/gutenberg-coding-standards/*</exclude-pattern>
 
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
@@ -51,6 +63,7 @@
 	</rule>
 	<rule ref="Squiz.Commenting.FileComment.Missing">
 		<exclude-pattern>phpunit/*</exclude-pattern>
+		<exclude-pattern>**/*.min.asset.php</exclude-pattern>
 	</rule>
 	<rule ref="Squiz.Commenting.ClassComment.Missing">
 		<exclude-pattern>phpunit/*</exclude-pattern>
@@ -87,5 +100,29 @@
 	<!-- Ignore filename error since it requires WP core build process change -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+
+	<!-- Exclude PHPUnit tests from file and class name sniffs (for Core parity). -->
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+	<rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+
+	<!-- Enforce checks against redeclaration for functions and classes. -->
+	<rule ref="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames">
+		<exclude-pattern>./phpunit/*</exclude-pattern>
+		<exclude-pattern>./packages/*</exclude-pattern>
+		<exclude-pattern>./bin/generate-gutenberg-php</exclude-pattern>
+		<properties>
+			<property name="functionsWhiteList" type="array">
+				<element value="/^_?gutenberg.+/"/>
+			</property>
+			<property name="classesWhiteList" type="array">
+				<element value="/^Gutenberg.+/"/>
+			</property>
+		</properties>
 	</rule>
 </ruleset>

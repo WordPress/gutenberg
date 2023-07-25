@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, partial } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -35,11 +30,9 @@ function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
 	return (
 		<PostFeaturedImageCheck>
 			<PanelBody
-				title={ get(
-					postType,
-					[ 'labels', 'featured_image' ],
-					__( 'Featured image' )
-				) }
+				title={
+					postType?.labels?.featured_image ?? __( 'Featured image' )
+				}
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
 			>
@@ -66,7 +59,8 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	const { toggleEditorPanelOpened } = dispatch( editPostStore );
 
 	return {
-		onTogglePanel: partial( toggleEditorPanelOpened, PANEL_NAME ),
+		onTogglePanel: ( ...args ) =>
+			toggleEditorPanelOpened( PANEL_NAME, ...args ),
 	};
 } );
 

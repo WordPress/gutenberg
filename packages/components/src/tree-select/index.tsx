@@ -1,24 +1,24 @@
 /**
- * External dependencies
- */
-import { unescape as unescapeString } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+
 /**
  * Internal dependencies
  */
 import { SelectControl } from '../select-control';
-import type { TreeSelectProps, Tree, SelectOptions, Truthy } from './types';
+import type { TreeSelectProps, Tree, Truthy } from './types';
 
-function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
+function getSelectOptions(
+	tree: Tree[],
+	level = 0
+): NonNullable< TreeSelectProps[ 'options' ] > {
 	return tree.flatMap( ( treeNode ) => [
 		{
 			value: treeNode.id,
 			label:
-				'\u00A0'.repeat( level * 3 ) + unescapeString( treeNode.name ),
+				'\u00A0'.repeat( level * 3 ) + decodeEntities( treeNode.name ),
 		},
 		...getSelectOptions( treeNode.children || [], level + 1 ),
 	] );

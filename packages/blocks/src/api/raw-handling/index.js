@@ -71,7 +71,7 @@ export function rawHandler( { HTML = '' } ) {
 			piece = deepFilterHTML( piece, filters, blockContentSchema );
 			piece = normaliseBlocks( piece );
 
-			return htmlToBlocks( piece );
+			return htmlToBlocks( piece, rawHandler );
 		} )
 		.flat()
 		.filter( Boolean );

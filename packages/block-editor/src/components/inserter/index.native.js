@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { AccessibilityInfo, Platform, Text } from 'react-native';
-import { delay } from 'lodash';
+import { AccessibilityInfo, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -36,33 +35,17 @@ const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 const defaultRenderToggle = ( {
 	onToggle,
 	disabled,
-	style,
-	containerStyle,
+	iconStyle,
+	buttonStyle,
 	onLongPress,
-	useExpandedMode,
 } ) => {
-	// The "expanded mode" refers to the editor's appearance when no blocks
-	// are currently selected. The "add block" button has a separate style
-	// for the "expanded mode", which are added via the below "expandedModeViewProps"
-	// and "expandedModeViewText" variables.
-	const expandedModeViewProps = useExpandedMode && {
-		icon: <Icon icon={ plus } style={ style } />,
-		customContainerStyles: containerStyle,
-		fixedRatio: false,
-	};
-	const expandedModeViewText = (
-		<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
-			{ __( 'Add blocks' ) }
-		</Text>
-	);
-
 	return (
 		<ToolbarButton
 			title={ _x(
 				'Add block',
 				'Generic label for block inserter button'
 			) }
-			icon={ <Icon icon={ plusCircleFilled } style={ style } /> }
+			icon={ <Icon icon={ plus } style={ iconStyle } /> }
 			onClick={ onToggle }
 			extraProps={ {
 				hint: __( 'Double tap to add a block' ),
@@ -70,22 +53,28 @@ const defaultRenderToggle = ( {
 				// usually required for components. See: https://github.com/WordPress/gutenberg/pull/18832#issuecomment-561411389.
 				testID: 'add-block-button',
 				onLongPress,
+				hitSlop: { top: 10, bottom: 10, left: 10, right: 10 },
 			} }
 			isDisabled={ disabled }
-			{ ...expandedModeViewProps }
-		>
-			{ useExpandedMode && expandedModeViewText }
-		</ToolbarButton>
+			customContainerStyles={ buttonStyle }
+			fixedRatio={ false }
+		/>
 	);
 };
 
 export class Inserter extends Component {
+	announcementTimeout;
+
 	constructor() {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
 		this.renderInserterToggle = this.renderInserterToggle.bind( this );
 		this.renderContent = this.renderContent.bind( this );
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.announcementTimeout );
 	}
 
 	getInsertionOptions() {
@@ -211,13 +200,13 @@ export class Inserter extends Component {
 	}
 
 	onInserterToggledAnnouncement( isOpen ) {
-		AccessibilityInfo.isScreenReaderEnabled().done( ( isEnabled ) => {
+		AccessibilityInfo.isScreenReaderEnabled().then( ( isEnabled ) => {
 			if ( isEnabled ) {
 				const isIOS = Platform.OS === 'ios';
 				const announcement = isOpen
 					? __( 'Scrollable block menu opened. Select a block.' )
 					: __( 'Scrollable block menu closed.' );
-				delay(
+				this.announcementTimeout = setTimeout(
 					() =>
 						AccessibilityInfo.announceForAccessibility(
 							announcement
@@ -244,21 +233,19 @@ export class Inserter extends Component {
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
 			showSeparator,
-			useExpandedMode,
 		} = this.props;
 		if ( showSeparator && isOpen ) {
 			return <BlockInsertionPoint />;
 		}
-		const style = useExpandedMode
-			? styles[ 'inserter-menu__add-block-button-icon--expanded' ]
-			: getStylesFromColorScheme(
-					styles[ 'inserter-menu__add-block-button-icon' ],
-					styles[ 'inserter-menu__add-block-button-icon--dark' ]
-			  );
 
-		const containerStyle = getStylesFromColorScheme(
+		const buttonStyle = getStylesFromColorScheme(
 			styles[ 'inserter-menu__add-block-button' ],
 			styles[ 'inserter-menu__add-block-button--dark' ]
+		);
+
+		const iconStyle = getStylesFromColorScheme(
+			styles[ 'inserter-menu__add-block-button-icon' ],
+			styles[ 'inserter-menu__add-block-button-icon--dark' ]
 		);
 
 		const onPress = () => {
@@ -296,10 +283,9 @@ export class Inserter extends Component {
 					onToggle: onPress,
 					isOpen,
 					disabled,
-					style,
-					containerStyle,
+					iconStyle,
+					buttonStyle,
 					onLongPress,
-					useExpandedMode,
 				} ) }
 				<Picker
 					ref={ ( instance ) => ( this.picker = instance ) }

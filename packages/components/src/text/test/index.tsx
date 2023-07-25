@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -14,138 +14,190 @@ describe( 'Text', () => {
 	describe( 'snapshot tests', () => {
 		test( 'should render correctly', () => {
 			const { container } = render( <Text>Lorem ipsum.</Text> );
-			expect( container.firstChild ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 	} );
 
 	test( 'should render optimizeReadabilityFor', () => {
-		const { container } = render(
-			<Text optimizeReadabilityFor="blue">Lorem ipsum.</Text>
+		render(
+			<Text role="heading" optimizeReadabilityFor="blue">
+				Lorem ipsum.
+			</Text>
 		);
-		expect( container.firstChild ).toHaveStyle( {
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
 			color: COLORS.white,
 		} );
 	} );
 
 	test( 'should render truncate', () => {
-		const { container } = render( <Text truncate>Lorem ipsum.</Text> );
-		expect( container.firstChild ).toHaveStyle( {
+		render(
+			<Text role="heading" truncate>
+				Lorem ipsum.
+			</Text>
+		);
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
 			textOverflow: 'ellipsis',
 		} );
 	} );
 
 	test( 'should render size', () => {
-		const { container } = render( <Text size="title">Lorem ipsum.</Text> );
-		expect( container.firstChild ).toHaveStyle( {
+		render(
+			<Text role="heading" size="title">
+				Lorem ipsum.
+			</Text>
+		);
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
 			fontSize: getFontSize( 'title' ),
 		} );
 	} );
 
 	test( 'should render custom size', () => {
-		const { container } = render( <Text size={ 15 }>Lorem ipsum.</Text> );
-		expect( container.firstChild ).toHaveStyle( {
+		render(
+			<Text role="heading" size={ 15 }>
+				Lorem ipsum.
+			</Text>
+		);
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
 			fontSize: getFontSize( 15 ),
 		} );
 	} );
 
 	test( 'should render variant', () => {
-		const { container } = render(
-			<Text variant="muted">Lorem ipsum.</Text>
+		render(
+			<Text role="heading" variant="muted">
+				Lorem ipsum.
+			</Text>
 		);
-		expect( container.firstChild ).toHaveStyle( {
-			color: COLORS.mediumGray.text,
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
+			color: COLORS.gray[ 700 ],
 		} );
 	} );
 
 	test( 'should render as another element', () => {
-		const { container } = render( <Text as="div">Lorem ipsum.</Text> );
-		expect( container.firstChild?.nodeName ).toBe( 'DIV' );
+		render(
+			<Text role="heading" as="div">
+				Lorem ipsum.
+			</Text>
+		);
+		expect( screen.getByRole( 'heading' )?.nodeName ).toBe( 'DIV' );
 	} );
 
 	test( 'should render align', () => {
-		const { container: centerAlignedContainer } = render(
-			<Text align="center">Lorem ipsum.</Text>
-		);
-		const { container: defaultAlignedContainer } = render(
-			<Text>Lorem ipsum.</Text>
+		render(
+			<>
+				<Text role="heading" align="center">
+					Lorem ipsum.
+				</Text>
+				<Text role="note">Lorem ipsum.</Text>
+			</>
 		);
 
-		expect(
-			defaultAlignedContainer.children[ 0 ]
-		).toMatchStyleDiffSnapshot( centerAlignedContainer.children[ 0 ] );
+		expect( screen.getByRole( 'note' ) ).toMatchStyleDiffSnapshot(
+			screen.getByRole( 'heading' )
+		);
 	} );
 
 	test( 'should render color', () => {
-		const { container } = render(
-			<Text color="orange">Lorem ipsum.</Text>
+		render(
+			<Text role="heading" color="orange">
+				Lorem ipsum.
+			</Text>
 		);
-		expect( container.firstChild ).toHaveStyle( { color: 'orange' } );
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
+			color: 'orange',
+		} );
 	} );
 
 	test( 'should render display', () => {
-		const { container } = render(
-			<Text display="inline-flex">Lorem ipsum.</Text>
+		render(
+			<Text role="heading" display="inline-flex">
+				Lorem ipsum.
+			</Text>
 		);
-		expect( container.firstChild ).toHaveStyle( {
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
 			display: 'inline-flex',
 		} );
 	} );
 
 	test( 'should render highlighted words', async () => {
-		const wrapper = render(
-			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
+		render(
+			<Text role="heading" highlightWords={ [ 'm' ] }>
+				Lorem ipsum.
+			</Text>
 		);
-		expect( wrapper.container.firstChild?.childNodes ).toHaveLength( 5 );
-		const words = await wrapper.findAllByText( 'm' );
+		expect( screen.getByRole( 'heading' )?.childNodes ).toHaveLength( 5 );
+		const words = await screen.findAllByText( 'm' );
 		expect( words ).toHaveLength( 2 );
 		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
 	} );
 
 	test( 'should render highlighted words with undefined passed', () => {
-		const { container } = render(
-			<Text highlightWords={ undefined }>Lorem ipsum.</Text>
+		render(
+			<Text role="heading" highlightWords={ undefined }>
+				Lorem ipsum.
+			</Text>
 		);
 		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered.
-		expect( container.firstChild?.childNodes ).toHaveLength( 1 );
+		expect( screen.getByRole( 'heading' )?.childNodes ).toHaveLength( 1 );
 	} );
 
 	test( 'should render highlighted words with highlightCaseSensitive', () => {
 		const { container } = render(
-			<Text highlightCaseSensitive highlightWords={ [ 'IPSUM' ] }>
+			<Text
+				role="heading"
+				highlightCaseSensitive
+				highlightWords={ [ 'IPSUM' ] }
+			>
 				Lorem ipsum.
 			</Text>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered.
-		expect( container.firstChild?.childNodes ).toHaveLength( 1 );
+		expect( screen.getByRole( 'heading' )?.childNodes ).toHaveLength( 1 );
 	} );
 
 	test( 'should render isBlock', () => {
-		const { container } = render( <Text isBlock>Lorem ipsum.</Text> );
-		expect( container.firstChild ).toHaveStyle( {
+		render(
+			<Text role="heading" isBlock>
+				Lorem ipsum.
+			</Text>
+		);
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
 			display: 'block',
 		} );
 	} );
 
 	test( 'should render lineHeight', () => {
-		const { container } = render(
-			<Text lineHeight={ 1.5 }>Lorem ipsum.</Text>
+		render(
+			<Text role="heading" lineHeight={ 1.5 }>
+				Lorem ipsum.
+			</Text>
 		);
-		expect( container.firstChild ).toHaveStyle( { lineHeight: '1.5' } );
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
+			lineHeight: '1.5',
+		} );
 	} );
 
 	test( 'should render upperCase', () => {
-		const { container } = render( <Text upperCase>Lorem ipsum.</Text> );
-		expect( container.firstChild ).toHaveStyle( {
+		render(
+			<Text role="heading" upperCase>
+				Lorem ipsum.
+			</Text>
+		);
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
 			textTransform: 'uppercase',
 		} );
 	} );
 
 	test( 'should render weight', () => {
-		const { container } = render(
-			<Text weight={ 700 }>Lorem ipsum.</Text>
+		render(
+			<Text role="heading" weight={ 700 }>
+				Lorem ipsum.
+			</Text>
 		);
-		expect( container.firstChild ).toHaveStyle( { fontWeight: '700' } );
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
+			fontWeight: '700',
+		} );
 	} );
 } );

@@ -8,7 +8,10 @@ import type { ReactNode } from 'react';
  */
 import type { BaseControlProps } from '../base-control/types';
 
-export type CheckboxControlProps = Pick< BaseControlProps, 'help' > & {
+export type CheckboxControlProps = Pick<
+	BaseControlProps,
+	'help' | '__nextHasNoMarginBottom'
+> & {
 	/**
 	 * A function that receives the checked state (boolean) as input.
 	 */

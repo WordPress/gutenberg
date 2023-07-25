@@ -37,18 +37,16 @@ import {
 
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
+import { space } from '../ui/utils/space';
 
 const noop = () => {};
 
-function UnforwardedRangeControl< IconProps = unknown >(
-	props: WordPressComponentProps<
-		RangeControlProps< IconProps >,
-		'input',
-		false
-	>,
+function UnforwardedRangeControl(
+	props: WordPressComponentProps< RangeControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
+		__nextHasNoMarginBottom = false,
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -72,6 +70,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 		railColor,
 		renderTooltipContent = ( v ) => v,
 		resetFallbackValue,
+		__next40pxDefaultSize = false,
 		shiftStep = 10,
 		showTooltip: showTooltipProp,
 		step = 1,
@@ -137,7 +136,9 @@ function UnforwardedRangeControl< IconProps = unknown >(
 		onChange( nextValue );
 	};
 
-	const handleOnChange = ( next: string ) => {
+	const handleOnChange = ( next?: string ) => {
+		// @ts-expect-error TODO: Investigate if it's problematic for setValue() to
+		// potentially receive a NaN when next is undefined.
 		let nextValue = parseFloat( next );
 		setValue( nextValue );
 
@@ -209,22 +210,26 @@ function UnforwardedRangeControl< IconProps = unknown >(
 	const offsetStyle = {
 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 	};
-
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			className={ classes }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ `${ id }` }
 			help={ help }
 		>
-			<Root className="components-range-control__root">
+			<Root
+				className="components-range-control__root"
+				__next40pxDefaultSize={ __next40pxDefaultSize }
+			>
 				{ beforeIcon && (
 					<BeforeIconWrapper>
 						<Icon icon={ beforeIcon } />
 					</BeforeIconWrapper>
 				) }
 				<Wrapper
+					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 					className={ wrapperClasses }
 					color={ colorProp }
 					marks={ !! marks }
@@ -264,7 +269,11 @@ function UnforwardedRangeControl< IconProps = unknown >(
 						style={ { width: fillValueOffset } }
 						trackColor={ trackColor }
 					/>
-					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
+					<ThumbWrapper
+						className="components-range-control__thumb-wrapper"
+						style={ offsetStyle }
+						disabled={ disabled }
+					>
 						<Thumb
 							aria-hidden={ true }
 							isFocused={ isThumbFocused }
@@ -300,7 +309,16 @@ function UnforwardedRangeControl< IconProps = unknown >(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
+						size={
+							__next40pxDefaultSize
+								? '__unstable-large'
+								: 'default'
+						}
+						__unstableInputWidth={
+							__next40pxDefaultSize ? space( 20 ) : space( 16 )
+						}
 						step={ step }
+						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
 					/>
 				) }

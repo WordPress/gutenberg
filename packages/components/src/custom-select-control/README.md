@@ -50,6 +50,7 @@ function MyCustomSelectControl() {
 	const [ , setFontSize ] = useState();
 	return (
 		<CustomSelectControl
+			__nextUnconstrainedWidth
 			label="Font Size"
 			options={ options }
 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
@@ -61,6 +62,7 @@ function MyControlledCustomSelectControl() {
 	const [ fontSize, setFontSize ] = useState( options[ 0 ] );
 	return (
 		<CustomSelectControl
+			__nextUnconstrainedWidth
 			label="Font Size"
 			options={ options }
 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
@@ -119,6 +121,42 @@ Function called with the control's internal state changes. The `selectedItem` pr
 Can be used to externally control the value of the control, like in the `MyControlledCustomSelectControl` example above.
 
 -   Type: `Object`
+-   Required: No
+
+#### __nextUnconstrainedWidth
+
+Start opting into the unconstrained width style that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+#### onMouseOver
+
+A handler for onMouseOver events.
+
+-   Type: `Function`
+-   Required: No
+
+#### onMouseOut
+
+A handler for onMouseOut events.
+
+-   Type: `Function`
+-   Required: No
+
+#### onFocus
+
+A handler for onFocus events.
+
+-   Type: `Function`
+-   Required: No
+
+#### onBlur
+
+A handler for onBlur events.
+
+-   Type: `Function`
 -   Required: No
 
 ## Related components

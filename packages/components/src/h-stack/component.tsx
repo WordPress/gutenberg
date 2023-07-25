@@ -20,7 +20,6 @@ function UnconnectedHStack(
  *
  * `HStack` can render anything inside.
  *
- * @example
  * ```jsx
  * import {
  * 	__experimentalHStack as HStack,

@@ -1,14 +1,6 @@
 /**
  * External dependencies
  */
-const {
-	groupBy,
-	escapeRegExp,
-	uniq,
-	flow,
-	sortBy,
-	uniqBy,
-} = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -69,8 +61,7 @@ const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
  * @type {Record<string,string>}
  */
 const LABEL_TYPE_MAPPING = {
-	'[Feature] Navigation Screen': 'Experiments',
-	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
+	'[Type] Developer Documentation': 'Documentation',
 	'[Package] Jest Puppeteer aXe': 'Tools',
 	'[Package] E2E Tests': 'Tools',
 	'[Package] E2E Test Utils': 'Tools',
@@ -82,16 +73,17 @@ const LABEL_TYPE_MAPPING = {
 	'[Package] Scripts': 'Tools',
 	'[Type] Build Tooling': 'Tools',
 	'Automated Testing': 'Tools',
+	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
+	'[Type] Code Quality': 'Code Quality',
+	'[Type] Performance': 'Performance',
+	'[Type] Security': 'Security',
+	'[Feature] Navigation Screen': 'Experiments',
 	'[Type] Experimental': 'Experiments',
 	'[Type] Bug': 'Bug Fixes',
 	'[Type] Regression': 'Bug Fixes',
-	'[Type] Feature': 'Features',
 	'[Type] Enhancement': 'Enhancements',
 	'[Type] New API': 'New APIs',
-	'[Type] Performance': 'Performance',
-	'[Type] Developer Documentation': 'Documentation',
-	'[Type] Code Quality': 'Code Quality',
-	'[Type] Security': 'Security',
+	'[Type] Feature': 'Features',
 };
 
 /**
@@ -134,10 +126,6 @@ const LABEL_FEATURE_MAPPING = {
 	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
 	'Accessibility (a11y)': 'Accessibility',
-	'[a11y] Color Contrast': 'Accessibility',
-	'[a11y] Keyboard & Focus': 'Accessibility',
-	'[a11y] Labelling': 'Accessibility',
-	'[a11y] Zooming': 'Accessibility',
 	'[Package] E2E Tests': 'Testing',
 	'[Package] E2E Test Utils': 'Testing',
 	'Automated Testing': 'Testing',
@@ -193,6 +181,32 @@ const REWORD_TERMS = {
 };
 
 /**
+ * Creates a pipe function. Performs left-to-right function composition, where
+ * each successive invocation is supplied the return value of the previous.
+ *
+ * @param {Function[]} functions Functions to pipe.
+ */
+function pipe( functions ) {
+	return ( /** @type {unknown[]} */ ...args ) => {
+		return functions.reduce(
+			( prev, func ) => [ func( ...prev ) ],
+			args
+		)[ 0 ];
+	};
+}
+
+/**
+ * Escapes the RegExp special characters.
+ *
+ * @param {string} string Input string.
+ *
+ * @return {string} Regex-escaped string.
+ */
+function escapeRegExp( string ) {
+	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
+}
+
+/**
  * Returns candidates based on whether the given labels
  * are part of the allowed list.
  *
@@ -201,13 +215,15 @@ const REWORD_TERMS = {
  * @return {string[]} Type candidates.
  */
 function getTypesByLabels( labels ) {
-	return uniq(
-		labels
-			.filter( ( label ) =>
-				Object.keys( LABEL_TYPE_MAPPING ).includes( label )
-			)
-			.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
-	);
+	return [
+		...new Set(
+			labels
+				.filter( ( label ) =>
+					Object.keys( LABEL_TYPE_MAPPING ).includes( label )
+				)
+				.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
+		),
+	];
 }
 
 /**
@@ -283,12 +299,6 @@ function getIssueType( issue ) {
 		...getTypesByTitle( issue.title ),
 	];
 
-	// Force all tasks identified as Documentation tasks
-	// to appear under the main "Documentation" section.
-	if ( candidates.includes( 'Documentation' ) ) {
-		return 'Documentation';
-	}
-
 	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
 }
 
@@ -357,7 +367,7 @@ function getIssueFeature( issue ) {
  */
 function sortType( a, b ) {
 	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
-		return Object.keys( LABEL_TYPE_MAPPING ).indexOf( title );
+		return Object.values( LABEL_TYPE_MAPPING ).indexOf( title );
 	} );
 
 	return aIndex - bIndex;
@@ -690,9 +700,19 @@ async function fetchAllPullRequests( octokit, settings ) {
 function getChangelog( pullRequests ) {
 	let changelog = '## Changelog\n\n';
 
-	const groupedPullRequests = groupBy(
-		skipCreatedByBots( pullRequests ),
-		getIssueType
+	const groupedPullRequests = skipCreatedByBots( pullRequests ).reduce(
+		(
+			/** @type {Record<string, IssuesListForRepoResponseItem[]>} */ acc,
+			pr
+		) => {
+			const issueType = getIssueType( pr );
+			if ( ! acc[ issueType ] ) {
+				acc[ issueType ] = [];
+			}
+			acc[ issueType ].push( pr );
+			return acc;
+		},
+		{}
 	);
 
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
@@ -711,7 +731,20 @@ function getChangelog( pullRequests ) {
 		changelog += '### ' + group + '\n\n';
 
 		// Group PRs within this section into "Features".
-		const featureGroups = groupBy( groupPullRequests, getIssueFeature );
+		const featureGroups = groupPullRequests.reduce(
+			(
+				/** @type {Record<string, IssuesListForRepoResponseItem[]>} */ acc,
+				pr
+			) => {
+				const issueFeature = getIssueFeature( pr );
+				if ( ! acc[ issueFeature ] ) {
+					acc[ issueFeature ] = [];
+				}
+				acc[ issueFeature ].push( pr );
+				return acc;
+			},
+			{}
+		);
 
 		const featuredGroupNames = sortFeatureGroups( featureGroups );
 
@@ -828,7 +861,9 @@ function getContributorPropsMarkdownList( ftcPRs ) {
  * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
  */
 function sortByUsername( items ) {
-	return sortBy( items, ( item ) => item.user.login.toLowerCase() );
+	return [ ...items ].sort( ( a, b ) =>
+		a.user.login.toLowerCase().localeCompare( b.user.login.toLowerCase() )
+	);
 }
 
 /**
@@ -838,7 +873,17 @@ function sortByUsername( items ) {
  * @return {IssuesListForRepoResponseItem[]} The list of pull requests unique per user.
  */
 function getUniqueByUsername( items ) {
-	return uniqBy( items, ( item ) => item.user.login );
+	/**
+	 * @type {IssuesListForRepoResponseItem[]} List of pull requests.
+	 */
+	const EMPTY_PR_LIST = [];
+
+	return items.reduce( ( acc, item ) => {
+		if ( ! acc.some( ( i ) => i.user.login === item.user.login ) ) {
+			acc.push( item );
+		}
+		return acc;
+	}, EMPTY_PR_LIST );
 }
 
 /**
@@ -862,13 +907,17 @@ function skipCreatedByBots( pullRequests ) {
  * @return {string} The formatted props section.
  */
 function getContributorProps( pullRequests ) {
-	const contributorsList = flow( [
+	const contributorsList = pipe( [
 		skipCreatedByBots,
 		getFirstTimeContributorPRs,
 		getUniqueByUsername,
 		sortByUsername,
 		getContributorPropsMarkdownList,
 	] )( pullRequests );
+
+	if ( ! contributorsList ) {
+		return '';
+	}
 
 	return (
 		'## First time contributors' +
@@ -902,7 +951,7 @@ function getContributorsMarkdownList( pullRequests ) {
  * @return {string} The formatted contributors section.
  */
 function getContributorsList( pullRequests ) {
-	const contributorsList = flow( [
+	const contributorsList = pipe( [
 		skipCreatedByBots,
 		getUniqueByUsername,
 		sortByUsername,

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { castArray, first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -62,7 +61,10 @@ const BlockMoverButton = forwardRef(
 		ref
 	) => {
 		const instanceId = useInstanceId( BlockMoverButton );
-		const blocksCount = castArray( clientIds ).length;
+		const normalizedClientIds = Array.isArray( clientIds )
+			? clientIds
+			: [ clientIds ];
+		const blocksCount = normalizedClientIds.length;
 
 		const {
 			blockType,
@@ -81,12 +83,11 @@ const BlockMoverButton = forwardRef(
 					getBlock,
 					getBlockListSettings,
 				} = select( blockEditorStore );
-				const normalizedClientIds = castArray( clientIds );
-				const firstClientId = first( normalizedClientIds );
+				const firstClientId = normalizedClientIds[ 0 ];
 				const blockRootClientId = getBlockRootClientId( firstClientId );
 				const firstBlockIndex = getBlockIndex( firstClientId );
 				const lastBlockIndex = getBlockIndex(
-					last( normalizedClientIds )
+					normalizedClientIds[ normalizedClientIds.length - 1 ]
 				);
 				const blockOrder = getBlockOrder( blockRootClientId );
 				const block = getBlock( firstClientId );

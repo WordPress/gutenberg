@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import classnames from 'classnames';
 /**
  * WordPress dependencies
@@ -47,7 +46,7 @@ const LinkControlSearchInput = forwardRef(
 			suggestionsQuery = {},
 			withURLSuggestion = true,
 			createSuggestionButtonText,
-			useLabel = false,
+			hideLabelFromVision = false,
 		},
 		ref
 	) => {
@@ -82,7 +81,6 @@ const LinkControlSearchInput = forwardRef(
 				...props,
 				instanceId,
 				withCreateSuggestion,
-				currentInputValue: value,
 				createSuggestionButtonText,
 				suggestionsQuery,
 				handleSuggestionClick: ( suggestion ) => {
@@ -112,22 +110,26 @@ const LinkControlSearchInput = forwardRef(
 				allowDirectEntry ||
 				( suggestion && Object.keys( suggestion ).length >= 1 )
 			) {
+				const { id, url, ...restLinkProps } = currentLink ?? {};
 				onSelect(
 					// Some direct entries don't have types or IDs, and we still need to clear the previous ones.
-					{ ...omit( currentLink, 'id', 'url' ), ...suggestion },
+					{ ...restLinkProps, ...suggestion },
 					suggestion
 				);
 			}
 		};
 
 		const inputClasses = classnames( className, {
-			'has-no-label': ! useLabel,
+			// 'has-no-label': ! hideLabelFromVision,
 		} );
 
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
-					label={ useLabel ? 'URL' : undefined }
+					disableSuggestions={ currentLink?.url === value }
+					__nextHasNoMarginBottom
+					label={ __( 'Link' ) }
+					hideLabelFromVision={ hideLabelFromVision }
 					className={ inputClasses }
 					value={ value }
 					onChange={ onInputChange }

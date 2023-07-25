@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import { reduce, forEach, debounce, mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { debounce } from '@wordpress/compose';
 import { dispatch } from '@wordpress/data';
 
 /**
@@ -20,9 +16,12 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	 */
 	const setIsMatching = debounce(
 		() => {
-			const values = mapValues( queries, ( query ) => query.matches );
+			const values = Object.fromEntries(
+				queries.map( ( [ key, query ] ) => [ key, query.matches ] )
+			);
 			dispatch( store ).setIsMatching( values );
 		},
+		0,
 		{ leading: true }
 	);
 
@@ -35,22 +34,17 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	 *
 	 * @type {Object<string,MediaQueryList>}
 	 */
-	const queries = reduce(
-		breakpoints,
-		( result, width, name ) => {
-			forEach( operators, ( condition, operator ) => {
+	const operatorEntries = Object.entries( operators );
+	const queries = Object.entries( breakpoints ).flatMap(
+		( [ name, width ] ) => {
+			return operatorEntries.map( ( [ operator, condition ] ) => {
 				const list = window.matchMedia(
 					`(${ condition }: ${ width }px)`
 				);
-				list.addListener( setIsMatching );
-
-				const key = [ operator, name ].join( ' ' );
-				result[ key ] = list;
+				list.addEventListener( 'change', setIsMatching );
+				return [ `${ operator } ${ name }`, list ];
 			} );
-
-			return result;
-		},
-		{}
+		}
 	);
 
 	window.addEventListener( 'orientationchange', setIsMatching );

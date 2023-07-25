@@ -2,6 +2,68 @@
 
 ## Unreleased
 
+## 8.15.0 (2023-07-20)
+
+## 8.14.0 (2023-07-05)
+
+## 8.13.0 (2023-06-23)
+
+## 8.12.0 (2023-06-07)
+
+## 8.11.0 (2023-05-24)
+
+## 8.10.0 (2023-05-10)
+
+## 8.9.0 (2023-04-26)
+
+## 8.8.0 (2023-04-12)
+
+## 8.7.0 (2023-03-29)
+
+## 8.6.0 (2023-03-15)
+
+## 8.5.0 (2023-03-01)
+
+## 8.4.0 (2023-02-15)
+
+## 8.3.0 (2023-02-01)
+
+## 8.2.0 (2023-01-11)
+
+## 8.1.0 (2023-01-02)
+
+## 8.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 7.19.0 (2022-11-16)
+
+## 7.18.0 (2022-11-02)
+
+## 7.17.0 (2022-10-19)
+
+## 7.16.0 (2022-10-05)
+
+## 7.15.0 (2022-09-21)
+
+## 7.14.0 (2022-09-13)
+
+### New Feature
+
+-   Made it possible to import individual blocks ([#42258](https://github.com/WordPress/gutenberg/pull/42258)). Check [README](./README.md#loading-individual-blocks) for more information.
+
+## 7.13.0 (2022-08-24)
+
+### Bug Fix
+
+-   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
+
+## 7.12.0 (2022-08-10)
+
+## 7.11.0 (2022-07-27)
+
 ## 7.10.0 (2022-07-13)
 
 ## 7.9.0 (2022-06-29)
@@ -14,7 +76,7 @@
 
 ### Enhancement
 
--   Declare blocks as __experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
+-   Declare blocks as \_\_experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
 
 ## 7.5.0 (2022-05-04)
 
