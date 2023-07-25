@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-// @ts-ignore
-import { WebrtcProvider } from 'y-webrtc';
+// import { WebrtcProvider } from 'y-webrtc';
+
+/**
+ * Internal dependencies
+ */
+import { WebrtcProvider } from './webrtc-http-stream-signaling';
 
 /** @typedef {import('./types').ObjectType} ObjectType */
 /** @typedef {import('./types').ObjectID} ObjectID */
@@ -20,6 +24,7 @@ import { WebrtcProvider } from 'y-webrtc';
 export function connectWebRTC( objectId, objectType, doc ) {
 	const docName = `${ objectType }-${ objectId }`;
 	new WebrtcProvider( docName, doc, {
+		signaling: [ 'ws://localhost:4444' ],
 		// @ts-ignore
 		password: window.__experimentalCollaborativeEditingSecret,
 	} );
