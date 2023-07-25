@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
+
 ### Internal
 
 -   `TabPanel`: Introduce a new version of `TabPanel` with updated internals while maintaining the same functionality and API surface   ([#52133](https://github.com/WordPress/gutenberg/pull/52133)).

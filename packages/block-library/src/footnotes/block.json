@@ -9,6 +9,13 @@
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
+		"color": {
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
 		"html": false,
 		"multiple": false,
 		"reusable": false

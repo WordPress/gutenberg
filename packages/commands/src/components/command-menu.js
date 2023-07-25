@@ -1,13 +1,19 @@
 /**
  * External dependencies
  */
-import { Command } from 'cmdk';
+import { Command, useCommandState } from 'cmdk';
 
 /**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Modal,
@@ -43,6 +49,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 						key={ command.name }
 						value={ command.searchLabel ?? command.label }
 						onSelect={ () => command.callback( { close } ) }
+						id={ command.name }
 					>
 						<HStack
 							alignment="left"
@@ -112,6 +119,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 					key={ command.name }
 					value={ command.searchLabel ?? command.label }
 					onSelect={ () => command.callback( { close } ) }
+					id={ command.name }
 				>
 					<HStack
 						alignment="left"
@@ -140,6 +148,32 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 	);
 }
 
+function CommandInput( { isOpen, search, setSearch } ) {
+	const commandMenuInput = useRef();
+	const _value = useCommandState( ( state ) => state.value );
+	const selectedItemId = useMemo( () => {
+		const item = document.querySelector(
+			`[cmdk-item=""][data-value="${ _value }"]`
+		);
+		return item?.getAttribute( 'id' );
+	}, [ _value ] );
+	useEffect( () => {
+		// Focus the command palette input when mounting the modal.
+		if ( isOpen ) {
+			commandMenuInput.current.focus();
+		}
+	}, [ isOpen ] );
+	return (
+		<Command.Input
+			ref={ commandMenuInput }
+			value={ search }
+			onValueChange={ setSearch }
+			placeholder={ __( 'Type a command or search' ) }
+			aria-activedescendant={ selectedItemId }
+		/>
+	);
+}
+
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
@@ -149,7 +183,6 @@ export function CommandMenu() {
 	);
 	const { open, close } = useDispatch( commandsStore );
 	const [ loaders, setLoaders ] = useState( {} );
-	const commandMenuInput = useRef();
 
 	useEffect( () => {
 		registerShortcut( {
@@ -191,13 +224,6 @@ export function CommandMenu() {
 		close();
 	};
 
-	useEffect( () => {
-		// Focus the command palette input when mounting the modal.
-		if ( isOpen ) {
-			commandMenuInput.current.focus();
-		}
-	}, [ isOpen ] );
-
 	if ( ! isOpen ) {
 		return false;
 	}
@@ -230,11 +256,10 @@ export function CommandMenu() {
 					onKeyDown={ onKeyDown }
 				>
 					<div className="commands-command-menu__header">
-						<Command.Input
-							ref={ commandMenuInput }
-							value={ search }
-							onValueChange={ setSearch }
-							placeholder={ __( 'Type a command or search' ) }
+						<CommandInput
+							search={ search }
+							setSearch={ setSearch }
+							isOpen={ isOpen }
 						/>
 					</div>
 					<Command.List>
