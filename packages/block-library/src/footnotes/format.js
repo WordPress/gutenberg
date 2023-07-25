@@ -14,7 +14,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -44,8 +44,15 @@ export const format = {
 			getBlockName,
 			getBlocks,
 		} = useSelect( blockEditorStore );
+		const footnotesBlockType = useSelect( ( select ) =>
+			select( blocksStore ).getBlockType( name )
+		);
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
+
+		if ( ! footnotesBlockType ) {
+			return null;
+		}
 
 		if ( postType !== 'post' && postType !== 'page' ) {
 			return null;
