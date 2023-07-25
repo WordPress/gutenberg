@@ -52,17 +52,17 @@ function getBlocksOfTypeFromBlocks( targetBlockType, blocks ) {
 export default function useNavigationMenuContent( postType, postId ) {
 	const { record } = useEditedEntityRecord( postType, postId );
 
-	const blocks =
-		record && record.content && typeof record.content !== 'function'
-			? parse( record.content )
-			: [];
-
 	// Only managing navigation menus in template parts is supported
 	// to match previous behaviour. This could potentially be expanded
 	// to patterns as well.
 	if ( postType !== 'wp_template_part' ) {
 		return;
 	}
+
+	const blocks =
+		record && record.content && typeof record.content !== 'function'
+			? parse( record.content )
+			: [];
 
 	const navigationBlocks = getBlocksOfTypeFromBlocks(
 		'core/navigation',
