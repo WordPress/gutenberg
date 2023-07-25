@@ -154,7 +154,6 @@ function ColorPicker( {
 				satValPickerSliderSize={ pickerPointerSize * 2 }
 				satValPickerBorderRadius={ borderRadius }
 				huePickerBorderRadius={ borderRadius }
-				testID="color-picker"
 			/>
 			<View style={ footerStyle }>
 				<TouchableWithoutFeedback
@@ -176,10 +175,7 @@ function ColorPicker( {
 					</View>
 				</TouchableWithoutFeedback>
 				{ bottomLabelText ? (
-					<Text
-						testID="color-picker-bottom-label-text"
-						style={ selectColorTextStyle }
-					>
+					<Text style={ selectColorTextStyle }>
 						{ bottomLabelText }
 					</Text>
 				) : (
