@@ -10,22 +10,8 @@ import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { useReducedMotion, useInstanceId } from '@wordpress/compose';
 import { _x, isRTL } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../store';
-
-function LinkSettingsDrawer( { children, setSettingsOpen } ) {
-	// Preference is supplied by the relevant editor.
-	const settingsOpen = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()
-				.linkControlAdvancedSettingsPreference,
-		[]
-	);
-
+function LinkSettingsDrawer( { children, settingsOpen, setSettingsOpen } ) {
 	const prefersReducedMotion = useReducedMotion();
 	const MaybeAnimatePresence = prefersReducedMotion
 		? Fragment

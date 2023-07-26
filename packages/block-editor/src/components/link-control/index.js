@@ -139,9 +139,24 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
+	const [ settingsOpen, setSettingsOpen ] = useState( false );
+
+	// Preference is supplied by the relevant editor.
+	// If not defined then fallback to local state.
+	const isSettingsOpen = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.linkControlAdvancedSettingsPreference || settingsOpen,
+		[ settingsOpen ]
+	);
+
+	// Preference setter is supplied by the relevant editor.
+	// If not defined then fallback to local state setter.
 	const setSettingsOpenWithPreference = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings()
-			.setLinkControlAdvancedSettingsPreference;
+		return (
+			select( blockEditorStore ).getSettings()
+				.setLinkControlAdvancedSettingsPreference || setSettingsOpen
+		);
 	}, [] );
 
 	const isMounting = useRef( true );
@@ -392,6 +407,7 @@ function LinkControl( {
 			<div className="block-editor-link-control__tools">
 				{ ! currentInputIsEmpty && (
 					<LinkControlSettingsDrawer
+						settingsOpen={ isSettingsOpen }
 						setSettingsOpen={ setSettingsOpenWithPreference }
 					>
 						<LinkSettings
