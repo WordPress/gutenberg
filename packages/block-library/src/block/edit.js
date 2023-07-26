@@ -28,7 +28,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
-import { ungroup } from '@wordpress/icons';
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const hasAlreadyRendered = useHasRecursion( ref );
@@ -39,13 +38,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	);
 	const isMissing = hasResolved && ! record;
 
-	const { canRemove, innerBlockCount } = useSelect(
+	const { canRemove } = useSelect(
 		( select ) => {
-			const { canRemoveBlock, getBlockCount } =
-				select( blockEditorStore );
+			const { canRemoveBlock } = select( blockEditorStore );
 			return {
 				canRemove: canRemoveBlock( clientId ),
-				innerBlockCount: getBlockCount( clientId ),
 			};
 		},
 		[ clientId ]
@@ -117,14 +114,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => convertBlockToStatic( clientId ) }
-							label={
-								innerBlockCount > 1
-									? __( 'Detach patterns' )
-									: __( 'Detach pattern' )
-							}
-							icon={ ungroup }
+							label={ __( 'Detach' ) }
 							showTooltip
-						/>
+						>
+							{ __( 'Detach' ) }
+						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
 			) }
