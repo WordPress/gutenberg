@@ -153,7 +153,6 @@
 }
 
 .wp-lightbox-container {
-
 	.img-container {
 		position: relative;
 	}
@@ -198,31 +197,25 @@
 
 	.wp-block-image {
 		position: absolute;
+		transform-origin: 0 0;
+		top: 0;
+		left: 0;
+		display: flex;
 		width: 100%;
 		height: 100%;
-		display: flex;
 		justify-content: center;
 		align-items: center;
 		box-sizing: border-box;
 		z-index: 3000000;
-		padding: 40px 0;
-
-		@media screen and (min-width: 480px) {
-			padding: 40px;
-		}
-
-		@media screen and (min-width: 1920px) {
-			padding: 40px 80px;
-		}
+		margin: 0;
 
 		figcaption {
 			display: none;
 		}
 
 		img {
-			width: auto;
-			max-width: 100%;
-			max-height: 100%;
+			aspect-ratio: var(--lightbox-image-target-aspect-ratio);
+			object-fit: cover;
 		}
 	}
 
@@ -243,51 +236,23 @@
 	&.active {
 		visibility: visible;
 		animation: both turn-on-visibility 0.25s;
-
-		img {
-			animation: both turn-on-visibility 0.3s;
-		}
-	}
-
-	&.hideanimationenabled {
-		&:not(.active) {
-			animation: both turn-off-visibility 0.3s;
-
-			img {
-				animation: both turn-off-visibility 0.25s;
-			}
-		}
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
 		&.zoom {
-			.wp-block-image {
-				left: var(--lightbox-origin-left-position);
-				top: var(--lightbox-origin-top-position);
-				width: var(--lightbox-origin-width);
-				height: var(--lightbox-origin-height);
-				padding: 0;
-				overflow: var(--lightbox-outer-overflow);
-
-				img {
-					object-fit: cover;
-					width: var(--lightbox-inner-width);
-					height: var(--lightbox-inner-height);
-					transform-origin: center center;
-				}
-			}
-
 			&.active {
 				opacity: 1;
 				visibility: visible;
 				animation: none;
 
 				.wp-block-image {
-					animation: lightbox-outer-zoom-in 0.4s forwards;
-
 					img {
-						animation: lightbox-inner-zoom-in 0.4s forwards;
+						animation: lightbox-zoom-in 0.4s;
+						// Important is needed to overwrite the custom sizes.
+						width: var(--lightbox-image-width) !important;
+						height: var(--lightbox-image-height) !important;
 					}
+					// animation: lightbox-zoom-in 0.4s;
 				}
 				.scrim {
 					animation: turn-on-visibility 0.4s forwards;
@@ -298,11 +263,13 @@
 					animation: none;
 
 					.wp-block-image {
-						animation: lightbox-outer-zoom-out 0.4s forwards;
-
 						img {
-							animation: lightbox-inner-zoom-out 0.4s forwards;
+							animation: lightbox-zoom-out 0.4s;
+							// Important is needed to overwrite the custom sizes.
+							width: var(--lightbox-image-width) !important;
+							height: var(--lightbox-image-height) !important;
 						}
+						// animation: lightbox-zoom-out 0.4s;
 					}
 					.scrim {
 						animation: turn-off-visibility 0.4s forwards;
@@ -341,42 +308,25 @@ html.has-lightbox-open {
 	}
 }
 
-@keyframes lightbox-outer-zoom-in {
+@keyframes lightbox-zoom-in {
 	0% {
-		transform: translate(0, 0) scale(1, 1);
+		transform: translate(var(--lightbox-initial-left-position), var(--lightbox-initial-top-position)) scale(var(--lightbox-scale));
 	}
 	100% {
-		transform: translate(var(--lightbox-translate-left-position), var(--lightbox-translate-top-position)) scale(var(--lightbox-outer-scale-width), var(--lightbox-outer-scale-height));
+		transform: translate(0, 0) scale(1, 1);
 	}
 }
 
-@keyframes lightbox-outer-zoom-out {
+@keyframes lightbox-zoom-out {
 	0% {
 		visibility: visible;
-		transform: translate(var(--lightbox-translate-left-position), var(--lightbox-translate-top-position)) scale(var(--lightbox-outer-scale-width), var(--lightbox-outer-scale-height));
+		transform: translate(0, 0) scale(1, 1);
 	}
 	99% {
 		visibility: visible;
 	}
 	100% {
-		transform: translate(0, 0) scale(1, 1);
-	}
-}
-
-@keyframes lightbox-inner-zoom-in {
-	0% {
-		transform: scale(var(--lightbox-inner-initial-scale-width), var(--lightbox-inner-initial-scale-height));
-	}
-	100% {
-		transform: scale(var(--lightbox-inner-target-scale-width), var(--lightbox-inner-target-scale-height));
-	}
-}
-
-@keyframes lightbox-inner-zoom-out {
-	0% {
-		transform: scale(var(--lightbox-inner-target-scale-width), var(--lightbox-inner-target-scale-height));
-	}
-	100% {
-		transform: scale(var(--lightbox-inner-initial-scale-width), var(--lightbox-inner-initial-scale-height));
+		visibility: hidden;
+		transform: translate(var(--lightbox-initial-left-position), var(--lightbox-initial-top-position)) scale(var(--lightbox-scale));
 	}
 }
