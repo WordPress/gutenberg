@@ -68,8 +68,9 @@ test.describe( 'Global styles revisions', () => {
 			name: /^Changes saved by /,
 		} );
 
+		// There should be 2 revisions plus the added reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(
-			currentRevisions.length + 2
+			currentRevisions.length + 3
 		);
 	} );
 
@@ -101,7 +102,7 @@ test.describe( 'Global styles revisions', () => {
 			.last()
 			.click();
 
-		await page.getByRole( 'button', { name: 'Apply' } ).click();
+		await page.getByRole( 'button', { name: 'Reset to defaults' } ).click();
 
 		const confirm = page.getByRole( 'dialog' );
 		await expect( confirm ).toBeVisible();
