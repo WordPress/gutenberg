@@ -203,8 +203,12 @@ store( {
 function setZoomStyles( context, event ) {
 	// The reference img element lies adjacent
 	// to the event target button in the DOM.
-	const { naturalWidth, naturalHeight, offsetWidth, offsetHeight } =
-		event.target.nextElementSibling;
+	const {
+		naturalWidth,
+		naturalHeight,
+		offsetWidth: originalWidth,
+		offsetHeight: originalHeight,
+	} = event.target.nextElementSibling;
 	const { x: screenPosX, y: screenPosY } =
 		event.target.nextElementSibling.getBoundingClientRect();
 
@@ -212,188 +216,69 @@ function setZoomStyles( context, event ) {
 	// dimensions have not been set (i.e. an external image with only one size),
 	// the image's dimensions in the lightbox are the same
 	// as those of the image in the content.
-	let targetWidth =
+	let targetWidth = parseFloat(
 		context.core.image.targetWidth !== 'none'
 			? context.core.image.targetWidth
-			: naturalWidth;
-	let targetHeight =
+			: naturalWidth
+	);
+	let targetHeight = parseFloat(
 		context.core.image.targetHeight !== 'none'
 			? context.core.image.targetHeight
-			: naturalHeight;
-	targetWidth = parseFloat( targetWidth );
-	targetHeight = parseFloat( targetHeight );
+			: naturalHeight
+	);
 
 	// If the image has been pixelated on purpose, keep that size.
-	if ( offsetWidth > targetWidth || offsetHeight > targetHeight ) {
-		targetWidth = offsetWidth;
-		targetHeight = offsetHeight;
+	const originalRatio = originalWidth / originalHeight;
+	if ( originalWidth > targetWidth || originalHeight > targetHeight ) {
+		targetWidth = originalWidth;
+		targetHeight = originalHeight;
 	}
 
-	// Change the target dimensions if the original aspect ratio has been changed.
-	const targetRatio = targetWidth / targetHeight;
-	const offsetRatio = offsetWidth / offsetHeight;
-	const naturalRatio = naturalWidth / naturalHeight;
+	// Calculate the final lightbox image size and the scale factor.
 
-	if ( targetRatio.toFixed( 2 ) !== offsetRatio.toFixed( 2 ) ) {
-		if ( offsetRatio >= 1 ) targetWidth = targetHeight * offsetRatio;
-		if ( offsetRatio < 1 ) targetHeight = targetWidth / offsetRatio;
-	}
+	// MaxWidth is either the window container or the image resolution.
+	// TO DO: Add padding to the window container value.
+	const targetMaxWidth = Math.min( window.innerWidth, targetWidth );
+	const targetMaxHeight = Math.min( window.innerHeight, targetHeight );
+	const targetContainerRatio = targetMaxWidth / targetMaxHeight;
 
-	// To have more control over the styles for the zoom, let's account for padding
-	// while calculating the image dimensions. As per the design, we'll constrain
-	// the height with fixed padding.
-	const containerOuterHeight = window.innerHeight;
-	const verticalPadding = 40;
-	const containerInnerHeight = containerOuterHeight - verticalPadding * 2;
-
-	// Let's set a variable horizontal padding based on the container width.
-	const containerOuterWidth = window.innerWidth;
-	let horizontalPadding = 0;
-	if ( containerOuterWidth > 480 ) {
-		horizontalPadding = 40;
-	} else if ( containerOuterWidth > 1920 ) {
-		horizontalPadding = 80;
-	}
-	const containerInnerWidth = containerOuterWidth - horizontalPadding * 2;
-
-	// If the image is larger than the container, let's resize
-	// it along the greater axis relative to the container.
-	const widthOverflow = targetWidth - containerInnerWidth;
-	const heightOverflow = targetHeight - containerInnerHeight;
-
-	if ( widthOverflow > 0 || heightOverflow > 0 ) {
-		const containerInnerAspectRatio =
-			containerInnerWidth / containerInnerHeight;
-		const imageAspectRatio = targetWidth / targetHeight;
-
-		// The larger the aspect ratio, the wider the image.
-		// If the image is wider than the container, then resize
-		// it along the width; if the image is narrower than the
-		// container, resize it along the height. Doing this, we
-		// can always be sure that the image will be placed within
-		// the bounds of the container.
-		if ( imageAspectRatio > containerInnerAspectRatio ) {
-			targetWidth = containerInnerWidth;
-			targetHeight = containerInnerWidth / offsetRatio;
-		} else {
-			targetHeight = containerInnerHeight;
-			targetWidth = containerInnerHeight * offsetRatio;
-		}
-	}
-
-	// Set the origin values of the lightbox image
-	// from which we'll calculate our animation values.
-	const root = document.documentElement;
-	root.style.setProperty( '--lightbox-image-max-width', targetWidth + 'px' );
-	root.style.setProperty(
-		'--lightbox-image-max-height',
-		targetHeight + 'px'
-	);
-	root.style.setProperty( '--lightbox-origin-width', offsetWidth + 'px' );
-	root.style.setProperty( '--lightbox-origin-height', offsetHeight + 'px' );
-
-	root.style.setProperty(
-		'--lightbox-origin-left-position',
-		screenPosX + 'px'
-	);
-	root.style.setProperty(
-		'--lightbox-origin-top-position',
-		screenPosY + 'px'
-	);
-
-	// Create a scaling factor based on the target dimensions,
-	// which reflect our desired padding and container size.
-
-	const scaleWidth = targetWidth / offsetWidth;
-	const scaleHeight = targetHeight / offsetHeight;
-
-	if ( targetRatio.toFixed( 2 ) === naturalRatio.toFixed( 2 ) ) {
-		root.style.setProperty( '--lightbox-outer-overflow', 'visible' );
-		root.style.setProperty( '--lightbox-outer-scale-width', 1 );
-		root.style.setProperty( '--lightbox-outer-scale-height', 1 );
-		root.style.setProperty( '--lightbox-inner-width', '100%' );
-		root.style.setProperty( '--lightbox-inner-height', '100%' );
-		root.style.setProperty( '--lightbox-inner-initial-scale-width', 1 );
-		root.style.setProperty( '--lightbox-inner-initial-scale-height', 1 );
-		root.style.setProperty(
-			'--lightbox-inner-target-scale-width',
-			scaleWidth
-		);
-		root.style.setProperty(
-			'--lightbox-inner-target-scale-height',
-			scaleHeight
-		);
+	let lightboxImgWidth = 0;
+	let lightboxImgHeight = 0;
+	if ( originalRatio > targetContainerRatio ) {
+		// If targetMaxWidth is reached before targetMaxHeight
+		lightboxImgWidth = targetMaxWidth;
+		lightboxImgHeight = lightboxImgWidth / originalRatio;
 	} else {
-		root.style.setProperty( '--lightbox-outer-overflow', 'hidden' );
-		root.style.setProperty( '--lightbox-outer-scale-width', scaleWidth );
-		root.style.setProperty( '--lightbox-outer-scale-height', scaleHeight );
-
-		let innerWidth;
-		let innerHeight;
-
-		let offsetScale = 0;
-		if ( offsetRatio >= 1 ) {
-			root.style.setProperty(
-				'--lightbox-inner-width',
-				offsetHeight + 'px'
-			);
-			root.style.setProperty(
-				'--lightbox-inner-height',
-				offsetHeight + 'px'
-			);
-			innerHeight = offsetWidth;
-			innerWidth = offsetRatio * offsetWidth;
-			offsetScale = innerHeight / offsetHeight;
-		} else {
-			root.style.setProperty(
-				'--lightbox-inner-width',
-				offsetWidth + 'px'
-			);
-			root.style.setProperty(
-				'--lightbox-inner-height',
-				offsetWidth + 'px'
-			);
-			innerWidth = offsetHeight;
-			innerHeight = offsetWidth / offsetRatio;
-			offsetScale = innerWidth / offsetWidth;
-		}
-
-		root.style.setProperty(
-			'--lightbox-inner-initial-scale-width',
-			offsetScale
-		);
-		root.style.setProperty(
-			'--lightbox-inner-initial-scale-height',
-			offsetScale
-		);
-		root.style.setProperty(
-			'--lightbox-inner-target-scale-width',
-			offsetScale
-		);
-		root.style.setProperty(
-			'--lightbox-inner-target-scale-height',
-			offsetScale
-		);
+		// If targetMaxHeight is reached before targetMaxWidth
+		lightboxImgHeight = targetMaxHeight;
+		lightboxImgWidth = lightboxImgHeight * originalRatio;
 	}
+	const imageScale = originalWidth / lightboxImgWidth;
 
-	// Figure out the offset values of the image if
-	// it were placed in the center of the screen.
-	const centerLeft = ( containerOuterWidth - offsetWidth ) / 2;
-	const centerTop = ( containerOuterHeight - offsetHeight ) / 2;
+	// Calculate the position of the original image from the center of the screen.
+	const originalLeftPosition =
+		screenPosX - ( window.innerWidth / 2 - originalWidth / 2 );
+	const originalTopPosition =
+		screenPosY - ( window.innerHeight / 2 - originalHeight / 2 );
 
-	// Calculate how much to translate by comparing the image's position
-	// in the content with its would-be values in the center — we need to
-	// center the image with manual values rather than using percentages
-	// because otherwise the animation does not function properly in Safari.
-	const translateLeft = centerLeft - screenPosX;
-	const translateTop = centerTop - screenPosY;
-
+	// Add the CSS variables needed.
+	const root = document.documentElement;
 	root.style.setProperty(
-		'--lightbox-translate-left-position',
-		translateLeft + 'px'
+		'--lightbox-image-target-aspect-ratio',
+		originalRatio
 	);
 	root.style.setProperty(
-		'--lightbox-translate-top-position',
-		translateTop + 'px'
+		'--lightbox-initial-top-position',
+		originalTopPosition + 'px'
 	);
+	root.style.setProperty(
+		'--lightbox-initial-left-position',
+		originalLeftPosition + 'px'
+	);
+	root.style.setProperty( '--lightbox-image-width', lightboxImgWidth + 'px' );
+	root.style.setProperty(
+		'--lightbox-image-height',
+		lightboxImgHeight + 'px'
+	);
+	root.style.setProperty( '--lightbox-scale', imageScale );
 }
