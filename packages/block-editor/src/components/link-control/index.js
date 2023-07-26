@@ -155,8 +155,9 @@ function LinkControl( {
 		};
 	}, [] );
 
-	// Preference get/setter are supplied by the relevant editor.
-	// If not defined then fallback to local state.
+	// Block Editor components can be consumed by non-WordPress environments
+	// which may not have these preferences setup.
+	// Therefore a local state is used as a fallback.
 	const isSettingsOpen =
 		linkControlAdvancedSettingsPreference || settingsOpen;
 	const setSettingsOpenWithPreference =
