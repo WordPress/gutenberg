@@ -1025,6 +1025,7 @@ export const mergeBlocks =
 				dispatch.selectBlock( blockA.clientId );
 				return;
 			}
+
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
@@ -1035,6 +1036,41 @@ export const mergeBlocks =
 				dispatch.selectBlock(
 					blockWithSameType.innerBlocks[ 0 ].clientId
 				);
+
+				// Attempt to merge the next block if it's the same type and
+				// same attributes. This is useful when merging a paragraph into
+				// a list, and the next block is also a list. If we don't merge,
+				// it looks like one list, but it's actually two lists. The same
+				// applies to other blocks such as a group with the same
+				// attributes.
+				const nextBlockClientId =
+					select.getNextBlockClientId( clientIdA );
+
+				if (
+					nextBlockClientId &&
+					select.getBlockName( clientIdA ) ===
+						select.getBlockName( nextBlockClientId )
+				) {
+					const rootAttributes =
+						select.getBlockAttributes( clientIdA );
+					const previousRootAttributes =
+						select.getBlockAttributes( nextBlockClientId );
+
+					if (
+						Object.keys( rootAttributes ).every(
+							( key ) =>
+								rootAttributes[ key ] ===
+								previousRootAttributes[ key ]
+						)
+					) {
+						dispatch.moveBlocksToPosition(
+							select.getBlockOrder( nextBlockClientId ),
+							nextBlockClientId,
+							clientIdA
+						);
+						dispatch.removeBlock( nextBlockClientId, false );
+					}
+				}
 			} );
 			return;
 		}
