@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Upgrade React Native to 0.71.11 [#51303]
 
 ## 1.100.1
 -   [**] Add WP hook for registering non-core blocks [#52791]
@@ -21,7 +22,6 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
 -   [**] Update Editor toolbar icons and colors [#52336]
 -   [*] Update Block Settings button border [#52715]
--   [**] Upgrade React Native to 0.71.11 [#51303]
 
 ## 1.99.1
 - [**] Fix crash related to removing a block under certain conditions [#52595]
