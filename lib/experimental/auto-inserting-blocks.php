@@ -71,6 +71,7 @@ function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_blo
 		}
 
 		$data                = $response->get_data();
+		// TODO: If auto_insert already exists, add the new key/value pair to the array.
 		$data['auto_insert'] = array( $anchor_block => $position );
 		$response->set_data( $data );
 		return $response;
