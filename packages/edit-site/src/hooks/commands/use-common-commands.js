@@ -114,13 +114,68 @@ function useGlobalStylesOpenCssCommands() {
 	};
 }
 
-export function useCommonCommands() {
+function useGlobalStylesOpenRevisionsCommands() {
 	const { openGeneralSidebar, setEditorCanvasContainerView, setCanvasMode } =
 		unlock( useDispatch( editSiteStore ) );
+	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
 	const { params } = useLocation();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isListPage = getIsListPage( params, isMobileViewport );
-	const isEditorPage = ! isListPage;
+	const isEditorPage = ! getIsListPage( params, isMobileViewport );
+	const history = useHistory();
+	const hasRevisions = useSelect(
+		( select ) =>
+			select( coreStore ).getCurrentThemeGlobalStylesRevisions()?.length,
+		[]
+	);
+	const commands = useMemo( () => {
+		if ( ! hasRevisions ) {
+			return [];
+		}
+
+		return [
+			{
+				name: 'core/edit-site/open-global-styles-revisions',
+				label: __( 'Open styles revisions' ),
+				icon: backup,
+				callback: ( { close } ) => {
+					close();
+					if ( ! isEditorPage ) {
+						history.push( {
+							path: '/wp_global_styles',
+							canvas: 'edit',
+						} );
+					}
+					if ( isEditorPage && getCanvasMode() !== 'edit' ) {
+						setCanvasMode( 'edit' );
+					}
+					openGeneralSidebar( 'edit-site/global-styles' );
+					setEditorCanvasContainerView( 'global-styles-revisions' );
+				},
+			},
+		];
+	}, [
+		hasRevisions,
+		history,
+		openGeneralSidebar,
+		setEditorCanvasContainerView,
+		isEditorPage,
+		getCanvasMode,
+		setCanvasMode,
+	] );
+
+	return {
+		isLoading: false,
+		commands,
+	};
+}
+
+export function useCommonCommands() {
+	const { openGeneralSidebar, setCanvasMode } = unlock(
+		useDispatch( editSiteStore )
+	);
+	const { params } = useLocation();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
 	const { set } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
@@ -138,26 +193,6 @@ export function useCommonCommands() {
 			),
 		};
 	}, [] );
-
-	useCommand( {
-		name: 'core/edit-site/open-global-styles-revisions',
-		label: __( 'Open styles revisions' ),
-		icon: backup,
-		callback: ( { close } ) => {
-			close();
-			if ( ! isEditorPage ) {
-				history.push( {
-					path: '/wp_global_styles',
-					canvas: 'edit',
-				} );
-			}
-			if ( isEditorPage && getCanvasMode() !== 'edit' ) {
-				setCanvasMode( 'edit' );
-			}
-			openGeneralSidebar( 'edit-site/global-styles' );
-			setEditorCanvasContainerView( 'global-styles-revisions' );
-		},
-	} );
 
 	useCommand( {
 		name: 'core/edit-site/open-styles',
@@ -227,5 +262,10 @@ export function useCommonCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/open-styles-css',
 		hook: useGlobalStylesOpenCssCommands,
+	} );
+
+	useCommandLoader( {
+		name: 'core/edit-site/open-styles-revisions',
+		hook: useGlobalStylesOpenRevisionsCommands,
 	} );
 }

@@ -1,0 +1,18 @@
+name: Enforce labels on Pull Request
+on:
+    pull_request_target:
+        types: [opened, labeled, unlabeled, synchronize]
+jobs:
+    type-related-labels:
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+        steps:
+            - uses: mheap/github-action-required-labels@v5
+              with:
+                  mode: exactly
+                  count: 1
+                  labels: '[Type] Accessibility (a11y), [Type] Automated Testing, [Type] Breaking Change, [Type] Bug, [Type] Build Tooling, [Type] Code Quality, [Type] Copy, [Type] Developer Documentation, [Type] Enhancement, [Type] Experimental, [Type] Feature, [Type] New API, [Type] Task, [Type] Performance, [Type] Project Management, [Type] Security, [Type] WP Core Ticket'
+                  add_comment: true
+                  message: "## ⚠️ Type of PR label error\n To merge this PR, it requires {{ errorString }} {{ count }} label indicating the type of PR. Other labels are optional and not being checked here. \n- **Type-related labels to choose from**: {{ provided }}.\n- **Labels found**: {{ applied }}."
+                  exit_type: success

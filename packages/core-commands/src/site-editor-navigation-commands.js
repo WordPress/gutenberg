@@ -13,7 +13,6 @@ import {
 	symbolFilled,
 	styles,
 	navigation,
-	symbol,
 } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
@@ -198,23 +197,6 @@ function useSiteEditorBasicNavigationCommands() {
 			},
 		} );
 
-		result.push( {
-			name: 'core/edit-site/open-template-parts',
-			label: __( 'Open patterns' ),
-			icon: symbol,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/patterns',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
 		return result;
 	}, [ history, isSiteEditor ] );
 
