@@ -326,9 +326,7 @@ _Returns_
 
 ### htmlToBlocks
 
-Converts HTML directly to blocks. Looks for a matching transform for each
-top-level tag. The HTML should be filtered to not have any text between
-top-level tags and formatted in a way that blocks can handle the HTML.
+Converts HTML directly to blocks. Looks for a matching transform for each top-level tag. The HTML should be filtered to not have any text between top-level tags and formatted in a way that blocks can handle the HTML.
 
 _Parameters_
 
