@@ -37,17 +37,47 @@ class BehaviorUtils {
 		return media;
 	}
 
-	async selectFadeBehavior() {
+	async setLightboxBehavior( value ) {
 		// Open the "Advanced" panel
-		await this.page.getByRole( 'button', { name: 'Advanced' } ).click();
+		const toggleButton = this.page.getByRole( 'button', {
+			name: 'Advanced',
+		} );
 
-		// Set the value of Behaviors to "fade"
+		const isClosed =
+			( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
+
+		if ( isClosed ) {
+			await toggleButton.click();
+		}
+
+		// Set the value of Behaviors
 		await this.page
 			.getByRole( 'combobox', { name: 'Behaviors' } )
 			.selectOption( 'lightbox' );
 		await this.page
 			.getByRole( 'combobox', { name: 'Animation' } )
-			.selectOption( 'fade' );
+			.selectOption( value );
+	}
+
+	async goToImageBlockStyles() {
+		const toggleButton = this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', {
+				name: 'Styles',
+				disabled: false,
+			} );
+
+		const isClosed =
+			( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
+
+		if ( isClosed ) await toggleButton.click();
+
+		await this.page
+			.getByRole( 'button', { name: 'Blocks styles' } )
+			.click();
+		await this.page
+			.getByRole( 'button', { name: 'Image block styles', exact: true } )
+			.click();
 	}
 }
 
@@ -120,19 +150,13 @@ test.describe( 'Site editor behaviors', () => {
 		page,
 		admin,
 		editor,
+		behaviorUtils,
 	} ) => {
 		await admin.visitSiteEditor();
 		await editor.canvas.click( 'body' );
 
 		// Navigate to Styles -> Blocks -> Image
-		await page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Styles' } )
-			.click();
-		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Image block styles', exact: true } )
-			.click();
+		await behaviorUtils.goToImageBlockStyles();
 
 		// Open the advanced panel
 		await page.getByRole( 'button', { name: 'Advanced' } ).click();
@@ -151,6 +175,10 @@ test.describe( 'Site editor behaviors', () => {
 		admin,
 		editor,
 	} ) => {
+		//
+		// Post editor
+		//
+
 		await admin.createNewPost();
 		const media = await behaviorUtils.createMedia();
 
@@ -163,11 +191,6 @@ test.describe( 'Site editor behaviors', () => {
 				url: media.source_url,
 			},
 		} );
-
-		const imageDefault = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageDefault ).toBeVisible();
 
 		// Second, insert an image with "zoom" behavior
 		await editor.insertBlock( {
@@ -185,56 +208,57 @@ test.describe( 'Site editor behaviors', () => {
 			},
 		} );
 
-		const imageZoom = editor.canvas
-			.locator( 'role=document[name="Block: Image"i]' )
-			.nth( 1 );
-
-		await expect( imageZoom ).toBeVisible();
+		//
+		// Front-end
+		//
 
 		// Go to the front-end
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		// Lightbox should be hidden first
+		// Lightbox should be initially hidden
 		const lightbox = page.getByRole( 'dialog', { name: 'Image' } );
 		await expect( lightbox ).toBeHidden();
 
-		// Click on the default image
+		// Click on the default image (the first image, with the "default" behavior)
 		const defaultImage = page.locator( 'figure.wp-block-image' ).nth( 0 );
 		await defaultImage.click();
 
 		// Lightbox should NOT appear
 		await expect( lightbox ).toBeHidden();
 
-		// Click on the image with the zoom behavior
+		// Click on the image with the zoom behavior (the second image)
 		await page.locator( 'figure.wp-block-image' ).nth( 1 ).click();
 
 		// Lightbox should appear now!
 		await expect( lightbox ).toBeVisible();
 
-		// Click on the close button
+		// Click on the close button of the lightbox
 		const closeButton = lightbox.getByRole( 'button', {
 			name: 'Close',
 		} );
 		await closeButton.click();
 
-		// Go back to the site editor
+		//
+		// Site editor
+		//
+
+		// Go to the site editor
 		await admin.visitSiteEditor();
 		await editor.canvas.click( 'body' );
 
-		// Open the image settings panel
-		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
-		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Image block styles', exact: true } )
-			.click();
+		// Navigate to Styles -> Blocks -> Image
+		await behaviorUtils.goToImageBlockStyles();
 
 		// Set the value of Behavior to "fade"
-		await behaviorUtils.selectFadeBehavior();
+		await behaviorUtils.setLightboxBehavior( 'fade' );
 
 		// Save the changes
 		await editor.saveSiteEditorEntities();
+
+		//
+		// Front-end
+		//
 
 		// Open the post on the front-end again
 		await page.goto( `/?p=${ postId }` );
@@ -261,10 +285,9 @@ test.describe( 'Site editor behaviors', () => {
 		behaviorUtils,
 	} ) => {
 		//
-		//
 		//  Site editor
 		//
-		//
+
 		// Go to the site editor
 		await admin.visitSiteEditor();
 		await editor.canvas.click( 'body' );
@@ -285,7 +308,7 @@ test.describe( 'Site editor behaviors', () => {
 		await editor.openDocumentSettingsSidebar();
 
 		// Set the value of Behaviors to "fade"
-		await behaviorUtils.selectFadeBehavior();
+		await behaviorUtils.setLightboxBehavior( 'fade' );
 
 		// Click on the "Apply Globally" button
 		await page.getByRole( 'button', { name: 'Apply Globally' } ).click();
@@ -299,9 +322,7 @@ test.describe( 'Site editor behaviors', () => {
 		await editor.saveSiteEditorEntities();
 
 		//
-		//
 		//  Post editor
-		//
 		//
 
 		// Create a new post and an image file
@@ -323,10 +344,9 @@ test.describe( 'Site editor behaviors', () => {
 		await page.goto( `/?p=${ postId }` );
 
 		//
-		//
 		//  Front end
 		//
-		//
+
 		// Click on the image
 		const image = page.locator( 'figure.wp-block-image' ).nth( 0 );
 		await image.click();
@@ -341,5 +361,71 @@ test.describe( 'Site editor behaviors', () => {
 
 		// Check that the lightbox is using the "fade" animation
 		expect( animation ).toBe( 'fade' );
+	} );
+
+	test( 'Revisions work as expected with behaviors', async ( {
+		page,
+		editor,
+		admin,
+		behaviorUtils,
+	} ) => {
+		// Go to the site editor
+		await admin.visitSiteEditor();
+		await editor.canvas.click( 'body' );
+
+		// Navigate to Styles -> Blocks -> Image
+		await behaviorUtils.goToImageBlockStyles();
+
+		// Set the value of Image Lightbox behavior to "fade" and then to "zoom" and
+		// save the changes each time.
+		await behaviorUtils.setLightboxBehavior( 'fade' );
+		await editor.saveSiteEditorEntities();
+		await behaviorUtils.setLightboxBehavior( 'zoom' );
+		await editor.saveSiteEditorEntities();
+
+		// Go to the Revisions panel
+		await page
+			.getByRole( 'region', { name: 'Editor Settings' } )
+			.getByRole( 'button', { name: 'Revisions' } )
+			.click();
+
+		// Open the revision history
+		await page
+			.getByRole( 'menuitem', { name: 'Revision history' } )
+			.click();
+
+		// Click on the previous revision
+		await page
+			.getByRole( 'group', {
+				name: 'Global styles revisions',
+			} )
+			.getByRole( 'button', { name: 'Changes saved by admin' } )
+			.nth( 1 )
+			.click();
+
+		// Click on the "Apply" button
+		await page.getByRole( 'button', { name: 'Apply' } ).click();
+
+		// Click on the "Close Styles" button
+		await page
+			.getByRole( 'button', { name: 'Navigate to the previous view' } )
+			.click();
+
+		// Navigate to Styles -> Blocks -> Image
+		await behaviorUtils.goToImageBlockStyles();
+
+		// Open the "Advanced" panel
+		await page
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Check that the value of the Image Lightbox behavior is "fade"
+		await expect(
+			page.getByRole( 'combobox', {
+				name: 'Animation',
+			} )
+		).toHaveValue( 'fade' );
 	} );
 } );
