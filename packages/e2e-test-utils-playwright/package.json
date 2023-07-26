@@ -35,10 +35,13 @@
 		"@wordpress/url": "file:../url",
 		"change-case": "^4.1.2",
 		"form-data": "^4.0.0",
+		"get-port": "^7.0.0",
+		"lighthouse": "^10.4.0",
 		"mime": "^3.0.0"
 	},
 	"peerDependencies": {
-		"@playwright/test": ">=1"
+		"@playwright/test": ">=1",
+		"playwright": ">=1"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -4,11 +4,13 @@
 import * as path from 'path';
 import { test as base, expect } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
+import { type Browser, chromium } from 'playwright';
+import getPort from 'get-port';
 
 /**
  * Internal dependencies
  */
-import { Admin, Editor, PageUtils, RequestUtils } from './index';
+import { Admin, Editor, PageUtils, RequestUtils, Metrics } from './index';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
@@ -103,9 +105,12 @@ const test = base.extend<
 		editor: Editor;
 		pageUtils: PageUtils;
 		snapshotConfig: void;
+		metrics: Metrics;
 	},
 	{
 		requestUtils: RequestUtils;
+		port: number;
+		browser: Browser;
 	}
 >( {
 	admin: async ( { page, pageUtils }, use ) => {
@@ -140,6 +145,27 @@ const test = base.extend<
 		},
 		{ scope: 'worker', auto: true },
 	],
+	port: [
+		async ( {}, use ) => {
+			const port = await getPort();
+			await use( port );
+		},
+		{ scope: 'worker' },
+	],
+	browser: [
+		async ( { port }, use ) => {
+			const browser = await chromium.launch( {
+				args: [ `--remote-debugging-port=${ port }` ],
+			} );
+			await use( browser );
+
+			await browser.close();
+		},
+		{ scope: 'worker' },
+	],
+	metrics: async ( { page, port }, use ) => {
+		await use( new Metrics( page, port ) );
+	},
 } );
 
 export { test, expect };
