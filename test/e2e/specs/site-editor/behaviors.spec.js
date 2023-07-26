@@ -80,17 +80,7 @@ test.describe( 'Site editor behaviors', () => {
 		if ( await resetButton.isDisabled() ) return;
 		await resetButton.click();
 
-		// Save the changes
-		await page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
-
-		// Confirm saving the changes
-		await page
-			.getByRole( 'region', { name: 'Save panel' } )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
+		await editor.saveSiteEditorEntities();
 	} );
 
 	test.beforeAll( async ( { requestUtils } ) => {
