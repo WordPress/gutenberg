@@ -128,7 +128,10 @@ function TemplateDocumentActions( { className, onBack } ) {
 
 	return (
 		<BaseDocumentActions
-			className={ className }
+			className={ classnames( className, {
+				'is-synced-entity':
+					record.wp_pattern_sync_status !== 'unsynced',
+			} ) }
 			icon={ typeIcon }
 			onBack={ onBack }
 		>

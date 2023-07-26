@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]
 -   [**] Upgrade React Native to 0.71.11 [#51303]
 
 ## 1.100.1
