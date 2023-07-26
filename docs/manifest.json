@@ -1116,6 +1116,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ProgressBar",
+		"slug": "progress-bar",
+		"markdown_source": "../packages/components/src/progress-bar/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "QueryControls",
 		"slug": "query-controls",
 		"markdown_source": "../packages/components/src/query-controls/README.md",

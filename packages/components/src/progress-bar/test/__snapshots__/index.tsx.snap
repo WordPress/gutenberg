@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProgressBar should be able to specify custom track and indicator colors 1`] = `
+<div>
+  <div
+    class="components-progress-bar is-indeterminate"
+    style="background-color: rgb(217, 217, 217);"
+  >
+    <div
+      class="components-progress-bar__indicator"
+      style="width: 50%; background-color: rgb(153, 0, 0);"
+    />
+    <progress
+      max="100"
+    />
+  </div>
+</div>
+`;
+
+exports[`ProgressBar should have an \`is-indeterminate\` className if \`value\` is not provided 1`] = `
+<div>
+  <div
+    class="components-progress-bar is-indeterminate"
+  >
+    <div
+      class="components-progress-bar__indicator"
+      style="width: 50%;"
+    />
+    <progress
+      max="100"
+    />
+  </div>
+</div>
+`;
+
+exports[`ProgressBar should not have an \`is-indeterminate\` className if \`value\` is provided 1`] = `
+<div>
+  <div
+    class="components-progress-bar"
+  >
+    <div
+      class="components-progress-bar__indicator"
+      style="width: 55%;"
+    />
+    <progress
+      max="100"
+      value="55"
+    />
+  </div>
+</div>
+`;
