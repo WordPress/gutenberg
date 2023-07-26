@@ -10,6 +10,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check, desktop, mobile, tablet } from '@wordpress/icons';
+import { PluginPreviewMenu } from '@wordpress/interface';
 
 export default function PreviewOptions( {
 	children,
@@ -79,6 +80,9 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
+					<PluginPreviewMenu.Slot>
+						{ ( fills ) => <MenuGroup>{ fills }</MenuGroup> }
+					</PluginPreviewMenu.Slot>
 					{ children( renderProps ) }
 				</>
 			) }
