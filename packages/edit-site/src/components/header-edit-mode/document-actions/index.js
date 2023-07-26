@@ -34,7 +34,10 @@ import useEditedEntityRecord from '../../use-edited-entity-record';
 import { store as editSiteStore } from '../../../store';
 
 export default function DocumentActions() {
-	const isPage = useSelect( ( select ) => select( editSiteStore ).isPage() );
+	const isPage = useSelect(
+		( select ) => select( editSiteStore ).isPage(),
+		[]
+	);
 	return isPage ? <PageDocumentActions /> : <TemplateDocumentActions />;
 }
 
