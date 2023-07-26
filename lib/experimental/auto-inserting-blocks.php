@@ -257,23 +257,11 @@ function gutenberg_serialize_blocks( $blocks ) {
 	return implode( '', array_map( 'gutenberg_serialize_block', $blocks ) );
 }
 
-/**
- * Filterable version of `serialize_blocks()`.
- *
- * This function is identical to `serialize_blocks()`, except that it applies
- * the `gutenberg_serialize_block` filter to each block before it is serialized.
- *
- * @see serialize_blocks()
- */
 function gutenberg_register_auto_insert_rest_field() {
 	register_rest_field(
 		'block-type',
-		'autoinsert',
+		'auto_insert',
 		array(
-			'get_callback' => function( $data ) {
-				var_dump( $data );
-				return 'patata';
-			},
 			'schema'       => array(
 				'description' => __( 'Auto Insert.', 'default' ),
 				'type'        => 'string',
@@ -282,3 +270,19 @@ function gutenberg_register_auto_insert_rest_field() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_auto_insert_rest_field' );
+
+/**
+ * Add the `auto_insert` value into the API response.
+ *
+ * @since 6.4.0 Added 'auto_insert' property.
+ *
+ * @param WP_REST_Response $response    The response object.
+ * @param WP_Block_Type	   $block_type  The block type object.
+ */
+function filter_block_type_response( $response, $block_type ) {
+	$data                = $response->get_data();
+	$data['auto_insert'] = 'Test';
+	$response->set_data( $data );
+	return $response;
+}
+add_filter( 'rest_prepare_block_type', 'filter_block_type_response', 10, 2 );
