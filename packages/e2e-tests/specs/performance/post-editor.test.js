@@ -103,6 +103,16 @@ describe( 'Post Editor Performance', () => {
 				localAutosaveInterval: 100000000000,
 			} );
 		} );
+
+		const client = await page.target().createCDPSession();
+
+		// Good 3G
+		await client.send( 'Network.emulateNetworkConditions', {
+			offline: false,
+			downloadThroughput: ( 1.5 * 1024 * 1024 ) / 8,
+			uploadThroughput: ( 750 * 1024 ) / 8,
+			latency: 40,
+		} );
 	} );
 
 	it( 'Loading', async () => {
