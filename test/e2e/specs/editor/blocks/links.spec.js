@@ -145,4 +145,66 @@ test.describe( 'Links', () => {
 			},
 		] );
 	} );
+
+	test( 'toggle state of advanced link settings is preserved across editing links', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is WordPress' );
+
+		// Select "WordPress".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'w.org' );
+
+		await page.keyboard.press( 'Enter' );
+
+		// Move caret back into the link.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Click Edit to move back into editing mode
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Toggle the Advanced settings to be open.
+		// This should set the editor preference to persist this
+		// UI state.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Close the Link popover
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Cancel',
+			} )
+			.click();
+
+		// Check the popover (with role of "popover") is no longer visible.
+		// This is necessary to avoid false positives on this test in the
+		// event that the popover remained open.
+		await expect( page.getByRole( 'popover' ) ).not.toBeVisible();
+
+		// Reselect the link
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Check that the Advanced settings are still expanded/open
+		// and I can see the open in new tab checkbox
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await expect( page.getByLabel( 'Open in new tab' ) ).toBeVisible();
+	} );
 } );
