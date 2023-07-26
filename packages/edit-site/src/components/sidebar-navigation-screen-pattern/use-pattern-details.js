@@ -84,7 +84,7 @@ export default function usePatternDetails( postType, postId ) {
 
 		details.push( {
 			label: __( 'Area' ),
-			value: templatePartArea?.label,
+			value: templatePartArea?.label || record.area || __( 'None' ),
 		} );
 	}
 
