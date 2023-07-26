@@ -78,6 +78,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsBlockBasedTheme',
 	'behaviors',
 	'linkControlAdvancedSettingsPreference',
+	'setLinkControlAdvancedSettingsPreference',
 ];
 
 /**
