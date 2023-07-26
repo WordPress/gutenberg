@@ -36,6 +36,19 @@ class BehaviorUtils {
 		);
 		return media;
 	}
+
+	async selectFadeBehavior() {
+		// Open the "Advanced" panel
+		await this.page.getByRole( 'button', { name: 'Advanced' } ).click();
+
+		// Set the value of Behaviors to "fade"
+		await this.page
+			.getByRole( 'combobox', { name: 'Behaviors' } )
+			.selectOption( 'lightbox' );
+		await this.page
+			.getByRole( 'combobox', { name: 'Animation' } )
+			.selectOption( 'fade' );
+	}
 }
 
 test.describe( 'Site editor behaviors', () => {
@@ -217,16 +230,8 @@ test.describe( 'Site editor behaviors', () => {
 			.getByRole( 'button', { name: 'Image block styles', exact: true } )
 			.click();
 
-		// Open the "Advanced" panel
-		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-
 		// Set the value of Behavior to "fade"
-		await page
-			.getByRole( 'combobox', { name: 'Behaviors' } )
-			.selectOption( 'lightbox' );
-		await page
-			.getByRole( 'combobox', { name: 'Animation' } )
-			.selectOption( 'fade' );
+		await behaviorUtils.selectFadeBehavior();
 
 		// Save the changes
 		await editor.saveSiteEditorEntities();
@@ -279,16 +284,8 @@ test.describe( 'Site editor behaviors', () => {
 		// Open the image block settings panel
 		await editor.openDocumentSettingsSidebar();
 
-		// Open the "Advanced" panel
-		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-
 		// Set the value of Behaviors to "fade"
-		await page
-			.getByRole( 'combobox', { name: 'Behaviors' } )
-			.selectOption( 'lightbox' );
-		await page
-			.getByRole( 'combobox', { name: 'Animation' } )
-			.selectOption( 'fade' );
+		await behaviorUtils.selectFadeBehavior();
 
 		// Click on the "Apply Globally" button
 		await page.getByRole( 'button', { name: 'Apply Globally' } ).click();
