@@ -231,7 +231,6 @@ function LinkControl( {
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
-		setSettingsOpenWithPreference( false );
 		setIsEditingLink( false );
 	};
 
@@ -405,7 +404,7 @@ function LinkControl( {
 			) }
 
 			<div className="block-editor-link-control__tools">
-				{ ! currentInputIsEmpty && (
+				{ ! currentInputIsEmpty && isEditingLink && (
 					<LinkControlSettingsDrawer
 						settingsOpen={ isSettingsOpen }
 						setSettingsOpen={ setSettingsOpenWithPreference }
