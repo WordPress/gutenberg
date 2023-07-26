@@ -248,4 +248,101 @@ test.describe( 'Site editor behaviors', () => {
 		// Check that the lightbox is using the "fade" animation
 		expect( animation ).toBe( 'fade' );
 	} );
+
+	test( 'Use the "Apply globally" button to apply the "fade" behavior as a default to all image blocks', async ( {
+		page,
+		editor,
+		admin,
+		behaviorUtils,
+	} ) => {
+		//
+		//
+		//  Site editor
+		//
+		//
+		// Go to the site editor
+		await admin.visitSiteEditor();
+		await editor.canvas.click( 'body' );
+
+		let media = await behaviorUtils.createMedia();
+
+		// Insert a new image block with default behaviors
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: 'default-image',
+				url: media.source_url,
+			},
+		} );
+
+		// Open the image block settings panel
+		await editor.openDocumentSettingsSidebar();
+
+		// Open the "Advanced" panel
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+
+		// Set the value of Behaviors to "fade"
+		await page
+			.getByRole( 'combobox', { name: 'Behaviors' } )
+			.selectOption( 'lightbox' );
+		await page
+			.getByRole( 'combobox', { name: 'Animation' } )
+			.selectOption( 'fade' );
+
+		// Click on the "Apply Globally" button
+		await page.getByRole( 'button', { name: 'Apply Globally' } ).click();
+
+		// Snackbar notification should appear
+		await expect(
+			page.getByText( 'Image behaviors applied.', { exact: true } )
+		).toBeVisible();
+
+		// Save the changes
+		await editor.saveSiteEditorEntities();
+
+		//
+		//
+		//  Post editor
+		//
+		//
+
+		// Create a new post and an image file
+		await admin.createNewPost();
+		media = await behaviorUtils.createMedia();
+
+		// Insert a new image block with default behaviors
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: 'default-image',
+				url: media.source_url,
+			},
+		} );
+
+		// Save & publish the post and go to the front-end
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		//
+		//
+		//  Front end
+		//
+		//
+		// Click on the image
+		const image = page.locator( 'figure.wp-block-image' ).nth( 0 );
+		await image.click();
+
+		/// Lightbox should be hidden
+		const lightbox = page.getByRole( 'dialog', { name: 'Image' } );
+		await expect( lightbox ).toBeVisible();
+
+		// Get the animation type from the image
+		const wpContext = await image.getAttribute( 'data-wp-context' );
+		const animation = JSON.parse( wpContext ).core.image.lightboxAnimation;
+
+		// Check that the lightbox is using the "fade" animation
+		expect( animation ).toBe( 'fade' );
+	} );
 } );
