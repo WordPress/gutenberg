@@ -140,12 +140,12 @@ export default function ListViewSidebar() {
 				tabs={ [
 					{
 						name: 'list-view',
-						title: 'List View',
+						title: __( 'List View' ),
 						className: 'edit-post-sidebar__panel-tab',
 					},
 					{
 						name: 'outline',
-						title: 'Outline',
+						title: __( 'Outline' ),
 						className: 'edit-post-sidebar__panel-tab',
 					},
 				] }
