@@ -6,13 +6,12 @@ import { addFilter } from '@wordpress/hooks';
 import { PanelBody } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
-import { useSelect } from '@wordpress/data';
-import { useMemo } from 'react';
 
 function AutoInsertingBlocksControl() {
 	const blocks = useSelect( ( select ) => {
@@ -33,7 +32,7 @@ function AutoInsertingBlocksControl() {
 export const withAutoInsertingBlocks = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
-			const blockName = props.name;
+			//const blockName = props.name;
 			//console.log( blockName );
 
 			const blockEdit = <BlockEdit key="edit" { ...props } />;
