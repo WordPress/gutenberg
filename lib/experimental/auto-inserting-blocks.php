@@ -64,6 +64,19 @@ function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anch
 	};
 }
 
+function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_block, $position, $anchor_block ) {
+	return function( $response, $block_type ) use ( $inserted_block, $position, $anchor_block ){
+		if ( $block_type->name !== $inserted_block ) {
+			return $response;
+		}
+
+		$data                = $response->get_data();
+		$data['auto_insert'] = array( $anchor_block => $position );
+		$response->set_data( $data );
+		return $response;
+	};
+}
+
 /**
  * Register blocks for auto-insertion, based on their block.json metadata.
  *
@@ -135,7 +148,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_bl
  * @return void
  */
 function gutenberg_register_auto_inserted_block( $inserted_block, $position, $anchor_block ) {
-		$inserted_block = array(
+		$inserted_block_array = array(
 			'blockName'    => $inserted_block,
 			'attrs'        => array(),
 			'innerHTML'    => '',
@@ -143,8 +156,11 @@ function gutenberg_register_auto_inserted_block( $inserted_block, $position, $an
 			'innerBlocks'  => array(),
 		);
 
-		$inserter = gutenberg_auto_insert_block( $inserted_block, $position, $anchor_block );
+		$inserter = gutenberg_auto_insert_block( $inserted_block_array, $position, $anchor_block );
 		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
+
+		$controller_extender = gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_block, $position, $anchor_block );
+		add_filter( 'rest_prepare_block_type', $controller_extender, 10, 2 );
 }
 
 /**
@@ -264,25 +280,9 @@ function gutenberg_register_auto_insert_rest_field() {
 		array(
 			'schema'       => array(
 				'description' => __( 'Auto Insert.', 'default' ),
-				'type'        => 'string',
+				'type'        => 'object',
 			),
 		)
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_auto_insert_rest_field' );
-
-/**
- * Add the `auto_insert` value into the API response.
- *
- * @since 6.4.0 Added 'auto_insert' property.
- *
- * @param WP_REST_Response $response    The response object.
- * @param WP_Block_Type	   $block_type  The block type object.
- */
-function filter_block_type_response( $response, $block_type ) {
-	$data                = $response->get_data();
-	$data['auto_insert'] = 'Test';
-	$response->set_data( $data );
-	return $response;
-}
-add_filter( 'rest_prepare_block_type', 'filter_block_type_response', 10, 2 );
