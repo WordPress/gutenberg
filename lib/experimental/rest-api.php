@@ -19,6 +19,11 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
 		$block_patterns->register_routes();
 	}
 	add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
+	function gutenberg_register_rest_block_types() {
+		$block_types = new Gutenberg_REST_Block_Types_Controller();
+		$block_types->register_routes();
+	}
+	add_action( 'rest_api_init', 'gutenberg_register_rest_block_types' );
 }
 
 /**
