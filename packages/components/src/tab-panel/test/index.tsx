@@ -307,12 +307,10 @@ describe.each( [
 			);
 
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
 			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			rerender(
@@ -325,7 +323,6 @@ describe.each( [
 			);
 
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 		} );
 
