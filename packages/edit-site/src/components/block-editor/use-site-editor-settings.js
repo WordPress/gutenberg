@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
@@ -112,6 +112,14 @@ export default function useSiteEditorSettings() {
 		};
 	}, [] );
 
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const setLinkControlAdvancedSettingsPreference = useCallback(
+		( val ) =>
+			setPreference( 'core/edit-site', 'linkControlSettingsDrawer', val ),
+		[ setPreference ]
+	);
+
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
 		storedSettings.__experimentalBlockPatterns; // WP 5.9
@@ -188,6 +196,7 @@ export default function useSiteEditorSettings() {
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
 			linkControlAdvancedSettingsPreference,
+			setLinkControlAdvancedSettingsPreference,
 		};
 	}, [
 		storedSettings,
@@ -197,5 +206,6 @@ export default function useSiteEditorSettings() {
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
 		linkControlAdvancedSettingsPreference,
+		setLinkControlAdvancedSettingsPreference,
 	] );
 }

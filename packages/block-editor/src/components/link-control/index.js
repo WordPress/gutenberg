@@ -12,8 +12,12 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
-import { useDispatch } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Internal dependencies
@@ -135,12 +139,10 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
-	const { set: setPreference } = useDispatch( preferencesStore );
-	const setSettingsOpenWithPreference = ( isOpen ) => {
-		// Should we set both?
-		setPreference( 'core/edit-site', 'linkControlSettingsDrawer', isOpen );
-		setPreference( 'core/edit-post', 'linkControlSettingsDrawer', isOpen );
-	};
+	const setSettingsOpenWithPreference = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings()
+			.setLinkControlAdvancedSettingsPreference;
+	}, [] );
 
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
