@@ -256,3 +256,29 @@ function gutenberg_serialize_block( $block ) {
 function gutenberg_serialize_blocks( $blocks ) {
 	return implode( '', array_map( 'gutenberg_serialize_block', $blocks ) );
 }
+
+/**
+ * Filterable version of `serialize_blocks()`.
+ *
+ * This function is identical to `serialize_blocks()`, except that it applies
+ * the `gutenberg_serialize_block` filter to each block before it is serialized.
+ *
+ * @see serialize_blocks()
+ */
+function gutenberg_register_auto_insert_rest_field() {
+	register_rest_field(
+		'block-type',
+		'autoinsert',
+		array(
+			'get_callback' => function( $data ) {
+				var_dump( $data );
+				return 'patata';
+			},
+			'schema'       => array(
+				'description' => __( 'Auto Insert.', 'default' ),
+				'type'        => 'string',
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_auto_insert_rest_field' );
