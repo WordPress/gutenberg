@@ -67,7 +67,7 @@ function gutenberg_post_being_edited_requires_classic_block() {
 	}
 
 	// Bail if for some reason the post isn't found.
-	$current_post = get_post( intval( $_GET['post'] ) );
+	$current_post = get_post( absint( $_GET['post'] ) );
 	if ( ! $current_post || is_wp_error( $current_post ) ) {
 		return false;
 	}
