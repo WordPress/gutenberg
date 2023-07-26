@@ -43,6 +43,7 @@ function UnforwardedNumberControl(
 		required = false,
 		shiftStep = 10,
 		step = 1,
+		roundingStep,
 		type: typeProp = 'number',
 		value: valueProp,
 		size = 'default',
@@ -63,34 +64,24 @@ function UnforwardedNumberControl(
 	const inputRef = useRef< HTMLInputElement >();
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
 
-	const isLineHeightControl =
-		className === 'block-editor-line-height-control__input';
-
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = (
 		value: number | string,
 		stepOverride?: number
-	) => {
-		/*
-		 * If this is a line height control, do not use roundClamp() as this does not allow for manual input
-		 * of values with 2 decimal places.
-		 *
-		 * Use Math.round instead to round to a maximum of 2 decimal places for more granular control. e.g. 1.67.
-		 */
-		if ( isLineHeightControl && ! isStepAny ) {
-			return (
-				'' +
-				Math.round( ( ensureNumber( value ) + Number.EPSILON ) * 100 ) /
-					100
-			);
-		}
-
+	): string => {
 		// When step is "any" clamp the value, otherwise round and clamp it.
+		// Use '' + to convert to string for use in input value attribute.
 		return isStepAny
-			? Math.min( max, Math.max( min, ensureNumber( value ) ) )
-			: roundClamp( value, min, max, stepOverride ?? baseStep );
+			? '' + Math.min( max, Math.max( min, ensureNumber( value ) ) )
+			: '' +
+					roundClamp(
+						value,
+						min,
+						max,
+						stepOverride ?? ( roundingStep || baseStep )
+					);
 	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
@@ -137,7 +128,6 @@ function UnforwardedNumberControl(
 				type === inputControlActionTypes.PRESS_UP ||
 				type === inputControlActionTypes.PRESS_DOWN
 			) {
-				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 				nextState.value = spinValue(
 					currentValue,
 					type === inputControlActionTypes.PRESS_UP ? 'up' : 'down',
@@ -184,7 +174,6 @@ function UnforwardedNumberControl(
 					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
 					const distance = delta * modifier * directionModifier;
 
-					// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 					nextState.value = constrainValue(
 						// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
 						add( currentValue, distance ),
@@ -203,7 +192,6 @@ function UnforwardedNumberControl(
 				const applyEmptyValue =
 					required === false && currentValue === '';
 
-				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 				nextState.value = applyEmptyValue
 					? currentValue
 					: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined

@@ -75,6 +75,13 @@ export type NumberControlProps = Omit<
 	 */
 	step?: InputControlProps[ 'step' ];
 	/**
+	 * Optional amount to round input value by if value should have a different number of
+	 * decimal places to step value.
+	 *
+	 * @default 'number'
+	 */
+	roundingStep?: number;
+	/**
 	 * The `type` attribute of the `input` element.
 	 *
 	 * @default 'number'

@@ -12,6 +12,7 @@ import {
 	BASE_DEFAULT_VALUE,
 	RESET_VALUE,
 	STEP,
+	ROUNDING_STEP,
 	isLineHeightDefined,
 } from './utils';
 
@@ -105,13 +106,13 @@ const LineHeightControl = ( {
 		>
 			<NumberControl
 				{ ...otherProps }
-				className="block-editor-line-height-control__input"
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
 				onChange={ handleOnChange }
 				label={ __( 'Line height' ) }
 				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }
+				roundingStep={ ROUNDING_STEP }
 				value={ value }
 				min={ 0 }
 				spinControls="custom"

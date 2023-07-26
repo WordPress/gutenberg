@@ -1,5 +1,6 @@
 export const BASE_DEFAULT_VALUE = 1.5;
 export const STEP = 0.1;
+export const ROUNDING_STEP = 0.01;
 /**
  * There are varying value types within LineHeightControl:
  *
