@@ -155,9 +155,7 @@ test.describe( 'Site Editor Performance', () => {
 		).toBeDisabled();
 
 		// Get the ID of the saved page.
-		testPageId = await page.evaluate( () =>
-			new URL( document.location ).searchParams.get( 'post' )
-		);
+		testPageId = new URL( page.url() ).searchParams.get( 'post' );
 
 		// Open the test page in Site Editor.
 		await admin.visitSiteEditor( {
@@ -166,17 +164,25 @@ test.describe( 'Site Editor Performance', () => {
 		} );
 
 		// Wait for the first paragraph to be ready.
-		const canvas = page.frameLocator( 'iframe[name="editor-canvas"]' );
-		const firstParagraph = canvas
+		const firstParagraph = editor.canvas
 			.getByText( 'Lorem ipsum dolor sit amet' )
 			.first();
 		await firstParagraph.waitFor( { timeout: 60_000 } );
 
 		// Enter edit mode.
-		await canvas.locator( 'body' ).click();
+		await editor.canvas.locator( 'body' ).click();
 
 		// Append an empty paragraph.
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		// Since `editor.insertBlock( { name: 'core/paragraph' } )` is not
+		// working in page edit mode, we need to _manually_ insert a new
+		// paragraph.
+		await editor.canvas
+			.getByText( 'Quamquam tu hanc copiosiorem etiam soles dicere.' )
+			.last()
+			.click(); // Enters edit mode for the last post's element, which is a list item.
+
+		await page.keyboard.press( 'Enter' ); // Creates a new list item.
+		await page.keyboard.press( 'Enter' ); // Exits the list and creates a new paragraph.
 
 		// Start tracing.
 		const traceFilePath = getTraceFilePath();
