@@ -26,22 +26,6 @@ test.describe( 'Global styles revisions', () => {
 		await admin.visitSiteEditor();
 	} );
 
-	test( 'should display no revisions message if landing via command center', async ( {
-		page,
-	} ) => {
-		await page
-			.getByRole( 'button', { name: 'Open command palette' } )
-			.focus();
-		await page.keyboard.press( 'Meta+k' );
-		await page.keyboard.type( 'styles revisions' );
-		await page
-			.getByRole( 'option', { name: 'Open styles revisions' } )
-			.click();
-		await expect(
-			page.getByTestId( 'global-styles-no-revisions' )
-		).toHaveText( 'No results found.' );
-	} );
-
 	test( 'should display revisions UI when there is more than 1 revision', async ( {
 		page,
 		editor,
