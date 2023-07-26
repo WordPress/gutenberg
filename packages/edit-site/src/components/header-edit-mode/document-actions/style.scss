@@ -24,6 +24,15 @@
 	@include break-large() {
 		width: min(100%, 450px);
 	}
+
+	&.is-synced-entity {
+		.edit-site-document-actions__title {
+			color: var(--wp-block-synced-color);
+			h1 {
+				color: var(--wp-block-synced-color);
+			}
+		}
+	}
 }
 
 .edit-site-document-actions__command {
@@ -36,7 +45,6 @@
 
 .edit-site-document-actions__title {
 	flex-grow: 1;
-	color: var(--wp-block-synced-color);
 	overflow: hidden;
 	grid-column: 2 / 3;
 
@@ -48,7 +56,6 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		color: var(--wp-block-synced-color);
 	}
 
 	.edit-site-document-actions.is-page & {
