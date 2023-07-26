@@ -68,9 +68,10 @@ function register_block_core_footnotes() {
 			$post_type,
 			'footnotes',
 			array(
-				'show_in_rest' => true,
-				'single'       => true,
-				'type'         => 'string',
+				'show_in_rest'      => true,
+				'single'            => true,
+				'type'              => 'string',
+				'revisions_enabled' => true,
 			)
 		);
 	}
@@ -102,7 +103,9 @@ function wp_save_footnotes_meta( $revision_id ) {
 		}
 	}
 }
-add_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' );
+if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
+	add_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' );
+}
 
 /**
  * Keeps track of the revision ID for "rest_after_insert_{$post_type}".
@@ -117,7 +120,9 @@ function wp_keep_footnotes_revision_id( $revision_id ) {
 	global $wp_temporary_footnote_revision_id;
 	$wp_temporary_footnote_revision_id = $revision_id;
 }
-add_action( '_wp_put_post_revision', 'wp_keep_footnotes_revision_id' );
+if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
+	add_action( '_wp_put_post_revision', 'wp_keep_footnotes_revision_id' );
+}
 
 /**
  * This is a specific fix for the REST API. The REST API doesn't update
@@ -159,11 +164,11 @@ function wp_add_footnotes_revisions_to_post_meta( $post ) {
 		}
 	}
 }
-
-foreach ( array( 'post', 'page' ) as $post_type ) {
-	add_action( "rest_after_insert_{$post_type}", 'wp_add_footnotes_revisions_to_post_meta' );
+if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
+	foreach ( array( 'post', 'page' ) as $post_type ) {
+		add_action( "rest_after_insert_{$post_type}", 'wp_add_footnotes_revisions_to_post_meta' );
+	}
 }
-
 /**
  * Restores the footnotes meta value from the revision.
  *
@@ -181,7 +186,9 @@ function wp_restore_footnotes_from_revision( $post_id, $revision_id ) {
 		delete_post_meta( $post_id, 'footnotes' );
 	}
 }
-add_action( 'wp_restore_post_revision', 'wp_restore_footnotes_from_revision', 10, 2 );
+if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
+	add_action( 'wp_restore_post_revision', 'wp_restore_footnotes_from_revision', 10, 2 );
+}
 
 /**
  * Adds the footnotes field to the revision.
