@@ -72,7 +72,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
 		require_once __DIR__ . '/experimental/class-gutenberg-rest-block-patterns-controller.php';
-		require_once __DIR__ . '/experimental/class-gutenberg-rest-block-types-controller.php';
 	}
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
