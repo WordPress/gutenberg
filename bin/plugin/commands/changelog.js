@@ -72,7 +72,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Project Management': 'Tools',
 	'[Package] Scripts': 'Tools',
 	'[Type] Build Tooling': 'Tools',
-	'[Type] Automated Testing': 'Tools',
+	'Automated Testing': 'Tools',
 	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
 	'[Type] Code Quality': 'Code Quality',
 	'[Type] Accessibility (a11y)': 'Accessibility',
