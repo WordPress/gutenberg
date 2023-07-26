@@ -855,6 +855,26 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 		} );
 
+		it( 'should not focus the next tab when the Tab key is pressed', async () => {
+			const user = userEvent.setup();
+
+			render( <Component tabs={ TABS } children={ () => undefined } /> );
+
+			// Tab should initially focus the first tab in the tablist, which
+			// is Alpha.
+			await user.keyboard( '[Tab]' );
+			expect(
+				await screen.findByRole( 'tab', { name: 'Alpha' } )
+			).toHaveFocus();
+
+			// Because all other tabs should have `tabindex=-1`, pressing Tab
+			// should NOT move the focus to the next tab, which is Beta.
+			await user.keyboard( '[Tab]' );
+			expect(
+				await screen.findByRole( 'tab', { name: 'Beta' } )
+			).not.toHaveFocus();
+		} );
+
 		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
