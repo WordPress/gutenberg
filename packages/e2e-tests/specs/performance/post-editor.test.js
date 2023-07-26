@@ -124,7 +124,7 @@ describe( 'Post Editor Performance', () => {
 		const draftURL = await page.url();
 
 		// Number of sample measurements to take.
-		const samples = 5;
+		const samples = 1000;
 		// Number of throwaway measurements to perform before recording samples.
 		// Having at least one helps ensure that caching quirks don't manifest in
 		// the results.
