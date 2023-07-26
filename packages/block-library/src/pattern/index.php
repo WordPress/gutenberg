@@ -43,7 +43,8 @@ function render_block_core_pattern( $attributes ) {
 	$pattern = $registry->get_registered( $slug );
 	$content = $pattern['content'];
 
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	if ( $gutenberg_experiments && ! empty( $gutenberg_experiments['gutenberg-auto-inserting-blocks'] ) ) {
 		// TODO: In the long run, we'd likely want to have a filter in the `WP_Block_Patterns_Registry` class
 		// instead to allow us plugging in code like this.
 		$blocks  = parse_blocks( $content );
