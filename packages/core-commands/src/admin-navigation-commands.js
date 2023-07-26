@@ -16,22 +16,14 @@ import { unlock } from './lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export function useAdminNavigationCommands() {
+export function useAdminNavigationCommands( options ) {
 	const history = useHistory();
+	const { isBlockTheme } = options;
 
-	const { isBlockTheme, canAccessSiteEditor } = useSelect( ( select ) => {
-		return {
-			isBlockTheme:
-				// To avoid making core-commands dependent on block-editor using store string literal name.
-				// eslint-disable-next-line @wordpress/data-no-store-string-literals
-				select( 'core/block-editor' )?.getSettings()
-					.__unstableIsBlockBasedTheme,
-			canAccessSiteEditor: select( coreStore ).canUser(
-				'read',
-				'templates'
-			),
-		};
-	}, [] );
+	const canAccessSiteEditor = useSelect(
+		( select ) => select( coreStore ).canUser( 'read', 'templates' ),
+		[]
+	);
 
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'

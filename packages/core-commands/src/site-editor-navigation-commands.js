@@ -118,13 +118,16 @@ const useTemplateNavigationCommandLoader =
 const useTemplatePartNavigationCommandLoader =
 	getNavigationCommandLoaderPerPostType( 'wp_template_part' );
 
-function useSiteEditorBasicNavigationCommands() {
+function useSiteEditorBasicNavigationCommands( options ) {
 	const history = useHistory();
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
 	const commands = useMemo( () => {
 		const result = [];
+		if ( ! options.isBlockTheme ) {
+			return result;
+		}
 		result.push( {
 			name: 'core/edit-site/open-navigation',
 			label: __( 'Open navigation' ),
@@ -198,7 +201,7 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		return result;
-	}, [ history, isSiteEditor ] );
+	}, [ history, isSiteEditor, options.isBlockTheme ] );
 
 	return {
 		commands,
@@ -206,7 +209,7 @@ function useSiteEditorBasicNavigationCommands() {
 	};
 }
 
-export function useSiteEditorNavigationCommands() {
+export function useSiteEditorNavigationCommands( options ) {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-pages',
 		hook: usePageNavigationCommandLoader,
@@ -225,7 +228,7 @@ export function useSiteEditorNavigationCommands() {
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/basic-navigation',
-		hook: useSiteEditorBasicNavigationCommands,
+		hook: useSiteEditorBasicNavigationCommands.bind( null, options ),
 		context: 'site-editor',
 	} );
 }
