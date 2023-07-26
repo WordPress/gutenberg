@@ -141,23 +141,26 @@ function LinkControl( {
 
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
-	// Preference is supplied by the relevant editor.
-	// If not defined then fallback to local state.
-	const isSettingsOpen = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()
-				.linkControlAdvancedSettingsPreference || settingsOpen,
-		[ settingsOpen ]
-	);
+	const {
+		linkControlAdvancedSettingsPreference,
+		setLinkControlAdvancedSettingsPreference,
+	} = useSelect( ( select ) => {
+		const prefSettings = select( blockEditorStore ).getSettings();
 
-	// Preference setter is supplied by the relevant editor.
-	// If not defined then fallback to local state setter.
-	const setSettingsOpenWithPreference = useSelect( ( select ) => {
-		return (
-			select( blockEditorStore ).getSettings()
-				.setLinkControlAdvancedSettingsPreference || setSettingsOpen
-		);
+		return {
+			linkControlAdvancedSettingsPreference:
+				prefSettings.linkControlAdvancedSettingsPreference,
+			setLinkControlAdvancedSettingsPreference:
+				prefSettings.setLinkControlAdvancedSettingsPreference,
+		};
 	}, [] );
+
+	// Preference get/setter are supplied by the relevant editor.
+	// If not defined then fallback to local state.
+	const isSettingsOpen =
+		linkControlAdvancedSettingsPreference || settingsOpen;
+	const setSettingsOpenWithPreference =
+		setLinkControlAdvancedSettingsPreference || setSettingsOpen;
 
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
