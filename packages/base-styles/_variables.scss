@@ -46,7 +46,9 @@ $grid-unit-80: 8 * $grid-unit;		// 64px
 
 $icon-size: 24px;
 $button-size: 36px;
+$button-size-next-default-40px: 40px; // transitionary variable for next default button size
 $button-size-small: 24px;
+$button-size-compact: 32px;
 $header-height: 60px;
 $panel-header-height: $grid-unit-60;
 $nav-sidebar-width: 360px;
@@ -55,7 +57,7 @@ $admin-bar-height-big: 46px;
 $admin-sidebar-width: 160px;
 $admin-sidebar-width-big: 190px;
 $admin-sidebar-width-collapsed: 36px;
-$modal-min-width: 360px;
+$modal-min-width: 350px;
 $spinner-size: 16px;
 $canvas-padding: $grid-unit-30;
 

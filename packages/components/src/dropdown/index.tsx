@@ -7,15 +7,16 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
+import { contextConnect, useContextSystem } from '../ui/context';
 import Popover from '../popover';
-import type { DropdownProps } from './types';
+import type { DropdownProps, DropdownInternalContext } from './types';
 
 function useObservableState(
 	initialState: boolean,
@@ -33,8 +34,11 @@ function useObservableState(
 	] as const;
 }
 
-function UnforwardedDropdown(
-	{
+const UnconnectedDropdown = (
+	props: DropdownProps,
+	forwardedRef: ForwardedRef< any >
+) => {
+	const {
 		renderContent,
 		renderToggle,
 		className,
@@ -49,9 +53,14 @@ function UnforwardedDropdown(
 
 		// Deprecated props
 		position,
-	}: DropdownProps,
-	forwardedRef: ForwardedRef< any >
-) {
+
+		// From context system
+		variant,
+	} = useContextSystem< DropdownProps & DropdownInternalContext >(
+		props,
+		'Dropdown'
+	);
+
 	if ( position !== undefined ) {
 		deprecated( '`position` prop in wp.components.Dropdown', {
 			since: '6.2',
@@ -120,7 +129,7 @@ function UnforwardedDropdown(
 
 	return (
 		<div
-			className={ classnames( 'components-dropdown', className ) }
+			className={ className }
 			ref={ useMergeRefs( [
 				containerRef,
 				forwardedRef,
@@ -149,6 +158,7 @@ function UnforwardedDropdown(
 							? fallbackPopoverAnchor
 							: undefined
 					}
+					variant={ variant }
 					{ ...popoverProps }
 					className={ classnames(
 						'components-dropdown__content',
@@ -161,7 +171,7 @@ function UnforwardedDropdown(
 			) }
 		</div>
 	);
-}
+};
 
 /**
  * Renders a button that opens a floating content modal when clicked.
@@ -188,6 +198,6 @@ function UnforwardedDropdown(
  * );
  * ```
  */
-export const Dropdown = forwardRef( UnforwardedDropdown );
+export const Dropdown = contextConnect( UnconnectedDropdown, 'Dropdown' );
 
 export default Dropdown;

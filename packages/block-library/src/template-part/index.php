@@ -63,18 +63,16 @@ function render_block_core_template_part( $attributes ) {
 			 */
 			do_action( 'render_block_core_template_part_post', $template_part_id, $attributes, $template_part_post, $content );
 		} else {
+			$template_part_file_path = '';
 			// Else, if the template part was provided by the active theme,
 			// render the corresponding file content.
-			$parent_theme_folders        = get_block_theme_folders( get_template() );
-			$child_theme_folders         = get_block_theme_folders( get_stylesheet() );
-			$child_theme_part_file_path  = get_theme_file_path( '/' . $child_theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
-			$parent_theme_part_file_path = get_theme_file_path( '/' . $parent_theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
-			$template_part_file_path     = 0 === validate_file( $attributes['slug'] ) && file_exists( $child_theme_part_file_path ) ? $child_theme_part_file_path : $parent_theme_part_file_path;
-			if ( 0 === validate_file( $attributes['slug'] ) && file_exists( $template_part_file_path ) ) {
-				$content = file_get_contents( $template_part_file_path );
-				$content = is_string( $content ) && '' !== $content
-						? _inject_theme_attribute_in_block_template_content( $content )
-						: '';
+			if ( 0 === validate_file( $attributes['slug'] ) ) {
+				$block_template = get_block_file_template( $template_part_id, 'wp_template_part' );
+
+				$content = $block_template->content;
+				if ( isset( $block_template->area ) ) {
+					$area = $block_template->area;
+				}
 			}
 
 			if ( '' !== $content && null !== $content ) {
@@ -143,14 +141,14 @@ function render_block_core_template_part( $attributes ) {
 	}
 
 	// Run through the actions that are typically taken on the_content.
+	$content                       = shortcode_unautop( $content );
+	$content                       = do_shortcode( $content );
 	$seen_ids[ $template_part_id ] = true;
 	$content                       = do_blocks( $content );
 	unset( $seen_ids[ $template_part_id ] );
 	$content = wptexturize( $content );
 	$content = convert_smilies( $content );
-	$content = shortcode_unautop( $content );
 	$content = wp_filter_content_tags( $content, "template_part_{$area}" );
-	$content = do_shortcode( $content );
 
 	// Handle embeds for block template parts.
 	global $wp_embed;

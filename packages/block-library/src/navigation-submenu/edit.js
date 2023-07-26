@@ -320,8 +320,8 @@ export default function NavigationSubmenuEdit( {
 		getNavigationChildBlockProps( innerBlocksColors );
 	const innerBlocksProps = useInnerBlocksProps( navigationChildBlockProps, {
 		allowedBlocks,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: true,
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 
 		// Ensure block toolbar is not too far removed from item
 		// being edited.
@@ -422,8 +422,11 @@ export default function NavigationSubmenuEdit( {
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
 						} }
-						label={ __( 'Link title' ) }
+						label={ __( 'Title attribute' ) }
 						autoComplete="off"
+						help={ __(
+							'Additional information to help clarify the purpose of the link.'
+						) }
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
@@ -431,8 +434,11 @@ export default function NavigationSubmenuEdit( {
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
 						} }
-						label={ __( 'Link rel' ) }
+						label={ __( 'Rel attribute' ) }
 						autoComplete="off"
+						help={ __(
+							'The relationship of the linked URL as space-separated link types.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>

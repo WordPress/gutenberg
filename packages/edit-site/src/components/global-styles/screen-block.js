@@ -9,6 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import {
 	PanelBody,
 	__experimentalVStack as VStack,
+	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -17,20 +18,58 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
 import { useBlockVariations, VariationsPanel } from './variations-panel';
+
+function applyFallbackStyle( border ) {
+	if ( ! border ) {
+		return border;
+	}
+
+	const hasColorOrWidth = border.color || border.width;
+
+	if ( ! border.style && hasColorOrWidth ) {
+		return { ...border, style: 'solid' };
+	}
+
+	if ( border.style && ! hasColorOrWidth ) {
+		return undefined;
+	}
+
+	return border;
+}
+
+function applyAllFallbackStyles( border ) {
+	if ( ! border ) {
+		return border;
+	}
+
+	if ( hasSplitBorders( border ) ) {
+		return {
+			top: applyFallbackStyle( border.top ),
+			right: applyFallbackStyle( border.right ),
+			bottom: applyFallbackStyle( border.bottom ),
+			left: applyFallbackStyle( border.left ),
+		};
+	}
+
+	return applyFallbackStyle( border );
+}
 
 const {
 	useHasDimensionsPanel,
 	useHasTypographyPanel,
 	useHasBorderPanel,
+	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
 	useHasColorPanel,
 	useHasEffectsPanel,
 	useHasFiltersPanel,
 	useGlobalStyle,
+	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
+	__experimentalBehaviorsPanel: StylesBehaviorsPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
@@ -55,10 +94,14 @@ function ScreenBlock( { name, variation } ) {
 	} );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
+	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
+	const { behavior } = useGlobalBehaviors( name, 'user' );
+
 	const blockType = getBlockType( name );
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
+	const hasBehaviorsPanel = useHasBehaviorsPanel( rawSettings, name );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );
@@ -108,6 +151,41 @@ function ScreenBlock( { name, variation } ) {
 			} );
 		}
 	};
+	const onChangeBorders = ( newStyle ) => {
+		if ( ! newStyle?.border ) {
+			setStyle( newStyle );
+			return;
+		}
+
+		// As Global Styles can't conditionally generate styles based on if
+		// other style properties have been set, we need to force split
+		// border definitions for user set global border styles. Border
+		// radius is derived from the same property i.e. `border.radius` if
+		// it is a string that is used. The longhand border radii styles are
+		// only generated if that property is an object.
+		//
+		// For borders (color, style, and width) those are all properties on
+		// the `border` style property. This means if the theme.json defined
+		// split borders and the user condenses them into a flat border or
+		// vice-versa we'd get both sets of styles which would conflict.
+		const { radius, ...newBorder } = newStyle.border;
+		const border = applyAllFallbackStyles( newBorder );
+		const updatedBorder = ! hasSplitBorders( border )
+			? {
+					top: border,
+					right: border,
+					bottom: border,
+					left: border,
+			  }
+			: {
+					color: null,
+					style: null,
+					width: null,
+					...border,
+			  };
+
+		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
+	};
 
 	return (
 		<>
@@ -152,7 +230,7 @@ function ScreenBlock( { name, variation } ) {
 				<StylesBorderPanel
 					inheritedValue={ inheritedStyle }
 					value={ style }
-					onChange={ setStyle }
+					onChange={ onChangeBorders }
 					settings={ settings }
 				/>
 			) }
@@ -160,7 +238,7 @@ function ScreenBlock( { name, variation } ) {
 				<StylesEffectsPanel
 					inheritedValue={ inheritedStyleWithLayout }
 					value={ styleWithLayout }
-					onChange={ onChangeDimensions }
+					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
 				/>
@@ -169,7 +247,7 @@ function ScreenBlock( { name, variation } ) {
 				<StylesFiltersPanel
 					inheritedValue={ inheritedStyleWithLayout }
 					value={ styleWithLayout }
-					onChange={ onChangeDimensions }
+					onChange={ setStyle }
 					settings={ {
 						...settings,
 						color: {
@@ -196,6 +274,14 @@ function ScreenBlock( { name, variation } ) {
 						onChange={ setStyle }
 						inheritedValue={ inheritedStyle }
 					/>
+					{ hasBehaviorsPanel && (
+						<StylesBehaviorsPanel
+							value={ behavior }
+							onChange={ setBehavior }
+							behaviors={ inheritedBehaviors }
+							blockName={ name }
+						></StylesBehaviorsPanel>
+					) }
 				</PanelBody>
 			) }
 		</>

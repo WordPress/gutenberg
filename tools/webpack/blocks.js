@@ -29,6 +29,7 @@ const blockViewRegex = new RegExp(
  */
 const prefixFunctions = [
 	'build_query_vars_from_query_block',
+	'wp_apply_colors_support',
 	'wp_enqueue_block_support_styles',
 	'wp_get_typography_font_size_value',
 	'wp_style_engine_get_styles',
@@ -218,65 +219,5 @@ module.exports = [
 				),
 			} ),
 		].filter( Boolean ),
-	},
-	{
-		entry: {
-			// blockname: './packages/block-library/src/blockname/interactivity.js',
-		},
-		output: {
-			devtoolNamespace: 'wp',
-			filename: './build/block-library/interactive-blocks/[name].min.js',
-			path: join( __dirname, '..', '..' ),
-		},
-		optimization: {
-			runtimeChunk: {
-				name: 'vendors',
-			},
-			splitChunks: {
-				cacheGroups: {
-					vendors: {
-						name: 'vendors',
-						test: /[\\/]node_modules[\\/]/,
-						minSize: 0,
-						chunks: 'all',
-					},
-					interactivity: {
-						name: 'interactivity',
-						test: /[\\/]utils\/interactivity[\\/]/,
-						chunks: 'all',
-						minSize: 0,
-						priority: -10,
-					},
-				},
-			},
-		},
-		module: {
-			rules: [
-				{
-					test: /\.(j|t)sx?$/,
-					exclude: /node_modules/,
-					use: [
-						{
-							loader: require.resolve( 'babel-loader' ),
-							options: {
-								cacheDirectory:
-									process.env.BABEL_CACHE_DIRECTORY || true,
-								babelrc: false,
-								configFile: false,
-								presets: [
-									[
-										'@babel/preset-react',
-										{
-											runtime: 'automatic',
-											importSource: 'preact',
-										},
-									],
-								],
-							},
-						},
-					],
-				},
-			],
-		},
 	},
 ];

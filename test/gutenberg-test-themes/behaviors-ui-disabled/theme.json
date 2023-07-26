@@ -1,0 +1,10 @@
+{
+	"version": 2,
+	"settings": {
+		"blocks": {
+			"core/image": {
+				"behaviors": false
+			}
+		}
+	}
+}

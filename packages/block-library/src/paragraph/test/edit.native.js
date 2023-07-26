@@ -40,9 +40,9 @@ const getTestComponentWithContent = ( content ) => {
 };
 
 describe( 'Paragraph block', () => {
-	it( 'renders without crashing', () => {
+	it( 'should render without crashing and match snapshot', () => {
 		const screen = getTestComponentWithContent( '' );
-		expect( screen.container ).toBeTruthy();
+		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 
 	it( 'should bold text', async () => {
@@ -251,7 +251,7 @@ describe( 'Paragraph block', () => {
 			'wordpress.org'
 		);
 		fireEvent.changeText(
-			screen.getByPlaceholderText( 'Add link text' ),
+			screen.getByPlaceholderText( 'Add link text', { hidden: true } ),
 			'WordPress'
 		);
 		jest.useFakeTimers();
@@ -638,5 +638,31 @@ describe( 'Paragraph block', () => {
 			/This color combination/
 		);
 		expect( contrastCheckElement ).toBeDefined();
+	} );
+
+	it( 'should highlight text with selection', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
+		);
+		fireEvent.press( screen.getByLabelText( 'Text color' ) );
+		fireEvent.press( await screen.findByLabelText( 'Tertiary' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <mark style="background-color:rgba(0, 0, 0, 0);color:#2411a4" class="has-inline-color has-tertiary-color">quick</mark> brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
 	} );
 } );

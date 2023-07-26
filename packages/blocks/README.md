@@ -5,7 +5,7 @@
 For more context, refer to [_What Are Little Blocks Made Of?_](https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of/) from the [Make WordPress Design](https://make.wordpress.org/design/) blog.
 
 <div class="callout callout-alert">
-[Learn how to create your first block](https://developer.wordpress.org/block-editor/getting-started/create-block/) for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all you need to know to get started with creating blocks.
+<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">Learn how to create your first block</a> for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all you need to know to get started with creating blocks.
 </div>
 
 ## Installation

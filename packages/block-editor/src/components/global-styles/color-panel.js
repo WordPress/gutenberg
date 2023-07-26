@@ -20,7 +20,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -35,7 +35,7 @@ export function useHasColorPanel( settings ) {
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
-	const hasButtonPanel = useHasHeadingPanel( settings );
+	const hasButtonPanel = useHasButtonPanel( settings );
 	const hasCaptionPanel = useHasCaptionPanel( settings );
 
 	return (
@@ -230,6 +230,11 @@ function ColorPanelDropdown( {
 							{ 'is-open': isOpen }
 						),
 						'aria-expanded': isOpen,
+						'aria-label': sprintf(
+							/* translators: %s is the type of color property, e.g., "background" */
+							__( 'Color %s styles' ),
+							label
+						),
 					};
 
 					return (
@@ -323,22 +328,6 @@ export default function ColorPanel( {
 			: gradientValue;
 	};
 
-	// Text Color
-	const showTextPanel = useHasTextPanel( settings );
-	const textColor = decodeValue( inheritedValue?.color?.text );
-	const userTextColor = decodeValue( value?.color?.text );
-	const hasTextColor = () => !! userTextColor;
-	const setTextColor = ( newColor ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'color', 'text' ],
-				encodeColorValue( newColor )
-			)
-		);
-	};
-	const resetTextColor = () => setTextColor( undefined );
-
 	// BackgroundColor
 	const showBackgroundPanel = useHasBackgroundPanel( settings );
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
@@ -418,6 +407,29 @@ export default function ColorPanel( {
 		);
 		onChange( newValue );
 	};
+
+	// Text Color
+	const showTextPanel = useHasTextPanel( settings );
+	const textColor = decodeValue( inheritedValue?.color?.text );
+	const userTextColor = decodeValue( value?.color?.text );
+	const hasTextColor = () => !! userTextColor;
+	const setTextColor = ( newColor ) => {
+		let changedObject = setImmutably(
+			value,
+			[ 'color', 'text' ],
+			encodeColorValue( newColor )
+		);
+		if ( textColor === linkColor ) {
+			changedObject = setImmutably(
+				changedObject,
+				[ 'elements', 'link', 'color', 'text' ],
+				encodeColorValue( newColor )
+			);
+		}
+
+		onChange( changedObject );
+	};
+	const resetTextColor = () => setTextColor( undefined );
 
 	// Elements
 	const elements = [
@@ -520,14 +532,14 @@ export default function ColorPanel( {
 			isShownByDefault: defaultControls.background,
 			indicators: [ gradient ?? backgroundColor ],
 			tabs: [
-				{
+				hasSolidColors && {
 					key: 'background',
 					label: __( 'Solid' ),
 					inheritedValue: backgroundColor,
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
 				},
-				{
+				hasGradientColors && {
 					key: 'gradient',
 					label: __( 'Gradient' ),
 					inheritedValue: gradient,
@@ -535,7 +547,7 @@ export default function ColorPanel( {
 					userValue: userGradient,
 					isGradient: true,
 				},
-			],
+			].filter( Boolean ),
 		},
 		showLinkPanel && {
 			key: 'link',

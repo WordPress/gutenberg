@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +17,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -28,6 +28,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import Image from './image';
+import { unlock } from '../lock-unlock';
 
 /**
  * Module constants
@@ -39,6 +40,8 @@ import {
 	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 } from './constants';
+
+const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 export const pickRelevantMediaFiles = ( image, size ) => {
 	const imageProps = Object.fromEntries(
@@ -125,20 +128,15 @@ export function ImageEdit( {
 	}, [ caption ] );
 
 	const ref = useRef();
-	const { imageDefaultSize, mediaUpload, isContentLocked } = useSelect(
-		( select ) => {
-			const { getSettings, __unstableGetContentLockingParent } =
-				select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				imageDefaultSize: settings.imageDefaultSize,
-				mediaUpload: settings.mediaUpload,
-				isContentLocked:
-					!! __unstableGetContentLockingParent( clientId ),
-			};
-		},
-		[]
-	);
+	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			imageDefaultSize: settings.imageDefaultSize,
+			mediaUpload: settings.mediaUpload,
+		};
+	}, [] );
+	const blockEditingMode = useBlockEditingMode();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
@@ -185,8 +183,6 @@ export function ImageEdit( {
 		// Reset the dimension attributes if changing to a different image.
 		if ( ! media.id || media.id !== id ) {
 			additionalAttributes = {
-				width: undefined,
-				height: undefined,
 				// Fallback to size "full" if there's no default image size.
 				// It means the image is smaller, and the block will use a full-size URL.
 				sizeSlug: hasDefaultSize( media, imageDefaultSize )
@@ -250,8 +246,6 @@ export function ImageEdit( {
 			setAttributes( {
 				url: newURL,
 				id: undefined,
-				width: undefined,
-				height: undefined,
 				sizeSlug: imageDefaultSize,
 			} );
 		}
@@ -320,7 +314,9 @@ export function ImageEdit( {
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
-			!! borderProps.className || ! isEmpty( borderProps.style ),
+			!! borderProps.className ||
+			( borderProps.style &&
+				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
 	const blockProps = useBlockProps( {
@@ -365,10 +361,10 @@ export function ImageEdit( {
 					containerRef={ ref }
 					context={ context }
 					clientId={ clientId }
-					isContentLocked={ isContentLocked }
+					blockEditingMode={ blockEditingMode }
 				/>
 			) }
-			{ ! url && ! isContentLocked && (
+			{ ! url && blockEditingMode === 'default' && (
 				<BlockControls group="block">
 					<BlockAlignmentControl
 						value={ align }

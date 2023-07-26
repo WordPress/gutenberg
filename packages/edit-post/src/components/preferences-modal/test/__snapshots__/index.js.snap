@@ -102,9 +102,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </svg>
       </button>
     </div>
-    <div
-      class="components-modal__children-container"
-    >
+    <div>
       <div
         class="interface-preferences__tabs"
       >
@@ -592,6 +590,8 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 }
 
 .emotion-13 {
+  font-size: 13px;
+  font-family: inherit;
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -609,15 +609,27 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   border-radius: 2px;
 }
 
+.emotion-13 svg,
+.emotion-13 path {
+  fill: currentColor;
+}
+
 .emotion-13:hover {
   color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 }
 
 .emotion-13:focus {
-  background-color: transparent;
-  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
-  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
-  outline: 3px solid transparent;
+  box-shadow: none;
+  outline: none;
+}
+
+.emotion-13:focus-visible {
+  box-shadow: 0 0 0 var( --wp-admin-border-width-focus ) var(
+  					--wp-components-color-accent,
+  					var( --wp-admin-theme-color, var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) )
+  				);
+  outline: 2px solid transparent;
+  outline-offset: 0;
 }
 
 .emotion-15 {
@@ -725,9 +737,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </svg>
       </button>
     </div>
-    <div
-      class="components-modal__children-container"
-    >
+    <div>
       <div
         class="components-navigator-provider interface-preferences__provider emotion-0 emotion-1"
         data-wp-c16t="true"

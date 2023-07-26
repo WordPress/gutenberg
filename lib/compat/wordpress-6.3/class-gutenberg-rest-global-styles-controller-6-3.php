@@ -11,14 +11,6 @@
  */
 class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_Styles_Controller_6_2 {
 	/**
-	 * Revision controller.
-	 *
-	 * @since 6.3.0
-	 * @var WP_REST_Revisions_Controller
-	 */
-	private $revisions_controller;
-
-	/**
 	 * Prepares links for the request.
 	 *
 	 * @since 5.9.0
@@ -39,7 +31,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 		if ( post_type_supports( $this->post_type, 'revisions' ) ) {
 			$revisions                = wp_get_latest_revision_id_and_total_count( $id );
 			$revisions_count          = ! is_wp_error( $revisions ) ? $revisions['count'] : 0;
-			$revisions_base           = sprintf( '/%s/%s/%d/revisions', $this->namespace, $this->rest_base, $id );
+			$revisions_base           = sprintf( '/%s/%d/revisions', $base, $id );
 			$links['version-history'] = array(
 				'href'  => rest_url( $revisions_base ),
 				'count' => $revisions_count,

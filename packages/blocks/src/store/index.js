@@ -11,7 +11,7 @@ import * as selectors from './selectors';
 import * as privateSelectors from './private-selectors';
 import * as actions from './actions';
 import { STORE_NAME } from './constants';
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 
 /**
  * Store definition for the blocks namespace.

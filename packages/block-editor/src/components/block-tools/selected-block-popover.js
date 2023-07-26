@@ -20,8 +20,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import Inserter from '../inserter';
-import { unlock } from '../../lock-unlock';
-import { privateApis } from '../../private-apis';
+import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
 function selector( select ) {
 	const {
@@ -29,7 +28,7 @@ function selector( select ) {
 		hasMultiSelection,
 		isTyping,
 		getLastMultiSelectedBlockClientId,
-	} = unlock( select( blockEditorStore ) );
+	} = select( blockEditorStore );
 
 	return {
 		editorMode: __unstableGetEditorMode(),
@@ -54,7 +53,6 @@ function SelectedBlockPopover( {
 		[]
 	);
 
-	const { useShouldContextualToolbarShow } = unlock( privateApis );
 	const isInsertionPointVisible = useSelect(
 		( select ) => {
 			const {
@@ -103,6 +101,12 @@ function SelectedBlockPopover( {
 	// Stores the active toolbar item index so the block toolbar can return focus
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
+
+	useEffect( () => {
+		// Resets the index whenever the active block changes so this is not
+		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+		initialToolbarItemIndexRef.current = undefined;
+	}, [ clientId ] );
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,

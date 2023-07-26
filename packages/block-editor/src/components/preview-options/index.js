@@ -18,6 +18,7 @@ export default function PreviewOptions( {
 	isEnabled = true,
 	deviceType,
 	setDeviceType,
+	label,
 } ) {
 	const isMobile = useViewportMatch( 'small', '<' );
 	if ( isMobile ) return null;
@@ -27,10 +28,9 @@ export default function PreviewOptions( {
 			className,
 			'block-editor-post-preview__dropdown-content'
 		),
-		position: 'bottom left',
+		placement: 'bottom-end',
 	};
 	const toggleProps = {
-		variant: 'tertiary',
 		className: 'block-editor-post-preview__button-toggle',
 		disabled: ! isEnabled,
 		children: viewLabel,
@@ -52,8 +52,9 @@ export default function PreviewOptions( {
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
 			icon={ deviceIcons[ deviceType.toLowerCase() ] }
+			label={ label || __( 'Preview' ) }
 		>
-			{ () => (
+			{ ( renderProps ) => (
 				<>
 					<MenuGroup>
 						<MenuItem
@@ -78,7 +79,7 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
-					{ children }
+					{ children( renderProps ) }
 				</>
 			) }
 		</DropdownMenu>

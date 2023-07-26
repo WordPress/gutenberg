@@ -99,54 +99,6 @@ describe( 'buildDockerComposeConfig', () => {
 		);
 	} );
 
-	it( 'should not map the default phpunit uploads directory if the user has specified their own directory', () => {
-		const envConfig = {
-			...CONFIG,
-			mappings: {
-				'wp-content/uploads': {
-					path: '/path/to/wp-uploads',
-				},
-			},
-		};
-		const dockerConfig = buildDockerComposeConfig( {
-			workDirectoryPath: '/path',
-			env: { development: envConfig, tests: envConfig },
-		} );
-		const expectedVolumes = [
-			'tests-wordpress:/var/www/html',
-			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
-			'tests-user-home:/home/test',
-			'/path/to/wp-uploads:/var/www/html/wp-content/uploads',
-		];
-		expect( dockerConfig.services.phpunit.volumes ).toEqual(
-			expectedVolumes
-		);
-	} );
-
-	it( 'should map the default phpunit uploads directory even if the user has specified their own directory only for the development instance', () => {
-		const envConfig = {
-			...CONFIG,
-			mappings: {
-				'wp-content/uploads': {
-					path: '/path/to/wp-uploads',
-				},
-			},
-		};
-		const dockerConfig = buildDockerComposeConfig( {
-			workDirectoryPath: '/path',
-			env: { development: envConfig, tests: CONFIG },
-		} );
-		const expectedVolumes = [
-			'tests-wordpress:/var/www/html',
-			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
-			'tests-user-home:/home/test',
-			'phpunit-uploads:/var/www/html/wp-content/uploads',
-		];
-		expect( dockerConfig.services.phpunit.volumes ).toEqual(
-			expectedVolumes
-		);
-	} );
-
 	it( 'should create "wordpress" and "tests-wordpress" volumes if they are needed by containers', () => {
 		// CONFIG has no coreSource entry, so there are no core sources on the
 		// local filesystem, so a volume should be created to contain core

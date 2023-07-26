@@ -25,7 +25,7 @@ export async function waitForStoreResolvers( fn ) {
 		const result = fn();
 
 		// Advance all timers allowing store resolvers to resolve.
-		act( () => jest.runAllTimers() );
+		act( () => jest.runOnlyPendingTimers() );
 
 		// The store resolvers perform several API fetches during editor
 		// initialization. The most straightforward approach to ensure all of them

@@ -21,7 +21,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 function EditorCanvas( { enableResizing, settings, children, ...props } ) {
@@ -87,7 +87,9 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 					// which isn't a requirement in auto resize mode.
 					enableResizing ? 'min-height:0!important;' : ''
 				}}body{position:relative; ${
-					canvasMode === 'view' ? 'cursor: pointer;' : ''
+					canvasMode === 'view'
+						? 'cursor: pointer; min-height: 100vh;'
+						: ''
 				}}}`
 			}</style>
 			{ children }

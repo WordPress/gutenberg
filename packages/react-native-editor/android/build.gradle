@@ -3,11 +3,11 @@ import org.apache.tools.ant.taskdefs.condition.Os
 buildscript {
     ext {
         gradlePluginVersion = '7.2.1'
-        kotlinVersion = '1.5.32'
-        buildToolsVersion = "31.0.0"
+        kotlinVersion = '1.6.10'
+        buildToolsVersion = "33.0.0"
         minSdkVersion = 24
-        compileSdkVersion = 31
-        targetSdkVersion = 31
+        compileSdkVersion = 33
+        targetSdkVersion = 33
         supportLibVersion = '28.0.0'
         gradleDownloadTask = '5.0.1'
         

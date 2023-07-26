@@ -22,6 +22,7 @@ import {
 	setNestedValue,
 } from './utils';
 import type * as ET from './entity-types';
+import { getUndoEdits, getRedoEdits } from './private-selectors';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
@@ -38,6 +39,7 @@ export interface State {
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
+	themeGlobalStyleRevisions: Record< number, Object >;
 	undo: UndoState;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
@@ -72,9 +74,18 @@ interface EntityConfig {
 	kind: string;
 }
 
-interface UndoState extends Array< Object > {
-	flattenedUndo: unknown;
+export interface UndoEdit {
+	name: string;
+	kind: string;
+	recordId: string;
+	from: any;
+	to: any;
+}
+
+interface UndoState {
+	list: Array< UndoEdit[] >;
 	offset: number;
+	cache: UndoEdit[];
 }
 
 interface UserState {
@@ -883,24 +894,38 @@ function getCurrentUndoOffset( state: State ): number {
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param state State tree.
+ * @deprecated since 6.3
+ *
+ * @param      state State tree.
  *
  * @return The edit.
  */
 export function getUndoEdit( state: State ): Optional< any > {
-	return state.undo[ state.undo.length - 2 + getCurrentUndoOffset( state ) ];
+	deprecated( "select( 'core' ).getUndoEdit()", {
+		since: '6.3',
+	} );
+	return state.undo.list[
+		state.undo.list.length - 2 + getCurrentUndoOffset( state )
+	]?.[ 0 ];
 }
 
 /**
  * Returns the next edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param state State tree.
+ * @deprecated since 6.3
+ *
+ * @param      state State tree.
  *
  * @return The edit.
  */
 export function getRedoEdit( state: State ): Optional< any > {
-	return state.undo[ state.undo.length + getCurrentUndoOffset( state ) ];
+	deprecated( "select( 'core' ).getRedoEdit()", {
+		since: '6.3',
+	} );
+	return state.undo.list[
+		state.undo.list.length + getCurrentUndoOffset( state )
+	]?.[ 0 ];
 }
 
 /**
@@ -912,7 +937,7 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	return Boolean( getUndoEdit( state ) );
+	return Boolean( getUndoEdits( state ) );
 }
 
 /**
@@ -924,7 +949,7 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	return Boolean( getRedoEdit( state ) );
+	return Boolean( getRedoEdits( state ) );
 }
 
 /**
@@ -1141,11 +1166,7 @@ export const hasFetchedAutosaves = createRegistrySelector(
 export const getReferenceByDistinctEdits = createSelector(
 	// This unused state argument is listed here for the documentation generating tool (docgen).
 	( state: State ) => [],
-	( state: State ) => [
-		state.undo.length,
-		state.undo.offset,
-		state.undo.flattenedUndo,
-	]
+	( state: State ) => [ state.undo.list.length, state.undo.offset ]
 );
 
 /**
@@ -1237,13 +1258,21 @@ export function getBlockPatternCategories( state: State ): Array< any > {
 }
 
 /**
- * Retrieve the fallback Navigation.
+ * Returns the revisions of the current global styles theme.
  *
  * @param state Data state.
- * @return The ID for the fallback Navigation post.
+ *
+ * @return The current global styles.
  */
-export function getNavigationFallbackId(
+export function getCurrentThemeGlobalStylesRevisions(
 	state: State
-): EntityRecordKey | undefined {
-	return state.navigationFallbackId;
+): Array< object > | null {
+	const currentGlobalStylesId =
+		__experimentalGetCurrentGlobalStylesId( state );
+
+	if ( ! currentGlobalStylesId ) {
+		return null;
+	}
+
+	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
 }

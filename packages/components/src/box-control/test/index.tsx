@@ -46,15 +46,10 @@ describe( 'BoxControl', () => {
 				name: 'Box Control',
 			} );
 
-			await user.type( input, '100%' );
+			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect(
-				screen.getByRole( 'combobox', {
-					name: 'Select unit',
-				} )
-			).toHaveValue( '%' );
 		} );
 	} );
 
@@ -67,20 +62,15 @@ describe( 'BoxControl', () => {
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
-			const select = screen.getByRole( 'combobox', {
-				name: 'Select unit',
-			} );
 
-			await user.type( input, '100px' );
+			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
 
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
-			expect( select ).toHaveValue( 'px' );
 		} );
 
 		it( 'should reset values when clicking Reset, if controlled', async () => {
@@ -91,20 +81,15 @@ describe( 'BoxControl', () => {
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
-			const select = screen.getByRole( 'combobox', {
-				name: 'Select unit',
-			} );
 
-			await user.type( input, '100px' );
+			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
 
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
-			expect( select ).toHaveValue( 'px' );
 		} );
 
 		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', async () => {
@@ -115,20 +100,15 @@ describe( 'BoxControl', () => {
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
-			const select = screen.getByRole( 'combobox', {
-				name: 'Select unit',
-			} );
 
-			await user.type( input, '100px' );
+			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
 
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
-			expect( select ).toHaveValue( 'px' );
 		} );
 
 		it( 'should persist cleared value when focus changes', async () => {
@@ -141,15 +121,10 @@ describe( 'BoxControl', () => {
 				name: 'Box Control',
 			} );
 
-			await user.type( input, '100%' );
+			await user.type( input, '100' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect(
-				screen.getByRole( 'combobox', {
-					name: 'Select unit',
-				} )
-			).toHaveValue( '%' );
 
 			await user.clear( input );
 			expect( input ).toHaveValue( '' );
@@ -178,9 +153,8 @@ describe( 'BoxControl', () => {
 
 			await user.type(
 				screen.getByRole( 'textbox', { name: 'Top' } ),
-				'100px'
+				'100'
 			);
-			await user.keyboard( '{Enter}' );
 
 			expect(
 				screen.getByRole( 'textbox', { name: 'Top' } )
@@ -194,12 +168,6 @@ describe( 'BoxControl', () => {
 			expect(
 				screen.getByRole( 'textbox', { name: 'Left' } )
 			).not.toHaveValue();
-
-			screen
-				.getAllByRole( 'combobox', { name: 'Select unit' } )
-				.forEach( ( combobox ) => {
-					expect( combobox ).toHaveValue( 'px' );
-				} );
 		} );
 
 		it( 'should update a whole axis when value is changed when unlinked', async () => {
@@ -215,9 +183,8 @@ describe( 'BoxControl', () => {
 				screen.getByRole( 'textbox', {
 					name: 'Vertical',
 				} ),
-				'100px'
+				'100'
 			);
-			await user.keyboard( '{Enter}' );
 
 			expect(
 				screen.getByRole( 'textbox', { name: 'Vertical' } )
@@ -225,12 +192,6 @@ describe( 'BoxControl', () => {
 			expect(
 				screen.getByRole( 'textbox', { name: 'Horizontal' } )
 			).not.toHaveValue();
-
-			screen
-				.getAllByRole( 'combobox', { name: 'Select unit' } )
-				.forEach( ( combobox ) => {
-					expect( combobox ).toHaveValue( 'px' );
-				} );
 		} );
 	} );
 
@@ -321,23 +282,30 @@ describe( 'BoxControl', () => {
 	describe( 'onChange updates', () => {
 		it( 'should call onChange when values contain more than just CSS units', async () => {
 			const user = userEvent.setup();
-			const setState = jest.fn();
+			const onChangeSpy = jest.fn();
 
-			render( <BoxControl onChange={ setState } /> );
+			render( <BoxControl onChange={ onChangeSpy } /> );
 
-			await user.type(
-				screen.getByRole( 'textbox', {
-					name: 'Box Control',
-				} ),
-				'7.5rem'
-			);
-			await user.keyboard( '{Enter}' );
+			const valueInput = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 
-			expect( setState ).toHaveBeenCalledWith( {
-				top: '7.5rem',
-				right: '7.5rem',
-				bottom: '7.5rem',
-				left: '7.5rem',
+			// Typing the first letter of a unit blurs the input and focuses the combobox.
+			await user.type( valueInput, '7r' );
+
+			expect( unitSelect ).toHaveFocus();
+
+			// The correct expected behavior would be for the values to have "rem"
+			// as their unit, but the test environment doesn't seem to change
+			// values on `select` elements when using the keyboard.
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( {
+				top: '7px',
+				right: '7px',
+				bottom: '7px',
+				left: '7px',
 			} );
 		} );
 

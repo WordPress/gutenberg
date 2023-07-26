@@ -27,7 +27,7 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should disable toolbar butons when open', async ( { page } ) => {
+	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
 			page.locator( 'role=button[name="Toggle block inserter"i]' )
 		).not.toBeVisible();
@@ -39,9 +39,6 @@ test.describe( 'Style Book', () => {
 		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="Redo"i]' )
-		).not.toBeVisible();
-		await expect(
-			page.locator( 'role=button[name="Show template details"i]' )
 		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="View"i]' )
@@ -165,18 +162,11 @@ class StyleBook {
 		this.page = page;
 	}
 
-	async disableWelcomeGuide() {
-		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'welcomeGuideStyles', false );
-		} );
-	}
-
 	async open() {
-		await this.disableWelcomeGuide();
-		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.page.click( 'role=button[name="Style Book"i]' );
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+		await this.page.getByRole( 'button', { name: 'Style Book' } ).click();
 	}
 }

@@ -117,7 +117,7 @@ describe( 'validate-config', () => {
 	describe( 'checkObjectWithValues', () => {
 		it( 'throws when not an object', () => {
 			expect( () =>
-				checkObjectWithValues( 'test.json', 'test', 'test', [] )
+				checkObjectWithValues( 'test.json', 'test', 'test', [], false )
 			).toThrow(
 				new ValidationError(
 					'Invalid test.json: "test" must be an object.'
@@ -125,7 +125,13 @@ describe( 'validate-config', () => {
 			);
 
 			expect( () =>
-				checkObjectWithValues( 'test.json', 'test', [ 'test' ], [] )
+				checkObjectWithValues(
+					'test.json',
+					'test',
+					[ 'test' ],
+					[],
+					false
+				)
 			).toThrow(
 				new ValidationError(
 					'Invalid test.json: "test" must be an object.'
@@ -139,33 +145,42 @@ describe( 'validate-config', () => {
 					'test.json',
 					'test',
 					{ test: 'test' },
-					[]
+					[],
+					false
 				)
 			).toThrow(
 				new ValidationError(
-					'Invalid test.json: "test.test" must be a .'
+					'Invalid test.json: "test.test" must be of type: .'
 				)
 			);
 		} );
 
 		it( 'throws when type is not allowed', () => {
 			expect( () =>
-				checkObjectWithValues( 'test.json', 'test', { test: 'test' }, [
-					'number',
-				] )
+				checkObjectWithValues(
+					'test.json',
+					'test',
+					{ test: 'test' },
+					[ 'number' ],
+					false
+				)
 			).toThrow(
 				new ValidationError(
-					'Invalid test.json: "test.test" must be a number.'
+					'Invalid test.json: "test.test" must be of type: number.'
 				)
 			);
 
 			expect( () =>
-				checkObjectWithValues( 'test.json', 'test', { test: 1 }, [
-					'string',
-				] )
+				checkObjectWithValues(
+					'test.json',
+					'test',
+					{ test: 1 },
+					[ 'string' ],
+					false
+				)
 			).toThrow(
 				new ValidationError(
-					'Invalid test.json: "test.test" must be a string.'
+					'Invalid test.json: "test.test" must be of type: string.'
 				)
 			);
 
@@ -174,32 +189,65 @@ describe( 'validate-config', () => {
 					'test.json',
 					'test',
 					{ test: [ 'test' ] },
-					[ 'object', 'string' ]
+					[ 'object', 'string' ],
+					false
 				)
 			).toThrow(
 				new ValidationError(
-					'Invalid test.json: "test.test" must be a object or string.'
+					'Invalid test.json: "test.test" must be of type: object or string.'
+				)
+			);
+
+			expect( () =>
+				checkObjectWithValues(
+					'test.json',
+					'test',
+					{ test: null },
+					[ 'object' ],
+					true
+				)
+			).toThrow(
+				new ValidationError(
+					'Invalid test.json: "test.test" must be of type: object.'
 				)
 			);
 		} );
 
 		it( 'passes when type is allowed', () => {
 			expect( () =>
-				checkObjectWithValues( 'test.json', 'test', { test: 'test' }, [
-					'string',
-				] )
+				checkObjectWithValues(
+					'test.json',
+					'test',
+					{ test: 'test' },
+					[ 'string' ],
+					false
+				)
 			).not.toThrow();
 			expect( () =>
-				checkObjectWithValues( 'test.json', 'test', { test: 1 }, [
-					'number',
-				] )
+				checkObjectWithValues(
+					'test.json',
+					'test',
+					{ test: '' },
+					[ 'string' ],
+					true
+				)
+			).not.toThrow();
+			expect( () =>
+				checkObjectWithValues(
+					'test.json',
+					'test',
+					{ test: 1 },
+					[ 'number' ],
+					false
+				)
 			).not.toThrow();
 			expect( () =>
 				checkObjectWithValues(
 					'test.json',
 					'test',
 					{ test: { nested: 'test' } },
-					[ 'object' ]
+					[ 'object' ],
+					false
 				)
 			).not.toThrow();
 			expect( () =>
@@ -207,7 +255,17 @@ describe( 'validate-config', () => {
 					'test.json',
 					'test',
 					{ test: [ 'test' ] },
-					[ 'array' ]
+					[ 'array' ],
+					false
+				)
+			).not.toThrow();
+			expect( () =>
+				checkObjectWithValues(
+					'test.json',
+					'test',
+					{ test: null },
+					[ 'null' ],
+					false
 				)
 			).not.toThrow();
 		} );

@@ -16,6 +16,7 @@ const AppiumLocal = require( './appium-local' );
 // Platform setup.
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
+const iPadDevice = process.env.IPAD;
 
 // Environment setup, local environment or Sauce Labs.
 const defaultEnvironment = 'local';
@@ -115,10 +116,10 @@ const setupDriver = async () => {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
 		}
 	} else {
-		desiredCaps = { ...iosServer };
+		desiredCaps = iosServer( { iPadDevice } );
 		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
 		if ( isLocalEnvironment() ) {
-			desiredCaps = { ...iosLocal };
+			desiredCaps = iosLocal( { iPadDevice } );
 
 			const iosPlatformVersions = getIOSPlatformVersions();
 			if ( iosPlatformVersions.length === 0 ) {
@@ -475,18 +476,21 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
 	if ( isAndroid() ) {
-		// Hit the "Menu" key.
-		await driver.pressKeycode( 82 );
+		const moreOptionsButton = await driver.elementByAccessibilityId(
+			'More options'
+		);
+		await moreOptionsButton.click();
 
 		const showHtmlButtonXpath =
 			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
 	} else if ( toggleOn ) {
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="..."]'
+		const moreOptionsButton = await driver.elementByAccessibilityId(
+			'editor-menu-button'
 		);
+		await moreOptionsButton.click();
+
 		await clickIfClickable(
 			driver,
 			'//XCUIElementTypeButton[@name="Switch to HTML"]'
@@ -494,10 +498,10 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 	} else {
 		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
 		await driver.sleep( 3000 );
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="..."]'
+		const moreOptionsButton = await driver.elementByAccessibilityId(
+			'editor-menu-button'
 		);
+		await moreOptionsButton.click();
 		await clickIfClickable(
 			driver,
 			'//XCUIElementTypeButton[@name="Switch To Visual"]'
