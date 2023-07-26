@@ -47,7 +47,7 @@ describe( 'LineHeightControl', () => {
 		render( <ControlledLineHeightControl /> );
 		const input = screen.getByRole( 'spinbutton' );
 		act( () => input.focus() );
-		fireEvent.change( input, { target: { value: 0.01 } } ); // simulates click on spin button up
+		fireEvent.change( input, { target: { value: 0.1 } } ); // simulates click on spin button up
 		expect( input ).toHaveValue( BASE_DEFAULT_VALUE + STEP );
 	} );
 
