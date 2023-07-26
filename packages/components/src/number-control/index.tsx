@@ -63,6 +63,9 @@ function UnforwardedNumberControl(
 	const inputRef = useRef< HTMLInputElement >();
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
 
+	const isLineHeightControl =
+		className === 'block-editor-line-height-control__input';
+
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
@@ -70,6 +73,20 @@ function UnforwardedNumberControl(
 		value: number | string,
 		stepOverride?: number
 	) => {
+		/*
+		 * If this is a line height control, do not use roundClamp() as this does not allow for manual input
+		 * of values with 2 decimal places.
+		 *
+		 * Use Math.round instead to round to a maximum of 2 decimal places for more granular control. e.g. 1.67.
+		 */
+		if ( isLineHeightControl && ! isStepAny ) {
+			return (
+				'' +
+				Math.round( ( ensureNumber( value ) + Number.EPSILON ) * 100 ) /
+					100
+			);
+		}
+
 		// When step is "any" clamp the value, otherwise round and clamp it.
 		return isStepAny
 			? Math.min( max, Math.max( min, ensureNumber( value ) ) )

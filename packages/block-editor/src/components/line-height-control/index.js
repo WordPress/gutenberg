@@ -105,6 +105,7 @@ const LineHeightControl = ( {
 		>
 			<NumberControl
 				{ ...otherProps }
+				className="block-editor-line-height-control__input"
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
 				onChange={ handleOnChange }
