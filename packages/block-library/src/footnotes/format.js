@@ -16,6 +16,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -34,23 +35,26 @@ export const format = {
 		'data-fn': 'data-fn',
 	},
 	contentEditable: false,
-	[ usesContextKey ]: [ 'postType' ],
+	[ usesContextKey ]: [ 'postType', 'postId' ],
 	edit: function Edit( {
 		value,
 		onChange,
 		isObjectActive,
-		context: { postType },
+		context: { postType, postId },
 	} ) {
 		const registry = useRegistry();
 		const {
 			getSelectedBlockClientId,
 			getBlockRootClientId,
 			getBlockName,
-			getBlocks,
+			getBlockParentsByBlockName,
 		} = useSelect( blockEditorStore );
 		const footnotesBlockType = useSelect( ( select ) =>
 			select( blocksStore ).getBlockType( name )
 		);
+		const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
+			id: postId,
+		} );
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
 
@@ -59,6 +63,16 @@ export const format = {
 		}
 
 		if ( postType !== 'post' && postType !== 'page' ) {
+			return null;
+		}
+
+		// Checks if the selected block lives within a pattern.
+		if (
+			getBlockParentsByBlockName(
+				getSelectedBlockClientId(),
+				'core/block'
+			).length > 0
+		) {
 			return null;
 		}
 
@@ -86,19 +100,8 @@ export const format = {
 					onChange( newValue );
 				}
 
-				// BFS search to find the first footnote block.
-				let fnBlock = null;
-				{
-					const queue = [ ...getBlocks() ];
-					while ( queue.length ) {
-						const block = queue.shift();
-						if ( block.name === name ) {
-							fnBlock = block;
-							break;
-						}
-						queue.push( ...block.innerBlocks );
-					}
-				}
+				// Finds the first footnote block.
+				let fnBlock = blocks?.find( ( block ) => block.name === name );
 
 				// Maybe this should all also be moved to the entity provider.
 				// When there is no footnotes block in the post, create one and
