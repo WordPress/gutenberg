@@ -122,13 +122,13 @@ function useGlobalStylesOpenRevisionsCommands() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const history = useHistory();
-	const revisions = useSelect(
+	const hasRevisions = useSelect(
 		( select ) =>
-			select( coreStore ).getCurrentThemeGlobalStylesRevisions(),
+			select( coreStore ).getCurrentThemeGlobalStylesRevisions()?.length,
 		[]
 	);
 	const commands = useMemo( () => {
-		if ( ! revisions?.length ) {
+		if ( ! hasRevisions ) {
 			return [];
 		}
 
@@ -154,7 +154,7 @@ function useGlobalStylesOpenRevisionsCommands() {
 			},
 		];
 	}, [
-		revisions,
+		hasRevisions,
 		history,
 		openGeneralSidebar,
 		setEditorCanvasContainerView,
