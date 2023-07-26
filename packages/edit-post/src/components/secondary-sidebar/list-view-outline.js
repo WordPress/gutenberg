@@ -17,6 +17,7 @@ import {
 	Rect,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 
 function EmptyOutlineIllustration() {
 	return (
@@ -57,84 +58,43 @@ function EmptyOutlineIllustration() {
 }
 
 export default function ListViewOutline() {
-	const { headingCount, paragraphCount, blockCount } = useSelect(
-		( select ) => {
-			const { getGlobalBlockCount, getBlocks } =
-				select( blockEditorStore );
-			const blocks = getBlocks();
-			return {
-				headingCount: getGlobalBlockCount( 'core/heading' ),
-				paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
-				blockCount: blocks.length ? blocks.length : 0,
-			};
-		},
-		[]
-	);
+	const { headingCount } = useSelect( ( select ) => {
+		const { getGlobalBlockCount } = select( blockEditorStore );
+		return {
+			headingCount: getGlobalBlockCount( 'core/heading' ),
+		};
+	}, [] );
+	const instanceId = useInstanceId( ListViewOutline );
 	return (
-		<>
-			<table className="edit-post-editor__list-view-overview">
-				<caption className="screen-reader-text">
-					{ __( 'Outline information about current post' ) }
-				</caption>
-				<thead className="screen-reader-text">
-					<tr>
-						<th scope="col">{ __( 'Metric' ) }</th>
-						<th scope="col">{ __( 'Value' ) }</th>
-						<th scope="col">{ __( 'Metric' ) }</th>
-						<th scope="col">{ __( 'Value' ) }</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>
-							<Text>{ __( 'Characters:' ) }</Text>
-						</td>
-						<td>
-							<Text>
-								<CharacterCount />
-							</Text>
-						</td>
-						<td>
-							<Text>{ __( 'Headings:' ) }</Text>
-						</td>
-						<td>
-							<Text>{ headingCount }</Text>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<Text>{ __( 'Words:' ) }</Text>
-						</td>
-						<td>
-							<Text>
-								<WordCount />
-							</Text>
-						</td>
-						<td>
-							<Text>{ __( 'Paragraphs:' ) }</Text>
-						</td>
-						<td>
-							<Text>{ paragraphCount }</Text>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<Text>{ __( 'Time to read:' ) }</Text>
-						</td>
-						<td>
-							<Text>
-								<TimeToRead />
-							</Text>
-						</td>
-						<td>
-							<Text>{ __( 'Blocks:' ) }</Text>
-						</td>
-						<td>
-							<Text>{ blockCount }</Text>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+		<div className="edit-post-editor__list-view-overview__container">
+			<p
+				id={ `edit-post-editor-list-view-overview-outline-${ instanceId }` }
+			>
+				{ __( 'Document outline' ) }
+			</p>
+			<ul
+				className="edit-post-editor__list-view-overview"
+				aria-describedby={ `edit-post-editor-list-view-overview-outline-${ instanceId }` }
+			>
+				<li className="edit-post-editor__list-view-overview__item">
+					<Text>{ __( 'Characters:' ) }</Text>
+					<Text>
+						<CharacterCount />
+					</Text>
+				</li>
+				<li className="edit-post-editor__list-view-overview__item">
+					<Text>{ __( 'Words:' ) }</Text>
+					<Text>
+						<WordCount />
+					</Text>
+				</li>
+				<li className="edit-post-editor__list-view-overview__item">
+					<Text>{ __( 'Time to read:' ) }</Text>
+					<Text>
+						<TimeToRead />
+					</Text>
+				</li>
+			</ul>
 			{ headingCount > 0 ? (
 				<DocumentOutline />
 			) : (
@@ -147,6 +107,6 @@ export default function ListViewOutline() {
 					</p>
 				</div>
 			) }
-		</>
+		</div>
 	);
 }
