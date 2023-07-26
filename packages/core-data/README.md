@@ -313,7 +313,7 @@ _Parameters_
 
 _Returns_
 
--   `Object | null`: The current global styles.
+-   `Array< object > | null`: The current global styles.
 
 ### getCurrentUser
 

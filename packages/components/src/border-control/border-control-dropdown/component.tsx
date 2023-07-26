@@ -30,12 +30,8 @@ import type { DropdownProps as DropdownComponentProps } from '../../dropdown/typ
 import type { ColorProps, DropdownProps } from '../types';
 
 const getAriaLabelColorValue = ( colorValue: string ) => {
-	const isHex = colorValue.startsWith( '#' );
-
 	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
-	const displayValue = colorValue.replace( /^var\((.+)\)$/, '$1' );
-
-	return isHex ? displayValue.split( '' ).join( '-' ) : displayValue;
+	return colorValue.replace( /^var\((.+)\)$/, '$1' );
 };
 
 const getColorObject = (
@@ -79,14 +75,14 @@ const getToggleAriaLabel = (
 			const ariaLabelValue = getAriaLabelColorValue( colorObject.color );
 			return style
 				? sprintf(
-						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0". %3$s: The current border style selection e.g. "solid".
+						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:". %3$s: The current border style selection e.g. "solid".
 						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s". The currently selected style is "%3$s".',
 						colorObject.name,
 						ariaLabelValue,
 						style
 				  )
 				: sprintf(
-						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
+						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:".
 						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
 						colorObject.name,
 						ariaLabelValue
@@ -97,13 +93,13 @@ const getToggleAriaLabel = (
 			const ariaLabelValue = getAriaLabelColorValue( colorValue );
 			return style
 				? sprintf(
-						// translators: %1$s: The color's hex code, with added hyphens e.g: "#-f-0-0". %2$s: The current border style selection e.g. "solid".
+						// translators: %1$s: The color's hex code e.g.: "#f00:". %2$s: The current border style selection e.g. "solid".
 						'Border color and style picker. The currently selected color has a value of "%1$s". The currently selected style is "%2$s".',
 						ariaLabelValue,
 						style
 				  )
 				: sprintf(
-						// translators: %1$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
+						// translators: %1$s: The color's hex code e.g: "#f00".
 						'Border color and style picker. The currently selected color has a value of "%1$s".',
 						ariaLabelValue
 				  );
@@ -114,7 +110,7 @@ const getToggleAriaLabel = (
 
 	if ( colorObject ) {
 		return sprintf(
-			// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
+			// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g: "#f00".
 			'Border color picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
 			colorObject.name,
 			getAriaLabelColorValue( colorObject.color )
@@ -123,7 +119,7 @@ const getToggleAriaLabel = (
 
 	if ( colorValue ) {
 		return sprintf(
-			// translators: %1$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
+			// translators: %1$s: The color's hex code e.g: "#f00".
 			'Border color picker. The currently selected color has a value of "%1$s".',
 			getAriaLabelColorValue( colorValue )
 		);

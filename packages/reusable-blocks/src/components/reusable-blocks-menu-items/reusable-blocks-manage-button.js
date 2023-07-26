@@ -64,7 +64,7 @@ function ReusableBlocksManageButton( { clientId } ) {
 	return (
 		<BlockSettingsMenuControls>
 			<MenuItem href={ managePatternsUrl }>
-				{ __( 'Manage Patterns' ) }
+				{ __( 'Manage patterns' ) }
 			</MenuItem>
 			{ canRemove && (
 				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>

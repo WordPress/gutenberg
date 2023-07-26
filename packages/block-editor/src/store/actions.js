@@ -948,36 +948,30 @@ export const __unstableSplitSelection =
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = remove( valueB, 0, selectionB.offset );
 
-		dispatch.replaceBlocks(
-			select.getSelectedBlockClientIds(),
-			[
-				{
-					// Preserve the original client ID.
-					...blockA,
-					attributes: {
-						...blockA.attributes,
-						[ selectionA.attributeKey ]: toHTMLString( {
-							value: valueA,
-							...mapRichTextSettings( attributeDefinitionA ),
-						} ),
-					},
+		dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
+			{
+				// Preserve the original client ID.
+				...blockA,
+				attributes: {
+					...blockA.attributes,
+					[ selectionA.attributeKey ]: toHTMLString( {
+						value: valueA,
+						...mapRichTextSettings( attributeDefinitionA ),
+					} ),
 				},
-				createBlock( getDefaultBlockName() ),
-				{
-					// Preserve the original client ID.
-					...blockB,
-					attributes: {
-						...blockB.attributes,
-						[ selectionB.attributeKey ]: toHTMLString( {
-							value: valueB,
-							...mapRichTextSettings( attributeDefinitionB ),
-						} ),
-					},
+			},
+			{
+				// Preserve the original client ID.
+				...blockB,
+				attributes: {
+					...blockB.attributes,
+					[ selectionB.attributeKey ]: toHTMLString( {
+						value: valueB,
+						...mapRichTextSettings( attributeDefinitionB ),
+					} ),
 				},
-			],
-			1, // If we don't pass the `indexToSelect` it will default to the last block.
-			select.getSelectedBlocksInitialCaretPosition()
-		);
+			},
+		] );
 	};
 
 /**

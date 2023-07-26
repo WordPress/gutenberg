@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import EditorKeyboardShortcuts from './global-keyboard-shortcuts';
+
 // Block Creation Components.
 export * from './autocompleters';
 
@@ -5,8 +10,7 @@ export * from './autocompleters';
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
-export { default as VisualEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/visual-editor-shortcuts';
-export { default as TextEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/text-editor-shortcuts';
+export { EditorKeyboardShortcuts };
 export { default as EditorKeyboardShortcutsRegister } from './global-keyboard-shortcuts/register-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
@@ -84,3 +88,5 @@ export { default as CharacterCount } from './character-count';
 export { default as EditorProvider } from './provider';
 
 export * from './deprecated';
+export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
+export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;

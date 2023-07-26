@@ -5747,13 +5747,13 @@
 				"description": "/packages/components"
 			},
 			{
-				"id": 1344464662,
-				"node_id": "MDU6TGFiZWwxMzQ0NDY0NjYy",
-				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[a11y]%20Keyboard%20&%20Focus",
-				"name": "[a11y] Keyboard & Focus",
-				"color": "efde5d",
+				"id": 546517042,
+				"node_id": "MDU6TGFiZWw1NDY1MTcwNDI=",
+				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/Accessibility%20(a11y)",
+				"name": "Accessibility (a11y)",
+				"color": "655104",
 				"default": false,
-				"description": ""
+				"description": "Changes that impact accessibility and need corresponding review (e.g. markup changes)."
 			}
 		],
 		"state": "closed",

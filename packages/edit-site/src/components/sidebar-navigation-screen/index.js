@@ -4,7 +4,6 @@
 import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -12,6 +11,7 @@ import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -24,6 +24,8 @@ import {
 	currentlyPreviewingTheme,
 } from '../../utils/is-previewing-theme';
 
+const { useLocation } = unlock( routerPrivateApis );
+
 export default function SidebarNavigationScreen( {
 	isRoot,
 	title,
@@ -32,7 +34,7 @@ export default function SidebarNavigationScreen( {
 	content,
 	footer,
 	description,
-	backPath,
+	backPath: backPathProp,
 } ) {
 	const { dashboardLink } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -41,7 +43,8 @@ export default function SidebarNavigationScreen( {
 		};
 	}, [] );
 	const { getTheme } = useSelect( coreStore );
-	const { goTo } = useNavigator();
+	const location = useLocation();
+	const navigator = useNavigator();
 	const theme = getTheme( currentlyPreviewingTheme() );
 	const icon = isRTL() ? chevronRight : chevronLeft;
 
@@ -57,17 +60,19 @@ export default function SidebarNavigationScreen( {
 					alignment="flex-start"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
-					{ ! isRoot && ! backPath && (
-						<NavigatorToParentButton
-							as={ SidebarButton }
-							icon={ isRTL() ? chevronRight : chevronLeft }
-							label={ __( 'Back' ) }
-							showTooltip={ false }
-						/>
-					) }
-					{ ! isRoot && backPath && (
+					{ ! isRoot && (
 						<SidebarButton
-							onClick={ () => goTo( backPath, { isBack: true } ) }
+							onClick={ () => {
+								const backPath =
+									backPathProp ?? location.state?.backPath;
+								if ( backPath ) {
+									navigator.goTo( backPath, {
+										isBack: true,
+									} );
+								} else {
+									navigator.goToParent();
+								}
+							} }
 							icon={ icon }
 							label={ __( 'Back' ) }
 							showTooltip={ false }

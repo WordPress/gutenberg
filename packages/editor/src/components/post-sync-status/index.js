@@ -12,12 +12,13 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
-import { ReusableBlocksRenameHint } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 export default function PostSyncStatus() {
 	const { syncStatus, postType, meta } = useSelect( ( select ) => {
@@ -81,7 +82,7 @@ export function PostSyncStatusModal() {
 	if ( postType !== 'wp_block' || ! isNewPost ) {
 		return null;
 	}
-
+	const { ReusableBlocksRenameHint } = unlock( blockEditorPrivateApis );
 	return (
 		<>
 			{ isModalOpen && (

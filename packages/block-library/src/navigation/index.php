@@ -65,6 +65,9 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 
 		return $menu_items_by_parent_id;
 	}
+}
+
+if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) ) {
 
 	/**
 	 * Add Interactivity API directives to the navigation-submenu and page-list blocks markup using the Tag Processor
@@ -148,13 +151,13 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	 */
 	function gutenberg_block_core_navigation_update_interactive_view_script( $metadata ) {
 		if ( 'core/navigation' === $metadata['name'] ) {
-			$metadata['viewScript'] = array( 'file:./view-interactivity.min.js' );
+			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
+			$metadata['supports']['interactivity'] = true;
 		}
 		return $metadata;
 	}
 	add_filter( 'block_type_metadata', 'gutenberg_block_core_navigation_update_interactive_view_script', 10, 1 );
 }
-
 
 
 /**
@@ -668,24 +671,38 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks_html .= '</ul>';
 	}
 
-	// If the script already exists, there is no point in removing it from viewScript.
-	$should_load_view_script = ( $is_responsive_menu || ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) );
-	$view_js_file            = 'wp-block-navigation-view';
-	if ( ! wp_script_is( $view_js_file ) ) {
-		$script_handles = $block->block_type->view_script_handles;
+	$needed_script_map = array(
+		'wp-block-navigation-view'   => ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ),
+		'wp-block-navigation-view-2' => $is_responsive_menu,
+	);
 
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file, 'wp-block-navigation-view-2' ) );
-		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file, 'wp-block-navigation-view-2' ) );
+	$should_load_view_script = false;
+	if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) ) {
+		// TODO: The script is still loaded even when it isn't needed when the Interactivity API is used.
+		$should_load_view_script = count( array_filter( $needed_script_map ) ) > 0;
+	} else {
+		foreach ( $needed_script_map as $view_script_handle => $is_view_script_needed ) {
+
+			// If the script already exists, there is no point in removing it from viewScript.
+			if ( wp_script_is( $view_script_handle ) ) {
+				continue;
+			}
+
+			$script_handles = $block->block_type->view_script_handles;
+
+			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+			if ( ! $is_view_script_needed && in_array( $view_script_handle, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_script_handle ) );
+			}
+			// If the script is needed, but it was previously removed, add it again.
+			if ( $is_view_script_needed && ! in_array( $view_script_handle, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_script_handle ) );
+			}
 		}
 	}
 
 	// Add directives to the submenu if needed.
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $has_submenus && $should_load_view_script ) {
+	if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) && $has_submenus && $should_load_view_script ) {
 		$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
 		$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $w, $attributes );
 	}
@@ -733,7 +750,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$responsive_container_directives = '';
 	$responsive_dialog_directives    = '';
 	$close_button_directives         = '';
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $should_load_view_script ) {
+	if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) && $should_load_view_script ) {
 		$nav_element_directives          = '
 			data-wp-interactive
 			data-wp-context=\'{ "core": { "navigation": { "overlayOpenedBy": {}, "type": "overlay", "roleAttribute": "" } } }\'

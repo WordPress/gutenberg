@@ -100,9 +100,11 @@ const BlockActionsMenu = ( {
 	} = getMoversSetup( isStackedHorizontally, moversOptions );
 
 	// Check if selected block is Groupable and/or Ungroupable.
-	const convertToGroupButtonProps = useConvertToGroupButtonProps( [
-		selectedBlockClientId,
-	] );
+	const convertToGroupButtonProps = useConvertToGroupButtonProps(
+		// `selectedBlockClientId` can be undefined in some cases where this
+		// component gets re-rendered right after the block is removed.
+		selectedBlockClientId ? [ selectedBlockClientId ] : []
+	);
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton =
 		( isGroupable || isUngroupable ) && canRemove;

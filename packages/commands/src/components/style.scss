@@ -116,8 +116,8 @@
 		position: relative;
 	}
 
-	[cmdk-group]:has([cmdk-group-items]:not(:empty)) + [cmdk-group]:has([cmdk-group-items]:not(:empty)) {
-		border-top: 1px solid $gray-200;
+	[cmdk-group]:has([cmdk-group-items]:not(:empty)):not([hidden]) + [cmdk-group]:has([cmdk-group-items]:not(:empty)) {
+		border-top: $border-width solid $gray-200;
 	}
 }
 
