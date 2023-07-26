@@ -70,33 +70,11 @@ describe( 'ToolTip', () => {
 
 		render( <ToolTip { ...props } /> );
 
-		await user.tab();
-
-		expect(
-			screen.getByRole( 'button', { name: /Button/i } )
-		).toHaveFocus();
-
-		await waitFor( () =>
-			expect(
-				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
-			).toBeVisible()
-		);
-
-		await user.tab();
-
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
-	} );
-
-	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
-		const user = userEvent.setup();
-
-		render( <ToolTip { ...props } /> );
-
 		const button = screen.getByRole( 'button', { name: /Button/i } );
 
-		await user.hover( button );
+		await user.tab();
+
+		expect( button ).toHaveFocus();
 
 		await waitFor( () =>
 			expect(
@@ -104,6 +82,7 @@ describe( 'ToolTip', () => {
 			).toBeVisible()
 		);
 
+		await user.tab();
 		await user.unhover( button );
 
 		expect(
@@ -136,35 +115,6 @@ describe( 'ToolTip', () => {
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
-
-		await waitFor( () =>
-			expect(
-				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
-			).toBeVisible()
-		);
-
-		await user.unhover( button );
-
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
-	} );
-
-	it( 'should show tooltip when an element is disabled', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<ToolTip { ...props }>
-				<Button aria-disabled>Button</Button>
-			</ToolTip>
-		);
-
-		const button = screen.getByRole( 'button', { name: /Button/i } );
-
-		expect( button ).toBeVisible();
-		expect( button ).toHaveAttribute( 'aria-disabled' );
-
-		await user.hover( button );
 
 		await waitFor( () =>
 			expect(
@@ -240,6 +190,57 @@ describe( 'ToolTip', () => {
 		);
 
 		// ToolTip won't show, since the mouse has left the tooltip anchor
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
+		const user = userEvent.setup();
+
+		render( <ToolTip { ...props } /> );
+
+		const button = screen.getByRole( 'button', { name: /Button/i } );
+
+		await user.hover( button );
+
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
+			).toBeVisible()
+		);
+
+		await user.unhover( button );
+
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should show tooltip when an element is disabled', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<ToolTip { ...props }>
+				<Button aria-disabled>Button</Button>
+			</ToolTip>
+		);
+
+		const button = screen.getByRole( 'button', { name: /Button/i } );
+
+		expect( button ).toBeVisible();
+		expect( button ).toHaveAttribute( 'aria-disabled' );
+
+		await user.hover( button );
+
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
+			).toBeVisible()
+		);
+
+		await user.unhover( button );
+
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();

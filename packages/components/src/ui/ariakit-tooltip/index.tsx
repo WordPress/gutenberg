@@ -81,6 +81,7 @@ function AriaToolTip( props: ToolTipProps ) {
 							shortcut={ shortcut }
 						/>
 					) }
+					{ /* workaround needed until floating-ui/core is updated to ^1.0.2   */ }
 					<TooltipArrow size={ 0.0001 } />
 				</Tooltip>
 			) }
