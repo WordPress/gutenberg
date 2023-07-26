@@ -72,6 +72,7 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 				const isSelected = selectedRevisionId
 					? selectedRevisionId === revision?.id
 					: index === 0;
+				const isReset = 'parent' === revision?.id;
 
 				return (
 					<li
@@ -91,29 +92,37 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 							} }
 							label={ getRevisionLabel( revision ) }
 						>
-							<span className="edit-site-global-styles-screen-revisions__description">
-								<time dateTime={ modified }>
-									{ humanTimeDiff( modified ) }
-								</time>
-								<span className="edit-site-global-styles-screen-revisions__meta">
-									{ isUnsaved
-										? sprintf(
-												/* translators: %s author display name */
-												__( 'Unsaved changes by %s' ),
-												authorDisplayName
-										  )
-										: sprintf(
-												/* translators: %s author display name */
-												__( 'Changes saved by %s' ),
-												authorDisplayName
-										  ) }
-
-									<img
-										alt={ author?.name }
-										src={ authorAvatar }
-									/>
+							{ isReset ? (
+								<span className="edit-site-global-styles-screen-revisions__description">
+									{ __( 'Theme default styles' ) }
 								</span>
-							</span>
+							) : (
+								<span className="edit-site-global-styles-screen-revisions__description">
+									<time dateTime={ modified }>
+										{ humanTimeDiff( modified ) }
+									</time>
+									<span className="edit-site-global-styles-screen-revisions__meta">
+										{ isUnsaved
+											? sprintf(
+													/* translators: %s author display name */
+													__(
+														'Unsaved changes by %s'
+													),
+													authorDisplayName
+											  )
+											: sprintf(
+													/* translators: %s author display name */
+													__( 'Changes saved by %s' ),
+													authorDisplayName
+											  ) }
+
+										<img
+											alt={ author?.name }
+											src={ authorAvatar }
+										/>
+									</span>
+								</span>
+							) }
 						</Button>
 					</li>
 				);
