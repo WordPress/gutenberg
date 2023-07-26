@@ -21,6 +21,7 @@ import { ESCAPE } from '@wordpress/keycodes';
  */
 import { store as editPostStore } from '../../store';
 import ListViewOutline from './list-view-outline';
+import ListViewInfo from './list-view-info';
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
@@ -114,6 +115,8 @@ export default function ListViewSidebar() {
 					<ListView dropZoneElement={ dropZoneElement } />
 				</div>
 			);
+		} else if ( tabName === 'info' ) {
+			return <ListViewInfo />;
 		}
 		return <ListViewOutline />;
 	}
@@ -146,6 +149,11 @@ export default function ListViewSidebar() {
 					{
 						name: 'outline',
 						title: 'Outline',
+						className: 'edit-post-sidebar__panel-tab',
+					},
+					{
+						name: 'info',
+						title: 'Info',
 						className: 'edit-post-sidebar__panel-tab',
 					},
 				] }
