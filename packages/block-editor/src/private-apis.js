@@ -22,6 +22,7 @@ import {
 	default as ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
 } from './components/inserter/reusable-block-rename-hint';
+import { usesContextKey } from './components/rich-text/format-edit';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -47,4 +48,5 @@ lock( privateApis, {
 	ResolutionTool,
 	ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
+	usesContextKey,
 } );
