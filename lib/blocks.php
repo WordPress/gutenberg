@@ -173,6 +173,40 @@ function gutenberg_reregister_core_block_types() {
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
 
 /**
+ * Adds the defer loading strategy to all registered blocks.
+ *
+ * This function would not be part of core merge. Instead, the register_block_script_handle() function would be patched
+ * as follows.
+ *
+ * ```
+ * --- a/wp-includes/blocks.php
+ * +++ b/wp-includes/blocks.php
+ * @ @ -153,7 +153,8 @ @ function register_block_script_handle( $metadata, $field_name, $index = 0 ) {
+ *                 $script_handle,
+ *                 $script_uri,
+ *                 $script_dependencies,
+ * -           isset( $script_asset['version'] ) ? $script_asset['version'] : false
+ * +         isset( $script_asset['version'] ) ? $script_asset['version'] : false,
+ * +         array( 'strategy' => 'defer' )
+ *         );
+ *         if ( ! $result ) {
+ *                 return false;
+ * ```
+ *
+ * @see register_block_script_handle()
+ */
+function gutenberg_defer_block_view_scripts() {
+	$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+	foreach ( $block_types as $block_type ) {
+		foreach ( $block_type->view_script_handles as $view_script_handle ) {
+			wp_script_add_data( $view_script_handle, 'strategy', 'defer' );
+		}
+	}
+}
+
+add_action( 'init', 'gutenberg_defer_block_view_scripts', 100 );
+
+/**
  * Deregisters the existing core block type and its assets.
  *
  * @param string $block_name The name of the block.

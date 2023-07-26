@@ -21,34 +21,40 @@ const EMPTY_ARRAY = [];
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 export default function useGlobalStylesRevisions() {
 	const { user: userConfig } = useContext( GlobalStylesContext );
-	const { authors, currentUser, isDirty, revisions } = useSelect(
-		( select ) => {
-			const {
-				__experimentalGetDirtyEntityRecords,
-				getCurrentUser,
-				getUsers,
-				getCurrentThemeGlobalStylesRevisions,
-			} = select( coreStore );
-			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-			const _currentUser = getCurrentUser();
-			const _isDirty = dirtyEntityRecords.length > 0;
-			const globalStylesRevisions =
-				getCurrentThemeGlobalStylesRevisions() || EMPTY_ARRAY;
-			const _authors =
-				getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
+	const {
+		authors,
+		currentUser,
+		isDirty,
+		revisions,
+		isLoadingGlobalStylesRevisions,
+	} = useSelect( ( select ) => {
+		const {
+			__experimentalGetDirtyEntityRecords,
+			getCurrentUser,
+			getUsers,
+			getCurrentThemeGlobalStylesRevisions,
+			isResolving,
+		} = select( coreStore );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		const _currentUser = getCurrentUser();
+		const _isDirty = dirtyEntityRecords.length > 0;
+		const globalStylesRevisions =
+			getCurrentThemeGlobalStylesRevisions() || EMPTY_ARRAY;
+		const _authors = getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
 
-			return {
-				authors: _authors,
-				currentUser: _currentUser,
-				isDirty: _isDirty,
-				revisions: globalStylesRevisions,
-			};
-		},
-		[]
-	);
+		return {
+			authors: _authors,
+			currentUser: _currentUser,
+			isDirty: _isDirty,
+			revisions: globalStylesRevisions,
+			isLoadingGlobalStylesRevisions: isResolving(
+				'getCurrentThemeGlobalStylesRevisions'
+			),
+		};
+	}, [] );
 	return useMemo( () => {
 		let _modifiedRevisions = [];
-		if ( ! authors.length || ! revisions.length ) {
+		if ( ! authors.length || isLoadingGlobalStylesRevisions ) {
 			return {
 				revisions: _modifiedRevisions,
 				hasUnsavedChanges: isDirty,
@@ -66,31 +72,33 @@ export default function useGlobalStylesRevisions() {
 			};
 		} );
 
-		// Flags the most current saved revision.
-		if ( _modifiedRevisions[ 0 ].id !== 'unsaved' ) {
-			_modifiedRevisions[ 0 ].isLatest = true;
-		}
+		if ( _modifiedRevisions.length ) {
+			// Flags the most current saved revision.
+			if ( _modifiedRevisions[ 0 ].id !== 'unsaved' ) {
+				_modifiedRevisions[ 0 ].isLatest = true;
+			}
 
-		// Adds an item for unsaved changes.
-		if (
-			isDirty &&
-			userConfig &&
-			Object.keys( userConfig ).length > 0 &&
-			currentUser
-		) {
-			const unsavedRevision = {
-				id: 'unsaved',
-				styles: userConfig?.styles,
-				settings: userConfig?.settings,
-				behaviors: userConfig?.behaviors,
-				author: {
-					name: currentUser?.name,
-					avatar_urls: currentUser?.avatar_urls,
-				},
-				modified: new Date(),
-			};
+			// Adds an item for unsaved changes.
+			if (
+				isDirty &&
+				userConfig &&
+				Object.keys( userConfig ).length > 0 &&
+				currentUser
+			) {
+				const unsavedRevision = {
+					id: 'unsaved',
+					styles: userConfig?.styles,
+					settings: userConfig?.settings,
+					behaviors: userConfig?.behaviors,
+					author: {
+						name: currentUser?.name,
+						avatar_urls: currentUser?.avatar_urls,
+					},
+					modified: new Date(),
+				};
 
-			_modifiedRevisions.unshift( unsavedRevision );
+				_modifiedRevisions.unshift( unsavedRevision );
+			}
 		}
 
 		return {
@@ -98,5 +106,12 @@ export default function useGlobalStylesRevisions() {
 			hasUnsavedChanges: isDirty,
 			isLoading: false,
 		};
-	}, [ isDirty, revisions, currentUser, authors, userConfig ] );
+	}, [
+		isDirty,
+		revisions,
+		currentUser,
+		authors,
+		userConfig,
+		isLoadingGlobalStylesRevisions,
+	] );
 }

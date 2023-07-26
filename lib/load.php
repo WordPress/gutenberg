@@ -117,9 +117,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) ) {
-	require __DIR__ . '/experimental/interactivity-api/blocks.php';
-}
 require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
 require __DIR__ . '/experimental/interactivity-api/store.php';
 require __DIR__ . '/experimental/interactivity-api/scripts.php';

@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { parse } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import TemplatePartNavigationMenus from './template-part-navigation-menus';
@@ -54,9 +59,14 @@ export default function useNavigationMenuContent( postType, postId ) {
 		return;
 	}
 
+	const blocks =
+		record?.content && typeof record.content !== 'function'
+			? parse( record.content )
+			: [];
+
 	const navigationBlocks = getBlocksOfTypeFromBlocks(
 		'core/navigation',
-		record?.blocks
+		blocks
 	);
 
 	if ( ! navigationBlocks.length ) {

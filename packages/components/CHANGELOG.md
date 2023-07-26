@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
+
+### Bug Fix
+
+-   `Modal`: Fix loss of focus when clicking outside ([#52653](https://github.com/WordPress/gutenberg/pull/52653)).
+
 ## 25.4.0 (2023-07-20)
 
 ### Enhancements

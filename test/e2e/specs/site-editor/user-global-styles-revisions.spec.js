@@ -22,9 +22,8 @@ test.describe( 'Global styles revisions', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
 	} );
 
 	test( 'should display revisions UI when there is more than 1 revision', async ( {
@@ -32,6 +31,7 @@ test.describe( 'Global styles revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
+		await editor.canvas.click( 'body' );
 		const currentRevisions =
 			await userGlobalStylesRevisions.getGlobalStylesRevisions();
 		await userGlobalStylesRevisions.openStylesPanel();
@@ -78,6 +78,7 @@ test.describe( 'Global styles revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
+		await editor.canvas.click( 'body' );
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Colors styles' } ).click();
 		await page

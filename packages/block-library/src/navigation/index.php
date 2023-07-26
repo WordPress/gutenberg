@@ -671,19 +671,33 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks_html .= '</ul>';
 	}
 
-	// If the script already exists, there is no point in removing it from viewScript.
-	$should_load_view_script = ( $is_responsive_menu || ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) );
-	$view_js_file            = 'wp-block-navigation-view';
-	if ( ! wp_script_is( $view_js_file ) ) {
-		$script_handles = $block->block_type->view_script_handles;
+	$needed_script_map = array(
+		'wp-block-navigation-view'   => ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ),
+		'wp-block-navigation-view-2' => $is_responsive_menu,
+	);
 
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file, 'wp-block-navigation-view-2' ) );
-		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file, 'wp-block-navigation-view-2' ) );
+	$should_load_view_script = false;
+	if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) ) {
+		// TODO: The script is still loaded even when it isn't needed when the Interactivity API is used.
+		$should_load_view_script = count( array_filter( $needed_script_map ) ) > 0;
+	} else {
+		foreach ( $needed_script_map as $view_script_handle => $is_view_script_needed ) {
+
+			// If the script already exists, there is no point in removing it from viewScript.
+			if ( wp_script_is( $view_script_handle ) ) {
+				continue;
+			}
+
+			$script_handles = $block->block_type->view_script_handles;
+
+			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+			if ( ! $is_view_script_needed && in_array( $view_script_handle, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_script_handle ) );
+			}
+			// If the script is needed, but it was previously removed, add it again.
+			if ( $is_view_script_needed && ! in_array( $view_script_handle, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_script_handle ) );
+			}
 		}
 	}
 
