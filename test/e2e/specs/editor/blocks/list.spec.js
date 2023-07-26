@@ -1367,4 +1367,85 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
 	} );
+
+	test( 'should merge two list items with nested lists', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: '1' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'a' },
+								},
+							],
+						},
+					],
+				},
+				{
+					name: 'core/list-item',
+					attributes: { content: '2' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'b' },
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+
+		// Navigate to the third item.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		await page.keyboard.press( 'Backspace' );
+
+		// Test caret position.
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'a‸2' },
+									},
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+	} );
 } );
