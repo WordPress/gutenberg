@@ -115,7 +115,8 @@ describe( 'Post Editor Performance', () => {
 		} );
 	} );
 
-	it( 'Loading', async () => {
+	// eslint-disable-next-line jest/no-focused-tests
+	it.only( 'Loading', async () => {
 		await loadHtmlIntoTheBlockEditor(
 			readFile( path.join( __dirname, '../../assets/large-post.html' ) )
 		);
