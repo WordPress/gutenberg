@@ -134,6 +134,7 @@ export default function usePatternDetails( postType, postId ) {
 
 	const content = (
 		<>
+			{ useNavigationMenuContent( postType, postId ) }
 			{ !! details.length && (
 				<SidebarNavigationScreenDetailsPanel
 					spacing={ 5 }
@@ -151,7 +152,6 @@ export default function usePatternDetails( postType, postId ) {
 					) ) }
 				</SidebarNavigationScreenDetailsPanel>
 			) }
-			{ useNavigationMenuContent( postType, postId ) }
 		</>
 	);
 
