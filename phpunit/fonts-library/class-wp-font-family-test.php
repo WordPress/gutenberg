@@ -16,11 +16,111 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::__construct
 	 * @covers ::get_data
+	 *
 	 * @dataProvider data_font_fixtures
+	 *
+	 * @param array $font_data Font family data in theme.json format
 	 */
 	public function test_get_data( $font_data ) {
 		$font = new WP_Font_Family( $font_data );
 		$this->assertEquals( $font_data, $font->get_data() );
+	}
+
+	/**
+	 * Test if the get_data_as_json method returns the correct data
+	 *
+	 * @covers ::get_data_as_json
+	 *
+	 * @dataProvider data_font_fixtures
+	 *
+	 * @param array $font_data Font family data in theme.json format
+	 */
+	public function test_get_data_as_json( $font_data ) {
+		$font = new WP_Font_Family( $font_data );
+		$this->assertSame( wp_json_encode( $font_data ), $font->get_data_as_json() );
+	}
+
+	/**
+	 * Test if the has_font_faces method returns the correct data
+	 *
+	 * @covers ::has_font_faces
+	 *
+	 * @dataProvider data_font_fixtures
+	 *
+	 * @param array $font_data Font family data in theme.json format
+	 */
+	public function test_has_font_faces( $font_data ) {
+		$font = new WP_Font_Family( $font_data );
+		$this->assertSame( ! empty( $font_data['fontFace'] ) && is_array( $font_data['fontFace'] ), $font->has_font_faces() );
+	}
+
+	/**
+	 * @covers ::install
+	 * @covers ::uninstall
+	 * @covers ::get_font_post
+	 *
+	 * @dataProvider data_font_fixtures
+	 *
+	 * @param array $font_data Font family data in theme.json format
+	 * @param array $installed_font_data Font family data in theme.json format expected data after installation
+	 * @param array $files_data Optional. Files data in $_FILES format (Used only if the font has local files). Default: empty array.
+	 */
+	public function test_install_and_uninstall( $font_data, $installed_font_data, $files_data = array() ) {
+		$font = new WP_Font_Family( $font_data );
+		$font->install( $files_data );
+
+		// Check that the post was created
+		$post = $font->get_font_post();
+		$this->assertInstanceof( 'WP_Post', $post );
+
+		// Check that the post has the correct data
+		$this->assertSame( $installed_font_data['name'], $post->post_title );
+		$this->assertSame( $installed_font_data['slug'], $post->post_name );
+
+		$content = json_decode( $post->post_content, true );
+		$this->assertSame( $installed_font_data['fontFamily'], $content['fontFamily'] );
+		$this->assertSame( $installed_font_data['slug'], $content['slug'] );
+
+		if ( $font->has_font_faces() ) {
+			$font_face_index = 0;
+			foreach ( $content['fontFace'] as $font_face ) {
+				$source_index = 0;
+				if ( is_array( $font_face['src'] ) ) {
+					foreach ( $font_face['src'] as $src ) {
+						$this->assertStringEndsWith( $installed_font_data[ $font_face_index ]['src'][ $source_index ], $src );
+						$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ] );
+					}
+				} else {
+					$this->assertStringEndsWith( $installed_font_data['fontFace'][ $font_face_index ]['src'], $font_face['src'] );
+					$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'] );
+				}
+				$font_face_index++;
+				$source_index++;
+			}
+		}
+
+		$font->uninstall();
+
+		// Check that the post was deleted
+		$post = $font->get_font_post();
+		$this->assertNull( $post );
+
+		// Check that the font asset was deleted
+		if ( $font->has_font_faces() ) {
+			$font_face_index = 0;
+			foreach ( $content['fontFace'] as $font_face ) {
+				$source_index = 0;
+				if ( is_array( $font_face['src'] ) ) {
+					foreach ( $font_face['src'] as $src ) {
+						$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ] );
+					}
+				} else {
+					$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'] );
+				}
+				$font_face_index++;
+				$source_index++;
+			}
+		}
 	}
 
 	public function data_font_fixtures() {
@@ -124,91 +224,5 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-	}
-
-	/**
-	 * Test if the get_data_as_json method returns the correct data
-	 *
-	 * @covers ::get_data_as_json
-	 * @dataProvider data_font_fixtures
-	 */
-	public function test_get_data_as_json( $font_data ) {
-		$font = new WP_Font_Family( $font_data );
-		$this->assertSame( wp_json_encode( $font_data ), $font->get_data_as_json() );
-	}
-
-	/**
-	 * Test if the has_font_faces method returns the correct data
-	 *
-	 * @covers ::has_font_faces
-	 * @dataProvider data_font_fixtures
-	 */
-	public function test_has_font_faces( $font_data ) {
-		$font = new WP_Font_Family( $font_data );
-		$this->assertSame( ! empty( $font_data['fontFace'] ) && is_array( $font_data['fontFace'] ), $font->has_font_faces() );
-	}
-
-	/**
-	 * @covers ::install
-	 * @covers ::uninstall
-	 * @covers ::get_font_post
-	 * @dataProvider data_font_fixtures
-	 */
-	public function test_install_and_uninstall( $font_data, $installed_font_data, $files_data = array() ) {
-		$font = new WP_Font_Family( $font_data );
-		$font->install( $files_data );
-
-		// Check that the post was created
-		$post = $font->get_font_post();
-		$this->assertInstanceof( 'WP_Post', $post );
-
-		// Check that the post has the correct data
-		$this->assertSame( $installed_font_data['name'], $post->post_title );
-		$this->assertSame( $installed_font_data['slug'], $post->post_name );
-
-		$content = json_decode( $post->post_content, true );
-		$this->assertSame( $installed_font_data['fontFamily'], $content['fontFamily'] );
-		$this->assertSame( $installed_font_data['slug'], $content['slug'] );
-
-		if ( $font->has_font_faces() ) {
-			$font_face_index = 0;
-			foreach ( $content['fontFace'] as $font_face ) {
-				$source_index = 0;
-				if ( is_array( $font_face['src'] ) ) {
-					foreach ( $font_face['src'] as $src ) {
-						$this->assertStringEndsWith( $installed_font_data[ $font_face_index ]['src'][ $source_index ], $src );
-						$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ] );
-					}
-				} else {
-					$this->assertStringEndsWith( $installed_font_data['fontFace'][ $font_face_index ]['src'], $font_face['src'] );
-					$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'] );
-				}
-				$font_face_index++;
-				$source_index++;
-			}
-		}
-
-		$font->uninstall();
-
-		// Check that the post was deleted
-		$post = $font->get_font_post();
-		$this->assertNull( $post );
-
-		// Check that the font asset was deleted
-		if ( $font->has_font_faces() ) {
-			$font_face_index = 0;
-			foreach ( $content['fontFace'] as $font_face ) {
-				$source_index = 0;
-				if ( is_array( $font_face['src'] ) ) {
-					foreach ( $font_face['src'] as $src ) {
-						$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ] );
-					}
-				} else {
-					$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'] );
-				}
-				$font_face_index++;
-				$source_index++;
-			}
-		}
 	}
 }
