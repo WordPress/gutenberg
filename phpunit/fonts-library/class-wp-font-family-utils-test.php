@@ -13,130 +13,277 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::has_font_mime_type
+	 * @dataProvider data_has_font_mime_type_fixtures
 	 */
-	public function test_has_font_mime_type() {
-		$this->assertFalse(
-			WP_Font_Family_Utils::has_font_mime_type( '/temp/not-a-font.ttf.exe' )
-		);
-		$this->assertFalse(
-			WP_Font_Family_Utils::has_font_mime_type( '/temp/not-a-font.otf.php' )
-		);
-		$this->assertTrue(
-			WP_Font_Family_Utils::has_font_mime_type( '/temp/piazzolla_400_italic.ttf' )
-		);
-		$this->assertTrue(
-			WP_Font_Family_Utils::has_font_mime_type( '/temp/piazzolla_400_italic.otf' )
-		);
-		$this->assertTrue(
-			WP_Font_Family_Utils::has_font_mime_type( '/temp/piazzolla_400_italic.woff' )
-		);
-		$this->assertTrue(
-			WP_Font_Family_Utils::has_font_mime_type( '/temp/piazzolla_400_italic.woff2' )
+	public function test_has_font_mime_type( $font_file, $expected ) {
+		$this->assertSame( $expected, WP_Font_Family_Utils::has_font_mime_type( $font_file ) );
+	}
+
+	public function data_has_font_mime_type_fixtures() {
+		return array(
+			'ttf'   => array(
+				'font_file' => '/temp/piazzolla_400_italic.ttf',
+				'expected'  => true,
+			),
+			'otf'   => array(
+				'font_file' => '/temp/piazzolla_400_italic.otf',
+				'expected'  => true,
+			),
+			'woff'  => array(
+				'font_file' => '/temp/piazzolla_400_italic.woff',
+				'expected'  => true,
+			),
+			'woff2' => array(
+				'font_file' => '/temp/piazzolla_400_italic.woff2',
+				'expected'  => true,
+			),
+			'exe'   => array(
+				'font_file' => '/temp/piazzolla_400_italic.exe',
+				'expected'  => false,
+			),
+			'php'   => array(
+				'font_file' => '/temp/piazzolla_400_italic.php',
+				'expected'  => false,
+			),
 		);
 	}
 
 	/**
 	 * @covers ::get_filename_from_font_face
+	 * @dataProvider data_get_filename_from_font_face_fixtures
 	 */
-	public function test_get_filename_from_font_face() {
-		$font_face = array(
-			'fontFamily' => 'Piazzolla',
-			'fontStyle'  => 'italic',
-			'fontWeight' => '400',
-			'src'        => array(
-				'http://example.com/fonts/piazzolla1.ttf',
-				'http://example.com/fonts/piazzolla2.ttf',
-				'http://example.com/fonts/piazzolla3.ttf',
+	public function test_get_filename_from_font_face( $slug, $font_face, $suffix, $expected_file_name ) {
+
+		$this->assertEquals(
+			$expected_file_name,
+			WP_Font_Family_Utils::get_filename_from_font_face(
+				$slug,
+				$font_face,
+				$font_face['src'],
+				$suffix,
+			)
+		);
+	}
+
+	public function data_get_filename_from_font_face_fixtures() {
+		return array(
+			'piazzolla' => array(
+				'slug'               => 'piazzolla',
+				'font_face'          => array(
+					'fontStyle'  => 'italic',
+					'fontWeight' => '400',
+					'src'        => 'http://example.com/fonts/font_file.ttf',
+				),
+				'suffix'             => '',
+				'expected_file_name' => 'piazzolla_italic_400.ttf',
 			),
-		);
-
-		$this->assertSame(
-			WP_Font_Family_Utils::get_filename_from_font_face( 'piazzolla', $font_face, $font_face['src'][0] ),
-			'piazzolla_italic_400.ttf'
-		);
-
-		$this->assertSame(
-			WP_Font_Family_Utils::get_filename_from_font_face( 'piazzolla', $font_face, $font_face['src'][1], 1 ),
-			'piazzolla_italic_400_1.ttf'
-		);
-
-		$this->assertSame(
-			WP_Font_Family_Utils::get_filename_from_font_face( 'piazzolla', $font_face, $font_face['src'][2], 2 ),
-			'piazzolla_italic_400_2.ttf'
+			'inter'     => array(
+				'slug'               => 'inter',
+				'font_face'          => array(
+					'fontStyle'  => 'normal',
+					'fontWeight' => '600',
+					'src'        => 'http://example.com/fonts/font_file.otf',
+				),
+				'suffix'             => '',
+				'expected_file_name' => 'inter_normal_600.otf',
+			),
 		);
 	}
 
 	/**
 	 * @covers ::merge_fonts_data
+	 * @dataProvider data_merge_fonts_data_fixtures
 	 */
-	public function test_merge_fonts_data() {
-		$font1 = array(
-			'slug'       => 'piazzolla',
-			'name'       => 'Piazzolla',
-			'fontFamily' => 'Piazzolla',
-			'fontFace'   => array(
-				array(
-					'fontFamily' => 'Piazzolla',
-					'fontStyle'  => 'italic',
-					'fontWeight' => '400',
-					'src'        => 'http://example.com/fonts/piazzolla_400_italic.ttf',
-				),
-				array(
-					'fontFamily' => 'Piazzolla',
-					'fontStyle'  => 'italic',
-					'fontWeight' => '500',
-					'src'        => 'http://example.com/fonts/piazzolla_500_italic.ttf',
-				),
-			),
-		);
-
-		$font2 = array(
-			'slug'       => 'piazzolla',
-			'fontFamily' => 'Piazzolla',
-			'fontFace'   => array(
-				array(
-					'fontFamily' => 'Piazzolla',
-					'fontStyle'  => 'italic',
-					'fontWeight' => '400',
-					'src'        => 'http://example.com/fonts/piazzolla_400_italic.ttf',
-				),
-				array(
-					'fontFamily' => 'Piazzolla',
-					'fontStyle'  => 'normal',
-					'fontWeight' => '400',
-					'src'        => 'http://example.com/fonts/piazzolla_400_normal.ttf',
-				),
-				array(
-					'fontFamily' => 'Piazzolla',
-					'fontStyle'  => 'italic',
-					'fontWeight' => '700',
-					'src'        => 'http://example.com/fonts/piazzolla_700_italic.ttf',
-				),
-			),
-		);
-
-		$font3 = array(
-			'slug'       => 'encode-sans',
-			'name'       => 'Encode Sans',
-			'fontFamily' => 'Encode Sans',
-		);
-
+	public function test_merge_fonts_data( $are_mergeable, $font1, $font2, $expected_result ) {
 		// Fonts with same slug should be merged
 		$merged_font = WP_Font_Family_Utils::merge_fonts_data( $font1, $font2 );
-		$this->assertNotWPError( $merged_font );
 
-		// Total of font faces without duplicates
-		$this->assertCount( 4, $merged_font['fontFace'] );
+		if ( $are_mergeable ) {
+			$this->assertNotWPError( $merged_font );
+			$this->assertEquals( $expected_result, $merged_font );
+		} else {
+			$this->assertWPError( $merged_font );
+		}
+	}
 
-		// Missing keys should be added to the merged result
-		$this->assertSame(
-			$merged_font['name'],
-			'Piazzolla'
+	public function data_merge_fonts_data_fixtures() {
+		return array(
+
+			'mergeable_fonts'                          => array(
+				'are_mergeable'   => true,
+				'font1'           => array(
+					'slug'       => 'piazzolla',
+					'name'       => 'Piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '400',
+							'src'        => 'http://example.com/fonts/piazzolla_400_italic.ttf',
+						),
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '500',
+							'src'        => 'http://example.com/fonts/piazzolla_500_italic.ttf',
+						),
+					),
+				),
+				'font2'           => array(
+					'slug'       => 'piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '600',
+							'src'        => 'http://example.com/fonts/piazzolla_600_normal.ttf',
+						),
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '700',
+							'src'        => 'http://example.com/fonts/piazzolla_700_normal.ttf',
+						),
+					),
+				),
+				'expected_result' => array(
+					'slug'       => 'piazzolla',
+					'name'       => 'Piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '400',
+							'src'        => 'http://example.com/fonts/piazzolla_400_italic.ttf',
+						),
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '500',
+							'src'        => 'http://example.com/fonts/piazzolla_500_italic.ttf',
+						),
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '600',
+							'src'        => 'http://example.com/fonts/piazzolla_600_normal.ttf',
+						),
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '700',
+							'src'        => 'http://example.com/fonts/piazzolla_700_normal.ttf',
+						),
+					),
+				),
+			),
+
+			'mergeable_fonts_with_repeated_font_faces' => array(
+				'are_mergeable'   => true,
+				'font1'           => array(
+					'slug'       => 'piazzolla',
+					'name'       => 'Piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '400',
+							'src'        => 'http://example.com/fonts/piazzolla_400_italic.ttf',
+						),
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '500',
+							'src'        => 'http://example.com/fonts/piazzolla_500_italic.ttf',
+						),
+					),
+				),
+				'font2'           => array(
+					'slug'       => 'piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '600',
+							'src'        => 'http://example.com/fonts/piazzolla_600_normal.ttf',
+						),
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '400',
+							'src'        => 'http://example.com/fonts/piazzolla_400_italic.ttf',
+						),
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '500',
+							'src'        => 'http://example.com/fonts/piazzolla_500_italic.ttf',
+						),
+					),
+				),
+				'expected_result' => array(
+					'slug'       => 'piazzolla',
+					'name'       => 'Piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '400',
+							'src'        => 'http://example.com/fonts/piazzolla_400_italic.ttf',
+						),
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '500',
+							'src'        => 'http://example.com/fonts/piazzolla_500_italic.ttf',
+						),
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '600',
+							'src'        => 'http://example.com/fonts/piazzolla_600_normal.ttf',
+						),
+					),
+				),
+			),
+
+			'non_mergeable_fonts'                      => array(
+				'are_mergeable'   => false,
+				'font1'           => array(
+					'slug'       => 'piazzolla',
+					'name'       => 'Piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '400',
+							'src'        => 'http://example.com/fonts/piazzolla_400_italic.ttf',
+						),
+					),
+				),
+				'font2'           => array(
+					'slug'       => 'inter',
+					'fontFamily' => 'Inter',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Inter',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '700',
+							'src'        => 'http://example.com/fonts/inter_700_normal.ttf',
+						),
+					),
+				),
+				'expected_result' => 'WP_Error',
+			),
+
 		);
-
-		// Fonts with different slugs should not be merged
-		$merged_font = WP_Font_Family_Utils::merge_fonts_data( $font1, $font3 );
-		$this->assertWPError( $merged_font );
 	}
 
 }
