@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import path from 'path';
 import { existsSync, readFileSync, unlinkSync } from 'fs';
 
 export function sum( array ) {
@@ -58,10 +57,6 @@ export function deleteFile( filePath ) {
 	if ( existsSync( filePath ) ) {
 		unlinkSync( filePath );
 	}
-}
-
-export function getTraceFilePath() {
-	return path.join( process.env.WP_ARTIFACTS_PATH, '/trace.json' );
 }
 
 function isEvent( item ) {

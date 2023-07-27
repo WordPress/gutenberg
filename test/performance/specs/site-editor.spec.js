@@ -12,9 +12,6 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const {
-	readFile,
-	deleteFile,
-	getTraceFilePath,
 	getTypingEventDurations,
 	getLoadingDurations,
 	loadBlocksFromHtml,
@@ -186,9 +183,7 @@ test.describe( 'Site Editor Performance', () => {
 		await page.keyboard.press( 'Enter' ); // Exits the list and creates a new paragraph.
 
 		// Start tracing.
-		const traceFilePath = getTraceFilePath();
 		await browser.startTracing( page, {
-			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
@@ -206,9 +201,8 @@ test.describe( 'Site Editor Performance', () => {
 		} );
 
 		// Stop tracing and save results.
-		await browser.stopTracing();
-
-		const traceResults = JSON.parse( readFile( traceFilePath ) );
+		const traceBuffer = await browser.stopTracing();
+		const traceResults = JSON.parse( traceBuffer.toString() );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
 		for ( let i = throwaway; i < rounds; i++ ) {
@@ -216,8 +210,5 @@ test.describe( 'Site Editor Performance', () => {
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);
 		}
-
-		// Delete the trace file.
-		deleteFile( traceFilePath );
 	} );
 } );

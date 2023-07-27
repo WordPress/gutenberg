@@ -12,8 +12,6 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const {
-	readFile,
-	deleteFile,
 	getTypingEventDurations,
 	getClickEventDurations,
 	getHoverEventDurations,
@@ -22,7 +20,6 @@ const {
 	loadBlocksFromHtml,
 	load1000Paragraphs,
 	sum,
-	getTraceFilePath,
 } = require( '../utils' );
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
@@ -45,16 +42,11 @@ const results = {
 };
 
 test.describe( 'Post Editor Performance', () => {
-	const traceFilePath = getTraceFilePath();
-
 	test.afterAll( async ( {}, testInfo ) => {
 		await testInfo.attach( 'results', {
 			body: JSON.stringify( results, null, 2 ),
 			contentType: 'application/json',
 		} );
-
-		// Delete the trace file.
-		deleteFile( traceFilePath );
 	} );
 
 	test.beforeEach( async ( { admin, page } ) => {
@@ -132,7 +124,6 @@ test.describe( 'Post Editor Performance', () => {
 
 		// Start tracing.
 		await browser.startTracing( page, {
-			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
@@ -150,9 +141,8 @@ test.describe( 'Post Editor Performance', () => {
 		} );
 
 		// Stop tracing and save results.
-		await browser.stopTracing();
-
-		const traceResults = JSON.parse( readFile( traceFilePath ) );
+		const traceBuffer = await browser.stopTracing();
+		const traceResults = JSON.parse( traceBuffer.toString() );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
 
@@ -161,9 +151,6 @@ test.describe( 'Post Editor Performance', () => {
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);
 		}
-
-		// Delete the trace file.
-		deleteFile( traceFilePath );
 	} );
 
 	test( 'Typing within containers', async ( { browser, page } ) => {
@@ -183,7 +170,6 @@ test.describe( 'Post Editor Performance', () => {
 			.click();
 
 		await browser.startTracing( page, {
-			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
@@ -198,9 +184,8 @@ test.describe( 'Post Editor Performance', () => {
 			delay: BROWSER_IDLE_WAIT,
 		} );
 
-		await browser.stopTracing();
-
-		const traceResults = JSON.parse( readFile( traceFilePath ) );
+		const traceBuffer = await browser.stopTracing();
+		const traceResults = JSON.parse( traceBuffer.toString() );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
 
@@ -209,9 +194,6 @@ test.describe( 'Post Editor Performance', () => {
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);
 		}
-
-		// Delete the trace file.
-		deleteFile( traceFilePath );
 	} );
 
 	test( 'Selecting blocks', async ( { browser, page } ) => {
@@ -228,17 +210,16 @@ test.describe( 'Post Editor Performance', () => {
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( BROWSER_IDLE_WAIT );
 			await browser.startTracing( page, {
-				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 
 			await paragraphs.nth( i ).click();
 
-			await browser.stopTracing();
+			const traceBuffer = await browser.stopTracing();
 
 			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( readFile( traceFilePath ) );
+				const traceResults = JSON.parse( traceBuffer.toString() );
 				const allDurations = getSelectionEventDurations( traceResults );
 				results.focus.push(
 					allDurations.reduce( ( acc, eventDurations ) => {
@@ -247,9 +228,6 @@ test.describe( 'Post Editor Performance', () => {
 				);
 			}
 		}
-
-		// Delete the trace file.
-		deleteFile( traceFilePath );
 	} );
 
 	test( 'Opening persistent list view', async ( { browser, page } ) => {
@@ -266,7 +244,6 @@ test.describe( 'Post Editor Performance', () => {
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( BROWSER_IDLE_WAIT );
 			await browser.startTracing( page, {
-				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
@@ -274,10 +251,10 @@ test.describe( 'Post Editor Performance', () => {
 			// Open List View
 			await listViewToggle.click();
 
-			await browser.stopTracing();
+			const traceBuffer = await browser.stopTracing();
 
 			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( readFile( traceFilePath ) );
+				const traceResults = JSON.parse( traceBuffer.toString() );
 				const [ mouseClickEvents ] =
 					getClickEventDurations( traceResults );
 				results.listViewOpen.push( mouseClickEvents[ 0 ] );
@@ -286,9 +263,6 @@ test.describe( 'Post Editor Performance', () => {
 			// Close List View
 			await listViewToggle.click();
 		}
-
-		// Delete the trace file.
-		deleteFile( traceFilePath );
 	} );
 
 	test( 'Opening the inserter', async ( { browser, page } ) => {
@@ -305,7 +279,6 @@ test.describe( 'Post Editor Performance', () => {
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( BROWSER_IDLE_WAIT );
 			await browser.startTracing( page, {
-				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
@@ -313,10 +286,10 @@ test.describe( 'Post Editor Performance', () => {
 			// Open Inserter.
 			await globalInserterToggle.click();
 
-			await browser.stopTracing();
+			const traceBuffer = await browser.stopTracing();
 
 			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( readFile( traceFilePath ) );
+				const traceResults = JSON.parse( traceBuffer.toString() );
 				const [ mouseClickEvents ] =
 					getClickEventDurations( traceResults );
 				results.inserterOpen.push( mouseClickEvents[ 0 ] );
@@ -325,9 +298,6 @@ test.describe( 'Post Editor Performance', () => {
 			// Close Inserter.
 			await globalInserterToggle.click();
 		}
-
-		// Delete the trace file.
-		deleteFile( traceFilePath );
 	} );
 
 	test( 'Searching the inserter', async ( { browser, page } ) => {
@@ -347,17 +317,16 @@ test.describe( 'Post Editor Performance', () => {
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( BROWSER_IDLE_WAIT );
 			await browser.startTracing( page, {
-				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 
 			await page.keyboard.type( 'p' );
 
-			await browser.stopTracing();
+			const traceBuffer = await browser.stopTracing();
 
 			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( readFile( traceFilePath ) );
+				const traceResults = JSON.parse( traceBuffer.toString() );
 				const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 					getTypingEventDurations( traceResults );
 				results.inserterSearch.push(
@@ -370,9 +339,6 @@ test.describe( 'Post Editor Performance', () => {
 
 		// Close Inserter.
 		await globalInserterToggle.click();
-
-		// Delete the trace file.
-		deleteFile( traceFilePath );
 	} );
 
 	test( 'Hovering Inserter Items', async ( { browser, page } ) => {
@@ -398,7 +364,6 @@ test.describe( 'Post Editor Performance', () => {
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( BROWSER_IDLE_WAIT );
 			await browser.startTracing( page, {
-				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
@@ -407,10 +372,10 @@ test.describe( 'Post Editor Performance', () => {
 			await paragraphBlockItem.hover();
 			await headingBlockItem.hover();
 
-			await browser.stopTracing();
+			const traceBuffer = await browser.stopTracing();
 
 			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( readFile( traceFilePath ) );
+				const traceResults = JSON.parse( traceBuffer.toString() );
 				const [ mouseOverEvents, mouseOutEvents ] =
 					getHoverEventDurations( traceResults );
 				for ( let k = 0; k < mouseOverEvents.length; k++ ) {
@@ -423,8 +388,5 @@ test.describe( 'Post Editor Performance', () => {
 
 		// Close Inserter.
 		await globalInserterToggle.click();
-
-		// Delete the trace file.
-		deleteFile( traceFilePath );
 	} );
 } );
