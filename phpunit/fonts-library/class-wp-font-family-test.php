@@ -33,7 +33,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_data_as_json
 	 *
-	 * @param array $font_data Font family data in theme.json format
+	 * @param array  $font_data Font family data in theme.json format
 	 * @param string $expected  Expected font family data as JSON string
 	 */
 	public function test_get_data_as_json( $font_data, $expected ) {
@@ -41,40 +41,40 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $font->get_data_as_json() );
 	}
 
-	public function data_get_data_as_json () {
-		return array (
-			'piazzolla' => array (
-				'font_data' => array (
-					'slug' => 'piazzolla',
+	public function data_get_data_as_json() {
+		return array(
+			'piazzolla'  => array(
+				'font_data' => array(
+					'slug'       => 'piazzolla',
 					'fontFamily' => 'Piazzolla',
-					'name' => 'Piazzolla',
-					'fontFace' => [
+					'name'       => 'Piazzolla',
+					'fontFace'   => array(
 						array(
 							'fontFamily' => 'Piazzolla',
-							'src' => 'https://example.com/fonts/piazzolla_italic_400.ttf',
-							'fontStyle' => 'italic',
+							'src'        => 'https://example.com/fonts/piazzolla_italic_400.ttf',
+							'fontStyle'  => 'italic',
 							'fontWeight' => '400',
 						),
-					]
+					),
 				),
-				'expected' => '{"slug":"piazzolla","fontFamily":"Piazzolla","name":"Piazzolla","fontFace":[{"fontFamily":"Piazzolla","src":"https:\/\/example.com\/fonts\/piazzolla_italic_400.ttf","fontStyle":"italic","fontWeight":"400"}]}',
+				'expected'  => '{"slug":"piazzolla","fontFamily":"Piazzolla","name":"Piazzolla","fontFace":[{"fontFamily":"Piazzolla","src":"https:\/\/example.com\/fonts\/piazzolla_italic_400.ttf","fontStyle":"italic","fontWeight":"400"}]}',
 			),
-			'piazzolla2' => array (
-				'font_data' => array (
-					'slug' => 'piazzolla',
+			'piazzolla2' => array(
+				'font_data' => array(
+					'slug'       => 'piazzolla',
 					'fontFamily' => 'Piazzolla',
-					'name' => 'Piazzolla',
-					'fontFace' => [
+					'name'       => 'Piazzolla',
+					'fontFace'   => array(
 						array(
 							'fontFamily' => 'Piazzolla',
-							'src' => 'https://example.com/fonts/piazzolla_italic_400.ttf',
-							'fontStyle' => 'italic',
+							'src'        => 'https://example.com/fonts/piazzolla_italic_400.ttf',
+							'fontStyle'  => 'italic',
 							'fontWeight' => '400',
 						),
-					]
+					),
 				),
-				'expected' => '{"slug":"piazzolla","fontFamily":"Piazzolla","name":"Piazzolla","fontFace":[{"fontFamily":"Piazzolla","src":"https:\/\/example.com\/fonts\/piazzolla_italic_400.ttf","fontStyle":"italic","fontWeight":"400"}]}',
-			)
+				'expected'  => '{"slug":"piazzolla","fontFamily":"Piazzolla","name":"Piazzolla","fontFace":[{"fontFamily":"Piazzolla","src":"https:\/\/example.com\/fonts\/piazzolla_italic_400.ttf","fontStyle":"italic","fontWeight":"400"}]}',
+			),
 		);
 	}
 
@@ -93,35 +93,35 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $font->has_font_faces() );
 	}
 
-	public function data_has_font_faces () {
-		return array (
-			'with font faces' => array (
-				'font_data' => array (
-					'slug' => 'piazzolla',
-					'fontFace' => [
+	public function data_has_font_faces() {
+		return array(
+			'with font faces'    => array(
+				'font_data' => array(
+					'slug'     => 'piazzolla',
+					'fontFace' => array(
 						array(
 							'fontFamily' => 'Piazzolla',
 							'fontStyle'  => 'italic',
 							'fontWeight' => '400',
-						)
-					]
+						),
+					),
 				),
-				'expected' => true,
+				'expected'  => true,
 			),
 
-			'empty font faces' => array (
-				'font_data' => array (
-					'slug' => 'piazzolla',
-					'fontFace' => [],
+			'empty font faces'   => array(
+				'font_data' => array(
+					'slug'     => 'piazzolla',
+					'fontFace' => array(),
 				),
-				'expected' => false
+				'expected'  => false,
 			),
 
-			'without font faces' => array (
-				'font_data' => array (
+			'without font faces' => array(
+				'font_data' => array(
 					'slug' => 'piazzolla',
 				),
-				'expected' => false,
+				'expected'  => false,
 			),
 		);
 	}
