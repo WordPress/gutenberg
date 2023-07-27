@@ -40,8 +40,6 @@ export default function useCommonCommands() {
 		editorMode,
 		activeSidebar,
 		isListViewOpen,
-		previewLink,
-		currentPostLink,
 		isPublishSidebarEnabled,
 		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
@@ -55,14 +53,12 @@ export default function useCommonCommands() {
 			isListViewOpen: isListViewOpened(),
 			isPublishSidebarEnabled:
 				select( editorStore ).isPublishSidebarEnabled(),
-			previewLink: select( editorStore ).getEditedPostPreviewLink(),
-			currentPostLink:
-				select( editorStore ).getCurrentPostAttribute( 'link' ),
 			showBlockBreadcrumbs: isFeatureActive( 'showBlockBreadcrumbs' ),
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
+	const { __unstableSaveForPreview } = useDispatch( editorStore );
 
 	useCommand( {
 		name: 'core/open-settings-sidebar',
@@ -216,9 +212,10 @@ export default function useCommonCommands() {
 		name: 'core/preview-link',
 		label: __( 'Preview in a new tab' ),
 		icon: external,
-		callback: ( { close } ) => {
+		callback: async ( { close } ) => {
 			close();
-			window.open( previewLink || currentPostLink, '_blank' );
+			const link = await __unstableSaveForPreview( {} );
+			window.open( link, '_blank' );
 		},
 	} );
 }
