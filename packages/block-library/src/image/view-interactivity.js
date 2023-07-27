@@ -36,12 +36,6 @@ store( {
 					if ( context.core.image.lightboxAnimation === 'zoom' ) {
 						setZoomStyles( context, event );
 					}
-					// Hide overflow only when the animation is in progress,
-					// otherwise the removal of the scrollbars will draw attention
-					// to itself and look like an error
-					document.documentElement.classList.add(
-						'has-lightbox-open'
-					);
 
 					// Since the img is hidden and its src not loaded until
 					// the lightbox is opened, let's create an img element on the fly
@@ -91,10 +85,6 @@ store( {
 								window.onscroll = function () {};
 							}, 400 );
 						}
-
-						document.documentElement.classList.remove(
-							'has-lightbox-open'
-						);
 
 						context.core.image.lightboxEnabled = false;
 						context.core.image.lastFocusedElement.focus();
@@ -201,6 +191,9 @@ store( {
 } );
 
 function setZoomStyles( context, event ) {
+	if ( document.getElementById( 'wp-lightbox-styles' ) ) {
+		return;
+	}
 	// The reference img element lies adjacent
 	// to the event target button in the DOM.
 	const {
@@ -262,23 +255,17 @@ function setZoomStyles( context, event ) {
 		screenPosY - ( window.innerHeight / 2 - originalHeight / 2 );
 
 	// Add the CSS variables needed.
-	const root = document.documentElement;
-	root.style.setProperty(
-		'--lightbox-image-target-aspect-ratio',
-		originalRatio
-	);
-	root.style.setProperty(
-		'--lightbox-initial-top-position',
-		originalTopPosition + 'px'
-	);
-	root.style.setProperty(
-		'--lightbox-initial-left-position',
-		originalLeftPosition + 'px'
-	);
-	root.style.setProperty( '--lightbox-image-width', lightboxImgWidth + 'px' );
-	root.style.setProperty(
-		'--lightbox-image-height',
-		lightboxImgHeight + 'px'
-	);
-	root.style.setProperty( '--lightbox-scale', imageScale );
+	const styleTag = document.createElement( 'style' );
+	styleTag.id = 'wp-lightbox-styles';
+	styleTag.innerHTML = `
+		:root {
+			--wp--lightbox-image-target-aspect-ratio: ${ originalRatio };
+			--wp--lightbox-initial-top-position: ${ originalTopPosition }px;
+			--wp--lightbox-initial-left-position: ${ originalLeftPosition }px;
+			--lightbox-image-width: ${ lightboxImgWidth }px;
+			--wp--lightbox-image-height: ${ lightboxImgHeight }px;
+			--wp--lightbox-scale: ${ imageScale };
+		}
+	`;
+	document.head.appendChild( styleTag );
 }

@@ -179,7 +179,6 @@
 	top: 0;
 	left: 0;
 	z-index: 100000;
-	overflow: hidden;
 	width: 100vw;
 	height: 100vh;
 	box-sizing: border-box;
@@ -280,10 +279,6 @@
 	}
 }
 
-html.has-lightbox-open {
-	overflow: hidden;
-}
-
 @keyframes turn-on-visibility {
 	0% {
 		opacity: 0;
@@ -310,7 +305,7 @@ html.has-lightbox-open {
 
 @keyframes lightbox-zoom-in {
 	0% {
-		transform: translate(var(--lightbox-initial-left-position), var(--lightbox-initial-top-position)) scale(var(--lightbox-scale));
+		transform: translate(var(--wp--lightbox-initial-left-position), var(--wp--lightbox-initial-top-position)) scale(var(--wp--lightbox-scale));
 	}
 	100% {
 		transform: translate(0, 0) scale(1, 1);
@@ -327,6 +322,6 @@ html.has-lightbox-open {
 	}
 	100% {
 		visibility: hidden;
-		transform: translate(var(--lightbox-initial-left-position), var(--lightbox-initial-top-position)) scale(var(--lightbox-scale));
+		transform: translate(var(--wp--lightbox-initial-left-position), var(--wp--lightbox-initial-top-position)) scale(var(--wp--lightbox-scale));
 	}
 }
