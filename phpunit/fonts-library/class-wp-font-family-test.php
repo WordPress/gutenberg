@@ -12,12 +12,6 @@
  */
 class WP_Font_Family_Test extends WP_UnitTestCase {
 
-	const FONT_DATA_2 = array(
-		'name'       => 'Arial',
-		'slug'       => 'arial',
-		'fontFamily' => 'Arial',
-	);
-
 	/**
 	 * Test the constructor and the get_data method
 	 * 
