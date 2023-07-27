@@ -134,12 +134,10 @@ function getFilesFromDir( dir ) {
 		return [];
 	}
 
-	const files = fs.readdirSync( dir );
-	const filelist = files
-		.map( ( file ) => path.join( dir, file ) ) // map to full file path
-		.filter( ( file ) => fs.lstatSync( file ).isFile() ); // filter out subdirectories
-
-	return filelist;
+	return fs
+		.readdirSync( dir, { withFileTypes: true } )
+		.filter( ( dirent ) => dirent.isFile() )
+		.map( ( dirent ) => path.join( dir, dirent.name ) );
 }
 
 module.exports = {
