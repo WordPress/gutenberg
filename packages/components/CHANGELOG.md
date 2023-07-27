@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `NumberControl`: Add `roundingStep` prop to allow for opting into alternative rounding behavior. ([#52902](https://github.com/WordPress/gutenberg/pull/52902)).
+
 ## 25.4.0 (2023-07-20)
 
 ### Enhancements
