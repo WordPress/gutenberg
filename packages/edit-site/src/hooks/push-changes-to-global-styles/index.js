@@ -12,7 +12,7 @@ import {
 import { BaseControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	__EXPERIMENTAL_STYLE_PROPERTY,
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
@@ -32,6 +32,14 @@ const {
 	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
 	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
 } = unlock( blockEditorPrivateApis );
+
+// Block Gap is a special case and isn't defined within the blocks
+// style properties config. We'll add it here to allow it to be pushed
+// to global styles as well.
+const STYLE_PROPERTY = {
+	...__EXPERIMENTAL_STYLE_PROPERTY,
+	blockGap: { value: [ 'spacing', 'blockGap' ] },
+};
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
 // removed by moving PushChangesToGlobalStylesControl to
@@ -79,7 +87,7 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.h6.typography.fontFamily': 'font-family',
 	'elements.h6.color.gradient': 'gradient',
 	'color.gradient': 'gradient',
-	'spacing.blockGap': 'spacing',
+	blockGap: 'spacing',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
 };
