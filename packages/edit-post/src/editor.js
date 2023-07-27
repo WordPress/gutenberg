@@ -9,7 +9,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
@@ -44,7 +44,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		keepCaretInsideBlock,
 		isTemplateMode,
 		template,
-		linkControlAdvancedSettingsPreference,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -76,23 +75,15 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			const isViewable = getPostType( postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
 
-			const prefsStore = select( preferencesStore );
-
 			return {
 				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 				focusMode: isFeatureActive( 'focusMode' ),
 				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
-				hasThemeStyles: isFeatureActive( 'themeStyles' ),
-				preferredStyleVariations: prefsStore.get(
+				preferredStyleVariations: select( preferencesStore ).get(
 					'core/edit-post',
 					'preferredStyleVariations'
 				),
-				linkControlAdvancedSettingsPreference:
-					prefsStore.get(
-						'core/edit-post',
-						'linkControlSettingsDrawer'
-					) ?? false,
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
@@ -109,14 +100,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 
 	const { updatePreferredStyleVariations, setIsInserterOpened } =
 		useDispatch( editPostStore );
-
-	const { set: setPreference } = useDispatch( preferencesStore );
-
-	const setLinkControlAdvancedSettingsPreference = useCallback(
-		( val ) =>
-			setPreference( 'core/edit-post', 'linkControlSettingsDrawer', val ),
-		[ setPreference ]
-	);
 
 	const editorSettings = useMemo( () => {
 		const result = {
@@ -136,8 +119,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
 			// where we need to differentiate if a block is disabled by the user or some plugin.
 			defaultAllowedBlockTypes: settings.allowedBlockTypes,
-			linkControlAdvancedSettingsPreference,
-			setLinkControlAdvancedSettingsPreference,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -168,8 +149,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
-		linkControlAdvancedSettingsPreference,
-		setLinkControlAdvancedSettingsPreference,
 	] );
 
 	if ( ! post ) {
