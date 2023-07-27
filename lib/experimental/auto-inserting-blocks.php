@@ -162,6 +162,14 @@ function gutenberg_register_auto_inserted_block( $inserted_block, $position, $an
 		$inserter = gutenberg_auto_insert_block( $inserted_block_array, $position, $anchor_block );
 		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
 
+		/*
+		 * The block-types REST API controller uses objects of the `WP_Block_Type` class, which are
+		 * in turn created upon block type registration. However, that class does not contain
+		 * an `auto_insert` property (and is not easily extensible), so we have to use a different
+		 * mechanism to communicate to the controller which blocks have been registered for
+		 * auto-insertion. We're doing so here (i.e. upon block registration), by adding a filter to
+		 * the controller's response.
+		 */
 		$controller_extender = gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_block, $position, $anchor_block );
 		add_filter( 'rest_prepare_block_type', $controller_extender, 10, 2 );
 }
