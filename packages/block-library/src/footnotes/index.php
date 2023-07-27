@@ -222,7 +222,6 @@ function wp_rest_api_autosave_meta( $autosave ) {
 	// `wp_creating_autosave` passes the object,
 	// `_wp_put_post_revision` passes the ID.
 	$id = is_int( $autosave ) ? $autosave : $autosave['ID'];
-	var_dump( $id );
 
 	// Ensure it's a REST API request.
 	if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
