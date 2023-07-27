@@ -155,7 +155,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	 * @covers ::get_font_post
 	 * @dataProvider data_font_fixtures
      */
-	public function test_install_and_uninstall_google_font( $font_data, $installed_font_data, $files_data = array() ) {
+	public function test_install_and_uninstall( $font_data, $installed_font_data, $files_data = array() ) {
 		$font = new WP_Font_Family( $font_data );
 		$font->install( $files_data );
 		
