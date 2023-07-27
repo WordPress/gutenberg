@@ -730,7 +730,7 @@ test.describe( 'Image', () => {
 // These tests are disabled for now while we
 // work on a solution to make them more stable.
 // See https://github.com/WordPress/gutenberg/pull/52442
-test.skip( 'Image - interactivity', () => {
+test.describe.skip( 'Image - interactivity', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
