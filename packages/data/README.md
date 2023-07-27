@@ -1057,7 +1057,7 @@ function Component() {
           "getEntityRecords",
           selectorArgs
         ),
-        isResolving: select(coreDataStore).isResolving(
+        isResolving: select( coreDataStore ).isResolving(
           "getEntityRecords",
           selectorArgs
         )
