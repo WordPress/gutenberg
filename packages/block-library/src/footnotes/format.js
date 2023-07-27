@@ -16,7 +16,6 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
-import { useEntityBlockEditor } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -35,16 +34,17 @@ export const format = {
 		'data-fn': 'data-fn',
 	},
 	contentEditable: false,
-	[ usesContextKey ]: [ 'postType', 'postId' ],
+	[ usesContextKey ]: [ 'postType' ],
 	edit: function Edit( {
 		value,
 		onChange,
 		isObjectActive,
-		context: { postType, postId },
+		context: { postType },
 	} ) {
 		const registry = useRegistry();
 		const {
 			getSelectedBlockClientId,
+			getBlocks,
 			getBlockRootClientId,
 			getBlockName,
 			getBlockParentsByBlockName,
@@ -52,9 +52,6 @@ export const format = {
 		const footnotesBlockType = useSelect( ( select ) =>
 			select( blocksStore ).getBlockType( name )
 		);
-		const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
-			id: postId,
-		} );
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
 
@@ -100,8 +97,32 @@ export const format = {
 					onChange( newValue );
 				}
 
-				// Finds the first footnote block.
-				let fnBlock = blocks?.find( ( block ) => block.name === name );
+				// Attempt to find a common parent post content block.
+				// This allows for locating blocks within a page edited in the site editor.
+				const parentPostContent = getBlockParentsByBlockName(
+					getSelectedBlockClientId(),
+					'core/post-content'
+				);
+
+				// When called with a post content block, getBlocks will return
+				// the block with controlled inner blocks included.
+				const blocks = parentPostContent.length
+					? getBlocks( parentPostContent[ 0 ] )
+					: getBlocks();
+
+				// BFS search to find the first footnote block.
+				let fnBlock = null;
+				{
+					const queue = [ ...blocks ];
+					while ( queue.length ) {
+						const block = queue.shift();
+						if ( block.name === name ) {
+							fnBlock = block;
+							break;
+						}
+						queue.push( ...block.innerBlocks );
+					}
+				}
 
 				// Maybe this should all also be moved to the entity provider.
 				// When there is no footnotes block in the post, create one and
