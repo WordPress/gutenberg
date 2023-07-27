@@ -1035,46 +1035,53 @@ The following selectors are available on the object returned by `wp.data.select(
 _Example_
 
 ```js
-import { store as coreDataStore } from "@wordpress/core-data";
+import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 function Component() {
+	const result = useSelect( ( select ) => {
+		const query = { per_page: 20 };
+		const selectorArgs = [ 'postType', 'page', query ];
 
-  const result = useSelect(
+		return {
+			pages: select( coreDataStore ).getEntityRecords( ...selectorArgs ),
+			hasStartedResolution: select( coreDataStore ).hasStartedResolution(
+				'getEntityRecords', // _selectorName_
+				selectorArgs
+			),
+			hasFinishedResolution: select(
+				coreDataStore
+			).hasFinishedResolution( 'getEntityRecords', selectorArgs ),
+			isResolving: select( coreDataStore ).isResolving(
+				'getEntityRecords',
+				selectorArgs
+			),
+		};
+	} );
 
-    ( select ) => {
+	if ( result.hasStartedResolution ) {
+		return <>Fetching data...</>;
+	}
 
-      const query = { per_page: 20 };
-      const selectorArgs = [ "postType", "page", query ];
+	if ( result.isResolving ) {
+		return (
+			<>
+				{
+					// show a spinner
+				 }
+			</>
+		);
+	}
 
-      return {
-        pages: select( coreDataStore ).getEntityRecords( ...selectorArgs ),
-        hasStartedResolution: select( coreDataStore ).hasStartedResolution(
-          "getEntityRecords", // _selectorName_
-          selectorArgs
-        ),
-        hasFinishedResolution: select( coreDataStore ).hasFinishedResolution(
-          "getEntityRecords",
-          selectorArgs
-        ),
-        isResolving: select( coreDataStore ).isResolving(
-          "getEntityRecords",
-          selectorArgs
-        )
-      };
-    }
-  );
-
-  console.log( result.hasStartedResolution );
-  console.log( result.hasFinishedResolutio n);
-  console.log( result.isResolving );
-
-  return (
-    <>
-      {
-        //use the result properties here
-      }
-    </>
+	if ( result.hasFinishedResolution ) {
+		return (
+			<>
+				{
+					// data is ready
+				 }
+			</>
+		);
+	}
 }
 ```
 
