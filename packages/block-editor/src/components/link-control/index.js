@@ -420,18 +420,20 @@ function LinkControl( {
 
 			{ showSettings && (
 				<div className="block-editor-link-control__tools">
-					<LinkControlSettingsDrawer
-						settingsOpen={ isSettingsOpen }
-						setSettingsOpen={ setSettingsOpenWithPreference }
-					>
-						<LinkSettings
-							value={ internalControlValue }
-							settings={ settings }
-							onChange={ createSetInternalSettingValueHandler(
-								settingsKeys
-							) }
-						/>
-					</LinkControlSettingsDrawer>
+					{ ! currentInputIsEmpty && (
+						<LinkControlSettingsDrawer
+							settingsOpen={ isSettingsOpen }
+							setSettingsOpen={ setSettingsOpenWithPreference }
+						>
+							<LinkSettings
+								value={ internalControlValue }
+								settings={ settings }
+								onChange={ createSetInternalSettingValueHandler(
+									settingsKeys
+								) }
+							/>
+						</LinkControlSettingsDrawer>
+					) }
 				</div>
 			) }
 
