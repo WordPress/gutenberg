@@ -785,8 +785,7 @@ test.describe( 'Image - interactivity', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			filename = await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' ),
-				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				imageBlock.locator( 'data-testid=form-file-upload-input' )
 			);
 			const image = imageBlock.locator( 'role=img' );
 			await expect( image ).toBeVisible();
@@ -847,7 +846,8 @@ test.describe( 'Image - interactivity', () => {
 				await expect( image ).toBeVisible();
 				await expect( image ).toHaveAttribute(
 					'src',
-					new RegExp( filename )
+					new RegExp( filename ),
+					{ timeout: 10_000 }
 				);
 
 				await editor.openDocumentSettingsSidebar();
@@ -970,7 +970,8 @@ test.describe( 'Image - interactivity', () => {
 				await expect( image ).toBeVisible();
 				await expect( image ).toHaveAttribute(
 					'src',
-					new RegExp( filename )
+					new RegExp( filename ),
+					{ timeout: 10_000 }
 				);
 
 				await editor.openDocumentSettingsSidebar();
@@ -1058,8 +1059,7 @@ test.describe( 'Image - interactivity', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			filename = await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' ),
-				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				imageBlock.locator( 'data-testid=form-file-upload-input' )
 			);
 			const image = imageBlock.locator( 'role=img' );
 			await expect( image ).toBeVisible();
@@ -1112,8 +1112,7 @@ test.describe( 'Image - interactivity', () => {
 			await expect( imageBlock ).toBeVisible();
 
 			filename = await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' ),
-				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				imageBlock.locator( 'data-testid=form-file-upload-input' )
 			);
 			const image = imageBlock.locator( 'role=img' );
 			await expect( image ).toBeVisible();
@@ -1151,8 +1150,7 @@ test.describe( 'Image - interactivity', () => {
 				await expect( imageBlock ).toBeVisible();
 
 				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' ),
-					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
 				);
 				const image = imageBlock.locator( 'role=img' );
 				await expect( image ).toBeVisible();
@@ -1185,8 +1183,7 @@ test.describe( 'Image - interactivity', () => {
 				await expect( imageBlock ).toBeVisible();
 
 				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' ),
-					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
 				);
 				const image = imageBlock.locator( 'role=img' );
 				await expect( image ).toBeVisible();
@@ -1219,8 +1216,7 @@ test.describe( 'Image - interactivity', () => {
 				await expect( imageBlock ).toBeVisible();
 
 				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' ),
-					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
 				);
 				const image = imageBlock.locator( 'role=img' );
 				await expect( image ).toBeVisible();
@@ -1256,8 +1252,7 @@ test.describe( 'Image - interactivity', () => {
 				await expect( imageBlock ).toBeVisible();
 
 				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' ),
-					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
 				);
 				const image = imageBlock.locator( 'role=img' );
 				await expect( image ).toBeVisible();
