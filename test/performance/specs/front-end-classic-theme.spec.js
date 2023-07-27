@@ -27,13 +27,16 @@ test.describe( 'Front End Performance', () => {
 		const rounds = samples + throwaway;
 
 		for ( let i = 0; i < rounds; i++ ) {
-			const testPage = await browser.newPage( { storageState: {} } );
+			const tmpContext = await browser.newContext( {
+				storageState: {}, // User will be logged out.
+			} );
+			const tmpPage = await tmpContext.newPage();
 
 			// Go to the base URL.
-			await testPage.goto( '/', { waitUntil: 'networkidle' } );
+			await tmpPage.goto( '/', { waitUntil: 'networkidle' } );
 
 			// Take the measurements.
-			const [ lcp, ttfb ] = await testPage.evaluate( () => {
+			const [ lcp, ttfb ] = await tmpPage.evaluate( () => {
 				return Promise.all( [
 					// Measure the Largest Contentful Paint time.
 					// Based on https://www.checklyhq.com/learn/headless/basics-performance#largest-contentful-paint-api-largest-contentful-paint
@@ -76,7 +79,7 @@ test.describe( 'Front End Performance', () => {
 				results.lcpMinusTtfb.push( lcp - ttfb );
 			}
 
-			await testPage.close();
+			await tmpContext.close();
 		}
 	} );
 } );
