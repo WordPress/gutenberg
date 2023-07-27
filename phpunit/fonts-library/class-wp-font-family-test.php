@@ -240,7 +240,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-			'with_no_font_faces'        => array(
+			'without_font_faces'        => array(
 				'font_data'           => array(
 					'name'       => 'Arial',
 					'slug'       => 'arial',
