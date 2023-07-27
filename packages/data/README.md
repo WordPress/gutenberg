@@ -1042,7 +1042,7 @@ function Component() {
 
   const result = useSelect(
 
-    (select) => {
+    ( select ) => {
 
       const query = { per_page: 20 };
       const selectorArgs = [ "postType", "page", query ];
@@ -1065,13 +1065,16 @@ function Component() {
     }
   );
 
-  console.log(result.hasStartedResolution);
-  console.log(result.hasFinishedResolution);
-  console.log(result.isResolving);
+  console.log( result.hasStartedResolution );
+  console.log( result.hasFinishedResolutio n);
+  console.log( result.isResolving );
 
   return (
-    // use the result properties here
-  )
+    <>
+      {
+        //use the result properties here
+      }
+    </>
 }
 ```
 
