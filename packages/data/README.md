@@ -1045,7 +1045,7 @@ function Component() {
     (select) => {
 
       const query = { per_page: 20 };
-      const selectorArgs = ["postType", "page", query];
+      const selectorArgs = [ "postType", "page", query ];
 
       return {
         pages: select(coreDataStore).getEntityRecords(...selectorArgs),
