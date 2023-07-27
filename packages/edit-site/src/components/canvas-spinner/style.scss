@@ -10,8 +10,8 @@
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
 
-	circle {
-		stroke: rgba($black, 0.3);
+	.components-progress-bar {
+		max-width: 200px;
 	}
 }
 
