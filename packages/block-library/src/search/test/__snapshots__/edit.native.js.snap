@@ -20,6 +20,15 @@ exports[`Search Block renders block with button inside option 1`] = `
       }
     >
       <RCTAztecView
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
         accessible={true}
         activeFormats={[]}
         blockType={
@@ -136,6 +145,15 @@ exports[`Search Block renders block with button inside option 1`] = `
           }
         >
           <RCTAztecView
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
             accessible={true}
             activeFormats={[]}
             blockType={
@@ -216,6 +234,15 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
       }
     >
       <RCTAztecView
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
         accessible={true}
         activeFormats={[]}
         blockType={
@@ -402,6 +429,15 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
           }
         >
           <RCTAztecView
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
             accessible={true}
             activeFormats={[]}
             blockType={
@@ -482,6 +518,15 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
       }
     >
       <RCTAztecView
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
         accessible={true}
         activeFormats={[]}
         blockType={
@@ -598,6 +643,15 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
           }
         >
           <RCTAztecView
+            accessibilityState={
+              {
+                "busy": undefined,
+                "checked": undefined,
+                "disabled": undefined,
+                "expanded": undefined,
+                "selected": undefined,
+              }
+            }
             accessible={true}
             activeFormats={[]}
             blockType={
@@ -678,6 +732,15 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
       }
     >
       <RCTAztecView
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
         accessible={true}
         activeFormats={[]}
         blockType={
