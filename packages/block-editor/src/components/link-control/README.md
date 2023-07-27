@@ -23,23 +23,7 @@ In some circumstances if may be desirable to persist the toggle state of this po
 
 For example, once the user has toggled the UI to "open", then it may remain open across all links on the site until such time as the user toggles the UI back again.
 
-Consumers who which to take advantage of this functionality can optionally pass a getter/setter to the `@wordpress/block-editor` store's `settings` to which `<LinkControl>` will automatically call to handle the state of the UI.
-
-In WordPress Core this is achieved by way of the `@wordpress/preferences` package but consumers can also choose to utilise their own implementation.
-
-The setting keys are as follows:
-
--   `linkControlAdvancedSettingsPreference` - a variable which provides the _current_ state of the UI as a `boolean` value.
--   `setLinkControlAdvancedSettingsPreference` - a function which _updates_ the persisted state of the UI.
-
-```jsx
-<BlockEditorProvider
-	value={ blocks }
-	onChange={ onChange }
-	onInput={ onInput }
-	settings={ blockEditorSettings } // this value should contain the settings outlined above.
->
-```
+Consumers who which to take advantage of this functionality should ensure that their block editor environment utilizes the [`@wordpress/preferences`](packages/preferences/README.md) package. By default the `<LinkControl>` component will attempt to persist the state of UI to a setting named `linkControlSettingsDrawer` with a scope of `core/block-editor`. If the preferences package is not available then local state is used and the setting will not be persisted.
 
 ## Search Suggestions
 
