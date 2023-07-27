@@ -70,6 +70,7 @@ function AriaToolTip( props: ToolTipProps ) {
 				<Tooltip
 					className="components-ariakit-tooltip"
 					id={ describedById }
+					gutter={ 4 }
 					store={ tooltipStore }
 				>
 					{ text }
