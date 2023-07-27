@@ -82,9 +82,20 @@ class BehaviorUtils {
 }
 
 test.describe( 'Site editor behaviors', () => {
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterEach( async ( { requestUtils, page, admin } ) => {
 		await requestUtils.deleteAllMedia();
 		await requestUtils.deleteAllPosts();
+
+		await admin.visitAdminPage(
+			'/admin.php',
+			'page=gutenberg-experiments'
+		);
+
+		await page
+			.locator( `#gutenberg-interactivity-api-core-blocks` )
+			.setChecked( false );
+		await page.locator( `input[name="submit"]` ).click();
+		await page.waitForLoadState();
 	} );
 
 	test.beforeEach( async ( { admin, page, requestUtils, editor } ) => {
@@ -131,18 +142,7 @@ test.describe( 'Site editor behaviors', () => {
 		await requestUtils.activateTheme( 'twentytwentythree' );
 	} );
 
-	test.afterAll( async ( { admin, page, requestUtils } ) => {
-		await admin.visitAdminPage(
-			'/admin.php',
-			'page=gutenberg-experiments'
-		);
-
-		await page
-			.locator( `#gutenberg-interactivity-api-core-blocks` )
-			.setChecked( false );
-		await page.locator( `input[name="submit"]` ).click();
-		await page.waitForLoadState();
-
+	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
