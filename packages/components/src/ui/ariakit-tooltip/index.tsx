@@ -65,7 +65,11 @@ function AriaToolTip( props: ToolTipProps ) {
 
 	return (
 		<>
-			<TooltipAnchor render={ children } store={ tooltipStore } />
+			<TooltipAnchor
+				onBlur={ () => tooltipStore.hide() }
+				render={ children }
+				store={ tooltipStore }
+			/>
 			{ ( text || shortcut ) && (
 				<Tooltip
 					className="components-ariakit-tooltip"
