@@ -16,8 +16,8 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_has_font_mime_type_fixtures
 	 *
-	 * @param string $font_file Font file path
-	 * @param bool   $expected  Expected result
+	 * @param string $font_file Font file path.
+	 * @param bool   $expected  Expected result.
 	 */
 	public function test_has_font_mime_type( $font_file, $expected ) {
 		$this->assertSame( $expected, WP_Font_Family_Utils::has_font_mime_type( $font_file ) );
@@ -62,10 +62,10 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_filename_from_font_face_fixtures
 	 *
-	 * @param string          $slug               Font slug
-	 * @param array           $font_face          Font face data in theme.json format
+	 * @param string          $slug               Font slug.
+	 * @param array           $font_face          Font face data in theme.json format.
 	 * @param string Optional. $suffix             Suffix added to the resulting filename. Default empty string.
-	 * @param string          $expected_file_name Expected file name
+	 * @param string          $expected_file_name Expected file name.
 	 */
 	public function test_get_filename_from_font_face( $slug, $font_face, $suffix, $expected_file_name ) {
 
@@ -115,10 +115,10 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_merge_fonts_data_fixtures
 	 *
-	 * @param bool  $are_mergeable   Whether the fonts are mergeable
-	 * @param array $font1           First font data in theme.json format
-	 * @param array $font2           Second font data in theme.json format
-	 * @param array $expected_result Expected result
+	 * @param bool  $are_mergeable   Whether the fonts are mergeable.
+	 * @param array $font1           First font data in theme.json format.
+	 * @param array $font2           Second font data in theme.json format.
+	 * @param array $expected_result Expected result.
 	 */
 	public function test_merge_fonts_data( $are_mergeable, $font1, $font2, $expected_result ) {
 		// Fonts with same slug should be merged
