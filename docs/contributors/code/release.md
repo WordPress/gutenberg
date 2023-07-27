@@ -123,7 +123,7 @@ Before you begin, announce in [#core-editor](https://wordpress.slack.com/message
 
 Then go to the Gutenberg repository, click on the Actions tab, and then locate the [Build Gutenberg Plugin Zip](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) action. Note the blue banner that says, “This workflow has a `workflow_dispatch` event trigger.” Expand the “Run workflow” dropdown on its right-hand side.
 
-![Run workflow dropdown for the plugin release](https://developer.wordpress.org/files/2023/07/image-1.png)
+![Run workflow dropdown for the plugin release](https://developer.wordpress.org/files/2023/07/image-3-1.png)
 
 To release an RC version of the plugin, enter `rc `in the text field. To release a stable version, enter `stable`. In each case, press the button “Run workflow”.
 
