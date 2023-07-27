@@ -146,7 +146,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test.only( 'toggle state of advanced link settings is preserved across editing links', async ( {
+	test( 'toggle state of advanced link settings is preserved across editing links', async ( {
 		page,
 		editor,
 		pageUtils,
