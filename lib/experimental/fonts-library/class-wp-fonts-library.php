@@ -13,6 +13,9 @@ if ( class_exists( 'WP_Fonts_Library' ) ) {
 	return;
 }
 
+/**
+ * Fonts Library class.
+ */
 class WP_Fonts_Library {
 
 	const ALLOWED_FONT_MIME_TYPES = array(
