@@ -216,45 +216,45 @@ function setZoomStyles( context, event ) {
 	// dimensions have not been set (i.e. an external image with only one size),
 	// the image's dimensions in the lightbox are the same
 	// as those of the image in the content.
-	let targetWidth = parseFloat(
+	let imgMaxWidth = parseFloat(
 		context.core.image.targetWidth !== 'none'
 			? context.core.image.targetWidth
 			: naturalWidth
 	);
-	let targetHeight = parseFloat(
+	let imgMaxHeight = parseFloat(
 		context.core.image.targetHeight !== 'none'
 			? context.core.image.targetHeight
 			: naturalHeight
 	);
 
+	// Natural ratio of the image clicked to open the lightbox.
 	const naturalRatio = naturalWidth / naturalHeight;
-	let targetRatio = targetWidth / targetHeight;
+	// Original ratio of the image clicked to open the lightbox.
 	const originalRatio = originalWidth / originalHeight;
-
-	// If the ratio differs, recalculate the width and height.
-	let imgMaxWidth = targetWidth;
-	let imgMaxHeight = targetHeight;
-	let containerMaxWidth = targetWidth;
-	let containerMaxHeight = targetHeight;
+	// Ratio of the biggest image stored in the database.
+	let imgRatio = imgMaxWidth / imgMaxHeight;
+	let containerMaxWidth = imgMaxWidth;
+	let containerMaxHeight = imgMaxHeight;
+	let containerWidth = imgMaxWidth;
+	let containerHeight = imgMaxHeight;
 	// Check if the target image has a different ratio than the original one (thumbnail).
 	// Recalculate the width and height.
-	if ( naturalRatio.toFixed( 2 ) !== targetRatio.toFixed( 2 ) ) {
-		if ( naturalRatio > targetRatio ) {
+	if ( naturalRatio.toFixed( 2 ) !== imgRatio.toFixed( 2 ) ) {
+		if ( naturalRatio > imgRatio ) {
 			// If the width is reached before the height, we keep the targetWidth
 			// and recalculate the height.
-			// targetHeight = targetWidth / naturalRatio;
-			imgMaxHeight = targetWidth / naturalRatio;
+			imgMaxHeight = imgMaxWidth / naturalRatio;
 		} else {
 			// If the height is reached before the width, we keep the targetHeight
 			// and recalculate the width.
-			imgMaxWidth = targetHeight * naturalRatio;
+			imgMaxWidth = imgMaxHeight * naturalRatio;
 		}
-		targetWidth = imgMaxWidth;
-		targetHeight = imgMaxHeight;
-		targetRatio = targetWidth / targetHeight;
+		containerWidth = imgMaxWidth;
+		containerHeight = imgMaxHeight;
+		imgRatio = imgMaxWidth / imgMaxHeight;
 
 		// Calculate the max size of the container.
-		if ( originalRatio > targetRatio ) {
+		if ( originalRatio > imgRatio ) {
 			containerMaxWidth = imgMaxWidth;
 			containerMaxHeight = containerMaxWidth / originalRatio;
 		} else {
@@ -264,36 +264,33 @@ function setZoomStyles( context, event ) {
 	}
 
 	// If the image has been pixelated on purpose, keep that size.
-	if ( originalWidth > targetWidth || originalHeight > targetHeight ) {
-		targetWidth = originalWidth;
-		targetHeight = originalHeight;
+	if ( originalWidth > containerWidth || originalHeight > containerHeight ) {
+		containerWidth = originalWidth;
+		containerHeight = originalHeight;
 	}
 
 	// Calculate the final lightbox image size and the scale factor.
-
 	// MaxWidth is either the window container or the image resolution.
 	// TO DO: Add padding to the window container value.
-	const targetMaxWidth = Math.min( window.innerWidth, targetWidth );
-	const targetMaxHeight = Math.min( window.innerHeight, targetHeight );
+	const targetMaxWidth = Math.min( window.innerWidth, containerWidth );
+	const targetMaxHeight = Math.min( window.innerHeight, containerHeight );
 	const targetContainerRatio = targetMaxWidth / targetMaxHeight;
 
-	let imgContainerWidth;
-	let imgContainerHeight;
 	if ( originalRatio > targetContainerRatio ) {
 		// If targetMaxWidth is reached before targetMaxHeight
-		imgContainerWidth = targetMaxWidth;
-		imgContainerHeight = imgContainerWidth / originalRatio;
+		containerWidth = targetMaxWidth;
+		containerHeight = containerWidth / originalRatio;
 	} else {
 		// If targetMaxHeight is reached before targetMaxWidth
-		imgContainerHeight = targetMaxHeight;
-		imgContainerWidth = imgContainerHeight * originalRatio;
+		containerHeight = targetMaxHeight;
+		containerWidth = containerHeight * originalRatio;
 	}
 
-	const containerScale = originalWidth / imgContainerWidth;
+	const containerScale = originalWidth / containerWidth;
 	const lightboxImgWidth =
-		imgMaxWidth * ( imgContainerWidth / containerMaxWidth );
+		imgMaxWidth * ( containerWidth / containerMaxWidth );
 	const lightboxImgHeight =
-		imgMaxHeight * ( imgContainerHeight / containerMaxHeight );
+		imgMaxHeight * ( containerHeight / containerMaxHeight );
 
 	// Add the CSS variables needed.
 	const root = document.documentElement;
@@ -311,11 +308,11 @@ function setZoomStyles( context, event ) {
 	);
 	root.style.setProperty(
 		'--lightbox-container-width',
-		imgContainerWidth + 'px'
+		containerWidth + 'px'
 	);
 	root.style.setProperty(
 		'--lightbox-container-height',
-		imgContainerHeight + 'px'
+		containerHeight + 'px'
 	);
 	root.style.setProperty( '--lightbox-image-width', lightboxImgWidth + 'px' );
 	root.style.setProperty(
