@@ -295,7 +295,7 @@ class WP_Font_Family {
 	 */
 	public function get_font_post() {
 		$args = array(
-			'post_type'      => 'wp_fonts_library',
+			'post_type'      => 'wp_font_family',
 			'post_name'      => $this->data['slug'],
 			'name'           => $this->data['slug'],
 			'posts_per_page' => 1,
@@ -333,7 +333,7 @@ class WP_Font_Family {
 		$post    = array(
 			'post_title'   => $this->data['name'],
 			'post_name'    => $this->data['slug'],
-			'post_type'    => 'wp_fonts_library',
+			'post_type'    => 'wp_font_family',
 			'post_content' => $this->get_data_as_json(),
 			'post_status'  => 'publish',
 		);
