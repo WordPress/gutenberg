@@ -13,7 +13,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::has_font_mime_type
-	 * 
+	 *
 	 * @dataProvider data_has_font_mime_type_fixtures
 	 *
 	 * @param string $font_file Font file path
@@ -102,7 +102,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::merge_fonts_data
-	 * 
+	 *
 	 * @dataProvider data_merge_fonts_data_fixtures
 	 *
 	 * @param bool  $are_mergeable   Whether the fonts are mergeable
@@ -115,10 +115,10 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 		$merged_font = WP_Font_Family_Utils::merge_fonts_data( $font1, $font2 );
 
 		if ( $are_mergeable ) {
-			$this->assertNotWPError( $merged_font );
-			$this->assertEquals( $expected_result, $merged_font );
+			$this->assertNotWPError( $merged_font, 'Fonts could not be merged' );
+			$this->assertEquals( $expected_result, $merged_font, 'The font family data and font faces merged not as expected' );
 		} else {
-			$this->assertWPError( $merged_font );
+			$this->assertWPError( $merged_font, 'Merging non mergeable fonts (diifferent slug) should have failed.' );
 		}
 	}
 

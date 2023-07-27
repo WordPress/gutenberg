@@ -71,15 +71,15 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 
 		// Check that the post was created
 		$post = $font->get_font_post();
-		$this->assertInstanceof( 'WP_Post', $post );
+		$this->assertInstanceof( 'WP_Post', $post, 'The font post was not created.' );
 
 		// Check that the post has the correct data
-		$this->assertSame( $installed_font_data['name'], $post->post_title );
-		$this->assertSame( $installed_font_data['slug'], $post->post_name );
+		$this->assertSame( $installed_font_data['name'], $post->post_title, 'The font post has the wrong title.' );
+		$this->assertSame( $installed_font_data['slug'], $post->post_name, 'The font post has the wrong slug.' );
 
 		$content = json_decode( $post->post_content, true );
-		$this->assertSame( $installed_font_data['fontFamily'], $content['fontFamily'] );
-		$this->assertSame( $installed_font_data['slug'], $content['slug'] );
+		$this->assertSame( $installed_font_data['fontFamily'], $content['fontFamily'], 'The font post content has the wrong font family.' );
+		$this->assertSame( $installed_font_data['slug'], $content['slug'], 'The font post content has the wrong slug.' );
 
 		if ( $font->has_font_faces() ) {
 			$font_face_index = 0;
@@ -87,12 +87,12 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 				$source_index = 0;
 				if ( is_array( $font_face['src'] ) ) {
 					foreach ( $font_face['src'] as $src ) {
-						$this->assertStringEndsWith( $installed_font_data[ $font_face_index ]['src'][ $source_index ], $src );
-						$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ] );
+						$this->assertStringEndsWith( $installed_font_data[ $font_face_index ]['src'][ $source_index ], $src, 'The font post content has the wrong src.' );
+						$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ], 'The font asset was not created.' );
 					}
 				} else {
-					$this->assertStringEndsWith( $installed_font_data['fontFace'][ $font_face_index ]['src'], $font_face['src'] );
-					$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'] );
+					$this->assertStringEndsWith( $installed_font_data['fontFace'][ $font_face_index ]['src'], $font_face['src'], 'The font post content has the wrong src.' );
+					$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'], 'The font asset was not created.' );
 				}
 				$font_face_index++;
 				$source_index++;
@@ -103,7 +103,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 
 		// Check that the post was deleted
 		$post = $font->get_font_post();
-		$this->assertNull( $post );
+		$this->assertNull( $post, 'The font post was not deleted' );
 
 		// Check that the font asset was deleted
 		if ( $font->has_font_faces() ) {
@@ -112,10 +112,10 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 				$source_index = 0;
 				if ( is_array( $font_face['src'] ) ) {
 					foreach ( $font_face['src'] as $src ) {
-						$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ] );
+						$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ], 'The font face asset was not removed' );
 					}
 				} else {
-					$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'] );
+					$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'], 'The font face asset was not removed' );
 				}
 				$font_face_index++;
 				$source_index++;
