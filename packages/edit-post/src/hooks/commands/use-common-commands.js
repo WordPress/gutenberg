@@ -152,4 +152,14 @@ export default function useCommonCommands() {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
 		},
 	} );
+
+	useCommand( {
+		name: 'core/toggle-breadcrumbs',
+		label: __( 'Show/hide block breadcrumbs' ),
+		icon: cog,
+		callback: ( { close } ) => {
+			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
+			close();
+		},
+	} );
 }

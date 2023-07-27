@@ -265,6 +265,16 @@ function useEditUICommands() {
 		},
 	} );
 
+	commands.push( {
+		name: 'core/toggle-breadcrumbs',
+		label: __( 'Show/hide block breadcrumbs' ),
+		icon: cog,
+		callback: ( { close } ) => {
+			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
+			close();
+		},
+	} );
+
 	return {
 		isLoading: false,
 		commands,
