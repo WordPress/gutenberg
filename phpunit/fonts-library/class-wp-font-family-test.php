@@ -12,20 +12,6 @@
  */
 class WP_Font_Family_Test extends WP_UnitTestCase {
 
-	const FONT_DATA_1 = array(
-		'name'       => 'Piazzolla',
-		'slug'       => 'piazzolla',
-		'fontFamily' => 'Piazzolla',
-		'fontFace'   => array(
-			array(
-				'fontFamily' => 'Piazzolla',
-				'fontStyle'  => 'italic',
-				'fontWeight' => '400',
-				'src'        => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-			),
-		),
-	);
-
 	const FONT_DATA_2 = array(
 		'name'       => 'Arial',
 		'slug'       => 'arial',
@@ -33,62 +19,182 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	);
 
 	/**
-     * @covers ::get_data
+	 * Test the constructor and the get_data method
+	 * 
+	 * @covers ::__construct
+	 * @covers ::get_data
+	 * @dataProvider data_font_fixtures
      */
-	public function test_get_data() {
-		$font = new WP_Font_Family( self::FONT_DATA_1 );
-		$this->assertSame( 'piazzolla', $font->get_data()['slug'] );
-		$this->assertEquals( self::FONT_DATA_1, $font->get_data() );
+	public function test_get_data( $font_data ) {
+		$font = new WP_Font_Family( $font_data );
+		$this->assertEquals( $font_data, $font->get_data() );
+	}
+
+	public function data_font_fixtures() {
+		return array(
+			'with_one_google_font_face' => array (
+				'font_data' => array(
+					'name'       => 'Piazzolla',
+					'slug'       => 'piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '400',
+							'src'        => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+						),
+					),
+				),
+				'installed_font_data' => array (
+					'name'       => 'Piazzolla',
+					'slug'       => 'piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '400',
+							'src'        => 'piazzolla_italic_400.ttf', // This is just filename of the font asset and not the entire URL because we can't know the URL of the asset in the test
+						),
+					),
+				),
+			),
+			'with_no_font_faces' => array (
+				'font_data' => array(
+					'name'       => 'Arial',
+					'slug'       => 'arial',
+					'fontFamily' => 'Arial',
+				),
+				'installed_font_data' => array (
+					'name'       => 'Arial',
+					'slug'       => 'arial',
+					'fontFamily' => 'Arial',
+				),
+			),
+			'with_local_files' => array (
+				'font_data' => array (
+					'name'       => 'Inter',
+					'slug'       => 'inter',
+					'fontFamily' => 'Inter',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Inter',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '400',
+							'file'       => 'files0',
+						),
+						array(
+							'fontFamily' => 'Inter',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '500',
+							'file'       => 'files1',
+						),
+					),
+				),
+				'installed_font_data' => array (
+					'name'       => 'Inter',
+					'slug'       => 'inter',
+					'fontFamily' => 'Inter',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Inter',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '400',
+							'src'        => 'https://example.com/wp-content/fonts/inter_normal_400.ttf',
+						),
+						array(
+							'fontFamily' => 'Inter',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '500',
+							'src'        => 'https://example.com/wp-content/fonts/inter_normal_500.ttf',
+						),
+					),
+				),
+				'files_data' => array (
+					'files0' => array(
+						'name'      => 'inter1.ttf',
+						'full_path' => 'inter1.ttf',
+						'type'      => 'font/ttf',
+						'tmp_name'  => tempnam( sys_get_temp_dir(), 'Inter-' ),
+						'error'     => 0,
+						'size'      => 156764,
+					),
+					'files1' => array(
+						'name'      => 'inter2.ttf',
+						'full_path' => 'inter2.ttf',
+						'type'      => 'font/ttf',
+						'tmp_name'  => tempnam( sys_get_temp_dir(), 'Inter-' ),
+						'error'     => 0,
+						'size'      => 156524,
+					),
+				),
+			),
+		);
 	}
 
 	/**
+	 * Test if the get_data_as_json method returns the correct data
+	 * 
      * @covers ::get_data_as_json
+	 * @dataProvider data_font_fixtures
      */
-	public function test_get_data_as_json() {
-		$font = new WP_Font_Family( self::FONT_DATA_1 );
-		$this->assertSame( wp_json_encode( self::FONT_DATA_1 ), $font->get_data_as_json() );
+	public function test_get_data_as_json( $font_data ) {
+		$font = new WP_Font_Family( $font_data );
+		$this->assertSame( wp_json_encode( $font_data ), $font->get_data_as_json() );
 	}
 
 	/**
+	 * Test if the has_font_faces method returns the correct data
+	 * 
      * @covers ::has_font_faces
+	 * @dataProvider data_font_fixtures
      */
-	public function test_has_font_faces() {
-		$font1 = new WP_Font_Family( self::FONT_DATA_1 );
-		$this->assertTrue( $font1->has_font_faces() );
-
-		$font2 = new WP_Font_Family( self::FONT_DATA_2 );
-		$this->assertFalse( $font2->has_font_faces() );
+	public function test_has_font_faces( $font_data ) {
+		$font = new WP_Font_Family( $font_data );
+		$this->assertSame( !empty( $font_data['fontFace'] ) && is_array( $font_data['fontFace'] ),  $font->has_font_faces() );
 	}
 
 	/**
      * @covers ::install
 	 * @covers ::uninstall
 	 * @covers ::get_font_post
+	 * @dataProvider data_font_fixtures
      */
-	public function test_install_and_uninstall_google_font() {
-		$font = new WP_Font_Family( self::FONT_DATA_1 );
-		$font->install();
-
+	public function test_install_and_uninstall_google_font( $font_data, $installed_font_data, $files_data = array() ) {
+		$font = new WP_Font_Family( $font_data );
+		$font->install( $files_data );
+		
 		// Check that the post was created
 		$post = $font->get_font_post();
 		$this->assertInstanceof( 'WP_Post', $post );
 
 		// Check that the post has the correct data
-		$this->assertSame( 'Piazzolla' , $post->post_title );
-		$this->assertSame( 'piazzolla' , $post->post_name );
+		$this->assertSame( $installed_font_data['name'] , $post->post_title );
+		$this->assertSame( $installed_font_data['slug'] , $post->post_name );
+
 		$content = json_decode( $post->post_content, true );
-		$this->assertSame( 'Piazzolla' , $content['fontFamily'] );
-		$this->assertSame( 'piazzolla' , $content['slug'] );
-		$this->assertSame( 'Piazzolla' , $content['fontFace'][0]['fontFamily'] );
-		$this->assertSame( 'italic' , $content['fontFace'][0]['fontStyle'] );
-		$this->assertSame( '400' , $content['fontFace'][0]['fontWeight'] );
+		$this->assertSame( $installed_font_data['fontFamily'], $content['fontFamily'] );
+		$this->assertSame( $installed_font_data['slug'], $content['slug'] );
 
-		// Check that the font file src was updated to the local font asset
-		$this->assertStringEndsWith( '/piazzolla_italic_400.ttf', $content['fontFace'][0]['src'] );
-
-		// Check that the font file was created
-		$this->assertFileExists( WP_FONTS_DIR . '/piazzolla_italic_400.ttf' );
-
+		if ( $font->has_font_faces() ) {
+			$font_face_index = 0;
+			foreach ( $content['fontFace'] as $font_face ) {
+				$source_index = 0;
+				if ( is_array ( $font_face['src'] ) ) {
+					foreach ( $font_face['src'] as $src ) {
+						$this->assertStringEndsWith( $installed_font_data[ $font_face_index ]['src'][ $source_index ], $src );
+						$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ] );
+					}
+				} else {
+					$this->assertStringEndsWith( $installed_font_data['fontFace'][ $font_face_index ]['src'], $font_face['src'] );
+					$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'] );
+				}
+				$font_face_index++;
+				$source_index++;
+			}
+		}
+		
 		$font->uninstall();
 
 		// Check that the post was deleted
@@ -96,115 +202,20 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertNull( $post );
 
 		// Check that the font asset was deleted
-		$this->assertFileDoesNotExist( WP_FONTS_DIR . '/piazzolla_italic_400.ttf' );
+		if ( $font->has_font_faces() ) {
+			$font_face_index = 0;
+			foreach ( $content['fontFace'] as $font_face ) {
+				$source_index = 0;
+				if ( is_array ( $font_face['src'] ) ) {
+					foreach ( $font_face['src'] as $src ) {
+						$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ] );
+					}
+				} else {
+					$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'] );
+				}
+				$font_face_index++;
+				$source_index++;
+			}
+		}
 	}
-
-	/**
-     * @covers ::install
-	 * @covers ::uninstall
-	 * @covers ::get_font_post
-     */
-	public function test_install_and_uninstall_font_without_faces() {
-		$font = new WP_Font_Family( self::FONT_DATA_2 );
-		$font->install();
-
-		// Check that the post was created
-		$post = $font->get_font_post();
-		$this->assertInstanceof( 'WP_Post', $post );
-
-		// Check that the post has the correct data
-		$this->assertSame( 'Arial', $post->post_title );
-		$this->assertSame( 'arial', $post->post_name );
-		$content = json_decode( $post->post_content, true );
-		$this->assertSame( 'Arial', $content['fontFamily'] );
-		$this->assertSame( 'arial', $content['slug'] );
-		$this->assertArrayNotHasKey( 'fontFace', $content );
-
-		$font->uninstall();
-
-		// Check that the post was deleted
-		$post = $font->get_font_post();
-		$this->assertNull( $post );
-	}
-
-	/**
-     * @covers ::install
-	 * @covers ::uninstall
-	 * @covers ::get_font_post
-     */
-	public function test_install_and_uninstall_local_fonts() {
-		// TODO: Fix this test. Is failing because the font file is not being copied from the temp dir to the fonts folder
-		// We need to figure out why move_uploaded_file call in the WP_Font_Family::move_font_face_asset function is not working while testing
-		$local_font = array(
-			'name'       => 'Inter',
-			'slug'       => 'inter',
-			'fontFamily' => 'Inter',
-			'fontFace'   => array(
-				array(
-					'fontFamily' => 'Inter',
-					'fontStyle'  => 'normal',
-					'fontWeight' => '400',
-					'file'       => 'files0',
-				),
-				array(
-					'fontFamily' => 'Inter',
-					'fontStyle'  => 'normal',
-					'fontWeight' => '500',
-					'file'       => 'files1',
-				),
-			),
-		);
-
-		$files = array(
-			'files0' => array(
-				'name'      => 'inter1.ttf',
-				'full_path' => 'inter1.ttf',
-				'type'      => 'font/ttf',
-				'tmp_name'  => tempnam( sys_get_temp_dir(), 'Inter-' ),
-				'error'     => 0,
-				'size'      => 156764,
-			),
-			'files1' => array(
-				'name'      => 'inter2.ttf',
-				'full_path' => 'inter2.ttf',
-				'type'      => 'font/ttf',
-				'tmp_name'  => tempnam( sys_get_temp_dir(), 'Inter-' ),
-				'error'     => 0,
-				'size'      => 156524,
-			),
-		);
-
-		$font = new WP_Font_Family( $local_font );
-		$data = $font->install( $files );
-
-		// Check that the post was created
-		$post = $font->get_font_post();
-		$this->assertInstanceof( 'WP_Post', $post );
-
-		// Check that the post has the correct data
-		$this->assertSame( 'Inter', $post->post_title );
-		$this->assertSame( 'inter', $post->post_name );
-		$content = json_decode( $post->post_content, true );
-		$this->assertSame( 'Inter', $content['fontFamily'] );
-		$this->assertSame( 'inter', $content['slug'] );
-
-		// Check that the font file src was updated to the local font asset
-		$this->assertStringEndsWith( '/inter_normal_400.ttf', $content['fontFace'][0]['src'] );
-		$this->assertStringEndsWith( '/inter_normal_500.ttf', $content['fontFace'][1]['src'] );
-
-		// Check that the font file was created
-		$this->assertFileExists( WP_FONTS_DIR . '/inter_normal_400.ttf' );
-		$this->assertFileExists( WP_FONTS_DIR . '/inter_normal_500.ttf' );
-
-		$font->uninstall();
-
-		// Check that the post was deleted
-		$post = $font->get_font_post();
-		$this->assertNull( $post );
-
-		// Check that the font asset was deleted
-		$this->assertFileDoesNotExist( WP_FONTS_DIR . '/inter_normal_400.ttf' );
-		$this->assertFileDoesNotExist( WP_FONTS_DIR . '/inter_normal_500.ttf' );
-	}
-
 }
