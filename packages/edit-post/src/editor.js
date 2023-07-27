@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	ErrorBoundary,
@@ -31,14 +30,8 @@ const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
+	useCommands();
 	useCommonCommands();
-	const isBlockTheme = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()
-				.__unstableIsBlockBasedTheme,
-		[]
-	);
-	useCommands( { isBlockTheme } );
 	const {
 		hasFixedToolbar,
 		focusMode,

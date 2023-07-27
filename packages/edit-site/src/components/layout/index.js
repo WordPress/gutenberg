@@ -26,10 +26,7 @@ import {
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
@@ -66,13 +63,7 @@ export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
-	const isBlockTheme = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()
-				.__unstableIsBlockBasedTheme,
-		[]
-	);
-	useCommands( { isBlockTheme } );
+	useCommands();
 	useEditModeCommands();
 	useCommonCommands();
 

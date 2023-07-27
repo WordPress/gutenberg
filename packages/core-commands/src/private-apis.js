@@ -5,15 +5,9 @@ import { useAdminNavigationCommands } from './admin-navigation-commands';
 import { useSiteEditorNavigationCommands } from './site-editor-navigation-commands';
 import { lock } from './lock-unlock';
 
-/**
- * @typedef CommandOptions
- *
- * @property {boolean} [isBlockTheme] Whether the current theme is a block theme.
- */
-
-function useCommands( options = {} ) {
-	useAdminNavigationCommands( options );
-	useSiteEditorNavigationCommands( options );
+function useCommands() {
+	useAdminNavigationCommands();
+	useSiteEditorNavigationCommands();
 }
 
 export const privateApis = {};

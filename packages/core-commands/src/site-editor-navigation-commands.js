@@ -20,6 +20,7 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
 /**
  * Internal dependencies
  */
+import { useIsSiteEditorAccessible } from './hooks';
 import { unlock } from './lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -118,14 +119,16 @@ const useTemplateNavigationCommandLoader =
 const useTemplatePartNavigationCommandLoader =
 	getNavigationCommandLoaderPerPostType( 'wp_template_part' );
 
-function useSiteEditorBasicNavigationCommands( options ) {
+function useSiteEditorBasicNavigationCommands() {
 	const history = useHistory();
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
+	const isSiteEditorAccessible = useIsSiteEditorAccessible();
 	const commands = useMemo( () => {
 		const result = [];
-		if ( ! options.isBlockTheme ) {
+
+		if ( ! isSiteEditorAccessible ) {
 			return result;
 		}
 		result.push( {
@@ -201,7 +204,7 @@ function useSiteEditorBasicNavigationCommands( options ) {
 		} );
 
 		return result;
-	}, [ history, isSiteEditor, options.isBlockTheme ] );
+	}, [ history, isSiteEditor, isSiteEditorAccessible ] );
 
 	return {
 		commands,
@@ -209,7 +212,7 @@ function useSiteEditorBasicNavigationCommands( options ) {
 	};
 }
 
-export function useSiteEditorNavigationCommands( options ) {
+export function useSiteEditorNavigationCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-pages',
 		hook: usePageNavigationCommandLoader,
@@ -228,7 +231,7 @@ export function useSiteEditorNavigationCommands( options ) {
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/basic-navigation',
-		hook: useSiteEditorBasicNavigationCommands.bind( null, options ),
+		hook: useSiteEditorBasicNavigationCommands,
 		context: 'site-editor',
 	} );
 }
