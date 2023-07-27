@@ -1049,7 +1049,7 @@ function Component() {
 
       return {
         pages: select( coreDataStore ).getEntityRecords( ...selectorArgs ),
-        hasStartedResolution: select(coreDataStore).hasStartedResolution(
+        hasStartedResolution: select( coreDataStore ).hasStartedResolution(
           "getEntityRecords", // _selectorName_
           selectorArgs
         ),
