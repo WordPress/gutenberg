@@ -12,10 +12,12 @@ import {
 	keyboardClose,
 	desktop,
 	listView,
+	external,
 } from '@wordpress/icons';
 import { useCommand } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -32,19 +34,25 @@ export default function useCommonCommands() {
 		setIsListViewOpened,
 	} = useDispatch( editPostStore );
 	const { openModal } = useDispatch( interfaceStore );
-	const { editorMode, activeSidebar, isListViewOpen } = useSelect(
-		( select ) => {
-			const { getEditorMode, isListViewOpened } = select( editPostStore );
-			return {
-				activeSidebar: select(
-					interfaceStore
-				).getActiveComplementaryArea( editPostStore.name ),
-				editorMode: getEditorMode(),
-				isListViewOpen: isListViewOpened(),
-			};
-		},
-		[]
-	);
+	const {
+		editorMode,
+		activeSidebar,
+		isListViewOpen,
+		previewLink,
+		currentPostLink,
+	} = useSelect( ( select ) => {
+		const { getEditorMode, isListViewOpened } = select( editPostStore );
+		return {
+			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
+				editPostStore.name
+			),
+			editorMode: getEditorMode(),
+			isListViewOpen: isListViewOpened(),
+			previewLink: select( editorStore ).getEditedPostPreviewLink(),
+			currentPostLink:
+				select( editorStore ).getCurrentPostAttribute( 'link' ),
+		};
+	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
 
 	useCommand( {
@@ -160,6 +168,16 @@ export default function useCommonCommands() {
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
 			close();
+		},
+	} );
+
+	useCommand( {
+		name: 'core/preview-link',
+		label: __( 'Preview in a new tab' ),
+		icon: external,
+		callback: ( { close } ) => {
+			close();
+			window.open( previewLink || currentPostLink, '_blank' );
 		},
 	} );
 }
