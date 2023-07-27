@@ -258,6 +258,18 @@
 					"description": "ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.",
 					"default": false
 				},
+				"behaviors": {
+					"type": "object",
+					"description": "Behaviors are a way to add additional functionality to a block. They are defined as an object with a name and a set of properties. Curently, only one behavior is supported: lightbox.",
+					"additionalProperties": false,
+					"properties": {
+						"lightbox": {
+							"type": "boolean",
+							"description": "This property adds a 'lightbox' behavior to the block. It allows to open the block's content in a lightbox when clicking on it.",
+							"default": false
+						}
+					}
+				},
 				"className": {
 					"type": "boolean",
 					"description": "By default, the class .wp-block-your-block-name is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If, for whatever reason, a class is not desired on the markup, this functionality can be disabled.",

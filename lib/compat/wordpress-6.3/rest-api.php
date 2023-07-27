@@ -85,15 +85,18 @@ if ( ! function_exists( 'add_modified_wp_template_schema' ) ) {
 }
 add_filter( 'rest_api_init', 'add_modified_wp_template_schema' );
 
-/**
- * Registers the block patterns REST API routes.
- */
-function gutenberg_register_rest_block_patterns() {
-	$block_patterns = new Gutenberg_REST_Block_Patterns_Controller_6_3();
-	$block_patterns->register_routes();
+// If the Auto-inserting Blocks experiment is enabled, we load the block patterns
+// controller in lib/experimental/rest-api.php instead.
+if ( ! gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+	/**
+	 * Registers the block patterns REST API routes.
+	 */
+	function gutenberg_register_rest_block_patterns() {
+		$block_patterns = new Gutenberg_REST_Block_Patterns_Controller_6_3();
+		$block_patterns->register_routes();
+	}
+	add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
 }
-add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
-
 
 /**
  * Registers the Navigation Fallbacks REST API routes.
