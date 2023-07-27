@@ -13,11 +13,13 @@ import {
 	desktop,
 	listView,
 	external,
+	formatListBullets,
 } from '@wordpress/icons';
 import { useCommand } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -33,6 +35,8 @@ export default function useCommonCommands() {
 		switchEditorMode,
 		setIsListViewOpened,
 	} = useDispatch( editPostStore );
+	const { enablePublishSidebar, disablePublishSidebar } =
+		useDispatch( editorStore );
 	const { openModal } = useDispatch( interfaceStore );
 	const {
 		editorMode,
@@ -40,6 +44,7 @@ export default function useCommonCommands() {
 		isListViewOpen,
 		previewLink,
 		currentPostLink,
+		isPublishSidebarEnabled,
 	} = useSelect( ( select ) => {
 		const { getEditorMode, isListViewOpened } = select( editPostStore );
 		return {
@@ -48,12 +53,16 @@ export default function useCommonCommands() {
 			),
 			editorMode: getEditorMode(),
 			isListViewOpen: isListViewOpened(),
+			isPublishSidebarEnabled:
+				select( editorStore ).isPublishSidebarEnabled(),
 			previewLink: select( editorStore ).getEditedPostPreviewLink(),
 			currentPostLink:
 				select( editorStore ).getCurrentPostAttribute( 'link' ),
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
+	const { get: getPreference } = useSelect( preferencesStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
 
 	useCommand( {
 		name: 'core/open-settings-sidebar',
@@ -168,6 +177,40 @@ export default function useCommonCommands() {
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
 			close();
+			createInfoNotice(
+				getPreference( 'core/edit-post', 'showBlockBreadcrumbs' )
+					? __( 'Breadcrumbs on.' )
+					: __( 'Breadcrumbs off.' ),
+				{
+					id: 'core/edit-post/toggle-breadcrumbs/notice',
+					type: 'snackbar',
+				}
+			);
+		},
+	} );
+
+	useCommand( {
+		name: 'core/toggle-publish-sidebar',
+		label: isPublishSidebarEnabled
+			? __( 'Disable pre-publish checklist' )
+			: __( 'Enable pre-publish checklist' ),
+		icon: formatListBullets,
+		callback: ( { close } ) => {
+			close();
+			if ( isPublishSidebarEnabled ) {
+				disablePublishSidebar();
+			} else {
+				enablePublishSidebar();
+			}
+			createInfoNotice(
+				isPublishSidebarEnabled
+					? __( 'Pre-publish checklist off.' )
+					: __( 'Pre-publish checklist on.' ),
+				{
+					id: 'core/edit-post/publish-sidebar/notice',
+					type: 'snackbar',
+				}
+			);
 		},
 	} );
 
