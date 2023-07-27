@@ -23,6 +23,7 @@ class WP_Font_Family_Utils {
 	 *
 	 * Creates a filename for a font face asset using font family, style, weight and extension information.
 	 *
+	 * @param string $font_slug The font slug to use in the filename.
 	 * @param array  $font_face The font face array containing 'fontFamily', 'fontStyle', and 'fontWeight' attributes.
 	 * @param string $url The URL of the font face asset, used to derive the file extension.
 	 * @param string $suffix Optional suffix added to the resulting filename
