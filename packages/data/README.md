@@ -1036,6 +1036,7 @@ _Example_
 
 ```js
 import { store as coreDataStore } from "@wordpress/core-data";
+import { useSelect } from '@wordpress/data';
 
 function Component() {
 
