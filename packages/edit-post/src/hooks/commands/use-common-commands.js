@@ -45,8 +45,10 @@ export default function useCommonCommands() {
 		previewLink,
 		currentPostLink,
 		isPublishSidebarEnabled,
+		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
-		const { getEditorMode, isListViewOpened } = select( editPostStore );
+		const { getEditorMode, isListViewOpened, isFeatureActive } =
+			select( editPostStore );
 		return {
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
 				editPostStore.name
@@ -58,10 +60,10 @@ export default function useCommonCommands() {
 			previewLink: select( editorStore ).getEditedPostPreviewLink(),
 			currentPostLink:
 				select( editorStore ).getCurrentPostAttribute( 'link' ),
+			showBlockBreadcrumbs: isFeatureActive( 'showBlockBreadcrumbs' ),
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
-	const { get: getPreference } = useSelect( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
 
 	useCommand( {
@@ -172,15 +174,17 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/toggle-breadcrumbs',
-		label: __( 'Show/hide block breadcrumbs' ),
+		label: showBlockBreadcrumbs
+			? __( 'Hide block breadcrumbs' )
+			: __( 'Show block breadcrumbs' ),
 		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
 			close();
 			createInfoNotice(
-				getPreference( 'core/edit-post', 'showBlockBreadcrumbs' )
-					? __( 'Breadcrumbs on.' )
-					: __( 'Breadcrumbs off.' ),
+				showBlockBreadcrumbs
+					? __( 'Breadcrumbs off.' )
+					: __( 'Breadcrumbs on.' ),
 				{
 					id: 'core/edit-post/toggle-breadcrumbs/notice',
 					type: 'snackbar',
