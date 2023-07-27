@@ -200,8 +200,8 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
                     $close_button_icon
                 </button>
-                $initial_image_content
-				$enlarged_image_content
+                <div class="lightbox-image-container">$initial_image_content</div>
+				<div class="lightbox-image-container">$enlarged_image_content</div>
                 <div class="scrim" style="background-color: $background_color"></div>
         </div>
 HTML;

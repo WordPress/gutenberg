@@ -195,11 +195,21 @@
 		z-index: 5000000;
 	}
 
-	.wp-block-image {
+	.lightbox-image-container {
 		position: absolute;
+		overflow: hidden;
+		top: 50%;
+		left: 50%;
+		transform-origin: top left;
+		transform: translate(-50%, -50%);
+		width: var(--lightbox-container-width);
+		height: var(--lightbox-container-height);
+		z-index: 9999999999;
+	}
+
+	.wp-block-image {
+		position: relative;
 		transform-origin: 0 0;
-		top: 0;
-		left: 0;
 		display: flex;
 		width: 100%;
 		height: 100%;
@@ -244,15 +254,16 @@
 				opacity: 1;
 				visibility: visible;
 				animation: none;
+				.lightbox-image-container {
+					animation: lightbox-zoom-in 0.4s;
+				}
 
 				.wp-block-image {
 					img {
-						animation: lightbox-zoom-in 0.4s;
 						// Important is needed to overwrite the custom sizes.
 						width: var(--lightbox-image-width) !important;
 						height: var(--lightbox-image-height) !important;
 					}
-					// animation: lightbox-zoom-in 0.4s;
 				}
 				.scrim {
 					animation: turn-on-visibility 0.4s forwards;
@@ -261,15 +272,16 @@
 			&.hideanimationenabled {
 				&:not(.active) {
 					animation: none;
+					.lightbox-image-container {
+						animation: lightbox-zoom-out 0.4s;
+					}
 
 					.wp-block-image {
 						img {
-							animation: lightbox-zoom-out 0.4s;
 							// Important is needed to overwrite the custom sizes.
 							width: var(--lightbox-image-width) !important;
 							height: var(--lightbox-image-height) !important;
 						}
-						// animation: lightbox-zoom-out 0.4s;
 					}
 					.scrim {
 						animation: turn-off-visibility 0.4s forwards;
@@ -310,23 +322,23 @@ html.has-lightbox-open {
 
 @keyframes lightbox-zoom-in {
 	0% {
-		transform: translate(var(--lightbox-initial-left-position), var(--lightbox-initial-top-position)) scale(var(--lightbox-scale));
+		transform: translate(calc(-50vw + var(--lightbox-initial-left-position)), calc(-50vh + var(--lightbox-initial-top-position))) scale(var(--lightbox-scale));
 	}
 	100% {
-		transform: translate(0, 0) scale(1, 1);
+		transform: translate(-50%, -50%) scale(1, 1);
 	}
 }
 
 @keyframes lightbox-zoom-out {
 	0% {
 		visibility: visible;
-		transform: translate(0, 0) scale(1, 1);
+		transform: translate(-50%, -50%) scale(1, 1);
 	}
 	99% {
 		visibility: visible;
 	}
 	100% {
 		visibility: hidden;
-		transform: translate(var(--lightbox-initial-left-position), var(--lightbox-initial-top-position)) scale(var(--lightbox-scale));
+		transform: translate(calc(-50vw + var(--lightbox-initial-left-position)), calc(-50vh + var(--lightbox-initial-top-position))) scale(var(--lightbox-scale));
 	}
 }
