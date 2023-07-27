@@ -7,6 +7,7 @@ import {
 	__experimentalUseNavigator as useNavigator,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Spinner,
+	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext, useState, useEffect } from '@wordpress/element';
@@ -89,6 +90,7 @@ function ScreenRevisions() {
 	const isLoadButtonEnabled =
 		!! globalStylesRevision?.id &&
 		! areGlobalStyleConfigsEqual( globalStylesRevision, userConfig );
+	const shouldShowRevisions = ! isLoading && revisions.length;
 
 	return (
 		<>
@@ -101,68 +103,84 @@ function ScreenRevisions() {
 			{ isLoading && (
 				<Spinner className="edit-site-global-styles-screen-revisions__loading" />
 			) }
-			{ ! isLoading && (
-				<Revisions
-					blocks={ blocks }
-					userConfig={ globalStylesRevision }
-					onClose={ onCloseRevisions }
-				/>
-			) }
-			<div className="edit-site-global-styles-screen-revisions">
-				<RevisionsButtons
-					onChange={ selectRevision }
-					selectedRevisionId={ selectedRevisionId }
-					userRevisions={ revisions }
-				/>
-				{ isLoadButtonEnabled && (
-					<SidebarFixedBottom>
-						<Button
-							variant="primary"
-							className="edit-site-global-styles-screen-revisions__button"
-							disabled={
-								! globalStylesRevision?.id ||
-								globalStylesRevision?.id === 'unsaved'
-							}
-							onClick={ () => {
-								if ( hasUnsavedChanges ) {
-									setIsLoadingRevisionWithUnsavedChanges(
-										true
-									);
-								} else {
-									restoreRevision( globalStylesRevision );
-								}
-							} }
-						>
-							{ __( 'Apply' ) }
-						</Button>
-					</SidebarFixedBottom>
-				) }
-			</div>
-			{ isLoadingRevisionWithUnsavedChanges && (
-				<ConfirmDialog
-					title={ __(
-						'Loading this revision will discard all unsaved changes.'
-					) }
-					isOpen={ isLoadingRevisionWithUnsavedChanges }
-					confirmButtonText={ __( ' Discard unsaved changes' ) }
-					onConfirm={ () => restoreRevision( globalStylesRevision ) }
-					onCancel={ () =>
-						setIsLoadingRevisionWithUnsavedChanges( false )
-					}
-				>
-					<>
-						<h2>
-							{ __(
+			{ shouldShowRevisions ? (
+				<>
+					<Revisions
+						blocks={ blocks }
+						userConfig={ globalStylesRevision }
+						onClose={ onCloseRevisions }
+					/>
+					<div className="edit-site-global-styles-screen-revisions">
+						<RevisionsButtons
+							onChange={ selectRevision }
+							selectedRevisionId={ selectedRevisionId }
+							userRevisions={ revisions }
+						/>
+						{ isLoadButtonEnabled && (
+							<SidebarFixedBottom>
+								<Button
+									variant="primary"
+									className="edit-site-global-styles-screen-revisions__button"
+									disabled={
+										! globalStylesRevision?.id ||
+										globalStylesRevision?.id === 'unsaved'
+									}
+									onClick={ () => {
+										if ( hasUnsavedChanges ) {
+											setIsLoadingRevisionWithUnsavedChanges(
+												true
+											);
+										} else {
+											restoreRevision(
+												globalStylesRevision
+											);
+										}
+									} }
+								>
+									{ __( 'Apply' ) }
+								</Button>
+							</SidebarFixedBottom>
+						) }
+					</div>
+					{ isLoadingRevisionWithUnsavedChanges && (
+						<ConfirmDialog
+							title={ __(
 								'Loading this revision will discard all unsaved changes.'
 							) }
-						</h2>
-						<p>
-							{ __(
-								'Do you want to replace your unsaved changes in the editor?'
+							isOpen={ isLoadingRevisionWithUnsavedChanges }
+							confirmButtonText={ __(
+								' Discard unsaved changes'
 							) }
-						</p>
-					</>
-				</ConfirmDialog>
+							onConfirm={ () =>
+								restoreRevision( globalStylesRevision )
+							}
+							onCancel={ () =>
+								setIsLoadingRevisionWithUnsavedChanges( false )
+							}
+						>
+							<>
+								<h2>
+									{ __(
+										'Loading this revision will discard all unsaved changes.'
+									) }
+								</h2>
+								<p>
+									{ __(
+										'Do you want to replace your unsaved changes in the editor?'
+									) }
+								</p>
+							</>
+						</ConfirmDialog>
+					) }
+				</>
+			) : (
+				<Spacer marginX={ 4 } data-testid="global-styles-no-revisions">
+					{
+						// Adding an existing translation here in case these changes are shipped to WordPress 6.3.
+						// Later we could update to something better, e.g., "There are currently no style revisions.".
+						__( 'No results found.' )
+					}
+				</Spacer>
 			) }
 		</>
 	);

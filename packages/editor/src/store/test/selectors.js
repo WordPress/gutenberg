@@ -260,7 +260,7 @@ describe( 'selectors', () => {
 			parent: [ 'core/test-block-b' ],
 		} );
 
-		registerBlockType( 'core/test-freeform', {
+		registerBlockType( 'core/freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
 			category: 'text',
 			title: 'Test Freeform Content Handler',
@@ -287,7 +287,7 @@ describe( 'selectors', () => {
 			save: () => null,
 		} );
 
-		setFreeformContentHandlerName( 'core/test-freeform' );
+		setFreeformContentHandlerName( 'core/freeform' );
 		setDefaultBlockName( 'core/test-default' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -298,7 +298,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
-		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/freeform' );
 		unregisterBlockType( 'core/test-default' );
 
 		setFreeformContentHandlerName( undefined );
@@ -1337,7 +1337,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1364,7 +1364,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1741,7 +1741,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1769,7 +1769,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1797,7 +1797,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: 'Test Data',
@@ -1825,7 +1825,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1833,7 +1833,7 @@ describe( 'selectors', () => {
 								},
 								{
 									clientId: 456,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -2426,7 +2426,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( "returns removep'd serialization of blocks for single unknown", () => {
-			const unknownBlock = createBlock( 'core/test-freeform', {
+			const unknownBlock = createBlock( 'core/freeform', {
 				content: '<p>foo</p>',
 			} );
 			const state = {
@@ -2448,10 +2448,10 @@ describe( 'selectors', () => {
 		} );
 
 		it( "returns non-removep'd serialization of blocks for multiple unknown", () => {
-			const firstUnknown = createBlock( 'core/test-freeform', {
+			const firstUnknown = createBlock( 'core/freeform', {
 				content: '<p>foo</p>',
 			} );
-			const secondUnknown = createBlock( 'core/test-freeform', {
+			const secondUnknown = createBlock( 'core/freeform', {
 				content: '<p>bar</p>',
 			} );
 			const state = {

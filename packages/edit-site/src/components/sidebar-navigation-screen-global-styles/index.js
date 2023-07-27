@@ -37,10 +37,10 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { createNotice } = useDispatch( noticesStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const { get: getPrefference } = useSelect( preferencesStore );
+	const { get: getPreference } = useSelect( preferencesStore );
 
 	const turnOffDistractionFreeMode = useCallback( () => {
-		const isDistractionFree = getPrefference(
+		const isDistractionFree = getPreference(
 			editSiteStore.name,
 			'distractionFree'
 		);
@@ -52,7 +52,7 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 			isDismissible: true,
 			type: 'snackbar',
 		} );
-	}, [ createNotice, setPreference, getPrefference ] );
+	}, [ createNotice, setPreference, getPreference ] );
 	const hasGlobalStyleVariations = useSelect(
 		( select ) =>
 			!! select(
@@ -170,7 +170,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	);
 	const { createNotice } = useDispatch( noticesStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const { get: getPrefference } = useSelect( preferencesStore );
+	const { get: getPreference } = useSelect( preferencesStore );
 	const { isViewMode, isStyleBookOpened } = useSelect( ( select ) => {
 		const { getCanvasMode, getEditorCanvasContainerView } = unlock(
 			select( editSiteStore )
@@ -182,7 +182,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	}, [] );
 
 	const turnOffDistractionFreeMode = useCallback( () => {
-		const isDistractionFree = getPrefference(
+		const isDistractionFree = getPreference(
 			editSiteStore.name,
 			'distractionFree'
 		);
@@ -194,7 +194,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 			isDismissible: true,
 			type: 'snackbar',
 		} );
-	}, [ createNotice, setPreference, getPrefference ] );
+	}, [ createNotice, setPreference, getPreference ] );
 
 	const openGlobalStyles = useCallback( async () => {
 		turnOffDistractionFreeMode();

@@ -81,4 +81,21 @@ test.describe( 'Directives (w/ priority)', () => {
 			].join( ', ' )
 		);
 	} );
+
+	test( 'should not create a Directives component if none of the directives are registered', async ( {
+		page,
+	} ) => {
+		const nonExistentDirectives = page.getByTestId(
+			'non-existent-directives'
+		);
+		expect(
+			await nonExistentDirectives.evaluate(
+				// This returns undefined if type is a component.
+				( node ) => {
+					return ( node as any ).__k.__k.__k[ 0 ].__k[ 0 ].__k[ 0 ]
+						.type;
+				}
+			)
+		).toBe( 'div' );
+	} );
 } );
