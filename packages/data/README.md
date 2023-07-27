@@ -1048,7 +1048,7 @@ function Component() {
       const selectorArgs = [ "postType", "page", query ];
 
       return {
-        pages: select(coreDataStore).getEntityRecords(...selectorArgs),
+        pages: select( coreDataStore ).getEntityRecords( ...selectorArgs ),
         hasStartedResolution: select(coreDataStore).hasStartedResolution(
           "getEntityRecords", // _selectorName_
           selectorArgs
