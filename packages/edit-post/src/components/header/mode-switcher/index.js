@@ -76,7 +76,7 @@ function ModeSwitcher() {
 				...choice,
 				disabled: true,
 				info: __(
-					'Enable the visual editor in your profile settings.'
+					'You can enable the visual editor in your profile settings.'
 				),
 			};
 		}
