@@ -4,21 +4,20 @@
  *
  * @package    Gutenberg
  * @subpackage Fonts Library
- * 
  */
 
  /**
- * @coversDefaultClass WP_Font_Family
- */
+  * @coversDefaultClass WP_Font_Family
+  */
 class WP_Font_Family_Test extends WP_UnitTestCase {
 
 	/**
 	 * Test the constructor and the get_data method
-	 * 
+	 *
 	 * @covers ::__construct
 	 * @covers ::get_data
 	 * @dataProvider data_font_fixtures
-     */
+	 */
 	public function test_get_data( $font_data ) {
 		$font = new WP_Font_Family( $font_data );
 		$this->assertEquals( $font_data, $font->get_data() );
@@ -26,8 +25,8 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 
 	public function data_font_fixtures() {
 		return array(
-			'with_one_google_font_face' => array (
-				'font_data' => array(
+			'with_one_google_font_face' => array(
+				'font_data'           => array(
 					'name'       => 'Piazzolla',
 					'slug'       => 'piazzolla',
 					'fontFamily' => 'Piazzolla',
@@ -40,7 +39,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'installed_font_data' => array (
+				'installed_font_data' => array(
 					'name'       => 'Piazzolla',
 					'slug'       => 'piazzolla',
 					'fontFamily' => 'Piazzolla',
@@ -54,20 +53,20 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-			'with_no_font_faces' => array (
-				'font_data' => array(
+			'with_no_font_faces'        => array(
+				'font_data'           => array(
 					'name'       => 'Arial',
 					'slug'       => 'arial',
 					'fontFamily' => 'Arial',
 				),
-				'installed_font_data' => array (
+				'installed_font_data' => array(
 					'name'       => 'Arial',
 					'slug'       => 'arial',
 					'fontFamily' => 'Arial',
 				),
 			),
-			'with_local_files' => array (
-				'font_data' => array (
+			'with_local_files'          => array(
+				'font_data'           => array(
 					'name'       => 'Inter',
 					'slug'       => 'inter',
 					'fontFamily' => 'Inter',
@@ -86,7 +85,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'installed_font_data' => array (
+				'installed_font_data' => array(
 					'name'       => 'Inter',
 					'slug'       => 'inter',
 					'fontFamily' => 'Inter',
@@ -105,7 +104,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'files_data' => array (
+				'files_data'          => array(
 					'files0' => array(
 						'name'      => 'inter1.ttf',
 						'full_path' => 'inter1.ttf',
@@ -129,10 +128,10 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 
 	/**
 	 * Test if the get_data_as_json method returns the correct data
-	 * 
-     * @covers ::get_data_as_json
+	 *
+	 * @covers ::get_data_as_json
 	 * @dataProvider data_font_fixtures
-     */
+	 */
 	public function test_get_data_as_json( $font_data ) {
 		$font = new WP_Font_Family( $font_data );
 		$this->assertSame( wp_json_encode( $font_data ), $font->get_data_as_json() );
@@ -140,32 +139,32 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 
 	/**
 	 * Test if the has_font_faces method returns the correct data
-	 * 
-     * @covers ::has_font_faces
+	 *
+	 * @covers ::has_font_faces
 	 * @dataProvider data_font_fixtures
-     */
+	 */
 	public function test_has_font_faces( $font_data ) {
 		$font = new WP_Font_Family( $font_data );
-		$this->assertSame( !empty( $font_data['fontFace'] ) && is_array( $font_data['fontFace'] ),  $font->has_font_faces() );
+		$this->assertSame( ! empty( $font_data['fontFace'] ) && is_array( $font_data['fontFace'] ), $font->has_font_faces() );
 	}
 
 	/**
-     * @covers ::install
+	 * @covers ::install
 	 * @covers ::uninstall
 	 * @covers ::get_font_post
 	 * @dataProvider data_font_fixtures
-     */
+	 */
 	public function test_install_and_uninstall( $font_data, $installed_font_data, $files_data = array() ) {
 		$font = new WP_Font_Family( $font_data );
 		$font->install( $files_data );
-		
+
 		// Check that the post was created
 		$post = $font->get_font_post();
 		$this->assertInstanceof( 'WP_Post', $post );
 
 		// Check that the post has the correct data
-		$this->assertSame( $installed_font_data['name'] , $post->post_title );
-		$this->assertSame( $installed_font_data['slug'] , $post->post_name );
+		$this->assertSame( $installed_font_data['name'], $post->post_title );
+		$this->assertSame( $installed_font_data['slug'], $post->post_name );
 
 		$content = json_decode( $post->post_content, true );
 		$this->assertSame( $installed_font_data['fontFamily'], $content['fontFamily'] );
@@ -175,7 +174,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 			$font_face_index = 0;
 			foreach ( $content['fontFace'] as $font_face ) {
 				$source_index = 0;
-				if ( is_array ( $font_face['src'] ) ) {
+				if ( is_array( $font_face['src'] ) ) {
 					foreach ( $font_face['src'] as $src ) {
 						$this->assertStringEndsWith( $installed_font_data[ $font_face_index ]['src'][ $source_index ], $src );
 						$this->assertFileExists( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ] );
@@ -188,7 +187,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 				$source_index++;
 			}
 		}
-		
+
 		$font->uninstall();
 
 		// Check that the post was deleted
@@ -200,7 +199,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 			$font_face_index = 0;
 			foreach ( $content['fontFace'] as $font_face ) {
 				$source_index = 0;
-				if ( is_array ( $font_face['src'] ) ) {
+				if ( is_array( $font_face['src'] ) ) {
 					foreach ( $font_face['src'] as $src ) {
 						$this->assertFileDoesNotExist( WP_FONTS_DIR . DIRECTORY_SEPARATOR . $installed_font_data['fontFace'][ $font_face_index ]['src'][ $source_index ] );
 					}

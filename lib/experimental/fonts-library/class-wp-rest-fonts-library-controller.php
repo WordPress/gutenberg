@@ -74,10 +74,10 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function uninstall_font_family( $request ) {
-		$data = array(
+		$data   = array(
 			'slug' => $request['slug'],
 		);
-		$font = new WP_Font_Family( $data );
+		$font   = new WP_Font_Family( $data );
 		$result = $font->uninstall();
 
 		if ( is_wp_error( $result ) ) {
@@ -190,7 +190,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			$font->install( $files );
 			$fonts_installed[] = $font;
 		}
-		
+
 		if ( empty( $fonts_installed ) ) {
 			return new WP_Error( 'error_installing_fonts', __( 'Error installing fonts. No font was installed.', 'gutenberg' ), array( 'status' => 500 ) );
 		}
