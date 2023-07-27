@@ -23,10 +23,13 @@ export default function DefaultSidebar( {
 	headerClassName,
 	panelClassName,
 } ) {
-	const showIconLabels = useSelect(
-		( select ) => select( editSiteStore ).getSettings().showIconLabels,
-		[]
-	);
+	const { showIconLabels, isDistractionFree } = useSelect( ( select ) => {
+		const settings = select( editSiteStore ).getSettings();
+		return {
+			showIconLabels: settings.showIconLabels,
+			isDistractionFree: settings.isDistractionFree,
+		};
+	}, [] );
 
 	return (
 		<>
@@ -48,6 +51,7 @@ export default function DefaultSidebar( {
 				scope="core/edit-site"
 				identifier={ identifier }
 				icon={ icon }
+				disabled={ isDistractionFree }
 			>
 				{ title }
 			</ComplementaryAreaMoreMenuItem>
