@@ -18,4 +18,9 @@ export type ProgressBarProps = {
 	 * Color of the progress bar track.
 	 */
 	trackColor?: CSSProperties[ 'color' ];
+
+	/**
+	 * A CSS class to apply to the progress bar wrapper (track) element.
+	 */
+	className?: string;
 };
