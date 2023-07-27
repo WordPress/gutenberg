@@ -45,13 +45,47 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::has_font_faces
 	 *
-	 * @dataProvider data_font_fixtures
+	 * @dataProvider data_has_font_faces
 	 *
 	 * @param array $font_data Font family data in theme.json format
+	 * @param bool  $expected  Expected result
 	 */
-	public function test_has_font_faces( $font_data ) {
+	public function test_has_font_faces( $font_data, $expected ) {
 		$font = new WP_Font_Family( $font_data );
-		$this->assertSame( ! empty( $font_data['fontFace'] ) && is_array( $font_data['fontFace'] ), $font->has_font_faces() );
+		$this->assertSame( $expected, $font->has_font_faces() );
+	}
+
+	public function data_has_font_faces () {
+		return array (
+			'with font faces' => array (
+				'font_data' => array (
+					'slug' => 'piazzolla',
+					'fontFace' => [
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'italic',
+							'fontWeight' => '400',
+						)
+					]
+				),
+				'expected' => true,
+			),
+
+			'empty font faces' => array (
+				'font_data' => array (
+					'slug' => 'piazzolla',
+					'fontFace' => [],
+				),
+				'expected' => false
+			),
+
+			'without font faces' => array (
+				'font_data' => array (
+					'slug' => 'piazzolla',
+				),
+				'expected' => false,
+			),
+		);
 	}
 
 	/**
