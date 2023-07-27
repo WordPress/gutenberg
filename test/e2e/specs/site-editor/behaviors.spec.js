@@ -82,35 +82,14 @@ class BehaviorUtils {
 }
 
 test.describe( 'Site editor behaviors', () => {
-	test.afterEach( async ( { requestUtils, page, admin } ) => {
+	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 		await requestUtils.deleteAllPosts();
-
-		await admin.visitAdminPage(
-			'/admin.php',
-			'page=gutenberg-experiments'
-		);
-
-		await page
-			.locator( `#gutenberg-interactivity-api-core-blocks` )
-			.setChecked( false );
-		await page.locator( `input[name="submit"]` ).click();
-		await page.waitForLoadState();
 	} );
 
 	test.beforeEach( async ( { admin, page, requestUtils, editor } ) => {
 		await requestUtils.deleteAllMedia();
 		await requestUtils.deleteAllPosts();
-
-		await admin.visitAdminPage(
-			'/admin.php',
-			'page=gutenberg-experiments'
-		);
-		await page
-			.locator( `#gutenberg-interactivity-api-core-blocks` )
-			.setChecked( true );
-		await page.locator( `input[name="submit"]` ).click();
-		await page.waitForLoadState();
 
 		await admin.visitSiteEditor();
 		await editor.canvas.click( 'body' );
@@ -138,12 +117,12 @@ test.describe( 'Site editor behaviors', () => {
 	} );
 
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.activateTheme( 'twentytwentythree' );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'Behaviors should be set to "default" by default', async ( {
