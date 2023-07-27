@@ -328,8 +328,7 @@ function LinkControl( {
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
 	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
-
-	const shouldShowAdvancedSettings = ! currentInputIsEmpty && isEditingLink;
+	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 
 	return (
 		<div
@@ -409,8 +408,8 @@ function LinkControl( {
 				/>
 			) }
 
-			<div className="block-editor-link-control__tools">
-				{ shouldShowAdvancedSettings && (
+			{ showSettings && (
+				<div className="block-editor-link-control__tools">
 					<LinkControlSettingsDrawer
 						settingsOpen={ isSettingsOpen }
 						setSettingsOpen={ setSettingsOpenWithPreference }
@@ -423,8 +422,8 @@ function LinkControl( {
 							) }
 						/>
 					</LinkControlSettingsDrawer>
-				) }
-			</div>
+				</div>
+			) }
 
 			{ showActions && (
 				<div className="block-editor-link-control__search-actions">
