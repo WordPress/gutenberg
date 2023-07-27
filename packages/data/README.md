@@ -1062,7 +1062,7 @@ function Component() {
           selectorArgs
         )
       };
-    };
+    }
   );
 
   console.log(result.hasStartedResolution);
