@@ -326,7 +326,11 @@ export function useSettingsForBlockElement(
 			const sides = Array.isArray( supports?.spacing?.[ key ] )
 				? supports?.spacing?.[ key ]
 				: supports?.spacing?.[ key ]?.sides;
-			if ( sides?.length ) {
+			// Check if spacing type actually exists before adding sides.
+			if (
+				sides?.length &&
+				typeof updatedSettings.spacing?.[ key ] !== 'undefined'
+			) {
 				updatedSettings.spacing = {
 					...updatedSettings.spacing,
 					[ key ]: {
