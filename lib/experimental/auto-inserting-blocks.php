@@ -65,7 +65,7 @@ function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anch
 }
 
 function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_block, $position, $anchor_block ) {
-	return function( $response, $block_type ) use ( $inserted_block, $position, $anchor_block ){
+	return function( $response, $block_type ) use ( $inserted_block, $position, $anchor_block ) {
 		if ( $block_type->name !== $inserted_block ) {
 			return $response;
 		}
@@ -74,7 +74,7 @@ function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_blo
 		if ( ! isset( $data['auto_insert'] ) ) {
 			$data['auto_insert'] = array();
 		}
-		$data['auto_insert'][ $anchor_block ] = $position ;
+		$data['auto_insert'][ $anchor_block ] = $position;
 		$response->set_data( $data );
 		return $response;
 	};
@@ -289,7 +289,7 @@ function gutenberg_register_auto_insert_rest_field() {
 		'block-type',
 		'auto_insert',
 		array(
-			'schema'       => array(
+			'schema' => array(
 				'description' => __( 'Auto Insert.', 'default' ),
 				'type'        => 'object',
 			),
