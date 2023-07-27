@@ -52,18 +52,18 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			WP_Font_Family_Utils::get_filename_from_font_face( 'piazzola', $font_face, $font_face['src'][0] ),
+			WP_Font_Family_Utils::get_filename_from_font_face( 'piazzolla', $font_face, $font_face['src'][0] ),
 			'piazzolla_italic_400.ttf'
 		);
 
 		$this->assertSame(
-			WP_Font_Family_Utils::get_filename_from_font_face( 'piazzola', $font_face, $font_face['src'][1], 1 ),
+			WP_Font_Family_Utils::get_filename_from_font_face( 'piazzolla', $font_face, $font_face['src'][1], 1 ),
 			'piazzolla_italic_400_1.ttf'
 		);
 
 		$this->assertSame(
-			WP_Font_Family_Utils::get_filename_from_font_face( 'piazzola', $font_face, $font_face['src'][2], 2 ),
-			'piazzolla_italic_400_1.ttf'
+			WP_Font_Family_Utils::get_filename_from_font_face( 'piazzolla', $font_face, $font_face['src'][2], 2 ),
+			'piazzolla_italic_400_2.ttf'
 		);
 	}
 
@@ -92,7 +92,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 		);
 
 		$font2 = array(
-			'slug'       => 'Piazzolla',
+			'slug'       => 'piazzolla',
 			'fontFamily' => 'Piazzolla',
 			'fontFace'   => array(
 				array(
