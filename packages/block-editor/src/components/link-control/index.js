@@ -12,12 +12,8 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
-import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../store';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -107,6 +103,9 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
 
 const noop = () => {};
 
+const PREFERENCE_SCOPE = 'core/block-editor';
+const PREFERENCE_KEY = 'linkControlSettingsDrawer';
+
 /**
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
@@ -141,27 +140,38 @@ function LinkControl( {
 
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
-	const {
-		linkControlAdvancedSettingsPreference,
-		setLinkControlAdvancedSettingsPreference,
-	} = useSelect( ( select ) => {
-		const prefSettings = select( blockEditorStore ).getSettings();
+	const { advancedSettingsPreference } = useSelect( ( select ) => {
+		const prefsStore = select( preferencesStore );
 
 		return {
-			linkControlAdvancedSettingsPreference:
-				prefSettings.linkControlAdvancedSettingsPreference,
-			setLinkControlAdvancedSettingsPreference:
-				prefSettings.setLinkControlAdvancedSettingsPreference,
+			advancedSettingsPreference:
+				prefsStore.get( PREFERENCE_SCOPE, PREFERENCE_KEY ) ?? false,
 		};
 	}, [] );
+
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	/**
+	 * Sets the open/closed state of the Advanced Settings Drawer,
+	 * optionlly persisting the state to the user's preferences.
+	 *
+	 * Note that Block Editor components can be consumed by non-WordPress
+	 * environments which may not have preferences setup.
+	 * Therefore a local state is also  used as a fallback.
+	 *
+	 * @param {boolean} prefVal the open/closed state of the Advanced Settings Drawer.
+	 */
+	const setSettingsOpenWithPreference = ( prefVal ) => {
+		if ( setPreference ) {
+			setPreference( PREFERENCE_SCOPE, PREFERENCE_KEY, prefVal );
+		}
+		setSettingsOpen( prefVal );
+	};
 
 	// Block Editor components can be consumed by non-WordPress environments
 	// which may not have these preferences setup.
 	// Therefore a local state is used as a fallback.
-	const isSettingsOpen =
-		linkControlAdvancedSettingsPreference || settingsOpen;
-	const setSettingsOpenWithPreference =
-		setLinkControlAdvancedSettingsPreference || setSettingsOpen;
+	const isSettingsOpen = advancedSettingsPreference || settingsOpen;
 
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
