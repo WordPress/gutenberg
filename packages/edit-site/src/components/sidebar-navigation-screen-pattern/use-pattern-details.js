@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { sentenceCase } from 'change-case';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -82,10 +87,19 @@ export default function usePatternDetails( postType, postId ) {
 			( area ) => area.area === record.area
 		);
 
-		details.push( {
-			label: __( 'Area' ),
-			value: templatePartArea?.label || record.area || __( 'None' ),
-		} );
+		let areaDetailValue = templatePartArea?.label;
+
+		if ( ! areaDetailValue ) {
+			areaDetailValue = record.area
+				? sprintf(
+						// translators: %s: Sentenced cased template part area e.g: "My custom area".
+						__( '%s (removed)' ),
+						sentenceCase( record.area )
+				  )
+				: __( 'None' );
+		}
+
+		details.push( { label: __( 'Area' ), value: areaDetailValue } );
 	}
 
 	if (
