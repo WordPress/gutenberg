@@ -15,6 +15,32 @@ The distinction between the two components is perhaps best summarized by the fol
 -   `<URLInput>` - an input for presenting and managing selection behaviors associated with choosing a URL, optionally from a pool of available candidates.
 -   `<LinkControl>` - includes the features of `<URLInput>`, plus additional UI and behaviors to control how this URL applies to the concept of a "link". This includes link "settings" (eg: "opens in new tab", etc) and dynamic, "on the fly" link creation capabilities.
 
+## Persistent "Advanced" (settings) toggle state
+
+By default the link "settings" are hidden and can be toggled open/closed by way of a button labelled `Advanced` in the UI.
+
+In some circumstances if may be desirable to persist the toggle state of this portion of the UI so that it remains in the last state triggered by user interaction.
+
+For example, once the user has toggled the UI to "open", then it may remain open across all links on the site until such time as the user toggles the UI back again.
+
+Consumers who which to take advantage of this functionality can optionally pass a getter/setter to the `@wordpress/block-editor` store's `settings` to which `<LinkControl>` will automatically call to handle the state of the UI.
+
+In WordPress Core this is achieved by way of the `@wordpress/preferences` package but consumers can also choose to utilise their own implementation.
+
+The setting keys are as follows:
+
+-   `linkControlAdvancedSettingsPreference` - a variable which provides the _current_ state of the UI as a `boolean` value.
+-   `setLinkControlAdvancedSettingsPreference` - a function which _updates_ the persisted state of the UI.
+
+```jsx
+<BlockEditorProvider
+	value={ blocks }
+	onChange={ onChange }
+	onInput={ onInput }
+	settings={ blockEditorSettings } // this value should contain the settings outlined above.
+>
+```
+
 ## Search Suggestions
 
 When creating links the `LinkControl` component will handle two kinds of input from users:
@@ -69,9 +95,7 @@ An array of settings objects associated with a link (for example: a setting to d
 To disable settings, pass in an empty array. for example:
 
 ```jsx
-<LinkControl
-	settings={ [] }
-/>
+<LinkControl settings={ [] } />
 ```
 
 ### onChange
@@ -192,6 +216,7 @@ A `suggestion` should have the following shape:
 	)}
 />
 ```
+
 ### renderControlBottom
 
 -   Type: `Function`
