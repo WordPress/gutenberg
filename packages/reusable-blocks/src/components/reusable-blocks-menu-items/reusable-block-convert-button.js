@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import escapeHtml from 'escape-html';
+
+/**
  * WordPress dependencies
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
@@ -16,6 +21,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	ToggleControl,
+	SelectControl,
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -29,6 +35,49 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+const unescapeString = ( arg ) => {
+	return decodeEntities( arg );
+};
+
+/**
+ * Returns a term object with name unescaped.
+ *
+ * @param {Object} term The term object to unescape.
+ *
+ * @return {Object} Term object with name property unescaped.
+ */
+const unescapeTerm = ( term ) => {
+	return {
+		...term,
+		name: unescapeString( term.name ),
+	};
+};
+// Tries to create a term or fetch it if it already exists.
+function findOrCreateTerm( category ) {
+	const escapedTermName = escapeHtml( category.label );
+	const escapedTermSlug = escapeHtml( category.value );
+	const escapedTermDescription = escapeHtml( category.description );
+	return apiFetch( {
+		path: '/wp/v2/wp_pattern',
+		method: 'POST',
+		data: {
+			name: escapedTermName,
+			slug: escapedTermSlug,
+			description: escapedTermDescription,
+		},
+	} )
+		.catch( ( error ) => {
+			if ( error.code !== 'term_exists' ) {
+				return Promise.reject( error );
+			}
+
+			return Promise.resolve( {
+				id: error.data.term_id,
+				name: category.label,
+			} );
+		} )
+		.then( unescapeTerm );
+}
 /**
  * Menu control to convert block(s) to reusable block.
  *
@@ -48,6 +97,7 @@ export default function ReusableBlockConvertButton( {
 	const [ syncType, setSyncType ] = useState( undefined );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
+	const [ categorySlug, setCategorySlug ] = useState( '' );
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
@@ -102,13 +152,58 @@ export default function ReusableBlockConvertButton( {
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+	const patternCategories = categories === null ? [] : categories;
+	const categoryOptions = patternCategories.map( ( cat ) => ( {
+		label: cat.name,
+		value: cat.slug,
+		taxonomyId: cat.id,
+	} ) );
+
+	corePatternCategories
+		.filter( ( cat ) => cat.name !== 'query' )
+		.forEach( ( coreCategory ) => {
+			if (
+				! categoryOptions.find(
+					( cat ) =>
+						cat.value === coreCategory.name ||
+						cat.label === coreCategory.label
+				)
+			) {
+				categoryOptions.push( {
+					label: coreCategory.label,
+					value: coreCategory.name,
+					taxonomyId: undefined,
+					description: coreCategory.description,
+				} );
+			}
+		} );
+
+	categoryOptions
+		.sort( ( a, b ) => a.label.localeCompare( b.label ) )
+		.push( {
+			value: '',
+			label: __( 'Select a category' ),
+			disabled: true,
+		} );
+
 	const onConvert = useCallback(
 		async function ( reusableBlockTitle ) {
+			let categoryId;
+			const selectedCategory = categoryOptions.find(
+				( cat ) => cat.value === categorySlug
+			);
+			if ( selectedCategory.taxonomyId ) {
+				categoryId = selectedCategory.taxonomyId;
+			} else {
+				const newTerm = await findOrCreateTerm( selectedCategory );
+				categoryId = newTerm.id;
+			}
 			try {
 				await convertBlocksToReusable(
 					clientIds,
 					reusableBlockTitle,
-					syncType
+					syncType,
+					categoryId
 				);
 				createSuccessNotice(
 					! syncType
@@ -186,7 +281,13 @@ export default function ReusableBlockConvertButton( {
 										onChange={ setTitle }
 										placeholder={ __( 'My pattern' ) }
 									/>
-
+									<SelectControl
+										label={ __( 'Category' ) }
+										onChange={ setCategoryId }
+										options={ categoryOptions }
+										size="__unstable-large"
+										value={ categoryId }
+									/>
 									<ToggleControl
 										label={ __( 'Synced' ) }
 										help={ __(
