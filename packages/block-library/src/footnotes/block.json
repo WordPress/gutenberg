@@ -12,7 +12,7 @@
 		"color": {
 			"link": true,
 			"__experimentalDefaultControls": {
-				"background": true,
+				"link": true,
 				"text": true
 			}
 		},
