@@ -35,8 +35,6 @@ export default function useCommonCommands() {
 		switchEditorMode,
 		setIsListViewOpened,
 	} = useDispatch( editPostStore );
-	const { enablePublishSidebar, disablePublishSidebar } =
-		useDispatch( editorStore );
 	const { openModal } = useDispatch( interfaceStore );
 	const {
 		editorMode,
@@ -201,11 +199,7 @@ export default function useCommonCommands() {
 		icon: formatListBullets,
 		callback: ( { close } ) => {
 			close();
-			if ( isPublishSidebarEnabled ) {
-				disablePublishSidebar();
-			} else {
-				enablePublishSidebar();
-			}
+			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
 			createInfoNotice(
 				isPublishSidebarEnabled
 					? __( 'Pre-publish checklist off.' )
