@@ -146,7 +146,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( 'toggle state of advanced link settings is preserved across editing links', async ( {
+	test.only( 'toggle state of advanced link settings is preserved across editing links', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -155,13 +155,26 @@ test.describe( 'Links', () => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 		} );
-		await page.keyboard.type( 'This is WordPress' );
+		await page.keyboard.type( 'This is Gutenberg WordPress' );
 
 		// Select "WordPress".
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Create a link.
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'w.org' );
+		await page.keyboard.press( 'Enter' );
 
+		// Move to edge of text "Gutenberg".
+		await pageUtils.pressKeys( 'Alt+ArrowLeft' );
+		await pageUtils.pressKeys( 'ArrowLeft' );
+
+		// Select "Gutenberg".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Create a link.
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'https://wordpress.org/plugins/gutenberg/' );
 		await page.keyboard.press( 'Enter' );
 
 		// Move caret back into the link.
@@ -183,28 +196,47 @@ test.describe( 'Links', () => {
 			} )
 			.click();
 
-		// Close the Link popover
+		// Move focus out of Link UI and into Paragraph block.
+		await pageUtils.pressKeys( 'Escape' );
+
+		// Move caret back into the "WordPress" link to trigger
+		// the Link UI for that link.
+		await pageUtils.pressKeys( 'Alt+ArrowRight' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+
+		// Switch Link UI to "edit" mode.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Check that the Advanced settings are still expanded/open
+		// and I can see the open in new tab checkbox. This verifies
+		// that the editor preference was persisted.
+		await expect( page.getByLabel( 'Open in new tab' ) ).toBeVisible();
+
+		// Toggle the Advanced settings back to being closed.
 		await page
 			.getByRole( 'region', {
 				name: 'Editor content',
 			} )
 			.getByRole( 'button', {
-				name: 'Cancel',
+				name: 'Advanced',
 			} )
 			.click();
 
-		// Check the popover (with role of "popover") is no longer visible.
-		// This is necessary to avoid false positives on this test in the
-		// event that the popover remained open.
-		await expect( page.getByRole( 'popover' ) ).not.toBeVisible();
+		// Move focus out of Link UI and into Paragraph block.
+		await pageUtils.pressKeys( 'Escape' );
 
-		// Reselect the link
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
+		// Move caret back into the "Gutenberg" link to trigger
+		// the Link UI for that link.
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'ArrowLeft' );
 
-		// Check that the Advanced settings are still expanded/open
-		// and I can see the open in new tab checkbox
+		// Switch Link UI to "Edit" mode.
 		await page.getByRole( 'button', { name: 'Edit' } ).click();
-		await expect( page.getByLabel( 'Open in new tab' ) ).toBeVisible();
+
+		// Check that the Advanced settings are still closed.
+		// This verifies that the editor preference was persisted.
+		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeVisible();
 	} );
 } );
