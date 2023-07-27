@@ -24,9 +24,7 @@ const {
 	clickIfClickable,
 } = require( '../helpers/utils' );
 
-const ADD_BLOCK_ID = isAndroid()
-	? 'Add block, Double tap to add a block'
-	: 'add-block-button';
+const ADD_BLOCK_ID = isAndroid() ? 'Add block' : 'add-block-button';
 
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
@@ -188,7 +186,7 @@ class EditorPage {
 
 	async getTitleElement( options = { autoscroll: false } ) {
 		const titleElement = isAndroid()
-			? 'Post title. Welcome to Gutenberg!, Updates the title.'
+			? 'Post title. Welcome to Gutenberg!'
 			: 'post-title';
 
 		if ( options.autoscroll ) {
@@ -292,11 +290,9 @@ class EditorPage {
 		}
 
 		const hideKeyboardButton = isAndroid()
-			? await this.waitForElementToBeDisplayedById(
-					'Hide keyboard, Tap to hide the keyboard'
-			  )
+			? await this.waitForElementToBeDisplayedById( 'Hide keyboard' )
 			: await this.waitForElementToBeDisplayedByXPath(
-					'//XCUIElementTypeButton[@name="Hide keyboard"]'
+					'(//XCUIElementTypeOther[@name="Hide keyboard"])[1]'
 			  );
 
 		await hideKeyboardButton.click();
@@ -672,7 +668,7 @@ class EditorPage {
 
 			await this.typeTextToTextBlock( block, paragraphs[ i ], clear );
 			if ( i !== paragraphs.length - 1 ) {
-				await this.typeTextToTextBlock( block, '\n', false );
+				await this.typeTextToTextBlock( block, '\n' );
 			}
 		}
 	}
@@ -968,7 +964,7 @@ class EditorPage {
 	async addButtonWithInlineAppender( position = 1 ) {
 		const appenderButton = isAndroid()
 			? await this.waitForElementToBeDisplayedByXPath(
-					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.Button[${ position }]`
+					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[${ position }]/android.view.ViewGroup/android.widget.Button`
 			  )
 			: await this.waitForElementToBeDisplayedById( 'appender-button' );
 		await appenderButton.click();
@@ -1014,6 +1010,7 @@ const blockNames = {
 	buttons: 'Buttons',
 	button: 'Button',
 	preformatted: 'Preformatted',
+	unsupported: 'Unsupported',
 };
 
 module.exports = { initializeEditorPage, blockNames };

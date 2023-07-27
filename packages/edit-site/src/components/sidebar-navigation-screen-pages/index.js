@@ -28,10 +28,15 @@ import { unlock } from '../../lock-unlock';
 const { useHistory } = unlock( routerPrivateApis );
 
 const PageItem = ( { postType = 'page', postId, ...props } ) => {
-	const linkInfo = useLink( {
-		postType,
-		postId,
-	} );
+	const linkInfo = useLink(
+		{
+			postType,
+			postId,
+		},
+		{
+			backPath: '/page',
+		}
+	);
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };
 

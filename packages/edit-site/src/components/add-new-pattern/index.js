@@ -57,21 +57,28 @@ export default function AddNewPattern() {
 		setShowTemplatePartModal( false );
 	}
 
+	const controls = [
+		{
+			icon: symbol,
+			onClick: () => setShowPatternModal( true ),
+			title: __( 'Create pattern' ),
+		},
+	];
+
+	// Remove condition when command palette issues are resolved.
+	// See: https://github.com/WordPress/gutenberg/issues/52154.
+	if ( ! isTemplatePartsMode ) {
+		controls.push( {
+			icon: symbolFilled,
+			onClick: () => setShowTemplatePartModal( true ),
+			title: __( 'Create template part' ),
+		} );
+	}
+
 	return (
 		<>
 			<DropdownMenu
-				controls={ [
-					! isTemplatePartsMode && {
-						icon: symbolFilled,
-						onClick: () => setShowTemplatePartModal( true ),
-						title: __( 'Create template part' ),
-					},
-					{
-						icon: symbol,
-						onClick: () => setShowPatternModal( true ),
-						title: __( 'Create pattern' ),
-					},
-				].filter( Boolean ) }
+				controls={ controls }
 				toggleProps={ {
 					as: SidebarButton,
 				} }

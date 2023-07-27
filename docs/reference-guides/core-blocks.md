@@ -275,7 +275,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 
 -	**Name:** core/footnotes
 -	**Category:** text
--	**Supports:** ~~html~~, ~~multiple~~, ~~reusable~~
+-	**Supports:** color (background, link, text), ~~html~~, ~~multiple~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Classic
@@ -646,7 +646,7 @@ Add text that respects your spacing and tabs, and also allows styling. ([Source]
 
 -	**Name:** core/preformatted
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, text), typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** content
 
 ## Pullquote
