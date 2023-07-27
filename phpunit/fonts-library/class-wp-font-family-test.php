@@ -41,6 +41,11 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $font->get_data_as_json() );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
 	public function data_get_data_as_json() {
 		return array(
 			'piazzolla'  => array(
@@ -93,6 +98,11 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $font->has_font_faces() );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
 	public function data_has_font_faces() {
 		return array(
 			'with font faces'    => array(
@@ -195,6 +205,11 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
 	public function data_font_fixtures() {
 		return array(
 			'with_one_google_font_face' => array(

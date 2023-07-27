@@ -23,6 +23,11 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, WP_Font_Family_Utils::has_font_mime_type( $font_file ) );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
 	public function data_has_font_mime_type_fixtures() {
 		return array(
 			'ttf'   => array(
@@ -75,6 +80,11 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
 	public function data_get_filename_from_font_face_fixtures() {
 		return array(
 			'piazzolla' => array(
@@ -122,6 +132,11 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
 	public function data_merge_fonts_data_fixtures() {
 		return array(
 
