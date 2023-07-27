@@ -1053,7 +1053,7 @@ function Component() {
           "getEntityRecords", // _selectorName_
           selectorArgs
         ),
-        hasFinishedResolution: select(coreDataStore).hasFinishedResolution(
+        hasFinishedResolution: select( coreDataStore ).hasFinishedResolution(
           "getEntityRecords",
           selectorArgs
         ),
