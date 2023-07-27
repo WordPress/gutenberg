@@ -31,13 +31,51 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::get_data_as_json
 	 *
-	 * @dataProvider data_font_fixtures
+	 * @dataProvider data_get_data_as_json
 	 *
 	 * @param array $font_data Font family data in theme.json format
+	 * @param string $expected  Expected font family data as JSON string
 	 */
-	public function test_get_data_as_json( $font_data ) {
+	public function test_get_data_as_json( $font_data, $expected ) {
 		$font = new WP_Font_Family( $font_data );
-		$this->assertSame( wp_json_encode( $font_data ), $font->get_data_as_json() );
+		$this->assertSame( $expected, $font->get_data_as_json() );
+	}
+
+	public function data_get_data_as_json () {
+		return array (
+			'piazzolla' => array (
+				'font_data' => array (
+					'slug' => 'piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'name' => 'Piazzolla',
+					'fontFace' => [
+						array(
+							'fontFamily' => 'Piazzolla',
+							'src' => 'https://example.com/fonts/piazzolla_italic_400.ttf',
+							'fontStyle' => 'italic',
+							'fontWeight' => '400',
+						),
+					]
+				),
+				'expected' => '{"slug":"piazzolla","fontFamily":"Piazzolla","name":"Piazzolla","fontFace":[{"fontFamily":"Piazzolla","src":"https:\/\/example.com\/fonts\/piazzolla_italic_400.ttf","fontStyle":"italic","fontWeight":"400"}]}',
+			),
+			'piazzolla2' => array (
+				'font_data' => array (
+					'slug' => 'piazzolla',
+					'fontFamily' => 'Piazzolla',
+					'name' => 'Piazzolla',
+					'fontFace' => [
+						array(
+							'fontFamily' => 'Piazzolla',
+							'src' => 'https://example.com/fonts/piazzolla_italic_400.ttf',
+							'fontStyle' => 'italic',
+							'fontWeight' => '400',
+						),
+					]
+				),
+				'expected' => '{"slug":"piazzolla","fontFamily":"Piazzolla","name":"Piazzolla","fontFace":[{"fontFamily":"Piazzolla","src":"https:\/\/example.com\/fonts\/piazzolla_italic_400.ttf","fontStyle":"italic","fontWeight":"400"}]}',
+			)
+		);
 	}
 
 	/**
