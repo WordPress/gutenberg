@@ -4,7 +4,11 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
 <View
   accessibilityState={
     {
+      "busy": undefined,
+      "checked": undefined,
       "disabled": true,
+      "expanded": undefined,
+      "selected": undefined,
     }
   }
   accessible={true}
@@ -38,7 +42,11 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
     <View
       accessibilityState={
         {
+          "busy": undefined,
+          "checked": undefined,
           "disabled": true,
+          "expanded": undefined,
+          "selected": undefined,
         }
       }
       accessible={true}
@@ -126,6 +134,15 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
         }
       >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
           activeFormats={[]}
           blockType={
@@ -189,7 +206,11 @@ exports[`Audio block renders audio file without crashing 1`] = `
 <View
   accessibilityState={
     {
+      "busy": undefined,
+      "checked": undefined,
       "disabled": true,
+      "expanded": undefined,
+      "selected": undefined,
     }
   }
   accessible={true}
@@ -223,7 +244,11 @@ exports[`Audio block renders audio file without crashing 1`] = `
     <View
       accessibilityState={
         {
+          "busy": undefined,
+          "checked": undefined,
           "disabled": true,
+          "expanded": undefined,
+          "selected": undefined,
         }
       }
       accessible={true}
@@ -274,6 +299,15 @@ exports[`Audio block renders audio file without crashing 1`] = `
         accessibilityHint="Double tap to listen the audio file"
         accessibilityLabel="Audio Player"
         accessibilityRole="button"
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
         accessible={true}
         focusable={true}
         onClick={[Function]}
@@ -326,6 +360,15 @@ exports[`Audio block renders audio file without crashing 1`] = `
         }
       >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
           activeFormats={[]}
           blockType={
@@ -440,6 +483,23 @@ exports[`Audio block renders placeholder without crashing 1`] = `
         accessibilityHint="Double tap to select an audio file"
         accessibilityLabel="Audio block. Empty"
         accessibilityRole="button"
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
         accessible={true}
         collapsable={false}
         focusable={true}

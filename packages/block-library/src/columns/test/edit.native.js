@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	act,
 	addBlock,
 	fireEvent,
 	getEditorHtml,
@@ -290,6 +291,10 @@ describe( 'Columns block', () => {
 		// Get the first column
 		const firstColumnBlock = await getBlock( screen, 'Column' );
 		fireEvent.press( firstColumnBlock );
+		// Inner blocks batch store updates with microtasks.
+		// To avoid `act` warnings, we let queued microtasks to be executed.
+		// Reference: https://t.ly/b95nA
+		await act( async () => {} );
 
 		// Open vertical alignment menu
 		fireEvent.press( verticalAlignmentButton );

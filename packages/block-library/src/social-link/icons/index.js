@@ -31,6 +31,7 @@ export * from './snapchat';
 export * from './soundcloud';
 export * from './spotify';
 export * from './telegram';
+export * from './threads';
 export * from './tiktok';
 export * from './tumblr';
 export * from './twitch';

@@ -41,7 +41,19 @@ export const addBlock = async (
 		},
 	} );
 
-	fireEvent.press( await screen.findByText( blockName ) );
+	const blockButton = await screen.findByText( blockName );
+	// Blocks can perform belated state updates after they are inserted.
+	// To avoid potential `act` warnings, we ensure that all timers and queued
+	// microtasks are executed.
+	await withFakeTimers( async () => {
+		fireEvent.press( blockButton );
+		// Run all timers, in case any performs a state updates.
+		// Column block example: https://t.ly/NjTs
+		act( () => jest.runOnlyPendingTimers() );
+		// Let potential queued microtasks (like Promises) to be executed.
+		// Inner blocks example: https://t.ly/b95nA
+		await act( async () => {} );
+	} );
 
 	// On iOS the action for inserting a block is delayed (https://bit.ly/3AVALqH).
 	// Hence, we need to wait for the different steps until the the block is inserted.
