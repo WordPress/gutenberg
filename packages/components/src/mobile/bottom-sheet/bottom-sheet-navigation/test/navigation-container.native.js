@@ -2,7 +2,12 @@
  * External dependencies
  */
 import { Text } from 'react-native';
-import { render, fireEvent, act } from 'test/helpers';
+import {
+	render,
+	fireEvent,
+	withReanimatedTimer,
+	advanceAnimationByTime,
+} from 'test/helpers';
 import { useNavigation } from '@react-navigation/native';
 
 /**
@@ -10,11 +15,8 @@ import { useNavigation } from '@react-navigation/native';
  */
 import NavigationContainer from '../navigation-container';
 import NavigationScreen from '../navigation-screen';
-import { performLayoutAnimation } from '../../../layout-animation';
 
-jest.mock( '../../../layout-animation', () => ( {
-	performLayoutAnimation: jest.fn(),
-} ) );
+const WINDOW_HEIGHT = 1000;
 
 const TestScreen = ( { fullScreen, name, navigateTo } ) => {
 	const navigation = useNavigation();
@@ -27,130 +29,174 @@ const TestScreen = ( { fullScreen, name, navigateTo } ) => {
 	);
 };
 
+const fireLayoutEvent = ( element, layout ) =>
+	fireEvent( element, 'layout', {
+		nativeEvent: { layout },
+	} );
+
 beforeAll( () => {
-	jest.useFakeTimers( { legacyFakeTimers: true } );
+	jest.spyOn(
+		require( 'react-native' ),
+		'useWindowDimensions'
+	).mockReturnValue( { width: 900, height: WINDOW_HEIGHT } );
 } );
 
-afterAll( () => {
-	jest.runOnlyPendingTimers();
-	jest.useRealTimers();
-} );
+it( 'animates height transitioning from non-full-screen to non-full-screen', async () =>
+	withReanimatedTimer( async () => {
+		const screen = render(
+			<NavigationContainer testID="navigation-container" main animate>
+				<TestScreen name="test-screen-1" navigateTo="test-screen-2" />
+				<TestScreen name="test-screen-2" navigateTo="test-screen-1" />
+			</NavigationContainer>
+		);
 
-it( 'animates height transitioning from non-full-screen to full-screen', async () => {
-	const screen = render(
-		<NavigationContainer main animate>
-			<TestScreen name="test-screen-1" navigateTo="test-screen-2" />
-			<TestScreen
-				name="test-screen-2"
-				navigateTo="test-screen-1"
-				fullScreen
-			/>
-		</NavigationContainer>
-	);
+		const navigationContainer = await screen.findByTestId(
+			'navigation-container'
+		);
 
-	// Await navigation screen to allow async state updates to complete
-	const navigationScreen = await screen.findByTestId(
-		'navigation-screen-test-screen-1'
-	);
-	// Trigger non-full-screen layout event
-	act( () => {
-		fireEvent( navigationScreen, 'layout', {
-			nativeEvent: {
-				layout: {
-					height: 123,
-				},
-			},
+		expect( navigationContainer ).toHaveAnimatedStyle( { height: 1 } );
+
+		// First height value should be set without animation, but we need
+		// to wait for a frame to let animated styles be updated.
+		const screen1Layout = { height: 100 };
+		fireLayoutEvent(
+			screen.getByTestId( 'navigation-screen-test-screen-1' ),
+			screen1Layout
+		);
+		advanceAnimationByTime( 1 );
+		expect( navigationContainer ).toHaveAnimatedStyle( screen1Layout );
+
+		// Navigate to screen 2
+		fireEvent.press( screen.getByText( /test-screen-1/ ) );
+		const screen2Layout = { height: 200 };
+		fireLayoutEvent(
+			screen.getByTestId( 'navigation-screen-test-screen-2' ),
+			screen2Layout
+		);
+		// The animation takes 300 ms, so we wait that time plus 1 ms
+		// to the completion.
+		advanceAnimationByTime( 301 );
+		expect( navigationContainer ).toHaveAnimatedStyle( screen2Layout );
+	} ) );
+
+it( 'animates height transitioning from non-full-screen to full-screen', async () =>
+	withReanimatedTimer( async () => {
+		const screen = render(
+			<NavigationContainer testID="navigation-container" main animate>
+				<TestScreen name="test-screen-1" navigateTo="test-screen-2" />
+				<TestScreen
+					name="test-screen-2"
+					navigateTo="test-screen-1"
+					fullScreen
+				/>
+			</NavigationContainer>
+		);
+
+		const navigationContainer = await screen.findByTestId(
+			'navigation-container'
+		);
+
+		expect( navigationContainer ).toHaveAnimatedStyle( { height: 1 } );
+
+		// First height value should be set without animation, but we need
+		// to wait for a frame to let animated styles be updated.
+		const screen1Layout = { height: 100 };
+		fireLayoutEvent(
+			screen.getByTestId( 'navigation-screen-test-screen-1' ),
+			screen1Layout
+		);
+		advanceAnimationByTime( 1 );
+		expect( navigationContainer ).toHaveAnimatedStyle( screen1Layout );
+
+		// Navigate to screen 2
+		fireEvent.press( screen.getByText( /test-screen-1/ ) );
+		// The animation takes 300 ms, so we wait that time plus 1 ms
+		// to the completion.
+		advanceAnimationByTime( 301 );
+		expect( navigationContainer ).toHaveAnimatedStyle( {
+			height: WINDOW_HEIGHT,
 		} );
-		// Trigger debounced setting of height after layout event
-		jest.advanceTimersByTime( 10 );
-	} );
-	// Navigate to screen 2
-	fireEvent.press( await screen.findByText( /test-screen-1/ ) );
-	// Await navigation screen to allow async state updates to complete
-	await screen.findByText( /test-screen-2/ );
+	} ) );
 
-	expect( performLayoutAnimation ).toHaveBeenCalledTimes( 1 );
-} );
+it( 'animates height transitioning from full-screen to non-full-screen', async () =>
+	withReanimatedTimer( async () => {
+		const screen = render(
+			<NavigationContainer testID="navigation-container" main animate>
+				<TestScreen name="test-screen-1" navigateTo="test-screen-2" />
+				<TestScreen
+					name="test-screen-2"
+					navigateTo="test-screen-1"
+					fullScreen
+				/>
+			</NavigationContainer>
+		);
 
-it( 'animates height transitioning from full-screen to non-full-screen', async () => {
-	const screen = render(
-		<NavigationContainer main animate>
-			<TestScreen name="test-screen-1" navigateTo="test-screen-2" />
-			<TestScreen
-				name="test-screen-2"
-				navigateTo="test-screen-1"
-				fullScreen
-			/>
-		</NavigationContainer>
-	);
+		const navigationContainer = await screen.findByTestId(
+			'navigation-container'
+		);
 
-	// Await navigation screen to allow async state updates to complete
-	const navigationScreen = await screen.findByTestId(
-		'navigation-screen-test-screen-1'
-	);
-	// Trigger non-full-screen layout event
-	act( () => {
-		fireEvent( navigationScreen, 'layout', {
-			nativeEvent: {
-				layout: {
-					height: 123,
-				},
-			},
+		expect( navigationContainer ).toHaveAnimatedStyle( { height: 1 } );
+
+		// First height value should be set without animation, but we need
+		// to wait for a frame to let animated styles be updated.
+		const screen1Layout = { height: 100 };
+		fireLayoutEvent(
+			screen.getByTestId( 'navigation-screen-test-screen-1' ),
+			screen1Layout
+		);
+		advanceAnimationByTime( 1 );
+		expect( navigationContainer ).toHaveAnimatedStyle( screen1Layout );
+
+		// Navigate to screen 2
+		fireEvent.press( screen.getByText( /test-screen-1/ ) );
+		// The animation takes 300 ms, so we wait that time plus 1 ms
+		// to the completion.
+		advanceAnimationByTime( 301 );
+		expect( navigationContainer ).toHaveAnimatedStyle( {
+			height: WINDOW_HEIGHT,
 		} );
-		// Trigger debounced setting of height after layout event
-		jest.advanceTimersByTime( 10 );
-	} );
-	// Navigate to screen 2
-	fireEvent.press( await screen.findByText( /test-screen-1/ ) );
-	// Navigate to screen 1
-	fireEvent.press( await screen.findByText( /test-screen-2/ ) );
-	// Await navigation screen to allow async state updates to complete
-	await screen.findByText( /test-screen-1/ );
 
-	expect( performLayoutAnimation ).toHaveBeenCalledTimes( 2 );
-} );
+		// Navigate to screen 1
+		fireEvent.press( await screen.findByText( /test-screen-2/ ) );
+		// The animation takes 300 ms, so we wait that time plus 1 ms
+		// to the completion.
+		advanceAnimationByTime( 301 );
+		expect( navigationContainer ).toHaveAnimatedStyle( screen1Layout );
+	} ) );
 
-it( 'does not animate height transitioning from full-screen to full-screen', async () => {
-	const screen = render(
-		<NavigationContainer main animate>
-			<TestScreen name="test-screen-1" navigateTo="test-screen-2" />
-			<TestScreen
-				name="test-screen-2"
-				navigateTo="test-screen-3"
-				fullScreen
-			/>
-			<TestScreen
-				name="test-screen-3"
-				navigateTo="test-screen-2"
-				fullScreen
-			/>
-		</NavigationContainer>
-	);
+it( 'does not animate height transitioning from full-screen to full-screen', async () =>
+	withReanimatedTimer( async () => {
+		const screen = render(
+			<NavigationContainer testID="navigation-container" main animate>
+				<TestScreen
+					name="test-screen-1"
+					navigateTo="test-screen-2"
+					fullScreen
+				/>
+				<TestScreen
+					name="test-screen-2"
+					navigateTo="test-screen-1"
+					fullScreen
+				/>
+			</NavigationContainer>
+		);
 
-	// Await navigation screen to allow async state updates to complete
-	const navigationScreen = await screen.findByTestId(
-		'navigation-screen-test-screen-1'
-	);
-	// Trigger non-full-screen layout event
-	act( () => {
-		fireEvent( navigationScreen, 'layout', {
-			nativeEvent: {
-				layout: {
-					height: 123,
-				},
-			},
+		const navigationContainer = await screen.findByTestId(
+			'navigation-container'
+		);
+
+		// First height value should be set without animation, but we need
+		// to wait for a frame to let animated styles be updated.
+		advanceAnimationByTime( 1 );
+		expect( navigationContainer ).toHaveAnimatedStyle( {
+			height: WINDOW_HEIGHT,
 		} );
-		// Trigger debounced setting of height after layout event
-		jest.advanceTimersByTime( 10 );
-	} );
-	// Navigate to screen 2
-	fireEvent.press( await screen.findByText( /test-screen-1/ ) );
-	// Navigate to screen 3
-	fireEvent.press( await screen.findByText( /test-screen-2/ ) );
-	// Navigate to screen 2
-	fireEvent.press( await screen.findByText( /test-screen-3/ ) );
-	// Await navigation screen to allow async state updates to complete
-	await screen.findByText( /test-screen-2/ );
 
-	expect( performLayoutAnimation ).toHaveBeenCalledTimes( 1 );
-} );
+		// Navigate to screen 2
+		fireEvent.press( screen.getByText( /test-screen-1/ ) );
+		// We wait some milliseconds to check if height has changed.
+		advanceAnimationByTime( 10 );
+		expect( navigationContainer ).toHaveAnimatedStyle( {
+			height: WINDOW_HEIGHT,
+		} );
+	} ) );

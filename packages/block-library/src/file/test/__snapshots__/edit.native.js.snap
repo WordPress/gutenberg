@@ -22,7 +22,11 @@ exports[`File block renders file error state without crashing 1`] = `
   <View
     accessibilityState={
       {
+        "busy": undefined,
+        "checked": undefined,
         "disabled": false,
+        "expanded": undefined,
+        "selected": undefined,
       }
     }
     accessible={false}
@@ -61,6 +65,15 @@ exports[`File block renders file error state without crashing 1`] = `
         }
       >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
           activeFormats={[]}
           blockType={
@@ -167,6 +180,15 @@ exports[`File block renders file error state without crashing 1`] = `
         }
       >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
           activeFormats={[]}
           blockType={
@@ -251,7 +273,11 @@ exports[`File block renders file without crashing 1`] = `
   <View
     accessibilityState={
       {
+        "busy": undefined,
+        "checked": undefined,
         "disabled": false,
+        "expanded": undefined,
+        "selected": undefined,
       }
     }
     accessible={false}
@@ -290,6 +316,15 @@ exports[`File block renders file without crashing 1`] = `
         }
       >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
           activeFormats={[]}
           blockType={
@@ -370,6 +405,15 @@ exports[`File block renders file without crashing 1`] = `
         }
       >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
           activeFormats={[]}
           blockType={
@@ -486,6 +530,23 @@ exports[`File block renders placeholder without crashing 1`] = `
       accessibilityHint="Double tap to select"
       accessibilityLabel="File block. Empty"
       accessibilityRole="button"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
       accessible={true}
       collapsable={false}
       focusable={true}
