@@ -97,7 +97,7 @@ describe( 'NumberControl', () => {
 			// Second call: type '1'
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 2, '1', false );
 			// Third call: clamp value
-			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, 4, true );
+			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, '4', true );
 		} );
 
 		it( 'should call onChange callback when value is not valid', async () => {
@@ -139,7 +139,7 @@ describe( 'NumberControl', () => {
 			// Third call: invalid, unclamped value
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, '14', false );
 			// Fourth call: valid, clamped value
-			expect( onChangeSpy ).toHaveBeenNthCalledWith( 4, 10, true );
+			expect( onChangeSpy ).toHaveBeenNthCalledWith( 4, '10', true );
 		} );
 	} );
 
