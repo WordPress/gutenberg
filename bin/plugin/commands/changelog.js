@@ -513,7 +513,7 @@ function removeFeaturePrefix( text ) {
  * @type {Array<WPChangelogNormalization>}
  */
 const TITLE_NORMALIZATIONS = [
-	createOmitByLabel( [ 'Mobile App Android/iOS' ] ),
+	createOmitByLabel( [ 'Mobile App - i.e. Android or iOS' ] ),
 	createOmitByTitlePrefix( [ '[rnmobile]', '[mobile]', 'Mobile Release' ] ),
 	removeRedundantTypePrefix,
 	reword,
