@@ -94,7 +94,7 @@
 		max-height: 368px; // Specific to not have commands overflow oddly.
 		overflow: auto;
 
-		& > [cmdk-list-sizer] :has([cmdk-group-items]:not(:empty)) {
+		& > [cmdk-list-sizer]:not(:empty) {
 			padding: 0 $grid-unit $grid-unit;
 		}
 	}
