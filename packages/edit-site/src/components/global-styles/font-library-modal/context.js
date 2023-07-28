@@ -36,7 +36,7 @@ function FontLibraryProvider( { children } ) {
 
 	const { records: posts = [] } = useEntityRecords(
 		'postType',
-		'wp_fonts_library',
+		'wp_font_family',
 		{ refreshKey }
 	);
 
