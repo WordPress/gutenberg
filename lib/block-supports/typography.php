@@ -459,8 +459,11 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	$fluid_settings = isset( $typography_settings['fluid'] ) && is_array( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
 
 	// Defaults.
-	$default_maximum_viewport_width       = isset( $layout_settings['wideSize'] ) ? $layout_settings['wideSize'] : '1600px';
-	$default_minimum_viewport_width       = '320px';
+	$default_maximum_viewport_width = isset( $layout_settings['wideSize'] ) ? $layout_settings['wideSize'] : '1600px';
+	if ( isset( $typography_settings['maxViewportWidth'] ) ) {
+		$default_maximum_viewport_width = $typography_settings['maxViewportWidth'];
+	}
+	$default_minimum_viewport_width       = isset( $typography_settings['minViewportWidth'] ) ? $typography_settings['minViewportWidth'] : '320px';
 	$default_minimum_font_size_factor_max = 0.75;
 	$default_minimum_font_size_factor_min = 0.25;
 	$default_scale_factor                 = 1;

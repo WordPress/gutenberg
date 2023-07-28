@@ -451,6 +451,14 @@
 										"minFontSize": {
 											"description": "Allow users to set a global minimum font size boundary in px, rem or em. Custom font sizes below this value will not be clamped, and all calculated minimum font sizes will be, a at minimum, this value.",
 											"type": "string"
+										},
+										"maxViewPortWidth": {
+											"description": "Allow users to set custom a max viewport width in px, rem or em, used to set the maximum size boundary of a fluid font size.",
+											"type": "string"
+										},
+										"minViewPortWidth": {
+											"description": "Allow users to set a custom min viewport width in px, rem or em, used to set the minimum size boundary of a fluid font size.",
+											"type": "string"
 										}
 									},
 									"additionalProperties": false
