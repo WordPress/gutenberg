@@ -6,7 +6,7 @@ import {
 	__experimentalText as Text,
 	Button,
 } from '@wordpress/components';
-import { useRef, useState, useMemo } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
@@ -82,8 +82,13 @@ function Pagination( { currentPage, numPages, changePage, totalItems } ) {
 	);
 }
 
-export default function Grid( { categoryId, items, ...props } ) {
-	const [ currentPage, setCurrentPage ] = useState( 1 );
+export default function Grid( {
+	categoryId,
+	items,
+	currentPage,
+	setCurrentPage,
+	...props
+} ) {
 	const gridRef = useRef();
 	const totalItems = items.length;
 	const pageIndex = currentPage - 1;
