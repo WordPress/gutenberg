@@ -14,7 +14,8 @@ describe( 'ProgressBar', () => {
 
 		const progressBar = screen.getByRole( 'progressbar' );
 
-		expect( progressBar ).toBeVisible();
+		expect( progressBar ).toBeInTheDocument();
+		expect( progressBar ).not.toBeVisible();
 		expect( progressBar ).not.toHaveValue();
 	} );
 
@@ -23,7 +24,8 @@ describe( 'ProgressBar', () => {
 
 		const progressBar = screen.getByRole( 'progressbar' );
 
-		expect( progressBar ).toBeVisible();
+		expect( progressBar ).toBeInTheDocument();
+		expect( progressBar ).not.toBeVisible();
 		expect( progressBar ).toHaveValue( 55 );
 	} );
 
@@ -35,9 +37,7 @@ describe( 'ProgressBar', () => {
 		 * the track is an intentionally non-interactive presentation element.
 		 */
 		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const indicator = container.querySelector(
-			'.components-progress-bar__indicator'
-		);
+		const indicator = container.firstChild?.firstChild;
 
 		expect( indicator ).toHaveStyle( {
 			width: `${ INDETERMINATE_TRACK_WIDTH }%`,
@@ -52,9 +52,7 @@ describe( 'ProgressBar', () => {
 		 * the track is an intentionally non-interactive presentation element.
 		 */
 		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const indicator = container.querySelector(
-			'.components-progress-bar__indicator'
-		);
+		const indicator = container.firstChild?.firstChild;
 
 		expect( indicator ).toHaveStyle( {
 			width: '55%',
@@ -69,14 +67,6 @@ describe( 'ProgressBar', () => {
 
 	it( 'should not have an `is-indeterminate` className if `value` is provided', () => {
 		const { container } = render( <ProgressBar value={ 55 } /> );
-
-		expect( container ).toMatchSnapshot();
-	} );
-
-	it( 'should be able to specify custom track and indicator colors', () => {
-		const { container } = render(
-			<ProgressBar indicatorColor="#900" trackColor="#d9d9d9" />
-		);
 
 		expect( container ).toMatchSnapshot();
 	} );
