@@ -94,6 +94,28 @@ export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
 } );
 
 /**
+ * Returns any available custom pattern categories.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} The available custom pattern categories.
+ */
+export const getCustomPatternCategories = createRegistrySelector(
+	( select ) => () => {
+		const isWeb = Platform.OS === 'web';
+		return isWeb
+			? select( coreDataStore ).getEntityRecords(
+					'taxonomy',
+					'wp_pattern_custom_categories',
+					{
+						per_page: -1,
+					}
+			  )
+			: [];
+	}
+);
+
+/**
  * Returns the settings, taking into account active features and permissions.
  *
  * @param {Object}   state             Global application state.

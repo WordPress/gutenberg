@@ -125,16 +125,26 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 	return { patterns, isResolving: false };
 };
 
-const reusableBlockToPattern = ( reusableBlock ) => ( {
-	blocks: parse( reusableBlock.content.raw ),
-	categories: reusableBlock.wp_pattern,
-	id: reusableBlock.id,
-	name: reusableBlock.slug,
-	syncStatus: reusableBlock.wp_pattern_sync_status || SYNC_TYPES.full,
-	title: reusableBlock.title.raw,
-	type: reusableBlock.type,
-	reusableBlock,
-} );
+const reusableBlockToPattern = ( reusableBlock, customCategories ) => {
+	const categories = reusableBlock.wp_pattern_custom_categories?.map(
+		( category ) => {
+			const customCategory = customCategories?.find(
+				( cat ) => cat.id === category
+			);
+			return customCategory ? customCategory.slug : category;
+		}
+	);
+	return {
+		blocks: parse( reusableBlock.content.raw ),
+		categories,
+		id: reusableBlock.id,
+		name: reusableBlock.slug,
+		syncStatus: reusableBlock.wp_pattern_sync_status || SYNC_TYPES.full,
+		title: reusableBlock.title.raw,
+		type: reusableBlock.type,
+		reusableBlock,
+	};
+};
 
 const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 	const { getEntityRecords, getIsResolving } = select( coreStore );
@@ -142,8 +152,13 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 	const query = { per_page: -1 };
 	const records = getEntityRecords( 'postType', USER_PATTERNS, query );
 
+	const customCategories =
+		select( editSiteStore ).getCustomPatternCategories();
+
 	let patterns = records
-		? records.map( ( record ) => reusableBlockToPattern( record ) )
+		? records.map( ( record ) =>
+				reusableBlockToPattern( record, customCategories )
+		  )
 		: EMPTY_PATTERN_LIST;
 	const isResolving = getIsResolving( 'getEntityRecords', [
 		'postType',
