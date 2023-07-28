@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
+import * as ProgressBarStyled from './styles';
 import type { ProgressBarProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
@@ -23,19 +24,20 @@ export function ProgressBar(
 	const trackStyle = {
 		backgroundColor: trackColor ? trackColor : undefined,
 	};
+
 	const indicatorStyle = {
 		width: `${ isIndeterminate ? INDETERMINATE_TRACK_WIDTH : value }%`,
 		backgroundColor: indicatorColor ? indicatorColor : undefined,
 	};
 
 	return (
-		<div className={ wrapperClasses } style={ trackStyle }>
-			<div
-				className="components-progress-bar__indicator"
-				style={ indicatorStyle }
-			/>
-			<progress max={ 100 } value={ value } />
-		</div>
+		<ProgressBarStyled.Track
+			className={ wrapperClasses }
+			style={ trackStyle }
+		>
+			<ProgressBarStyled.Indicator style={ indicatorStyle } />
+			<ProgressBarStyled.ProgressElement max={ 100 } value={ value } />
+		</ProgressBarStyled.Track>
 	);
 }
 
