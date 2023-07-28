@@ -23,7 +23,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_data( $font_data ) {
 		$font = new WP_Font_Family( $font_data );
-		$this->assertEquals( $font_data, $font->get_data() );
+		$this->assertSame( $font_data, $font->get_data() );
 	}
 
 	/**
