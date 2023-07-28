@@ -323,7 +323,7 @@ function RichTextWrapper(
 			{ isSelected && (
 				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
 					<inputEventContext.Provider value={ inputEvents }>
-						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+						<Popover>
 							{ children &&
 								children( { value, onChange, onFocus } ) }
 
@@ -334,7 +334,7 @@ function RichTextWrapper(
 								formatTypes={ formatTypes }
 								forwardedRef={ anchorRef }
 							/>
-						</Popover.__unstableSlotNameProvider>
+						</Popover>
 					</inputEventContext.Provider>
 				</keyboardShortcutContext.Provider>
 			) }
