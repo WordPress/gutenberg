@@ -157,9 +157,6 @@ store( {
 						? context.core.image.imageUploadedSrc
 						: '';
 				},
-				inheritSize: ( { context } ) => {
-					return context.core.image.lightboxEnabled && 'inherit';
-				},
 				lightboxObjectFit: ( { context } ) => {
 					if ( context.core.image.initialized ) {
 						return 'cover';
