@@ -12,8 +12,6 @@ const meta: ComponentMeta< typeof ProgressBar > = {
 	component: ProgressBar,
 	title: 'Components (Experimental)/ProgressBar',
 	argTypes: {
-		indicatorColor: { control: { type: 'color' } },
-		trackColor: { control: { type: 'color' } },
 		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
 	},
 	parameters: {

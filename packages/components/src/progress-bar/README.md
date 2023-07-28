@@ -19,18 +19,6 @@ If a `value` is not specified, the progress bar will be considered indeterminate
 
 -   Required: No
 
-#### `trackColor`: `string`
-
-Optional color of the progress bar track.
-
--   Required: No
-
-#### `indicatorColor`: `string`
-
-Optional color of the progress bar indicator.
-
--   Required: No
-
 ##### `className`: `string`
 
 A CSS class to apply to the underlying `div` element, serving as a progress bar track.

@@ -16,26 +16,21 @@ export const INDETERMINATE_TRACK_WIDTH = 50;
 export function ProgressBar(
 	props: WordPressComponentProps< ProgressBarProps, 'div', false >
 ) {
-	const { className, value, indicatorColor, trackColor } = props;
+	const { className, value } = props;
 	const isIndeterminate = ! Number.isFinite( value );
 	const wrapperClasses = classnames( 'components-progress-bar', className, {
 		'is-indeterminate': isIndeterminate,
 	} );
-	const trackStyle = {
-		backgroundColor: trackColor ? trackColor : undefined,
-	};
-
-	const indicatorStyle = {
-		width: `${ isIndeterminate ? INDETERMINATE_TRACK_WIDTH : value }%`,
-		backgroundColor: indicatorColor ? indicatorColor : undefined,
-	};
 
 	return (
-		<ProgressBarStyled.Track
-			className={ wrapperClasses }
-			style={ trackStyle }
-		>
-			<ProgressBarStyled.Indicator style={ indicatorStyle } />
+		<ProgressBarStyled.Track className={ wrapperClasses }>
+			<ProgressBarStyled.Indicator
+				style={ {
+					width: `${
+						isIndeterminate ? INDETERMINATE_TRACK_WIDTH : value
+					}%`,
+				} }
+			/>
 			<ProgressBarStyled.ProgressElement max={ 100 } value={ value } />
 		</ProgressBarStyled.Track>
 	);
