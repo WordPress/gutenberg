@@ -188,7 +188,7 @@ export function getComputedFluidTypographyValue( {
 		3
 	);
 
-	const viewPortWidthOffset =
+	const viewportWidthOffset =
 		roundToPrecision( minViewportWidthOffsetValue, 3 ) + fontSizeUnit;
 	const linearFactor =
 		100 *
@@ -199,7 +199,7 @@ export function getComputedFluidTypographyValue( {
 		( linearFactor || 1 ) * scaleFactor,
 		3
 	);
-	const fluidTargetFontSize = `${ minimumFontSizeRem.value }${ minimumFontSizeRem.unit } + ((1vw - ${ viewPortWidthOffset }) * ${ linearFactorScaled })`;
+	const fluidTargetFontSize = `${ minimumFontSizeRem.value }${ minimumFontSizeRem.unit } + ((1vw - ${ viewportWidthOffset }) * ${ linearFactorScaled })`;
 
 	return `clamp(${ minimumFontSize }, ${ fluidTargetFontSize }, ${ maximumFontSize })`;
 }
