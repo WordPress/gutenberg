@@ -305,11 +305,23 @@ function setStyles( context, event ) {
 		containerHeight = originalHeight;
 	}
 
-	// Calculate the final lightbox image size and the scale factor.
-	// MaxWidth is either the window container (plus padding) or the image resolution.
-	const targetMaxWidth = Math.min( window.innerWidth * 0.95, containerWidth );
+	// Calculate the final lightbox image size and the
+	// scale factor. MaxWidth is either the window container
+	// (accounting for padding) or the image resolution.
+	let horizontalPadding = 0;
+	if ( window.innerWidth > 480 ) {
+		horizontalPadding = 80;
+	} else if ( window.innerWidth > 1920 ) {
+		horizontalPadding = 160;
+	}
+	const verticalPadding = 80;
+
+	const targetMaxWidth = Math.min(
+		window.innerWidth - horizontalPadding,
+		containerWidth
+	);
 	const targetMaxHeight = Math.min(
-		window.innerHeight * 0.95,
+		window.innerHeight - verticalPadding,
 		containerHeight
 	);
 	const targetContainerRatio = targetMaxWidth / targetMaxHeight;
