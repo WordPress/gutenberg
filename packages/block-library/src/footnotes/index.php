@@ -222,11 +222,7 @@ add_filter( 'wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision'
  *
  * @param int|array $autosave The autosave ID or array.
  */
-function wp_rest_api_autosave_meta( $autosave ) {
-	// `wp_creating_autosave` passes the array,
-	// `_wp_put_post_revision` passes the ID.
-	$id = is_int( $autosave ) ? $autosave : $autosave['ID'];
-
+function _wp_rest_api_autosave_meta( $autosave ) {
 	// Ensure it's a REST API request.
 	if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
 		return;
@@ -239,13 +235,21 @@ function wp_rest_api_autosave_meta( $autosave ) {
 		return;
 	}
 
+	// `wp_creating_autosave` passes the array,
+	// `_wp_put_post_revision` passes the ID.
+	$id = is_int( $autosave ) ? $autosave : $autosave['ID'];
+
+	if ( ! $id ) {
+		return;
+	}
+
 	update_post_meta( $id, 'footnotes', $body['meta']['footnotes'] );
 }
 // See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L391C1-L391C1.
-add_action( 'wp_creating_autosave', 'wp_rest_api_autosave_meta' );
+add_action( 'wp_creating_autosave', '_wp_rest_api_autosave_meta' );
 // See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L398.
 // Then https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/revision.php#L367.
-add_action( '_wp_put_post_revision', 'wp_rest_api_autosave_meta' );
+add_action( '_wp_put_post_revision', '_wp_rest_api_autosave_meta' );
 
 /**
  * This is a workaround for the autosave endpoint returning early if the
@@ -265,14 +269,14 @@ add_action( '_wp_put_post_revision', 'wp_rest_api_autosave_meta' );
  * See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L365-L384.
  * See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L219.
  */
-function wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
+function _wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
 	// We only want to be altering POST requests.
 	if ( $request->get_method() !== 'POST' ) {
 		return $prepared_post;
 	}
 
-	// Only alter requests for the 'autosaves' route.
-	if ( strpos( $request->get_route(), '/autosaves' ) === false ) {
+	// Only alter requests for the '/autosaves' route.
+	if ( substr( $request->get_route(), -strlen( '/autosaves' ) ) !== '/autosaves' ) {
 		return $prepared_post;
 	}
 
@@ -280,4 +284,4 @@ function wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
 	return $prepared_post;
 }
 
-add_filter( 'rest_pre_insert_post', 'wp_rest_api_force_autosave_difference', 10, 2 );
+add_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference', 10, 2 );

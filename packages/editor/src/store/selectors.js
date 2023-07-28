@@ -611,7 +611,7 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 			return true;
 		}
 
-		// If the title or excerpt has changed, the post is autosaveable.
+		// If title, excerpt, or meta have changed, the post is autosaveable.
 		return [ 'title', 'excerpt', 'meta' ].some(
 			( field ) =>
 				getPostRawValue( autosave[ field ] ) !==
