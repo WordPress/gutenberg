@@ -61,6 +61,7 @@ const typeLabels = {
 	wp_template: __( 'Template' ),
 	wp_template_part: __( 'Template Part' ),
 	wp_block: __( 'Pattern' ),
+	wp_navigation: __( 'Navigation' ),
 };
 
 // Prevent accidental removal of certain blocks, asking the user for
