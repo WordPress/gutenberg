@@ -39,7 +39,7 @@ export type MenuItemChoice = {
 	 */
 	value: string;
 	/**
-	 * Unique value for choice.
+	 * Whether the menu item is disabled.
 	 */
 	disabled?: boolean;
 	/**
