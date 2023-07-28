@@ -10,6 +10,14 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]
+-   [*] Remove Gallery caption button on mobile [#53010]
+-   [**] Upgrade React Native to 0.71.11 [#51303]
+
+## 1.100.1
+-   [**] Add WP hook for registering non-core blocks [#52791]
+
+## 1.100.0
 -   [**] Add media inserter buttons to editor toolbar [#51827]
 -   [**] Update native BlockOutline component styles to remove blue border from blocks [#51222]
 -   [**] Move the undo/redo buttons to the navigation bar [#51766]
@@ -48,8 +56,6 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Add disabled style to `Cell` component [#50665]
 -   [**] Fix undo/redo history when inserting a link configured to open in a new tab [#50460]
 -   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
-
-
 
 ## 1.95.0
 -   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]

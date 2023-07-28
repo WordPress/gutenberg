@@ -622,6 +622,20 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
+	it( 'does not display MediaReplaceFlow component within the block toolbar', async () => {
+		const screen = await initializeWithGalleryBlock( {
+			numberOfItems: 3,
+			media,
+		} );
+		const { queryByTestId } = screen;
+
+		fireEvent.press( getBlock( screen, 'Gallery' ) );
+
+		// Expect the native MediaReplaceFlow component to not be present in the block toolbar
+		const mediaReplaceFlow = queryByTestId( 'media-replace-flow' );
+		expect( mediaReplaceFlow ).toBeNull();
+	} );
+
 	// Test cases related to TC013 - Settings - Columns
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc013
 	describe( 'Columns setting', () => {

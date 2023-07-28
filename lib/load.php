@@ -59,12 +59,19 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-blocks-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/footnotes.php';
 
+	// WordPress 6.4 compat.
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-controller-6-4.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-revisions-controller-6-4.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
+
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
-
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+		require_once __DIR__ . '/experimental/class-gutenberg-rest-block-patterns-controller.php';
+	}
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
@@ -103,7 +110,6 @@ require __DIR__ . '/compat/wordpress-6.3/block-editor-settings.php';
 require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
 // Experimental features.
-require __DIR__ . '/experimental/behaviors.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
@@ -114,8 +120,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) ) {
-	require __DIR__ . '/experimental/interactivity-api/blocks.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+	require __DIR__ . '/experimental/auto-inserting-blocks.php';
 }
 require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
 require __DIR__ . '/experimental/interactivity-api/store.php';

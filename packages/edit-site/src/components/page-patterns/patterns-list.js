@@ -78,6 +78,16 @@ export default function PatternsList( { categoryId, type } ) {
 		}
 	);
 
+	const updateSearchFilter = ( value ) => {
+		setCurrentPage( 1 );
+		setFilterValue( value );
+	};
+
+	const updateSyncFilter = ( value ) => {
+		setCurrentPage( 1 );
+		setSyncFilter( value );
+	};
+
 	const id = useId();
 	const titleId = `${ id }-title`;
 	const descriptionId = `${ id }-description`;
@@ -90,14 +100,12 @@ export default function PatternsList( { categoryId, type } ) {
 	const pageIndex = currentPage - 1;
 	const numPages = Math.ceil( patterns.length / PAGE_SIZE );
 
-	const list = useMemo(
-		() =>
-			patterns.slice(
-				pageIndex * PAGE_SIZE,
-				pageIndex * PAGE_SIZE + PAGE_SIZE
-			),
-		[ pageIndex, patterns ]
-	);
+	const list = useMemo( () => {
+		return patterns.slice(
+			pageIndex * PAGE_SIZE,
+			pageIndex * PAGE_SIZE + PAGE_SIZE
+		);
+	}, [ pageIndex, patterns ] );
 
 	const asyncList = useAsyncList( list, { step: 10 } );
 
@@ -138,7 +146,9 @@ export default function PatternsList( { categoryId, type } ) {
 					<FlexBlock className="edit-site-patterns__search-block">
 						<SearchControl
 							className="edit-site-patterns__search"
-							onChange={ ( value ) => setFilterValue( value ) }
+							onChange={ ( value ) =>
+								updateSearchFilter( value )
+							}
 							placeholder={ __( 'Search patterns' ) }
 							label={ __( 'Search patterns' ) }
 							value={ filterValue }
@@ -152,7 +162,7 @@ export default function PatternsList( { categoryId, type } ) {
 							label={ __( 'Filter by sync status' ) }
 							value={ syncFilter }
 							isBlock
-							onChange={ ( value ) => setSyncFilter( value ) }
+							onChange={ ( value ) => updateSyncFilter( value ) }
 							__nextHasNoMarginBottom
 						>
 							{ Object.entries( SYNC_FILTERS ).map(

@@ -35,7 +35,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Gradle cache
-              uses: gradle/gradle-build-action@6095a76664413da4c8c134ee32e8a8ae900f0f1f # v2.4.0
+              uses: gradle/gradle-build-action@8e02c8272aba4650563824b7012f8a86158901c6 # v2.5.0
 
             - name: AVD cache
               uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
