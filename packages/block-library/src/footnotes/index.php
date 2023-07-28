@@ -217,9 +217,13 @@ add_filter( 'wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision'
  * The REST API autosave endpoint doesn't save meta, so we can use the
  * `wp_creating_autosave` when it updates an exiting autosave, and
  * `_wp_put_post_revision` when it creates a new autosave.
+ *
+ * @since 6.3.0
+ *
+ * @param int|array $autosave The autosave ID or array.
  */
 function wp_rest_api_autosave_meta( $autosave ) {
-	// `wp_creating_autosave` passes the object,
+	// `wp_creating_autosave` passes the array,
 	// `_wp_put_post_revision` passes the ID.
 	$id = is_int( $autosave ) ? $autosave : $autosave['ID'];
 
@@ -237,10 +241,10 @@ function wp_rest_api_autosave_meta( $autosave ) {
 
 	update_post_meta( $id, 'footnotes', $body['meta']['footnotes'] );
 }
-// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L391C1-L391C1
+// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L391C1-L391C1.
 add_action( 'wp_creating_autosave', 'wp_rest_api_autosave_meta' );
-// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L398
-// Then https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/revision.php#L367
+// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L398.
+// Then https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/revision.php#L367.
 add_action( '_wp_put_post_revision', 'wp_rest_api_autosave_meta' );
 
 /**
@@ -253,22 +257,27 @@ add_action( '_wp_put_post_revision', 'wp_rest_api_autosave_meta' );
  * be fine, it should be ok to update the revision even if nothing changed. Of
  * course, this is temporary fix.
  *
- * See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L365-L384
- * See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L219
+ * @since 6.3.0
+ *
+ * @param WP_Post         $prepared_post The prepared post object.
+ * @param WP_REST_Request $request       The request object.
+ *
+ * See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L365-L384.
+ * See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L219.
  */
-function wp_check_post_test( $prepared_post, $request ) {
+function wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
 	// We only want to be altering POST requests.
-    if ( $request->get_method() !== 'POST' ) {
-        return $prepared_post;
-    }
+	if ( $request->get_method() !== 'POST' ) {
+		return $prepared_post;
+	}
 
-    // Only alter requests for the 'autosaves' route.
-    if (strpos($request->get_route(), '/autosaves') === false) {
-        return $prepared_post;
-    }
+	// Only alter requests for the 'autosaves' route.
+	if (strpos($request->get_route(), '/autosaves') === false) {
+		return $prepared_post;
+	}
 
 	$prepared_post->footnotes = '[]';
 	return $prepared_post;
 }
 
-add_filter( 'rest_pre_insert_post', 'wp_check_post_test', 10, 2 );
+add_filter( 'rest_pre_insert_post', 'wp_rest_api_force_autosave_difference', 10, 2 );
