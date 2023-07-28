@@ -30,13 +30,17 @@ import Peer from 'simple-peer/simplepeer.min.js';
 
 import * as syncProtocol from 'y-protocols/sync';
 import * as awarenessProtocol from 'y-protocols/awareness';
+/**
+ * WordPress dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import * as cryptoutils from './crypto.js';
 
-const log = logging.createModuleLogger( 'y-webrtc' );
+const log = console.log;
 
 const messageSync = 0;
 const messageQueryAwareness = 3;
@@ -256,14 +260,8 @@ export class WebrtcConn {
 		 * @type {any}
 		 */
 		this.peer = new Peer( { initiator, ...room.provider.peerOpts } );
+
 		this.peer.on( 'signal', ( signal ) => {
-			console.log( 'on-signal', {
-				to: remotePeerId,
-				from: room.peerId,
-				type: 'signal',
-				token: this.glareToken,
-				signal,
-			} );
 			if ( this.glareToken === undefined ) {
 				// add some randomness to the timestamp of the offer
 				this.glareToken = Date.now() + Math.random();
@@ -622,6 +620,325 @@ const publishSignalingMessage = ( conn, room, data ) => {
 	}
 };
 
+const reconnectTimeoutBase = 1200;
+const maxReconnectTimeout = 2500;
+const messageReconnectTimeout = 30000;
+
+function setupSignalEventHandlers( signalCon, url ) {
+	signalCon.on( 'connect', () => {
+		log( `connected (${ url })` );
+		const topics = Array.from( rooms.keys() );
+		signalCon.send( { type: 'subscribe', topics } );
+		rooms.forEach( ( room ) =>
+			publishSignalingMessage( signalCon, room, {
+				type: 'announce',
+				from: room.peerId,
+			} )
+		);
+	} );
+	signalCon.on( 'message', ( m ) => {
+		switch ( m.type ) {
+			case 'publish': {
+				const roomName = m.topic;
+				const room = rooms.get( roomName );
+				if ( room == null || typeof roomName !== 'string' ) {
+					return;
+				}
+				const execMessage = ( data ) => {
+					const webrtcConns = room.webrtcConns;
+					const peerId = room.peerId;
+					if (
+						data == null ||
+						data.from === peerId ||
+						( data.to !== undefined && data.to !== peerId ) ||
+						room.bcConns.has( data.from )
+					) {
+						// ignore messages that are not addressed to this conn, or from clients that are connected via broadcastchannel
+						return;
+					}
+					const emitPeerChange = webrtcConns.has( data.from )
+						? () => {}
+						: () =>
+								room.provider.emit( 'peers', [
+									{
+										removed: [],
+										added: [ data.from ],
+										webrtcPeers: Array.from(
+											room.webrtcConns.keys()
+										),
+										bcPeers: Array.from( room.bcConns ),
+									},
+								] );
+					switch ( data.type ) {
+						case 'announce':
+							if ( webrtcConns.size < room.provider.maxConns ) {
+								map.setIfUndefined(
+									webrtcConns,
+									data.from,
+									() =>
+										new WebrtcConn(
+											signalCon,
+											true,
+											data.from,
+											room
+										)
+								);
+								emitPeerChange();
+							}
+							break;
+						case 'signal':
+							if ( data.signal.type === 'offer' ) {
+								const existingConn = webrtcConns.get(
+									data.from
+								);
+								if ( existingConn ) {
+									const remoteToken = data.token;
+									const localToken = existingConn.glareToken;
+									if (
+										localToken &&
+										localToken > remoteToken
+									) {
+										log( 'offer rejected: ', data.from );
+										return;
+									}
+									// if we don't reject the offer, we will be accepting it and answering it
+									existingConn.glareToken = undefined;
+								}
+							}
+							if ( data.signal.type === 'answer' ) {
+								log( 'offer answered by: ', data.from );
+								const existingConn = webrtcConns.get(
+									data.from
+								);
+								existingConn.glareToken = undefined;
+							}
+							if ( data.to === peerId ) {
+								map.setIfUndefined(
+									webrtcConns,
+									data.from,
+									() =>
+										new WebrtcConn(
+											signalCon,
+											false,
+											data.from,
+											room
+										)
+								).peer.signal( data.signal );
+								emitPeerChange();
+							}
+							break;
+					}
+				};
+				if ( room.key ) {
+					if ( typeof m.data === 'string' ) {
+						cryptoutils
+							.decryptJson(
+								buffer.fromBase64( m.data ),
+								room.key
+							)
+							.then( execMessage );
+					}
+				} else {
+					execMessage( m.data );
+				}
+			}
+		}
+	} );
+	signalCon.on( 'disconnect', () => log( `disconnect (${ url })` ) );
+}
+
+function setupHttpSignal( httpClient ) {
+	if ( httpClient.shouldConnect && httpClient.ws === null ) {
+		const unique = Math.floor( 100000 + Math.random() * 900000 );
+		const url = httpClient.url;
+		const eventSource = new window.EventSource(
+			addQueryArgs( url, {
+				unique,
+				action: 'gutenberg_signaling_server',
+			} )
+		);
+		/**
+		 * @type {any}
+		 */
+		let pingTimeout = null;
+		httpClient.ws = eventSource;
+		httpClient.connecting = true;
+		httpClient.connected = false;
+		eventSource.onsinglemessage = ( data ) => {
+			const message =
+				typeof data === 'string' ? JSON.parse( data ) : data;
+			//console.log( 'receive', message );
+			if ( message && message.type === 'pong' ) {
+				clearTimeout( pingTimeout );
+				pingTimeout = setTimeout(
+					sendPing,
+					messageReconnectTimeout / 2
+				);
+			}
+			httpClient.emit( 'message', [ message, httpClient ] );
+		};
+		eventSource.onmessage = ( event ) => {
+			httpClient.lastMessageReceived = Date.now();
+			const data = event.data;
+
+			if ( data.includes( '|MULTIPLE|' ) ) {
+				const messages = data.split( '|MULTIPLE|' );
+				messages.forEach( eventSource.onsinglemessage );
+			} else {
+				eventSource.onsinglemessage( data );
+			}
+		};
+
+		eventSource.send = function send( message ) {
+			//console.log( 'send', message );
+			const xhttp = new window.XMLHttpRequest();
+			xhttp.onreadystatechange = function () {
+				if ( this.readyState != 4 ) {
+					return;
+				}
+				if ( this.status != 200 ) {
+					console.log(
+						'Error sending to server with message: ' + message
+					);
+				}
+			};
+			xhttp.open( 'POST', url, true );
+			const formData = new FormData();
+			formData.append( 'unique', unique );
+			formData.append( 'data', message );
+			formData.append( 'action', 'gutenberg_signaling_server' );
+			xhttp.send( new URLSearchParams( formData ) );
+		};
+
+		/**
+		 * @param {any} error
+		 */
+		const onclose = ( error ) => {
+			if ( httpClient.ws !== null ) {
+				httpClient.ws.close();
+				httpClient.ws = null;
+				httpClient.connecting = false;
+				if ( httpClient.connected ) {
+					httpClient.connected = false;
+					httpClient.emit( 'disconnect', [
+						{ type: 'disconnect', error },
+						httpClient,
+					] );
+				} else {
+					httpClient.unsuccessfulReconnects++;
+				}
+			}
+			clearTimeout( pingTimeout );
+		};
+		const sendPing = () => {
+			if ( httpClient.ws === eventSource ) {
+				httpClient.send( {
+					type: 'ping',
+				} );
+			}
+		};
+		eventSource.onclose = () => {
+			onclose( null );
+		};
+		eventSource.onerror = ( error ) => {
+			// Todo: add an error handler
+		};
+		eventSource.onopen = () => {
+			if ( httpClient.connected ) {
+				return;
+			}
+			if ( eventSource.readyState === window.EventSource.OPEN ) {
+				httpClient.lastMessageReceived = Date.now();
+				httpClient.connecting = false;
+				httpClient.connected = true;
+				httpClient.unsuccessfulReconnects = 0;
+				httpClient.emit( 'connect', [
+					{ type: 'connect' },
+					httpClient,
+				] );
+				// set ping
+				pingTimeout = setTimeout(
+					sendPing,
+					messageReconnectTimeout / 2
+				);
+			}
+		};
+	}
+}
+
+export class HttpSignalingConn extends Observable {
+	constructor( url ) {
+		super();
+
+		//WebsocketClient from lib0/websocket.js
+		this.url = url;
+		/**
+		 * @type {WebSocket?}
+		 */
+		this.ws = null;
+		this.binaryType = null; // this.binaryType = binaryType
+		this.connected = false;
+		this.connecting = false;
+		this.unsuccessfulReconnects = 0;
+		this.lastMessageReceived = 0;
+		/**
+		 * Whether to connect to other peers or not
+		 *
+		 * @type {boolean}
+		 */
+		this.shouldConnect = true;
+		this._checkInterval = setInterval( () => {
+			if (
+				this.connected &&
+				messageReconnectTimeout < Date.now() - this.lastMessageReceived
+			) {
+				// no message received in a long time - not even your own awareness
+				// updates (which are updated every 15 seconds)
+				this.ws.close();
+			}
+		}, messageReconnectTimeout / 2 );
+		//setupWS( this );
+		setupHttpSignal( this );
+
+		// From SignalingConn
+		/**
+		 * @type {Set<WebrtcProvider>}
+		 */
+		this.providers = new Set();
+
+		setupSignalEventHandlers( this, url );
+	}
+
+	/**
+	 * @param {any} message
+	 */
+	send( message ) {
+		if ( this.ws ) {
+			this.ws.send( JSON.stringify( message ) );
+		}
+	}
+
+	destroy() {
+		clearInterval( this._checkInterval );
+		this.disconnect();
+		super.destroy();
+	}
+
+	disconnect() {
+		this.shouldConnect = false;
+		if ( this.ws !== null ) {
+			this.ws.close();
+		}
+	}
+
+	connect() {
+		this.shouldConnect = true;
+		if ( ! this.connected && this.ws === null ) {
+			setupHttpSignal( this );
+		}
+	}
+}
+
 export class SignalingConn extends ws.WebsocketClient {
 	constructor( url ) {
 		super( url );
@@ -629,132 +946,7 @@ export class SignalingConn extends ws.WebsocketClient {
 		 * @type {Set<WebrtcProvider>}
 		 */
 		this.providers = new Set();
-		this.on( 'connect', () => {
-			log( `connected (${ url })` );
-			const topics = Array.from( rooms.keys() );
-			this.send( { type: 'subscribe', topics } );
-			rooms.forEach( ( room ) =>
-				publishSignalingMessage( this, room, {
-					type: 'announce',
-					from: room.peerId,
-				} )
-			);
-		} );
-		this.on( 'message', ( m ) => {
-			switch ( m.type ) {
-				case 'publish': {
-					const roomName = m.topic;
-					const room = rooms.get( roomName );
-					if ( room == null || typeof roomName !== 'string' ) {
-						return;
-					}
-					const execMessage = ( data ) => {
-						const webrtcConns = room.webrtcConns;
-						const peerId = room.peerId;
-						if (
-							data == null ||
-							data.from === peerId ||
-							( data.to !== undefined && data.to !== peerId ) ||
-							room.bcConns.has( data.from )
-						) {
-							// ignore messages that are not addressed to this conn, or from clients that are connected via broadcastchannel
-							return;
-						}
-						const emitPeerChange = webrtcConns.has( data.from )
-							? () => {}
-							: () =>
-									room.provider.emit( 'peers', [
-										{
-											removed: [],
-											added: [ data.from ],
-											webrtcPeers: Array.from(
-												room.webrtcConns.keys()
-											),
-											bcPeers: Array.from( room.bcConns ),
-										},
-									] );
-						switch ( data.type ) {
-							case 'announce':
-								if (
-									webrtcConns.size < room.provider.maxConns
-								) {
-									map.setIfUndefined(
-										webrtcConns,
-										data.from,
-										() =>
-											new WebrtcConn(
-												this,
-												true,
-												data.from,
-												room
-											)
-									);
-									emitPeerChange();
-								}
-								break;
-							case 'signal':
-								if ( data.signal.type === 'offer' ) {
-									const existingConn = webrtcConns.get(
-										data.from
-									);
-									if ( existingConn ) {
-										const remoteToken = data.token;
-										const localToken =
-											existingConn.glareToken;
-										if (
-											localToken &&
-											localToken > remoteToken
-										) {
-											log(
-												'offer rejected: ',
-												data.from
-											);
-											return;
-										}
-										// if we don't reject the offer, we will be accepting it and answering it
-										existingConn.glareToken = undefined;
-									}
-								}
-								if ( data.signal.type === 'answer' ) {
-									log( 'offer answered by: ', data.from );
-									const existingConn = webrtcConns.get(
-										data.from
-									);
-									existingConn.glareToken = undefined;
-								}
-								if ( data.to === peerId ) {
-									map.setIfUndefined(
-										webrtcConns,
-										data.from,
-										() =>
-											new WebrtcConn(
-												this,
-												false,
-												data.from,
-												room
-											)
-									).peer.signal( data.signal );
-									emitPeerChange();
-								}
-								break;
-						}
-					};
-					if ( room.key ) {
-						if ( typeof m.data === 'string' ) {
-							cryptoutils
-								.decryptJson(
-									buffer.fromBase64( m.data ),
-									room.key
-								)
-								.then( execMessage );
-						}
-					} else {
-						execMessage( m.data );
-					}
-				}
-			}
-		} );
-		this.on( 'disconnect', () => log( `disconnect (${ url })` ) );
+		setupSignalEventHandlers( this, url );
 	}
 }
 
@@ -838,7 +1030,9 @@ export class WebrtcProvider extends Observable {
 			const signalingConn = map.setIfUndefined(
 				signalingConns,
 				url,
-				() => new SignalingConn( url )
+				url.startsWith( 'ws://' ) || url.startsWith( 'wss://' )
+					? () => new SignalingConn( url )
+					: () => new HttpSignalingConn( url )
 			);
 			this.signalingConns.push( signalingConn );
 			signalingConn.providers.add( this );
