@@ -167,7 +167,7 @@ export function getComputedFluidTypographyValue( {
 		maximumViewportWidth,
 		{ coerceTo: fontSizeUnit }
 	);
-	const minumumViewportWidthParsed = getTypographyValueAndUnit(
+	const minimumViewportWidthParsed = getTypographyValueAndUnit(
 		minimumViewportWidth,
 		{ coerceTo: fontSizeUnit }
 	);
@@ -175,7 +175,7 @@ export function getComputedFluidTypographyValue( {
 	// Protect against unsupported units.
 	if (
 		! maximumViewportWidthParsed ||
-		! minumumViewportWidthParsed ||
+		! minimumViewportWidthParsed ||
 		! minimumFontSizeRem
 	) {
 		return null;
@@ -184,7 +184,7 @@ export function getComputedFluidTypographyValue( {
 	// Build CSS rule.
 	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
 	const minViewportWidthOffsetValue = roundToPrecision(
-		minumumViewportWidthParsed.value / 100,
+		minimumViewportWidthParsed.value / 100,
 		3
 	);
 
@@ -194,7 +194,7 @@ export function getComputedFluidTypographyValue( {
 		100 *
 		( ( maximumFontSizeParsed.value - minimumFontSizeParsed.value ) /
 			( maximumViewportWidthParsed.value -
-				minumumViewportWidthParsed.value ) );
+				minimumViewportWidthParsed.value ) );
 	const linearFactorScaled = roundToPrecision(
 		( linearFactor || 1 ) * scaleFactor,
 		3
