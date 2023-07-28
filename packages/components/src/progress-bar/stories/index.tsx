@@ -10,7 +10,7 @@ import { ProgressBar } from '..';
 
 const meta: ComponentMeta< typeof ProgressBar > = {
 	component: ProgressBar,
-	title: 'Components/ProgressBar',
+	title: 'Components (Experimental)/ProgressBar',
 	argTypes: {
 		indicatorColor: { control: { type: 'color' } },
 		trackColor: { control: { type: 'color' } },
