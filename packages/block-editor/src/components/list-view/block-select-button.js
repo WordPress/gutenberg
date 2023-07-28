@@ -189,15 +189,15 @@ function ListViewBlockSelectButton(
 				/>
 				<HStack
 					alignment="center"
-					className="block-editor-list-view-block-node__label-wrapper"
+					className="block-editor-list-view-block-select-button__label-wrapper"
 					justify="flex-start"
 					spacing={ 1 }
 				>
-					<span className="block-editor-list-view-block-node__title">
+					<span className="block-editor-list-view-block-select-button__title">
 						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 					</span>
 					{ blockInformation?.anchor && (
-						<span className="block-editor-list-view-block-node__anchor-wrapper">
+						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
 							<Truncate
 								className="block-editor-list-view-block-node__anchor"
 								ellipsizeMode="auto"
@@ -231,7 +231,7 @@ function ListViewBlockSelectButton(
 						</span>
 					) : null }
 					{ isLocked && (
-						<span className="block-editor-list-view-block-node__lock">
+						<span className="block-editor-list-view-block-select-button__lock">
 							<Icon icon={ lock } />
 						</span>
 					) }
