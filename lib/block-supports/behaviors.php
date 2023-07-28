@@ -72,7 +72,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 
 	$alt_attribute = $processor->get_attribute( 'alt' );
 
-	if ( null !== $alt_attribute  ) {
+	if ( null !== $alt_attribute ) {
 		$alt_attribute = trim( $alt_attribute );
 	}
 
@@ -113,7 +113,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', true );
-	
+
 	$w->set_attribute(
 		'data-wp-context',
 		sprintf(
