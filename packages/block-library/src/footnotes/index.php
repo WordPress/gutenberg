@@ -272,7 +272,7 @@ function wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
 	}
 
 	// Only alter requests for the 'autosaves' route.
-	if (strpos($request->get_route(), '/autosaves') === false) {
+	if ( strpos( $request->get_route(), '/autosaves' ) === false ) {
 		return $prepared_post;
 	}
 
