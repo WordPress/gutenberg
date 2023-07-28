@@ -124,3 +124,8 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+
+.commands-command-menu__item mark {
+	color: inherit;
+	background: unset;
+}
