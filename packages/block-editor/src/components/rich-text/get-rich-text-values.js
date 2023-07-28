@@ -91,6 +91,9 @@ function _getSaveElement( name, attributes, innerBlocks ) {
 				block.attributes,
 				block.innerBlocks
 			);
+			if ( ! saveElement ) {
+				return null;
+			}
 			elementToInnerBlocksMap.set( saveElement, block );
 			return saveElement;
 		} )
