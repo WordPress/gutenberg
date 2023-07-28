@@ -40,7 +40,7 @@ store( {
 					// otherwise the removal of the scrollbars will draw attention
 					// to itself and look like an error
 					document.documentElement.classList.add(
-						'has-lightbox-open'
+						'wp-has-lightbox-open'
 					);
 
 					// Since the img is hidden and its src not loaded until
@@ -93,7 +93,7 @@ store( {
 						}
 
 						document.documentElement.classList.remove(
-							'has-lightbox-open'
+							'wp-has-lightbox-open'
 						);
 
 						context.core.image.lightboxEnabled = false;
@@ -339,14 +339,14 @@ function setZoomStyles( context, event ) {
 	}
 	styleTag.innerHTML = `
 		:root {
-			--lightbox-image-target-aspect-ratio: ${ originalRatio };
-			--lightbox-initial-top-position: ${ screenPosY }px;
-			--lightbox-initial-left-position: ${ screenPosX }px;
-			--lightbox-container-width: ${ containerWidth }px;
-			--lightbox-container-height: ${ containerHeight }px;
-			--lightbox-image-width: ${ lightboxImgWidth }px;
-			--lightbox-image-height: ${ lightboxImgHeight }px;
-			--lightbox-scale: ${ containerScale };
+			--wp--lightbox-image-target-aspect-ratio: ${ originalRatio };
+			--wp--lightbox-initial-top-position: ${ screenPosY }px;
+			--wp--lightbox-initial-left-position: ${ screenPosX }px;
+			--wp--lightbox-container-width: ${ containerWidth }px;
+			--wp--lightbox-container-height: ${ containerHeight }px;
+			--wp--lightbox-image-width: ${ lightboxImgWidth }px;
+			--wp--lightbox-image-height: ${ lightboxImgHeight }px;
+			--wp--lightbox-scale: ${ containerScale };
 		}
 	`;
 }
