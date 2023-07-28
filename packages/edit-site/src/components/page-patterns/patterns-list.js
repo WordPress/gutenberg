@@ -48,6 +48,7 @@ const SYNC_DESCRIPTIONS = {
 };
 
 export default function PatternsList( { categoryId, type } ) {
+	const [ currentPage, setCurrentPage ] = useState( 1 );
 	const location = useLocation();
 	const history = useHistory();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -72,6 +73,16 @@ export default function PatternsList( { categoryId, type } ) {
 					: deferredSyncedFilter,
 		}
 	);
+
+	const updateSearchFilter = ( value ) => {
+		setCurrentPage( 1 );
+		setFilterValue( value );
+	};
+
+	const updateSyncFilter = ( value ) => {
+		setCurrentPage( 1 );
+		setSyncFilter( value );
+	};
 
 	const id = useId();
 	const titleId = `${ id }-title`;
@@ -109,7 +120,7 @@ export default function PatternsList( { categoryId, type } ) {
 				<FlexBlock className="edit-site-patterns__search-block">
 					<SearchControl
 						className="edit-site-patterns__search"
-						onChange={ ( value ) => setFilterValue( value ) }
+						onChange={ ( value ) => updateSearchFilter( value ) }
 						placeholder={ __( 'Search patterns' ) }
 						label={ __( 'Search patterns' ) }
 						value={ filterValue }
@@ -123,7 +134,7 @@ export default function PatternsList( { categoryId, type } ) {
 						label={ __( 'Filter by sync status' ) }
 						value={ syncFilter }
 						isBlock
-						onChange={ ( value ) => setSyncFilter( value ) }
+						onChange={ ( value ) => updateSyncFilter( value ) }
 						__nextHasNoMarginBottom
 					>
 						{ Object.entries( SYNC_FILTERS ).map(
@@ -157,6 +168,8 @@ export default function PatternsList( { categoryId, type } ) {
 					items={ patterns }
 					aria-labelledby={ titleId }
 					aria-describedby={ descriptionId }
+					currentPage={ currentPage }
+					setCurrentPage={ setCurrentPage }
 				/>
 			) }
 			{ ! isResolving && ! hasPatterns && <NoPatterns /> }
