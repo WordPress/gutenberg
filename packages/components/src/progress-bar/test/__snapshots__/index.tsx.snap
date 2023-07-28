@@ -65,6 +65,7 @@ exports[`ProgressBar should have an \`is-indeterminate\` className if \`value\` 
       style="width: 50%;"
     />
     <progress
+      aria-label="Loading …"
       class="emotion-4 emotion-5"
       max="100"
     />
@@ -137,6 +138,7 @@ exports[`ProgressBar should not have an \`is-indeterminate\` className if \`valu
       style="width: 55%;"
     />
     <progress
+      aria-label="Loading …"
       class="emotion-4 emotion-5"
       max="100"
       value="55"
