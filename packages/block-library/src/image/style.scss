@@ -247,9 +247,23 @@
 		opacity: 0.9;
 	}
 
+
+	// When fading, make the image come in slightly slower
+	// or faster than the scrim to give a sense of depth.
 	&.active {
 		visibility: visible;
 		animation: both turn-on-visibility 0.25s;
+		img {
+			animation: both turn-on-visibility 0.35s;
+		}
+	}
+	&.hideanimationenabled {
+		&:not(.active) {
+			animation: both turn-off-visibility 0.35s;
+			img {
+				animation: both turn-off-visibility 0.25s;
+			}
+		}
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
@@ -260,6 +274,10 @@
 				animation: none;
 				.lightbox-image-container {
 					animation: lightbox-zoom-in 0.4s;
+					// Override fade animation for image
+					img {
+						animation: none;
+					}
 				}
 				.scrim {
 					animation: turn-on-visibility 0.4s forwards;
@@ -270,6 +288,10 @@
 					animation: none;
 					.lightbox-image-container {
 						animation: lightbox-zoom-out 0.4s;
+						// Override fade animation for image
+						img {
+							animation: none;
+						}
 					}
 					.scrim {
 						animation: turn-off-visibility 0.4s forwards;
