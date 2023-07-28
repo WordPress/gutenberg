@@ -1,7 +1,7 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
+import type { ForwardedRef } from 'react';
 import classnames from 'classnames';
 
 /**
@@ -15,8 +15,13 @@ import { cloneElement, forwardRef } from '@wordpress/element';
 import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
+import type { WordPressComponentProps } from '../ui/context';
+import type { MenuItemProps } from './types';
 
-export function MenuItem( props, ref ) {
+export function MenuItem(
+	props: WordPressComponentProps< MenuItemProps, 'button', false >,
+	ref: ForwardedRef< HTMLButtonElement >
+) {
 	let {
 		children,
 		info,
@@ -78,4 +83,26 @@ export function MenuItem( props, ref ) {
 	);
 }
 
+/**
+ * MenuItem is a component which renders a button intended to be used in combination with the `DropdownMenu` component.
+ *
+ * ```jsx
+ * import { MenuItem } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyMenuItem = () => {
+ * 	const [ isActive, setIsActive ] = useState( true );
+ *
+ * 	return (
+ * 		<MenuItem
+ * 			icon={ isActive ? 'yes' : 'no' }
+ * 			isSelected={ isActive }
+ * 			onClick={ () => setIsActive( ( state ) => ! state ) }
+ * 		>
+ * 			Toggle
+ * 		</MenuItem>
+ * 	);
+ * };
+ * ```
+ */
 export default forwardRef( MenuItem );
