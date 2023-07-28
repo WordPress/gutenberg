@@ -22,7 +22,7 @@ buildscript {
         androidxRecyclerviewVersion = '1.1.0'
 
         // test
-        junitAztecVersion = '4.13' // TODO: Align 'junit' versions.
+        junitAztecVersion = '4.13'
     }
 }
 
