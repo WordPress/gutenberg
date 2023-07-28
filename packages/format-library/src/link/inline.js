@@ -3,7 +3,8 @@
  */
 import { useState, useRef, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { withSpokenMessages, Popover } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
+import { Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
 import {
 	create,
@@ -36,7 +37,6 @@ function InlineLinkUI( {
 	addingLink,
 	value,
 	onChange,
-	speak,
 	stopAddingLink,
 	contentRef,
 } ) {
@@ -299,4 +299,4 @@ function getRichTextValueFromSelection( value, isActive ) {
 	return slice( value, textStart, textEnd );
 }
 
-export default withSpokenMessages( InlineLinkUI );
+export default InlineLinkUI;
