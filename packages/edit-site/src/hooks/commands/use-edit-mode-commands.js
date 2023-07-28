@@ -145,16 +145,21 @@ function useEditUICommands() {
 		setIsListViewOpened,
 		switchEditorMode,
 	} = useDispatch( editSiteStore );
-	const { canvasMode, editorMode, activeSidebar } = useSelect(
-		( select ) => ( {
-			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-			editorMode: select( editSiteStore ).getEditorMode(),
-			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
-				editSiteStore.name
-			),
-		} ),
-		[]
-	);
+	const { canvasMode, editorMode, activeSidebar, showBlockBreadcrumbs } =
+		useSelect(
+			( select ) => ( {
+				canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+				editorMode: select( editSiteStore ).getEditorMode(),
+				activeSidebar: select(
+					interfaceStore
+				).getActiveComplementaryArea( editSiteStore.name ),
+				showBlockBreadcrumbs: select( preferencesStore ).get(
+					'core/edit-site',
+					'showBlockBreadcrumbs'
+				),
+			} ),
+			[]
+		);
 	const { openModal } = useDispatch( interfaceStore );
 	const { get: getPreference } = useSelect( preferencesStore );
 	const { set: setPreference, toggle } = useDispatch( preferencesStore );
@@ -267,7 +272,9 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/toggle-breadcrumbs',
-		label: __( 'Show/hide block breadcrumbs' ),
+		label: showBlockBreadcrumbs
+			? __( 'Hide block breadcrumbs' )
+			: __( 'Show block breadcrumbs' ),
 		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
