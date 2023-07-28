@@ -34,6 +34,13 @@ MenuItem supports the following props. Any additional props are passed through t
 
 Element to render as child of button.
 
+### `disabled`
+
+-   Type: `boolean`
+-   Required: No
+
+Refer to documentation for [Button's `disabled` prop](/packages/components/src/button/README.md#disabled-boolean).
+
 ### `info`
 
 -   Type: `string`
