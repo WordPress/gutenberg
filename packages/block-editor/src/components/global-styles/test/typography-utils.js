@@ -192,7 +192,7 @@ describe( 'typography utils', () => {
 
 			{
 				message:
-					'should apply maxViewPortWidth as maximum viewport width',
+					'should apply maxViewportWidth as maximum viewport width',
 				preset: {
 					size: '80px',
 					fluid: {
@@ -202,7 +202,7 @@ describe( 'typography utils', () => {
 				},
 				typographySettings: {
 					fluid: {
-						maxViewPortWidth: '1100px',
+						maxViewportWidth: '1100px',
 					},
 				},
 				expected:
@@ -548,18 +548,18 @@ describe( 'typography utils', () => {
 					layout: { wideSize: '1000rem' },
 				},
 				expected: {
-					fluid: { maxViewPortWidth: '1000rem', minFontSize: '16px' },
+					fluid: { maxViewportWidth: '1000rem', minFontSize: '16px' },
 				},
 			},
 
 			{
 				message:
-					'should prioritize fluid `maxViewPortWidth` over `layout.wideSize`',
+					'should prioritize fluid `maxViewportWidth` over `layout.wideSize`',
 				settings: {
-					typography: { fluid: { maxViewPortWidth: '10px' } },
+					typography: { fluid: { maxViewportWidth: '10px' } },
 					layout: { wideSize: '1000rem' },
 				},
-				expected: { fluid: { maxViewPortWidth: '10px' } },
+				expected: { fluid: { maxViewportWidth: '10px' } },
 			},
 		].forEach( ( { message, settings, expected } ) => {
 			it( `${ message }`, () => {

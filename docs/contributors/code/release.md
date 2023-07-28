@@ -123,7 +123,7 @@ Before you begin, announce in [#core-editor](https://wordpress.slack.com/message
 
 Then go to the Gutenberg repository, click on the Actions tab, and then locate the [Build Gutenberg Plugin Zip](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) action. Note the blue banner that says, “This workflow has a `workflow_dispatch` event trigger.” Expand the “Run workflow” dropdown on its right-hand side.
 
-![Run workflow dropdown for the plugin release](../../assets/workflow-dispatch-plugin-banner.png)
+![Run workflow dropdown for the plugin release](https://developer.wordpress.org/files/2023/07/image-3-1.png)
 
 To release an RC version of the plugin, enter `rc `in the text field. To release a stable version, enter `stable`. In each case, press the button “Run workflow”.
 
@@ -209,7 +209,7 @@ Behind the scenes, the script will:
 
 Here is a screenshot of the process:
 
-![Automated cherry-picking](../../assets/cherry-pick-backport-to-gutenberg-rc.png)
+![Automated cherry-picking](https://developer.wordpress.org/files/2023/07/image-7.png)
 
 ##### Manual cherry-picking
 
@@ -221,7 +221,7 @@ If you need to handle cherry-picking one at a time and one step at a time, you c
 
 To find the `[SHA]` for a pull request, open the PR, and you’ll see a message “`[Username]` merged commit `[SHA]` into `trunk`” near the end.
 
-![Manual cherry-picking](../../assets/cherry-pick-sha.png)
+![Manual cherry-picking](https://developer.wordpress.org/files/2023/07/image-5.png)
 
 If the cherry-picked fixes deserve another release candidate before the stable version is published, create one by following the instructions above. Let other contributors know that a new release candidate has been released in the [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel.
 
@@ -240,7 +240,7 @@ Only once you’re happy with the shape of the changelog in the release draft, p
 
 Note that you do not need to change the checkboxes above the button. If you are publishing an RC, the “Set as a pre-release” will automatically be selected, and “Set as the latest release” will be selected if you are publishing the stable version.
 
-![Publishing the release checkboxes for an RC](../../assets/publishing-the-release-checkboxes.png)
+![Publishing the release checkboxes for an RC](https://developer.wordpress.org/files/2023/07/image.png)
 
 Publishing the release will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) with a twofold purpose:
 
@@ -325,7 +325,7 @@ Once you have the stable release branch in order and the correct Milestone assig
 
 #### Running the minor release
 
-![Run workflow dropdown for the plugin release](../../assets/workflow-dispatch-plugin-banner.png)
+![Run workflow dropdown for the plugin release](https://developer.wordpress.org/files/2023/07/image-1.png)
 
 Go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). You should now _carefully_ choose the next action based on information about the current Plugin release version:
 
@@ -420,7 +420,7 @@ The following workflow is needed when bug or security fixes need to be backporte
 
 Now, the `wp/X.Y` branch is ready for publishing npm packages. In order to start the process, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
 
-![Run workflow dropdown for npm publishing](../../assets/workflow-dispatch-npm-banner.png)
+![Run workflow dropdown for npm publishing](https://developer.wordpress.org/files/2023/07/image-2.png)
 
 To publish packages to npm for the WordPress major release, select `wp` from the "Release type" dropdown and enter `X.Y` (example `5.2`) in the "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
@@ -484,7 +484,7 @@ Note: You may discover the current version of each package is not up to date, if
 
 Now, the `wp/latest` branch is ready for publishing npm packages. In order to start the process, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
 
-![Run workflow dropdown for npm publishing](../../assets/workflow-dispatch-npm-banner.png)
+![Run workflow dropdown for npm publishing](https://developer.wordpress.org/files/2023/07/image-6.png)
 
 To publish packages to npm with bugfixes, select `bugfix` from the "Release type" dropdown and leave empty "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
@@ -514,7 +514,7 @@ npm install @wordpress/components@next
 
 In order to start the publishing process for development version of npm packages, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
 
-![Run workflow dropdown for npm publishing](../../assets/workflow-dispatch-npm-banner.png)
+![Run workflow dropdown for npm publishing](https://developer.wordpress.org/files/2023/07/image-4.png)
 
 To publish development packages to npm, select `development` from the "Release type" dropdown and leave empty "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
