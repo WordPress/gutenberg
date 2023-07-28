@@ -74,8 +74,9 @@ describe( 'Editor', () => {
 		// Act
 		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
-
-		toggleMode();
+		act( () => {
+			toggleMode();
+		} );
 
 		// Assert
 		const htmlEditor = await screen.findByLabelText( 'html-view-content' );
