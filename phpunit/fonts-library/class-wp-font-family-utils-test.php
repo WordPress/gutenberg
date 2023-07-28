@@ -126,7 +126,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 
 		if ( $are_mergeable ) {
 			$this->assertNotWPError( $merged_font, 'Fonts could not be merged' );
-			$this->assertEquals( $expected_result, $merged_font, 'The font family data and font faces merged not as expected' );
+			$this->assertSame( $expected_result, $merged_font, 'The font family data and font faces merged not as expected' );
 		} else {
 			$this->assertWPError( $merged_font, 'Merging non mergeable fonts (diifferent slug) should have failed.' );
 		}
