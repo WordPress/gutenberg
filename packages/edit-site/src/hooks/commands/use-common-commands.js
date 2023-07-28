@@ -6,7 +6,10 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { trash, backup, help, styles, external } from '@wordpress/icons';
 import { useCommandLoader, useCommand } from '@wordpress/commands';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
@@ -22,6 +25,145 @@ import getIsListPage from '../../utils/get-is-list-page';
 
 const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+
+function useGlobalStylesOpenStylesCommands() {
+	const { openGeneralSidebar, setCanvasMode } = unlock(
+		useDispatch( editSiteStore )
+	);
+	const { params } = useLocation();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isEditorPage = ! getIsListPage( params, isMobileViewport );
+	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
+	const { set } = useDispatch( preferencesStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
+
+	const history = useHistory();
+	const { isDistractionFree, isBlockBasedTheme } = useSelect( ( select ) => {
+		return {
+			isDistractionFree: select( preferencesStore ).get(
+				editSiteStore.name,
+				'distractionFree'
+			),
+			isBlockBasedTheme:
+				select( blockEditorStore ).getSettings()
+					.__unstableIsBlockBasedTheme,
+		};
+	}, [] );
+
+	const commands = useMemo( () => {
+		if ( ! isBlockBasedTheme ) {
+			return [];
+		}
+
+		return [
+			{
+				name: 'core/edit-site/open-styles',
+				label: __( 'Open styles' ),
+				callback: ( { close } ) => {
+					close();
+					if ( ! isEditorPage ) {
+						history.push( {
+							path: '/wp_global_styles',
+							canvas: 'edit',
+						} );
+					}
+					if ( isEditorPage && getCanvasMode() !== 'edit' ) {
+						setCanvasMode( 'edit' );
+					}
+					if ( isDistractionFree ) {
+						set( editSiteStore.name, 'distractionFree', false );
+						createInfoNotice(
+							__( 'Distraction free mode turned off.' ),
+							{
+								type: 'snackbar',
+							}
+						);
+					}
+					openGeneralSidebar( 'edit-site/global-styles' );
+				},
+				icon: styles,
+			},
+		];
+	}, [
+		history,
+		openGeneralSidebar,
+		setCanvasMode,
+		isEditorPage,
+		createInfoNotice,
+		getCanvasMode,
+		isDistractionFree,
+		isBlockBasedTheme,
+		set,
+	] );
+
+	return {
+		isLoading: false,
+		commands,
+	};
+}
+
+function useGlobalStylesToggleWelcomeGuideCommands() {
+	const { openGeneralSidebar, setCanvasMode } = unlock(
+		useDispatch( editSiteStore )
+	);
+	const { params } = useLocation();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isEditorPage = ! getIsListPage( params, isMobileViewport );
+	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
+	const { set } = useDispatch( preferencesStore );
+
+	const history = useHistory();
+	const isBlockBasedTheme = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings()
+			.__unstableIsBlockBasedTheme;
+	}, [] );
+
+	const commands = useMemo( () => {
+		if ( ! isBlockBasedTheme ) {
+			return [];
+		}
+
+		return [
+			{
+				name: 'core/edit-site/toggle-styles-welcome-guide',
+				label: __( 'Learn about styles' ),
+				callback: ( { close } ) => {
+					close();
+					if ( ! isEditorPage ) {
+						history.push( {
+							path: '/wp_global_styles',
+							canvas: 'edit',
+						} );
+					}
+					if ( isEditorPage && getCanvasMode() !== 'edit' ) {
+						setCanvasMode( 'edit' );
+					}
+					openGeneralSidebar( 'edit-site/global-styles' );
+					set( 'core/edit-site', 'welcomeGuideStyles', true );
+					// sometimes there's a focus loss that happens after some time
+					// that closes the modal, we need to force reopening it.
+					setTimeout( () => {
+						set( 'core/edit-site', 'welcomeGuideStyles', true );
+					}, 500 );
+				},
+				icon: help,
+			},
+		];
+	}, [
+		history,
+		openGeneralSidebar,
+		setCanvasMode,
+		isEditorPage,
+		getCanvasMode,
+		isBlockBasedTheme,
+		set,
+	] );
+
+	return {
+		isLoading: false,
+		commands,
+	};
+}
 
 function useGlobalStylesResetCommands() {
 	const [ canReset, onReset ] = useGlobalStylesReset();
@@ -170,79 +312,13 @@ function useGlobalStylesOpenRevisionsCommands() {
 }
 
 export function useCommonCommands() {
-	const { openGeneralSidebar, setCanvasMode } = unlock(
-		useDispatch( editSiteStore )
-	);
-	const { params } = useLocation();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isEditorPage = ! getIsListPage( params, isMobileViewport );
-	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
-	const { set } = useDispatch( preferencesStore );
-	const { createInfoNotice } = useDispatch( noticesStore );
-	const history = useHistory();
-	const { homeUrl, isDistractionFree } = useSelect( ( select ) => {
+	const homeUrl = useSelect( ( select ) => {
 		const {
 			getUnstableBase, // Site index.
 		} = select( coreStore );
 
-		return {
-			homeUrl: getUnstableBase()?.home,
-			isDistractionFree: select( preferencesStore ).get(
-				editSiteStore.name,
-				'distractionFree'
-			),
-		};
+		return getUnstableBase()?.home;
 	}, [] );
-
-	useCommand( {
-		name: 'core/edit-site/open-styles',
-		label: __( 'Open styles' ),
-		callback: ( { close } ) => {
-			close();
-			if ( ! isEditorPage ) {
-				history.push( {
-					path: '/wp_global_styles',
-					canvas: 'edit',
-				} );
-			}
-			if ( isEditorPage && getCanvasMode() !== 'edit' ) {
-				setCanvasMode( 'edit' );
-			}
-			if ( isDistractionFree ) {
-				set( editSiteStore.name, 'distractionFree', false );
-				createInfoNotice( __( 'Distraction free mode turned off.' ), {
-					type: 'snackbar',
-				} );
-			}
-			openGeneralSidebar( 'edit-site/global-styles' );
-		},
-		icon: styles,
-	} );
-
-	useCommand( {
-		name: 'core/edit-site/toggle-styles-welcome-guide',
-		label: __( 'Learn about styles' ),
-		callback: ( { close } ) => {
-			close();
-			if ( ! isEditorPage ) {
-				history.push( {
-					path: '/wp_global_styles',
-					canvas: 'edit',
-				} );
-			}
-			if ( isEditorPage && getCanvasMode() !== 'edit' ) {
-				setCanvasMode( 'edit' );
-			}
-			openGeneralSidebar( 'edit-site/global-styles' );
-			set( 'core/edit-site', 'welcomeGuideStyles', true );
-			// sometimes there's a focus loss that happens after some time
-			// that closes the modal, we need to force reopening it.
-			setTimeout( () => {
-				set( 'core/edit-site', 'welcomeGuideStyles', true );
-			}, 500 );
-		},
-		icon: help,
-	} );
 
 	useCommand( {
 		name: 'core/edit-site/view-site',
@@ -252,6 +328,16 @@ export function useCommonCommands() {
 			window.open( homeUrl, '_blank' );
 		},
 		icon: external,
+	} );
+
+	useCommandLoader( {
+		name: 'core/edit-site/open-styles',
+		hook: useGlobalStylesOpenStylesCommands,
+	} );
+
+	useCommandLoader( {
+		name: 'core/edit-site/toggle-styles-welcome-guide',
+		hook: useGlobalStylesToggleWelcomeGuideCommands,
 	} );
 
 	useCommandLoader( {
