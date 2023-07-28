@@ -9,7 +9,7 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	keyboardClose,
+	keyboard,
 	desktop,
 	listView,
 } from '@wordpress/icons';
@@ -147,7 +147,7 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/open-shortcut-help',
 		label: __( 'Open keyboard shortcuts' ),
-		icon: keyboardClose,
+		icon: keyboard,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
 		},
