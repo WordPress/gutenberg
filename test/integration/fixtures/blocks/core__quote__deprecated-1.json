@@ -3,7 +3,8 @@
 		"name": "core/quote",
 		"isValid": true,
 		"attributes": {
-			"citation": "...with a caption"
+			"value": "<p>Testing deprecated quote block...</p>",
+			"citation": ""
 		},
 		"innerBlocks": [
 			{

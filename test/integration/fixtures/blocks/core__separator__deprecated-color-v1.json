@@ -3,8 +3,8 @@
 		"name": "core/separator",
 		"isValid": true,
 		"attributes": {
-			"backgroundColor": "accent",
-			"opacity": "css"
+			"opacity": "css",
+			"backgroundColor": "accent"
 		},
 		"innerBlocks": []
 	}

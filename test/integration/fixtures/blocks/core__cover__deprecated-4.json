@@ -4,14 +4,18 @@
 		"isValid": true,
 		"attributes": {
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"useFeaturedImage": false,
 			"id": 35,
+			"alt": "",
 			"hasParallax": false,
+			"isRepeated": false,
 			"dimRatio": 50,
 			"backgroundType": "image",
 			"focalPoint": {
 				"x": "0.07",
 				"y": "0.07"
 			},
+			"isDark": true,
 			"tagName": "div"
 		},
 		"innerBlocks": [

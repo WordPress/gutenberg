@@ -3,8 +3,8 @@
 		"name": "core/group",
 		"isValid": true,
 		"attributes": {
-			"textColor": "accent",
-			"tagName": "div"
+			"tagName": "div",
+			"textColor": "accent"
 		},
 		"innerBlocks": [
 			{

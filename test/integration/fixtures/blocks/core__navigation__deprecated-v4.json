@@ -6,6 +6,9 @@
 			"showSubmenuIcon": true,
 			"openSubmenusOnClick": false,
 			"overlayMenu": "never",
+			"icon": "handle",
+			"hasIcon": true,
+			"maxNestingLevel": 5,
 			"fontFamily": "cambria-georgia",
 			"layout": {
 				"type": "flex",
