@@ -4,6 +4,11 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import * as ProgressBarStyled from './styles';
@@ -31,7 +36,11 @@ export function ProgressBar(
 					}%`,
 				} }
 			/>
-			<ProgressBarStyled.ProgressElement max={ 100 } value={ value } />
+			<ProgressBarStyled.ProgressElement
+				max={ 100 }
+				value={ value }
+				aria-label={ __( 'Loading …' ) }
+			/>
 		</ProgressBarStyled.Track>
 	);
 }
