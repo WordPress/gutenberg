@@ -225,7 +225,8 @@
 
 		img {
 			aspect-ratio: var(--lightbox-image-target-aspect-ratio);
-			object-fit: cover;
+			// Important is needed to overwrite the contain setting.
+			object-fit: cover !important;
 		}
 	}
 
@@ -261,6 +262,8 @@
 				.wp-block-image {
 					img {
 						// Important is needed to overwrite the custom sizes.
+						min-width: var(--lightbox-image-width);
+						min-height: var(--lightbox-image-height);
 						width: var(--lightbox-image-width) !important;
 						height: var(--lightbox-image-height) !important;
 					}
@@ -279,6 +282,8 @@
 					.wp-block-image {
 						img {
 							// Important is needed to overwrite the custom sizes.
+							min-width: var(--lightbox-image-width);
+							min-height: var(--lightbox-image-height);
 							width: var(--lightbox-image-width) !important;
 							height: var(--lightbox-image-height) !important;
 						}

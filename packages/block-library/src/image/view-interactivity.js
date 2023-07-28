@@ -241,13 +241,31 @@ function setZoomStyles( context, event ) {
 	// Recalculate the width and height.
 	if ( naturalRatio.toFixed( 2 ) !== imgRatio.toFixed( 2 ) ) {
 		if ( naturalRatio > imgRatio ) {
-			// If the width is reached before the height, we keep the targetWidth
+			// If the width is reached before the height, we keep the maxWidth
 			// and recalculate the height.
-			imgMaxHeight = imgMaxWidth / naturalRatio;
+			// Unless the difference between the maxHeight and the reducedHeight
+			// is higher than the maxWidth, where we keep the reducedHeight and
+			// recalculate the width.
+			const reducedHeight = imgMaxWidth / naturalRatio;
+			if ( imgMaxHeight - reducedHeight > imgMaxWidth ) {
+				imgMaxHeight = reducedHeight;
+				imgMaxWidth = reducedHeight * naturalRatio;
+			} else {
+				imgMaxHeight = imgMaxWidth / naturalRatio;
+			}
 		} else {
-			// If the height is reached before the width, we keep the targetHeight
+			// If the height is reached before the width, we keep the maxHeight
 			// and recalculate the width.
-			imgMaxWidth = imgMaxHeight * naturalRatio;
+			// Unless the difference between the maxWidth and the reducedWidth
+			// is higher than the maxHeight, where we keep the reducedWidth and
+			// recalculate the height.
+			const reducedWidth = imgMaxHeight * naturalRatio;
+			if ( imgMaxWidth - reducedWidth > imgMaxHeight ) {
+				imgMaxWidth = reducedWidth;
+				imgMaxHeight = reducedWidth / naturalRatio;
+			} else {
+				imgMaxWidth = imgMaxHeight * naturalRatio;
+			}
 		}
 		containerWidth = imgMaxWidth;
 		containerHeight = imgMaxHeight;
