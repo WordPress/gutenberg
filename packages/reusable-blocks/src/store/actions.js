@@ -67,7 +67,7 @@ export const __experimentalConvertBlocksToReusable =
 			),
 			status: 'publish',
 			meta,
-			wp_user_pattern_categories: categories,
+			wp_pattern_custom_category: categories,
 		};
 
 		const updatedRecord = await registry

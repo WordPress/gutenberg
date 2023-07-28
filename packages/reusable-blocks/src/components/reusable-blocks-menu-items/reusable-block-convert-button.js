@@ -27,7 +27,9 @@ import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import apiFetch from '@wordpress/api-fetch';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -58,7 +60,7 @@ function findOrCreateTerm( category ) {
 	const escapedTermSlug = escapeHtml( category.value );
 	const escapedTermDescription = escapeHtml( category.description );
 	return apiFetch( {
-		path: '/wp/v2/wp_pattern',
+		path: '/wp/v2/wp_pattern_custom_category',
 		method: 'POST',
 		data: {
 			name: escapedTermName,
@@ -90,6 +92,13 @@ export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
 } ) {
+	const query = { per_page: -1, hide_empty: false, context: 'view' };
+
+	const { records: categories } = useEntityRecords(
+		'taxonomy',
+		'wp_pattern_custom_category',
+		query
+	);
 	const { useReusableBlocksRenameHint, ReusableBlocksRenameHint } = unlock(
 		blockEditorPrivateApis
 	);
@@ -98,13 +107,14 @@ export default function ReusableBlockConvertButton( {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 	const [ categorySlug, setCategorySlug ] = useState( '' );
-	const canConvert = useSelect(
+	const { canConvert, corePatternCategories } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
 			const {
 				getBlocksByClientId,
 				canInsertBlockType,
 				getBlockRootClientId,
+				getSettings,
 			} = select( blockEditorStore );
 
 			const rootId =
@@ -142,7 +152,11 @@ export default function ReusableBlockConvertButton( {
 				// Hide when current doesn't have permission to do that.
 				!! canUser( 'create', 'blocks' );
 
-			return _canConvert;
+			return {
+				canConvert: _canConvert,
+				corePatternCategories:
+					getSettings().__experimentalBlockPatternCategories,
+			};
 		},
 		[ clientIds, rootClientId ]
 	);
@@ -230,6 +244,8 @@ export default function ReusableBlockConvertButton( {
 			}
 		},
 		[
+			categoryOptions,
+			categorySlug,
 			convertBlocksToReusable,
 			clientIds,
 			syncType,
@@ -283,10 +299,10 @@ export default function ReusableBlockConvertButton( {
 									/>
 									<SelectControl
 										label={ __( 'Category' ) }
-										onChange={ setCategoryId }
+										onChange={ setCategorySlug }
 										options={ categoryOptions }
 										size="__unstable-large"
-										value={ categoryId }
+										value={ categorySlug }
 									/>
 									<ToggleControl
 										label={ __( 'Synced' ) }
