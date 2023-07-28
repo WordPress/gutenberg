@@ -28,7 +28,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
-import apiFetch from '@wordpress/api-fetch';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -55,30 +54,21 @@ const unescapeTerm = ( term ) => {
 	};
 };
 // Tries to create a term or fetch it if it already exists.
-function findOrCreateTerm( category ) {
+async function findOrCreateTerm( category, saveEntityRecord ) {
 	const escapedTermName = escapeHtml( category.label );
 	const escapedTermSlug = escapeHtml( category.value );
 	const escapedTermDescription = escapeHtml( category.description );
-	return apiFetch( {
-		path: '/wp/v2/wp_pattern_custom_category',
-		method: 'POST',
-		data: {
+	const newCategory = await saveEntityRecord(
+		'taxonomy',
+		'wp_pattern_custom_category',
+		{
 			name: escapedTermName,
 			slug: escapedTermSlug,
 			description: escapedTermDescription,
 		},
-	} )
-		.catch( ( error ) => {
-			if ( error.code !== 'term_exists' ) {
-				return Promise.reject( error );
-			}
-
-			return Promise.resolve( {
-				id: error.data.term_id,
-				name: category.label,
-			} );
-		} )
-		.then( unescapeTerm );
+		{ throwOnError: true }
+	);
+	return unescapeTerm( newCategory );
 }
 /**
  * Menu control to convert block(s) to reusable block.
@@ -92,6 +82,7 @@ export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
 } ) {
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const query = { per_page: -1, hide_empty: false, context: 'view' };
 
 	const { records: categories } = useEntityRecords(
@@ -209,7 +200,10 @@ export default function ReusableBlockConvertButton( {
 			if ( selectedCategory.taxonomyId ) {
 				categoryId = selectedCategory.taxonomyId;
 			} else {
-				const newTerm = await findOrCreateTerm( selectedCategory );
+				const newTerm = await findOrCreateTerm(
+					selectedCategory,
+					saveEntityRecord
+				);
 				categoryId = newTerm.id;
 			}
 			try {
@@ -246,6 +240,7 @@ export default function ReusableBlockConvertButton( {
 		[
 			categoryOptions,
 			categorySlug,
+			saveEntityRecord,
 			convertBlocksToReusable,
 			clientIds,
 			syncType,
