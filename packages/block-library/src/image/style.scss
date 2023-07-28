@@ -202,8 +202,8 @@
 		left: 50%;
 		transform-origin: top left;
 		transform: translate(-50%, -50%);
-		width: var(--lightbox-container-width);
-		height: var(--lightbox-container-height);
+		width: var(--wp--lightbox-container-width);
+		height: var(--wp--lightbox-container-height);
 		z-index: 9999999999;
 	}
 
@@ -224,7 +224,7 @@
 		}
 
 		img {
-			aspect-ratio: var(--lightbox-image-target-aspect-ratio);
+			aspect-ratio: var(--wp--lightbox-image-target-aspect-ratio);
 			// Important is needed to overwrite the contain setting.
 			object-fit: cover !important;
 		}
@@ -262,10 +262,10 @@
 				.wp-block-image {
 					img {
 						// Important is needed to overwrite the custom sizes.
-						min-width: var(--lightbox-image-width);
-						min-height: var(--lightbox-image-height);
-						width: var(--lightbox-image-width) !important;
-						height: var(--lightbox-image-height) !important;
+						min-width: var(--wp--lightbox-image-width);
+						min-height: var(--wp--lightbox-image-height);
+						width: var(--wp--lightbox-image-width) !important;
+						height: var(--wp--lightbox-image-height) !important;
 					}
 				}
 				.scrim {
@@ -282,10 +282,10 @@
 					.wp-block-image {
 						img {
 							// Important is needed to overwrite the custom sizes.
-							min-width: var(--lightbox-image-width);
-							min-height: var(--lightbox-image-height);
-							width: var(--lightbox-image-width) !important;
-							height: var(--lightbox-image-height) !important;
+							min-width: var(--wp--lightbox-image-width);
+							min-height: var(--wp--lightbox-image-height);
+							width: var(--wp--lightbox-image-width) !important;
+							height: var(--wp--lightbox-image-height) !important;
 						}
 					}
 					.scrim {
@@ -297,7 +297,7 @@
 	}
 }
 
-html.has-lightbox-open {
+html.wp-has-lightbox-open {
 	overflow: hidden;
 }
 
@@ -327,7 +327,7 @@ html.has-lightbox-open {
 
 @keyframes lightbox-zoom-in {
 	0% {
-		transform: translate(calc(-50vw + var(--lightbox-initial-left-position)), calc(-50vh + var(--lightbox-initial-top-position))) scale(var(--lightbox-scale));
+		transform: translate(calc(-50vw + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 	100% {
 		transform: translate(-50%, -50%) scale(1, 1);
@@ -344,6 +344,6 @@ html.has-lightbox-open {
 	}
 	100% {
 		visibility: hidden;
-		transform: translate(calc(-50vw + var(--lightbox-initial-left-position)), calc(-50vh + var(--lightbox-initial-top-position))) scale(var(--lightbox-scale));
+		transform: translate(calc(-50vw + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 }
