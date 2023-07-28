@@ -113,7 +113,11 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 
 		block = {
 			...block,
-			attributes: migratedAttributes,
+			attributes: getBlockAttributes(
+				blockType,
+				migratedBlock.originalContent,
+				migratedAttributes
+			),
 			innerBlocks: migratedInnerBlocks,
 			isValid: true,
 			validationIssues: [],
