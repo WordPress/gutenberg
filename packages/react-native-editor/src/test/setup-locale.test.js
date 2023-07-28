@@ -28,6 +28,11 @@ const pluginTranslations = [
 describe( 'Setup locale', () => {
 	it( 'sets up default domain translations', () => {
 		setupLocale( 'test', extraTranslations, getDefaultTranslation );
+		// TODO(jest-console): Remove the log and remove the expect below.
+		expect( console ).toHaveLoggedWith( 'locale', 'test', {
+			...getDefaultTranslation(),
+			...extraTranslations,
+		} );
 
 		expect( __( 'default-string' ) ).toBe( 'default-string-translation' );
 		expect( __( 'extra-string' ) ).toBe( 'extra-string-translation' );
@@ -42,6 +47,11 @@ describe( 'Setup locale', () => {
 			getDefaultTranslation,
 			pluginTranslations
 		);
+		// TODO(jest-console): Remove the log and remove the expect below.
+		expect( console ).toHaveLoggedWith( 'locale', 'test', {
+			...getDefaultTranslation(),
+			...extraTranslations,
+		} );
 
 		/* eslint-disable @wordpress/i18n-text-domain */
 		expect( __( 'domain-1-string', domain ) ).toBe(
