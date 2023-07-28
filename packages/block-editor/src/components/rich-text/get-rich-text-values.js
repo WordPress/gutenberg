@@ -85,6 +85,11 @@ function _getSaveElement( name, attributes, innerBlocks ) {
 	return getSaveElement(
 		name,
 		attributes,
+		// We need to pass the inner blocks as save elements so that these
+		// elements can be used by `useInnerBlocksProps.save`
+		// (getInnerBlocksProps in the blocks package). The save element tree
+		// could in turn have inner blocks, which we may need when rendering
+		// `InnerBlocks.Content`.
 		innerBlocks.map( ( block ) => {
 			const saveElement = _getSaveElement(
 				block.name,
