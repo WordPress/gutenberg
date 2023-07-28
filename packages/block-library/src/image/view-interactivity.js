@@ -203,14 +203,36 @@ store( {
 function setZoomStyles( context, event ) {
 	// The reference img element lies adjacent
 	// to the event target button in the DOM.
-	const {
+	let {
 		naturalWidth,
 		naturalHeight,
 		offsetWidth: originalWidth,
 		offsetHeight: originalHeight,
 	} = event.target.nextElementSibling;
-	const { x: screenPosX, y: screenPosY } =
+	let { x: screenPosX, y: screenPosY } =
 		event.target.nextElementSibling.getBoundingClientRect();
+
+	// Natural ratio of the image clicked to open the lightbox.
+	const naturalRatio = naturalWidth / naturalHeight;
+	// Original ratio of the image clicked to open the lightbox.
+	let originalRatio = originalWidth / originalHeight;
+
+	// If it has object-fit: contain, recalculate the original sizes
+	// and the screen position without the blank spaces.
+	if ( context.core.image.scaleAttr === 'contain' ) {
+		if ( naturalRatio > originalRatio ) {
+			const heightWithoutSpace = originalWidth / naturalRatio;
+			// Recalculate screen position without the top space.
+			screenPosY += ( originalHeight - heightWithoutSpace ) / 2;
+			originalHeight = heightWithoutSpace;
+		} else {
+			const widthWithoutSpace = originalHeight * naturalRatio;
+			// Recalculate screen position without the left space.
+			screenPosX += ( originalWidth - widthWithoutSpace ) / 2;
+			originalWidth = widthWithoutSpace;
+		}
+	}
+	originalRatio = originalWidth / originalHeight;
 
 	// Typically, we use the image's full-sized dimensions. If those
 	// dimensions have not been set (i.e. an external image with only one size),
@@ -227,10 +249,6 @@ function setZoomStyles( context, event ) {
 			: naturalHeight
 	);
 
-	// Natural ratio of the image clicked to open the lightbox.
-	const naturalRatio = naturalWidth / naturalHeight;
-	// Original ratio of the image clicked to open the lightbox.
-	const originalRatio = originalWidth / originalHeight;
 	// Ratio of the biggest image stored in the database.
 	let imgRatio = imgMaxWidth / imgMaxHeight;
 	let containerMaxWidth = imgMaxWidth;
