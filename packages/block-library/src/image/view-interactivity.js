@@ -331,31 +331,22 @@ function setZoomStyles( context, event ) {
 		imgMaxHeight * ( containerHeight / containerMaxHeight );
 
 	// Add the CSS variables needed.
-	const root = document.documentElement;
-	root.style.setProperty(
-		'--lightbox-image-target-aspect-ratio',
-		originalRatio
-	);
-	root.style.setProperty(
-		'--lightbox-initial-top-position',
-		screenPosY + 'px'
-	);
-	root.style.setProperty(
-		'--lightbox-initial-left-position',
-		screenPosX + 'px'
-	);
-	root.style.setProperty(
-		'--lightbox-container-width',
-		containerWidth + 'px'
-	);
-	root.style.setProperty(
-		'--lightbox-container-height',
-		containerHeight + 'px'
-	);
-	root.style.setProperty( '--lightbox-image-width', lightboxImgWidth + 'px' );
-	root.style.setProperty(
-		'--lightbox-image-height',
-		lightboxImgHeight + 'px'
-	);
-	root.style.setProperty( '--lightbox-scale', containerScale );
+	let styleTag = document.getElementById( 'wp-lightbox-styles' );
+	if ( ! styleTag ) {
+		styleTag = document.createElement( 'style' );
+		styleTag.id = 'wp-lightbox-styles';
+		document.head.appendChild( styleTag );
+	}
+	styleTag.innerHTML = `
+		:root {
+			--lightbox-image-target-aspect-ratio: ${ originalRatio };
+			--lightbox-initial-top-position: ${ screenPosY }px;
+			--lightbox-initial-left-position: ${ screenPosX }px;
+			--lightbox-container-width: ${ containerWidth }px;
+			--lightbox-container-height: ${ containerHeight }px;
+			--lightbox-image-width: ${ lightboxImgWidth }px;
+			--lightbox-image-height: ${ lightboxImgHeight }px;
+			--lightbox-scale: ${ containerScale };
+		}
+	`;
 }
