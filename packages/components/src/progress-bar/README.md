@@ -8,19 +8,6 @@ A simple horizontal progress bar component.
 
 Supports two modes: determinate and indeterminate. A progress bar is determinate when a specific progress value has been specified (from 0 to 100), and indeterminate when a value hasn't been specified.
 
-### Usage
-
-```jsx
-/**
- * WordPress dependencies
- */
-import { __experimentalProgressBar as ProgressBar } from '@wordpress/components';
-
-export const MyProgressBar = () => {
-	return <ProgressBar value={ 30 } />;
-};
-```
-
 ### Props
 
 The component accepts the following props:
