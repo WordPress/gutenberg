@@ -18,7 +18,7 @@ import { default as DevicePreview } from '../device-preview';
 import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
-import DocumentTitle from './document-title';
+import DocumentActions from './document-actions';
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -65,8 +65,8 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				className="edit-post-header__toolbar"
 			>
 				<HeaderToolbar />
-				<div className="edit-post-header__document-title">
-					<DocumentTitle />
+				<div className="edit-post-header__center">
+					<DocumentActions />
 				</div>
 			</motion.div>
 			<motion.div

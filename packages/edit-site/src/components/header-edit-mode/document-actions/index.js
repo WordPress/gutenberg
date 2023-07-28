@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -17,7 +17,8 @@ import {
 import { BlockIcon } from '@wordpress/block-editor';
 import { store as commandsStore } from '@wordpress/commands';
 import {
-	chevronLeftSmall as chevronLeftSmallIcon,
+	chevronLeftSmall,
+	chevronRightSmall,
 	page as pageIcon,
 	navigation as navigationIcon,
 	symbol,
@@ -153,7 +154,7 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			{ onBack && (
 				<Button
 					className="edit-site-document-actions__back"
-					icon={ chevronLeftSmallIcon }
+					icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
 					onClick={ ( event ) => {
 						event.stopPropagation();
 						onBack();
