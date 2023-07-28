@@ -12,14 +12,18 @@ import { insertObject } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	store as blockEditorStore,
+	privateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { name } from './block.json';
+import { unlock } from '../lock-unlock';
+
+const { usesContextKey } = unlock( privateApis );
 
 export const formatName = 'core/footnote';
 export const format = {
@@ -30,7 +34,13 @@ export const format = {
 		'data-fn': 'data-fn',
 	},
 	contentEditable: false,
-	edit: function Edit( { value, onChange, isObjectActive } ) {
+	[ usesContextKey ]: [ 'postType' ],
+	edit: function Edit( {
+		value,
+		onChange,
+		isObjectActive,
+		context: { postType },
+	} ) {
 		const registry = useRegistry();
 		const {
 			getSelectedBlockClientId,
@@ -38,8 +48,19 @@ export const format = {
 			getBlockName,
 			getBlocks,
 		} = useSelect( blockEditorStore );
+		const footnotesBlockType = useSelect( ( select ) =>
+			select( blocksStore ).getBlockType( name )
+		);
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
+
+		if ( ! footnotesBlockType ) {
+			return null;
+		}
+
+		if ( postType !== 'post' && postType !== 'page' ) {
+			return null;
+		}
 
 		function onClick() {
 			registry.batch( () => {

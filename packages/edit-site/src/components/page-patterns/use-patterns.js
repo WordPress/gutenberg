@@ -4,6 +4,7 @@
 import { parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -39,14 +40,12 @@ const templatePartToPattern = ( templatePart ) => ( {
 	templatePart,
 } );
 
-const templatePartHasCategory = ( item, category ) =>
-	item.templatePart.area === category;
-
 const selectTemplatePartsAsPatterns = (
 	select,
 	{ categoryId, search = '' } = {}
 ) => {
 	const { getEntityRecords, getIsResolving } = select( coreStore );
+	const { __experimentalGetDefaultTemplatePartAreas } = select( editorStore );
 	const query = { per_page: -1 };
 	const rawTemplateParts =
 		getEntityRecords( 'postType', TEMPLATE_PARTS, query ) ??
@@ -54,6 +53,23 @@ const selectTemplatePartsAsPatterns = (
 	const templateParts = rawTemplateParts.map( ( templatePart ) =>
 		templatePartToPattern( templatePart )
 	);
+
+	// In the case where a custom template part area has been removed we need
+	// the current list of areas to cross check against so orphaned template
+	// parts can be treated as uncategorized.
+	const knownAreas = __experimentalGetDefaultTemplatePartAreas() || [];
+	const templatePartAreas = knownAreas.map( ( area ) => area.area );
+
+	const templatePartHasCategory = ( item, category ) => {
+		if ( category !== 'uncategorized' ) {
+			return item.templatePart.area === category;
+		}
+
+		return (
+			item.templatePart.area === category ||
+			! templatePartAreas.includes( item.templatePart.area )
+		);
+	};
 
 	const isResolving = getIsResolving( 'getEntityRecords', [
 		'postType',

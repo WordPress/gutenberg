@@ -23,10 +23,12 @@ import {
 	currentlyPreviewingTheme,
 } from '../../utils/is-previewing-theme';
 import { unlock } from '../../lock-unlock';
+import { getPathFromURL } from '../sync-state-with-url/use-sync-path-with-url';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function LeafMoreMenu( props ) {
+	const location = useLocation();
 	const history = useHistory();
 	const { block } = props;
 	const { clientId } = block;
@@ -63,22 +65,32 @@ export default function LeafMoreMenu( props ) {
 				attributes.type &&
 				history
 			) {
-				history.push( {
-					postType: attributes.type,
-					postId: attributes.id,
-					...( isPreviewingTheme() && {
-						wp_theme_preview: currentlyPreviewingTheme(),
-					} ),
-				} );
+				history.push(
+					{
+						postType: attributes.type,
+						postId: attributes.id,
+						...( isPreviewingTheme() && {
+							wp_theme_preview: currentlyPreviewingTheme(),
+						} ),
+					},
+					{
+						backPath: getPathFromURL( location.params ),
+					}
+				);
 			}
 			if ( name === 'core/page-list-item' && attributes.id && history ) {
-				history.push( {
-					postType: 'page',
-					postId: attributes.id,
-					...( isPreviewingTheme() && {
-						wp_theme_preview: currentlyPreviewingTheme(),
-					} ),
-				} );
+				history.push(
+					{
+						postType: 'page',
+						postId: attributes.id,
+						...( isPreviewingTheme() && {
+							wp_theme_preview: currentlyPreviewingTheme(),
+						} ),
+					},
+					{
+						backPath: getPathFromURL( location.params ),
+					}
+				);
 			}
 		},
 		[ history ]

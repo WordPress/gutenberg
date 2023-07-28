@@ -616,44 +616,46 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls group="block">
-				{ ! isContentLocked && (
-					<ToolbarButton
-						onClick={ () => {
-							setShowCaption( ! showCaption );
-							if ( showCaption && caption ) {
-								setAttributes( { caption: undefined } );
-							}
-						} }
-						icon={ captionIcon }
-						isPressed={ showCaption }
-						label={
-							showCaption
-								? __( 'Remove caption' )
-								: __( 'Add caption' )
-						}
-					/>
-				) }
-			</BlockControls>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
-					handleUpload={ false }
-					onSelect={ updateImages }
-					name={ __( 'Add' ) }
-					multiple={ true }
-					mediaIds={ images
-						.filter( ( image ) => image.id )
-						.map( ( image ) => image.id ) }
-					addToGallery={ hasImageIds }
-				/>
-			</BlockControls>
 			{ Platform.isWeb && (
-				<GapStyles
-					blockGap={ attributes.style?.spacing?.blockGap }
-					clientId={ clientId }
-				/>
+				<>
+					<BlockControls group="block">
+						{ ! isContentLocked && (
+							<ToolbarButton
+								onClick={ () => {
+									setShowCaption( ! showCaption );
+									if ( showCaption && caption ) {
+										setAttributes( { caption: undefined } );
+									}
+								} }
+								icon={ captionIcon }
+								isPressed={ showCaption }
+								label={
+									showCaption
+										? __( 'Remove caption' )
+										: __( 'Add caption' )
+								}
+							/>
+						) }
+					</BlockControls>
+					<BlockControls group="other">
+						<MediaReplaceFlow
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="image/*"
+							handleUpload={ false }
+							onSelect={ updateImages }
+							name={ __( 'Add' ) }
+							multiple={ true }
+							mediaIds={ images
+								.filter( ( image ) => image.id )
+								.map( ( image ) => image.id ) }
+							addToGallery={ hasImageIds }
+						/>
+					</BlockControls>
+					<GapStyles
+						blockGap={ attributes.style?.spacing?.blockGap }
+						clientId={ clientId }
+					/>
+				</>
 			) }
 			<Gallery
 				{ ...props }

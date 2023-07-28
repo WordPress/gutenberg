@@ -383,7 +383,7 @@ describe( 'BlockDraggable', () => {
 			// activate the gesture. Since this not available in tests, the library
 			// displays a warning message.
 			expect( console ).toHaveWarnedWith(
-				'[react-native-gesture-handler] You have to use react-native-reanimated in order to control the state of the gesture.'
+				'[Reanimated] You can not use setGestureState in non-worklet function.'
 			);
 			expect( getEditorHtml() ).toMatchSnapshot(
 				'Paragraph block moved from first to second position'
@@ -411,7 +411,7 @@ describe( 'BlockDraggable', () => {
 			// activate the gesture. Since this not available in tests, the library
 			// displays a warning message.
 			expect( console ).toHaveWarnedWith(
-				'[react-native-gesture-handler] You have to use react-native-reanimated in order to control the state of the gesture.'
+				'[Reanimated] You can not use setGestureState in non-worklet function.'
 			);
 			expect( getEditorHtml() ).toMatchSnapshot(
 				'Spacer block moved from third to first position'
