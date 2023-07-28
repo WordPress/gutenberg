@@ -69,7 +69,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_filename_from_font_face( $slug, $font_face, $suffix, $expected_file_name ) {
 
-		$this->assertEquals(
+		$this->assertSame(
 			$expected_file_name,
 			WP_Font_Family_Utils::get_filename_from_font_face(
 				$slug,
