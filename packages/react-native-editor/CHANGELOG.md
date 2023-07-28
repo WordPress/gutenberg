@@ -13,6 +13,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]
 -   [*] Remove Gallery caption button on mobile [#53010]
 -   [**] Upgrade React Native to 0.71.11 [#51303]
+-   [*] Upgrade Gradle to 8.2.1 & AGP to 8.1.0 [#52872]
 
 ## 1.100.1
 -   [**] Add WP hook for registering non-core blocks [#52791]
