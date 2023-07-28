@@ -260,7 +260,7 @@ describe( 'selectors', () => {
 			parent: [ 'core/test-block-b' ],
 		} );
 
-		registerBlockType( 'core/test-freeform', {
+		registerBlockType( 'core/freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
 			category: 'text',
 			title: 'Test Freeform Content Handler',
@@ -287,7 +287,7 @@ describe( 'selectors', () => {
 			save: () => null,
 		} );
 
-		setFreeformContentHandlerName( 'core/test-freeform' );
+		setFreeformContentHandlerName( 'core/freeform' );
 		setDefaultBlockName( 'core/test-default' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -298,7 +298,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
-		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/freeform' );
 		unregisterBlockType( 'core/test-default' );
 
 		setFreeformContentHandlerName( undefined );
@@ -1316,7 +1316,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1335,7 +1337,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1362,7 +1364,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1591,14 +1593,13 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocks: {
-							value: [],
-						},
 						edits: {},
 					},
 				},
 				initialEdits: {},
-				currentPost: {},
+				currentPost: {
+					content: '',
+				},
 			};
 
 			expect( isEditedPostEmpty( state ) ).toBe( true );
@@ -1620,7 +1621,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1650,7 +1653,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1660,7 +1665,7 @@ describe( 'selectors', () => {
 			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
-		it( 'should return false if blocks, but empty content edit', () => {
+		it( 'should return true if blocks, but empty content edit', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1687,7 +1692,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostEmpty( state ) ).toBe( false );
+			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if the post has an empty content property', () => {
@@ -1709,7 +1714,7 @@ describe( 'selectors', () => {
 			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if edits include a non-empty content property, but blocks are empty', () => {
+		it( 'should return false if edits include a non-empty content property', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1725,7 +1730,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 			};
 
-			expect( isEditedPostEmpty( state ) ).toBe( true );
+			expect( isEditedPostEmpty( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if empty classic block', () => {
@@ -1736,7 +1741,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1744,7 +1749,9 @@ describe( 'selectors', () => {
 								},
 							],
 						},
-						edits: {},
+						edits: {
+							content: () => {},
+						},
 					},
 				},
 				initialEdits: {},
@@ -1762,7 +1769,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1790,7 +1797,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: 'Test Data',
@@ -1818,7 +1825,7 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 123,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -1826,7 +1833,7 @@ describe( 'selectors', () => {
 								},
 								{
 									clientId: 456,
-									name: 'core/test-freeform',
+									name: 'core/freeform',
 									isValid: true,
 									attributes: {
 										content: '',
@@ -2150,6 +2157,7 @@ describe( 'selectors', () => {
 									attributes: {
 										providerNameSlug: 'instagram',
 									},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2172,6 +2180,7 @@ describe( 'selectors', () => {
 									clientId: 567,
 									name: 'core/embed',
 									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2194,11 +2203,13 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/image',
 									attributes: {},
+									innerBlocks: [],
 								},
 								{
 									clientId: 456,
 									name: 'core/quote',
 									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2222,6 +2233,7 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/image',
 									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2245,6 +2257,7 @@ describe( 'selectors', () => {
 									clientId: 456,
 									name: 'core/quote',
 									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2270,6 +2283,7 @@ describe( 'selectors', () => {
 									attributes: {
 										providerNameSlug: 'youtube',
 									},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2295,6 +2309,7 @@ describe( 'selectors', () => {
 									attributes: {
 										providerNameSlug: 'soundcloud',
 									},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2318,11 +2333,13 @@ describe( 'selectors', () => {
 									clientId: 456,
 									name: 'core/quote',
 									attributes: {},
+									innerBlocks: [],
 								},
 								{
 									clientId: 789,
 									name: 'core/paragraph',
 									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -2409,7 +2426,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( "returns removep'd serialization of blocks for single unknown", () => {
-			const unknownBlock = createBlock( 'core/test-freeform', {
+			const unknownBlock = createBlock( 'core/freeform', {
 				content: '<p>foo</p>',
 			} );
 			const state = {
@@ -2431,10 +2448,10 @@ describe( 'selectors', () => {
 		} );
 
 		it( "returns non-removep'd serialization of blocks for multiple unknown", () => {
-			const firstUnknown = createBlock( 'core/test-freeform', {
+			const firstUnknown = createBlock( 'core/freeform', {
 				content: '<p>foo</p>',
 			} );
-			const secondUnknown = createBlock( 'core/test-freeform', {
+			const secondUnknown = createBlock( 'core/freeform', {
 				content: '<p>bar</p>',
 			} );
 			const state = {

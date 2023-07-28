@@ -8,7 +8,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 #### Components
 - Add new ColorPicker. ([33714](https://github.com/WordPress/gutenberg/pull/33714))
 - Update snackbar to use framer motion instead of react spring. ([33717](https://github.com/WordPress/gutenberg/pull/33717))
-- Use updated range styles. ([33824](https://github.com/WordPress/gutenberg/pull/33824))
 
 #### Block Library
 - [Post Featured Image]: Add basic dimension controls. ([31634](https://github.com/WordPress/gutenberg/pull/31634))
@@ -76,11 +75,16 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 #### Meta Boxes
 - Fix Safari 13 metaboxes from overlapping the content. ([33817](https://github.com/WordPress/gutenberg/pull/33817))
 
-#### Accessibility
-- Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))
-
 #### Template Editor
 - Template: Only show post template actions to users with correct capabilities. ([33392](https://github.com/WordPress/gutenberg/pull/33392))
+
+
+### Accessibility
+
+- Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))
+
+#### Components
+- Use updated range styles. ([33824](https://github.com/WordPress/gutenberg/pull/33824))
 
 
 ### Performance

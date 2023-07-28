@@ -8,6 +8,8 @@
 /**
  * Dynamically renders the `core/search` block.
  *
+ * @since 6.3.0 Using block.json `viewScript` to register script, and update `view_script_handles()` only when needed.
+ *
  * @param array    $attributes The block attributes.
  * @param string   $content    The saved content.
  * @param WP_Block $block      The parsed block.
@@ -138,8 +140,10 @@ function render_block_core_search( $attributes, $content, $block ) {
 			$button->add_class( implode( ' ', $button_classes ) );
 			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
 				$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
+				$button->set_attribute( 'data-toggled-aria-label', __( 'Submit Search' ) );
 				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
 				$button->set_attribute( 'aria-expanded', 'false' );
+				$button->set_attribute( 'type', 'button' ); // Will be set to submit after clicking.
 			} else {
 				$button->set_attribute( 'aria-label', wp_strip_all_tags( $attributes['buttonText'] ) );
 			}
