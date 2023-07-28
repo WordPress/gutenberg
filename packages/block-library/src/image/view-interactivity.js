@@ -33,9 +33,7 @@ store( {
 					context.core.image.scrollDelta = 0;
 
 					context.core.image.lightboxEnabled = true;
-					if ( context.core.image.lightboxAnimation === 'zoom' ) {
-						setZoomStyles( context, event );
-					}
+					setStyles( context, event );
 					// Hide overflow only when the animation is in progress,
 					// otherwise the removal of the scrollbars will draw attention
 					// to itself and look like an error
@@ -205,7 +203,7 @@ store( {
 	},
 } );
 
-function setZoomStyles( context, event ) {
+function setStyles( context, event ) {
 	// The reference img element lies adjacent
 	// to the event target button in the DOM.
 	let {
