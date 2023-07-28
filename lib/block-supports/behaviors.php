@@ -164,6 +164,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$m->next_tag( 'img' );
 	$m->set_attribute( 'src', '' );
 	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.responsiveImgSrc' );
+	$m->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
 	$m->set_attribute( 'width', $img_width );
 	$m->set_attribute( 'height', $img_height );
 	if ( 'fade' === $lightbox_animation ) {
@@ -177,6 +178,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$q->next_tag( 'img' );
 	$q->set_attribute( 'src', '' );
 	$q->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
+	$q->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
 	$q->set_attribute( 'width', $img_width );
 	$q->set_attribute( 'height', $img_height );
 	if ( 'fade' === $lightbox_animation  ) {

@@ -222,12 +222,6 @@
 		figcaption {
 			display: none;
 		}
-
-		img {
-			aspect-ratio: var(--wp--lightbox-image-target-aspect-ratio);
-			// Important is needed to overwrite the contain setting.
-			object-fit: cover !important;
-		}
 	}
 
 	button {
@@ -261,11 +255,10 @@
 
 				.wp-block-image {
 					img {
-						// Important is needed to overwrite the custom sizes.
 						min-width: var(--wp--lightbox-image-width);
 						min-height: var(--wp--lightbox-image-height);
-						width: var(--wp--lightbox-image-width) !important;
-						height: var(--wp--lightbox-image-height) !important;
+						width: var(--wp--lightbox-image-width);
+						height: var(--wp--lightbox-image-height);
 					}
 				}
 				.scrim {
@@ -281,11 +274,10 @@
 
 					.wp-block-image {
 						img {
-							// Important is needed to overwrite the custom sizes.
 							min-width: var(--wp--lightbox-image-width);
 							min-height: var(--wp--lightbox-image-height);
-							width: var(--wp--lightbox-image-width) !important;
-							height: var(--wp--lightbox-image-height) !important;
+							width: var(--wp--lightbox-image-width);
+							height: var(--wp--lightbox-image-height);
 						}
 					}
 					.scrim {
