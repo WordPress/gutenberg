@@ -98,6 +98,8 @@ export function getBlockProps( props = {} ) {
  */
 export function getInnerBlocksProps( props = {} ) {
 	const { innerBlocks } = innerBlocksPropsProvider;
+	// Allow a different component to be passed to getSaveElement to handle
+	// inner blocks, bypassing the default serialisation.
 	if ( ! Array.isArray( innerBlocks ) ) {
 		return { ...props, children: innerBlocks };
 	}
