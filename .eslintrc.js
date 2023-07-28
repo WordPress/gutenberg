@@ -286,7 +286,7 @@ module.exports = {
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
 			],
 			extends: [
-				'plugin:eslint-plugin-playwright/playwright-test',
+				'plugin:@wordpress/eslint-plugin/test-playwright',
 				'plugin:@typescript-eslint/base',
 			],
 			parserOptions: {
@@ -300,7 +300,6 @@ module.exports = {
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
-				'playwright/no-page-pause': 'error',
 				'no-restricted-syntax': [
 					'error',
 					{
