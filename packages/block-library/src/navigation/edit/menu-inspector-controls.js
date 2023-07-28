@@ -11,6 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 	Spinner,
+	createSlotFill,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -139,39 +140,46 @@ const MenuInspectorControls = ( props ) => {
 		isManageMenusButtonDisabled,
 		blockEditingMode,
 	} = props;
-
+	const { Fill } = createSlotFill( 'NavigationSidebar' );
 	return (
-		<InspectorControls group="list">
-			<PanelBody title={ null }>
-				<HStack className="wp-block-navigation-off-canvas-editor__header">
-					<Heading
-						className="wp-block-navigation-off-canvas-editor__title"
-						level={ 2 }
-					>
-						{ __( 'Menu' ) }
-					</Heading>
-					{ blockEditingMode === 'default' && (
-						<NavigationMenuSelector
-							currentMenuId={ currentMenuId }
-							onSelectClassicMenu={ onSelectClassicMenu }
-							onSelectNavigationMenu={ onSelectNavigationMenu }
-							onCreateNew={ onCreateNew }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							createNavigationMenuIsError={
-								createNavigationMenuIsError
-							}
-							actionLabel={ actionLabel }
-							isManageMenusButtonDisabled={
-								isManageMenusButtonDisabled
-							}
-						/>
-					) }
-				</HStack>
+		<>
+			<InspectorControls group="list">
+				<PanelBody title={ null }>
+					<HStack className="wp-block-navigation-off-canvas-editor__header">
+						<Heading
+							className="wp-block-navigation-off-canvas-editor__title"
+							level={ 2 }
+						>
+							{ __( 'Menu' ) }
+						</Heading>
+						{ blockEditingMode === 'default' && (
+							<NavigationMenuSelector
+								currentMenuId={ currentMenuId }
+								onSelectClassicMenu={ onSelectClassicMenu }
+								onSelectNavigationMenu={
+									onSelectNavigationMenu
+								}
+								onCreateNew={ onCreateNew }
+								createNavigationMenuIsSuccess={
+									createNavigationMenuIsSuccess
+								}
+								createNavigationMenuIsError={
+									createNavigationMenuIsError
+								}
+								actionLabel={ actionLabel }
+								isManageMenusButtonDisabled={
+									isManageMenusButtonDisabled
+								}
+							/>
+						) }
+					</HStack>
+					<MainContent { ...props } />
+				</PanelBody>
+			</InspectorControls>
+			<Fill>
 				<MainContent { ...props } />
-			</PanelBody>
-		</InspectorControls>
+			</Fill>
+		</>
 	);
 };
 

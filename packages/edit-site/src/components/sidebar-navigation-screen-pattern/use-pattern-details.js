@@ -4,14 +4,13 @@
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { Icon } from '@wordpress/components';
+import { Icon, createSlotFill } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { useAddedBy } from '../list/added-by';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import useNavigationMenuContent from './use-navigation-menu-content';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 import {
 	SidebarNavigationScreenDetailsPanel,
@@ -22,6 +21,7 @@ import {
 import normalizeRecordKey from '../../utils/normalize-record-key';
 
 export default function usePatternDetails( postType, postId ) {
+	const { Slot } = createSlotFill( 'NavigationSidebar' );
 	postId = normalizeRecordKey( postId );
 
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
@@ -123,7 +123,7 @@ export default function usePatternDetails( postType, postId ) {
 					) ) }
 				</SidebarNavigationScreenDetailsPanel>
 			) }
-			{ useNavigationMenuContent( postType, postId ) }
+			<Slot />
 		</>
 	);
 
