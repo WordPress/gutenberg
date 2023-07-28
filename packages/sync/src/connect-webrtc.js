@@ -24,10 +24,12 @@ import { WebrtcProvider } from './webrtc-http-stream-signaling';
 export function connectWebRTC( objectId, objectType, doc ) {
 	const docName = `${ objectType }-${ objectId }`;
 	new WebrtcProvider( docName, doc, {
-		signaling: [ 'ws://localhost:4444' ],
+		signaling: [
+			//'ws://localhost:4444',
+			window.wp.ajax.settings.url,
+		],
 		// @ts-ignore
 		password: window.__experimentalCollaborativeEditingSecret,
 	} );
-
 	return Promise.resolve( () => true );
 }

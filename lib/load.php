@@ -199,3 +199,4 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/behaviors.php';
+require __DIR__ . '/sync/endpoint.php';

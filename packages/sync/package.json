@@ -33,7 +33,8 @@
 		"yjs": "~13.6.6",
 		"lib0": "^0.2.42",
 		"y-protocols": "^1.0.5",
-		"simple-peer": "^9.11.0"
+		"simple-peer": "^9.11.0",
+		"@wordpress/url": "file:../url"
 	},
 	"publishConfig": {
 		"access": "public"
