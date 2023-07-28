@@ -162,6 +162,11 @@ store( {
 				inheritSize: ( { context } ) => {
 					return context.core.image.lightboxEnabled && 'inherit';
 				},
+				lightboxObjectFit: ( { context } ) => {
+					if ( context.core.image.initialized ) {
+						return 'cover';
+					}
+				},
 			},
 		},
 	},
@@ -339,7 +344,6 @@ function setZoomStyles( context, event ) {
 	}
 	styleTag.innerHTML = `
 		:root {
-			--wp--lightbox-image-target-aspect-ratio: ${ originalRatio };
 			--wp--lightbox-initial-top-position: ${ screenPosY }px;
 			--wp--lightbox-initial-left-position: ${ screenPosX }px;
 			--wp--lightbox-container-width: ${ containerWidth }px;
