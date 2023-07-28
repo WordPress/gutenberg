@@ -106,7 +106,7 @@ test.describe( 'Global styles revisions', () => {
 		const confirm = page.getByRole( 'dialog' );
 		await expect( confirm ).toBeVisible();
 		await expect( confirm ).toHaveText(
-			/^Loading this revision will discard all unsaved changes/
+			/^Any unsaved changes will be lost when you apply this revision./
 		);
 
 		// This is to make sure there are no lingering unsaved changes.
