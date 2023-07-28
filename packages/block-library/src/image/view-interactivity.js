@@ -306,10 +306,12 @@ function setZoomStyles( context, event ) {
 	}
 
 	// Calculate the final lightbox image size and the scale factor.
-	// MaxWidth is either the window container or the image resolution.
-	// TO DO: Add padding to the window container value.
-	const targetMaxWidth = Math.min( window.innerWidth, containerWidth );
-	const targetMaxHeight = Math.min( window.innerHeight, containerHeight );
+	// MaxWidth is either the window container (plus padding) or the image resolution.
+	const targetMaxWidth = Math.min( window.innerWidth * 0.95, containerWidth );
+	const targetMaxHeight = Math.min(
+		window.innerHeight * 0.95,
+		containerHeight
+	);
 	const targetContainerRatio = targetMaxWidth / targetMaxHeight;
 
 	if ( originalRatio > targetContainerRatio ) {
