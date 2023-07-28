@@ -13,7 +13,7 @@ import {
 	blockDefault,
 	cog,
 	code,
-	keyboardClose,
+	keyboard,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -259,7 +259,7 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/open-shortcut-help',
 		label: __( 'Open keyboard shortcuts' ),
-		icon: keyboardClose,
+		icon: keyboard,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
 		},
