@@ -103,10 +103,17 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		$img_height       = 'none';
 	}
 
+	if ( isset( $block['attrs']['scale'] ) ) {
+		$scale_attr = $block['attrs']['scale'];
+	} else {
+		$scale_attr = false;
+	}
+
 	$w = new WP_HTML_Tag_Processor( $content );
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', true );
+	
 	$w->set_attribute(
 		'data-wp-context',
 		sprintf(
@@ -121,14 +128,16 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 						"imageUploadedSrc": "%s",
 						"imageCurrentSrc": "",
 						"targetWidth": "%s",
-						"targetHeight": "%s"
+						"targetHeight": "%s",
+						"scaleAttr": "%s"
 					}
 				}
 			}',
 			$lightbox_animation,
 			$img_uploaded_src,
 			$img_width,
-			$img_height
+			$img_height,
+			$scale_attr
 		)
 	);
 	$w->next_tag( 'img' );
