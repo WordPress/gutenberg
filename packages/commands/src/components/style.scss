@@ -63,7 +63,7 @@
 	}
 
 	[cmdk-item] {
-		border-radius: $grid-unit-05;
+		border-radius: 0 $grid-unit-05 $grid-unit-05 0;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -76,7 +76,19 @@
 			color: var(--wp-admin-theme-color);
 
 			svg {
-				fill: var(--wp-admin-theme-color);
+				fill: currentColor;
+			}
+
+			&::after {
+				border-color: currentColor;
+				border-style: solid;
+				border-width: 2px 2px 0 0;
+				content: "";
+				display: inline-block;
+				height: 10px;
+				margin-right: 0.75rem;
+				transform: rotate(45deg);
+				width: 10px;
 			}
 		}
 
