@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createPortal, useEffect, useRef, useState } from '@wordpress/element';
+import { createPortal, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,20 +14,16 @@ const GenericIframe = ( {
 	children,
 	...props
 }: WordPressComponentProps< { children: React.ReactNode }, 'iframe' > ) => {
-	const [ isMounted, setIsMounted ] = useState( false );
-	const iframeRef = useRef< HTMLIFrameElement >( null );
-
-	useEffect( () => {
-		setIsMounted( true );
-	}, [] );
+	const [ iframeRef, setIframeRef ] = useState< HTMLIFrameElement | null >(
+		null
+	);
 
 	return (
-		<iframe { ...props } title="My Iframe" ref={ iframeRef }>
-			{ isMounted &&
-				iframeRef.current?.contentWindow &&
+		<iframe { ...props } title="My Iframe" ref={ setIframeRef }>
+			{ iframeRef?.contentWindow &&
 				createPortal(
 					children,
-					iframeRef.current.contentWindow.document.body
+					iframeRef?.contentWindow.document.body
 				) }
 		</iframe>
 	);
@@ -37,8 +33,9 @@ export const PopoverInsideIframeRenderedInExternalSlot = (
 	props: React.ComponentProps< typeof Popover >
 ) => {
 	const SLOT_NAME = 'my-slot';
-	const [ anchorRef, setAnchorRef ] =
-		useState< HTMLParagraphElement | null >();
+	const [ anchorRef, setAnchorRef ] = useState< HTMLParagraphElement | null >(
+		null
+	);
 
 	return (
 		<SlotFillProvider>
