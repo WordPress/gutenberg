@@ -90,7 +90,7 @@ add_action( 'init', 'register_block_core_footnotes' );
  *
  * @param int $revision_id The revision ID.
  */
-function wp_save_footnotes_meta( $revision_id ) {
+function _wp_save_footnotes_meta( $revision_id ) {
 	$post_id = wp_is_post_revision( $revision_id );
 
 	if ( $post_id ) {
@@ -102,7 +102,7 @@ function wp_save_footnotes_meta( $revision_id ) {
 		}
 	}
 }
-add_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' );
+add_action( 'wp_after_insert_post', '_wp_save_footnotes_meta' );
 
 /**
  * Keeps track of the revision ID for "rest_after_insert_{$post_type}".
@@ -172,7 +172,7 @@ foreach ( array( 'post', 'page' ) as $post_type ) {
  * @param int $post_id     The post ID.
  * @param int $revision_id The revision ID.
  */
-function wp_restore_footnotes_from_revision( $post_id, $revision_id ) {
+function _wp_restore_footnotes_from_revision( $post_id, $revision_id ) {
 	$footnotes = get_post_meta( $revision_id, 'footnotes', true );
 
 	if ( $footnotes ) {
@@ -181,7 +181,7 @@ function wp_restore_footnotes_from_revision( $post_id, $revision_id ) {
 		delete_post_meta( $post_id, 'footnotes' );
 	}
 }
-add_action( 'wp_restore_post_revision', 'wp_restore_footnotes_from_revision', 10, 2 );
+add_action( 'wp_restore_post_revision', '_wp_restore_footnotes_from_revision', 10, 2 );
 
 /**
  * Adds the footnotes field to the revision.
@@ -191,11 +191,11 @@ add_action( 'wp_restore_post_revision', 'wp_restore_footnotes_from_revision', 10
  * @param array $fields The revision fields.
  * @return array The revision fields.
  */
-function wp_add_footnotes_to_revision( $fields ) {
+function _wp_add_footnotes_to_revision( $fields ) {
 	$fields['footnotes'] = __( 'Footnotes' );
 	return $fields;
 }
-add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
+add_filter( '_wp_post_revision_fields', '_wp_add_footnotes_to_revision' );
 
 /**
  * Gets the footnotes field from the revision.
@@ -208,10 +208,10 @@ add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
  * @param object $revision       The revision object to compare against.
  * @return string The field value.
  */
-function wp_get_footnotes_from_revision( $revision_field, $field, $revision ) {
+function _wp_get_footnotes_from_revision( $revision_field, $field, $revision ) {
 	return get_metadata( 'post', $revision->ID, $field, true );
 }
-add_filter( 'wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );
+add_filter( 'wp_post_revision_field_footnotes', '_wp_get_footnotes_from_revision', 10, 3 );
 
 /**
  * The REST API autosave endpoint doesn't save meta, so we can use the
