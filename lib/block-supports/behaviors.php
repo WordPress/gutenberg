@@ -141,14 +141,13 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		)
 	);
 	$w->next_tag( 'img' );
-	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setCurrentSrc' );
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
 	$button       = '<div class="img-container">
-                             <button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox" data-wp-on--mouseenter="actions.core.image.preloadLightboxImage"></button>'
+                             <button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox"></button>'
 		. $img[0] .
 		'</div>';
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
@@ -162,8 +161,6 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$m->next_tag( 'figure' );
 	$m->add_class( 'responsive-image' );
 	$m->next_tag( 'img' );
-	$m->set_attribute( 'src', '' );
-	$m->set_attribute( 'data-wp-bind--src', 'selectors.core.image.responsiveImgSrc' );
 	$m->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
 	$initial_image_content = $m->get_updated_html();
 
@@ -171,8 +168,9 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$q->next_tag( 'figure' );
 	$q->add_class( 'enlarged-image' );
 	$q->next_tag( 'img' );
-	$q->set_attribute( 'src', '' );
-	$q->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
+	$q->set_attribute( 'src', $img_uploaded_src );
+	$q->set_attribute( 'data-wp-bind--hidden', '!selectors.core.image.imageLoaded' );
+	$q->set_attribute( 'data-wp-effect', 'effects.core.image.loadImage' );
 	$q->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
 	$enlarged_image_content = $q->get_updated_html();
 
@@ -200,7 +198,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
                     $close_button_icon
                 </button>
-                <div class="lightbox-image-container">$initial_image_content</div>
+				<div class="lightbox-image-container">$initial_image_content</div>
 				<div class="lightbox-image-container">$enlarged_image_content</div>
                 <div class="scrim" style="background-color: $background_color"></div>
         </div>

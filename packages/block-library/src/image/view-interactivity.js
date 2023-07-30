@@ -18,20 +18,21 @@ const focusableSelectors = [
 ];
 
 store( {
+	state: {
+		core: {
+			image: {
+				imagesLoaded: [],
+			},
+		},
+	},
 	actions: {
 		core: {
 			image: {
 				showLightbox: ( { context, event } ) => {
-					// We can't initialize the lightbox until the reference
-					// image is loaded, otherwise the UX is broken.
-					if ( ! context.core.image.imageLoaded ) {
-						return;
-					}
 					context.core.image.initialized = true;
 					context.core.image.lastFocusedElement =
 						window.document.activeElement;
 					context.core.image.scrollDelta = 0;
-
 					context.core.image.lightboxEnabled = true;
 					setStyles( context, event );
 					// Hide overflow only when the animation is in progress,
@@ -39,19 +40,6 @@ store( {
 					// to itself and look like an error
 					document.documentElement.classList.add(
 						'wp-has-lightbox-open'
-					);
-
-					// Since the img is hidden and its src not loaded until
-					// the lightbox is opened, let's create an img element on the fly
-					// so we can get the dimensions we need to calculate the styles
-					context.core.image.preloadInitialized = true;
-					const imgDom = document.createElement( 'img' );
-					imgDom.onload = function () {
-						context.core.image.activateLargeImage = true;
-					};
-					imgDom.setAttribute(
-						'src',
-						context.core.image.imageUploadedSrc
 					);
 				},
 				hideLightbox: async ( { context, event } ) => {
@@ -127,16 +115,6 @@ store( {
 						}
 					}
 				},
-				preloadLightboxImage: ( { context } ) => {
-					if ( ! context.core.image.preloadInitialized ) {
-						context.core.image.preloadInitialized = true;
-						const imgDom = document.createElement( 'img' );
-						imgDom.setAttribute(
-							'src',
-							context.core.image.imageUploadedSrc
-						);
-					}
-				},
 			},
 		},
 	},
@@ -146,16 +124,10 @@ store( {
 				roleAttribute: ( { context } ) => {
 					return context.core.image.lightboxEnabled ? 'dialog' : '';
 				},
-				responsiveImgSrc: ( { context } ) => {
-					return context.core.image.activateLargeImage &&
-						context.core.image.hideAnimationEnabled
-						? ''
-						: context.core.image.imageCurrentSrc;
-				},
-				enlargedImgSrc: ( { context } ) => {
-					return context.core.image.initialized
-						? context.core.image.imageUploadedSrc
-						: '';
+				imageLoaded: ( { state, context } ) => {
+					return state.core.image.imagesLoaded.includes(
+						context.core.image.imageUploadedSrc
+					);
 				},
 				lightboxObjectFit: ( { context } ) => {
 					if ( context.core.image.initialized ) {
@@ -168,16 +140,17 @@ store( {
 	effects: {
 		core: {
 			image: {
-				setCurrentSrc: ( { context, ref } ) => {
-					if ( ref.complete ) {
-						context.core.image.imageLoaded = true;
-						context.core.image.imageCurrentSrc = ref.currentSrc;
-					} else {
-						ref.addEventListener( 'load', function () {
-							context.core.image.imageLoaded = true;
-							context.core.image.imageCurrentSrc =
-								this.currentSrc;
-						} );
+				loadImage: ( { state, context } ) => {
+					// If the image hasn't been loaded, load it.
+					if (
+						context.core.image.lightboxEnabled &&
+						! state.core.image.imagesLoaded.includes(
+							context.core.image.imageUploadedSrc
+						)
+					) {
+						state.core.image.imagesLoaded.push(
+							context.core.image.imageUploadedSrc
+						);
 					}
 				},
 				initLightbox: async ( { context, ref } ) => {
