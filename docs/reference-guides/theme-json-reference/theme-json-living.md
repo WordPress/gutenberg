@@ -317,13 +317,6 @@ Outline styles.
 | width | string, object |  |
 
 ---
-
-### css
-
-Sets custom CSS to apply styling not covered by other theme.json properties.
-
-
----
 ## customTemplates
 
 Additional metadata for custom templates defined in the templates folder.
