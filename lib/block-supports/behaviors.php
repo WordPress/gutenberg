@@ -161,6 +161,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$m->next_tag( 'figure' );
 	$m->add_class( 'responsive-image' );
 	$m->next_tag( 'img' );
+	$m->set_attribute( 'data-wp-bind--hidden', '!context.core.image.lightboxEnabled' );
 	$m->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
 	$initial_image_content = $m->get_updated_html();
 
@@ -168,6 +169,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$q->next_tag( 'figure' );
 	$q->add_class( 'enlarged-image' );
 	$q->next_tag( 'img' );
+	$q->set_attribute( 'loading', 'lazy' );
 	$q->set_attribute( 'src', $img_uploaded_src );
 	$q->set_attribute( 'data-wp-bind--hidden', '!selectors.core.image.imageLoaded' );
 	$q->set_attribute( 'data-wp-effect', 'effects.core.image.loadImage' );
