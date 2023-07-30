@@ -198,9 +198,10 @@ export function CommandMenu() {
 
 	useShortcut(
 		'core/commands',
+		/** @type {import('react').KeyboardEventHandler} */
 		( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
-			if ( event.isDefaultPrevented() ) return;
+			if ( event.defaultPrevented ) return;
 
 			event.preventDefault();
 			if ( isOpen ) {
