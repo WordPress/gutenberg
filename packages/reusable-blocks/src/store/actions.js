@@ -88,6 +88,57 @@ export const __experimentalConvertBlocksToReusable =
 	};
 
 /**
+ * Returns a generator converting one or more static blocks into a pattern.
+ *
+ * @param {string}             title     Pattern title.
+ * @param {'full'|'unsynced'}  syncType  They way block is synced, 'full' or 'unsynced'.
+ * @param {string[]|undefined} clientIds Optional client IDs of blocks to convert to pattern.
+ */
+export const __experimentalCreatePattern =
+	( title, syncType, clientIds ) =>
+	async ( { registry, dispatch } ) => {
+		const meta =
+			syncType === 'unsynced'
+				? {
+						wp_pattern_sync_status: syncType,
+				  }
+				: undefined;
+
+		const reusableBlock = {
+			title: title || __( 'Untitled Pattern block' ),
+			content: clientIds
+				? serialize(
+						registry
+							.select( blockEditorStore )
+							.getBlocksByClientId( clientIds )
+				  )
+				: undefined,
+			status: 'publish',
+			meta,
+		};
+
+		const updatedRecord = await registry
+			.dispatch( 'core' )
+			.saveEntityRecord( 'postType', 'wp_block', reusableBlock );
+
+		if ( syncType === 'unsynced' || ! clientIds ) {
+			return updatedRecord;
+		}
+
+		const newBlock = createBlock( 'core/block', {
+			ref: updatedRecord.id,
+		} );
+		registry
+			.dispatch( blockEditorStore )
+			.replaceBlocks( clientIds, newBlock );
+		dispatch.__experimentalSetEditingReusableBlock(
+			newBlock.clientId,
+			true
+		);
+		return updatedRecord;
+	};
+
+/**
  * Returns a generator deleting a reusable block.
  *
  * @param {string} id The ID of the reusable block to delete.

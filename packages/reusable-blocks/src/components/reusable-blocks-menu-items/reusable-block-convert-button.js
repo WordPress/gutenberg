@@ -5,29 +5,18 @@ import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import {
 	BlockSettingsMenuControls,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useCallback, useState } from '@wordpress/element';
-import {
-	MenuItem,
-	Modal,
-	Button,
-	TextControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	ToggleControl,
-} from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { MenuItem } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
-
 /**
  * Internal dependencies
  */
-import { store } from '../../store';
-import { unlock } from '../../lock-unlock';
+import CreatePatternModal from '../create-pattern-modal';
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -41,13 +30,8 @@ export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
 } ) {
-	const { useReusableBlocksRenameHint, ReusableBlocksRenameHint } = unlock(
-		blockEditorPrivateApis
-	);
-	const showRenameHint = useReusableBlocksRenameHint();
-	const [ syncType, setSyncType ] = useState( undefined );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const [ title, setTitle ] = useState( '' );
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
@@ -97,56 +81,30 @@ export default function ReusableBlockConvertButton( {
 		[ clientIds, rootClientId ]
 	);
 
-	const { __experimentalConvertBlocksToReusable: convertBlocksToReusable } =
-		useDispatch( store );
-
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-	const onConvert = useCallback(
-		async function ( reusableBlockTitle ) {
-			try {
-				await convertBlocksToReusable(
-					clientIds,
-					reusableBlockTitle,
-					syncType
-				);
-				createSuccessNotice(
-					! syncType
-						? sprintf(
-								// translators: %s: the name the user has given to the pattern.
-								__( 'Synced Pattern created: %s' ),
-								reusableBlockTitle
-						  )
-						: sprintf(
-								// translators: %s: the name the user has given to the pattern.
-								__( 'Unsynced Pattern created: %s' ),
-								reusableBlockTitle
-						  ),
-					{
-						type: 'snackbar',
-						id: 'convert-to-reusable-block-success',
-					}
-				);
-			} catch ( error ) {
-				createErrorNotice( error.message, {
-					type: 'snackbar',
-					id: 'convert-to-reusable-block-error',
-				} );
-			}
-		},
-		[
-			convertBlocksToReusable,
-			clientIds,
-			syncType,
-			createSuccessNotice,
-			createErrorNotice,
-		]
-	);
-
 	if ( ! canConvert ) {
 		return null;
 	}
 
+	const handleSuccess = ( newPattern ) => {
+		createSuccessNotice(
+			! newPattern.wp_pattern_sync_status === 'unsynced'
+				? sprintf(
+						// translators: %s: the name the user has given to the pattern.
+						__( 'Unsynced Pattern created: %s' ),
+						newPattern.title.raw
+				  )
+				: sprintf(
+						// translators: %s: the name the user has given to the pattern.
+						__( 'Synced Pattern created: %s' ),
+						newPattern.title.raw
+				  ),
+			{
+				type: 'snackbar',
+				id: 'convert-to-reusable-block-success',
+			}
+		);
+		setIsModalOpen( false );
+	};
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { onClose } ) => (
@@ -155,70 +113,24 @@ export default function ReusableBlockConvertButton( {
 						icon={ symbol }
 						onClick={ () => setIsModalOpen( true ) }
 					>
-						{ showRenameHint
-							? __( 'Create pattern/reusable block' )
-							: __( 'Create pattern' ) }
+						{ __( 'Create pattern' ) }
 					</MenuItem>
 					{ isModalOpen && (
-						<Modal
-							title={ __( 'Create pattern' ) }
-							onRequestClose={ () => {
-								setIsModalOpen( false );
-								setTitle( '' );
+						<CreatePatternModal
+							clientIds={ clientIds }
+							onSuccess={ ( { newPattern } ) => {
+								handleSuccess( newPattern );
+								onClose();
 							} }
-							overlayClassName="reusable-blocks-menu-items__convert-modal"
-						>
-							<form
-								onSubmit={ ( event ) => {
-									event.preventDefault();
-									onConvert( title );
-									setIsModalOpen( false );
-									setTitle( '' );
-									onClose();
-								} }
-							>
-								<VStack spacing="5">
-									<ReusableBlocksRenameHint />
-									<TextControl
-										__nextHasNoMarginBottom
-										label={ __( 'Name' ) }
-										value={ title }
-										onChange={ setTitle }
-										placeholder={ __( 'My pattern' ) }
-									/>
-
-									<ToggleControl
-										label={ __( 'Synced' ) }
-										help={ __(
-											'Editing the pattern will update it anywhere it is used.'
-										) }
-										checked={ ! syncType }
-										onChange={ () => {
-											setSyncType(
-												! syncType
-													? 'unsynced'
-													: undefined
-											);
-										} }
-									/>
-									<HStack justify="right">
-										<Button
-											variant="tertiary"
-											onClick={ () => {
-												setIsModalOpen( false );
-												setTitle( '' );
-											} }
-										>
-											{ __( 'Cancel' ) }
-										</Button>
-
-										<Button variant="primary" type="submit">
-											{ __( 'Create' ) }
-										</Button>
-									</HStack>
-								</VStack>
-							</form>
-						</Modal>
+							onError={ () => {
+								setIsModalOpen( false );
+								onClose();
+							} }
+							onClose={ () => {
+								setIsModalOpen( false );
+								onClose();
+							} }
+						/>
 					) }
 				</>
 			) }
