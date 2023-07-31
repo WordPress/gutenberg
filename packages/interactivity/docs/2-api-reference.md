@@ -47,6 +47,15 @@ It runs an expression **when the node is created and runs it again when the stat
 _Example of `wp-effect` directive_
 ```html
 <form 
+  data-wp-effect="effect.myNamespace.logTime" 
+>
+  <input type="text" id="password" name="access-password">
+</form>
+```
+
+_Example of several `wp-effect` directives on the same DOM element_
+```html
+<form 
   data-wp-effect–-1="effect.myNamespace.logTime" 
   data-wp-effect–-2="effect.myNamespace.focusFirstElement"
 >
