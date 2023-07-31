@@ -28,8 +28,8 @@ function gutenberg_register_taxonomy_patterns() {
 		'show_admin_column' => true,
 		'query_var'         => true,
 		'show_in_rest'      => true,
-		'rewrite'           => array( 'slug' => 'wp_pattern_custom_category' ),
+		'rewrite'           => array( 'slug' => 'wp_pattern_category' ),
 	);
-	register_taxonomy( 'wp_pattern_custom_category', array( 'wp_block' ), $args );
+	register_taxonomy( 'wp_pattern_category', array( 'wp_block' ), $args );
 }
 add_action( 'init', 'gutenberg_register_taxonomy_patterns' );
