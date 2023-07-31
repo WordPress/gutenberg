@@ -79,9 +79,9 @@ function ScreenRevisions() {
 
 	const selectRevision = ( revision ) => {
 		setGlobalStylesRevision( {
-			styles: revision?.styles,
-			settings: revision?.settings,
-			behaviors: revision?.behaviors,
+			styles: revision?.styles || {},
+			settings: revision?.settings || {},
+			behaviors: revision?.behaviors || {},
 			id: revision?.id,
 		} );
 		setSelectedRevisionId( revision?.id );

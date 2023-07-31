@@ -9,6 +9,8 @@ import classnames from 'classnames';
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Returns a button label for the revision.
@@ -19,6 +21,10 @@ import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 function getRevisionLabel( revision ) {
 	const authorDisplayName = revision?.author?.name || __( 'User' );
 
+	if ( 'parent' === revision?.id ) {
+		return __( 'Reset the styles to the theme defaults' );
+	}
+
 	if ( 'unsaved' === revision?.id ) {
 		return sprintf(
 			/* translators: %s author display name */
@@ -26,6 +32,7 @@ function getRevisionLabel( revision ) {
 			authorDisplayName
 		);
 	}
+
 	const formattedDate = dateI18n(
 		getSettings().formats.datetimeAbbreviated,
 		getDate( revision?.modified )
@@ -58,6 +65,10 @@ function getRevisionLabel( revision ) {
  * @return {JSX.Element} The modal component.
  */
 function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme(),
+		[]
+	);
 	return (
 		<ol
 			className="edit-site-global-styles-screen-revisions__revisions-list"
@@ -80,6 +91,7 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 							'edit-site-global-styles-screen-revisions__revision-item',
 							{
 								'is-selected': isSelected,
+								'is-reset': isReset,
 							}
 						) }
 						key={ id }
@@ -94,7 +106,11 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 						>
 							{ isReset ? (
 								<span className="edit-site-global-styles-screen-revisions__description">
-									{ __( 'Theme default styles' ) }
+									{ __( 'Default styles' ) }
+									<span className="edit-site-global-styles-screen-revisions__meta">
+										{ currentTheme?.name?.rendered ||
+											currentTheme?.stylesheet }
+									</span>
 								</span>
 							) : (
 								<span className="edit-site-global-styles-screen-revisions__description">
