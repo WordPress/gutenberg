@@ -120,8 +120,14 @@ function gutenberg_block_core_form_send_email() {
 		}
 		$content .= $key . ': ' . $value . '</br>';
 	}
+
+	// Filter the email content.
+	$content = apply_filters( 'render_block_core_form_email_content', $content, $params );
+
+	// Send the email.
 	wp_mail( $params['wp-email-address'], __( 'Form submission', 'gutenberg' ), $content );
 
+	// Redirect back to the form.
 	wp_safe_redirect( get_site_url( null, $params['_wp_http_referer'] ) );
 	exit;
 }
