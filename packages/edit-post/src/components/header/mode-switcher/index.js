@@ -68,7 +68,6 @@ function ModeSwitcher() {
 			choice = {
 				...choice,
 				disabled: true,
-				info: __( 'Code editor is disabled for this site.' ),
 			};
 		}
 		if ( ! isRichEditingEnabled && choice.value === 'visual' ) {
