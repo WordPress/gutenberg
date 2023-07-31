@@ -122,7 +122,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@4bd44f22a98a19e0950cbad5f31095157cc9621b # v2.25.4
+              uses: shivammathur/setup-php@72ae4ccbe57f82bbe08411e84e2130bd4ba1c10f # v2.25.5
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -220,7 +220,7 @@ jobs:
               uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@4bd44f22a98a19e0950cbad5f31095157cc9621b # v2.25.4
+              uses: shivammathur/setup-php@72ae4ccbe57f82bbe08411e84e2130bd4ba1c10f # v2.25.5
               with:
                   php-version: '7.4'
                   coverage: none
