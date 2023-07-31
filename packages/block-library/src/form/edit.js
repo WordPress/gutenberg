@@ -50,7 +50,7 @@ const TEMPLATE = [
 ];
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
-	const { action, method } = attributes;
+	const { action, method, email } = attributes;
 	const blockProps = useBlockProps();
 
 	const { hasInnerBlocks } = useSelect(
@@ -75,33 +75,50 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	return (
 		<>
 			<InspectorControls>
-				<TextControl
-					__nextHasNoMarginBottom
-					autoComplete="off"
-					label={ __( 'Form action' ) }
-					value={ action }
-					onChange={ ( newVal ) => {
-						setAttributes( {
-							action: newVal,
-						} );
-					} }
-					help={ __(
-						'Define where the form should be submitted. Leave empty to send an email to the site admin when a form gets submitted.'
-					) }
-				/>
 				<SelectControl
 					__nextHasNoMarginBottom
 					label={ __( 'Form method' ) }
 					options={ [
+						{ label: 'Send email', value: 'email' },
 						{ label: 'Get', value: 'get' },
 						{ label: __( 'Post' ), value: 'post' },
 					] }
 					value={ method }
 					onChange={ ( value ) => setAttributes( { method: value } ) }
 					help={ __(
-						'Whether the form will submit a POST or GET request.'
+						'Whether the form will send an email, or submit a POST/GET request.'
 					) }
 				/>
+				{ method === 'email' && (
+					<TextControl
+						__nextHasNoMarginBottom
+						autoComplete="off"
+						label={ __( 'Email for form submissions' ) }
+						value={ email }
+						onChange={ ( value ) =>
+							setAttributes( { email: value } )
+						}
+						help={ __(
+							'The email address where form submissions will be sent. Leave empty to use the site admin address.'
+						) }
+					/>
+				) }
+				{ method !== 'email' && (
+					<TextControl
+						__nextHasNoMarginBottom
+						autoComplete="off"
+						label={ __( 'Form action' ) }
+						value={ action }
+						onChange={ ( newVal ) => {
+							setAttributes( {
+								action: newVal,
+							} );
+						} }
+						help={ __(
+							'The URL where the form should be submitted.'
+						) }
+					/>
+				) }
 			</InspectorControls>
 			<form { ...innerBlocksProps } />
 		</>

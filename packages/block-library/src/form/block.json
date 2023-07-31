@@ -13,6 +13,10 @@
 			"type": "string"
 		},
 		"method": {
+			"type": "string",
+			"default": "email"
+		},
+		"email": {
 			"type": "string"
 		}
 	},
