@@ -599,9 +599,9 @@ export const __experimentalCreatePattern =
 	};
 
 /**
- * Returns an action descriptor for SET_EDITING_REUSABLE_BLOCK action.
+ * Returns an action descriptor for SET_EDITING_PATTERN action.
  *
- * @param {string}  clientId  The clientID of the reusable block to target.
+ * @param {string}  clientId  The clientID of the pattern to target.
  * @param {boolean} isEditing Whether the block should be in editing state.
  * @return {Object} Action descriptor.
  */
