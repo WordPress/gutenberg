@@ -392,6 +392,10 @@ Usually triggered by the `data-wp-on` directive (using event listeners) or other
 
 Automatically react to state changes. Usually triggered by `data-wp-effect` or `data-wp-init` directives.
 
+#### Selectors
+
+Also known as _derived state_, returns a computed version of the state.
+
 ### Objects passed to directive callbacks
 
 When a directive is evaluated, the reference callback receives an object with:
