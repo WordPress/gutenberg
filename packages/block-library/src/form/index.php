@@ -28,12 +28,13 @@ function render_block_core_form( $attributes, $content ) {
 		$processed_content->set_attribute( 'action', esc_attr( $action ) );
 	}
 
-	// Add the method attribute. If it is not set, default to `post`.
-	$method = empty( $attributes['method'] ) ? 'post' : $attributes['method'];
-	// If the user has set the method to "email", change it to "post".
-	if ( 'email' === $method ) {
-		$method = 'post';
-	}
+	/*
+	 * Add the method attribute. If it is not set, default to `post`.
+	 * If the user has set the method to `email`, change it to `post`.
+	 */
+	$method = empty( $attributes['method'] ) || 'email' === $attributes['method']
+		? 'post'
+		: $attributes['method'];
 	$processed_content->set_attribute( 'method', $method );
 
 	$extra_fields = apply_filters( 'render_block_core_form_extra_fields', '', $attributes );
