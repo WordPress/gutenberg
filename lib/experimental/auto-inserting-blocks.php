@@ -10,6 +10,7 @@
  *
  * @param array  $inserted_block    The block to insert.
  * @param string $relative_position The position relative to the given block.
+ *                                  Can be 'before', 'after', 'first_child', or 'last_child'.
  * @param string $anchor_block      The block to insert relative to.
  * @return callable A function that accepts a block's content and returns the content with the inserted block.
  */
