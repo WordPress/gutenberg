@@ -26,6 +26,7 @@ export function connectWebRTC( objectId, objectType, doc ) {
 	new WebrtcProvider( docName, doc, {
 		signaling: [
 			//'ws://localhost:4444',
+			// @ts-ignore
 			window.wp.ajax.settings.url,
 		],
 		// @ts-ignore
