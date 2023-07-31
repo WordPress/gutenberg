@@ -291,6 +291,7 @@ $preview-image-height: 140px;
 	display: flex;
 	flex-direction: row;
 	width: 100%; // clip.
+	align-items: center;
 }
 
 .block-editor-link-control__search-item-bottom {
