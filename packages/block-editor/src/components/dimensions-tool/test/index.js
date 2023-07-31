@@ -655,7 +655,7 @@ describe( 'DimensionsTool', () => {
 				name: 'Width',
 			} );
 
-			const heightInput = screen.getByRole( 'spinbutton', {
+			const heightInput = screen.queryByRole( 'spinbutton', {
 				name: 'Height',
 			} );
 
