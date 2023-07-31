@@ -20,11 +20,11 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const reusableBlockNameInputSelector =
-	'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
+	'.patterns-menu-items__convert-modal .components-text-control__input';
 const reusableBlockInspectorNameInputSelector =
 	'.block-editor-block-inspector .components-text-control__input';
 const syncToggleSelectorChecked =
-	'.reusable-blocks-menu-items__convert-modal .components-form-toggle.is-checked';
+	'.patterns-menu-items__convert-modal .components-form-toggle.is-checked';
 
 const saveAll = async () => {
 	const publishButtonSelector =
