@@ -396,6 +396,26 @@ Automatically react to state changes. Usually triggered by `data-wp-effect` or `
 
 Also known as _derived state_, returns a computed version of the state.
 
+```js
+// view.js
+import { store } from "@wordpress/interactivity"
+  
+store({
+    state: {
+        amount: 34,
+        defaultCurrency: "EUR",
+        currencyExchange: {
+          "USD": 1.10,
+          "GBP": 0.85
+        }
+    },
+    selectors: {
+        amountInUSD : ( { state } ) => state.currencyExchange["USD"] * state.amount,
+        amountInGBP : ( { state } ) => state.currencyExchange["GBP"] * state.amount
+    }
+})
+```
+
 ### Objects passed to directive callbacks
 
 When a directive is evaluated, the reference callback receives an object with:
