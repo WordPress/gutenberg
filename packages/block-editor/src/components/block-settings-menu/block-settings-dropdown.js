@@ -31,7 +31,7 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
-import { useShowMoversGestures } from '../block-toolbar/utils';
+import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -60,7 +60,6 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {
 		firstParentClientId,
-		isDistractionFree,
 		onlyBlock,
 		parentBlockType,
 		previousBlockClientId,
@@ -73,7 +72,6 @@ export function BlockSettingsDropdown( {
 				getBlockRootClientId,
 				getPreviousBlockClientId,
 				getSelectedBlockClientIds,
-				getSettings,
 				getBlockAttributes,
 			} = select( blockEditorStore );
 
@@ -86,7 +84,6 @@ export function BlockSettingsDropdown( {
 
 			return {
 				firstParentClientId: _firstParentClientId,
-				isDistractionFree: getSettings().isDistractionFree,
 				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
 				parentBlockType:
 					_firstParentClientId &&
@@ -122,8 +119,7 @@ export function BlockSettingsDropdown( {
 	}, [] );
 	const isMatch = __unstableUseShortcutEventMatch();
 
-	const { selectBlock, toggleBlockHighlight } =
-		useDispatch( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
 
 	const updateSelectionAfterDuplicate = useCallback(
@@ -168,14 +164,9 @@ export function BlockSettingsDropdown( {
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
 	const selectParentButtonRef = useRef();
-	const { gestures: showParentOutlineGestures } = useShowMoversGestures( {
+	const showParentOutlineGestures = useShowHoveredOrFocusedGestures( {
 		ref: selectParentButtonRef,
-		onChange( isFocused ) {
-			if ( isFocused && isDistractionFree ) {
-				return;
-			}
-			toggleBlockHighlight( firstParentClientId, isFocused );
-		},
+		highlightParent: true,
 	} );
 
 	// This can occur when the selected block (the parent)

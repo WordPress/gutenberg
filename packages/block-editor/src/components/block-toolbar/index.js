@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -29,76 +29,52 @@ import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import BlockEditVisuallyButton from '../block-edit-visually-button';
-import { useShowMoversGestures } from './utils';
+import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import { unlock } from '../../lock-unlock';
 
 const BlockToolbar = ( { hideDragHandle } ) => {
-	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
-	const {
-		blockClientIds,
-		blockType,
-		hasFixedToolbar,
-		isDistractionFree,
-		isValid,
-		isVisual,
-		blockEditingMode,
-	} = useSelect( ( select ) => {
-		const {
-			getBlockName,
-			getBlockMode,
-			getSelectedBlockClientIds,
-			isBlockValid,
-			getBlockRootClientId,
-			getSettings,
-			getBlockEditingMode,
-		} = unlock( select( blockEditorStore ) );
-		const selectedBlockClientIds = getSelectedBlockClientIds();
-		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
-		const settings = getSettings();
-
-		return {
-			blockClientIds: selectedBlockClientIds,
-			blockType:
-				selectedBlockClientId &&
-				getBlockType( getBlockName( selectedBlockClientId ) ),
-			hasFixedToolbar: settings.hasFixedToolbar,
-			isDistractionFree: settings.isDistractionFree,
-			rootClientId: blockRootClientId,
-			isValid: selectedBlockClientIds.every( ( id ) =>
-				isBlockValid( id )
-			),
-			isVisual: selectedBlockClientIds.every(
-				( id ) => getBlockMode( id ) === 'visual'
-			),
-			blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
-		};
-	}, [] );
+	const { blockClientIds, blockType, isValid, isVisual, blockEditingMode } =
+		useSelect( ( select ) => {
+			const {
+				getBlockName,
+				getBlockMode,
+				getSelectedBlockClientIds,
+				isBlockValid,
+				getBlockRootClientId,
+				getBlockEditingMode,
+			} = unlock( select( blockEditorStore ) );
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+			const blockRootClientId = getBlockRootClientId(
+				selectedBlockClientId
+			);
+			return {
+				blockClientIds: selectedBlockClientIds,
+				blockType:
+					selectedBlockClientId &&
+					getBlockType( getBlockName( selectedBlockClientId ) ),
+				rootClientId: blockRootClientId,
+				isValid: selectedBlockClientIds.every( ( id ) =>
+					isBlockValid( id )
+				),
+				isVisual: selectedBlockClientIds.every(
+					( id ) => getBlockMode( id ) === 'visual'
+				),
+				blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
+			};
+		}, [] );
 
 	const toolbarWrapperRef = useRef( null );
 
 	// Handles highlighting the current block outline on hover or focus of the
 	// block type toolbar area.
-	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const nodeRef = useRef();
-	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
-		{
-			ref: nodeRef,
-			onChange( isFocused ) {
-				if ( isFocused && isDistractionFree ) {
-					return;
-				}
-				toggleBlockHighlight( getSelectedBlockClientId(), isFocused );
-			},
-		}
-	);
+	const showHoveredOrFocusedGestures = useShowHoveredOrFocusedGestures( {
+		ref: nodeRef,
+	} );
 
-	// Account for the cases where the block toolbar is rendered within the
-	// header area and not contextually to the block.
-	const displayHeaderToolbar =
-		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
 	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
 	if ( blockType ) {
@@ -106,8 +82,6 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			return null;
 		}
 	}
-
-	const shouldShowMovers = displayHeaderToolbar || showMovers;
 
 	if ( blockClientIds.length === 0 ) {
 		return null;
@@ -119,7 +93,6 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
 	const classes = classnames( 'block-editor-block-toolbar', {
-		'is-showing-movers': shouldShowMovers,
 		'is-synced': isSynced,
 	} );
 
@@ -130,7 +103,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				blockEditingMode === 'default' && <BlockParentSelector /> }
 			{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 				blockEditingMode === 'default' && (
-					<div ref={ nodeRef } { ...showMoversGestures }>
+					<div ref={ nodeRef } { ...showHoveredOrFocusedGestures }>
 						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 							<BlockSwitcher clientIds={ blockClientIds } />
 							{ ! isMultiToolbar && (
