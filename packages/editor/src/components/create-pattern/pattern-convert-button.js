@@ -57,9 +57,9 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 				);
 
 			const _canConvert =
-				// Hide when this is already a reusable block.
+				// Hide when this is already a synced pattern.
 				! isReusable &&
-				// Hide when reusable blocks are disabled.
+				// Hide when patterns are disabled.
 				canInsertBlockType( 'core/block', rootId ) &&
 				blocks.every(
 					( block ) =>
@@ -67,7 +67,7 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 						!! block &&
 						// Hide on invalid blocks.
 						block.isValid &&
-						// Hide when block doesn't support being made reusable.
+						// Hide when block doesn't support being made into a pattern.
 						hasBlockSupport( block.name, 'reusable', true )
 				) &&
 				// Hide when current doesn't have permission to do that.
@@ -97,7 +97,7 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 				  ),
 			{
 				type: 'snackbar',
-				id: 'convert-to-reusable-block-success',
+				id: 'convert-to-pattern-success',
 			}
 		);
 		setIsModalOpen( false );

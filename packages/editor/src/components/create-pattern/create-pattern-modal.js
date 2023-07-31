@@ -52,7 +52,7 @@ export default function CreatePatternModal( {
 			} catch ( error ) {
 				createErrorNotice( error.message, {
 					type: 'snackbar',
-					id: 'convert-to-reusable-block-error',
+					id: 'convert-to-pattern-error',
 				} );
 				onError();
 			}
@@ -66,7 +66,7 @@ export default function CreatePatternModal( {
 				onClose();
 				setTitle( '' );
 			} }
-			overlayClassName="reusable-blocks-menu-items__convert-modal"
+			overlayClassName="patterns-menu-items__convert-modal"
 		>
 			<form
 				onSubmit={ ( event ) => {
