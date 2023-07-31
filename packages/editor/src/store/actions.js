@@ -607,7 +607,7 @@ export const __experimentalCreatePattern =
  */
 export function __experimentalSetEditingPattern( clientId, isEditing ) {
 	return {
-		type: 'SET_EDITING_REUSABLE_BLOCK',
+		type: 'SET_EDITING_PATTERN',
 		clientId,
 		isEditing,
 	};

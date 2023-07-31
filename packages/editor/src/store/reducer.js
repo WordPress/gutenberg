@@ -279,6 +279,17 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
+export function isEditingPattern( state = {}, action ) {
+	if ( action?.type === 'SET_EDITING_PATTERN' ) {
+		return {
+			...state,
+			[ action.clientId ]: action.isEditing,
+		};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -290,4 +301,5 @@ export default combineReducers( {
 	isReady,
 	editorSettings,
 	postAutosavingLock,
+	isEditingPattern,
 } );
