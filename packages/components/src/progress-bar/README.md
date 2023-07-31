@@ -27,6 +27,6 @@ A CSS class to apply to the underlying `div` element, serving as a progress bar 
 
 ##### `id`: `string`
 
-The HTML `id` of the control element. This is necessary to be able to accessibly associate the label with that element.
+The HTML `id` of the `progress` element. This is necessary to be able to accessibly associate the label with that element.
 
 -   Required: No
