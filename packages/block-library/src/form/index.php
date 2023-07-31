@@ -118,7 +118,7 @@ function gutenberg_block_core_form_send_email() {
 		if ( in_array( $key, $skip_fields, true ) ) {
 			continue;
 		}
-		$content .= $key . ': ' . $value . '</br>';
+		$content .= sanitize_key( $key ) . ': ' . wp_kses_post( $value ) . '</br>';
 	}
 
 	// Filter the email content.
