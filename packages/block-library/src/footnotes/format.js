@@ -26,6 +26,10 @@ import { unlock } from '../lock-unlock';
 const { usesContextKey } = unlock( privateApis );
 
 export const formatName = 'core/footnote';
+
+const POST_CONTENT_BLOCK_NAME = 'core/post-content';
+const SYNCED_PATTERN_BLOCK_NAME = 'core/block';
+
 export const format = {
 	title: __( 'Footnote' ),
 	tagName: 'sup',
@@ -52,6 +56,18 @@ export const format = {
 		const footnotesBlockType = useSelect( ( select ) =>
 			select( blocksStore ).getBlockType( name )
 		);
+		const hasParentCoreBlocks = useSelect( ( select ) => {
+			const {
+				getBlockParentsByBlockName: _getBlockParentsByBlockName,
+				getSelectedBlockClientId: _getSelectedBlockClientId,
+			} = select( blockEditorStore );
+			const parentCoreBlocks = _getBlockParentsByBlockName(
+				_getSelectedBlockClientId(),
+				SYNCED_PATTERN_BLOCK_NAME
+			);
+			return parentCoreBlocks && parentCoreBlocks.length > 0;
+		}, [] );
+
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
 
@@ -64,12 +80,7 @@ export const format = {
 		}
 
 		// Checks if the selected block lives within a pattern.
-		if (
-			getBlockParentsByBlockName(
-				getSelectedBlockClientId(),
-				'core/block'
-			).length > 0
-		) {
+		if ( hasParentCoreBlocks ) {
 			return null;
 		}
 
@@ -97,11 +108,15 @@ export const format = {
 					onChange( newValue );
 				}
 
-				// Attempt to find a common parent post content block.
-				// This allows for locating blocks within a page edited in the site editor.
+				const selectedClientId = getSelectedBlockClientId();
+
+				/*
+				 * Attempts to find a common parent post content block.
+				 * This allows for locating blocks within a page edited in the site editor.
+				 */
 				const parentPostContent = getBlockParentsByBlockName(
-					getSelectedBlockClientId(),
-					'core/post-content'
+					selectedClientId,
+					POST_CONTENT_BLOCK_NAME
 				);
 
 				// When called with a post content block, getBlocks will return
@@ -128,12 +143,11 @@ export const format = {
 				// When there is no footnotes block in the post, create one and
 				// insert it at the bottom.
 				if ( ! fnBlock ) {
-					const clientId = getSelectedBlockClientId();
-					let rootClientId = getBlockRootClientId( clientId );
+					let rootClientId = getBlockRootClientId( selectedClientId );
 
 					while (
 						rootClientId &&
-						getBlockName( rootClientId ) !== 'core/post-content'
+						getBlockName( rootClientId ) !== POST_CONTENT_BLOCK_NAME
 					) {
 						rootClientId = getBlockRootClientId( rootClientId );
 					}
