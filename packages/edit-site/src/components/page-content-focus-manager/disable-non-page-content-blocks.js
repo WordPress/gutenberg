@@ -32,7 +32,6 @@ export default function DisableNonPageContentBlocks() {
  * Disables non-content blocks using the `useBlockEditingMode` hook.
  */
 export function useDisableNonPageContentBlocks() {
-	useBlockEditingMode( 'disabled' );
 	useEffect( () => {
 		addFilter(
 			'editor.BlockEdit',
@@ -53,7 +52,8 @@ const withDisableNonPageContentBlocks = createHigherOrderComponent(
 		const isPageContent =
 			PAGE_CONTENT_BLOCK_TYPES.includes( props.name ) &&
 			! isDescendentOfQueryLoop;
-		const mode = isPageContent ? 'contentOnly' : undefined;
+		const mode = isPageContent ? 'contentOnly' : 'disabled';
+
 		useBlockEditingMode( mode );
 		return <BlockEdit { ...props } />;
 	},
