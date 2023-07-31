@@ -11,7 +11,7 @@
  * @param array  $inserted_block    The block to insert.
  * @param string $relative_position The position relative to the given block.
  *                                  Can be 'before', 'after', 'first_child', or 'last_child'.
- * @param string $anchor_block      The block to insert relative to.
+ * @param string $anchor_block_type The auto-inserted block will be inserted next to instances of this block type.
  * @return callable A function that accepts a block's content and returns the content with the inserted block.
  */
 function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anchor_block ) {
