@@ -278,9 +278,12 @@ export default function Layout() {
 						} }
 						className="edit-site-layout__sidebar"
 					>
-						<NavigableRegion ariaLabel={ __( 'Navigation' ) }>
-							<Sidebar />
-						</NavigableRegion>
+						{ showSidebar && (
+							<NavigableRegion ariaLabel={ __( 'Navigation' ) }>
+								<Sidebar />
+							</NavigableRegion>
+						) }
+						{ ! showSidebar && <Sidebar /> }
 					</motion.div>
 
 					<SavePanel />
