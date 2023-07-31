@@ -95,7 +95,9 @@ store( {
 						);
 
 						context.core.image.lightboxEnabled = false;
-						context.core.image.lastFocusedElement.focus();
+						context.core.image.lastFocusedElement.focus( {
+							preventScroll: true,
+						} );
 					}
 				},
 				handleKeydown: ( { context, actions, event } ) => {
