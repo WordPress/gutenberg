@@ -23,7 +23,10 @@ export const Track = styled.div`
 	overflow: hidden;
 	width: 100%;
 	height: ${ CONFIG.borderWidthFocus };
-	background-color: ${ COLORS.gray[ '100' ] };
+	background-color: var(
+		--wp-components-color-gray-100,
+		${ COLORS.gray[ 100 ] }
+	);
 	border-radius: ${ CONFIG.radiusBlockUi };
 `;
 
