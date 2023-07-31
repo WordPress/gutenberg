@@ -6,6 +6,7 @@ import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	trash,
 	rotateLeft,
+	rotateRight,
 	layout,
 	page,
 	drawerLeft,
@@ -58,7 +59,7 @@ function usePageContentFocusCommands() {
 			name: 'core/switch-to-template-focus',
 			/* translators: %1$s: template title */
 			label: sprintf(
-				'Edit template — %s',
+				'Edit template: %s',
 				decodeEntities( template.title )
 			),
 			icon: layout,
@@ -102,18 +103,18 @@ function useManipulateDocumentCommands() {
 			template.type === 'wp_template'
 				? /* translators: %1$s: template title */
 				  sprintf(
-						'Reset template — %s',
+						'Reset template: %s',
 						decodeEntities( template.title )
 				  )
 				: /* translators: %1$s: template part title */
 				  sprintf(
-						'Reset template part — %s',
+						'Reset template part: %s',
 						decodeEntities( template.title )
 				  );
 		commands.push( {
 			name: 'core/reset-template',
 			label,
-			icon: rotateLeft,
+			icon: isRTL() ? rotateRight : rotateLeft,
 			callback: ( { close } ) => {
 				revertTemplate( template );
 				close();
@@ -126,12 +127,12 @@ function useManipulateDocumentCommands() {
 			template.type === 'wp_template'
 				? /* translators: %1$s: template title */
 				  sprintf(
-						'Delete template — %s',
+						'Delete template: %s',
 						decodeEntities( template.title )
 				  )
 				: /* translators: %1$s: template part title */
 				  sprintf(
-						'Delete template part — %s',
+						'Delete template part: %s',
 						decodeEntities( template.title )
 				  );
 		const path =
