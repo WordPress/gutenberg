@@ -36,11 +36,11 @@ _Example of directives used in the HTML markup_
 </div>
 ```
 
-#### List of Directives
+### List of Directives
 
 With directives we can manage directly in the DOM behavior related to things such as: Side Effects, State, Event Handlers, Attributes, Display, Template Logic, Content or Errors
 
-##### `wp-effect` ![](https://img.shields.io/badge/SIDE_EFFECTS-207399.svg)
+#### `wp-effect` ![](https://img.shields.io/badge/SIDE_EFFECTS-207399.svg)
 
 It runs an expression **when the node is created and runs it again when the state or context changes**. You can call several effects (or inits) from the same DOM by using the syntax`data-effect--[unique-id]`
 
@@ -81,7 +81,7 @@ store({
 
 Typical use cases for this directive are: showing a console.log, change the title of the page or usability behaviours using `.ref()` `.focus()`
 
-##### `wp-init` ![](https://img.shields.io/badge/SIDE_EFFECTS-207399.svg)
+#### `wp-init` ![](https://img.shields.io/badge/SIDE_EFFECTS-207399.svg)
 
 Like `wp-effect` but it runs an expression **only when the node is created**.
 
@@ -107,7 +107,7 @@ store({
 </details>
 <br/>
 
-##### `wp-on` ![](https://img.shields.io/badge/EVENT_HANDLERS-207399.svg)
+#### `wp-on` ![](https://img.shields.io/badge/EVENT_HANDLERS-207399.svg)
 
 It runs code on dispatched DOM events like `click` or `keyup`. The format of this directive is `data-wp-on--[event]`, like `data-wp-on--click` or `data-wp-on--keyup`.
 
@@ -133,7 +133,7 @@ store({
 </details>
 <br/>
 
-##### `wp-context` ![](https://img.shields.io/badge/STATE-207399.svg)
+#### `wp-context` ![](https://img.shields.io/badge/STATE-207399.svg)
 
 It provides **local** state available to a specific HTML node and its children.
 
@@ -165,7 +165,7 @@ store({
 </details>
 <br/>
 
-##### `wp-class` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
+#### `wp-class` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
 
 It adds or removes a class to an HTML element, depending on a boolean value.
 
@@ -198,7 +198,7 @@ store({
 </details>
 <br/>
 
-##### `wp-style` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
+#### `wp-style` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
 
 It adds or removes inline style to an HTML element, depending on its value.
 
@@ -228,7 +228,7 @@ store({
 </details>
 <br/>
 
-##### `wp-show` ![](https://img.shields.io/badge/DISPLAY-207399.svg)
+#### `wp-show` ![](https://img.shields.io/badge/DISPLAY-207399.svg)
 
 It shows and hides elements depending on the state or context.
 
@@ -263,7 +263,7 @@ store({
 </details>
 <br/>
 
-##### `wp-bind` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
+#### `wp-bind` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
 
 It allows setting HTML attributes on elements based on a boolean value.
 
@@ -300,15 +300,15 @@ store({
 <br/>
 
 
-##### `wp-each` ![](https://img.shields.io/badge/TEMPLATE_LOGIC-207399.svg)
+#### `wp-each` ![](https://img.shields.io/badge/TEMPLATE_LOGIC-207399.svg)
 
 It creates DOM elements by iterating through a list.
 
-##### `wp-slot / wp-fill` ![](https://img.shields.io/badge/TEMPLATE_LOGIC-207399.svg)
+#### `wp-slot / wp-fill` ![](https://img.shields.io/badge/TEMPLATE_LOGIC-207399.svg)
 
 It moves snippets of HTML from one place (fills) to another (slots).
 
-##### `wp-text` ![](https://img.shields.io/badge/CONTENT-207399.svg)
+#### `wp-text` ![](https://img.shields.io/badge/CONTENT-207399.svg)
 
 It sets the inner content of an HTML element.
 
@@ -342,16 +342,16 @@ store({
 </details>
 <br/>
 
-##### `wp-html` ![](https://img.shields.io/badge/CONTENT-207399.svg)
+#### `wp-html` ![](https://img.shields.io/badge/CONTENT-207399.svg)
 
 It sets the innerHTML property of an HTML element.
 
-##### `wp-error` ![](https://img.shields.io/badge/ERROR-207399.svg)
+#### `wp-error` ![](https://img.shields.io/badge/ERROR-207399.svg)
 
 It captures errors in other interactive blocks.
 
 
-#### Values of directives are references to properties
+### Values of directives are references to properties
 
 The value assigned to a directive is a string pointing to a specific state, selector, action, or effect. *Using a Namespace is highly recommended* to define these elements of the store. 
 
