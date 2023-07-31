@@ -197,6 +197,34 @@ store( {
 						ref.querySelector( '.close-button' ).focus();
 					}
 				},
+				initImageButton: ( { context, ref } ) => {
+					const originalImage =
+						ref.parentElement.querySelector( 'img' );
+					const {
+						naturalWidth,
+						naturalHeight,
+						offsetWidth: originalWidth,
+						offsetHeight: originalHeight,
+					} = originalImage;
+
+					// Natural ratio of the image.
+					const naturalRatio = naturalWidth / naturalHeight;
+					// Original ratio of the image.
+					const originalRatio = originalWidth / originalHeight;
+					if ( naturalRatio > originalRatio ) {
+						// If it reaches the width first, keep the width
+						// and recalculate the height.
+						context.core.image.imageButtonWidth = originalWidth;
+						context.core.image.imageButtonHeight =
+							originalWidth / naturalRatio;
+					} else {
+						// If it reaches the height first, keep the height
+						// and recalculate the width.
+						context.core.image.imageButtonHeight = originalHeight;
+						context.core.image.imageButtonWidth =
+							originalHeight * naturalRatio;
+					}
+				},
 			},
 		},
 	},

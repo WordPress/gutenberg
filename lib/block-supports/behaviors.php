@@ -148,7 +148,17 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
 	$button       = '<div class="img-container">
-                             <button type="button" aria-haspopup="dialog" aria-label="' . esc_attr( $aria_label ) . '" data-wp-on--click="actions.core.image.showLightbox" data-wp-on--mouseenter="actions.core.image.preloadLightboxImage"></button>'
+                             <button
+							 	type="button"
+								aria-haspopup="dialog"
+								aria-label="' . esc_attr( $aria_label ) . '"
+								data-wp-on--click="actions.core.image.showLightbox"
+								data-wp-on--mouseenter="actions.core.image.preloadLightboxImage"
+								data-wp-effect="effects.core.image.initImageButton"
+								data-wp-style--width="context.core.image.imageButtonWidth"
+								data-wp-style--height="context.core.image.imageButtonHeight"
+							>
+							</button>'
 		. $img[0] .
 		'</div>';
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );

@@ -157,6 +157,9 @@
 		position: relative;
 		width: max-content;
 		max-width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	button {
@@ -246,7 +249,6 @@
 		background-color: rgb(255, 255, 255);
 		opacity: 0.9;
 	}
-
 
 	// When fading, make the image come in slightly slower
 	// or faster than the scrim to give a sense of depth.
