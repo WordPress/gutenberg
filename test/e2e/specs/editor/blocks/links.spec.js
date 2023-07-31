@@ -258,6 +258,45 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	test( `can be removed`, async ( { page, editor, pageUtils } ) => {
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg' );
+
+		// Select some text.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Click on the Link button.
+		await page.getByRole( 'button', { name: 'Link' } ).click();
+
+		// Type a URL.
+		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+
+		// Click on the Submit button.
+		await pageUtils.pressKeys( 'Enter' );
+
+		// Reselect the link.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Unlick via shortcut
+		// we do this to avoid an layout edge case whereby
+		// the rich link preview popover will obscure the block toolbar
+		// under very specific circumstances and screensizes.
+		await page.getByRole( 'button', { name: 'Unlink' } ).nth( 1 ).click();
+
+		// The link should have been removed.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is Gutenberg',
+				},
+			},
+		] );
+	} );
+
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
 		page,
 		editor,
