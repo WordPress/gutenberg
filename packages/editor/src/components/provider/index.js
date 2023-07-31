@@ -10,7 +10,6 @@ import {
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -20,6 +19,7 @@ import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
+import PatternsMenuItems from '../create-pattern';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -130,7 +130,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							useSubRegistry={ false }
 						>
 							{ children }
-							<ReusableBlocksMenuItems />
+							<PatternsMenuItems />
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>

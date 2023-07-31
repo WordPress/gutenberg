@@ -7,6 +7,8 @@ import {
 	parse,
 	synchronizeBlocksWithTemplate,
 	__unstableSerializeAndClean,
+	serialize,
+	createBlock,
 } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -545,6 +547,69 @@ export function updateEditorSettings( settings ) {
 	return {
 		type: 'UPDATE_EDITOR_SETTINGS',
 		settings,
+	};
+}
+
+/**
+ * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
+ *
+ * @param {string}             title     Pattern title.
+ * @param {'full'|'unsynced'}  syncType  They way block is synced, 'full' or 'unsynced'.
+ * @param {string[]|undefined} clientIds Optional client IDs of blocks to convert to pattern.
+ */
+export const __experimentalCreatePattern =
+	( title, syncType, clientIds ) =>
+	async ( { registry, dispatch } ) => {
+		const meta =
+			syncType === 'unsynced'
+				? {
+						wp_pattern_sync_status: syncType,
+				  }
+				: undefined;
+
+		const reusableBlock = {
+			title,
+			content: clientIds
+				? serialize(
+						registry
+							.select( blockEditorStore )
+							.getBlocksByClientId( clientIds )
+				  )
+				: undefined,
+			status: 'publish',
+			meta,
+		};
+
+		const updatedRecord = await registry
+			.dispatch( coreStore )
+			.saveEntityRecord( 'postType', 'wp_block', reusableBlock );
+
+		if ( syncType === 'unsynced' || ! clientIds ) {
+			return updatedRecord;
+		}
+
+		const newBlock = createBlock( 'core/block', {
+			ref: updatedRecord.id,
+		} );
+		registry
+			.dispatch( blockEditorStore )
+			.replaceBlocks( clientIds, newBlock );
+		dispatch.__experimentalSetEditingPattern( newBlock.clientId, true );
+		return updatedRecord;
+	};
+
+/**
+ * Returns an action descriptor for SET_EDITING_REUSABLE_BLOCK action.
+ *
+ * @param {string}  clientId  The clientID of the reusable block to target.
+ * @param {boolean} isEditing Whether the block should be in editing state.
+ * @return {Object} Action descriptor.
+ */
+export function __experimentalSetEditingPattern( clientId, isEditing ) {
+	return {
+		type: 'SET_EDITING_REUSABLE_BLOCK',
+		clientId,
+		isEditing,
 	};
 }
 
