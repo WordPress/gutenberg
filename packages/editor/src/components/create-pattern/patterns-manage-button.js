@@ -54,7 +54,7 @@ function PatternsManageButton( { clientId } ) {
 			[ clientId ]
 		);
 
-	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+	const { __experimentalConvertSyncedPatternToStatic: convertBlockToStatic } =
 		useDispatch( editorStore );
 
 	if ( ! isVisible ) {

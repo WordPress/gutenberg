@@ -599,6 +599,35 @@ export const __experimentalCreatePattern =
 	};
 
 /**
+ * Returns a generator converting a synced pattern block into a static block.
+ *
+ * @param {string} clientId The client ID of the block to attach.
+ */
+export const __experimentalConvertSyncedPatternToStatic =
+	( clientId ) =>
+	( { registry } ) => {
+		const oldBlock = registry
+			.select( blockEditorStore )
+			.getBlock( clientId );
+		const pattern = registry
+			.select( 'core' )
+			.getEditedEntityRecord(
+				'postType',
+				'wp_block',
+				oldBlock.attributes.ref
+			);
+
+		const newBlocks = parse(
+			typeof pattern.content === 'function'
+				? pattern.content( pattern )
+				: pattern.content
+		);
+		registry
+			.dispatch( blockEditorStore )
+			.replaceBlocks( oldBlock.clientId, newBlocks );
+	};
+
+/**
  * Returns an action descriptor for SET_EDITING_PATTERN action.
  *
  * @param {string}  clientId  The clientID of the pattern to target.
