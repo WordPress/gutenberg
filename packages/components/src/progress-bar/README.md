@@ -24,3 +24,9 @@ If a `value` is not specified, the progress bar will be considered indeterminate
 A CSS class to apply to the underlying `div` element, serving as a progress bar track.
 
 - Required: No
+
+##### `id`: `string`
+
+The HTML `id` of the control element. This is necessary to be able to accessibly associate the label with that element.
+
+-   Required: No

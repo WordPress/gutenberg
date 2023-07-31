@@ -70,4 +70,12 @@ describe( 'ProgressBar', () => {
 
 		expect( container ).toMatchSnapshot();
 	} );
+
+	it( 'should allow a custom `id` attribute to be specified', () => {
+		const id = 'foo-bar-123';
+
+		render( <ProgressBar id={ id } /> );
+
+		expect( screen.getByRole( 'progressbar' ) ).toHaveAttribute( 'id', id );
+	} );
 } );
