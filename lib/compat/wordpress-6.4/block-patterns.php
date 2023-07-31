@@ -10,7 +10,7 @@
  *
  * Note: This should be removed when the minimum required WP version is >= 6.4.
  *
- * @see https://github.com/WordPress/gutenberg/pull/51144
+ * @see https://github.com/WordPress/gutenberg/pull/53163
  *
  * @return void
  */
