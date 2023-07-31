@@ -15,8 +15,12 @@ exports[`ProgressBar should have an \`is-indeterminate\` className if \`value\` 
   position: relative;
   overflow: hidden;
   width: 100%;
+  max-width: 160px;
   height: 1.5px;
-  background-color: #f0f0f0;
+  background-color: var(
+  		--wp-components-color-gray-100,
+  		#f0f0f0
+  	);
   border-radius: 2px;
 }
 
@@ -58,7 +62,7 @@ exports[`ProgressBar should have an \`is-indeterminate\` className if \`value\` 
 
 <div>
   <div
-    class="components-progress-bar is-indeterminate emotion-0 emotion-1"
+    class="is-indeterminate emotion-0 emotion-1"
   >
     <div
       class="emotion-2 emotion-3"
@@ -88,8 +92,12 @@ exports[`ProgressBar should not have an \`is-indeterminate\` className if \`valu
   position: relative;
   overflow: hidden;
   width: 100%;
+  max-width: 160px;
   height: 1.5px;
-  background-color: #f0f0f0;
+  background-color: var(
+  		--wp-components-color-gray-100,
+  		#f0f0f0
+  	);
   border-radius: 2px;
 }
 
@@ -131,7 +139,7 @@ exports[`ProgressBar should not have an \`is-indeterminate\` className if \`valu
 
 <div>
   <div
-    class="components-progress-bar emotion-0 emotion-1"
+    class=" emotion-0 emotion-1"
   >
     <div
       class="emotion-2 emotion-3"
