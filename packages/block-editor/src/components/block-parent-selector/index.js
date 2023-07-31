@@ -12,10 +12,7 @@ import { useRef } from '@wordpress/element';
  */
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
-import {
-	useShowHoveredOrFocusedGestures,
-	highlightBlock,
-} from '../block-toolbar/utils';
+import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -59,7 +56,7 @@ export default function BlockParentSelector() {
 	const nodeRef = useRef();
 	const showHoveredOrFocusedGestures = useShowHoveredOrFocusedGestures( {
 		ref: nodeRef,
-		highlightedBlock: highlightBlock.parent,
+		highlightParent: true,
 	} );
 
 	if ( ! isVisible ) {

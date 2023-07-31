@@ -31,10 +31,7 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
-import {
-	useShowHoveredOrFocusedGestures,
-	highlightBlock,
-} from '../block-toolbar/utils';
+import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -169,7 +166,7 @@ export function BlockSettingsDropdown( {
 	const selectParentButtonRef = useRef();
 	const showParentOutlineGestures = useShowHoveredOrFocusedGestures( {
 		ref: selectParentButtonRef,
-		highlightedBlock: highlightBlock.parent,
+		highlightParent: true,
 	} );
 
 	// This can occur when the selected block (the parent)

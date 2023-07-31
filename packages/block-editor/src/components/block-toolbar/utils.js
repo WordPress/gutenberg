@@ -11,7 +11,6 @@ import { store as blockEditorStore } from '../../store';
 
 const { clearTimeout, setTimeout } = window;
 const DEBOUNCE_TIMEOUT = 200;
-export const highlightBlock = { selectedBlock: 1, parent: 2 };
 
 /**
  * Hook that creates debounced callbacks when the node is hovered or focused.
@@ -19,13 +18,13 @@ export const highlightBlock = { selectedBlock: 1, parent: 2 };
  * @param {Object}  props                       Component props.
  * @param {Object}  props.ref                   Element reference.
  * @param {boolean} props.isFocused             Whether the component has current focus.
- * @param {number}  props.highlightedBlock      Which block to highlight.
+ * @param {number}  props.highlightParent       Whether to highlight the parent block. It defaults in highlighting the selected block.
  * @param {number}  [props.debounceTimeout=250] Debounce timeout in milliseconds.
  */
-export function useDebouncedShowGestures( {
+function useDebouncedShowGestures( {
 	ref,
 	isFocused,
-	highlightedBlock,
+	highlightParent,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
 } ) {
 	const { getSelectedBlockClientId, getBlockRootClientId } =
@@ -42,13 +41,9 @@ export function useDebouncedShowGestures( {
 			return;
 		}
 		const selectedBlockClientId = getSelectedBlockClientId();
-		let clientId;
-		if ( highlightedBlock === highlightBlock.selectedBlock ) {
-			clientId = selectedBlockClientId;
-		}
-		if ( highlightedBlock === highlightBlock.parent ) {
-			clientId = getBlockRootClientId( selectedBlockClientId );
-		}
+		const clientId = highlightParent
+			? getBlockRootClientId( selectedBlockClientId )
+			: selectedBlockClientId;
 		toggleBlockHighlight( clientId, nextIsFocused );
 	};
 
@@ -115,14 +110,14 @@ export function useDebouncedShowGestures( {
  * Hook that provides gesture events for DOM elements
  * that interact with the isFocused state.
  *
- * @param {Object} props                       Component props.
- * @param {Object} props.ref                   Element reference.
- * @param {number} props.highlightedBlock      Which block to highlight.
- * @param {number} [props.debounceTimeout=250] Debounce timeout in milliseconds.
+ * @param {Object} props                         Component props.
+ * @param {Object} props.ref                     Element reference.
+ * @param {number} [props.highlightParent=false] Whether to highlight the parent block. It defaults to highlighting the selected block.
+ * @param {number} [props.debounceTimeout=250]   Debounce timeout in milliseconds.
  */
 export function useShowHoveredOrFocusedGestures( {
 	ref,
-	highlightedBlock,
+	highlightParent = false,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
 } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -131,7 +126,7 @@ export function useShowHoveredOrFocusedGestures( {
 			ref,
 			debounceTimeout,
 			isFocused,
-			highlightedBlock,
+			highlightParent,
 		} );
 
 	const registerRef = useRef( false );

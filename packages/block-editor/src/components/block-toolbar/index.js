@@ -29,7 +29,7 @@ import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import BlockEditVisuallyButton from '../block-edit-visually-button';
-import { useShowHoveredOrFocusedGestures, highlightBlock } from './utils';
+import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import { unlock } from '../../lock-unlock';
@@ -73,7 +73,6 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 	const nodeRef = useRef();
 	const showHoveredOrFocusedGestures = useShowHoveredOrFocusedGestures( {
 		ref: nodeRef,
-		highlightedBlock: highlightBlock.selectedBlock,
 	} );
 
 	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
