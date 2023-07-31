@@ -1,8 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -16,7 +22,11 @@ import {
 import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
-import { cleanEmptyObject, useBlockSettings } from './utils';
+import {
+	cleanEmptyObject,
+	useBlockSettings,
+	shouldSkipSerialization,
+} from './utils';
 
 function omit( object, keys ) {
 	return Object.fromEntries(
@@ -44,6 +54,14 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
 ];
+
+const hasWritingModeSupport = ( blockType ) => {
+	const writingModeSupport = getBlockSupport(
+		blockType,
+		WRITING_MODE_SUPPORT_KEY
+	);
+	return writingModeSupport;
+};
 
 function styleToAttributes( style ) {
 	const updatedStyle = { ...omit( style, [ 'fontFamily' ] ) };
@@ -153,3 +171,70 @@ export const hasTypographySupport = ( blockName ) => {
 		hasBlockSupport( blockName, key )
 	);
 };
+
+/**
+ * Filters registered block settings to extend the block edit wrapper
+ * to apply the desired classnames properly.
+ *
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
+ */
+export function addEditProps( settings ) {
+	if ( ! hasWritingModeSupport( settings ) ) {
+		return settings;
+	}
+
+	const existingGetEditWrapperProps = settings.getEditWrapperProps;
+	settings.getEditWrapperProps = ( attributes ) => {
+		let props = {};
+		if ( existingGetEditWrapperProps ) {
+			props = existingGetEditWrapperProps( attributes );
+		}
+		return addSaveProps( props, settings, attributes );
+	};
+
+	return settings;
+}
+
+/**
+ * Override props assigned to save component to inject typography classnames.
+ *
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} Filtered props applied to save element.
+ */
+export function addSaveProps( props, blockType, attributes ) {
+	if (
+		! hasWritingModeSupport( blockType ) ||
+		shouldSkipSerialization( blockType, WRITING_MODE_SUPPORT_KEY )
+	) {
+		return props;
+	}
+
+	const { style } = attributes;
+	const writingMode = style?.typography?.writingMode;
+	const newClassName = classnames( props.className, {
+		'has-writing-mode': writingMode ? true : false,
+		'is-vertical-lr': writingMode === 'vertical-lr' ? true : false,
+		'is-vertical-rl': writingMode === 'vertical-rl' ? true : false,
+		'is-horizontal-tb': writingMode === 'horizontal-tb' ? true : false,
+	} );
+	props.className = newClassName ? newClassName : undefined;
+
+	return props;
+}
+
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'core/typography/addSaveProps',
+	addSaveProps
+);
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/typography/addEditProps',
+	addEditProps
+);

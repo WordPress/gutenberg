@@ -28,6 +28,12 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= " has-text-align-{$attributes['textAlign']}";
 	}
+
+	$writing_mode = _wp_array_get( $attributes, array( 'style', 'typography', 'writingMode' ), null );
+	if ( isset( $writing_mode ) ) {
+		$classes .= " has-writing-mode";
+		$classes .= " is-{$writing_mode}";
+	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	// Set default values.
 	$format = '%link';

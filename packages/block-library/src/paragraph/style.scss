@@ -49,3 +49,11 @@ p.has-background {
 :where(p.has-text-color:not(.has-link-color)) a {
 	color: inherit;
 }
+
+p.has-text-align-right.has-writing-mode.is-vertical-rl {
+	transform: scale(-1, -1);
+}
+
+body.rtl p.has-text-align-left.has-writing-mode.is-vertical-lr {
+	transform: scale(-1, -1);
+}

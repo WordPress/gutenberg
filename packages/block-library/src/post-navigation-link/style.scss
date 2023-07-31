@@ -20,4 +20,19 @@
 		}
 	}
 
+	&.has-writing-mode.is-vertical-rl {
+		writing-mode: vertical-rl;
+	}
+
+	&.has-writing-mode.is-vertical-lr {
+		writing-mode: vertical-lr;
+	}
+
+	&.has-text-align-right.has-writing-mode.is-vertical-rl {
+		transform: scale(-1, -1);
+	}
+}
+
+body.rtl .wp-block-post-navigation-link .has-text-align-left.has-writing-mode.is-vertical-lr {
+	transform: scale(-1, -1);
 }
