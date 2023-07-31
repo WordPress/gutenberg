@@ -24,6 +24,11 @@ export function ProgressBar(
 	const { className, value } = props;
 	const isIndeterminate = ! Number.isFinite( value );
 	const wrapperClasses = classnames( 'components-progress-bar', className, {
+		/**
+		 * @todo Use the `:indeterminate` pseudo-class once supported.
+		 *
+		 * @see https://caniuse.com/mdn-css_selectors_indeterminate_progress
+		 */
 		'is-indeterminate': isIndeterminate,
 	} );
 
