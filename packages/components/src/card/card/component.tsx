@@ -88,15 +88,15 @@ function UnconnectedCard(
  *   CardHeader,
  *   CardBody,
  *   CardFooter,
- *   Text,
- *   Heading,
+ *   __experimentalText as Text,
+ *   __experimentalHeading as Heading,
  * } from `@wordpress/components`;
  *
  * function Example() {
  *   return (
  *     <Card>
  *       <CardHeader>
- *         <Heading size={ 4 }>Card Title</Heading>
+ *         <Heading level={ 4 }>Card Title</Heading>
  *       </CardHeader>
  *       <CardBody>
  *         <Text>Card Content</Text>
