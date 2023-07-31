@@ -17,7 +17,7 @@ import { store as noticesStore } from '@wordpress/notices';
 export const USER_PATTERN_CATEGORY = 'my-patterns';
 
 export const SYNC_TYPES = {
-	full: 'fully',
+	full: undefined,
 	unsynced: 'unsynced',
 };
 
@@ -32,7 +32,7 @@ export default function CreatePatternModal( {
 	clientIds,
 	onClose,
 } ) {
-	const [ syncType, setSyncType ] = useState( undefined );
+	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
 	const [ title, setTitle ] = useState( '' );
 	const { __experimentalCreatePattern: createPattern } = useDispatch( store );
 
@@ -91,7 +91,11 @@ export default function CreatePatternModal( {
 						) }
 						checked={ ! syncType }
 						onChange={ () => {
-							setSyncType( ! syncType ? 'unsynced' : undefined );
+							setSyncType(
+								syncType === SYNC_TYPES.full
+									? SYNC_TYPES.unsynced
+									: SYNC_TYPES.full
+							);
 						} }
 					/>
 					<HStack justify="right">
