@@ -56,7 +56,11 @@ export const format = {
 		const footnotesBlockType = useSelect( ( select ) =>
 			select( blocksStore ).getBlockType( name )
 		);
-		const hasParentCoreBlocks = useSelect( ( select ) => {
+		/*
+		 * This useSelect exists because we need to use its return value
+		 * outside the event callback.
+		 */
+		const isBlockWithinPattern = useSelect( ( select ) => {
 			const {
 				getBlockParentsByBlockName: _getBlockParentsByBlockName,
 				getSelectedBlockClientId: _getSelectedBlockClientId,
@@ -80,7 +84,7 @@ export const format = {
 		}
 
 		// Checks if the selected block lives within a pattern.
-		if ( hasParentCoreBlocks ) {
+		if ( isBlockWithinPattern ) {
 			return null;
 		}
 
