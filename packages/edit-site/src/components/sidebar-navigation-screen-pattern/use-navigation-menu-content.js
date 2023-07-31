@@ -2,12 +2,15 @@
  * WordPress dependencies
  */
 import { parse } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import TemplatePartNavigationMenus from './template-part-navigation-menus';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Retrieves a list of specific blocks from a given tree of blocks.
@@ -51,6 +54,7 @@ function getBlocksOfTypeFromBlocks( targetBlockType, blocks ) {
 
 export default function useNavigationMenuContent( postType, postId ) {
 	const { record } = useEditedEntityRecord( postType, postId );
+	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
 	// Only managing navigation menus in template parts is supported
 	// to match previous behaviour. This could potentially be expanded
@@ -73,8 +77,9 @@ export default function useNavigationMenuContent( postType, postId ) {
 		return;
 	}
 
-	const navigationMenuIds = navigationBlocks?.map(
-		( block ) => block.attributes.ref
+	const navigationMenuIds = navigationBlocks?.map( ( block ) =>
+		// If the block doesn't have a ref, assume that it's the fallback navigation.
+		block.attributes.ref ? block.attributes.ref : getNavigationFallbackId()
 	);
 
 	// Dedupe the Navigation blocks, as you can have multiple navigation blocks in the template.
