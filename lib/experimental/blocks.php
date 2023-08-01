@@ -121,3 +121,98 @@ function gutenberg_register_metadata_attribute( $args ) {
 	return $args;
 }
 add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
+
+
+
+
+// TODO: Wrap this with a check for the experimental Custom Sources API.
+
+/**
+ * Renders the block meta attributes.
+ *
+ * @param string   $block_content Block Content.
+ * @param array    $block Block attributes.
+ * @param WP_Block $block_instance The block instance.
+ */
+function gutenberg_render_custom_sources( $block_content, $block, $block_instance ) {
+	$meta_custom_source = require __DIR__ . '/custom-sources/meta.php';
+	$block_type         = $block_instance->block_type;
+
+	// Not sure if we need it, it was in Riad's PR.
+	if ( null === $block_type ) {
+		return $block_content;
+	}
+
+	// Whitelist of the block types that support custom sources
+	// Currently, we only allow the Paragraph and Image blocks to use custom sources.
+	if ( ! in_array( $block_type->name, array( 'core/paragraph', 'core/image' ), true ) ) {
+		return $block_content;
+	}
+
+	// Get all the attributes that have a connection.
+	$connected_attributes = _wp_array_get( $block_type->attributes, array( 'connections', 'attributes' ), false );
+	if ( ! $connected_attributes ) {
+		return $block_content;
+	}
+
+	foreach ( $connected_attributes as $attribute_name => $attribute_value ) {
+		// If the source value is not meta, skip it because we only support meta
+		// sources for now.
+		if ( 'meta' !== $attribute_value['source'] ) {
+			continue;
+		}
+
+		// If the attribute does not have a source, skip it.
+		if ( ! isset( $block_type->attributes[ $attribute_name ]['source'] ) ) {
+			continue;
+		}
+
+		// If the attribute does not specify the name of the custom field, skip it.
+		if ( ! isset( $attribute_value['value'] ) ) {
+			continue;
+		}
+
+		$block_content = $meta_custom_source['apply_source'](
+			$block_content,
+			$block_instance,
+			$attribute_value['value'],
+			$block_type->attributes[ $attribute_name ]
+		);
+	}
+
+	return $block_content;
+}
+
+add_filter( 'render_block', 'gutenberg_render_custom_sources', 10, 3 );
+
+
+
+
+// ----- This is just for testing, remove later -----
+
+/**
+ * Registers a custom meta
+ */
+function init_test_summary_meta_field() {
+	register_meta(
+		'post',
+		'test_custom_field',
+		array(
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'string',
+			'default'      => 'hello this is a custom field test',
+		)
+	);
+	register_meta(
+		'post',
+		'second_test_custom_field',
+		array(
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'string',
+			'default'      => 'second custom field test',
+		)
+	);
+}
+add_action( 'init', 'init_test_summary_meta_field' );

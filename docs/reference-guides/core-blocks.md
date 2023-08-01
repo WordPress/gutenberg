@@ -480,7 +480,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 -	**Name:** core/paragraph
 -	**Category:** text
 -	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
--	**Attributes:** align, content, direction, dropCap, placeholder
+-	**Attributes:** align, connections, content, direction, dropCap, placeholder
 
 ## Pattern placeholder
 
