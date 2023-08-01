@@ -22,7 +22,6 @@ import setupApiFetch from './api-fetch-setup';
 const reactNativeSetup = () => {
 	LogBox.ignoreLogs( [
 		'Require cycle:', // TODO: Refactor to remove require cycles
-		'lineHeight', // TODO: Remove lineHeight warning from Aztec
 		/**
 		 * TODO: Migrate to @gorhom/bottom-sheet or replace usage of
 		 * LayoutAnimation to Animated. KeyboardAvoidingView's usage of

@@ -256,9 +256,6 @@ class AztecView extends Component {
 
 		if ( style.hasOwnProperty( 'lineHeight' ) ) {
 			delete style.lineHeight;
-			window.console.warn(
-				"Removing lineHeight style as it's not supported by native AztecView"
-			);
 			// Prevents passing line-height within styles to avoid a crash due to values without units
 			// We now support this but passing line-height as a prop instead.
 		}
