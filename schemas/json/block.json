@@ -859,6 +859,17 @@
 		"render": {
 			"type": "string",
 			"description": "Template file loaded on the server when rendering a block."
+		},
+		"__experimentalAutoInsert": {
+			"type": "object",
+			"description": "Blocks to auto-insert this block next to.",
+			"patternProperties": {
+				"[a-zA-Z]": {
+					"type": "string",
+					"description": "Position relative to the block to auto-insert this block next to.",
+					"enum": [ "before", "after", "firstChild", "lastChild" ]
+				}
+			}
 		}
 	},
 	"required": [ "name", "title" ],
