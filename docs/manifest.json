@@ -1596,6 +1596,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/edit-patterns",
+		"slug": "packages-edit-patterns",
+		"markdown_source": "../packages/edit-patterns/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "../packages/edit-post/README.md",
