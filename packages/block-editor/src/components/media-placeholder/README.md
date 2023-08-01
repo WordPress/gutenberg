@@ -133,9 +133,9 @@ An object that can contain a `title` and `instructions` properties. These proper
 
 ### multiple
 
-Whether to allow multiple selection of files or not.
+Whether to allow multiple selection of files or not. This property will also accept a string with the value `add` to allow multiple selection of files without the need to use the `Shift` or `Ctrl`/`Cmd` keys.
 
--   Type: `Boolean`
+-   Type: `Boolean|String`
 -   Required: No
 -   Default: `false`
 -   Platform: Web
