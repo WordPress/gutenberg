@@ -209,9 +209,6 @@ export function usePasteHandler( props ) {
 				mode = 'BLOCKS';
 			}
 
-			// If the data comes from a rich text instance, we can directly use it
-			// without filtering the data. The filters are only meant for externally
-			// pasted content and remove inline styles.
 			const content = pasteHandler( {
 				HTML: html,
 				plainText,

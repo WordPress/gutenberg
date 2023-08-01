@@ -109,7 +109,7 @@ function maybeConvertParagraphToInline( { blocks, plainText, mode } ) {
  * @param {Array}   [options.tagName]            The tag into which content will be inserted.
  * @param {boolean} [options.preserveWhiteSpace] Whether or not to preserve consequent white space.
  *
- * @param {boolean} [options.disableFilters]
+ * @param {boolean} [options.disableFilters]     Whether or not to filter non semantic content.
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
 export function pasteHandler( {
@@ -154,9 +154,6 @@ export function pasteHandler( {
 	}
 
 	if ( disableFilters ) {
-		// If the data comes from a rich text instance, we can directly use it
-		// without filtering the data. The filters are only meant for externally
-		// pasted content and remove inline styles.
 		return maybeConvertParagraphToInline( {
 			blocks: htmlToBlocks( HTML, pasteHandler ),
 			plainText,
