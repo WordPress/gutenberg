@@ -347,7 +347,7 @@ The callback passed as reference receives [the event](https://developer.mozilla.
 
 #### `wp-effect` 
 
-It runs an expression (or callback) **when the node is created and runs it again when the state or context changes**. You can attach several effects to the same DOM element by using the syntax`data-wp-effect--[unique-id]`.
+It runs a callback **when the node is created and runs it again when the state or context changes**. You can attach several effects to the same DOM element by using the syntax`data-wp-effect--[unique-id]`.
 
 _Example of `wp-on` directive_
 ```html
@@ -396,7 +396,7 @@ As a reference, some use cases for this directive may be:
 
 #### `wp-init` 
 
-It runs an expression (or callback) **only when the node is created**.
+It runs a callback **only when the node is created**.
 
 You can attach several effects to the same DOM element by using the syntax`data-wp-init--[unique-id]`.
 
