@@ -1,2 +1,6 @@
-export { store } from './store';
+/**
+ * Internal dependencies
+ */
+import './store';
+
 export * from './private-apis';
