@@ -5,7 +5,7 @@ To add interactivity to blocks using the Interactivity API, developers can use:
 - **Directives** - added to the markup to add specific behavior to the DOM elements of block.
 - **Store** - that contains the logic and data (state, actions, or effects among others) needed for the behaviour.
 
-DOM elements are connected to data stored in the state & context through directives. If data in the state or context change, directives will react to those changes updating the DOM accordingly (see [diagram](https://excalidraw.com/#room=11c461f5e18480cd8631,mNsrOHbcUKgVdITiRl6H5w)).
+DOM elements are connected to data stored in the state & context through directives. If data in the state or context change, directives will react to those changes updating the DOM accordingly (see [diagram](https://excalidraw.com/#json=rEg5d71O_jy3NrgYJUIVd,yjOUmMvxzNf6alqFjElvIw).
 
 ![State & Directives](assets/state-directives.png)
 
@@ -19,298 +19,216 @@ _Example of directives used in the HTML markup_
 
 ```html
 <div
-  data-wp-context='{ "isOpen": false }'
-  data-wp-effect="effects.logIsOpen"
+  data-wp-context='{ "myNamespace" : { "isOpen": false } }'
+  data-wp-effect="effects.myNamespace.logIsOpen"
 >
   <button
-    data-wp-on--click="actions.toggle"
-    data-wp-bind--aria-expanded="context.isOpen"
+    data-wp-on--click="actions.myNamespace.toggle"
+    data-wp-bind--aria-expanded="context.myNamespace.isOpen"
     aria-controls="p-1"
   >
     Toggle
   </button>
  
-  <p id="p-1" data-wp-show="context.isOpen">
+  <p id="p-1" data-bind--hidden="!context.myNamespace.isOpen">
     This element is now visible!
   </p>
 </div>
 ```
 
+> **Note**
+> The use of Namespaces to define the context, state or any other elements of the store is highly recommended to avoid possible collision with other elements with the same name. In the following examples we have not use namespaces for the sake of simplicity
+
+Directives can also be injected dynamically using the [HTML Tag Processor](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2).
+
 ### List of Directives
 
 With directives we can manage directly in the DOM behavior related to things such as: Side Effects, State, Event Handlers, Attributes, Display, Template Logic, Content or Errors
 
-#### `wp-effect` ![](https://img.shields.io/badge/SIDE_EFFECTS-207399.svg)
+#### `wp-interactive` ![](https://img.shields.io/badge/DECLARATIVE-207399.svg)
 
-It runs an expression **when the node is created and runs it again when the state or context changes**. You can call several effects (or inits) from the same DOM by using the syntax`data-effect--[unique-id]`
+The `wp-interactive` "activates" hydration for the DOM element and its children through the Interactivity API (directives and store). 
 
-_Example of `wp-effect` directive_
-```html
-<form 
-  data-wp-effect="effect.myNamespace.logTime" 
->
-  <input type="text" id="password" name="access-password">
-</form>
-```
+> **Note**
+> The use of `wp-interactive` is a requirement for the Intereactivity API "engine" to work. We have not added the `wp-interactive` to the following examples for the sake of simplicity
 
-_Example of several `wp-effect` directives on the same DOM element_
-```html
-<form 
-  data-wp-effect–-1="effect.myNamespace.logTime" 
-  data-wp-effect–-2="effect.myNamespace.focusFirstElement"
->
-  <input type="text" id="password" name="access-password">
-</form>
-```
-
-<details>
-  <summary><em>See store used with the directive above</em></summary>
-<pre><code>
-// store
-store({
-  effects: {
-    myNamespace: {
-      logTime: () => console.log(new Date()),
-      focusFirstElement: ({ref}) => ref.querySelector('input:first-child').focus();
-    },
-  }
-});
-</code></pre>
-</details>
-<br/>
-
-Typical use cases for this directive are: showing a console.log, change the title of the page or usability behaviours using `.ref()` `.focus()`
-
-#### `wp-init` ![](https://img.shields.io/badge/SIDE_EFFECTS-207399.svg)
-
-Like `wp-effect` but it runs an expression **only when the node is created**.
-
-_Example of `data-wp-init` directive_ 
-```html
-<div data-wp-init="effect.myNamespace.logTimeInit">
-  <p>Hi!</>
-</div>
-```
-
-<details>
-  <summary><em>See store used with the directive above</em></summary>
-<pre><code>
-// store
-store({
-  effects: {
-    myNamespace: {
-      logTimeInit: () => console.log( `Init at `+ new Date()),
-    },
-  }
-});
-</code></pre>
-</details>
-<br/>
-
-#### `wp-on` ![](https://img.shields.io/badge/EVENT_HANDLERS-207399.svg)
-
-It runs code on dispatched DOM events like `click` or `keyup`. The format of this directive is `data-wp-on--[event]`, like `data-wp-on--click` or `data-wp-on--keyup`.
-
-_Example of `wp-context` directive_ 
-```php
-<button data-wp-on--click="actions.myNamespace logTime" >
-  Click Me!
-</button>
-```
-
-<details>
-  <summary><em>See store used with the directive above</em></summary>
-<pre><code>
-// store
-store({
-  actions: {
-    myNamespace: {
-      logTime: () => console.log(new Date())
-    },
-  },
-});
-</code></pre>
-</details>
-<br/>
 
 #### `wp-context` ![](https://img.shields.io/badge/STATE-207399.svg)
 
 It provides **local** state available to a specific HTML node and its children.
 
+The `wp-context` directive accepts a stringified JSON as value.
+
 _Example of `wp-context` directive_ 
 ```php
 //render.php
-<div data-wp-context='{ "post": { "id": <?php echo $post->ID; ?> } }' >
-  <button data-wp-on--click="actions.myNamespace.logId" >
+<div data-wp-context='{ {"post": { "id": <?php echo $post->ID; ?> } } ' >
+  <button data-wp-on--click="actions.logId" >
     Click Me!
   </button>
 </div>
 >
 ```
-
-<details>
-  <summary><em>See store used with the directive above</em></summary>
-<pre><code>
-// store
-store({
-  actions: {
-    myNamespace: {
-      logId: ({ context }) => {
-        console.log(context.post.id);
-      },
+```js
+// store used with the directive above
+store( {
+	actions: {
+    logId: ( { context } ) => {
+      console.log( context.post.id );
     },
-  },
-});
-</code></pre>
-</details>
-<br/>
+	},
+} );
+```
+
+Different contexts can be defined at different levels and deeper levels will merge their own context with any parent one:
+
+```html
+<div data-wp-context="{ foo: 'bar' }">
+  <span data-wp-text="context.foo"><!-- Will output: "bar" --></span>
+
+  <div data-wp-context="{ bar: 'baz' }">
+    <span data-wp-text="context.foo"><!-- Will output: "bar" --></span>
+
+    <div data-wp-context="{ foo: 'bob' }">
+      <span data-wp-text="context.foo"><!-- Will output: "bob" --></span>
+    </div>
+
+  </div>
+</div>
+```
+
+#### `wp-bind` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
+
+It allows setting HTML attributes on elements based on a boolean or string value.
+
+> This directive follows the syntax `data-wp-bind--attribute`
+
+_Example of `wp-bind` directive_ 
+```html
+<li
+  data-wp-context='{ "isMenuOpen": false } '>
+  <button
+    data-wp-on--click="actions.toggleMenu"
+    data-wp-bind.aria-expanded="context.isMenuOpen"
+  >
+  </button>
+  <div data-wp-bind--hidden="!context.isMenuOpen">
+    <span>Title</span>
+    <ul>
+      SUBMENU ITEMS
+    </ul>
+  </div>
+</li>
+```
+```js
+// store used with the directive above
+store( {
+	actions: {
+		toggleMenu: ( { context } ) => ! context.isMenuOpen,
+	},
+} );
+```
+
+The `wp-bind` directive is executed:
+  - when the element is created 
+  - each time there's a change on any of the properties of the `state` or `context` involved on getting the final value of the directive (inside the callback or the expression passed as reference)
+
+The `wp-bind` will do different things over the DOM element is applied depending on its value:
+  - If the value is `true`, the attribute is added: `<div attribute>`.
+  - If the value is `false`, the attribute is removed: `<div>`.
+  - If the value is a string, the attribute is added with its value assigned: `<div attribute="value"`.
+  - If the attribute name starts with `aria-` or `data-` and the value is boolean (either `true` or `false`), the attribute is added to the DOM with the boolean value assigned as a string: `<div aria-attribute="true">`.
+
+When `wp-bind` directive references a callback to get its final value: 
+- The `wp-bind` directive will be executed each time there's a change on any of the properties of the `state` or `context` used inside this callback.
+- The callback receives the attribute name: `attribute`.
+- The returned value in the callback function is used to change the value of the associated attribute.
 
 #### `wp-class` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
 
 It adds or removes a class to an HTML element, depending on a boolean value.
 
+> This directive follows the syntax `data-wp-class--classname`
+
 _Example of `wp-class` directive_ 
 ```php
-<div data-wp-context='{ "hidden": true }' >
-  <button data-wp-on--click="actions.myNamespace.toggleTextVisibility" >Show Text</button>
-  <p data-wp-class--hidden="selectors.myNamespace.isTextHidden">Hello World!</p>
+<div data-wp-interactive>
+  <li 
+    data-wp-context='{ "isSelected": false } '
+    data-wp-on--click="actions.toggleSelection"
+    data-wp-class--selected="context.isSelected"
+  >
+    Option 1
+  </li>
+  <li 
+    data-wp-context='{ "isSelected": false } '
+    data-wp-on--click="actions.toggleSelection"
+    data-wp-class--selected="context.isSelected"
+  >
+    Option 2
+  </li>
 </div>
->
 ```
 
-<details>
-  <summary><em>See store used with the directive above</em></summary>
-<pre><code>
-// store
-store({
-  actions: {
-    myNamespace: {
-      toggleTextVisibility: ({ context }) => !context.hidden ,
-    },
-  },
-  selectors: {
-    myNamespace: {
-      isTextHidden: ({ context }) => context.hidden ,
-    },
-  },
-});
-</code></pre>
-</details>
-<br/>
+```js
+// store used with the directive above
+store( {
+	actions: {
+		toggleSelection: ( { context } ) => {
+				context.isSelected = !context.isSelected
+			}
+	}
+} );
+```
+
+The `wp-class` directive is executed:
+  - when the element is created
+  - each time there's a change on any of the properties of the `state` or `context` involved on getting the final value of the directive (inside the callback or the expression passed as reference)
+
+When `wp-class` directive references a callback to get its final boolean value, the callback receives the class name: `className`.
+
+The boolean value received by the directive is used to toggle (add when `true` or remove when `false`) the associated class name from the `class` attribute.
+
 
 #### `wp-style` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
 
 It adds or removes inline style to an HTML element, depending on its value.
 
+> This directive follows the syntax `data-wp-style--cssProperty`
+
 _Example of `wp-style` directive_ 
 ```html
 <div data-wp-context='{ "color": "red" }' >
-  <button data-wp-on--click="actions.myNamespace.toggleContextColor">Toggle Color Text</button>
-  <p data-wp-style--color="context.color"">Hello World!</p>
+  <button data-wp-on--click="actions.toggleContextColor">Toggle Color Text</button>
+  <p data-wp-style--color="context.color">Hello World!</p>
 </div>
 >
 ```
 
-<details>
-  <summary><em>See store used with the directive above</em></summary>
-<pre><code>
-// store
-store({
-  actions: {
-    myNamespace: {
-      toggleContextColor: ( { context } ) => {
-        context.color = context.color === "red" ? "blue" : "red";
-      }
+```js
+// store used with the directive above
+store( {
+	actions: {
+    toggleContextColor: ( { context } ) => {
+      context.color = context.color === 'red' ? 'blue' : 'red';
     },
-  }
-});
-</code></pre>
-</details>
-<br/>
-
-#### `wp-show` ![](https://img.shields.io/badge/DISPLAY-207399.svg)
-
-It shows and hides elements depending on the state or context.
-
-```html
-<li
-  data-wp-context='{"isMenuOpen": false }'>
-  <button
-    data-wp-on.click="actions.myNamespace.toggleMenu"
-  >
-  </button>
-  <div data-wp-show="context.isMenuOpen">
-    <span>Title</span>
-    <ul>
-      SUBMENU ITEMS
-    </ul>
-  </div>
-</li>
+	},
+} );
 ```
 
-<details>
-  <summary><em>See store used with the directive above</em></summary>
-<pre><code>
-// store
-store({
-  actions: {
-    myNamespace: {
-      toggleMenu: ( { context } ) => !context.isMenuOpen
-    },
-  }
-});
-</code></pre>
-</details>
-<br/>
+The `wp-style` directive is executed:
+  - when the element is created
+  - each time there's a change on any of the properties of the `state` or `context` involved on getting the final value of the directive (inside the callback or the expression passed as reference)
 
-#### `wp-bind` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
+When `wp-style` directive references a callback to get its final value, the callback receives the class style property: `cssProperty`.
 
-It allows setting HTML attributes on elements based on a boolean value.
-
-```html
-<li
-  data-wp-context='{"isMenuOpen": false }'>
-  <button
-    data-wp-on.click="actions.myNamespace.toggleMenu"
-    data-wp-bind.aria-expanded="context.isMenuOpen"
-  >
-  </button>
-  <div data-wp-show="context.isMenuOpen">
-    <span>Title</span>
-    <ul>
-      SUBMENU ITEMS
-    </ul>
-  </div>
-</li>
-```
-
-<details>
-  <summary><em>See store used with the directive above</em></summary>
-<pre><code>
-// store
-store({
-  actions: {
-    myNamespace: {
-      toggleMenu: ( { context } ) => !context.isMenuOpen
-    },
-  }
-});
-</code></pre>
-</details>
-<br/>
-
-
-#### `wp-each` ![](https://img.shields.io/badge/TEMPLATE_LOGIC-207399.svg)
-
-It creates DOM elements by iterating through a list.
-
-#### `wp-slot / wp-fill` ![](https://img.shields.io/badge/TEMPLATE_LOGIC-207399.svg)
-
-It moves snippets of HTML from one place (fills) to another (slots).
+The value received by the directive is used to add or remove the style attribute with the associated CSS property: :
+  - If the value is `false`, the style attribute is removed: `<div>`.
+  - If the value is a string, the attribute is added with its value assigned: `<div style="cssProperty: value;`.
 
 #### `wp-text` ![](https://img.shields.io/badge/CONTENT-207399.svg)
 
-It sets the inner content of an HTML element.
+It sets the inner text of an HTML element.
 
 ```html
 <div data-wp-context='{ "text": "Text 1" }'>
@@ -325,51 +243,151 @@ It sets the inner content of an HTML element.
 </div>
 ```
 
-<details>
-  <summary><em>See store used with the directive above</em></summary>
-<pre><code>
-// store
-store({
+```js
+// store used with the directive above
+store( {
+	actions: {
+    toggleContextText: ( { context } ) => {
+      context.text = context.text === 'Text 1' ? 'Text 2' : 'Text 1';
+    },
+	},
+} );
+```
+
+The `wp-text` directive is executed:
+  - when the element is created
+  - each time there's a change on any of the properties of the `state` or `context` involved on getting the final value of the directive (inside the callback or the expression passed as reference)
+
+The returned value is used to change the inner content of the element: `<div>value</div>`.
+
+#### `wp-on` ![](https://img.shields.io/badge/EVENT_HANDLERS-207399.svg)
+
+It runs code on dispatched DOM events like `click` or `keyup`. 
+
+> The syntax of this directive is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`)
+
+_Example of `wp-context` directive_ 
+```php
+<button data-wp-on--click="actions.logTime" >
+  Click Me!
+</button>
+```
+
+```js
+// store used with the directive above
+store( {
+	actions: {
+		logTime: () => console.log( new Date() ),
+	},
+} );
+```
+
+The `wp-on` directive is executed each time the associated event is triggered. 
+
+The callback passed as reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`) and the returned value by this callback is ignored.
+
+
+#### `wp-effect` ![](https://img.shields.io/badge/SIDE_EFFECTS-207399.svg)
+
+It runs an expression (or callback) **when the node is created and runs it again when the state or context changes**. You can attach several effects to the same DOM element by using the syntax`data-wp-effect--[unique-id]`.
+
+_Example of `wp-on` directive_
+```html
+<div 
+  data-wp-interactive
+  data-wp-context='{ { "counter": 0 } '
+  data-wp-effect="effects.logCounter"
+>
+  <p>Counter: <span data-wp-text="context.counter" ></p>
+  <button data-wp-on--click="actions.increaseCounter">+</button>
+  <button data-wp-on--click="actions.decreaseCounter">-</button>
+</div>
+```
+
+```js
+// store used with the directive above
+store( {
   actions: {
-    myNamespace: {
-      toggleContextText: ( { context } ) => {
-        context.text = context.text === 'Text 1' ? 'Text 2' : 'Text 1';
-      },
+    increaseCounter: ({ context }) => {
+      context.counter++;
+    },
+    decreaseCounter: ({ context }) => {	
+      context.counter--;
     },
   }
-});
-</code></pre>
-</details>
-<br/>
+	effects: {
+		logCounter: ({ context }) => console.log("Counter is " + context.myNamespace.counter + " at " + new Date() ),
+	},
+} );
+```
 
-#### `wp-html` ![](https://img.shields.io/badge/CONTENT-207399.svg)
+The `wp-effect` directive is executed:
+  - when the element is created
+  - each time there's a change on any of the properties of the `state` or `context` involved on getting the final value of the directive (inside the callback or the expression passed as reference)
 
-It sets the innerHTML property of an HTML element.
+The `wp-effect` directive can return a function. If it does, the returned function is used as cleanup logic, i.e., it will run just before the callback runs again, and it will run again when the element is removed from the DOM.
 
-#### `wp-error` ![](https://img.shields.io/badge/ERROR-207399.svg)
+As a reference, some use cases for this directive may be: 
+- showing a `console.log`
+- changing the title of the page 
+- setting the focus on an element with `.focus()`
 
-It captures errors in other interactive blocks.
+#### `wp-init` ![](https://img.shields.io/badge/SIDE_EFFECTS-207399.svg)
 
+It runs an expression (or callback) **only when the node is created**.
+
+You can attach several effects to the same DOM element by using the syntax`data-wp-init--[unique-id]`.
+
+_Example of `data-wp-init` directive_ 
+```html
+<div data-wp-init="effect.logTimeInit">
+  <p>Hi!</>
+</div>
+```
+
+_Example of several `wp-init` directives on the same DOM element_
+```html
+<form 
+  data-wp-init-1="effect.logTimeInit" 
+  data-wp-init-2="effect.focusFirstElement"
+>
+  <input type="text" id="password" name="access-password">
+</form>
+```
+
+```js
+// store used with the directive above
+store( {
+	effects: {
+    logTimeInit: () => console.log( `Init at ` + new Date() ),
+    focusFirstElement: ( { ref } ) =>
+      ref.querySelector( 'input:first-child' ).focus(),
+	},
+} );
+```
+
+The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM.
 
 ### Values of directives are references to properties
 
 The value assigned to a directive is a string pointing to a specific state, selector, action, or effect. *Using a Namespace is highly recommended* to define these elements of the store. 
 
 In the following example we use the namespace `wpmovies` (plugin name is usually a good namespace name) to define the `isPlaying` selector
+
 ```js
-store({
-  selectors: {
-    wpmovies: {
-      isPlaying: ({ state }) => state.wpmovies.currentVideo !== '',
-    },
-  }
-});
+store( {
+	selectors: {
+		wpmovies: {
+			isPlaying: ( { state } ) => state.wpmovies.currentVideo !== '',
+		},
+	},
+} );
 ```
 
-And then, we use the string value `"selectors.wpmovies.isPlaying"` to assign the result of this selector to the `data-wp-show`
+And then, we use the string value `"selectors.wpmovies.isPlaying"` to assign the result of this selector to `data-bind--hidden`
 
 ```php
-<div data-wp-show="selectors.wpmovies.isPlaying" ... >
+<div data-bind--hidden="!selectors.wpmovies.isPlaying" ... >
   <iframe ...></iframe>
 </div>
 ```
@@ -379,9 +397,9 @@ These values assigned to directives are **references** to a particular property 
 
 ## The store
 
-The store is used to create the logic (actions and effects) called by the directives and the data used this logic.
+The store is used to create the logic (actions, effects…) linked to the directives and the data used inside that logic (state, selectors…).
 
-**The store is usually created in the `view.js` file of each block**, although it can be initialized from the `render.php` of the block (see [diagram](https://excalidraw.com/#room=11c461f5e18480cd8631,mNsrOHbcUKgVdITiRl6H5w))
+**The store is usually created in the `view.js` file of each block**, although it can be initialized from the `render.php` of the block (see [diagram](https://excalidraw.com/#json=FPTvzmKpyunGuFzWt5nzX,gs2vvsN0HEvnEHsQ9u1gPg)
 
 The store contains the reactive state and the actions and effects that modify it.
 
@@ -406,23 +424,23 @@ Automatically react to state changes. Usually triggered by `data-wp-effect` or `
 Also known as _derived state_, returns a computed version of the state.
 
 ```js
-// view.js
-import { store } from "@wordpress/interactivity"
-  
-store({
-    state: {
-        amount: 34,
-        defaultCurrency: "EUR",
-        currencyExchange: {
-          "USD": 1.10,
-          "GBP": 0.85
-        }
-    },
-    selectors: {
-        amountInUSD : ( { state } ) => state.currencyExchange["USD"] * state.amount,
-        amountInGBP : ( { state } ) => state.currencyExchange["GBP"] * state.amount
-    }
-})
+// view.js  
+store( {
+	state: {
+		amount: 34,
+		defaultCurrency: 'EUR',
+		currencyExchange: {
+			USD: 1.1,
+			GBP: 0.85,
+		},
+	},
+	selectors: {
+		amountInUSD: ( { state } ) =>
+			state.currencyExchange[ 'USD' ] * state.amount,
+		amountInGBP: ( { state } ) =>
+			state.currencyExchange[ 'GBP' ] * state.amount,
+	},
+} );
 ```
 
 ### Objects passed to directive callbacks
@@ -437,33 +455,25 @@ When a directive is evaluated, the reference callback receives an object with:
 _Example of action making use of all values received when it's triggered_
 ```js
 // view.js
-import { store } from "@wordpress/interactivity"
-  
-store({
-    state: {
-        theme: false,
-    },
-    actions: {
-        toggle: ({
-            state,
-            context,
-            ref,
-            event,
-            className,
-        }) => {
-            console.log(state);
-            // `{ "theme": false }`
-            console.log(context);
-            // `{ "isOpen": true }`
-            console.log(ref);
-            // The DOM element
-            console.log(event);
-            // The Event object if using the `data-wp-on`
-            console.log(className);
-            // The class name if using the `data-wp-class`
-        }
-    }
-})
+store( {
+	state: {
+		theme: false,
+	},
+	actions: {
+		toggle: ( { state, context, ref, event, className } ) => {
+			console.log( state );
+			// `{ "theme": false }`
+			console.log( context );
+			// `{ "isOpen": true }`
+			console.log( ref );
+			// The DOM element
+			console.log( event );
+			// The Event object if using the `data-wp-on`
+			console.log( className );
+			// The class name if using the `data-wp-class`
+		},
+	},
+} );
 ```
 
 This approach enables some functionalities that make directives flexible and powerful:
@@ -483,22 +493,20 @@ This approach enables some functionalities that make directives flexible and pow
 
 ```js
 // store
-import { store } from "@wordpress/interactivity"
+import { store } from '@wordpress/interactivity';
 
-store({
-  state: {
-    isVisible: false,
-  }
-  actions: {
-    myNamespace: {
-      toggleVisibility: ({ state }) => !state.isVisible ,
+store( {
+	actions: {
+    toggle: ( { context } ) => {
+      context.isOpen = !context.isOpen;
     },
-  },
-  selectors: {
-    myNamespace: {
-      isHidden: ({ state }) => state.isVisible === false,
-    },
-  },
+	},
+	effects: {
+    logIsOpen: ( { context } ) => {
+      // Log the value of `isOpen` each time it changes.
+      console.log( `Is open: ${ context.isOpen }` );
+    }
+	},
 });
 ```
 
