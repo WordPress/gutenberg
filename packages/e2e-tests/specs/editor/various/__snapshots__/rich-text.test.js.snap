@@ -26,11 +26,11 @@ exports[`RichText should apply multiple formats when selection is collapsed 1`] 
 
 exports[`RichText should copy/paste heading 1`] = `
 "<!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\">Heading</h2>
+<h2 class="wp-block-heading">Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\">Heading</h2>
+<h2 class="wp-block-heading">Heading</h2>
 <!-- /wp:heading -->"
 `;
 

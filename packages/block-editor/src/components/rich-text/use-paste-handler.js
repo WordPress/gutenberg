@@ -8,9 +8,6 @@ import {
 	pasteHandler,
 	findTransform,
 	getBlockTransforms,
-	htmlToBlocks,
-	hasBlockSupport,
-	getBlockContent,
 } from '@wordpress/blocks';
 import {
 	isEmpty,
@@ -45,15 +42,6 @@ function adjustLines( value, isMultiline ) {
 	}
 
 	return replace( value, new RegExp( LINE_SEPARATOR, 'g' ), '\n' );
-}
-
-function maybeInline( blocks, mode ) {
-	if ( mode !== 'AUTO' ) return blocks;
-	if ( blocks.length !== 1 ) return blocks;
-	const [ block ] = blocks;
-	if ( ! hasBlockSupport( block.name, '__unstablePasteTextInline', false ) )
-		return blocks;
-	return getBlockContent( block );
 }
 
 export function usePasteHandler( props ) {
@@ -224,16 +212,17 @@ export function usePasteHandler( props ) {
 			// If the data comes from a rich text instance, we can directly use it
 			// without filtering the data. The filters are only meant for externally
 			// pasted content and remove inline styles.
-			const isInternal = !! clipboardData.getData( 'rich-text' );
-			const content = isInternal
-				? maybeInline( htmlToBlocks( html ), mode )
-				: pasteHandler( {
-						HTML: html,
-						plainText,
-						mode,
-						tagName,
-						preserveWhiteSpace,
-				  } );
+			const content = pasteHandler( {
+				HTML: html,
+				plainText,
+				mode,
+				tagName,
+				preserveWhiteSpace,
+				// If the data comes from a rich text instance, we can directly
+				// use it without filtering the data. The filters are only meant
+				// for externally pasted content and remove inline styles.
+				disableFilters: !! clipboardData.getData( 'rich-text' ),
+			} );
 
 			if ( typeof content === 'string' ) {
 				let valueToInsert = create( { html: content } );
