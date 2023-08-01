@@ -32,7 +32,7 @@ class WP_Font_Family_Utils {
 	public static function get_filename_from_font_face( $font_slug, $font_face, $url, $suffix = '' ) {
 		$extension = pathinfo( $url, PATHINFO_EXTENSION );
 		$filename  = "{$font_slug}_{$font_face['fontStyle']}_{$font_face['fontWeight']}";
-		if ( $suffix ) {
+		if ( '' !== $suffix ) {
 			$filename .= "_{$suffix}";
 		}
 		return sanitize_file_name( "{$filename}.{$extension}" );
