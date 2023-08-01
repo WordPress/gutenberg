@@ -54,7 +54,7 @@ export function FormFileUpload( {
 			<input
 				type="file"
 				ref={ ref }
-				multiple={ multiple }
+				multiple={ multiple === true || multiple === 'add' }
 				style={ { display: 'none' } }
 				accept={ accept }
 				onChange={ onChange }
