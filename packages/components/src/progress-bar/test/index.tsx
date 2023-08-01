@@ -60,11 +60,20 @@ describe( 'ProgressBar', () => {
 		} );
 	} );
 
-	it( 'should allow a custom `id` attribute to be specified', () => {
+	it( 'should pass any additional props down to the underlying `progress` element', () => {
 		const id = 'foo-bar-123';
+		const ariaLabel = 'in progress...';
+		const style = { opacity: 1 };
 
-		render( <ProgressBar id={ id } /> );
+		render(
+			<ProgressBar id={ id } aria-label={ ariaLabel } style={ style } />
+		);
 
 		expect( screen.getByRole( 'progressbar' ) ).toHaveAttribute( 'id', id );
+		expect( screen.getByRole( 'progressbar' ) ).toHaveAttribute(
+			'aria-label',
+			ariaLabel
+		);
+		expect( screen.getByRole( 'progressbar' ) ).toHaveStyle( style );
 	} );
 } );

@@ -25,8 +25,6 @@ A CSS class to apply to the underlying `div` element, serving as a progress bar 
 
 - Required: No
 
-##### `id`: `string`
+#### Inherited props
 
-The HTML `id` of the `progress` element. This is necessary to be able to accessibly associate the label with that element.
-
--   Required: No
+Any additional props will be passed the underlying `<progress/>` element.

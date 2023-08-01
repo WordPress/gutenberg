@@ -8,7 +8,6 @@ import type { ForwardedRef } from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,11 +17,10 @@ import type { ProgressBarProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
 function UnforwardedProgressBar(
-	props: WordPressComponentProps< ProgressBarProps, 'div', false >,
+	props: WordPressComponentProps< ProgressBarProps, 'progress', false >,
 	ref: ForwardedRef< HTMLProgressElement >
 ) {
-	const { className, id: idProp, value } = props;
-	const id = useInstanceId( ProgressBar, 'progress-bar', idProp );
+	const { className, value, ...progressProps } = props;
 	const isIndeterminate = ! Number.isFinite( value );
 
 	return (
@@ -35,8 +33,8 @@ function UnforwardedProgressBar(
 				max={ 100 }
 				value={ value }
 				aria-label={ __( 'Loading …' ) }
-				id={ id }
 				ref={ ref }
+				{ ...progressProps }
 			/>
 		</ProgressBarStyled.Track>
 	);
