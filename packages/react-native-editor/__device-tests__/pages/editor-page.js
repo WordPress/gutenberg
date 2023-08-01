@@ -22,27 +22,14 @@ const {
 	typeString,
 	waitForVisible,
 	clickIfClickable,
+	launchApp,
 } = require( '../helpers/utils' );
 
 const ADD_BLOCK_ID = isAndroid() ? 'Add block' : 'add-block-button';
 
-const initializeEditorPage = async () => {
+const setupEditor = async () => {
 	const driver = await setupDriver();
-	await isEditorVisible( driver );
-	const initialValues = await setupInitialValues( driver );
-	return new EditorPage( driver, initialValues );
-};
-
-// Stores initial values from the editor for different helpers.
-const setupInitialValues = async ( driver ) => {
-	const initialValues = {};
-	const addButton = await driver.elementsByAccessibilityId( ADD_BLOCK_ID );
-
-	if ( addButton.length !== 0 ) {
-		initialValues.addButtonLocation = await addButton[ 0 ].getLocation();
-	}
-
-	return initialValues;
+	return new EditorPage( driver );
 };
 
 class EditorPage {
@@ -53,16 +40,33 @@ class EditorPage {
 	verseBlockName = 'Verse';
 	orderedListButtonName = 'Ordered';
 
-	constructor( driver, initialValues ) {
+	constructor( driver ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
 		this.accessibilityIdXPathAttrib = 'name';
-		this.initialValues = initialValues;
+		this.initialValues = {};
+		this.blockNames = blockNames;
 
 		if ( isAndroid() ) {
 			this.accessibilityIdXPathAttrib = 'content-desc';
 			this.accessibilityIdKey = 'contentDescription';
 		}
+	}
+
+	async initializeEditor( { initialData } = {} ) {
+		await launchApp( this.driver, { initialData } );
+
+		// Stores initial values from the editor for different helpers.
+		const addButton = await this.driver.elementsByAccessibilityId(
+			ADD_BLOCK_ID
+		);
+
+		if ( addButton.length !== 0 ) {
+			this.initialValues.addButtonLocation =
+				await addButton[ 0 ].getLocation();
+		}
+
+		await isEditorVisible( this.driver );
 	}
 
 	async getBlockList() {
@@ -1036,4 +1040,4 @@ const blockNames = {
 	unsupported: 'Unsupported',
 };
 
-module.exports = { initializeEditorPage, blockNames };
+module.exports = { setupEditor, blockNames };
