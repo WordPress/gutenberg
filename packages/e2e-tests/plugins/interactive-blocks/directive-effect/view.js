@@ -1,8 +1,8 @@
 ( ( { wp } ) => {
-	const { store, directive, useContext, useMemo } = wp.interactivity;
+	const { store, directive } = wp.interactivity;
 
-	// Fake `data-wp-fakeshow` directive to test when things are removed from the DOM.
-	// Replace with `data-wp-show` when it's ready.
+	// Fake `data-wp-fakeshow` directive to test when things are removed from the
+	// DOM.  Replace with `data-wp-show` when it's ready.
 	directive(
 		'fakeshow',
 		( {
@@ -11,18 +11,9 @@
 			},
 			element,
 			evaluate,
-			context,
 		} ) => {
-			const contextValue = useContext( context );
-			const children = useMemo(
-				() =>
-					element.type === 'template'
-						? element.props.templateChildren
-						: element,
-				[]
-			);
-			if ( ! evaluate( fakeshow, { context: contextValue } ) ) return null;
-			return children;
+			if ( ! evaluate( fakeshow ) ) return null;
+			return element;
 		}
 	);
 
