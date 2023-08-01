@@ -9,6 +9,33 @@ DOM elements are connected to data stored in the state & context through directi
 
 ![State & Directives](assets/state-directives.png)
 
+## Table of Contents
+
+- [The directives](#the-directives)
+  - [List of Directives](#list-of-directives)
+    - [`wp-interactive`](#wp-interactive) ![](https://img.shields.io/badge/DECLARATIVE-afd2e3.svg)
+    - [`wp-context`](#wp-context) ![](https://img.shields.io/badge/STATE-afd2e3.svg)
+    - [`wp-bind`](#wp-bind) ![](https://img.shields.io/badge/ATTRIBUTES-afd2e3.svg)
+    - [`wp-class`](#wp-class) ![](https://img.shields.io/badge/ATTRIBUTES-afd2e3.svg)
+    - [`wp-style`](#wp-style) ![](https://img.shields.io/badge/ATTRIBUTES-afd2e3.svg)
+    - [`wp-text`](#wp-text) ![](https://img.shields.io/badge/CONTENT-afd2e3.svg)
+    - [`wp-on`](#wp-on) ![](https://img.shields.io/badge/EVENT_HANDLERS-afd2e3.svg)
+    - [`wp-effect`](#wp-effect) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
+    - [`wp-init`](#wp-init) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
+  - [Values of directives are references to properties](#values-of-directives-are-references-to-properties)
+- [The store](#the-store)
+  - [Elements of the store](#elements-of-the-store)
+    - [State](#state)
+    - [Actions](#actions)
+    - [Effects](#effects)
+    - [Selectors](#selectors)
+  - [Objects passed to callbacks](#objects-passed-to-callbacks)
+  - [Setting the store](#setting-the-store)
+    - [On the client side](#on-the-client-side)
+    - [On the server side](#on-the-server-side)
+
+
+
 ## The directives
 
 Directives are custom attributes that are added to the markup of your block to add behaviour to its DOM elements. This can be done in the `render.php` file (for dynamic blocks) or the `save.js` file (for static blocks).
@@ -45,7 +72,7 @@ Directives can also be injected dynamically using the [HTML Tag Processor](https
 
 With directives we can manage directly in the DOM behavior related to things such as: Side Effects, State, Event Handlers, Attributes, Display, Template Logic, Content or Errors
 
-#### `wp-interactive` ![](https://img.shields.io/badge/DECLARATIVE-207399.svg)
+#### `wp-interactive` 
 
 The `wp-interactive` "activates" hydration for the DOM element and its children through the Interactivity API (directives and store). 
 
@@ -53,7 +80,7 @@ The `wp-interactive` "activates" hydration for the DOM element and its children 
 > The use of `wp-interactive` is a requirement for the Interactivity API "engine" to work. In the following examples the `wp-interactive` has not been added for the sake of simplicity
 
 
-#### `wp-context` ![](https://img.shields.io/badge/STATE-207399.svg)
+#### `wp-context` 
 
 It provides **local** state available to a specific HTML node and its children.
 
@@ -103,7 +130,7 @@ Different contexts can be defined at different levels and deeper levels will mer
 </div>
 ```
 
-#### `wp-bind` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
+#### `wp-bind` 
 
 It allows setting HTML attributes on elements based on a boolean or string value.
 
@@ -155,7 +182,7 @@ When `wp-bind` directive references a callback to get its final value:
 - The callback receives the attribute name: `attribute`.
 - The returned value in the callback function is used to change the value of the associated attribute.
 
-#### `wp-class` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
+#### `wp-class` 
 
 It adds or removes a class to an HTML element, depending on a boolean value.
 
@@ -206,7 +233,7 @@ When `wp-class` directive references a callback to get its final boolean value, 
 The boolean value received by the directive is used to toggle (add when `true` or remove when `false`) the associated class name from the `class` attribute.
 
 
-#### `wp-style` ![](https://img.shields.io/badge/ATTRIBUTES-207399.svg)
+#### `wp-style` 
 
 It adds or removes inline style to an HTML element, depending on its value.
 
@@ -247,7 +274,7 @@ The value received by the directive is used to add or remove the style attribute
   - If the value is `false`, the style attribute is removed: `<div>`.
   - If the value is a string, the attribute is added with its value assigned: `<div style="cssProperty: value;`.
 
-#### `wp-text` ![](https://img.shields.io/badge/CONTENT-207399.svg)
+#### `wp-text` 
 
 It sets the inner text of an HTML element.
 
@@ -286,13 +313,13 @@ The `wp-text` directive is executed:
 
 The returned value is used to change the inner content of the element: `<div>value</div>`.
 
-#### `wp-on` ![](https://img.shields.io/badge/EVENT_HANDLERS-207399.svg)
+#### `wp-on` 
 
 It runs code on dispatched DOM events like `click` or `keyup`. 
 
 > The syntax of this directive is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`)
 
-_Example of `wp-context` directive_ 
+_Example of `wp-on` directive_ 
 ```php
 <button data-wp-on--click="actions.logTime" >
   Click Me!
@@ -318,18 +345,17 @@ The `wp-on` directive is executed each time the associated event is triggered.
 The callback passed as reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`) and the returned value by this callback is ignored.
 
 
-#### `wp-effect` ![](https://img.shields.io/badge/SIDE_EFFECTS-207399.svg)
+#### `wp-effect` 
 
 It runs an expression (or callback) **when the node is created and runs it again when the state or context changes**. You can attach several effects to the same DOM element by using the syntax`data-wp-effect--[unique-id]`.
 
 _Example of `wp-on` directive_
 ```html
 <div 
-  data-wp-interactive
-  data-wp-context='{ { "counter": 0 } '
+  data-wp-context='{ "counter": 0 }'
   data-wp-effect="effects.logCounter"
 >
-  <p>Counter: <span data-wp-text="context.counter" ></p>
+  <p>Counter: <span data-wp-text="context.counter"></span></p>
   <button data-wp-on--click="actions.increaseCounter">+</button>
   <button data-wp-on--click="actions.decreaseCounter">-</button>
 </div>
@@ -368,7 +394,7 @@ As a reference, some use cases for this directive may be:
 - changing the title of the page 
 - setting the focus on an element with `.focus()`
 
-#### `wp-init` ![](https://img.shields.io/badge/SIDE_EFFECTS-207399.svg)
+#### `wp-init` 
 
 It runs an expression (or callback) **only when the node is created**.
 
@@ -387,7 +413,7 @@ _Example of several `wp-init` directives on the same DOM element_
   data-wp-init-1="effect.logTimeInit" 
   data-wp-init-2="effect.focusFirstElement"
 >
-  <input type="text" id="password" name="access-password">
+  <input type="text">
 </form>
 ```
 
@@ -485,7 +511,7 @@ store( {
 } );
 ```
 
-### Objects passed to directive callbacks
+### Objects passed to callbacks
 
 When a directive is evaluated, the reference callback receives an object with:
 
