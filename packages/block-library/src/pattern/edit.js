@@ -9,7 +9,12 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 
-const PatternEdit = ( { attributes, clientId } ) => {
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const PatternEdit = ( { attributes, clientId, rootClientId } ) => {
 	const selectedPattern = useSelect(
 		( select ) =>
 			select( blockEditorStore ).__experimentalGetParsedPattern(
@@ -20,6 +25,8 @@ const PatternEdit = ( { attributes, clientId } ) => {
 
 	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
+	const { setBlockEditingMode } = unlock( useDispatch( blockEditorStore ) );
+	const { getBlockEditingMode } = unlock( useSelect( blockEditorStore ) );
 
 	// Run this effect when the component loads.
 	// This adds the Pattern's contents to the post.
@@ -38,15 +45,26 @@ const PatternEdit = ( { attributes, clientId } ) => {
 				const clonedBlocks = selectedPattern.blocks.map( ( block ) =>
 					cloneBlock( block )
 				);
+				const rootEditingMode = getBlockEditingMode( rootClientId );
+				// Temporarily set the root block to default mode to allow replacing the pattern.
+				// This could happen when the page is disabling edits of non-content blocks.
+				__unstableMarkNextChangeAsNotPersistent();
+				setBlockEditingMode( rootClientId, 'default' );
 				__unstableMarkNextChangeAsNotPersistent();
 				replaceBlocks( clientId, clonedBlocks );
+				// Restore the root block's original mode.
+				__unstableMarkNextChangeAsNotPersistent();
+				setBlockEditingMode( rootClientId, rootEditingMode );
 			} );
 		}
 	}, [
+		rootClientId,
 		clientId,
 		selectedPattern?.blocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceBlocks,
+		getBlockEditingMode,
+		setBlockEditingMode,
 	] );
 
 	const props = useBlockProps();
