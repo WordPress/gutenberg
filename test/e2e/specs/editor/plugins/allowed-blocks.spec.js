@@ -24,23 +24,25 @@ test.describe( 'Allowed Blocks Filter', () => {
 			.getByRole( 'button', { name: 'Toggle block inserter' } )
 			.click();
 
-		await page
-			.getByPlaceholder( 'Search', { exact: true } )
-			.fill( 'Paragraph' );
+		const searchbox = page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', {
+				name: 'Search for blocks and patterns',
+			} );
+
+		await searchbox.fill( 'Paragraph' );
 
 		await expect(
 			page.getByRole( 'option', { name: 'Paragraph' } )
 		).toBeVisible();
 
 		// The gallery block is not available.
-		await page.getByPlaceholder( 'Search', { exact: true } ).click( {
+		await searchbox.click( {
 			clickCount: 3,
 		} );
 		await page.keyboard.press( 'Backspace' );
 
-		await page
-			.getByPlaceholder( 'Search', { exact: true } )
-			.fill( 'Gallery' );
+		await searchbox.fill( 'Gallery' );
 
 		await expect(
 			page.getByRole( 'option', { name: 'Gallery' } )
@@ -50,19 +52,19 @@ test.describe( 'Allowed Blocks Filter', () => {
 	test( 'should remove not allowed blocks from the block manager', async ( {
 		page,
 	} ) => {
-		await page.getByRole( 'button', { name: 'Options' } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
 
 		await page.getByRole( 'menuitem', { name: 'Preferences' } ).click();
 
 		await page.getByRole( 'tab', { name: 'Blocks' } ).click();
 
-		const BLOCK_LABEL_SELECTOR =
-			'.edit-post-block-manager__checklist-item .components-checkbox-control__label';
-		const blocks = await page.evaluate( ( selector ) => {
-			return Array.from( document.querySelectorAll( selector ) )
-				.map( ( element ) => ( element.innerText || '' ).trim() )
-				.sort();
-		}, BLOCK_LABEL_SELECTOR );
-		expect( blocks ).toEqual( [ 'Image', 'Paragraph' ] );
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Available block types' } )
+				.getByRole( 'listitem' )
+		).toHaveText( [ 'Paragraph', 'Image' ] );
 	} );
 } );
