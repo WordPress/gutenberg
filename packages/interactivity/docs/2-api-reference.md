@@ -70,7 +70,7 @@ Directives can also be injected dynamically using the [HTML Tag Processor](https
 
 ### List of Directives
 
-With directives we can manage directly in the DOM behavior related to things such as: Side Effects, State, Event Handlers, Attributes, Display, Template Logic, Content or Errors
+With directives we can manage directly in the DOM behavior related to things such as side effects, state, event handlers, attributes or content.
 
 #### `wp-interactive` 
 
