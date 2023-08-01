@@ -21,9 +21,9 @@
  * @param string $anchor_block_type The auto-inserted block will be inserted next to instances of this block type.
  * @return callable A function that accepts a block's content and returns the content with the inserted block.
  */
-function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anchor_block ) {
-	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block ) {
-		if ( $anchor_block === $block['blockName'] ) {
+function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anchor_block_type ) {
+	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block_type ) {
+		if ( $anchor_block_type === $block['blockName'] ) {
 			if ( 'first_child' === $relative_position ) {
 				array_unshift( $block['innerBlocks'], $inserted_block );
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
@@ -40,7 +40,7 @@ function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anch
 			return $block;
 		}
 
-		$anchor_block_index = array_search( $anchor_block, array_column( $block['innerBlocks'], 'blockName' ), true );
+		$anchor_block_index = array_search( $anchor_block_type, array_column( $block['innerBlocks'], 'blockName' ), true );
 		if ( false !== $anchor_block_index && ( 'after' === $relative_position || 'before' === $relative_position ) ) {
 			if ( 'after' === $relative_position ) {
 				$anchor_block_index++;
@@ -164,8 +164,7 @@ function gutenberg_parse_and_serialize_block_templates( $query_result ) {
 		if ( 'custom' === $block_template->source ) {
 			continue;
 		}
-		$blocks                  = parse_blocks( $block_template->content );
-		$block_template->content = gutenberg_serialize_blocks( $blocks );
+		gutenberg_parse_and_serialize_blocks( $block_template );
 	}
 
 	return $query_result;
@@ -183,7 +182,7 @@ add_filter( 'get_block_templates', 'gutenberg_parse_and_serialize_block_template
  *
  * @param WP_Block_Template|null $block_template The found block template, or null if there is none.
  */
-function gutenberg_parse_and_serialize_blocks( $block_template ) {
+function gutenberg_parse_and_serialize_blocks( &$block_template ) {
 
 	$blocks                  = parse_blocks( $block_template->content );
 	$block_template->content = gutenberg_serialize_blocks( $blocks );
