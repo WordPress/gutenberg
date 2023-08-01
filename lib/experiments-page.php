@@ -105,13 +105,13 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-custom-fields',
-		__( 'Custom Fields', 'gutenberg' ),
+		__( 'Connections', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test Custom Fields', 'gutenberg' ),
-			'id'    => 'gutenberg-custom-fields',
+			'label' => __( 'Test Connections', 'gutenberg' ),
+			'id'    => 'gutenberg-connections',
 		)
 	);
 
