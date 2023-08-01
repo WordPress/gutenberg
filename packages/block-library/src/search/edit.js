@@ -97,8 +97,8 @@ export default function SearchEdit( {
 	);
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-
-	if ( insertedInNavigationBlock ) {
+	useEffect( () => {
+		if ( ! insertedInNavigationBlock ) return;
 		// This side-effect should not create an undo level.
 		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( {
@@ -106,8 +106,7 @@ export default function SearchEdit( {
 			buttonUseIcon: true,
 			buttonPosition: 'button-inside',
 		} );
-	}
-
+	}, [ insertedInNavigationBlock ] );
 	const borderRadius = style?.border?.radius;
 	const borderProps = useBorderProps( attributes );
 
