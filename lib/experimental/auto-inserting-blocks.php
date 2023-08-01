@@ -152,7 +152,7 @@ function gutenberg_register_auto_inserted_block( $inserted_block, $position, $an
  *
  * By parsing a block template's content and then reserializing it
  * via `gutenberg_serialize_blocks()`, we are able to run filters
- * on the parsed blocks. This allows us to modify blocks during
+ * on the parsed blocks. This allows us to modify (parsed) blocks during
  * depth-first traversal already provided by the serialization process,
  * rather than having to do so in a separate pass.
  *
@@ -177,7 +177,7 @@ add_filter( 'get_block_templates', 'gutenberg_parse_and_serialize_block_template
  *
  * By parsing a block template's content and then reserializing it
  * via `gutenberg_serialize_blocks()`, we are able to run filters
- * on the parsed blocks. This allows us to modify blocks during
+ * on the parsed blocks. This allows us to modify (parsed) blocks during
  * depth-first traversal already provided by the serialization process,
  * rather than having to do so in a separate pass.
  *
