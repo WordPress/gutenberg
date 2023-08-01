@@ -193,7 +193,7 @@ add_filter( 'render_block', 'gutenberg_render_custom_sources', 10, 3 );
 /**
  * Registers a custom meta
  */
-function init_test_summary_meta_field() {
+function gutenberg_init_test_summary_meta_field() {
 	register_meta(
 		'post',
 		'test_custom_field',
@@ -215,4 +215,4 @@ function init_test_summary_meta_field() {
 		)
 	);
 }
-add_action( 'init', 'init_test_summary_meta_field' );
+add_action( 'init', 'gutenberg_init_test_summary_meta_field' );
