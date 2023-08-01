@@ -347,7 +347,7 @@ class WP_Font_Family {
 	/**
 	 * Create a post for a font family.
 	 *
-	 * @return int post id
+	 * @return int|WP_Error Post ID.
 	 */
 	private function create_font_post() {
 		$post    = array(
