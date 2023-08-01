@@ -49,10 +49,6 @@ const gutenbergSetup = () => {
 
 	setupApiFetch();
 
-	const isHermes = () => global.HermesInternal !== null;
-	// eslint-disable-next-line no-console
-	console.log( 'Hermes is: ' + isHermes() );
-
 	setupInitHooks();
 };
 

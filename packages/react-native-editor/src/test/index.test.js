@@ -197,7 +197,6 @@ describe( 'Register Gutenberg', () => {
 			registerCoreBlocksCallOrder
 		);
 		expect( callbackCallOrder ).toBeLessThan( onRenderEditorCallOrder );
-		expect( console ).toHaveLoggedWith( 'Hermes is: true' );
 
 		initializeEditorMock.mockRestore();
 	} );
