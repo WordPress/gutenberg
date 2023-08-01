@@ -149,7 +149,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 		'example'          => 'example',
 		'variations'       => 'variations',
 	);
-	$fields_to_pick[ 'auto_insert' ] = 'autoInsert';
+	$fields_to_pick['auto_insert'] = 'autoInsert';
 
 	$exposed_settings = array_intersect_key( $settings, $fields_to_pick );
 
