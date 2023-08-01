@@ -129,10 +129,34 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 		$settings['auto_insert'][ $anchor_block_name ] = $mapped_position;
 	}
 
+	// Copied from `get_block_editor_server_block_settings()`.
+	$fields_to_pick = array(
+		'api_version'      => 'apiVersion',
+		'title'            => 'title',
+		'description'      => 'description',
+		'icon'             => 'icon',
+		'attributes'       => 'attributes',
+		'provides_context' => 'providesContext',
+		'uses_context'     => 'usesContext',
+		'selectors'        => 'selectors',
+		'supports'         => 'supports',
+		'category'         => 'category',
+		'styles'           => 'styles',
+		'textdomain'       => 'textdomain',
+		'parent'           => 'parent',
+		'ancestor'         => 'ancestor',
+		'keywords'         => 'keywords',
+		'example'          => 'example',
+		'variations'       => 'variations',
+	);
+	$fields_to_pick[ 'auto_insert' ] = 'autoInsert';
+
+	$exposed_settings = array_intersect_key( $settings, $fields_to_pick );
+
 	// TODO: Make work for blocks registered via direct call to gutenberg_register_auto_inserted_block().
 	wp_add_inline_script(
 		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( array( $inserted_block_name => $settings ) ) . ');',
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( array( $inserted_block_name => $exposed_settings ) ) . ');',
 	);
 
 	return $settings;
