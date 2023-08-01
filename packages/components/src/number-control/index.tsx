@@ -43,7 +43,7 @@ function UnforwardedNumberControl(
 		required = false,
 		shiftStep = 10,
 		step = 1,
-		roundingStep,
+		spincrement = step,
 		type: typeProp = 'number',
 		value: valueProp,
 		size = 'default',
@@ -65,7 +65,8 @@ function UnforwardedNumberControl(
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
 
 	const isStepAny = step === 'any';
-	const baseStep = isStepAny ? 1 : ensureNumber( step );
+	let baseStep = ensureNumber( spincrement );
+	if ( spincrement === step ) baseStep = isStepAny ? 1 : ensureNumber( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = (
 		value: number | string,
@@ -75,13 +76,7 @@ function UnforwardedNumberControl(
 		// Use '' + to convert to string for use in input value attribute.
 		return isStepAny
 			? '' + Math.min( max, Math.max( min, ensureNumber( value ) ) )
-			: '' +
-					roundClamp(
-						value,
-						min,
-						max,
-						stepOverride ?? ( roundingStep || baseStep )
-					);
+			: '' + roundClamp( value, min, max, stepOverride ?? baseStep );
 	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
