@@ -177,12 +177,9 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'https://wordpress.org/plugins/gutenberg/' );
 		await page.keyboard.press( 'Enter' );
 
-		// Move caret back into the link.
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
-
-		// Click Edit to move back into editing mode
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		// Move back into the link.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+k' );
 
 		// Toggle the Advanced settings to be open.
 		// This should set the editor preference to persist this
@@ -226,14 +223,10 @@ test.describe( 'Links', () => {
 		// Move focus out of Link UI and into Paragraph block.
 		await pageUtils.pressKeys( 'Escape' );
 
-		// Move caret back into the "Gutenberg" link to trigger
+		// Move caret back into the "Gutenberg" link and open
 		// the Link UI for that link.
-		await pageUtils.pressKeys( 'ArrowLeft' );
-		await pageUtils.pressKeys( 'ArrowLeft' );
-		await pageUtils.pressKeys( 'ArrowLeft' );
-
-		// Switch Link UI to "Edit" mode.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+k' );
 
 		// Check that the Advanced settings are still closed.
 		// This verifies that the editor preference was persisted.
