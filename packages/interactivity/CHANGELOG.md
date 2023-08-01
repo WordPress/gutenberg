@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Breaking Changes
+### Breaking Change
 
--   Remove the `wp-show` directive until we figure out its final implementation. ([#X](https://github.com/WordPress/gutenberg/pull/X))
+-   Remove the `wp-show` directive until we figure out its final implementation. ([#53240](https://github.com/WordPress/gutenberg/pull/53240))
 
 ## 1.2.0 (2023-07-20)
 
