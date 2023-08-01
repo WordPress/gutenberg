@@ -130,21 +130,11 @@
 	display: flex;
 	align-content: space-between;
 	flex-wrap: wrap;
-	margin: -5px;
-
-	> * {
-		flex-grow: 1;
-		margin: 5px;
-	}
+	gap: $grid-unit-20;
 
 	.components-button {
-		height: auto;
 		justify-content: center;
-		padding: 3px 10px 4px;
 		flex: 1;
-		line-height: 1.6;
-		text-align: center;
-		white-space: normal;
 	}
 
 	.components-clipboard-button {
