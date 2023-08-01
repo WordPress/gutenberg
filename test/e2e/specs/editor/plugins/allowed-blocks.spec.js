@@ -20,41 +20,31 @@ test.describe( 'Allowed Blocks Filter', () => {
 		page,
 	} ) => {
 		// The paragraph block is available.
-		await page.click( 'role=button[name="Toggle block inserter"i]' );
+		await page.getByRole('button', { name: 'Toggle block inserter' }).click();
 
-		await page.type(
-			'role=searchbox[name="Search for blocks and patterns"i]',
-			'Paragraph'
-		);
+		await page.getByPlaceholder('Search', { exact: true }).fill('Paragraph');
 
-		expect( 'role=option[name="Paragraph"i]' ).not.toBeNull();
+		expect(  page.getByRole('option', { name: 'Paragraph' }) ).toBeVisible();
 
 		// The gallery block is not available.
-		await page.click(
-			'role=searchbox[name="Search for blocks and patterns"i]',
-			{ clickCount: 3 }
-		);
+		await page.getByPlaceholder('Search', { exact: true }).click({
+			clickCount: 3
+		  });
 		await page.keyboard.press( 'Backspace' );
 
-		await page.type(
-			'role=searchbox[name="Search for blocks and patterns"i]',
-			'Gallery'
-		);
+		await page.getByPlaceholder('Search', { exact: true }).fill('Gallery');
 
-		const galleryBlockButton = page.locator(
-			`//button//span[contains(text(), 'Gallery')]`
-		)[ 0 ];
-		expect( galleryBlockButton ).toBeUndefined();
+		expect( page.getByRole('option', { name: 'Gallery' })).toBeHidden()
 	} );
 
 	test( 'should remove not allowed blocks from the block manager', async ( {
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Options"i]' );
+		await page.getByRole('button', { name: 'Options' }).click();
 
-		await page.click( 'role=menuitem[name="Preferences"i]' );
+		await page.getByRole('menuitem', { name: 'Preferences' }).click();
 
-		await page.click( 'role=tab[name="Blocks"i]' );
+		await page.getByRole('tab', { name: 'Blocks' }).click();
 
 		const BLOCK_LABEL_SELECTOR =
 			'.edit-post-block-manager__checklist-item .components-checkbox-control__label';
