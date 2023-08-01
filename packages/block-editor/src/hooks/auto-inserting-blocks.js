@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
+import { Fragment } from '@wordpress/element';
 import { PanelBody } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -25,22 +26,44 @@ function AutoInsertingBlocksControl( props ) {
 			Object.keys( block.autoInsert ).includes( props.blockName )
 	);
 
+	// Group by block name prefix (before the slash).
+	const groupedAutoInsertedBlocks = autoInsertedBlocksForCurrentBlock.reduce(
+		( acc, block ) => {
+			const [ prefix ] = block.name.split( '/' );
+			if ( ! acc[ prefix ] ) {
+				acc[ prefix ] = [];
+			}
+			acc[ prefix ].push( block );
+			return acc;
+		},
+		{}
+	);
+
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Plugins' ) } initialOpen={ true }>
-				{ autoInsertedBlocksForCurrentBlock.map( ( block ) => {
+				{ Object.keys( groupedAutoInsertedBlocks ).map( ( vendor ) => {
 					return (
-						<div
-							key={ block.name }
-							className="block-editor-block-card"
-						>
-							<BlockIcon icon={ block.icon } />
-							<div className="block-editor-block-card__content">
-								<h2 className="block-editor-block-card__title">
-									{ block.title }
-								</h2>
-							</div>
-						</div>
+						<Fragment key={ vendor }>
+							<h3>{ vendor }</h3>
+							{ groupedAutoInsertedBlocks[ vendor ].map(
+								( block ) => {
+									return (
+										<div
+											key={ block.name }
+											className="block-editor-block-card"
+										>
+											<BlockIcon icon={ block.icon } />
+											<div className="block-editor-block-card__content">
+												<h2 className="block-editor-block-card__title">
+													{ block.title }
+												</h2>
+											</div>
+										</div>
+									);
+								}
+							) }
+						</Fragment>
 					);
 				} ) }
 			</PanelBody>
