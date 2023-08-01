@@ -50,7 +50,7 @@ With directives we can manage directly in the DOM behavior related to things suc
 The `wp-interactive` "activates" hydration for the DOM element and its children through the Interactivity API (directives and store). 
 
 > **Note**
-> The use of `wp-interactive` is a requirement for the Intereactivity API "engine" to work. We have not added the `wp-interactive` to the following examples for the sake of simplicity
+> The use of `wp-interactive` is a requirement for the Interactivity API "engine" to work. In the following examples the `wp-interactive` has not been added for the sake of simplicity
 
 
 #### `wp-context` ![](https://img.shields.io/badge/STATE-207399.svg)
@@ -69,16 +69,22 @@ _Example of `wp-context` directive_
 </div>
 >
 ```
+
+<details>
+  <summary><em>See store used with the directive above</em></summary>
+
 ```js
-// store used with the directive above
 store( {
-	actions: {
+  actions: {
     logId: ( { context } ) => {
       console.log( context.post.id );
     },
-	},
+  },
 } );
 ```
+
+</details>
+<br/>
 
 Different contexts can be defined at different levels and deeper levels will merge their own context with any parent one:
 
@@ -120,14 +126,19 @@ _Example of `wp-bind` directive_
   </div>
 </li>
 ```
+<details>
+  <summary><em>See store used with the directive above</em></summary>
+
 ```js
-// store used with the directive above
 store( {
 	actions: {
 		toggleMenu: ( { context } ) => ! context.isMenuOpen,
 	},
 } );
 ```
+
+</details>
+<br/>
 
 The `wp-bind` directive is executed:
   - when the element is created 
@@ -170,16 +181,21 @@ _Example of `wp-class` directive_
 </div>
 ```
 
+<details>
+  <summary><em>See store used with the directive above</em></summary>
+
 ```js
-// store used with the directive above
 store( {
-	actions: {
-		toggleSelection: ( { context } ) => {
-				context.isSelected = !context.isSelected
-			}
-	}
+  actions: {
+    toggleSelection: ( { context } ) => {
+      context.isSelected = !context.isSelected
+    }
+  }
 } );
 ```
+
+</details>
+<br/>
 
 The `wp-class` directive is executed:
   - when the element is created
@@ -205,8 +221,10 @@ _Example of `wp-style` directive_
 >
 ```
 
+<details>
+  <summary><em>See store used with the directive above</em></summary>
+
 ```js
-// store used with the directive above
 store( {
 	actions: {
     toggleContextColor: ( { context } ) => {
@@ -215,6 +233,9 @@ store( {
 	},
 } );
 ```
+
+</details>
+<br/>
 
 The `wp-style` directive is executed:
   - when the element is created
@@ -243,16 +264,21 @@ It sets the inner text of an HTML element.
 </div>
 ```
 
+<details>
+  <summary><em>See store used with the directive above</em></summary>
+
 ```js
-// store used with the directive above
 store( {
-	actions: {
+  actions: {
     toggleContextText: ( { context } ) => {
       context.text = context.text === 'Text 1' ? 'Text 2' : 'Text 1';
     },
-	},
+  },
 } );
 ```
+
+</details>
+<br/>
 
 The `wp-text` directive is executed:
   - when the element is created
@@ -273,14 +299,19 @@ _Example of `wp-context` directive_
 </button>
 ```
 
+<details>
+  <summary><em>See store used with the directive above</em></summary>
+
 ```js
-// store used with the directive above
 store( {
-	actions: {
-		logTime: () => console.log( new Date() ),
-	},
+  actions: {
+    logTime: () => console.log( new Date() ),
+  },
 } );
 ```
+
+</details>
+<br/>
 
 The `wp-on` directive is executed each time the associated event is triggered. 
 
@@ -304,8 +335,10 @@ _Example of `wp-on` directive_
 </div>
 ```
 
+<details>
+  <summary><em>See store used with the directive above</em></summary>
+
 ```js
-// store used with the directive above
 store( {
   actions: {
     increaseCounter: ({ context }) => {
@@ -315,11 +348,14 @@ store( {
       context.counter--;
     },
   }
-	effects: {
-		logCounter: ({ context }) => console.log("Counter is " + context.myNamespace.counter + " at " + new Date() ),
-	},
+  effects: {
+    logCounter: ({ context }) => console.log("Counter is " + context.myNamespace.counter + " at " + new Date() ),
+  },
 } );
 ```
+
+</details>
+<br/>
 
 The `wp-effect` directive is executed:
   - when the element is created
@@ -355,16 +391,22 @@ _Example of several `wp-init` directives on the same DOM element_
 </form>
 ```
 
+<details>
+  <summary><em>See store used with the directive above</em></summary>
+
 ```js
-// store used with the directive above
 store( {
-	effects: {
+  effects: {
     logTimeInit: () => console.log( `Init at ` + new Date() ),
     focusFirstElement: ( { ref } ) =>
       ref.querySelector( 'input:first-child' ).focus(),
-	},
+  },
 } );
 ```
+
+</details>
+<br/>
+
 
 The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM.
 
