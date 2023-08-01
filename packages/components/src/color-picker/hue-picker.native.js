@@ -1,203 +1,212 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { Animated, View, PanResponder, StyleSheet } from 'react-native';
 
-// import React, { useRef, useEffect } from 'react';
-// import { Animated, View, StyleSheet, PanResponder } from 'react-native';
-// import LinearGradient from 'react-native-linear-gradient';
-// import tinycolor from 'tinycolor2';
-// import normalizeValue from './utils';
+/**
+ * WordPress dependencies
+ */
+import React, { Component } from '@wordpress/element';
 
-// const HuePicker = ( props ) => {
-// 	const {
-// 		sliderSize = 24,
-// 		barWidth = 200,
-// 		barHeight = 12,
-// 		borderRadius = 0,
-// 		hue = 0,
-// 		onPress,
-// 		onDragStart,
-// 		onDragMove,
-// 		onDragEnd,
-// 		onDragTerminate,
-// 	} = props;
+/**
+ * Internal dependencies
+ */
+import LinearGradient from 'react-native-linear-gradient';
+import tinycolor from 'tinycolor2';
+import normalizeValue from './utils';
 
-// 	const hueColors = [
-// 		'#ff0000',
-// 		'#ffff00',
-// 		'#00ff00',
-// 		'#00ffff',
-// 		'#0000ff',
-// 		'#ff00ff',
-// 		'#ff0000',
-// 	];
+export default class HuePicker extends Component {
+	constructor( props ) {
+		super( props );
+		this.hueColors = [
+			'#ff0000',
+			'#ffff00',
+			'#00ff00',
+			'#00ffff',
+			'#0000ff',
+			'#ff00ff',
+			'#ff0000',
+		];
+		this.sliderX = new Animated.Value(
+			( props.barHeight * props.hue ) / 360
+		);
+		this.panResponder = PanResponder.create( {
+			onStartShouldSetPanResponder: () => true,
+			onStartShouldSetPanResponderCapture: () => true,
+			onMoveShouldSetPanResponder: () => true,
+			onMoveShouldSetPanResponderCapture: () => true,
+			onPanResponderGrant: ( evt, gestureState ) => {
+				const { onPress } = this.props;
+				this.dragStartValue = this.computeHueValuePress( evt );
 
-//     const normalizeValue = ( value ) => {
-// 		if ( value < 0 ) return 0;
-// 		if ( value > 1 ) return 1;
-// 		return value;
-// 	};
+				if ( onPress ) {
+					onPress( {
+						hue: this.computeHueValuePress( evt ),
+						nativeEvent: evt.nativeEvent,
+					} );
+				}
 
-// 	const borderWidth = sliderSize / 10;
-// 	const sliderX = useRef(
-// 		new Animated.Value( ( barHeight * hue ) / 360 )
-// 	).current;
-// 	const dragStartValue = useRef( 0 );
+				this.fireDragEvent( 'onDragStart', gestureState );
+			},
+			onPanResponderMove: ( evt, gestureState ) => {
+				this.fireDragEvent( 'onDragMove', gestureState );
+			},
+			onPanResponderTerminationRequest: () => true,
+			onPanResponderRelease: ( evt, gestureState ) => {
+				this.fireDragEvent( 'onDragEnd', gestureState );
+			},
+			onPanResponderTerminate: ( evt, gestureState ) => {
+				this.fireDragEvent( 'onDragTerminate', gestureState );
+			},
+			onShouldBlockNativeResponder: () => true,
+		} );
+	}
 
-// 	const panResponder = useRef(
-// 		PanResponder.create( {
-// 			onStartShouldSetPanResponder: () => true,
-// 			onStartShouldSetPanResponderCapture: () => true,
-// 			onMoveShouldSetPanResponder: () => true,
-// 			onMoveShouldSetPanResponderCapture: () => true,
-// 			onPanResponderGrant: ( evt, gestureState ) => {
-// 				const updatedHue = computeHueValuePress( evt );
+	componentDidUpdate( prevProps ) {
+		const { hue = 0, barWidth = 200, sliderSize = 24 } = this.props;
+		const borderWidth = sliderSize / 10;
+		if ( prevProps.hue !== hue || prevProps.barWidth !== barWidth ) {
+			this.sliderX.setValue(
+				( ( barWidth - sliderSize + borderWidth ) * hue ) / 360
+			);
+		}
+	}
 
-// 				if ( onPress ) {
-// 					onPress( {
-// 						hue: updatedHue,
-// 						nativeEvent: evt.nativeEvent,
-// 					} );
-// 				}
+	getContainerStyle() {
+		const {
+			sliderSize = 24,
+			barHeight = 12,
+			containerStyle = {},
+		} = this.props;
+		const paddingLeft = sliderSize / 2;
+		const paddingTop =
+			sliderSize - barHeight > 0 ? ( sliderSize - barHeight ) / 2 : 0;
+		return [
+			styles.container,
+			containerStyle,
+			{
+				paddingTop,
+				paddingBottom: paddingTop,
+				paddingLeft,
+				paddingRight: paddingLeft,
+			},
+		];
+	}
 
-// 				dragStartValue.current = updatedHue;
-// 				fireDragEvent( 'onDragStart', gestureState );
-// 			},
-// 			onPanResponderMove: ( evt, gestureState ) => {
-// 				fireDragEvent( 'onDragMove', gestureState );
-// 			},
-// 			onPanResponderTerminationRequest: () => true,
-// 			onPanResponderRelease: ( evt, gestureState ) => {
-// 				fireDragEvent( 'onDragEnd', gestureState );
-// 			},
-// 			onPanResponderTerminate: ( evt, gestureState ) => {
-// 				fireDragEvent( 'onDragTerminate', gestureState );
-// 			},
-// 			onShouldBlockNativeResponder: () => true,
-// 		} )
-// 	).current;
+	getCurrentColor() {
+		const { hue = 0 } = this.props;
+		return tinycolor( `hue ${ hue } 1.0 0.5` ).toHexString();
+	}
 
-// 	useEffect( () => {
-// 		const updatedSliderX =
-// 			( ( barWidth - sliderSize + borderWidth ) * hue ) / 360;
-// 		sliderX.setValue( updatedSliderX );
-// 	}, [ hue, barWidth, sliderSize, borderWidth, sliderX ] );
+	computeHueValueDrag( gestureState ) {
+		const { dx } = gestureState;
+		const { barWidth = 200 } = this.props;
+		const { dragStartValue } = this;
+		const diff = dx / barWidth;
+		const updatedHue = normalizeValue( dragStartValue / 360 + diff ) * 360;
+		return updatedHue;
+	}
 
-// 	const getContainerStyle = () => {
-// 		const paddingLeft = sliderSize / 2;
-// 		const paddingTop =
-// 			sliderSize - barHeight > 0 ? ( sliderSize - barHeight ) / 2 : 0;
-// 		return [
-// 			styles.container,
-// 			{
-// 				paddingTop,
-// 				paddingBottom: paddingTop,
-// 				paddingLeft,
-// 				paddingRight: paddingLeft,
-// 			},
-// 		];
-// 	};
+	computeHueValuePress( event ) {
+		const { nativeEvent } = event;
+		const { locationX } = nativeEvent;
+		const { barWidth = 200 } = this.props;
+		const updatedHue = normalizeValue( locationX / barWidth ) * 360;
+		return updatedHue;
+	}
 
-// 	const getCurrentColor = () => {
-// 		return tinycolor( `hue ${ hue } 1.0 0.5` ).toHexString();
-// 	};
+	fireDragEvent( eventName, gestureState ) {
+		const { [ eventName ]: event } = this.props;
+		if ( event ) {
+			event( {
+				hue: this.computeHueValueDrag( gestureState ),
+				gestureState,
+			} );
+		}
+	}
 
-// 	const computeHueValueDrag = ( gestureState ) => {
-// 		const { dx } = gestureState;
-// 		const diff = dx / barWidth;
-// 		const updatedHue =
-// 			normalizeValue( dragStartValue.current / 360 + diff ) * 360;
-// 		return updatedHue;
-// 	};
+	firePressEvent( event ) {
+		const { onPress } = this.props;
+		if ( onPress ) {
+			onPress( {
+				hue: this.computeHueValuePress( event ),
+				nativeEvent: event.nativeEvent,
+			} );
+		}
+	}
 
-// 	const computeHueValuePress = ( event ) => {
-// 		const { nativeEvent } = event;
-// 		const { locationX } = nativeEvent;
-// 		const updatedHue = normalizeValue( locationX / barWidth ) * 360;
-// 		return updatedHue;
-// 	};
+	render() {
+		const { hueColors } = this;
+		const {
+			sliderSize = 24,
+			barWidth = 200,
+			barHeight = 12,
+			borderRadius = 0,
+		} = this.props;
+		const borderWidth = sliderSize / 10;
+		return (
+			<View
+				style={ this.getContainerStyle() }
+				{ ...this.panResponder.panHandlers }
+				hitSlop={ {
+					top: 10,
+					bottom: 10,
+					left: 0,
+					right: 0,
+				} }
+			>
+				<LinearGradient
+					colors={ hueColors }
+					style={ {
+						borderRadius,
+					} }
+					start={ { x: 0, y: 0 } }
+					end={ { x: 1, y: 0 } }
+				>
+					<View
+						style={ {
+							width: barWidth,
+							height: barHeight,
+						} }
+					/>
+				</LinearGradient>
+				<Animated.View
+					pointerEvents="none"
+					style={ [
+						styles.slider,
+						{
+							width: sliderSize,
+							height: sliderSize,
+							left: ( sliderSize - borderWidth ) / 2,
+							borderRadius: sliderSize / 2,
+							transform: [
+								{
+									translateX: this.sliderX,
+								},
+							],
+						},
+					] }
+				/>
+			</View>
+		);
+	}
+}
 
-// 	const fireDragEvent = ( eventName, gestureState ) => {
-// 		const event = props[ eventName ];
-// 		if ( event ) {
-// 			event( {
-// 				hue: computeHueValueDrag( gestureState ),
-// 				gestureState,
-// 			} );
-// 		}
-// 	};
-
-// 	return (
-// 		<View
-// 			style={ getContainerStyle() }
-// 			{ ...panResponder.panHandlers }
-// 			hitSlop={ {
-// 				top: 10,
-// 				bottom: 10,
-// 				left: 0,
-// 				right: 0,
-// 			} }
-// 		>
-// 			<LinearGradient
-// 				colors={ hueColors }
-// 				style={ {
-// 					borderRadius,
-// 				} }
-// 				start={ { x: 0, y: 0 } }
-// 				end={ { x: 1, y: 0 } }
-// 			>
-// 				<View
-// 					style={ {
-// 						width: barWidth,
-// 						height: barHeight,
-// 					} }
-// 				/>
-// 			</LinearGradient>
-// 			<Animated.View
-// 				pointerEvents="none"
-// 				style={ [
-// 					styles.slider,
-// 					{
-// 						width: sliderSize,
-// 						height: sliderSize,
-// 						left: ( sliderSize - borderWidth ) / 2,
-// 						borderRadius: sliderSize / 2,
-// 						transform: [
-// 							{
-// 								translateX: sliderX,
-// 							},
-// 						],
-// 					},
-// 				] }
-// 			/>
-// 		</View>
-// 	);
-// };
-
-// const styles = StyleSheet.create( {
-// 	container: {
-// 		justifyContent: 'center',
-// 		alignItems: 'center',
-// 	},
-// 	slider: {
-// 		position: 'absolute',
-// 		backgroundColor: '#fff',
-// 		shadowColor: '#000',
-// 		shadowOffset: {
-// 			width: 0,
-// 			height: 7,
-// 		},
-// 		shadowOpacity: 0.43,
-// 		shadowRadius: 10,
-// 		elevation: 5,
-// 	},
-// } );
-
-// export default HuePicker;
-
-const HuePicker = () => {
-	return <View />;
-};
-
-export default HuePicker;
+const styles = StyleSheet.create( {
+	container: {
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	slider: {
+		position: 'absolute',
+		backgroundColor: '#fff',
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 7,
+		},
+		shadowOpacity: 0.43,
+		shadowRadius: 10,
+		elevation: 5,
+	},
+} );

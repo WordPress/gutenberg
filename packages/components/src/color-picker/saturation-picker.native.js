@@ -6,7 +6,7 @@ import { View, PanResponder, StyleSheet } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { React, Component } from '@wordpress/element';
+import React, { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
