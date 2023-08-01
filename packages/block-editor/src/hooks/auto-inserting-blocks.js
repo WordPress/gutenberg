@@ -19,21 +19,10 @@ function AutoInsertingBlocksControl( props ) {
 		return getBlockTypes();
 	}, [] );
 
-	const autoInsertedBlocksForCurrentBlock = blocks.reduce(
-		( autoInsertedBlocks, block ) => {
-			if ( ! block.autoInsert ) {
-				return autoInsertedBlocks;
-			}
-
-			const name = Object.keys( block.autoInsert ).find(
-				( n ) => n === props.blockName
-			);
-			if ( name !== undefined ) {
-				autoInsertedBlocks.push( block );
-			}
-			return autoInsertedBlocks;
-		},
-		[]
+	const autoInsertedBlocksForCurrentBlock = blocks.filter(
+		( block ) =>
+			block.autoInsert &&
+			Object.keys( block.autoInsert ).includes( props.blockName )
 	);
 
 	return (
