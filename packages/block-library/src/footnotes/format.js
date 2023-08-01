@@ -50,6 +50,7 @@ export const format = {
 			getSelectedBlockClientId,
 			getBlocks,
 			getBlockRootClientId,
+			getBlockName,
 			getBlockParentsByBlockName,
 		} = useSelect( blockEditorStore );
 		const footnotesBlockType = useSelect( ( select ) =>
@@ -148,8 +149,11 @@ export const format = {
 				if ( ! fnBlock ) {
 					let rootClientId = getBlockRootClientId( selectedClientId );
 
-					if ( parentPostContent.length ) {
-						rootClientId = parentPostContent[ 0 ];
+					while (
+						rootClientId &&
+						getBlockName( rootClientId ) !== POST_CONTENT_BLOCK_NAME
+					) {
+						rootClientId = getBlockRootClientId( rootClientId );
 					}
 
 					fnBlock = createBlock( name );
