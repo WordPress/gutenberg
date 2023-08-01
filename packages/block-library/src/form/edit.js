@@ -99,7 +99,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 							setAttributes( { email: value } )
 						}
 						help={ __(
-							'The email address where form submissions will be sent. Leave empty to use the site admin address.'
+							'The email address where form submissions will be sent. Separate multiple email addresses with a comma, or leave empty to use the site admin address.'
 						) }
 					/>
 				) }
