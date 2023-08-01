@@ -104,7 +104,7 @@ class WP_Font_Family {
 	 */
 	private static function delete_asset( $src ) {
 		$filename  = basename( $src );
-		$file_path = path_join( WP_FONTS_DIR, $filename );
+		$file_path = path_join( WP_Fonts_Library::get_fonts_dir(), $filename );
 		wp_delete_file( $file_path );
 		return ! file_exists( $file_path );
 	}
@@ -136,10 +136,8 @@ class WP_Font_Family {
 	 * @return string|bool The relative path to the downloaded font asset. False if the download failed.
 	 */
 	private function download_asset( $src, $filename ) {
-		$file_path = path_join( WP_FONTS_DIR, $filename );
-
 		// Checks if the file to be downloaded has a font mime type.
-		if ( ! WP_Font_Family_Utils::has_font_mime_type( $file_path ) ) {
+		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filename ) ) {
 			return false;
 		}
 
@@ -154,17 +152,29 @@ class WP_Font_Family {
 			return false;
 		}
 
-		// Moves the file to the fonts directory or return false.
-		$renamed_file = rename( $temp_file, $file_path );
+		$overrides = array (
+			'action' => 'wp_handle_google_font_download', // Arbitrary string to avoid the is_uploaded_file() check applied when using 'wp_handle_upload'.	
+			'test_form' => false, // We are not testing a form submission.
+			'test_type' => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/
+			'unique_filename_callback' => function () use ($filename) { return $filename; }, // We want to keep the original filename.
+		);
+
+		$file = array (
+			'tmp_name' => $temp_file,
+			'name' => $filename,
+		);
+
+		$handled_file = wp_handle_upload( $file, $overrides );
+
 		// Cleans the temp file.
 		@unlink( $temp_file );
 
-		if ( ! $renamed_file ) {
+		if ( !isset ( $handled_file['url'] ) ) {
 			return false;
 		}
 
 		// Returns the relative path to the downloaded font asset to be used as font face src.
-		return WP_Fonts_Library::get_relative_fonts_path() . $filename;
+		return $handled_file['url'];
 	}
 
 	/**
@@ -179,22 +189,32 @@ class WP_Font_Family {
 	private function move_font_face_asset( $font_face, $file ) {
 		$new_font_face = $font_face;
 		$filename      = WP_Font_Family_Utils::get_filename_from_font_face( $this->data['slug'], $font_face, $file['name'] );
-		$filepath      = path_join( WP_FONTS_DIR, $filename );
 
 		// Remove the uploaded font asset reference from the font face definition because it is no longer needed.
 		unset( $new_font_face['file'] );
 
-		// If the filepath has not a font mime type, we don't move the file and return the font face definition without src to be ignored later.
-		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filepath ) ) {
+		// If the filename has not a font mime type, we don't move the file and return the font face definition without src to be ignored later.
+		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filename ) ) {
 			return $new_font_face;
 		}
 
 		// Move the uploaded font asset from the temp folder to the wp fonts directory.
-		$file_was_moved = move_uploaded_file( $file['tmp_name'], $filepath );
+		if ( ! function_exists( 'wp_handle_upload' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
 
-		if ( $file_was_moved ) {
+		$overrides = array (
+			'action' => 'wp_handle_upload', 
+			'test_form' => false, // We are not testing a form submission.
+			'test_type' => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/
+			'unique_filename_callback' => function () use ($filename) { return $filename; }, // We want to keep the original filename.
+		);
+
+		$handled_file = wp_handle_upload( $file, $overrides );
+
+		if ( isset( $handled_file['url'] ) ) {
 			// If the file was successfully moved, we update the font face definition to reference the new file location.
-			$new_font_face['src'] = WP_Fonts_Library::get_relative_fonts_path() . $filename;
+			$new_font_face['src'] = $handled_file['url'];
 		}
 
 		return $new_font_face;
@@ -390,7 +410,9 @@ class WP_Font_Family {
 	 * @return array|WP_Error
 	 */
 	public function install( $files = null ) {
+		add_filter( 'upload_dir', array( 'WP_Fonts_Library', 'set_upload_dir' ) );
 		$were_assets_written = $this->download_or_move_font_faces( $files );
+		remove_filter( 'upload_dir', array( 'WP_Fonts_Library', 'set_upload_dir' ) );
 
 		if ( ! $were_assets_written ) {
 			return new WP_Error( 'font_face_download_failed', __( 'The font face assets could not be written.', 'gutenberg' ) );

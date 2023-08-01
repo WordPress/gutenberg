@@ -26,35 +26,25 @@ class WP_Fonts_Library {
 	);
 
 	/**
-	 * Returns the absolute path to the fonts directory.
-	 *
-	 * @return string Path to the fonts directory.
+	 * Get the upload directory for fonts.
+	 * 
+	 * @return string Path of the upload directory for fonts.
 	 */
-	public static function get_fonts_directory() {
-		return path_join( WP_CONTENT_DIR, 'fonts' );
+	public static function get_fonts_dir() {
+		return wp_upload_dir()['basedir'] . '/fonts';
 	}
 
-	/**
-	 * Returns the relative path to the fonts directory.
-	 *
-	 * @return string Relative path to the fonts directory.
+	/*
+	 * Sets the upload directory for fonts.
+	 * 
+	 * @param array $defaults Default upload directory.
+	 * @return array Modified upload directory.
 	 */
-	public static function get_relative_fonts_path() {
-		return content_url( '/fonts/' );
-	}
-
-	/**
-	 * Define WP_FONTS_DIR constant to make it available to the rest of the code.
-	 */
-	public static function define_fonts_directory() {
-		define( 'WP_FONTS_DIR', self::get_fonts_directory() );
-	}
-
-	/**
-	 * Create fonts directory if it doesn't exist.
-	 */
-	public static function create_fonts_directory() {
-		wp_mkdir_p( self::get_fonts_directory() );
+	public static function set_upload_dir( $defaults ) {
+		$defaults['subdir'] = '/fonts';
+		$defaults['path'] = $defaults['basedir'] . $defaults['subdir'];
+		$defaults['url'] = $defaults['baseurl'] . $defaults['subdir'];
+		return $defaults;
 	}
 
 }

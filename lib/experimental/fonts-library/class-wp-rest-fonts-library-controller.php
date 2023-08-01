@@ -105,7 +105,8 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
 		// The update endpoints requires write access to the temp and the fonts directories.
 		$temp_dir = get_temp_dir();
-		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( WP_FONTS_DIR ) ) {
+		$upload_dir = wp_upload_dir()['basedir'];
+		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $upload_dir ) ) {
 			return new WP_Error(
 				'rest_cannot_write_fonts_folder',
 				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' ),

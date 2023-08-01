@@ -9,9 +9,6 @@
  * @since      X.X.X
  */
 
-add_action( 'init', array( 'WP_Fonts_Library', 'define_fonts_directory' ) );
-add_action( 'init', array( 'WP_Fonts_Library', 'create_fonts_directory' ) );
-
 /**
  * Registers the routes for the objects of the controller.
  */
