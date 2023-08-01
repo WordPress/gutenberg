@@ -6,7 +6,8 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { ProgressBar, INDETERMINATE_TRACK_WIDTH } from '..';
+import { ProgressBar } from '..';
+import { INDETERMINATE_TRACK_WIDTH } from '../styles';
 
 describe( 'ProgressBar', () => {
 	it( 'should render an indeterminate semantic progress bar element', () => {
@@ -57,18 +58,6 @@ describe( 'ProgressBar', () => {
 		expect( indicator ).toHaveStyle( {
 			width: '55%',
 		} );
-	} );
-
-	it( 'should have an `is-indeterminate` className if `value` is not provided', () => {
-		const { container } = render( <ProgressBar /> );
-
-		expect( container ).toMatchSnapshot();
-	} );
-
-	it( 'should not have an `is-indeterminate` className if `value` is provided', () => {
-		const { container } = render( <ProgressBar value={ 55 } /> );
-
-		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should allow a custom `id` attribute to be specified', () => {

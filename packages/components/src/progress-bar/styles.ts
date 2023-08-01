@@ -2,7 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-import { keyframes } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -18,6 +18,9 @@ const animateProgressBar = keyframes( {
 	},
 } );
 
+// Width of the indicator for the indeterminate progress bar
+export const INDETERMINATE_TRACK_WIDTH = 50;
+
 export const Track = styled.div`
 	position: relative;
 	overflow: hidden;
@@ -31,7 +34,10 @@ export const Track = styled.div`
 	border-radius: ${ CONFIG.radiusBlockUi };
 `;
 
-export const Indicator = styled.div`
+export const Indicator = styled.div< {
+	isIndeterminate: boolean;
+	value?: number;
+} >`
 	display: inline-block;
 	position: absolute;
 	top: 0;
@@ -39,16 +45,16 @@ export const Indicator = styled.div`
 	border-radius: ${ CONFIG.radiusBlockUi };
 	background-color: ${ COLORS.ui.theme };
 
-	.is-indeterminate & {
-		animation-duration: 1.5s;
-		animation-timing-function: ease-in-out;
-		animation-iteration-count: infinite;
-		animation-name: ${ animateProgressBar };
-
-		@media ( prefers-reduced-motion ) {
-			animation-duration: 0s;
-		}
-	}
+	${ ( { isIndeterminate, value } ) =>
+		isIndeterminate
+			? css( {
+					animationDuration: '1.5s',
+					animationTimingFunction: 'ease-in-out',
+					animationIterationCount: 'infinite',
+					animationName: animateProgressBar,
+					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
+			  } )
+			: css( { width: `${ value }%` } ) };
 `;
 
 export const ProgressElement = styled.progress`

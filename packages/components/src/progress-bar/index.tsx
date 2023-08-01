@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -18,9 +17,6 @@ import * as ProgressBarStyled from './styles';
 import type { ProgressBarProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
-// Width of the indicator for the indeterminate progress bar
-export const INDETERMINATE_TRACK_WIDTH = 50;
-
 function UnforwardedProgressBar(
 	props: WordPressComponentProps< ProgressBarProps, 'div', false >,
 	ref: ForwardedRef< HTMLProgressElement >
@@ -28,23 +24,12 @@ function UnforwardedProgressBar(
 	const { className, id: idProp, value } = props;
 	const id = useInstanceId( ProgressBar, 'progress-bar', idProp );
 	const isIndeterminate = ! Number.isFinite( value );
-	const wrapperClasses = classnames( className, {
-		/**
-		 * @todo Use the `:indeterminate` pseudo-class once supported.
-		 *
-		 * @see https://caniuse.com/mdn-css_selectors_indeterminate_progress
-		 */
-		'is-indeterminate': isIndeterminate,
-	} );
 
 	return (
-		<ProgressBarStyled.Track className={ wrapperClasses }>
+		<ProgressBarStyled.Track className={ className }>
 			<ProgressBarStyled.Indicator
-				style={ {
-					width: `${
-						isIndeterminate ? INDETERMINATE_TRACK_WIDTH : value
-					}%`,
-				} }
+				isIndeterminate={ isIndeterminate }
+				value={ value }
 			/>
 			<ProgressBarStyled.ProgressElement
 				max={ 100 }
