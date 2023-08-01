@@ -360,4 +360,44 @@ test.describe( 'Footnotes', () => {
 			},
 		] );
 	} );
+
+	test( 'can be previewed when published', async ( { editor, page } ) => {
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'a' );
+
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.locator( 'button:text("Footnote")' ).click();
+
+		await page.keyboard.type( '1' );
+
+		// Publish post.
+		await editor.publishPost();
+
+		await editor.canvas.click( 'ol.wp-block-footnotes li span' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '2' );
+
+		const editorPage = page;
+		const previewPage = await editor.openPreviewPage();
+
+		await expect(
+			previewPage.locator( 'ol.wp-block-footnotes li' )
+		).toHaveText( '12 ↩︎' );
+
+		await previewPage.close();
+		await editorPage.bringToFront();
+
+		// Test again, this time with an existing revision (different code
+		// path).
+		await editor.canvas.click( 'ol.wp-block-footnotes li span' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '3' );
+
+		const previewPage2 = await editor.openPreviewPage();
+
+		await expect(
+			previewPage2.locator( 'ol.wp-block-footnotes li' )
+		).toHaveText( '123  ↩︎' );
+	} );
 } );

@@ -260,28 +260,35 @@ export default function Layout() {
 				</motion.div>
 
 				<div className="edit-site-layout__content">
-					<motion.div
-						// The sidebar is needed for routing on mobile
-						// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
-						// so we can't remove the element entirely. Using `inert` will make
-						// it inaccessible to screen readers and keyboard navigation.
-						inert={ showSidebar ? undefined : 'inert' }
-						animate={ { opacity: showSidebar ? 1 : 0 } }
-						transition={ {
-							type: 'tween',
-							duration:
-								// Disable transition in mobile to emulate a full page transition.
-								disableMotion || isMobileViewport
-									? 0
-									: ANIMATION_DURATION,
-							ease: 'easeOut',
-						} }
-						className="edit-site-layout__sidebar"
+					{ /*
+						The NavigableRegion must always be rendered and not use
+						`inert` otherwise `useNavigateRegions` will fail.
+					*/ }
+					<NavigableRegion
+						ariaLabel={ __( 'Navigation' ) }
+						className="edit-site-layout__sidebar-region"
 					>
-						<NavigableRegion ariaLabel={ __( 'Navigation' ) }>
+						<motion.div
+							// The sidebar is needed for routing on mobile
+							// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
+							// so we can't remove the element entirely. Using `inert` will make
+							// it inaccessible to screen readers and keyboard navigation.
+							inert={ showSidebar ? undefined : 'inert' }
+							animate={ { opacity: showSidebar ? 1 : 0 } }
+							transition={ {
+								type: 'tween',
+								duration:
+									// Disable transition in mobile to emulate a full page transition.
+									disableMotion || isMobileViewport
+										? 0
+										: ANIMATION_DURATION,
+								ease: 'easeOut',
+							} }
+							className="edit-site-layout__sidebar"
+						>
 							<Sidebar />
-						</NavigableRegion>
-					</motion.div>
+						</motion.div>
+					</NavigableRegion>
 
 					<SavePanel />
 

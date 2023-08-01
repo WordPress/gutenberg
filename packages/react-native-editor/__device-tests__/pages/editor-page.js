@@ -554,6 +554,29 @@ class EditorPage {
 		} while ( navigateUpElements.length > 0 );
 	}
 
+	// Adds a block by tapping on the appender button of blocks with inner blocks (e.g. Group block)
+	async addBlockUsingAppender( block, blockName ) {
+		const appenderButton = isAndroid()
+			? await this.waitForElementToBeDisplayedByXPath(
+					`//android.widget.Button[@resource-id="appender-button"]`
+			  )
+			: await this.waitForElementToBeDisplayedById( 'appender-button' );
+		await appenderButton.click();
+
+		// Click on block of choice.
+		const blockButton = await this.findBlockButton( blockName );
+
+		if ( isAndroid() ) {
+			await blockButton.click();
+		} else {
+			await this.driver.execute( 'mobile: tap', {
+				element: blockButton,
+				x: 10,
+				y: 10,
+			} );
+		}
+	}
+
 	// =========================
 	// Inline toolbar functions
 	// =========================
