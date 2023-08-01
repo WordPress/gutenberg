@@ -348,7 +348,7 @@ export function addEditProps( settings ) {
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		if ( ! hasStyleSupport( props.name ) ) {
-			return <BlockEdit { ...props } />;
+			return <BlockEdit key="edit" { ...props } />;
 		}
 
 		const shouldDisplayControls = useDisplayBlockControls();
@@ -364,7 +364,7 @@ export const withBlockControls = createHigherOrderComponent(
 						<DimensionsPanel { ...props } />
 					</>
 				) }
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},
