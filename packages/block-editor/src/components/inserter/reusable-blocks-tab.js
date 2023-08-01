@@ -13,6 +13,7 @@ import BlockTypesList from '../block-types-list';
 import InserterPanel from './panel';
 import InserterNoResults from './no-results';
 import useBlockTypesState from './hooks/use-block-types-state';
+import ReusableBlocksRenameHint from './reusable-block-rename-hint';
 
 function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	const [ items, , , onSelectItem ] = useBlockTypesState(
@@ -21,7 +22,10 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 	);
 
 	const filteredItems = useMemo( () => {
-		return items.filter( ( { category } ) => category === 'reusable' );
+		return items.filter(
+			( { category, syncStatus } ) =>
+				category === 'reusable' && syncStatus !== 'unsynced'
+		);
 	}, [ items ] );
 
 	if ( filteredItems.length === 0 ) {
@@ -54,6 +58,9 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 export function ReusableBlocksTab( { rootClientId, onInsert, onHover } ) {
 	return (
 		<>
+			<div className="block-editor-inserter__hint">
+				<ReusableBlocksRenameHint />
+			</div>
 			<ReusableBlocksList
 				onHover={ onHover }
 				onInsert={ onInsert }

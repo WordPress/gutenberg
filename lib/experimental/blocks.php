@@ -5,6 +5,27 @@
  * @package gutenberg
  */
 
+/**
+ * Checks whether the experimental Interactivity API should be used for a block.
+ *
+ * Note: This function is located here instead of in interactivity-api/blocks.php because it has to be available earler.
+ *
+ * @param string $block_name Block name.
+ * @return bool Whether Interactivity API is used for block.
+ */
+function gutenberg_should_block_use_interactivity_api( $block_name ) {
+
+	/**
+	 * Filters whether the experimental Interactivity API should be used for a block.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param bool   $enabled    Whether Interactivity API is used for block.
+	 * @param string $block_name Block name.
+	 */
+	return (bool) apply_filters( 'gutenberg_should_block_use_interactivity_api', true, $block_name );
+}
+
 if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	/**
 	 * Enqueues a frontend script for a specific block.

@@ -11,6 +11,7 @@ import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	hasBlockSupport,
+	getBlockType,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
@@ -347,6 +348,11 @@ export function addEditProps( settings ) {
  */
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const blockType = getBlockType( props.name );
+		if ( ! hasStyleSupport( blockType ) ) {
+			return <BlockEdit { ...props } />;
+		}
+
 		const shouldDisplayControls = useDisplayBlockControls();
 		const blockEditingMode = useBlockEditingMode();
 

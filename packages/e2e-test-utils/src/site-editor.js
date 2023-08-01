@@ -17,68 +17,23 @@ const SELECTORS = {
  * Skips the welcome guide popping up to first time users of the site editor
  */
 export async function disableSiteEditorWelcomeGuide() {
-	// This code prioritizes using the preferences store. However, performance
-	// tests run on older versions of the codebase where the preferences store
-	// doesn't exist. Some backwards compatibility has been built-in so that
-	// those tests continue to work there. This can be removed once WordPress
-	// 6.0 is released, as the older version used by the performance tests will
-	// then include the preferences store.
-	// See https://github.com/WordPress/gutenberg/pull/39300.
-	const isWelcomeGuideActive = await page.evaluate( () => {
-		// TODO - remove if statement after WordPress 6.0 is released.
-		if ( ! wp.data.select( 'core/preferences' ) ) {
-			return wp.data
-				.select( 'core/edit-site' )
-				.isFeatureActive( 'welcomeGuide' );
-		}
+	await page.evaluate( () => {
+		window.wp.data
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-site', 'welcomeGuide', false );
 
-		return !! wp.data
-			.select( 'core/preferences' )
-			?.get( 'core/edit-site', 'welcomeGuide' );
+		window.wp.data
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-site', 'welcomeGuideStyles', false );
+
+		window.wp.data
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-site', 'welcomeGuidePage', false );
+
+		window.wp.data
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-site', 'welcomeGuideTemplate', false );
 	} );
-	const isWelcomeGuideStyesActive = await page.evaluate( () => {
-		// TODO - remove if statement after WordPress 6.0 is released.
-		if ( ! wp.data.select( 'core/preferences' ) ) {
-			return wp.data
-				.select( 'core/edit-site' )
-				.isFeatureActive( 'welcomeGuideStyles' );
-		}
-
-		return !! wp.data
-			.select( 'core/preferences' )
-			?.get( 'core/edit-site', 'welcomeGuideStyles' );
-	} );
-
-	if ( isWelcomeGuideActive ) {
-		await page.evaluate( () => {
-			// TODO - remove if statement after WordPress 6.0 is released.
-			if ( ! wp.data.dispatch( 'core/preferences' ) ) {
-				wp.data
-					.dispatch( 'core/edit-site' )
-					.toggleFeature( 'welcomeGuide' );
-				return;
-			}
-
-			wp.data
-				.dispatch( 'core/preferences' )
-				.toggle( 'core/edit-site', 'welcomeGuide' );
-		} );
-	}
-
-	if ( isWelcomeGuideStyesActive ) {
-		await page.evaluate( () => {
-			// TODO - remove if statement after WordPress 6.0 is released.
-			if ( ! wp.data.dispatch( 'core/preferences' ) ) {
-				wp.data
-					.dispatch( 'core/edit-site' )
-					.toggleFeature( 'welcomeGuideStyles' );
-				return;
-			}
-			wp.data
-				.dispatch( 'core/preferences' )
-				.toggle( 'core/edit-site', 'welcomeGuideStyles' );
-		} );
-	}
 }
 
 /**

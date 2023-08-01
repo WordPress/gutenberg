@@ -566,9 +566,9 @@ export default function Image( {
 				className={ borderProps.className }
 				style={ {
 					width:
-						( width && height ) || aspectRatio ? '100%' : 'inherit',
+						( width && height ) || aspectRatio ? '100%' : undefined,
 					height:
-						( width && height ) || aspectRatio ? '100%' : 'inherit',
+						( width && height ) || aspectRatio ? '100%' : undefined,
 					objectFit: scale,
 					...borderProps.style,
 				} }
@@ -607,7 +607,8 @@ export default function Image( {
 		const ratio =
 			( aspectRatio && evalAspectRatio( aspectRatio ) ) ||
 			( width && height && width / height ) ||
-			naturalWidth / naturalHeight;
+			naturalWidth / naturalHeight ||
+			1;
 
 		const currentWidth = ! width && height ? height * ratio : width;
 		const currentHeight = ! height && width ? width / ratio : height;

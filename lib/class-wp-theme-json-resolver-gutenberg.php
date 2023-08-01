@@ -6,6 +6,10 @@
  * @since 5.8.0
  */
 
+if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
+	return;
+}
+
 /**
  * Class that abstracts the processing of the different data sources
  * for site-level config and offers an API to work with them.
@@ -275,7 +279,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 
 			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-			static::$theme = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( static::$theme );
+			if ( ! class_exists( 'WP_Font_Face' ) && class_exists( 'WP_Fonts_Resolver' ) ) {
+				static::$theme = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( static::$theme );
+			}
 			// END OF EXPERIMENTAL CODE.
 
 		}

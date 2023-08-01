@@ -7,8 +7,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -19,8 +18,7 @@ import Table from '../table';
 import Link from '../routes/link';
 import AddedBy from '../list/added-by';
 import TemplateActions from '../template-actions';
-import AddNewTemplate from '../add-new-template';
-import { store as editSiteStore } from '../../store';
+import AddNewTemplatePart from './add-new-template-part';
 
 export default function PageTemplateParts() {
 	const { records: templateParts } = useEntityRecords(
@@ -31,26 +29,16 @@ export default function PageTemplateParts() {
 		}
 	);
 
-	const { canCreate } = useSelect( ( select ) => {
-		const { supportsTemplatePartsMode } =
-			select( editSiteStore ).getSettings();
-		return {
-			postType: select( coreStore ).getPostType( 'wp_template_part' ),
-			canCreate: ! supportsTemplatePartsMode,
-		};
-	} );
-
 	const columns = [
 		{
 			header: __( 'Template Part' ),
 			cell: ( templatePart ) => (
 				<VStack>
-					<Heading level={ 5 }>
+					<Heading as="h3" level={ 5 }>
 						<Link
 							params={ {
 								postId: templatePart.id,
 								postType: templatePart.type,
-								canvas: 'view',
 							} }
 							state={ { backPath: '/wp_template_part/all' } }
 						>
@@ -87,15 +75,7 @@ export default function PageTemplateParts() {
 	return (
 		<Page
 			title={ __( 'Template Parts' ) }
-			actions={
-				canCreate && (
-					<AddNewTemplate
-						templateType={ 'wp_template_part' }
-						showIcon={ false }
-						toggleProps={ { variant: 'primary' } }
-					/>
-				)
-			}
+			actions={ <AddNewTemplatePart /> }
 		>
 			{ templateParts && (
 				<Table data={ templateParts } columns={ columns } />
