@@ -97,6 +97,7 @@
 	color: $gray-700;
 	gap: 0;
 	z-index: 1;
+	position: absolute;
 
 	&:hover {
 		color: currentColor;
