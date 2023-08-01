@@ -48,8 +48,7 @@ export default function DuplicateMenuItem( {
 	onClose,
 } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createErrorNotice, createSuccessNotice } =
-		useDispatch( noticesStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const history = useHistory();
 	const existingTemplateParts = useExistingTemplateParts();
@@ -75,29 +74,12 @@ export default function DuplicateMenuItem( {
 				{ throwOnError: true }
 			);
 
-			createSuccessNotice(
-				sprintf(
-					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
-					__( '"%s" created.' ),
-					title
-				),
-				{
-					type: 'snackbar',
-					id: 'edit-site-patterns-success',
-					actions: [
-						{
-							label: __( 'Edit' ),
-							onClick: () =>
-								history.push( {
-									postType: TEMPLATE_PARTS,
-									postId: result?.id,
-									categoryType: TEMPLATE_PARTS,
-									categoryId,
-								} ),
-						},
-					],
-				}
-			);
+			history.push( {
+				postType: TEMPLATE_PARTS,
+				postId: result?.id,
+				categoryType: TEMPLATE_PARTS,
+				categoryId,
+			} );
 
 			onClose();
 		} catch ( error ) {
@@ -139,40 +121,12 @@ export default function DuplicateMenuItem( {
 				{ throwOnError: true }
 			);
 
-			const actionLabel = isThemePattern
-				? __( 'View my patterns' )
-				: __( 'Edit' );
-
-			const newLocation = isThemePattern
-				? {
-						categoryType: USER_PATTERNS,
-						categoryId: USER_PATTERN_CATEGORY,
-						path: '/patterns',
-				  }
-				: {
-						categoryType: USER_PATTERNS,
-						categoryId: USER_PATTERN_CATEGORY,
-						postType: USER_PATTERNS,
-						postId: result?.id,
-				  };
-
-			createSuccessNotice(
-				sprintf(
-					// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
-					__( '"%s" added to my patterns.' ),
-					title
-				),
-				{
-					type: 'snackbar',
-					id: 'edit-site-patterns-success',
-					actions: [
-						{
-							label: actionLabel,
-							onClick: () => history.push( newLocation ),
-						},
-					],
-				}
-			);
+			history.push( {
+				categoryType: USER_PATTERNS,
+				categoryId: USER_PATTERN_CATEGORY,
+				postType: USER_PATTERNS,
+				postId: result?.id,
+			} );
 
 			onClose();
 		} catch ( error ) {
