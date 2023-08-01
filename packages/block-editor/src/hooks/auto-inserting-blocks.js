@@ -29,21 +29,19 @@ function AutoInsertingBlocksControl( props ) {
 				( n ) => n === props.blockName
 			);
 			if ( name !== undefined ) {
-				autoInsertedBlocks[ block.name ] = block.autoInsert[ name ];
+				autoInsertedBlocks.push( block );
 			}
 			return autoInsertedBlocks;
 		},
-		{}
+		[]
 	);
 
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Plugins' ) } initialOpen={ true }>
-				{ Object.keys( autoInsertedBlocksForCurrentBlock ).map(
-					( blockName ) => {
-						return <div key={ blockName }>{ blockName }</div>;
-					}
-				) }
+				{ autoInsertedBlocksForCurrentBlock.map( ( block ) => {
+					return <div key={ block.name }>{ block.title }</div>;
+				} ) }
 			</PanelBody>
 		</InspectorControls>
 	);
