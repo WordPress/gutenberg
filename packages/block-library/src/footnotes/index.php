@@ -211,7 +211,7 @@ add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
 function wp_get_footnotes_from_revision( $revision_field, $field, $revision ) {
 	return get_metadata( 'post', $revision->ID, $field, true );
 }
-add_filter( 'wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );
+add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );
 
 /**
  * The REST API autosave endpoint doesn't save meta, so we can use the
