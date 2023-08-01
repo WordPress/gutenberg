@@ -142,6 +142,8 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	);
 	$w->next_tag( 'img' );
 	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setCurrentSrc' );
+	$w->set_attribute( 'data-wp-init', 'effects.core.image.initButtonContainStyles' );
+	$w->set_attribute( 'data-wp-on--load', 'effects.core.image.initButtonContainStyles' );
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
@@ -153,8 +155,6 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 								aria-haspopup="dialog"
 								aria-label="' . esc_attr( $aria_label ) . '"
 								data-wp-on--click="actions.core.image.showLightbox"
-								data-wp-on--mouseenter="actions.core.image.preloadLightboxImage"
-								data-wp-effect="effects.core.image.initImageButton"
 								data-wp-style--width="context.core.image.imageButtonWidth"
 								data-wp-style--height="context.core.image.imageButtonHeight"
 							>
