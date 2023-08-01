@@ -22,14 +22,6 @@ import setupApiFetch from './api-fetch-setup';
 const reactNativeSetup = () => {
 	LogBox.ignoreLogs( [
 		'Require cycle:', // TODO: Refactor to remove require cycles
-		/**
-		 * TODO: Migrate to @gorhom/bottom-sheet or replace usage of
-		 * LayoutAnimation to Animated. KeyboardAvoidingView's usage of
-		 * LayoutAnimation collides with both BottomSheet and NavigationContainer
-		 * usage of LayoutAnimation simultaneously https://github.com/facebook/react-native/issues/12663,
-		 * https://github.com/facebook/react-native/issues/10606
-		 */
-		'Overriding previous layout animation',
 	] );
 
 	// "@react-navigation" package uses the old API of gesture handler,
