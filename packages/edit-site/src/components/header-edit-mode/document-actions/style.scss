@@ -25,10 +25,6 @@
 		}
 	}
 
-	@include break-medium() {
-		width: 50%;
-	}
-
 	@include break-large() {
 		width: min(100%, 450px);
 	}
@@ -69,6 +65,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		max-width: 50%;
 	}
 
 	.edit-site-document-actions.is-page & {
