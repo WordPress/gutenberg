@@ -128,11 +128,28 @@ function gutenberg_block_core_form_send_email() {
 	// Send the email.
 	wp_mail( $params['wp-email-address'], __( 'Form submission', 'gutenberg' ), $content );
 
-	// Redirect back to the form.
+	/**
+	 * Fires after the email has been sent.
+	 *
+	 * This will allow 3rd-party plugins to redirect to a different page
+	 * by removing the default redirect, or add a success message etc.
+	 *
+	 * @param array $params The POST data.
+	 */
+	do_action( 'render_block_core_form_email_sent', $params );
+}
+add_action( 'wp', 'gutenberg_block_core_form_send_email' );
+
+/**
+ * Redirect to the same page when the form has been submitted and an email was sent.
+ *
+ * @param array $params The POST data.
+ */
+function gutenberg_block_core_form_email_sent( $params ) {
 	wp_safe_redirect( get_site_url( null, $params['_wp_http_referer'] ) );
 	exit;
 }
-add_action( 'wp', 'gutenberg_block_core_form_send_email' );
+add_action( 'render_block_core_form_email_sent', 'gutenberg_block_core_form_email_sent' );
 
 /**
  * Registers the `core/form` block on server.
