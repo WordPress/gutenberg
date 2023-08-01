@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { InspectorControls } from '../components';
+import { BlockIcon, InspectorControls } from '../components';
 
 function AutoInsertingBlocksControl( props ) {
 	const blocks = useSelect( ( select ) => {
@@ -29,7 +29,19 @@ function AutoInsertingBlocksControl( props ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Plugins' ) } initialOpen={ true }>
 				{ autoInsertedBlocksForCurrentBlock.map( ( block ) => {
-					return <div key={ block.name }>{ block.title }</div>;
+					return (
+						<div
+							key={ block.name }
+							className="block-editor-block-card"
+						>
+							<BlockIcon icon={ block.icon } />
+							<div className="block-editor-block-card__content">
+								<h2 className="block-editor-block-card__title">
+									{ block.title }
+								</h2>
+							</div>
+						</div>
+					);
 				} ) }
 			</PanelBody>
 		</InspectorControls>
