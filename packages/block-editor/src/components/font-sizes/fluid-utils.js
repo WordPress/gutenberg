@@ -32,8 +32,8 @@ const DEFAULT_MINIMUM_FONT_SIZE_LIMIT = '14px';
  * ```
  *
  * @param {Object}        args
- * @param {?string}       args.minimumViewPortWidth Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
- * @param {?string}       args.maximumViewPortWidth Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+ * @param {?string}       args.minimumViewportWidth Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+ * @param {?string}       args.maximumViewportWidth Maximum size up to which type will have fluidity. Optional if fontSize is specified.
  * @param {string|number} [args.fontSize]           Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
  * @param {?string}       args.maximumFontSize      Maximum font size for any clamp() calculation. Optional.
  * @param {?string}       args.minimumFontSize      Minimum font size for any clamp() calculation. Optional.
@@ -46,8 +46,8 @@ export function getComputedFluidTypographyValue( {
 	minimumFontSize,
 	maximumFontSize,
 	fontSize,
-	minimumViewPortWidth = DEFAULT_MINIMUM_VIEWPORT_WIDTH,
-	maximumViewPortWidth = DEFAULT_MAXIMUM_VIEWPORT_WIDTH,
+	minimumViewportWidth = DEFAULT_MINIMUM_VIEWPORT_WIDTH,
+	maximumViewportWidth = DEFAULT_MAXIMUM_VIEWPORT_WIDTH,
 	scaleFactor = DEFAULT_SCALE_FACTOR,
 	minimumFontSizeLimit,
 } ) {
@@ -163,19 +163,19 @@ export function getComputedFluidTypographyValue( {
 	} );
 
 	// Viewport widths defined for fluid typography. Normalize units
-	const maximumViewPortWidthParsed = getTypographyValueAndUnit(
-		maximumViewPortWidth,
+	const maximumViewportWidthParsed = getTypographyValueAndUnit(
+		maximumViewportWidth,
 		{ coerceTo: fontSizeUnit }
 	);
-	const minumumViewPortWidthParsed = getTypographyValueAndUnit(
-		minimumViewPortWidth,
+	const minimumViewportWidthParsed = getTypographyValueAndUnit(
+		minimumViewportWidth,
 		{ coerceTo: fontSizeUnit }
 	);
 
 	// Protect against unsupported units.
 	if (
-		! maximumViewPortWidthParsed ||
-		! minumumViewPortWidthParsed ||
+		! maximumViewportWidthParsed ||
+		! minimumViewportWidthParsed ||
 		! minimumFontSizeRem
 	) {
 		return null;
@@ -183,23 +183,23 @@ export function getComputedFluidTypographyValue( {
 
 	// Build CSS rule.
 	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
-	const minViewPortWidthOffsetValue = roundToPrecision(
-		minumumViewPortWidthParsed.value / 100,
+	const minViewportWidthOffsetValue = roundToPrecision(
+		minimumViewportWidthParsed.value / 100,
 		3
 	);
 
-	const viewPortWidthOffset =
-		roundToPrecision( minViewPortWidthOffsetValue, 3 ) + fontSizeUnit;
+	const viewportWidthOffset =
+		roundToPrecision( minViewportWidthOffsetValue, 3 ) + fontSizeUnit;
 	const linearFactor =
 		100 *
 		( ( maximumFontSizeParsed.value - minimumFontSizeParsed.value ) /
-			( maximumViewPortWidthParsed.value -
-				minumumViewPortWidthParsed.value ) );
+			( maximumViewportWidthParsed.value -
+				minimumViewportWidthParsed.value ) );
 	const linearFactorScaled = roundToPrecision(
 		( linearFactor || 1 ) * scaleFactor,
 		3
 	);
-	const fluidTargetFontSize = `${ minimumFontSizeRem.value }${ minimumFontSizeRem.unit } + ((1vw - ${ viewPortWidthOffset }) * ${ linearFactorScaled })`;
+	const fluidTargetFontSize = `${ minimumFontSizeRem.value }${ minimumFontSizeRem.unit } + ((1vw - ${ viewportWidthOffset }) * ${ linearFactorScaled })`;
 
 	return `clamp(${ minimumFontSize }, ${ fluidTargetFontSize }, ${ maximumFontSize })`;
 }
