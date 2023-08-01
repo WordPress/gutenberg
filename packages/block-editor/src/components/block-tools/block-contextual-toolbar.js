@@ -32,48 +32,56 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	const toolbarButtonRef = useRef();
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { blockType, hasParents, showParentSelector, selectedBlockClientId } =
-		useSelect( ( select ) => {
-			const {
-				getBlockName,
-				getBlockParents,
-				getSelectedBlockClientIds,
-				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
-			const { getBlockType } = select( blocksStore );
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
-			const parents = getBlockParents( _selectedBlockClientId );
-			const firstParentClientId = parents[ parents.length - 1 ];
-			const parentBlockName = getBlockName( firstParentClientId );
-			const parentBlockType = getBlockType( parentBlockName );
+	const {
+		blockType,
+		hasParents,
+		showParentSelector,
+		selectedBlockClientId,
+		isContentOnly,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getBlockParents,
+			getSelectedBlockClientIds,
+			getBlockEditingMode,
+		} = unlock( select( blockEditorStore ) );
+		const { getBlockType } = select( blocksStore );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
+		const parents = getBlockParents( _selectedBlockClientId );
+		const firstParentClientId = parents[ parents.length - 1 ];
+		const parentBlockName = getBlockName( firstParentClientId );
+		const parentBlockType = getBlockType( parentBlockName );
 
-			return {
-				selectedBlockClientId: _selectedBlockClientId,
-				blockType:
-					_selectedBlockClientId &&
-					getBlockType( getBlockName( _selectedBlockClientId ) ),
-				hasParents: parents.length,
-				showParentSelector:
-					parentBlockType &&
-					getBlockEditingMode( firstParentClientId ) === 'default' &&
-					hasBlockSupport(
-						parentBlockType,
-						'__experimentalParentSelector',
-						true
-					) &&
-					selectedBlockClientIds.length <= 1 &&
-					getBlockEditingMode( _selectedBlockClientId ) === 'default',
-			};
-		}, [] );
+		return {
+			selectedBlockClientId: _selectedBlockClientId,
+			blockType:
+				_selectedBlockClientId &&
+				getBlockType( getBlockName( _selectedBlockClientId ) ),
+			hasParents: parents.length,
+			isContentOnly:
+				getBlockEditingMode( _selectedBlockClientId ) === 'contentOnly',
+			showParentSelector:
+				parentBlockType &&
+				getBlockEditingMode( firstParentClientId ) === 'default' &&
+				hasBlockSupport(
+					parentBlockType,
+					'__experimentalParentSelector',
+					true
+				) &&
+				selectedBlockClientIds.length <= 1 &&
+				getBlockEditingMode( _selectedBlockClientId ) === 'default',
+		};
+	}, [] );
 
 	useEffect( () => {
 		setIsCollapsed( false );
 	}, [ selectedBlockClientId ] );
 
 	if (
-		blockType &&
-		! hasBlockSupport( blockType, '__experimentalToolbar', true )
+		isContentOnly ||
+		( blockType &&
+			! hasBlockSupport( blockType, '__experimentalToolbar', true ) )
 	) {
 		return null;
 	}
