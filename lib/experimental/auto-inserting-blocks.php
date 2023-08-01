@@ -129,6 +129,12 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 		$settings['auto_insert'][ $anchor_block_name ] = $mapped_position;
 	}
 
+	// TODO: Make work for blocks registered via direct call to gutenberg_register_auto_inserted_block().
+	wp_add_inline_script(
+		'wp-blocks',
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( array( $inserted_block_name => $settings ) ) . ');',
+	);
+
 	return $settings;
 }
 add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_blocks', 10, 2 );
