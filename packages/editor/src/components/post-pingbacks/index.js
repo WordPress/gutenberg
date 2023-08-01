@@ -11,12 +11,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '../../store';
 
 function PostPingbacks() {
-	const pingStatus =
-		useSelect(
-			( select ) =>
-				select( editorStore ).getEditedPostAttribute( 'ping_status' ),
-			[]
-		) ?? 'open';
+	const pingStatus = useSelect(
+		( select ) =>
+			select( editorStore ).getEditedPostAttribute( 'ping_status' ) ??
+			'open',
+		[]
+	);
 	const { editPost } = useDispatch( editorStore );
 	const onTogglePingback = () =>
 		editPost( {
