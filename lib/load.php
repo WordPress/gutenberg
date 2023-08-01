@@ -135,6 +135,13 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
 
+// Fonts Library.
+require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
+require __DIR__ . '/experimental/fonts-library/class-wp-font-family-utils.php';
+require __DIR__ . '/experimental/fonts-library/class-wp-font-family.php';
+require __DIR__ . '/experimental/fonts-library/class-wp-rest-fonts-library-controller.php';
+require __DIR__ . '/experimental/fonts-library/fonts-library.php';
+
 // Fonts API / Font Face.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.
 
@@ -182,13 +189,6 @@ if ( class_exists( 'WP_Font_Family' ) || class_exists( 'WP_REST_Fonts_Library_Co
 	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-webfonts.php';
 	require __DIR__ . '/experimental/fonts-api/bc-layer/class-wp-web-fonts.php';
 }
-
-// Fonts Library.
-require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
-require __DIR__ . '/experimental/fonts-library/class-wp-font-family-utils.php';
-require __DIR__ . '/experimental/fonts-library/class-wp-font-family.php';
-require __DIR__ . '/experimental/fonts-library/class-wp-rest-fonts-library-controller.php';
-require __DIR__ . '/experimental/fonts-library/fonts-library.php';
 
 // Plugin specific code.
 require __DIR__ . '/script-loader.php';
