@@ -14,17 +14,23 @@ const GenericIframe = ( {
 	children,
 	...props
 }: WordPressComponentProps< { children: React.ReactNode }, 'iframe' > ) => {
-	const [ iframeRef, setIframeRef ] = useState< HTMLIFrameElement | null >(
-		null
-	);
+	const [ containerNode, setContainerNode ] = useState< HTMLElement >();
 
 	return (
-		<iframe { ...props } title="My Iframe" ref={ setIframeRef }>
-			{ iframeRef?.contentWindow &&
-				createPortal(
-					children,
-					iframeRef?.contentWindow.document.body
-				) }
+		<iframe
+			{ ...props }
+			title="My Iframe"
+			// Waiting for the load event ensures that this works in Firefox.
+			// See https://github.com/facebook/react/issues/22847#issuecomment-991394558
+			onLoad={ ( event ) => {
+				if ( event.currentTarget.contentDocument ) {
+					setContainerNode(
+						event.currentTarget.contentDocument.body
+					);
+				}
+			} }
+		>
+			{ containerNode && createPortal( children, containerNode ) }
 		</iframe>
 	);
 };
