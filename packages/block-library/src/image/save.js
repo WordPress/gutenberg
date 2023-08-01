@@ -49,20 +49,26 @@ export default function save( { attributes } ) {
 		[ `wp-image-${ id }` ]: !! id,
 	} );
 
+	const imgStyle = {
+		...borderProps.style,
+		aspectRatio,
+		objectFit: scale,
+	};
+	if ( width ) {
+		imgStyle.width = width;
+	}
+
+	if ( height && ! isNaN( height ) ) {
+		imgStyle.height = height;
+	}
 	const image = (
 		<img
 			src={ url }
 			alt={ alt }
 			className={ imageClasses || undefined }
-			style={ {
-				...borderProps.style,
-				aspectRatio,
-				objectFit: scale,
-				width,
-				height,
-			} }
+			style={ imgStyle }
 			width={ width }
-			height={ height }
+			height={ isNaN( height ) ? undefined : height }
 			title={ title }
 		/>
 	);

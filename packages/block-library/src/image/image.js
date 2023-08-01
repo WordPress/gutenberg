@@ -547,6 +547,21 @@ export default function Image( {
 	const borderProps = useBorderProps( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 
+	const imgStyle = {
+		aspectRatio: aspectRatio ? aspectRatio : undefined,
+		objectFit: scale,
+		...borderProps.style,
+	};
+	if ( aspectRatio ) {
+		imgStyle.height = 'auto';
+		imgStyle.width = '100%';
+	}
+	if ( width ) {
+		imgStyle.width = width;
+	}
+	if ( height ) {
+		imgStyle.height = height;
+	}
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
 		// should direct focus to block.
@@ -564,14 +579,7 @@ export default function Image( {
 				} }
 				ref={ imageRef }
 				className={ borderProps.className }
-				style={ {
-					width:
-						( width && height ) || aspectRatio ? '100%' : undefined,
-					height:
-						( width && height ) || aspectRatio ? '100%' : undefined,
-					objectFit: scale,
-					...borderProps.style,
-				} }
+				style={ imgStyle }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>
@@ -689,8 +697,8 @@ export default function Image( {
 					onResizeStop();
 					setAttributes( {
 						width: elt.offsetWidth,
-						height: elt.offsetHeight,
-						aspectRatio: undefined,
+						height: 'auto',
+						aspectRatio: aspectRatio ? aspectRatio : undefined,
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
