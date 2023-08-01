@@ -22,8 +22,25 @@ function gutenberg_save_contents_to_file_descriptor( $fd, $contents ) {
 
 function gutenberg_wp_ajax_signaling_server() {
     $subscriber_to_messages_path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_messages.txt';
+    // array(
+    //    2 => array(
+    //        'hello',
+    //        'handshake',
+    //    ),
+    //)
+
     $topics_to_subscribers_path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'topics_to_subscribers.txt';
+    // array(
+    //    2: 2323232121,
+    //    14: 2323232123,
+    //)
     $subscribers_to_last_connection_path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_last_connection.txt';
+        // array(
+    //    'edited-post-15' => array(
+    //        2,
+    //        14,
+    //    ),
+    //)
 
     $subscriber_id = $_REQUEST['unique'];
     if ( ! $subscriber_id ) {
@@ -31,14 +48,16 @@ function gutenberg_wp_ajax_signaling_server() {
     }
 
     if ( 'GET' === $_SERVER['REQUEST_METHOD'] ) {
+        //set_time_limit(0);
         header('Content-Type: text/event-stream');
         header('Cache-Control: no-cache');
-        while (true) {
+        //while (true) {
             echo 'retry: 1000' . PHP_EOL;
             $fd = fopen($subscriber_to_messages_path, 'c+');
             flock($fd, LOCK_EX );
             $subscriber_to_messages = gutenberg_get_contents_from_file_descriptor($fd);
-            if( $subscriber_to_messages[$subscriber_id] && count($subscriber_to_messages[$subscriber_id]) > 0 ) {
+            //var_dump($subscriber_to_messages);
+            if( isset( $subscriber_to_messages[$subscriber_id] ) && count($subscriber_to_messages[$subscriber_id]) > 0 ) {
                 $messages = array_map( 'json_encode', $subscriber_to_messages[$subscriber_id] );
                 $subscriber_to_messages[$subscriber_id] = array();
                 $data;
@@ -57,9 +76,10 @@ function gutenberg_wp_ajax_signaling_server() {
             }
             flock($fd, LOCK_UN);
             fclose($fd );
-            flush();
-            sleep(1); 
-        }
+            //ob_end_flush();
+            //flush();
+            //sleep(1); 
+        //}
     } else {
         $raw_data = $_POST['data'];
         $message = json_decode( wp_unslash( $raw_data ), true );
@@ -125,6 +145,7 @@ function gutenberg_wp_ajax_signaling_server() {
         flock($fd_topics_subscriber, LOCK_UN );
         fclose($fd_topics_subscriber);
     }
+    echo json_encode( array( 'result' => 'ok' ) ), PHP_EOL, PHP_EOL;
 
     $fd_subscribers_last_connection = fopen($subscribers_to_last_connection_path, 'c+');
     flock($fd_subscribers_last_connection, LOCK_EX );
@@ -132,7 +153,7 @@ function gutenberg_wp_ajax_signaling_server() {
     $subscribers_to_last_connection_time[$subscriber_id] = time();
     $needs_cleanup = false;
     foreach( $subscribers_to_last_connection_time as $subscriber_id => $last_connection_time ) {
-        if ( $last_connection_time < time() - 10 ) {
+        if ( $last_connection_time < time() - 20 ) {
             unset($subscribers_to_last_connection_time[$subscriber_id]);
             $needs_cleanup = true;
         }
