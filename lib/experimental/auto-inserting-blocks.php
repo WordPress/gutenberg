@@ -6,7 +6,14 @@
  */
 
 /**
- * Return a function that auto-inserts blocks relative to a given block.
+ * Return a function that auto-inserts a block next to a given "anchor" block.
+ *
+ * The auto-inserted block can be inserted before or after the anchor block,
+ * or as the first or last child of the anchor block.
+ *
+ * Note that the returned function mutates the auto-inserted block's designated
+ * parent block by inserting into the parent's `innerBlocks` array, and by
+ * updating the parent's `innerContent` array accordingly.
  *
  * @param array  $inserted_block    The block to insert.
  * @param string $relative_position The position relative to the given block.
