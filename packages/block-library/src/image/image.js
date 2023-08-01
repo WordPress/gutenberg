@@ -484,14 +484,18 @@ export default function Image( {
 							// for values that are removed since setAttributes
 							// doesn't do anything with keys that aren't set.
 							setAttributes( {
+								// width: attribute & style.
 								width:
 									newValue.width &&
 									parseInt( newValue.width, 10 ),
+								// height: attribute only, style is 'auto'.
 								height:
 									newValue.height &&
 									parseInt( newValue.height, 10 ),
 								scale: newValue.scale,
-								aspectRatio: newValue.aspectRatio,
+								aspectRatio:
+									newValue.aspectRatio ||
+									newValue.width / newValue.height,
 							} );
 						} }
 						defaultScale="cover"
@@ -688,9 +692,9 @@ export default function Image( {
 				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
 					setAttributes( {
-						width: elt.offsetWidth,
-						height: elt.offsetHeight,
-						aspectRatio: undefined,
+						width: elt.offsetWidth, // attribute & style.
+						height: elt.offsetHeight, // attribute only, style is 'auto'.
+						aspectRatio: elt.offsetWidth / elt.offsetHeight,
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }

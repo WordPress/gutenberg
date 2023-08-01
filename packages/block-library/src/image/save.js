@@ -59,7 +59,7 @@ export default function save( { attributes } ) {
 				aspectRatio,
 				objectFit: scale,
 				width,
-				height,
+				height: !! height && 'auto', // Also defined in style.scss.
 			} }
 			width={ width }
 			height={ height }
