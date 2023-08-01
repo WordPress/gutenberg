@@ -6,9 +6,9 @@ import { createPortal, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Popover from '..';
-import { Provider as SlotFillProvider } from '../../slot-fill';
-import type { WordPressComponentProps } from '../../ui/context';
+import Popover from '../..';
+import { Provider as SlotFillProvider } from '../../../slot-fill';
+import type { WordPressComponentProps } from '../../../ui/context';
 
 const GenericIframe = ( {
 	children,
