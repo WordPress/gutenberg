@@ -191,7 +191,7 @@ class WP_Font_Family {
 		$filename      = WP_Font_Family_Utils::get_filename_from_font_face( $this->data['slug'], $font_face, $file['name'] );
 
 		// Remove the uploaded font asset reference from the font face definition because it is no longer needed.
-		unset( $new_font_face['file'] );
+		unset( $new_font_face['uploaded_file'] );
 
 		// If the filename has not a font mime type, we don't move the file and return the font face definition without src to be ignored later.
 		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filename ) ) {
@@ -256,7 +256,7 @@ class WP_Font_Family {
 	 */
 	private function download_font_face_assets( $font_face ) {
 		$new_font_face        = $font_face;
-		$sources              = (array) $font_face['src'];
+		$sources              = (array) $font_face['download_from_url'];
 		$new_font_face['src'] = array();
 		$index                = 0;
 		foreach ( $sources as $src ) {
@@ -270,6 +270,8 @@ class WP_Font_Family {
 		if ( count( $new_font_face['src'] ) === 1 ) {
 			$new_font_face['src'] = $new_font_face['src'][0];
 		}
+		// Remove the download url reference from the font face definition because it is no longer needed.
+		unset( $new_font_face['download_from_url'] );
 		return $new_font_face;
 	}
 
@@ -286,13 +288,19 @@ class WP_Font_Family {
 		}
 		$new_font_faces = array();
 		foreach ( $this->data['fontFace'] as $font_face ) {
-			if ( empty( $files ) ) {
-				// If we are installing local fonts, we need to move the font face assets from the temp folder to the wp fonts directory.
-				$new_font_face = $this->download_font_face_assets( $font_face );
-			} else {
-				// If we are installing google fonts, we need to download the font face assets.
-				$new_font_face = $this->move_font_face_asset( $font_face, $files[ $font_face['file'] ] );
+			// If the fonts is not meant to be dowloaded or uploaded (for example to install fonts that use a remote url)
+			$new_font_face = $font_face;
+
+			// If we are installing google fonts, we need to download the font face assets.
+			if ( !empty ( $font_face['download_from_url'] )  ) {
+				$new_font_face = $this->download_font_face_assets( $new_font_face );
 			}
+
+			// If we are installing local fonts, we need to move the font face assets from the temp folder to the wp fonts directory.
+			if ( ! empty ( $font_face['uploaded_file'] ) && ! empty( $files ) ) {
+				$new_font_face = $this->move_font_face_asset( $new_font_face, $files[ $new_font_face['uploaded_file'] ] );
+			}
+
 			/*
 			* If the font face assets were successfully downloaded, we add the font face to the new font.
 			* Font faces with failed downloads are not added to the new font.
