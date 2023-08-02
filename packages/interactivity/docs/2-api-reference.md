@@ -385,12 +385,12 @@ store( {
 
 The `wp-effect` directive is executed:
   - when the element is created.
-  - each time there's a change on any of the properties of the `state` or `context` involved on getting the final value of the directive (inside the callback or the expression passed as reference).
+  - each time that any of the properties of the `state` or `context` used inside the callback changes.
 
 The `wp-effect` directive can return a function. If it does, the returned function is used as cleanup logic, i.e., it will run just before the callback runs again, and it will run again when the element is removed from the DOM.
 
 As a reference, some use cases for this directive may be: 
-- showing a `console.log`.
+- logging.
 - changing the title of the page.
 - setting the focus on an element with `.focus()`.
 
