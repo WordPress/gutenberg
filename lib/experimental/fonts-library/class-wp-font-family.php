@@ -152,16 +152,17 @@ class WP_Font_Family {
 			return false;
 		}
 
-		$overrides = array (
-			'action' => 'wp_handle_font_upload', // Arbitrary string to avoid the is_uploaded_file() check applied when using 'wp_handle_upload'.	
-			'test_form' => false, // We are not testing a form submission.
-			'test_type' => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/
-			'unique_filename_callback' => function () use ($filename) { return $filename; }, // We want to keep the original filename.
+		$overrides = array(
+			'action'                   => 'wp_handle_font_upload', // Arbitrary string to avoid the is_uploaded_file() check applied when using 'wp_handle_upload'.
+			'test_form'                => false, // We are not testing a form submission.
+			'test_type'                => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/
+			'unique_filename_callback' => function () use ( $filename ) {
+				return $filename; }, // We want to keep the original filename.
 		);
 
-		$file = array (
+		$file = array(
 			'tmp_name' => $temp_file,
-			'name' => $filename,
+			'name'     => $filename,
 		);
 
 		$handled_file = wp_handle_upload( $file, $overrides );
@@ -169,7 +170,7 @@ class WP_Font_Family {
 		// Cleans the temp file.
 		@unlink( $temp_file );
 
-		if ( !isset ( $handled_file['url'] ) ) {
+		if ( ! isset( $handled_file['url'] ) ) {
 			return false;
 		}
 
@@ -203,11 +204,12 @@ class WP_Font_Family {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
-		$overrides = array (
-			'action' => 'wp_handle_font_upload', // Arbitrary string to avoid the is_uploaded_file() check applied when using 'wp_handle_upload'.	
-			'test_form' => false, // We are not testing a form submission.
-			'test_type' => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/
-			'unique_filename_callback' => function () use ($filename) { return $filename; }, // We want to keep the original filename.
+		$overrides = array(
+			'action'                   => 'wp_handle_font_upload', // Arbitrary string to avoid the is_uploaded_file() check applied when using 'wp_handle_upload'.
+			'test_form'                => false, // We are not testing a form submission.
+			'test_type'                => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/
+			'unique_filename_callback' => function () use ( $filename ) {
+				return $filename; }, // We want to keep the original filename.
 		);
 
 		$handled_file = wp_handle_upload( $file, $overrides );
@@ -292,12 +294,12 @@ class WP_Font_Family {
 			$new_font_face = $font_face;
 
 			// If we are installing google fonts, we need to download the font face assets.
-			if ( !empty ( $font_face['download_from_url'] )  ) {
+			if ( ! empty( $font_face['download_from_url'] ) ) {
 				$new_font_face = $this->download_font_face_assets( $new_font_face );
 			}
 
 			// If we are installing local fonts, we need to move the font face assets from the temp folder to the wp fonts directory.
-			if ( ! empty ( $font_face['uploaded_file'] ) && ! empty( $files ) ) {
+			if ( ! empty( $font_face['uploaded_file'] ) && ! empty( $files ) ) {
 				$new_font_face = $this->move_font_face_asset( $new_font_face, $files[ $new_font_face['uploaded_file'] ] );
 			}
 

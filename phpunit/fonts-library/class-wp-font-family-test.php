@@ -194,10 +194,10 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 					'fontFamily' => 'Piazzolla',
 					'fontFace'   => array(
 						array(
-							'fontFamily' => 'Piazzolla',
-							'fontStyle'  => 'italic',
-							'fontWeight' => '400',
-							'src'		 => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+							'fontFamily'        => 'Piazzolla',
+							'fontStyle'         => 'italic',
+							'fontWeight'        => '400',
+							'src'               => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
 							'download_from_url' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
 						),
 					),
@@ -215,7 +215,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'files_data' => null,
+				'files_data'          => null,
 			),
 			'with_one_google_font_face_to_not_be_downloaded' => array(
 				'font_data'           => array(
@@ -227,7 +227,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 							'fontFamily' => 'Piazzolla',
 							'fontStyle'  => 'italic',
 							'fontWeight' => '400',
-							'src'		 => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+							'src'        => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
 						),
 					),
 				),
@@ -244,9 +244,9 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'files_data' => null,
+				'files_data'          => null,
 			),
-			'without_font_faces'        => array(
+			'without_font_faces'                         => array(
 				'font_data'           => array(
 					'name'       => 'Arial',
 					'slug'       => 'arial',
@@ -259,25 +259,25 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 					'fontFamily' => 'Arial',
 					'fontFace'   => array(),
 				),
-				'files_data' => null,
+				'files_data'          => null,
 			),
-			'with_local_files'          => array(
+			'with_local_files'                           => array(
 				'font_data'           => array(
 					'name'       => 'Inter',
 					'slug'       => 'inter',
 					'fontFamily' => 'Inter',
 					'fontFace'   => array(
 						array(
-							'fontFamily' => 'Inter',
-							'fontStyle'  => 'normal',
-							'fontWeight' => '400',
-							'uploaded_file'       => 'files0',
+							'fontFamily'    => 'Inter',
+							'fontStyle'     => 'normal',
+							'fontWeight'    => '400',
+							'uploaded_file' => 'files0',
 						),
 						array(
-							'fontFamily' => 'Inter',
-							'fontStyle'  => 'normal',
-							'fontWeight' => '500',
-							'uploaded_file'       => 'files1',
+							'fontFamily'    => 'Inter',
+							'fontStyle'     => 'normal',
+							'fontWeight'    => '500',
+							'uploaded_file' => 'files1',
 						),
 					),
 				),
@@ -302,21 +302,21 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 				),
 				'files_data'          => array(
 					'files0' => array(
-						'name'      => 'inter1.ttf',
-						'type'      => 'font/ttf',
-						'tmp_name'  => $temp_file_path1,
-						'error'     => 0,
-						'size'      => 123,
+						'name'     => 'inter1.ttf',
+						'type'     => 'font/ttf',
+						'tmp_name' => $temp_file_path1,
+						'error'    => 0,
+						'size'     => 123,
 					),
 					'files1' => array(
-						'name'      => 'inter2.ttf',
-						'type'      => 'font/ttf',
-						'tmp_name'  => $temp_file_path2,
-						'error'     => 0,
-						'size'      => 123,
+						'name'     => 'inter2.ttf',
+						'type'     => 'font/ttf',
+						'tmp_name' => $temp_file_path2,
+						'error'    => 0,
+						'size'     => 123,
 					),
 				),
-			)
+			),
 		);
 	}
 }

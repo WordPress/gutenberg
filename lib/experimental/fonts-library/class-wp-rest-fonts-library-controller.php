@@ -92,7 +92,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		}
 
 		// The update endpoints requires write access to the temp and the fonts directories.
-		$temp_dir = get_temp_dir();
+		$temp_dir   = get_temp_dir();
 		$upload_dir = wp_upload_dir()['basedir'];
 		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $upload_dir ) ) {
 			return new WP_Error(
