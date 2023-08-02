@@ -53,18 +53,6 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 				),
 			)
 		);
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/google_fonts',
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_google_fonts' ),
-					'permission_callback' => array( $this, 'read_fonts_library_permissions_check' ),
-				),
-			)
-		);
-
 	}
 
 	/**
@@ -117,46 +105,6 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Checks whether the user has permissions to read the fonts library.
-	 *
-	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
-	 */
-	public function read_fonts_library_permissions_check() {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new WP_Error(
-				'rest_cannot_read_fonts_library',
-				__( 'Sorry, you are not allowed to read the fonts library on this site.', 'gutenberg' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
-			);
-		}
-
-		return true;
-	}
-
-	/**
-	 * Fetches the Google Fonts JSON file.
-	 *
-	 * Reads the "google-fonts.json" file from the file system and returns its content.
-	 *
-	 * @return WP_REST_Response|WP_Error The content of the "google-fonts.json" file wrapped in a WP_REST_Response object.
-	 */
-	public function get_google_fonts() {
-		$file = file_get_contents(
-			path_join( dirname( __FILE__ ), 'google-fonts.json' )
-		);
-		if ( $file ) {
-			return new WP_REST_Response( json_decode( $file ) );
-		}
-		return new WP_Error(
-			'rest_cant_read_google_fonts',
-			__( 'Error reading Google Fonts JSON file.', 'gutenberg' ),
-			array( 'status' => 500 )
-		);
 	}
 
 	/**
