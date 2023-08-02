@@ -405,8 +405,8 @@ _Example of `data-wp-init` directive_
 _Example of several `wp-init` directives on the same DOM element_
 ```html
 <form 
-  data-wp-init-1="effect.logTimeInit" 
-  data-wp-init-2="effect.focusFirstElement"
+  data-wp-init--log="effect.logTimeInit" 
+  data-wp-init--focus="effect.focusFirstElement"
 >
   <input type="text">
 </form>
