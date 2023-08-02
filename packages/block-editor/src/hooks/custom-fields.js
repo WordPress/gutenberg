@@ -6,7 +6,6 @@ import { PanelBody, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -54,13 +53,6 @@ export const withInspectorControl = createHigherOrderComponent(
 				'connections',
 				false
 			);
-			// We prevent that the content is lost when the user removes the custom field.
-			// Editing the content in the paragraph block with a placeholder is not the best solution.
-			// As this is a temporary solution, that will be removed soon, we can live with it.
-			const prevContent = useRef( props.attributes?.content );
-			if ( ! prevContent.current ) {
-				prevContent.current = '';
-			}
 			if ( hasCustomFieldsSupport && props.isSelected ) {
 				return (
 					<>
@@ -84,11 +76,7 @@ export const withInspectorControl = createHigherOrderComponent(
 											if ( nextValue === '' ) {
 												props.setAttributes( {
 													connections: undefined,
-													content:
-														prevContent.current !==
-														''
-															? prevContent.current
-															: undefined,
+													content: undefined,
 												} );
 											} else {
 												props.setAttributes( {
