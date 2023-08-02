@@ -1,18 +1,18 @@
 ( ( { wp } ) => {
 	const { store, directive, createElement } = wp.interactivity;
 
-	// Fake `data-wp-fakeshow` directive to test when things are removed from the
+	// Fake `data-wp-show-mock` directive to test when things are removed from the
 	// DOM.  Replace with `data-wp-show` when it's ready.
 	directive(
-		'fakeshow',
+		'show-mock',
 		( {
 			directives: {
-				fakeshow: { default: fakeshow },
+				"show-mock": { default: showMock },
 			},
 			element,
 			evaluate,
 		} ) => {
-			if ( ! evaluate( fakeshow ) )
+			if ( ! evaluate( showMock ) )
 				element.props.children =
 					createElement( "template", null, element.props.children );
 		}
