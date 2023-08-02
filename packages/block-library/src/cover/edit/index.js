@@ -124,50 +124,24 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 	const setMedia = attributesFromMedia( setAttributes, dimRatio );
-	const getCoverIsDark = useCoverIsDark();
+	const setCoverIsDark = useCoverIsDark( setAttributes );
 
 	const onSelectMedia = async ( newMedia ) => {
 		setMedia( newMedia );
-		const coverIsDark = await getCoverIsDark(
-			newMedia.url,
-			dimRatio,
-			overlayColor.color
-		);
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			isDark: coverIsDark,
-		} );
+		setCoverIsDark( newMedia.url, dimRatio, overlayColor.color );
 	};
 
 	const onSetOverlayColor = async ( colorValue ) => {
 		setOverlayColor( colorValue );
-		const coverIsDark = await getCoverIsDark(
-			mediaUrl,
-			dimRatio,
-			colorValue
-		);
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			isDark: coverIsDark,
-		} );
+		setCoverIsDark( mediaUrl, dimRatio, colorValue );
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
 		setAttributes( { dimRatio: newDimRatio } );
-		const coverIsDark = await getCoverIsDark(
-			mediaUrl,
-			newDimRatio,
-			overlayColor.color
-		);
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			isDark: coverIsDark,
-		} );
+		setCoverIsDark( mediaUrl, newDimRatio, overlayColor.color );
 	};
 
 	const isUploadingMedia = isTemporaryMedia( id, url );
