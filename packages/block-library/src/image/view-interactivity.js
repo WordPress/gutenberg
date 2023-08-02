@@ -385,12 +385,14 @@ function setStyles( context, event ) {
 		document.head.appendChild( styleTag );
 	}
 
+	// Add 1 pixel to the container width and height
+	// to avoid whitespace around the image on iOS.
 	styleTag.innerHTML = `
 		:root {
 			--wp--lightbox-initial-top-position: ${ screenPosY }px;
 			--wp--lightbox-initial-left-position: ${ screenPosX }px;
-			--wp--lightbox-container-width: ${ containerWidth }px;
-			--wp--lightbox-container-height: ${ containerHeight }px;
+			--wp--lightbox-container-width: ${ containerWidth + 1 }px;
+			--wp--lightbox-container-height: ${ containerHeight + 1 }px;
 			--wp--lightbox-image-width: ${ lightboxImgWidth }px;
 			--wp--lightbox-image-height: ${ lightboxImgHeight }px;
 			--wp--lightbox-scale: ${ containerScale };
