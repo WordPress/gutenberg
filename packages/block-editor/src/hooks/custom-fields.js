@@ -91,12 +91,14 @@ export const withInspectorControl = createHigherOrderComponent(
 											} else {
 												props.setAttributes( {
 													connections: {
-														// Content will be variable, could be content, href, src, etc.
-														content: {
-															// Source will be variable, could be post_meta, user_meta, term_meta, etc.
-															// Could even be a custom source like a social media attribute.
-															source: 'meta_fields',
-															value: nextValue,
+														attributes: {
+															// Content will be variable, could be content, href, src, etc.
+															content: {
+																// Source will be variable, could be post_meta, user_meta, term_meta, etc.
+																// Could even be a custom source like a social media attribute.
+																source: 'meta_fields',
+																value: nextValue,
+															},
 														},
 													},
 													content: sprintf(
