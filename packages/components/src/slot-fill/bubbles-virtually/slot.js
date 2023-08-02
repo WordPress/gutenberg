@@ -20,7 +20,7 @@ function Slot( props, forwardedRef ) {
 	const {
 		name,
 		fillProps = {},
-		as: Component = 'div',
+		as,
 		// `children` is not allowed. However, if it is passed,
 		// it will be displayed as is, so remove `children`.
 		children,
@@ -50,7 +50,7 @@ function Slot( props, forwardedRef ) {
 
 	return (
 		<View
-			as={ Component }
+			as={ as }
 			ref={ useMergeRefs( [ forwardedRef, ref ] ) }
 			{ ...restProps }
 		/>
