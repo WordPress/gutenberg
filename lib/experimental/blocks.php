@@ -180,7 +180,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 
 		return $block_content;
 	}
-}
+
 
 	add_filter( 'render_block', 'gutenberg_render_custom_sources', 10, 3 );
 
@@ -190,28 +190,28 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 	/**
 	 * Registers a custom meta
 	 */
-function gutenberg_init_test_summary_meta_field() {
-	register_meta(
-		'post',
-		'test_custom_field',
-		array(
-			'show_in_rest' => true,
-			'single'       => true,
-			'type'         => 'string',
-			'default'      => 'hello this is a custom field test',
-		)
-	);
-	register_meta(
-		'post',
-		'second_test_custom_field',
-		array(
-			'show_in_rest' => true,
-			'single'       => true,
-			'type'         => 'string',
-			'default'      => 'second custom field test',
-		)
-	);
-}
+	function gutenberg_init_test_summary_meta_field() {
+		register_meta(
+			'post',
+			'test_custom_field',
+			array(
+				'show_in_rest' => true,
+				'single'       => true,
+				'type'         => 'string',
+				'default'      => 'hello this is a custom field test',
+			)
+		);
+		register_meta(
+			'post',
+			'second_test_custom_field',
+			array(
+				'show_in_rest' => true,
+				'single'       => true,
+				'type'         => 'string',
+				'default'      => 'second custom field test',
+			)
+		);
+	}
 	add_action( 'init', 'gutenberg_init_test_summary_meta_field' );
 
 }
