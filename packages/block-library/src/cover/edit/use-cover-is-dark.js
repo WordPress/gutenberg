@@ -24,7 +24,7 @@ function retrieveFastAverageColor() {
  * @return {Function} Function to calculate isDark attribute.
  */
 export default function useCoverIsDark() {
-	const setCoverIsDark = useCallback(
+	const getCoverIsDark = useCallback(
 		async ( url, dimRatio = 50, overlayColor ) => {
 			if ( url && dimRatio <= 50 ) {
 				const imgCrossOrigin = applyFilters(
@@ -65,5 +65,5 @@ export default function useCoverIsDark() {
 		},
 		[]
 	);
-	return setCoverIsDark;
+	return getCoverIsDark;
 }
