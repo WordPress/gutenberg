@@ -18,6 +18,10 @@
 		width: min(100%, 380px);
 	}
 
+	&:hover {
+		background-color: $gray-200;
+	}
+
 	.components-button {
 		&:hover {
 			color: var(--wp-block-synced-color);
@@ -102,6 +106,7 @@
 
 	&:hover {
 		color: currentColor;
+		background-color: transparent;
 	}
 
 	.edit-site-document-actions.is-animated & {
