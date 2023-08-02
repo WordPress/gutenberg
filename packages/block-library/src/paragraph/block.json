@@ -34,7 +34,7 @@
 			"type": "object",
 			"attributes": {
 				"content": {
-					"source": "meta"
+					"source": "meta_fields"
 				}
 			}
 		}

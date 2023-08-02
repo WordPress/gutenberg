@@ -150,7 +150,7 @@ function gutenberg_render_custom_sources( $block_content, $block, $block_instanc
 	}
 
 	// Get all the attributes that have a connection.
-	$connected_attributes = _wp_array_get( $block_type->attributes, array( 'connections', 'attributes' ), false );
+	$connected_attributes = _wp_array_get( $block['attrs'], array( 'connections', 'attributes' ), false );
 	if ( ! $connected_attributes ) {
 		return $block_content;
 	}
@@ -158,7 +158,7 @@ function gutenberg_render_custom_sources( $block_content, $block, $block_instanc
 	foreach ( $connected_attributes as $attribute_name => $attribute_value ) {
 		// If the source value is not meta, skip it because we only support meta
 		// sources for now.
-		if ( 'meta' !== $attribute_value['source'] ) {
+		if ( 'meta_fields' !== $attribute_value['source'] ) {
 			continue;
 		}
 
