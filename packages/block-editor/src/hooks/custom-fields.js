@@ -76,7 +76,8 @@ export const withInspectorControl = createHigherOrderComponent(
 										label={ __( 'Custom field meta_key' ) }
 										value={
 											props.attributes?.connections
-												?.content?.value || ''
+												?.attributes?.content?.value ||
+											''
 										}
 										onChange={ ( nextValue ) => {
 											if ( nextValue === '' ) {
