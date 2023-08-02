@@ -54,7 +54,7 @@ function getBlocksOfTypeFromBlocks( targetBlockType, blocks ) {
 
 export default function useNavigationMenuContent( postType, postId ) {
 	const { record } = useEditedEntityRecord( postType, postId );
-	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
+	const selectedCoreStore = useSelect( coreStore );
 
 	// Only managing navigation menus in template parts is supported
 	// to match previous behaviour. This could potentially be expanded
@@ -77,6 +77,7 @@ export default function useNavigationMenuContent( postType, postId ) {
 		return;
 	}
 
+	const { getNavigationFallbackId } = unlock( selectedCoreStore );
 	const navigationMenuIds = navigationBlocks?.map( ( block ) =>
 		// If the block doesn't have a ref, assume that it's the fallback navigation.
 		block.attributes.ref ? block.attributes.ref : getNavigationFallbackId()
