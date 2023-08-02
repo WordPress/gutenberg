@@ -77,6 +77,7 @@ export const withInspectorControl = createHigherOrderComponent(
 												props.setAttributes( {
 													connections: undefined,
 													content: undefined,
+													placeholder: undefined,
 												} );
 											} else {
 												props.setAttributes( {
@@ -91,7 +92,8 @@ export const withInspectorControl = createHigherOrderComponent(
 															},
 														},
 													},
-													content: sprintf(
+													content: undefined,
+													placeholder: sprintf(
 														'This content will be replaced in the frontend by the custom field "%s" value.',
 														nextValue
 													),
