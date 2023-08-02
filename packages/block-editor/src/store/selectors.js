@@ -1962,51 +1962,8 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createSelector(
 	( state, rootClientId = null ) => {
-		/*
-		 * Matches block comment delimiters amid serialized content.
-		 *
-		 * @see `tokenizer` in `@wordpress/block-serialization-default-parser`
-		 * package
-		 *
-		 * blockParserTokenizer differs from the original tokenizer in the
-		 * following ways:
-		 *
-		 * - removed global flag (/g)
-		 * - prepended ^\s*
-		 *
-		 */
-		const blockParserTokenizer =
-			/^\s*<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
-
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
-			let icon = symbol;
-
-			/*
-			 * Instead of always displaying a generic "symbol" icon for every
-			 * reusable block, try to use an icon that represents the first
-			 * outermost block contained in the reusable block. This requires
-			 * scanning the serialized form of the reusable block to find its
-			 * first block delimiter, then looking up the corresponding block
-			 * type, if available.
-			 */
-			if ( Platform.OS === 'web' ) {
-				const content =
-					typeof reusableBlock.content.raw === 'string'
-						? reusableBlock.content.raw
-						: reusableBlock.content;
-				const rawBlockMatch = content.match( blockParserTokenizer );
-				if ( rawBlockMatch ) {
-					const [ , , namespace = 'core/', blockName ] =
-						rawBlockMatch;
-					const referencedBlockType = getBlockType(
-						namespace + blockName
-					);
-					if ( referencedBlockType ) {
-						icon = referencedBlockType.icon;
-					}
-				}
-			}
-
+			const icon = symbol;
 			const id = `core/block/${ reusableBlock.id }`;
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const frecency = calculateFrecency( time, count );

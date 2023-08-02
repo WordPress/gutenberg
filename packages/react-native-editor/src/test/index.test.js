@@ -11,7 +11,6 @@ import * as wpHooks from '@wordpress/hooks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 // eslint-disable-next-line no-restricted-imports
 import * as wpEditPost from '@wordpress/edit-post';
-import '@wordpress/jest-console';
 
 /**
  * Internal dependencies

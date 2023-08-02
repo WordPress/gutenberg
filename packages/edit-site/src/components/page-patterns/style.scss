@@ -6,14 +6,6 @@
 	padding: 0;
 	overflow-x: auto;
 
-	.edit-site-page-content {
-		height: 100%;
-		position: relative;
-		padding: 0;
-		display: flex;
-		flex-flow: column;
-	}
-
 	.components-base-control {
 		width: 100%;
 		@include break-medium {

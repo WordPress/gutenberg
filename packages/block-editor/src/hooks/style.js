@@ -11,7 +11,6 @@ import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	hasBlockSupport,
-	getBlockType,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
@@ -45,8 +44,8 @@ const styleSupportKeys = [
 	SPACING_SUPPORT_KEY,
 ];
 
-const hasStyleSupport = ( blockType ) =>
-	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
+const hasStyleSupport = ( nameOrType ) =>
+	styleSupportKeys.some( ( key ) => hasBlockSupport( nameOrType, key ) );
 
 /**
  * Returns the inline styles to add depending on the style object
@@ -348,9 +347,8 @@ export function addEditProps( settings ) {
  */
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const blockType = getBlockType( props.name );
-		if ( ! hasStyleSupport( blockType ) ) {
-			return <BlockEdit { ...props } />;
+		if ( ! hasStyleSupport( props.name ) ) {
+			return <BlockEdit key="edit" { ...props } />;
 		}
 
 		const shouldDisplayControls = useDisplayBlockControls();
@@ -366,7 +364,7 @@ export const withBlockControls = createHigherOrderComponent(
 						<DimensionsPanel { ...props } />
 					</>
 				) }
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},
