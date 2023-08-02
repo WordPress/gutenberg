@@ -230,7 +230,6 @@ const UnforwardedTabPanel = (
 				<Ariakit.TabPanel
 					id={ `${ prependInstanceId( selectedTab.name ) }-view` }
 					store={ tabStore }
-					key={ selectedTab.name }
 					tabId={ prependInstanceId( selectedTab.name ) }
 					className={ 'components-tab-panel__tab-content' }
 				>
