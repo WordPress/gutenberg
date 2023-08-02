@@ -393,7 +393,7 @@ As a reference, some use cases for this directive may be:
 
 It runs a callback **only when the node is created**.
 
-You can attach several effects to the same DOM element by using the syntax`data-wp-init--[unique-id]`.
+You can attach several `wp-init` to the same DOM element by using the syntax`data-wp-init--[unique-id]`.
 
 _Example of `data-wp-init` directive_ 
 ```html
