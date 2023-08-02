@@ -136,8 +136,11 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		$meta_custom_source = require __DIR__ . '/custom-sources/meta.php';
 		$block_type         = $block_instance->block_type;
 
-		// Not sure if we need it, it was in Riad's PR.
 		if ( null === $block_type ) {
+			return $block_content;
+		}
+
+		if ( ! block_has_support( $block_type, array( 'connections' ), false ) ) {
 			return $block_content;
 		}
 
@@ -180,8 +183,6 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 
 		return $block_content;
 	}
-
-
 	add_filter( 'render_block', 'gutenberg_render_custom_sources', 10, 3 );
 
 
