@@ -12,7 +12,8 @@ return array(
 		$p          = new WP_HTML_Tag_Processor( $block_content );
 		$found      = $p->next_tag(
 			array(
-				// TODO: build the query from CSS selector.
+				// TODO: In the future, when blocks other than Paragraph and Image are
+				// supported, we should build the full query from CSS selector.
 				'tag_name' => $attribute_config['selector'],
 			)
 		);
