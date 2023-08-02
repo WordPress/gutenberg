@@ -136,17 +136,17 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		$meta_custom_source = require __DIR__ . '/custom-sources/meta.php';
 		$block_type         = $block_instance->block_type;
 
+		// Whitelist of the block types that support custom sources
+		// Currently, we only allow the Paragraph and Image blocks to use custom sources.
+		if ( ! in_array( $block['blockName'], array( 'core/paragraph', 'core/image' ), true ) ) {
+			return $block_content;
+		}
+
 		if ( null === $block_type ) {
 			return $block_content;
 		}
 
 		if ( ! block_has_support( $block_type, array( 'connections' ), false ) ) {
-			return $block_content;
-		}
-
-		// Whitelist of the block types that support custom sources
-		// Currently, we only allow the Paragraph and Image blocks to use custom sources.
-		if ( ! in_array( $block_type->name, array( 'core/paragraph', 'core/image' ), true ) ) {
 			return $block_content;
 		}
 
