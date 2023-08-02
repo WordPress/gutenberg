@@ -272,7 +272,7 @@ When `wp-style` directive references a callback to get its final value, the call
 
 The value received by the directive is used to add or remove the style attribute with the associated CSS property: :
   - If the value is `false`, the style attribute is removed: `<div>`.
-  - If the value is a string, the attribute is added with its value assigned: `<div style="cssProperty: value;`.
+  - If the value is a string, the attribute is added with its value assigned: `<div style="cssProperty: value;">`.
 
 #### `wp-text` 
 
