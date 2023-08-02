@@ -186,23 +186,23 @@ store( {
 						ref.querySelector( '.close-button' ).focus();
 					}
 				},
-				initButtonContainStyles: ( { context, ref } ) => {
-					// In the case of an image with object-fit: contain, the
-					// size of the img element can be larger than the image itself,
-					// so we need to calculate the size of the button to match.
-					if ( context.core.image.scaleAttr === 'contain' ) {
-						const {
-							naturalWidth,
-							naturalHeight,
-							offsetWidth,
-							offsetHeight,
-						} = ref;
+				initButtonStyles: ( { context, ref } ) => {
+					const {
+						naturalWidth,
+						naturalHeight,
+						offsetWidth,
+						offsetHeight,
+					} = ref;
 
-						// If the image isn't loaded yet, we can't
-						// calculate how big the button should be.
-						if ( naturalWidth === 0 || naturalHeight === 0 ) {
-							return;
-						}
+					// If the image isn't loaded yet, we can't
+					// calculate how big the button should be.
+					if ( naturalWidth === 0 || naturalHeight === 0 ) {
+						return;
+					}
+					if ( context.core.image.scaleAttr === 'contain' ) {
+						// In the case of an image with object-fit: contain, the
+						// size of the img element can be larger than the image itself,
+						// so we need to calculate the size of the button to match.
 
 						// Natural ratio of the image.
 						const naturalRatio = naturalWidth / naturalHeight;
@@ -222,6 +222,12 @@ store( {
 							context.core.image.imageButtonWidth =
 								offsetHeight * naturalRatio;
 						}
+					} else {
+						// In all other cases, we can trust that the size of
+						// the image is the right size for the button as well.
+
+						context.core.image.imageButtonWidth = offsetWidth;
+						context.core.image.imageButtonHeight = offsetHeight;
 					}
 				},
 			},
@@ -378,6 +384,7 @@ function setStyles( context, event ) {
 		styleTag.id = 'wp-lightbox-styles';
 		document.head.appendChild( styleTag );
 	}
+
 	styleTag.innerHTML = `
 		:root {
 			--wp--lightbox-initial-top-position: ${ screenPosY }px;

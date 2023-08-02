@@ -142,25 +142,24 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	);
 	$w->next_tag( 'img' );
 	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setCurrentSrc' );
-	$w->set_attribute( 'data-wp-init', 'effects.core.image.initButtonContainStyles' );
-	$w->set_attribute( 'data-wp-on--load', 'effects.core.image.initButtonContainStyles' );
+	$w->set_attribute( 'data-wp-init', 'effects.core.image.initButtonStyles' );
+	$w->set_attribute( 'data-wp-on--load', 'effects.core.image.initButtonStyles' );
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
-	$button       = '<div class="img-container">
-                             <button
-							 	type="button"
-								aria-haspopup="dialog"
-								aria-label="' . esc_attr( $aria_label ) . '"
-								data-wp-on--click="actions.core.image.showLightbox"
-								data-wp-style--width="context.core.image.imageButtonWidth"
-								data-wp-style--height="context.core.image.imageButtonHeight"
-							>
-							</button>'
-		. $img[0] .
-		'</div>';
+	$button       =
+				'<button
+					type="button"
+					aria-haspopup="dialog"
+					aria-label="' . esc_attr( $aria_label ) . '"
+					data-wp-on--click="actions.core.image.showLightbox"
+					data-wp-style--width="context.core.image.imageButtonWidth"
+					data-wp-style--height="context.core.image.imageButtonHeight"
+				>
+				</button>'
+				. $img[0];
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
 	// We need both a responsive image and an enlarged image to animate

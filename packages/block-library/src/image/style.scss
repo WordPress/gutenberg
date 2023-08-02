@@ -153,14 +153,10 @@
 }
 
 .wp-lightbox-container {
-	.img-container {
-		position: relative;
-		width: max-content;
-		max-width: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	button {
 		border: none;
