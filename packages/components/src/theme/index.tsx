@@ -20,7 +20,15 @@ import { useCx } from '../utils';
  *
  * @example
  * ```jsx
- * import { __experimentalTheme as Theme } from '@wordpress/components';
+ * import { privateApis as componentsPrivateApis } from '@wordpress/components';
+ * import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+ *
+ * const { lock, unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+ *   'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
+ *   '@wordpress/components'
+ * );
+ *
+ * const { Theme } = unlock( componentsPrivateApis );
  *
  * const Example = () => {
  *   return (
