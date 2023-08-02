@@ -745,7 +745,7 @@ const v6 = {
  * removing the width and height img element attributes which are not needed
  * as they get added by the TODO hook.
  *
- * @see https://github.com/WordPress/gutenberg/pull/TODO
+ * @see https://github.com/WordPress/gutenberg/pull/53274
  */
 const v7 = {
 	attributes: {
