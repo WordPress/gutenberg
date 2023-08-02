@@ -253,11 +253,11 @@ _Example of `wp-style` directive_
 
 ```js
 store( {
-	actions: {
+  actions: {
     toggleContextColor: ( { context } ) => {
       context.color = context.color === 'red' ? 'blue' : 'red';
     },
-	},
+  },
 } );
 ```
 
