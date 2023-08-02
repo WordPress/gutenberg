@@ -263,16 +263,22 @@ class AztecView extends Component {
 			// - https://github.com/wordpress-mobile/WordPress-Android/issues/16167
 			Platform.OS === 'ios'
 		) {
-			// Programmatically swapping input focus creates an infinite loop if the
-			// user taps a different input in between the programmatic focus and
-			// the resulting update to the React Native TextInputState focused element
-			// ref. To mitigate this, the below updates the focused element ref, but
-			// does not call the native focus methods.
-			//
-			// See: https://github.com/wordpress-mobile/WordPress-iOS/issues/18783
 			this.updateCaretData( event );
+
 			if ( ! this.isFocused() ) {
+				// Programmatically swapping input focus creates an infinite loop if the
+				// user taps a different input in between the programmatic focus and
+				// the resulting update to the React Native TextInputState focused element
+				// ref. To mitigate this, the below updates the focused element ref, but
+				// does not call the native focus methods.
+				//
+				// See: https://github.com/wordpress-mobile/WordPress-iOS/issues/18783
 				AztecInputState.focusInput( this.aztecViewRef.current );
+
+				// Calling _onFocus is needed to trigger provided onFocus callbacks
+				// which are needed to prevent undesired results like having a focused
+				// TextInput when another element has the focus.
+				this._onFocus( event );
 			}
 		}
 	}
