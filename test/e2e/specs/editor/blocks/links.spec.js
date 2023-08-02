@@ -158,7 +158,7 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg WordPress' );
 
 		// Select "WordPress".
-		await pageUtils.pressKeys( 'Shift+Alt+ArrowLeft' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Create a link.
 		await pageUtils.pressKeys( 'primary+k' );
@@ -166,11 +166,12 @@ test.describe( 'Links', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Move to edge of text "Gutenberg".
-		await pageUtils.pressKeys( 'Alt+ArrowLeft' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' ); // If you just use Alt here it won't work on windows.
+		await pageUtils.pressKeys( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'ArrowLeft' );
 
 		// Select "Gutenberg".
-		await pageUtils.pressKeys( 'Shift+Alt+ArrowLeft' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Create a link.
 		await pageUtils.pressKeys( 'primary+k' );
