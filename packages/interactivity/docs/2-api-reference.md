@@ -138,8 +138,7 @@ It allows setting HTML attributes on elements based on a boolean or string value
 
 _Example of `wp-bind` directive_ 
 ```html
-<li
-  data-wp-context='{ "isMenuOpen": false } '>
+<li data-wp-context='{ "isMenuOpen": false }'>
   <button
     data-wp-on--click="actions.toggleMenu"
     data-wp-bind.aria-expanded="context.isMenuOpen"
@@ -280,12 +279,8 @@ It sets the inner text of an HTML element.
 
 ```html
 <div data-wp-context='{ "text": "Text 1" }'>
-  <span
-    data-wp-text="context.text"
-  ></span>
-  <button
-    data-wp-on--click="actions.toggleContextText"
-  >
+  <span data-wp-text="context.text"></span>
+  <button data-wp-on--click="actions.toggleContextText">
     Toggle Context Text
   </button>
 </div>
