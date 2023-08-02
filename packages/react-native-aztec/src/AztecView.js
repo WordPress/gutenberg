@@ -271,7 +271,9 @@ class AztecView extends Component {
 			//
 			// See: https://github.com/wordpress-mobile/WordPress-iOS/issues/18783
 			this.updateCaretData( event );
-			AztecInputState.focusInput( this.aztecViewRef.current );
+			if ( ! this.isFocused() ) {
+				AztecInputState.focusInput( this.aztecViewRef.current );
+			}
 		}
 	}
 
