@@ -5,7 +5,7 @@ To add interactivity to blocks using the Interactivity API, developers can use:
 - **Directives** - added to the markup to add specific behavior to the DOM elements of block.
 - **Store** - that contains the logic and data (state, actions, or effects among others) needed for the behaviour.
 
-DOM elements are connected to data stored in the state & context through directives. If data in the state or context change, directives will react to those changes updating the DOM accordingly (see [diagram](https://excalidraw.com/#json=rEg5d71O_jy3NrgYJUIVd,yjOUmMvxzNf6alqFjElvIw).
+DOM elements are connected to data stored in the state & context through directives. If data in the state or context change, directives will react to those changes updating the DOM accordingly (see [diagram](https://excalidraw.com/#json=rEg5d71O_jy3NrgYJUIVd,yjOUmMvxzNf6alqFjElvIw)).
 
 ![State & Directives](assets/state-directives.png)
 
@@ -22,14 +22,14 @@ DOM elements are connected to data stored in the state & context through directi
     - [`wp-on`](#wp-on) ![](https://img.shields.io/badge/EVENT_HANDLERS-afd2e3.svg)
     - [`wp-effect`](#wp-effect) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
     - [`wp-init`](#wp-init) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
-  - [Values of directives are references to properties](#values-of-directives-are-references-to-properties)
+  - [Values of directives are references to store properties](#values-of-directives-are-references-to-store-properties)
 - [The store](#the-store)
   - [Elements of the store](#elements-of-the-store)
     - [State](#state)
     - [Actions](#actions)
     - [Effects](#effects)
     - [Selectors](#selectors)
-  - [Objects passed to callbacks](#objects-passed-to-callbacks)
+  - [Arguments passed to callbacks](#arguments-passed-to-callbacks)
   - [Setting the store](#setting-the-store)
     - [On the client side](#on-the-client-side)
     - [On the server side](#on-the-server-side)
@@ -74,7 +74,20 @@ With directives we can manage directly in the DOM behavior related to things suc
 
 #### `wp-interactive` 
 
-The `wp-interactive` "activates" hydration for the DOM element and its children through the Interactivity API (directives and store). 
+The `wp-interactive` directive "activates" the interactivity for the DOM element and its children through the Interactivity API (directives and store). 
+
+```html
+<!-- Let's make this element and its children interactive -->
+<div 
+  data-wp-interactive
+  data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
+>
+  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">>and I can use directives!</span></p>
+  <div>
+    <p>I'm also interactive, <span data-wp-style--color="context.myColor">and I can also use directives!</span></p>
+  </div>
+</div>
+```
 
 > **Note**
 > The use of `wp-interactive` is a requirement for the Interactivity API "engine" to work. In the following examples the `wp-interactive` has not been added for the sake of simplicity.
@@ -94,7 +107,6 @@ _Example of `wp-context` directive_
     Click Me!
   </button>
 </div>
->
 ```
 
 <details>
@@ -141,8 +153,9 @@ _Example of `wp-bind` directive_
 <li data-wp-context='{ "isMenuOpen": false }'>
   <button
     data-wp-on--click="actions.toggleMenu"
-    data-wp-bind.aria-expanded="context.isMenuOpen"
+    data-wp-bind--aria-expanded="context.isMenuOpen"
   >
+    Toggle
   </button>
   <div data-wp-bind--hidden="!context.isMenuOpen">
     <span>Title</span>
@@ -158,7 +171,9 @@ _Example of `wp-bind` directive_
 ```js
 store( {
 	actions: {
-		toggleMenu: ( { context } ) => ! context.isMenuOpen,
+		toggleMenu: ( { context } ) => {
+      context.isMenuOpen = !context.isMenuOpen;
+    },
 	},
 } );
 ```
@@ -170,16 +185,16 @@ The `wp-bind` directive is executed:
   - when the element is created. 
   - each time there's a change on any of the properties of the `state` or `context` involved on getting the final value of the directive (inside the callback or the expression passed as reference).
 
+When `wp-bind` directive references a callback to get its final value: 
+- The `wp-bind` directive will be executed each time there's a change on any of the properties of the `state` or `context` used inside this callback.
+- The callback receives the attribute name: `attribute`.
+- The returned value in the callback function is used to change the value of the associated attribute.
+
 The `wp-bind` will do different things over the DOM element is applied depending on its value:
   - If the value is `true`, the attribute is added: `<div attribute>`.
   - If the value is `false`, the attribute is removed: `<div>`.
   - If the value is a string, the attribute is added with its value assigned: `<div attribute="value"`.
   - If the attribute name starts with `aria-` or `data-` and the value is boolean (either `true` or `false`), the attribute is added to the DOM with the boolean value assigned as a string: `<div aria-attribute="true">`.
-
-When `wp-bind` directive references a callback to get its final value: 
-- The `wp-bind` directive will be executed each time there's a change on any of the properties of the `state` or `context` used inside this callback.
-- The callback receives the attribute name: `attribute`.
-- The returned value in the callback function is used to change the value of the associated attribute.
 
 #### `wp-class` 
 
@@ -189,7 +204,7 @@ It adds or removes a class to an HTML element, depending on a boolean value.
 
 _Example of `wp-class` directive_ 
 ```php
-<div data-wp-interactive>
+<div>
   <li 
     data-wp-context='{ "isSelected": false } '
     data-wp-on--click="actions.toggleSelection"
@@ -236,7 +251,7 @@ The boolean value received by the directive is used to toggle (add when `true` o
 
 It adds or removes inline style to an HTML element, depending on its value.
 
-> This directive follows the syntax `data-wp-style--cssProperty`.
+> This directive follows the syntax `data-wp-style--css-property`.
 
 _Example of `wp-style` directive_ 
 ```html
@@ -267,11 +282,11 @@ The `wp-style` directive is executed:
   - when the element is created.
   - each time there's a change on any of the properties of the `state` or `context` involved on getting the final value of the directive (inside the callback or the expression passed as reference).
 
-When `wp-style` directive references a callback to get its final value, the callback receives the class style property: `cssProperty`.
+When `wp-style` directive references a callback to get its final value, the callback receives the class style property: `css-property`.
 
 The value received by the directive is used to add or remove the style attribute with the associated CSS property: :
   - If the value is `false`, the style attribute is removed: `<div>`.
-  - If the value is a string, the attribute is added with its value assigned: `<div style="cssProperty: value;">`.
+  - If the value is a string, the attribute is added with its value assigned: `<div style="css-property: value;">`.
 
 #### `wp-text` 
 
@@ -342,9 +357,11 @@ The callback passed as reference receives [the event](https://developer.mozilla.
 
 #### `wp-effect` 
 
-It runs a callback **when the node is created and runs it again when the state or context changes**. You can attach several effects to the same DOM element by using the syntax`data-wp-effect--[unique-id]`.
+It runs a callback **when the node is created and runs it again when the state or context changes**. 
 
-_Example of `wp-on` directive_
+You can attach several effects to the same DOM element by using the syntax `data-wp-effect--[unique-id]`. _The unique id doesn't need to be unique globally, it just needs to be different than the other unique ids of the `wp-effect` directives of that DOM element._
+
+_Example of `wp-effect` directive_
 ```html
 <div 
   data-wp-context='{ "counter": 0 }'
@@ -370,7 +387,7 @@ store( {
     },
   }
   effects: {
-    logCounter: ({ context }) => console.log("Counter is " + context.myNamespace.counter + " at " + new Date() ),
+    logCounter: ({ context }) => console.log("Counter is " + context.counter + " at " + new Date() ),
   },
 } );
 ```
@@ -388,16 +405,17 @@ As a reference, some use cases for this directive may be:
 - logging.
 - changing the title of the page.
 - setting the focus on an element with `.focus()`.
+- changing the state or context when certain conditions are met.
 
 #### `wp-init` 
 
 It runs a callback **only when the node is created**.
 
-You can attach several `wp-init` to the same DOM element by using the syntax`data-wp-init--[unique-id]`.
+You can attach several `wp-init` to the same DOM element by using the syntax `data-wp-init--[unique-id]`. _The unique id doesn't need to be unique globally, it just needs to be different than the other unique ids of the `wp-init` directives of that DOM element._
 
 _Example of `data-wp-init` directive_ 
 ```html
-<div data-wp-init="effect.logTimeInit">
+<div data-wp-init="effects.logTimeInit">
   <p>Hi!</>
 </div>
 ```
@@ -405,8 +423,8 @@ _Example of `data-wp-init` directive_
 _Example of several `wp-init` directives on the same DOM element_
 ```html
 <form 
-  data-wp-init--log="effect.logTimeInit" 
-  data-wp-init--focus="effect.focusFirstElement"
+  data-wp-init--log="effects.logTimeInit" 
+  data-wp-init--focus="effects.focusFirstElement"
 >
   <input type="text">
 </form>
@@ -431,7 +449,7 @@ store( {
 
 The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM.
 
-### Values of directives are references to properties
+### Values of directives are references to store properties
 
 The value assigned to a directive is a string pointing to a specific state, selector, action, or effect. *Using a Namespace is highly recommended* to define these elements of the store. 
 
@@ -462,7 +480,7 @@ These values assigned to directives are **references** to a particular property 
 
 The store is used to create the logic (actions, effects…) linked to the directives and the data used inside that logic (state, selectors…).
 
-**The store is usually created in the `view.js` file of each block**, although it can be initialized from the `render.php` of the block (see [diagram](https://excalidraw.com/#json=FPTvzmKpyunGuFzWt5nzX,gs2vvsN0HEvnEHsQ9u1gPg)).
+**The store is usually created in the `view.js` file of each block**, although it can be initialized from the `render.php` of the block.
 
 The store contains the reactive state and the actions and effects that modify it.
 
@@ -471,8 +489,27 @@ The store contains the reactive state and the actions and effects that modify it
 #### State 
 
 Defines data available to the HTML nodes of the page. It is important to differentiate between two ways to define the data:
-  - **Global state**:  It is defined using the `store()` function, and the data is available to all the HTML nodes of the page.
-  - **Context/Local State**: It is defined using the `data-wp-context` directive in an HTML node, and the data is available to that HTML node and its children.
+   - **Global state**:  It is defined using the `store()` function, and the data is available to all the HTML nodes of the page. It can be accessed using the `state` property.
+	- **Context/Local State**: It is defined using the `data-wp-context` directive in an HTML node, and the data is available to that HTML node and its children. It can be accessed using the `context` property.
+	
+```html
+<!-- Access global state -->
+<span data-wp-text="state.someText"></span>
+
+<!-- Access local state (context) -->
+<span data-wp-text="context.someText"></span>
+```
+
+```js
+store( {
+  actions: {
+    someAction: ({ state, context }) => {
+      state.someText // Access or modify global state
+      context.someText // Access or modify local state (context)
+    },
+  },
+} )
+```
 
 #### Actions 
 
@@ -484,7 +521,7 @@ Automatically react to state changes. Usually triggered by `data-wp-effect` or `
 
 #### Selectors
 
-Also known as _derived state_, returns a computed version of the state.
+Also known as _derived state_, returns a computed version of the state. They can access both `state` and `context`.
 
 ```js
 // view.js  
@@ -506,11 +543,11 @@ store( {
 } );
 ```
 
-### Objects passed to callbacks
+### Arguments passed to callbacks
 
 When a directive is evaluated, the reference callback receives an object with:
 
-- The **`store`** containing the `state`, `actions` and `effects`.
+- The **`store`** containing all the store properties, like `state`, `selectors`, `actions` or `effects`
 - The **context** (an object containing the context defined in all the `wp-context` ancestors).
 - The reference to the DOM element on which the directive was defined (a `ref`).
 - Other properties relevant to the directive. For example, the `data-wp-on--click` directive also receives the instance of the [MouseEvent](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent) triggered by the user.
@@ -588,7 +625,7 @@ _Example of store initialized from the server with a `state` = `{ someValue: 123
 // render.php
 wp_store( array(
   'state' => array(
-    'myPlugin' => array(
+    'myNamespace' => array(
       'someValue' = 123
     )
   )
