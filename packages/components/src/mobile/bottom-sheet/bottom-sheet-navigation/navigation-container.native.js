@@ -59,6 +59,7 @@ const options = {
 	headerShown: false,
 	gestureEnabled: false,
 	cardStyleInterpolator: fadeConfig,
+	keyboardHandlingEnabled: false,
 };
 
 const HEIGHT_ANIMATION_DURATION = 300;
@@ -162,7 +163,6 @@ function BottomSheetNavigationContainer( {
 							<Stack.Navigator
 								screenOptions={ options }
 								detachInactiveScreens={ false }
-								keyboardHandlingEnabled={ false }
 							>
 								{ screens }
 							</Stack.Navigator>
@@ -171,7 +171,6 @@ function BottomSheetNavigationContainer( {
 						<Stack.Navigator
 							screenOptions={ options }
 							detachInactiveScreens={ false }
-							keyboardHandlingEnabled={ false }
 						>
 							{ screens }
 						</Stack.Navigator>
