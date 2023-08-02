@@ -490,7 +490,7 @@ The store contains the reactive state and the actions and effects that modify it
 
 Defines data available to the HTML nodes of the page. It is important to differentiate between two ways to define the data:
    - **Global state**:  It is defined using the `store()` function, and the data is available to all the HTML nodes of the page. It can be accessed using the `state` property.
-	- **Context/Local State**: It is defined using the `data-wp-context` directive in an HTML node, and the data is available to that HTML node and its children. It can be accessed using the `context` property.
+   - **Context/Local State**: It is defined using the `data-wp-context` directive in an HTML node, and the data is available to that HTML node and its children. It can be accessed using the `context` property.
 	
 ```html
 <!-- Access global state -->
