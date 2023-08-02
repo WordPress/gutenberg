@@ -493,19 +493,26 @@ Defines data available to the HTML nodes of the page. It is important to differe
    - **Context/Local State**: It is defined using the `data-wp-context` directive in an HTML node, and the data is available to that HTML node and its children. It can be accessed using the `context` property.
 	
 ```html
-<!-- Access global state -->
-<span data-wp-text="state.someText"></span>
+<div data-wp-context=' { "someText": "Hello World!" }'>
 
-<!-- Access local state (context) -->
-<span data-wp-text="context.someText"></span>
+  <!-- Access global state -->
+  <span data-wp-text="state.someText"></span>
+
+  <!-- Access local state (context) -->
+  <span data-wp-text="context.someText"></span>
+
+</div>
 ```
 
 ```js
 store( {
+  state: {
+    someText: "Hello Universe!"
+  }
   actions: {
     someAction: ({ state, context }) => {
-      state.someText // Access or modify global state
-      context.someText // Access or modify local state (context)
+      state.someText // Access or modify global state - "Hello Universe!"
+      context.someText // Access or modify local state (context) - "Hello World!"
     },
   },
 } )
