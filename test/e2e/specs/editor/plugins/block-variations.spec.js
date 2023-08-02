@@ -154,6 +154,7 @@ test.describe( 'Block variations', () => {
 		page,
 		pageUtils,
 	} ) => {
+		await editor.openDocumentSettingsSidebar();
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/Heading' );
 		await page.keyboard.press( 'Enter' );
@@ -187,6 +188,7 @@ test.describe( 'Block variations', () => {
 		page,
 		pageUtils,
 	} ) => {
+		await editor.openDocumentSettingsSidebar();
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/Heading' );
 		await page.keyboard.press( 'Enter' );
