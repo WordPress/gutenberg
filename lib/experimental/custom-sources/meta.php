@@ -8,6 +8,8 @@
 return array(
 	'name'         => 'meta',
 	'apply_source' => function ( $block_content, $block_instance, $meta_field, $attribute_config ) {
+		// We should probably also check if the meta field exists but for now it's okay because
+		// if it doesn't, `get_post_meta()` will just return an empty string.
 		$meta_value = get_post_meta( $block_instance->context['postId'], $meta_field, true );
 		$p          = new WP_HTML_Tag_Processor( $block_content );
 		$found      = $p->next_tag(
