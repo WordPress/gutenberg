@@ -145,4 +145,92 @@ test.describe( 'Links', () => {
 			},
 		] );
 	} );
+
+	test( 'toggle state of advanced link settings is preserved across editing links', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg WordPress' );
+
+		// Select "WordPress".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Create a link.
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'w.org' );
+		await page.keyboard.press( 'Enter' );
+
+		// Move to edge of text "Gutenberg".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' ); // If you just use Alt here it won't work on windows.
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'ArrowLeft' );
+
+		// Select "Gutenberg".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Create a link.
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'https://wordpress.org/plugins/gutenberg/' );
+		await page.keyboard.press( 'Enter' );
+
+		// Move back into the link.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+k' );
+
+		// Toggle the Advanced settings to be open.
+		// This should set the editor preference to persist this
+		// UI state.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Move focus out of Link UI and into Paragraph block.
+		await pageUtils.pressKeys( 'Escape' );
+
+		// Move caret back into the "WordPress" link to trigger
+		// the Link UI for that link.
+		await pageUtils.pressKeys( 'Alt+ArrowRight' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+
+		// Switch Link UI to "edit" mode.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Check that the Advanced settings are still expanded/open
+		// and I can see the open in new tab checkbox. This verifies
+		// that the editor preference was persisted.
+		await expect( page.getByLabel( 'Open in new tab' ) ).toBeVisible();
+
+		// Toggle the Advanced settings back to being closed.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Move focus out of Link UI and into Paragraph block.
+		await pageUtils.pressKeys( 'Escape' );
+
+		// Move caret back into the "Gutenberg" link and open
+		// the Link UI for that link.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+k' );
+
+		// Check that the Advanced settings are still closed.
+		// This verifies that the editor preference was persisted.
+		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeVisible();
+	} );
 } );
