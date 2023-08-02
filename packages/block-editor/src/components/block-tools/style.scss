@@ -125,9 +125,18 @@
 		display: none;
 	}
 
+	// Add a scrim to the right of the collapsed button.
+	&.is-collapsed::after {
+		content: "";
+		position: absolute;
+		left: 100%;
+		width: $grid-unit-60;
+		height: 100%;
+		background: linear-gradient(to right, $white, transparent);
+	}
+
 	// on desktop and tablet viewports the toolbar is fixed
 	// on top of interface header
-
 	@include break-medium() {
 		&.is-fixed {
 
@@ -157,7 +166,7 @@
 				}
 			}
 
-			& > .block-editor-block-toolbar.is-showing-movers {
+			& > .block-editor-block-toolbar {
 				flex-grow: initial;
 				width: initial;
 
@@ -308,7 +317,7 @@
 		}
 	}
 
-	// on tablet vewports the toolbar is fixed
+	// on tablet viewports the toolbar is fixed
 	// on top of interface header and covers the whole header
 	// except for the inserter on the left
 	@include break-medium() {
@@ -328,7 +337,7 @@
 			// in full screen mode we need to account for
 			// the combined with of the tools at the right of the header and the margin left
 			// of the toolbar which includes four buttons
-			width: calc(100% - 240px - #{4 * $grid-unit-80});
+			width: calc(100% - 280px - #{4 * $grid-unit-80});
 		}
 	}
 }

@@ -12,6 +12,8 @@ import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -101,6 +103,9 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
 
 const noop = () => {};
 
+const PREFERENCE_SCOPE = 'core/block-editor';
+const PREFERENCE_KEY = 'linkControlSettingsDrawer';
+
 /**
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
@@ -133,14 +138,47 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
+	const [ settingsOpen, setSettingsOpen ] = useState( false );
+
+	const { advancedSettingsPreference } = useSelect( ( select ) => {
+		const prefsStore = select( preferencesStore );
+
+		return {
+			advancedSettingsPreference:
+				prefsStore.get( PREFERENCE_SCOPE, PREFERENCE_KEY ) ?? false,
+		};
+	}, [] );
+
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	/**
+	 * Sets the open/closed state of the Advanced Settings Drawer,
+	 * optionlly persisting the state to the user's preferences.
+	 *
+	 * Note that Block Editor components can be consumed by non-WordPress
+	 * environments which may not have preferences setup.
+	 * Therefore a local state is also  used as a fallback.
+	 *
+	 * @param {boolean} prefVal the open/closed state of the Advanced Settings Drawer.
+	 */
+	const setSettingsOpenWithPreference = ( prefVal ) => {
+		if ( setPreference ) {
+			setPreference( PREFERENCE_SCOPE, PREFERENCE_KEY, prefVal );
+		}
+		setSettingsOpen( prefVal );
+	};
+
+	// Block Editor components can be consumed by non-WordPress environments
+	// which may not have these preferences setup.
+	// Therefore a local state is used as a fallback.
+	const isSettingsOpen = advancedSettingsPreference || settingsOpen;
+
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
 	const settingsKeys = settings.map( ( { id } ) => id );
-
-	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
 	const [
 		internalControlValue,
@@ -207,7 +245,6 @@ function LinkControl( {
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
-		setSettingsOpen( false );
 		setIsEditingLink( false );
 	};
 
@@ -292,7 +329,6 @@ function LinkControl( {
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
-	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 	const showActions = isEditingLink && hasLinkValue;
 
 	// Only show text control once a URL value has been committed
@@ -302,6 +338,7 @@ function LinkControl( {
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
 	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
+	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 
 	return (
 		<div
@@ -385,8 +422,8 @@ function LinkControl( {
 				<div className="block-editor-link-control__tools">
 					{ ! currentInputIsEmpty && (
 						<LinkControlSettingsDrawer
-							settingsOpen={ settingsOpen }
-							setSettingsOpen={ setSettingsOpen }
+							settingsOpen={ isSettingsOpen }
+							setSettingsOpen={ setSettingsOpenWithPreference }
 						>
 							<LinkSettings
 								value={ internalControlValue }

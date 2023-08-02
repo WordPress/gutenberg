@@ -566,9 +566,9 @@ export default function Image( {
 				className={ borderProps.className }
 				style={ {
 					width:
-						( width && height ) || aspectRatio ? '100%' : 'inherit',
+						( width && height ) || aspectRatio ? '100%' : undefined,
 					height:
-						( width && height ) || aspectRatio ? '100%' : 'inherit',
+						( width && height ) || aspectRatio ? '100%' : undefined,
 					objectFit: scale,
 					...borderProps.style,
 				} }
