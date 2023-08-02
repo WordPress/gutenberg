@@ -493,7 +493,7 @@ Defines data available to the HTML nodes of the page. It is important to differe
    - **Context/Local State**: It is defined using the `data-wp-context` directive in an HTML node, and the data is available to that HTML node and its children. It can be accessed using the `context` property.
 	
 ```html
-<div data-wp-context=' { "someText": "Hello World!" }'>
+<div data-wp-context='{ "someText": "Hello World!" }'>
 
   <!-- Access global state -->
   <span data-wp-text="state.someText"></span>
