@@ -46,7 +46,7 @@ import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 import BlockList from '../components/block-list';
-import { getLayoutType, getLayoutTypes } from '../layouts';
+import { getLayoutType } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { kebabCase } from '../utils/object';
@@ -159,8 +159,7 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 }
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
-	const { layout } = attributes;
-	const defaultThemeLayout = useSetting( 'layout' );
+	const { layout, style } = attributes;
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
