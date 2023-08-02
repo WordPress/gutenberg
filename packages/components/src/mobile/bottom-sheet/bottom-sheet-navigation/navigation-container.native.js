@@ -162,6 +162,7 @@ function BottomSheetNavigationContainer( {
 							<Stack.Navigator
 								screenOptions={ options }
 								detachInactiveScreens={ false }
+								keyboardHandlingEnabled={ false }
 							>
 								{ screens }
 							</Stack.Navigator>
@@ -170,6 +171,7 @@ function BottomSheetNavigationContainer( {
 						<Stack.Navigator
 							screenOptions={ options }
 							detachInactiveScreens={ false }
+							keyboardHandlingEnabled={ false }
 						>
 							{ screens }
 						</Stack.Navigator>
