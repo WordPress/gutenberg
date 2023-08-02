@@ -210,17 +210,21 @@ store( {
 						const offsetRatio = offsetWidth / offsetHeight;
 
 						if ( naturalRatio > offsetRatio ) {
-							// If it reaches the width first, keep the width
-							// and recalculate the height.
+							// If it reaches the width first, keep
+							// the width and recalculate the height.
 							context.core.image.imageButtonWidth = offsetWidth;
-							context.core.image.imageButtonHeight =
-								offsetWidth / naturalRatio;
+							const buttonHeight = offsetWidth / naturalRatio;
+							context.core.image.imageButtonHeight = buttonHeight;
+							context.core.image.imageButtonTop =
+								( offsetHeight - buttonHeight ) / 2;
 						} else {
-							// If it reaches the height first, keep the height
-							// and recalculate the width.
+							// If it reaches the height first, keep
+							// the height and recalculate the width.
 							context.core.image.imageButtonHeight = offsetHeight;
-							context.core.image.imageButtonWidth =
-								offsetHeight * naturalRatio;
+							const buttonWidth = offsetHeight * naturalRatio;
+							context.core.image.imageButtonWidth = buttonWidth;
+							context.core.image.imageButtonLeft =
+								( offsetWidth - buttonWidth ) / 2;
 						}
 					} else {
 						// In all other cases, we can trust that the size of

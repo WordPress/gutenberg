@@ -157,6 +157,8 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 					data-wp-on--click="actions.core.image.showLightbox"
 					data-wp-style--width="context.core.image.imageButtonWidth"
 					data-wp-style--height="context.core.image.imageButtonHeight"
+					data-wp-style--left="context.core.image.imageButtonLeft"
+					data-wp-style--top="context.core.image.imageButtonTop"
 				>
 				</button>'
 				. $img[0];
