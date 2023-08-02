@@ -36,7 +36,7 @@ Default.args = {
 	tabs: [
 		{
 			name: 'tab1',
-			title: 'Tab 1fsdfs',
+			title: 'Tab 1',
 		},
 		{
 			name: 'tab2',
