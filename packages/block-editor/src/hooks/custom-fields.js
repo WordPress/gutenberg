@@ -56,6 +56,7 @@ export const withInspectorControl = createHigherOrderComponent(
 			);
 			// We prevent that the content is lost when the user removes the custom field.
 			// Editing the content in the paragraph block with a placeholder is not the best solution.
+			// As this is a temporary solution, that will be removed soon, we can live with it.
 			const prevContent = useRef( props.attributes?.content );
 			if ( ! prevContent.current ) {
 				prevContent.current = '';
