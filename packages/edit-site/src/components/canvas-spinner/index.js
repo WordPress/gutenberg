@@ -18,7 +18,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../lock-unlock';
 import { useStylesPreviewColors } from '../global-styles/hooks';
 
-const { ProgressBar } = unlock( componentsPrivateApis );
+const { ProgressBar, Theme } = unlock( componentsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 export default function CanvasSpinner() {
@@ -35,10 +35,9 @@ export default function CanvasSpinner() {
 
 	return (
 		<div className="edit-site-canvas-spinner">
-			<ProgressBar
-				indicatorColor={ indicatorColor }
-				trackColor={ trackColor }
-			/>
+			<Theme background={ trackColor } accent={ indicatorColor }>
+				<ProgressBar />
+			</Theme>
 		</div>
 	);
 }
