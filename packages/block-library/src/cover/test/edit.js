@@ -18,7 +18,10 @@ const defaultSettings = {
 			defaultPalette: true,
 			defaultGradients: true,
 			palette: {
-				default: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+				default: [
+					{ name: 'Black', slug: 'black', color: '#000000' },
+					{ name: 'White', slug: 'white', color: '#ffffff' },
+				],
 			},
 		},
 	},
@@ -373,6 +376,78 @@ describe( 'Cover block', () => {
 					'min-height: 300px;'
 				);
 			} );
+		} );
+	} );
+
+	describe( 'isDark settings', () => {
+		test( 'should set is-light class if light background set', async () => {
+			const { container } = await setup();
+			const colorPicker = screen.getByRole( 'button', {
+				name: 'Color: White',
+			} );
+			await userEvent.click( colorPicker );
+
+			const coverBlock = // eslint-disable-next-line testing-library/no-node-access
+				container.getElementsByClassName( 'wp-block-cover' );
+
+			expect( coverBlock[ 0 ] ).toHaveClass( `is-light` );
+		} );
+		test( 'should not set is-light class if dark background set', async () => {
+			const { container } = await setup();
+			const colorPicker = screen.getByRole( 'button', {
+				name: 'Color: Black',
+			} );
+			await userEvent.click( colorPicker );
+
+			const coverBlock = // eslint-disable-next-line testing-library/no-node-access
+				container.getElementsByClassName( 'wp-block-cover' );
+
+			expect( coverBlock[ 0 ] ).not.toHaveClass( `is-light` );
+		} );
+		test( 'should toggle on is-light class if dark background changed to light', async () => {
+			const { container } = await setup();
+			await createAndSelectBlock();
+
+			const coverBlock = // eslint-disable-next-line testing-library/no-node-access
+				container.getElementsByClassName( 'wp-block-cover' );
+
+			expect( coverBlock[ 0 ] ).not.toHaveClass( `is-light` );
+
+			await userEvent.click(
+				screen.getByRole( 'tab', {
+					name: 'Styles',
+				} )
+			);
+			await userEvent.click( screen.getByText( 'Overlay' ) );
+			const colorPicker = screen.getByRole( 'button', {
+				name: 'Color: White',
+			} );
+			await userEvent.click( colorPicker );
+			expect( coverBlock[ 0 ] ).toHaveClass( `is-light` );
+		} );
+		test( 'should toggle off is-light class if light background changed to dark', async () => {
+			const { container } = await setup();
+			const colorPicker = screen.getByRole( 'button', {
+				name: 'Color: White',
+			} );
+			await userEvent.click( colorPicker );
+
+			const coverBlock = // eslint-disable-next-line testing-library/no-node-access
+				container.getElementsByClassName( 'wp-block-cover' );
+
+			expect( coverBlock[ 0 ] ).toHaveClass( `is-light` );
+			await selectBlock( 'Block: Cover' );
+			await userEvent.click(
+				screen.getByRole( 'tab', {
+					name: 'Styles',
+				} )
+			);
+			await userEvent.click( screen.getByText( 'Overlay' ) );
+			const popupColorPicker = screen.getByRole( 'button', {
+				name: 'Color: Black',
+			} );
+			await userEvent.click( popupColorPicker );
+			expect( coverBlock[ 0 ] ).not.toHaveClass( `is-light` );
 		} );
 	} );
 } );
