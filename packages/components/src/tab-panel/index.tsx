@@ -2,7 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import cx from 'classnames';
+import classnames from 'classnames';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -201,7 +201,7 @@ const UnforwardedTabPanel = (
 						<Ariakit.Tab
 							key={ tab.name }
 							id={ prependInstanceId( tab.name ) }
-							className={ cx(
+							className={ classnames(
 								'components-tab-panel__tabs-item',
 								tab.className,
 								{
