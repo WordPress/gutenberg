@@ -93,6 +93,7 @@ export default function CoverInspectorControls( {
 	setOverlayColor,
 	coverRef,
 	currentSettings,
+	updateDimRatio,
 } ) {
 	const {
 		useFeaturedImage,
@@ -281,9 +282,7 @@ export default function CoverInspectorControls( {
 								: dimRatio !== ( url ? 50 : 100 );
 						} }
 						label={ __( 'Overlay opacity' ) }
-						onDeselect={ () =>
-							setAttributes( { dimRatio: url ? 50 : 100 } )
-						}
+						onDeselect={ () => updateDimRatio( url ? 50 : 100 ) }
 						resetAllFilter={ () => ( {
 							dimRatio: url ? 50 : 100,
 						} ) }
@@ -294,10 +293,8 @@ export default function CoverInspectorControls( {
 							__nextHasNoMarginBottom
 							label={ __( 'Overlay opacity' ) }
 							value={ dimRatio }
-							onChange={ ( newDimRation ) =>
-								setAttributes( {
-									dimRatio: newDimRation,
-								} )
+							onChange={ ( newDimRatio ) =>
+								updateDimRatio( newDimRatio )
 							}
 							min={ 0 }
 							max={ 100 }

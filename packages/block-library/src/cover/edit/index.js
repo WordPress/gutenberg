@@ -9,7 +9,7 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
@@ -128,20 +128,53 @@ function CoverEdit( {
 		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
-	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
+	const setMedia = attributesFromMedia( setAttributes, dimRatio );
+	const getCoverIsDark = useCoverIsDark();
+
+	const onSelectMedia = async ( newMedia ) => {
+		setMedia( newMedia );
+		const coverIsDark = await getCoverIsDark(
+			newMedia.url,
+			dimRatio,
+			overlayColor.color
+		);
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			isDark: coverIsDark,
+		} );
+	};
+
+	const onSetOverlayColor = async ( colorValue ) => {
+		setOverlayColor( colorValue );
+		const coverIsDark = await getCoverIsDark(
+			mediaUrl,
+			dimRatio,
+			colorValue
+		);
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			isDark: coverIsDark,
+		} );
+	};
+
+	const onUpdateDimRatio = async ( newDimRatio ) => {
+		setAttributes( { dimRatio: newDimRatio } );
+		const coverIsDark = await getCoverIsDark(
+			mediaUrl,
+			newDimRatio,
+			overlayColor.color
+		);
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			isDark: coverIsDark,
+		} );
+	};
+
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
-
-	const isCoverDark = useCoverIsDark( url, dimRatio, overlayColor.color );
-
-	useEffect( () => {
-		// This side-effect should not create an undo level.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isDark: isCoverDark } );
-	}, [ isCoverDark ] );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -247,10 +280,11 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			clientId={ clientId }
-			setOverlayColor={ setOverlayColor }
+			setOverlayColor={ onSetOverlayColor }
 			coverRef={ ref }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+			updateDimRatio={ onUpdateDimRatio }
 		/>
 	);
 
@@ -304,7 +338,7 @@ function CoverEdit( {
 							<ColorPalette
 								disableCustomColors={ true }
 								value={ overlayColor.color }
-								onChange={ setOverlayColor }
+								onChange={ onSetOverlayColor }
 								clearable={ false }
 							/>
 						</div>
