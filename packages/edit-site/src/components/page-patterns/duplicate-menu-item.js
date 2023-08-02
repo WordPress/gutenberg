@@ -48,7 +48,8 @@ export default function DuplicateMenuItem( {
 	onClose,
 } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 
 	const history = useHistory();
 	const existingTemplateParts = useExistingTemplateParts();
@@ -72,6 +73,18 @@ export default function DuplicateMenuItem( {
 				'wp_template_part',
 				{ slug, title, content, area },
 				{ throwOnError: true }
+			);
+
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
+					__( '"%s" created.' ),
+					title
+				),
+				{
+					type: 'snackbar',
+					id: 'edit-site-patterns-success',
+				}
 			);
 
 			history.push( {
@@ -119,6 +132,18 @@ export default function DuplicateMenuItem( {
 					title,
 				},
 				{ throwOnError: true }
+			);
+
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
+					__( '"%s" added to my patterns.' ),
+					title
+				),
+				{
+					type: 'snackbar',
+					id: 'edit-site-patterns-success',
+				}
 			);
 
 			history.push( {
