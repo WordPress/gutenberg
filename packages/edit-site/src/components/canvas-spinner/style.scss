@@ -10,8 +10,8 @@
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
 
-	.components-progress-bar {
-		max-width: 200px;
+	& > div {
+		width: 160px;
 	}
 }
 
