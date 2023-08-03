@@ -85,6 +85,8 @@ const config = defineConfig( {
 		{
 			name: 'replay-chromium',
 			use: { ...( replayDevices[ 'Replay Chromium' ] as any ) },
+			snapshotPathTemplate:
+				'{testDir}/{testFileDir}/__snapshots__/{arg}-chromium{ext}',
 		},
 	],
 } );
