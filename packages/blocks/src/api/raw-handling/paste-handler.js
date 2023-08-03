@@ -155,7 +155,7 @@ export function pasteHandler( {
 
 	if ( disableFilters ) {
 		return maybeConvertParagraphToInline( {
-			blocks: htmlToBlocks( HTML, pasteHandler ),
+			blocks: htmlToBlocks( normaliseBlocks( HTML ), pasteHandler ),
 			plainText,
 			mode,
 		} );
