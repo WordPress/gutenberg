@@ -22,7 +22,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->rest_base = 'fonts_library';
+		$this->rest_base = 'fonts';
 		$this->namespace = 'wp/v2';
 	}
 
@@ -117,13 +117,13 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 */
 	public function install_fonts( $request ) {
 		// Get new fonts to install.
-		$fonts_to_install = $request->get_param( 'fontFamilies' );
+		$fonts_param = $request->get_param( 'fontFamilies' );
 
 		/*
 		 * As we are receiving form data, the font families are encoded as a string.
 		 * We are using form data because local fonts need to use that format to attach the files in the request.
 		 */
-		$fonts_to_install = json_decode( $fonts_to_install, true );
+		$fonts_to_install = json_decode( $fonts_param, true );
 
 		if ( empty( $fonts_to_install ) ) {
 			return new WP_Error( 'no_fonts_to_install', __( 'No fonts to install', 'gutenberg' ), array( 'status' => 400 ) );
