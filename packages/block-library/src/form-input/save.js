@@ -36,7 +36,7 @@ const getNameFromLabel = ( content ) => {
 };
 
 export default function save( { attributes } ) {
-	const { type, name, label, inlineLabel, required, placeholder } =
+	const { type, name, label, inlineLabel, required, placeholder, value } =
 		attributes;
 
 	const borderProps = getBorderClassesAndStyles( attributes );
@@ -53,6 +53,10 @@ export default function save( { attributes } ) {
 		borderProps.className
 	);
 	const TagName = type === 'textarea' ? 'textarea' : 'input';
+
+	if ( 'hidden' === type ) {
+		return <input type={ type } name={ name } value={ value } />;
+	}
 
 	/* eslint-disable jsx-a11y/label-has-associated-control */
 	return (

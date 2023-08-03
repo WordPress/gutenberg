@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { unseen } from '@wordpress/icons';
 
 const variations = [
 	{
@@ -76,6 +77,18 @@ const variations = [
 		isDefault: true,
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) => blockAttributes?.type === 'number',
+	},
+	{
+		name: 'hidden',
+		title: __( 'Hidden input' ),
+		icon: unseen,
+		description: __(
+			'A hidden input. Use it to add hidden data to form submissions.'
+		),
+		attributes: { type: 'hidden' },
+		isDefault: false,
+		scope: [ 'inserter', 'transform' ],
+		isActive: ( blockAttributes ) => blockAttributes?.type === 'hidden',
 	},
 ];
 

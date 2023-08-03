@@ -19,7 +19,7 @@ import { PanelBody, TextControl, CheckboxControl } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 
 function InputFieldBlock( { attributes, setAttributes, className } ) {
-	const { type, name, label, inlineLabel, required, placeholder } =
+	const { type, name, label, inlineLabel, required, placeholder, value } =
 		attributes;
 	const blockProps = useBlockProps();
 	const ref = useRef();
@@ -33,28 +33,30 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 
 	const controls = (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Input settings' ) }>
-					<CheckboxControl
-						label={ __( 'Inline label' ) }
-						checked={ attributes.inlineLabel }
-						onChange={ ( newVal ) => {
-							setAttributes( {
-								inlineLabel: newVal,
-							} );
-						} }
-					/>
-					<CheckboxControl
-						label={ __( 'Required' ) }
-						checked={ attributes.required }
-						onChange={ ( newVal ) => {
-							setAttributes( {
-								required: newVal,
-							} );
-						} }
-					/>
-				</PanelBody>
-			</InspectorControls>
+			{ 'hidden' !== type && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Input settings' ) }>
+						<CheckboxControl
+							label={ __( 'Inline label' ) }
+							checked={ attributes.inlineLabel }
+							onChange={ ( newVal ) => {
+								setAttributes( {
+									inlineLabel: newVal,
+								} );
+							} }
+						/>
+						<CheckboxControl
+							label={ __( 'Required' ) }
+							checked={ attributes.required }
+							onChange={ ( newVal ) => {
+								setAttributes( {
+									required: newVal,
+								} );
+							} }
+						/>
+					</PanelBody>
+				</InspectorControls>
+			) }
 			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					autoComplete="off"
@@ -72,6 +74,40 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 			</InspectorControls>
 		</>
 	);
+
+	if ( 'hidden' === type ) {
+		return (
+			<div { ...blockProps }>
+				{ controls }
+				<span className={ 'is-input-hidden' }>
+					<RichText
+						tagName="span"
+						className="wp-block-form-input__label-content"
+						value={ name }
+						onChange={ ( newValue ) =>
+							setAttributes( { name: newValue } )
+						}
+						aria-label={ __( 'Input name' ) }
+						placeholder={ __( 'Type the name for this input' ) }
+					/>
+					<input
+						type="text"
+						className={ classNames(
+							className,
+							'wp-block-form-input__input',
+							colorProps.className,
+							borderProps.className
+						) }
+						aria-label={ __( 'Value' ) }
+						value={ value }
+						onChange={ ( event ) =>
+							setAttributes( { value: event.target.value } )
+						}
+					/>
+				</span>
+			</div>
+		);
+	}
 
 	return (
 		<div { ...blockProps }>

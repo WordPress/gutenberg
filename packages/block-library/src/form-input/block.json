@@ -42,6 +42,13 @@
 			"attribute": "placeholder",
 			"__experimentalRole": "content"
 		},
+		"value": {
+			"type": "string",
+			"default": "",
+			"selector": "input",
+			"source": "attribute",
+			"attribute": "value"
+		},
 		"visibilityPermissions": {
 			"type": "string",
 			"default": "all"
