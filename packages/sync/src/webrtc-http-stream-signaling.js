@@ -841,6 +841,7 @@ function setupHttpSignal( httpClient ) {
 			onclose( null );
 		};
 		eventSource.onerror = ( error ) => {
+			console.error( error );
 			// Todo: add an error handler
 		};
 		eventSource.onopen = () => {
