@@ -14,6 +14,7 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
+import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -42,8 +43,16 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					: {
 							per_page: -1,
 					  };
+				const results = getEntityRecords( 'postType', postType, query );
+				/*
+				 * wp_template and wp_template_part endpoints do not support per_page or orderby parameters.
+				 * We need to sort the results based on the search query to avoid removing relevant
+				 * records below using .slice().
+				 */
 				return {
-					records: getEntityRecords( 'postType', postType, query ),
+					records: supportsSearch
+						? results
+						: orderEntityRecordsBySearch( results || [], search ),
 					isLoading: ! select( coreStore ).hasFinishedResolution(
 						'getEntityRecords',
 						[ 'postType', postType, query ]
