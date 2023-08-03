@@ -94,7 +94,7 @@ export const withInspectorControl = createHigherOrderComponent(
 													},
 													content: undefined,
 													placeholder: sprintf(
-														'This content will be replaced in the frontend by the custom field "%s" value.',
+														'This content will be replaced on the frontend by the value of "%s" custom field.',
 														nextValue
 													),
 												} );
