@@ -13,16 +13,16 @@
  * Registers the routes for the objects of the controller.
  */
 
-if ( ! function_exists( 'fonts_library_register_routes' ) ) {
+if ( ! function_exists( 'fonts_library_init' ) ) {
 	/**
 	 * Registers the routes for the objects of the controller.
 	 */
-	function fonts_library_register_routes() {
-		$fonts_library = new WP_REST_Fonts_Library_Controller();
-		$fonts_library->register_routes();
-		$fonts_library->register_post_type();
+	function fonts_library_init() {
+		WP_Fonts_Library::register_post_type();
+		$fonts_library_controller = new WP_REST_Fonts_Library_Controller();
+		$fonts_library_controller->register_routes();
 	}
 
-	add_action( 'rest_api_init', 'fonts_library_register_routes' );
+	add_action( 'rest_api_init', 'fonts_library_init' );
 }
 

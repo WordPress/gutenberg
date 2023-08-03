@@ -151,16 +151,4 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		return new WP_REST_Response( $response );
 	}
 
-	/**
-	 * Registers the fonts library post type.
-	 */
-	public function register_post_type() {
-		$args = array(
-			'public'       => true,
-			'label'        => 'Font Library',
-			'show_in_rest' => true,
-		);
-		register_post_type( 'wp_font_family', $args );
-	}
-
 }

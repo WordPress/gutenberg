@@ -47,4 +47,16 @@ class WP_Fonts_Library {
 		return $defaults;
 	}
 
+	/**
+	 * Registers the fonts library post type.
+	 */
+	public static function register_post_type() {
+		$args = array(
+			'public'       => true,
+			'label'        => 'Font Library',
+			'show_in_rest' => true,
+		);
+		register_post_type( 'wp_font_family', $args );
+	}
+
 }
