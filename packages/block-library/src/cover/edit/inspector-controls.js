@@ -94,6 +94,7 @@ export default function CoverInspectorControls( {
 	coverRef,
 	currentSettings,
 	updateDimRatio,
+	onClearMedia,
 } ) {
 	const {
 		useFeaturedImage,
@@ -232,17 +233,7 @@ export default function CoverInspectorControls( {
 								variant="secondary"
 								isSmall
 								className="block-library-cover__reset-button"
-								onClick={ () =>
-									setAttributes( {
-										url: undefined,
-										id: undefined,
-										backgroundType: undefined,
-										focalPoint: undefined,
-										hasParallax: undefined,
-										isRepeated: undefined,
-										useFeaturedImage: false,
-									} )
-								}
+								onClick={ onClearMedia }
 							>
 								{ __( 'Clear Media' ) }
 							</Button>

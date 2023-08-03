@@ -9,9 +9,9 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef, useEffect } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
-import { compose, useResizeObserver } from '@wordpress/compose';
+import { compose, useResizeObserver, usePrevious } from '@wordpress/compose';
 import {
 	withColors,
 	ColorPalette,
@@ -103,7 +103,7 @@ function CoverEdit( {
 		'featured_media',
 		postId
 	);
-
+	const setCoverIsDark = useCoverIsDark( setAttributes );
 	const media = useSelect(
 		( select ) =>
 			featuredImage &&
@@ -111,6 +111,26 @@ function CoverEdit( {
 		[ featuredImage ]
 	);
 	const mediaUrl = media?.source_url;
+
+	const prevUseFeaturedImage = usePrevious( useFeaturedImage );
+	if ( mediaUrl && useFeaturedImage ) {
+		setCoverIsDark( mediaUrl, dimRatio, overlayColor.color );
+	}
+
+	// An effect is needed here to reset the isDark attribute when the
+	// useFeaturedImage attribute is toggled off. Trying to do this outside an
+	// effect causes a `cannot update while rendering another component` warning.
+	useEffect( () => {
+		if ( prevUseFeaturedImage && ! useFeaturedImage ) {
+			setCoverIsDark( undefined, dimRatio, overlayColor.color );
+		}
+	}, [
+		dimRatio,
+		overlayColor.color,
+		prevUseFeaturedImage,
+		setCoverIsDark,
+		useFeaturedImage,
+	] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -127,21 +147,33 @@ function CoverEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 	const setMedia = attributesFromMedia( setAttributes, dimRatio );
-	const setCoverIsDark = useCoverIsDark( setAttributes );
 
 	const onSelectMedia = async ( newMedia ) => {
 		setMedia( newMedia );
 		setCoverIsDark( newMedia.url, dimRatio, overlayColor.color );
 	};
 
+	const onClearMedia = async () => {
+		setAttributes( {
+			url: undefined,
+			id: undefined,
+			backgroundType: undefined,
+			focalPoint: undefined,
+			hasParallax: undefined,
+			isRepeated: undefined,
+			useFeaturedImage: false,
+		} );
+		setCoverIsDark( undefined, dimRatio, overlayColor.color );
+	};
+
 	const onSetOverlayColor = async ( colorValue ) => {
 		setOverlayColor( colorValue );
-		setCoverIsDark( mediaUrl, dimRatio, colorValue );
+		setCoverIsDark( url, dimRatio, colorValue );
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
 		setAttributes( { dimRatio: newDimRatio } );
-		setCoverIsDark( mediaUrl, newDimRatio, overlayColor.color );
+		setCoverIsDark( url, newDimRatio, overlayColor.color );
 	};
 
 	const isUploadingMedia = isTemporaryMedia( id, url );
@@ -259,6 +291,7 @@ function CoverEdit( {
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			updateDimRatio={ onUpdateDimRatio }
+			onClearMedia={ onClearMedia }
 		/>
 	);
 

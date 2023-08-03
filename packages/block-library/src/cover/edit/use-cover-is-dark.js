@@ -20,8 +20,17 @@ function retrieveFastAverageColor() {
 }
 
 /**
- * useCoverIsDark is a hook that specifyies if the cover
- * background is dark or not.
+ * getCoverIsDark is a method that specifyies if the cover background is dark or not and
+ * applies the relevant attribute to help ensure that text is visible by default.
+ * This needs to be recalculated in all of the following Cover block scenarios:
+ * - When an overlay image is added, changed or removed
+ * - When the featured image is selected as the overlay imaged, or removed from the overlay
+ * - When the overlay color is changed
+ * - When the overlay color is removed
+ * - When the dimRatio is changed
+ *
+ * See the comments below for more details about which aspects take priority when
+ * calculating the relative darkness of the Cover.
  *
  * @param {Function} setAttributes function to set attributes.
  * @return {Function} Function to calculate isDark attribute.
@@ -32,6 +41,7 @@ export default function useCoverIsDark( setAttributes ) {
 
 	const getCoverIsDark = useCallback(
 		( url, dimRatio = 50, overlayColor ) => {
+			// If the dimRatio is less than 50, the image will have the most impact on darkness.
 			if ( url && dimRatio <= 50 ) {
 				const imgCrossOrigin = applyFilters(
 					'media.crossOrigin',
@@ -54,9 +64,10 @@ export default function useCoverIsDark( setAttributes ) {
 					} );
 			}
 
-			if ( dimRatio > 50 || ! url ) {
+			// Once dimRatio is greater than 50, the overlay color will have most impact on darkness.
+			if ( dimRatio > 50 ) {
 				if ( ! overlayColor ) {
-					// If no overlay color exists the overlay color is black (isDark )
+					// If no overlay color exists the overlay color is black so set to isDark.
 					__unstableMarkNextChangeAsNotPersistent();
 					setAttributes( { isDark: true } );
 					return;
@@ -66,12 +77,7 @@ export default function useCoverIsDark( setAttributes ) {
 				return;
 			}
 
-			if ( ! url && ! overlayColor ) {
-				// Reset isDark.
-				__unstableMarkNextChangeAsNotPersistent();
-				setAttributes( { isDark: false } );
-				return;
-			}
+			// At this point there is no image and a dimRatio < 50 so even black can no be considered light.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { isDark: false } );
 		},
