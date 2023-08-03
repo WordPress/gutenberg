@@ -31,6 +31,7 @@ export default function CreatePatternModal( {
 	onError,
 	clientIds,
 	onClose,
+	className = 'patterns-menu-items__convert-modal',
 } ) {
 	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
 	const [ title, setTitle ] = useState( '' );
@@ -66,7 +67,7 @@ export default function CreatePatternModal( {
 				onClose();
 				setTitle( '' );
 			} }
-			overlayClassName="patterns-menu-items__convert-modal"
+			overlayClassName={ className }
 		>
 			<form
 				onSubmit={ ( event ) => {
