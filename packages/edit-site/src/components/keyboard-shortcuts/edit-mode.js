@@ -33,10 +33,8 @@ function KeyboardShortcutsEditMode() {
 	);
 	const { redo, undo } = useDispatch( coreStore );
 	const {
-		isFeatureActive,
 		setIsListViewOpened,
 		switchEditorMode,
-		toggleFeature,
 		setIsInserterOpened,
 		closeGeneralSidebar,
 	} = useDispatch( editSiteStore );
@@ -47,7 +45,8 @@ function KeyboardShortcutsEditMode() {
 	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
 		useSelect( blockEditorStore );
 
-	const { set: setPreference } = useDispatch( preferencesStore );
+	const { get: getPreference } = useSelect( preferencesStore );
+	const { set: setPreference, toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
 
 	const toggleDistractionFree = () => {
@@ -135,9 +134,9 @@ function KeyboardShortcutsEditMode() {
 
 	useShortcut( 'core/edit-site/toggle-distraction-free', () => {
 		toggleDistractionFree();
-		toggleFeature( 'distractionFree' );
+		toggle( 'core/edit-site', 'distractionFree' );
 		createInfoNotice(
-			isFeatureActive( 'distractionFree' )
+			getPreference( 'core/edit-site', 'distractionFree' )
 				? __( 'Distraction free mode turned on.' )
 				: __( 'Distraction free mode turned off.' ),
 			{

@@ -29,7 +29,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_3 extends WP_REST_Cont
 	 * @since 6.3.0
 	 * @var string
 	 */
-	private $parent_base;
+	protected $parent_base;
 
 	/**
 	 * Constructor.

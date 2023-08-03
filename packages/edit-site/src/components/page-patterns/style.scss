@@ -6,14 +6,6 @@
 	padding: 0;
 	overflow-x: auto;
 
-	.edit-site-page-content {
-		height: 100%;
-		position: relative;
-		padding: 0;
-		display: flex;
-		flex-flow: column;
-	}
-
 	.components-base-control {
 		width: 100%;
 		@include break-medium {
@@ -67,6 +59,9 @@
 		@include break-medium {
 			width: 300px;
 		}
+	}
+	.edit-site-patterns__sync-status-filter-option:not([aria-checked="true"]) {
+		color: $gray-600;
 	}
 	.edit-site-patterns__sync-status-filter-option:active {
 		background: $gray-700;
@@ -127,6 +122,12 @@
 	margin-bottom: 0;
 	@include break-large {
 		grid-template-columns: 1fr 1fr;
+	}
+	@include break-huge {
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+	@include break-xhuge {
+		grid-template-columns: 1fr 1fr 1fr 1fr;
 	}
 	.edit-site-patterns__pattern {
 		break-inside: avoid-column;
