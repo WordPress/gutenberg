@@ -55,9 +55,17 @@ export const withInspectorControl = createHigherOrderComponent(
 			);
 
 			// Check if the current block is a paragraph or image block.
+			// Currently, only these two blocks are supported.
 			if ( ! [ 'core/paragraph', 'core/image' ].includes( props.name ) ) {
 				return <BlockEdit { ...props } />;
 			}
+
+			// If the block is a paragraph or image block, we need to know which
+			// attribute to use for the connection. Only the `content` attribute
+			// of the paragraph block and the `url` attribute of the image block are supported.
+			let attributeName;
+			if ( props.name === 'core/paragraph' ) attributeName = 'content';
+			if ( props.name === 'core/image' ) attributeName = 'url';
 
 			if ( hasCustomFieldsSupport && props.isSelected ) {
 				return (
@@ -75,22 +83,23 @@ export const withInspectorControl = createHigherOrderComponent(
 										label={ __( 'Custom field meta_key' ) }
 										value={
 											props.attributes?.connections
-												?.attributes?.content?.value ||
-											''
+												?.attributes?.[ attributeName ]
+												?.value || ''
 										}
 										onChange={ ( nextValue ) => {
 											if ( nextValue === '' ) {
 												props.setAttributes( {
 													connections: undefined,
-													content: undefined,
+													[ attributeName ]:
+														undefined,
 													placeholder: undefined,
 												} );
 											} else {
 												props.setAttributes( {
 													connections: {
 														attributes: {
-															// Content will be variable, could be content, href, src, etc.
-															content: {
+															// The attributeName will be either `content` or `url`.
+															[ attributeName ]: {
 																// Source will be variable, could be post_meta, user_meta, term_meta, etc.
 																// Could even be a custom source like a social media attribute.
 																source: 'meta_fields',
@@ -98,7 +107,8 @@ export const withInspectorControl = createHigherOrderComponent(
 															},
 														},
 													},
-													content: undefined,
+													[ attributeName ]:
+														undefined,
 													placeholder: sprintf(
 														'This content will be replaced on the frontend by the value of "%s" custom field.',
 														nextValue
