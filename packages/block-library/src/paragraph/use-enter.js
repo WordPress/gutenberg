@@ -23,6 +23,7 @@ export function useOnEnter( props ) {
 		getBlockName,
 		getBlock,
 		getNextBlockClientId,
+		canInsertBlockType,
 	} = useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
@@ -63,11 +64,23 @@ export function useOnEnter( props ) {
 
 			// If it is the last block, exit.
 			if ( position === order.length - 1 ) {
+				let newWrapperClientId = wrapperClientId;
+
+				while (
+					! canInsertBlockType(
+						getBlockName( clientId ),
+						getBlockRootClientId( newWrapperClientId )
+					)
+				) {
+					newWrapperClientId =
+						getBlockRootClientId( newWrapperClientId );
+				}
+
 				moveBlocksToPosition(
 					[ clientId ],
 					wrapperClientId,
-					getBlockRootClientId( wrapperClientId ),
-					getBlockIndex( wrapperClientId ) + 1
+					getBlockRootClientId( newWrapperClientId ),
+					getBlockIndex( newWrapperClientId ) + 1
 				);
 				return;
 			}
