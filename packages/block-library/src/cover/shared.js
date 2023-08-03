@@ -35,9 +35,9 @@ export function dimRatioToClass( ratio ) {
 }
 
 export function attributesFromMedia( setAttributes, dimRatio ) {
-	return ( media ) => {
+	return ( media, isDark ) => {
 		if ( ! media || ! media.url ) {
-			setAttributes( { url: undefined, id: undefined } );
+			setAttributes( { url: undefined, id: undefined, isDark } );
 			return;
 		}
 
@@ -67,6 +67,7 @@ export function attributesFromMedia( setAttributes, dimRatio ) {
 		}
 
 		setAttributes( {
+			isDark,
 			dimRatio: dimRatio === 100 ? 50 : dimRatio,
 			url: media.url,
 			id: media.id,

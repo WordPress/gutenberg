@@ -9,8 +9,6 @@ import { colord } from 'colord';
  */
 import { useCallback } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-import { useDispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -32,13 +30,9 @@ function retrieveFastAverageColor() {
  * See the comments below for more details about which aspects take priority when
  * calculating the relative darkness of the Cover.
  *
- * @param {Function} setAttributes function to set attributes.
  * @return {Function} Function to calculate isDark attribute.
  */
-export default function useCoverIsDark( setAttributes ) {
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
+export default function useCoverIsDark() {
 	const getCoverIsDark = useCallback(
 		( url, dimRatio = 50, overlayColor ) => {
 			// If the dimRatio is less than 50, the image will have the most impact on darkness.
@@ -59,8 +53,9 @@ export default function useCoverIsDark( setAttributes ) {
 						crossOrigin: imgCrossOrigin,
 					} )
 					.then( ( color ) => {
-						__unstableMarkNextChangeAsNotPersistent();
-						setAttributes( { isDark: color.isDark } );
+						// __unstableMarkNextChangeAsNotPersistent();
+						// setAttributes( { isDark: color.isDark } );
+						return color.isDark;
 					} );
 			}
 
@@ -68,20 +63,21 @@ export default function useCoverIsDark( setAttributes ) {
 			if ( dimRatio > 50 ) {
 				if ( ! overlayColor ) {
 					// If no overlay color exists the overlay color is black so set to isDark.
-					__unstableMarkNextChangeAsNotPersistent();
-					setAttributes( { isDark: true } );
-					return;
+					// __unstableMarkNextChangeAsNotPersistent();
+					// setAttributes( { isDark: true } );
+					return true;
 				}
-				__unstableMarkNextChangeAsNotPersistent();
-				setAttributes( { isDark: colord( overlayColor ).isDark() } );
-				return;
+				// __unstableMarkNextChangeAsNotPersistent();
+				// setAttributes( { isDark: colord( overlayColor ).isDark() } );
+				return colord( overlayColor ).isDark();
 			}
 
 			// At this point there is no image and a dimRatio < 50 so even black can no be considered light.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { isDark: false } );
+			// __unstableMarkNextChangeAsNotPersistent();
+			// setAttributes( { isDark: false } );
+			return false;
 		},
-		[ setAttributes, __unstableMarkNextChangeAsNotPersistent ]
+		[]
 	);
 	return getCoverIsDark;
 }

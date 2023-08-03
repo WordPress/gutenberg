@@ -9,7 +9,7 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
@@ -103,7 +103,9 @@ function CoverEdit( {
 		'featured_media',
 		postId
 	);
-	const setCoverIsDark = useCoverIsDark( setAttributes );
+	const getCoverIsDark = useCoverIsDark();
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const media = useSelect(
 		( select ) =>
 			featuredImage &&
@@ -112,9 +114,21 @@ function CoverEdit( {
 	);
 	const mediaUrl = media?.source_url;
 
-	if ( mediaUrl && useFeaturedImage ) {
-		setCoverIsDark( mediaUrl, dimRatio, overlayColor.color );
-	}
+	useEffect( () => {
+		if ( useFeaturedImage ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				isDark: getCoverIsDark(
+					mediaUrl,
+					dimRatio,
+					overlayColor.color
+				),
+			} );
+		}
+		// We only ever want to run this effect if the mediaUrl changes.
+		// All other changes to the isDark state are handled in the appropriate event handlers.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ mediaUrl ] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -133,8 +147,12 @@ function CoverEdit( {
 	const setMedia = attributesFromMedia( setAttributes, dimRatio );
 
 	const onSelectMedia = async ( newMedia ) => {
-		setMedia( newMedia );
-		setCoverIsDark( newMedia.url, dimRatio, overlayColor.color );
+		const isMediaDark = getCoverIsDark(
+			newMedia.url,
+			dimRatio,
+			overlayColor.color
+		);
+		setMedia( newMedia, isMediaDark );
 	};
 
 	const onClearMedia = async () => {
@@ -146,18 +164,23 @@ function CoverEdit( {
 			hasParallax: undefined,
 			isRepeated: undefined,
 			useFeaturedImage: false,
+			isDark: getCoverIsDark( undefined, dimRatio, overlayColor.color ),
 		} );
-		setCoverIsDark( undefined, dimRatio, overlayColor.color );
 	};
 
 	const onSetOverlayColor = async ( colorValue ) => {
 		setOverlayColor( colorValue );
-		setCoverIsDark( url, dimRatio, colorValue );
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			isDark: getCoverIsDark( url, dimRatio, colorValue ),
+		} );
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
-		setAttributes( { dimRatio: newDimRatio } );
-		setCoverIsDark( url, newDimRatio, overlayColor.color );
+		setAttributes( {
+			dimRatio: newDimRatio,
+			isDark: getCoverIsDark( url, newDimRatio, overlayColor.color ),
+		} );
 	};
 
 	const isUploadingMedia = isTemporaryMedia( id, url );
@@ -244,9 +267,6 @@ function CoverEdit( {
 	};
 
 	const toggleUseFeaturedImage = () => {
-		if ( useFeaturedImage ) {
-			setCoverIsDark( undefined, dimRatio, overlayColor.color );
-		}
 		setAttributes( {
 			id: undefined,
 			url: undefined,
@@ -255,6 +275,9 @@ function CoverEdit( {
 			backgroundType: useFeaturedImage
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
+			isDark: useFeaturedImage
+				? getCoverIsDark( undefined, dimRatio, overlayColor.color )
+				: getCoverIsDark( mediaUrl, dimRatio, overlayColor.color ),
 		} );
 	};
 
