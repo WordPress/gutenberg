@@ -113,19 +113,20 @@ function CoverEdit( {
 	const mediaUrl = media?.source_url;
 
 	const prevUseFeaturedImage = usePrevious( useFeaturedImage );
-	if ( mediaUrl && useFeaturedImage ) {
-		setCoverIsDark( mediaUrl, dimRatio, overlayColor.color );
-	}
 
-	// An effect is needed here to reset the isDark attribute when the
-	// useFeaturedImage attribute is toggled off. Trying to do this outside an
+	// An effect is needed here as we don't have access to the set featured image event handler
+	// and reseting the isDark attribute when the useFeaturedImage attribute is toggled off outside an
 	// effect causes a `cannot update while rendering another component` warning.
 	useEffect( () => {
 		if ( prevUseFeaturedImage && ! useFeaturedImage ) {
 			setCoverIsDark( undefined, dimRatio, overlayColor.color );
 		}
+		if ( mediaUrl && useFeaturedImage ) {
+			setCoverIsDark( mediaUrl, dimRatio, overlayColor.color );
+		}
 	}, [
 		dimRatio,
+		mediaUrl,
 		overlayColor.color,
 		prevUseFeaturedImage,
 		setCoverIsDark,
