@@ -111,6 +111,12 @@ jobs:
                   path: flaky-tests
                   if-no-files-found: ignore
 
+            - uses: replayio/action-upload@v0.5.1
+              if: always()
+              with:
+                  api-key: rwk_nTJTM9W3n5HTbKit7Bn7Kgf1Lo7ytyLE4eiuba3APJV
+                  public: true
+
     report-to-issues:
         name: Report to GitHub
         needs: [e2e-puppeteer, e2e-playwright]
