@@ -159,7 +159,12 @@ function CoverEdit( {
 		setMedia( newMedia, isDarkSetting );
 	};
 
-	const onClearMedia = () => {
+	const onClearMedia = async () => {
+		const isDarkSetting = await getCoverIsDark(
+			undefined,
+			dimRatio,
+			overlayColor.color
+		);
 		setAttributes( {
 			url: undefined,
 			id: undefined,
@@ -168,7 +173,7 @@ function CoverEdit( {
 			hasParallax: undefined,
 			isRepeated: undefined,
 			useFeaturedImage: false,
-			isDark: getCoverIsDark( undefined, dimRatio, overlayColor.color ),
+			isDark: isDarkSetting,
 		} );
 	};
 
