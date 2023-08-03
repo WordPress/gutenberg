@@ -69,6 +69,14 @@ function AutoInsertingBlocksControl( props ) {
 								( block ) => {
 									// TODO: Display block icon.
 									// <BlockIcon icon={ block.icon } />
+
+									const relativePosition =
+										block.autoInsert[ props.blockName ];
+									const insertionIndex =
+										relativePosition === 'after'
+											? blockIndex + 1
+											: blockIndex;
+
 									return (
 										<ToggleControl
 											checked={ toggleStatus }
@@ -76,14 +84,24 @@ function AutoInsertingBlocksControl( props ) {
 											label={ block.title }
 											onChange={ () => {
 												if ( ! toggleStatus ) {
-													insertBlock(
-														createBlock(
-															block.name
-														),
-														blockIndex + 1,
-														rootClientId,
-														false
-													);
+													if (
+														[
+															'before',
+															'after',
+														].includes(
+															relativePosition
+														)
+													) {
+														insertBlock(
+															createBlock(
+																block.name
+															),
+															insertionIndex,
+															rootClientId,
+															false
+														);
+													}
+													// TODO: Implement first_child and last_child insertion.
 												}
 
 												setToggleStatus(
