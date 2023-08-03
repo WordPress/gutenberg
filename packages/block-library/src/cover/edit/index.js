@@ -9,7 +9,7 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useMemo, useRef, useEffect } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver, usePrevious } from '@wordpress/compose';
 import {
