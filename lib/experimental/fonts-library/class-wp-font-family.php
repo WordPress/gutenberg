@@ -155,7 +155,7 @@ class WP_Font_Family {
 		$overrides = array(
 			'action'                   => 'wp_handle_font_upload', // Arbitrary string to avoid the is_uploaded_file() check applied when using 'wp_handle_upload'.
 			'test_form'                => false, // We are not testing a form submission.
-			'test_type'                => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/
+			'test_type'                => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/ .
 			'unique_filename_callback' => function () use ( $filename ) {
 				return $filename; }, // We want to keep the original filename.
 		);
@@ -207,7 +207,7 @@ class WP_Font_Family {
 		$overrides = array(
 			'action'                   => 'wp_handle_font_upload', // Arbitrary string to avoid the is_uploaded_file() check applied when using 'wp_handle_upload'.
 			'test_form'                => false, // We are not testing a form submission.
-			'test_type'                => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/
+			'test_type'                => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/ .
 			'unique_filename_callback' => function () use ( $filename ) {
 				return $filename; }, // We want to keep the original filename.
 		);
@@ -290,7 +290,7 @@ class WP_Font_Family {
 		}
 		$new_font_faces = array();
 		foreach ( $this->data['fontFace'] as $font_face ) {
-			// If the fonts is not meant to be dowloaded or uploaded (for example to install fonts that use a remote url)
+			// If the fonts is not meant to be dowloaded or uploaded (for example to install fonts that use a remote url).
 			$new_font_face = $font_face;
 
 			// If we are installing google fonts, we need to download the font face assets.

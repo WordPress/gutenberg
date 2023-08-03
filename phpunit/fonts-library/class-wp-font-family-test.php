@@ -6,9 +6,9 @@
  * @subpackage Fonts Library
  */
 
- /**
-  * @coversDefaultClass WP_Font_Family
-  */
+/**
+ * @coversDefaultClass WP_Font_Family
+ */
 class WP_Font_Family_Test extends WP_UnitTestCase {
 
 	/**
@@ -19,7 +19,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_font_fixtures
 	 *
-	 * @param array $font_data Font family data in theme.json format
+	 * @param array $font_data Font family data in theme.json format.
 	 */
 	public function test_get_data( $font_data ) {
 		$font = new WP_Font_Family( $font_data );
@@ -33,8 +33,8 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_data_as_json
 	 *
-	 * @param array  $font_data Font family data in theme.json format
-	 * @param string $expected  Expected font family data as JSON string
+	 * @param array  $font_data Font family data in theme.json format.
+	 * @param string $expected  Expected font family data as JSON string.
 	 */
 	public function test_get_data_as_json( $font_data, $expected ) {
 		$font = new WP_Font_Family( $font_data );
@@ -90,8 +90,8 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_has_font_faces
 	 *
-	 * @param array $font_data Font family data in theme.json format
-	 * @param bool  $expected  Expected result
+	 * @param array $font_data Font family data in theme.json format.
+	 * @param bool  $expected  Expected result.
 	 */
 	public function test_has_font_faces( $font_data, $expected ) {
 		$font = new WP_Font_Family( $font_data );
@@ -143,19 +143,19 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_font_fixtures
 	 *
-	 * @param array $font_data Font family data in theme.json format
-	 * @param array $installed_font_data Font family data in theme.json format expected data after installation
+	 * @param array $font_data Font family data in theme.json format.
+	 * @param array $installed_font_data Font family data in theme.json format expected data after installation.
 	 * @param array $files_data Optional. Files data in $_FILES format (Used only if the font has local files). Default: empty array.
 	 */
 	public function test_install_and_uninstall( $font_data, $installed_font_data, $files_data = array() ) {
 		$font = new WP_Font_Family( $font_data );
-		$inst = $font->install( $files_data );
+		$font->install( $files_data );
 
-		// Check that the post was created
+		// Check that the post was created.
 		$post = $font->get_font_post();
 		$this->assertInstanceof( 'WP_Post', $post, 'The font post was not created.' );
 
-		// Check that the post has the correct data
+		// Check that the post has the correct data.
 		$this->assertSame( $installed_font_data['name'], $post->post_title, 'The font post has the wrong title.' );
 		$this->assertSame( $installed_font_data['slug'], $post->post_name, 'The font post has the wrong slug.' );
 
@@ -170,7 +170,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 
 		$font->uninstall();
 
-		// Check that the post was deleted
+		// Check that the post was deleted.
 		$post = $font->get_font_post();
 		$this->assertNull( $post, 'The font post was not deleted' );
 	}
@@ -211,7 +211,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 							'fontFamily' => 'Piazzolla',
 							'fontStyle'  => 'italic',
 							'fontWeight' => '400',
-							'src'        => 'piazzolla_italic_400.ttf', // This is just filename of the font asset and not the entire URL because we can't know the URL of the asset in the test
+							'src'        => 'piazzolla_italic_400.ttf', // This is just filename of the font asset and not the entire URL because we can't know the URL of the asset in the test.
 						),
 					),
 				),
@@ -240,7 +240,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 							'fontFamily' => 'Piazzolla',
 							'fontStyle'  => 'italic',
 							'fontWeight' => '400',
-							'src'        => 'piazzolla_italic_400.ttf', // This is just filename of the font asset and not the entire URL because we can't know the URL of the asset in the test
+							'src'        => 'piazzolla_italic_400.ttf', // This is just filename of the font asset and not the entire URL because we can't know the URL of the asset in the test.
 						),
 					),
 				),
