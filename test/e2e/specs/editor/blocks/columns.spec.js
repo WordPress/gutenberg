@@ -122,4 +122,56 @@ test.describe( 'Columns', () => {
 			},
 		] );
 	} );
+
+	test( 'can exit on Enter', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+				},
+			],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+		);
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '1' },
+							},
+						],
+					},
+					{
+						name: 'core/column',
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
+			},
+		] );
+	} );
 } );
