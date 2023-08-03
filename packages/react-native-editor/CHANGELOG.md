@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.100.2
+-   [**] Fix iOS Focus loop for RichText components [#53217]
+
 ## 1.100.1
 -   [**] Add WP hook for registering non-core blocks [#52791]
 
