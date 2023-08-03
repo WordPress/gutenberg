@@ -63,7 +63,8 @@ jobs:
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        # TODO: Remove later once we file the official PR -jvv
+        # if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
