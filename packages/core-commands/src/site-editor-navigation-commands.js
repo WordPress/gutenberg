@@ -62,16 +62,16 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 		 * We need to sort the results based on the search query to avoid removing relevant
 		 * records below using .slice().
 		 */
-		const orderedRecords = useMemo(
-			() =>
-				supportsSearch
-					? records
-					: orderEntityRecordsBySearch( records || [], search ),
-			[ supportsSearch, records, search ]
-		);
+		const orderedRecords = useMemo( () => {
+			if ( supportsSearch ) {
+				return records ?? [];
+			}
+
+			return orderEntityRecordsBySearch( records, search ).slice( 0, 10 );
+		}, [ supportsSearch, records, search ] );
 
 		const commands = useMemo( () => {
-			return ( orderedRecords ?? [] ).slice( 0, 10 ).map( ( record ) => {
+			return orderedRecords.map( ( record ) => {
 				const isSiteEditor = getPath( window.location.href )?.includes(
 					'site-editor.php'
 				);
