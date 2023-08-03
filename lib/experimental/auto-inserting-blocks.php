@@ -164,7 +164,8 @@ function gutenberg_parse_and_serialize_block_templates( $query_result ) {
 		if ( 'custom' === $block_template->source ) {
 			continue;
 		}
-		gutenberg_parse_and_serialize_blocks( $block_template );
+		$blocks                  = parse_blocks( $block_template->content );
+		$block_template->content = gutenberg_serialize_blocks( $blocks );
 	}
 
 	return $query_result;
@@ -182,7 +183,7 @@ add_filter( 'get_block_templates', 'gutenberg_parse_and_serialize_block_template
  *
  * @param WP_Block_Template|null $block_template The found block template, or null if there is none.
  */
-function gutenberg_parse_and_serialize_blocks( &$block_template ) {
+function gutenberg_parse_and_serialize_blocks( $block_template ) {
 
 	$blocks                  = parse_blocks( $block_template->content );
 	$block_template->content = gutenberg_serialize_blocks( $blocks );
