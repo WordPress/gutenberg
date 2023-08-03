@@ -33,6 +33,10 @@ const v0 = {
 		spacing: {
 			margin: true,
 			padding: true,
+			__experimentalDefaultControls: {
+				margin: false,
+				padding: false,
+			},
 		},
 		typography: {
 			fontSize: true,
