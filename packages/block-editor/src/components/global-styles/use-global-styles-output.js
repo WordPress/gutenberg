@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, isEmpty, kebabCase, set } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -22,12 +17,21 @@ import { getCSSRules } from '@wordpress/style-engine';
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
-import { getTypographyFontSizeValue } from './typography-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
 import { PresetDuotoneFilter } from '../duotone/components';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
+import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
+import {
+	getValueFromObjectPath,
+	kebabCase,
+	setImmutably,
+} from '../../utils/object';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -64,7 +68,11 @@ function compileStyleValue( uncompiledValue ) {
 function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
 	return PRESET_METADATA.reduce(
 		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
-			const presetByOrigin = get( blockPresets, path, [] );
+			const presetByOrigin = getValueFromObjectPath(
+				blockPresets,
+				path,
+				[]
+			);
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( value ) => {
@@ -108,7 +116,11 @@ function getPresetsClasses( blockSelector = '*', blockPresets = {} ) {
 				return declarations;
 			}
 
-			const presetByOrigin = get( blockPresets, path, [] );
+			const presetByOrigin = getValueFromObjectPath(
+				blockPresets,
+				path,
+				[]
+			);
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( { slug } ) => {
@@ -142,7 +154,11 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 		// Duotone are the only type of filters for now.
 		( metadata ) => metadata.path.at( -1 ) === 'duotone'
 	).flatMap( ( metadata ) => {
-		const presetByOrigin = get( blockPresets, metadata.path, {} );
+		const presetByOrigin = getValueFromObjectPath(
+			blockPresets,
+			metadata.path,
+			{}
+		);
 		return [ 'default', 'theme' ]
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>
@@ -314,7 +330,10 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 
-			const styleValue = get( blockStyles, pathToValue );
+			const styleValue = getValueFromObjectPath(
+				blockStyles,
+				pathToValue
+			);
 
 			// Root-level padding styles don't currently support strings with CSS shorthand values.
 			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
@@ -325,11 +344,13 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 
-			if ( !! properties && typeof styleValue !== 'string' ) {
+			if ( properties && typeof styleValue !== 'string' ) {
 				Object.entries( properties ).forEach( ( entry ) => {
 					const [ name, prop ] = entry;
 
-					if ( ! get( styleValue, [ prop ], false ) ) {
+					if (
+						! getValueFromObjectPath( styleValue, [ prop ], false )
+					) {
 						// Do not create a declaration
 						// for sub-properties that don't have any value.
 						return;
@@ -340,17 +361,19 @@ export function getStylesDeclarations(
 						: kebabCase( name );
 					declarations.push(
 						`${ cssProperty }: ${ compileStyleValue(
-							get( styleValue, [ prop ] )
+							getValueFromObjectPath( styleValue, [ prop ] )
 						) }`
 					);
 				} );
-			} else if ( get( blockStyles, pathToValue, false ) ) {
+			} else if (
+				getValueFromObjectPath( blockStyles, pathToValue, false )
+			) {
 				const cssProperty = key.startsWith( '--' )
 					? key
 					: kebabCase( key );
 				declarations.push(
 					`${ cssProperty }: ${ compileStyleValue(
-						get( blockStyles, pathToValue )
+						getValueFromObjectPath( blockStyles, pathToValue )
 					) }`
 				);
 			}
@@ -379,10 +402,10 @@ export function getStylesDeclarations(
 		let ruleValue = rule.value;
 		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
 			const refPath = ruleValue.ref.split( '.' );
-			ruleValue = get( tree, refPath );
+			ruleValue = getValueFromObjectPath( tree, refPath );
 			// Presence of another ref indicates a reference to another dynamic value.
 			// Pointing to another dynamic value is not supported.
-			if ( ! ruleValue || !! ruleValue?.ref ) {
+			if ( ! ruleValue || ruleValue?.ref ) {
 				return;
 			}
 		}
@@ -398,7 +421,7 @@ export function getStylesDeclarations(
 			 */
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
-				tree?.settings?.typography
+				getFluidTypographyOptionsFromSettings( tree?.settings )
 			);
 		}
 
@@ -413,7 +436,7 @@ export function getStylesDeclarations(
  * in theme.json, and outputting common layout styles, and specific blockGap values.
  *
  * @param {Object}  props
- * @param {Object}  props.tree                  A theme.json tree containing layout definitions.
+ * @param {Object}  props.layoutDefinitions     Layout definitions, keyed by layout type.
  * @param {Object}  props.style                 A style object containing spacing values.
  * @param {string}  props.selector              Selector used to group together layout styling rules.
  * @param {boolean} props.hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
@@ -422,7 +445,7 @@ export function getStylesDeclarations(
  * @return {string} Generated CSS rules for the layout styles.
  */
 export function getLayoutStyles( {
-	tree,
+	layoutDefinitions = LAYOUT_DEFINITIONS,
 	style,
 	selector,
 	hasBlockGapSupport,
@@ -444,11 +467,15 @@ export function getLayoutStyles( {
 		}
 	}
 
-	if ( gapValue && tree?.settings?.layout?.definitions ) {
-		Object.values( tree.settings.layout.definitions ).forEach(
+	if ( gapValue && layoutDefinitions ) {
+		Object.values( layoutDefinitions ).forEach(
 			( { className, name, spacingStyles } ) => {
 				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
-				if ( ! hasBlockGapSupport && 'flex' !== name ) {
+				if (
+					! hasBlockGapSupport &&
+					'flex' !== name &&
+					'grid' !== name
+				) {
 					return;
 				}
 
@@ -484,10 +511,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `${ selector } .${ className }${
+										? `:where(${ selector } .${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }-${ className }${ selector }-${ className }${
+										: `${ selector }-${ className }${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -506,12 +533,9 @@ export function getLayoutStyles( {
 	}
 
 	// Output base styles
-	if (
-		selector === ROOT_BLOCK_SELECTOR &&
-		tree?.settings?.layout?.definitions
-	) {
+	if ( selector === ROOT_BLOCK_SELECTOR && layoutDefinitions ) {
 		const validDisplayModes = [ 'block', 'flex', 'grid' ];
-		Object.values( tree.settings.layout.definitions ).forEach(
+		Object.values( layoutDefinitions ).forEach(
 			( { className, displayMode, baseStyles } ) => {
 				if (
 					displayMode &&
@@ -551,6 +575,33 @@ export function getLayoutStyles( {
 	return ruleset;
 }
 
+const STYLE_KEYS = [
+	'border',
+	'color',
+	'dimensions',
+	'spacing',
+	'typography',
+	'filter',
+	'outline',
+	'shadow',
+];
+
+function pickStyleKeys( treeToPickFrom ) {
+	if ( ! treeToPickFrom ) {
+		return {};
+	}
+	const entries = Object.entries( treeToPickFrom );
+	const pickedEntries = entries.filter( ( [ key ] ) =>
+		STYLE_KEYS.includes( key )
+	);
+	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
+	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
+		key,
+		JSON.parse( JSON.stringify( style ) ),
+	] );
+	return Object.fromEntries( clonedEntries );
+}
+
 export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	const nodes = [];
 
@@ -558,25 +609,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		return nodes;
 	}
 
-	const pickStyleKeys = ( treeToPickFrom ) =>
-		Object.fromEntries(
-			Object.entries( treeToPickFrom ?? {} ).filter( ( [ key ] ) =>
-				[
-					'border',
-					'color',
-					'dimensions',
-					'spacing',
-					'typography',
-					'filter',
-					'outline',
-					'shadow',
-				].includes( key )
-			)
-		);
-
 	// Top-level.
 	const styles = pickStyleKeys( tree.styles );
-	if ( !! styles ) {
+	if ( styles ) {
 		nodes.push( {
 			styles,
 			selector: ROOT_BLOCK_SELECTOR,
@@ -584,7 +619,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	}
 
 	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
-		if ( !! tree.styles?.elements?.[ name ] ) {
+		if ( tree.styles?.elements?.[ name ] ) {
 			nodes.push( {
 				styles: tree.styles?.elements?.[ name ],
 				selector,
@@ -606,10 +641,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 				} );
 				blockStyles.variations = variations;
 			}
-			if (
-				!! blockStyles &&
-				!! blockSelectors?.[ blockName ]?.selector
-			) {
+			if ( blockStyles && blockSelectors?.[ blockName ]?.selector ) {
 				nodes.push( {
 					duotoneSelector:
 						blockSelectors[ blockName ].duotoneSelector,
@@ -617,7 +649,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 						blockSelectors[ blockName ].fallbackGapValue,
 					hasLayoutSupport:
 						blockSelectors[ blockName ].hasLayoutSupport,
-					selector: blockSelectors[ blockName ]?.selector,
+					selector: blockSelectors[ blockName ].selector,
 					styles: blockStyles,
 					featureSelectors:
 						blockSelectors[ blockName ].featureSelectors,
@@ -629,9 +661,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			Object.entries( node?.elements ?? {} ).forEach(
 				( [ elementName, value ] ) => {
 					if (
-						!! value &&
-						!! blockSelectors?.[ blockName ] &&
-						!! ELEMENTS?.[ elementName ]
+						value &&
+						blockSelectors?.[ blockName ] &&
+						ELEMENTS[ elementName ]
 					) {
 						nodes.push( {
 							styles: value,
@@ -664,11 +696,11 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	}
 
 	const pickPresets = ( treeToPickFrom ) => {
-		const presets = {};
+		let presets = {};
 		PRESET_METADATA.forEach( ( { path } ) => {
-			const value = get( treeToPickFrom, path, false );
+			const value = getValueFromObjectPath( treeToPickFrom, path, false );
 			if ( value !== false ) {
-				set( presets, path, value );
+				presets = setImmutably( presets, path, value );
 			}
 		} );
 		return presets;
@@ -677,7 +709,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	// Top-level.
 	const presets = pickPresets( tree.settings );
 	const custom = tree.settings?.custom;
-	if ( ! isEmpty( presets ) || !! custom ) {
+	if ( Object.keys( presets ).length > 0 || custom ) {
 		nodes.push( {
 			presets,
 			custom,
@@ -690,7 +722,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 		( [ blockName, node ] ) => {
 			const blockPresets = pickPresets( node );
 			const blockCustom = node.custom;
-			if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
+			if ( Object.keys( blockPresets ).length > 0 || blockCustom ) {
 				nodes.push( {
 					presets: blockPresets,
 					custom: blockCustom,
@@ -714,7 +746,7 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 		}
 
 		if ( declarations.length > 0 ) {
-			ruleset = ruleset + `${ selector }{${ declarations.join( ';' ) };}`;
+			ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
 		}
 	} );
 
@@ -761,7 +793,7 @@ export const toStyles = (
 			.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }
 			.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
 			.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }
-			.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
+			.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
 			.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0;`;
 	}
 
@@ -787,9 +819,9 @@ export const toStyles = (
 
 				Object.entries( featureDeclarations ).forEach(
 					( [ cssSelector, declarations ] ) => {
-						if ( !! declarations.length ) {
+						if ( declarations.length ) {
 							const rules = declarations.join( ';' );
-							ruleset = ruleset + `${ cssSelector }{${ rules }}`;
+							ruleset += `${ cssSelector }{${ rules };}`;
 						}
 					}
 				);
@@ -798,20 +830,20 @@ export const toStyles = (
 			if ( styleVariationSelectors ) {
 				Object.entries( styleVariationSelectors ).forEach(
 					( [ styleVariationName, styleVariationSelector ] ) => {
-						if ( styles?.variations?.[ styleVariationName ] ) {
+						const styleVariations =
+							styles?.variations?.[ styleVariationName ];
+						if ( styleVariations ) {
 							// If the block uses any custom selectors for block support, add those first.
 							if ( featureSelectors ) {
 								const featureDeclarations =
 									getFeatureDeclarations(
 										featureSelectors,
-										styles?.variations?.[
-											styleVariationName
-										]
+										styleVariations
 									);
 
 								Object.entries( featureDeclarations ).forEach(
 									( [ baseSelector, declarations ] ) => {
-										if ( !! declarations.length ) {
+										if ( declarations.length ) {
 											const cssSelector =
 												concatFeatureVariationSelectorString(
 													baseSelector,
@@ -819,9 +851,7 @@ export const toStyles = (
 												);
 											const rules =
 												declarations.join( ';' );
-											ruleset =
-												ruleset +
-												`${ cssSelector }{${ rules }}`;
+											ruleset += `${ cssSelector }{${ rules };}`;
 										}
 									}
 								);
@@ -830,39 +860,34 @@ export const toStyles = (
 							// Otherwise add regular selectors.
 							const styleVariationDeclarations =
 								getStylesDeclarations(
-									styles?.variations?.[ styleVariationName ],
+									styleVariations,
 									styleVariationSelector,
 									useRootPaddingAlign,
 									tree
 								);
-							if ( !! styleVariationDeclarations.length ) {
-								ruleset =
-									ruleset +
-									`${ styleVariationSelector }{${ styleVariationDeclarations.join(
-										';'
-									) }}`;
+							if ( styleVariationDeclarations.length ) {
+								ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
+									';'
+								) };}`;
 							}
 						}
 					}
 				);
 			}
 
-			const duotoneStyles = {};
-			if ( styles?.filter ) {
-				duotoneStyles.filter = styles.filter;
-				delete styles.filter;
-			}
-
 			// Process duotone styles.
 			if ( duotoneSelector ) {
+				const duotoneStyles = {};
+				if ( styles?.filter ) {
+					duotoneStyles.filter = styles.filter;
+					delete styles.filter;
+				}
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
-				if ( duotoneDeclarations.length > 0 ) {
-					ruleset =
-						ruleset +
-						`${ duotoneSelector }{${ duotoneDeclarations.join(
-							';'
-						) };}`;
+				if ( duotoneDeclarations.length ) {
+					ruleset += `${ duotoneSelector }{${ duotoneDeclarations.join(
+						';'
+					) };}`;
 				}
 			}
 
@@ -872,7 +897,6 @@ export const toStyles = (
 				( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
 			) {
 				ruleset += getLayoutStyles( {
-					tree,
 					style: styles,
 					selector,
 					hasBlockGapSupport,
@@ -889,8 +913,7 @@ export const toStyles = (
 				tree
 			);
 			if ( declarations?.length ) {
-				ruleset =
-					ruleset + `${ selector }{${ declarations.join( ';' ) };}`;
+				ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
 			}
 
 			// Check for pseudo selector in `styles` and handle separately.
@@ -924,7 +947,7 @@ export const toStyles = (
 							';'
 						) };}`;
 
-						ruleset = ruleset + pseudoRule;
+						ruleset += pseudoRule;
 					}
 				);
 			}
@@ -948,10 +971,13 @@ export const toStyles = (
 			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
 		ruleset =
 			ruleset +
-			'.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
+			`:where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
 		ruleset =
 			ruleset +
-			`.wp-site-blocks > * + * { margin-block-start: ${ gapValue }; }`;
+			':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';
+		ruleset =
+			ruleset +
+			':where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }';
 	}
 
 	nodesWithSettings.forEach( ( { selector, presets } ) => {
@@ -961,8 +987,8 @@ export const toStyles = (
 		}
 
 		const classes = getPresetsClasses( selector, presets );
-		if ( ! isEmpty( classes ) ) {
-			ruleset = ruleset + classes;
+		if ( classes.length > 0 ) {
+			ruleset += classes;
 		}
 	} );
 
@@ -977,7 +1003,10 @@ export function toSvgFilters( tree, blockSelectors ) {
 }
 
 const getSelectorsConfig = ( blockType, rootSelector ) => {
-	if ( ! isEmpty( blockType?.selectors ) ) {
+	if (
+		blockType?.selectors &&
+		Object.keys( blockType.selectors ).length > 0
+	) {
 		return blockType.selectors;
 	}
 
@@ -1020,7 +1049,9 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 				duotoneSupport && scopeSelector( rootSelector, duotoneSupport );
 		}
 
-		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
+		const hasLayoutSupport =
+			!! blockType?.supports?.layout ||
+			!! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
 
@@ -1103,9 +1134,17 @@ const processCSSNesting = ( css, blockSelector ) => {
 	return processedCSS;
 };
 
-export function useGlobalStylesOutput() {
-	let { merged: mergedConfig } = useContext( GlobalStylesContext );
-
+/**
+ * Returns the global styles output using a global styles configuration.
+ * If wishing to generate global styles and settings based on the
+ * global styles config loaded in the editor context, use `useGlobalStylesOutput()`.
+ * The use case for a custom config is to generate bespoke styles
+ * and settings for previews, or other out-of-editor experiences.
+ *
+ * @param {Object} mergedConfig Global styles configuration.
+ * @return {Array} Array of stylesheets and settings.
+ */
+export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
@@ -1186,4 +1225,14 @@ export function useGlobalStylesOutput() {
 		mergedConfig,
 		disableLayoutStyles,
 	] );
+}
+
+/**
+ * Returns the global styles output based on the current state of global styles config loaded in the editor context.
+ *
+ * @return {Array} Array of stylesheets and settings.
+ */
+export function useGlobalStylesOutput() {
+	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	return useGlobalStylesOutputWithConfig( mergedConfig );
 }

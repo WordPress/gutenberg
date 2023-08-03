@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
+	parse,
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 
@@ -16,6 +17,7 @@ import useBlockTypesState from '../components/inserter/hooks/use-block-types-sta
 import BlockIcon from '../components/block-icon';
 import { store as blockEditorStore } from '../store';
 import { orderBy } from '../utils/sorting';
+import { orderInserterBlockItems } from '../utils/order-inserter-block-items';
 
 const noop = () => {};
 const SHOWN_BLOCK_TYPES = 9;
@@ -34,23 +36,28 @@ function createBlockCompleter() {
 		triggerPrefix: '/',
 
 		useItems( filterValue ) {
-			const { rootClientId, selectedBlockName } = useSelect(
-				( select ) => {
+			const { rootClientId, selectedBlockName, prioritizedBlocks } =
+				useSelect( ( select ) => {
 					const {
 						getSelectedBlockClientId,
 						getBlockName,
-						getBlockInsertionPoint,
+						getBlockListSettings,
+						getBlockRootClientId,
 					} = select( blockEditorStore );
 					const selectedBlockClientId = getSelectedBlockClientId();
+					const _rootClientId = getBlockRootClientId(
+						selectedBlockClientId
+					);
 					return {
 						selectedBlockName: selectedBlockClientId
 							? getBlockName( selectedBlockClientId )
 							: null,
-						rootClientId: getBlockInsertionPoint().rootClientId,
+						rootClientId: _rootClientId,
+						prioritizedBlocks:
+							getBlockListSettings( _rootClientId )
+								?.prioritizedInserterBlocks,
 					};
-				},
-				[]
-			);
+				}, [] );
 			const [ items, categories, collections ] = useBlockTypesState(
 				rootClientId,
 				noop
@@ -64,7 +71,10 @@ function createBlockCompleter() {
 							collections,
 							filterValue
 					  )
-					: orderBy( items, 'frecency', 'desc' );
+					: orderInserterBlockItems(
+							orderBy( items, 'frecency', 'desc' ),
+							prioritizedBlocks
+					  );
 
 				return initialFilteredItems
 					.filter( ( item ) => item.name !== selectedBlockName )
@@ -75,6 +85,7 @@ function createBlockCompleter() {
 				items,
 				categories,
 				collections,
+				prioritizedBlocks,
 			] );
 
 			const options = useMemo(
@@ -106,14 +117,28 @@ function createBlockCompleter() {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );
 		},
 		getOptionCompletion( inserterItem ) {
-			const { name, initialAttributes, innerBlocks } = inserterItem;
+			const {
+				name,
+				initialAttributes,
+				innerBlocks,
+				syncStatus,
+				content,
+			} = inserterItem;
+
 			return {
 				action: 'replace',
-				value: createBlock(
-					name,
-					initialAttributes,
-					createBlocksFromInnerBlocksTemplate( innerBlocks )
-				),
+				value:
+					syncStatus === 'unsynced'
+						? parse( content, {
+								__unstableSkipMigrationLogs: true,
+						  } )
+						: createBlock(
+								name,
+								initialAttributes,
+								createBlocksFromInnerBlocksTemplate(
+									innerBlocks
+								)
+						  ),
 			};
 		},
 	};

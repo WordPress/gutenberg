@@ -7,7 +7,7 @@ import type { ForwardedRef, KeyboardEvent } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,6 +42,8 @@ function ConfirmDialog(
 
 	const cx = useCx();
 	const wrapperClassName = cx( styles.wrapper );
+	const cancelButtonRef = useRef();
+	const confirmButtonRef = useRef();
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
 	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();
@@ -69,7 +71,13 @@ function ConfirmDialog(
 
 	const handleEnter = useCallback(
 		( event: KeyboardEvent< HTMLDivElement > ) => {
-			if ( event.key === 'Enter' ) {
+			// Avoid triggering the 'confirm' action when a button is focused,
+			// as this can cause a double submission.
+			const isConfirmOrCancelButton =
+				event.target === cancelButtonRef.current ||
+				event.target === confirmButtonRef.current;
+
+			if ( ! isConfirmOrCancelButton && event.key === 'Enter' ) {
 				handleEvent( onConfirm )( event );
 			}
 		},
@@ -96,12 +104,14 @@ function ConfirmDialog(
 						<Text>{ children }</Text>
 						<Flex direction="row" justify="flex-end">
 							<Button
+								ref={ cancelButtonRef }
 								variant="tertiary"
 								onClick={ handleEvent( onCancel ) }
 							>
 								{ cancelLabel }
 							</Button>
 							<Button
+								ref={ confirmButtonRef }
 								variant="primary"
 								onClick={ handleEvent( onConfirm ) }
 							>

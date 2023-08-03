@@ -5,6 +5,7 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
+	parse,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
@@ -37,12 +38,20 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 	);
 
 	const onSelectItem = useCallback(
-		( { name, initialAttributes, innerBlocks }, shouldFocusBlock ) => {
-			const insertedBlock = createBlock(
-				name,
-				initialAttributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			);
+		(
+			{ name, initialAttributes, innerBlocks, syncStatus, content },
+			shouldFocusBlock
+		) => {
+			const insertedBlock =
+				syncStatus === 'unsynced'
+					? parse( content, {
+							__unstableSkipMigrationLogs: true,
+					  } )
+					: createBlock(
+							name,
+							initialAttributes,
+							createBlocksFromInnerBlocksTemplate( innerBlocks )
+					  );
 
 			onInsert( insertedBlock, undefined, shouldFocusBlock );
 		},

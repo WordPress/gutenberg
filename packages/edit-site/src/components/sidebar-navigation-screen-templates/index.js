@@ -4,11 +4,9 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
-	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -19,33 +17,7 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import AddNewTemplate from '../add-new-template';
-import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-
-const config = {
-	wp_template: {
-		labels: {
-			title: __( 'Templates' ),
-			loading: __( 'Loading templates' ),
-			notFound: __( 'No templates found' ),
-			manage: __( 'Manage all templates' ),
-			description: __(
-				'Express the layout of your site with templates.'
-			),
-		},
-	},
-	wp_template_part: {
-		labels: {
-			title: __( 'Template parts' ),
-			loading: __( 'Loading template parts' ),
-			notFound: __( 'No template parts found' ),
-			manage: __( 'Manage all template parts' ),
-			description: __(
-				'Template Parts are small pieces of a layout that can be reused across multiple templates and always appear the same way. Common template parts include the site header, footer, or sidebar.'
-			),
-		},
-	},
-};
 
 const TemplateItem = ( { postType, postId, ...props } ) => {
 	const linkInfo = useLink( {
@@ -56,41 +28,33 @@ const TemplateItem = ( { postType, postId, ...props } ) => {
 };
 
 export default function SidebarNavigationScreenTemplates() {
-	const {
-		params: { postType },
-	} = useNavigator();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isTemplatePartsMode = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
-
-		return !! settings.supportsTemplatePartsMode;
-	}, [] );
 
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
-		postType,
+		'wp_template',
 		{
 			per_page: -1,
 		}
 	);
+
 	const sortedTemplates = templates ? [ ...templates ] : [];
-	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
+	sortedTemplates.sort( ( a, b ) =>
+		a.title.rendered.localeCompare( b.title.rendered )
+	);
 
-	const browseAllLink = useLink( {
-		path: '/' + postType + '/all',
-	} );
-
-	const canCreate = ! isMobileViewport && ! isTemplatePartsMode;
-
+	const browseAllLink = useLink( { path: '/wp_template/all' } );
+	const canCreate = ! isMobileViewport;
 	return (
 		<SidebarNavigationScreen
-			isRoot={ isTemplatePartsMode }
-			title={ config[ postType ].labels.title }
-			description={ config[ postType ].labels.description }
+			title={ __( 'Templates' ) }
+			description={ __(
+				'Express the layout of your site with templates'
+			) }
 			actions={
 				canCreate && (
 					<AddNewTemplate
-						templateType={ postType }
+						templateType={ 'wp_template' }
 						toggleProps={ {
 							as: SidebarButton,
 						} }
@@ -99,19 +63,18 @@ export default function SidebarNavigationScreenTemplates() {
 			}
 			content={
 				<>
-					{ isLoading && config[ postType ].labels.loading }
+					{ isLoading && __( 'Loading templates' ) }
 					{ ! isLoading && (
 						<ItemGroup>
 							{ ! templates?.length && (
-								<Item>
-									{ config[ postType ].labels.notFound }
-								</Item>
+								<Item>{ __( 'No templates found' ) }</Item>
 							) }
 							{ sortedTemplates.map( ( template ) => (
 								<TemplateItem
-									postType={ postType }
+									postType={ 'wp_template' }
 									postId={ template.id }
 									key={ template.id }
+									withChevron
 								>
 									{ decodeEntities(
 										template.title?.rendered ||
@@ -119,18 +82,16 @@ export default function SidebarNavigationScreenTemplates() {
 									) }
 								</TemplateItem>
 							) ) }
-							{ ! isMobileViewport && (
-								<SidebarNavigationItem
-									className="edit-site-sidebar-navigation-screen-templates__see-all"
-									{ ...browseAllLink }
-									children={
-										config[ postType ].labels.manage
-									}
-								/>
-							) }
 						</ItemGroup>
 					) }
 				</>
+			}
+			footer={
+				! isMobileViewport && (
+					<SidebarNavigationItem withChevron { ...browseAllLink }>
+						{ __( 'Manage all templates' ) }
+					</SidebarNavigationItem>
+				)
 			}
 		/>
 	);

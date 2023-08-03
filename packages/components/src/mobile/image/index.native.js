@@ -178,12 +178,19 @@ const ImageComponent = ( {
 			imageData &&
 			containerSize && {
 				height:
-					imageData?.width > containerSize?.width
+					imageData?.width > containerSize?.width && ! imageWidth
 						? containerSize?.width / imageData?.aspectRatio
 						: undefined,
 			},
 		imageHeight && { height: imageHeight },
 		shapeStyle,
+	];
+	const imageSelectedStyles = [
+		usePreferredColorSchemeStyle(
+			styles.imageBorder,
+			styles.imageBorderDark
+		),
+		{ height: containerSize?.height },
 	];
 
 	return (
@@ -210,12 +217,7 @@ const ImageComponent = ( {
 				{ isSelected &&
 					highlightSelected &&
 					! ( isUploadInProgress || isUploadFailed ) && (
-						<View
-							style={ [
-								styles.imageBorder,
-								{ height: containerSize?.height },
-							] }
-						/>
+						<View style={ imageSelectedStyles } />
 					) }
 
 				{ ! imageData ? (

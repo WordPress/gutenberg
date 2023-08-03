@@ -31,8 +31,8 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 				} }
 			>
 				{ willEnable
-					? __( 'Enable & Reload' )
-					: __( 'Disable & Reload' ) }
+					? __( 'Show & Reload Page' )
+					: __( 'Hide & Reload Page' ) }
 			</Button>
 		</>
 	);

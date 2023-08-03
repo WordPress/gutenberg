@@ -2,15 +2,11 @@
  * External dependencies
  */
 import type gradientParser from 'gradient-parser';
-/**
- * Internal dependencies
- */
-import type { ColorStopTypeAndValue } from './types';
 
 export function serializeGradientColor( {
 	type,
 	value,
-}: ColorStopTypeAndValue ) {
+}: gradientParser.ColorStop ) {
 	if ( type === 'literal' ) {
 		return value;
 	}
@@ -38,7 +34,7 @@ export function serializeGradientColorStop( {
 	return `${ serializeGradientColor( {
 		type,
 		value,
-	} as ColorStopTypeAndValue ) } ${ serializeGradientPosition( length ) }`;
+	} as gradientParser.ColorStop ) } ${ serializeGradientPosition( length ) }`;
 }
 
 export function serializeGradientOrientation(

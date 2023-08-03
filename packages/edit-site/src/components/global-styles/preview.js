@@ -17,7 +17,7 @@ import { useState, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useGlobalSetting, useGlobalStyle, useGlobalStylesOutput } = unlock(
 	blockEditorPrivateApis
@@ -130,7 +130,7 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 							height: normalizedHeight * ratio,
 							width: '100%',
 							background: gradientValue ?? backgroundColor,
-							cursor: 'pointer',
+							cursor: withHoverView ? 'pointer' : undefined,
 						} }
 						initial="start"
 						animate={

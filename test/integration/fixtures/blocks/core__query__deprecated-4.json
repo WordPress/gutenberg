@@ -1,7 +1,7 @@
 [
 	{
 		"name": "core/query",
-		"isValid": false,
+		"isValid": true,
 		"attributes": {
 			"queryId": 0,
 			"query": {
@@ -17,19 +17,21 @@
 				"sticky": "",
 				"inherit": true
 			},
-			"tagName": "main",
-			"displayLayout": {
-				"type": "list"
-			},
+			"tagName": "div",
 			"layout": {
-				"inherit": true
+				"contentSize": null,
+				"type": "constrained"
 			}
 		},
 		"innerBlocks": [
 			{
 				"name": "core/post-template",
 				"isValid": true,
-				"attributes": {},
+				"attributes": {
+					"layout": {
+						"type": "default"
+					}
+				},
 				"innerBlocks": [
 					{
 						"name": "core/post-title",

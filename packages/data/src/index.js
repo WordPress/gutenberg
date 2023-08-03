@@ -29,6 +29,8 @@ export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
+export { dispatch } from './dispatch';
+export { select } from './select';
 
 /**
  * Object of available plugins to use with a registry.
@@ -81,29 +83,6 @@ export { plugins };
 export const combineReducers = turboCombineReducers;
 
 /**
- * Given a store descriptor, returns an object of the store's selectors.
- * The selector functions are been pre-bound to pass the current state automatically.
- * As a consumer, you need only pass arguments of the selector, if applicable.
- *
- * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
- *                                                       convention of passing the store name is
- *                                                       also supported.
- *
- * @example
- * ```js
- * import { select } from '@wordpress/data';
- * import { store as myCustomStore } from 'my-custom-store';
- *
- * select( myCustomStore ).getPrice( 'hammer' );
- * ```
- *
- * @return {Object} Object containing the store's selectors.
- */
-export function select( storeNameOrDescriptor ) {
-	return defaultRegistry.select( storeNameOrDescriptor );
-}
-
-/**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state
  * so that you only need to supply additional arguments, and modified so that they return promises
  * that resolve to their eventual values, after any resolvers have ran.
@@ -136,30 +115,6 @@ export const resolveSelect = defaultRegistry.resolveSelect;
  * @return {Object} Object containing the store's suspense-wrapped selectors.
  */
 export const suspendSelect = defaultRegistry.suspendSelect;
-
-/**
- * Given a store descriptor, returns an object of the store's action creators.
- * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
- *
- * Note: Action creators returned by the dispatch will return a promise when
- * they are called.
- *
- * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
- *                                                       convention of passing the store name is
- *                                                       also supported.
- *
- * @example
- * ```js
- * import { dispatch } from '@wordpress/data';
- * import { store as myCustomStore } from 'my-custom-store';
- *
- * dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
- * ```
- * @return {Object} Object containing the action creators.
- */
-export function dispatch( storeNameOrDescriptor ) {
-	return defaultRegistry.dispatch( storeNameOrDescriptor );
-}
 
 /**
  * Given a listener function, the function will be called any time the state value

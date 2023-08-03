@@ -13,13 +13,18 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
 	'@wordpress/blocks',
+	'@wordpress/commands',
 	'@wordpress/components',
+	'@wordpress/core-commands',
+	'@wordpress/core-data',
 	'@wordpress/customize-widgets',
 	'@wordpress/data',
 	'@wordpress/edit-post',
 	'@wordpress/edit-site',
 	'@wordpress/edit-widgets',
 	'@wordpress/editor',
+	'@wordpress/reusable-blocks',
+	'@wordpress/router',
 ];
 
 /**

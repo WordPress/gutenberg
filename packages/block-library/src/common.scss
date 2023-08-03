@@ -158,7 +158,7 @@ html :where(img[class*="wp-image-"]) {
 /**
  * Reset user agent styles for figure element margins.
  */
-figure {
+:where(figure) {
 	margin: 0 0 1em 0;
 }
 

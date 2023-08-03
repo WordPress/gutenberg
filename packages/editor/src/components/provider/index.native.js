@@ -319,8 +319,6 @@ class NativeEditorProvider extends Component {
 		const { mode, switchMode } = this.props;
 		// Refresh html content first.
 		this.serializeToNativeAction();
-		// Make sure to blur the selected block and dismiss the keyboard.
-		this.props.clearSelectedBlock();
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
 	}
 
@@ -387,12 +385,8 @@ const ComposedNativeProvider = compose( [
 	withDispatch( ( dispatch ) => {
 		const { editPost, resetEditorBlocks, updateEditorSettings } =
 			dispatch( editorStore );
-		const {
-			updateSettings,
-			clearSelectedBlock,
-			insertBlock,
-			replaceBlock,
-		} = dispatch( blockEditorStore );
+		const { updateSettings, insertBlock, replaceBlock } =
+			dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( editPostStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
 		const { createSuccessNotice } = dispatch( noticesStore );
@@ -401,7 +395,6 @@ const ComposedNativeProvider = compose( [
 			updateBlockEditorSettings: updateSettings,
 			updateEditorSettings,
 			addEntities,
-			clearSelectedBlock,
 			insertBlock,
 			createSuccessNotice,
 			editTitle( title ) {

@@ -12,7 +12,7 @@ import type { Icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import type { ButtonAsButtonProps } from '../button/types';
-import type Dropdown from '../dropdown';
+import type { DropdownProps } from '../dropdown/types';
 import type { WordPressComponentProps } from '../ui/context';
 
 export type CircularOptionPickerProps = {
@@ -44,10 +44,7 @@ export type DropdownLinkActionProps = {
 		'children'
 	>;
 	linkText: string;
-	dropdownProps: Omit<
-		React.ComponentProps< typeof Dropdown >,
-		'className' | 'renderToggle'
-	>;
+	dropdownProps: Omit< DropdownProps, 'className' | 'renderToggle' >;
 	className?: string;
 };
 

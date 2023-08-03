@@ -91,6 +91,7 @@ function GalleryEdit( props ) {
 		isSelected,
 		insertBlocksAfter,
 		isContentLocked,
+		onFocus,
 	} = props;
 
 	const { columns, imageCrop, linkTarget, linkTo, sizeSlug, caption } =
@@ -127,7 +128,6 @@ function GalleryEdit( props ) {
 		replaceInnerBlocks,
 		updateBlockAttributes,
 		selectBlock,
-		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
@@ -145,7 +145,10 @@ function GalleryEdit( props ) {
 
 	const innerBlockImages = useSelect(
 		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
+			const innerBlocks =
+				select( blockEditorStore ).getBlock( clientId )?.innerBlocks ??
+				[];
+			return innerBlocks;
 		},
 		[ clientId ]
 	);
@@ -186,9 +189,6 @@ function GalleryEdit( props ) {
 				align: undefined,
 			} );
 		} );
-		if ( newImages?.length > 0 ) {
-			clearSelectedBlock();
-		}
 	}, [ newImages ] );
 
 	const imageSizeOptions = useImageSizes(
@@ -343,10 +343,6 @@ function GalleryEdit( props ) {
 			} );
 		} );
 
-		if ( newBlocks?.length > 0 ) {
-			selectBlock( newBlocks[ 0 ].clientId );
-		}
-
 		replaceInnerBlocks(
 			clientId,
 			existingImageBlocks
@@ -357,6 +353,11 @@ function GalleryEdit( props ) {
 						newOrderMap[ b.attributes.id ]
 				)
 		);
+
+		// Select the first block to scroll into view when new blocks are added.
+		if ( newBlocks?.length > 0 ) {
+			selectBlock( newBlocks[ 0 ].clientId );
+		}
 	}
 
 	function onUploadError( message ) {
@@ -498,6 +499,7 @@ function GalleryEdit( props ) {
 			value: hasImageIds ? images : {},
 			autoOpenMediaUpload:
 				! hasImages && isSelected && wasBlockJustInserted,
+			onFocus,
 		},
 	} );
 	const mediaPlaceholder = (
@@ -562,7 +564,7 @@ function GalleryEdit( props ) {
 							max={ Math.min( MAX_COLUMNS, images.length ) }
 							{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 							required
-							size="__unstable-large"
+							__next40pxDefaultSize
 						/>
 					) }
 					<ToggleControl
@@ -616,44 +618,46 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls group="block">
-				{ ! isContentLocked && (
-					<ToolbarButton
-						onClick={ () => {
-							setShowCaption( ! showCaption );
-							if ( showCaption && caption ) {
-								setAttributes( { caption: undefined } );
-							}
-						} }
-						icon={ captionIcon }
-						isPressed={ showCaption }
-						label={
-							showCaption
-								? __( 'Remove caption' )
-								: __( 'Add caption' )
-						}
-					/>
-				) }
-			</BlockControls>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
-					handleUpload={ false }
-					onSelect={ updateImages }
-					name={ __( 'Add' ) }
-					multiple={ true }
-					mediaIds={ images
-						.filter( ( image ) => image.id )
-						.map( ( image ) => image.id ) }
-					addToGallery={ hasImageIds }
-				/>
-			</BlockControls>
 			{ Platform.isWeb && (
-				<GapStyles
-					blockGap={ attributes.style?.spacing?.blockGap }
-					clientId={ clientId }
-				/>
+				<>
+					<BlockControls group="block">
+						{ ! isContentLocked && (
+							<ToolbarButton
+								onClick={ () => {
+									setShowCaption( ! showCaption );
+									if ( showCaption && caption ) {
+										setAttributes( { caption: undefined } );
+									}
+								} }
+								icon={ captionIcon }
+								isPressed={ showCaption }
+								label={
+									showCaption
+										? __( 'Remove caption' )
+										: __( 'Add caption' )
+								}
+							/>
+						) }
+					</BlockControls>
+					<BlockControls group="other">
+						<MediaReplaceFlow
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="image/*"
+							handleUpload={ false }
+							onSelect={ updateImages }
+							name={ __( 'Add' ) }
+							multiple={ true }
+							mediaIds={ images
+								.filter( ( image ) => image.id )
+								.map( ( image ) => image.id ) }
+							addToGallery={ hasImageIds }
+						/>
+					</BlockControls>
+					<GapStyles
+						blockGap={ attributes.style?.spacing?.blockGap }
+						clientId={ clientId }
+					/>
+				</>
 			) }
 			<Gallery
 				{ ...props }

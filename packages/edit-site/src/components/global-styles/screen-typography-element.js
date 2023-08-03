@@ -39,7 +39,7 @@ const elements = {
 	},
 };
 
-function ScreenTypographyElement( { name, element } ) {
+function ScreenTypographyElement( { element } ) {
 	const [ headingLevel, setHeadingLevel ] = useState( 'heading' );
 
 	return (
@@ -50,7 +50,6 @@ function ScreenTypographyElement( { name, element } ) {
 			/>
 			<Spacer marginX={ 4 }>
 				<TypographyPreview
-					name={ name }
 					element={ element }
 					headingLevel={ headingLevel }
 				/>
@@ -100,7 +99,6 @@ function ScreenTypographyElement( { name, element } ) {
 				</Spacer>
 			) }
 			<TypographyPanel
-				name={ name }
 				element={ element }
 				headingLevel={ headingLevel }
 			/>

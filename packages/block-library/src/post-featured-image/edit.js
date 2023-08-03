@@ -110,7 +110,8 @@ export default function PostFeaturedImageEdit( {
 				) }
 				withIllustration={ true }
 				style={ {
-					...blockProps.style,
+					height: !! aspectRatio && '100%',
+					width: !! aspectRatio && '100%',
 					...borderProps.style,
 				} }
 			>
@@ -145,9 +146,9 @@ export default function PostFeaturedImageEdit( {
 						label={
 							postType?.labels.singular_name
 								? sprintf(
-										// translators: %s: Name of the post type e.g: "post".
+										// translators: %s: Name of the post type e.g: "Page".
 										__( 'Link to %s' ),
-										postType.labels.singular_name.toLowerCase()
+										postType.labels.singular_name
 								  )
 								: __( 'Link to post' )
 						}
@@ -183,10 +184,15 @@ export default function PostFeaturedImageEdit( {
 	let image;
 
 	/**
-	 * A post featured image block placed in a query loop
-	 * does not have image replacement or upload options.
+	 * A Post Featured Image block should not have image replacement
+	 * or upload options in the following cases:
+	 * - Is placed in a Query Loop. This is a consious decision to
+	 * prevent content editing of different posts in Query Loop, and
+	 * this could change in the future.
+	 * - Is in a context where it does not have a postId (for example
+	 * in a template or template part).
 	 */
-	if ( ! featuredImage && isDescendentOfQueryLoop ) {
+	if ( ! featuredImage && ( isDescendentOfQueryLoop || ! postId ) ) {
 		return (
 			<>
 				{ controls }
@@ -202,36 +208,10 @@ export default function PostFeaturedImageEdit( {
 		);
 	}
 
-	/**
-	 * A post featured image placed in a block template, outside a query loop,
-	 * does not have a postId and will always be a placeholder image.
-	 * It does not have image replacement, upload, or link options.
-	 */
-	if ( ! featuredImage && ! postId ) {
-		return (
-			<>
-				<DimensionControls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					imageSizeOptions={ imageSizeOptions }
-				/>
-				<div { ...blockProps }>
-					{ placeholder() }
-					<Overlay
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						clientId={ clientId }
-					/>
-				</div>
-			</>
-		);
-	}
-
 	const label = __( 'Add a featured image' );
 	const imageStyles = {
 		...borderProps.style,
-		height: ( !! aspectRatio && '100%' ) || height,
+		height: aspectRatio ? '100%' : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
 	};

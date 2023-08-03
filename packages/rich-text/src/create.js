@@ -15,25 +15,7 @@ import {
 	ZWNBSP,
 } from './special-characters';
 
-/**
- * @typedef {Object} RichTextFormat
- *
- * @property {string} type Format type.
- */
-
-/**
- * @typedef {Array<RichTextFormat>} RichTextFormatList
- */
-
-/**
- * @typedef {Object} RichTextValue
- *
- * @property {string}                    text         Text.
- * @property {Array<RichTextFormatList>} formats      Formats.
- * @property {Array<RichTextFormat>}     replacements Replacements.
- * @property {number|undefined}          start        Selection start.
- * @property {number|undefined}          end          Selection end.
- */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 function createEmptyValue() {
 	return {
@@ -80,7 +62,7 @@ function toFormat( { tagName, attributes } ) {
 	}
 
 	if ( ! attributes ) {
-		return { type: formatType.name, tagName };
+		return { formatType, type: formatType.name, tagName };
 	}
 
 	const registeredAttributes = {};
@@ -113,7 +95,12 @@ function toFormat( { tagName, attributes } ) {
 		unregisteredAttributes[ name ] = attributes[ name ];
 	}
 
+	if ( formatType.contentEditable === false ) {
+		delete unregisteredAttributes.contenteditable;
+	}
+
 	return {
+		formatType,
 		type: formatType.name,
 		tagName,
 		attributes: registeredAttributes,
@@ -436,6 +423,26 @@ function createFromElement( {
 			tagName,
 			attributes: getAttributes( { element: node } ),
 		} );
+
+		// When a format type is declared as not editable, replace it with an
+		// object replacement character and preserve the inner HTML.
+		if ( format?.formatType?.contentEditable === false ) {
+			delete format.formatType;
+			accumulateSelection( accumulator, node, range, createEmptyValue() );
+			mergePair( accumulator, {
+				formats: [ , ],
+				replacements: [
+					{
+						...format,
+						innerHTML: node.innerHTML,
+					},
+				],
+				text: OBJECT_REPLACEMENT_CHARACTER,
+			} );
+			continue;
+		}
+
+		if ( format ) delete format.formatType;
 
 		if (
 			multilineWrapperTags &&

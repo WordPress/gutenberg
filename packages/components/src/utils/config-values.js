@@ -67,6 +67,7 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	cardPaddingSmall: `${ space( 4 ) }`,
 	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
 	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
+	popoverShadow: `0 0.7px 1px rgba(0, 0, 0, 0.1), 0 1.2px 1.7px -0.2px rgba(0, 0, 0, 0.1), 0 2.3px 3.3px -0.5px rgba(0, 0, 0, 0.1)`,
 	surfaceBackgroundColor: COLORS.white,
 	surfaceBackgroundSubtleColor: '#F3F3F3',
 	surfaceBackgroundTintColor: '#F5F5F5',

@@ -109,19 +109,20 @@
 	}
 
 	.components-popover__content {
-		box-shadow: none;
+		width: 300px;
 		border: $border-width solid $gray-900;
 		background: $white;
 		border-radius: $radius-block-ui;
 		outline: none;
+		box-shadow: none;
 	}
 
 	.block-editor-block-switcher__preview {
-		width: 300px;
-		height: auto;
-		// Subtract margin from max-height.
+		// Subtract vertical margin from max-height.
 		max-height: calc(500px - #{$grid-unit-40});
-		margin: $grid-unit-20;
+		margin: $grid-unit-20 0;
+		// Use padding to prevent the pattern previews focus style from being cut-off.
+		padding: 0 $grid-unit-20;
 		overflow: hidden;
 	}
 }

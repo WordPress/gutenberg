@@ -10,63 +10,87 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
 	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { forwardRef } from '@wordpress/element';
+import { search, external } from '@wordpress/icons';
+import { store as commandsStore } from '@wordpress/commands';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
-const SiteHub = forwardRef( ( props, ref ) => {
-	const { canvasMode, dashboardLink } = useSelect( ( select ) => {
-		select( editSiteStore ).getEditedPostType();
-		const { getCanvasMode, getSettings } = unlock(
-			select( editSiteStore )
-		);
-		return {
-			canvasMode: getCanvasMode(),
-			dashboardLink: getSettings().__experimentalDashboardLink,
-		};
-	}, [] );
-	const disableMotion = useReducedMotion();
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const isBackToDashboardButton = canvasMode === 'view';
-	const showLabels = canvasMode !== 'edit';
-	const siteIconButtonProps = isBackToDashboardButton
-		? {
-				href: dashboardLink || 'index.php',
-				'aria-label': __( 'Go back to the dashboard' ),
-		  }
-		: {
-				label: __( 'Open Navigation Sidebar' ),
-				onClick: () => {
-					clearSelectedBlock();
-					setCanvasMode( 'view' );
-				},
-		  };
-	const siteTitle = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', 'site' )?.title,
+const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
+	const { canvasMode, dashboardLink, homeUrl, siteTitle } = useSelect(
+		( select ) => {
+			const { getCanvasMode, getSettings } = unlock(
+				select( editSiteStore )
+			);
+
+			const {
+				getSite,
+				getUnstableBase, // Site index.
+			} = select( coreStore );
+
+			return {
+				canvasMode: getCanvasMode(),
+				dashboardLink:
+					getSettings().__experimentalDashboardLink || 'index.php',
+				homeUrl: getUnstableBase()?.home,
+				siteTitle: getSite()?.title,
+			};
+		},
 		[]
 	);
+	const { open: openCommandCenter } = useDispatch( commandsStore );
+
+	const disableMotion = useReducedMotion();
+	const {
+		setCanvasMode,
+		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
+	} = unlock( useDispatch( editSiteStore ) );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const isBackToDashboardButton = canvasMode === 'view';
+	const siteIconButtonProps = isBackToDashboardButton
+		? {
+				href: dashboardLink,
+				label: __( 'Go to the Dashboard' ),
+		  }
+		: {
+				href: dashboardLink, // We need to keep the `href` here so the component doesn't remount as a `<button>` and break the animation.
+				role: 'button',
+				label: __( 'Open Navigation' ),
+				onClick: ( event ) => {
+					event.preventDefault();
+					if ( canvasMode === 'edit' ) {
+						clearSelectedBlock();
+						setPreviewDeviceType( 'desktop' );
+						setCanvasMode( 'view' );
+					}
+				},
+		  };
 
 	return (
 		<motion.div
 			ref={ ref }
-			{ ...props }
-			className={ classnames( 'edit-site-site-hub', props.className ) }
-			layout
+			{ ...restProps }
+			className={ classnames(
+				'edit-site-site-hub',
+				restProps.className
+			) }
+			initial={ false }
 			transition={ {
 				type: 'tween',
 				duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
@@ -74,31 +98,103 @@ const SiteHub = forwardRef( ( props, ref ) => {
 			} }
 		>
 			<HStack
-				justify="flex-start"
-				className="edit-site-site-hub__text-content"
-				spacing="0"
+				justify="space-between"
+				alignment="center"
+				className="edit-site-site-hub__container"
 			>
-				<motion.div
-					className="edit-site-site-hub__view-mode-toggle-container"
-					layout
-					transition={ {
-						type: 'tween',
-						duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
-						ease: 'easeOut',
-					} }
+				<HStack
+					justify="flex-start"
+					className="edit-site-site-hub__text-content"
+					spacing="0"
 				>
-					<Button
-						{ ...siteIconButtonProps }
-						className="edit-site-layout__view-mode-toggle"
+					<motion.div
+						className={ classnames(
+							'edit-site-site-hub__view-mode-toggle-container',
+							{
+								'has-transparent-background': isTransparent,
+							}
+						) }
+						layout
+						transition={ {
+							type: 'tween',
+							duration: disableMotion
+								? 0
+								: HUB_ANIMATION_DURATION,
+							ease: 'easeOut',
+						} }
 					>
-						<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-					</Button>
-				</motion.div>
+						<Button
+							{ ...siteIconButtonProps }
+							className="edit-site-layout__view-mode-toggle"
+						>
+							<motion.div
+								initial={ false }
+								animate={ {
+									scale: canvasMode === 'view' ? 0.5 : 1,
+								} }
+								whileHover={ {
+									scale: canvasMode === 'view' ? 0.5 : 0.96,
+								} }
+								transition={ {
+									type: 'tween',
+									duration: disableMotion
+										? 0
+										: HUB_ANIMATION_DURATION,
+									ease: 'easeOut',
+								} }
+							>
+								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+							</motion.div>
+						</Button>
+					</motion.div>
 
-				{ showLabels && (
-					<div className="edit-site-site-hub__site-title">
-						{ siteTitle }
-					</div>
+					<AnimatePresence>
+						<motion.div
+							layout={ canvasMode === 'edit' }
+							animate={ {
+								opacity: canvasMode === 'view' ? 1 : 0,
+							} }
+							exit={ {
+								opacity: 0,
+							} }
+							className={ classnames(
+								'edit-site-site-hub__site-title',
+								{ 'is-transparent': isTransparent }
+							) }
+							transition={ {
+								type: 'tween',
+								duration: disableMotion ? 0 : 0.2,
+								ease: 'easeOut',
+								delay: canvasMode === 'view' ? 0.1 : 0,
+							} }
+						>
+							{ decodeEntities( siteTitle ) }
+						</motion.div>
+					</AnimatePresence>
+					{ canvasMode === 'view' && (
+						<Button
+							href={ homeUrl }
+							target="_blank"
+							label={ __( 'View site (opens in a new tab)' ) }
+							aria-label={ __(
+								'View site (opens in a new tab)'
+							) }
+							icon={ external }
+							className="edit-site-site-hub__site-view-link"
+						/>
+					) }
+				</HStack>
+				{ canvasMode === 'view' && (
+					<Button
+						className={ classnames(
+							'edit-site-site-hub_toggle-command-center',
+							{ 'is-transparent': isTransparent }
+						) }
+						icon={ search }
+						onClick={ () => openCommandCenter() }
+						label={ __( 'Open command palette' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+					/>
 				) }
 			</HStack>
 		</motion.div>

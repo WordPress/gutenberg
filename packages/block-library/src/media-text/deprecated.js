@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -262,7 +261,7 @@ const v6 = {
 		} = attributes;
 		const mediaSizeSlug =
 			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
-		const newRel = isEmpty( rel ) ? undefined : rel;
+		const newRel = ! rel ? undefined : rel;
 
 		const imageClasses = classnames( {
 			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
@@ -391,7 +390,7 @@ const v5 = {
 		} = attributes;
 		const mediaSizeSlug =
 			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
-		const newRel = isEmpty( rel ) ? undefined : rel;
+		const newRel = ! rel ? undefined : rel;
 
 		const imageClasses = classnames( {
 			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
@@ -505,7 +504,7 @@ const v4 = {
 		} = attributes;
 		const mediaSizeSlug =
 			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
-		const newRel = isEmpty( rel ) ? undefined : rel;
+		const newRel = ! rel ? undefined : rel;
 
 		const imageClasses = classnames( {
 			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
@@ -654,7 +653,7 @@ const v3 = {
 			linkTarget,
 			rel,
 		} = attributes;
-		const newRel = isEmpty( rel ) ? undefined : rel;
+		const newRel = ! rel ? undefined : rel;
 
 		let image = (
 			<img

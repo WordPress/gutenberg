@@ -59,6 +59,7 @@ export default function BlockTools( {
 		insertAfterBlock,
 		insertBeforeBlock,
 		clearSelectedBlock,
+		selectBlock,
 		moveBlocksUp,
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
@@ -108,7 +109,15 @@ export default function BlockTools( {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
-				clearSelectedBlock();
+
+				// If there is more than one block selected, select the first
+				// block so that focus is directed back to the beginning of the selection.
+				// In effect, to the user this feels like deselecting the multi-selection.
+				if ( clientIds.length > 1 ) {
+					selectBlock( clientIds[ 0 ] );
+				} else {
+					clearSelectedBlock();
+				}
 				event.target.ownerDocument.defaultView
 					.getSelection()
 					.removeAllRanges();

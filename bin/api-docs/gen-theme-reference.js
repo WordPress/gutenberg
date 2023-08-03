@@ -211,6 +211,35 @@ styleSections.forEach( ( section ) => {
 	autogen += getSectionMarkup( section, styles[ section ], 'styles' );
 } );
 
+const templateTableGeneration = ( themeJson, context ) => {
+	let content = '';
+	content += '## ' + context + '\n\n';
+	content += themeJson.properties[ context ].description + '\n\n';
+	content +=
+		'Type: `' + themeJson.properties[ context ].items.type + '`.\n\n';
+	content += '| Property | Description | Type |\n';
+	content += '| ---      | ---         | ---  |\n';
+	keys( themeJson.properties[ context ].items.properties ).forEach(
+		( key ) => {
+			content += `| ${ key } | ${ themeJson.properties[ context ].items.properties[ key ].description } | ${ themeJson.properties[ context ].items.properties[ key ].type } |\n`;
+		}
+	);
+	content += '\n\n';
+
+	return content;
+};
+
+// customTemplates
+autogen += templateTableGeneration( themejson, 'customTemplates' );
+
+// templateParts
+autogen += templateTableGeneration( themejson, 'templateParts' );
+
+// Patterns
+autogen += '## Patterns' + '\n\n';
+autogen += themejson.properties.patterns.description + '\n';
+autogen += 'Type: `' + themejson.properties.patterns.type + '`.\n\n';
+
 // Read existing file to wrap auto generated content.
 let docsContent = fs.readFileSync( THEME_JSON_REF_DOC, {
 	encoding: 'utf8',

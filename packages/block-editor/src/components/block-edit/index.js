@@ -29,11 +29,9 @@ export default function BlockEdit( props ) {
 		__unstableLayoutClassNames,
 	} = props;
 	const { layout = null } = attributes;
-	const layoutSupport = hasBlockSupport(
-		name,
-		'__experimentalLayout',
-		false
-	);
+	const layoutSupport =
+		hasBlockSupport( name, 'layout', false ) ||
+		hasBlockSupport( name, '__experimentalLayout', false );
 	const context = {
 		name,
 		isSelected,

@@ -3,10 +3,10 @@
 	overflow: auto;
 
 	// Extra left padding prevents checkbox focus borders from being cut off.
-	margin-left: -$border-width * 4 - $border-width-focus;
-	padding-left: $border-width * 4 + $border-width-focus;
-	margin-top: -$border-width * 4 - $border-width-focus;
-	padding-top: $border-width * 4 + $border-width-focus;
+	margin-left: -$border-width * 4 - $border-width-focus-fallback;
+	padding-left: $border-width * 4 + $border-width-focus-fallback;
+	margin-top: -$border-width * 4 - $border-width-focus-fallback;
+	padding-top: $border-width * 4 + $border-width-focus-fallback;
 }
 
 .editor-post-taxonomies__hierarchical-terms-choice {

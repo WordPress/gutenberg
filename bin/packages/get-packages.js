@@ -3,7 +3,6 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { isEmpty } = require( 'lodash' );
 
 /**
  * Absolute path to packages directory.
@@ -43,7 +42,7 @@ function hasModuleField( file ) {
 		return false;
 	}
 
-	return ! isEmpty( pkg.module );
+	return !! pkg.module;
 }
 
 /**

@@ -49,6 +49,9 @@ export function setClipboardData(
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 	clipboardDataHolder = await page.evaluate(
 		( [ _type, _clipboardData ] ) => {
+			const canvasDoc =
+				// @ts-ignore
+				document.activeElement?.contentDocument ?? document;
 			const clipboardDataTransfer = new DataTransfer();
 
 			if ( _type === 'paste' ) {
@@ -61,7 +64,7 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 					_clipboardData.html
 				);
 			} else {
-				const selection = window.getSelection()!;
+				const selection = canvasDoc.defaultView.getSelection()!;
 				const plainText = selection.toString();
 				let html = plainText;
 				if ( selection.rangeCount ) {
@@ -70,7 +73,8 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 					html = Array.from( fragment.childNodes )
 						.map(
 							( node ) =>
-								( node as Element ).outerHTML ?? node.nodeValue
+								( node as Element ).outerHTML ??
+								( node as Element ).nodeValue
 						)
 						.join( '' );
 				}
@@ -78,7 +82,7 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 				clipboardDataTransfer.setData( 'text/html', html );
 			}
 
-			document.activeElement?.dispatchEvent(
+			canvasDoc.activeElement?.dispatchEvent(
 				new ClipboardEvent( _type, {
 					bubbles: true,
 					cancelable: true,
