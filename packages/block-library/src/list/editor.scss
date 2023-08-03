@@ -1,0 +1,18 @@
+ol {
+	// Override WP Admin reset style applied when the editor is not an iframe.
+	&.is-type-A {
+		list-style-type: upper-alpha;
+	}
+
+	&.is-type-a {
+		list-style-type: lower-alpha;
+	}
+
+	&.is-type-I {
+		list-style-type: upper-roman;
+	}
+
+	&.is-type-i {
+		list-style-type: lower-roman;
+	}
+}

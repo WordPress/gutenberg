@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -124,8 +129,12 @@ function IndentUI( { clientId } ) {
 }
 
 export default function Edit( { attributes, setAttributes, clientId, style } ) {
+	const { ordered, type, reversed, start } = attributes;
 	const blockProps = useBlockProps( {
 		...( Platform.isNative && { style } ),
+		className: classnames( {
+			[ `is-type-${ type }` ]: type && type !== '1',
+		} ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list-item' ],
@@ -139,7 +148,6 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 		} ),
 	} );
 	useMigrateOnLoad( attributes, clientId );
-	const { ordered, type, reversed, start } = attributes;
 
 	const controls = (
 		<BlockControls group="block">
