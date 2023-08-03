@@ -182,6 +182,14 @@ _Returns_
 
 -   `WPPlugin | undefined`: The previous plugin settings object, if it has been successfully unregistered; otherwise `undefined`.
 
+#### usePluginContext
+
+A hook that returns the plugin context.
+
+_Returns_
+
+-   `PluginContext`: Plugin context
+
 #### withPluginContext
 
 A Higher Order Component used to inject Plugin context to the wrapped component.
