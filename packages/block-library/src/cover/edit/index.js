@@ -9,9 +9,9 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
-import { compose, useResizeObserver, usePrevious } from '@wordpress/compose';
+import { compose, useResizeObserver } from '@wordpress/compose';
 import {
 	withColors,
 	ColorPalette,
@@ -112,26 +112,9 @@ function CoverEdit( {
 	);
 	const mediaUrl = media?.source_url;
 
-	const prevUseFeaturedImage = usePrevious( useFeaturedImage );
-
-	// An effect is needed here as we don't have access to the set featured image event handler
-	// and reseting the isDark attribute when the useFeaturedImage attribute is toggled off outside an
-	// effect causes a `cannot update while rendering another component` warning.
-	useEffect( () => {
-		if ( prevUseFeaturedImage && ! useFeaturedImage ) {
-			setCoverIsDark( undefined, dimRatio, overlayColor.color );
-		}
-		if ( mediaUrl && useFeaturedImage ) {
-			setCoverIsDark( mediaUrl, dimRatio, overlayColor.color );
-		}
-	}, [
-		dimRatio,
-		mediaUrl,
-		overlayColor.color,
-		prevUseFeaturedImage,
-		setCoverIsDark,
-		useFeaturedImage,
-	] );
+	if ( mediaUrl && useFeaturedImage ) {
+		setCoverIsDark( mediaUrl, dimRatio, overlayColor.color );
+	}
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -261,6 +244,9 @@ function CoverEdit( {
 	};
 
 	const toggleUseFeaturedImage = () => {
+		if ( useFeaturedImage ) {
+			setCoverIsDark( undefined, dimRatio, overlayColor.color );
+		}
 		setAttributes( {
 			id: undefined,
 			url: undefined,
