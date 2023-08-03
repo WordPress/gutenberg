@@ -39,7 +39,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 						{ 'checkbox' !== type && (
 							<CheckboxControl
 								label={ __( 'Inline label' ) }
-								checked={ attributes.inlineLabel }
+								checked={ inlineLabel }
 								onChange={ ( newVal ) => {
 									setAttributes( {
 										inlineLabel: newVal,
@@ -49,7 +49,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 						) }
 						<CheckboxControl
 							label={ __( 'Required' ) }
-							checked={ attributes.required }
+							checked={ required }
 							onChange={ ( newVal ) => {
 								setAttributes( {
 									required: newVal,
