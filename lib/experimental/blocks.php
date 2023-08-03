@@ -142,10 +142,12 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			return $block_content;
 		}
 
+		// If for some reason, the block type is not found, skip it.
 		if ( null === $block_type ) {
 			return $block_content;
 		}
 
+		// If the block does not have support for connections, skip it.
 		if ( ! block_has_support( $block_type, array( 'connections' ), false ) ) {
 			return $block_content;
 		}
