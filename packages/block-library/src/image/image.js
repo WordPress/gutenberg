@@ -252,11 +252,7 @@ export default function Image( {
 				loadedNaturalHeight ||
 				undefined,
 		};
-	}, [
-		loadedNaturalWidth,
-		loadedNaturalHeight,
-		imageRef.current?.complete,
-	] );
+	}, [ loadedNaturalWidth, loadedNaturalHeight, imageRef.current ] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -480,6 +476,26 @@ export default function Image( {
 					<DimensionsTool
 						value={ { width, height, scale, aspectRatio } }
 						onChange={ ( newValue ) => {
+							// If the width and height are set but the aspect ratio isn't
+							// then we need to calculate the aspect ratio from the width and height.
+							let newAspectRatio = newValue.aspectRatio;
+							const newNumericHeight = parseInt(
+								newValue.height,
+								10
+							);
+							const newNumericWidth = parseInt(
+								newValue.width,
+								10
+							);
+							if (
+								! newAspectRatio &&
+								height &&
+								newNumericWidth
+							) {
+								newAspectRatio =
+									newNumericWidth + '/' + newNumericHeight;
+							}
+
 							// Rebuilding the object forces setting `undefined`
 							// for values that are removed since setAttributes
 							// doesn't do anything with keys that aren't set.
@@ -487,7 +503,7 @@ export default function Image( {
 								width: newValue.width,
 								height: newValue.height,
 								scale: newValue.scale,
-								aspectRatio: newValue.aspectRatio,
+								aspectRatio: newAspectRatio,
 							} );
 						} }
 						defaultScale="cover"
