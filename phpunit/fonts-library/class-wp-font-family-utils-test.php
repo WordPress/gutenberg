@@ -6,9 +6,9 @@
  * @subpackage Fonts Library
  */
 
- /**
-  * @coversDefaultClass WP_Font_Family_Utils
-  */
+/**
+ * @coversDefaultClass WP_Font_Family_Utils
+ */
 class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 
 	/**
@@ -62,10 +62,10 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_filename_from_font_face_fixtures
 	 *
-	 * @param string          $slug               Font slug.
-	 * @param array           $font_face          Font face data in theme.json format.
-	 * @param string Optional. $suffix             Suffix added to the resulting filename. Default empty string.
-	 * @param string          $expected_file_name Expected file name.
+	 * @param string $slug               Font slug.
+	 * @param array  $font_face          Font face data in theme.json format.
+	 * @param string $suffix Suffix added to the resulting filename. Default empty string.
+	 * @param string $expected_file_name Expected file name.
 	 */
 	public function test_get_filename_from_font_face( $slug, $font_face, $suffix, $expected_file_name ) {
 
@@ -75,7 +75,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 				$slug,
 				$font_face,
 				$font_face['src'],
-				$suffix,
+				$suffix
 			)
 		);
 	}
@@ -121,7 +121,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 	 * @param array $expected_result Expected result.
 	 */
 	public function test_merge_fonts_data( $are_mergeable, $font1, $font2, $expected_result ) {
-		// Fonts with same slug should be merged
+		// Fonts with same slug should be merged.
 		$merged_font = WP_Font_Family_Utils::merge_fonts_data( $font1, $font2 );
 
 		if ( $are_mergeable ) {

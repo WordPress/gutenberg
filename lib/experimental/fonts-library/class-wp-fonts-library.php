@@ -34,7 +34,7 @@ class WP_Fonts_Library {
 		return wp_upload_dir()['basedir'] . '/fonts';
 	}
 
-	/*
+	/**
 	 * Sets the upload directory for fonts.
 	 *
 	 * @param array $defaults Default upload directory.
