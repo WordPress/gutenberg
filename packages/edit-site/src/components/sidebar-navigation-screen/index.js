@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -51,7 +56,12 @@ export default function SidebarNavigationScreen( {
 	return (
 		<>
 			<VStack
-				className="edit-site-sidebar-navigation-screen__main"
+				className={ classnames(
+					'edit-site-sidebar-navigation-screen__main',
+					{
+						'has-footer': !! footer,
+					}
+				) }
 				spacing={ 0 }
 				justify="flex-start"
 			>

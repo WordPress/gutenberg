@@ -26,7 +26,6 @@ import { select, dispatch } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
-import '@wordpress/jest-console';
 
 /**
  * Internal dependencies

@@ -177,8 +177,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 ### Various
 
 - Core Data: Deprecate \`getAuthors\` in favor of \`getUsers\`. ([33725](https://github.com/WordPress/gutenberg/pull/33725))
-- RNMobile: Add integration test guide. ([33833](https://github.com/WordPress/gutenberg/pull/33833))
-- RNMobile: Try unifying the unit test command on mobile. ([33657](https://github.com/WordPress/gutenberg/pull/33657))
 - Tune appender margin. ([33866](https://github.com/WordPress/gutenberg/pull/33866))
 
 #### Block Library
@@ -196,7 +194,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Try to fix flaky customizer inspector test. ([33890](https://github.com/WordPress/gutenberg/pull/33890))
 
 #### Block Editor
-- Closing the block inserter decrements block type impressions. ([33906](https://github.com/WordPress/gutenberg/pull/33906))
 - Enable rich previews for internal links. ([33086](https://github.com/WordPress/gutenberg/pull/33086))
 
 #### Icons

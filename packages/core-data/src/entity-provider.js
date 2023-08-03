@@ -221,6 +221,15 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			);
 
 			function updateAttributes( attributes ) {
+				// Only attempt to update attributes, if attributes is an object.
+				if (
+					! attributes ||
+					Array.isArray( attributes ) ||
+					typeof attributes !== 'object'
+				) {
+					return attributes;
+				}
+
 				attributes = { ...attributes };
 
 				for ( const key in attributes ) {

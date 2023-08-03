@@ -7,6 +7,7 @@ import {
 	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
+import { symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -3347,7 +3348,7 @@ describe( 'selectors', () => {
 				category: 'reusable',
 				content: '<!-- /wp:test-block-a -->',
 				frecency: 0,
-				icon: { src: 'test' },
+				icon: symbol,
 				id: 'core/block/1',
 				initialAttributes: { ref: 1 },
 				isDisabled: false,

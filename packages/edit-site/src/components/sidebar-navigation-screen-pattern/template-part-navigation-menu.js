@@ -23,7 +23,7 @@ export default function TemplatePartNavigationMenu( { id } ) {
 				upperCase={ true }
 				weight={ 500 }
 			>
-				{ title?.rendered || title || __( 'Navigation' ) }
+				{ title || __( 'Navigation' ) }
 			</Heading>
 			<NavigationMenuEditor navigationMenuId={ id } />
 		</>

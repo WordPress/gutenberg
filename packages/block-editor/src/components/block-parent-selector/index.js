@@ -12,7 +12,7 @@ import { useRef } from '@wordpress/element';
  */
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
-import { useShowMoversGestures } from '../block-toolbar/utils';
+import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -23,52 +23,40 @@ import { unlock } from '../../lock-unlock';
  * @return {WPComponent} Parent block selector.
  */
 export default function BlockParentSelector() {
-	const { selectBlock, toggleBlockHighlight } =
-		useDispatch( blockEditorStore );
-	const { firstParentClientId, isVisible, isDistractionFree } = useSelect(
-		( select ) => {
-			const {
-				getBlockName,
-				getBlockParents,
-				getSelectedBlockClientId,
-				getSettings,
-				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
-			const { hasBlockSupport } = select( blocksStore );
-			const selectedBlockClientId = getSelectedBlockClientId();
-			const parents = getBlockParents( selectedBlockClientId );
-			const _firstParentClientId = parents[ parents.length - 1 ];
-			const parentBlockName = getBlockName( _firstParentClientId );
-			const _parentBlockType = getBlockType( parentBlockName );
-			const settings = getSettings();
-			return {
-				firstParentClientId: _firstParentClientId,
-				isVisible:
-					_firstParentClientId &&
-					getBlockEditingMode( _firstParentClientId ) === 'default' &&
-					hasBlockSupport(
-						_parentBlockType,
-						'__experimentalParentSelector',
-						true
-					),
-				isDistractionFree: settings.isDistractionFree,
-			};
-		},
-		[]
-	);
+	const { selectBlock } = useDispatch( blockEditorStore );
+	const { firstParentClientId, isVisible } = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getBlockParents,
+			getSelectedBlockClientId,
+			getBlockEditingMode,
+		} = unlock( select( blockEditorStore ) );
+		const { hasBlockSupport } = select( blocksStore );
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const parents = getBlockParents( selectedBlockClientId );
+		const _firstParentClientId = parents[ parents.length - 1 ];
+		const parentBlockName = getBlockName( _firstParentClientId );
+		const _parentBlockType = getBlockType( parentBlockName );
+		return {
+			firstParentClientId: _firstParentClientId,
+			isVisible:
+				_firstParentClientId &&
+				getBlockEditingMode( _firstParentClientId ) === 'default' &&
+				hasBlockSupport(
+					_parentBlockType,
+					'__experimentalParentSelector',
+					true
+				),
+		};
+	}, [] );
 	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
 	const nodeRef = useRef();
-	const { gestures: showMoversGestures } = useShowMoversGestures( {
+	const showHoveredOrFocusedGestures = useShowHoveredOrFocusedGestures( {
 		ref: nodeRef,
-		onChange( isFocused ) {
-			if ( isFocused && isDistractionFree ) {
-				return;
-			}
-			toggleBlockHighlight( firstParentClientId, isFocused );
-		},
+		highlightParent: true,
 	} );
 
 	if ( ! isVisible ) {
@@ -80,7 +68,7 @@ export default function BlockParentSelector() {
 			className="block-editor-block-parent-selector"
 			key={ firstParentClientId }
 			ref={ nodeRef }
-			{ ...showMoversGestures }
+			{ ...showHoveredOrFocusedGestures }
 		>
 			<ToolbarButton
 				className="block-editor-block-parent-selector__button"
