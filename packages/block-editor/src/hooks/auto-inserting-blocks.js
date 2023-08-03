@@ -3,22 +3,41 @@
  */
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
-import { Fragment } from '@wordpress/element';
-import { PanelBody } from '@wordpress/components';
+import { Fragment, useState } from '@wordpress/element';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { store as blocksStore } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { BlockIcon, InspectorControls } from '../components';
+import { InspectorControls } from '../components';
+import { store as blockEditorStore } from '../store';
 
 function AutoInsertingBlocksControl( props ) {
+	// FIXME: Properly set toggle state based on presence of auto-inserted block.
+	const [ toggleStatus, setToggleStatus ] = useState( false );
+
 	const blocks = useSelect( ( select ) => {
 		const { getBlockTypes } = select( blocksStore );
 		return getBlockTypes();
 	}, [] );
+
+	const { blockIndex, rootClientId } = useSelect(
+		( select ) => {
+			const { getBlockIndex, getBlockRootClientId } =
+				select( blockEditorStore );
+			const _rootClientId = getBlockRootClientId( props.clientId );
+			return {
+				blockIndex: getBlockIndex( props.clientId ),
+				rootClientId: _rootClientId,
+			};
+		},
+		[ props.clientId ]
+	);
+
+	const { insertBlock } = useDispatch( blockEditorStore );
 
 	const autoInsertedBlocksForCurrentBlock = blocks.filter(
 		( block ) =>
@@ -48,18 +67,30 @@ function AutoInsertingBlocksControl( props ) {
 							<h3>{ vendor }</h3>
 							{ groupedAutoInsertedBlocks[ vendor ].map(
 								( block ) => {
+									// TODO: Display block icon.
+									// <BlockIcon icon={ block.icon } />
 									return (
-										<div
-											key={ block.name }
-											className="block-editor-block-card"
-										>
-											<BlockIcon icon={ block.icon } />
-											<div className="block-editor-block-card__content">
-												<h2 className="block-editor-block-card__title">
-													{ block.title }
-												</h2>
-											</div>
-										</div>
+										<ToggleControl
+											checked={ toggleStatus }
+											key={ block.title }
+											label={ block.title }
+											onChange={ () => {
+												if ( ! toggleStatus ) {
+													insertBlock(
+														createBlock(
+															block.name
+														),
+														blockIndex + 1,
+														rootClientId,
+														false
+													);
+												}
+
+												setToggleStatus(
+													! toggleStatus
+												);
+											} }
+										/>
 									);
 								}
 							) }
@@ -78,7 +109,10 @@ export const withAutoInsertingBlocks = createHigherOrderComponent(
 			return (
 				<>
 					{ blockEdit }
-					<AutoInsertingBlocksControl blockName={ props.name } />
+					<AutoInsertingBlocksControl
+						blockName={ props.name }
+						clientId={ props.clientId }
+					/>
 				</>
 			);
 		};
