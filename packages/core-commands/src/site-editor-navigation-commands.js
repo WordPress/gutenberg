@@ -43,16 +43,8 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					: {
 							per_page: -1,
 					  };
-				const results = getEntityRecords( 'postType', postType, query );
-				/*
-				 * wp_template and wp_template_part endpoints do not support per_page or orderby parameters.
-				 * We need to sort the results based on the search query to avoid removing relevant
-				 * records below using .slice().
-				 */
 				return {
-					records: supportsSearch
-						? results
-						: orderEntityRecordsBySearch( results || [], search ),
+					records: getEntityRecords( 'postType', postType, query ),
 					isLoading: ! select( coreStore ).hasFinishedResolution(
 						'getEntityRecords',
 						[ 'postType', postType, query ]
@@ -65,8 +57,21 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 			[ supportsSearch, search ]
 		);
 
+		/*
+		 * wp_template and wp_template_part endpoints do not support per_page or orderby parameters.
+		 * We need to sort the results based on the search query to avoid removing relevant
+		 * records below using .slice().
+		 */
+		const orderedRecords = useMemo(
+			() =>
+				supportsSearch
+					? records
+					: orderEntityRecordsBySearch( records || [], search ),
+			[ supportsSearch, records, search ]
+		);
+
 		const commands = useMemo( () => {
-			return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
+			return ( orderedRecords ?? [] ).slice( 0, 10 ).map( ( record ) => {
 				const isSiteEditor = getPath( window.location.href )?.includes(
 					'site-editor.php'
 				);
@@ -99,7 +104,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					},
 				};
 			} );
-		}, [ records, history ] );
+		}, [ orderedRecords, history ] );
 
 		return {
 			commands,
