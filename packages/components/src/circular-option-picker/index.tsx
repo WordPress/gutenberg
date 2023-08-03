@@ -142,7 +142,7 @@ export function ButtonAction( {
  * 					<CircularOptionPicker.ButtonAction
  * 						onClick={ () => setCurrentColor( undefined ) }
  * 					>
- * 						{ 'Clear' }
+ * 						{ 'Reset' }
  * 					</CircularOptionPicker.ButtonAction>
  * 				}
  * 			/>

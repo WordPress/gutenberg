@@ -222,7 +222,7 @@ export function GradientPicker( {
 								<CircularOptionPicker.ButtonAction
 									onClick={ clearGradient }
 								>
-									{ __( 'Clear' ) }
+									{ __( 'Reset' ) }
 								</CircularOptionPicker.ButtonAction>
 							)
 						}

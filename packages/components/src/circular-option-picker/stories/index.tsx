@@ -97,7 +97,7 @@ const DefaultActions = () => {
 		<CircularOptionPicker.ButtonAction
 			onClick={ () => setCurrentColor?.( undefined ) }
 		>
-			{ 'Clear' }
+			{ 'Reset' }
 		</CircularOptionPicker.ButtonAction>
 	);
 };

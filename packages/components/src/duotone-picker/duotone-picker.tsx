@@ -128,7 +128,7 @@ function DuotonePicker( {
 					<CircularOptionPicker.ButtonAction
 						onClick={ () => onChange( undefined ) }
 					>
-						{ __( 'Clear' ) }
+						{ __( 'Reset' ) }
 					</CircularOptionPicker.ButtonAction>
 				)
 			}

@@ -240,7 +240,7 @@ function UnforwardedColorPalette(
 		value,
 		actions: !! clearable && (
 			<CircularOptionPicker.ButtonAction onClick={ clearColor }>
-				{ __( 'Clear' ) }
+				{ __( 'Reset' ) }
 			</CircularOptionPicker.ButtonAction>
 		),
 		headingLevel,

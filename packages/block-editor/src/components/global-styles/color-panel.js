@@ -21,6 +21,7 @@ import {
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { reset } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -238,12 +239,25 @@ function ColorPanelDropdown( {
 					};
 
 					return (
-						<Button { ...toggleProps }>
-							<LabeledColorIndicators
-								indicators={ indicators }
-								label={ label }
+						<>
+							<Button { ...toggleProps }>
+								<LabeledColorIndicators
+									indicators={ indicators }
+									label={ label }
+								/>
+							</Button>
+							<Button
+								label={ __( 'Reset' ) }
+								aria-label={
+									/* translators: %s is the type of color property, e.g., "background" */
+									__( 'Reset %s color' )
+								}
+								className="block-editor-panel-color-gradient-settings__reset"
+								icon={ reset }
+								onClick={ resetValue }
+								showTooltip
 							/>
-						</Button>
+						</>
 					);
 				} }
 				renderContent={ () => (
