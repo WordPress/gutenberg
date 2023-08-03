@@ -53,6 +53,12 @@ export const withInspectorControl = createHigherOrderComponent(
 				'connections',
 				false
 			);
+
+			// Check if the current block is a paragraph or image block.
+			if ( ! [ 'core/paragraph', 'core/image' ].includes( props.name ) ) {
+				return <BlockEdit { ...props } />;
+			}
+
 			if ( hasCustomFieldsSupport && props.isSelected ) {
 				return (
 					<>
