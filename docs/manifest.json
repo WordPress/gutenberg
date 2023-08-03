@@ -170,14 +170,8 @@
 	{
 		"title": "Building a custom block editor",
 		"slug": "custom-block-editor",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/README.md",
+		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor.md",
 		"parent": "platform"
-	},
-	{
-		"title": "Tutorial: building a custom block editor",
-		"slug": "tutorial",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
-		"parent": "custom-block-editor"
 	},
 	{
 		"title": "Create your First App with Gutenberg Data",
