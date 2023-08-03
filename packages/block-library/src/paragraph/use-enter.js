@@ -57,9 +57,6 @@ export function useOnEnter( props ) {
 			}
 
 			const order = getBlockOrder( wrapperClientId );
-
-			event.preventDefault();
-
 			const position = order.indexOf( clientId );
 
 			// If it is the last block, exit.
@@ -76,12 +73,15 @@ export function useOnEnter( props ) {
 						getBlockRootClientId( newWrapperClientId );
 				}
 
-				moveBlocksToPosition(
-					[ clientId ],
-					wrapperClientId,
-					getBlockRootClientId( newWrapperClientId ),
-					getBlockIndex( newWrapperClientId ) + 1
-				);
+				if ( typeof newWrapperClientId === 'string' ) {
+					event.preventDefault();
+					moveBlocksToPosition(
+						[ clientId ],
+						wrapperClientId,
+						getBlockRootClientId( newWrapperClientId ),
+						getBlockIndex( newWrapperClientId ) + 1
+					);
+				}
 				return;
 			}
 
