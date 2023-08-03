@@ -54,6 +54,9 @@
 # Full Site Editing
 /packages/edit-site
 
+# Interactivity API
+/packages/interactivity                         @luisherranz @darerodz
+
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra
@@ -78,13 +81,15 @@
 /packages/prettier-config                       @ntwb @gziolo
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
-/test/e2e                                       @kevin940726
+/test/e2e                                       @kevin940726 @Mamaduka
+/test/php/gutenberg-coding-standards			@anton-vlasenko
 
 # UI Components
 /packages/components                            @ajitbohra
 /packages/compose                               @ajitbohra
 /packages/element                               @ajitbohra
 /packages/notices                               @ajitbohra
+/packages/nux                                   @ajitbohra @peterwilsoncc
 /packages/viewport                              @ajitbohra
 /packages/base-styles
 /packages/icons

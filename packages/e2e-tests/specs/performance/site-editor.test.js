@@ -87,7 +87,6 @@ describe( 'Site Editor Performance', () => {
 		saveResultsFile( __filename, results );
 		await deleteAllTemplates( 'wp_template' );
 		await deleteAllTemplates( 'wp_template_part' );
-		await activateTheme( 'twentytwentyone' );
 	} );
 
 	// Number of loading measurements to take.
@@ -142,17 +141,21 @@ describe( 'Site Editor Performance', () => {
 			postType: 'page',
 		} );
 
-		// Wait for the first paragraph to be ready.
-		const firstParagraph = await canvas().waitForXPath(
-			'//p[contains(text(), "Lorem ipsum dolor sit amet")]'
-		);
+		// Wait for the first block to be ready.
+		await canvas().waitForSelector( '.wp-block' );
 
 		// Get inside the post content.
 		await enterEditMode();
 
-		// Insert a new paragraph right under the first one.
-		await firstParagraph.click(); // Once to select the block overlay.
-		await firstParagraph.click(); // Once again to select the paragraph.
+		// Select the post content block wrapper.
+		await canvas().click( '.wp-block-post-content' );
+
+		// Select the first paragraph in the post content block.
+		const firstParagraph = await canvas().waitForXPath(
+			'//p[contains(text(), "Lorem ipsum dolor sit amet")]'
+		);
+		await firstParagraph.click();
+
 		await insertBlock( 'Paragraph' );
 
 		// Start tracing.

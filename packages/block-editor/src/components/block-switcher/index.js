@@ -196,8 +196,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						className="block-editor-block-switcher"
 						label={ blockSwitcherLabel }
 						popoverProps={ {
-							position: 'bottom right',
-							variant: 'toolbar',
+							placement: 'bottom-start',
 							className: 'block-editor-block-switcher__popover',
 						} }
 						icon={

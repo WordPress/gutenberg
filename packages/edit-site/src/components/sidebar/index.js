@@ -14,7 +14,8 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
-import SidebarNavigationScreenTemplatePart from '../sidebar-navigation-screen-template-part';
+import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
+import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
 import useSyncPathWithURL, {
 	getPathFromURL,
 } from '../sync-state-with-url/use-sync-path-with-url';
@@ -23,7 +24,7 @@ import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 
@@ -52,17 +53,20 @@ function SidebarScreens() {
 			<NavigatorScreen path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
+			<NavigatorScreen path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
+			</NavigatorScreen>
+			<NavigatorScreen path="/patterns">
+				<SidebarNavigationScreenPatterns />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template_part|wp_block)/:postId">
+				<SidebarNavigationScreenPattern />
+			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template_part)/:postId">
-				<SidebarNavigationScreenTemplatePart />
 			</NavigatorScreen>
 		</>
 	);

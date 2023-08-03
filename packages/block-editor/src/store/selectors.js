@@ -187,16 +187,27 @@ export function getBlocks( state, rootClientId ) {
  * Returns a stripped down block object containing only its client ID,
  * and its inner blocks' client IDs.
  *
+ * @deprecated
+ *
  * @param {Object} state    Editor state.
  * @param {string} clientId Client ID of the block to get.
  *
  * @return {Object} Client IDs of the post blocks.
  */
 export const __unstableGetClientIdWithClientIdsTree = createSelector(
-	( state, clientId ) => ( {
-		clientId,
-		innerBlocks: __unstableGetClientIdsTree( state, clientId ),
-	} ),
+	( state, clientId ) => {
+		deprecated(
+			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree",
+			{
+				since: '6.3',
+				version: '6.5',
+			}
+		);
+		return {
+			clientId,
+			innerBlocks: __unstableGetClientIdsTree( state, clientId ),
+		};
+	},
 	( state ) => [ state.blocks.order ]
 );
 
@@ -205,16 +216,26 @@ export const __unstableGetClientIdWithClientIdsTree = createSelector(
  * given root, consisting of stripped down block objects containing only
  * their client IDs, and their inner blocks' client IDs.
  *
+ * @deprecated
+ *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Object[]} Client IDs of the post blocks.
  */
 export const __unstableGetClientIdsTree = createSelector(
-	( state, rootClientId = '' ) =>
-		getBlockOrder( state, rootClientId ).map( ( clientId ) =>
+	( state, rootClientId = '' ) => {
+		deprecated(
+			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree",
+			{
+				since: '6.3',
+				version: '6.5',
+			}
+		);
+		return getBlockOrder( state, rootClientId ).map( ( clientId ) =>
 			__unstableGetClientIdWithClientIdsTree( state, clientId )
-		),
+		);
+	},
 	( state ) => [ state.blocks.order ]
 );
 
@@ -303,10 +324,13 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
 		if ( ! blockName ) {
 			return EMPTY_ARRAY;
 		}
+		const blockNames = Array.isArray( blockName )
+			? blockName
+			: [ blockName ];
 		const clientIds = getClientIdsWithDescendants( state );
 		const foundBlocks = clientIds.filter( ( clientId ) => {
 			const block = state.blocks.byClientId.get( clientId );
-			return block.name === blockName;
+			return blockNames.includes( block.name );
 		} );
 		return foundBlocks.length > 0 ? foundBlocks : EMPTY_ARRAY;
 	},
@@ -536,18 +560,10 @@ export const getBlockParents = createSelector(
 export const getBlockParentsByBlockName = createSelector(
 	( state, clientId, blockName, ascending = false ) => {
 		const parents = getBlockParents( state, clientId, ascending );
-		return parents
-			.map( ( id ) => ( {
-				id,
-				name: getBlockName( state, id ),
-			} ) )
-			.filter( ( { name } ) => {
-				if ( Array.isArray( blockName ) ) {
-					return blockName.includes( name );
-				}
-				return name === blockName;
-			} )
-			.map( ( { id } ) => id );
+		const hasName = Array.isArray( blockName )
+			? ( name ) => blockName.includes( name )
+			: ( name ) => blockName === name;
+		return parents.filter( ( id ) => hasName( getBlockName( state, id ) ) );
 	},
 	( state ) => [ state.blocks.parents ]
 );
@@ -1672,16 +1688,14 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes === null ) {
 		return true;
 	}
-	if ( attributes.lock?.remove ) {
-		return false;
+	if ( attributes.lock?.remove !== undefined ) {
+		return ! attributes.lock.remove;
 	}
 	if ( getTemplateLock( state, rootClientId ) ) {
 		return false;
 	}
-	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
-		return false;
-	}
-	return true;
+
+	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
 /**
@@ -1711,18 +1725,16 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
 export function canMoveBlock( state, clientId, rootClientId = null ) {
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
-		return;
+		return true;
 	}
-	if ( attributes.lock?.move ) {
-		return false;
+	if ( attributes.lock?.move !== undefined ) {
+		return ! attributes.lock.move;
 	}
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
-	if ( getBlockEditingMode( state, rootClientId ) === 'disabled' ) {
-		return false;
-	}
-	return true;
+
+	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
 /**
@@ -1950,55 +1962,8 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createSelector(
 	( state, rootClientId = null ) => {
-		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
-			buildScope: 'inserter',
-		} );
-
-		/*
-		 * Matches block comment delimiters amid serialized content.
-		 *
-		 * @see `tokenizer` in `@wordpress/block-serialization-default-parser`
-		 * package
-		 *
-		 * blockParserTokenizer differs from the original tokenizer in the
-		 * following ways:
-		 *
-		 * - removed global flag (/g)
-		 * - prepended ^\s*
-		 *
-		 */
-		const blockParserTokenizer =
-			/^\s*<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
-
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
-			let icon = symbol;
-
-			/*
-			 * Instead of always displaying a generic "symbol" icon for every
-			 * reusable block, try to use an icon that represents the first
-			 * outermost block contained in the reusable block. This requires
-			 * scanning the serialized form of the reusable block to find its
-			 * first block delimiter, then looking up the corresponding block
-			 * type, if available.
-			 */
-			if ( Platform.OS === 'web' ) {
-				const content =
-					typeof reusableBlock.content.raw === 'string'
-						? reusableBlock.content.raw
-						: reusableBlock.content;
-				const rawBlockMatch = content.match( blockParserTokenizer );
-				if ( rawBlockMatch ) {
-					const [ , , namespace = 'core/', blockName ] =
-						rawBlockMatch;
-					const referencedBlockType = getBlockType(
-						namespace + blockName
-					);
-					if ( referencedBlockType ) {
-						icon = referencedBlockType.icon;
-					}
-				}
-			}
-
+			const icon = symbol;
 			const id = `core/block/${ reusableBlock.id }`;
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const frecency = calculateFrecency( time, count );
@@ -2010,26 +1975,32 @@ export const getInserterItems = createSelector(
 				title: reusableBlock.title.raw,
 				icon,
 				category: 'reusable',
-				keywords: [],
+				keywords: [ 'reusable' ],
 				isDisabled: false,
 				utility: 1, // Deprecated.
 				frecency,
+				content: reusableBlock.content.raw,
+				syncStatus: reusableBlock.wp_pattern_sync_status,
 			};
 		};
 
-		const blockTypeInserterItems = getBlockTypes()
-			.filter( ( blockType ) =>
-				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
-			)
-			.map( buildBlockTypeInserterItem );
-
-		const reusableBlockInserterItems = canInsertBlockTypeUnmemoized(
+		const syncedPatternInserterItems = canInsertBlockTypeUnmemoized(
 			state,
 			'core/block',
 			rootClientId
 		)
 			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
 			: [];
+
+		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
+			buildScope: 'inserter',
+		} );
+
+		const blockTypeInserterItems = getBlockTypes()
+			.filter( ( blockType ) =>
+				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+			)
+			.map( buildBlockTypeInserterItem );
 
 		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
 			const { variations = [] } = item;
@@ -2061,7 +2032,7 @@ export const getInserterItems = createSelector(
 			{ core: [], noncore: [] }
 		);
 		const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
-		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
+		return [ ...sortedBlockTypes, ...syncedPatternInserterItems ];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
@@ -2190,15 +2161,24 @@ export const getAllowedBlocks = createSelector(
 			return;
 		}
 
-		return getBlockTypes().filter( ( blockType ) =>
+		const blockTypes = getBlockTypes().filter( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
+		const hasReusableBlock =
+			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) &&
+			getReusableBlocks( state ).length > 0;
+
+		return [
+			...blockTypes,
+			...( hasReusableBlock ? [ 'core/block' ] : [] ),
+		];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
+		getReusableBlocks( state ),
 		getBlockTypes(),
 	]
 );
@@ -2234,15 +2214,15 @@ export const __experimentalGetAllowedBlocks = createSelector(
  * @property {?Object}        attributes       Attributes to pass to the newly created block.
  * @property {?Array<string>} attributesToCopy Attributes to be copied from adjecent blocks when inserted.
  */
-export const __experimentalGetDirectInsertBlock = createSelector(
+export const getDirectInsertBlock = createSelector(
 	( state, rootClientId = null ) => {
 		if ( ! rootClientId ) {
 			return;
 		}
 		const defaultBlock =
-			state.blockListSettings[ rootClientId ]?.__experimentalDefaultBlock;
+			state.blockListSettings[ rootClientId ]?.defaultBlock;
 		const directInsert =
-			state.blockListSettings[ rootClientId ]?.__experimentalDirectInsert;
+			state.blockListSettings[ rootClientId ]?.directInsert;
 		if ( ! defaultBlock || ! directInsert ) {
 			return;
 		}
@@ -2252,6 +2232,25 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 				: null;
 		}
 		return defaultBlock;
+	},
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.tree.get( rootClientId ),
+	]
+);
+
+export const __experimentalGetDirectInsertBlock = createSelector(
+	( state, rootClientId = null ) => {
+		deprecated(
+			'wp.data.select( "core/block-editor" ).__experimentalGetDirectInsertBlock',
+			{
+				alternative:
+					'wp.data.select( "core/block-editor" ).getDirectInsertBlock',
+				since: '6.3',
+				version: '6.4',
+			}
+		);
+		return getDirectInsertBlock( state, rootClientId );
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
@@ -2285,10 +2284,33 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 	return true;
 };
 
+function getUnsyncedPatterns( state ) {
+	const reusableBlocks =
+		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
+
+	return reusableBlocks
+		.filter(
+			( reusableBlock ) =>
+				reusableBlock.wp_pattern_sync_status === 'unsynced'
+		)
+		.map( ( reusableBlock ) => {
+			return {
+				name: `core/block/${ reusableBlock.id }`,
+				title: reusableBlock.title.raw,
+				categories: [ 'custom' ],
+				content: reusableBlock.content.raw,
+			};
+		} );
+}
+
 export const __experimentalGetParsedPattern = createSelector(
 	( state, patternName ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		const pattern = patterns.find( ( { name } ) => name === patternName );
+		const unsyncedPatterns = getUnsyncedPatterns( state );
+
+		const pattern = [ ...patterns, ...unsyncedPatterns ].find(
+			( { name } ) => name === patternName
+		);
 		if ( ! pattern ) {
 			return null;
 		}
@@ -2299,14 +2321,20 @@ export const __experimentalGetParsedPattern = createSelector(
 			} ),
 		};
 	},
-	( state ) => [ state.settings.__experimentalBlockPatterns ]
+	( state ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.__experimentalReusableBlocks,
+	]
 );
 
 const getAllAllowedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
+		const unsyncedPatterns = getUnsyncedPatterns( state );
+
 		const { allowedBlockTypes } = getSettings( state );
-		const parsedPatterns = patterns
+
+		const parsedPatterns = [ ...patterns, ...unsyncedPatterns ]
 			.filter( ( { inserter = true } ) => !! inserter )
 			.map( ( { name } ) =>
 				__experimentalGetParsedPattern( state, name )
@@ -2318,6 +2346,7 @@ const getAllAllowedPatterns = createSelector(
 	},
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
+		state.settings.__experimentalReusableBlocks,
 		state.settings.allowedBlockTypes,
 	]
 );
@@ -2344,6 +2373,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.settings.__experimentalBlockPatterns,
+		state.settings.__experimentalReusableBlocks,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.blockListSettings[ rootClientId ],
@@ -2492,30 +2522,6 @@ export function getBlockListSettings( state, clientId ) {
  */
 export function getSettings( state ) {
 	return state.settings;
-}
-
-/**
- * Returns the behaviors registered with the editor.
- *
- * Behaviors are named, reusable pieces of functionality that can be
- * attached to blocks. They are registered with the editor using the
- * `theme.json` file.
- *
- * @example
- *
- * ```js
- * const behaviors = select( blockEditorStore ).getBehaviors();
- * if ( behaviors?.lightbox ) {
- * 	 // Do something with the lightbox.
- * }
- *```
- *
- * @param {Object} state Editor state.
- *
- * @return {Object} The editor behaviors object.
- */
-export function getBehaviors( state ) {
-	return state.settings.behaviors;
 }
 
 /**
@@ -2816,10 +2822,11 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 }
 
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
-	// Prevent overlay on disabled blocks. It's redundant since disabled blocks
-	// can't be selected, and prevents non-disabled nested blocks from being
-	// selected.
-	if ( getBlockEditingMode( state, clientId ) === 'disabled' ) {
+	// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
+	// 'disabled' then the overlay is redundant since the block can't be
+	// selected. If the mode is 'contentOnly' then the overlay is redundant
+	// since there will be no controls to interact with once selected.
+	if ( getBlockEditingMode( state, clientId ) !== 'default' ) {
 		return false;
 	}
 

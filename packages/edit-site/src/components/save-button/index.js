@@ -19,6 +19,7 @@ export default function SaveButton( {
 	showTooltip = true,
 	defaultLabel,
 	icon,
+	__next40pxDefaultSize = false,
 } ) {
 	const { isDirty, isSaving, isSaveViewOpen } = useSelect( ( select ) => {
 		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
@@ -39,21 +40,24 @@ export default function SaveButton( {
 	const disabled = isSaving || ! activateSaveEnabled;
 
 	const getLabel = () => {
-		if ( isSaving ) {
-			return __( 'Saving' );
-		}
-		if ( disabled ) {
-			return __( 'Saved' );
-		}
-
-		if ( defaultLabel ) return defaultLabel;
-
-		if ( isPreviewingTheme() && isDirty ) {
-			return __( 'Activate & Save' );
-		} else if ( isPreviewingTheme() ) {
+		if ( isPreviewingTheme() ) {
+			if ( isSaving ) {
+				return __( 'Activating' );
+			} else if ( disabled ) {
+				return __( 'Saved' );
+			} else if ( isDirty ) {
+				return __( 'Activate & Save' );
+			}
 			return __( 'Activate' );
 		}
 
+		if ( isSaving ) {
+			return __( 'Saving' );
+		} else if ( disabled ) {
+			return __( 'Saved' );
+		} else if ( defaultLabel ) {
+			return defaultLabel;
+		}
 		return __( 'Save' );
 	};
 	const label = getLabel();
@@ -80,6 +84,7 @@ export default function SaveButton( {
 			 */
 			showTooltip={ showTooltip }
 			icon={ icon }
+			__next40pxDefaultSize={ __next40pxDefaultSize }
 		>
 			{ label }
 		</Button>

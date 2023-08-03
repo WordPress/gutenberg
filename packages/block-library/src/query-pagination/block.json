@@ -23,7 +23,6 @@
 		"showLabel": "showLabel"
 	},
 	"supports": {
-		"anchor": true,
 		"align": true,
 		"reusable": false,
 		"html": false,
@@ -36,7 +35,7 @@
 				"link": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {

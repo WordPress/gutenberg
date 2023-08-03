@@ -31,16 +31,22 @@ const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
  */
 const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
 /**
+ * Key within block settings' supports array indicating support for writing mode
+ * e.g. settings found in `block.json`.
+ */
+const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
+/**
  * Key within block settings' supports array indicating support for text
  * transforms e.g. settings found in `block.json`.
  */
 const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
+
 /**
  * Key within block settings' supports array indicating support for letter-spacing
  * e.g. settings found in `block.json`.
  */
 const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
-const LAYOUT_SUPPORT_KEY = '__experimentalLayout';
+const LAYOUT_SUPPORT_KEY = 'layout';
 const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
@@ -50,6 +56,7 @@ const TYPOGRAPHY_SUPPORT_KEYS = [
 	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
+	WRITING_MODE_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
 ];
 const SPACING_SUPPORT_KEY = 'spacing';

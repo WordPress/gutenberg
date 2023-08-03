@@ -37,7 +37,7 @@ const data = new TextEncoder().encode(
 		branch,
 		hash,
 		baseHash,
-		timestamp: parseInt( timestamp, 10 ),
+		timestamp,
 		metrics: resultsFiles.reduce( ( result, { metricsPrefix }, index ) => {
 			return {
 				...result,

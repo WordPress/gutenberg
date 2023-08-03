@@ -18,7 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
 import { useBlockVariations, VariationsPanel } from './variations-panel';
 
@@ -61,12 +61,15 @@ const {
 	useHasDimensionsPanel,
 	useHasTypographyPanel,
 	useHasBorderPanel,
+	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
 	useHasColorPanel,
 	useHasEffectsPanel,
 	useHasFiltersPanel,
 	useGlobalStyle,
+	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
+	__experimentalBehaviorsPanel: StylesBehaviorsPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
@@ -91,10 +94,14 @@ function ScreenBlock( { name, variation } ) {
 	} );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
+	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
+	const { behavior } = useGlobalBehaviors( name, 'user' );
+
 	const blockType = getBlockType( name );
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
+	const hasBehaviorsPanel = useHasBehaviorsPanel( rawSettings, name );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );
@@ -267,6 +274,14 @@ function ScreenBlock( { name, variation } ) {
 						onChange={ setStyle }
 						inheritedValue={ inheritedStyle }
 					/>
+					{ hasBehaviorsPanel && (
+						<StylesBehaviorsPanel
+							value={ behavior }
+							onChange={ setBehavior }
+							behaviors={ inheritedBehaviors }
+							blockName={ name }
+						></StylesBehaviorsPanel>
+					) }
 				</PanelBody>
 			) }
 		</>

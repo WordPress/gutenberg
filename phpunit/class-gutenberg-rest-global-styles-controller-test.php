@@ -123,13 +123,14 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 
 		$this->assertEquals(
 			array(
-				'id'       => self::$global_styles_id,
-				'title'    => array(
+				'id'        => self::$global_styles_id,
+				'title'     => array(
 					'raw'      => 'Custom Styles',
 					'rendered' => 'Custom Styles',
 				),
-				'settings' => new stdClass(),
-				'styles'   => new stdClass(),
+				'settings'  => new stdClass(),
+				'styles'    => new stdClass(),
+				'behaviors' => new stdClass(),
 			),
 			$data
 		);

@@ -28,17 +28,6 @@ test.describe( 'Links', () => {
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
-		// Open settings.
-		await page.getByRole( 'button', { name: 'Link Settings' } ).click();
-
-		// Navigate to and toggle the "Open in new tab" checkbox.
-		const checkbox = page.getByLabel( 'Open in new tab' );
-		await checkbox.click();
-
-		// Toggle should still have focus and be checked.
-		await expect( checkbox ).toBeChecked();
-		await expect( checkbox ).toBeFocused();
-
 		// Ensure that the contents of the post have not been changed, since at
 		// this point the link is still not inserted.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -47,6 +36,32 @@ test.describe( 'Links', () => {
 				attributes: { content: 'This is Gutenberg' },
 			},
 		] );
+
+		await page.keyboard.press( 'Enter' );
+
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Edit link.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Open settings.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Navigate to and toggle the "Open in new tab" checkbox.
+		const checkbox = page.getByLabel( 'Open in new tab' );
+		await checkbox.click();
+
+		// Toggle should still have focus and be checked.
+		await expect( checkbox ).toBeChecked();
+		await expect( checkbox ).toBeFocused();
 
 		// Tab back to the Submit and apply the link.
 		await page
@@ -82,11 +97,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'w.org' );
 
-		await page
-			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
+		await page.keyboard.press( 'Enter' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -107,7 +118,11 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'wordpress.org' );
 
 		// Update the link.
-		await page.keyboard.press( 'Enter' );
+		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
 
 		// Navigate back to the popover.
 		await page.keyboard.press( 'ArrowLeft' );
@@ -129,5 +144,93 @@ test.describe( 'Links', () => {
 				},
 			},
 		] );
+	} );
+
+	test( 'toggle state of advanced link settings is preserved across editing links', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg WordPress' );
+
+		// Select "WordPress".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Create a link.
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'w.org' );
+		await page.keyboard.press( 'Enter' );
+
+		// Move to edge of text "Gutenberg".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' ); // If you just use Alt here it won't work on windows.
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'ArrowLeft' );
+
+		// Select "Gutenberg".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Create a link.
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'https://wordpress.org/plugins/gutenberg/' );
+		await page.keyboard.press( 'Enter' );
+
+		// Move back into the link.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+k' );
+
+		// Toggle the Advanced settings to be open.
+		// This should set the editor preference to persist this
+		// UI state.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Move focus out of Link UI and into Paragraph block.
+		await pageUtils.pressKeys( 'Escape' );
+
+		// Move caret back into the "WordPress" link to trigger
+		// the Link UI for that link.
+		await pageUtils.pressKeys( 'Alt+ArrowRight' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+
+		// Switch Link UI to "edit" mode.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Check that the Advanced settings are still expanded/open
+		// and I can see the open in new tab checkbox. This verifies
+		// that the editor preference was persisted.
+		await expect( page.getByLabel( 'Open in new tab' ) ).toBeVisible();
+
+		// Toggle the Advanced settings back to being closed.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Move focus out of Link UI and into Paragraph block.
+		await pageUtils.pressKeys( 'Escape' );
+
+		// Move caret back into the "Gutenberg" link and open
+		// the Link UI for that link.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+k' );
+
+		// Check that the Advanced settings are still closed.
+		// This verifies that the editor preference was persisted.
+		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeVisible();
 	} );
 } );

@@ -6,12 +6,195 @@
  */
 
 /**
+ * Returns layout definitions, keyed by layout type.
+ *
+ * Provides a common definition of slugs, classnames, base styles, and spacing styles for each layout type.
+ * When making changes or additions to layout definitions, the corresponding JavaScript definitions should
+ * also be updated.
+ *
+ * @return array[] Layout definitions.
+ */
+function gutenberg_get_layout_definitions() {
+	$layout_definitions = array(
+		'default'     => array(
+			'name'          => 'default',
+			'slug'          => 'flow',
+			'className'     => 'is-layout-flow',
+			'baseStyles'    => array(
+				array(
+					'selector' => ' > .alignleft',
+					'rules'    => array(
+						'float'               => 'left',
+						'margin-inline-start' => '0',
+						'margin-inline-end'   => '2em',
+					),
+				),
+				array(
+					'selector' => ' > .alignright',
+					'rules'    => array(
+						'float'               => 'right',
+						'margin-inline-start' => '2em',
+						'margin-inline-end'   => '0',
+					),
+				),
+				array(
+					'selector' => ' > .aligncenter',
+					'rules'    => array(
+						'margin-left'  => 'auto !important',
+						'margin-right' => 'auto !important',
+					),
+				),
+			),
+			'spacingStyles' => array(
+				array(
+					'selector' => ' > :first-child:first-child',
+					'rules'    => array(
+						'margin-block-start' => '0',
+					),
+				),
+				array(
+					'selector' => ' > :last-child:last-child',
+					'rules'    => array(
+						'margin-block-end' => '0',
+					),
+				),
+				array(
+					'selector' => ' > *',
+					'rules'    => array(
+						'margin-block-start' => null,
+						'margin-block-end'   => '0',
+					),
+				),
+			),
+		),
+		'constrained' => array(
+			'name'          => 'constrained',
+			'slug'          => 'constrained',
+			'className'     => 'is-layout-constrained',
+			'baseStyles'    => array(
+				array(
+					'selector' => ' > .alignleft',
+					'rules'    => array(
+						'float'               => 'left',
+						'margin-inline-start' => '0',
+						'margin-inline-end'   => '2em',
+					),
+				),
+				array(
+					'selector' => ' > .alignright',
+					'rules'    => array(
+						'float'               => 'right',
+						'margin-inline-start' => '2em',
+						'margin-inline-end'   => '0',
+					),
+				),
+				array(
+					'selector' => ' > .aligncenter',
+					'rules'    => array(
+						'margin-left'  => 'auto !important',
+						'margin-right' => 'auto !important',
+					),
+				),
+				array(
+					'selector' => ' > :where(:not(.alignleft):not(.alignright):not(.alignfull))',
+					'rules'    => array(
+						'max-width'    => 'var(--wp--style--global--content-size)',
+						'margin-left'  => 'auto !important',
+						'margin-right' => 'auto !important',
+					),
+				),
+				array(
+					'selector' => ' > .alignwide',
+					'rules'    => array(
+						'max-width' => 'var(--wp--style--global--wide-size)',
+					),
+				),
+			),
+			'spacingStyles' => array(
+				array(
+					'selector' => ' > :first-child:first-child',
+					'rules'    => array(
+						'margin-block-start' => '0',
+					),
+				),
+				array(
+					'selector' => ' > :last-child:last-child',
+					'rules'    => array(
+						'margin-block-end' => '0',
+					),
+				),
+				array(
+					'selector' => ' > *',
+					'rules'    => array(
+						'margin-block-start' => null,
+						'margin-block-end'   => '0',
+					),
+				),
+			),
+		),
+		'flex'        => array(
+			'name'          => 'flex',
+			'slug'          => 'flex',
+			'className'     => 'is-layout-flex',
+			'displayMode'   => 'flex',
+			'baseStyles'    => array(
+				array(
+					'selector' => '',
+					'rules'    => array(
+						'flex-wrap'   => 'wrap',
+						'align-items' => 'center',
+					),
+				),
+				array(
+					'selector' => ' > *',
+					'rules'    => array(
+						'margin' => '0',
+					),
+				),
+			),
+			'spacingStyles' => array(
+				array(
+					'selector' => '',
+					'rules'    => array(
+						'gap' => null,
+					),
+				),
+			),
+		),
+		'grid'        => array(
+			'name'          => 'grid',
+			'slug'          => 'grid',
+			'className'     => 'is-layout-grid',
+			'displayMode'   => 'grid',
+			'baseStyles'    => array(
+				array(
+					'selector' => ' > *',
+					'rules'    => array(
+						'margin' => '0',
+					),
+				),
+			),
+			'spacingStyles' => array(
+				array(
+					'selector' => '',
+					'rules'    => array(
+						'gap' => null,
+					),
+				),
+			),
+		),
+	);
+
+	return $layout_definitions;
+}
+
+/**
  * Registers the layout block attribute for block types that support it.
  *
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_layout_support( $block_type ) {
-	$support_layout = block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$support_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	if ( $support_layout ) {
 		if ( ! $block_type->attributes ) {
 			$block_type->attributes = array();
@@ -347,7 +530,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type       = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$support_layout   = block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$support_layout   = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	$has_child_layout = isset( $block['attrs']['style']['layout']['selfStretch'] );
 
 	if ( ! $support_layout
@@ -400,16 +583,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return (string) $content;
 	}
 
-	$global_settings        = gutenberg_get_global_settings();
-	$global_layout_settings = _wp_array_get( $global_settings, array( 'layout' ), null );
-	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-
-	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] && ! $global_layout_settings ) {
-		return $block_content;
-	}
+	$global_settings = gutenberg_get_global_settings();
+	$fallback_layout = ! empty( _wp_array_get( $block_type->supports, array( 'layout', 'default' ), array() ) ) ? _wp_array_get( $block_type->supports, array( 'layout', 'default' ), array() ) : _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
+	$used_layout     = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $fallback_layout;
 
 	$class_names        = array();
-	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
+	$layout_definitions = gutenberg_get_layout_definitions();
 	$container_class    = wp_unique_id( 'wp-container-' );
 	$layout_classname   = '';
 

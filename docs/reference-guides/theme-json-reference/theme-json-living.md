@@ -158,6 +158,7 @@ Settings related to typography.
 | lineHeight | boolean | false |  |
 | textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
+| writingMode | boolean | false |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
 | fontSizes | array |  | fluid, name, size, slug |
@@ -169,6 +170,16 @@ Settings related to typography.
 
 Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.
 
+
+---
+
+### behaviors
+
+Settings related to behaviors.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| lightbox | boolean | false |  |
 
 ---
 ## Styles
@@ -239,6 +250,7 @@ Typography styles.
 | lineHeight | string, object |  |
 | textColumns | string |  |
 | textDecoration | string, object |  |
+| writingMode | string, object |  |
 | textTransform | string, object |  |
 
 ---

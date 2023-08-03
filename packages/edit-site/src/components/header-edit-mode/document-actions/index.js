@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -17,12 +17,15 @@ import {
 import { BlockIcon } from '@wordpress/block-editor';
 import { store as commandsStore } from '@wordpress/commands';
 import {
-	chevronLeftSmall as chevronLeftSmallIcon,
+	chevronLeftSmall,
+	chevronRightSmall,
 	page as pageIcon,
+	navigation as navigationIcon,
+	symbol,
 } from '@wordpress/icons';
-import { useEntityRecord } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useState, useEffect, useRef } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -36,18 +39,28 @@ export default function DocumentActions() {
 }
 
 function PageDocumentActions() {
-	const { hasPageContentFocus, context } = useSelect(
-		( select ) => ( {
-			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
-			context: select( editSiteStore ).getEditedPostContext(),
-		} ),
+	const { hasPageContentFocus, hasResolved, isFound, title } = useSelect(
+		( select ) => {
+			const {
+				hasPageContentFocus: _hasPageContentFocus,
+				getEditedPostContext,
+			} = select( editSiteStore );
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const context = getEditedPostContext();
+			const queryArgs = [ 'postType', context.postType, context.postId ];
+			const page = getEditedEntityRecord( ...queryArgs );
+			return {
+				hasPageContentFocus: _hasPageContentFocus(),
+				hasResolved: hasFinishedResolution(
+					'getEditedEntityRecord',
+					queryArgs
+				),
+				isFound: !! page,
+				title: page?.title,
+			};
+		},
 		[]
-	);
-
-	const { hasResolved, editedRecord } = useEntityRecord(
-		'postType',
-		context.postType,
-		context.postId
 	);
 
 	const { setHasPageContentFocus } = useDispatch( editSiteStore );
@@ -65,7 +78,7 @@ function PageDocumentActions() {
 		return null;
 	}
 
-	if ( ! editedRecord ) {
+	if ( ! isFound ) {
 		return (
 			<div className="edit-site-document-actions">
 				{ __( 'Document not found' ) }
@@ -80,7 +93,7 @@ function PageDocumentActions() {
 			} ) }
 			icon={ pageIcon }
 		>
-			{ editedRecord.title }
+			{ title }
 		</BaseDocumentActions>
 	) : (
 		<TemplateDocumentActions
@@ -105,15 +118,22 @@ function TemplateDocumentActions( { className, onBack } ) {
 		);
 	}
 
-	const entityLabel =
-		record.type === 'wp_template_part'
-			? __( 'template part' )
-			: __( 'template' );
+	const entityLabel = getEntityLabel( record.type );
+
+	let typeIcon = icon;
+	if ( record.type === 'wp_navigation' ) {
+		typeIcon = navigationIcon;
+	} else if ( record.type === 'wp_block' ) {
+		typeIcon = symbol;
+	}
 
 	return (
 		<BaseDocumentActions
-			className={ className }
-			icon={ icon }
+			className={ classnames( className, {
+				'is-synced-entity':
+					record.wp_pattern_sync_status !== 'unsynced',
+			} ) }
+			icon={ typeIcon }
 			onBack={ onBack }
 		>
 			<VisuallyHidden as="span">
@@ -137,7 +157,7 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			{ onBack && (
 				<Button
 					className="edit-site-document-actions__back"
-					icon={ chevronLeftSmallIcon }
+					icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
 					onClick={ ( event ) => {
 						event.stopPropagation();
 						onBack();
@@ -166,4 +186,21 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			</Button>
 		</div>
 	);
+}
+
+function getEntityLabel( entityType ) {
+	let label = '';
+	switch ( entityType ) {
+		case 'wp_navigation':
+			label = 'navigation menu';
+			break;
+		case 'wp_template_part':
+			label = 'template part';
+			break;
+		default:
+			label = 'template';
+			break;
+	}
+
+	return label;
 }

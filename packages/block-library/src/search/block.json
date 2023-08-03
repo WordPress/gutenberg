@@ -54,7 +54,6 @@
 	},
 	"supports": {
 		"align": [ "left", "center", "right" ],
-		"anchor": true,
 		"color": {
 			"gradients": true,
 			"__experimentalSkipSerialization": true,
@@ -91,6 +90,7 @@
 		},
 		"html": false
 	},
+	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-search-editor",
 	"style": "wp-block-search"
 }

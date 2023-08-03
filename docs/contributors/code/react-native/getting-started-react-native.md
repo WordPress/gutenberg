@@ -89,7 +89,7 @@ One of the extensions we are using is the [React Native Tools](https://marketpla
 Use the following command to run the test suite:
 
 ```sh
-npm run native test
+npm run test:native
 ```
 
 It will run the [jest](https://github.com/facebook/jest) test runner on your tests. The tests are running on the desktop against Node.js.
@@ -97,7 +97,7 @@ It will run the [jest](https://github.com/facebook/jest) test runner on your tes
 To run the tests with debugger support, start it with the following CLI command:
 
 ```sh
-npm run native test:debug
+npm run test:native:debug
 ```
 
 Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to sprinkle `debugger` statements anywhere in the code that you'd like the debugger to break.
@@ -111,7 +111,7 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 This repository uses Appium to run UI tests. The tests live in `__device-tests__` and are written using Appium to run tests against simulators and real devices. To run these you'll need to check off a few things:
 
 -   When running the tests, you'll need to ensure the Metro bundler (`npm run native start`) is not running.
--   [Appium CLI](https://appium.io/docs/en/about-appium/getting-started/) installed and available globally. We also recommend using [appium-doctor](https://github.com/appium/appium-doctor) to ensure all of Appium's dependencies are good to go. You don't have to worry about starting the server yourself, the tests handle starting the server on port 4723, just be sure that the port is free or feel free to change the port number in the test file.
+-   [Appium CLI](https://github.com/appium/appium/blob/1.x/docs/en/about-appium/getting-started.md) installed and available globally. We also recommend using [appium-doctor](https://github.com/appium/appium-doctor) to ensure all of Appium's dependencies are good to go. You don't have to worry about starting the server yourself, the tests handle starting the server on port 4723, just be sure that the port is free or feel free to change the port number in the test file.
 -   For iOS a simulator should automatically launch but for Android you'll need to have an emulator _with at least platform version 8.0_ fired up and running.
 
 Then, to run the UI tests on iOS:

@@ -10,7 +10,46 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]
+-   [*] Remove Gallery caption button on mobile [#53010]
+-   [**] Upgrade React Native to 0.71.11 [#51303]
+-   [*] Upgrade Gradle to 8.2.1 & AGP to 8.1.0 [#52872]
+-   [*] Fix Gallery block selection when adding media [#53127]
+-   [**] Fix iOS Focus loop for RichText components [#53217]
+
+## 1.100.1
+-   [**] Add WP hook for registering non-core blocks [#52791]
+
+## 1.100.0
+-   [**] Add media inserter buttons to editor toolbar [#51827]
+-   [**] Update native BlockOutline component styles to remove blue border from blocks [#51222]
+-   [**] Move the undo/redo buttons to the navigation bar [#51766]
+-   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
+-   [**] Update Editor toolbar icons and colors [#52336]
+-   [*] Update Block Settings button border [#52715]
+
+## 1.99.1
+- [**] Fix crash related to removing a block under certain conditions [#52595]
+
+## 1.99.0
+-   [*] Rename "Reusable blocks" to "Synced patterns", aligning with the web editor. [#51704]
+-   [**] Fix a crash related to Reanimated when closing the editor [#52320]
+
+## 1.98.1
+-   [*] fix: Display heading level dropdown icons and labels [#52004]
+
+## 1.98.0
+-   [*] Image block - Fix issue where in some cases the image doesn't display the right aspect ratio [#51463]
+-   [*] Fix cursor positioning when dictating text on iOS [#51227]
+
+## 1.97.1
+-   [**] Fix crash when using the delete key to remove a single button [#51435]
+-   [*] Ensure text input field is not editable when Bottom sheet cell is disabled [#51567]
+
+## 1.97.0
+-   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
 -   [*] [internal] Upgrade compile and target sdk version to Android API 33 [#50731]
+-   [*] Display lock icon in disabled state of `Cell` component [#50907]
 
 ## 1.96.1
 -   [**] Fix Android-only issue related to block toolbar not being displayed on some blocks in UBE [#51131]
@@ -20,8 +59,6 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Add disabled style to `Cell` component [#50665]
 -   [**] Fix undo/redo history when inserting a link configured to open in a new tab [#50460]
 -   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
-
--   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
 
 ## 1.95.0
 -   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]

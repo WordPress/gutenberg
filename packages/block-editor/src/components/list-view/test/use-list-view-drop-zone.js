@@ -103,78 +103,118 @@ describe( 'getListViewDropTarget', () => {
 	];
 
 	it( 'should return the correct target when dragging a block over the top half of the first block', () => {
-		const position = { x: 50, y: 70 };
-		const target = getListViewDropTarget( blocksData, position );
+		[
+			{ position: { x: 50, y: 70 }, rtl: false },
+			{ position: { x: 250, y: 70 }, rtl: true },
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget( blocksData, position, rtl );
 
-		expect( target ).toEqual( {
-			blockIndex: 0,
-			clientId: 'block-1',
-			dropPosition: 'top',
-			rootClientId: '',
+			expect( target ).toEqual( {
+				blockIndex: 0,
+				clientId: 'block-1',
+				dropPosition: 'top',
+				rootClientId: '',
+			} );
 		} );
 	} );
 
 	it( 'should nest when dragging a block over the bottom half of an expanded block', () => {
-		const position = { x: 50, y: 90 };
-		const target = getListViewDropTarget( blocksData, position );
+		[
+			{ position: { x: 50, y: 90 }, rtl: false },
+			{ position: { x: 250, y: 90 }, rtl: true },
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget( blocksData, position, rtl );
 
-		expect( target ).toEqual( {
-			blockIndex: 0,
-			dropPosition: 'inside',
-			rootClientId: 'block-1',
+			expect( target ).toEqual( {
+				blockIndex: 0,
+				dropPosition: 'inside',
+				rootClientId: 'block-1',
+			} );
 		} );
 	} );
 
 	it( 'should nest when dragging a block over the right side of the bottom half of a block nested to three levels', () => {
-		const position = { x: 250, y: 180 };
-		const target = getListViewDropTarget( blocksData, position );
+		[
+			{ position: { x: 250, y: 180 }, rtl: false },
+			{ position: { x: 50, y: 180 }, rtl: true },
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget( blocksData, position, rtl );
 
-		expect( target ).toEqual( {
-			blockIndex: 0,
-			dropPosition: 'inside',
-			rootClientId: 'block-3',
+			expect( target ).toEqual( {
+				blockIndex: 0,
+				dropPosition: 'inside',
+				rootClientId: 'block-3',
+			} );
 		} );
 	} );
 
 	it( 'should drag below when positioned at the bottom half of a block nested to three levels, and over the third level horizontally', () => {
-		const position = { x: 10 + NESTING_LEVEL_INDENTATION * 3, y: 180 };
-		const target = getListViewDropTarget( blocksData, position );
+		[
+			{
+				position: { x: 10 + NESTING_LEVEL_INDENTATION * 3, y: 180 },
+				rtl: false,
+			},
+			{
+				position: { x: 300 - NESTING_LEVEL_INDENTATION * 3, y: 180 },
+				rtl: true,
+			},
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget( blocksData, position, rtl );
 
-		expect( target ).toEqual( {
-			blockIndex: 1,
-			clientId: 'block-3',
-			dropPosition: 'bottom',
-			rootClientId: 'block-2',
+			expect( target ).toEqual( {
+				blockIndex: 1,
+				clientId: 'block-3',
+				dropPosition: 'bottom',
+				rootClientId: 'block-2',
+			} );
 		} );
 	} );
 
-	it( 'should drag one level up below when positioned at the bottom half of a block nested to three levels, and over the second level horizontally', () => {
-		const position = { x: 10 + NESTING_LEVEL_INDENTATION * 2, y: 180 };
-		const target = getListViewDropTarget( blocksData, position );
+	it( 'should drag one level up when positioned at the bottom half of a block nested to three levels, and over the second level horizontally', () => {
+		[
+			{
+				position: { x: 10 + NESTING_LEVEL_INDENTATION * 2, y: 180 },
+				rtl: false,
+			},
+			{
+				position: { x: 300 - NESTING_LEVEL_INDENTATION * 2, y: 180 },
+				rtl: true,
+			},
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget( blocksData, position, rtl );
 
-		expect( target ).toEqual( {
-			blockIndex: 1,
-			clientId: 'block-3',
-			dropPosition: 'bottom',
-			rootClientId: 'block-1',
+			expect( target ).toEqual( {
+				blockIndex: 1,
+				clientId: 'block-3',
+				dropPosition: 'bottom',
+				rootClientId: 'block-1',
+			} );
 		} );
 	} );
 
 	it( 'should drag two levels up below when positioned at the bottom half of a block nested to three levels, and over the first level horizontally', () => {
-		const position = { x: 10 + NESTING_LEVEL_INDENTATION, y: 180 };
-		const target = getListViewDropTarget( blocksData, position );
+		[
+			{
+				position: { x: 10 + NESTING_LEVEL_INDENTATION, y: 180 },
+				rtl: false,
+			},
+			{
+				position: { x: 300 - NESTING_LEVEL_INDENTATION, y: 180 },
+				rtl: true,
+			},
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget( blocksData, position, rtl );
 
-		expect( target ).toEqual( {
-			blockIndex: 1,
-			clientId: 'block-3',
-			dropPosition: 'bottom',
-			rootClientId: '',
+			expect( target ).toEqual( {
+				blockIndex: 1,
+				clientId: 'block-3',
+				dropPosition: 'bottom',
+				rootClientId: '',
+			} );
 		} );
 	} );
 
 	it( 'should nest and append to end when dragging a block over the right side and bottom half of a collapsed block with children', () => {
-		const position = { x: 160, y: 90 };
-
 		const collapsedBlockData = [ ...blocksData ];
 
 		// Set the first block to be collapsed.
@@ -186,38 +226,64 @@ describe( 'getListViewDropTarget', () => {
 		// Hide the first block's children.
 		collapsedBlockData.splice( 1, 1 );
 
-		const target = getListViewDropTarget( collapsedBlockData, position );
+		[
+			{
+				position: { x: 250, y: 90 },
+				rtl: false,
+			},
+			{
+				position: { x: 50, y: 90 },
+				rtl: true,
+			},
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget(
+				collapsedBlockData,
+				position,
+				rtl
+			);
 
-		expect( target ).toEqual( {
-			blockIndex: 1,
-			dropPosition: 'inside',
-			rootClientId: 'block-1',
+			expect( target ).toEqual( {
+				blockIndex: 1,
+				dropPosition: 'inside',
+				rootClientId: 'block-1',
+			} );
 		} );
 	} );
 
 	it( 'should nest and prepend when dragging a block over the right side and bottom half of an expanded block with children', () => {
-		const position = { x: 160, y: 90 };
-
 		const collapsedBlockData = [ ...blocksData ];
 
-		// Set the first block to be collapsed.
+		// Set the first block to be expanded.
 		collapsedBlockData[ 0 ] = {
 			...collapsedBlockData[ 0 ],
 			isExpanded: true,
 		};
 
-		const target = getListViewDropTarget( collapsedBlockData, position );
+		[
+			{
+				position: { x: 250, y: 90 },
+				rtl: false,
+			},
+			{
+				position: { x: 50, y: 90 },
+				rtl: true,
+			},
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget(
+				collapsedBlockData,
+				position,
+				rtl
+			);
 
-		expect( target ).toEqual( {
-			blockIndex: 0,
-			dropPosition: 'inside',
-			rootClientId: 'block-1',
+			expect( target ).toEqual( {
+				blockIndex: 0,
+				dropPosition: 'inside',
+				rootClientId: 'block-1',
+			} );
 		} );
 	} );
 
 	it( 'should drag below when dragging a block over the left side and bottom half of a collapsed block with children', () => {
-		const position = { x: 30, y: 90 };
-
 		const collapsedBlockData = [ ...blocksData ];
 
 		// Set the first block to be collapsed.
@@ -229,19 +295,32 @@ describe( 'getListViewDropTarget', () => {
 		// Hide the first block's children.
 		collapsedBlockData.splice( 1, 1 );
 
-		const target = getListViewDropTarget( collapsedBlockData, position );
+		[
+			{
+				position: { x: 30, y: 90 },
+				rtl: false,
+			},
+			{
+				position: { x: 270, y: 90 },
+				rtl: true,
+			},
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget(
+				collapsedBlockData,
+				position,
+				rtl
+			);
 
-		expect( target ).toEqual( {
-			blockIndex: 1,
-			clientId: 'block-1',
-			dropPosition: 'bottom',
-			rootClientId: '',
+			expect( target ).toEqual( {
+				blockIndex: 1,
+				clientId: 'block-1',
+				dropPosition: 'bottom',
+				rootClientId: '',
+			} );
 		} );
 	} );
 
 	it( 'should drag below when attempting to nest but the dragged block is not allowed as a child', () => {
-		const position = { x: 70, y: 90 };
-
 		const childNotAllowedBlockData = [ ...blocksData ];
 
 		// Set the first block to not be allowed as a child.
@@ -250,16 +329,28 @@ describe( 'getListViewDropTarget', () => {
 			canInsertDraggedBlocksAsChild: false,
 		};
 
-		const target = getListViewDropTarget(
-			childNotAllowedBlockData,
-			position
-		);
+		[
+			{
+				position: { x: 70, y: 90 },
+				rtl: false,
+			},
+			{
+				position: { x: 230, y: 90 },
+				rtl: true,
+			},
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget(
+				childNotAllowedBlockData,
+				position,
+				rtl
+			);
 
-		expect( target ).toEqual( {
-			blockIndex: 1,
-			clientId: 'block-1',
-			dropPosition: 'bottom',
-			rootClientId: '',
+			expect( target ).toEqual( {
+				blockIndex: 1,
+				clientId: 'block-1',
+				dropPosition: 'bottom',
+				rootClientId: '',
+			} );
 		} );
 	} );
 
@@ -288,14 +379,18 @@ describe( 'getListViewDropTarget', () => {
 		// This position is to the right of the block, but below the bottom of the block.
 		// This should result in the block being moved below the bottom-most block, and
 		// not being treated as a nesting gesture.
-		const position = { x: 160, y: 250 };
-		const target = getListViewDropTarget( singleBlock, position );
+		[
+			{ position: { x: 160, y: 250 }, rtl: false },
+			{ position: { x: 140, y: 250 }, rtl: true },
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget( singleBlock, position, rtl );
 
-		expect( target ).toEqual( {
-			blockIndex: 1,
-			clientId: 'block-1',
-			dropPosition: 'bottom',
-			rootClientId: '',
+			expect( target ).toEqual( {
+				blockIndex: 1,
+				clientId: 'block-1',
+				dropPosition: 'bottom',
+				rootClientId: '',
+			} );
 		} );
 	} );
 } );

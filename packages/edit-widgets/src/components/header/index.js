@@ -23,7 +23,7 @@ import RedoButton from './undo-redo/redo';
 import MoreMenu from '../more-menu';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 

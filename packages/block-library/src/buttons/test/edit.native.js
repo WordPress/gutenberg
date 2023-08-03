@@ -18,6 +18,7 @@ import {
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import { BACKSPACE } from '@wordpress/keycodes';
 
 const BUTTONS_HTML = `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button /--></div>
@@ -80,7 +81,8 @@ describe( 'Buttons block', () => {
 			);
 
 			const incrementButton = await within( radiusStepper ).findByTestId(
-				'Increment'
+				'Increment',
+				{ hidden: true }
 			);
 			fireEvent( incrementButton, 'onPressIn' );
 
@@ -180,7 +182,7 @@ describe( 'Buttons block', () => {
 			expect( addBlockHerePlaceholders.length ).toBe( 0 );
 
 			// Add a new Button block
-			fireEvent.press( await screen.findByText( 'Button' ) );
+			fireEvent.press( within( blockList ).getByText( 'Button' ) );
 
 			// Get new button
 			const secondButtonBlock = await getBlock( screen, 'Button', {
@@ -229,6 +231,32 @@ describe( 'Buttons block', () => {
 				// Delete block
 				const deleteButton = screen.getByLabelText( /Remove block/ );
 				fireEvent.press( deleteButton );
+
+				expect( getEditorHtml() ).toMatchSnapshot();
+			} );
+
+			it( 'removes the button and buttons block when deleting the block using the delete (backspace) key', async () => {
+				const screen = await initializeEditor( {
+					initialHtml: BUTTONS_HTML,
+				} );
+
+				// Get block
+				const buttonsBlock = await getBlock( screen, 'Buttons' );
+				triggerBlockListLayout( buttonsBlock );
+
+				// Get inner button block
+				const buttonBlock = await getBlock( screen, 'Button' );
+				fireEvent.press( buttonBlock );
+
+				const buttonInput =
+					within( buttonBlock ).getByLabelText( 'Text input. Empty' );
+
+				// Delete block
+				fireEvent( buttonInput, 'onKeyDown', {
+					nativeEvent: {},
+					preventDefault() {},
+					keyCode: BACKSPACE,
+				} );
 
 				expect( getEditorHtml() ).toMatchSnapshot();
 			} );
@@ -296,6 +324,10 @@ describe( 'Buttons block', () => {
 
 			// Tap one color
 			fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
+			// TODO(jest-console): Fix the warning and remove the expect below.
+			expect( console ).toHaveWarnedWith(
+				`Non-serializable values were found in the navigation state. Check:\n\nColor > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+			);
 
 			// Dismiss the Block Settings modal.
 			fireEvent( blockSettingsModal, 'backdropPress' );

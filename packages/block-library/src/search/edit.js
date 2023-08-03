@@ -97,8 +97,8 @@ export default function SearchEdit( {
 	);
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	useEffect( () => {
-		if ( ! insertedInNavigationBlock ) return;
+
+	if ( insertedInNavigationBlock ) {
 		// This side-effect should not create an undo level.
 		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( {
@@ -106,7 +106,8 @@ export default function SearchEdit( {
 			buttonUseIcon: true,
 			buttonPosition: 'button-inside',
 		} );
-	}, [ insertedInNavigationBlock ] );
+	}
+
 	const borderRadius = style?.border?.radius;
 	const borderProps = useBorderProps( attributes );
 
@@ -226,7 +227,7 @@ export default function SearchEdit( {
 		},
 		{
 			role: 'menuitemradio',
-			title: __( 'Button Only' ),
+			title: __( 'Button only' ),
 			isActive: buttonPosition === 'button-only',
 			icon: buttonOnly,
 			onClick: () => {
@@ -440,8 +441,8 @@ export default function SearchEdit( {
 										key={ widthValue }
 										isSmall
 										variant={
-											`${ widthValue }%` ===
-											`${ width }${ widthUnit }`
+											widthValue === width &&
+											widthUnit === '%'
 												? 'primary'
 												: undefined
 										}

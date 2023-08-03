@@ -11,7 +11,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { COLORS, font, rtl, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 import Icon from '../icon';
-import type { DropdownMenuContext } from './types';
+import type { DropdownMenuInternalContext } from './types';
 
 const ANIMATION_PARAMS = {
 	SLIDE_AMOUNT: '2px',
@@ -62,7 +62,9 @@ const slideLeftAndFade = keyframes( {
 	'100%': { opacity: 1, transform: 'translateX(0)' },
 } );
 
-const baseContent = ( variant: DropdownMenuContext[ 'variant' ] ) => css`
+const baseContent = (
+	variant: DropdownMenuInternalContext[ 'variant' ]
+) => css`
 	min-width: 220px;
 	background-color: ${ COLORS.ui.background };
 	border-radius: ${ CONFIG.radiusBlockUi };
@@ -200,12 +202,12 @@ const baseItem = css`
 `;
 
 export const Content = styled( DropdownMenu.Content )<
-	Pick< DropdownMenuContext, 'variant' >
+	Pick< DropdownMenuInternalContext, 'variant' >
 >`
 	${ ( props ) => baseContent( props.variant ) }
 `;
 export const SubContent = styled( DropdownMenu.SubContent )<
-	Pick< DropdownMenuContext, 'variant' >
+	Pick< DropdownMenuInternalContext, 'variant' >
 >`
 	${ ( props ) => baseContent( props.variant ) }
 `;
@@ -246,7 +248,7 @@ export const Label = styled( DropdownMenu.Label )`
 `;
 
 export const Separator = styled( DropdownMenu.Separator )<
-	Pick< DropdownMenuContext, 'variant' >
+	Pick< DropdownMenuInternalContext, 'variant' >
 >`
 	height: ${ CONFIG.borderWidth };
 	/* TODO: doesn't match border color from variables */

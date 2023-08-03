@@ -8,3 +8,34 @@
 .edit-site-page-panels__edit-template-button {
 	justify-content: center;
 }
+
+.edit-site-change-status__content {
+	.components-popover__content {
+		min-width: 320px;
+		padding: $grid-unit-20;
+	}
+	.edit-site-change-status__options {
+		.components-base-control__field > .components-v-stack {
+			gap: $grid-unit-10;
+		}
+		label {
+			.components-text {
+				display: block;
+				margin-left: $radio-input-size + 6;
+			}
+		}
+	}
+}
+
+.edit-site-summary-field {
+	.components-dropdown {
+		flex-grow: 1;
+	}
+	.edit-site-summary-field__trigger {
+		width: 100%;
+	}
+	.edit-site-summary-field__label {
+		width: 30%;
+	}
+}
+

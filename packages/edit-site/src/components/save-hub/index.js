@@ -15,7 +15,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import SaveButton from '../save-button';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -27,12 +27,13 @@ const PUBLISH_ON_SAVE_ENTITIES = [
 ];
 
 export default function SaveHub() {
+	const saveNoticeId = 'site-edit-save-notice';
 	const { params } = useLocation();
 
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { createSuccessNotice, createErrorNotice } =
+	const { createSuccessNotice, createErrorNotice, removeNotice } =
 		useDispatch( noticesStore );
 
 	const { dirtyCurrentEntity, countUnsavedChanges, isDirty, isSaving } =
@@ -107,6 +108,7 @@ export default function SaveHub() {
 	const saveCurrentEntity = async () => {
 		if ( ! dirtyCurrentEntity ) return;
 
+		removeNotice( saveNoticeId );
 		const { kind, name, key, property } = dirtyCurrentEntity;
 
 		try {
@@ -132,6 +134,7 @@ export default function SaveHub() {
 
 			createSuccessNotice( __( 'Site updated.' ), {
 				type: 'snackbar',
+				id: saveNoticeId,
 			} );
 		} catch ( error ) {
 			createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` );
@@ -148,6 +151,7 @@ export default function SaveHub() {
 					disabled={ isSaving }
 					aria-disabled={ isSaving }
 					className="edit-site-save-hub__button"
+					__next40pxDefaultSize
 				>
 					{ label }
 				</Button>
@@ -158,6 +162,7 @@ export default function SaveHub() {
 					showTooltip={ false }
 					icon={ disabled && ! isSaving ? check : null }
 					defaultLabel={ label }
+					__next40pxDefaultSize
 				/>
 			) }
 		</HStack>

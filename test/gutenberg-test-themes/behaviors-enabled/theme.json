@@ -3,7 +3,10 @@
 	"behaviors": {
 		"blocks": {
 			"core/image": {
-				"lightbox": true
+				"lightbox": {
+					"enabled": true,
+					"animation": "zoom"
+				}
 			}
 		}
 	}

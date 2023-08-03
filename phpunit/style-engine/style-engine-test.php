@@ -632,6 +632,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that incoming styles are deduped and merged.
 	 *
+	 * @ticket 58811
+	 *
 	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
 	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
 	 */
@@ -674,7 +676,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 
-		$this->assertSame( '.gandalf{color:white;height:190px;border-style:dotted;padding:10px;margin-bottom:100px;}.dumbledore,.rincewind{color:grey;height:90px;border-style:dotted;}', $compiled_stylesheet );
+		$this->assertSame( '.gandalf{color:white;height:190px;border-style:dotted;padding:10px;margin-bottom:100px;}.dumbledore{color:grey;height:90px;border-style:dotted;}.rincewind{color:grey;height:90px;border-style:dotted;}', $compiled_stylesheet );
 	}
 
 	/**

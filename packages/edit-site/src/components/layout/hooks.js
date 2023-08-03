@@ -10,6 +10,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import useEditedEntityRecord from '../use-edited-entity-record';
 
+const MAX_LOADING_TIME = 10000; // 10 seconds
+
 export function useIsSiteEditorLoading() {
 	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
 	const [ loaded, setLoaded ] = useState( false );
@@ -21,6 +23,25 @@ export function useIsSiteEditorLoading() {
 		},
 		[ loaded ]
 	);
+
+	/*
+	 * If the maximum expected loading time has passed, we're marking the
+	 * editor as loaded, in order to prevent any failed requests from blocking
+	 * the editor canvas from appearing.
+	 */
+	useEffect( () => {
+		let timeout;
+
+		if ( ! loaded ) {
+			timeout = setTimeout( () => {
+				setLoaded( true );
+			}, MAX_LOADING_TIME );
+		}
+
+		return () => {
+			clearTimeout( timeout );
+		};
+	}, [ loaded ] );
 
 	useEffect( () => {
 		if ( inLoadingPause ) {

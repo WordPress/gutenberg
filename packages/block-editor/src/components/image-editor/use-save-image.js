@@ -66,7 +66,6 @@ export default function useSaveImage( {
 				onSaveImage( {
 					id: response.id,
 					url: response.source_url,
-					height: height && width ? width / aspect : undefined,
 				} );
 			} )
 			.catch( ( error ) => {

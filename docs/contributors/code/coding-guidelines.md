@@ -211,7 +211,7 @@ import { privateHasContentRoleAttribute, ...selectors } from './selectors';
 import { privateToggleFeature, ...actions } from './selectors';
 // The `lock` function is exported from the internal private-apis.js file where
 // the opt-in function was called.
-import { lock, unlock } from './private-apis';
+import { lock, unlock } from './lock-unlock';
 
 export const store = registerStore(/* ... */);
 // Attach a private action to the exported store:
@@ -230,7 +230,7 @@ import { store } from '@wordpress/package1';
 import { useSelect } from '@wordpress/data';
 // The `unlock` function is exported from the internal private-apis.js file where
 // the opt-in function was called.
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
 
 function MyComponent() {
     const hasRole = useSelect( ( select ) => (
@@ -251,7 +251,7 @@ function MyComponent() {
 
 ```js
 // In packages/package1/index.js:
-import { lock } from './private-apis';
+import { lock } from './lock-unlock';
 
 export const privateApis = {};
 /* Attach private data to the exported object */
@@ -266,7 +266,7 @@ lock( privateApis, {
 
 // In packages/package2/index.js:
 import { privateApis } from '@wordpress/package1';
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
 
 const {
 	privateCallback,
@@ -314,7 +314,7 @@ inside it:
 
 ```js
 // In @wordpress/package1/index.js:
-import { lock } from './private-apis';
+import { lock } from './lock-unlock';
 
 // A private function contains all the logic
 function privateValidateBlocks( formula, privateIsStrict ) {
@@ -339,7 +339,7 @@ lock( privateApis, { privateValidateBlocks } );
 
 // In @wordpress/package2/index.js:
 import { privateApis as package1PrivateApis } from '@wordpress/package1';
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
 
 // The private function may be "unlocked" given the stable function:
 const { privateValidateBlocks } = unlock( package1PrivateApis );
@@ -355,7 +355,7 @@ inside it:
 
 ```js
 // In @wordpress/package1/index.js:
-import { lock } from './private-apis';
+import { lock } from './lock-unlock';
 
 // The private component contains all the logic
 const PrivateMyButton = ( { title, privateShowIcon = true } ) => {
@@ -379,7 +379,7 @@ lock( privateApis, { PrivateMyButton } );
 
 // In @wordpress/package2/index.js:
 import { privateApis } from '@wordpress/package1';
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
 
 // The private component may be "unlocked" given the stable component:
 const { PrivateMyButton } = unlock(privateApis);

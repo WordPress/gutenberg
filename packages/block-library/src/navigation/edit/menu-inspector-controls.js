@@ -19,7 +19,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
@@ -60,7 +60,6 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 			onClose={ () => {
 				setInsertedBlock( null );
 			} }
-			hasCreateSuggestion={ false }
 			onChange={ ( updatedValue ) => {
 				updateAttributes(
 					updatedValue,
@@ -104,7 +103,7 @@ const MainContent = ( {
 		? sprintf(
 				/* translators: %s: The name of a menu. */
 				__( 'Structure for navigation menu: %s' ),
-				navigationMenu?.title?.rendered || __( 'Untitled menu' )
+				navigationMenu?.title || __( 'Untitled menu' )
 		  )
 		: __(
 				'You have not yet created any menus. Displaying a list of your Pages'
@@ -138,6 +137,7 @@ const MenuInspectorControls = ( props ) => {
 		onSelectClassicMenu,
 		onSelectNavigationMenu,
 		isManageMenusButtonDisabled,
+		blockEditingMode,
 	} = props;
 
 	return (
@@ -150,22 +150,24 @@ const MenuInspectorControls = ( props ) => {
 					>
 						{ __( 'Menu' ) }
 					</Heading>
-					<NavigationMenuSelector
-						currentMenuId={ currentMenuId }
-						onSelectClassicMenu={ onSelectClassicMenu }
-						onSelectNavigationMenu={ onSelectNavigationMenu }
-						onCreateNew={ onCreateNew }
-						createNavigationMenuIsSuccess={
-							createNavigationMenuIsSuccess
-						}
-						createNavigationMenuIsError={
-							createNavigationMenuIsError
-						}
-						actionLabel={ actionLabel }
-						isManageMenusButtonDisabled={
-							isManageMenusButtonDisabled
-						}
-					/>
+					{ blockEditingMode === 'default' && (
+						<NavigationMenuSelector
+							currentMenuId={ currentMenuId }
+							onSelectClassicMenu={ onSelectClassicMenu }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
+							onCreateNew={ onCreateNew }
+							createNavigationMenuIsSuccess={
+								createNavigationMenuIsSuccess
+							}
+							createNavigationMenuIsError={
+								createNavigationMenuIsError
+							}
+							actionLabel={ actionLabel }
+							isManageMenusButtonDisabled={
+								isManageMenusButtonDisabled
+							}
+						/>
+					) }
 				</HStack>
 				<MainContent { ...props } />
 			</PanelBody>

@@ -82,9 +82,6 @@ Default.args = {
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
-					{ /* There is an issue here with TS not recognizing the
-					 * `RenderProp` being passed.
-					 * @ts-expect-error */ }
 					{ ( toggleProps ) => (
 						<DropdownMenu
 							icon={ alignLeft }

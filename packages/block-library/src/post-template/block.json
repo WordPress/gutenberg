@@ -19,8 +19,7 @@
 		"reusable": false,
 		"html": false,
 		"align": [ "wide", "full" ],
-		"anchor": true,
-		"__experimentalLayout": true,
+		"layout": true,
 		"color": {
 			"gradients": true,
 			"link": true,

@@ -43,9 +43,8 @@
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
-		"anchor": true,
 		"html": false,
-		"__experimentalLayout": true
+		"layout": true
 	},
 	"editorStyle": "wp-block-query-editor"
 }

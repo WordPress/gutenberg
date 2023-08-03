@@ -17,7 +17,7 @@ function gutenberg_get_theme_preview_path( $current_stylesheet = null ) {
 		return $current_stylesheet;
 	}
 
-	$preview_stylesheet = ! empty( $_GET['gutenberg_theme_preview'] ) ? $_GET['gutenberg_theme_preview'] : null;
+	$preview_stylesheet = ! empty( $_GET['wp_theme_preview'] ) ? $_GET['wp_theme_preview'] : null;
 	$wp_theme           = wp_get_theme( $preview_stylesheet );
 	if ( ! is_wp_error( $wp_theme->errors() ) ) {
 		if ( current_filter() === 'template' ) {
@@ -45,20 +45,21 @@ function gutenberg_attach_theme_preview_middleware() {
 		'wp-api-fetch',
 		sprintf(
 			'wp.apiFetch.use( wp.apiFetch.createThemePreviewMiddleware( %s ) );',
-			wp_json_encode( sanitize_text_field( $_GET['gutenberg_theme_preview'] ) )
+			wp_json_encode( sanitize_text_field( $_GET['wp_theme_preview'] ) )
 		),
 		'after'
 	);
 }
 
-/**
- * Temporary function to add a live preview button to block themes.
- * Remove when https://core.trac.wordpress.org/ticket/58190 lands.
- */
-function add_live_preview_button() {
-	global $pagenow;
-	if ( 'themes.php' === $pagenow ) {
-		?>
+if ( ! function_exists( 'add_live_preview_button' ) ) {
+	/**
+	 * Temporary function to add a live preview button to block themes.
+	 * Remove when https://core.trac.wordpress.org/ticket/58190 lands.
+	 */
+	function add_live_preview_button() {
+		global $pagenow;
+		if ( 'themes.php' === $pagenow ) {
+			?>
 <script type="text/javascript">
 	jQuery( document ).ready( function() {
 		addLivePreviewButton();
@@ -88,42 +89,42 @@ function add_live_preview_button() {
 			livePreviewButton.setAttribute('class', 'button button-primary');
 			livePreviewButton.setAttribute(
 				'href',
-				`/wp-admin/site-editor.php?gutenberg_theme_preview=${themePath}&return=themes.php`
+				`<?php echo esc_url( admin_url( '/site-editor.php' ) ); ?>?wp_theme_preview=${themePath}&return=themes.php`
 			);
 			livePreviewButton.innerHTML = '<?php echo esc_html_e( 'Live Preview' ); ?>';
 			themeInfo.querySelector('.theme-actions').appendChild(livePreviewButton);
 		});
 	}
 </script>
+			<?php
+		}
+	}
+}
+
+if ( ! function_exists( 'block_theme_activate_nonce' ) ) {
+	/**
+	 * Adds a nonce for the theme activation link.
+	 */
+	function block_theme_activate_nonce() {
+		$nonce_handle = 'switch-theme_' . gutenberg_get_theme_preview_path();
+		?>
+<script type="text/javascript">
+	window.WP_BLOCK_THEME_ACTIVATE_NONCE = '<?php echo wp_create_nonce( $nonce_handle ); ?>';
+</script>
 		<?php
 	}
-
 }
 
 /**
- * Adds a nonce for the theme activation link.
+ * Attaches filters to enable theme previews in the Site Editor.
  */
-function block_theme_activate_nonce() {
-	$nonce_handle = 'switch-theme_' . gutenberg_get_theme_preview_path();
-	?>
-<script type="text/javascript">
-	window.BLOCK_THEME_ACTIVATE_NONCE = '<?php echo wp_create_nonce( $nonce_handle ); ?>';
-</script>
-	<?php
+if ( ! empty( $_GET['wp_theme_preview'] ) && ! function_exists( 'wp_get_theme_preview_path' ) ) {
+	add_filter( 'stylesheet', 'gutenberg_get_theme_preview_path' );
+	add_filter( 'template', 'gutenberg_get_theme_preview_path' );
+	add_filter( 'init', 'gutenberg_attach_theme_preview_middleware' );
 }
 
-// Hide this feature behind an experiment.
-$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-theme-previews', $gutenberg_experiments ) ) {
-	/**
-	 * Attaches filters to enable theme previews in the Site Editor.
-	 */
-	if ( ! empty( $_GET['gutenberg_theme_preview'] ) ) {
-		add_filter( 'stylesheet', 'gutenberg_get_theme_preview_path' );
-		add_filter( 'template', 'gutenberg_get_theme_preview_path' );
-		add_filter( 'init', 'gutenberg_attach_theme_preview_middleware' );
-	}
-
+if ( ! function_exists( 'wp_get_theme_preview_path' ) ) {
 	add_action( 'admin_head', 'block_theme_activate_nonce' );
 	add_action( 'admin_print_footer_scripts', 'add_live_preview_button', 11 );
 }

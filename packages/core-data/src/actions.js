@@ -18,7 +18,6 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { getUndoEdits, getRedoEdits } from './private-selectors';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -357,7 +356,7 @@ export const editEntityRecord =
 				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 			);
 		}
-		const { transientEdits = {}, mergedEdits = {} } = entityConfig;
+		const { mergedEdits = {} } = entityConfig;
 		const record = select.getRawEntityRecord( kind, name, recordId );
 		const editedRecord = select.getEditedEntityRecord(
 			kind,
@@ -382,7 +381,6 @@ export const editEntityRecord =
 					: value;
 				return acc;
 			}, {} ),
-			transientEdits,
 		};
 		dispatch( {
 			type: 'EDIT_ENTITY_RECORD',
@@ -395,6 +393,7 @@ export const editEntityRecord =
 						acc[ key ] = editedRecord[ key ];
 						return acc;
 					}, {} ),
+					isCached: options.isCached,
 				},
 			},
 		} );
@@ -407,8 +406,7 @@ export const editEntityRecord =
 export const undo =
 	() =>
 	( { select, dispatch } ) => {
-		// Todo: we shouldn't have to pass "root" here.
-		const undoEdit = select( ( state ) => getUndoEdits( state.root ) );
+		const undoEdit = select.getUndoEdits();
 		if ( ! undoEdit ) {
 			return;
 		}
@@ -425,8 +423,7 @@ export const undo =
 export const redo =
 	() =>
 	( { select, dispatch } ) => {
-		// Todo: we shouldn't have to pass "root" here.
-		const redoEdit = select( ( state ) => getRedoEdits( state.root ) );
+		const redoEdit = select.getRedoEdits();
 		if ( ! redoEdit ) {
 			return;
 		}
@@ -554,9 +551,12 @@ export const saveEntityRecord =
 					data = Object.keys( data ).reduce(
 						( acc, key ) => {
 							if (
-								[ 'title', 'excerpt', 'content' ].includes(
-									key
-								)
+								[
+									'title',
+									'excerpt',
+									'content',
+									'meta',
+								].includes( key )
 							) {
 								acc[ key ] = data[ key ];
 							}
@@ -789,6 +789,22 @@ export const __experimentalSaveSpecifiedEntityEdits =
 				editsToSave[ edit ] = edits[ edit ];
 			}
 		}
+
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+
+		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
+
+		// If a record key is provided then update the existing record.
+		// This necessitates providing `recordKey` to saveEntityRecord as part of the
+		// `record` argument (here called `editsToSave`) to stop that action creating
+		// a new record and instead cause it to update the existing record.
+		if ( recordId ) {
+			editsToSave[ entityIdKey ] = recordId;
+		}
+
 		return await dispatch.saveEntityRecord(
 			kind,
 			name,

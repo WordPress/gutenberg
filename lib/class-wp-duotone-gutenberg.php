@@ -32,6 +32,10 @@
  * @since 6.3.0
  */
 
+if ( class_exists( 'WP_Duotone_Gutenberg' ) ) {
+	return;
+}
+
 /**
  * Manages duotone block supports and global styles.
  *
@@ -530,10 +534,19 @@ class WP_Duotone_Gutenberg {
 		foreach ( $colors as $color_str ) {
 			$color = self::colord_parse( $color_str );
 
-			$duotone_values['r'][] = $color['r'] / 255;
-			$duotone_values['g'][] = $color['g'] / 255;
-			$duotone_values['b'][] = $color['b'] / 255;
-			$duotone_values['a'][] = $color['a'];
+			if ( null === $color ) {
+				$error_message = sprintf(
+					/* translators: %s: duotone colors */
+					__( '"%s" in theme.json settings.color.duotone is not a hex or rgb string.', 'gutenberg' ),
+					$color_str
+				);
+				_doing_it_wrong( __METHOD__, $error_message, '6.3.0' );
+			} else {
+				$duotone_values['r'][] = $color['r'] / 255;
+				$duotone_values['g'][] = $color['g'] / 255;
+				$duotone_values['b'][] = $color['b'] / 255;
+				$duotone_values['a'][] = $color['a'];
+			}
 		}
 
 		ob_start();

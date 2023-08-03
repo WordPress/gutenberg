@@ -65,7 +65,11 @@ export function initializeEditor(
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 
 	// Check if the block list view should be open by default.
-	if ( select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) ) {
+	// If `distractionFree` mode is enabled, the block list view should not be open.
+	if (
+		select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) &&
+		! select( editPostStore ).isFeatureActive( 'distractionFree' )
+	) {
 		dispatch( editPostStore ).setIsListViewOpened( true );
 	}
 
@@ -79,7 +83,7 @@ export function initializeEditor(
 	}
 
 	/*
-	 * Prevent adding template part and post content block in the post editor.
+	 * Prevent adding template part in the post editor.
 	 * Only add the filter when the post editor is initialized, not imported.
 	 * Also only add the filter(s) after registerCoreBlocks()
 	 * so that common filters in the block library are not overwritten.
@@ -90,10 +94,37 @@ export function initializeEditor(
 		( canInsert, blockType ) => {
 			if (
 				! select( editPostStore ).isEditingTemplate() &&
-				( blockType.name === 'core/template-part' ||
-					blockType.name === 'core/post-content' )
+				blockType.name === 'core/template-part'
 			) {
 				return false;
+			}
+			return canInsert;
+		}
+	);
+
+	/*
+	 * Prevent adding post content block (except in query block) in the post editor.
+	 * Only add the filter when the post editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removePostContentFromInserter',
+		(
+			canInsert,
+			blockType,
+			rootClientId,
+			{ getBlockParentsByBlockName }
+		) => {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/post-content'
+			) {
+				return (
+					getBlockParentsByBlockName( rootClientId, 'core/query' )
+						.length > 0
+				);
 			}
 			return canInsert;
 		}

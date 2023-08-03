@@ -198,6 +198,8 @@ Renders a pressed button style.
 
 Decreases the size of the button.
 
+Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
+
 -   Required: No
 
 #### `label`: `string`
@@ -217,6 +219,19 @@ If provided with `showTooltip`, appends the Shortcut label to the tooltip conten
 If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.
 
 -   Required: No
+
+#### `size`: `'default'` | `'compact'` | `'small'`
+
+The size of the button.
+
+-   `'default'`: For normal text-label buttons, unless it is a toggle button.
+-   `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
+-   `'small'`: For icon buttons associated with more advanced or auxiliary features.
+
+If the deprecated `isSmall` prop is also defined, this prop will take precedence.
+
+-   Required: No
+-   Default: `'default'`
 
 #### `target`: `string`
 
