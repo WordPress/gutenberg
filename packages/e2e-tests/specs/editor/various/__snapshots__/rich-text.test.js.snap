@@ -139,7 +139,11 @@ exports[`RichText should paste paragraph contents into list 1`] = `
 
 <!-- wp:list -->
 <ul><!-- wp:list-item -->
-<li>1<br>2</li>
+<li>1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>2</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
