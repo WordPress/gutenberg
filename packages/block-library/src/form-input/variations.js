@@ -33,7 +33,7 @@ const variations = [
 		title: __( 'Checkbox input' ),
 		description: __( 'A simple checkbox input.' ),
 		icon: 'forms',
-		attributes: { type: 'checkbox' },
+		attributes: { type: 'checkbox', inlineLabel: true },
 		isDefault: true,
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) => blockAttributes?.type === 'checkbox',
