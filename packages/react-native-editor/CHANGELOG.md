@@ -15,6 +15,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Upgrade React Native to 0.71.11 [#51303]
 -   [*] Upgrade Gradle to 8.2.1 & AGP to 8.1.0 [#52872]
 -   [*] Fix Gallery block selection when adding media [#53127]
+-   [**] Fix iOS Focus loop for RichText components [#53217]
 
 ## 1.100.1
 -   [**] Add WP hook for registering non-core blocks [#52791]
