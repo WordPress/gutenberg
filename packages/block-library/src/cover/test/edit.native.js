@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image } from 'react-native';
+import { Image, Pressable } from 'react-native';
 import {
 	getEditorHtml,
 	initializeEditor,
@@ -12,6 +12,7 @@ import {
 	getBlock,
 	openBlockSettings,
 } from 'test/helpers';
+import HsvColorPicker from 'react-native-hsv-color-picker';
 
 /**
  * WordPress dependencies
@@ -537,6 +538,39 @@ describe( 'color settings', () => {
 		fireEvent.press( resetButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'displays the hex color value in the custom color picker', async () => {
+		HsvColorPicker.mockImplementation( ( props ) => {
+			return <Pressable { ...props } testID="hsv-color-picker" />;
+		} );
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
+		} );
+
+		// Select a color from the placeholder palette.
+		const colorButton = screen.getByA11yHint(
+			'Navigates to custom color picker'
+		);
+		fireEvent.press( colorButton );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Assert label text before tapping color picker
+		expect( screen.getByText( 'Select a color' ) ).toBeVisible();
+
+		// Tap color picker
+		const colorPicker = screen.getByTestId( 'hsv-color-picker' );
+		fireEvent( colorPicker, 'onHuePickerPress', {
+			hue: 120,
+			saturation: 12,
+			value: 50,
+		} );
+
+		// Assert label hex value after tapping color picker
+		expect( screen.getByText( '#00FF00' ) ).toBeVisible();
 	} );
 } );
 

@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Display custom color value in mobile Cover Block color picker [#51414]
 
 ## 1.101.0
 -   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]
@@ -28,8 +29,8 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Add media inserter buttons to editor toolbar [#51827]
 -   [**] Update native BlockOutline component styles to remove blue border from blocks [#51222]
 -   [**] Move the undo/redo buttons to the navigation bar [#51766]
--   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
--   [**] Update Editor toolbar icons and colors [#52336]
+-   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
+-   [**] Update Editor toolbar icons and colors [#52336]
 -   [*] Update Block Settings button border [#52715]
 
 ## 1.99.1
@@ -77,7 +78,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Fix regression with the Color hook and ColorPanel. [#49917]
 
 ## 1.93.0
--   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
+-   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
 
 ## 1.92.1
 -   [*] Avoid empty Gallery block error [#49557]
@@ -572,8 +573,8 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.42.0
 
 -   [***] Adding support for selecting different unit of value in Cover and Columns blocks [#26161]
--   [**] Button block - Add link picker to the block settings [#26206]
--   [**] Support to render background/text colors in Group, Paragraph and Quote blocks [#25994]
+-   [**] Button block - Add link picker to the block settings [#26206]
+-   [**] Support to render background/text colors in Group, Paragraph and Quote blocks [#25994]
 -   [*] Fix theme colors syncing with the editor [#26821]
 -   [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
 
