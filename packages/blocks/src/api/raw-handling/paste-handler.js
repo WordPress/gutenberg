@@ -75,7 +75,7 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
  * @param {string} options.plainText
  * @param {string} options.mode
  */
-function maybeConvertParagraphToInline( { blocks, plainText, mode } ) {
+function maybeConvertToInline( { blocks, plainText, mode } ) {
 	if (
 		mode === 'AUTO' &&
 		blocks.length === 1 &&
@@ -89,7 +89,10 @@ function maybeConvertParagraphToInline( { blocks, plainText, mode } ) {
 			trimmedPlainText !== '' &&
 			trimmedPlainText.indexOf( '\n' ) === -1
 		) {
-			return blocks[ 0 ].attributes.content;
+			const target = blocks[ 0 ].innerBlocks.length
+				? blocks[ 0 ].innerBlocks[ 0 ]
+				: blocks[ 0 ];
+			return target.attributes.content;
 		}
 	}
 
@@ -154,7 +157,7 @@ export function pasteHandler( {
 	}
 
 	if ( disableFilters ) {
-		return maybeConvertParagraphToInline( {
+		return maybeConvertToInline( {
 			blocks: htmlToBlocks( normaliseBlocks( HTML ), pasteHandler ),
 			plainText,
 			mode,
@@ -259,9 +262,5 @@ export function pasteHandler( {
 		.flat()
 		.filter( Boolean );
 
-	// If we're allowed to return inline content, and there is only one
-	// inlineable block, and the original plain text content does not have any
-	// line breaks, then treat it as inline paste.
-
-	return maybeConvertParagraphToInline( { blocks, plainText, mode } );
+	return maybeConvertToInline( { blocks, plainText, mode } );
 }
