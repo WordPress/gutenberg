@@ -85,6 +85,17 @@ export function useOnEnter( props ) {
 				return;
 			}
 
+			if (
+				! canInsertBlockType(
+					'core/paragraph',
+					getBlockRootClientId( wrapperClientId )
+				)
+			) {
+				return;
+			}
+
+			event.preventDefault();
+
 			// If it is in the middle, split the block in two.
 			const wrapperBlock = getBlock( wrapperClientId );
 			batch( () => {
