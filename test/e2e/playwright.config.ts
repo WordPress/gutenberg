@@ -5,7 +5,7 @@ import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig, devices } from '@playwright/test';
-import { devices as replayDevices } from "@replayio/playwright";
+import { devices as replayDevices } from '@replayio/playwright';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
