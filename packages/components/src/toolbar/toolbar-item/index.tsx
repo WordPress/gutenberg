@@ -50,7 +50,9 @@ function ToolbarItem(
 			{ ...allProps }
 			store={ accessibleToolbarStore }
 			render={ render }
-		/>
+		>
+			{ children }
+		</BaseToolbarItem>
 	);
 }
 
