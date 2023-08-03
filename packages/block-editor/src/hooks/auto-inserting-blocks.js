@@ -26,15 +26,15 @@ function AutoInsertingBlocksControl( props ) {
 			Object.keys( block.autoInsert ).includes( props.blockName )
 	);
 
-	// Group by block name prefix (before the slash).
+	// Group by block namespace (i.e. prefix before the slash).
 	const groupedAutoInsertedBlocks = autoInsertedBlocksForCurrentBlock.reduce(
-		( acc, block ) => {
+		( groups, block ) => {
 			const [ prefix ] = block.name.split( '/' );
-			if ( ! acc[ prefix ] ) {
-				acc[ prefix ] = [];
+			if ( ! groups[ prefix ] ) {
+				groups[ prefix ] = [];
 			}
-			acc[ prefix ].push( block );
-			return acc;
+			groups[ prefix ].push( block );
+			return groups;
 		},
 		{}
 	);
