@@ -36,15 +36,17 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 			{ 'hidden' !== type && (
 				<InspectorControls>
 					<PanelBody title={ __( 'Input settings' ) }>
-						<CheckboxControl
-							label={ __( 'Inline label' ) }
-							checked={ attributes.inlineLabel }
-							onChange={ ( newVal ) => {
-								setAttributes( {
-									inlineLabel: newVal,
-								} );
-							} }
-						/>
+						{ 'checkbox' !== type && (
+							<CheckboxControl
+								label={ __( 'Inline label' ) }
+								checked={ attributes.inlineLabel }
+								onChange={ ( newVal ) => {
+									setAttributes( {
+										inlineLabel: newVal,
+									} );
+								} }
+							/>
+						) }
 						<CheckboxControl
 							label={ __( 'Required' ) }
 							checked={ attributes.required }
@@ -114,7 +116,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 			{ controls }
 			<span
 				className={ classNames( 'wp-block-form-input__label', {
-					'is-label-inline': inlineLabel,
+					'is-label-inline': inlineLabel || 'checkbox' === type,
 				} ) }
 			>
 				<RichText
