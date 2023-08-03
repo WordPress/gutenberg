@@ -7,6 +7,7 @@ import {
 	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
+import { symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -121,7 +122,7 @@ describe( 'selectors', () => {
 			parent: [ 'core/test-block-b' ],
 		} );
 
-		registerBlockType( 'core/test-freeform', {
+		registerBlockType( 'core/freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
 			category: 'text',
 			title: 'Test Freeform Content Handler',
@@ -177,7 +178,7 @@ describe( 'selectors', () => {
 			ancestor: [ 'core/test-block-ancestor' ],
 		} );
 
-		setFreeformContentHandlerName( 'core/test-freeform' );
+		setFreeformContentHandlerName( 'core/freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
 	} );
@@ -187,7 +188,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
-		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/freeform' );
 		unregisterBlockType( 'core/post-content-child' );
 		unregisterBlockType( 'core/test-block-ancestor' );
 		unregisterBlockType( 'core/test-block-parent' );
@@ -3326,36 +3327,36 @@ describe( 'selectors', () => {
 				( item ) => item.id === 'core/test-block-a'
 			);
 			expect( testBlockAItem ).toEqual( {
-				id: 'core/test-block-a',
-				name: 'core/test-block-a',
-				initialAttributes: {},
-				title: 'Test Block A',
-				icon: {
-					src: 'test',
-				},
 				category: 'design',
-				keywords: [ 'testing' ],
-				variations: [],
-				isDisabled: false,
-				utility: 1,
+				description: undefined,
+				example: undefined,
 				frecency: 0,
+				icon: { src: 'test' },
+				id: 'core/test-block-a',
+				initialAttributes: {},
+				isDisabled: false,
+				keywords: [ 'testing' ],
+				name: 'core/test-block-a',
+				title: 'Test Block A',
+				utility: 1,
+				variations: [],
 			} );
 			const reusableBlockItem = items.find(
 				( item ) => item.id === 'core/block/1'
 			);
 			expect( reusableBlockItem ).toEqual( {
-				id: 'core/block/1',
-				name: 'core/block',
-				initialAttributes: { ref: 1 },
-				title: 'Reusable Block 1',
-				icon: {
-					src: 'test',
-				},
 				category: 'reusable',
-				keywords: [],
-				isDisabled: false,
-				utility: 1,
+				content: '<!-- /wp:test-block-a -->',
 				frecency: 0,
+				icon: symbol,
+				id: 'core/block/1',
+				initialAttributes: { ref: 1 },
+				isDisabled: false,
+				keywords: [ 'reusable' ],
+				name: 'core/block',
+				syncStatus: undefined,
+				title: 'Reusable Block 1',
+				utility: 1,
 			} );
 		} );
 
@@ -3450,7 +3451,7 @@ describe( 'selectors', () => {
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-a',
 				'core/test-block-b',
-				'core/test-freeform',
+				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
 				'core/block/1',
@@ -3466,7 +3467,7 @@ describe( 'selectors', () => {
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-a',
 				'core/test-block-b',
-				'core/test-freeform',
+				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
 				'core/block/1',
@@ -4734,6 +4735,7 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 				{ clientId: 'baz', innerBlocks: [] },
 			],
 		} );
+		expect( console ).toHaveWarned();
 	} );
 } );
 describe( '__unstableGetClientIdsTree', () => {

@@ -313,7 +313,7 @@ _Parameters_
 
 _Returns_
 
--   `Object | null`: The current global styles.
+-   `Array< object > | null`: The current global styles.
 
 ### getCurrentUser
 
@@ -505,18 +505,6 @@ _Parameters_
 _Returns_
 
 -   `any`: The entity record's save error.
-
-### getNavigationFallbackId
-
-Retrieve the fallback Navigation.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `EntityRecordKey | undefined`: The ID for the fallback Navigation post.
 
 ### getRawEntityRecord
 
@@ -859,7 +847,7 @@ Resolves the specified entity records.
 _Usage_
 
 ```js
-import { useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 function PageTitlesList() {
 	const { records, isResolving } = useEntityRecords( 'postType', 'page' );

@@ -417,8 +417,8 @@ const fontSize = getComputedFluidTypographyValue( {
 _Parameters_
 
 -   _args_ `Object`:
--   _args.minimumViewPortWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
--   _args.maximumViewPortWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+-   _args.minimumViewportWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+-   _args.maximumViewportWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
 -   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
 -   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
@@ -544,6 +544,18 @@ _Parameters_
 _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
+
+### HeadingLevelDropdown
+
+Dropdown for selecting a heading level (1 through 6) or paragraph (0).
+
+_Parameters_
+
+-   _props_ `WPHeadingLevelDropdownProps`: Component props.
+
+_Returns_
+
+-   `WPComponent`: The toolbar.
 
 ### HeightControl
 
@@ -699,6 +711,7 @@ _Properties_
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `boolean|Array`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
+-   _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode

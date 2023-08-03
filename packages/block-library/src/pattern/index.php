@@ -22,6 +22,8 @@ function register_block_core_pattern() {
 /**
  * Renders the `core/pattern` block on the server.
  *
+ * @since 6.3.0 Backwards compatibility: blocks with no `syncStatus` attribute do not receive block wrapper.
+ *
  * @param array $attributes Block attributes.
  *
  * @return string Returns the output of the pattern.
@@ -39,19 +41,17 @@ function render_block_core_pattern( $attributes ) {
 	}
 
 	$pattern = $registry->get_registered( $slug );
+	$content = $pattern['content'];
 
-	// Currently all existing blocks should be returned here without a wp-block-pattern wrapper
-	// as the syncStatus attribute is only used if the gutenberg-pattern-enhancements experiment
-	// is enabled.
-	if ( ! isset( $attributes['syncStatus'] ) ) {
-		return do_blocks( $pattern['content'] );
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	if ( $gutenberg_experiments && ! empty( $gutenberg_experiments['gutenberg-auto-inserting-blocks'] ) ) {
+		// TODO: In the long run, we'd likely want to have a filter in the `WP_Block_Patterns_Registry` class
+		// instead to allow us plugging in code like this.
+		$blocks  = parse_blocks( $content );
+		$content = gutenberg_serialize_blocks( $blocks );
 	}
 
-	$block_classnames = 'wp-block-pattern ' . str_replace( '/', '-', $attributes['slug'] );
-	$classnames       = isset( $attributes['className'] ) ? $attributes['className'] . ' ' . $block_classnames : $block_classnames;
-	$wrapper          = '<div class="' . esc_attr( $classnames ) . '">%s</div>';
-
-	return sprintf( $wrapper, do_blocks( $pattern['content'] ) );
+	return do_blocks( $content );
 }
 
 add_action( 'init', 'register_block_core_pattern' );

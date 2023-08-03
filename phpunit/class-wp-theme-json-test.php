@@ -1391,7 +1391,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'selector' => 'body',
 		);
 
-		$expected    = 'body { margin: 0;}.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}body{--wp--style--root--padding-top: 10px;--wp--style--root--padding-right: 12px;--wp--style--root--padding-bottom: 10px;--wp--style--root--padding-left: 12px;}';
+		$expected    = 'body { margin: 0;}.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}body{--wp--style--root--padding-top: 10px;--wp--style--root--padding-right: 12px;--wp--style--root--padding-bottom: 10px;--wp--style--root--padding-left: 12px;}';
 		$root_rules  = $theme_json->get_root_layout_rules( WP_Theme_JSON::ROOT_BLOCK_SELECTOR, $metadata );
 		$style_rules = $theme_json->get_styles_for_block( $metadata );
 		$this->assertEquals( $expected, $root_rules . $style_rules );
@@ -2021,4 +2021,158 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'var(--wp--preset--color--s)', $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Style variations: Assert the internal variables are convert to CSS custom variables.' );
 
 	}
+
+	public function test_resolve_variables() {
+		$primary_color   = '#9DFF20';
+		$secondary_color = '#9DFF21';
+		$contrast_color  = '#000';
+		$raw_color_value = '#efefef';
+		$large_font      = '18px';
+		$small_font      = '12px';
+		$theme_json      = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'      => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'color' => $primary_color,
+									'name'  => 'Primary',
+									'slug'  => 'primary',
+								),
+								array(
+									'color' => $secondary_color,
+									'name'  => 'Secondary',
+									'slug'  => 'secondary',
+								),
+								array(
+									'color' => $contrast_color,
+									'name'  => 'Contrast',
+									'slug'  => 'contrast',
+								),
+							),
+						),
+					),
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'size' => $small_font,
+								'name' => 'Font size small',
+								'slug' => 'small',
+							),
+							array(
+								'size' => $large_font,
+								'name' => 'Font size large',
+								'slug' => 'large',
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'color'    => array(
+						'background' => 'var(--wp--preset--color--primary)',
+						'text'       => $raw_color_value,
+					),
+					'elements' => array(
+						'button' => array(
+							'color'      => array(
+								'text' => 'var(--wp--preset--color--contrast)',
+							),
+							'typography' => array(
+								'fontSize' => 'var(--wp--preset--font-size--small)',
+							),
+						),
+					),
+					'blocks'   => array(
+						'core/post-terms'      => array(
+							'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--small)' ),
+							'color'      => array( 'background' => $raw_color_value ),
+						),
+						'core/more'            => array(
+							'typography' => array( 'fontSize' => 'var(--undefined--font-size--small)' ),
+							'color'      => array( 'background' => 'linear-gradient(90deg, var(--wp--preset--color--primary) 0%, var(--wp--preset--color--secondary) 35%, var(--wp--undefined--color--secondary) 100%)' ),
+						),
+						'core/comment-content' => array(
+							'typography' => array( 'fontSize' => 'calc(var(--wp--preset--font-size--small, 12px) + 20px)' ),
+							'color'      => array(
+								'text'       => 'var(--wp--preset--color--primary, red)',
+								'background' => 'var(--wp--preset--color--primary, var(--wp--preset--font-size--secondary))',
+								'link'       => 'var(--undefined--color--primary, var(--wp--preset--font-size--secondary))',
+							),
+						),
+						'core/comments'        => array(
+							'color' => array(
+								'text'       => 'var(--undefined--color--primary, var(--wp--preset--font-size--small))',
+								'background' => 'var(--wp--preset--color--primary, var(--undefined--color--primary))',
+							),
+						),
+						'core/navigation'      => array(
+							'elements' => array(
+								'link' => array(
+									'color'      => array(
+										'background' => 'var(--wp--preset--color--primary)',
+										'text'       => 'var(--wp--preset--color--secondary)',
+									),
+									'typography' => array(
+										'fontSize' => 'var(--wp--preset--font-size--large)',
+									),
+								),
+							),
+						),
+						'core/quote'           => array(
+							'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--large)' ),
+							'color'      => array( 'background' => 'var(--wp--preset--color--primary)' ),
+							'variations' => array(
+								'plain' => array(
+									'typography' => array( 'fontSize' => 'var(--wp--preset--font-size--small)' ),
+									'color'      => array( 'background' => 'var(--wp--preset--color--secondary)' ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$styles = $theme_json::resolve_variables( $theme_json )->get_raw_data()['styles'];
+
+		$this->assertEquals( $primary_color, $styles['color']['background'], 'Top level: Assert values are converted' );
+		$this->assertEquals( $raw_color_value, $styles['color']['text'], 'Top level: Assert raw values stay intact' );
+
+		$this->assertEquals( $contrast_color, $styles['elements']['button']['color']['text'], 'Elements: color' );
+		$this->assertEquals( $small_font, $styles['elements']['button']['typography']['fontSize'], 'Elements: font-size' );
+
+		$this->assertEquals( $large_font, $styles['blocks']['core/quote']['typography']['fontSize'], 'Blocks: font-size' );
+		$this->assertEquals( $primary_color, $styles['blocks']['core/quote']['color']['background'], 'Blocks: color' );
+		$this->assertEquals( $raw_color_value, $styles['blocks']['core/post-terms']['color']['background'], 'Blocks: Raw color value stays intact' );
+		$this->assertEquals( $small_font, $styles['blocks']['core/post-terms']['typography']['fontSize'], 'Block core/post-terms: font-size' );
+		$this->assertEquals(
+			"linear-gradient(90deg, $primary_color 0%, $secondary_color 35%, var(--wp--undefined--color--secondary) 100%)",
+			$styles['blocks']['core/more']['color']['background'],
+			'Blocks: multiple colors and undefined color'
+		);
+		$this->assertEquals( 'var(--undefined--font-size--small)', $styles['blocks']['core/more']['typography']['fontSize'], 'Blocks: undefined font-size ' );
+		$this->assertEquals( "calc($small_font + 20px)", $styles['blocks']['core/comment-content']['typography']['fontSize'], 'Blocks: font-size in random place' );
+		$this->assertEquals( $primary_color, $styles['blocks']['core/comment-content']['color']['text'], 'Blocks: text color with fallback' );
+		$this->assertEquals( $primary_color, $styles['blocks']['core/comment-content']['color']['background'], 'Blocks: background color with var as fallback' );
+		$this->assertEquals( $primary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Block element: background color' );
+		$this->assertEquals( $secondary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Block element: text color' );
+		$this->assertEquals( $large_font, $styles['blocks']['core/navigation']['elements']['link']['typography']['fontSize'], 'Block element: font-size' );
+
+		$this->assertEquals(
+			"var(--undefined--color--primary, $small_font)",
+			$styles['blocks']['core/comments']['color']['text'],
+			'Blocks: text color with undefined var and fallback'
+		);
+		$this->assertEquals(
+			$primary_color,
+			$styles['blocks']['core/comments']['color']['background'],
+			'Blocks: background color with variable and undefined fallback'
+		);
+
+		$this->assertEquals( $small_font, $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Block variations: font-size' );
+		$this->assertEquals( $secondary_color, $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Block variations: color' );
+	}
+
 }

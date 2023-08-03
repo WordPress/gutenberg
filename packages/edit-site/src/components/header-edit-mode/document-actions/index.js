@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -17,9 +17,11 @@ import {
 import { BlockIcon } from '@wordpress/block-editor';
 import { store as commandsStore } from '@wordpress/commands';
 import {
-	chevronLeftSmall as chevronLeftSmallIcon,
+	chevronLeftSmall,
+	chevronRightSmall,
 	page as pageIcon,
 	navigation as navigationIcon,
+	symbol,
 } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useState, useEffect, useRef } from '@wordpress/element';
@@ -118,10 +120,20 @@ function TemplateDocumentActions( { className, onBack } ) {
 
 	const entityLabel = getEntityLabel( record.type );
 
+	let typeIcon = icon;
+	if ( record.type === 'wp_navigation' ) {
+		typeIcon = navigationIcon;
+	} else if ( record.type === 'wp_block' ) {
+		typeIcon = symbol;
+	}
+
 	return (
 		<BaseDocumentActions
-			className={ className }
-			icon={ record.type === 'wp_navigation' ? navigationIcon : icon }
+			className={ classnames( className, {
+				'is-synced-entity':
+					record.wp_pattern_sync_status !== 'unsynced',
+			} ) }
+			icon={ typeIcon }
 			onBack={ onBack }
 		>
 			<VisuallyHidden as="span">
@@ -145,7 +157,7 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			{ onBack && (
 				<Button
 					className="edit-site-document-actions__back"
-					icon={ chevronLeftSmallIcon }
+					icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
 					onClick={ ( event ) => {
 						event.stopPropagation();
 						onBack();

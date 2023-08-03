@@ -7,51 +7,52 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { alignmentHelpers } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './block.scss';
 
+const TEXT_BLOCKS_WITH_OUTLINE = [ 'core/missing' ];
+
 function BlockOutline( {
-	align,
-	blockWidth,
-	isParentSelected,
+	blockCategory,
+	hasInnerBlocks,
+	isRootList,
 	isSelected,
 	name,
-	screenWidth,
 } ) {
-	const { isFullWidth, isContainerRelated } = alignmentHelpers;
-	const isScreenWidthWider = blockWidth < screenWidth;
+	const textBlockWithOutline = TEXT_BLOCKS_WITH_OUTLINE.includes( name );
+	const hasBlockTextCategory =
+		blockCategory === 'text' && ! textBlockWithOutline;
+	const hasBlockMediaCategory =
+		blockCategory === 'media' ||
+		blockCategory === 'embed' ||
+		! blockCategory;
+	const shouldShowCompactOutline =
+		( hasBlockMediaCategory && ! hasInnerBlocks ) || textBlockWithOutline;
 
 	const styleSolidBorder = [
 		styles.solidBorder,
-		isFullWidth( align ) && isScreenWidthWider && styles.borderFullWidth,
-		isFullWidth( align ) &&
-			isContainerRelated( name ) &&
-			isScreenWidthWider &&
-			styles.containerBorderFullWidth,
 		usePreferredColorSchemeStyle(
 			styles.solidBorderColor,
 			styles.solidBorderColorDark
 		),
-	];
-	const styleDashedBorder = [
-		styles.dashedBorder,
-		usePreferredColorSchemeStyle(
-			styles.dashedBorderColor,
-			styles.dashedBorderColorDark
-		),
+		shouldShowCompactOutline && styles.solidBorderCompact,
+		hasBlockTextCategory && styles.solidBorderTextContent,
 	];
 
+	const shoudlShowOutline =
+		isSelected &&
+		( ( hasBlockTextCategory && hasInnerBlocks ) ||
+			( ! hasBlockTextCategory && hasInnerBlocks ) ||
+			( ! hasBlockTextCategory && isRootList ) ||
+			textBlockWithOutline );
+
 	return (
-		<>
-			{ isSelected && (
-				<View pointerEvents="box-none" style={ styleSolidBorder } />
-			) }
-			{ isParentSelected && <View style={ styleDashedBorder } /> }
-		</>
+		shoudlShowOutline && (
+			<View pointerEvents="box-none" style={ styleSolidBorder } />
+		)
 	);
 }
 

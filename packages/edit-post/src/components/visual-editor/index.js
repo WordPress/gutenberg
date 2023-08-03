@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	VisualEditorGlobalKeyboardShortcuts,
-	PostTitle,
-	store as editorStore,
-} from '@wordpress/editor';
+import { PostTitle, store as editorStore } from '@wordpress/editor';
 import {
 	WritingFlow,
 	BlockList,
@@ -345,7 +341,6 @@ export default function VisualEditor( { styles } ) {
 				'is-template-mode': isTemplateMode,
 			} ) }
 		>
-			<VisualEditorGlobalKeyboardShortcuts />
 			<motion.div
 				className="edit-post-visual-editor__content-area"
 				animate={ {

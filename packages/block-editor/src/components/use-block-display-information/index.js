@@ -7,6 +7,7 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -28,6 +29,26 @@ import { store as blockEditorStore } from '../../store';
  */
 
 /**
+ * Get the display label for a block's position type.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string} The position type label.
+ */
+function getPositionTypeLabel( attributes ) {
+	const positionType = attributes?.style?.position?.type;
+
+	if ( positionType === 'sticky' ) {
+		return __( 'Sticky' );
+	}
+
+	if ( positionType === 'fixed' ) {
+		return __( 'Fixed' );
+	}
+
+	return null;
+}
+
+/**
  * Hook used to try to find a matching block variation and return
  * the appropriate information for display reasons. In order to
  * to try to find a match we need to things:
@@ -46,8 +67,11 @@ export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) return null;
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
+			const {
+				getBlockName,
+				getBlockAttributes,
+				__experimentalGetReusableBlockTitle,
+			} = select( blockEditorStore );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -55,14 +79,21 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! blockType ) return null;
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
-			const isSynced =
-				isReusableBlock( blockType ) || isTemplatePart( blockType );
+			const isReusable = isReusableBlock( blockType );
+			const resusableTitle = isReusable
+				? __experimentalGetReusableBlockTitle( attributes.ref )
+				: undefined;
+			const title = resusableTitle || blockType.title;
+			const isSynced = isReusable || isTemplatePart( blockType );
+			const positionLabel = getPositionTypeLabel( attributes );
 			const blockTypeInfo = {
 				isSynced,
-				title: blockType.title,
+				title,
 				icon: blockType.icon,
 				description: blockType.description,
 				anchor: attributes?.anchor,
+				positionLabel,
+				positionType: attributes?.style?.position?.type,
 			};
 			if ( ! match ) return blockTypeInfo;
 
@@ -72,6 +103,8 @@ export default function useBlockDisplayInformation( clientId ) {
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,
 				anchor: attributes?.anchor,
+				positionLabel,
+				positionType: attributes?.style?.position?.type,
 			};
 		},
 		[ clientId ]

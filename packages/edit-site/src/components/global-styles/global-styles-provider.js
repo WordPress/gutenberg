@@ -15,7 +15,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesContext, cleanEmptyObject } = unlock(
@@ -32,7 +31,7 @@ export function mergeBaseAndUserConfigs( base, user ) {
 }
 
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, isReady, settings, styles } = useSelect(
+	const { globalStylesId, isReady, settings, styles, behaviors } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
@@ -66,6 +65,7 @@ function useGlobalStylesUserConfig() {
 				isReady: hasResolved,
 				settings: record?.settings,
 				styles: record?.styles,
+				behaviors: record?.behaviors,
 			};
 		},
 		[]
@@ -77,8 +77,9 @@ function useGlobalStylesUserConfig() {
 		return {
 			settings: settings ?? {},
 			styles: styles ?? {},
+			behaviors: behaviors ?? {},
 		};
-	}, [ settings, styles ] );
+	}, [ settings, styles, behaviors ] );
 
 	const setConfig = useCallback(
 		( callback, options = {} ) => {
@@ -90,6 +91,7 @@ function useGlobalStylesUserConfig() {
 			const currentConfig = {
 				styles: record?.styles ?? {},
 				settings: record?.settings ?? {},
+				behaviors: record?.behaviors ?? {},
 			};
 			const updatedConfig = callback( currentConfig );
 			editEntityRecord(
@@ -99,6 +101,8 @@ function useGlobalStylesUserConfig() {
 				{
 					styles: cleanEmptyObject( updatedConfig.styles ) || {},
 					settings: cleanEmptyObject( updatedConfig.settings ) || {},
+					behaviors:
+						cleanEmptyObject( updatedConfig.behaviors ) || {},
 				},
 				options
 			);
@@ -152,7 +156,7 @@ function useGlobalStylesContext() {
 export function GlobalStylesProvider( { children } ) {
 	const context = useGlobalStylesContext();
 	if ( ! context.isReady ) {
-		return <CanvasSpinner />;
+		return null;
 	}
 
 	return (

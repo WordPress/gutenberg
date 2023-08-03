@@ -9,6 +9,8 @@ import classnames from 'classnames';
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Returns a button label for the revision.
@@ -19,15 +21,18 @@ import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 function getRevisionLabel( revision ) {
 	const authorDisplayName = revision?.author?.name || __( 'User' );
 
+	if ( 'parent' === revision?.id ) {
+		return __( 'Reset the styles to the theme defaults' );
+	}
+
 	if ( 'unsaved' === revision?.id ) {
 		return sprintf(
-			/* translators: %(name)s author display name */
-			__( 'Unsaved changes by %(name)s' ),
-			{
-				name: authorDisplayName,
-			}
+			/* translators: %s author display name */
+			__( 'Unsaved changes by %s' ),
+			authorDisplayName
 		);
 	}
+
 	const formattedDate = dateI18n(
 		getSettings().formats.datetimeAbbreviated,
 		getDate( revision?.modified )
@@ -35,20 +40,16 @@ function getRevisionLabel( revision ) {
 
 	return revision?.isLatest
 		? sprintf(
-				/* translators: %(name)s author display name, %(date)s: revision creation date */
-				__( 'Changes saved by %(name)s on %(date)s (current)' ),
-				{
-					name: authorDisplayName,
-					date: formattedDate,
-				}
+				/* translators: %1$s author display name, %2$s: revision creation date */
+				__( 'Changes saved by %1$s on %2$s (current)' ),
+				authorDisplayName,
+				formattedDate
 		  )
 		: sprintf(
-				/* translators: %(name)s author display name, %(date)s: revision creation date */
-				__( 'Changes saved by %(name)s on %(date)s' ),
-				{
-					name: authorDisplayName,
-					date: formattedDate,
-				}
+				/* translators: %1$s author display name, %2$s: revision creation date */
+				__( 'Changes saved by %1$s on %2$s' ),
+				authorDisplayName,
+				formattedDate
 		  );
 }
 
@@ -64,6 +65,10 @@ function getRevisionLabel( revision ) {
  * @return {JSX.Element} The modal component.
  */
 function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme(),
+		[]
+	);
 	return (
 		<ol
 			className="edit-site-global-styles-screen-revisions__revisions-list"
@@ -78,6 +83,7 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 				const isSelected = selectedRevisionId
 					? selectedRevisionId === revision?.id
 					: index === 0;
+				const isReset = 'parent' === revision?.id;
 
 				return (
 					<li
@@ -85,6 +91,7 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 							'edit-site-global-styles-screen-revisions__revision-item',
 							{
 								'is-selected': isSelected,
+								'is-reset': isReset,
 							}
 						) }
 						key={ id }
@@ -97,37 +104,41 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 							} }
 							label={ getRevisionLabel( revision ) }
 						>
-							<span className="edit-site-global-styles-screen-revisions__description">
-								<time dateTime={ modified }>
-									{ humanTimeDiff( modified ) }
-								</time>
-								<span className="edit-site-global-styles-screen-revisions__meta">
-									{ isUnsaved
-										? sprintf(
-												/* translators: %(name)s author display name */
-												__(
-													'Unsaved changes by %(name)s'
-												),
-												{
-													name: authorDisplayName,
-												}
-										  )
-										: sprintf(
-												/* translators: %(name)s author display name */
-												__(
-													'Changes saved by %(name)s'
-												),
-												{
-													name: authorDisplayName,
-												}
-										  ) }
-
-									<img
-										alt={ author?.name }
-										src={ authorAvatar }
-									/>
+							{ isReset ? (
+								<span className="edit-site-global-styles-screen-revisions__description">
+									{ __( 'Default styles' ) }
+									<span className="edit-site-global-styles-screen-revisions__meta">
+										{ currentTheme?.name?.rendered ||
+											currentTheme?.stylesheet }
+									</span>
 								</span>
-							</span>
+							) : (
+								<span className="edit-site-global-styles-screen-revisions__description">
+									<time dateTime={ modified }>
+										{ humanTimeDiff( modified ) }
+									</time>
+									<span className="edit-site-global-styles-screen-revisions__meta">
+										{ isUnsaved
+											? sprintf(
+													/* translators: %s author display name */
+													__(
+														'Unsaved changes by %s'
+													),
+													authorDisplayName
+											  )
+											: sprintf(
+													/* translators: %s author display name */
+													__( 'Changes saved by %s' ),
+													authorDisplayName
+											  ) }
+
+										<img
+											alt={ author?.name }
+											src={ authorAvatar }
+										/>
+									</span>
+								</span>
+							) }
 						</Button>
 					</li>
 				);

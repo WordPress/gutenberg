@@ -11,8 +11,15 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
+const notEmptyString = ( testString ) => testString?.trim()?.length > 0;
+
 export default function RenameModal( { menuTitle, onClose, onSave } ) {
 	const [ editedMenuTitle, setEditedMenuTitle ] = useState( menuTitle );
+
+	const titleHasChanged = editedMenuTitle !== menuTitle;
+
+	const isEditedMenuTitleValid =
+		titleHasChanged && notEmptyString( editedMenuTitle );
 
 	return (
 		<Modal title={ __( 'Rename' ) } onRequestClose={ onClose }>
@@ -30,11 +37,15 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 						</Button>
 
 						<Button
-							disabled={ editedMenuTitle === menuTitle }
+							disabled={ ! isEditedMenuTitleValid }
 							variant="primary"
 							type="submit"
 							onClick={ ( e ) => {
 								e.preventDefault();
+
+								if ( ! isEditedMenuTitleValid ) {
+									return;
+								}
 								onSave( { title: editedMenuTitle } );
 
 								// Immediate close avoids ability to hit save multiple times.

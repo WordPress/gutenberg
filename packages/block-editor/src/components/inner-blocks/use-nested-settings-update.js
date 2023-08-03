@@ -3,7 +3,7 @@
  */
 import { useLayoutEffect, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -26,9 +26,13 @@ const pendingSettingsUpdates = new WeakMap();
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
  * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
- * @param {?WPDirectInsertBlock} __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
- * @param {?Function|boolean}    __experimentalDirectInsert If a default block should be inserted directly by the
- *                                                          appender.
+ * @param {?WPDirectInsertBlock} defaultBlock               The default block to insert: [ blockName, { blockAttributes } ].
+ * @param {?Function|boolean}    directInsert               If a default block should be inserted directly by the appender.
+ *
+ * @param {?WPDirectInsertBlock} __experimentalDefaultBlock A deprecated prop for the default block to insert: [ blockName, { blockAttributes } ]. Use `defaultBlock` instead.
+ *
+ * @param {?Function|boolean}    __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
+ *
  * @param {string}               [templateLock]             The template lock specified for the inner
  *                                                          blocks component. (e.g. "all")
  * @param {boolean}              captureToolbars            Whether or children toolbars should be shown
@@ -42,6 +46,8 @@ export default function useNestedSettingsUpdate(
 	clientId,
 	allowedBlocks,
 	prioritizedInserterBlocks,
+	defaultBlock,
+	directInsert,
 	__experimentalDefaultBlock,
 	__experimentalDirectInsert,
 	templateLock,
@@ -52,13 +58,11 @@ export default function useNestedSettingsUpdate(
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 	const registry = useRegistry();
 
-	const { blockListSettings, parentLock } = useSelect(
+	const { parentLock } = useSelect(
 		( select ) => {
 			const rootClientId =
 				select( blockEditorStore ).getBlockRootClientId( clientId );
 			return {
-				blockListSettings:
-					select( blockEditorStore ).getBlockListSettings( clientId ),
 				parentLock:
 					select( blockEditorStore ).getTemplateLock( rootClientId ),
 			};
@@ -83,14 +87,16 @@ export default function useNestedSettingsUpdate(
 		prioritizedInserterBlocks
 	);
 
+	const _templateLock =
+		templateLock === undefined || parentLock === 'contentOnly'
+			? parentLock
+			: templateLock;
+
 	useLayoutEffect( () => {
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
 			prioritizedInserterBlocks: _prioritizedInserterBlocks,
-			templateLock:
-				templateLock === undefined || parentLock === 'contentOnly'
-					? parentLock
-					: templateLock,
+			templateLock: _templateLock,
 		};
 
 		// These values are not defined for RN, so only include them if they
@@ -109,48 +115,64 @@ export default function useNestedSettingsUpdate(
 		}
 
 		if ( __experimentalDefaultBlock !== undefined ) {
-			newSettings.__experimentalDefaultBlock = __experimentalDefaultBlock;
+			deprecated( '__experimentalDefaultBlock', {
+				alternative: 'defaultBlock',
+				since: '6.3',
+				version: '6.4',
+			} );
+			newSettings.defaultBlock = __experimentalDefaultBlock;
+		}
+
+		if ( defaultBlock !== undefined ) {
+			newSettings.defaultBlock = defaultBlock;
 		}
 
 		if ( __experimentalDirectInsert !== undefined ) {
-			newSettings.__experimentalDirectInsert = __experimentalDirectInsert;
+			deprecated( '__experimentalDirectInsert', {
+				alternative: 'directInsert',
+				since: '6.3',
+				version: '6.4',
+			} );
+			newSettings.directInsert = __experimentalDirectInsert;
 		}
 
-		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
-			// Batch updates to block list settings to avoid triggering cascading renders
-			// for each container block included in a tree and optimize initial render.
-			// To avoid triggering updateBlockListSettings for each container block
-			// causing X re-renderings for X container blocks,
-			// we batch all the updatedBlockListSettings in a single "data" batch
-			// which results in a single re-render.
-			if ( ! pendingSettingsUpdates.get( registry ) ) {
-				pendingSettingsUpdates.set( registry, [] );
-			}
-			pendingSettingsUpdates
-				.get( registry )
-				.push( [ clientId, newSettings ] );
-			window.queueMicrotask( () => {
-				if ( pendingSettingsUpdates.get( registry )?.length ) {
-					registry.batch( () => {
-						pendingSettingsUpdates
-							.get( registry )
-							.forEach( ( args ) => {
-								updateBlockListSettings( ...args );
-							} );
-						pendingSettingsUpdates.set( registry, [] );
-					} );
-				}
-			} );
+		if ( directInsert !== undefined ) {
+			newSettings.directInsert = directInsert;
 		}
+
+		// Batch updates to block list settings to avoid triggering cascading renders
+		// for each container block included in a tree and optimize initial render.
+		// To avoid triggering updateBlockListSettings for each container block
+		// causing X re-renderings for X container blocks,
+		// we batch all the updatedBlockListSettings in a single "data" batch
+		// which results in a single re-render.
+		if ( ! pendingSettingsUpdates.get( registry ) ) {
+			pendingSettingsUpdates.set( registry, [] );
+		}
+		pendingSettingsUpdates
+			.get( registry )
+			.push( [ clientId, newSettings ] );
+		window.queueMicrotask( () => {
+			if ( pendingSettingsUpdates.get( registry )?.length ) {
+				registry.batch( () => {
+					pendingSettingsUpdates
+						.get( registry )
+						.forEach( ( args ) => {
+							updateBlockListSettings( ...args );
+						} );
+					pendingSettingsUpdates.set( registry, [] );
+				} );
+			}
+		} );
 	}, [
 		clientId,
-		blockListSettings,
 		_allowedBlocks,
 		_prioritizedInserterBlocks,
+		_templateLock,
+		defaultBlock,
+		directInsert,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
-		templateLock,
-		parentLock,
 		captureToolbars,
 		orientation,
 		updateBlockListSettings,

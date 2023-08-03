@@ -56,8 +56,14 @@ For example, let's say a user edits the title of a post, followed by a modificat
 
 The store also keep tracks of a "pointer" to the current "undo/redo" step. By default, the pointer always points to the last item in the stack. This pointer is updated when the user performs an undo or redo operation.
 
-### Transient changes
+### Cached changes
 
-The undo/redo core behavior also supports what we call "transient modifications". These are modifications that are not stored in the undo/redo stack right away. For instance, when a user starts typing in a text field, the value of the field is modified in the store, but this modification is not stored in the undo/redo stack until after the user moves to the next word or after a few milliseconds. This is done to avoid creating a new undo/redo step for each character typed by the user.
+The undo/redo core behavior also supports what we call "cached modifications". These are modifications that are not stored in the undo/redo stack right away. For instance, when a user starts typing in a text field, the value of the field is modified in the store, but this modification is not stored in the undo/redo stack until after the user moves to the next word or after a few milliseconds. This is done to avoid creating a new undo/redo step for each character typed by the user.
 
-So by default, `core-data` store considers all modifications to properties that are marked as "transient" (like the `blocks` property in the post entity) as transient modifications. It keeps these modifications outside the undo/redo stack in what is called a "cache" of modifications and these modifications are only stored in the undo/redo stack when we explicitely call `__unstableCreateUndoLevel` or when the next non-transient modification is performed.
+Cached changes are kept outside the undo/redo stack in what is called a "cache" of modifications and these modifications are only stored in the undo/redo stack when we explicitely call `__unstableCreateUndoLevel` or when the next modification is not a cached one.
+
+By default all calls to `editEntityRecord` are considered "non-cached" unless the `isCached` option is passed as true. Example:
+
+```js
+wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'post', 1, { title: 'Hello World' }, { isCached: true } );
+```

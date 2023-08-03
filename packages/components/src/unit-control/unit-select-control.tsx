@@ -2,7 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, ForwardedRef } from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,15 +17,18 @@ import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
 import { CSS_UNITS, hasUnits } from './utils';
 import type { UnitSelectControlProps } from './types';
 
-export default function UnitSelectControl( {
-	className,
-	isUnitSelectTabbable: isTabbable = true,
-	onChange,
-	size = 'default',
-	unit = 'px',
-	units = CSS_UNITS,
-	...props
-}: WordPressComponentProps< UnitSelectControlProps, 'select', false > ) {
+function UnitSelectControl(
+	{
+		className,
+		isUnitSelectTabbable: isTabbable = true,
+		onChange,
+		size = 'default',
+		unit = 'px',
+		units = CSS_UNITS,
+		...props
+	}: WordPressComponentProps< UnitSelectControlProps, 'select', false >,
+	ref: ForwardedRef< any >
+) {
 	if ( ! hasUnits( units ) || units?.length === 1 ) {
 		return (
 			<UnitLabel
@@ -43,6 +51,7 @@ export default function UnitSelectControl( {
 
 	return (
 		<UnitSelect
+			ref={ ref }
 			className={ classes }
 			onChange={ handleOnChange }
 			selectSize={ size }
@@ -58,3 +67,4 @@ export default function UnitSelectControl( {
 		</UnitSelect>
 	);
 }
+export default forwardRef( UnitSelectControl );

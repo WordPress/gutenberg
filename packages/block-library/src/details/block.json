@@ -5,7 +5,7 @@
 	"title": "Details",
 	"category": "text",
 	"description": "Hide and show additional content.",
-	"keywords": [ "disclosure", "summary", "hide", "accordion" ],
+	"keywords": [ "disclosure", "summary", "hide" ],
 	"textdomain": "default",
 	"attributes": {
 		"showContent": {
@@ -36,7 +36,11 @@
 		"html": false,
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"typography": {
 			"fontSize": true,

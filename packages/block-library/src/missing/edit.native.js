@@ -5,7 +5,7 @@ import {
 	View,
 	Text,
 	TouchableWithoutFeedback,
-	TouchableHighlight,
+	TouchableOpacity,
 } from 'react-native';
 
 /**
@@ -83,7 +83,7 @@ export class UnsupportedBlockEdit extends Component {
 		);
 
 		return (
-			<TouchableHighlight
+			<TouchableOpacity
 				onPress={ this.onHelpButtonPressed }
 				style={ styles.helpIconContainer }
 				accessibilityLabel={ __( 'Help button' ) }
@@ -94,9 +94,9 @@ export class UnsupportedBlockEdit extends Component {
 					className="unsupported-icon-help"
 					label={ __( 'Help icon' ) }
 					icon={ help }
-					color={ infoIconStyle.color }
+					fill={ infoIconStyle.color }
 				/>
-			</TouchableHighlight>
+			</TouchableOpacity>
 		);
 	}
 
@@ -282,12 +282,14 @@ export class UnsupportedBlockEdit extends Component {
 					) }
 				>
 					{ this.renderHelpIcon() }
-					<Icon
-						className={ iconClassName }
-						icon={ icon && icon.src ? icon.src : icon }
-						color={ iconStyle.color }
-					/>
-					<Text style={ titleStyle }>{ title }</Text>
+					<View style={ styles.unsupportedBlockHeader }>
+						<Icon
+							className={ iconClassName }
+							icon={ icon && icon.src ? icon.src : icon }
+							fill={ iconStyle.color }
+						/>
+						<Text style={ titleStyle }>{ title }</Text>
+					</View>
 					{ subtitle }
 					{ this.renderSheet( title, originalName ) }
 				</View>

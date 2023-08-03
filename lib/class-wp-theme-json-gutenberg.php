@@ -6,6 +6,10 @@
  * @since 5.8.0
  */
 
+if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
+	return;
+}
+
 /**
  * Class that encapsulates the processing of structures that adhere to the theme.json spec.
  *
@@ -202,6 +206,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              `--wp--style--root--padding-*`, and `box-shadow` properties,
 	 *              removed the `--wp--style--block-gap` property.
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
+	 * @since 6.3.0 Added `writing-mode` property.
 	 *
 	 * @var array
 	 */
@@ -260,6 +265,7 @@ class WP_Theme_JSON_Gutenberg {
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
+		'writing-mode'                      => array( 'typography', 'writingMode' ),
 	);
 
 	/**
@@ -339,7 +345,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added `layout.definitions` and `useRootPaddingAwareAlignments`.
 	 * @since 6.2.0 Added `dimensions.minHeight`, 'shadow.presets', 'shadow.defaultPresets',
 	 *              `position.fixed` and `position.sticky`.
-	 * @since 6.3.0 Removed `layout.definitions`.
+	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -406,6 +412,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
+			'writingMode'    => null,
 		),
 		'behaviors'                     => null,
 	);
@@ -468,6 +475,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
+			'writingMode'    => null,
 		),
 		'css'        => null,
 	);
@@ -544,9 +552,7 @@ class WP_Theme_JSON_Gutenberg {
 	public static function get_element_class_name( $element ) {
 		$class_name = '';
 
-		// TODO: Replace array_key_exists() with isset() check once WordPress drops
-		// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
-		if ( array_key_exists( $element, static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES ) ) {
+		if ( isset( static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $element ] ) ) {
 			$class_name = static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $element ];
 		}
 
@@ -741,9 +747,7 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $valid_element_names as $element ) {
 			$schema_styles_elements[ $element ] = $styles_non_top_level;
 
-			// TODO: Replace array_key_exists() with isset() check once WordPress drops
-			// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
-			if ( array_key_exists( $element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
+			if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
 				foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 					$schema_styles_elements[ $element ][ $pseudo_selector ] = $styles_non_top_level;
 				}
@@ -1920,9 +1924,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( is_array( $value_path ) ) {
 				$path_string = implode( '.', $value_path );
 				if (
-					// TODO: Replace array_key_exists() with isset() check once WordPress drops
-					// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
-					array_key_exists( $path_string, static::PROTECTED_PROPERTIES ) &&
+					isset( static::PROTECTED_PROPERTIES[ $path_string ] ) &&
 					_wp_array_get( $settings, static::PROTECTED_PROPERTIES[ $path_string ], null ) === null
 				) {
 					continue;
@@ -2126,9 +2128,7 @@ class WP_Theme_JSON_Gutenberg {
 				);
 
 				// Handle any pseudo selectors for the element.
-				// TODO: Replace array_key_exists() with isset() check once WordPress drops
-				// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
-				if ( array_key_exists( $element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
+				if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
 					foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 
 						if ( isset( $theme_json['styles']['elements'][ $element ][ $pseudo_selector ] ) ) {
@@ -2279,9 +2279,7 @@ class WP_Theme_JSON_Gutenberg {
 					);
 
 					// Handle any pseudo selectors for the element.
-					// TODO: Replace array_key_exists() with isset() check once WordPress drops
-					// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
-					if ( array_key_exists( $element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
+					if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
 						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
 								$nodes[] = array(
@@ -2361,9 +2359,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		$element_pseudo_allowed = array();
 
-		// TODO: Replace array_key_exists() with isset() check once WordPress drops
-		// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
-		if ( array_key_exists( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
+		if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
 			$element_pseudo_allowed = static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ];
 		}
 
@@ -2388,9 +2384,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * Otherwise just compute the styles for the default selector as normal.
 		 */
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) &&
-			// TODO: Replace array_key_exists() with isset() check once WordPress drops
-			// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
-			array_key_exists( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS )
+			isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] )
 			&& in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true )
 		) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
@@ -2508,7 +2502,7 @@ class WP_Theme_JSON_Gutenberg {
 			// The above rule is negated for alignfull children of nested containers.
 			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }';
 			// Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
-			$css .= '.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+			$css .= '.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 			// The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
 			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }';
 		}
@@ -2893,9 +2887,7 @@ class WP_Theme_JSON_Gutenberg {
 			 * $output is stripped of pseudo selectors. Re-add and process them
 			 * or insecure styles here.
 			 */
-			// TODO: Replace array_key_exists() with isset() check once WordPress drops
-			// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
-			if ( array_key_exists( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
+			if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
 				foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] as $pseudo_selector ) {
 					if ( isset( $input[ $pseudo_selector ] ) ) {
 						$output[ $pseudo_selector ] = static::remove_insecure_styles( $input[ $pseudo_selector ] );
@@ -3646,4 +3638,78 @@ class WP_Theme_JSON_Gutenberg {
 
 		return $tree;
 	}
+
+	/**
+	 * Replaces CSS variables with their values in place.
+	 *
+	 * @since 6.3.0
+	 * @param array $styles CSS declarations to convert.
+	 * @param array $values key => value pairs to use for replacement.
+	 * @return array
+	 */
+	private static function convert_variables_to_value( $styles, $values ) {
+		foreach ( $styles as $key => $style ) {
+			if ( is_array( $style ) ) {
+				$styles[ $key ] = self::convert_variables_to_value( $style, $values );
+				continue;
+			}
+
+			if ( 0 <= strpos( $style, 'var(' ) ) {
+				// find all the variables in the string in the form of var(--variable-name, fallback), with fallback in the second capture group.
+
+				$has_matches = preg_match_all( '/var\(([^),]+)?,?\s?(\S+)?\)/', $style, $var_parts );
+
+				if ( $has_matches ) {
+					$resolved_style = $styles[ $key ];
+					foreach ( $var_parts[1] as $index => $var_part ) {
+						$key_in_values   = 'var(' . $var_part . ')';
+						$rule_to_replace = $var_parts[0][ $index ]; // the css rule to replace e.g. var(--wp--preset--color--vivid-green-cyan).
+						$fallback        = $var_parts[2][ $index ]; // the fallback value.
+						$resolved_style  = str_replace(
+							array(
+								$rule_to_replace,
+								$fallback,
+							),
+							array(
+								isset( $values[ $key_in_values ] ) ? $values[ $key_in_values ] : $rule_to_replace,
+								isset( $values[ $fallback ] ) ? $values[ $fallback ] : $fallback,
+							),
+							$resolved_style
+						);
+					}
+					$styles[ $key ] = $resolved_style;
+				}
+			}
+		}
+
+		return $styles;
+	}
+
+	/**
+	 * Resolves the values of CSS variables in the given styles.
+	 *
+	 * @since 6.3.0
+	 * @param WP_Theme_JSON_Gutenberg $theme_json The theme json resolver.
+	 *
+	 * @return WP_Theme_JSON_Gutenberg The $theme_json with resolved variables.
+	 */
+	public static function resolve_variables( $theme_json ) {
+		$settings    = $theme_json->get_settings();
+		$styles      = $theme_json->get_raw_data()['styles'];
+		$preset_vars = static::compute_preset_vars( $settings, static::VALID_ORIGINS );
+		$theme_vars  = static::compute_theme_vars( $settings );
+		$vars        = array_reduce(
+			array_merge( $preset_vars, $theme_vars ),
+			function( $carry, $item ) {
+				$name                    = $item['name'];
+				$carry[ "var({$name})" ] = $item['value'];
+				return  $carry;
+			},
+			array()
+		);
+
+		$theme_json->theme_json['styles'] = self::convert_variables_to_value( $styles, $vars );
+		return $theme_json;
+	}
+
 }
