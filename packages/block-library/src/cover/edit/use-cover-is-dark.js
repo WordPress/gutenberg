@@ -7,7 +7,9 @@ import { colord } from 'colord';
 /**
  * WordPress dependencies
  */
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 
 function retrieveFastAverageColor() {
@@ -18,23 +20,39 @@ function retrieveFastAverageColor() {
 }
 
 /**
- * useCoverIsDark is a hook that returns a boolean variable specifying if the cover
- * background is dark or not.
+ * Derives the `isDark` attribute.
  *
- * @param {?string} url          Url of the media background.
- * @param {?number} dimRatio     Transparency of the overlay color. If an image and
- *                               color are set, dimRatio is used to decide what is used
- *                               for background darkness checking purposes.
- * @param {?string} overlayColor String containing the overlay color value if one exists.
- *
- * @return {boolean} True if the cover background is considered "dark" and false otherwise.
+ * @param {?string}  url           Url of the media background.
+ * @param {?number}  dimRatio      Transparency of the overlay color. If an image and
+ *                                 color are set, dimRatio is used to decide what is used
+ *                                 for background darkness checking purposes.
+ * @param {?string}  overlayColor  String containing the overlay color value if one exists.
+ * @param {Function} setAttributes Block attributes setter.
  */
-export default function useCoverIsDark( url, dimRatio = 50, overlayColor ) {
-	const [ isDark, setIsDark ] = useState( false );
+function useCoverIsDark( url, dimRatio = 50, overlayColor, setAttributes ) {
+	const [ mediaIsDark, setMediaIsDark ] = useState();
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	let isDark;
+
+	// When opacity is less than 50 uses the media’s determined dark state.
+	if ( url && dimRatio <= 50 ) {
+		isDark = !! mediaIsDark;
+	}
+	// When opacity is greater than 50 uses the overlay color’s darkness.
+	else if ( dimRatio > 50 || ! url ) {
+		// If no overlay color exists the overlay color is black (isDark)
+		isDark = ! overlayColor || colord( overlayColor ).isDark();
+	}
+	// Without an overlay color and opacity less than 50 the overlay color
+	// is black yet not opaque enough to be dark.
+	else if ( ! url && ! overlayColor ) {
+		isDark = false;
+	}
+
 	useEffect( () => {
-		// If opacity is lower than 50 the dominant color is the image or video color,
-		// so use that color for the dark mode computation.
-		if ( url && dimRatio <= 50 ) {
+		if ( url ) {
 			const imgCrossOrigin = applyFilters(
 				'media.crossOrigin',
 				undefined,
@@ -50,26 +68,15 @@ export default function useCoverIsDark( url, dimRatio = 50, overlayColor ) {
 					silent: process.env.NODE_ENV === 'production',
 					crossOrigin: imgCrossOrigin,
 				} )
-				.then( ( color ) => setIsDark( color.isDark ) );
+				.then( ( color ) => setMediaIsDark( color.isDark ) );
 		}
-	}, [ url, url && dimRatio <= 50, setIsDark ] );
+	}, [ url ] );
+
+	// Updates `isDark` in attributes without an editor history entry.
 	useEffect( () => {
-		// If opacity is greater than 50 the dominant color is the overlay color,
-		// so use that color for the dark mode computation.
-		if ( dimRatio > 50 || ! url ) {
-			if ( ! overlayColor ) {
-				// If no overlay color exists the overlay color is black (isDark )
-				setIsDark( true );
-				return;
-			}
-			setIsDark( colord( overlayColor ).isDark() );
-		}
-	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
-	useEffect( () => {
-		if ( ! url && ! overlayColor ) {
-			// Reset isDark.
-			setIsDark( false );
-		}
-	}, [ ! url && ! overlayColor, setIsDark ] );
-	return isDark;
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { isDark } );
+	}, [ isDark, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 }
+
+export default useCoverIsDark;

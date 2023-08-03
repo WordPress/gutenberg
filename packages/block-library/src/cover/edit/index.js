@@ -124,8 +124,6 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
@@ -135,13 +133,7 @@ function CoverEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
-	const isCoverDark = useCoverIsDark( url, dimRatio, overlayColor.color );
-
-	useEffect( () => {
-		// This side-effect should not create an undo level.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isDark: isCoverDark } );
-	}, [ isCoverDark ] );
+	useCoverIsDark( url, dimRatio, overlayColor.color, setAttributes );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
