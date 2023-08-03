@@ -24,7 +24,7 @@ function retrieveFastAverageColor() {
  * applies the relevant attribute to help ensure that text is visible by default.
  * This needs to be recalculated in all of the following Cover block scenarios:
  * - When an overlay image is added, changed or removed
- * - When the featured image is selected as the overlay imaged, or removed from the overlay
+ * - When the featured image is selected as the overlay image, or removed from the overlay
  * - When the overlay color is changed
  * - When the overlay color is removed
  * - When the dimRatio is changed
