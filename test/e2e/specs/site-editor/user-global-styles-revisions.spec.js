@@ -68,6 +68,7 @@ test.describe( 'Global styles revisions', () => {
 			name: /^Changes saved by /,
 		} );
 
+		// There should be 2 revisions not including the reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(
 			currentRevisions.length + 2
 		);
@@ -115,6 +116,25 @@ test.describe( 'Global styles revisions', () => {
 			.getByRole( 'button', { name: 'Cancel' } )
 			.click();
 		await editor.saveSiteEditorEntities();
+	} );
+
+	test( 'should have a reset to defaults button', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.click( 'body' );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await userGlobalStylesRevisions.openRevisions();
+		const lastRevisionButton = page
+			.getByLabel( 'Global styles revisions' )
+			.getByRole( 'button' )
+			.last();
+		await expect( lastRevisionButton ).toContainText( 'Default styles' );
+		await lastRevisionButton.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Reset to defaults' } )
+		).toBeVisible();
 	} );
 } );
 

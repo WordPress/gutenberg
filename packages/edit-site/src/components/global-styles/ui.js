@@ -139,7 +139,7 @@ function GlobalStylesRevisionsMenu() {
 		goTo( '/revisions' );
 		setEditorCanvasContainerView( 'global-styles-revisions' );
 	};
-	const hasRevisions = revisionsCount >= 2;
+	const hasRevisions = revisionsCount >= 1;
 
 	return (
 		<GlobalStylesMenuFill>
