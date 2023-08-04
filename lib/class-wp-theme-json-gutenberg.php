@@ -612,17 +612,20 @@ class WP_Theme_JSON_Gutenberg {
 			$origin = 'theme';
 		}
 
-		$this->theme_json    = WP_Theme_JSON_Schema::migrate( $theme_json );
-		$registry            = WP_Block_Type_Registry::get_instance();
-		$valid_block_names   = array_keys( $registry->get_all_registered() );
+		$this->theme_json = WP_Theme_JSON_Schema::migrate( $theme_json );
+
+		// TODO: this needs to be validated at a later stage.
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$valid_variations    = array();
-		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
-			if ( ! isset( $block_meta['styleVariations'] ) ) {
-				continue;
-			}
-			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
+		$valid_block_names   = array();
+		if ( isset( $theme_json['styles']['blocks'] ) ) {
+			$valid_block_names = array_keys( $theme_json['styles']['blocks'] );
 		}
+		if ( isset( $theme_json['settings']['blocks'] ) ) {
+			$valid_block_names = array_unique( array_merge( $valid_block_names, array_keys( $theme_json['settings']['blocks'] ) ) );
+		}
+		$valid_variations = array();
+		// END OF TODO
+
 		$theme_json       = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
 		$this->theme_json = static::maybe_opt_in_into_settings( $theme_json );
 
@@ -2849,15 +2852,17 @@ class WP_Theme_JSON_Gutenberg {
 
 		$theme_json = WP_Theme_JSON_Schema::migrate( $theme_json );
 
-		$valid_block_names   = array_keys( static::get_blocks_metadata() );
+		// TODO: this needs to be validated at a later stage.
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$valid_variations    = array();
-		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
-			if ( ! isset( $block_meta['styleVariations'] ) ) {
-				continue;
-			}
-			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
+		$valid_block_names   = array();
+		if ( isset( $theme_json['styles']['blocks'] ) ) {
+			$valid_block_names = array_keys( $theme_json['styles']['blocks'] );
 		}
+		if ( isset( $theme_json['settings']['blocks'] ) ) {
+			$valid_block_names = array_unique( array_merge( $valid_block_names, array_keys( $theme_json['settings']['blocks'] ) ) );
+		}
+		$valid_variations = array();
+		// END OF TODO
 
 		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
 
