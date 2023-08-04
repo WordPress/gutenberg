@@ -156,6 +156,85 @@ function gutenberg_block_core_form_email_sent( $params ) {
 add_action( 'render_block_core_form_email_sent', 'gutenberg_block_core_form_email_sent' );
 
 /**
+ * Send the data export/remove request if the form is a privacy-request form.
+ *
+ * @return void
+ */
+function gutenberg_block_core_form_privacy_form() {
+	// Get the POST data.
+	$params = wp_unslash( $_POST );
+
+	// Bail early if not a form submission, or if the nonce is not valid.
+	if ( empty( $params['wp-action'] )
+		|| 'wp_privacy_send_request' !== $params['wp-action']
+		|| empty( $params['wp-privacy-request'] )
+		|| '1' !== $params['wp-privacy-request']
+		|| empty( $params['email'] )
+	) {
+		return;
+	}
+
+	// Get the request types.
+	$request_types  = _wp_privacy_action_request_types();
+	$requests_found = array();
+	foreach ( $request_types as $request_type ) {
+		if ( ! empty( $params[ $request_type ] ) ) {
+			$requests_found[] = $request_type;
+		}
+	}
+
+	// Bail early if no requests were found.
+	if ( empty( $requests_found ) ) {
+		return;
+	}
+
+	// Process the requests.
+	$actions_errored   = array();
+	$actions_performed = array();
+	foreach ( $requests_found as $action_name ) {
+		// Get the request ID.
+		$request_id = wp_create_user_request( $params['email'], $action_name );
+
+		// Bail early if the request ID is invalid.
+		if ( is_wp_error( $request_id ) ) {
+			$actions_errored[] = $action_name;
+			continue;
+		}
+
+		// Send the request email.
+		wp_send_user_request( $request_id );
+		$actions_performed[] = $action_name;
+	}
+
+	// Add feedback to the top of the form when the page re-renders.
+	$privacy_form_feedback = static function( $block_content ) use ( $actions_errored, $actions_performed ) {
+		// Bail early if no actions were detected.
+		if ( empty( $actions_errored ) && empty( $actions_performed ) ) {
+			return $block_content;
+		}
+
+		// Bail early if this is not a privacy form.
+		if ( false === strpos( $block_content, 'wp_privacy_send_request' ) ) {
+			return $block_content;
+		}
+
+		if ( ! empty( $actions_errored ) ) {
+			$feedback  = '<div class="wp-privacy-request-error" style="padding:1em;border:1px solid #EA8484;background:#FBEAEA;color:#9A2323;border-radius:3px;">';
+			$feedback .= '<p>' . __( 'There was a problem with your action. Please try again later.', 'gutenberg' ) . '</p>';
+			$feedback .= '</div>';
+		} else {
+			$feedback  = '<div class="wp-privacy-request-success" style="padding:1em;border:1px solid #B5E1B9;background:#ECF7ED;color:#31843F;border-radius:3px;">';
+			$feedback .= '<p>' . __( 'Confirmation request initiated successfully. Please check your email for confirmation.', 'gutenberg' ) . '</p>';
+			$feedback .= '</div>';
+		}
+
+		return $feedback . $block_content;
+	};
+	add_action( 'render_block_core/form', $privacy_form_feedback );
+}
+add_action( 'wp', 'gutenberg_block_core_form_privacy_form' );
+
+/**
  * Registers the `core/form` block on server.
  */
 function register_block_core_form() {

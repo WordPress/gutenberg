@@ -51,6 +51,78 @@ const variations = [
 		isActive: ( blockAttributes ) =>
 			! blockAttributes?.type || blockAttributes?.type === 'text',
 	},
+	{
+		name: 'wp-privacy-form',
+		title: __( 'Experimental privacy request form' ),
+		keywords: [ 'GDPR' ],
+		description: __( 'A form torequest data exports and/or deletion.' ),
+		attributes: {
+			action: '',
+			method: 'post',
+			anchor: 'gdpr-form',
+		},
+		isDefault: false,
+		innerBlocks: [
+			[
+				'core/paragraph',
+				{
+					content: __(
+						'To request an export or deletion of your personal data on this site, please fill-in the form below. You can define the type of request you wish to perform, and your email address. Once the form is submitted, you will receive a confirmation email with instructions on the next steps.'
+					),
+				},
+			],
+			[
+				'core/form-input',
+				{
+					type: 'email',
+					name: 'email',
+					label: __( 'Enter your email address.' ),
+					required: true,
+					visibilityPermissions: 'all',
+				},
+			],
+			[
+				'core/form-input',
+				{
+					type: 'checkbox',
+					name: 'export_personal_data',
+					label: __( 'Request data export' ),
+					required: false,
+					visibilityPermissions: 'all',
+				},
+			],
+			[
+				'core/form-input',
+				{
+					type: 'checkbox',
+					name: 'remove_personal_data',
+					label: __( 'Request data deletion' ),
+					required: false,
+					visibilityPermissions: 'all',
+				},
+			],
+			[ 'core/form-submit-button', {} ],
+			[
+				'core/form-input',
+				{
+					type: 'hidden',
+					name: 'wp-action',
+					value: 'wp_privacy_send_request',
+				},
+			],
+			[
+				'core/form-input',
+				{
+					type: 'hidden',
+					name: 'wp-privacy-request',
+					value: '1',
+				},
+			],
+		],
+		scope: [ 'inserter', 'transform' ],
+		isActive: ( blockAttributes ) =>
+			! blockAttributes?.type || blockAttributes?.type === 'text',
+	},
 ];
 
 export default variations;
