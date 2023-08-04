@@ -190,7 +190,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 	if ( $form->next_tag() ) {
 		$form->set_attribute( 'data-wp-interactive', true );
 		$form->set_attribute( 'data-wp-context', '{ "core": { "search": { "isSearchCollapsed": true } } }' );
-		$form->set_attribute( 'data-wp-class--wp-block-search-searchfield-hidden', 'context.core.search.isSearchCollapsed' );
+		$form->set_attribute( 'data-wp-class--wp-block-search__searchfield-hidden', 'context.core.search.isSearchCollapsed' );
 	}
 
 	return $form;
@@ -235,7 +235,7 @@ function classnames_for_block_core_search( $attributes ) {
 		if ( 'button-only' === $attributes['buttonPosition'] ) {
 			$classnames[] = 'wp-block-search__button-only';
 			if ( ! empty( $attributes['buttonBehavior'] ) && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
-				$classnames[] = 'wp-block-search__button-behavior-expand wp-block-search-searchfield-hidden';
+				$classnames[] = 'wp-block-search__button-behavior-expand wp-block-search__searchfield-hidden';
 			}
 		}
 	}

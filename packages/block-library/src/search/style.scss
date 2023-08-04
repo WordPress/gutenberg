@@ -94,8 +94,7 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	}
 
 	// !important here to override inline styles on button only deselected view.
-
-	&.wp-block-search-searchfield-hidden {
+	&.wp-block-search__searchfield-hidden {
 		overflow: hidden;
 
 		.wp-block-search__inside-wrapper {
