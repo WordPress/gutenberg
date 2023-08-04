@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Allow passing optional `afterLoad` callbacks to `store` calls.
+
 ### Bug Fix
 
 -   Add support for underscores and leading dashes in the suffix part of the directive. ([#53337](https://github.com/WordPress/gutenberg/pull/53337))
