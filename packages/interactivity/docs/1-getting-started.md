@@ -5,9 +5,9 @@ To get started with the Interactivity API, you can follow this [**Quick Start Gu
 ## Table of Contents
 
 - [Quick Start Guide](#quick-start-guide)
-    [1. Scaffold an interactive block](#1-scaffold-an-interactive-block)
-    [2. Generate the build](#2-generate-the-build) 
-    [3. Use it in your WordPress installation ](#3-use-it-in-your-wordpress-installation)
+    - [1. Scaffold an interactive block](#1-scaffold-an-interactive-block)
+    - [2. Generate the build](#2-generate-the-build) 
+    - [3. Use it in your WordPress installation ](#3-use-it-in-your-wordpress-installation)
 - [Requirements of the Interactivity API](#requirements-of-the-interactivity-aPI)
     - [A local WordPress installation](#a-local-wordpress-installation)
     - [Latest vesion of Gutenberg](#latest-vesion-of-gutenberg)
@@ -48,7 +48,7 @@ At this point you should be able to insert the "My First Interactive Block" bloc
 
 ## Requirements of the Interactivity API
 
-To start working with the Interactivity API you'll need to have a [proper WordPress development environment for blocks](https://developer.wordpress.org/block-editor/getting-started/devenv/) and some project code additions, which should include:
+To start working with the Interactivity API you'll need to have a [proper WordPress development environment for blocks](https://developer.wordpress.org/block-editor/getting-started/devenv/)  and some specific code in your block, which should include:
 
 #### A local WordPress installation
 
