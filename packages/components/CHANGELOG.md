@@ -4,9 +4,6 @@
 
 ### New Feature
 
--   Modal component: allow toggling fullscreen. ([#53328](https://github.com/WordPress/gutenberg/pull/53328)).
--   Add a new `ProgressBar` component. ([#53030](https://github.com/WordPress/gutenberg/pull/53030)).
-
 ### Enhancements
 
 -   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
@@ -15,6 +12,7 @@
 -   `Theme`: Expose via private APIs ([#53262](https://github.com/WordPress/gutenberg/pull/53262)).
 -   `ProgressBar`: Use the theme system accent for indicator color ([#53347](https://github.com/WordPress/gutenberg/pull/53347)).
 -   `ProgressBar`: Use gray 300 for track color ([#53349](https://github.com/WordPress/gutenberg/pull/53349)).
+-   `Modal`: add auxiliary actions prop to render buttons in the header. ([#53328](https://github.com/WordPress/gutenberg/pull/53328)).
 
 ### Bug Fix
 
