@@ -16,6 +16,12 @@ import type {
 import type { useFocusOnMount } from '@wordpress/compose';
 
 export type ModalProps = {
+	/**
+	 * This property when set to `true` allows toggling between full screen.
+	 *
+	 * @default false
+	 */
+	allowFullScreenToggle?: boolean;
 	aria?: {
 		/**
 		 * If this property is added, it will be added to the modal content

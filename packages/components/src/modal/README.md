@@ -150,6 +150,13 @@ const MyModal = () => {
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input elements.
 
+#### allowFullScreenToggle
+
+This property when set to `true` allows toggling between full screen.
+
+-   Required: No
+-   Default: `false`
+
 #### `aria.describedby`: `string`
 
 If this property is added, it will be added to the modal content `div` as `aria-describedby`.

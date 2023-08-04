@@ -115,4 +115,27 @@ describe( 'Modal', () => {
 		await user.click( modalFrame.parentElement! );
 		expect( opener ).toHaveFocus();
 	} );
+
+	it( 'should allow fullscreen toggle', async () => {
+		const user = userEvent.setup();
+		render(
+			<Modal allowFullScreenToggle={ true } onRequestClose={ noop }>
+				<p>Modal content</p>
+			</Modal>
+		);
+		const enterFullScreenToggleButton = screen.getByLabelText(
+			'Enter fullscreen',
+			{ selector: 'button' }
+		);
+		await user.click( enterFullScreenToggleButton );
+		expect( screen.getByRole( 'dialog' ) ).toHaveClass( 'is-full-screen' );
+		const exitFullScreenToggleButton = screen.getByLabelText(
+			'Exit fullscreen',
+			{ selector: 'button' }
+		);
+		await user.click( exitFullScreenToggleButton );
+		expect( screen.getByRole( 'dialog' ) ).not.toHaveClass(
+			'is-full-screen'
+		);
+	} );
 } );

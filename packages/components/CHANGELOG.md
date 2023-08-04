@@ -4,6 +4,7 @@
 
 ### New Feature
 
+-   Modal component: allow toggling fullscreen. ([#53328](https://github.com/WordPress/gutenberg/pull/53328)).
 -   Add a new `ProgressBar` component. ([#53030](https://github.com/WordPress/gutenberg/pull/53030)).
 
 ### Enhancements

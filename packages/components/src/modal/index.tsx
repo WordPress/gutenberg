@@ -25,7 +25,7 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { close } from '@wordpress/icons';
+import { aspectRatio, close, fullscreen } from '@wordpress/icons';
 import { getScrollContainer } from '@wordpress/dom';
 
 /**
@@ -66,6 +66,7 @@ function UnforwardedModal(
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
+		allowFullScreenToggle = false,
 		__experimentalHideHeader = false,
 	} = props;
 
@@ -83,6 +84,8 @@ function UnforwardedModal(
 
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
+	const [ isModalFullScreen, setIsModalFullScreen ] =
+		useState( isFullScreen );
 
 	// Determines whether the Modal content is scrollable and updates the state.
 	const isContentScrollable = useCallback( () => {
@@ -202,7 +205,7 @@ function UnforwardedModal(
 						'components-modal__frame',
 						className,
 						{
-							'is-full-screen': isFullScreen,
+							'is-full-screen': isModalFullScreen,
 						}
 					) }
 					style={ style }
@@ -257,6 +260,25 @@ function UnforwardedModal(
 										</h1>
 									) }
 								</div>
+								{ allowFullScreenToggle && (
+									<Button
+										onClick={ () =>
+											setIsModalFullScreen(
+												! isModalFullScreen
+											)
+										}
+										icon={
+											isModalFullScreen
+												? fullscreen
+												: aspectRatio
+										}
+										label={
+											isModalFullScreen
+												? __( 'Exit fullscreen' )
+												: __( 'Enter fullscreen' )
+										}
+									/>
+								) }
 								{ isDismissible && (
 									<Button
 										onClick={ onRequestClose }
