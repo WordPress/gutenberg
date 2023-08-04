@@ -20,6 +20,7 @@ const GenericIframe = ( {
 		<iframe
 			{ ...props }
 			title="My Iframe"
+			srcDoc="<!doctype html><html><body></body></html>"
 			// Waiting for the load event ensures that this works in Firefox.
 			// See https://github.com/facebook/react/issues/22847#issuecomment-991394558
 			onLoad={ ( event ) => {
