@@ -13,7 +13,6 @@ import {
 	useMemo,
 	useEffect,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import {
 	useResizeObserver,
 	useMergeRefs,
@@ -234,6 +233,8 @@ function Iframe( {
 	return (
 		<>
 			{ tabIndex >= 0 && before }
+			{ /* No title to reduce screen reader verbosity. */ }
+			{ /* eslint-disable-next-line jsx-a11y/iframe-has-title */ }
 			<iframe
 				{ ...props }
 				style={ {
@@ -260,7 +261,7 @@ function Iframe( {
 				// mode. Also preload the styles to avoid a flash of unstyled
 				// content.
 				src={ src }
-				title={ __( 'Editor canvas' ) }
+				role="application"
 			>
 				{ iframeDocument &&
 					createPortal(
