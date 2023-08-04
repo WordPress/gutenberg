@@ -698,7 +698,7 @@ export default function Image( {
 					setAttributes( {
 						width: `${ elt.offsetWidth }px`,
 						height: 'auto',
-						aspectRatio: stringAspectRatio,
+						aspectRatio: `${ stringAspectRatio }`,
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
