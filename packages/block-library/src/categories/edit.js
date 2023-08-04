@@ -27,6 +27,7 @@ export default function CategoriesEdit( {
 		showPostCounts,
 		showOnlyTopLevel,
 		showEmpty,
+		taxonomy,
 	},
 	setAttributes,
 	className,
@@ -39,7 +40,7 @@ export default function CategoriesEdit( {
 
 	const { records: categories, isResolving } = useEntityRecords(
 		'taxonomy',
-		'category',
+		taxonomy,
 		query
 	);
 
