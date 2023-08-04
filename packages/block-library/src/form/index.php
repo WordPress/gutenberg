@@ -21,7 +21,11 @@ function render_block_core_form( $attributes, $content ) {
 	// Get the action for this form.
 	$action = '';
 	if ( isset( $attributes['action'] ) ) {
-		$action = str_replace( '{SITE_URL}', site_url(), $attributes['action'] );
+		$action = str_replace(
+			array( '{SITE_URL}', '{ADMIN_URL}' ),
+			array( site_url(), admin_url() ),
+			$attributes['action']
+		);
 	}
 
 	if ( ! empty( $action ) ) {
