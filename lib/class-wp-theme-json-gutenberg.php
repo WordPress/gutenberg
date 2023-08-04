@@ -1043,7 +1043,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$blocks_metadata = static::get_blocks_metadata();
-		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata );
+		$style_nodes     = static::get_style_nodes( $this->theme_json );
 		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
 		$root_style_key    = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ), true );
@@ -2108,10 +2108,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 *
 	 * @param array $theme_json The tree to extract style nodes from.
-	 * @param array $selectors  List of selectors per block.
 	 * @return array An array of style nodes metadata.
 	 */
-	protected static function get_style_nodes( $theme_json, $selectors = array() ) {
+	protected static function get_style_nodes( $theme_json ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
@@ -2150,26 +2149,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		// Blocks.
-		if ( ! isset( $theme_json['styles']['blocks'] ) ) {
-			return $nodes;
-		}
-
-		$block_nodes = static::get_block_nodes( $theme_json, $selectors );
-		foreach ( $block_nodes as $block_node ) {
-			$nodes[] = $block_node;
-		}
-
-		/**
-		 * Filters the list of style nodes with metadata.
-		 *
-		 * This allows for things like loading block CSS independently.
-		 *
-		 * @since 6.1.0
-		 *
-		 * @param array $nodes Style nodes with metadata.
-		 */
-		return apply_filters( 'wp_theme_json_get_style_nodes', $nodes );
+		return $nodes;
 	}
 
 	/**
@@ -2868,8 +2848,10 @@ class WP_Theme_JSON_Gutenberg {
 
 		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
 
-		$blocks_metadata = static::get_blocks_metadata();
-		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata );
+		$style_nodes = array_merge(
+			static::get_style_nodes( $theme_json ),
+			static::get_block_nodes( $theme_json ),
+		);
 
 		foreach ( $style_nodes as $metadata ) {
 			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
