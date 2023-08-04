@@ -1315,7 +1315,7 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
-					$class_name    = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), false ) );
+					$class_name    = _wp_array_get( $layout_definition, array( 'className' ), false );
 					$spacing_rules = _wp_array_get( $layout_definition, array( 'spacingStyles' ), array() );
 
 					if (
@@ -1372,7 +1372,7 @@ class WP_Theme_JSON_Gutenberg {
 		) {
 			$valid_display_modes = array( 'block', 'flex', 'grid' );
 			foreach ( $layout_definitions as $layout_definition ) {
-				$class_name       = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), false ) );
+				$class_name       = _wp_array_get( $layout_definition, array( 'className' ), false );
 				$base_style_rules = _wp_array_get( $layout_definition, array( 'baseStyles' ), array() );
 
 				if (
