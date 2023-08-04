@@ -2670,8 +2670,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string SVG filters.
 	 */
 	public function get_svg_filters( $origins ) {
-		$blocks_metadata = static::get_blocks_metadata();
-		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
+		$setting_nodes = static::get_setting_nodes( $this->theme_json );
 
 		$filters = '';
 		foreach ( $setting_nodes as $metadata ) {
