@@ -124,12 +124,7 @@ function DimensionsTool( {
 					}
 
 					// Auto-update width and height.
-					if ( nextAspectRatio && width && height ) {
-						delete nextValue.height;
-					}
-
-					// Delete width and height when setting back to original.
-					if ( nextAspectRatio === null ) {
+					if ( aspectRatio !== nextAspectRatio && width && height ) {
 						delete nextValue.height;
 					}
 
