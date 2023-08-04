@@ -126,8 +126,8 @@ function retrieveFastAverageColor() {
 }
 
 /**
- * getCoverIsDark is a method that specifyies if the cover background is dark or not and
- * applies the relevant attribute to help ensure that text is visible by default.
+ * This method evaluates if the cover block's background is dark or not and this boolen
+ * can then be applied to the relevant attribute to help ensure that text is visible by default.
  * This needs to be recalculated in all of the following Cover block scenarios:
  * - When an overlay image is added, changed or removed
  * - When the featured image is selected as the overlay image, or removed from the overlay
