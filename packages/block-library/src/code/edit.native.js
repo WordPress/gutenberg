@@ -48,6 +48,7 @@ export function CodeEdit( props ) {
 	return (
 		<View>
 			<PlainText
+				__experimentalVersion={ 2 }
 				value={ attributes.content }
 				identifier="content"
 				style={ codeStyle }
