@@ -896,6 +896,62 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	public function test_sanitize_invalid_typography_settings(){
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array(
+						'fontFamilies' => array(
+							'badKey' => 'I am invalid',
+							array(
+								'name'       => 'Piazzolla',
+								'slug'       => 'piazzolla',
+								'badKey'	 => 'I am invalid',
+								'fontFamily' => 'Piazzolla',
+								'fontFace'   => array(
+									array(
+										'anotherKey' => 'I am invalid',
+										'fontFamily' => 'Piazzolla',
+										'fontStyle'  => 'italic',
+										'fontWeight' => '400',
+										'src'        => 'https://example.com/font.ttf',
+									),
+								),
+							),
+						),
+						'src' => 'https://example.com/font.ttf',
+					),
+				),
+			)
+		);
+
+		$sanitized_theme_json = $theme_json->get_data();
+		$expected             = array(
+			'version'  => 2,
+			'settings' => array(
+				'typography' => array(
+					'fontFamilies' => array(
+						array(
+							'fontFace'   => array(
+								array(
+									'fontFamily' => 'Piazzolla',
+									'fontStyle'  => 'italic',
+									'fontWeight' => '400',
+									'src'        => 'https://example.com/font.ttf',
+								),
+							),
+							'fontFamily' => 'Piazzolla',
+							'name'       => 'Piazzolla',
+							'slug'       => 'piazzolla',
+						),
+					),
+				)
+			)
+		);
+		$this->assertSameSetsWithIndex( $expected, $sanitized_theme_json, 'Sanitized theme.json settings do not match.' );
+	}
+
 	public function test_get_element_class_name_button() {
 		$expected = 'wp-element-button';
 		$actual   = WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' );
