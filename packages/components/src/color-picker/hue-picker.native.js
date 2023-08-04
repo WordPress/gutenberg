@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Animated, View, PanResponder, StyleSheet } from 'react-native';
+import { Animated, View, PanResponder } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -13,6 +13,7 @@ import React, { Component } from '@wordpress/element';
  */
 import LinearGradient from 'react-native-linear-gradient';
 import tinycolor from 'tinycolor2';
+import styles from './style.native.scss';
 
 export default class HuePicker extends Component {
 	constructor( props ) {
@@ -87,7 +88,7 @@ export default class HuePicker extends Component {
 		const paddingTop =
 			sliderSize - barHeight > 0 ? ( sliderSize - barHeight ) / 2 : 0;
 		return [
-			styles.container,
+			styles[ 'hsv-container' ],
 			containerStyle,
 			{
 				paddingTop,
@@ -179,7 +180,7 @@ export default class HuePicker extends Component {
 				<Animated.View
 					pointerEvents="none"
 					style={ [
-						styles.slider,
+						styles[ 'hue-slider' ],
 						{
 							width: sliderSize,
 							height: sliderSize,
@@ -197,22 +198,3 @@ export default class HuePicker extends Component {
 		);
 	}
 }
-
-const styles = StyleSheet.create( {
-	container: {
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	slider: {
-		position: 'absolute',
-		backgroundColor: '#fff',
-		shadowColor: '#000',
-		shadowOffset: {
-			width: 0,
-			height: 7,
-		},
-		shadowOpacity: 0.43,
-		shadowRadius: 10,
-		elevation: 5,
-	},
-} );

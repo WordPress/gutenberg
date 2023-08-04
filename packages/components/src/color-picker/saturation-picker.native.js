@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, PanResponder, StyleSheet } from 'react-native';
+import { View, PanResponder } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -13,6 +13,7 @@ import React, { Component } from '@wordpress/element';
  */
 import LinearGradient from 'react-native-linear-gradient';
 import tinycolor from 'tinycolor2';
+import styles from './style.native.scss';
 
 export default class SaturationValuePicker extends Component {
 	constructor( props ) {
@@ -113,7 +114,7 @@ export default class SaturationValuePicker extends Component {
 		return (
 			<View
 				style={ [
-					styles.container,
+					styles[ 'hsv-container' ],
 					containerStyle,
 					{
 						height: size.height + sliderSize,
@@ -124,7 +125,7 @@ export default class SaturationValuePicker extends Component {
 			>
 				<LinearGradient
 					style={ [
-						styles.gradientContainer,
+						styles[ 'gradient-container' ],
 						{
 							borderRadius,
 						},
@@ -148,7 +149,7 @@ export default class SaturationValuePicker extends Component {
 				<View
 					pointerEvents="none"
 					style={ [
-						styles.slider,
+						styles[ 'saturation-slider' ],
 						{
 							width: sliderSize,
 							height: sliderSize,
@@ -166,19 +167,3 @@ export default class SaturationValuePicker extends Component {
 		);
 	}
 }
-
-const styles = StyleSheet.create( {
-	container: {
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	gradientContainer: {
-		overflow: 'hidden',
-	},
-	slider: {
-		top: 0,
-		left: 0,
-		position: 'absolute',
-		borderColor: '#fff',
-	},
-} );
