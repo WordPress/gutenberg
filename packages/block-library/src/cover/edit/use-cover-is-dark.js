@@ -41,7 +41,7 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, setAttributes ) {
 		isDark = !! mediaIsDark;
 	}
 	// When opacity is greater than 50 uses the overlay color’s darkness.
-	else if ( dimRatio > 50 || ! url ) {
+	else if ( dimRatio > 50 ) {
 		// If no overlay color exists the overlay color is black (isDark)
 		isDark = ! overlayColor || colord( overlayColor ).isDark();
 	}
