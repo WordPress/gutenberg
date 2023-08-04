@@ -14,6 +14,9 @@ import { NEW_TAB_REL } from './constants';
  * @return {number} Numerical aspect ratio or NaN if invalid.
  */
 export function evalAspectRatio( value ) {
+	if ( value === 'auto' ) {
+		return NaN;
+	}
 	const [ width, height = 1 ] = value.split( '/' ).map( Number );
 	const aspectRatio = width / height;
 	return aspectRatio === Infinity || aspectRatio === 0 ? NaN : aspectRatio;
