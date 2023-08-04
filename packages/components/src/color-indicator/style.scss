@@ -1,9 +1,0 @@
-.component-color-indicator {
-	width: $grid-unit-50 * 0.5;
-	height: $grid-unit-50 * 0.5;
-	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-	border-radius: 50%;
-	display: inline-block;
-	padding: 0;
-	background: $white linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
-}

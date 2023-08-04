@@ -1,9 +1,0 @@
-/**
-*  Converts a hex value into the rgb equivalent.
-*
-* @param {string} hex - the hexadecimal value to convert
-* @return {string} comma separated rgb values
-*/
-@function hex-to-rgb($hex) {
-	@return red($hex), green($hex), blue($hex);
-}

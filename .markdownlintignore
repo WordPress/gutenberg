@@ -1,9 +1,0 @@
-bin
-build
-node_modules
-phpunit
-playground
-storybook
-test
-vendor
-wordpress

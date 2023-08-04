@@ -1,9 +1,0 @@
-{
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
-	},
-	"include": [ "src/**/*" ],
-	"references": [ { "path": "../element" }, { "path": "../primitives" } ]
-}
