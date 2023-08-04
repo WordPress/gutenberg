@@ -449,7 +449,7 @@
 									"type": "object",
 									"properties": {
 										"minFontSize": {
-											"description": "Allow users to set a global minimum font size boundary in px, rem or em. Custom font sizes below this value will not be clamped, and all calculated minimum font sizes will be, a at minimum, this value.",
+											"description": "Allow users to set a global minimum font size boundary in px, rem or em. Custom font sizes below this value will not be clamped, and all calculated minimum font sizes will be, at a minimum, this value.",
 											"type": "string"
 										},
 										"maxViewportWidth": {
