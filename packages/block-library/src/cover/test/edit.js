@@ -404,7 +404,7 @@ describe( 'Cover block', () => {
 			await userEvent.click( popupColorPicker );
 			expect( coverBlock ).not.toHaveClass( 'is-light' );
 		} );
-		test( 'should apply is-light class if overlay color is removed', async () => {
+		test( 'should keep is-dark class if overlay color is removed as the CSS default is black', async () => {
 			await setup();
 			await createAndSelectBlock();
 			const coverBlock = screen.getByLabelText( 'Block: Cover' );
@@ -416,13 +416,13 @@ describe( 'Cover block', () => {
 				} )
 			);
 			await userEvent.click( screen.getByText( 'Overlay' ) );
-			// The default color is black, so clicking the black color option will remove the background color,
-			// which should remove the isDark setting and assign the is-light class.
+			// The default color is black, so clicking the black color option will remove the background color.
+			// The fallback CSS is still black, so the is-dark class should remain.
 			const popupColorPicker = screen.getByRole( 'button', {
 				name: 'Color: Black',
 			} );
 			await userEvent.click( popupColorPicker );
-			expect( coverBlock ).toHaveClass( 'is-light' );
+			expect( coverBlock ).toHaveClass( 'is-dark' );
 		} );
 	} );
 } );
