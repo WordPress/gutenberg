@@ -15,6 +15,7 @@ import {
 	ROUNDING_STEP,
 	isLineHeightDefined,
 } from './utils';
+import { roundClamp } from '../../../../components/src/utils/math';
 
 const LineHeightControl = ( {
 	value: lineHeight,
@@ -24,9 +25,27 @@ const LineHeightControl = ( {
 	__unstableInputWidth = '60px',
 	...otherProps
 } ) => {
+	const min = 0;
+	const max = Infinity;
 	const isDefined = isLineHeightDefined( lineHeight );
 
-	const adjustNextValue = ( nextValue, wasTypedOrPasted ) => {
+	const adjustNextValue = ( nextValue, wasTypedOrPasted, wasOnBlur ) => {
+		/**
+		 * The following logic handles the rounding of values that have two decimals
+		 * when the spin controls are used.
+		 *
+		 * For example, if the value is 1.25, the next value up should be 1.3, and the
+		 * next value down should be 1.2.
+		 */
+		const valueHasTwoDecimals = /^\d+\.\d{2}$/.test( value.toString() );
+
+		if ( valueHasTwoDecimals && ! wasTypedOrPasted && ! wasOnBlur ) {
+			if ( value.toString().endsWith( '5' ) && nextValue < value ) {
+				return roundClamp( value - 0.01, min, max, STEP );
+			}
+			return roundClamp( value, min, max, STEP );
+		}
+
 		// Set the next value without modification if lineHeight has been defined.
 		if ( isDefined ) return nextValue;
 
@@ -65,7 +84,12 @@ const LineHeightControl = ( {
 		const wasTypedOrPasted = [ 'insertText', 'insertFromPaste' ].includes(
 			action.payload.event.nativeEvent?.inputType
 		);
-		const value = adjustNextValue( state.value, wasTypedOrPasted );
+		const wasOnBlur = action.payload.event.type === 'blur';
+		const value = adjustNextValue(
+			state.value,
+			wasTypedOrPasted,
+			wasOnBlur
+		);
 		return { ...state, value };
 	};
 
@@ -114,7 +138,8 @@ const LineHeightControl = ( {
 				step={ ROUNDING_STEP }
 				spincrement={ STEP }
 				value={ value }
-				min={ 0 }
+				min={ min }
+				max={ max }
 				spinControls="custom"
 			/>
 		</div>
