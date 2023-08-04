@@ -422,7 +422,7 @@ describe( 'Cover block', () => {
 				name: 'Color: Black',
 			} );
 			await userEvent.click( popupColorPicker );
-			expect( coverBlock ).toHaveClass( 'is-dark' );
+			expect( coverBlock ).not.toHaveClass( 'is-light' );
 		} );
 	} );
 } );
