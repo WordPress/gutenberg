@@ -11,8 +11,8 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import HuePicker from './HuePicker';
-import SaturationValuePicker from './SaturationValuePicker';
+import HuePicker from './hue-picker';
+import SaturationValuePicker from './saturation-picker';
 
 const HsvColorPicker = ( props ) => {
 	const maxWidth = Dimensions.get( 'window' ).width - 32;

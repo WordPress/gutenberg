@@ -13,7 +13,6 @@ import React, { Component } from '@wordpress/element';
  */
 import LinearGradient from 'react-native-linear-gradient';
 import tinycolor from 'tinycolor2';
-import normalizeValue from './utils';
 
 export default class HuePicker extends Component {
 	constructor( props ) {
@@ -72,6 +71,12 @@ export default class HuePicker extends Component {
 		}
 	}
 
+	normalizeValue( value ) {
+		if ( value < 0 ) return 0;
+		if ( value > 1 ) return 1;
+		return value;
+	}
+
 	getContainerStyle() {
 		const {
 			sliderSize = 24,
@@ -103,7 +108,8 @@ export default class HuePicker extends Component {
 		const { barWidth = 200 } = this.props;
 		const { dragStartValue } = this;
 		const diff = dx / barWidth;
-		const updatedHue = normalizeValue( dragStartValue / 360 + diff ) * 360;
+		const updatedHue =
+			this.normalizeValue( dragStartValue / 360 + diff ) * 360;
 		return updatedHue;
 	}
 
@@ -111,7 +117,7 @@ export default class HuePicker extends Component {
 		const { nativeEvent } = event;
 		const { locationX } = nativeEvent;
 		const { barWidth = 200 } = this.props;
-		const updatedHue = normalizeValue( locationX / barWidth ) * 360;
+		const updatedHue = this.normalizeValue( locationX / barWidth ) * 360;
 		return updatedHue;
 	}
 

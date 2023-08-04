@@ -13,7 +13,6 @@ import React, { Component } from '@wordpress/element';
  */
 import LinearGradient from 'react-native-linear-gradient';
 import tinycolor from 'tinycolor2';
-import normalizeValue from './utils';
 
 export default class SaturationValuePicker extends Component {
 	constructor( props ) {
@@ -55,6 +54,12 @@ export default class SaturationValuePicker extends Component {
 		} );
 	}
 
+	normalizeValue( value ) {
+		if ( value < 0 ) return 0;
+		if ( value > 1 ) return 1;
+		return value;
+	}
+
 	getCurrentColor() {
 		const { hue = 0, saturation = 1, value = 1 } = this.props;
 		return tinycolor(
@@ -69,8 +74,8 @@ export default class SaturationValuePicker extends Component {
 		const diffx = dx / size.width;
 		const diffy = dy / size.height;
 		return {
-			saturation: normalizeValue( saturation + diffx ),
-			value: normalizeValue( value - diffy ),
+			saturation: this.normalizeValue( saturation + diffx ),
+			value: this.normalizeValue( value - diffy ),
 		};
 	}
 
@@ -79,8 +84,8 @@ export default class SaturationValuePicker extends Component {
 		const { locationX, locationY } = nativeEvent;
 		const { size } = this.props;
 		return {
-			saturation: normalizeValue( locationX / size.width ),
-			value: 1 - normalizeValue( locationY / size.height ),
+			saturation: this.normalizeValue( locationX / size.width ),
+			value: 1 - this.normalizeValue( locationY / size.height ),
 		};
 	}
 
