@@ -1,22 +1,5 @@
-# (Next) Component System
+# TODO
 
-This directory contains the code for next Component System.
+We want to get rid of this folder. Don't add anything new here.
 
-More information can be found in the original GitHub issue:
-https://github.com/WordPress/gutenberg/issues/27484
-
-## Usage
-
-(This is still very much a work in progress)
-
-```jsx
-import { Text, View } from '@wordpress/components/ui';
-
-function Example() {
-	return (
-		<View>
-			<Text>Code is Poetry</Text>
-		</View>
-	);
-}
-```
+What is left of this folder should either be deleted (if unused elsewhere), or be moved into the root `packages/components/src` and `packages/components/src/utils` folders. 
