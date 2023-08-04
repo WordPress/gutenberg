@@ -1,12 +1,4 @@
 /**
- * External dependencies
- */
-import { colord, extend } from 'colord';
-import mixPlugin from 'colord/plugins/mix';
-
-extend( [ mixPlugin ] );
-
-/**
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -23,19 +15,14 @@ const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 export default function CanvasSpinner() {
 	const [ fallbackIndicatorColor ] = useGlobalStyle( 'color.text' );
+	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { highlightedColors } = useStylesPreviewColors();
-
 	const indicatorColor =
 		highlightedColors[ 0 ]?.color ?? fallbackIndicatorColor;
-	const grayscaleIndicatorColor = colord( indicatorColor ).grayscale();
-	const trackColorBase = grayscaleIndicatorColor.isDark()
-		? grayscaleIndicatorColor.tints( 3 )[ 1 ]
-		: grayscaleIndicatorColor.shades( 3 )[ 1 ];
-	const trackColor = trackColorBase.alpha( 0.5 ).toHex();
 
 	return (
 		<div className="edit-site-canvas-spinner">
-			<Theme accent={ indicatorColor } background={ trackColor }>
+			<Theme accent={ indicatorColor } background={ backgroundColor }>
 				<ProgressBar />
 			</Theme>
 		</div>
