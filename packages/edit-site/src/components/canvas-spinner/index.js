@@ -22,20 +22,20 @@ const { ProgressBar, Theme } = unlock( componentsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 export default function CanvasSpinner() {
-	const [ fallbackTrackColor ] = useGlobalStyle( 'color.text' );
+	const [ fallbackIndicatorColor ] = useGlobalStyle( 'color.text' );
 	const { highlightedColors } = useStylesPreviewColors();
 
-	const trackColor = highlightedColors[ 1 ]?.color ?? fallbackTrackColor;
-	const trackColord = colord( trackColor );
-	const fallbackIndicatorColor = trackColord.isDark()
-		? trackColord.tints( 3 )[ 1 ].toHex()
-		: trackColord.shades( 3 )[ 1 ].toHex();
 	const indicatorColor =
 		highlightedColors[ 0 ]?.color ?? fallbackIndicatorColor;
+	const grayscaleIndicatorColor = colord( indicatorColor ).grayscale();
+	const trackColorBase = grayscaleIndicatorColor.isDark()
+		? grayscaleIndicatorColor.tints( 3 )[ 1 ]
+		: grayscaleIndicatorColor.shades( 3 )[ 1 ];
+	const trackColor = trackColorBase.alpha( 0.5 ).toHex();
 
 	return (
 		<div className="edit-site-canvas-spinner">
-			<Theme background={ trackColor } accent={ indicatorColor }>
+			<Theme accent={ indicatorColor } background={ trackColor }>
 				<ProgressBar />
 			</Theme>
 		</div>
