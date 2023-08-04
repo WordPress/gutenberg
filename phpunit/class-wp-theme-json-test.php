@@ -896,7 +896,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
-	public function test_sanitize_invalid_typography_settings(){
+	public function test_sanitize_invalid_typography_settings() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -907,7 +907,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							array(
 								'name'       => 'Piazzolla',
 								'slug'       => 'piazzolla',
-								'badKey'	 => 'I am invalid',
+								'badKey'     => 'I am invalid',
 								'fontFamily' => 'Piazzolla',
 								'fontFace'   => array(
 									array(
@@ -920,7 +920,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'src' => 'https://example.com/font.ttf',
+						'src'          => 'https://example.com/font.ttf',
 					),
 				),
 			)
@@ -946,8 +946,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'slug'       => 'piazzolla',
 						),
 					),
-				)
-			)
+				),
+			),
 		);
 		$this->assertSameSetsWithIndex( $expected, $sanitized_theme_json, 'Sanitized theme.json settings do not match.' );
 	}
