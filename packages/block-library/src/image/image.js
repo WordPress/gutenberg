@@ -114,6 +114,11 @@ export default function Image( {
 		linkTarget,
 		sizeSlug,
 	} = attributes;
+
+	// The only supported unit is px, so we can parseInt to strip the px here.
+	const numericWidth = width ? parseInt( width, 10 ) : undefined;
+	const numericHeight = height ? parseInt( height, 10 ) : undefined;
+
 	const imageRef = useRef();
 	const prevCaption = usePrevious( caption );
 	const [ showCaption, setShowCaption ] = useState( !! caption );
@@ -473,23 +478,14 @@ export default function Image( {
 						</ToolsPanelItem>
 					) }
 					<DimensionsTool
-						value={ {
-							width: width && `${ width }px`,
-							height: height && `${ height }px`,
-							scale,
-							aspectRatio,
-						} }
+						value={ { width, height, scale, aspectRatio } }
 						onChange={ ( newValue ) => {
 							// Rebuilding the object forces setting `undefined`
 							// for values that are removed since setAttributes
 							// doesn't do anything with keys that aren't set.
 							setAttributes( {
-								width:
-									newValue.width &&
-									parseInt( newValue.width, 10 ),
-								height:
-									newValue.height &&
-									parseInt( newValue.height, 10 ),
+								width: newValue.width,
+								height: newValue.height,
 								scale: newValue.scale,
 								aspectRatio: newValue.aspectRatio,
 							} );
@@ -587,8 +583,8 @@ export default function Image( {
 			<ImageEditor
 				id={ id }
 				url={ url }
-				width={ width }
-				height={ height }
+				width={ numericWidth }
+				height={ numericHeight }
 				clientWidth={ fallbackClientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
@@ -604,14 +600,18 @@ export default function Image( {
 	} else if ( ! isResizable ) {
 		img = <div style={ { width, height, aspectRatio } }>{ img }</div>;
 	} else {
+		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );
+		const customRatio = numericWidth / numericHeight;
 		const ratio =
-			( aspectRatio && evalAspectRatio( aspectRatio ) ) ||
-			( width && height && width / height ) ||
-			naturalWidth / naturalHeight ||
-			1;
-
-		const currentWidth = ! width && height ? height * ratio : width;
-		const currentHeight = ! height && width ? width / ratio : height;
+			numericRatio || customRatio || naturalWidth / naturalHeight || 1;
+		const currentWidth =
+			! numericWidth && numericHeight
+				? numericHeight * ratio
+				: numericWidth;
+		const currentHeight =
+			! numericHeight && numericWidth
+				? numericWidth / ratio
+				: numericHeight;
 
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
@@ -687,10 +687,14 @@ export default function Image( {
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
+					// Since the aspect ratio is locked when resizing, we can
+					// use the width of the resized element to calculate the
+					// height in CSS to prevent stretching when the max-width
+					// is reached.
 					setAttributes( {
-						width: elt.offsetWidth,
-						height: elt.offsetHeight,
-						aspectRatio: undefined,
+						width: `${ elt.offsetWidth }px`,
+						height: 'auto',
+						aspectRatio: `${ ratio }`,
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }

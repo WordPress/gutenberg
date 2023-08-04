@@ -42,10 +42,12 @@ export default function LinkPreview( {
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
 
-	const displayTitle = richData?.title || value?.title || displayURL;
-
 	// url can be undefined if the href attribute is unset
 	const isEmptyURL = ! value?.url?.length;
+
+	const displayTitle =
+		! isEmptyURL &&
+		stripHTML( richData?.title || value?.title || displayURL );
 
 	let icon;
 
@@ -87,10 +89,10 @@ export default function LinkPreview( {
 									className="block-editor-link-control__search-item-title"
 									href={ value.url }
 								>
-									{ stripHTML( displayTitle ) }
+									{ displayTitle }
 								</ExternalLink>
 
-								{ value?.url && (
+								{ value?.url && displayTitle !== displayURL && (
 									<span className="block-editor-link-control__search-item-info">
 										{ displayURL }
 									</span>
