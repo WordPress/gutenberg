@@ -84,7 +84,7 @@ $preview-image-height: 140px;
 	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
 	justify-content: flex-start;
 	gap: $grid-unit-10;
-	padding: $grid-unit-10;
+	padding: $grid-unit-10 $grid-unit-20 $grid-unit-20;
 	order: 20;
 }
 
@@ -215,9 +215,9 @@ $preview-image-height: 140px;
 
 	.block-editor-link-control__search-item-title {
 		display: block;
-		margin-bottom: 0.2em;
 		font-weight: 500;
 		position: relative;
+		line-height: $grid-unit-30;
 
 		mark {
 			font-weight: 600;
@@ -291,6 +291,7 @@ $preview-image-height: 140px;
 	display: flex;
 	flex-direction: row;
 	width: 100%; // clip.
+	align-items: center;
 }
 
 .block-editor-link-control__search-item-bottom {

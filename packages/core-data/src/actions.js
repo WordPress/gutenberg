@@ -551,9 +551,12 @@ export const saveEntityRecord =
 					data = Object.keys( data ).reduce(
 						( acc, key ) => {
 							if (
-								[ 'title', 'excerpt', 'content' ].includes(
-									key
-								)
+								[
+									'title',
+									'excerpt',
+									'content',
+									'meta',
+								].includes( key )
 							) {
 								acc[ key ] = data[ key ];
 							}
