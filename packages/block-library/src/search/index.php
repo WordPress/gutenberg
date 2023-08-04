@@ -5,6 +5,24 @@
  * @package WordPress
  */
 
+if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
+	/**
+	 * Replaces view script for the File block with version using Interactivity API.
+	 *
+	 * @param array $metadata Block metadata as read in via block.json.
+	 *
+	 * @return array Filtered block type metadata.
+	 */
+	function gutenberg_block_core_search_update_interactive_view_script( $metadata ) {
+		if ( 'core/search' === $metadata['name'] ) {
+			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
+			$metadata['supports']['interactivity'] = true;
+		}
+		return $metadata;
+	}
+	add_filter( 'block_type_metadata', 'gutenberg_block_core_search_update_interactive_view_script', 10, 1 );
+}
+
 /**
  * Dynamically renders the `core/search` block.
  *
@@ -144,6 +162,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
 				$button->set_attribute( 'aria-expanded', 'false' );
 				$button->set_attribute( 'type', 'button' ); // Will be set to submit after clicking.
+				$button->set_attribute( 'data-wp-on--click', 'actions.core.search.toggleSearch' );
 			} else {
 				$button->set_attribute( 'aria-label', wp_strip_all_tags( $attributes['buttonText'] ) );
 			}
@@ -160,13 +179,21 @@ function render_block_core_search( $attributes, $content, $block ) {
 	$wrapper_attributes   = get_block_wrapper_attributes(
 		array( 'class' => $classnames )
 	);
-
-	return sprintf(
-		'<form role="search" method="get" action="%s" %s>%s</form>',
-		esc_url( home_url( '/' ) ),
-		$wrapper_attributes,
-		$label . $field_markup
+	$form                 = new WP_HTML_Tag_Processor(
+		sprintf(
+			'<form role="search" method="get" action="%1s" %2s>%3s</form>',
+			esc_url( home_url( '/' ) ),
+			$wrapper_attributes,
+			$label . $field_markup
+		)
 	);
+	if ( $form->next_tag() ) {
+		$form->set_attribute( 'data-wp-interactive', true );
+		$form->set_attribute( 'data-wp-context', '{ "core": { "search": { "isSearchCollapsed": true } } }' );
+		$form->set_attribute( 'data-wp-class--wp-block-search-searchfield-hidden', 'context.core.search.isSearchCollapsed' );
+	}
+
+	return $form;
 }
 
 /**
@@ -208,7 +235,7 @@ function classnames_for_block_core_search( $attributes ) {
 		if ( 'button-only' === $attributes['buttonPosition'] ) {
 			$classnames[] = 'wp-block-search__button-only';
 			if ( ! empty( $attributes['buttonBehavior'] ) && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
-				$classnames[] = 'wp-block-search__button-behavior-expand wp-block-search__searchfield-hidden';
+				$classnames[] = 'wp-block-search__button-behavior-expand wp-block-search-searchfield-hidden';
 			}
 		}
 	}

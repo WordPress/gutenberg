@@ -59,6 +59,11 @@
 		data-testid="can toggle class when class attribute is missing"
 	></div>
 
+	<div
+		data-wp-class--foo__bar="state.falseValue"
+		data-testid="can toggle class with underscores"
+	></div>
+
 	<div data-wp-context='{ "falseValue": false }'>
 		<div
 			class="foo"
