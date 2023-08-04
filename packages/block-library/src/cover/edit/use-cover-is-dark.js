@@ -51,6 +51,7 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, setAttributes ) {
 		isDark = false;
 	}
 
+	// Determines darkness of media’s averaged color when the url changes.
 	useEffect( () => {
 		if ( url ) {
 			const imgCrossOrigin = applyFilters(
