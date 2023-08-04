@@ -79,7 +79,7 @@ To indicate that our block [supports](https://developer.wordpress.org/block-edit
 
 ##### Add `wp-interactive` directive to a DOM element
 
-To "activate" the Interactivity API in a DOM elements and its children we add the [`wp-interactive` directive](./2-api-reference.md#wp-interactive) in our `render.php` or `save.js`
+To "activate" the Interactivity API in a DOM element (and its children) we add the [`wp-interactive` directive](./2-api-reference.md#wp-interactive) to it from our `render.php` or `save.js`
 
 
 ```html
