@@ -193,7 +193,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$form->set_attribute( 'data-wp-class--wp-block-search__searchfield-hidden', 'context.core.search.isSearchCollapsed' );
 	}
 
-	return $form;
+	return $form->get_updated_html();
 }
 
 /**
