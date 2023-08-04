@@ -48,9 +48,7 @@ At this point you should be able to insert the "My First Interactive Block" bloc
 
 ## Requirements of the Interactivity API
 
-To start working with the Interactivity API you'll need to have a [proper WordPress development environment for blocks](https://developer.wordpress.org/block-editor/getting-started/devenv/) which should include:
-
-
+To start working with the Interactivity API you'll need to have a [proper WordPress development environment for blocks](https://developer.wordpress.org/block-editor/getting-started/devenv/) and some project code additions, which should include:
 
 #### A local WordPress installation
 
