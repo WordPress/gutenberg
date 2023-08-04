@@ -88,8 +88,7 @@ function DimensionsTool( {
 	// as a custom aspect ratio.
 	const aspectRatioValue = width && height ? 'custom' : lastAspectRatio;
 
-	const showScaleControl =
-		( aspectRatio && aspectRatio !== '1' ) || ( width && height );
+	const showScaleControl = aspectRatio || ( width && height );
 
 	return (
 		<>

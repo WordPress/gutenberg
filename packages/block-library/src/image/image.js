@@ -602,8 +602,8 @@ export default function Image( {
 	} else {
 		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );
 		const customRatio = numericWidth / numericHeight;
-		const ratio =
-			numericRatio || customRatio || naturalWidth / naturalHeight || 1;
+		const naturalRatio = naturalWidth / naturalHeight;
+		const ratio = numericRatio || customRatio || naturalRatio || 1;
 		const currentWidth =
 			! numericWidth && numericHeight
 				? numericHeight * ratio
@@ -694,7 +694,7 @@ export default function Image( {
 					setAttributes( {
 						width: `${ elt.offsetWidth }px`,
 						height: 'auto',
-						aspectRatio: `${ ratio }`,
+						aspectRatio: ratio === naturalRatio ? 'auto' : ratio,
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
