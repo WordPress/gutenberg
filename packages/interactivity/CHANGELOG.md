@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Allow passing optional `afterLoad` callbacks to `store` calls.
+-   Allow passing optional `afterLoad` callbacks to `store` calls. ([#53363](https://github.com/WordPress/gutenberg/pull/53363))
 
 ### Bug Fix
 
