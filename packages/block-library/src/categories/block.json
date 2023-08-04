@@ -26,6 +26,10 @@
 		"showEmpty": {
 			"type": "boolean",
 			"default": false
+		},
+		"taxonomy": {
+			"type": "string",
+			"default": "category"
 		}
 	},
 	"supports": {
