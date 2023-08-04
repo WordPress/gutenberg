@@ -285,14 +285,11 @@ describe( 'Cover block', () => {
 					} )
 				);
 
-				fireEvent.change(
-					screen.getByRole( 'spinbutton', {
-						name: 'Overlay opacity',
-					} ),
-					{
-						target: { value: '40' },
-					}
-				);
+				const input = screen.getByRole( 'spinbutton', {
+					name: 'Overlay opacity',
+				} );
+				await userEvent.click( input );
+				await userEvent.keyboard( '[ArrowDown>6/]' );
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-40' );
 			} );
@@ -315,12 +312,16 @@ describe( 'Cover block', () => {
 					} )
 				);
 
-				fireEvent.change(
-					screen.getByRole( 'slider', {
-						name: 'Overlay opacity',
-					} ),
-					{ target: { value: 30 } }
-				);
+				// Disable reason: Something about `useCoverIsDark` triggers warnings otherwise.
+				// eslint-disable-next-line testing-library/no-unnecessary-act
+				await act( async () => {
+					fireEvent.change(
+						screen.getByRole( 'slider', {
+							name: 'Overlay opacity',
+						} ),
+						{ target: { value: 30 } }
+					);
+				} );
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-30' );
 			} );
@@ -404,12 +405,15 @@ describe( 'Cover block', () => {
 			await userEvent.click( popupColorPicker );
 			expect( coverBlock ).not.toHaveClass( 'is-light' );
 		} );
-		test( 'should apply is-light class if overlay color is removed', async () => {
+		test( 'should remove is-light class if overlay color is removed', async () => {
 			await setup();
-			await createAndSelectBlock();
+			const colorPicker = screen.getByRole( 'button', {
+				name: 'Color: White',
+			} );
+			await userEvent.click( colorPicker );
 			const coverBlock = screen.getByLabelText( 'Block: Cover' );
-			expect( coverBlock ).not.toHaveClass( 'is-light' );
-
+			expect( coverBlock ).toHaveClass( 'is-light' );
+			await selectBlock( 'Block: Cover' );
 			await userEvent.click(
 				screen.getByRole( 'tab', {
 					name: 'Styles',
@@ -419,10 +423,10 @@ describe( 'Cover block', () => {
 			// The default color is black, so clicking the black color option will remove the background color,
 			// which should remove the isDark setting and assign the is-light class.
 			const popupColorPicker = screen.getByRole( 'button', {
-				name: 'Color: Black',
+				name: 'Color: White',
 			} );
 			await userEvent.click( popupColorPicker );
-			expect( coverBlock ).toHaveClass( 'is-light' );
+			expect( coverBlock ).not.toHaveClass( 'is-light' );
 		} );
 	} );
 } );
