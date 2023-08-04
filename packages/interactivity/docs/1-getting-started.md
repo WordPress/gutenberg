@@ -70,7 +70,7 @@ Block development requires [Node](https://nodejs.org/en), so you'll need to have
 
 ##### Add `interactivity` support to `block.json`
 
-To indicate that our block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Inteactivity API features, we do so by adding `"interactivity": true` to the `supports` attribute of our block's `block.json`
+To indicate that our block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Interactivity API features, we do so by adding `"interactivity": true` to the `supports` attribute of our block's `block.json`
 
 ```
 "supports": {
