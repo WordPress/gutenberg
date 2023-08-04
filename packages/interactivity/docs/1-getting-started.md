@@ -14,6 +14,7 @@ To get started with the Interactivity API, you can follow this [**Quick Start Gu
     - [Node.js](#nodejs)
     - [Code requirements](#code-requirements)  
         - [Add `interactivity` support to `block.json`](#add-interactivity-support-to-blockjson)
+        - [Add `wp-interactive` directive to a DOM element](#add-wp-interactive-directive-to-a-dom-element)
 
         
 
