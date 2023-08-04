@@ -35,6 +35,7 @@
 		"spacing": {
 			"margin": true,
 			"padding": true,
+			"blockGap": true,
 			"__experimentalDefaultControls": {
 				"margin": false,
 				"padding": false
@@ -52,6 +53,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"layout": {
+			"allowEditing": false
 		}
 	},
 	"editorStyle": "wp-block-details-editor",
