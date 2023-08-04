@@ -28,8 +28,8 @@ export const Track = styled.div`
 	max-width: 160px;
 	height: ${ CONFIG.borderWidthFocus };
 	background-color: var(
-		--wp-components-color-gray-100,
-		${ COLORS.gray[ 100 ] }
+		--wp-components-color-gray-300,
+		${ COLORS.gray[ 300 ] }
 	);
 	border-radius: ${ CONFIG.radiusBlockUi };
 `;
