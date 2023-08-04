@@ -15,33 +15,26 @@
 		"showLabel": {
 			"type": "boolean",
 			"default": true
-		},
-		"midSize": {
-			"type": "number",
-			"default": 2
 		}
 	},
 	"usesContext": [ "queryId", "query" ],
 	"providesContext": {
 		"paginationArrow": "paginationArrow",
-		"showLabel": "showLabel",
-		"midSize": "midSize"
+		"showLabel": "showLabel"
 	},
 	"supports": {
 		"align": true,
 		"reusable": false,
 		"html": false,
 		"color": {
-			"gradients": true,
-			"link": true,
+			"gradients": true,			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true,
 				"link": true
 			}
 		},
-		"layout": {
-			"allowSwitching": false,
+		"layout": {			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {
 				"type": "flex"

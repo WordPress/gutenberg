@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { PanelBody } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { QueryPaginationNumbersMidSizeControl } from './query-pagination-numbers-mid-size-control';
 
 const createPaginationItem = ( content, Tag = 'a', extraClass = '' ) => (
 	<Tag key={ content } className={ `page-numbers ${ extraClass }` }>
@@ -36,9 +43,29 @@ const previewPaginationNumbers = ( midSize ) => {
 	return <>{ paginationItems }</>;
 };
 
-export default function QueryPaginationNumbersEdit( { context: { midSize } } ) {
+export default function QueryPaginationNumbersEdit( {
+	attributes,
+	setAttributes,
+} ) {
+	const { midSize } = attributes;
 	const paginationNumbers = previewPaginationNumbers(
 		parseInt( midSize, 10 )
 	);
-	return <div { ...useBlockProps() }>{ paginationNumbers }</div>;
+	return (
+		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Settings' ) }>
+					<QueryPaginationNumbersMidSizeControl
+						value={ midSize }
+						onChange={ ( value ) => {
+							setAttributes( {
+								midSize: parseInt( value, 10 ),
+							} );
+						} }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<div { ...useBlockProps() }>{ paginationNumbers }</div>
+		</>
+	);
 }
