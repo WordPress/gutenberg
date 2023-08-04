@@ -1,16 +1,23 @@
 /**
  * External dependencies
  */
-import { useRef, useEffect } from 'preact/hooks';
+import { useEffect } from 'preact/hooks';
 import { effect } from '@preact/signals';
 
-function afterNextFrame( callback ) {
-	const done = () => {
-		window.cancelAnimationFrame( raf );
-		setTimeout( callback );
-	};
-	const raf = window.requestAnimationFrame( done );
-}
+const afterNextFrame = ( callback ) => {
+	return new Promise( ( resolve ) => {
+		const done = () => {
+			clearTimeout( timeout );
+			window.cancelAnimationFrame( raf );
+			setTimeout( () => {
+				callback();
+				resolve();
+			} );
+		};
+		const timeout = setTimeout( done, 100 );
+		const raf = window.requestAnimationFrame( done );
+	} );
+};
 
 // Using the mangled properties:
 // this.c: this._callback
@@ -28,18 +35,20 @@ function createFlusher( compute, notify ) {
 }
 
 // Version of `useSignalEffect` with a `useEffect`-like execution. This hook
-// implementation comes from this PR:
-// https://github.com/preactjs/signals/pull/290.
-//
-// We need to include it here in this repo until the mentioned PR is merged.
-export function useSignalEffect( cb ) {
-	const callback = useRef( cb );
-	callback.current = cb;
-
+// implementation comes from this PR, but we added short-cirtuiting to avoid
+// infinite loops: https://github.com/preactjs/signals/pull/290
+export function useSignalEffect( callback ) {
 	useEffect( () => {
-		const execute = () => callback.current();
-		const notify = () => afterNextFrame( eff.flush );
-		const eff = createFlusher( execute, notify );
+		let eff = null;
+		let isExecuting = false;
+		const notify = async () => {
+			if ( eff && ! isExecuting ) {
+				isExecuting = true;
+				await afterNextFrame( eff.flush );
+				isExecuting = false;
+			}
+		};
+		eff = createFlusher( callback, notify );
 		return eff.dispose;
 	}, [] );
 }
