@@ -63,13 +63,13 @@ The Interactivity API is currently only available as an experimental feature fro
 
 #### Node.js
 
-Block development requires [Node](https://nodejs.org/en), so you'll need to have Node installed and running on your machine. Any version should work, but please check the minimum version requirements if you run into any issues with any of the Node.js tools used in WordPress development.
+Block development requires [Node](https://nodejs.org/en), so you'll need to have Node installed and running on your machine. Any version modern should work, but please check the minimum version requirements if you run into any issues with any of the Node.js tools used in WordPress development.
 
 #### Code requirements 
 
 ##### Add `interactivity` support to `block.json`
 
-To indicate that our block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Inteactivity API features, we do so by adding `"interactivity": true` to the `support` attribute of our block's `block.json`
+To indicate that our block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Inteactivity API features, we do so by adding `"interactivity": true` to the `supports` attribute of our block's `block.json`
 
 ```
 "supports": {
