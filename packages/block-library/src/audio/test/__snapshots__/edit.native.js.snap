@@ -129,6 +129,7 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
         style={
           [
             undefined,
+            {},
             undefined,
           ]
         }
@@ -355,6 +356,7 @@ exports[`Audio block renders audio file without crashing 1`] = `
         style={
           [
             undefined,
+            {},
             undefined,
           ]
         }

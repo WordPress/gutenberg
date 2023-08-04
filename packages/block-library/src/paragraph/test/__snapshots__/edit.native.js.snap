@@ -4,7 +4,10 @@ exports[`Paragraph block should render without crashing and match snapshot 1`] =
 <View
   style={
     [
-      undefined,
+      {
+        "backgroundColor": undefined,
+      },
+      {},
       undefined,
     ]
   }

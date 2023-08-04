@@ -13,7 +13,10 @@ exports[`Preformatted should match snapshot when content is empty 1`] = `
   <View
     style={
       [
-        undefined,
+        {
+          "backgroundColor": undefined,
+        },
+        {},
         undefined,
       ]
     }
@@ -60,7 +63,10 @@ exports[`Preformatted should match snapshot when content is not empty 1`] = `
   <View
     style={
       [
-        undefined,
+        {
+          "backgroundColor": undefined,
+        },
+        {},
         undefined,
       ]
     }

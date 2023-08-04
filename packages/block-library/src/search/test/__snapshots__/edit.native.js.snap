@@ -15,6 +15,7 @@ exports[`Search Block renders block with button inside option 1`] = `
       style={
         [
           undefined,
+          {},
           undefined,
         ]
       }
@@ -139,7 +140,10 @@ exports[`Search Block renders block with button inside option 1`] = `
         <View
           style={
             [
-              undefined,
+              {
+                "backgroundColor": undefined,
+              },
+              {},
               undefined,
             ]
           }
@@ -229,6 +233,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
       style={
         [
           undefined,
+          {},
           undefined,
         ]
       }
@@ -423,7 +428,10 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         <View
           style={
             [
-              undefined,
+              {
+                "backgroundColor": undefined,
+              },
+              {},
               undefined,
             ]
           }
@@ -513,6 +521,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
       style={
         [
           undefined,
+          {},
           undefined,
         ]
       }
@@ -637,7 +646,10 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         <View
           style={
             [
-              undefined,
+              {
+                "backgroundColor": undefined,
+              },
+              {},
               undefined,
             ]
           }
@@ -727,6 +739,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
       style={
         [
           undefined,
+          {},
           undefined,
         ]
       }
