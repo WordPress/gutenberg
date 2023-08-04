@@ -128,6 +128,11 @@ function DimensionsTool( {
 						delete nextValue.height;
 					}
 
+					// Delete width and height when setting back to original.
+					if ( nextAspectRatio === null ) {
+						delete nextValue.height;
+					}
+
 					onChange( nextValue );
 				} }
 			/>
