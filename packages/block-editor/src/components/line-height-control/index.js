@@ -40,8 +40,9 @@ const LineHeightControl = ( {
 		const valueHasTwoDecimals = /^\d+\.\d{2}$/.test( value.toString() );
 
 		if ( valueHasTwoDecimals && ! wasTypedOrPasted && ! wasOnBlur ) {
-			if ( value.toString().endsWith( '5' ) && nextValue < value ) {
-				return roundClamp( value - 0.01, min, max, STEP );
+			const valueWithOneDecimal = value.toString().slice( 0, -1 );
+			if ( nextValue < value ) {
+				return roundClamp( valueWithOneDecimal, min, max, STEP );
 			}
 			return roundClamp( value, min, max, STEP );
 		}
