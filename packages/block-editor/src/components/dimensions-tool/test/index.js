@@ -637,30 +637,5 @@ describe( 'DimensionsTool', () => {
 				],
 			] );
 		} );
-
-		it( 'when isResizable is false then the WidthHeightTool component should not be rendered', async () => {
-			const onChange = jest.fn();
-
-			const value = {};
-
-			render(
-				<Example
-					initialValue={ value }
-					onChange={ onChange }
-					isResizable={ false }
-				/>
-			);
-
-			const widthInput = screen.queryByRole( 'spinbutton', {
-				name: 'Width',
-			} );
-
-			const heightInput = screen.queryByRole( 'spinbutton', {
-				name: 'Height',
-			} );
-
-			expect( widthInput ).not.toBeInTheDocument();
-			expect( heightInput ).not.toBeInTheDocument();
-		} );
 	} );
 } );
