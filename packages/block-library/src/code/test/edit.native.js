@@ -57,7 +57,7 @@ describe( 'Code', () => {
 		fireEvent.press( codeBlock );
 
 		// Get initial text
-		const codeBlockText = getByDisplayValue( /Sample text/ );
+		const codeBlockText = getByDisplayValue( 'Sample text' );
 		expect( codeBlockText ).toBeVisible();
 
 		expect( getEditorHtml() ).toMatchSnapshot();
