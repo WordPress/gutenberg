@@ -1182,17 +1182,12 @@ export class RichText extends Component {
 			maxWidth && this.state.width && maxWidth - this.state.width < 10
 				? maxWidth
 				: this.state.width;
-
-		const paddingStyles = {};
-		for ( const key in style ) {
-			if ( /padding/.test( key ) ) {
-				paddingStyles[ key ] = style[ key ];
-			}
-		}
-
 		const containerStyles = [
-			style && { backgroundColor: style.backgroundColor },
-			paddingStyles,
+			style?.padding &&
+				style?.backgroundColor && {
+					padding: style.padding,
+					backgroundColor: style.backgroundColor,
+				},
 			containerWidth && {
 				width: containerWidth,
 			},

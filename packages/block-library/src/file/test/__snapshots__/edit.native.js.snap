@@ -60,7 +60,6 @@ exports[`File block renders file error state without crashing 1`] = `
         style={
           [
             undefined,
-            {},
             undefined,
           ]
         }
@@ -175,10 +174,7 @@ exports[`File block renders file error state without crashing 1`] = `
       <View
         style={
           [
-            {
-              "backgroundColor": undefined,
-            },
-            {},
+            undefined,
             undefined,
           ]
         }
@@ -315,7 +311,6 @@ exports[`File block renders file without crashing 1`] = `
         style={
           [
             undefined,
-            {},
             undefined,
           ]
         }
@@ -404,10 +399,7 @@ exports[`File block renders file without crashing 1`] = `
       <View
         style={
           [
-            {
-              "backgroundColor": undefined,
-            },
-            {},
+            undefined,
             undefined,
           ]
         }

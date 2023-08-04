@@ -10,10 +10,7 @@ exports[`<RichText/> Font Size should update the font size when style prop with 
 <View
   style={
     [
-      {
-        "backgroundColor": undefined,
-      },
-      {},
+      undefined,
       undefined,
     ]
   }
@@ -49,10 +46,7 @@ exports[`<RichText/> Font Size should update the font size with decimals when st
 <View
   style={
     [
-      {
-        "backgroundColor": undefined,
-      },
-      {},
+      undefined,
       undefined,
     ]
   }
