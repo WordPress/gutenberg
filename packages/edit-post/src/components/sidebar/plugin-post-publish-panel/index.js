@@ -62,7 +62,7 @@ const PluginPostPublishPanel = ( {
 	initialOpen = false,
 	icon,
 } ) => {
-	const context = usePluginContext();
+	const { icon: pluginIcon } = usePluginContext();
 
 	return (
 		<Fill>
