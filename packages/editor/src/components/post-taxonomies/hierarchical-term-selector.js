@@ -156,6 +156,7 @@ export function HierarchicalTermSelector( { slug } ) {
 	/**
 	 * @type {[number|'', Function]}
 	 */
+	const MAX_CATEGORY_NAME_LENGTH = 200;
 	const [ formParent, setFormParent ] = useState( '' );
 	const [ showForm, setShowForm ] = useState( false );
 	const [ filterValue, setFilterValue ] = useState( '' );
@@ -271,8 +272,29 @@ export function HierarchicalTermSelector( { slug } ) {
 
 	const onAddTerm = async ( event ) => {
 		event.preventDefault();
+
+		// Reset the error message before processing the form
+    	let errorMessage = '';
+
 		if ( formName === '' || adding ) {
 			return;
+		}
+
+		// Check the length of the category name
+		if (formName.length > MAX_CATEGORY_NAME_LENGTH) {
+		  errorMessage = (0, external_wp_i18n_namespaceObject.sprintf)(
+		    /* translators: %d: maximum category name length */
+		    (0, external_wp_i18n_namespaceObject.__)(
+		      'The category name should not exceed %d characters.'
+		    ),
+		    MAX_CATEGORY_NAME_LENGTH
+		  );
+		}
+  
+		// If there is an error message, show the alert and return
+		if (errorMessage) {
+		  alert(errorMessage);
+		  return;
 		}
 
 		// Check if the term we are adding already exists.
