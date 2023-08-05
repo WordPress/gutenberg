@@ -14,19 +14,22 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { SYNC_TYPES, USER_PATTERN_CATEGORY } from '../page-library/utils';
+import { SYNC_TYPES, USER_PATTERN_CATEGORY } from '../page-patterns/utils';
 
 export default function CreatePatternModal( {
+	blocks = [],
 	closeModal,
 	onCreate,
 	onError,
+	title,
 } ) {
 	const [ name, setName ] = useState( '' );
-	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
+	const [ syncType, setSyncType ] = useState( SYNC_TYPES.unsynced );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 
 	const onSyncChange = () => {
@@ -52,9 +55,12 @@ export default function CreatePatternModal( {
 				'wp_block',
 				{
 					title: name || __( 'Untitled Pattern' ),
-					content: '',
+					content: blocks?.length ? serialize( blocks ) : '',
 					status: 'publish',
-					meta: { sync_status: syncType },
+					meta:
+						syncType === SYNC_TYPES.unsynced
+							? { wp_pattern_sync_status: syncType }
+							: undefined,
 				},
 				{ throwOnError: true }
 			);
@@ -73,12 +79,10 @@ export default function CreatePatternModal( {
 
 	return (
 		<Modal
-			title={ __( 'Create pattern' ) }
+			title={ title || __( 'Create pattern' ) }
 			onRequestClose={ closeModal }
 			overlayClassName="edit-site-create-pattern-modal"
 		>
-			<p>{ __( 'Turn this block into a pattern to reuse later' ) }</p>
-
 			<form
 				onSubmit={ async ( event ) => {
 					event.preventDefault();
@@ -100,13 +104,11 @@ export default function CreatePatternModal( {
 						__nextHasNoMarginBottom
 					/>
 					<ToggleControl
-						label={ __( 'Synced' ) }
+						label={ __( 'Keep all pattern instances in sync' ) }
 						onChange={ onSyncChange }
-						help={
-							syncType === SYNC_TYPES.full
-								? __( 'Content is synced' )
-								: __( 'Content is not synced' )
-						}
+						help={ __(
+							'Editing the original pattern will also update anywhere the pattern is used.'
+						) }
 						checked={ syncType === SYNC_TYPES.full }
 					/>
 					<HStack justify="right">

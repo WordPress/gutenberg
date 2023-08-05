@@ -215,7 +215,7 @@ describe( 'BorderControl', () => {
 
 				expect(
 					screen.getByLabelText(
-						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#-7-2-a-e-e-6".'
+						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#72aee6".'
 					)
 				).toBeInTheDocument();
 			} );
@@ -226,7 +226,7 @@ describe( 'BorderControl', () => {
 
 				expect(
 					screen.getByLabelText(
-						'Border color and style picker. The currently selected color has a value of "#-4-b-1-d-8-0".'
+						'Border color and style picker. The currently selected color has a value of "#4b1d80".'
 					)
 				).toBeInTheDocument();
 			} );
@@ -239,7 +239,7 @@ describe( 'BorderControl', () => {
 
 				expect(
 					screen.getByLabelText(
-						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#-7-2-a-e-e-6". The currently selected style is "dotted".'
+						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#72aee6". The currently selected style is "dotted".'
 					)
 				).toBeInTheDocument();
 			} );
@@ -252,7 +252,7 @@ describe( 'BorderControl', () => {
 
 				expect(
 					screen.getByLabelText(
-						'Border color and style picker. The currently selected color has a value of "#-4-b-1-d-8-0". The currently selected style is "dashed".'
+						'Border color and style picker. The currently selected color has a value of "#4b1d80". The currently selected style is "dashed".'
 					)
 				).toBeInTheDocument();
 			} );
@@ -280,7 +280,7 @@ describe( 'BorderControl', () => {
 
 				expect(
 					screen.getByLabelText(
-						'Border color picker. The currently selected color is called "Blue" and has a value of "#-7-2-a-e-e-6".'
+						'Border color picker. The currently selected color is called "Blue" and has a value of "#72aee6".'
 					)
 				).toBeInTheDocument();
 			} );
@@ -294,7 +294,7 @@ describe( 'BorderControl', () => {
 
 				expect(
 					screen.getByLabelText(
-						'Border color picker. The currently selected color has a value of "#-4-b-1-d-8-0".'
+						'Border color picker. The currently selected color has a value of "#4b1d80".'
 					)
 				).toBeInTheDocument();
 			} );

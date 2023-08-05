@@ -1,0 +1,14 @@
+{
+	"apiVersion": 2,
+	"name": "test/directive-style",
+	"title": "E2E Interactivity tests - directive style",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScript": "directive-style-view",
+	"render": "file:./render.php"
+}

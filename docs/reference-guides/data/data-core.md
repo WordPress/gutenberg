@@ -136,7 +136,7 @@ _Parameters_
 
 _Returns_
 
--   `Object | null`: The current global styles.
+-   `Array< object > | null`: The current global styles.
 
 ### getCurrentUser
 
@@ -328,18 +328,6 @@ _Parameters_
 _Returns_
 
 -   `any`: The entity record's save error.
-
-### getNavigationFallbackId
-
-Retrieve the fallback Navigation.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `EntityRecordKey | undefined`: The ID for the fallback Navigation post.
 
 ### getRawEntityRecord
 

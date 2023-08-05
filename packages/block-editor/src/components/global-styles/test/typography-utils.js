@@ -96,6 +96,36 @@ describe( 'typography utils', () => {
 			},
 
 			{
+				message:
+					'should override default max viewport width fluid typography settings',
+				preset: {
+					size: '1.75rem',
+				},
+				typographySettings: {
+					fluid: {
+						maxViewportWidth: '1200px',
+					},
+				},
+				expected:
+					'clamp(1.119rem, 1.119rem + ((1vw - 0.2rem) * 1.147), 1.75rem)',
+			},
+
+			{
+				message:
+					'should override default min viewport width fluid typography settings',
+				preset: {
+					size: '1.75rem',
+				},
+				typographySettings: {
+					fluid: {
+						minViewportWidth: '800px',
+					},
+				},
+				expected:
+					'clamp(1.119rem, 1.119rem + ((1vw - 0.5rem) * 1.262), 1.75rem)',
+			},
+
+			{
 				message: 'should return clamp value with em min and max units',
 				preset: {
 					size: '1.75em',
@@ -192,7 +222,7 @@ describe( 'typography utils', () => {
 
 			{
 				message:
-					'should apply maxViewPortWidth as maximum viewport width',
+					'should apply maxViewportWidth as maximum viewport width',
 				preset: {
 					size: '80px',
 					fluid: {
@@ -202,7 +232,7 @@ describe( 'typography utils', () => {
 				},
 				typographySettings: {
 					fluid: {
-						maxViewPortWidth: '1100px',
+						maxViewportWidth: '1100px',
 					},
 				},
 				expected:
@@ -478,6 +508,21 @@ describe( 'typography utils', () => {
 				expected:
 					'clamp(100px, 6.25rem + ((1vw - 3.2px) * 7.813), 200px)',
 			},
+
+			{
+				message: 'should apply all custom fluid typography settings',
+				preset: {
+					size: '17px',
+				},
+				typographySettings: {
+					fluid: {
+						minFontSize: '16px',
+						maxViewportWidth: '1200px',
+						minViewportWidth: '640px',
+					},
+				},
+				expected: 'clamp(16px, 1rem + ((1vw - 6.4px) * 0.179), 17px)',
+			},
 		].forEach( ( { message, preset, typographySettings, expected } ) => {
 			it( `${ message }`, () => {
 				expect(
@@ -548,18 +593,18 @@ describe( 'typography utils', () => {
 					layout: { wideSize: '1000rem' },
 				},
 				expected: {
-					fluid: { maxViewPortWidth: '1000rem', minFontSize: '16px' },
+					fluid: { maxViewportWidth: '1000rem', minFontSize: '16px' },
 				},
 			},
 
 			{
 				message:
-					'should prioritize fluid `maxViewPortWidth` over `layout.wideSize`',
+					'should prioritize fluid `maxViewportWidth` over `layout.wideSize`',
 				settings: {
-					typography: { fluid: { maxViewPortWidth: '10px' } },
+					typography: { fluid: { maxViewportWidth: '10px' } },
 					layout: { wideSize: '1000rem' },
 				},
-				expected: { fluid: { maxViewPortWidth: '10px' } },
+				expected: { fluid: { maxViewportWidth: '10px' } },
 			},
 		].forEach( ( { message, settings, expected } ) => {
 			it( `${ message }`, () => {

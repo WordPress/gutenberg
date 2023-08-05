@@ -11,7 +11,7 @@ import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 /**
- * Sets the active context of the command center
+ * Sets the active context of the command palette
  *
  * @param {string} context Context to set.
  */

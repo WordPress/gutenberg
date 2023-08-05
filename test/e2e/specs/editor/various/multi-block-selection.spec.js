@@ -1114,12 +1114,8 @@ test.describe( 'Multi-block selection', () => {
 				attributes: { content: '1' },
 			},
 			{
-				name: 'core/paragraph',
-				attributes: { content: '|' },
-			},
-			{
 				name: 'core/heading',
-				attributes: { level: 2, content: '2' },
+				attributes: { level: 2, content: '|2' },
 			},
 		] );
 	} );

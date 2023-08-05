@@ -121,6 +121,8 @@ export default function Layout() {
 	const [ fullResizer ] = useResizeObserver();
 	const [ isResizing ] = useState( false );
 	const isEditorLoading = useIsSiteEditorLoading();
+	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
+		useState( false );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -143,7 +145,7 @@ export default function Layout() {
 		headerAnimationState = canvasMode; // edit, view, init
 	}
 
-	// Sets the right context for the command center
+	// Sets the right context for the command palette
 	const commandContext =
 		canvasMode === 'edit' && isEditorPage
 			? 'site-editor-edit'
@@ -218,20 +220,32 @@ export default function Layout() {
 							edit: { x: 0 },
 						} }
 						ref={ hubRef }
+						isTransparent={ isResizableFrameOversized }
 						className="edit-site-layout__hub"
 					/>
 
 					<AnimatePresence initial={ false }>
 						{ isEditorPage && isEditing && (
 							<NavigableRegion
+								key="header"
 								className="edit-site-layout__header"
 								ariaLabel={ __( 'Editor top bar' ) }
 								as={ motion.div }
 								variants={ {
-									isDistractionFree: { opacity: 0 },
-									isDistractionFreeHovering: { opacity: 1 },
-									view: { opacity: 1 },
-									edit: { opacity: 1 },
+									isDistractionFree: { opacity: 0, y: 0 },
+									isDistractionFreeHovering: {
+										opacity: 1,
+										y: 0,
+									},
+									view: { opacity: 1, y: '-100%' },
+									edit: { opacity: 1, y: 0 },
+								} }
+								exit={ {
+									y: '-100%',
+								} }
+								initial={ {
+									opacity: isDistractionFree ? 1 : 0,
+									y: isDistractionFree ? 0 : '-100%',
 								} }
 								transition={ {
 									type: 'tween',
@@ -239,51 +253,42 @@ export default function Layout() {
 									ease: 'easeOut',
 								} }
 							>
-								{ isEditing && <Header /> }
+								<Header />
 							</NavigableRegion>
 						) }
 					</AnimatePresence>
 				</motion.div>
 
 				<div className="edit-site-layout__content">
-					<AnimatePresence initial={ false }>
-						{
-							<motion.div
-								initial={ {
-									opacity: 0,
-								} }
-								animate={
-									showSidebar
-										? { opacity: 1, display: 'block' }
-										: {
-												opacity: 0,
-												transitionEnd: {
-													display: 'none',
-												},
-										  }
-								}
-								exit={ {
-									opacity: 0,
-								} }
-								transition={ {
-									type: 'tween',
-									duration:
-										// Disable transition in mobile to emulate a full page transition.
-										disableMotion || isMobileViewport
-											? 0
-											: ANIMATION_DURATION,
-									ease: 'easeOut',
-								} }
-								className="edit-site-layout__sidebar"
-							>
-								<NavigableRegion
-									ariaLabel={ __( 'Navigation' ) }
-								>
-									<Sidebar />
-								</NavigableRegion>
-							</motion.div>
-						}
-					</AnimatePresence>
+					{ /*
+						The NavigableRegion must always be rendered and not use
+						`inert` otherwise `useNavigateRegions` will fail.
+					*/ }
+					<NavigableRegion
+						ariaLabel={ __( 'Navigation' ) }
+						className="edit-site-layout__sidebar-region"
+					>
+						<motion.div
+							// The sidebar is needed for routing on mobile
+							// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
+							// so we can't remove the element entirely. Using `inert` will make
+							// it inaccessible to screen readers and keyboard navigation.
+							inert={ showSidebar ? undefined : 'inert' }
+							animate={ { opacity: showSidebar ? 1 : 0 } }
+							transition={ {
+								type: 'tween',
+								duration:
+									// Disable transition in mobile to emulate a full page transition.
+									disableMotion || isMobileViewport
+										? 0
+										: ANIMATION_DURATION,
+								ease: 'easeOut',
+							} }
+							className="edit-site-layout__sidebar"
+						>
+							<Sidebar />
+						</motion.div>
+					</NavigableRegion>
 
 					<SavePanel />
 
@@ -320,7 +325,13 @@ export default function Layout() {
 											}
 											initial={ false }
 											layout="position"
-											className="edit-site-layout__canvas"
+											className={ classnames(
+												'edit-site-layout__canvas',
+												{
+													'is-right-aligned':
+														isResizableFrameOversized,
+												}
+											) }
 											transition={ {
 												type: 'tween',
 												duration:
@@ -336,7 +347,18 @@ export default function Layout() {
 														! isEditorLoading
 													}
 													isFullWidth={ isEditing }
-													oversizedClassName="edit-site-layout__resizable-frame-oversized"
+													defaultSize={ {
+														width:
+															canvasSize.width -
+															24 /* $canvas-padding */,
+														height: canvasSize.height,
+													} }
+													isOversized={
+														isResizableFrameOversized
+													}
+													setIsOversized={
+														setIsResizableFrameOversized
+													}
 													innerContentStyle={ {
 														background:
 															gradientValue ??

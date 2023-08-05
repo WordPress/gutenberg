@@ -132,12 +132,8 @@ export default function ReusableBlockEdit( {
 	}
 
 	const onConvertToRegularBlocks = useCallback( () => {
-		const successNotice =
-			innerBlockCount > 1
-				? /* translators: %s: name of the reusable block */
-				  __( '%s converted to regular blocks' )
-				: /* translators: %s: name of the reusable block */
-				  __( '%s converted to regular block' );
+		/* translators: %s: name of the synced block */
+		const successNotice = __( '%s detached' );
 		createSuccessNotice( sprintf( successNotice, title ) );
 
 		clearSelectedBlock();
@@ -152,14 +148,14 @@ export default function ReusableBlockEdit( {
 				? sprintf(
 						/* translators: %s: name of the host app (e.g. WordPress) */
 						__(
-							'Editing reusable blocks is not yet supported on %s for Android'
+							'Editing synced patterns is not yet supported on %s for Android'
 						),
 						hostAppNamespace
 				  )
 				: sprintf(
 						/* translators: %s: name of the host app (e.g. WordPress) */
 						__(
-							'Editing reusable blocks is not yet supported on %s for iOS'
+							'Editing synced patterns is not yet supported on %s for iOS'
 						),
 						hostAppNamespace
 				  );
@@ -182,17 +178,17 @@ export default function ReusableBlockEdit( {
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 						{ innerBlockCount > 1
 							? __(
-									'Alternatively, you can detach and edit these blocks separately by tapping “Convert to regular blocks”.'
+									'Alternatively, you can detach and edit these blocks separately by tapping “Detach patterns”.'
 							  )
 							: __(
-									'Alternatively, you can detach and edit this block separately by tapping “Convert to regular block”.'
+									'Alternatively, you can detach and edit this block separately by tapping “Detach pattern”.'
 							  ) }
 					</Text>
 					<TextControl
 						label={
 							innerBlockCount > 1
-								? __( 'Convert to regular blocks' )
-								: __( 'Convert to regular block' )
+								? __( 'Detach patterns' )
+								: __( 'Detach pattern' )
 						}
 						separatorType="topFullWidth"
 						onPress={ onConvertToRegularBlocks }

@@ -8,7 +8,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 #### Components
 - Add new ColorPicker. ([33714](https://github.com/WordPress/gutenberg/pull/33714))
 - Update snackbar to use framer motion instead of react spring. ([33717](https://github.com/WordPress/gutenberg/pull/33717))
-- Use updated range styles. ([33824](https://github.com/WordPress/gutenberg/pull/33824))
 
 #### Block Library
 - [Post Featured Image]: Add basic dimension controls. ([31634](https://github.com/WordPress/gutenberg/pull/31634))
@@ -76,11 +75,16 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 #### Meta Boxes
 - Fix Safari 13 metaboxes from overlapping the content. ([33817](https://github.com/WordPress/gutenberg/pull/33817))
 
-#### Accessibility
-- Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))
-
 #### Template Editor
 - Template: Only show post template actions to users with correct capabilities. ([33392](https://github.com/WordPress/gutenberg/pull/33392))
+
+
+### Accessibility
+
+- Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))
+
+#### Components
+- Use updated range styles. ([33824](https://github.com/WordPress/gutenberg/pull/33824))
 
 
 ### Performance
@@ -173,8 +177,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 ### Various
 
 - Core Data: Deprecate \`getAuthors\` in favor of \`getUsers\`. ([33725](https://github.com/WordPress/gutenberg/pull/33725))
-- RNMobile: Add integration test guide. ([33833](https://github.com/WordPress/gutenberg/pull/33833))
-- RNMobile: Try unifying the unit test command on mobile. ([33657](https://github.com/WordPress/gutenberg/pull/33657))
 - Tune appender margin. ([33866](https://github.com/WordPress/gutenberg/pull/33866))
 
 #### Block Library
@@ -192,7 +194,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Try to fix flaky customizer inspector test. ([33890](https://github.com/WordPress/gutenberg/pull/33890))
 
 #### Block Editor
-- Closing the block inserter decrements block type impressions. ([33906](https://github.com/WordPress/gutenberg/pull/33906))
 - Enable rich previews for internal links. ([33086](https://github.com/WordPress/gutenberg/pull/33086))
 
 #### Icons

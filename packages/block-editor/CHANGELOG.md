@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 12.6.0 (2023-07-20)
+
+## 12.5.0 (2023-07-05)
+
+## 12.4.0 (2023-06-23)
+
 ### Enhancements
 
 - Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.

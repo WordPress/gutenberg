@@ -30,7 +30,9 @@ async function initBlockJSON( {
 	editorStyle,
 	style,
 	render,
+	viewScript,
 	customBlockJSON,
+	example,
 } ) {
 	info( '' );
 	info( 'Creating a "block.json" file.' );
@@ -52,6 +54,7 @@ async function initBlockJSON( {
 					category,
 					icon: dashicon,
 					description,
+					example,
 					attributes,
 					supports,
 					textdomain,
@@ -59,6 +62,7 @@ async function initBlockJSON( {
 					editorStyle,
 					style,
 					render,
+					viewScript,
 					...customBlockJSON,
 				} ).filter( ( [ , value ] ) => !! value )
 			),
