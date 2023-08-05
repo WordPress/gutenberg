@@ -73,7 +73,7 @@ const PluginPrePublishPanel = ( {
 				className={ className }
 				initialOpen={ initialOpen || ! title }
 				title={ title }
-				icon={ icon ?? context.icon }
+				icon={ icon ?? pluginIcon }
 			>
 				{ children }
 			</PanelBody>
