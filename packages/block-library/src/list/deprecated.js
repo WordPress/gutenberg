@@ -205,7 +205,7 @@ const v2 = {
 		__experimentalSlashInserter: true,
 	},
 	isEligible( { type } ) {
-		return type && type !== '1';
+		return !! type;
 	},
 	save( { attributes } ) {
 		const { ordered, type, reversed, start } = attributes;
