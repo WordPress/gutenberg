@@ -23,7 +23,8 @@
 			"__experimentalRole": "content"
 		},
 		"type": {
-			"type": "string"
+			"type": "string",
+			"default": "decimal"
 		},
 		"start": {
 			"type": "number"
