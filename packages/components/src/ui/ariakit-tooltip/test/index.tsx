@@ -23,6 +23,17 @@ const props = {
 };
 
 describe( 'ToolTip', () => {
+	// TODO: may need to be tested with Playwright; further context:
+	// https://github.com/WordPress/gutenberg/pull/52133#issuecomment-1613691258
+	// below workaround ensures tooltip is umounted after each test to prevent leaking
+	// similarly to ariakit tooltip tests: https://github.com/ariakit/ariakit/blob/249d376e41115e6d4ceba244e231a95fa457bd04/examples/tooltip/test.ts#L12-L14
+	afterEach( async () => {
+		const user = userEvent.setup();
+		await user.tab();
+		await user.tab();
+		await user.click( document.body );
+	} );
+
 	it( 'should not render the tooltip if multiple children are passed', async () => {
 		const user = userEvent.setup();
 		// mock expected console error
@@ -81,12 +92,6 @@ describe( 'ToolTip', () => {
 				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
 			).toBeVisible()
 		);
-
-		await user.tab();
-
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
 	} );
 
 	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
@@ -103,12 +108,6 @@ describe( 'ToolTip', () => {
 				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
 			).toBeVisible()
 		);
-
-		await user.unhover( button );
-
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
 	} );
 
 	it( 'should not show tooltip on focus as result of mouse click', async () => {
@@ -142,12 +141,6 @@ describe( 'ToolTip', () => {
 				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
 			).toBeVisible()
 		);
-
-		await user.unhover( button );
-
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
 	} );
 
 	it( 'should show tooltip when an element is disabled', async () => {
@@ -171,12 +164,6 @@ describe( 'ToolTip', () => {
 				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
 			).toBeVisible()
 		);
-
-		await user.unhover( button );
-
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
 	} );
 
 	it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
@@ -257,12 +244,6 @@ describe( 'ToolTip', () => {
 		await waitFor( () =>
 			expect( screen.getByText( 'shortcut text' ) ).toBeVisible()
 		);
-
-		await user.unhover( button );
-
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
 	} );
 
 	it( 'should render the keyboard shortcut display text and aria-label when an object is passed as the shortcut', async () => {
@@ -290,11 +271,5 @@ describe( 'ToolTip', () => {
 			'aria-label',
 			'Control + Shift + Comma'
 		);
-
-		await user.unhover( button );
-
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
 	} );
 } );
