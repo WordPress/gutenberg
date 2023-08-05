@@ -54,6 +54,9 @@ export default function useCoverIsDark(
 ) {
 	const [ isDark, setIsDark ] = useState( false );
 	useEffect( () => {
+		const overlay = colord( overlayColor )
+			.alpha( dimRatio / 100 )
+			.toRgb();
 		if ( url ) {
 			const imgCrossOrigin = applyFilters(
 				'media.crossOrigin',
@@ -72,16 +75,16 @@ export default function useCoverIsDark(
 				} )
 				.then( ( { value: [ r, g, b, a ] } ) => {
 					// FAC uses 0-255 for alpha, but colord expects 0-1.
-					const overlay = colord( overlayColor )
-						.alpha( dimRatio / 100 )
-						.toRgb();
 					const media = { r, g, b, a: a / 255 };
 					const composite = compositeSourceOver( overlay, media );
 					setIsDark( colord( composite ).isDark() );
 				} );
 		} else {
-			// Use the color directly since it's hard to determine the background color.
-			setIsDark( colord( overlayColor ).isDark() );
+			// Assume a white background because it isn't easy to get the actual
+			// parent background color.
+			const background = { r: 255, g: 255, b: 255, a: 1 };
+			const composite = compositeSourceOver( overlay, background );
+			setIsDark( colord( composite ).isDark() );
 		}
 	}, [ overlayColor, dimRatio, url, setIsDark ] );
 	return isDark;
