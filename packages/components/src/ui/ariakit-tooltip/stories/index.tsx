@@ -35,7 +35,6 @@ const meta: ComponentMeta< typeof ToolTip > = {
 					'left',
 					'left-start',
 					'left-end',
-					'overlay',
 				],
 			},
 		},

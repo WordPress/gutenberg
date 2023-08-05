@@ -58,6 +58,8 @@ function AriaToolTip( props: ToolTipProps ) {
 	}
 
 	const tooltipStore = useTooltipStore( {
+		// Placement doesn't have type 'overlay' from positionToPlacement
+		// can remove the ignore once position has been fully deprecated
 		// @ts-ignore
 		placement: computedPlacement,
 		timeout: delay,
