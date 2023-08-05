@@ -281,10 +281,10 @@ export function HierarchicalTermSelector( { slug } ) {
 		}
 
 		// Check the length of the category name
-		if (formName.length > MAX_CATEGORY_NAME_LENGTH) {
-		  errorMessage = (0, external_wp_i18n_namespaceObject.sprintf)(
+		if ( formName.length > MAX_CATEGORY_NAME_LENGTH ) {
+		  errorMessage = ( 0, external_wp_i18n_namespaceObject.sprintf )(
 		    /* translators: %d: maximum category name length */
-		    (0, external_wp_i18n_namespaceObject.__)(
+		    ( 0, external_wp_i18n_namespaceObject.__ )(
 		      'The category name should not exceed %d characters.'
 		    ),
 		    MAX_CATEGORY_NAME_LENGTH
@@ -292,8 +292,8 @@ export function HierarchicalTermSelector( { slug } ) {
 		}
   
 		// If there is an error message, show the alert and return
-		if (errorMessage) {
-		  alert(errorMessage);
+		if ( errorMessage ) {
+		  alert( errorMessage );
 		  return;
 		}
 
