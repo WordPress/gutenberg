@@ -78,3 +78,23 @@ export function migrateToListV2( attributes ) {
 		listBlock.innerBlocks,
 	];
 }
+
+export function migrateTypeToInlineStyle( attributes ) {
+	const typeStyles = {
+		A: 'upper-alpha',
+		a: 'lower-alpha',
+		I: 'upper-roman',
+		i: 'lower-roman',
+	};
+
+	const { type } = attributes;
+
+	if ( typeStyles[ type ] ) {
+		return {
+			...attributes,
+			type: typeStyles[ type ],
+		};
+	}
+
+	return attributes;
+}
