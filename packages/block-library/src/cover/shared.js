@@ -80,6 +80,42 @@ export function attributesFromMedia( setAttributes, dimRatio ) {
 	};
 }
 
+export function attributesFromUrl( setAttributes, dimRatio ) {
+	return ( newURL ) => {
+		getContentTypeFromUrl( newURL ).then( function ( contentType ) {
+			let mediaType;
+
+			if ( contentType && contentType.startsWith( 'image' ) ) {
+				mediaType = IMAGE_BACKGROUND_TYPE;
+			} else if ( contentType && contentType.startsWith( 'video' ) ) {
+				mediaType = VIDEO_BACKGROUND_TYPE;
+			}
+
+			if ( ! mediaType ) return;
+
+			setAttributes( {
+				url: newURL,
+				id: undefined,
+				width: undefined,
+				height: undefined,
+				dimRatio: dimRatio === 100 ? 50 : dimRatio,
+				backgroundType: mediaType,
+				...( mediaType === VIDEO_BACKGROUND_TYPE
+					? { focalPoint: undefined, hasParallax: undefined }
+					: {} ),
+			} );
+		} );
+	};
+}
+
+async function getContentTypeFromUrl( url ) {
+	const response = await window.fetch( url );
+	if ( response.ok ) {
+		return response.headers.get( 'Content-Type' );
+	}
+	return false;
+}
+
 /**
  * Checks of the contentPosition is the center (default) position.
  *

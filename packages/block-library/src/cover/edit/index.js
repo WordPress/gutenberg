@@ -31,6 +31,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import {
 	attributesFromMedia,
+	attributesFromUrl,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	dimRatioToClass,
@@ -129,6 +130,8 @@ function CoverEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
+	const onSelectURL = attributesFromUrl( setAttributes, dimRatio );
+
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const onUploadError = ( message ) => {
@@ -237,6 +240,7 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			onSelectMedia={ onSelectMedia }
+			onSelectURL={ onSelectURL }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 		/>
@@ -297,6 +301,7 @@ function CoverEdit( {
 					{ resizeListener }
 					<CoverPlaceholder
 						onSelectMedia={ onSelectMedia }
+						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 						toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					>
@@ -403,6 +408,7 @@ function CoverEdit( {
 				<CoverPlaceholder
 					disableMediaButtons
 					onSelectMedia={ onSelectMedia }
+					onSelectURL={ onSelectURL }
 					onError={ onUploadError }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 				/>
