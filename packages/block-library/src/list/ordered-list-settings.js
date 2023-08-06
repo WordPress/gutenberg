@@ -10,11 +10,6 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import { LIST_STYLE_TYPES } from './utils';
-
 const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 	<InspectorControls>
 		<PanelBody title={ __( 'Ordered list settings' ) }>
@@ -37,12 +32,28 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 			<SelectControl
 				__nextHasNoMarginBottom
 				label={ __( 'Numbering style' ) }
-				options={ LIST_STYLE_TYPES.map( ( { label, value } ) => {
-					return {
-						label,
-						value,
-					};
-				} ) }
+				options={ [
+					{
+						label: __( 'Numbers' ),
+						value: 'decimal',
+					},
+					{
+						label: __( 'Uppercase letters' ),
+						value: 'upper-alpha',
+					},
+					{
+						label: __( 'Lowercase letters' ),
+						value: 'lower-alpha',
+					},
+					{
+						label: __( 'Uppercase Roman numerals' ),
+						value: 'upper-roman',
+					},
+					{
+						label: __( 'Lowercase Roman numerals' ),
+						value: 'lower-roman',
+					},
+				] }
 				value={ type }
 				onChange={ ( newValue ) => setAttributes( { type: newValue } ) }
 			/>
