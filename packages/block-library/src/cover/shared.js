@@ -118,6 +118,24 @@ export function getPositionClassName( contentPosition ) {
 	return POSITION_CLASSNAMES[ contentPosition ];
 }
 
+/**
+ * Performs a Porter Duff composite source over operation on two rgba colors.
+ *
+ * @see https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_srcover
+ *
+ * @param {import('colord').RgbaColor} source Source color.
+ * @param {import('colord').RgbaColor} dest   Destination color.
+ * @return {import('colord').RgbaColor} Composite color.
+ */
+function compositeSourceOver( source, dest ) {
+	return {
+		r: source.r * source.a + dest.r * dest.a * ( 1 - source.a ),
+		g: source.g * source.a + dest.g * dest.a * ( 1 - source.a ),
+		b: source.b * source.a + dest.b * dest.a * ( 1 - source.a ),
+		a: source.a + dest.a * ( 1 - source.a ),
+	};
+}
+
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
 		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
@@ -144,6 +162,9 @@ function retrieveFastAverageColor() {
  * @return {boolean|Promise} True if cover should be considered to be dark.
  */
 export async function getCoverIsDark( url, dimRatio = 50, overlayColor ) {
+	const overlay = colord( overlayColor )
+		.alpha( dimRatio / 100 )
+		.toRgb();
 	// If the dimRatio is less than 50, the image will have the most impact on darkness.
 	if ( url && dimRatio <= 50 ) {
 		const imgCrossOrigin = applyFilters(
@@ -151,7 +172,9 @@ export async function getCoverIsDark( url, dimRatio = 50, overlayColor ) {
 			undefined,
 			url
 		);
-		const color = await retrieveFastAverageColor().getColorAsync( url, {
+		const {
+			value: [ r, g, b, a ],
+		} = await retrieveFastAverageColor().getColorAsync( url, {
 			// Previously the default color was white, but that changed
 			// in v6.0.0 so it has to be manually set now.
 			defaultColor: [ 255, 255, 255, 255 ],
@@ -160,19 +183,15 @@ export async function getCoverIsDark( url, dimRatio = 50, overlayColor ) {
 			silent: process.env.NODE_ENV === 'production',
 			crossOrigin: imgCrossOrigin,
 		} );
-
-		return color.isDark;
+		// FAC uses 0-255 for alpha, but colord expects 0-1.
+		const media = { r, g, b, a: a / 255 };
+		const composite = compositeSourceOver( overlay, media );
+		return colord( composite ).isDark();
 	}
 
-	// Once dimRatio is greater than 50, the overlay color will have most impact on darkness.
-	if ( dimRatio > 50 ) {
-		if ( ! overlayColor ) {
-			// If no overlay color exists the overlay color is black so set to isDark.
-			return true;
-		}
-		return colord( overlayColor ).isDark();
-	}
-
-	// At this point there is no image and a dimRatio < 50 so even black can no be considered light.
-	return false;
+	// Assume a white background because it isn't easy to get the actual
+	// parent background color.
+	const background = { r: 255, g: 255, b: 255, a: 1 };
+	const composite = compositeSourceOver( overlay, background );
+	return colord( composite ).isDark();
 }
