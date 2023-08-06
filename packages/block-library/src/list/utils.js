@@ -1,9 +1,52 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { createBlock, rawHandler } from '@wordpress/blocks';
 
+export const LIST_STYLE_TYPES = [
+	{
+		label: __( 'Numbers' ),
+		value: 'decimal',
+		type: '1',
+	},
+	{
+		label: __( 'Uppercase letters' ),
+		value: 'upper-alpha',
+		type: 'A',
+	},
+	{
+		label: __( 'Lowercase letters' ),
+		value: 'lower-alpha',
+		type: 'a',
+	},
+	{
+		label: __( 'Uppercase Roman numerals' ),
+		value: 'upper-roman',
+		type: 'I',
+	},
+	{
+		label: __( 'Lowercase Roman numerals' ),
+		value: 'lower-roman',
+		type: 'i',
+	},
+];
+
+function getListStyleTypeValue( type ) {
+	if ( ! type ) {
+		return undefined;
+	}
+
+	const listStyleType = LIST_STYLE_TYPES.find(
+		( item ) => item.type === type
+	);
+
+	return listStyleType ? listStyleType.value : undefined;
+}
+
 export function createListBlockFromDOMElement( listElement ) {
+	const type = listElement.getAttribute( 'type' );
+	const listStyleType = getListStyleTypeValue( type );
 	const listAttributes = {
 		ordered: 'OL' === listElement.tagName,
 		anchor: listElement.id === '' ? undefined : listElement.id,
@@ -11,7 +54,10 @@ export function createListBlockFromDOMElement( listElement ) {
 			? parseInt( listElement.getAttribute( 'start' ), 10 )
 			: undefined,
 		reversed: listElement.hasAttribute( 'reversed' ) ? true : undefined,
-		type: listElement.getAttribute( 'type' ) ?? undefined,
+		type:
+			listStyleType && listStyleType !== 'decimal'
+				? listStyleType
+				: undefined,
 	};
 
 	const innerBlocks = Array.from( listElement.children ).map(
@@ -80,19 +126,14 @@ export function migrateToListV2( attributes ) {
 }
 
 export function migrateTypeToInlineStyle( attributes ) {
-	const typeStyles = {
-		A: 'upper-alpha',
-		a: 'lower-alpha',
-		I: 'upper-roman',
-		i: 'lower-roman',
-	};
-
 	const { type } = attributes;
 
-	if ( typeStyles[ type ] ) {
+	const listStyleType = getListStyleTypeValue( type );
+
+	if ( listStyleType && listStyleType !== 'decimal' ) {
 		return {
 			...attributes,
-			type: typeStyles[ type ],
+			type: listStyleType || undefined,
 		};
 	}
 
