@@ -285,14 +285,11 @@ describe( 'Cover block', () => {
 					} )
 				);
 
-				fireEvent.change(
-					screen.getByRole( 'spinbutton', {
-						name: 'Overlay opacity',
-					} ),
-					{
-						target: { value: '40' },
-					}
-				);
+				const input = screen.getByRole( 'spinbutton', {
+					name: 'Overlay opacity',
+				} );
+				await userEvent.click( input );
+				await userEvent.keyboard( '[ArrowDown>6/]' );
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-40' );
 			} );
@@ -315,12 +312,16 @@ describe( 'Cover block', () => {
 					} )
 				);
 
-				fireEvent.change(
-					screen.getByRole( 'slider', {
-						name: 'Overlay opacity',
-					} ),
-					{ target: { value: 30 } }
-				);
+				// Disable reason: `useCoverIsDark` triggers `act` warnings otherwise.
+				// eslint-disable-next-line testing-library/no-unnecessary-act
+				await act( async () => {
+					fireEvent.change(
+						screen.getByRole( 'slider', {
+							name: 'Overlay opacity',
+						} ),
+						{ target: { value: 30 } }
+					);
+				} );
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-30' );
 			} );
