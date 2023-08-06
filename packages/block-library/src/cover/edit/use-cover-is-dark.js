@@ -7,7 +7,9 @@ import { colord } from 'colord';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -36,27 +38,33 @@ function retrieveFastAverageColor() {
 }
 
 /**
- * useCoverIsDark is a hook that returns a boolean variable specifying if the cover
- * background is dark or not.
+ * Derives the darkness of the background and updates `isDark` attribute.
  *
- * @param {?string} url          Url of the media background.
- * @param {?number} dimRatio     Transparency of the overlay color. If an image and
- *                               color are set, dimRatio is used to decide what is used
- *                               for background darkness checking purposes.
- * @param {?string} overlayColor String containing the overlay color value if one exists.
- *
- * @return {boolean} True if the cover background is considered "dark" and false otherwise.
+ * @param {?string}  url           Url of the media background.
+ * @param {?number}  dimRatio      Transparency of the overlay color. If an image and
+ *                                 color are set, dimRatio is used to decide what is used
+ *                                 for background darkness checking purposes.
+ * @param {?string}  overlayColor  String containing the overlay color value if one exists.
+ * @param {Function} setAttributes Block attribute setter.
  */
 export default function useCoverIsDark(
 	url,
 	dimRatio = 50,
-	overlayColor = '#000'
+	overlayColor = '#000',
+	setAttributes
 ) {
-	const [ isDark, setIsDark ] = useState( false );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	useEffect( () => {
-		const overlay = colord( overlayColor )
-			.alpha( dimRatio / 100 )
-			.toRgb();
+		const updateIsDark = ( base ) => {
+			const overlay = colord( overlayColor )
+				.alpha( dimRatio / 100 )
+				.toRgb();
+			const composite = compositeSourceOver( overlay, base );
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { isDark: colord( composite ).isDark() } );
+		};
+
 		if ( url ) {
 			const imgCrossOrigin = applyFilters(
 				'media.crossOrigin',
@@ -75,17 +83,20 @@ export default function useCoverIsDark(
 				} )
 				.then( ( { value: [ r, g, b, a ] } ) => {
 					// FAC uses 0-255 for alpha, but colord expects 0-1.
-					const media = { r, g, b, a: a / 255 };
-					const composite = compositeSourceOver( overlay, media );
-					setIsDark( colord( composite ).isDark() );
+					updateIsDark( { r, g, b, a: a / 255 } );
 				} );
 		} else {
-			// Assume a white background because it isn't easy to get the actual
-			// parent background color.
-			const background = { r: 255, g: 255, b: 255, a: 1 };
-			const composite = compositeSourceOver( overlay, background );
-			setIsDark( colord( composite ).isDark() );
+			updateIsDark(
+				// Assume a white background because it isn't easy to get
+				// the actual parent background color.
+				{ r: 255, g: 255, b: 255, a: 1 }
+			);
 		}
-	}, [ overlayColor, dimRatio, url, setIsDark ] );
-	return isDark;
+	}, [
+		overlayColor,
+		dimRatio,
+		url,
+		__unstableMarkNextChangeAsNotPersistent,
+		setAttributes,
+	] );
 }

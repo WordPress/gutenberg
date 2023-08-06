@@ -9,7 +9,7 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
@@ -124,8 +124,8 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	useCoverIsDark( url, dimRatio, overlayColor.color, setAttributes );
+
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
@@ -134,14 +134,6 @@ function CoverEdit( {
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
-
-	const isCoverDark = useCoverIsDark( url, dimRatio, overlayColor.color );
-
-	useEffect( () => {
-		// This side-effect should not create an undo level.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isDark: isCoverDark } );
-	}, [ isCoverDark ] );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
