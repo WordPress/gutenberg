@@ -61,7 +61,7 @@ const directivePriorities = {};
  * from the store using `evaluate`.
  *
  * When the HTML is processed by the Interactivity API, any element containing
- * the `data-wp-alert` directive will have the `onClick` event handler, e.g.,
+ * the `data-wp-alert` directive will have the `onclick` event handler, e.g.,
  *
  * ```html
  * <button data-wp-alert="state.messages.alert">Click me!</button>
