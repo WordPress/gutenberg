@@ -6,10 +6,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { trash, backup, help, styles, external } from '@wordpress/icons';
 import { useCommandLoader, useCommand } from '@wordpress/commands';
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
@@ -38,16 +35,15 @@ function useGlobalStylesOpenStylesCommands() {
 	const { createInfoNotice } = useDispatch( noticesStore );
 
 	const history = useHistory();
-	const { isDistractionFree, isBlockBasedTheme } = useSelect( ( select ) => {
-		return {
-			isDistractionFree: select( preferencesStore ).get(
-				editSiteStore.name,
-				'distractionFree'
-			),
-			isBlockBasedTheme:
-				select( blockEditorStore ).getSettings()
-					.__unstableIsBlockBasedTheme,
-		};
+	const isDistractionFree = useSelect( ( select ) => {
+		return select( preferencesStore ).get(
+			editSiteStore.name,
+			'distractionFree'
+		);
+	}, [] );
+
+	const isBlockBasedTheme = useSelect( ( select ) => {
+		return select( coreStore ).getCurrentTheme().is_block_theme;
 	}, [] );
 
 	const commands = useMemo( () => {
@@ -114,8 +110,7 @@ function useGlobalStylesToggleWelcomeGuideCommands() {
 
 	const history = useHistory();
 	const isBlockBasedTheme = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings()
-			.__unstableIsBlockBasedTheme;
+		return select( coreStore ).getCurrentTheme().is_block_theme;
 	}, [] );
 
 	const commands = useMemo( () => {
