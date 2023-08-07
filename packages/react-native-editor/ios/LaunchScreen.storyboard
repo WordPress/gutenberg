@@ -17,10 +17,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="GutenbergLogo" translatesAutoresizingMaskIntoConstraints="NO" id="ncC-dB-TVp">
-                                <rect key="frame" x="130" y="359.66666666666669" width="133" height="133"/>
+                                <rect key="frame" x="151.66666666666666" y="381" width="90" height="90"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="133" id="VX0-jg-Cfg"/>
-                                    <constraint firstAttribute="height" constant="133" id="aFA-Ec-hdU"/>
+                                    <constraint firstAttribute="width" constant="90" id="VX0-jg-Cfg"/>
+                                    <constraint firstAttribute="height" constant="90" id="aFA-Ec-hdU"/>
                                 </constraints>
                             </imageView>
                         </subviews>
