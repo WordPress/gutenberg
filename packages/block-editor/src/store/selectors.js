@@ -1963,14 +1963,12 @@ const buildBlockTypeItem =
 export const getInserterItems = createSelector(
 	( state, rootClientId = null ) => {
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
-			const icon =
-				reusableBlock.wp_pattern_sync_status === 'synced' ||
-				! reusableBlock.wp_pattern_sync_status
-					? {
-							src: symbol,
-							foreground: 'var(--wp-block-synced-color)',
-					  }
-					: symbol;
+			const icon = ! reusableBlock.wp_pattern_sync_status
+				? {
+						src: symbol,
+						foreground: 'var(--wp-block-synced-color)',
+				  }
+				: symbol;
 			const id = `core/block/${ reusableBlock.id }`;
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const frecency = calculateFrecency( time, count );
