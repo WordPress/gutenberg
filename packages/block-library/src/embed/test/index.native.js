@@ -898,6 +898,10 @@ describe( 'Embed block', () => {
 
 			// Select create embed option.
 			fireEvent.press( editor.getByText( 'Create embed' ) );
+			expect( console ).toHaveLoggedWith(
+				'Processed HTML piece:\n\n',
+				`<p>${ expectedURL }</p>`
+			);
 
 			// Get the created embed block.
 			const [ embedBlock ] = await editor.findAllByLabelText(
@@ -942,6 +946,10 @@ describe( 'Embed block', () => {
 
 			// Select create link option.
 			fireEvent.press( editor.getByText( 'Create link' ) );
+			expect( console ).toHaveLoggedWith(
+				'Processed HTML piece:\n\n',
+				`<p>${ expectedURL }</p>`
+			);
 
 			// Get the link text.
 			const linkText = await editor.findByDisplayValue(

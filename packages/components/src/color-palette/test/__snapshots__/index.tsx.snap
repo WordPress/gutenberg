@@ -193,7 +193,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         <button
           aria-expanded="false"
           aria-haspopup="true"
-          aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#-f-0-0"."
+          aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#f00"."
           class="components-color-palette__custom-color-button"
           style="background: rgb(255, 0, 0);"
         />

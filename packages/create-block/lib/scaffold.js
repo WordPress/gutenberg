@@ -48,6 +48,7 @@ module.exports = async (
 		variantVars,
 		customPackageJSON,
 		customBlockJSON,
+		example,
 	}
 ) => {
 	slug = slug.toLowerCase();
@@ -107,6 +108,7 @@ module.exports = async (
 		viewScript,
 		customPackageJSON,
 		customBlockJSON,
+		example,
 		...variantVars,
 	};
 

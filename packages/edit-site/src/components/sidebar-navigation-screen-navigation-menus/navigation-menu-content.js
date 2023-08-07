@@ -5,7 +5,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockList,
-	BlockTools,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -106,9 +105,7 @@ export default function NavigationMenuContent( { rootClientId } ) {
 				/>
 			) }
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">
-				<BlockTools>
-					<BlockList />
-				</BlockTools>
+				<BlockList />
 			</div>
 		</>
 	);

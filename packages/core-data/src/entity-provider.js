@@ -142,7 +142,7 @@ export function useEntityProp( kind, name, prop, _id ) {
  * The return value has the shape `[ blocks, onInput, onChange ]`.
  * `onInput` is for block changes that don't create undo levels
  * or dirty the post, non-persistent changes, and `onChange` is for
- * peristent changes. They map directly to the props of a
+ * persistent changes. They map directly to the props of a
  * `BlockEditorProvider` and are intended to be used with it,
  * or similar components or hooks.
  *
@@ -221,6 +221,15 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			);
 
 			function updateAttributes( attributes ) {
+				// Only attempt to update attributes, if attributes is an object.
+				if (
+					! attributes ||
+					Array.isArray( attributes ) ||
+					typeof attributes !== 'object'
+				) {
+					return attributes;
+				}
+
 				attributes = { ...attributes };
 
 				for ( const key in attributes ) {
@@ -281,7 +290,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				} );
 			}
 
-			// We need to go through all block attributs deeply and update the
+			// We need to go through all block attributes deeply and update the
 			// footnote anchor numbering (textContent) to match the new order.
 			const newBlocks = updateBlocksAttributes( _blocks );
 
