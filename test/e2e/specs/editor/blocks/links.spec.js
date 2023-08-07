@@ -337,6 +337,41 @@ test.describe( 'Links', () => {
 		await expect( popover ).not.toBeVisible();
 	} );
 
+	test( `allows Left to be pressed during creation in "Docked Toolbar" mode`, async ( {
+		page,
+		editor,
+		pageUtils,
+		LinkUtils,
+	} ) => {
+		await LinkUtils.toggleFixedToolbar( false );
+
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'Text' );
+
+		await editor.clickBlockToolbarButton( 'Link' );
+
+		// Typing "left" should not close the dialog.
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		let popover = page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator(
+				'.components-popover__content .block-editor-link-control'
+			);
+		await expect( popover ).toBeVisible();
+
+		// Escape should close the dialog still.
+		await page.keyboard.press( 'Escape' );
+		popover = page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator(
+				'.components-popover__content .block-editor-link-control'
+			);
+		await expect( popover ).not.toBeVisible();
+	} );
+
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
 		page,
 		editor,

@@ -3,7 +3,6 @@
  */
 import {
 	clickBlockAppender,
-	clickBlockToolbarButton,
 	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
@@ -53,40 +52,6 @@ describe( 'Links', () => {
 		// Reselect the link.
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 	};
-
-	const toggleFixedToolbar = async ( isFixed ) => {
-		await page.evaluate( ( _isFixed ) => {
-			const { select, dispatch } = wp.data;
-			const isCurrentlyFixed =
-				select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
-			if ( isCurrentlyFixed !== _isFixed ) {
-				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
-			}
-		}, isFixed );
-	};
-
-	it( 'allows Left to be pressed during creation in "Docked Toolbar" mode', async () => {
-		await toggleFixedToolbar( false );
-
-		await clickBlockAppender();
-		await page.keyboard.type( 'Text' );
-
-		await clickBlockToolbarButton( 'Link' );
-
-		// Typing "left" should not close the dialog.
-		await page.keyboard.press( 'ArrowLeft' );
-		let popover = await page.$(
-			'.components-popover__content .block-editor-link-control'
-		);
-		expect( popover ).not.toBeNull();
-
-		// Escape should close the dialog still.
-		await page.keyboard.press( 'Escape' );
-		popover = await page.$(
-			'.components-popover__content .block-editor-link-control'
-		);
-		expect( popover ).toBeNull();
-	} );
 
 	it( 'can be edited with collapsed selection', async () => {
 		await createAndReselectLink();
