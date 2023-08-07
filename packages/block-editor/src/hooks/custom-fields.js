@@ -14,18 +14,18 @@ import { InspectorControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
- * Filters registered block settings, extending attributes to include `connections`.
+ * Filters registered block settings, extending attributes to include `__experimentalConnections`.
  *
  * @param {Object} settings Original block settings.
  *
  * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
-	if ( hasBlockSupport( settings, 'connections', true ) ) {
+	if ( hasBlockSupport( settings, '__experimentalConnections', true ) ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
-			connections: {
+			__experimentalConnections: {
 				type: 'object',
 			},
 		};
@@ -50,7 +50,7 @@ export const withInspectorControl = createHigherOrderComponent(
 			const blockEditingMode = useBlockEditingMode();
 			const hasCustomFieldsSupport = hasBlockSupport(
 				props.name,
-				'connections',
+				'__experimentalConnections',
 				false
 			);
 
