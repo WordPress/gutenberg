@@ -39,6 +39,7 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 		$wp_query      = $block_query;
 		$total         = ! $max_page || $max_page > $wp_query->max_num_pages ? $wp_query->max_num_pages : $max_page;
 		$mid_size      = $block->attributes['midSize'] ? (int) $block->attributes['midSize'] : null;
+		$paginate_args = array(
 			'base'      => '%_%',
 			'format'    => "?$page_key=%#%",
 			'current'   => max( 1, $page ),
