@@ -1,8 +1,4 @@
 /**
- * Defines as extensibility slot for the Settings sidebar
- */
-
-/**
  * WordPress dependencies
  */
 import { createSlotFill, PanelBody } from '@wordpress/components';
