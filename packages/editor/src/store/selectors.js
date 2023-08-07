@@ -499,16 +499,31 @@ export function isEditedPostSaveable( state ) {
  *
  * @return {boolean} Whether post has content.
  */
-export function isEditedPostEmpty( state ) {
-	// While the condition of truthy content string is sufficient to determine
-	// emptiness, testing saveable blocks length is a trivial operation. Since
-	// this function can be called frequently, optimize for the fast case as a
-	// condition of the mere existence of blocks. Note that the value of edited
-	// content takes precedent over block content, and must fall through to the
-	// default logic.
-	const blocks = getEditorBlocks( state );
+export const isEditedPostEmpty = createRegistrySelector(
+	( select ) => ( state ) => {
+		// While the condition of truthy content string is sufficient to determine
+		// emptiness, testing saveable blocks length is a trivial operation. Since
+		// this function can be called frequently, optimize for the fast case as a
+		// condition of the mere existence of blocks. Note that the value of edited
+		// content takes precedent over block content, and must fall through to the
+		// default logic.
+		const postId = getCurrentPostId( state );
+		const postType = getCurrentPostType( state );
+		const record = select( coreStore ).getEditedEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
+		if ( typeof record.content !== 'function' ) {
+			return ! record.content;
+		}
 
-	if ( blocks.length ) {
+		const blocks = getEditedPostAttribute( state, 'blocks' );
+
+		if ( blocks.length === 0 ) {
+			return true;
+		}
+
 		// Pierce the abstraction of the serializer in knowing that blocks are
 		// joined with newlines such that even if every individual block
 		// produces an empty save result, the serialized content is non-empty.
@@ -534,10 +549,10 @@ export function isEditedPostEmpty( state ) {
 		) {
 			return false;
 		}
-	}
 
-	return ! getEditedPostContent( state );
-}
+		return ! getEditedPostContent( state );
+	}
+);
 
 /**
  * Returns true if the post can be autosaved, or false otherwise.
@@ -596,8 +611,8 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 			return true;
 		}
 
-		// If the title or excerpt has changed, the post is autosaveable.
-		return [ 'title', 'excerpt' ].some(
+		// If title, excerpt, or meta have changed, the post is autosaveable.
+		return [ 'title', 'excerpt', 'meta' ].some(
 			( field ) =>
 				getPostRawValue( autosave[ field ] ) !==
 				getEditedPostAttribute( state, field )

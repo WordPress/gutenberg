@@ -1,8 +1,11 @@
 .edit-site-patterns {
-	border: 1px solid $gray-800;
+	border-left: 1px solid $gray-800;
 	background: none;
 	margin: $header-height 0 0;
 	border-radius: 0;
+	padding: 0;
+	overflow-x: auto;
+
 	.components-base-control {
 		width: 100%;
 		@include break-medium {
@@ -57,27 +60,52 @@
 			width: 300px;
 		}
 	}
+	.edit-site-patterns__sync-status-filter-option:not([aria-checked="true"]) {
+		color: $gray-600;
+	}
 	.edit-site-patterns__sync-status-filter-option:active {
 		background: $gray-700;
 		color: $gray-100;
 	}
 
 	.edit-site-patterns__grid-pagination {
-		width: fit-content;
+		border-top: 1px solid $gray-800;
+		background: $gray-900;
+		padding: $grid-unit-30 $grid-unit-40;
+		position: sticky;
+		bottom: 0;
+		z-index: z-index(".edit-site-patterns__grid-pagination");
+
 		.components-button.is-tertiary {
 			width: $button-size-compact;
 			height: $button-size-compact;
 			color: $gray-100;
 			background-color: $gray-800;
+			justify-content: center;
+
 			&:disabled {
 				color: $gray-600;
 				background: none;
 			}
+
 			&:hover:not(:disabled) {
 				background-color: $gray-700;
 			}
 		}
 	}
+}
+
+.edit-site-patterns__header {
+	position: sticky;
+	top: 0;
+	background: $gray-900;
+	padding: $grid-unit-40 $grid-unit-40 $grid-unit-20;
+	z-index: z-index(".edit-site-patterns__header");
+}
+
+.edit-site-patterns__section {
+	padding: $grid-unit-30 $grid-unit-40;
+	flex: 1;
 }
 
 .edit-site-patterns__section-header {
@@ -90,13 +118,16 @@
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: $grid-unit-40;
-	// Small top padding required to avoid cutting off the visible outline
-	// when hovering items.
-	padding-top: $border-width-focus-fallback;
 	margin-top: 0;
-	margin-bottom: $grid-unit-40;
+	margin-bottom: 0;
 	@include break-large {
 		grid-template-columns: 1fr 1fr;
+	}
+	@include break-huge {
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+	@include break-xhuge {
+		grid-template-columns: 1fr 1fr 1fr 1fr;
 	}
 	.edit-site-patterns__pattern {
 		break-inside: avoid-column;

@@ -25,8 +25,8 @@ import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
 
 /**
  * @typedef {Object} TypographySettings
- * @property {?string} minViewPortWidth  Minimum viewport size from which type will have fluidity. Optional if size is specified.
- * @property {?string} maxViewPortWidth  Maximum size up to which type will have fluidity. Optional if size is specified.
+ * @property {?string} minViewportWidth  Minimum viewport size from which type will have fluidity. Optional if size is specified.
+ * @property {?string} maxViewportWidth  Maximum size up to which type will have fluidity. Optional if size is specified.
  * @property {?number} scaleFactor       A scale factor to determine how fast a font scales within boundaries. Optional.
  * @property {?number} minFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
  * @property {?string} minFontSize       The smallest a calculated font size may be. Optional.
@@ -67,7 +67,8 @@ export function getTypographyFontSizeValue( preset, typographyOptions ) {
 		maximumFontSize: preset?.fluid?.max,
 		fontSize: defaultSize,
 		minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
-		maximumViewPortWidth: fluidTypographySettings?.maxViewPortWidth,
+		maximumViewportWidth: fluidTypographySettings?.maxViewportWidth,
+		minimumViewportWidth: fluidTypographySettings?.minViewportWidth,
 	} );
 
 	if ( !! fluidFontSizeValue ) {
@@ -102,7 +103,7 @@ export function getFluidTypographyOptionsFromSettings( settings ) {
 		layoutSettings?.wideSize
 		? {
 				fluid: {
-					maxViewPortWidth: layoutSettings.wideSize,
+					maxViewportWidth: layoutSettings.wideSize,
 					...typographySettings.fluid,
 				},
 		  }

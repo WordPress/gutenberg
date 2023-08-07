@@ -21,6 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { forwardRef } from '@wordpress/element';
 import { search, external } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -174,7 +175,7 @@ const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 						<Button
 							href={ homeUrl }
 							target="_blank"
-							label={ __( 'View site' ) }
+							label={ __( 'View site (opens in a new tab)' ) }
 							aria-label={ __(
 								'View site (opens in a new tab)'
 							) }
@@ -192,6 +193,7 @@ const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 						icon={ search }
 						onClick={ () => openCommandCenter() }
 						label={ __( 'Open command palette' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
 					/>
 				) }
 			</HStack>

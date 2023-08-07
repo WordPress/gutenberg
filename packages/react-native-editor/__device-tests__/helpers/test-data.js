@@ -202,3 +202,33 @@ exports.galleryBlock = `<!-- wp:gallery {"columns":8,"linkTo":"none","className"
 <!-- /wp:image -->
 </figure>
 <!-- /wp:gallery -->`;
+
+exports.groupNestedStructure = `<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph {"style":{"color":{"background":"#f9d0d0"}}} -->
+<p class="has-background" style="background-color:#f9d0d0">Level 1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"50px"} -->
+<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph {"style":{"color":{"background":"#d5f0ab"}}} -->
+<p class="has-background" style="background-color:#d5f0ab">Level 2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"50px"} -->
+<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph {"style":{"color":{"background":"#c3e5ff"}}} -->
+<p class="has-background" style="background-color:#c3e5ff">Level 3</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"50px"} -->
+<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->`;
