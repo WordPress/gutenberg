@@ -12,6 +12,21 @@
 class WP_Font_Family_Test extends WP_UnitTestCase {
 
 	/**
+	 * Test the constructor failure
+	 * 
+	 * @covers ::__construct
+	 */
+	public function test_constructor_failure() {
+		$font_data = array (
+			'fontFamily' => 'Piazzolla',
+			'name'       => 'Piazzolla',
+		);
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Font family data is missing the slug.' );
+		$font = new WP_Font_Family( $font_data );
+	}
+
+	/**
 	 * Test the constructor and the get_data method
 	 *
 	 * @covers ::__construct
