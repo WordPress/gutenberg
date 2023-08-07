@@ -116,26 +116,17 @@ describe( 'Modal', () => {
 		expect( opener ).toHaveFocus();
 	} );
 
-	it( 'should allow fullscreen toggle', async () => {
-		const user = userEvent.setup();
+	it( 'should render `auxiliaryActions` React nodes', async () => {
 		render(
-			<Modal allowFullScreenToggle={ true } onRequestClose={ noop }>
+			<Modal
+				auxiliaryActions={ <button>A sweet button</button> }
+				onRequestClose={ noop }
+			>
 				<p>Modal content</p>
 			</Modal>
 		);
-		const enterFullScreenToggleButton = screen.getByLabelText(
-			'Enter fullscreen',
-			{ selector: 'button' }
-		);
-		await user.click( enterFullScreenToggleButton );
-		expect( screen.getByRole( 'dialog' ) ).toHaveClass( 'is-full-screen' );
-		const exitFullScreenToggleButton = screen.getByLabelText(
-			'Exit fullscreen',
-			{ selector: 'button' }
-		);
-		await user.click( exitFullScreenToggleButton );
-		expect( screen.getByRole( 'dialog' ) ).not.toHaveClass(
-			'is-full-screen'
-		);
+		expect(
+			screen.getByText( 'A sweet button', { selector: 'button' } )
+		).toBeInTheDocument();
 	} );
 } );

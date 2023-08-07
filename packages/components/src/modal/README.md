@@ -150,13 +150,6 @@ const MyModal = () => {
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input elements.
 
-#### allowFullScreenToggle
-
-This property when set to `true` allows toggling between full screen.
-
--   Required: No
--   Default: `false`
-
 #### `aria.describedby`: `string`
 
 If this property is added, it will be added to the modal content `div` as `aria-describedby`.
@@ -172,6 +165,14 @@ Titles are required for accessibility reasons, see `contentLabel` and `title` fo
 
 -   Required: No
 -   Default: if the `title` prop is provided, this will default to the id of the element that renders `title`
+
+
+#### auxiliaryActions
+
+An optional React node intended to contain auxiliary actions of the modal, for example, buttons. Content is rendered in the top right corner of the modal and to the left of the close button, if visible.
+
+-   Required: No
+-   Default: `null`
 
 #### `bodyOpenClassName`: `string`
 
