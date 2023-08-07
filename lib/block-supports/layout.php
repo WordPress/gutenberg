@@ -775,7 +775,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$constrained_class = $constrained ? ' is-layout-constrained' : '';
 	// 'is-layout-constrained' is not in the className attribute, so we need to remove it in a less optimal way.
 	// This needs to be replaced with a proper regex.
-	if ( $constrained === true ) {
+	if ( true === $constrained ) {
 		$block_content = str_replace( 'is-layout-constrained ', '', $block_content );
 	}
 
@@ -785,7 +785,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	);
 	$updated_content = preg_replace_callback(
 		$replace_regex,
-		static function( $matches ) use( $constrained_class ) {
+		static function( $matches ) use ( $constrained_class ) {
 			return $matches[1] . '<div class="wp-block-group__inner-container' . $constrained_class . '">' . $matches[2] . '</div>' . $matches[3];
 		},
 		$block_content
