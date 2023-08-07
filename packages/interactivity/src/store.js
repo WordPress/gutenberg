@@ -79,7 +79,6 @@ export const rawStore = { state: deepSignal( rawState ) };
  * @param {Object} properties         Properties to be added to the global store.
  * @param {Object} [properties.state] State to be added to the global store. All
  *                                    the properties included here become reactive.
- * @param {Object} [properties.block] Other properties to be added to the global store.
  */
 export const store = ( { state, ...block } ) => {
 	deepMerge( rawStore, block );
