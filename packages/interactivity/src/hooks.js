@@ -66,6 +66,41 @@ const directivePriorities = {};
  * ```html
  * <button data-wp-alert="state.messages.alert">Click me!</button>
  * ```
+ * Note that, in the previous example, you acces `alert.default` in order to
+ * retrieve the `state.messages.alert` value passed to the directive. You can
+ * also define custom names by appending `--` to the directive attribute,
+ * followed by a suffix, like in the following HTML snippet:
+ *
+ * ```html
+ * <button
+ *   data-wp-color--text="state.theme.text"
+ *   data-wp-color--background="state.theme.background"
+ * >Click me!</button>
+ * ```
+ *
+ * This could be an hypothetical implementation of the custom directive used in
+ * the snippet above.
+ *
+ * @example
+ * ```js
+ * directive(
+ *   'color', // Name without prefix and suffix.
+ *   ( { directives: { color }, ref, evaluate }) => {
+ *     if ( color.text ) {
+ * 	     ref.style.setProperty(
+ *         'color',
+ *         evaluate( color.text )
+ *       );
+ *     }
+ *     if ( color.background ) {
+ *       ref.style.setProperty(
+ *         'background-color',
+ *         evaluate( color.background )
+ *       );
+ *     }
+ *   }
+ * )
+ * ```
  *
  * @param {string}            name     Directive name, without the `data-wp-` prefix.
  * @param {DirectiveCallback} callback Function that runs the directive logic.
