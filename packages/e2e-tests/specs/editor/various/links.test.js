@@ -65,28 +65,6 @@ describe( 'Links', () => {
 		}, isFixed );
 	};
 
-	it( 'allows Left to be pressed during creation when the toolbar is fixed to top', async () => {
-		await toggleFixedToolbar( true );
-
-		await clickBlockAppender();
-		await page.keyboard.type( 'Text' );
-		await page.click( 'button[aria-label="Link"]' );
-
-		// Typing "left" should not close the dialog.
-		await page.keyboard.press( 'ArrowLeft' );
-		let popover = await page.$(
-			'.components-popover__content .block-editor-link-control'
-		);
-		expect( popover ).not.toBeNull();
-
-		// Escape should close the dialog still.
-		await page.keyboard.press( 'Escape' );
-		popover = await page.$(
-			'.components-popover__content .block-editor-link-control'
-		);
-		expect( popover ).toBeNull();
-	} );
-
 	it( 'allows Left to be pressed during creation in "Docked Toolbar" mode', async () => {
 		await toggleFixedToolbar( false );
 

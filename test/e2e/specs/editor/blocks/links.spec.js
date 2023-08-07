@@ -12,6 +12,12 @@ test.describe( 'Links', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
+	test.use( {
+		LinkUtils: async ( { page }, use ) => {
+			await use( new LinkUtils( { page } ) );
+		},
+	} );
+
 	test( `will use Post title as link text if link to existing post is created without any text selected`, async ( {
 		admin,
 		page,
@@ -295,6 +301,40 @@ test.describe( 'Links', () => {
 				},
 			},
 		] );
+	} );
+
+	test( `allows Left to be pressed during creation when the toolbar is fixed to top`, async ( {
+		page,
+		editor,
+		pageUtils,
+		LinkUtils,
+	} ) => {
+		await LinkUtils.toggleFixedToolbar( true );
+
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'Text' );
+		await page.getByRole( 'button', { name: 'Link' } ).click();
+
+		// Typing "left" should not close the dialog.
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		let popover = page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator(
+				'.components-popover__content .block-editor-link-control'
+			);
+		await expect( popover ).toBeVisible();
+
+		// Escape should close the dialog still.
+		await page.keyboard.press( 'Escape' );
+		popover = page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator(
+				'.components-popover__content .block-editor-link-control'
+			);
+		await expect( popover ).not.toBeVisible();
 	} );
 
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
@@ -605,3 +645,21 @@ test.describe( 'Links', () => {
 		] );
 	} );
 } );
+
+class LinkUtils {
+	constructor( { page } ) {
+		this.page = page;
+	}
+
+	async toggleFixedToolbar( isFixed ) {
+		await this.page.evaluate( ( _isFixed ) => {
+			const { select, dispatch } = window.wp.data;
+			const isCurrentlyFixed =
+				select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
+
+			if ( isCurrentlyFixed !== _isFixed ) {
+				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
+			}
+		}, isFixed );
+	}
+}
