@@ -219,6 +219,11 @@ This is the canonical list of keyboard shortcuts:
 			<td><kbd>Esc</kbd></td>
 			<td><kbd>Esc</kbd></td>
 		</tr>
+		<tr>
+			<td>Select text across multiple blocks.</td>
+			<td></td>
+			<td><kbd>Shift</kbd>+<kbd>Arrow (⇦, ⇧, ⇨, ⇩)</kbd></td>
+		</tr>
 	</tbody>
 </table>
 
