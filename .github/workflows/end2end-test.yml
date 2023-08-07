@@ -133,15 +133,14 @@ jobs:
             - name: Npm build
               run: npm run build
 
-            # Temporary while we figure out the caching problem
-            - run: npm ci
-
             - name: Install Playwright dependencies
               run: |
                   npx playwright install chromium firefox webkit --with-deps
 
             - name: Install Replay Playwright
-              run: npx @replayio/playwright install
+              run: npm i -g @replayio/playwright && replayio-playwright install
+              env:
+                  DEBUG: replay:*
 
             - name: Install WordPress and start the server
               run: |
