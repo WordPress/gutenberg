@@ -14,7 +14,7 @@ import { InspectorControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
- * Filters registered block settings, extending attributes to include `__experimentalConnections`.
+ * Filters registered block settings, extending attributes to include `connections`.
  *
  * @param {Object} settings Original block settings.
  *
@@ -22,10 +22,10 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
  */
 function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, '__experimentalConnections', true ) ) {
-		// Gracefully handle if settings.attributes is undefined.
+		// Gracefully handle if settings.attributes.connections is undefined.
 		settings.attributes = {
 			...settings.attributes,
-			__experimentalConnections: {
+			connections: {
 				type: 'object',
 			},
 		};
