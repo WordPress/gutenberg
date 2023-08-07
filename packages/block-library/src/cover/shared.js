@@ -144,7 +144,7 @@ function retrieveFastAverageColor() {
 }
 
 /**
- * This method evaluates if the cover block's background is dark or not and this boolen
+ * This method evaluates if the cover block's background is dark or not and this boolean
  * can then be applied to the relevant attribute to help ensure that text is visible by default.
  * This needs to be recalculated in all of the following Cover block scenarios:
  * - When an overlay image is added, changed or removed
@@ -159,7 +159,7 @@ function retrieveFastAverageColor() {
  * @param {string} url
  * @param {number} dimRatio
  * @param {string} overlayColor
- * @return {boolean|Promise} True if cover should be considered to be dark.
+ * @return {Promise<boolean>} True if cover should be considered to be dark.
  */
 export async function getCoverIsDark( url, dimRatio = 50, overlayColor ) {
 	const overlay = colord( overlayColor )
@@ -172,9 +172,7 @@ export async function getCoverIsDark( url, dimRatio = 50, overlayColor ) {
 			undefined,
 			url
 		);
-		const {
-			value: [ r, g, b, a ],
-		} = await retrieveFastAverageColor().getColorAsync( url, {
+		const { value } = await retrieveFastAverageColor().getColorAsync( url, {
 			// Previously the default color was white, but that changed
 			// in v6.0.0 so it has to be manually set now.
 			defaultColor: [ 255, 255, 255, 255 ],
@@ -184,7 +182,7 @@ export async function getCoverIsDark( url, dimRatio = 50, overlayColor ) {
 			crossOrigin: imgCrossOrigin,
 		} );
 		// FAC uses 0-255 for alpha, but colord expects 0-1.
-		const media = { r, g, b, a: a / 255 };
+		const media = { r: value.r, g: value.g, b: value.b, a: value.a / 255 };
 		const composite = compositeSourceOver( overlay, media );
 		return colord( composite ).isDark();
 	}
