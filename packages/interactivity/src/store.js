@@ -76,8 +76,6 @@ export const rawStore = { state: deepSignal( rawState ) };
  *
  * @param {Object} properties             Properties to be added to the global store.
  * @param {Object} [properties.state]     State to be added to the global store.
- * @param {Object} [properties.selectors] Selectors to be added to the global store.
- * @param {Object} [properties.actions]   Actions to be added to the global store.
  */
 export const store = ( { state, ...block } ) => {
 	deepMerge( rawStore, block );
