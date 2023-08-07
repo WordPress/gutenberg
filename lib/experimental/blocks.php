@@ -132,11 +132,11 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 	 * @param array    $block Block attributes.
 	 * @param WP_Block $block_instance The block instance.
 	 */
-	function gutenberg_render_custom_sources( $block_content, $block, $block_instance ) {
-		$meta_custom_source = require __DIR__ . '/custom-sources/meta.php';
+	function gutenberg_render_block_connections( $block_content, $block, $block_instance ) {
+		$connection_sources = require __DIR__ . '/connection-sources/index.php';
 		$block_type         = $block_instance->block_type;
 
-		// Allowlist of blocks that support custom sources
+		// Allowlist of blocks that support custom connections
 		// Currently, we only allow the following blocks and attributes:
 		// - Paragraph: content.
 		// - Image: url.
@@ -145,7 +145,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			'core/image'     => array( 'url' ),
 		);
 
-		// Whitelist of the block types that support custom sources
+		// Whitelist of the block types that support custom connection sources
 		// Currently, we only allow the Paragraph and Image blocks to use custom sources.
 		if ( ! in_array( $block['blockName'], array_keys( $blocks_attributes_allowlist ), true ) ) {
 			return $block_content;
@@ -190,15 +190,36 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				continue;
 			}
 
-			$block_content = $meta_custom_source['apply_source'](
-				$block_content,
+			// Get the content from the connection.
+			$custom_value = $connection_sources[ $attribute_value['source'] ](
 				$block_instance,
 				$attribute_value['value'],
-				$block_type->attributes[ $attribute_name ]
 			);
+
+			$tags  = new WP_HTML_Tag_Processor( $block_content );
+			$found = $tags->next_tag(
+				array(
+					// TODO: In the future, when blocks other than Paragraph and Image are
+					// supported, we should build the full query from CSS selector.
+					'tag_name' => $block_type->attributes[ $attribute_name ]['selector'],
+				)
+			);
+			if ( ! $found ) {
+				return $block_content;
+			};
+			$tag_name     = $tags->get_tag();
+			$markup       = "<$tag_name>$custom_value</$tag_name>";
+			$updated_tags = new WP_HTML_Tag_Processor( $markup );
+			$updated_tags->next_tag();
+			$names = $tags->get_attribute_names_with_prefix( '' );
+			foreach ( $names as $name ) {
+				$updated_tags->set_attribute( $name, $tags->get_attribute( $name ) );
+			}
+
+			return $updated_tags->get_updated_html();
 		}
 
 		return $block_content;
 	}
-	add_filter( 'render_block', 'gutenberg_render_custom_sources', 10, 3 );
+	add_filter( 'render_block', 'gutenberg_render_block_connections', 10, 3 );
 }
