@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -75,5 +76,17 @@ describe( 'ProgressBar', () => {
 			ariaLabel
 		);
 		expect( screen.getByRole( 'progressbar' ) ).toHaveStyle( style );
+	} );
+
+	it( 'should be able to focus the underlying `progress` element', async () => {
+		const user = userEvent.setup();
+
+		render( <ProgressBar /> );
+
+		expect( screen.getByRole( 'progressbar' ) ).not.toHaveFocus();
+
+		await user.tab();
+
+		expect( screen.getByRole( 'progressbar' ) ).toHaveFocus();
 	} );
 } );
