@@ -417,7 +417,18 @@ Read more about this functionality in the [Page creation patterns in WordPress 6
 
 In the same way patterns can be prioritized for new posts or pages, the same experience can be added to the template creation process. When patterns declare support for the 'templateTypes' property, the patterns will appear anytime a template that matches the designation is created, along with the options to start from a blank state or use the current fallback of the template. By default, WordPress does not include any of these patterns. 
 
-To opt into this, a pattern needs to specify a property called `templateTypes`, which is an array containing the templates where the patterns can be used as the full content. [Here's an example](https://gist.github.com/annezazu/99ce2f84fa033dae48eacc50a8287bae) of a pattern that would appear when creating a 404 template.
+To opt into this, a pattern needs to specify a property called `templateTypes`, which is an array containing the templates where the patterns can be used as the full content. Here's an example of a pattern that would appear when creating a 404 template:
+
+```
+register_block_pattern(
+  'wp-my-theme/404-template-pattern',
+  array(
+     'title'      => __( '404 Only template pattern', 'wp-my-theme' ),
+     'templateTypes' => array( '404' ),
+     'content'    => '<!-- wp:paragraph {"align":"center","fontSize":"x-large"} --><p class="has-text-align-center has-x-large-font-size">404 pattern</p><!-- /wp:paragraph -->',
+  )
+);
+```
 
 Read more about this functionality in the [Patterns on the create a new template modal in the WordPress 6.3 dev note](https://make.wordpress.org/core/2023/07/18/miscellaneous-editor-changes-in-wordpress-6-3/#patterns-on-the-create-a-new-template-modal).
 
