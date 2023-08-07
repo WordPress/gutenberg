@@ -28,6 +28,7 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
+import useListViewImages from './use-list-view-images';
 
 function ListViewBlockSelectButton(
 	{
@@ -63,6 +64,7 @@ function ListViewBlockSelectButton(
 	const { removeBlocks } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
+	const images = useListViewImages( { clientId, isExpanded } );
 
 	const positionLabel = blockInformation?.positionLabel
 		? sprintf(
@@ -184,6 +186,19 @@ function ListViewBlockSelectButton(
 							</span>
 						</Tooltip>
 					) }
+					{ images.length ? (
+						<span className="block-editor-list-view-block-select-button__images">
+							{ images.map( ( image, index ) => (
+								<img
+									key={ index }
+									src={ image.url }
+									alt={ image.alt }
+									width={ 24 }
+									height={ 24 }
+								/>
+							) ) }
+						</span>
+					) : null }
 					{ isLocked && (
 						<span className="block-editor-list-view-block-select-button__lock">
 							<Icon icon={ lock } />
