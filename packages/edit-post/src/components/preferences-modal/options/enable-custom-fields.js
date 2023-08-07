@@ -14,15 +14,12 @@ function submitCustomFieldsForm() {
 		'toggle-custom-fields-form'
 	);
 
-	if ( customFieldsForm ) {
-		customFieldsForm
-			.querySelector( '[name="_wp_http_referer"]' )
-			.setAttribute(
-				'value',
-				getPathAndQueryString( window.location.href )
-			);
-		customFieldsForm.submit();
-	}
+	// Ensure the referrer values is up to update with any
+	customFieldsForm
+		.querySelector( '[name="_wp_http_referer"]' )
+		.setAttribute( 'value', getPathAndQueryString( window.location.href ) );
+
+	customFieldsForm.submit();
 }
 
 export function CustomFieldsConfirmation( { willEnable } ) {
