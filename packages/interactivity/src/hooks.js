@@ -56,7 +56,7 @@ const directivePriorities = {};
  * )
  * ```
  *
- * The previous code register a custom directive type for displaying an alert
+ * The previous code registers a custom directive type for displaying an alert
  * message whenever an element using it is clicked. The message text is obtained
  * from the store using `evaluate`.
  *
@@ -66,7 +66,7 @@ const directivePriorities = {};
  * ```html
  * <button data-wp-alert="state.messages.alert">Click me!</button>
  * ```
- * Note that, in the previous example, you acces `alert.default` in order to
+ * Note that, in the previous example, you access `alert.default` in order to
  * retrieve the `state.messages.alert` value passed to the directive. You can
  * also define custom names by appending `--` to the directive attribute,
  * followed by a suffix, like in the following HTML snippet:
