@@ -9,6 +9,7 @@ const variations = [
 		title: __( 'Experimental Comment form' ),
 		description: __( 'A comment form for posts and pages.' ),
 		attributes: {
+			submissionMethod: 'custom',
 			action: '{SITE_URL}/wp-comments-post.php',
 			method: 'post',
 			anchor: 'comment-form',
@@ -57,6 +58,7 @@ const variations = [
 		keywords: [ 'GDPR' ],
 		description: __( 'A form torequest data exports and/or deletion.' ),
 		attributes: {
+			submissionMethod: 'custom',
 			action: '',
 			method: 'post',
 			anchor: 'gdpr-form',

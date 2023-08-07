@@ -48,15 +48,19 @@ const TEMPLATE = [
 ];
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
-	const { action, method, email } = attributes;
+	const { action, method, email, submissionMethod } = attributes;
 	const blockProps = useBlockProps();
 
-	const { hasInnerBlocks } = useSelect(
+	const { hasInnerBlocks, formMethods } = useSelect(
 		( select ) => {
+			const settings = select( blockEditorStore ).getSettings();
 			const { getBlock } = select( blockEditorStore );
 			const block = getBlock( clientId );
 			return {
 				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				formMethods: Object.values(
+					settings.formOptions.availableMethods
+				),
 			};
 		},
 		[ clientId ]
@@ -75,19 +79,17 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			<InspectorControls>
 				<SelectControl
 					__nextHasNoMarginBottom
-					label={ __( 'Form method' ) }
-					options={ [
-						{ label: 'Send email', value: 'email' },
-						{ label: 'Get', value: 'get' },
-						{ label: __( 'Post' ), value: 'post' },
-					] }
-					value={ method }
-					onChange={ ( value ) => setAttributes( { method: value } ) }
+					label={ __( 'Submissions method' ) }
+					options={ formMethods }
+					value={ submissionMethod }
+					onChange={ ( value ) =>
+						setAttributes( { submissionMethod: value } )
+					}
 					help={ __(
-						'Whether the form will send an email, or submit a POST/GET request.'
+						'Select the method to use for form submissions.'
 					) }
 				/>
-				{ method === 'email' && (
+				{ submissionMethod === 'email' && (
 					<TextControl
 						__nextHasNoMarginBottom
 						autoComplete="off"
@@ -101,21 +103,38 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						) }
 					/>
 				) }
-				{ method !== 'email' && (
-					<TextControl
-						__nextHasNoMarginBottom
-						autoComplete="off"
-						label={ __( 'Form action' ) }
-						value={ action }
-						onChange={ ( newVal ) => {
-							setAttributes( {
-								action: newVal,
-							} );
-						} }
-						help={ __(
-							'The URL where the form should be submitted.'
-						) }
-					/>
+				{ submissionMethod !== 'email' && (
+					<InspectorControls group="advanced">
+						<SelectControl
+							__nextHasNoMarginBottom
+							label={ __( 'Method' ) }
+							options={ [
+								{ label: 'Get', value: 'get' },
+								{ label: 'Post', value: 'post' },
+							] }
+							value={ method }
+							onChange={ ( value ) =>
+								setAttributes( { method: value } )
+							}
+							help={ __(
+								'Select the method to use for form submissions.'
+							) }
+						/>
+						<TextControl
+							__nextHasNoMarginBottom
+							autoComplete="off"
+							label={ __( 'Form action' ) }
+							value={ action }
+							onChange={ ( newVal ) => {
+								setAttributes( {
+									action: newVal,
+								} );
+							} }
+							help={ __(
+								'The URL where the form should be submitted.'
+							) }
+						/>
+					</InspectorControls>
 				) }
 			</InspectorControls>
 			<form { ...innerBlocksProps } />

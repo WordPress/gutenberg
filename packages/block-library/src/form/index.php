@@ -32,13 +32,8 @@ function render_block_core_form( $attributes, $content ) {
 		$processed_content->set_attribute( 'action', esc_attr( $action ) );
 	}
 
-	/*
-	 * Add the method attribute. If it is not set, default to `post`.
-	 * If the user has set the method to `email`, change it to `post`.
-	 */
-	$method = empty( $attributes['method'] ) || 'email' === $attributes['method']
-		? 'post'
-		: $attributes['method'];
+	// Add the method attribute. If it is not set, default to `post`.
+	$method = empty( $attributes['method'] ) ? 'post' : $attributes['method'];
 	$processed_content->set_attribute( 'method', $method );
 
 	$extra_fields = apply_filters( 'render_block_core_form_extra_fields', '', $attributes );
@@ -49,6 +44,30 @@ function render_block_core_form( $attributes, $content ) {
 		$processed_content->get_updated_html()
 	);
 }
+
+/**
+ * Adds extra settings to the block editor, for the forms block.
+ *
+ * @param array $settings The block editor settings.
+ *
+ * @return array The block editor settings with extra settings added.
+ */
+function gutenberg_block_core_form_editor_settings( $settings ) {
+	$settings['formOptions'] = array(
+		'availableMethods' => array(
+			'email'  => array(
+				'label' => __( 'Send email', 'gutenberg' ),
+				'value' => 'email',
+			),
+			'custom' => array(
+				'label' => __( '- Custom -', 'gutenberg' ),
+				'value' => 'custom',
+			),
+		),
+	);
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_block_core_form_editor_settings' );
 
 /**
  * Adds extra fields to the form.
@@ -82,7 +101,7 @@ add_filter( 'render_block_core_form_extra_fields', 'gutenberg_block_core_form_ex
  * @return string The extra fields.
  */
 function gutenberg_block_core_form_extra_fields_email( $extra_fields, $attributes ) {
-	if ( 'email' === $attributes['method'] ) {
+	if ( 'email' === $attributes['submissionMethod'] ) {
 		$extra_fields .= wp_nonce_field( 'wp-block-form', 'wp_block_form', true, false );
 		$extra_fields .= '<input type="hidden" name="wp-send-email" value="1">';
 		$email_address = empty( $attributes['email'] ) ? get_option( 'admin_email' ) : $attributes['email'];

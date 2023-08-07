@@ -9,12 +9,16 @@
 	"textdomain": "default",
 	"icon": "feedback",
 	"attributes": {
-		"action": {
-			"type": "string"
+		"submissionMethod": {
+			"type": "string",
+			"default": "email"
 		},
 		"method": {
 			"type": "string",
-			"default": "email"
+			"default": "post"
+		},
+		"action": {
+			"type": "string"
 		},
 		"email": {
 			"type": "string"
