@@ -24,6 +24,8 @@ export default function save( { attributes } ) {
 		linkClass,
 		width,
 		height,
+		maxWidth,
+		maxHeight,
 		aspectRatio,
 		scale,
 		id,
@@ -60,6 +62,8 @@ export default function save( { attributes } ) {
 				objectFit: scale,
 				width,
 				height,
+				maxWidth,
+				maxHeight,
 			} }
 			title={ title }
 		/>

@@ -69,6 +69,12 @@
 		"height": {
 			"type": "string"
 		},
+		"maxWidth": {
+			"type": "string"
+		},
+		"maxHeight": {
+			"type": "string"
+		},
 		"aspectRatio": {
 			"type": "string"
 		},

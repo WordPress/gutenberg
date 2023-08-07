@@ -109,6 +109,7 @@ export default function Image( {
 		title,
 		width,
 		height,
+		maxHeight,
 		aspectRatio,
 		scale,
 		linkTarget,
@@ -117,7 +118,7 @@ export default function Image( {
 
 	// The only supported unit is px, so we can parseInt to strip the px here.
 	const numericWidth = width ? parseInt( width, 10 ) : undefined;
-	const numericHeight = height ? parseInt( height, 10 ) : undefined;
+	const numericHeight = height ? parseInt( maxHeight, 10 ) : undefined;
 
 	const imageRef = useRef();
 	const prevCaption = usePrevious( caption );
@@ -326,7 +327,7 @@ export default function Image( {
 
 	function updateAlignment( nextAlign ) {
 		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
+			? { width: undefined, maxHeight: undefined }
 			: {};
 		setAttributes( {
 			...extraUpdatedAttributes,
@@ -443,7 +444,7 @@ export default function Image( {
 					resetAll={ () =>
 						setAttributes( {
 							width: undefined,
-							height: undefined,
+							maxHeight: undefined,
 							scale: undefined,
 							aspectRatio: undefined,
 						} )
@@ -479,14 +480,19 @@ export default function Image( {
 					) }
 					{ isResizable && (
 						<DimensionsTool
-							value={ { width, height, scale, aspectRatio } }
+							value={ {
+								width,
+								height: maxHeight,
+								scale,
+								aspectRatio,
+							} }
 							onChange={ ( newValue ) => {
 								// Rebuilding the object forces setting `undefined`
 								// for values that are removed since setAttributes
 								// doesn't do anything with keys that aren't set.
 								setAttributes( {
 									width: newValue.width,
-									height: newValue.height,
+									maxHeight: newValue.height,
 									scale: newValue.scale,
 									aspectRatio: newValue.aspectRatio,
 								} );
@@ -564,9 +570,13 @@ export default function Image( {
 				className={ borderProps.className }
 				style={ {
 					width:
-						( width && height ) || aspectRatio ? '100%' : undefined,
-					height:
-						( width && height ) || aspectRatio ? '100%' : undefined,
+						( width && maxHeight ) || aspectRatio
+							? '100%'
+							: undefined,
+					maxHeight:
+						( width && maxHeight ) || aspectRatio
+							? '100%'
+							: undefined,
 					objectFit: scale,
 					...borderProps.style,
 				} }
@@ -600,7 +610,7 @@ export default function Image( {
 			/>
 		);
 	} else if ( ! isResizable ) {
-		img = <div style={ { width, height, aspectRatio } }>{ img }</div>;
+		img = <div style={ { width, maxHeight, aspectRatio } }>{ img }</div>;
 	} else {
 		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );
 		const customRatio = numericWidth / numericHeight;
@@ -666,7 +676,7 @@ export default function Image( {
 					display: 'block',
 					objectFit: scale,
 					aspectRatio:
-						! width && ! height && aspectRatio
+						! width && ! maxHeight && aspectRatio
 							? aspectRatio
 							: undefined,
 				} }
@@ -696,6 +706,7 @@ export default function Image( {
 					setAttributes( {
 						width: `${ elt.offsetWidth }px`,
 						height: 'auto',
+						maxHeight: undefined,
 						aspectRatio: `${ ratio }`,
 					} );
 				} }
