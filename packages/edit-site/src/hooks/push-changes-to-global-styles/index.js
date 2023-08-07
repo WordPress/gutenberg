@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -30,9 +25,12 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesContext, useBlockEditingMode } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	GlobalStylesContext,
+	useBlockEditingMode,
+	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
+	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
+} = unlock( blockEditorPrivateApis );
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
 // removed by moving PushChangesToGlobalStylesControl to
@@ -96,6 +94,14 @@ const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 
 const SUPPORTED_STYLES = [ 'border', 'color', 'spacing', 'typography' ];
 
+const getValueFromObjectPath = ( object, path ) => {
+	let value = object;
+	path.forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
+
 function useChangesToPush( name, attributes ) {
 	const supports = useSupportedStyles( name );
 
@@ -115,10 +121,10 @@ function useChangesToPush( name, attributes ) {
 					];
 				const value = presetAttributeValue
 					? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
-					: get( attributes.style, path );
+					: getValueFromObjectPath( attributes.style, path );
 				return value ? [ { path, value } ] : [];
 			} ),
-		[ supports, name, attributes ]
+		[ supports, attributes ]
 	);
 }
 
@@ -173,6 +179,9 @@ function PushChangesToGlobalStylesControl( {
 } ) {
 	const changes = useChangesToPush( name, attributes );
 
+	const hasBehaviorsPanel = useHasBehaviorsPanel( attributes, name, {
+		blockSupportOnly: true,
+	} );
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 
@@ -180,55 +189,86 @@ function PushChangesToGlobalStylesControl( {
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
+	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
+
+	const userHasEditedBehaviors =
+		attributes.hasOwnProperty( 'behaviors' ) && hasBehaviorsPanel;
+
 	const pushChanges = useCallback( () => {
-		if ( changes.length === 0 ) {
+		if ( changes.length === 0 && ! userHasEditedBehaviors ) {
 			return;
 		}
+		if ( changes.length > 0 ) {
+			const { style: blockStyles } = attributes;
 
-		const { style: blockStyles } = attributes;
+			const newBlockStyles = cloneDeep( blockStyles );
+			const newUserConfig = cloneDeep( userConfig );
 
-		const newBlockStyles = cloneDeep( blockStyles );
-		const newUserConfig = cloneDeep( userConfig );
+			for ( const { path, value } of changes ) {
+				setNestedValue( newBlockStyles, path, undefined );
+				setNestedValue(
+					newUserConfig,
+					[ 'styles', 'blocks', name, ...path ],
+					value
+				);
+			}
 
-		for ( const { path, value } of changes ) {
-			setNestedValue( newBlockStyles, path, undefined );
-			setNestedValue(
-				newUserConfig,
-				[ 'styles', 'blocks', name, ...path ],
-				value
+			// @wordpress/core-data doesn't support editing multiple entity types in
+			// a single undo level. So for now, we disable @wordpress/core-data undo
+			// tracking and implement our own Undo button in the snackbar
+			// notification.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { style: newBlockStyles } );
+			setUserConfig( () => newUserConfig, { undoIgnore: true } );
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: Title of the block e.g. 'Heading'.
+					__( '%s styles applied.' ),
+					getBlockType( name ).title
+				),
+				{
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick() {
+								__unstableMarkNextChangeAsNotPersistent();
+								setAttributes( { style: blockStyles } );
+								setUserConfig( () => userConfig, {
+									undoIgnore: true,
+								} );
+							},
+						},
+					],
+				}
 			);
 		}
-
-		// @wordpress/core-data doesn't support editing multiple entity types in
-		// a single undo level. So for now, we disable @wordpress/core-data undo
-		// tracking and implement our own Undo button in the snackbar
-		// notification.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { style: newBlockStyles } );
-		setUserConfig( () => newUserConfig, { undoIgnore: true } );
-
-		createSuccessNotice(
-			sprintf(
-				// translators: %s: Title of the block e.g. 'Heading'.
-				__( '%s styles applied.' ),
-				getBlockType( name ).title
-			),
-			{
-				type: 'snackbar',
-				actions: [
-					{
-						label: __( 'Undo' ),
-						onClick() {
-							__unstableMarkNextChangeAsNotPersistent();
-							setAttributes( { style: blockStyles } );
-							setUserConfig( () => userConfig, {
-								undoIgnore: true,
-							} );
+		if ( userHasEditedBehaviors ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setBehavior( attributes.behaviors );
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: Title of the block e.g. 'Heading'.
+					__( '%s behaviors applied.' ),
+					getBlockType( name ).title
+				),
+				{
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick() {
+								__unstableMarkNextChangeAsNotPersistent();
+								setBehavior( inheritedBehaviors );
+								setUserConfig( () => userConfig, {
+									undoIgnore: true,
+								} );
+							},
 						},
-					},
-				],
-			}
-		);
+					],
+				}
+			);
+		}
 	}, [ changes, attributes, userConfig, name ] );
 
 	return (
@@ -237,7 +277,7 @@ function PushChangesToGlobalStylesControl( {
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
 				__(
-					'Apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
+					'Apply this block’s typography, spacing, dimensions, color styles, and behaviors to all %s blocks.'
 				),
 				getBlockType( name ).title
 			) }
@@ -247,7 +287,7 @@ function PushChangesToGlobalStylesControl( {
 			</BaseControl.VisualLabel>
 			<Button
 				variant="primary"
-				disabled={ changes.length === 0 }
+				disabled={ changes.length === 0 && ! userHasEditedBehaviors }
 				onClick={ pushChanges }
 			>
 				{ __( 'Apply globally' ) }

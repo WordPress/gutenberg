@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-commands",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"description": "WordPress core reusable commands.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,6 +27,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
+		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/commands": "file:../commands",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
@@ -38,7 +39,8 @@
 		"@wordpress/url": "file:../url"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

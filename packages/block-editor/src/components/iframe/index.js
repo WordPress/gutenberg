@@ -88,11 +88,14 @@ function Iframe( {
 	forwardedRef: ref,
 	...props
 } ) {
-	const { styles = '', scripts = '' } = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().__unstableResolvedAssets,
-		[]
-	);
+	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return {
+			resolvedAssets: settings.__unstableResolvedAssets,
+			isPreviewMode: settings.__unstableIsPreviewMode,
+		};
+	}, [] );
+	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const compatStyles = useCompatibilityStyles();
@@ -140,11 +143,13 @@ function Iframe( {
 					compatStyle.cloneNode( true )
 				);
 
-				// eslint-disable-next-line no-console
-				console.warn(
-					`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
-					compatStyle
-				);
+				if ( ! isPreviewMode ) {
+					// eslint-disable-next-line no-console
+					console.warn(
+						`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+						compatStyle
+					);
+				}
 			}
 
 			iFrameDocument.addEventListener(

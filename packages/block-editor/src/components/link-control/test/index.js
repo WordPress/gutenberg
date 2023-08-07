@@ -405,6 +405,32 @@ describe( 'Basic rendering', () => {
 
 			expect( mockOnRemove ).toHaveBeenCalled();
 		} );
+
+		it( 'should revert to "editing" mode when onRemove is triggered', async () => {
+			const user = userEvent.setup();
+			const mockOnRemove = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: 'https://example.com' } }
+					onRemove={ mockOnRemove }
+				/>
+			);
+
+			const unLinkButton = screen.queryByRole( 'button', {
+				name: 'Unlink',
+			} );
+			expect( unLinkButton ).toBeVisible();
+
+			await user.click( unLinkButton );
+
+			expect( mockOnRemove ).toHaveBeenCalled();
+
+			// Should revert back to editing mode.
+			expect(
+				screen.getByRole( 'combobox', { name: 'Link' } )
+			).toBeVisible();
+		} );
 	} );
 } );
 
@@ -1708,7 +1734,7 @@ describe( 'Selecting links', () => {
 } );
 
 describe( 'Addition Settings UI', () => {
-	it( 'should not show a means to toggle the link settings when not editing a link', async () => {
+	it( 'should hide advanced link settings when not editing a link', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
@@ -1723,6 +1749,7 @@ describe( 'Addition Settings UI', () => {
 
 		expect( settingsToggle ).not.toBeInTheDocument();
 	} );
+
 	it( 'should provides a means to toggle the link settings', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 

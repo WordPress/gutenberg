@@ -58,9 +58,10 @@
 	display: flex;
 }
 
-.edit-site-layout__sidebar {
+.edit-site-layout__sidebar-region {
 	z-index: z-index(".edit-site-layout__sidebar");
 	width: 100vw;
+	flex-shrink: 0;
 
 	@include break-medium {
 		width: $nav-sidebar-width;
@@ -74,7 +75,7 @@
 		top: 0;
 	}
 
-	> div {
+	.edit-site-layout__sidebar {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
@@ -120,7 +121,7 @@
 	justify-content: center;
 	align-items: center;
 
-	&:has(.edit-site-layout__resizable-frame-oversized) {
+	&.is-right-aligned {
 		justify-content: flex-end;
 	}
 

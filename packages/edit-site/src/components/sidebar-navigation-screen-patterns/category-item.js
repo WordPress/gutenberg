@@ -19,19 +19,11 @@ export default function CategoryItem( {
 	type,
 } ) {
 	const instanceId = useInstanceId( CategoryItem );
-	const linkInfo = useLink(
-		{
-			path: '/patterns',
-			categoryType: type,
-			categoryId: id,
-		},
-		{
-			// Keep a record of where we came from in state so we can
-			// use the browser's back button to go back to Patterns.
-			// See the implementation of the back button in patterns-list.
-			backPath: '/patterns',
-		}
-	);
+	const linkInfo = useLink( {
+		path: '/patterns',
+		categoryType: type,
+		categoryId: id,
+	} );
 
 	if ( ! count ) {
 		return;

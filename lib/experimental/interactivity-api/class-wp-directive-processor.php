@@ -6,6 +6,10 @@
  * @subpackage Interactivity API
  */
 
+if ( class_exists( 'WP_Directive_Processor' ) ) {
+	return;
+}
+
 /**
  * This processor is built on top of the HTML Tag Processor and augments its
  * capabilities to process the Interactivity API directives.
@@ -17,6 +21,37 @@
  * to improve this code.
  */
 class WP_Directive_Processor extends WP_HTML_Tag_Processor {
+
+	/**
+	 * An array of root blocks.
+	 *
+	 * @var array
+	 */
+	static $root_blocks = array();
+
+	/**
+	 * Add a root block to the list.
+	 *
+	 * @param array $block The block to add.
+	 *
+	 * @return void
+	 */
+	public static function add_root_block( $block ) {
+			self::$root_blocks[] = md5( serialize( $block ) );
+	}
+
+	/**
+	 * Check if block is a root block.
+	 *
+	 * @param array $block The block to check.
+	 *
+	 * @return bool True if block is a root block, false otherwise.
+	 */
+	public static function is_root_block( $block ) {
+			return in_array( md5( serialize( $block ) ), self::$root_blocks, true );
+	}
+
+
 	/**
 	 * Find the matching closing tag for an opening tag.
 	 *

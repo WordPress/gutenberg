@@ -17,6 +17,18 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 	const footnotes = meta?.footnotes ? JSON.parse( meta.footnotes ) : [];
 	const blockProps = useBlockProps();
 
+	if ( postType !== 'post' && postType !== 'page' ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ <BlockIcon icon={ icon } /> }
+					label={ __( 'Footnotes' ) }
+					// To do: add instructions. We can't add new string in RC.
+				/>
+			</div>
+		);
+	}
+
 	if ( ! footnotes.length ) {
 		return (
 			<div { ...blockProps }>

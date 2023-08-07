@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "5.14.0",
+	"version": "5.15.0",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,8 @@
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data"
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

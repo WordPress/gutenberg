@@ -121,6 +121,8 @@ export default function Layout() {
 	const [ fullResizer ] = useResizeObserver();
 	const [ isResizing ] = useState( false );
 	const isEditorLoading = useIsSiteEditorLoading();
+	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
+		useState( false );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -210,7 +212,6 @@ export default function Layout() {
 					animate={ headerAnimationState }
 				>
 					<SiteHub
-						as={ motion.div }
 						variants={ {
 							isDistractionFree: { x: '-100%' },
 							isDistractionFreeHovering: { x: 0 },
@@ -218,6 +219,7 @@ export default function Layout() {
 							edit: { x: 0 },
 						} }
 						ref={ hubRef }
+						isTransparent={ isResizableFrameOversized }
 						className="edit-site-layout__hub"
 					/>
 
@@ -257,28 +259,35 @@ export default function Layout() {
 				</motion.div>
 
 				<div className="edit-site-layout__content">
-					<motion.div
-						// The sidebar is needed for routing on mobile
-						// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
-						// so we can't remove the element entirely. Using `inert` will make
-						// it inaccessible to screen readers and keyboard navigation.
-						inert={ showSidebar ? undefined : 'inert' }
-						animate={ { opacity: showSidebar ? 1 : 0 } }
-						transition={ {
-							type: 'tween',
-							duration:
-								// Disable transition in mobile to emulate a full page transition.
-								disableMotion || isMobileViewport
-									? 0
-									: ANIMATION_DURATION,
-							ease: 'easeOut',
-						} }
-						className="edit-site-layout__sidebar"
+					{ /*
+						The NavigableRegion must always be rendered and not use
+						`inert` otherwise `useNavigateRegions` will fail.
+					*/ }
+					<NavigableRegion
+						ariaLabel={ __( 'Navigation' ) }
+						className="edit-site-layout__sidebar-region"
 					>
-						<NavigableRegion ariaLabel={ __( 'Navigation' ) }>
+						<motion.div
+							// The sidebar is needed for routing on mobile
+							// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
+							// so we can't remove the element entirely. Using `inert` will make
+							// it inaccessible to screen readers and keyboard navigation.
+							inert={ showSidebar ? undefined : 'inert' }
+							animate={ { opacity: showSidebar ? 1 : 0 } }
+							transition={ {
+								type: 'tween',
+								duration:
+									// Disable transition in mobile to emulate a full page transition.
+									disableMotion || isMobileViewport
+										? 0
+										: ANIMATION_DURATION,
+								ease: 'easeOut',
+							} }
+							className="edit-site-layout__sidebar"
+						>
 							<Sidebar />
-						</NavigableRegion>
-					</motion.div>
+						</motion.div>
+					</NavigableRegion>
 
 					<SavePanel />
 
@@ -315,7 +324,13 @@ export default function Layout() {
 											}
 											initial={ false }
 											layout="position"
-											className="edit-site-layout__canvas"
+											className={ classnames(
+												'edit-site-layout__canvas',
+												{
+													'is-right-aligned':
+														isResizableFrameOversized,
+												}
+											) }
 											transition={ {
 												type: 'tween',
 												duration:
@@ -331,7 +346,18 @@ export default function Layout() {
 														! isEditorLoading
 													}
 													isFullWidth={ isEditing }
-													oversizedClassName="edit-site-layout__resizable-frame-oversized"
+													defaultSize={ {
+														width:
+															canvasSize.width -
+															24 /* $canvas-padding */,
+														height: canvasSize.height,
+													} }
+													isOversized={
+														isResizableFrameOversized
+													}
+													setIsOversized={
+														setIsResizableFrameOversized
+													}
 													innerContentStyle={ {
 														background:
 															gradientValue ??

@@ -98,12 +98,11 @@ export function getBlockProps( props = {} ) {
  */
 export function getInnerBlocksProps( props = {} ) {
 	const { innerBlocks } = innerBlocksPropsProvider;
-	const [ firstBlock ] = innerBlocks ?? [];
-	if ( ! firstBlock ) return props;
-	// If the innerBlocks passed to `getSaveElement` are not blocks but already
-	// components, return the props as is. This is the case for
-	// `getRichTextValues`.
-	if ( ! firstBlock.clientId ) return { ...props, children: innerBlocks };
+	// Allow a different component to be passed to getSaveElement to handle
+	// inner blocks, bypassing the default serialisation.
+	if ( ! Array.isArray( innerBlocks ) ) {
+		return { ...props, children: innerBlocks };
+	}
 	// Value is an array of blocks, so defer to block serializer.
 	const html = serialize( innerBlocks, { isInnerBlocks: true } );
 	// Use special-cased raw HTML tag to avoid default escaping.
@@ -390,7 +389,8 @@ export function __unstableSerializeAndClean( blocks ) {
 	// pre-block-editor removep'd content formatting.
 	if (
 		blocks.length === 1 &&
-		blocks[ 0 ].name === getFreeformContentHandlerName()
+		blocks[ 0 ].name === getFreeformContentHandlerName() &&
+		blocks[ 0 ].name === 'core/freeform'
 	) {
 		content = removep( content );
 	}

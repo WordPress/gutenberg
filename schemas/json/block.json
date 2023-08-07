@@ -258,6 +258,18 @@
 					"description": "ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.",
 					"default": false
 				},
+				"behaviors": {
+					"type": "object",
+					"description": "Behaviors are a way to add additional functionality to a block. They are defined as an object with a name and a set of properties. Curently, only one behavior is supported: lightbox.",
+					"additionalProperties": false,
+					"properties": {
+						"lightbox": {
+							"type": "boolean",
+							"description": "This property adds a 'lightbox' behavior to the block. It allows to open the block's content in a lightbox when clicking on it.",
+							"default": false
+						}
+					}
+				},
 				"className": {
 					"type": "boolean",
 					"description": "By default, the class .wp-block-your-block-name is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If, for whatever reason, a class is not desired on the markup, this functionality can be disabled.",
@@ -335,6 +347,116 @@
 					"type": "boolean",
 					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set inserter to false.",
 					"default": true
+				},
+				"layout": {
+					"default": false,
+					"description": "This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.",
+					"oneOf": [
+						{ "type": "boolean" },
+						{
+							"type": "object",
+							"properties": {
+								"default": {
+									"type": "object",
+									"description": "Allows setting the `type` property to define what layout type is default for the block, and also default values for any properties inherent to that layout type, e.g., for a `flex` layout, a default value can be set for `flexWrap`.",
+									"properties": {
+										"type": {
+											"type": "string",
+											"description": "The layout type.",
+											"enum": [
+												"constrained",
+												"grid",
+												"flex"
+											]
+										},
+										"contentSize": {
+											"type": "string",
+											"description": "The content size used on all children."
+										},
+										"wideSize": {
+											"type": "string",
+											"description": "The wide size used on alignwide children."
+										},
+										"justifyContent": {
+											"type": "string",
+											"description": "Content justification value.",
+											"enum": [
+												"right",
+												"center",
+												"space-between",
+												"left",
+												"stretch"
+											]
+										},
+										"orientation": {
+											"type": "string",
+											"description": "The orientation of the layout.",
+											"enum": [ "horizontal", "vertical" ]
+										},
+										"flexWrap": {
+											"type": "string",
+											"description": "The flex wrap value.",
+											"enum": [ "wrap", "nowrap" ]
+										},
+										"verticalAlignment": {
+											"type": "string",
+											"description": "The vertical alignment value.",
+											"enum": [
+												"top",
+												"center",
+												"bottom",
+												"space-between",
+												"stretch"
+											]
+										},
+										"minimumColumnWidth": {
+											"type": "string",
+											"description": "The minimum column width value."
+										},
+										"columnCount": {
+											"type": "number",
+											"description": "The column count value."
+										}
+									}
+								},
+								"allowSwitching": {
+									"type": "boolean",
+									"description": "Exposes a switcher control that allows toggling between all existing layout types.",
+									"default": false
+								},
+								"allowEditing": {
+									"type": "boolean",
+									"description": "Determines display of layout controls in the block sidebar. If set to false, layout controls will be hidden.",
+									"default": true
+								},
+								"allowInheriting": {
+									"type": "boolean",
+									"description": "For the `flow` layout type only, determines display of the `Inner blocks use content width` toggle.",
+									"default": true
+								},
+								"allowSizingOnChildren": {
+									"type": "boolean",
+									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.",
+									"default": false
+								},
+								"allowVerticalAlignment": {
+									"type": "boolean",
+									"description": "For the `flex` layout type only, determines display of vertical alignment controls in the block toolbar.",
+									"default": true
+								},
+								"allowJustification": {
+									"type": "boolean",
+									"description": "For the `flex` layout type, determines display of justification controls in the block toolbar and block sidebar. For the `constrained` layout type, determines display of justification control in the block sidebar.",
+									"default": true
+								},
+								"allowOrientation": {
+									"type": "boolean",
+									"description": "For the `flex` layout type only, determines display of the orientation control in the block toolbar.",
+									"default": true
+								}
+							}
+						}
+					]
 				},
 				"multiple": {
 					"type": "boolean",
