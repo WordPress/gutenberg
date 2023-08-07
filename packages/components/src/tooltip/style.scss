@@ -7,11 +7,11 @@
 }
 
 .components-tooltip .components-popover__content {
-	background: $components-color-foreground; // TODO: Discuss with designers.
+	background: $black; // TODO: Discuss with designers.
 	border-radius: $radius-block-ui;
 	border-width: 0;
 	outline: none;
-	color: $components-color-foreground-inverted;
+	color: $gray-100;
 	white-space: nowrap;
 	text-align: center;
 	line-height: 1.4;

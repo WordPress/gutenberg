@@ -11,10 +11,20 @@ import type { PopoverProps } from '../popover/types';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 
 export type ButtonProps =
-	| WordPressComponentProps< BaseButtonProps & _ButtonProps, 'button', false >
-	| WordPressComponentProps< BaseButtonProps & AnchorProps, 'a', false >;
+	| WordPressComponentProps< ButtonAsButtonProps, 'button', false >
+	| WordPressComponentProps< ButtonAsAnchorProps, 'a', false >;
+
+export type ButtonAsButtonProps = BaseButtonProps & _ButtonProps;
+export type ButtonAsAnchorProps = BaseButtonProps & AnchorProps;
 
 type BaseButtonProps = {
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * The button's children.
 	 */
@@ -30,7 +40,7 @@ type BaseButtonProps = {
 	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
-	icon?: IconProps< unknown >[ 'icon' ];
+	icon?: IconProps[ 'icon' ];
 	/**
 	 * If provided with `icon`, sets the position of icon relative to the `text`.
 	 *
@@ -42,7 +52,7 @@ type BaseButtonProps = {
 	 * Please refer to the Icon component for more details regarding
 	 * the default value of its `size` prop.
 	 */
-	iconSize?: IconProps< unknown >[ 'size' ];
+	iconSize?: IconProps[ 'size' ];
 	/**
 	 * Indicates activity while a action is being performed.
 	 */
@@ -55,8 +65,13 @@ type BaseButtonProps = {
 	 * Renders a pressed button style.
 	 */
 	isPressed?: boolean;
+	// TODO: Deprecate officially (add console warning and move to DeprecatedButtonProps).
 	/**
 	 * Decreases the size of the button.
+	 *
+	 * Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
+	 *
+	 * @deprecated Use the `'small'` value on the `size` prop instead.
 	 */
 	isSmall?: boolean;
 	/**
@@ -73,6 +88,18 @@ type BaseButtonProps = {
 	 * If provided, renders a Tooltip component for the button.
 	 */
 	showTooltip?: boolean;
+	/**
+	 * The size of the button.
+	 *
+	 * - `'default'`: For normal text-label buttons, unless it is a toggle button.
+	 * - `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
+	 * - `'small'`: For icon buttons associated with more advanced or auxiliary features.
+	 *
+	 * If the deprecated `isSmall` prop is also defined, this prop will take precedence.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'default' | 'compact' | 'small';
 	/**
 	 * If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
 	 */

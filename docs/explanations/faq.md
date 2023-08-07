@@ -151,7 +151,7 @@ This is the canonical list of keyboard shortcuts:
 			<td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Z</kbd></td>
 		</tr>
 		<tr>
-			<td>Show or hide the settings sidebar.</td>
+			<td>Show or hide the Settings sidebar.</td>
 			<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>,</kbd></td>
 			<td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>,</kbd></td>
 		</tr>
@@ -218,6 +218,11 @@ This is the canonical list of keyboard shortcuts:
 			<td>Clear selection.</td>
 			<td><kbd>Esc</kbd></td>
 			<td><kbd>Esc</kbd></td>
+		</tr>
+		<tr>
+			<td>Select text across multiple blocks.</td>
+			<td></td>
+			<td><kbd>Shift</kbd>+<kbd>Arrow (⇦, ⇧, ⇨, ⇩)</kbd></td>
 		</tr>
 	</tbody>
 </table>

@@ -11,8 +11,6 @@ const webpack = require( 'webpack' );
 const fixturesPath = path.join( __dirname, 'fixtures' );
 const configFixtures = fs.readdirSync( fixturesPath ).sort();
 
-jest.useRealTimers();
-
 describe( 'DependencyExtractionWebpackPlugin', () => {
 	afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );
 

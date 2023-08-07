@@ -51,7 +51,7 @@ function from12hTo24h( hours: number, isPm: boolean ) {
  * given width. For example, the hours and minutes inputs are padded to 2 so
  * that '4' appears as '04'.
  *
- * @param  pad How many digits the value should be.
+ * @param pad How many digits the value should be.
  */
 function buildPadInputStateReducer( pad: number ) {
 	return ( state: InputState, action: InputAction ) => {

@@ -147,7 +147,6 @@ export default function InlineColorUI( {
 	const popoverAnchor = useCachedTruthy(
 		useAnchor( {
 			editableContentElement: contentRef.current,
-			value,
 			settings,
 		} )
 	);

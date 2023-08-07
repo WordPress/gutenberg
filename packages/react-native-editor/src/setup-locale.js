@@ -35,16 +35,6 @@ export default (
 			...extraTranslations,
 		};
 
-		if ( domain === 'default' ) {
-			// eslint-disable-next-line no-console
-			console.log( 'locale', locale, allTranslations );
-		} else {
-			// Extra translations are already logged along with the default domain, so
-			// for other domains we can limit the output to their translations.
-			// eslint-disable-next-line no-console
-			console.log( `${ domain } - locale`, locale, translations );
-		}
-
 		// Only change the locale if it's supported by gutenberg
 		if ( translations || extraTranslations ) {
 			setLocaleData( allTranslations, domain );

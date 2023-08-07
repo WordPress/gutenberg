@@ -22,6 +22,12 @@ if ( ! defined( 'LOCAL_WP_ENVIRONMENT_TYPE' ) ) {
 	define( 'LOCAL_WP_ENVIRONMENT_TYPE', 'local' );
 }
 
+// Pretend that these are Core unit tests. This is needed so that
+// wp_theme_has_theme_json() does not cache its return value between each test.
+if ( ! defined( 'WP_RUN_CORE_TESTS' ) ) {
+	define( 'WP_RUN_CORE_TESTS', true );
+}
+
 // Require composer dependencies.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
@@ -105,7 +111,7 @@ function gutenberg_register_test_block_for_feature_selectors() {
 	WP_Block_Type_Registry::get_instance()->register(
 		'test/test',
 		array(
-			'api_version' => 2,
+			'api_version' => 3,
 			'attributes'  => array(
 				'textColor' => array(
 					'type' => 'string',
@@ -134,6 +140,46 @@ function gutenberg_register_test_block_for_feature_selectors() {
 			),
 		)
 	);
+
+	WP_Block_Type_Registry::get_instance()->register(
+		'my/block-with-selectors',
+		array(
+			'api_version' => 2,
+			'attributes'  => array(
+				'textColor' => array(
+					'type' => 'string',
+				),
+				'style'     => array(
+					'type' => 'object',
+				),
+			),
+			'supports'    => array(
+				'__experimentalBorder' => array(
+					'radius' => true,
+				),
+				'color'                => array(
+					'background' => true,
+					'text'       => true,
+				),
+				'spacing'              => array(
+					'padding' => true,
+				),
+				'typography'           => array(
+					'fontSize' => true,
+				),
+			),
+			'selectors'   => array(
+				'root'       => '.custom-root-selector',
+				'border'     => array(
+					'root' => '.custom-root-selector img',
+				),
+				'color'      => array(
+					'text' => '.custom-root-selector > figcaption',
+				),
+				'typography' => '.custom-root-selector > figcaption',
+			),
+		)
+	);
 }
 tests_add_filter( 'init', 'gutenberg_register_test_block_for_feature_selectors' );
 
@@ -142,4 +188,3 @@ require $_tests_dir . '/includes/bootstrap.php';
 
 // Use existing behavior for wp_die during actual test execution.
 remove_filter( 'wp_die_handler', 'fail_if_died' );
-

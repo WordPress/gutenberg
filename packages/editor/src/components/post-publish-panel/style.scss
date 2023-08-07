@@ -6,7 +6,7 @@
 	// Ensure the post-publish panel accounts for the header and footer height.
 	min-height: calc(100% - #{$header-height + 84px});
 
-	.components-spinner {
+	> .components-spinner {
 		display: block;
 		margin: 100px auto 0;
 	}
@@ -62,7 +62,7 @@
 
 .editor-post-publish-panel__header-publish-button,
 .editor-post-publish-panel__header-cancel-button {
-	flex-grow: 1;
+	flex: 1;
 
 	@include break-mobile() {
 		max-width: $admin-sidebar-width;

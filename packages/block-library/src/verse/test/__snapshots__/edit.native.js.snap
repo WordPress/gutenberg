@@ -2,12 +2,12 @@
 
 exports[`Verse block inserts block 1`] = `
 "<!-- wp:verse -->
-<pre class=\\"wp-block-verse\\"></pre>
+<pre class="wp-block-verse"></pre>
 <!-- /wp:verse -->"
 `;
 
 exports[`Verse block renders block text set as initial content 1`] = `
 "<!-- wp:verse -->
-<pre class=\\"wp-block-verse\\">Sample text</pre>
+<pre class="wp-block-verse">Sample text</pre>
 <!-- /wp:verse -->"
 `;

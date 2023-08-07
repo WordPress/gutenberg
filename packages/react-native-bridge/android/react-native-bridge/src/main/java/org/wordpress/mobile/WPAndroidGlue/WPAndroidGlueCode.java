@@ -33,6 +33,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -99,6 +100,7 @@ public class WPAndroidGlueCode {
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
     private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
+    private OnGutenbergDidRequestEmbedFullscreenPreviewListener mOnGutenbergDidRequestEmbedFullscreenPreviewListener;
     private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
@@ -107,6 +109,10 @@ public class WPAndroidGlueCode {
     private OnBlockTypeImpressionsEventListener mOnBlockTypeImpressionsEventListener;
     private OnCustomerSupportOptionsListener mOnCustomerSupportOptionsListener;
     private OnSendEventToHostListener mOnSendEventToHostListener;
+
+    private OnToggleUndoButtonListener mOnToggleUndoButtonListener;
+
+    private OnToggleRedoButtonListener mOnToggleRedoButtonListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -209,6 +215,10 @@ public class WPAndroidGlueCode {
         void gutenbergDidRequestUnsupportedBlockFallback(UnsupportedBlock unsupportedBlock);
     }
 
+    public interface OnGutenbergDidRequestEmbedFullscreenPreviewListener {
+        void gutenbergDidRequestEmbedFullscreenPreview(String html, String title);
+    }
+
     public interface OnGutenbergDidSendButtonPressedActionListener {
         void gutenbergDidSendButtonPressedAction(String buttonType);
     }
@@ -240,6 +250,14 @@ public class WPAndroidGlueCode {
 
     public interface OnSendEventToHostListener {
         void onSendEventToHost(String eventName, Map<String, Object> properties);
+    }
+
+    public interface OnToggleUndoButtonListener {
+        void onToggleUndoButton(boolean isDisabled);
+    }
+
+    public interface OnToggleRedoButtonListener {
+        void onToggleRedoButton(boolean isDisabled);
     }
 
     public void mediaSelectionCancelled() {
@@ -429,8 +447,13 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void performRequest(String pathFromJS, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {
-                mRequestExecutor.performRequest(pathFromJS, enableCaching, onSuccess, onError);
+            public void performGetRequest(String pathFromJS, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {
+                mRequestExecutor.performGetRequest(pathFromJS, enableCaching, onSuccess, onError);
+            }
+
+            @Override
+            public void performPostRequest(String pathFromJS, ReadableMap data, Consumer<String> onSuccess, Consumer<Bundle> onError) {
+                mRequestExecutor.performPostRequest(pathFromJS, data, onSuccess, onError);
             }
 
             @Override
@@ -454,6 +477,11 @@ public class WPAndroidGlueCode {
                 mReplaceUnsupportedBlockCallback = replaceUnsupportedBlockCallback;
                 mOnGutenbergDidRequestUnsupportedBlockFallbackListener.
                         gutenbergDidRequestUnsupportedBlockFallback(new UnsupportedBlock(blockId, blockName, blockTitle, content));
+            }
+
+            public void requestEmbedFullscreenPreview(String html, String title) {
+                mOnGutenbergDidRequestEmbedFullscreenPreviewListener.
+                        gutenbergDidRequestEmbedFullscreenPreview(html, title);
             }
 
             @Override
@@ -557,6 +585,16 @@ public class WPAndroidGlueCode {
             public void sendEventToHost(String eventName, ReadableMap properties) {
                 mOnSendEventToHostListener.onSendEventToHost(eventName, properties.toHashMap());
             }
+
+            @Override
+            public void toggleUndoButton(boolean isDisabled) {
+                mOnToggleUndoButtonListener.onToggleUndoButton(isDisabled);
+            }
+
+            @Override
+            public void toggleRedoButton(boolean isDisabled) {
+                mOnToggleRedoButtonListener.onToggleRedoButton(isDisabled);
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -641,6 +679,7 @@ public class WPAndroidGlueCode {
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
+                                  OnGutenbergDidRequestEmbedFullscreenPreviewListener onGutenbergDidRequestEmbedFullscreenPreviewListener,
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   ShowSuggestionsUtil showSuggestionsUtil,
                                   OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
@@ -649,6 +688,8 @@ public class WPAndroidGlueCode {
                                   OnBlockTypeImpressionsEventListener onBlockTypeImpressionsEventListener,
                                   OnCustomerSupportOptionsListener onCustomerSupportOptionsListener,
                                   OnSendEventToHostListener onSendEventToHostListener,
+                                  OnToggleUndoButtonListener onToggleUndoButtonListener,
+                                  OnToggleRedoButtonListener onToggleRedoButtonListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -663,6 +704,7 @@ public class WPAndroidGlueCode {
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
         mOnMediaEditorListener = onMediaEditorListener;
         mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
+        mOnGutenbergDidRequestEmbedFullscreenPreviewListener = onGutenbergDidRequestEmbedFullscreenPreviewListener;
         mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
         mShowSuggestionsUtil = showSuggestionsUtil;
         mOnMediaFilesCollectionBasedBlockEditorListener = onMediaFilesCollectionBasedBlockEditorListener;
@@ -671,6 +713,8 @@ public class WPAndroidGlueCode {
         mOnBlockTypeImpressionsEventListener = onBlockTypeImpressionsEventListener;
         mOnCustomerSupportOptionsListener = onCustomerSupportOptionsListener;
         mOnSendEventToHostListener = onSendEventToHostListener;
+        mOnToggleUndoButtonListener = onToggleUndoButtonListener;
+        mOnToggleRedoButtonListener = onToggleRedoButtonListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -799,6 +843,14 @@ public class WPAndroidGlueCode {
 
     public void showEditorHelp() {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
+    }
+
+    public void onUndoPressed() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().onUndoPressed();
+    }
+
+    public void onRedoPressed() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().onRedoPressed();
     }
 
     public void setTitle(String title) {
@@ -986,6 +1038,10 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 
+    public void sendToJSPostSaveEvent() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().sendToJSPostSaveEvent();
+    }
+
     public void appendMediaFiles(ArrayList<Media> mediaList) {
         if (isMediaSelectedCallbackRegistered() && mMediaPickedByUserOnBlock) {
             mMediaPickedByUserOnBlock = false;
@@ -1058,8 +1114,9 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaFileUploadFailed(mediaId);
     }
 
-    public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId) {
-        mDeferredEventEmitter.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId);
+    public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId, final
+                                         WritableNativeMap metadata) {
+        mDeferredEventEmitter.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId, metadata);
     }
 
     public void clearMediaFileURL(final int mediaId) {

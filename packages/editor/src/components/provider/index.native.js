@@ -92,11 +92,16 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities, locale, hostAppNamespace, updateSettings } =
-			this.props;
+		const {
+			capabilities,
+			locale,
+			hostAppNamespace,
+			updateEditorSettings,
+			updateBlockEditorSettings,
+		} = this.props;
 
-		updateSettings( {
-			...capabilities,
+		updateEditorSettings( {
+			capabilities,
 			...this.getThemeColors( this.props ),
 			locale,
 			hostAppNamespace,
@@ -152,7 +157,9 @@ class NativeEditorProvider extends Component {
 						window.wp.galleryBlockV2Enabled =
 							galleryWithImageBlocks;
 					}
-					updateSettings( this.getThemeColors( editorSettings ) );
+					updateEditorSettings(
+						this.getThemeColors( editorSettings )
+					);
 				}
 			);
 
@@ -177,7 +184,7 @@ class NativeEditorProvider extends Component {
 			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
 
 			// Persist impressions to JavaScript store.
-			updateSettings( { impressions } );
+			updateBlockEditorSettings( { impressions } );
 
 			// Persist impressions to native store if they do not include latest
 			// `NEW_BLOCK_TYPES` configuration.
@@ -312,13 +319,11 @@ class NativeEditorProvider extends Component {
 		const { mode, switchMode } = this.props;
 		// Refresh html content first.
 		this.serializeToNativeAction();
-		// Make sure to blur the selected block and dismiss the keyboard.
-		this.props.clearSelectedBlock();
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
 	}
 
 	updateCapabilitiesAction( capabilities ) {
-		this.props.updateSettings( capabilities );
+		this.props.updateEditorSettings( { capabilities } );
 	}
 
 	render() {
@@ -345,24 +350,21 @@ class NativeEditorProvider extends Component {
 	}
 }
 
-export default compose( [
+const ComposedNativeProvider = compose( [
 	withSelect( ( select ) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
 			getEditedPostAttribute,
 			getEditedPostContent,
+			getEditorSettings,
 		} = select( editorStore );
 		const { getEditorMode } = select( editPostStore );
 
-		const {
-			getBlockIndex,
-			getSelectedBlockClientId,
-			getGlobalBlockCount,
-			getSettings: getBlockEditorSettings,
-		} = select( blockEditorStore );
+		const { getBlockIndex, getSelectedBlockClientId, getGlobalBlockCount } =
+			select( blockEditorStore );
 
-		const settings = getBlockEditorSettings();
+		const settings = getEditorSettings();
 		const defaultEditorColors = settings?.colors ?? [];
 		const defaultEditorGradients = settings?.gradients ?? [];
 
@@ -381,21 +383,18 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( editorStore );
-		const {
-			updateSettings,
-			clearSelectedBlock,
-			insertBlock,
-			replaceBlock,
-		} = dispatch( blockEditorStore );
+		const { editPost, resetEditorBlocks, updateEditorSettings } =
+			dispatch( editorStore );
+		const { updateSettings, insertBlock, replaceBlock } =
+			dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( editPostStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
 		const { createSuccessNotice } = dispatch( noticesStore );
 
 		return {
-			updateSettings,
+			updateBlockEditorSettings: updateSettings,
+			updateEditorSettings,
 			addEntities,
-			clearSelectedBlock,
 			insertBlock,
 			createSuccessNotice,
 			editTitle( title ) {
@@ -414,3 +413,6 @@ export default compose( [
 		};
 	} ),
 ] )( NativeEditorProvider );
+
+export default ComposedNativeProvider;
+export { ComposedNativeProvider as ExperimentalEditorProvider };

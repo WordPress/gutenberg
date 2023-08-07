@@ -1,12 +1,16 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * Internal dependencies
  */
-import { getTypographyFontSizeValue } from './typography-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from './typography-utils';
+import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
@@ -16,7 +20,9 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'captionColor',
 	'buttonColor',
+	'headingColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -57,14 +63,24 @@ export const PRESET_METADATA = [
 	},
 	{
 		path: [ 'color', 'duotone' ],
+		valueKey: 'colors',
 		cssVarInfix: 'duotone',
 		valueFunc: ( { slug } ) => `url( '#wp-duotone-${ slug }' )`,
 		classes: [],
 	},
 	{
+		path: [ 'shadow', 'presets' ],
+		valueKey: 'shadow',
+		cssVarInfix: 'shadow',
+		classes: [],
+	},
+	{
 		path: [ 'typography', 'fontSizes' ],
-		valueFunc: ( preset, { typography: typographySettings } ) =>
-			getTypographyFontSizeValue( preset, typographySettings ),
+		valueFunc: ( preset, settings ) =>
+			getTypographyFontSizeValue(
+				preset,
+				getFluidTypographyOptionsFromSettings( settings )
+			),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
@@ -89,12 +105,14 @@ export const PRESET_METADATA = [
 export const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'color.background': 'color',
 	'color.text': 'color',
+	'filter.duotone': 'duotone',
 	'elements.link.color.text': 'color',
 	'elements.link.:hover.color.text': 'color',
 	'elements.link.typography.fontFamily': 'font-family',
 	'elements.link.typography.fontSize': 'font-size',
 	'elements.button.color.text': 'color',
 	'elements.button.color.background': 'color',
+	'elements.caption.color.text': 'color',
 	'elements.button.typography.fontFamily': 'font-family',
 	'elements.button.typography.fontSize': 'font-size',
 	'elements.heading.color': 'color',
@@ -127,6 +145,7 @@ export const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.h6.typography.fontFamily': 'font-family',
 	'elements.h6.color.gradient': 'gradient',
 	'color.gradient': 'gradient',
+	shadow: 'shadow',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
 };
@@ -149,8 +168,12 @@ function findInPresetsBy(
 ) {
 	// Block presets take priority above root level presets.
 	const orderedPresetsByOrigin = [
-		get( features, [ 'blocks', blockName, ...presetPath ] ),
-		get( features, presetPath ),
+		getValueFromObjectPath( features, [
+			'blocks',
+			blockName,
+			...presetPath,
+		] ),
+		getValueFromObjectPath( features, presetPath ),
 	];
 
 	for ( const presetByOrigin of orderedPresetsByOrigin ) {
@@ -263,8 +286,13 @@ function getValueFromPresetVariable(
 
 function getValueFromCustomVariable( features, blockName, variable, path ) {
 	const result =
-		get( features.settings, [ 'blocks', blockName, 'custom', ...path ] ) ??
-		get( features.settings, [ 'custom', ...path ] );
+		getValueFromObjectPath( features.settings, [
+			'blocks',
+			blockName,
+			'custom',
+			...path,
+		] ) ??
+		getValueFromObjectPath( features.settings, [ 'custom', ...path ] );
 	if ( ! result ) {
 		return variable;
 	}
@@ -284,7 +312,7 @@ export function getValueFromVariable( features, blockName, variable ) {
 	if ( ! variable || typeof variable !== 'string' ) {
 		if ( variable?.ref && typeof variable?.ref === 'string' ) {
 			const refPath = variable.ref.split( '.' );
-			variable = get( features, refPath );
+			variable = getValueFromObjectPath( features, refPath );
 			// Presence of another ref indicates a reference to another dynamic value.
 			// Pointing to another dynamic value is not supported.
 			if ( ! variable || !! variable?.ref ) {
@@ -363,4 +391,31 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Compares global style variations according to their styles and settings properties.
+ *
+ * @example
+ * ```js
+ * const globalStyles = { styles: { typography: { fontSize: '10px' } }, settings: {} };
+ * const variation = { styles: { typography: { fontSize: '10000px' } }, settings: {} };
+ * const isEqual = areGlobalStyleConfigsEqual( globalStyles, variation );
+ * // false
+ * ```
+ *
+ * @param {Object} original  A global styles object.
+ * @param {Object} variation A global styles object.
+ *
+ * @return {boolean} Whether `original` and `variation` match.
+ */
+export function areGlobalStyleConfigsEqual( original, variation ) {
+	if ( typeof original !== 'object' || typeof variation !== 'object' ) {
+		return original === variation;
+	}
+	return (
+		fastDeepEqual( original?.styles, variation?.styles ) &&
+		fastDeepEqual( original?.settings, variation?.settings ) &&
+		fastDeepEqual( original?.behaviors, variation?.behaviors )
+	);
 }

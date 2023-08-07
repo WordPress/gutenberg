@@ -100,7 +100,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
       class="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
       type="button"
     >
-      Enable & Reload
+      Show & Reload Page
     </button>
   </div>
 </div>
@@ -303,7 +303,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
       class="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
       type="button"
     >
-      Disable & Reload
+      Hide & Reload Page
     </button>
   </div>
 </div>

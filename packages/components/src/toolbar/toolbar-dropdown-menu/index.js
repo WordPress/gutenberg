@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * WordPress dependencies
  */
@@ -26,7 +28,6 @@ function ToolbarDropdownMenu( props, ref ) {
 				<DropdownMenu
 					{ ...props }
 					popoverProps={ {
-						variant: 'toolbar',
 						...props.popoverProps,
 					} }
 					toggleProps={ toolbarItemProps }

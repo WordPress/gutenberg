@@ -175,4 +175,33 @@ module.exports = {
 	innerAppender: {
 		marginLeft: 8,
 	},
+	mediaAreaPadding: {
+		width: 12,
+	},
+	defaultAppender: {
+		marginLeft: 16,
+	},
+	'components-picker__button-title': {
+		color: 'white',
+	},
+	placeholderColor: {
+		color: 'gray',
+	},
+	'rich-text-selection': {
+		color: 'black',
+	},
+	'header-toolbar__keyboard-hide-shadow--light': {
+		color: 'black',
+	},
+	'header-toolbar__keyboard-hide-shadow--solid': {
+		color: 'black',
+	},
+	'media-placeholder__header-icon': {
+		fill: 'black',
+	},
+	embed__icon: {
+		fill: 'black',
+	},
+	picker: {},
+	pickerPointer: {},
 };

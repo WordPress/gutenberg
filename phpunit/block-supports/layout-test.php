@@ -362,7 +362,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'verticalAlignment' => 'bottom',
 					),
 				),
-				'expected_output' => '.wp-layout{flex-wrap:nowrap;flex-direction:column;align-items:flex-start;}',
+				'expected_output' => '.wp-layout{flex-wrap:nowrap;flex-direction:column;align-items:flex-start;justify-content:flex-end;}',
 			),
 			'default layout with blockGap to verify converting gap value into valid CSS' => array(
 				'args'            => array(
@@ -377,6 +377,90 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => '.wp-block-group.wp-container-6 > *{margin-block-start:0;margin-block-end:0;}.wp-block-group.wp-container-6.wp-block-group.wp-container-6 > * + *{margin-block-start:var(--wp--preset--spacing--70);margin-block-end:0;}',
+			),
+		);
+	}
+
+	/**
+	 * Check that gutenberg_render_layout_support_flag() renders the correct classnames on the wrapper.
+	 *
+	 * @dataProvider data_layout_support_flag_renders_classnames_on_wrapper
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 *
+	 * @param array  $args            Dataset to test.
+	 * @param string $expected_output The expected output.
+	 */
+	public function test_layout_support_flag_renders_classnames_on_wrapper( $args, $expected_output ) {
+		$actual_output = gutenberg_render_layout_support_flag( $args['block_content'], $args['block'] );
+		$this->assertEquals( $expected_output, $actual_output );
+	}
+
+	/**
+	 * Data provider for test_layout_support_flag_renders_classnames_on_wrapper.
+	 *
+	 * @return array
+	 */
+	public function data_layout_support_flag_renders_classnames_on_wrapper() {
+		return array(
+			'single wrapper block layout with flow type'   => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'default',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"></div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group is-layout-flow wp-block-group-is-layout-flow"></div>',
+			),
+			'single wrapper block layout with constrained type' => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'constrained',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"></div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"></div>',
+			),
+			'multiple wrapper block layout with flow type' => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"><div class="wp-block-group__inner-wrapper"></div></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'default',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"><div class="wp-block-group__inner-wrapper"></div></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"><div class="wp-block-group__inner-wrapper">',
+							' ',
+							' </div></div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group"><div class="wp-block-group__inner-wrapper is-layout-flow wp-block-group-is-layout-flow"></div></div>',
 			),
 		);
 	}

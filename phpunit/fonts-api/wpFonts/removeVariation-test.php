@@ -53,7 +53,7 @@ class Tests_Fonts_WpFonts_RemoveVariation extends WP_Fonts_TestCase {
 	public function test_mocked_setup( $font_family_handle, $variation_handle ) {
 		$this->setup_unit_test();
 
-		$this->assertArrayHasKey( $variation_handle, $this->wp_fonts->registered, 'Variation should be in the registered queue before remval' );
+		$this->assertArrayHasKey( $variation_handle, $this->wp_fonts->registered, 'Variation should be in the registered queue before removal' );
 		$this->assertContains( $variation_handle, $this->wp_fonts->registered[ $font_family_handle ]->deps, 'Variation should be in its font family deps before removal' );
 	}
 

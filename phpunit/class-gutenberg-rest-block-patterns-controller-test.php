@@ -145,10 +145,13 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2_Test extends WP_Test_REST_Con
 
 	/**
 	 * Abstract methods that we must implement.
+	 *
+	 * @doesNotPerformAssertions
 	 */
 	public function test_register_routes() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
 
@@ -166,25 +169,53 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2_Test extends WP_Test_REST_Con
 			$this->assertEquals( $expected_fields, array_keys( $item ) );
 		}
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_context_param() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_create_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_update_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_delete_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_prepare_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_item_schema() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
 }

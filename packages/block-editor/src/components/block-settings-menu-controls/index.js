@@ -4,9 +4,12 @@
 import {
 	createSlotFill,
 	MenuGroup,
+	MenuItem,
 	__experimentalStyleProvider as StyleProvider,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { pipe } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,6 +20,7 @@ import {
 } from '../convert-to-group-buttons';
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
+import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
@@ -28,16 +32,14 @@ const BlockSettingsMenuControlsSlot = ( {
 	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
 		( select ) => {
 			const {
-				getBlocksByClientId,
+				getBlockNamesByClientId,
 				getSelectedBlockClientIds,
 				canRemoveBlocks,
 			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
-				selectedBlocks: getBlocksByClientId( ids )
-					.filter( Boolean )
-					.map( ( block ) => block.name ),
+				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
 				canRemove: canRemoveBlocks( ids ),
 			};
@@ -50,7 +52,8 @@ const BlockSettingsMenuControlsSlot = ( {
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
-	const convertToGroupButtonProps = useConvertToGroupButtonProps();
+	const convertToGroupButtonProps =
+		useConvertToGroupButtonProps( selectedClientIds );
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton =
 		( isGroupable || isUngroupable ) && canRemove;
@@ -75,16 +78,32 @@ const BlockSettingsMenuControlsSlot = ( {
 
 				return (
 					<MenuGroup>
+						{ showConvertToGroupButton && (
+							<ConvertToGroupButton
+								{ ...convertToGroupButtonProps }
+								onClose={ fillProps?.onClose }
+							/>
+						) }
 						{ showLockButton && (
 							<BlockLockMenuItem
 								clientId={ selectedClientIds[ 0 ] }
 							/>
 						) }
 						{ fills }
-						{ showConvertToGroupButton && (
-							<ConvertToGroupButton
-								{ ...convertToGroupButtonProps }
-								onClose={ fillProps?.onClose }
+						{ fillProps?.canMove && ! fillProps?.onlyBlock && (
+							<MenuItem
+								onClick={ pipe(
+									fillProps?.onClose,
+									fillProps?.onMoveTo
+								) }
+							>
+								{ __( 'Move to' ) }
+							</MenuItem>
+						) }
+						{ fillProps?.count === 1 && (
+							<BlockModeToggle
+								clientId={ fillProps?.firstBlockClientId }
+								onToggle={ fillProps?.onClose }
 							/>
 						) }
 					</MenuGroup>

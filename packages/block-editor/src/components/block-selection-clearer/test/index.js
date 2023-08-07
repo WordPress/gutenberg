@@ -17,7 +17,7 @@ const defaultUseSelectValues = {
 	hasSelectedBlock: jest.fn().mockReturnValue( false ),
 	hasMultiSelection: jest.fn().mockReturnValue( false ),
 	getSettings: jest.fn().mockReturnValue( {
-		__experimentalClearBlockSelection: true,
+		clearBlockSelection: true,
 	} ),
 };
 
@@ -98,7 +98,7 @@ describe( 'BlockSelectionClearer component', () => {
 			...defaultUseSelectValues,
 			hasSelectedBlock: jest.fn().mockReturnValue( true ),
 			getSettings: jest.fn().mockReturnValue( {
-				__experimentalClearBlockSelection: false,
+				clearBlockSelection: false,
 			} ),
 		} ) );
 		useDispatch.mockImplementation( () => ( {

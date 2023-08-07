@@ -99,7 +99,11 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 				} ) }
 			</div>
 			{ hoveredStyle && ! isMobileViewport && (
-				<Popover placement="left-start" offset={ 20 }>
+				<Popover
+					placement="left-start"
+					offset={ 20 }
+					focusOnMount={ false }
+				>
 					<div
 						className="block-editor-block-styles__preview-panel"
 						onMouseLeave={ () => styleItemHandler( null ) }

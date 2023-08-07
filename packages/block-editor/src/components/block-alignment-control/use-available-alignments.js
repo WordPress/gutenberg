@@ -19,20 +19,25 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 	if ( ! controls.includes( 'none' ) ) {
 		controls = [ 'none', ...controls ];
 	}
-	const { wideControlsEnabled = false, themeSupportsLayout } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				wideControlsEnabled: settings.alignWide,
-				themeSupportsLayout: settings.supportsLayout,
-			};
-		},
-		[]
-	);
+	const {
+		wideControlsEnabled = false,
+		themeSupportsLayout,
+		isBlockBasedTheme,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			wideControlsEnabled: settings.alignWide,
+			themeSupportsLayout: settings.supportsLayout,
+			isBlockBasedTheme: settings.__unstableIsBlockBasedTheme,
+		};
+	}, [] );
 	const layout = useLayout();
 	const layoutType = getLayoutType( layout?.type );
-	const layoutAlignments = layoutType.getAlignments( layout );
+	const layoutAlignments = layoutType.getAlignments(
+		layout,
+		isBlockBasedTheme
+	);
 
 	if ( themeSupportsLayout ) {
 		const alignments = layoutAlignments.filter(

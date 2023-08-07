@@ -207,12 +207,14 @@ function AudioEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Autoplay' ) }
 						onChange={ toggleAttribute( 'autoplay' ) }
 						checked={ autoplay }
 						help={ getAutoplayHelp }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Loop' ) }
 						onChange={ toggleAttribute( 'loop' ) }
 						checked={ loop }

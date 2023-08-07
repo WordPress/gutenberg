@@ -58,7 +58,7 @@ class Tests_Fonts_WpFonts_RegisterProvider extends WP_Fonts_TestCase {
 		);
 	}
 
-	public function test_should_register_mutliple_providers() {
+	public function test_should_register_multiple_providers() {
 		$wp_fonts  = new WP_Fonts();
 		$providers = $this->get_provider_definitions();
 		foreach ( $providers as $provider ) {

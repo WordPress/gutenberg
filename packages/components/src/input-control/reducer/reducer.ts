@@ -23,7 +23,7 @@ import type { InputChangeCallback } from '../types';
 /**
  * Prepares initialState for the reducer.
  *
- * @param  initialState The initial state.
+ * @param initialState The initial state.
  * @return Prepared initialState for the reducer
  */
 function mergeInitialState(
@@ -45,7 +45,7 @@ function mergeInitialState(
  * exception for CONTROL actions is because they represent controlled updates
  * from props and no case has yet presented for their specialization.
  *
- * @param  composedStateReducers A reducer to specialize state changes.
+ * @param composedStateReducers A reducer to specialize state changes.
  * @return The reducer.
  */
 function inputControlStateReducer(
@@ -140,9 +140,9 @@ function inputControlStateReducer(
  * This technique uses the "stateReducer" design pattern:
  * https://kentcdodds.com/blog/the-state-reducer-pattern/
  *
- * @param  stateReducer    An external state reducer.
- * @param  initialState    The initial state for the reducer.
- * @param  onChangeHandler A handler for the onChange event.
+ * @param stateReducer    An external state reducer.
+ * @param initialState    The initial state for the reducer.
+ * @param onChangeHandler A handler for the onChange event.
  * @return State, dispatch, and a collection of actions.
  */
 export function useInputControlStateReducer(

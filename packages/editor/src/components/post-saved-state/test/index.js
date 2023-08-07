@@ -67,16 +67,6 @@ describe( 'PostSavedState', () => {
 		expect( screen.getByRole( 'button' ) ).toMatchSnapshot();
 	} );
 
-	it( 'returns a switch to draft link if the post is published', () => {
-		useSelect.mockImplementation( () => ( {
-			isPublished: true,
-		} ) );
-
-		render( <PostSavedState /> );
-
-		expect( screen.getByRole( 'button' ) ).toMatchSnapshot();
-	} );
-
 	it( 'should return Saved text if not new and not dirty', () => {
 		useSelect.mockImplementation( () => ( {
 			isDirty: false,

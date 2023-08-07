@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	setOption,
 	openDocumentSettingsSidebar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const saveEntities = async () => {
@@ -45,8 +46,8 @@ describe( 'Site Title block', () => {
 		await insertBlock( 'Site Title' );
 		const editableSiteTitleSelector =
 			'[aria-label="Block: Site Title"] a[contenteditable="true"]';
-		await page.waitForSelector( editableSiteTitleSelector );
-		await page.focus( editableSiteTitleSelector );
+		await canvas().waitForSelector( editableSiteTitleSelector );
+		await canvas().focus( editableSiteTitleSelector );
 		await pressKeyWithModifier( 'primary', 'a' );
 
 		await page.keyboard.type( 'New Site Title' );

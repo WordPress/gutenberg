@@ -9,28 +9,8 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../../store';
 
-/**
- * Interface for inserter media requests.
- *
- * @typedef {Object} InserterMediaRequest
- * @property {number} per_page How many items to fetch per page.
- * @property {string} search   The search term to use for filtering the results.
- */
-
-/**
- * Interface for inserter media responses. Any media resource should
- * map their response to this interface, in order to create the core
- * WordPress media blocks (image, video, audio).
- *
- * @typedef {Object} InserterMediaItem
- * @property {string}        title        The title of the media item.
- * @property {string}        url          The source url of the media item.
- * @property {string}        [previewUrl] The preview source url of the media item to display in the media list.
- * @property {number}        [id]         The WordPress id of the media item.
- * @property {number|string} [sourceId]   The id of the media item from external source.
- * @property {string}        [alt]        The alt text of the media item.
- * @property {string}        [caption]    The caption of the media item.
- */
+/** @typedef {import('./api').InserterMediaRequest} InserterMediaRequest */
+/** @typedef {import('./api').InserterMediaItem} InserterMediaItem */
 
 /**
  * Fetches media items based on the provided category.
@@ -78,7 +58,7 @@ function useInserterMediaCategories() {
 	} = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
-			inserterMediaCategories: settings.__unstableInserterMediaCategories,
+			inserterMediaCategories: settings.inserterMediaCategories,
 			allowedMimeTypes: settings.allowedMimeTypes,
 			enableOpenverseMediaCategory: settings.enableOpenverseMediaCategory,
 		};
@@ -97,13 +77,6 @@ function useInserterMediaCategories() {
 				category.name === 'openverse'
 			) {
 				return false;
-			}
-			// When a category has set `isExternalResource` to `true`, we
-			// don't need to check for allowed mime types, as they are used
-			// for restricting uploads for this media type and not for
-			// inserting media from external sources.
-			if ( category.isExternalResource ) {
-				return true;
 			}
 			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
 				mimeType.startsWith( `${ category.mediaType }/` )
@@ -143,7 +116,7 @@ export function useMediaCategories( rootClientId ) {
 	useEffect( () => {
 		( async () => {
 			const _categories = [];
-			// If `__unstableInserterMediaCategories` is not defined in
+			// If `inserterMediaCategories` is not defined in
 			// block editor settings, do not show any media categories.
 			if ( ! inserterMediaCategories ) {
 				return;
@@ -156,7 +129,15 @@ export function useMediaCategories( rootClientId ) {
 						if ( category.isExternalResource ) {
 							return [ category.name, true ];
 						}
-						const results = await category.fetch( { per_page: 1 } );
+						let results = [];
+						try {
+							results = await category.fetch( {
+								per_page: 1,
+							} );
+						} catch ( e ) {
+							// If the request fails, we shallow the error and just don't show
+							// the category, in order to not break the media tab.
+						}
 						return [ category.name, !! results.length ];
 					} )
 				)

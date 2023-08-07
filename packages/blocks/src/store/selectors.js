@@ -3,12 +3,16 @@
  */
 import createSelector from 'rememo';
 import removeAccents from 'remove-accents';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { pipe } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { getValueFromObjectPath } from './utils';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -607,7 +611,11 @@ export const getBlockSupport = (
 		return defaultSupports;
 	}
 
-	return get( blockType.supports, feature, defaultSupports );
+	return getValueFromObjectPath(
+		blockType.supports,
+		feature,
+		defaultSupports
+	);
 };
 
 /**

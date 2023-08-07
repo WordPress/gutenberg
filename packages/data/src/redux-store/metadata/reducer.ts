@@ -115,8 +115,8 @@ const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
  *
  *   selectorName -> EquivalentKeyMap<Array, boolean>
  *
- * @param  state  Current state.
- * @param  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
  * @return Next state.
  */

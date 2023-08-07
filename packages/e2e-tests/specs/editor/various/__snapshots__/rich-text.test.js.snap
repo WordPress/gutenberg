@@ -24,6 +24,16 @@ exports[`RichText should apply multiple formats when selection is collapsed 1`] 
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should copy/paste heading 1`] = `
+"<!-- wp:heading -->
+<h2 class="wp-block-heading">Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Heading</h2>
+<!-- /wp:heading -->"
+`;
+
 exports[`RichText should handle Home and End keys 1`] = `
 "<!-- wp:paragraph -->
 <p>-<strong>12</strong>+</p>
@@ -31,8 +41,8 @@ exports[`RichText should handle Home and End keys 1`] = `
 `;
 
 exports[`RichText should handle change in tag name gracefully 1`] = `
-"<!-- wp:heading {\\"level\\":3} -->
-<h3 class=\\"wp-block-heading\\"></h3>
+"<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading"></h3>
 <!-- /wp:heading -->"
 `;
 
@@ -129,24 +139,28 @@ exports[`RichText should paste paragraph contents into list 1`] = `
 
 <!-- wp:list -->
 <ul><!-- wp:list-item -->
-<li>1<br>2</li>
+<li>1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>2</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
 
 exports[`RichText should preserve internal formatting 1`] = `
 "<!-- wp:paragraph -->
-<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`RichText should preserve internal formatting 2`] = `
 "<!-- wp:paragraph -->
-<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark></p>
 <!-- /wp:paragraph -->"
 `;
 

@@ -31,21 +31,18 @@ jobs:
                 node: ['14']
 
         steps:
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+            - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
               with:
                   node-version: ${{ matrix.node }}
-                  cache: npm
 
-            - name: Npm install and build
+            - name: Npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
-              run: |
-                  npm ci
-                  npx lerna run build
+              run: npx lerna run build
 
             - name: Running the tests
               run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
@@ -53,8 +50,34 @@ jobs:
             - name: Running the date tests
               run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
+    compute-previous-wordpress-version:
+        name: Compute previous WordPress version
+        runs-on: ubuntu-latest
+        outputs:
+            previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
+
+        steps:
+            - name: Get previous WordPress version
+              id: get-previous-wordpress-version
+              run: |
+                  curl \
+                    -H "Accept: application/json" \
+                    -o versions.json \
+                    "http://api.wordpress.org/core/stable-check/1.0/"
+                  LATEST_WP_VERSION=$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)
+                  IFS='.' read LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
+                  if [[ ${LATEST_WP_MINOR} == "0" ]]; then
+                    PREVIOUS_WP_SERIES="$((LATEST_WP_MAJOR - 1)).9"
+                  else
+                    PREVIOUS_WP_SERIES="${LATEST_WP_MAJOR}.$((LATEST_WP_MINOR - 1))"
+                  fi
+                  PREVIOUS_WP_VERSION=$(jq --raw-output --arg series "${PREVIOUS_WP_SERIES}" 'with_entries(select(.key|startswith($series)))|keys[-1]' versions.json)
+                  echo "previous-wordpress-version=${PREVIOUS_WP_VERSION}" >> $GITHUB_OUTPUT
+                  rm versions.json
+
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ubuntu-latest
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on ubuntu-latest
+        needs: compute-previous-wordpress-version
         runs-on: ubuntu-latest
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -62,7 +85,6 @@ jobs:
             fail-fast: true
             matrix:
                 php:
-                    - '5.6'
                     - '7.0'
                     - '7.1'
                     - '7.2'
@@ -72,18 +94,25 @@ jobs:
                     - '8.1'
                     - '8.2'
                 multisite: [false, true]
+                wordpress: [''] # Latest WordPress version.
+                include:
+                    # Test with the previous WP version.
+                    - php: '7.0'
+                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
+                    - php: '7.4'
+                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
+                    - php: '8.2'
+                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
+            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
 
         steps:
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+            - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
-            - name: Set up Node.js
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
             ##
             # This allows Composer dependencies to be installed using a single step.
@@ -93,7 +122,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@8e2ac35f639d3e794c1da1f28999385ab6fdf0fc # v2.23.0
+              uses: shivammathur/setup-php@4bd44f22a98a19e0950cbad5f31095157cc9621b # v2.25.4
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -116,10 +145,8 @@ jobs:
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
-            - name: Install npm dependencies
-              run: |
-                  npm ci
-                  npm run build
+            - name: Npm build
+              run: npm run build
 
             - name: Docker debug information
               run: |
@@ -143,20 +170,44 @@ jobs:
 
             - name: Docker container debug information
               run: |
-                  npm run wp-env run tests-mysql "mysql --version"
-                  npm run wp-env run tests-wordpress "php --version"
-                  npm run wp-env run tests-wordpress "php -m"
-                  npm run wp-env run tests-wordpress "php -i"
-                  npm run wp-env run tests-wordpress "/var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit --version"
-                  npm run wp-env run tests-wordpress "locale -a"
+                  npm run wp-env run tests-mysql mysql -- --version
+                  npm run wp-env run tests-wordpress php -- --version
+                  npm run wp-env run tests-wordpress php -m
+                  npm run wp-env run tests-wordpress php -i
+                  npm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
+                  npm run wp-env run tests-wordpress locale -a
 
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
-              run: npm run test:unit:php
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php | tee phpunit.log
 
             - name: Running multisite unit tests
               if: ${{ matrix.multisite }}
-              run: npm run test:unit:php:multisite
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php:multisite | tee phpunit.log
+
+            # Verifies that PHPUnit actually runs in the first place. We want visibility
+            # into issues which can cause it to fail silently, so we check the output
+            # to verify that at least 500 tests have passed. This is an arbitrary
+            # number, but makes sure a drastic change doesn't happen without us noticing.
+            - name: Check number of passed tests
+              run: |
+                  # Note: relies on PHPUnit execution to fail on test failure.
+                  # Extract the number of executed tests from the log file.
+                  if ! num_tests=$(grep -Eo 'OK \([0-9]+ tests' phpunit.log) ; then
+                    if ! num_tests=$(grep -Eo 'Tests: [0-9]+, Assertions:' phpunit.log) ; then
+                      echo "PHPUnit failed or did not run. Check the PHPUnit output in the previous step to debug." && exit 1
+                    fi
+                  fi
+                  # Extract just the number of tests from the string.
+                  num_tests=$(echo "$num_tests" | grep -Eo '[0-9]+')
+                  if [ $num_tests -lt 500 ] ; then
+                    echo "Only $num_tests tests passed, which is much fewer than expected." && exit 1
+                  fi
+                  echo "$num_tests tests passed."
 
     phpcs:
         name: PHP coding standards
@@ -166,10 +217,10 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@8e2ac35f639d3e794c1da1f28999385ab6fdf0fc # v2.23.0
+              uses: shivammathur/setup-php@4bd44f22a98a19e0950cbad5f31095157cc9621b # v2.25.4
               with:
                   php-version: '7.4'
                   coverage: none
@@ -182,7 +233,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
+              uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -233,21 +284,16 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+            - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
+            - name: Npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
-              run: |
-                  npm ci
-                  npx lerna run build
+              run: npx lerna run build
 
             - name: Running the tests
-              run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

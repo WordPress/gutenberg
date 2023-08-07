@@ -235,7 +235,7 @@ export class DecodeEntityParser {
 	 *
 	 * @param {string} entity Entity fragment discovered in HTML.
 	 *
-	 * @return {?string} Entity substitute value.
+	 * @return {string | undefined} Entity substitute value.
 	 */
 	parse( entity ) {
 		if ( isValidCharacterReference( entity ) ) {
@@ -548,7 +548,7 @@ export const isEqualTokensOfType = {
  *
  * @param {Object[]} tokens Set of tokens to search.
  *
- * @return {Object} Next non-whitespace token.
+ * @return {Object | undefined} Next non-whitespace token.
  */
 export function getNextNonWhitespaceToken( tokens ) {
 	let token;

@@ -2,6 +2,58 @@
 
 ## Unreleased
 
+## 12.6.0 (2023-07-20)
+
+## 12.5.0 (2023-07-05)
+
+## 12.4.0 (2023-06-23)
+
+### Enhancements
+
+- Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
+
+### Bug Fix
+
+-   Fluid typography: custom font-sizes should use max viewport width ([#51516](https://github.com/WordPress/gutenberg/pull/51516)).
+
+
+## 12.3.0 (2023-06-07)
+
+## 12.2.0 (2023-05-24)
+
+## 12.1.0 (2023-05-10)
+
+-   `MediaPlaceholder`: Remove the undocumented `onHTMLDrop` prop ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
+
+## 12.0.0 (2023-04-26)
+
+### Breaking Changes
+
+- Renamed utility function `immutableSet` to `setImmutably` ([#50040](https://github.com/WordPress/gutenberg/pull/50040)).
+
+## 11.8.0 (2023-04-12)
+
+
+## 11.7.0 (2023-03-29)
+
+-   `ImageSizeControl`: Update image size label ([#49112](https://github.com/WordPress/gutenberg/pull/49112)).
+
+## 11.6.0 (2023-03-15)
+
+## 11.5.0 (2023-03-01)
+
+### Bug Fix
+
+-   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
+
+## 11.4.0 (2023-02-15)
+
+### Bug Fix
+
+-   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
+
+## 11.3.0 (2023-02-01)
+
 ## 11.2.0 (2023-01-11)
 
 ### Bug Fix

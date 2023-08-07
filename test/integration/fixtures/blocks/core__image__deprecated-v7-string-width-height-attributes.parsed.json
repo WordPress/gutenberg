@@ -1,0 +1,15 @@
+[
+	{
+		"blockName": "core/image",
+		"attrs": {
+			"width": 164,
+			"height": 164,
+			"sizeSlug": "large"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<figure class=\"wp-block-image size-large is-resized\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" style=\"width:164px;height:164px;\" width=\"164\" height=\"164\"/></figure>\n",
+		"innerContent": [
+			"\n<figure class=\"wp-block-image size-large is-resized\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" style=\"width:164px;height:164px;\" width=\"164\" height=\"164\"/></figure>\n"
+		]
+	}
+]

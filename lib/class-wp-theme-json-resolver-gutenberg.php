@@ -6,6 +6,10 @@
  * @since 5.8.0
  */
 
+if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
+	return;
+}
+
 /**
  * Class that abstracts the processing of the different data sources
  * for site-level config and offers an API to work with them.
@@ -275,7 +279,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 
 			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-			static::$theme = gutenberg_add_registered_fonts_to_theme_json( static::$theme );
+			if ( ! class_exists( 'WP_Font_Face' ) && class_exists( 'WP_Fonts_Resolver' ) ) {
+				static::$theme = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( static::$theme );
+			}
 			// END OF EXPERIMENTAL CODE.
 
 		}
@@ -290,7 +296,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * So we take theme supports, transform it to theme.json shape
 		 * and merge the static::$theme upon that.
 		 */
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_legacy_theme_supports_for_theme_json() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
 		if ( ! wp_theme_has_theme_json() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
@@ -319,10 +325,35 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			// Classic themes without a theme.json don't support global duotone.
 			$theme_support_data['settings']['color']['defaultDuotone'] = false;
 
+			// Allow themes to enable all border settings via theme_support.
+			if ( current_theme_supports( 'border' ) ) {
+				$theme_support_data['settings']['border']['color']  = true;
+				$theme_support_data['settings']['border']['radius'] = true;
+				$theme_support_data['settings']['border']['style']  = true;
+				$theme_support_data['settings']['border']['width']  = true;
+			}
+
+			// Allow themes to enable link colors via theme_support.
+			if ( current_theme_supports( 'link-color' ) ) {
+				$theme_support_data['settings']['color']['link'] = true;
+			}
+			if ( current_theme_supports( 'experimental-link-color' ) ) {
+				_doing_it_wrong(
+					current_theme_supports( 'experimental-link-color' ),
+					__( '`experimental-link-color` is no longer supported. Use `link-color` instead.', 'gutenberg' ),
+					'6.3.0'
+				);
+			}
+
+			// BEGIN EXPERIMENTAL.
 			// Allow themes to enable appearance tools via theme_support.
+			// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
+			// and then reverted as of https://core.trac.wordpress.org/ticket/57649
+			// Not to backport until the issues are resolved.
 			if ( current_theme_supports( 'appearance-tools' ) ) {
 				$theme_support_data['settings']['appearanceTools'] = true;
 			}
+			// END EXPERIMENTAL.
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
@@ -566,7 +597,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			_deprecated_argument( __FUNCTION__, '5.9.0' );
 		}
 
-		$result = static::get_core_data();
+		$result = new WP_Theme_JSON_Gutenberg();
+		$result->merge( static::get_core_data() );
 		if ( 'default' === $origin ) {
 			$result->set_spacing_sizes();
 			return $result;

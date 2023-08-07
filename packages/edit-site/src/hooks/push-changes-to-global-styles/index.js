@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, set } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -11,13 +6,14 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import {
 	InspectorAdvancedControls,
 	store as blockEditorStore,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	getBlockType,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import { useContext, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -26,10 +22,15 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels } from '../../components/global-styles/hooks';
-import { unlock } from '../../experiments';
+import { useSupportedStyles } from '../../components/global-styles/hooks';
+import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesContext } = unlock( blockEditorExperiments );
+const {
+	GlobalStylesContext,
+	useBlockEditingMode,
+	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
+	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
+} = unlock( blockEditorPrivateApis );
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
 // removed by moving PushChangesToGlobalStylesControl to
@@ -45,6 +46,7 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.button.color.background': 'color',
 	'elements.button.typography.fontFamily': 'font-family',
 	'elements.button.typography.fontSize': 'font-size',
+	'elements.caption.color.text': 'color',
 	'elements.heading.color': 'color',
 	'elements.heading.color.background': 'color',
 	'elements.heading.typography.fontFamily': 'font-family',
@@ -90,22 +92,80 @@ const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontFamily': 'fontFamily',
 };
 
-function getChangesToPush( name, attributes ) {
-	return getSupportedGlobalStylesPanels( name ).flatMap( ( key ) => {
-		if ( ! STYLE_PROPERTY[ key ] ) {
-			return [];
-		}
-		const { value: path } = STYLE_PROPERTY[ key ];
-		const presetAttributeKey = path.join( '.' );
-		const presetAttributeValue =
-			attributes[
-				STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[ presetAttributeKey ]
-			];
-		const value = presetAttributeValue
-			? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
-			: get( attributes.style, path );
-		return value ? [ { path, value } ] : [];
+const SUPPORTED_STYLES = [ 'border', 'color', 'spacing', 'typography' ];
+
+const getValueFromObjectPath = ( object, path ) => {
+	let value = object;
+	path.forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
 	} );
+	return value;
+};
+
+function useChangesToPush( name, attributes ) {
+	const supports = useSupportedStyles( name );
+
+	return useMemo(
+		() =>
+			supports.flatMap( ( key ) => {
+				if ( ! STYLE_PROPERTY[ key ] ) {
+					return [];
+				}
+				const { value: path } = STYLE_PROPERTY[ key ];
+				const presetAttributeKey = path.join( '.' );
+				const presetAttributeValue =
+					attributes[
+						STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[
+							presetAttributeKey
+						]
+					];
+				const value = presetAttributeValue
+					? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
+					: getValueFromObjectPath( attributes.style, path );
+				return value ? [ { path, value } ] : [];
+			} ),
+		[ supports, attributes ]
+	);
+}
+
+/**
+ * Sets the value at path of object.
+ * If a portion of path doesn’t exist, it’s created.
+ * Arrays are created for missing index properties while objects are created
+ * for all other missing properties.
+ *
+ * This function intentionally mutates the input object.
+ *
+ * Inspired by _.set().
+ *
+ * @see https://lodash.com/docs/4.17.15#set
+ *
+ * @todo Needs to be deduplicated with its copy in `@wordpress/core-data`.
+ *
+ * @param {Object} object Object to modify
+ * @param {Array}  path   Path of the property to set.
+ * @param {*}      value  Value to set.
+ */
+function setNestedValue( object, path, value ) {
+	if ( ! object || typeof object !== 'object' ) {
+		return object;
+	}
+
+	path.reduce( ( acc, key, idx ) => {
+		if ( acc[ key ] === undefined ) {
+			if ( Number.isInteger( path[ idx + 1 ] ) ) {
+				acc[ key ] = [];
+			} else {
+				acc[ key ] = {};
+			}
+		}
+		if ( idx === path.length - 1 ) {
+			acc[ key ] = value;
+		}
+		return acc[ key ];
+	}, object );
+
+	return object;
 }
 
 function cloneDeep( object ) {
@@ -117,11 +177,11 @@ function PushChangesToGlobalStylesControl( {
 	attributes,
 	setAttributes,
 } ) {
-	const changes = useMemo(
-		() => getChangesToPush( name, attributes ),
-		[ name, attributes ]
-	);
+	const changes = useChangesToPush( name, attributes );
 
+	const hasBehaviorsPanel = useHasBehaviorsPanel( attributes, name, {
+		blockSupportOnly: true,
+	} );
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 
@@ -129,51 +189,86 @@ function PushChangesToGlobalStylesControl( {
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
+	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
+
+	const userHasEditedBehaviors =
+		attributes.hasOwnProperty( 'behaviors' ) && hasBehaviorsPanel;
+
 	const pushChanges = useCallback( () => {
-		if ( changes.length === 0 ) {
+		if ( changes.length === 0 && ! userHasEditedBehaviors ) {
 			return;
 		}
+		if ( changes.length > 0 ) {
+			const { style: blockStyles } = attributes;
 
-		const { style: blockStyles } = attributes;
+			const newBlockStyles = cloneDeep( blockStyles );
+			const newUserConfig = cloneDeep( userConfig );
 
-		const newBlockStyles = cloneDeep( blockStyles );
-		const newUserConfig = cloneDeep( userConfig );
-
-		for ( const { path, value } of changes ) {
-			set( newBlockStyles, path, undefined );
-			set( newUserConfig, [ 'styles', 'blocks', name, ...path ], value );
-		}
-
-		// @wordpress/core-data doesn't support editing multiple entity types in
-		// a single undo level. So for now, we disable @wordpress/core-data undo
-		// tracking and implement our own Undo button in the snackbar
-		// notification.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { style: newBlockStyles } );
-		setUserConfig( () => newUserConfig, { undoIgnore: true } );
-
-		createSuccessNotice(
-			sprintf(
-				// translators: %s: Title of the block e.g. 'Heading'.
-				__( '%s styles applied.' ),
-				getBlockType( name ).title
-			),
-			{
-				type: 'snackbar',
-				actions: [
-					{
-						label: __( 'Undo' ),
-						onClick() {
-							__unstableMarkNextChangeAsNotPersistent();
-							setAttributes( { style: blockStyles } );
-							setUserConfig( () => userConfig, {
-								undoIgnore: true,
-							} );
-						},
-					},
-				],
+			for ( const { path, value } of changes ) {
+				setNestedValue( newBlockStyles, path, undefined );
+				setNestedValue(
+					newUserConfig,
+					[ 'styles', 'blocks', name, ...path ],
+					value
+				);
 			}
-		);
+
+			// @wordpress/core-data doesn't support editing multiple entity types in
+			// a single undo level. So for now, we disable @wordpress/core-data undo
+			// tracking and implement our own Undo button in the snackbar
+			// notification.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { style: newBlockStyles } );
+			setUserConfig( () => newUserConfig, { undoIgnore: true } );
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: Title of the block e.g. 'Heading'.
+					__( '%s styles applied.' ),
+					getBlockType( name ).title
+				),
+				{
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick() {
+								__unstableMarkNextChangeAsNotPersistent();
+								setAttributes( { style: blockStyles } );
+								setUserConfig( () => userConfig, {
+									undoIgnore: true,
+								} );
+							},
+						},
+					],
+				}
+			);
+		}
+		if ( userHasEditedBehaviors ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setBehavior( attributes.behaviors );
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: Title of the block e.g. 'Heading'.
+					__( '%s behaviors applied.' ),
+					getBlockType( name ).title
+				),
+				{
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick() {
+								__unstableMarkNextChangeAsNotPersistent();
+								setBehavior( inheritedBehaviors );
+								setUserConfig( () => userConfig, {
+									undoIgnore: true,
+								} );
+							},
+						},
+					],
+				}
+			);
+		}
 	}, [ changes, attributes, userConfig, name ] );
 
 	return (
@@ -182,7 +277,7 @@ function PushChangesToGlobalStylesControl( {
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
 				__(
-					'Apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
+					'Apply this block’s typography, spacing, dimensions, color styles, and behaviors to all %s blocks.'
 				),
 				getBlockType( name ).title
 			) }
@@ -192,7 +287,7 @@ function PushChangesToGlobalStylesControl( {
 			</BaseControl.VisualLabel>
 			<Button
 				variant="primary"
-				disabled={ changes.length === 0 }
+				disabled={ changes.length === 0 && ! userHasEditedBehaviors }
 				onClick={ pushChanges }
 			>
 				{ __( 'Apply globally' ) }
@@ -202,15 +297,23 @@ function PushChangesToGlobalStylesControl( {
 }
 
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) =>
-		(
+	( BlockEdit ) => ( props ) => {
+		const blockEditingMode = useBlockEditingMode();
+		const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
+			hasBlockSupport( props.name, feature )
+		);
+
+		return (
 			<>
 				<BlockEdit { ...props } />
-				<InspectorAdvancedControls>
-					<PushChangesToGlobalStylesControl { ...props } />
-				</InspectorAdvancedControls>
+				{ blockEditingMode === 'default' && supportsStyles && (
+					<InspectorAdvancedControls>
+						<PushChangesToGlobalStylesControl { ...props } />
+					</InspectorAdvancedControls>
+				) }
 			</>
-		)
+		);
+	}
 );
 
 addFilter(

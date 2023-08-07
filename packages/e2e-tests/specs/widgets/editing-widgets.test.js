@@ -24,7 +24,6 @@ import {
  */
 // eslint-disable-next-line no-restricted-imports
 import { find, findAll } from 'puppeteer-testing-library';
-import { groupBy, mapValues } from 'lodash';
 
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
@@ -384,6 +383,11 @@ describe( 'Widgets screen', () => {
 
 	describe( 'Function widgets', () => {
 		async function addMarquee( nbExpectedMarquees ) {
+			const [ firstWidgetArea ] = await findAll( {
+				role: 'document',
+				name: 'Block: Widget Area',
+			} );
+			await firstWidgetArea.focus();
 			const marqueeBlock = await getBlockInGlobalInserter(
 				'Marquee Greeting'
 			);
@@ -463,19 +467,19 @@ describe( 'Widgets screen', () => {
 			await saveWidgets();
 			let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-						Object {
-						  "sidebar-1": "<marquee>Howdy</marquee>",
-						}
-					` );
+			{
+			  "sidebar-1": "<marquee>Howdy</marquee>",
+			}
+		` );
 
 			await page.reload();
 
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-						Object {
-						  "sidebar-1": "<marquee>Howdy</marquee>",
-						}
-					` );
+			{
+			  "sidebar-1": "<marquee>Howdy</marquee>",
+			}
+		` );
 
 			await addMarquee( 2 );
 
@@ -493,10 +497,10 @@ describe( 'Widgets screen', () => {
 			await saveWidgets();
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-						Object {
-						  "sidebar-1": "<marquee>Howdy</marquee>",
-						}
-					` );
+			{
+			  "sidebar-1": "<marquee>Howdy</marquee>",
+			}
+		` );
 
 			await page.reload();
 			const marqueesAfter = await findAll( {
@@ -825,11 +829,11 @@ describe( 'Widgets screen', () => {
 
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		{
+		  "sidebar-1": "<div class="widget widget_block widget_text"><div class="widget-content">
 		<p>First Paragraph</p>
 		</div></div>
-		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<div class="widget widget_block widget_text"><div class="widget-content">
 		<p>Second Paragraph</p>
 		</div></div>",
 		}
@@ -940,13 +944,20 @@ async function saveWidgets() {
 async function getSerializedWidgetAreas() {
 	const widgets = await rest( { path: '/wp/v2/widgets' } );
 
-	const serializedWidgetAreas = mapValues(
-		groupBy( widgets, 'sidebar' ),
-		( sidebarWidgets ) =>
-			sidebarWidgets
-				.map( ( widget ) => widget.rendered )
-				.filter( Boolean )
-				.join( '\n' )
+	const serializedWidgetAreas = widgets.reduce(
+		( acc, { sidebar, rendered } ) => {
+			const currentWidgets = acc[ sidebar ] || '';
+			let newWidgets = Boolean( rendered ) ? rendered : '';
+			if ( currentWidgets.length && newWidgets.length ) {
+				newWidgets = '\n' + newWidgets;
+			}
+
+			return {
+				...acc,
+				[ sidebar ]: currentWidgets + newWidgets,
+			};
+		},
+		{}
 	);
 
 	return serializedWidgetAreas;

@@ -198,7 +198,7 @@ function ColumnsEditContainer( {
 			return (
 				<UnitControl
 					label={ label }
-					settingLabel="Width"
+					settingLabel={ __( 'Width' ) }
 					key={ `${ column.clientId }-${
 						getWidths( innerWidths ).length
 					}` }

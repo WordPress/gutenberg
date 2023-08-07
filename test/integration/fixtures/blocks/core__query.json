@@ -18,10 +18,7 @@
 				"taxQuery": null,
 				"parents": []
 			},
-			"tagName": "div",
-			"displayLayout": {
-				"type": "list"
-			}
+			"tagName": "div"
 		},
 		"innerBlocks": []
 	}

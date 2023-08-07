@@ -1,12 +1,12 @@
 /**
  *
- * @param {string} path The variation path in the Global Styles tree.
+ * @param {string} variation The variation name.
  *
  * @return {string} The variation class name.
  */
-export function getVariationClassNameFromPath( path ) {
-	if ( ! path ) {
+export function getVariationClassName( variation ) {
+	if ( ! variation ) {
 		return '';
 	}
-	return `is-style-${ path.split( '.' )[ 1 ] }`;
+	return `is-style-${ variation }`;
 }

@@ -291,9 +291,11 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<h1>FOO</h1>',
 			plainText: 'FOO\n',
 			mode: 'AUTO',
-		} );
+		} )
+			.map( getBlockContent )
+			.join( '' );
 
-		expect( filtered ).toBe( 'FOO' );
+		expect( filtered ).toBe( '<h1 class="wp-block-heading">FOO</h1>' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -378,6 +380,8 @@ describe( 'Blocks raw handling', () => {
 			'google-docs',
 			'google-docs-list-only',
 			'google-docs-table',
+			'google-docs-table-with-colspan',
+			'google-docs-table-with-rowspan',
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
 			'ms-word',

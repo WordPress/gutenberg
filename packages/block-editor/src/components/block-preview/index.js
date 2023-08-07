@@ -14,7 +14,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import BlockEditorProvider from '../provider';
+import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
@@ -66,13 +66,16 @@ export function BlockPreview( {
 	}
 
 	return (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+		<ExperimentalBlockEditorProvider
+			value={ renderedBlocks }
+			settings={ settings }
+		>
 			<AutoHeightBlockPreview
 				viewportWidth={ viewportWidth }
 				minHeight={ minHeight }
 				additionalStyles={ additionalStyles }
 			/>
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 }
 
@@ -98,18 +101,14 @@ export default memo( BlockPreview );
  * returns. Optionally, you can also pass any other props through this hook, and
  * they will be merged and returned.
  *
- * @param {Object}    options                      Preview options.
- * @param {WPBlock[]} options.blocks               Block objects.
- * @param {Object}    options.props                Optional. Props to pass to the element. Must contain
- *                                                 the ref if one is defined.
- * @param {Object}    options.__experimentalLayout Layout settings to be used in the preview.
+ * @param {Object}    options        Preview options.
+ * @param {WPBlock[]} options.blocks Block objects.
+ * @param {Object}    options.props  Optional. Props to pass to the element. Must contain
+ *                                   the ref if one is defined.
+ * @param {Object}    options.layout Layout settings to be used in the preview.
  *
  */
-export function useBlockPreview( {
-	blocks,
-	props = {},
-	__experimentalLayout,
-} ) {
+export function useBlockPreview( { blocks, props = {}, layout } ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
@@ -126,12 +125,12 @@ export function useBlockPreview( {
 	);
 
 	const children = (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
-			<BlockListItems
-				renderAppender={ false }
-				__experimentalLayout={ __experimentalLayout }
-			/>
-		</BlockEditorProvider>
+		<ExperimentalBlockEditorProvider
+			value={ renderedBlocks }
+			settings={ settings }
+		>
+			<BlockListItems renderAppender={ false } layout={ layout } />
+		</ExperimentalBlockEditorProvider>
 	);
 
 	return {

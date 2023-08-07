@@ -8,11 +8,13 @@ import { createReduxStore, register } from '@wordpress/data';
  */
 import reducer from './reducer';
 import * as selectors from './selectors';
+import * as privateSelectors from './private-selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
 import createLocksActions from './locks/actions';
 import { rootEntitiesConfig, getMethodName } from './entities';
 import { STORE_NAME } from './name';
+import { unlock } from './private-apis';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
 // (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
@@ -62,8 +64,8 @@ const storeConfig = () => ( {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  */
 export const store = createReduxStore( STORE_NAME, storeConfig() );
-
-register( store );
+unlock( store ).registerPrivateSelectors( privateSelectors );
+register( store ); // Register store after unlocking private selectors to allow resolvers to use them.
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';

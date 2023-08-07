@@ -224,16 +224,6 @@ export default function NavigationSubmenuEdit( {
 		}
 	}, [] );
 
-	// Store the colors from context as attributes for rendering.
-	useEffect( () => {
-		// This side-effect should not create an undo level as those should
-		// only be created via user interactions. Mark this change as
-		// not persistent to avoid undo level creation.
-		// See https://github.com/WordPress/gutenberg/issues/34564.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isTopLevelItem } );
-	}, [ isTopLevelItem ] );
-
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
 	 * when selecting a suggestion in the link popover, we force close on block unselection.
@@ -330,8 +320,8 @@ export default function NavigationSubmenuEdit( {
 		getNavigationChildBlockProps( innerBlocksColors );
 	const innerBlocksProps = useInnerBlocksProps( navigationChildBlockProps, {
 		allowedBlocks,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: true,
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 
 		// Ensure block toolbar is not too far removed from item
 		// being edited.
@@ -358,6 +348,9 @@ export default function NavigationSubmenuEdit( {
 	useEffect( () => {
 		// If block becomes empty, transform to Navigation Link.
 		if ( ! hasChildren && prevHasChildren ) {
+			// This side-effect should not create an undo level as those should
+			// only be created via user interactions.
+			__unstableMarkNextChangeAsNotPersistent();
 			transformToLink();
 		}
 	}, [ hasChildren, prevHasChildren ] );
@@ -391,7 +384,7 @@ export default function NavigationSubmenuEdit( {
 			</BlockControls>
 			{ /* Warning, this duplicated in packages/block-library/src/navigation-link/edit.js */ }
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
 						__nextHasNoMarginBottom
 						value={ label || '' }
@@ -429,8 +422,11 @@ export default function NavigationSubmenuEdit( {
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
 						} }
-						label={ __( 'Link title' ) }
+						label={ __( 'Title attribute' ) }
 						autoComplete="off"
+						help={ __(
+							'Additional information to help clarify the purpose of the link.'
+						) }
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
@@ -438,8 +434,11 @@ export default function NavigationSubmenuEdit( {
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
 						} }
-						label={ __( 'Link rel' ) }
+						label={ __( 'Rel attribute' ) }
 						autoComplete="off"
+						help={ __(
+							'The relationship of the linked URL as space-separated link types.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
