@@ -31,6 +31,6 @@ return array(
 			$updated_tags->set_attribute( $name, $tags->get_attribute( $name ) );
 		}
 
-		return $updated_tags->get_updated_html() . '';
+		return $updated_tags->get_updated_html();
 	},
 );
