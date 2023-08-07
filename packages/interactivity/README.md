@@ -25,7 +25,7 @@ You can test it, but it's still very experimental.
 
 ### How do I get started?
 
-The best place to start with the Interactivity API is this [**Getting started guide**](docs/1-getting-started.md). There you'll will find a very quick start guide and the current requirements of the Interactivity API.
+The best place to start with the Interactivity API is this [**Getting started guide**](https://github.com/WordPress/gutenberg/blob/trunk/packages/interactivity/docs/1-getting-started.md). There you'll will find a very quick start guide and the current requirements of the Interactivity API.
 
 ### Where can I ask questions?
 
