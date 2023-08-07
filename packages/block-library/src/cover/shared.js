@@ -165,8 +165,8 @@ export async function getCoverIsDark( url, dimRatio = 50, overlayColor ) {
 	const overlay = colord( overlayColor )
 		.alpha( dimRatio / 100 )
 		.toRgb();
-	// If the dimRatio is less than 50, the image will have the most impact on darkness.
-	if ( url && dimRatio <= 50 ) {
+
+	if ( url ) {
 		const imgCrossOrigin = applyFilters(
 			'media.crossOrigin',
 			undefined,
