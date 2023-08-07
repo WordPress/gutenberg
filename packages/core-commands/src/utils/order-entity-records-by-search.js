@@ -12,7 +12,9 @@ export function orderEntityRecordsBySearch( records = [], search = '' ) {
 
 	for ( let i = 0; i < records.length; i++ ) {
 		const record = records[ i ];
-		if ( record?.title?.raw?.localeCompare( search ) >= 0 ) {
+		if (
+			record?.title?.raw?.toLowerCase()?.includes( search?.toLowerCase() )
+		) {
 			priority.push( record );
 		} else {
 			nonPriority.push( record );

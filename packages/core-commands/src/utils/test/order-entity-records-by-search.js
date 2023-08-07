@@ -24,6 +24,11 @@ const mockData = [
 			raw: 'Single Product',
 		},
 	},
+	{
+		title: {
+			raw: 'Order Confirmation',
+		},
+	},
 ];
 
 describe( 'orderEntityRecordsBySearch', () => {
@@ -42,21 +47,37 @@ describe( 'orderEntityRecordsBySearch', () => {
 			mockData,
 			'Category'
 		);
+		const orderResult = orderEntityRecordsBySearch( mockData, 'Order' );
 
 		expect( singleResult.map( ( { title } ) => title.raw ) ).toEqual( [
 			'Single',
 			'Single Product',
 			'Category',
 			'Archive',
+			'Order Confirmation',
 		] );
 		expect( singleProductResult.map( ( { title } ) => title.raw ) ).toEqual(
-			[ 'Single Product', 'Category', 'Archive', 'Single' ]
+			[
+				'Single Product',
+				'Category',
+				'Archive',
+				'Single',
+				'Order Confirmation',
+			]
 		);
 		expect( categoryResult.map( ( { title } ) => title.raw ) ).toEqual( [
 			'Category',
+			'Archive',
 			'Single',
 			'Single Product',
+			'Order Confirmation',
+		] );
+		expect( orderResult.map( ( { title } ) => title.raw ) ).toEqual( [
+			'Order Confirmation',
+			'Category',
 			'Archive',
+			'Single',
+			'Single Product',
 		] );
 	} );
 } );
