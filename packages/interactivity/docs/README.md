@@ -14,7 +14,7 @@ The best place to start with the Interactivity API is this [**Getting started gu
 
 ## Take a deep dive
 
-At the [**API Reference**](1-getting-started.md) page you'll find detailed technical descriptions for the *Directives* and *Store* which are the main elements of the Interactivity API.
+At the [**API Reference**](2-api-reference.md) page you'll find detailed technical descriptions for the *Directives* and *Store* which are the main elements of the Interactivity API.
 
 You can also check [Getting Started - and other learning resources](https://github.com/WordPress/gutenberg/discussions/52894) among other [discussions in GitHub](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) to learn more on this proposal.
 
