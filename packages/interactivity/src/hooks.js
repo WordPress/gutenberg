@@ -49,7 +49,7 @@ const directivePriorities = {};
  * directive(
  *   'alert', // Name without the `data-wp-` prefix.
  *   ( { directives: { alert }, element, evaluate }) => {
- *     element.props.onClick = () => {
+ *     element.props.onclick = () => {
  *       alert( evaluate( alert.default ) );
  *     }
  *   }
