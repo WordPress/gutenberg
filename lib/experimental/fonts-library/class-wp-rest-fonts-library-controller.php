@@ -48,7 +48,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			array(
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
-					'callback'            => array( $this, 'uninstall_font_family' ),
+					'callback'            => array( $this, 'uninstall_fonts' ),
 					'permission_callback' => array( $this, 'update_fonts_library_permissions_check' ),
 				),
 			)
@@ -56,20 +56,22 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Removes a font family from the fonts library and all their assets.
+	 * Removes font families from the fonts library and all their assets.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function uninstall_font_family( $request ) {
-		$data   = array(
-			'slug' => $request['slug'],
-		);
-		$font   = new WP_Font_Family( $data );
-		$result = $font->uninstall();
+	public function uninstall_fonts( $request ) {
+		$fonts_param = $request->get_param( 'fontFamilies' );
 
-		if ( is_wp_error( $result ) ) {
-			return $result;
+		foreach ( $fonts_param as $font_data ) {
+			$font = new WP_Font_Family( $font_data );
+			$result = $font->uninstall();
+
+			// If there was an error uninstalling the font, return the error.
+			if ( is_wp_error( $result ) ) {
+				return $result;
+			}
 		}
 
 		return new WP_REST_Response( __( 'Font family uninstalled successfully.', 'gutenberg' ), 200 );

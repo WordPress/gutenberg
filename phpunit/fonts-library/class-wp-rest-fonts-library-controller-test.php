@@ -40,19 +40,47 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::uninstall_fonts
+	 */
+	public function test_uninstall_non_existing_fonts () {
+		wp_set_current_user( self::$admin_id );
+		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );
+		
+		$non_existing_font_data = [
+			array(
+				'slug' => 'non-existing-font',
+				'name' => 'Non existing font',
+			),
+			array(
+				'slug' => 'another-not-installed-font',
+				'name' => 'Another not installed font',
+			),
+		];
+
+		$uninstall_request->set_param( 'fontFamilies', $non_existing_font_data );
+		$response = rest_get_server()->dispatch( $uninstall_request );
+		$data     = $response->get_data();
+		$this->assertEquals( 500, $response->get_status(), 'The response status is not 500.' );
+	}
+	
+
+	/**
 	 * @covers ::install_fonts
+	 * @covers ::uninstall_fonts
 	 *
-	 * @dataProvider data_install_fonts
+	 * @dataProvider data_install_and_uninstall_fonts
 	 *
 	 * @param array $font_families Font families to install in theme.json format
+	 * @param array $files         Font files to install
+	 * @param array $expected_response Expected response data
 	 */
-	public function test_install_fonts( $font_families, $files, $expected_response ) {
+	public function test_install_and_uninstall_fonts( $font_families, $files, $expected_response ) {
 		wp_set_current_user( self::$admin_id );
-		$request            = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
+		$install_request            = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
 		$font_families_json = json_encode( $font_families );
-		$request->set_param( 'fontFamilies', $font_families_json );
-		$request->set_file_params( $files );
-		$response = rest_get_server()->dispatch( $request );
+		$install_request->set_param( 'fontFamilies', $font_families_json );
+		$install_request->set_file_params( $files );
+		$response = rest_get_server()->dispatch( $install_request );
 		$data     = $response->get_data();
 
 		$this->assertEquals( 200, $response->get_status(), 'The response status is not 200.' );
@@ -77,12 +105,16 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 			$this->assertEquals( $expected_font, $installed_font, 'The endpoint answer is not as expected.' );
 		}
 
+		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );
+		$uninstall_request->set_param( 'fontFamilies', $font_families );
+		$response = rest_get_server()->dispatch( $uninstall_request );
+		$this->assertEquals( 200, $response->get_status(), 'The response status is not 200.' );
 	}
 
 	/**
-	 * Data provider for test_install_fonts
+	 * Data provider for test_install_and_uninstall_fonts
 	 */
-	public function data_install_fonts() {
+	public function data_install_and_uninstall_fonts() {
 
 		$temp_file_path1 = wp_tempnam( 'Piazzola1-' );
 		file_put_contents( $temp_file_path1, 'Mocking file content' );
