@@ -65,7 +65,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		$fonts_param = $request->get_param( 'fontFamilies' );
 
 		foreach ( $fonts_param as $font_data ) {
-			$font = new WP_Font_Family( $font_data );
+			$font   = new WP_Font_Family( $font_data );
 			$result = $font->uninstall();
 
 			// If there was an error uninstalling the font, return the error.

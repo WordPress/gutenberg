@@ -13,11 +13,11 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 
 	/**
 	 * Test the constructor failure
-	 * 
+	 *
 	 * @covers ::__construct
 	 */
 	public function test_constructor_failure() {
-		$font_data = array (
+		$font_data = array(
 			'fontFamily' => 'Piazzolla',
 			'name'       => 'Piazzolla',
 		);

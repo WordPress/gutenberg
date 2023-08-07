@@ -33,7 +33,7 @@ class WP_Font_Family {
 	 * @param array $font_family Font family data.
 	 */
 	public function __construct( $font_data = array() ) {
-		if ( empty ( $font_data['slug'] ) ) {
+		if ( empty( $font_data['slug'] ) ) {
 			throw new Exception( 'Font family data is missing the slug.' );
 		}
 		$this->data = $font_data;
