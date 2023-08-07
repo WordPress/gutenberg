@@ -402,7 +402,7 @@ class WP_Font_Family {
 	/**
 	 * Creates a post for a font in the fonts library if it doesn't exist, or updates it if it does.
 	 *
-	 * @return int post id
+	 * @return int|WP_Error post id if the post was created or updated successfully, WP_Error otherwise.
 	 */
 	private function create_or_update_font_post() {
 		$this->sanitize();
