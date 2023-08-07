@@ -13,7 +13,7 @@
 -   `TabPanel`: Introduce a new version of `TabPanel` with updated internals and improved adherence to ARIA guidance on `tabpanel` focus behavior while maintaining the same functionality and API surface.([#52133](https://github.com/WordPress/gutenberg/pull/52133)).
 -   `Theme`: Expose via private APIs ([#53262](https://github.com/WordPress/gutenberg/pull/53262)).
 -   `ProgressBar`: Use the theme system accent for indicator color ([#53347](https://github.com/WordPress/gutenberg/pull/53347)).
--   `NumberControl`: Add `spincrement` prop to allow for opting into alternative rounding behavior ([#52902](https://github.com/WordPress/gutenberg/pull/52902)).
+-   `NumberControl`: Add `spincrement` prop to allow for alternative rounding behavior when using the spin controls ([#52902](https://github.com/WordPress/gutenberg/pull/52902)).
 
 ### Bug Fix
 
