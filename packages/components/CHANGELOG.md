@@ -14,6 +14,7 @@
 -   `Theme`: Expose via private APIs ([#53262](https://github.com/WordPress/gutenberg/pull/53262)).
 -   `ProgressBar`: Use the theme system accent for indicator color ([#53347](https://github.com/WordPress/gutenberg/pull/53347)).
 -   `ProgressBar`: Use gray 300 for track color ([#53349](https://github.com/WordPress/gutenberg/pull/53349)).
+-   `ProgressBar`: Add default `tabIndex` to make focusable ([#53383](https://github.com/WordPress/gutenberg/pull/53383)).
 
 ### Bug Fix
 
