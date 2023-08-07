@@ -31,6 +31,7 @@ import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { kebabCase } from '../utils/object';
+import { useBlockSettings } from './utils';
 
 const layoutBlockSupportKey = 'layout';
 
@@ -133,6 +134,9 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 }
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
+	const settings = useBlockSettings( blockName );
+	const { layout: layoutSetting } = settings;
+
 	const { layout } = attributes;
 	const defaultThemeLayout = useSetting( 'layout' );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
@@ -155,7 +159,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		default: defaultBlockLayout,
 	} = layoutBlockSupport;
 
-	if ( ! allowEditing ) {
+	if ( ! allowEditing || layoutSetting === false ) {
 		return null;
 	}
 

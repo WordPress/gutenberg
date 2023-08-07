@@ -415,6 +415,7 @@ class WP_Theme_JSON_Gutenberg {
 			'writingMode'    => null,
 		),
 		'behaviors'                     => null,
+		'layout'                        => null,
 	);
 
 	/**
