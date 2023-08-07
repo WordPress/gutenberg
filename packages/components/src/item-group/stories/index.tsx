@@ -39,19 +39,24 @@ Default.args = {
 	children: (
 		[
 			{
-				children: 'First item',
+				children: 'First button item',
 				// eslint-disable-next-line no-alert
 				onClick: () => alert( 'First item clicked' ),
 			},
 			{
-				children: 'Second item',
+				children: 'Second button item',
 				// eslint-disable-next-line no-alert
 				onClick: () => alert( 'Second item clicked' ),
 			},
 			{
-				children: 'Third item',
+				children: 'Third button item',
 				// eslint-disable-next-line no-alert
 				onClick: () => alert( 'Third item clicked' ),
+			},
+			{
+				children: 'Anchor item',
+				as: 'a',
+				href: 'https://wordpress.org',
 			},
 		] as ItemProps[]
 	 ).map( mapPropsToItem ),

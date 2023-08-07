@@ -146,10 +146,11 @@ registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
 _Parameters_
 
 -   _props_ `Object`: Component properties.
--   _props.name_ `[string]`: The machine-friendly name for the panel.
+-   _props.name_ `string`: The machine-friendly name for the panel.
 -   _props.className_ `[string]`: An optional class name added to the row.
 -   _props.title_ `[string]`: The title of the panel
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props.children_ `WPElement`: Children to be rendered
 
 _Returns_
 
@@ -259,6 +260,7 @@ _Parameters_
 -   _props.title_ `[string]`: Title displayed at the top of the panel.
 -   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props.children_ `WPElement`: Children to be rendered
 
 _Returns_
 
@@ -355,6 +357,7 @@ _Parameters_
 -   _props.title_ `[string]`: Title displayed at the top of the panel.
 -   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props.children_ `WPElement`: Children to be rendered
 
 _Returns_
 

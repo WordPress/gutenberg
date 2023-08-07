@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image } from 'react-native';
+import { Image, Pressable } from 'react-native';
 import {
 	getEditorHtml,
 	initializeEditor,
@@ -12,6 +12,7 @@ import {
 	getBlock,
 	openBlockSettings,
 } from 'test/helpers';
+import HsvColorPicker from 'react-native-hsv-color-picker';
 
 /**
  * WordPress dependencies
@@ -220,6 +221,10 @@ describe( 'when an image is attached', () => {
 			'52'
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
+		// TODO(jest-console): Fix the warning and remove the expect below.
+		expect( console ).toHaveWarnedWith(
+			`Non-serializable values were found in the navigation state. Check:\n\nFocalPoint > params.onFocalPointChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		);
 
 		expect( setAttributes ).toHaveBeenCalledWith(
 			expect.objectContaining( {
@@ -377,6 +382,10 @@ describe( 'color settings', () => {
 		// Find the selected color.
 		const colorPaletteButton = await screen.findByTestId( COLOR_PINK );
 		expect( colorPaletteButton ).toBeDefined();
+		// TODO(jest-console): Fix the warning and remove the expect below.
+		expect( console ).toHaveWarnedWith(
+			`Non-serializable values were found in the navigation state. Check:\n\nColor > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		);
 
 		// Select another color.
 		const newColorButton = await screen.findByTestId( COLOR_RED );
@@ -529,6 +538,39 @@ describe( 'color settings', () => {
 		fireEvent.press( resetButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'displays the hex color value in the custom color picker', async () => {
+		HsvColorPicker.mockImplementation( ( props ) => {
+			return <Pressable { ...props } testID="hsv-color-picker" />;
+		} );
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
+		} );
+
+		// Select a color from the placeholder palette.
+		const colorButton = screen.getByA11yHint(
+			'Navigates to custom color picker'
+		);
+		fireEvent.press( colorButton );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Assert label text before tapping color picker
+		expect( screen.getByText( 'Select a color' ) ).toBeVisible();
+
+		// Tap color picker
+		const colorPicker = screen.getByTestId( 'hsv-color-picker' );
+		fireEvent( colorPicker, 'onHuePickerPress', {
+			hue: 120,
+			saturation: 12,
+			value: 50,
+		} );
+
+		// Assert label hex value after tapping color picker
+		expect( screen.getByText( '#00FF00' ) ).toBeVisible();
 	} );
 } );
 

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -41,7 +36,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 				{
 					status: 'draft',
 					title,
-					slug: kebabCase( title || __( 'No title' ) ),
+					slug: title || __( 'No title' ),
 				},
 				{ throwOnError: true }
 			);
@@ -77,9 +72,6 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl
-						/* eslint-disable jsx-a11y/no-autofocus */
-						autoFocus
-						/* eslint-enable jsx-a11y/no-autofocus */
 						label={ __( 'Page title' ) }
 						onChange={ setTitle }
 						placeholder={ __( 'No title' ) }

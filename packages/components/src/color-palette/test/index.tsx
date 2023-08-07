@@ -240,11 +240,7 @@ describe( 'ColorPalette', () => {
 		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].color ) ).toBeVisible();
 		expect(
 			screen.getByRole( 'button', {
-				name: `Custom color picker. The currently selected color is called "${
-					EXAMPLE_COLORS[ 0 ].name
-				}" and has a value of "${ EXAMPLE_COLORS[ 0 ].color
-					.split( '' )
-					.join( '-' ) }".`,
+				name: `Custom color picker. The currently selected color is called "${ EXAMPLE_COLORS[ 0 ].name }" and has a value of "${ EXAMPLE_COLORS[ 0 ].color }".`,
 				expanded: false,
 			} )
 		).toBeInTheDocument();

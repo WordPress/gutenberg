@@ -79,6 +79,10 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2 extends WP_REST_Block_Pattern
 	 * @return array Item schema data.
 	 */
 	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
 		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
 			'title'      => 'block-pattern',
@@ -153,7 +157,9 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2 extends WP_REST_Block_Pattern
 			),
 		);
 
-		return $this->add_additional_fields_schema( $schema );
+		$this->schema = $schema;
+
+		return $this->add_additional_fields_schema( $this->schema );
 	}
 
 	/**

@@ -105,7 +105,8 @@ describe( 'Links', () => {
 		await waitForURLFieldAutoFocus();
 
 		const urlInputValue = await page.evaluate(
-			() => document.querySelector( '[aria-label="URL"]' ).value
+			() =>
+				document.querySelector( '.block-editor-url-input__input' ).value
 		);
 
 		expect( urlInputValue ).toBe( '' );
@@ -496,7 +497,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'primary', 'K' );
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
+				'//button[contains(text(), "Advanced")]'
 			);
 			await settingsToggle.click();
 
@@ -528,7 +529,7 @@ describe( 'Links', () => {
 
 			await waitForURLFieldAutoFocus();
 
-			await page.keyboard.press( 'Tab' );
+			await pressKeyWithModifier( 'shift', 'Tab' );
 
 			// Tabbing should land us in the text input.
 			const { isTextInput, textValue } = await page.evaluate( () => {
@@ -585,8 +586,10 @@ describe( 'Links', () => {
 
 			await editButton.click();
 
-			// Tabbing forward should land us in the "Text" input.
-			await page.keyboard.press( 'Tab' );
+			await waitForURLFieldAutoFocus();
+
+			// Tabbing backward should land us in the "Text" input.
+			await pressKeyWithModifier( 'shift', 'Tab' );
 
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
@@ -614,8 +617,9 @@ describe( 'Links', () => {
 			);
 			await editButton.click();
 
-			// tab forward to the text input.
-			await page.keyboard.press( 'Tab' );
+			await waitForURLFieldAutoFocus();
+
+			await pressKeyWithModifier( 'shift', 'Tab' );
 
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
@@ -661,7 +665,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
+				'//button[contains(text(), "Advanced")]'
 			);
 			await settingsToggle.click();
 
@@ -679,7 +683,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
 
 			// Move back to the text input.
-			await pressKeyTimes( 'Tab', 2 );
+			await pressKeyTimes( 'Tab', 1 );
 
 			// Tabbing back should land us in the text input.
 			const textInputValue = await page.evaluate(
@@ -879,8 +883,11 @@ describe( 'Links', () => {
 
 			await waitForURLFieldAutoFocus();
 
-			// Move to Link Text field.
-			await page.keyboard.press( 'Tab' );
+			// Move to "Text" field.
+			await pressKeyWithModifier( 'shift', 'Tab' );
+
+			// Delete existing value from "Text" field
+			await page.keyboard.press( 'Delete' );
 
 			// Change text to "z"
 			await page.keyboard.type( 'z' );

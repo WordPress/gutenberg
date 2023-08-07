@@ -5,7 +5,7 @@
  * @package WordPress
  */
 
-if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+if ( gutenberg_should_block_use_interactivity_api( 'core/file' ) ) {
 	/**
 	 * Replaces view script for the File block with version using Interactivity API.
 	 *
@@ -15,7 +15,8 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	 */
 	function gutenberg_block_core_file_update_interactive_view_script( $metadata ) {
 		if ( 'core/file' === $metadata['name'] ) {
-			$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
+			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
+			$metadata['supports']['interactivity'] = true;
 		}
 		return $metadata;
 	}
@@ -23,7 +24,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 }
 
 /**
- * When the `core/file` block is rendering, check if we need to enqueue the `'wp-block-file-view` script.
+ * When the `core/file` block is rendering, check if we need to enqueue the `wp-block-file-view` script.
  *
  * @param array    $attributes The block attributes.
  * @param string   $content    The block content.
@@ -71,7 +72,7 @@ function render_block_core_file( $attributes, $content, $block ) {
 	);
 
 	// If it uses the Interactivity API, add the directives.
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $should_load_view_script ) {
+	if ( gutenberg_should_block_use_interactivity_api( 'core/file' ) && $should_load_view_script ) {
 		$processor = new WP_HTML_Tag_Processor( $content );
 		$processor->next_tag();
 		$processor->set_attribute( 'data-wp-interactive', '' );

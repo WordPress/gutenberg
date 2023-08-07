@@ -427,7 +427,10 @@ test.describe( 'Writing Flow', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test( 'should navigate empty paragraphs', async ( { editor, page } ) => {
+	test( 'should navigate empty paragraphs (@firefox, @webkit)', async ( {
+		editor,
+		page,
+	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
@@ -438,7 +441,20 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '3' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '3' },
+			},
+		] );
 	} );
 
 	test( 'should navigate contenteditable with padding', async ( {

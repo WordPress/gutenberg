@@ -12,8 +12,6 @@ import {
 	activateTheme,
 	clickButton,
 	createReusableBlock,
-	visitSiteEditor,
-	enterEditMode,
 	deleteAllTemplates,
 	canvas,
 } from '@wordpress/e2e-test-utils';
@@ -237,106 +235,6 @@ describe( 'Multi-entity save flow', () => {
 			checkboxInputs = await page.$$( checkboxInputSelector );
 
 			expect( checkboxInputs ).toHaveLength( 1 );
-		} );
-	} );
-
-	describe( 'Site Editor', () => {
-		// Selectors - Site editor specific.
-		const saveSiteSelector = '.edit-site-save-button__button';
-		const activeSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=false]`;
-		const disabledSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=true]`;
-		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
-
-		const saveAllChanges = async () => {
-			// Clicking button should open panel with boxes checked.
-			await page.click( activeSaveSiteSelector );
-			await page.waitForSelector( savePanelSelector );
-			await assertAllBoxesChecked();
-
-			// Save a11y button should not be present with save panel open.
-			await assertExistence( saveA11ySelector, false );
-
-			// Saving should result in items being saved.
-			await page.click( entitiesSaveSelector );
-		};
-
-		it( 'Save flow should work as expected', async () => {
-			// Navigate to site editor.
-			await visitSiteEditor( {
-				postId: 'emptytheme//index',
-				postType: 'wp_template',
-			} );
-
-			await enterEditMode();
-
-			// Select the header template part via list view.
-			await page.click( '.edit-site-header-edit-mode__list-view-toggle' );
-			const headerTemplatePartListViewButton = await page.waitForXPath(
-				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "header")]'
-			);
-			headerTemplatePartListViewButton.click();
-			await page.click( 'button[aria-label="Close"]' );
-
-			// Insert something to dirty the editor.
-			await insertBlock( 'Paragraph' );
-
-			const enabledButton = await page.waitForSelector(
-				activeSaveSiteSelector
-			);
-
-			// Should be enabled after edits.
-			expect( enabledButton ).not.toBeNull();
-
-			// Save a11y button should be present.
-			await assertExistence( saveA11ySelector, true );
-
-			// Save all changes.
-			await saveAllChanges();
-
-			const disabledButton = await page.waitForSelector(
-				disabledSaveSiteSelector
-			);
-			expect( disabledButton ).not.toBeNull();
-		} );
-
-		it( 'Save flow should allow re-saving after changing the same block attribute', async () => {
-			// Navigate to site editor.
-			await visitSiteEditor( {
-				postId: 'emptytheme//index',
-				postType: 'wp_template',
-			} );
-
-			await enterEditMode();
-
-			// Insert a paragraph at the bottom.
-			await insertBlock( 'Paragraph' );
-
-			// Open the block settings.
-			await page.click( 'button[aria-label="Settings"]' );
-
-			// Wait for the font size picker controls.
-			await page.waitForSelector(
-				'.components-font-size-picker__controls'
-			);
-
-			// Change the font size.
-			await page.click(
-				'.components-font-size-picker__controls button[aria-label="Small"]'
-			);
-
-			// Save all changes.
-			await saveAllChanges();
-
-			// Change the font size.
-			await page.click(
-				'.components-font-size-picker__controls button[aria-label="Medium"]'
-			);
-
-			// Assert that the save button has been re-enabled.
-			const saveButton = await page.waitForSelector(
-				activeSaveSiteSelector
-			);
-			expect( saveButton ).not.toBeNull();
 		} );
 	} );
 } );

@@ -86,6 +86,10 @@ declare module './base-entity-records' {
 			 */
 			'automatic-feed-links': boolean;
 			/**
+			 * Whether border settings are enabled.
+			 */
+			border: boolean;
+			/**
 			 * Custom background if defined by the theme.
 			 */
 			'custom-background': boolean | CustomBackground;
@@ -141,6 +145,10 @@ declare module './base-entity-records' {
 			 * Post formats supported.
 			 */
 			formats: PostFormat[];
+			/**
+			 * Whether link colors are enabled.
+			 */
+			'link-color': boolean;
 			/**
 			 * The post types that support thumbnails or true if all post types are supported.
 			 */
