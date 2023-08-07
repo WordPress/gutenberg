@@ -330,7 +330,7 @@ describe( 'Embed block', () => {
 			const editor = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
-			fireEvent.press( await editor.findByText( 'ADD LINK' ) );
+			fireEvent.press( await editor.findByText( 'Add link' ) );
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
@@ -351,7 +351,7 @@ describe( 'Embed block', () => {
 			const editor = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
-			fireEvent.press( editor.getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'Add link' ) );
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
@@ -392,7 +392,7 @@ describe( 'Embed block', () => {
 			const editor = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
-			fireEvent.press( editor.getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'Add link' ) );
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
@@ -592,7 +592,7 @@ describe( 'Embed block', () => {
 			fireEvent.press( editor.block );
 
 			// Edit URL.
-			fireEvent.press( editor.getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'Add link' ) );
 
 			// Wait for edit URL modal to be visible.
 			await waitForModalVisible( embedEditURLModal );
@@ -602,7 +602,7 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			// Edit URL.
-			fireEvent.press( editor.getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'Add link' ) );
 
 			// Wait for edit URL modal to be visible.
 			await waitForModalVisible( embedEditURLModal );
@@ -898,6 +898,10 @@ describe( 'Embed block', () => {
 
 			// Select create embed option.
 			fireEvent.press( editor.getByText( 'Create embed' ) );
+			expect( console ).toHaveLoggedWith(
+				'Processed HTML piece:\n\n',
+				`<p>${ expectedURL }</p>`
+			);
 
 			// Get the created embed block.
 			const [ embedBlock ] = await editor.findAllByLabelText(
@@ -942,6 +946,10 @@ describe( 'Embed block', () => {
 
 			// Select create link option.
 			fireEvent.press( editor.getByText( 'Create link' ) );
+			expect( console ).toHaveLoggedWith(
+				'Processed HTML piece:\n\n',
+				`<p>${ expectedURL }</p>`
+			);
 
 			// Get the link text.
 			const linkText = await editor.findByDisplayValue(

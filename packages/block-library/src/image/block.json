@@ -64,10 +64,10 @@
 			"__experimentalRole": "content"
 		},
 		"width": {
-			"type": "number"
+			"type": "string"
 		},
 		"height": {
-			"type": "number"
+			"type": "string"
 		},
 		"aspectRatio": {
 			"type": "string"
@@ -127,5 +127,6 @@
 		{ "name": "rounded", "label": "Rounded" }
 	],
 	"editorStyle": "wp-block-image-editor",
-	"style": "wp-block-image"
+	"style": "wp-block-image",
+	"viewScript": "file:./view-interactivity.min.js"
 }

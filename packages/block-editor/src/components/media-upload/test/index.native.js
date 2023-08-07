@@ -44,6 +44,7 @@ describe( 'MediaUpload component', () => {
 			const wrapper = render(
 				<MediaUpload
 					allowedTypes={ [ mediaType ] }
+					onSelectURL={ jest.fn() }
 					render={ ( { open, getMediaOptions } ) => {
 						return (
 							<>

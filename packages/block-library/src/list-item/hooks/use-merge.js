@@ -107,11 +107,18 @@ export default function useMerge( clientId, onMerge ) {
 			} else if ( previousBlockClientId ) {
 				const trailingId = getTrailingId( previousBlockClientId );
 				registry.batch( () => {
-					moveBlocksToPosition(
-						getBlockOrder( clientId ),
-						clientId,
-						previousBlockClientId
-					);
+					// When merging a list item with a previous trailing list
+					// item, we also need to move any nested list items. First,
+					// check if there's a listed list. If there's a nested list,
+					// append its nested list items to the trailing list.
+					const [ nestedListClientId ] = getBlockOrder( clientId );
+					if ( nestedListClientId ) {
+						moveBlocksToPosition(
+							getBlockOrder( nestedListClientId ),
+							nestedListClientId,
+							getBlockRootClientId( trailingId )
+						);
+					}
 					mergeBlocks( trailingId, clientId );
 				} );
 			} else {

@@ -1241,17 +1241,19 @@ test.describe( 'List (@firefox)', () => {
 
 	test( 'can be created by pasting an empty list (-firefox)', async ( {
 		editor,
+		page,
 		pageUtils,
 	} ) => {
 		// Open code editor
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
-		// Paste empty list block
-		pageUtils.setClipboardData( {
-			plainText:
-				'<!-- wp:list -->\n<ul><li></li></ul>\n<!-- /wp:list -->',
-		} );
-		await pageUtils.pressKeys( 'primary+v' );
+		// Add empty list block
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
 
 		// Go back to normal editor
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
@@ -1364,5 +1366,86 @@ test.describe( 'List (@firefox)', () => {
 <li>2</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
+	} );
+
+	test( 'should merge two list items with nested lists', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: '1' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'a' },
+								},
+							],
+						},
+					],
+				},
+				{
+					name: 'core/list-item',
+					attributes: { content: '2' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'b' },
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+
+		// Navigate to the third item.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		await page.keyboard.press( 'Backspace' );
+
+		// Test caret position.
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'a‸2' },
+									},
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
 	} );
 } );

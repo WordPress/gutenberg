@@ -1,7 +1,7 @@
 // dirty hack to clean up modal
 .commands-command-menu {
 	width: 100%;
-	max-width: 480px;
+	max-width: 420px;
 	position: relative;
 	top: 15%;
 
@@ -19,6 +19,7 @@
 .commands-command-menu__header {
 	display: flex;
 	align-items: center;
+	padding-left: $grid-unit-20;
 
 	.components-button {
 		height: $grid-unit-70;
@@ -42,33 +43,32 @@
 	[cmdk-input] {
 		border: none;
 		width: 100%;
-		padding: $grid-unit-20;
+		padding: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-10;
 		outline: none;
 		color: $gray-900;
 		margin: 0;
-		font-size: 20px;
+		font-size: 16px;
 		line-height: 28px;
-		border-bottom: 1px solid $gray-200;
 		border-radius: 0;
 
 		&::placeholder {
-			color: $gray-600;
+			color: $gray-700;
 		}
 
 		&:focus {
 			box-shadow: none;
 			outline: none;
-			border-bottom: 1px solid $gray-200;
 		}
 	}
 
 	[cmdk-item] {
-		border-radius: $grid-unit-05;
+		border-radius: $radius-block-ui;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		padding: $grid-unit;
 		color: $gray-900;
+		font-size: $default-font-size;
 
 		&[aria-selected="true"],
 		&:active {
@@ -86,16 +86,16 @@
 		}
 
 		svg {
-			fill: $gray-600;
+			fill: $gray-900;
 		}
 	}
 
 	[cmdk-root] > [cmdk-list] {
-		max-height: 400px;
+		max-height: 368px; // Specific to not have commands overflow oddly.
 		overflow: auto;
 
-		& > [cmdk-list-sizer] :has([cmdk-group-items]:not(:empty)) {
-			padding: $grid-unit;
+		& > [cmdk-list-sizer]:not(:empty) {
+			padding: 0 $grid-unit $grid-unit;
 		}
 	}
 
@@ -105,7 +105,7 @@
 		justify-content: center;
 		height: $grid-unit-80;
 		white-space: pre-wrap;
-		color: $gray-800;
+		color: $gray-900;
 	}
 
 	[cmdk-loading] {
@@ -115,10 +115,14 @@
 	[cmdk-list-sizer] {
 		position: relative;
 	}
+}
 
-	[cmdk-group]:has([cmdk-group-items]:not(:empty)) + [cmdk-group]:has([cmdk-group-items]:not(:empty)) {
-		border-top: 1px solid $gray-200;
-	}
+.commands-command-menu__item span {
+	// Ensure commands do not run off the edge (great for post titles).
+	display: inline-block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .commands-command-menu__item mark {

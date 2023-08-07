@@ -60,7 +60,7 @@ function fromFormat( {
 
 	let elementAttributes = {};
 
-	if ( boundaryClass ) {
+	if ( boundaryClass && isEditableTree ) {
 		elementAttributes[ 'data-rich-text-format-boundary' ] = 'true';
 	}
 
@@ -108,7 +108,7 @@ function fromFormat( {
 	}
 
 	return {
-		type: formatType.tagName === '*' ? tagName : formatType.tagName,
+		type: tagName || formatType.tagName,
 		object: formatType.object,
 		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
 	};
@@ -326,7 +326,11 @@ export function toTree( {
 					} )
 				);
 
-				if ( innerHTML ) append( pointer, innerHTML );
+				if ( innerHTML ) {
+					append( pointer, {
+						html: innerHTML,
+					} );
+				}
 			} else {
 				pointer = append(
 					getParent( pointer ),
@@ -374,9 +378,7 @@ export function toTree( {
 					attributes: {
 						'data-rich-text-placeholder': placeholder,
 						// Necessary to prevent the placeholder from catching
-						// selection. The placeholder is also not editable after
-						// all.
-						contenteditable: 'false',
+						// selection and being editable.
 						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
 					},
 				} );

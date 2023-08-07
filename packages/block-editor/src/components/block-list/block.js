@@ -505,9 +505,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 			) {
 				__unstableMarkLastChangeAsPersistent();
 			}
+			//Unsynced patterns are nested in an array so we need to flatten them.
+			const replacementBlocks =
+				blocks?.length === 1 && Array.isArray( blocks[ 0 ] )
+					? blocks[ 0 ]
+					: blocks;
 			replaceBlocks(
 				[ ownProps.clientId ],
-				blocks,
+				replacementBlocks,
 				indexToSelect,
 				initialPosition
 			);

@@ -49,7 +49,15 @@ describe( 'getCustomValueFromPreset', () => {
 } );
 
 describe( 'getPresetValueFromCustomValue', () => {
-	const spacingSizes = [ { name: 'Small', slug: 20, size: '8px' } ];
+	const spacingSizes = [
+		{ name: 'Default', slug: 'default', size: undefined },
+		{ name: 'Small', slug: 20, size: '8px' },
+	];
+	it( 'should return undefined even if an undefined value exist in spacing sizes as occurs if spacingSizes has > 7 entries', () => {
+		expect( getPresetValueFromCustomValue( undefined, spacingSizes ) ).toBe(
+			undefined
+		);
+	} );
 	it( 'should return original value if a string in spacing presets var format', () => {
 		expect(
 			getPresetValueFromCustomValue(

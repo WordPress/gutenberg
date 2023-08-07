@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { parse } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import TemplatePartNavigationMenus from './template-part-navigation-menus';
@@ -54,18 +59,33 @@ export default function useNavigationMenuContent( postType, postId ) {
 		return;
 	}
 
+	const blocks =
+		record?.content && typeof record.content !== 'function'
+			? parse( record.content )
+			: [];
+
 	const navigationBlocks = getBlocksOfTypeFromBlocks(
 		'core/navigation',
-		record?.blocks
+		blocks
 	);
+
+	if ( ! navigationBlocks.length ) {
+		return;
+	}
 
 	const navigationMenuIds = navigationBlocks?.map(
 		( block ) => block.attributes.ref
 	);
 
-	if ( ! navigationMenuIds?.length ) {
+	// Dedupe the Navigation blocks, as you can have multiple navigation blocks in the template.
+	// Also, filter out undefined values, as blocks don't have an id when initially added.
+	const uniqueNavigationMenuIds = [ ...new Set( navigationMenuIds ) ].filter(
+		( menuId ) => menuId
+	);
+
+	if ( ! uniqueNavigationMenuIds?.length ) {
 		return;
 	}
 
-	return <TemplatePartNavigationMenus menus={ navigationMenuIds } />;
+	return <TemplatePartNavigationMenus menus={ uniqueNavigationMenuIds } />;
 }

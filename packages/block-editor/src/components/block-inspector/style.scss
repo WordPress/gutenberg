@@ -20,7 +20,8 @@
 
 	// Reset unwanted margin-bottom from being applied to BaseControls within certain components.
 	.components-focal-point-picker-control,
-	.components-query-controls {
+	.components-query-controls,
+	.components-range-control {
 		.components-base-control {
 			margin-bottom: 0;
 		}
