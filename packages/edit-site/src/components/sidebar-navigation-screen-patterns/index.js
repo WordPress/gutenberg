@@ -10,7 +10,6 @@ import {
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
@@ -24,7 +23,6 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
 import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-patterns/utils';
-import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
 import useMyPatterns from './use-my-patterns';
@@ -108,11 +106,6 @@ export default function SidebarNavigationScreenPatterns() {
 	const { patternCategories, hasPatterns } = usePatternCategories();
 	const { myPatterns } = useMyPatterns();
 
-	const isTemplatePartsMode = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
-		return !! settings.supportsTemplatePartsMode;
-	}, [] );
-
 	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
 	const footer = ! isMobileViewport ? (
 		<ItemGroup>
@@ -131,7 +124,6 @@ export default function SidebarNavigationScreenPatterns() {
 
 	return (
 		<SidebarNavigationScreen
-			isRoot={ isTemplatePartsMode }
 			title={ __( 'Patterns' ) }
 			description={ __(
 				'Manage what patterns are available when editing the site.'

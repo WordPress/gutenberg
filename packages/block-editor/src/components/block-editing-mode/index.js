@@ -66,6 +66,6 @@ export function useBlockEditingMode( mode ) {
 				unsetBlockEditingMode( clientId );
 			}
 		};
-	}, [ clientId, mode ] );
+	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
 	return blockEditingMode;
 }

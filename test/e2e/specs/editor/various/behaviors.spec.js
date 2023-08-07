@@ -21,32 +21,12 @@ test.describe( 'Testing behaviors functionality', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deleteAllPosts();
 	} );
-	test.beforeEach( async ( { admin, page, requestUtils } ) => {
+	test.beforeEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
-		await admin.visitAdminPage(
-			'/admin.php',
-			'page=gutenberg-experiments'
-		);
-
-		await page
-			.locator( `#gutenberg-interactivity-api-core-blocks` )
-			.setChecked( true );
-		await page.locator( `input[name="submit"]` ).click();
-		await page.waitForLoadState();
 	} );
 
-	test.afterEach( async ( { admin, page, requestUtils } ) => {
+	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
-		await admin.visitAdminPage(
-			'/admin.php',
-			'page=gutenberg-experiments'
-		);
-
-		await page
-			.locator( `#gutenberg-interactivity-api-core-blocks` )
-			.setChecked( false );
-		await page.locator( `input[name="submit"]` ).click();
-		await page.waitForLoadState();
 	} );
 
 	test( 'Behaviors UI can be disabled in the `theme.json`', async ( {

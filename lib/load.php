@@ -69,6 +69,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+		require_once __DIR__ . '/experimental/class-gutenberg-rest-block-patterns-controller.php';
+	}
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
@@ -117,8 +120,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-interactivity-api-core-blocks' ) ) {
-	require __DIR__ . '/experimental/interactivity-api/blocks.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+	require __DIR__ . '/experimental/auto-inserting-blocks.php';
 }
 require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
 require __DIR__ . '/experimental/interactivity-api/store.php';

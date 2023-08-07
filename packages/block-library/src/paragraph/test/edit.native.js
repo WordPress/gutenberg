@@ -13,6 +13,8 @@ import {
 	setupCoreBlocks,
 	waitFor,
 	within,
+	withFakeTimers,
+	waitForElementToBeRemoved,
 } from 'test/helpers';
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -25,6 +27,19 @@ import { ENTER } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import Paragraph from '../edit';
+
+// Mock debounce to prevent potentially belated state updates.
+jest.mock( '@wordpress/compose/src/utils/debounce', () => ( {
+	debounce: ( fn ) => {
+		fn.cancel = jest.fn();
+		return fn;
+	},
+} ) );
+// Mock link suggestions that are fetched by the link picker
+// when typing a search query.
+jest.mock( '@wordpress/core-data/src/fetch', () => ( {
+	__experimentalFetchLinkSuggestions: jest.fn().mockResolvedValue( [ {} ] ),
+} ) );
 
 setupCoreBlocks();
 
@@ -238,26 +253,27 @@ describe( 'Paragraph block', () => {
 		// Act
 		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
-		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
-		await act( () => fireEvent.press( screen.getByLabelText( 'Link' ) ) );
-		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
-		await act( () =>
-			fireEvent.press(
-				screen.getByLabelText( 'Link to, Search or type URL' )
-			)
-		);
+		fireEvent.press( screen.getByLabelText( 'Link' ) );
+
 		fireEvent.changeText(
-			screen.getByPlaceholderText( 'Search or type URL' ),
-			'wordpress.org'
-		);
-		fireEvent.changeText(
-			screen.getByPlaceholderText( 'Add link text', { hidden: true } ),
+			screen.getByPlaceholderText( 'Add link text' ),
 			'WordPress'
 		);
-		jest.useFakeTimers();
-		fireEvent.press( screen.getByLabelText( 'Apply' ) );
-		// Await link picker navigation delay
-		act( () => jest.runOnlyPendingTimers() );
+		fireEvent.press(
+			screen.getByLabelText( 'Link to, Search or type URL' )
+		);
+		const typeURLInput = await waitFor( () =>
+			screen.getByPlaceholderText( 'Search or type URL' )
+		);
+		fireEvent.changeText( typeURLInput, 'wordpress.org' );
+		await waitForElementToBeRemoved( () =>
+			screen.getByTestId( 'link-picker-loading' )
+		);
+		// Back navigation from link picker uses `setTimeout`
+		await withFakeTimers( () => {
+			fireEvent.press( screen.getByLabelText( 'Apply' ) );
+			act( () => jest.runOnlyPendingTimers() );
+		} );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -265,8 +281,6 @@ describe( 'Paragraph block', () => {
 		<p><a href="http://wordpress.org">WordPress</a></p>
 		<!-- /wp:paragraph -->"
 	` );
-
-		jest.useRealTimers();
 	} );
 
 	it( 'should link text with selection', async () => {
@@ -287,22 +301,22 @@ describe( 'Paragraph block', () => {
 				finalSelectionEnd: 7,
 			}
 		);
-		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
-		await act( () => fireEvent.press( screen.getByLabelText( 'Link' ) ) );
-		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
-		await act( () =>
-			fireEvent.press(
-				screen.getByLabelText( 'Link to, Search or type URL' )
-			)
+		fireEvent.press( screen.getByLabelText( 'Link' ) );
+		fireEvent.press(
+			screen.getByLabelText( 'Link to, Search or type URL' )
 		);
-		fireEvent.changeText(
-			screen.getByPlaceholderText( 'Search or type URL' ),
-			'wordpress.org'
+		const typeURLInput = await waitFor( () =>
+			screen.getByPlaceholderText( 'Search or type URL' )
 		);
-		jest.useFakeTimers();
-		fireEvent.press( screen.getByLabelText( 'Apply' ) );
-		// Await link picker navigation delay
-		act( () => jest.runOnlyPendingTimers() );
+		fireEvent.changeText( typeURLInput, 'wordpress.org' );
+		await waitForElementToBeRemoved( () =>
+			screen.getByTestId( 'link-picker-loading' )
+		);
+		// Back navigation from link picker uses `setTimeout`
+		await withFakeTimers( () => {
+			fireEvent.press( screen.getByLabelText( 'Apply' ) );
+			act( () => jest.runOnlyPendingTimers() );
+		} );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
@@ -310,8 +324,6 @@ describe( 'Paragraph block', () => {
 		<p>A <a href="http://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
-
-		jest.useRealTimers();
 	} );
 
 	it( 'should link text with clipboard contents', async () => {
@@ -402,6 +414,10 @@ describe( 'Paragraph block', () => {
 
 		// Tap one color
 		fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
+		// TODO(jest-console): Fix the warning and remove the expect below.
+		expect( console ).toHaveWarnedWith(
+			`Non-serializable values were found in the navigation state. Check:\n\nColor > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		);
 
 		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );
@@ -657,6 +673,10 @@ describe( 'Paragraph block', () => {
 		);
 		fireEvent.press( screen.getByLabelText( 'Text color' ) );
 		fireEvent.press( await screen.findByLabelText( 'Tertiary' ) );
+		// TODO(jest-console): Fix the warning and remove the expect below.
+		expect( console ).toHaveWarnedWith(
+			`Non-serializable values were found in the navigation state. Check:\n\ntext-color > Palette > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		);
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `

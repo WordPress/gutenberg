@@ -202,4 +202,6 @@ module.exports = {
 	embed__icon: {
 		fill: 'black',
 	},
+	picker: {},
+	pickerPointer: {},
 };
