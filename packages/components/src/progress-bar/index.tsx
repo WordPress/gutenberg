@@ -34,6 +34,7 @@ function UnforwardedProgressBar(
 				value={ value }
 				aria-label={ __( 'Loading …' ) }
 				ref={ ref }
+				tabIndex={ 0 }
 				{ ...progressProps }
 			/>
 		</ProgressBarStyled.Track>
