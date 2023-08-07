@@ -47,7 +47,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Docs & Examples
 
-**[Interactivity API Docs](https://github.com/WordPress/gutenberg/tree/trunk/packages/interactivity/docs)** is the best place to learn about this proposal. Although it's still in progress, some key pages are already available:
+**[Interactivity API Documentation](https://github.com/WordPress/gutenberg/tree/trunk/packages/interactivity/docs)** is the best place to learn about this proposal. Although it's still in progress, some key pages are already available:
 
 - **[Getting Started Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/interactivity/docs/1-getting-started.md)**: Follow this Getting Started guide to learn how to scaffold a new project and create your first interactive blocks.
 - **[API Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/interactivity/docs/2-api-reference.md)**: Check this page for technical  detailed explanations and examples of the directives and the store.
