@@ -116,6 +116,7 @@ function MyDocumentSettingPlugin() {
 		{
 			className: 'my-document-setting-plugin',
 			title: 'My Panel',
+			name: 'my-panel',
 		},
 		__( 'My Document Setting Panel' )
 	);
@@ -135,6 +136,7 @@ const MyDocumentSettingTest = () => (
 	<PluginDocumentSettingPanel
 		className="my-document-setting-plugin"
 		title="My Panel"
+		name="my-panel"
 	>
 		<p>My Document Setting Panel</p>
 	</PluginDocumentSettingPanel>

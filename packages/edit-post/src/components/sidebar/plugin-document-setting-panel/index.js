@@ -8,7 +8,6 @@
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { usePluginContext } from '@wordpress/plugins';
 import { useDispatch, useSelect } from '@wordpress/data';
-import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -42,6 +41,7 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  * 		{
  * 			className: 'my-document-setting-plugin',
  * 			title: 'My Panel',
+ * 			name: 'my-panel',
  * 		},
  * 		__( 'My Document Setting Panel' )
  * 	);
@@ -59,7 +59,7 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  * import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
  *
  * const MyDocumentSettingTest = () => (
- * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
+ * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel" name="my-panel">
  *			<p>My Document Setting Panel</p>
  *		</PluginDocumentSettingPanel>
  *	);
@@ -92,8 +92,11 @@ const PluginDocumentSettingPanel = ( {
 	);
 	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
 
-	if ( undefined === name ) {
-		warning( 'PluginDocumentSettingPanel requires a name property.' );
+	if ( ! name ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`PluginDocumentSettingPanel requires a 'name' property.`
+		);
 	}
 
 	return (
