@@ -133,6 +133,9 @@ jobs:
             - name: Npm build
               run: npm run build
 
+            # Temporary while we figure out the caching problem
+            - run: npm ci
+
             - name: Install Playwright dependencies
               run: |
                   npx playwright install chromium firefox webkit --with-deps
