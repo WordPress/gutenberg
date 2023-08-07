@@ -29,14 +29,6 @@
 		"direction": {
 			"type": "string",
 			"enum": [ "ltr", "rtl" ]
-		},
-		"connections": {
-			"type": "object",
-			"attributes": {
-				"content": {
-					"source": "meta_fields"
-				}
-			}
 		}
 	},
 	"supports": {
