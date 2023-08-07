@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 26.9.0 (2023-07-20)
+
 ## 26.8.0 (2023-07-05)
 
 ## 26.7.0 (2023-06-23)
@@ -55,6 +57,7 @@
 
 -   The `WP_DEVTOOL` environment variable can now be used to set the Webpack devtool option for sourcemaps in production builds ([#46812](https://github.com/WordPress/gutenberg/pull/46812)). Previously, this only worked for development builds.
 -   Update default webpack config and lint-style script to allow PostCSS (`.pcss` extension) file usage ([#45352](https://github.com/WordPress/gutenberg/pull/45352)).
+-   Add `--no-watch` option to allow creating the unminified/dev JS without starting the watcher ([#44237](https://github.com/WordPress/gutenberg/pull/44237)).
 
 ## 25.3.0 (2023-02-01)
 

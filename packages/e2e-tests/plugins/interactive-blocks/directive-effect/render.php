@@ -7,7 +7,7 @@
 
 ?>
 <div data-wp-interactive>
-	<div data-wp-fakeshow="state.isOpen">
+	<div data-wp-show-mock="state.isOpen">
 		<input
 			data-testid="input"
 			data-wp-effect="effects.elementAddedToTheDOM"

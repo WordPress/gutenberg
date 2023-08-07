@@ -44,13 +44,18 @@ exports[`LinksUI LinksUI renders 1`] = `
       }
     >
       <View
-        style={
-          [
-            undefined,
-            {
+        animatedStyle={
+          {
+            "value": {
               "height": 1,
             },
-          ]
+          }
+        }
+        collapsable={false}
+        style={
+          {
+            "height": 1,
+          }
         }
       >
         <RNGestureHandlerRootView
@@ -61,213 +66,248 @@ exports[`LinksUI LinksUI renders 1`] = `
           }
         >
           <View
-            onLayout={[Function]}
             style={
-              {
-                "flex": 1,
-              }
+              [
+                {
+                  "backgroundColor": undefined,
+                  "flex": 1,
+                },
+                undefined,
+              ]
             }
           >
             <View
-              pointerEvents="box-none"
+              onLayout={[Function]}
               style={
                 {
-                  "bottom": 0,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
+                  "flex": 1,
                 }
               }
             >
               <View
                 collapsable={false}
-                style={
-                  {
-                    "opacity": 1,
-                  }
-                }
-              />
-              <View
-                accessibilityElementsHidden={false}
-                closing={false}
-                gestureVelocityImpact={0.3}
-                importantForAccessibility="auto"
-                onClose={[Function]}
-                onGestureBegin={[Function]}
-                onGestureCanceled={[Function]}
-                onOpen={[Function]}
-                onTransitionStart={[Function]}
+                forwardedRef={[Function]}
                 pointerEvents="box-none"
                 style={
                   {
                     "bottom": 0,
+                    "display": "flex",
                     "left": 0,
                     "position": "absolute",
                     "right": 0,
                     "top": 0,
                   }
                 }
-                transitionSpec={
-                  {
-                    "close": {
-                      "animation": "timing",
-                      "config": {
-                        "duration": 200,
-                        "easing": [Function],
-                      },
-                    },
-                    "open": {
-                      "animation": "timing",
-                      "config": {
-                        "duration": 200,
-                        "easing": [Function],
-                      },
-                    },
-                  }
-                }
               >
                 <View
-                  pointerEvents="box-none"
+                  collapsable={false}
                   style={
                     {
-                      "bottom": 0,
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
+                      "opacity": 1,
                     }
                   }
                 />
                 <View
-                  collapsable={false}
+                  accessibilityElementsHidden={false}
+                  closing={false}
+                  gestureVelocityImpact={0.3}
+                  importantForAccessibility="auto"
+                  onClose={[Function]}
+                  onGestureBegin={[Function]}
+                  onGestureCanceled={[Function]}
+                  onGestureEnd={[Function]}
+                  onOpen={[Function]}
+                  onTransition={[Function]}
                   pointerEvents="box-none"
                   style={
+                    [
+                      {
+                        "display": "flex",
+                        "overflow": undefined,
+                      },
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      },
+                    ]
+                  }
+                  transitionSpec={
                     {
-                      "flex": 1,
+                      "close": {
+                        "animation": "timing",
+                        "config": {
+                          "duration": 200,
+                          "easing": [Function],
+                        },
+                      },
+                      "open": {
+                        "animation": "timing",
+                        "config": {
+                          "duration": 200,
+                          "easing": [Function],
+                        },
+                      },
                     }
                   }
                 >
                   <View
+                    pointerEvents="box-none"
+                    style={
+                      {
+                        "bottom": 0,
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                      }
+                    }
+                  />
+                  <View
                     collapsable={false}
-                    forwardedRef={[Function]}
-                    handlerTag={1}
-                    handlerType="PanGestureHandler"
-                    onGestureHandlerEvent={[Function]}
-                    onGestureHandlerStateChange={[Function]}
+                    pointerEvents="box-none"
                     style={
                       {
                         "flex": 1,
-                        "opacity": 1,
                       }
                     }
                   >
                     <View
+                      collapsable={false}
+                      forwardedRef={[Function]}
+                      handlerTag={1}
+                      handlerType="PanGestureHandler"
+                      needsOffscreenAlphaCompositing={true}
+                      onGestureHandlerEvent={[Function]}
+                      onGestureHandlerStateChange={[Function]}
                       style={
-                        [
-                          {
-                            "flex": 1,
-                            "overflow": "hidden",
-                          },
-                          [
-                            {
-                              "backgroundColor": undefined,
-                            },
-                            undefined,
-                          ],
-                        ]
+                        {
+                          "flex": 1,
+                          "opacity": 1,
+                        }
                       }
                     >
                       <View
+                        pointerEvents="box-none"
                         style={
-                          {
-                            "flex": 1,
-                            "flexDirection": "column-reverse",
-                          }
+                          [
+                            {
+                              "flex": 1,
+                              "overflow": "hidden",
+                            },
+                            [
+                              {
+                                "backgroundColor": undefined,
+                              },
+                              undefined,
+                            ],
+                          ]
                         }
                       >
                         <View
                           style={
                             {
                               "flex": 1,
+                              "flexDirection": "column-reverse",
                             }
                           }
                         >
-                          <RCTScrollView
-                            automaticallyAdjustContentInsets={false}
-                            bounces={false}
-                            contentContainerStyle={
-                              [
-                                {
-                                  "paddingLeft": 8,
-                                  "paddingRight": 8,
-                                },
-                                undefined,
-                                {},
-                                false,
-                              ]
-                            }
-                            disableScrollViewPanResponder={true}
-                            onScroll={[Function]}
-                            safeAreaBottomInset={0}
-                            scrollEnabled={true}
-                            scrollEventThrottle={16}
+                          <View
                             style={
                               {
-                                "maxHeight": 787.06,
+                                "flex": 1,
                               }
                             }
                           >
-                            <View>
-                              <View
-                                accessible={false}
-                                focusable={false}
-                                onClick={[Function]}
-                                onResponderGrant={[Function]}
-                                onResponderMove={[Function]}
-                                onResponderRelease={[Function]}
-                                onResponderTerminate={[Function]}
-                                onResponderTerminationRequest={[Function]}
-                                onStartShouldSetResponder={[Function]}
-                              >
+                            <RCTScrollView
+                              automaticallyAdjustContentInsets={false}
+                              bounces={false}
+                              contentContainerStyle={
+                                [
+                                  {
+                                    "paddingLeft": 8,
+                                    "paddingRight": 8,
+                                  },
+                                  undefined,
+                                  {},
+                                  false,
+                                ]
+                              }
+                              disableScrollViewPanResponder={true}
+                              onScroll={[Function]}
+                              safeAreaBottomInset={0}
+                              scrollEnabled={true}
+                              scrollEventThrottle={16}
+                              style={
+                                {
+                                  "maxHeight": 787.06,
+                                }
+                              }
+                            >
+                              <View>
                                 <View
-                                  onLayout={[Function]}
-                                  testID="navigation-screen-linkSettings"
+                                  accessibilityValue={
+                                    {
+                                      "max": undefined,
+                                      "min": undefined,
+                                      "now": undefined,
+                                      "text": undefined,
+                                    }
+                                  }
+                                  accessible={false}
+                                  focusable={false}
+                                  onClick={[Function]}
+                                  onResponderGrant={[Function]}
+                                  onResponderMove={[Function]}
+                                  onResponderRelease={[Function]}
+                                  onResponderTerminate={[Function]}
+                                  onResponderTerminationRequest={[Function]}
+                                  onStartShouldSetResponder={[Function]}
                                 >
                                   <View
-                                    accessibilityLabel="Link to, Search or type URL"
-                                    accessibilityRole="button"
-                                    accessibilityState={
-                                      {
-                                        "disabled": false,
-                                      }
-                                    }
-                                    accessible={true}
-                                    collapsable={false}
-                                    focusable={true}
-                                    onClick={[Function]}
-                                    onResponderGrant={[Function]}
-                                    onResponderMove={[Function]}
-                                    onResponderRelease={[Function]}
-                                    onResponderTerminate={[Function]}
-                                    onResponderTerminationRequest={[Function]}
-                                    onStartShouldSetResponder={[Function]}
-                                    style={
-                                      {
-                                        "opacity": 1,
-                                      }
-                                    }
+                                    onLayout={[Function]}
+                                    testID="navigation-screen-linkSettings"
                                   >
                                     <View
-                                      pointerEvents="auto"
+                                      accessibilityLabel="Link to, Search or type URL"
+                                      accessibilityRole="button"
+                                      accessibilityState={
+                                        {
+                                          "busy": undefined,
+                                          "checked": undefined,
+                                          "disabled": false,
+                                          "expanded": undefined,
+                                          "selected": undefined,
+                                        }
+                                      }
+                                      accessibilityValue={
+                                        {
+                                          "max": undefined,
+                                          "min": undefined,
+                                          "now": undefined,
+                                          "text": undefined,
+                                        }
+                                      }
+                                      accessible={true}
+                                      collapsable={false}
+                                      focusable={true}
+                                      onClick={[Function]}
+                                      onResponderGrant={[Function]}
+                                      onResponderMove={[Function]}
+                                      onResponderRelease={[Function]}
+                                      onResponderTerminate={[Function]}
+                                      onResponderTerminationRequest={[Function]}
+                                      onStartShouldSetResponder={[Function]}
                                       style={
-                                        [
-                                          undefined,
-                                          {},
-                                        ]
+                                        {
+                                          "opacity": 1,
+                                        }
                                       }
                                     >
                                       <View
+                                        pointerEvents="auto"
                                         style={
                                           [
                                             undefined,
@@ -275,198 +315,235 @@ exports[`LinksUI LinksUI renders 1`] = `
                                           ]
                                         }
                                       >
-                                        <View>
-                                          <View
-                                            style={
-                                              [
-                                                undefined,
-                                                undefined,
-                                              ]
-                                            }
-                                          >
-                                            <Svg
-                                              height={24}
-                                              lock={true}
-                                              style={{}}
-                                              viewBox="0 0 24 24"
-                                              width={24}
-                                              xmlns="http://www.w3.org/2000/svg"
+                                        <View
+                                          style={
+                                            [
+                                              undefined,
+                                              {},
+                                            ]
+                                          }
+                                        >
+                                          <View>
+                                            <View
+                                              style={
+                                                [
+                                                  undefined,
+                                                  undefined,
+                                                ]
+                                              }
                                             >
-                                              Path
-                                            </Svg>
-                                            <View />
+                                              <Svg
+                                                height={24}
+                                                lock={true}
+                                                style={{}}
+                                                viewBox="0 0 24 24"
+                                                width={24}
+                                                xmlns="http://www.w3.org/2000/svg"
+                                              >
+                                                Path
+                                              </Svg>
+                                              <View />
+                                            </View>
+                                            <Text
+                                              style={
+                                                [
+                                                  undefined,
+                                                  {},
+                                                ]
+                                              }
+                                            >
+                                              Link to
+                                            </Text>
                                           </View>
-                                          <Text
-                                            style={
-                                              [
-                                                undefined,
-                                                {},
-                                              ]
+                                        </View>
+                                        <Text
+                                          ellipsizeMode="middle"
+                                          numberOfLines={1}
+                                          style={
+                                            {
+                                              "color": "gray",
                                             }
+                                          }
+                                        >
+                                          Search or type URL
+                                        </Text>
+                                        <View
+                                          pointerEvents="auto"
+                                          style={
+                                            [
+                                              false,
+                                              undefined,
+                                            ]
+                                          }
+                                        >
+                                          <Svg
+                                            height={24}
+                                            style={{}}
+                                            viewBox="0 0 24 24"
+                                            width={24}
+                                            xmlns="http://www.w3.org/2000/svg"
                                           >
-                                            Link to
-                                          </Text>
+                                            Path
+                                          </Svg>
                                         </View>
                                       </View>
-                                      <Text
-                                        ellipsizeMode="middle"
-                                        numberOfLines={1}
-                                        style={
-                                          {
-                                            "color": "gray",
-                                          }
+                                      <View
+                                        style={{}}
+                                      />
+                                    </View>
+                                    <View
+                                      accessibilityHint="Double tap to edit this value"
+                                      accessibilityLabel="Link text. Empty"
+                                      accessibilityRole="button"
+                                      accessibilityState={
+                                        {
+                                          "busy": undefined,
+                                          "checked": undefined,
+                                          "disabled": false,
+                                          "expanded": undefined,
+                                          "selected": undefined,
                                         }
-                                      >
-                                        Search or type URL
-                                      </Text>
+                                      }
+                                      accessibilityValue={
+                                        {
+                                          "max": undefined,
+                                          "min": undefined,
+                                          "now": undefined,
+                                          "text": undefined,
+                                        }
+                                      }
+                                      accessible={true}
+                                      collapsable={false}
+                                      focusable={true}
+                                      onClick={[Function]}
+                                      onResponderGrant={[Function]}
+                                      onResponderMove={[Function]}
+                                      onResponderRelease={[Function]}
+                                      onResponderTerminate={[Function]}
+                                      onResponderTerminationRequest={[Function]}
+                                      onStartShouldSetResponder={[Function]}
+                                      style={
+                                        {
+                                          "opacity": 1,
+                                        }
+                                      }
+                                    >
                                       <View
                                         pointerEvents="auto"
                                         style={
                                           [
-                                            false,
                                             undefined,
+                                            {},
                                           ]
                                         }
                                       >
-                                        <Svg
-                                          height={24}
-                                          style={{}}
-                                          viewBox="0 0 24 24"
-                                          width={24}
-                                          xmlns="http://www.w3.org/2000/svg"
+                                        <View
+                                          style={
+                                            [
+                                              undefined,
+                                              {},
+                                            ]
+                                          }
                                         >
-                                          Path
-                                        </Svg>
+                                          <View>
+                                            <View
+                                              style={
+                                                [
+                                                  undefined,
+                                                  undefined,
+                                                ]
+                                              }
+                                            >
+                                              <Svg
+                                                height={24}
+                                                lock={true}
+                                                style={{}}
+                                                viewBox="0 0 24 24"
+                                                width={24}
+                                                xmlns="http://www.w3.org/2000/svg"
+                                              >
+                                                Path
+                                              </Svg>
+                                              <View />
+                                            </View>
+                                            <Text
+                                              style={
+                                                [
+                                                  undefined,
+                                                  {},
+                                                ]
+                                              }
+                                            >
+                                              Link text
+                                            </Text>
+                                          </View>
+                                        </View>
+                                        <TextInput
+                                          disabled={false}
+                                          editable={true}
+                                          keyboardType="default"
+                                          numberOfLines={1}
+                                          onBlur={[Function]}
+                                          onChangeText={[Function]}
+                                          onFocus={[Function]}
+                                          onSubmitEditing={[Function]}
+                                          placeholder="Add link text"
+                                          placeholderTextColor="gray"
+                                          pointerEvents="none"
+                                          preferredColorScheme="light"
+                                          style={{}}
+                                          value=""
+                                        />
+                                        <View
+                                          pointerEvents="auto"
+                                          style={
+                                            [
+                                              false,
+                                              undefined,
+                                            ]
+                                          }
+                                        />
                                       </View>
+                                      <View />
                                     </View>
                                     <View
-                                      style={{}}
+                                      style={
+                                        {
+                                          "height": 20,
+                                        }
+                                      }
                                     />
                                   </View>
-                                  <View
-                                    accessibilityHint="Double tap to edit this value"
-                                    accessibilityLabel="Link text. Empty"
-                                    accessibilityRole="button"
-                                    accessibilityState={
-                                      {
-                                        "disabled": false,
-                                      }
-                                    }
-                                    accessible={true}
-                                    collapsable={false}
-                                    focusable={true}
-                                    onClick={[Function]}
-                                    onResponderGrant={[Function]}
-                                    onResponderMove={[Function]}
-                                    onResponderRelease={[Function]}
-                                    onResponderTerminate={[Function]}
-                                    onResponderTerminationRequest={[Function]}
-                                    onStartShouldSetResponder={[Function]}
-                                    style={
-                                      {
-                                        "opacity": 1,
-                                      }
-                                    }
-                                  >
-                                    <View
-                                      pointerEvents="auto"
-                                      style={
-                                        [
-                                          undefined,
-                                          {},
-                                        ]
-                                      }
-                                    >
-                                      <View
-                                        style={
-                                          [
-                                            undefined,
-                                            {},
-                                          ]
-                                        }
-                                      >
-                                        <View>
-                                          <View
-                                            style={
-                                              [
-                                                undefined,
-                                                undefined,
-                                              ]
-                                            }
-                                          >
-                                            <Svg
-                                              height={24}
-                                              lock={true}
-                                              style={{}}
-                                              viewBox="0 0 24 24"
-                                              width={24}
-                                              xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                              Path
-                                            </Svg>
-                                            <View />
-                                          </View>
-                                          <Text
-                                            style={
-                                              [
-                                                undefined,
-                                                {},
-                                              ]
-                                            }
-                                          >
-                                            Link text
-                                          </Text>
-                                        </View>
-                                      </View>
-                                      <TextInput
-                                        disabled={false}
-                                        editable={true}
-                                        keyboardType="default"
-                                        numberOfLines={1}
-                                        onBlur={[Function]}
-                                        onChangeText={[Function]}
-                                        onFocus={[Function]}
-                                        onSubmitEditing={[Function]}
-                                        placeholder="Add link text"
-                                        placeholderTextColor="gray"
-                                        pointerEvents="none"
-                                        preferredColorScheme="light"
-                                        style={{}}
-                                        value=""
-                                      />
-                                      <View
-                                        pointerEvents="auto"
-                                        style={
-                                          [
-                                            false,
-                                            undefined,
-                                          ]
-                                        }
-                                      />
-                                    </View>
-                                    <View />
-                                  </View>
-                                  <View
-                                    style={
-                                      {
-                                        "height": 20,
-                                      }
-                                    }
-                                  />
                                 </View>
                               </View>
-                            </View>
-                          </RCTScrollView>
+                            </RCTScrollView>
+                          </View>
+                          <View
+                            collapsable={false}
+                            pointerEvents="box-none"
+                            style={{}}
+                          />
                         </View>
-                        <View
-                          pointerEvents="box-none"
-                        />
                       </View>
                     </View>
                   </View>
                 </View>
               </View>
             </View>
+            <View
+              collapsable={false}
+              pointerEvents="box-none"
+              style={
+                {
+                  "height": 56,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                  "zIndex": 1,
+                }
+              }
+            />
           </View>
         </RNGestureHandlerRootView>
       </View>

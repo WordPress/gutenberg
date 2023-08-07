@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/annotations",
-	"version": "2.37.0",
+	"version": "2.38.0",
 	"description": "Annotate content in the Gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,6 +32,9 @@
 		"@wordpress/rich-text": "file:../rich-text",
 		"rememo": "^4.0.2",
 		"uuid": "^8.3.0"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

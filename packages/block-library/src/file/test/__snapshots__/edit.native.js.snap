@@ -22,7 +22,11 @@ exports[`File block renders file error state without crashing 1`] = `
   <View
     accessibilityState={
       {
+        "busy": undefined,
+        "checked": undefined,
         "disabled": false,
+        "expanded": undefined,
+        "selected": undefined,
       }
     }
     accessible={false}
@@ -61,6 +65,15 @@ exports[`File block renders file error state without crashing 1`] = `
         }
       >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
           activeFormats={[]}
           blockType={
@@ -94,6 +107,7 @@ exports[`File block renders file error state without crashing 1`] = `
           onStartShouldSetResponder={[Function]}
           placeholder="File name"
           placeholderTextColor="gray"
+          selectionColor="black"
           style={
             {
               "backgroundColor": undefined,
@@ -166,6 +180,15 @@ exports[`File block renders file error state without crashing 1`] = `
         }
       >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
           activeFormats={[]}
           blockType={
@@ -250,7 +273,11 @@ exports[`File block renders file without crashing 1`] = `
   <View
     accessibilityState={
       {
+        "busy": undefined,
+        "checked": undefined,
         "disabled": false,
+        "expanded": undefined,
+        "selected": undefined,
       }
     }
     accessible={false}
@@ -289,6 +316,15 @@ exports[`File block renders file without crashing 1`] = `
         }
       >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
           activeFormats={[]}
           blockType={
@@ -322,6 +358,7 @@ exports[`File block renders file without crashing 1`] = `
           onStartShouldSetResponder={[Function]}
           placeholder="File name"
           placeholderTextColor="gray"
+          selectionColor="black"
           style={
             {
               "backgroundColor": undefined,
@@ -368,6 +405,15 @@ exports[`File block renders file without crashing 1`] = `
         }
       >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
           activeFormats={[]}
           blockType={
@@ -439,22 +485,13 @@ exports[`File block renders placeholder without crashing 1`] = `
   }
 >
   <View
-    accessibilityHint="Double tap to select"
-    accessibilityLabel="File block. Empty"
-    accessibilityRole="button"
-    accessible={true}
-    focusable={true}
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
     style={
       [
         [
-          undefined,
+          [
+            undefined,
+            false,
+          ],
           undefined,
           undefined,
         ],
@@ -462,33 +499,82 @@ exports[`File block renders placeholder without crashing 1`] = `
       ]
     }
   >
+    <View>
+      <View
+        style={
+          {
+            "fill": "black",
+          }
+        }
+      >
+        <View
+          style={{}}
+        >
+          <Svg
+            fill="black"
+            height={24}
+            style={{}}
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            Path
+          </Svg>
+        </View>
+      </View>
+      <Text>
+        File
+      </Text>
+    </View>
     <View
+      accessibilityHint="Double tap to select"
+      accessibilityLabel="File block. Empty"
+      accessibilityRole="button"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      hitSlop={
+        {
+          "bottom": 22,
+          "left": 22,
+          "right": 22,
+          "top": 22,
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
       style={
         {
-          "fill": "gray",
+          "opacity": 1,
         }
       }
     >
-      <View
-        style={{}}
-      >
-        <Svg
-          height={24}
-          style={{}}
-          viewBox="0 0 24 24"
-          width={24}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          Path
-        </Svg>
-      </View>
+      <Text>
+        Choose a file
+      </Text>
     </View>
-    <Text>
-      File
-    </Text>
-    <Text>
-      CHOOSE A FILE
-    </Text>
   </View>
 </View>
 `;

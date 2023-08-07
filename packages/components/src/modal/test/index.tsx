@@ -5,6 +5,11 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import Modal from '../';
@@ -81,5 +86,33 @@ describe( 'Modal', () => {
 		);
 		await user.keyboard( '[Escape]' );
 		expect( onRequestClose ).toHaveBeenCalled();
+	} );
+
+	it( 'should return focus when dismissed by clicking outside', async () => {
+		const user = userEvent.setup();
+		const ReturnDemo = () => {
+			const [ isShown, setIsShown ] = useState( false );
+			return (
+				<div>
+					<button onClick={ () => setIsShown( true ) }>📣</button>
+					{ isShown && (
+						<Modal onRequestClose={ () => setIsShown( false ) }>
+							<p>Modal content</p>
+						</Modal>
+					) }
+				</div>
+			);
+		};
+		render( <ReturnDemo /> );
+
+		const opener = screen.getByRole( 'button' );
+		await user.click( opener );
+		const modalFrame = screen.getByRole( 'dialog' );
+		expect( modalFrame ).toHaveFocus();
+
+		// Disable reason: No semantic query can reach the overlay.
+		// eslint-disable-next-line testing-library/no-node-access
+		await user.click( modalFrame.parentElement! );
+		expect( opener ).toHaveFocus();
 	} );
 } );

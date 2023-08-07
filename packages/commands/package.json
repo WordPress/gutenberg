@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/commands",
-	"version": "0.8.0",
+	"version": "0.9.0",
 	"description": "Handles the commands menu.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,7 +38,8 @@
 		"rememo": "^4.0.2"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
