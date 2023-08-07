@@ -153,3 +153,33 @@ export function hasResolvingSelectors( state ) {
 		)
 	);
 }
+
+/**
+ * Retrieves the total number of selectors, grouped per status.
+ *
+ * @param {State} state Data state.
+ *
+ * @return {Object} Object, containing selector totals by status.
+ */
+export function countSelectorsByStatus( state ) {
+	const selectorsByStatus = {};
+
+	Object.values( state ).forEach( ( selectorState ) =>
+		/**
+		 * This uses the internal `_map` property of `EquivalentKeyMap` for
+		 * optimization purposes, since the `EquivalentKeyMap` implementation
+		 * does not support a `.values()` implementation.
+		 *
+		 * @see https://github.com/aduth/equivalent-key-map
+		 */
+		Array.from( selectorState._map.values() ).forEach( ( resolution ) => {
+			const currentStatus = resolution[ 1 ]?.status ?? 'error';
+			if ( ! selectorsByStatus[ currentStatus ] ) {
+				selectorsByStatus[ currentStatus ] = 0;
+			}
+			selectorsByStatus[ currentStatus ]++;
+		} )
+	);
+
+	return selectorsByStatus;
+}
