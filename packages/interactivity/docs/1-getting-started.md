@@ -2,6 +2,21 @@
 
 To get started with the Interactivity API, you can follow this [**Quick Start Guide**](#quick-start-guide) by taking into account the [current requirements of the Interactivity API](#requirements-of-the-interactivity-api) (especially the need for Gutenberg 16.2 or later).
 
+## Table of Contents
+
+- [Quick Start Guide](#quick-start-guide)
+    [1. Scaffold an interactive block](#1-scaffold-an-interactive-block)
+    [2. Generate the build](#2-generate-the-build) 
+    [3. Use it in your WordPress installation ](#3-use-it-in-your-wordpress-installation)
+- [Requirements of the Interactivity API](#requirements-of-the-interactivity-aPI)
+    - [A local WordPress installation](#a-local-wordpress-installation)
+    - [Latest vesion of Gutenberg](#latest-vesion-of-gutenberg)
+    - [Node.js](#nodejs)
+    - [Code requirements](#code-requirements)  
+        - [Add `interactivity` support to `block.json`](#add-interactivity-support-to-blockjson)
+
+        
+
 ## Quick Start Guide
 
 #### 1. Scaffold an interactive block
@@ -34,9 +49,7 @@ At this point you should be able to insert the "My First Interactive Block" bloc
 
 To start working with the Interactivity API you'll need to have a [proper WordPress development environment for blocks](https://developer.wordpress.org/block-editor/getting-started/devenv/) which should include:
 
-- A local WordPress installation
-- Gutenberg 16.2 or later
-- Node.js
+
 
 #### A local WordPress installation
 
@@ -48,6 +61,29 @@ To get quickly started, [`wp-now`](https://www.npmjs.com/package/@wp-now/wp-now)
 
 The Interactivity API is currently only available as an experimental feature from Gutenberg 16.2, so you'll need to have Gutenberg 16.2 or higher version installed and activated in your WordPress installation.
 
-#### Node
+#### Node.js
 
-Block development requires [Node](https://nodejs.org/en), so you'll need to have Node installed and running on your machine. Any version should work, but please check the minimum version requirements if you run into any issues with any of the Node.js tools used in WordPress development.
+Block development requires [Node](https://nodejs.org/en), so you'll need to have Node installed and running on your machine. Any version modern should work, but please check the minimum version requirements if you run into any issues with any of the Node.js tools used in WordPress development.
+
+#### Code requirements 
+
+##### Add `interactivity` support to `block.json`
+
+To indicate that our block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Inteactivity API features, we do so by adding `"interactivity": true` to the `supports` attribute of our block's `block.json`
+
+```
+"supports": {
+    "interactivity": true
+},
+```
+
+##### Add `wp-interactive` directive to a DOM element
+
+To "activate" the Interactivity API in a DOM elements and its children we add the [`wp-interactive` directive](./2-api-reference.md#wp-interactive) in our `render.php` or `save.js`
+
+
+```html
+<div data-wp-interactive>
+    <!-- Interactivity API zone -->
+</div>
+```

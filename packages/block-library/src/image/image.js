@@ -477,24 +477,26 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
-					<DimensionsTool
-						value={ { width, height, scale, aspectRatio } }
-						onChange={ ( newValue ) => {
-							// Rebuilding the object forces setting `undefined`
-							// for values that are removed since setAttributes
-							// doesn't do anything with keys that aren't set.
-							setAttributes( {
-								width: newValue.width,
-								height: newValue.height,
-								scale: newValue.scale,
-								aspectRatio: newValue.aspectRatio,
-							} );
-						} }
-						defaultScale="cover"
-						defaultAspectRatio="auto"
-						scaleOptions={ scaleOptions }
-						unitsOptions={ dimensionsUnitsOptions }
-					/>
+					{ isResizable && (
+						<DimensionsTool
+							value={ { width, height, scale, aspectRatio } }
+							onChange={ ( newValue ) => {
+								// Rebuilding the object forces setting `undefined`
+								// for values that are removed since setAttributes
+								// doesn't do anything with keys that aren't set.
+								setAttributes( {
+									width: newValue.width,
+									height: newValue.height,
+									scale: newValue.scale,
+									aspectRatio: newValue.aspectRatio,
+								} );
+							} }
+							defaultScale="cover"
+							defaultAspectRatio="auto"
+							scaleOptions={ scaleOptions }
+							unitsOptions={ dimensionsUnitsOptions }
+						/>
+					) }
 					<ResolutionTool
 						value={ sizeSlug }
 						onChange={ updateImage }
