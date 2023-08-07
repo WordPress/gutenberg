@@ -177,7 +177,7 @@ describe( 'useEntityBlockEditor', () => {
 					...blocks,
 					createBlock( 'core/test-block', {
 						content:
-							'<p><sup data-fn="88e603f5-88f2-4870-b3e0-6a086b8bd566" class="fn"><a href="#88e603f5-88f2-4870-b3e0-6a086b8bd566" id="88e603f5-88f2-4870-b3e0-6a086b8bd566-link">1</a></sup></p>',
+							'<p><sup data-fn="1234" class="fn"><a href="#1234" id="1234-link">1</a></sup></p>',
 					} ),
 				],
 				{
