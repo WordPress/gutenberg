@@ -41,8 +41,10 @@ export const rawStore = { state: deepSignal( rawState ) };
 /**
  * Extends the Interactivity API global store with the passed properties.
  *
- * These props tipically consist of `state`, `selectors` and `actions` that can
- * be used by any directive, making the HTML reactive and interactive.
+ * These props typically consist of `state`, which is reactive, and other
+ * properties like `selectors`, `actions`, `effects`, etc. which can store
+ * callbacks and derived state. These props can then be referenced by any
+ * directive to make the HTML interactive.
  *
  * @example
  * ```js
