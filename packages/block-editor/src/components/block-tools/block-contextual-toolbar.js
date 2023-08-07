@@ -24,7 +24,6 @@ import { useViewportMatch } from '@wordpress/compose';
 import NavigableToolbar from '../navigable-toolbar';
 import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
@@ -45,7 +44,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			getBlockParents,
 			getSelectedBlockClientIds,
 			getBlockEditingMode,
-		} = unlock( select( blockEditorStore ) );
+		} = select( blockEditorStore );
 		const { getBlockType } = select( blocksStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const _selectedBlockClientId = selectedBlockClientIds[ 0 ];

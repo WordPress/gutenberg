@@ -14,7 +14,6 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Block parent selector component, displaying the hierarchy of the
@@ -30,7 +29,7 @@ export default function BlockParentSelector() {
 			getBlockParents,
 			getSelectedBlockClientId,
 			getBlockEditingMode,
-		} = unlock( select( blockEditorStore ) );
+		} = select( blockEditorStore );
 		const { hasBlockSupport } = select( blocksStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const parents = getBlockParents( selectedBlockClientId );
