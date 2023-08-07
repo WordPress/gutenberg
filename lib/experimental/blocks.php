@@ -136,9 +136,18 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		$meta_custom_source = require __DIR__ . '/custom-sources/meta.php';
 		$block_type         = $block_instance->block_type;
 
+		// Allowlist of blocks that support custom sources
+		// Currently, we only allow the following blocks and attributes:
+		// - Paragraph: content.
+		// - Image: url.
+		$blocks_attributes_allowlist = array(
+			'core/paragraph' => array( 'content' ),
+			'core/image'     => array( 'url' ),
+		);
+
 		// Whitelist of the block types that support custom sources
 		// Currently, we only allow the Paragraph and Image blocks to use custom sources.
-		if ( ! in_array( $block['blockName'], array( 'core/paragraph', 'core/image' ), true ) ) {
+		if ( ! in_array( $block['blockName'], array_keys( $blocks_attributes_allowlist ), true ) ) {
 			return $block_content;
 		}
 
@@ -159,6 +168,12 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		}
 
 		foreach ( $connected_attributes as $attribute_name => $attribute_value ) {
+
+			// If the attribute is not in the allowlist, skip it.
+			if ( ! in_array( $attribute_name, $blocks_attributes_allowlist[ $block['blockName'] ], true ) ) {
+				continue;
+			}
+
 			// If the source value is not meta, skip it because we only support meta
 			// sources for now.
 			if ( 'meta_fields' !== $attribute_value['source'] ) {
