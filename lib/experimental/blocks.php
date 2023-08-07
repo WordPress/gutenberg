@@ -148,7 +148,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		}
 
 		// If the block does not have support for connections, skip it.
-		if ( ! block_has_support( $block_type, array( 'connections' ), false ) ) {
+		if ( ! block_has_support( $block_type, array( '__experimentalConnections' ), false ) ) {
 			return $block_content;
 		}
 
