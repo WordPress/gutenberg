@@ -7,10 +7,23 @@ import { Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
+import { getPathAndQueryString } from '@wordpress/url';
+
+function submitCustomFieldsForm() {
+	const customFieldsForm = document.getElementById(
+		'toggle-custom-fields-form'
+	);
+
+	// Ensure the referrer values is up to update with any
+	customFieldsForm
+		.querySelector( '[name="_wp_http_referer"]' )
+		.setAttribute( 'value', getPathAndQueryString( window.location.href ) );
+
+	customFieldsForm.submit();
+}
 
 export function CustomFieldsConfirmation( { willEnable } ) {
 	const [ isReloading, setIsReloading ] = useState( false );
-
 	return (
 		<>
 			<p className="edit-post-preferences-modal__custom-fields-confirmation-message">
@@ -25,9 +38,7 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 				disabled={ isReloading }
 				onClick={ () => {
 					setIsReloading( true );
-					document
-						.getElementById( 'toggle-custom-fields-form' )
-						.submit();
+					submitCustomFieldsForm();
 				} }
 			>
 				{ willEnable

@@ -65,6 +65,8 @@ export default function AddNewPattern() {
 		},
 	];
 
+	// Remove condition when command palette issues are resolved.
+	// See: https://github.com/WordPress/gutenberg/issues/52154.
 	if ( ! isTemplatePartsMode ) {
 		controls.push( {
 			icon: symbolFilled,

@@ -19,6 +19,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_4 extends Gutenberg_RE
 	 * Prepares the revision for the REST response.
 	 *
 	 * @since 6.3.0
+	 * @since 6.4.0 Added `behaviors` field to the response.
 	 *
 	 * @param WP_Post         $post    Post revision object.
 	 * @param WP_REST_Request $request Request object.
@@ -87,6 +88,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_4 extends Gutenberg_RE
 	 * Retrieves the revision's schema, conforming to JSON Schema.
 	 *
 	 * @since 6.3.0
+	 * @since 6.4.0 Added `behaviors` field to the schema properties.
 	 *
 	 * @return array Item schema data.
 	 */
