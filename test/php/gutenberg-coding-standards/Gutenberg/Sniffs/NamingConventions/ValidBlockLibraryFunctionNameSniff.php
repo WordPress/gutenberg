@@ -13,12 +13,6 @@ use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 
 /**
- * The sniff implements the Gutenberg coding standard to verify whether functions and classes
- * are enclosed with function_exists() and !class_exists(). This check ensures that the functions
- * and classes are not already defined, and recommends the use of function_exists() and class_exists()
- * to prevent fatal errors during the integration of the feature to the Core.
- *
- * @link https://github.com/WordPress/gutenberg/blob/trunk/lib/README.md#wrap-functions-and-classes-with--function_exists-and--class_exists
  *
  * @package gutenberg/gutenberg-coding-standards
  *
@@ -66,11 +60,6 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	}
 
 	/**
-	 * Functions should be wrapped with !function_exists() to avoid fatal errors.
-	 * E.g.:
-	 * if ( ! function_exists( 'wp_get_navigation' ) ) {
-	 *     function wp_get_navigation( $slug ) { ... }
-	 * }
 	 *
 	 * @param File $phpcsFile    The file being scanned.
 	 * @param int  $stackPointer The position of the current token
@@ -79,6 +68,12 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	 * @return void
 	 */
 	private function processFunctionToken( File $phpcsFile, $stackPointer ) {
+
+		if ( empty( $this->prefixes ) ) {
+			// Nothing to process.
+			return;
+		}
+
 		$tokens        = $phpcsFile->getTokens();
 		$functionToken = $phpcsFile->findNext( T_STRING, $stackPointer );
 
@@ -98,14 +93,14 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		$functionName          = $tokens[ $functionToken ]['content'];
 		$parent_directory_name = basename( dirname( $phpcsFile->getFilename() ) );
 
-		$allowed_function_names = array();
+		$allowed_function_prefixes = array();
 		foreach ( $this->prefixes as $prefix ) {
-			$prefix                   = rtrim( $prefix, '_' );
-			$allowed_function_names[] = $prefix . '_' . str_replace( '-', '_', $parent_directory_name );
+			$prefix                      = rtrim( $prefix, '_' );
+			$allowed_function_prefixes[] = $prefix . '_' . str_replace( '-', '_', $parent_directory_name );
 		}
 
 		$is_function_name_valid = false;
-		foreach ( $allowed_function_names as $allowed_function_name ) {
+		foreach ( $allowed_function_prefixes as $allowed_function_name ) {
 			$is_function_name_valid |= 0 === strpos( $functionName, $allowed_function_name );
 		}
 
@@ -113,7 +108,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			return;
 		}
 
-		$errorMessage = 'Only the following PHP function names are allowed in this index.php file: "' . implode( '", "', $allowed_function_names ) . '"';
+		$errorMessage = 'In this index.php file, only the following prefixes for PHP function names are allowed: "1", "2", and "3".: "' . implode( '", "', $allowed_function_prefixes ) . '"';
 		$phpcsFile->addError( $errorMessage, $functionToken, 'FunctionNameInvalid' );
 	}
 
