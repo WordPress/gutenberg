@@ -38,10 +38,10 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'install_fonts' ),
 					'permission_callback' => array( $this, 'update_fonts_library_permissions_check' ),
-					'args'                 => array(
+					'args'                => array(
 						'fontFamilies' => array(
-							'required' => true,
-							'type'     => 'string',
+							'required'          => true,
+							'type'              => 'string',
 							'validate_callback' => array( $this, 'validate_install_font_families' ),
 						),
 					),
@@ -67,11 +67,11 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 * Returns validation errors in font families data for installation.
 	 *
 	 * @param array[] $font_families Array of font families to install.
-	 * @param array $files Array of files to install.
-	 * 
+	 * @param array   $files Array of files to install.
+	 *
 	 * @return array $error_messages Array of error messages.
 	 */
-	private function get_validation_errors ( $font_families, $files ) {
+	private function get_validation_errors( $font_families, $files ) {
 		$error_messages = array();
 
 		if ( ! is_array( $font_families ) ) {
@@ -79,7 +79,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			return $error_messages;
 		}
 
-		//check if there is at least one font family
+		// check if there is at least one font family
 		if ( count( $font_families ) < 1 ) {
 			$error_messages[] = __( 'fontFamilies should have at least one font family definition.', 'gutenberg' );
 			return $error_messages;
@@ -89,45 +89,53 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			$font_family = $font_families[ $family_index ];
 
 			if ( ! isset( $font_family['slug'] ) || ! isset( $font_family['name'] ) || ! isset( $font_family['fontFamily'] ) ) {
-				$error_messages[] = sprintf (
-					__( 'Font family [%s] should have slug, name and fontFamily properties defined.', 'gutenberg' ), $family_index
+				$error_messages[] = sprintf(
+					__( 'Font family [%s] should have slug, name and fontFamily properties defined.', 'gutenberg' ),
+					$family_index
 				);
 			}
 
 			if ( isset( $font_family['fontFace'] ) ) {
-				if ( !is_array( $font_family['fontFace'] ) ) {
-					$error_messages[] = sprintf (
-						__( 'Font family [%s] should have fontFace property defined as an array.', 'gutenberg' ), $family_index
+				if ( ! is_array( $font_family['fontFace'] ) ) {
+					$error_messages[] = sprintf(
+						__( 'Font family [%s] should have fontFace property defined as an array.', 'gutenberg' ),
+						$family_index
 					);
 				}
 
-				if ( count ( $font_family['fontFace'] ) < 1 ) {
-					$error_messages[] = sprintf (
-						__( 'Font family [%s] should have at least one font face definition.', 'gutenberg' ), $family_index
+				if ( count( $font_family['fontFace'] ) < 1 ) {
+					$error_messages[] = sprintf(
+						__( 'Font family [%s] should have at least one font face definition.', 'gutenberg' ),
+						$family_index
 					);
 				}
 
-				if ( !empty ( $font_family['fontFace'] ) ) { 
+				if ( ! empty( $font_family['fontFace'] ) ) {
 					for ( $face_index = 0; $face_index < count( $font_family['fontFace'] ); $face_index++ ) {
 
 						$font_face = $font_family['fontFace'][ $face_index ];
-						if ( ! isset( $font_face['fontWeight'] ) || ! isset( $font_face['fontStyle'] )  ) {
-							$error_messages[] = sprintf (
-								__( 'Font family [%s] Font face [%s] should have fontWeight and fontStyle properties defined.', 'gutenberg' ), $family_index, $face_index
+						if ( ! isset( $font_face['fontWeight'] ) || ! isset( $font_face['fontStyle'] ) ) {
+							$error_messages[] = sprintf(
+								__( 'Font family [%1$s] Font face [%2$s] should have fontWeight and fontStyle properties defined.', 'gutenberg' ),
+								$family_index,
+								$face_index
 							);
 						}
 
-
-						if ( isset ( $font_face['download_from_url'] ) &&  isset ( $font_face['uplodaded_file'] ) ) {
-							$error_messages[] = sprintf (
-								__( 'Font family [%s] Font face [%s] should have only one of the download_from_url or uploaded_file properties defined and not both.', 'gutenberg' ), $family_index, $face_index
+						if ( isset( $font_face['download_from_url'] ) && isset( $font_face['uplodaded_file'] ) ) {
+							$error_messages[] = sprintf(
+								__( 'Font family [%1$s] Font face [%2$s] should have only one of the download_from_url or uploaded_file properties defined and not both.', 'gutenberg' ),
+								$family_index,
+								$face_index
 							);
 						}
 
 						if ( isset( $font_face['uploaded_file'] ) ) {
-							if ( !isset( $files[ $font_face['uploaded_file'] ] ) ) {
-								$error_messages[]= sprintf (
-									__( 'Font family [%s] Font face [%s] file is not defined in the request files.', 'gutenberg' ), $family_index, $face_index
+							if ( ! isset( $files[ $font_face['uploaded_file'] ] ) ) {
+								$error_messages[] = sprintf(
+									__( 'Font family [%1$s] Font face [%2$s] file is not defined in the request files.', 'gutenberg' ),
+									$family_index,
+									$face_index
 								);
 							}
 						}
@@ -140,16 +148,16 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
 	/**
 	 * Validate input for the install endpoint.
-	 * 
-	 * @param string $param The font families to install.
+	 *
+	 * @param string          $param The font families to install.
 	 * @param WP_REST_Request $request The request object.
-	 * @param string $key The parameter key.
-	 * 
+	 * @param string          $key The parameter key.
+	 *
 	 * @return true|WP_Error True if the parameter is valid, WP_Error otherwise.
 	 */
-	public function validate_install_font_families ( $param, $request, $key ) {
-		$font_families = json_decode( $param, true );
-		$files  = $request->get_file_params();
+	public function validate_install_font_families( $param, $request, $key ) {
+		$font_families  = json_decode( $param, true );
+		$files          = $request->get_file_params();
 		$error_messages = $this->get_validation_errors( $font_families, $files );
 
 		if ( empty( $error_messages ) ) {
@@ -161,24 +169,24 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
 	/**
 	 * Schema for the uninstall endpoint.
-	 * 
+	 *
 	 * @return array Schema array.
 	 */
-	public function uninstall_schema () {
+	public function uninstall_schema() {
 		return array(
 			'fontFamilies' => array(
-				'type' => 'array',
+				'type'        => 'array',
 				'description' => __( 'The font families to install.', 'gutenberg' ),
-				'required' => true,
-				'minItems' => 1,
-				'items' => array(
-					'required' => true,
-					'type' => 'object',
+				'required'    => true,
+				'minItems'    => 1,
+				'items'       => array(
+					'required'   => true,
+					'type'       => 'object',
 					'properties' => array(
 						'slug' => array(
-							'type' => 'string',
+							'type'        => 'string',
 							'description' => __( 'The font family slug.', 'gutenberg' ),
-							'required' => true,
+							'required'    => true,
 						),
 					),
 				),

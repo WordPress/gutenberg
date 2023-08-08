@@ -154,7 +154,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that the install() and uninstall() methods work as expected
 	 * It uses different types of font families: with local, remote or no files.
-	 * 
+	 *
 	 * @covers ::install
 	 * @covers ::uninstall
 	 * @covers ::get_font_post

@@ -46,7 +46,7 @@ class WP_Fonts_Library {
 	 *     @type string $basedir Base directory.
 	 *     @type string $baseurl Base URL.
 	 * }
-	 * 
+	 *
 	 * @return array Modified upload directory.
 	 */
 	public static function set_upload_dir( $defaults ) {
