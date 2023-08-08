@@ -53,22 +53,6 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 	};
 
-	it( 'can be edited with collapsed selection', async () => {
-		await createAndReselectLink();
-		// Make a collapsed selection inside the link
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowRight' );
-		await showBlockToolbar();
-		const [ editButton ] = await page.$x(
-			'//button[contains(@aria-label, "Edit")]'
-		);
-		await editButton.click();
-		await waitForURLFieldAutoFocus();
-		await page.keyboard.type( '/handbook' );
-		await page.keyboard.press( 'Enter' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	const createPostWithTitle = async ( titleText ) => {
 		await createNewPost();
 		await canvas().type( '.editor-post-title__input', titleText );

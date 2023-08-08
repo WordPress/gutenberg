@@ -13,8 +13,8 @@ test.describe( 'Links', () => {
 	} );
 
 	test.use( {
-		LinkUtils: async ( { page }, use ) => {
-			await use( new LinkUtils( { page } ) );
+		LinkUtils: async ( { editor, page, pageUtils }, use ) => {
+			await use( new LinkUtils( { editor, page, pageUtils } ) );
 		},
 	} );
 
@@ -221,27 +221,8 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can be edited`, async ( { page, editor, pageUtils } ) => {
-		// Create a block with some text.
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-		} );
-		await page.keyboard.type( 'This is Gutenberg' );
-
-		// Select some text.
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-
-		// Click on the Link button.
-		await page.getByRole( 'button', { name: 'Link' } ).click();
-
-		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-		// Click on the Submit button.
-		await pageUtils.pressKeys( 'Enter' );
-
-		// Reselect the link.
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+	test( `can be edited`, async ( { page, editor, pageUtils, LinkUtils } ) => {
+		await LinkUtils.createAndReselectLink();
 
 		// Click on the Edit button.
 		await page.getByRole( 'button', { name: 'Edit' } ).click();
@@ -264,27 +245,8 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can be removed`, async ( { page, editor, pageUtils } ) => {
-		// Create a block with some text.
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-		} );
-		await page.keyboard.type( 'This is Gutenberg' );
-
-		// Select some text.
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-
-		// Click on the Link button.
-		await page.getByRole( 'button', { name: 'Link' } ).click();
-
-		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-		// Click on the Submit button.
-		await pageUtils.pressKeys( 'Enter' );
-
-		// Reselect the link.
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+	test( `can be removed`, async ( { page, editor, LinkUtils } ) => {
+		await LinkUtils.createAndReselectLink();
 
 		// Unlick via shortcut
 		// we do this to avoid an layout edge case whereby
@@ -370,6 +332,36 @@ test.describe( 'Links', () => {
 				'.components-popover__content .block-editor-link-control'
 			);
 		await expect( popover ).not.toBeVisible();
+	} );
+
+	test( `can be edited with collapsed selection`, async ( {
+		page,
+		editor,
+		LinkUtils,
+		pageUtils,
+	} ) => {
+		await LinkUtils.createAndReselectLink();
+		// Make a collapsed selection inside the link
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await editor.showBlockToolbar();
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Change the URL.
+		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
+		await page.keyboard.type( '/handbook' );
+
+		// Submit the link.
+		await pageUtils.pressKeys( 'Enter' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is <a href="/handbook">Gutenberg</a>',
+				},
+			},
+		] );
 	} );
 
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
@@ -682,8 +674,10 @@ test.describe( 'Links', () => {
 } );
 
 class LinkUtils {
-	constructor( { page } ) {
+	constructor( { editor, page, pageUtils } ) {
 		this.page = page;
+		this.editor = editor;
+		this.pageUtils = pageUtils;
 	}
 
 	async toggleFixedToolbar( isFixed ) {
@@ -696,5 +690,28 @@ class LinkUtils {
 				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
 			}
 		}, isFixed );
+	}
+
+	async createAndReselectLink() {
+		// Create a block with some text.
+		await this.editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await this.page.keyboard.type( 'This is Gutenberg' );
+
+		// Select some text.
+		await this.pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Click on the Link button.
+		await this.page.getByRole( 'button', { name: 'Link' } ).click();
+
+		// Type a URL.
+		await this.page.keyboard.type( 'https://wordpress.org/gutenberg' );
+
+		// Click on the Submit button.
+		await this.pageUtils.pressKeys( 'Enter' );
+
+		// Reselect the link.
+		await this.pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 	}
 }
