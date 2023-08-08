@@ -10,7 +10,14 @@ import {
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCommandLoader } from '@wordpress/commands';
-import { copy } from '@wordpress/icons';
+import {
+	copy,
+	edit as remove,
+	create as add,
+	group,
+	ungroup,
+	moveTo as move,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -179,14 +186,14 @@ const useActionsCommands = () => {
 		}
 		return removeBlocks( clientIds, true );
 	};
-	const onInsertBefore = () => {
+	const onAddBefore = () => {
 		if ( ! canInsertDefaultBlock ) {
 			return;
 		}
 		const clientId = Array.isArray( clientIds ) ? clientIds[ 0 ] : clientId;
 		insertBeforeBlock( clientId );
 	};
-	const onInsertAfter = () => {
+	const onAddAfter = () => {
 		if ( ! canInsertDefaultBlock ) {
 			return;
 		}
@@ -251,25 +258,43 @@ const useActionsCommands = () => {
 		return { isLoading: false, commands: [] };
 	}
 
+	const icons = {
+		paste: copy,
+		copy,
+		ungroup,
+		group,
+		move,
+		add,
+		remove,
+		duplicate: copy,
+	};
+
 	const commands = [
 		onPasteStyles,
 		onCopy,
 		onUngroup,
 		onGroup,
 		onMoveTo,
-		onInsertAfter,
-		onInsertBefore,
+		onAddAfter,
+		onAddBefore,
 		onRemove,
 		onDuplicate,
 	].map( ( callback ) => {
 		const action = callback.name
 			.replace( 'on', '' )
 			.replace( /([a-z])([A-Z])/g, '$1 $2' );
+
 		return {
 			name: 'core/block-editor/action-' + callback.name,
 			// translators: %s: type of the command.
-			label: sprintf( __( `%s block` ), action ),
-			icon: copy,
+			label: action,
+			icon: icons[
+				callback.name
+					.replace( 'on', '' )
+					.match( /[A-Z]{1}[a-z]*/ )
+					.toString()
+					.toLowerCase()
+			],
 			callback: ( { close } ) => {
 				callback();
 				close();
