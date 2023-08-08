@@ -108,7 +108,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );
 		$uninstall_request->set_param( 'fontFamilies', $font_families );
 		$response = rest_get_server()->dispatch( $uninstall_request );
-		$this->assertEquals( 200, $response->get_status(), 'The response status is not 200.' );
+		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
 	}
 
 	/**
