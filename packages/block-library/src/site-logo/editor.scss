@@ -45,6 +45,12 @@
 		border-radius: inherit;
 	}
 
+	// Make the linked image inside the resize full width
+	.components-resizable-box__container > a,
+	.components-resizable-box__container > a img {
+		width: 100%;
+	}
+
 	// Style the placeholder.
 	.components-placeholder {
 		display: flex;
