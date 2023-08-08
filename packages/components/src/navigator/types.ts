@@ -60,6 +60,18 @@ export type NavigatorScreenProps = {
 	 * The children elements.
 	 */
 	children: ReactNode;
+	/**
+	 * The aria-role attributed to the screen.
+	 *
+	 * @default 'region'
+	 */
+	role?: React.HTMLAttributes< Element >[ 'role' ];
+	/**
+	 * Additional text used to label the component for assistive technology.
+	 *
+	 * @default 'Navigator screen'
+	 */
+	'aria-label'?: React.HTMLAttributes< Element >[ 'aria-label' ];
 };
 
 export type NavigatorBackButtonProps = ButtonAsButtonProps;

@@ -43,7 +43,7 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 		style={ { ...style, height: '100vh', maxHeight: '450px' } }
 		{ ...props }
 	>
-		<NavigatorScreen path="/">
+		<NavigatorScreen path="/" aria-label="Home screen">
 			<Card>
 				<CardBody>
 					<p>This is the home screen.</p>
@@ -97,10 +97,11 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 			</Card>
 		</NavigatorScreen>
 
-		<NavigatorScreen path="/child">
+		<NavigatorScreen path="/child" aria-labelledby="child-screen-title">
 			<Card>
 				<CardBody>
-					<p>This is the child screen.</p>
+					{ /* eslint-disable-next-line no-restricted-syntax */ }
+					<h1 id="child-screen-title">Child screen</h1>
 					<NavigatorBackButton variant="secondary">
 						Go back
 					</NavigatorBackButton>
@@ -108,7 +109,10 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 			</Card>
 		</NavigatorScreen>
 
-		<NavigatorScreen path="/overflow-child">
+		<NavigatorScreen
+			path="/overflow-child"
+			aria-label="Child screen with overflowing content"
+		>
 			<Card>
 				<CardBody>
 					<NavigatorBackButton variant="secondary">
@@ -134,7 +138,10 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 			</Card>
 		</NavigatorScreen>
 
-		<NavigatorScreen path="/stickies">
+		<NavigatorScreen
+			path="/stickies"
+			aria-label="Screen with sticky content"
+		>
 			<Card>
 				<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
 					<NavigatorBackButton variant="secondary">
@@ -173,7 +180,7 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 			</Card>
 		</NavigatorScreen>
 
-		<NavigatorScreen path="/product/:id">
+		<NavigatorScreen path="/product/:id" aria-label="Product screen">
 			<ProductDetails />
 		</NavigatorScreen>
 	</NavigatorProvider>

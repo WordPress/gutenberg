@@ -19,3 +19,17 @@ The component accepts the following props:
 The screen's path, matched against the current path stored in the navigator.
 
 -   Required: Yes
+
+### `aria-label`: `string`
+
+Additional text used to label the component for assistive technology.
+
+-   Required: No
+-   Default: `"Navigator screen"`
+
+### `role`: `string`
+
+The aria-role attributed to the screen.
+
+-   Required: No
+-   Default: `"region"`

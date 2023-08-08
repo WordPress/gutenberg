@@ -41,6 +41,7 @@
 
 ### Enhancements
 
+-   `Navigator`: focus screen wrapper instead of first tabbable element. ([#51816](https://github.com/WordPress/gutenberg/pull/51816)).
 -   `SelectControl`: Added option to set hidden options. ([#51545](https://github.com/WordPress/gutenberg/pull/51545))
 -   `RangeControl`: Add `__next40pxDefaultSize` prop to opt into the new 40px default size ([#49105](https://github.com/WordPress/gutenberg/pull/49105)).
 -   `Button`: Introduce `size` prop with `default`, `compact`, and `small` variants ([#51842](https://github.com/WordPress/gutenberg/pull/51842)).

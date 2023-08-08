@@ -9,7 +9,6 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { focus } from '@wordpress/dom';
 import {
 	useContext,
 	useEffect,
@@ -18,7 +17,7 @@ import {
 	useId,
 } from '@wordpress/element';
 import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
-import { isRTL } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
@@ -51,10 +50,14 @@ function UnconnectedNavigatorScreen(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const screenId = useId();
-	const { children, className, path, ...otherProps } = useContextSystem(
-		props,
-		'NavigatorScreen'
-	);
+	const {
+		children,
+		className,
+		path,
+		'aria-label': ariaLabel = __( 'Navigator screen' ),
+		role = 'region',
+		...otherProps
+	} = useContextSystem( props, 'NavigatorScreen' );
 
 	const prefersReducedMotion = useReducedMotion();
 	const { location, match, addScreen, removeScreen } =
@@ -75,12 +78,33 @@ function UnconnectedNavigatorScreen(
 	const classes = useMemo(
 		() =>
 			cx(
-				css( {
-					// Ensures horizontal overflow is visually accessible.
-					overflowX: 'auto',
-					// In case the root has a height, it should not be exceeded.
-					maxHeight: '100%',
-				} ),
+				css`
+					/* Ensures horizontal overflow is visually accessible. */
+					overflow-x: auto;
+					/* In case the root has a height, it should not be exceeded. */
+					max-height: 100%;
+
+					&::after {
+						content: '';
+						position: absolute;
+						inset: 0;
+						z-index: 9999;
+						pointer-events: none;
+					}
+
+					&:focus {
+						outline: none;
+					}
+
+					&:focus::after {
+						box-shadow: inset 0 0 0
+							var( --wp-admin-border-width-focus )
+							var( --wp-admin-theme-color );
+
+						// Windows High Contrast mode will show this outline, but not the box-shadow.
+						outline: 2px solid transparent;
+					}
+				`,
 				className
 			),
 		[ className, cx ]
@@ -130,12 +154,9 @@ function UnconnectedNavigatorScreen(
 		}
 
 		// If the previous query didn't run or find any element to focus, fallback
-		// to the first tabbable element in the screen (or the screen itself).
+		// to the screen itself.
 		if ( ! elementToFocus ) {
-			const firstTabbable = (
-				focus.tabbable.find( wrapperRef.current ) as HTMLElement[]
-			 )[ 0 ];
-			elementToFocus = firstTabbable ?? wrapperRef.current;
+			elementToFocus = wrapperRef.current;
 		}
 
 		locationRef.current.hasRestoredFocus = true;
@@ -211,6 +232,9 @@ function UnconnectedNavigatorScreen(
 		<motion.div
 			ref={ mergedWrapperRef }
 			className={ classes }
+			tabIndex={ -1 }
+			role={ role }
+			aria-label={ ariaLabel }
 			{ ...otherProps }
 			{ ...animatedProps }
 		>
