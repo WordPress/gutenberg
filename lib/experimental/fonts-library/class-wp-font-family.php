@@ -369,9 +369,9 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Create a post for a font family.
+	 * Creates a post for a font family.
 	 *
-	 * @return int|WP_Error Post ID.
+	 * @return int|WP_Error Post ID if the post was created, WP_Error otherwise.
 	 */
 	private function create_font_post() {
 		$post    = array(
