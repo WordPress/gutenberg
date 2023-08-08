@@ -97,8 +97,8 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 
 		$functionName = $tokens[ $functionToken ]['content'];
 
-		foreach ( $this->whitelistedFunctions as $functionRegExp ) {
-			if ( preg_match( $functionRegExp, $functionName ) ) {
+		foreach ( $this->prefixes as $prefix ) {
+			if ( 0 === stripos( $functionName, $prefix ) ) {
 				// Ignore whitelisted function names.
 				return;
 			}
