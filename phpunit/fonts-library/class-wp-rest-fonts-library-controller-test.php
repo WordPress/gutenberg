@@ -60,7 +60,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 		$uninstall_request->set_param( 'fontFamilies', $non_existing_font_data );
 		$response = rest_get_server()->dispatch( $uninstall_request );
 		$data     = $response->get_data();
-		$this->assertEquals( 500, $response->get_status(), 'The response status is not 500.' );
+		$this->assertSame( 500, $response->get_status(), 'The response status is not 500.' );
 	}
 
 
