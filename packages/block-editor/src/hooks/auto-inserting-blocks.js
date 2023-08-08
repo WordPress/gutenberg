@@ -34,7 +34,7 @@ function AutoInsertingBlocksControl( props ) {
 				getBlock,
 				getBlockIndex,
 				getBlockRootClientId,
-				getNextBlockClientId,
+				getAdjacentBlockClientId,
 			} = select( blockEditorStore );
 			const _rootClientId = getBlockRootClientId( props.clientId );
 
@@ -46,24 +46,27 @@ function AutoInsertingBlocksControl( props ) {
 					const relativePosition =
 						block?.autoInsert?.[ props.blockName ];
 
-					if ( relativePosition === 'after' ) {
-						// Could do a `for` loop instead.
+					if ( [ 'before', 'after' ].includes( relativePosition ) ) {
+						const direction = relativePosition === 'after' ? 1 : -1;
 						let clientId = props.clientId;
 						while (
-							( clientId = getNextBlockClientId( clientId ) )
+							( clientId = getAdjacentBlockClientId(
+								clientId,
+								direction
+							) )
 						) {
 							if (
 								getBlock( clientId )?.blockName ===
 								block.blockName
 							) {
-								acc.after[ block.name ] = clientId;
+								acc[ block.name ] = clientId;
 								return acc;
 							}
 						}
 					}
 					return acc;
 				},
-				{ before: {}, after: {}, firstChild: {}, lastChild: {} }
+				{}
 			);
 
 			return {
@@ -105,12 +108,9 @@ function AutoInsertingBlocksControl( props ) {
 									const relativePosition =
 										block.autoInsert[ props.blockName ];
 
-									let checked = false;
-									if ( relativePosition === 'after' ) {
-										checked = Object.keys(
-											blocks.after
-										).includes( block.name );
-									}
+									const checked = Object.keys(
+										blocks
+									).includes( block.name );
 
 									const insertionIndex =
 										relativePosition === 'after'
@@ -143,13 +143,16 @@ function AutoInsertingBlocksControl( props ) {
 													}
 													// TODO: Implement first_child and last_child insertion.
 												} else if (
-													// Remove block.
-													relativePosition === 'after'
+													[
+														'before',
+														'after',
+													].includes(
+														relativePosition
+													)
 												) {
+													// Remove block.
 													const clientId =
-														blocks.after[
-															block.name
-														];
+														blocks[ block.name ];
 													removeBlock( clientId );
 												}
 											} }
