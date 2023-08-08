@@ -72,7 +72,7 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 		const splitBlockName = blockName.split( '/' );
 		const fullBlockName =
 			splitBlockName[ 0 ] === 'core'
-				? splitBlockName[ 1 ]
+				? splitBlockName.pop()
 				: splitBlockName.join( '-' );
 		const compoundClassName = `wp-block-${ fullBlockName }-${ baseClassName }`;
 		layoutClassnames.push( baseClassName, compoundClassName );

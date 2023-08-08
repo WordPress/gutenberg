@@ -687,7 +687,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	// Add combined layout and block classname for global styles to hook onto.
 	$split_block_name = explode( '/', $block['blockName'] );
-	$full_block_name  = 'core' === $split_block_name[0] ? $split_block_name[1] : implode( '-', $split_block_name );
+	$full_block_name  = 'core' === $split_block_name[0] ? end( $split_block_name ) : implode( '-', $split_block_name );
 	$class_names[]    = 'wp-block-' . $full_block_name . '-' . $layout_classname;
 
 	$content_with_outer_classnames = '';
