@@ -108,7 +108,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			return;
 		}
 
-		$errorMessage = 'In this index.php file, only the following prefixes for PHP function names are allowed: "1", "2", and "3".: "' . implode( '", "', $allowed_function_prefixes ) . '"';
+		$errorMessage = 'In this file, only the following prefixes for PHP function names are allowed: "' . implode( '", "', $allowed_function_prefixes ) . '"';
 		$phpcsFile->addError( $errorMessage, $functionToken, 'FunctionNameInvalid' );
 	}
 
