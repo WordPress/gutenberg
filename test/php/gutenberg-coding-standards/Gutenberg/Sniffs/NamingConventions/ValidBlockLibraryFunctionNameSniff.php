@@ -95,14 +95,26 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			}
 		}
 
-		$functionName = $tokens[ $functionToken ]['content'];
+		$functionName          = $tokens[ $functionToken ]['content'];
+		$parent_directory_name = basename( dirname( $phpcsFile->getFilename() ) );
 
+		$allowed_function_names = array();
 		foreach ( $this->prefixes as $prefix ) {
-			if ( 0 === stripos( $functionName, $prefix ) ) {
-				// Ignore whitelisted function names.
-				return;
-			}
+			$prefix                   = rtrim( $prefix, '_' );
+			$allowed_function_names[] = $prefix . '_' . str_replace( '-', '_', $parent_directory_name );
 		}
+
+		$is_function_name_valid = false;
+		foreach ( $allowed_function_names as $allowed_function_name ) {
+			$is_function_name_valid |= 0 === strpos( $functionName, $allowed_function_name );
+		}
+
+		if ( $is_function_name_valid ) {
+			return;
+		}
+
+		$errorMessage = 'Only the following PHP function names are allowed in this index.php file: "' . implode( '", "', $allowed_function_names ) . '"';
+		$phpcsFile->addError( $errorMessage, $functionToken, 'FunctionNameInvalid' );
 	}
 
 	/**
