@@ -189,12 +189,13 @@ function ListViewBlockSelectButton(
 					{ images.length ? (
 						<span className="block-editor-list-view-block-select-button__images">
 							{ images.map( ( image, index ) => (
-								<img
+								<span
+									className="block-editor-list-view-block-select-button__image"
 									key={ index }
-									src={ image.url }
-									alt={ image.alt }
-									width={ 24 }
-									height={ 24 }
+									style={ {
+										backgroundImage: `url(${ image.url })`,
+										zIndex: images.length - index, // Ensure the first image is on top, and subsequent images are behind.
+									} }
 								/>
 							) ) }
 						</span>
