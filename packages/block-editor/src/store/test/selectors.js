@@ -3348,7 +3348,10 @@ describe( 'selectors', () => {
 				category: 'reusable',
 				content: '<!-- /wp:test-block-a -->',
 				frecency: 0,
-				icon: symbol,
+				icon: {
+					src: symbol,
+					foreground: 'var(--wp-block-synced-color)',
+				},
 				id: 'core/block/1',
 				initialAttributes: { ref: 1 },
 				isDisabled: false,

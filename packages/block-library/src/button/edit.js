@@ -235,7 +235,6 @@ function ButtonEdit( props ) {
 					shift
 				>
 					<LinkControl
-						className="wp-block-navigation-link__inline-link-input"
 						value={ { url, opensInNewTab } }
 						onChange={ ( {
 							url: newURL = '',

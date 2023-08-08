@@ -69,9 +69,12 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 	if ( LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className ) {
 		const baseClassName =
 			LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className;
-		const compoundClassName = `wp-block-${ blockName
-			.split( '/' )
-			.pop() }-${ baseClassName }`;
+		const splitBlockName = blockName.split( '/' );
+		const fullBlockName =
+			splitBlockName[ 0 ] === 'core'
+				? splitBlockName.pop()
+				: splitBlockName.join( '-' );
+		const compoundClassName = `wp-block-${ fullBlockName }-${ baseClassName }`;
 		layoutClassnames.push( baseClassName, compoundClassName );
 	}
 
