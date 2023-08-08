@@ -18,6 +18,7 @@
 ### Bug Fix
 
 -   `Modal`: Fix loss of focus when clicking outside ([#52653](https://github.com/WordPress/gutenberg/pull/52653)).
+-   `MenuItemsChoice`: add `aria-disabled` when disabled is `true` ([#53411](https://github.com/WordPress/gutenberg/pull/53411)).
 
 ### Internal
 
