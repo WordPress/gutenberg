@@ -92,8 +92,8 @@ if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) ) {
 	 *   </ul>
 	 * </li>
 	 *
-	 * @param string $w Markup of the navigation block.
-	 * @param array  $block_attributes Block attributes.
+	 * @param WP_HTML_Tag_Processor $w                Markup of the navigation block.
+	 * @param array                 $block_attributes Block attributes.
 	 *
 	 * @return string Submenu markup with the directives injected.
 	 */
