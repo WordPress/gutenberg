@@ -120,13 +120,51 @@ html.interface-interface-skeleton__html-container {
 	overflow: auto;
 
 	@include break-medium() {
-		border-left: $border-width solid $gray-200;
+		border: $border-width solid $gray-200;
+		position: absolute !important;
+		top: 80px !important;
+		left: auto !important;
+		right: 20px !important;
+		width: auto !important;
+		height: 85vh !important;
+		opacity: 20%;
+		filter: brightness(300%);
+
+		&:focus,
+		&:focus-within,
+		&:hover {
+			opacity: 100%;
+			filter: brightness(100%);
+		}
+
+		.edit-site-layout__content & {
+			top: 20px !important;
+		}
 	}
 }
 
 .interface-interface-skeleton__secondary-sidebar {
 	@include break-medium() {
-		border-right: $border-width solid $gray-200;
+		position: absolute !important;
+		top: 80px !important;
+		left: 20px !important;
+		width: 350px !important;
+		height: 85vh !important;
+		border: $border-width solid $gray-200;
+		opacity: 20%;
+		filter: brightness(300%);
+
+		&:focus,
+		&:focus-within,
+		&:hover {
+			opacity: 100%;
+			filter: brightness(100%);
+		}
+
+		.edit-site-layout__content & {
+			top: 20px !important;
+		}
+
 	}
 }
 

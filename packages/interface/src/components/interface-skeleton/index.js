@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import Draggable from 'react-draggable';
 
 /**
  * WordPress dependencies
@@ -135,12 +136,14 @@ function InterfaceSkeleton(
 				) }
 				<div className="interface-interface-skeleton__body">
 					{ !! secondarySidebar && (
-						<NavigableRegion
-							className="interface-interface-skeleton__secondary-sidebar"
-							ariaLabel={ mergedLabels.secondarySidebar }
-						>
-							{ secondarySidebar }
-						</NavigableRegion>
+						<Draggable>
+							<NavigableRegion
+								className="interface-interface-skeleton__secondary-sidebar"
+								ariaLabel={ mergedLabels.secondarySidebar }
+							>
+								{ secondarySidebar }
+							</NavigableRegion>
+						</Draggable>
 					) }
 					{ !! notices && (
 						<div className="interface-interface-skeleton__notices">
@@ -154,12 +157,14 @@ function InterfaceSkeleton(
 						{ content }
 					</NavigableRegion>
 					{ !! sidebar && (
-						<NavigableRegion
-							className="interface-interface-skeleton__sidebar"
-							ariaLabel={ mergedLabels.sidebar }
-						>
-							{ sidebar }
-						</NavigableRegion>
+						<Draggable>
+							<NavigableRegion
+								className="interface-interface-skeleton__sidebar"
+								ariaLabel={ mergedLabels.sidebar }
+							>
+								{ sidebar }
+							</NavigableRegion>
+						</Draggable>
 					) }
 					{ !! actions && (
 						<NavigableRegion

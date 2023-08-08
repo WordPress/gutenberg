@@ -43,7 +43,8 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/viewport": "file:../viewport",
-		"classnames": "^2.3.1"
+		"classnames": "^2.3.1",
+		"react-draggable": "^4.4.5"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
