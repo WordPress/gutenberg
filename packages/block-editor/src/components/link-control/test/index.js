@@ -959,6 +959,12 @@ describe( 'Link submission', () => {
 		expect( submitButton ).toBeVisible();
 		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
 
+		// Click the button and check it's not possible to prematurely submit the link.
+		await user.click( submitButton );
+
+		expect( searchInput ).toBeVisible();
+		expect( submitButton ).toBeVisible();
+
 		await user.type( searchInput, 'https://wordpress.org' );
 
 		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'false' );
@@ -989,6 +995,7 @@ describe( 'Link submission', () => {
 			name: 'Submit',
 		} );
 
+		// Check the submit button for "creation" of links is not displayed.
 		expect( createSubmitButton ).not.toBeInTheDocument();
 
 		const editSubmitButton = screen.getByRole( 'button', {
@@ -997,6 +1004,12 @@ describe( 'Link submission', () => {
 
 		expect( editSubmitButton ).toBeVisible();
 		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		// Click the button and check it's not possible to prematurely submit the link.
+		await user.click( editSubmitButton );
+
+		expect( searchInput ).toBeVisible();
+		expect( editSubmitButton ).toBeVisible();
 
 		await user.type( searchInput, '#appendtolinktext' );
 
