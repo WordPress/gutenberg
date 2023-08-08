@@ -30,9 +30,9 @@ import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-d
 export default function SidebarNavigationScreenPage() {
 	const navigator = useNavigator();
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { params } = useNavigator();
-
-	const postId = Number( params?.postId );
+	const {
+		params: { postId },
+	} = useNavigator();
 	const { record } = useEntityRecord( 'postType', 'page', postId );
 
 	const { featuredMediaAltText, featuredMediaSourceUrl } = useSelect(
