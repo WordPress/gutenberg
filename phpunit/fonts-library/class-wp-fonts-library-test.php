@@ -24,10 +24,10 @@ class WP_Fonts_Library_Test extends WP_UnitTestCase {
 	 * @dataProvider data_set_upload_dir
 	 *
 	 * @param array $defaults Default upload directory data.
-	 * @param array $xpected Modified upload directory data.
+	 * @param array $expected Modified upload directory data.
 	 */
-	public function test_set_upload_dir( $defaults, $xpected ) {
-		$this->assertEquals( $xpected, WP_Fonts_Library::set_upload_dir( $defaults ) );
+	public function test_set_upload_dir( $defaults, $expected ) {
+		$this->assertSame( $expected, WP_Fonts_Library::set_upload_dir( $defaults ) );
 	}
 
 	public function data_set_upload_dir() {
