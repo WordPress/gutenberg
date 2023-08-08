@@ -121,10 +121,6 @@
 		}
 	}
 
-	&:has(.block-editor-block-toolbar:empty) {
-		display: none;
-	}
-
 	// Add a scrim to the right of the collapsed button.
 	&.is-collapsed::after {
 		content: "";
