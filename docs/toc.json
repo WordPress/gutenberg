@@ -80,11 +80,7 @@
 			{
 				"docs/how-to-guides/platform/README.md": [
 					{
-						"docs/how-to-guides/platform/custom-block-editor/README.md": [
-							{
-								"docs/how-to-guides/platform/custom-block-editor/tutorial.md": []
-							}
-						]
+						"docs/how-to-guides/platform/custom-block-editor.md": []
 					}
 				]
 			},

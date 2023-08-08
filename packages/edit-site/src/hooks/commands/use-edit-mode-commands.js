@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	trash,
-	backup,
+	rotateLeft,
+	rotateRight,
 	layout,
 	page,
 	drawerLeft,
@@ -16,6 +17,7 @@ import {
 	keyboard,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
+import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -35,6 +37,7 @@ import { unlock } from '../../lock-unlock';
 const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
+	const { record: template } = useEditedEntityRecord();
 	const { isPage, canvasMode, hasPageContentFocus } = useSelect(
 		( select ) => ( {
 			isPage: select( editSiteStore ).isPage(),
@@ -54,7 +57,11 @@ function usePageContentFocusCommands() {
 	if ( hasPageContentFocus ) {
 		commands.push( {
 			name: 'core/switch-to-template-focus',
-			label: __( 'Edit template' ),
+			/* translators: %1$s: template title */
+			label: sprintf(
+				'Edit template: %s',
+				decodeEntities( template.title )
+			),
 			icon: layout,
 			callback: ( { close } ) => {
 				setHasPageContentFocus( false );
@@ -94,12 +101,20 @@ function useManipulateDocumentCommands() {
 	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
 		const label =
 			template.type === 'wp_template'
-				? __( 'Reset template' )
-				: __( 'Reset template part' );
+				? /* translators: %1$s: template title */
+				  sprintf(
+						'Reset template: %s',
+						decodeEntities( template.title )
+				  )
+				: /* translators: %1$s: template part title */
+				  sprintf(
+						'Reset template part: %s',
+						decodeEntities( template.title )
+				  );
 		commands.push( {
 			name: 'core/reset-template',
 			label,
-			icon: backup,
+			icon: isRTL() ? rotateRight : rotateLeft,
 			callback: ( { close } ) => {
 				revertTemplate( template );
 				close();
@@ -110,8 +125,16 @@ function useManipulateDocumentCommands() {
 	if ( isTemplateRemovable( template ) && ! hasPageContentFocus ) {
 		const label =
 			template.type === 'wp_template'
-				? __( 'Delete template' )
-				: __( 'Delete template part' );
+				? /* translators: %1$s: template title */
+				  sprintf(
+						'Delete template: %s',
+						decodeEntities( template.title )
+				  )
+				: /* translators: %1$s: template part title */
+				  sprintf(
+						'Delete template part: %s',
+						decodeEntities( template.title )
+				  );
 		const path =
 			template.type === 'wp_template'
 				? '/wp_template'

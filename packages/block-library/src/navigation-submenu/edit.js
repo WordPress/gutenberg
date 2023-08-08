@@ -475,7 +475,6 @@ export default function NavigationSubmenuEdit( {
 					}
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI
-							className="wp-block-navigation-link__inline-link-input"
 							clientId={ clientId }
 							link={ attributes }
 							onClose={ () => setIsLinkOpen( false ) }
