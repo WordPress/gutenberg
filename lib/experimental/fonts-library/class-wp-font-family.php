@@ -58,7 +58,7 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Returns if the font family has font faces defined.
+	 * Returns whether the font family has font faces defined.
 	 *
 	 * @return bool true if the font family has font faces defined, false otherwise.
 	 */
