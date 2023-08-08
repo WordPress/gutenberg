@@ -70,8 +70,8 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_install_and_uninstall_fonts
 	 *
-	 * @param array $font_families Font families to install in theme.json format
-	 * @param array $files         Font files to install
+	 * @param array $font_families     Font families to install in theme.json format
+	 * @param array $files             Font files to install
 	 * @param array $expected_response Expected response data
 	 */
 	public function test_install_and_uninstall_fonts( $font_families, $files, $expected_response ) {
