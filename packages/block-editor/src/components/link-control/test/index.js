@@ -934,7 +934,9 @@ describe( 'Manual link entry', () => {
 			}
 		);
 	} );
+} );
 
+describe( 'Link submission', () => {
 	it( 'should show a submit button when creating a link', async () => {
 		const user = userEvent.setup();
 
@@ -960,6 +962,45 @@ describe( 'Manual link entry', () => {
 		await user.type( searchInput, 'https://wordpress.org' );
 
 		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'false' );
+	} );
+
+	it( 'should show a submit button when editing a link', async () => {
+		const user = userEvent.setup();
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( fauxEntitySuggestions[ 0 ] );
+
+			return (
+				<LinkControl
+					forceIsEditingLink
+					value={ link }
+					onChange={ setLink }
+				/>
+			);
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+
+		const createSubmitButton = screen.queryByRole( 'button', {
+			name: 'Submit',
+		} );
+
+		expect( createSubmitButton ).not.toBeInTheDocument();
+
+		const editSubmitButton = screen.getByRole( 'button', {
+			name: 'Save',
+		} );
+
+		expect( editSubmitButton ).toBeVisible();
+		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		await user.type( searchInput, '#appendtolinktext' );
+
+		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'false' );
 	} );
 } );
 
