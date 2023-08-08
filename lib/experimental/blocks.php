@@ -193,7 +193,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			// Get the content from the connection.
 			$custom_value = $connection_sources[ $attribute_value['source'] ](
 				$block_instance,
-				$attribute_value['value'],
+				$attribute_value['value']
 			);
 
 			$tags  = new WP_HTML_Tag_Processor( $block_content );
