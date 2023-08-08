@@ -42,7 +42,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test if the get_data_as_json method returns the correct data
+	 * Tests that the get_data_as_json() method returns the expected data in JSON format.
 	 *
 	 * @covers ::get_data_as_json
 	 *
