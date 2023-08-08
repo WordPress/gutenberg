@@ -201,14 +201,16 @@ function LinkControl( {
 		useCreatePage( createSuggestion );
 
 	useEffect( () => {
-		if (
-			forceIsEditingLink !== undefined &&
-			forceIsEditingLink !== isEditingLink
-		) {
-			setIsEditingLink( forceIsEditingLink );
+		if ( forceIsEditingLink === undefined ) {
+			return;
 		}
-		// Todo: bug if the missing dep is introduced. Will need a fix.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+
+		setIsEditingLink( ( prevIsEditing ) => {
+			if ( prevIsEditing === forceIsEditingLink ) {
+				return prevIsEditing;
+			}
+			return forceIsEditingLink;
+		} );
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
