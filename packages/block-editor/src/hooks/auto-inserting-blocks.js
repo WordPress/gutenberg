@@ -55,10 +55,7 @@ function AutoInsertingBlocksControl( props ) {
 								direction
 							) )
 						) {
-							if (
-								getBlock( clientId )?.blockName ===
-								block.blockName
-							) {
+							if ( getBlock( clientId )?.name === block.name ) {
 								acc[ block.name ] = clientId;
 								return acc;
 							}
@@ -123,15 +120,15 @@ function AutoInsertingBlocksControl( props ) {
 											key={ block.title }
 											label={ block.title }
 											onChange={ () => {
-												if ( ! checked ) {
-													if (
-														[
-															'before',
-															'after',
-														].includes(
-															relativePosition
-														)
-													) {
+												if (
+													[
+														'before',
+														'after',
+													].includes(
+														relativePosition
+													)
+												) {
+													if ( ! checked ) {
 														insertBlock(
 															createBlock(
 																block.name
@@ -140,21 +137,19 @@ function AutoInsertingBlocksControl( props ) {
 															rootClientId,
 															false
 														);
+													} else {
+														// Remove block.
+														const clientId =
+															blocks[
+																block.name
+															];
+														removeBlock(
+															clientId,
+															false
+														);
 													}
-													// TODO: Implement first_child and last_child insertion.
-												} else if (
-													[
-														'before',
-														'after',
-													].includes(
-														relativePosition
-													)
-												) {
-													// Remove block.
-													const clientId =
-														blocks[ block.name ];
-													removeBlock( clientId );
 												}
+												// TODO: Implement first_child and last_child insertion and removal.
 											} }
 										/>
 									);
