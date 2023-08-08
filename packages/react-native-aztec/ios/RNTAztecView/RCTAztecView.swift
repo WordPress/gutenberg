@@ -67,6 +67,7 @@ class RCTAztecView: Aztec.TextView {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .natural
+        label.font = font
 
         return label
     }()
@@ -574,17 +575,7 @@ class RCTAztecView: Aztec.TextView {
     var placeholderAttributes: [NSAttributedString.Key: Any] {
         var placeholderAttributes = typingAttributes
         placeholderAttributes[.foregroundColor] = placeholderTextColor
-        placeholderAttributes[.font] = placeholderFont
         return placeholderAttributes
-    }
-
-    @objc var placeholderFont: UIFont {
-        set {
-            placeholderLabel.font = newValue
-        }
-        get {
-            return placeholderLabel.font
-        }
     }
 
     @objc var placeholderTextColor: UIColor {
