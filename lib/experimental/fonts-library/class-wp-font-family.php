@@ -60,7 +60,7 @@ class WP_Font_Family {
 	/**
 	 * Returns whether the font family has font faces defined.
 	 *
-	 * @return bool true if the font family has font faces defined, false otherwise.
+	 * @return bool True if the font family has font faces defined, false otherwise.
 	 */
 	public function has_font_faces() {
 		return ! empty( $this->data['fontFace'] ) && is_array( $this->data['fontFace'] );
