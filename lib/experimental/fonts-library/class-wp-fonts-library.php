@@ -26,7 +26,7 @@ class WP_Fonts_Library {
 	);
 
 	/**
-	 * Get the upload directory for fonts.
+	 * Gets the upload directory for fonts.
 	 *
 	 * @return string Path of the upload directory for fonts.
 	 */
