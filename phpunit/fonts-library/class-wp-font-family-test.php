@@ -12,7 +12,7 @@
 class WP_Font_Family_Test extends WP_UnitTestCase {
 
 	/**
-	 * Test the constructor failure
+	 * Tests that an exception is thrown when the font family is missing a slug.
 	 *
 	 * @covers ::__construct
 	 */
