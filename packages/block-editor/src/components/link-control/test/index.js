@@ -934,6 +934,33 @@ describe( 'Manual link entry', () => {
 			}
 		);
 	} );
+
+	it( 'should show a submit button when creating a link', async () => {
+		const user = userEvent.setup();
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( {} );
+
+			return <LinkControl value={ link } onChange={ setLink } />;
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+
+		const submitButton = screen.getByRole( 'button', {
+			name: 'Submit',
+		} );
+
+		expect( submitButton ).toBeVisible();
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		await user.type( searchInput, 'https://wordpress.org' );
+
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'false' );
+	} );
 } );
 
 describe( 'Default search suggestions', () => {
