@@ -378,7 +378,7 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Update a post for a font family.
+	 * Updates a post for a font family.
 	 *
 	 * @param WP_Post $post The post to update.
 	 * @return int|WP_Error Post ID if the update was successful, WP_Error otherwise.
