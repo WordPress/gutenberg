@@ -23,7 +23,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		);
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( 'Font family data is missing the slug.' );
-		$font = new WP_Font_Family( $font_data );
+		new WP_Font_Family( $font_data );
 	}
 
 	/**

@@ -79,7 +79,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			return $error_messages;
 		}
 
-		// check if there is at least one font family
+		// Checks if there is at least one font family.
 		if ( count( $font_families ) < 1 ) {
 			$error_messages[] = __( 'fontFamilies should have at least one font family definition.', 'gutenberg' );
 			return $error_messages;
@@ -90,6 +90,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
 			if ( ! isset( $font_family['slug'] ) || ! isset( $font_family['name'] ) || ! isset( $font_family['fontFamily'] ) ) {
 				$error_messages[] = sprintf(
+					// translators: 1: font family index.
 					__( 'Font family [%s] should have slug, name and fontFamily properties defined.', 'gutenberg' ),
 					$family_index
 				);
@@ -98,6 +99,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 			if ( isset( $font_family['fontFace'] ) ) {
 				if ( ! is_array( $font_family['fontFace'] ) ) {
 					$error_messages[] = sprintf(
+						// translators: 1: font family index.
 						__( 'Font family [%s] should have fontFace property defined as an array.', 'gutenberg' ),
 						$family_index
 					);
@@ -105,6 +107,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
 				if ( count( $font_family['fontFace'] ) < 1 ) {
 					$error_messages[] = sprintf(
+						// translators: 1: font family index.
 						__( 'Font family [%s] should have at least one font face definition.', 'gutenberg' ),
 						$family_index
 					);
@@ -116,6 +119,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 						$font_face = $font_family['fontFace'][ $face_index ];
 						if ( ! isset( $font_face['fontWeight'] ) || ! isset( $font_face['fontStyle'] ) ) {
 							$error_messages[] = sprintf(
+								// translators: 1: font family index, 2: font face index.
 								__( 'Font family [%1$s] Font face [%2$s] should have fontWeight and fontStyle properties defined.', 'gutenberg' ),
 								$family_index,
 								$face_index
@@ -124,6 +128,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
 						if ( isset( $font_face['download_from_url'] ) && isset( $font_face['uplodaded_file'] ) ) {
 							$error_messages[] = sprintf(
+								// translators: 1: font family index, 2: font face index.
 								__( 'Font family [%1$s] Font face [%2$s] should have only one of the download_from_url or uploaded_file properties defined and not both.', 'gutenberg' ),
 								$family_index,
 								$face_index
@@ -133,6 +138,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 						if ( isset( $font_face['uploaded_file'] ) ) {
 							if ( ! isset( $files[ $font_face['uploaded_file'] ] ) ) {
 								$error_messages[] = sprintf(
+									// translators: 1: font family index, 2: font face index.
 									__( 'Font family [%1$s] Font face [%2$s] file is not defined in the request files.', 'gutenberg' ),
 									$family_index,
 									$face_index
@@ -155,7 +161,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the parameter is valid, WP_Error otherwise.
 	 */
-	public function validate_install_font_families( $param, $request, $key ) {
+	public function validate_install_font_families( $param, $request ) {
 		$font_families  = json_decode( $param, true );
 		$files          = $request->get_file_params();
 		$error_messages = $this->get_validation_errors( $font_families, $files );
