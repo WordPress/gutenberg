@@ -43,7 +43,6 @@ class WP_Font_Family_Utils {
 	 *
 	 * @param array $font1 The first font to merge.
 	 * @param array $font2 The second font to merge.
-	 *
 	 * @return array|WP_Error The merged font or WP_Error if the fonts have different slugs.
 	 */
 	public static function merge_fonts_data( $font1, $font2 ) {
