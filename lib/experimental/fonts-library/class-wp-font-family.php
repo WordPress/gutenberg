@@ -333,7 +333,7 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Get the post for a font family.
+	 * Gets the post for a font family.
 	 *
 	 * @return WP_Post|null The post for this font family object or null if the post does not exist.
 	 */
