@@ -296,7 +296,8 @@ class WP_Font_Family {
 	 * Downloads font face assets if the font family is a Google font, or moves them if it is a local font.
 	 *
 	 * @param array $files An array of files to be installed.
-	 * @return bool
+	 * 
+	 * @return bool True if the font faces were downloaded or moved successfully, false otherwise.
 	 */
 	private function download_or_move_font_faces( $files ) {
 		if ( ! $this->has_font_faces() ) {
