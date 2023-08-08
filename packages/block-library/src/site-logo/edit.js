@@ -249,7 +249,7 @@ const SiteLogo = ( {
 			<ResizableBox
 				size={ {
 					width: currentWidth,
-					height: currentHeight,
+					height: 'auto',
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
@@ -579,7 +579,10 @@ export default function LogoEdit( {
 				className={ placeholderClassName }
 				preview={ logoImage }
 				withIllustration={ true }
-				style={ ( width, borderProps.style ) }
+				style={
+					( width,
+					isSelected === false ? borderProps.style : undefined )
+				}
 			>
 				{ content }
 			</Placeholder>
