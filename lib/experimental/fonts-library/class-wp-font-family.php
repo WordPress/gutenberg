@@ -198,8 +198,8 @@ class WP_Font_Family {
 	 * This is used when uploading local fonts.
 	 *
 	 * @param array $font_face Font face to download.
-	 * @param array $file Uploaded file.
-	 * @return array New font face with all assets downloaded and referenced in the font face definition
+	 * @param array $file      Uploaded file.
+	 * @return array New font face with all assets downloaded and referenced in the font face definition.
 	 */
 	private function move_font_face_asset( $font_face, $file ) {
 		$new_font_face = $font_face;
