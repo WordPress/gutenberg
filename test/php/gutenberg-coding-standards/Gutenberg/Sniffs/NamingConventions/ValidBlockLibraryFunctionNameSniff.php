@@ -108,7 +108,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			return;
 		}
 
-		$errorMessage = "The function name \"{$functionName}\" is invalid because function names in this file should start with one of the following prefixes: \""
+		$errorMessage = "The function name \"{$functionName}()\" is invalid because function names in this file should start with one of the following prefixes: \""
 		                . implode( '", "', $allowed_function_prefixes ) . '"';
 		$phpcsFile->addError( $errorMessage, $functionToken, 'FunctionNameInvalid' );
 	}
