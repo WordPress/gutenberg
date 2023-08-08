@@ -64,7 +64,7 @@ class WP_Font_Family_Utils_Test extends WP_UnitTestCase {
 	 *
 	 * @param string $slug               Font slug.
 	 * @param array  $font_face          Font face data in theme.json format.
-	 * @param string $suffix Suffix added to the resulting filename. Default empty string.
+	 * @param string $suffix             Suffix added to the resulting filename. Default empty string.
 	 * @param string $expected_file_name Expected file name.
 	 */
 	public function test_get_filename_from_font_face( $slug, $font_face, $suffix, $expected_file_name ) {
