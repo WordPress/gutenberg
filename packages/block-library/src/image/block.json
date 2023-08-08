@@ -4,7 +4,7 @@
 	"name": "core/image",
 	"title": "Image",
 	"category": "media",
-	"usesContext": [ "allowResize", "imageCrop", "fixedHeight" ],
+	"usesContext": [ "allowResize", "imageCrop", "fixedHeight", "postId" ],
 	"description": "Insert an image to make a visual statement.",
 	"keywords": [ "img", "photo", "picture" ],
 	"textdomain": "default",
@@ -100,6 +100,7 @@
 		"filter": {
 			"duotone": true
 		},
+		"__experimentalConnections": true,
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
