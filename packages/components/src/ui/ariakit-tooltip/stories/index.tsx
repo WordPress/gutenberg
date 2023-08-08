@@ -19,25 +19,6 @@ const meta: ComponentMeta< typeof ToolTip > = {
 	component: ToolTip,
 	argTypes: {
 		children: { control: { type: null } },
-		placement: {
-			control: {
-				type: 'select',
-				options: [
-					'top',
-					'top-start',
-					'top-end',
-					'right',
-					'right-start',
-					'right-end',
-					'bottom',
-					'bottom-start',
-					'bottom-end',
-					'left',
-					'left-start',
-					'left-end',
-				],
-			},
-		},
 		position: {
 			control: {
 				type: 'select',

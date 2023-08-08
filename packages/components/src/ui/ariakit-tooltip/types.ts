@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { TooltipProps, TooltipStoreProps } from '@ariakit/react/tooltip';
+import type { TooltipProps } from '@ariakit/react/tooltip';
 /**
  * Internal dependencies
  */
@@ -20,17 +20,9 @@ export type ToolTipProps = {
 	 */
 	delay?: number;
 	/**
-	 * Where the tooltip should be positioned relative to its parent.
+	 * The direction in which the tooltip should open relative to its parent node.
 	 *
 	 * @default bottom
-	 */
-	placement?: TooltipStoreProps[ 'placement' ];
-	/**
-	 * _Note: this prop is deprecated. Please use the `placement` prop instead._
-	 *
-	 * Legacy way of specifying the tooltip's position relative to its parent.
-	 *
-	 * @deprecated
 	 */
 	position?: PopoverProps[ 'position' ];
 	/**

@@ -12,7 +12,6 @@ import {
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -24,14 +23,7 @@ import { positionToPlacement } from '../../popover/utils';
 import { contextConnectWithoutRef } from '../context/context-connect';
 
 function AriaToolTip( props: ToolTipProps ) {
-	const {
-		children,
-		delay = TOOLTIP_DELAY,
-		placement,
-		position,
-		shortcut,
-		text,
-	} = props;
+	const { children, delay = TOOLTIP_DELAY, position, shortcut, text } = props;
 
 	const baseId = useInstanceId( ToolTip, 'tooltip' );
 	const describedById = text || shortcut ? baseId : undefined;
@@ -39,25 +31,18 @@ function AriaToolTip( props: ToolTipProps ) {
 	const DEFAULT_PLACEMENT = 'bottom';
 
 	// Compute tooltip's placement:
-	// - give priority to `placement` prop, if defined
-	// - otherwise, compute it from the legacy `position` prop (if defined)
-	// - finally, fallback to the DEFAULT_PLACEMENT.
+	// - compute it from the legacy `position` prop (if defined)
+	// - otherwise, fallback to the DEFAULT_PLACEMENT.
 	let computedPlacement;
-	if ( placement !== undefined ) {
-		computedPlacement = placement;
-	} else if ( position !== undefined ) {
-		computedPlacement = positionToPlacement( position );
-	}
-	computedPlacement = computedPlacement || DEFAULT_PLACEMENT;
 
 	if ( position !== undefined ) {
-		deprecated( '`position` prop in wp.components.tooltip', {
-			since: '6.3',
-			alternative: '`placement` prop',
-		} );
+		computedPlacement = positionToPlacement( position );
+	} else {
+		computedPlacement = DEFAULT_PLACEMENT;
 	}
 
 	const tooltipStore = useTooltipStore( {
+		// TODO:
 		// Placement doesn't have type 'overlay' from positionToPlacement
 		// can remove the ignore once position has been fully deprecated
 		// @ts-ignore
