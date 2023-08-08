@@ -99,7 +99,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test if the has_font_faces method returns the correct data
+	 * Tests that the has_font_faces() method correctly determines whether a font family has font faces.
 	 *
 	 * @covers ::has_font_faces
 	 *
