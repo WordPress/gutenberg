@@ -70,6 +70,7 @@ function gutenberg_reregister_core_block_types() {
 				'file.php'                         => 'core/file',
 				'form.php'                         => 'core/form',
 				'form-input.php'                   => 'core/form-input',
+				'form-submission-notification.php' => 'core/form-submission-notification',
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
 				'gallery.php'                      => 'core/gallery',
