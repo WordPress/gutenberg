@@ -185,6 +185,30 @@ function useChangesToPush( name, attributes, userConfig ) {
 				? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
 				: getValueFromObjectPath( attributes.style, path );
 
+			// Links only have a single support entry but have two element
+			// style properties, color and hover color. The following check
+			// will add the hover color to the changes if required.
+			if ( key === 'linkColor' ) {
+				const linkChanges = value ? [ { path, value } ] : [];
+				const hoverPath = [
+					'elements',
+					'link',
+					':hover',
+					'color',
+					'text',
+				];
+				const hoverValue = getValueFromObjectPath(
+					attributes.style,
+					hoverPath
+				);
+
+				if ( hoverValue ) {
+					linkChanges.push( { path: hoverPath, value: hoverValue } );
+				}
+
+				return linkChanges;
+			}
+
 			// The shorthand border styles can't be mapped directly as global
 			// styles requires longhand config.
 			if ( flatBorderProperties.includes( key ) && value ) {
@@ -284,6 +308,7 @@ function PushChangesToGlobalStylesControl( {
 		if ( changes.length === 0 && ! userHasEditedBehaviors ) {
 			return;
 		}
+
 		if ( changes.length > 0 ) {
 			const { style: blockStyles } = attributes;
 
@@ -339,8 +364,10 @@ function PushChangesToGlobalStylesControl( {
 				}
 			);
 		}
+
 		if ( userHasEditedBehaviors ) {
 			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { behaviors: undefined } );
 			setBehavior( attributes.behaviors );
 			createSuccessNotice(
 				sprintf(
