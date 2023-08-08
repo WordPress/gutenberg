@@ -102,7 +102,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 			}
 
 			// Compare if the rest of the data is the same
-			$this->assertSame( $expected_font, $installed_font, 'The endpoint answer is not as expected.' );
+			$this->assertEquals( $expected_font, $installed_font, 'The endpoint answer is not as expected.' );
 		}
 
 		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );

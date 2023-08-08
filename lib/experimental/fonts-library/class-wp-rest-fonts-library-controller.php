@@ -67,10 +67,11 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 * Returns validation errors in font families data for installation.
 	 *
 	 * @param array[] $font_families Array of font families to install.
+	 * @param array $files Array of files to install.
 	 * 
 	 * @return array $error_messages Array of error messages.
 	 */
-	private function get_validation_errors ( $font_families ) {
+	private function get_validation_errors ( $font_families, $files ) {
 		$error_messages = array();
 
 		if ( ! is_array( $font_families ) ) {
@@ -124,7 +125,6 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 						}
 
 						if ( isset( $font_face['uploaded_file'] ) ) {
-							$files = $request->get_file_params();
 							if ( !isset( $files[ $font_face['uploaded_file'] ] ) ) {
 								$error_messages[]= sprintf (
 									__( 'Font family [%s] Font face [%s] file is not defined in the request files.', 'gutenberg' ), $family_index, $face_index
@@ -149,7 +149,8 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 */
 	public function validate_install_font_families ( $param, $request, $key ) {
 		$font_families = json_decode( $param, true );
-		$error_messages = $this->get_validation_errors( $font_families );
+		$files  = $request->get_file_params();
+		$error_messages = $this->get_validation_errors( $font_families, $files );
 
 		if ( empty( $error_messages ) ) {
 			return true;
