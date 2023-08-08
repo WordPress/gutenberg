@@ -156,11 +156,22 @@ class WP_Font_Family {
 		}
 
 		$overrides = array(
-			'action'                   => 'wp_handle_font_upload', // Arbitrary string to avoid the is_uploaded_file() check applied when using 'wp_handle_upload'.
-			'test_form'                => false, // We are not testing a form submission.
-			'test_type'                => false, // Seems like we can not test mime type for files that are not images. See this function docs: https://developer.wordpress.org/reference/functions/wp_check_filetype_and_ext/ .
+			/*
+			 * Arbitrary string to avoid the is_uploaded_file() check applied
+			 * when using 'wp_handle_upload'.
+			 */
+			'action'                   => 'wp_handle_font_upload',
+			 // We are not testing a form submission.
+			'test_form'                => false,
+			 /*
+			  * Seems like we can not test mime type for files that are not images.
+			  * See wp_check_filetype_and_ext().
+			  */
+			'test_type'                => false,
 			'unique_filename_callback' => function () use ( $filename ) {
-				return $filename; }, // We want to keep the original filename.
+			 	// We want to keep the original filename.
+				return $filename;
+			},
 		);
 
 		$file = array(
