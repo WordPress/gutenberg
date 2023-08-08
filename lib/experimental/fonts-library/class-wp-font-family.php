@@ -31,6 +31,8 @@ class WP_Font_Family {
 	 * WP_Font_Family constructor.
 	 *
 	 * @param array $font_data Font family data.
+	 *
+	 * @throws Exception If the font family data is missing the slug.
 	 */
 	public function __construct( $font_data = array() ) {
 		if ( empty( $font_data['slug'] ) ) {
@@ -130,7 +132,7 @@ class WP_Font_Family {
 	}
 
 
-	/*
+	/**
 	 * Gets the overrides for the 'wp_handle_upload' function.
 	 *
 	 * @param string $filename The filename to be used for the uploaded file.
@@ -139,6 +141,7 @@ class WP_Font_Family {
 	 */
 	private function get_upload_overrides( $filename ) {
 		return array(
+
 			/*
 			 * Arbitrary string to avoid the is_uploaded_file() check applied
 			 * when using 'wp_handle_upload'.
@@ -146,11 +149,12 @@ class WP_Font_Family {
 			'action'                   => 'wp_handle_font_upload',
 			// We are not testing a form submission.
 			'test_form'                => false,
+
 			/*
 			 * Seems like we can not test mime type for files that are not images.
 			 * See wp_check_filetype_and_ext().
 			 */
-		   'test_type'                 => false,
+			'test_type'                => false,
 			'unique_filename_callback' => function () use ( $filename ) {
 				// We want to keep the original filename.
 				return $filename;
@@ -159,15 +163,13 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Downloads a font asset.
-	 *
 	 * Downloads a font asset from a specified source URL and saves it to the font directory.
 	 *
-	 * @param string $src The source URL of the font asset to be downloaded.
+	 * @param string $url The source URL of the font asset to be downloaded.
 	 * @param string $filename The filename to save the downloaded font asset as.
 	 * @return string|bool The relative path to the downloaded font asset. False if the download failed.
 	 */
-	private function download_asset( $src, $filename ) {
+	private function download_asset( $url, $filename ) {
 		// Checks if the file to be downloaded has a font mime type.
 		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filename ) ) {
 			return false;
@@ -179,7 +181,7 @@ class WP_Font_Family {
 		}
 
 		// Downloads the font asset or returns false.
-		$temp_file = download_url( $src );
+		$temp_file = download_url( $url );
 		if ( is_wp_error( $temp_file ) ) {
 			return false;
 		}
