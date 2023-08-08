@@ -14,7 +14,7 @@
 -   `Theme`: Expose via private APIs ([#53262](https://github.com/WordPress/gutenberg/pull/53262)).
 -   `ProgressBar`: Use the theme system accent for indicator color ([#53347](https://github.com/WordPress/gutenberg/pull/53347)).
 -   `ProgressBar`: Use gray 300 for track color ([#53349](https://github.com/WordPress/gutenberg/pull/53349)).
--   `NumberControl`: Add `spincrement` prop to allow for alternative rounding behavior when using the spin controls ([#52902](https://github.com/WordPress/gutenberg/pull/52902)).
+-   `NumberControl`: Add `spinFactor` prop for adjusting the amount by which the spin controls change the value ([#52902](https://github.com/WordPress/gutenberg/pull/52902)).
 
 ### Bug Fix
 

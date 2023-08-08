@@ -75,12 +75,12 @@ export type NumberControlProps = Omit<
 	 */
 	step?: InputControlProps[ 'step' ];
 	/**
-	 * Optional alternative amount by which the `value` is rounded by when incrementing/decrementing
-	 * using the spin controls. e.g. a step value of 0.1 and a spincrement value of 0.01.
+	 * Optional multiplication factor in spin changes. i.e. A spin changes
+	 * by `spinFactor * step` (if `step` is "any", 1 is used instead).
 	 *
-	 * @default 'number'
+	 * @default 1
 	 */
-	spincrement?: InputControlProps[ 'step' ];
+	spinFactor?: number;
 	/**
 	 * The `type` attribute of the `input` element.
 	 *

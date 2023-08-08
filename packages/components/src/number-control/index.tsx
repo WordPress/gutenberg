@@ -43,7 +43,7 @@ function UnforwardedNumberControl(
 		required = false,
 		shiftStep = 10,
 		step = 1,
-		spincrement = step,
+		spinFactor = 1,
 		type: typeProp = 'number',
 		value: valueProp,
 		size = 'default',
@@ -65,9 +65,12 @@ function UnforwardedNumberControl(
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
 
 	const isStepAny = step === 'any';
-	const [ baseSpin, baseStep ] = isStepAny
-		? [ 1, 1 ]
-		: [ ensureNumber( spincrement ), ensureNumber( step ) ];
+	let baseStep = ensureNumber( step );
+	let baseSpin = ensureNumber( spinFactor ) * baseStep;
+	if ( isStepAny ) {
+		baseStep = 1;
+		baseSpin = 1 * ensureNumber( spinFactor );
+	}
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = (
 		value: number | string,
