@@ -417,10 +417,10 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Install the font family into the library
+	 * Installs the font family into the library.
 	 *
-	 * @param array $files An array of files to be installed, default is null.
-	 * @return array|WP_Error
+	 * @param array $files Optional. An array of files to be installed. Default null.
+	 * @return array|WP_Error An array of font family data on success, WP_Error otherwise.
 	 */
 	public function install( $files = null ) {
 		add_filter( 'upload_dir', array( 'WP_Fonts_Library', 'set_upload_dir' ) );
