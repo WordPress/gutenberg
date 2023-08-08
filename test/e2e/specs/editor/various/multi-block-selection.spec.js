@@ -567,33 +567,54 @@ test.describe( 'Multi-block selection', () => {
 			] );
 	} );
 
+	// This test MUST fail when this line is removed:
+	// https://github.com/WordPress/gutenberg/blob/eb2bb1d3456ea98db74b4518e3394ed6aed9e79f/packages/block-editor/src/components/writing-flow/use-drag-selection.js#L68
 	test( 'should return original focus after failed multi selection attempt', async ( {
 		page,
 		editor,
 	} ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: '1' },
-		} );
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: '2' },
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '12' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		const [ coord1, coord2 ] = await editor.canvas.evaluate( () => {
+			const selection = window.getSelection();
+
+			if ( ! selection.rangeCount ) {
+				return;
+			}
+
+			const range = selection.getRangeAt( 0 );
+			const rect1 = range.getClientRects()[ 0 ];
+			const element = document.querySelector(
+				'[data-type="core/paragraph"]'
+			);
+			const rect2 = element.getBoundingClientRect();
+			const iframeOffset = window.frameElement.getBoundingClientRect();
+
+			return [
+				{
+					x: iframeOffset.x + rect1.x,
+					y: iframeOffset.y + rect1.y + rect1.height / 2,
+				},
+				{
+					// Move a bit outside the paragraph.
+					x: iframeOffset.x + rect2.x - 5,
+					y: iframeOffset.y + rect2.y + rect2.height / 2,
+				},
+			];
 		} );
 
-		const [ paragraph1, paragraph2 ] = await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
-			.all();
-		const { height } = await paragraph2.boundingBox();
-
-		// Move caret to the start of the second block.
-		await paragraph2.click( { position: { x: 0, y: height / 2 } } );
+		await page.mouse.click( coord1.x, coord1.y );
 		await page.mouse.down();
-		await paragraph1.hover( {
-			position: { x: -5, y: height / 2 },
-			// Use force since it's outside the bounding box of the element.
-			force: true,
-		} );
+		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
 		await page.mouse.up();
+
+		// Wait for:
+		// https://github.com/WordPress/gutenberg/blob/eb2bb1d3456ea98db74b4518e3394ed6aed9e79f/packages/block-editor/src/components/writing-flow/use-drag-selection.js#L47
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 
 		// Only "1" should be deleted.
 		await page.keyboard.press( 'Backspace' );
