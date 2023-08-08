@@ -766,9 +766,6 @@ describe( 'Manual link entry', () => {
 					name: 'Save',
 				} );
 
-				// debug the UI state
-				// screen.debug();
-
 				// Verify the submission UI is disabled.
 				expect( submitButton ).toBeVisible();
 				expect( submitButton ).toHaveAttribute(
