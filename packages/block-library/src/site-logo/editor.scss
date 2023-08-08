@@ -28,6 +28,12 @@
 		height: auto;
 		max-width: 100%;
 	}
+
+	// Make the linked image inside the resize full width
+	.components-resizable-box__container > a,
+	.components-resizable-box__container > a img {
+		width: 100%;
+	}
 }
 
 // Provide special styling for the placeholder.
@@ -43,12 +49,6 @@
 	> div, // A 60px width div shown only in the editor on mobile.
 	.components-resizable-box__container {
 		border-radius: inherit;
-	}
-
-	// Make the linked image inside the resize full width
-	.components-resizable-box__container > a,
-	.components-resizable-box__container > a img {
-		width: 100%;
 	}
 
 	// Style the placeholder.
