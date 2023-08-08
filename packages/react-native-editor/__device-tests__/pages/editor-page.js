@@ -433,15 +433,7 @@ class EditorPage {
 		// Click on block of choice.
 		const blockButton = await this.findBlockButton( blockName );
 
-		if ( isAndroid() ) {
-			await blockButton.click();
-		} else {
-			await this.driver.execute( 'mobile: tap', {
-				element: blockButton,
-				x: 10,
-				y: 10,
-			} );
-		}
+		await blockButton.click();
 	}
 
 	static getInserterPageHeight( screenHeight ) {
@@ -530,6 +522,8 @@ class EditorPage {
 				toY: EditorPage.getInserterPageHeight( height ),
 				duration: 0.5,
 			} );
+			// Wait for dragging gesture
+			await this.driver.sleep( 2000 );
 		}
 
 		return blockButton;
