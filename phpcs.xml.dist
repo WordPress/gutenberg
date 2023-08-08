@@ -128,4 +128,15 @@
 			</property>
 		</properties>
 	</rule>
+
+	<rule ref="Gutenberg.NamingConventions.ValidBlockLibraryFunctionName">
+		<include-pattern>./packages/block-library/src/*/index.php</include-pattern>
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="block_core_"/>
+				<element value="render_block_core_"/>
+				<element value="register_block_core_"/>
+			</property>
+		</properties>
+	</rule>
 </ruleset>
