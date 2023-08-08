@@ -18,15 +18,11 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-<<<<<<< HEAD
 import {
 	useBlockCommands,
 	BlockBreadcrumb,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-=======
-import { useBlockCommands, BlockBreadcrumb } from '@wordpress/block-editor';
->>>>>>> 710181758b (fix rebase artefact)
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
