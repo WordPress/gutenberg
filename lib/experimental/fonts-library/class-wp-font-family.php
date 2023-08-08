@@ -182,7 +182,7 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Move an uploaded font face asset from temp folder to the wp fonts directory.
+	 * Moves an uploaded font face asset from temp folder to the wp fonts directory.
 	 *
 	 * This is used when uploading local fonts.
 	 *
