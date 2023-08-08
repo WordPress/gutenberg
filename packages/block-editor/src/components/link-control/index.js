@@ -205,12 +205,7 @@ function LinkControl( {
 			return;
 		}
 
-		setIsEditingLink( ( prevIsEditing ) => {
-			if ( prevIsEditing === forceIsEditingLink ) {
-				return prevIsEditing;
-			}
-			return forceIsEditingLink;
-		} );
+		setIsEditingLink( forceIsEditingLink );
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
