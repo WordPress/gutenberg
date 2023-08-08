@@ -379,8 +379,9 @@ class WP_Theme_JSON_Gutenberg {
 			'minHeight' => null,
 		),
 		'layout'                        => array(
-			'contentSize' => null,
-			'wideSize'    => null,
+			'contentSize'  => null,
+			'wideSize'     => null,
+			'allowEditing' => null,
 		),
 		'position'                      => array(
 			'fixed'  => null,
@@ -415,7 +416,6 @@ class WP_Theme_JSON_Gutenberg {
 			'writingMode'    => null,
 		),
 		'behaviors'                     => null,
-		'layout'                        => null,
 	);
 
 	/**

@@ -307,11 +307,7 @@ export function useSettingsForBlockElement(
 		}
 
 		[ 'contentSize', 'wideSize' ].forEach( ( key ) => {
-			// If layout is set to false in theme.json it should be left that way.
-			if (
-				! supportedStyles.includes( key ) &&
-				updatedSettings.layout !== false
-			) {
+			if ( ! supportedStyles.includes( key ) ) {
 				updatedSettings.layout = {
 					...updatedSettings.layout,
 					[ key ]: false,

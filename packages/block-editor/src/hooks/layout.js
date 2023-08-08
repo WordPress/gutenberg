@@ -135,7 +135,9 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const settings = useBlockSettings( blockName );
-	const { layout: layoutSetting } = settings;
+	const {
+		layout: { allowEditing: allowEditingSetting },
+	} = settings;
 
 	const { layout } = attributes;
 	const defaultThemeLayout = useSetting( 'layout' );
@@ -154,12 +156,12 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 	const {
 		allowSwitching,
-		allowEditing = true,
+		allowEditing = allowEditingSetting ?? true,
 		allowInheriting = true,
 		default: defaultBlockLayout,
 	} = layoutBlockSupport;
 
-	if ( ! allowEditing || layoutSetting === false ) {
+	if ( ! allowEditing ) {
 		return null;
 	}
 
