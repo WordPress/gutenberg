@@ -20,7 +20,7 @@ if ( class_exists( 'WP_Font_Family' ) ) {
 class WP_Font_Family {
 
 	/**
-	 * Font family data
+	 * Font family data.
 	 *
 	 * @var array
 	 */
