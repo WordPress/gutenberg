@@ -17,6 +17,7 @@ const ALLOWED_BLOCKS = [
 	'core/heading',
 	'core/form-input',
 	'core/form-submit-button',
+	'core/form-submission-notification',
 ];
 
 const TEMPLATE = [
