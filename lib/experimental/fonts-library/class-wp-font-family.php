@@ -30,7 +30,7 @@ class WP_Font_Family {
 	/**
 	 * WP_Font_Family constructor.
 	 *
-	 * @param array $font_family Font family data.
+	 * @param array $font_data Font family data.
 	 */
 	public function __construct( $font_data = array() ) {
 		if ( empty( $font_data['slug'] ) ) {
