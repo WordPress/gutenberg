@@ -1,13 +1,13 @@
 ( ( { wp } ) => {
 	const { store, directive, useContext, useMemo } = wp.interactivity;
 
-	// Fake `data-wp-show` directive to test when things are removed from the DOM.
-	// Replace with `data-wp-show` when it's ready.
+	// Mock `data-wp-show` directive to test when things are removed from the
+	// DOM.  Replace with `data-wp-show` when it's ready.
 	directive(
-		'fakeshow',
+		'show-mock',
 		( {
 			directives: {
-				fakeshow: { default: fakeshow },
+				'show-mock': { default: showMock },
 			},
 			element,
 			evaluate,
@@ -21,7 +21,9 @@
 						: element,
 				[]
 			);
-			if ( ! evaluate( fakeshow, { context: contextValue } ) ) return null;
+			if ( ! evaluate( showMock, { context: contextValue } ) ) {
+				return null;
+			}
 			return children;
 		}
 	);

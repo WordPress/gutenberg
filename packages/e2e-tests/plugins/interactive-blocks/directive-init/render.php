@@ -29,7 +29,7 @@
 		data-testid="init show"
 		data-wp-context='{"isVisible":true,"isMounted":false}'
 	>
-		<div data-wp-fakeshow="context.isVisible" data-testid="show">
+		<div data-wp-show-mock="context.isVisible" data-testid="show">
 			<span data-wp-init="actions.initMount">Initially visible</span>
 		</div>
 		<button data-wp-on--click="actions.toggle" data-testid="toggle">
