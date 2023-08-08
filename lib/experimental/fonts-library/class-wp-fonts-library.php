@@ -37,7 +37,16 @@ class WP_Fonts_Library {
 	/**
 	 * Sets the upload directory for fonts.
 	 *
-	 * @param array $defaults Default upload directory.
+	 * @param array $defaults {
+	 *     Default upload directory.
+	 *
+	 *     @type string $path   Path to the directory.
+	 *     @type string $url    URL for the directory.
+	 *     @type string $subdir Sub-directory of the directory.
+	 *     @type string $basedir Base directory.
+	 *     @type string $baseurl Base URL.
+	 * }
+	 * 
 	 * @return array Modified upload directory.
 	 */
 	public static function set_upload_dir( $defaults ) {
