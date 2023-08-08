@@ -27,7 +27,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the constructor and the get_data method
+	 * Tests that data is set by the constructor and retrieved by the get_data() method.
 	 *
 	 * @covers ::__construct
 	 * @covers ::get_data
