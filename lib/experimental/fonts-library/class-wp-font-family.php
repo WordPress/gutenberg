@@ -355,7 +355,7 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Get the data for this object from the database and set it to the data property.
+	 * Gets the data for this object from the database and sets it to the data property.
 	 *
 	 * @return WP_Post|null The post for this font family object or null if the post does not exist.
 	 */
