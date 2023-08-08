@@ -16,7 +16,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 	protected static $admin_id;
 
 	/**
-	 * Create fake data before our tests run.
+	 * Creates fake data before our tests run.
 	 *
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
