@@ -83,7 +83,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 		$response = rest_get_server()->dispatch( $install_request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 200, $response->get_status(), 'The response status is not 200.' );
+		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
 		$this->assertCount( count( $expected_response ), $data, 'Not all the font families were installed correctly.' );
 
 		// Check that the font families were installed correctly
