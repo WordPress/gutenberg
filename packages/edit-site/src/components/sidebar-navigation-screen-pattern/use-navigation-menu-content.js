@@ -78,10 +78,22 @@ export default function useNavigationMenuContent( postType, postId ) {
 	}
 
 	const { getNavigationFallbackId } = unlock( selectedCoreStore );
-	const navigationMenuIds = navigationBlocks?.map( ( block ) =>
-		// If the block doesn't have a ref, assume that it's the fallback navigation.
-		block.attributes.ref ? block.attributes.ref : getNavigationFallbackId()
-	);
+	const navigationMenuIds = navigationBlocks?.map( ( block ) => {
+		// There are three different states the block can be in:
+		// 1. The bloch is synced which means it had a ref attribute:
+		if ( block.attributes.ref ) {
+			return block.attributes.ref;
+		}
+
+		// 2. The block has defined inner blocks:
+		if ( block.innerBlocks.length > 0 ) {
+			return null;
+		}
+
+		// 3. The block has no inner blocks and no ref attribute, in which case
+		//	we use the fallback navigation menu id:
+		return getNavigationFallbackId();
+	} );
 
 	// Dedupe the Navigation blocks, as you can have multiple navigation blocks in the template.
 	// Also, filter out undefined values, as blocks don't have an id when initially added.
