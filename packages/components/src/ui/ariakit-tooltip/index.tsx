@@ -78,6 +78,11 @@ function AriaToolTip( props: ToolTipProps ) {
 					id={ describedById }
 					gutter={ 4 }
 					store={ tooltipStore }
+					// hide when interacting with anchor to match legacy
+					hideOnInteractOutside={ () => {
+						tooltipStore.setOpen( ( open ) => ! open );
+						return true;
+					} }
 				>
 					{ text }
 					{ shortcut && (
