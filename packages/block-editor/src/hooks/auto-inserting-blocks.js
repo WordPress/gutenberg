@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -16,34 +16,66 @@ import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
 function AutoInsertingBlocksControl( props ) {
-	// FIXME: Properly set toggle state based on presence of auto-inserted block.
-	const [ toggleStatus, setToggleStatus ] = useState( false );
-
-	const blocks = useSelect( ( select ) => {
-		const { getBlockTypes } = select( blocksStore );
-		return getBlockTypes();
-	}, [] );
-
-	const { blockIndex, rootClientId } = useSelect(
+	const autoInsertedBlocksForCurrentBlock = useSelect(
 		( select ) => {
-			const { getBlockIndex, getBlockRootClientId } =
-				select( blockEditorStore );
+			const { getBlockTypes } = select( blocksStore );
+			return getBlockTypes()?.filter(
+				( block ) =>
+					block.autoInsert &&
+					Object.keys( block.autoInsert ).includes( props.blockName )
+			);
+		},
+		[ props.blockName ]
+	);
+
+	const { blocks, blockIndex, rootClientId } = useSelect(
+		( select ) => {
+			const {
+				getBlock,
+				getBlockIndex,
+				getBlockRootClientId,
+				getNextBlockClientId,
+			} = select( blockEditorStore );
 			const _rootClientId = getBlockRootClientId( props.clientId );
+
+			// Iterate over all auto-inserted blocks after the current block, until there are no more
+			// Probably there won't be that many auto-inserted blocks.
+			// We still need to check everything after.
+			const _blocks = autoInsertedBlocksForCurrentBlock.reduce(
+				( acc, block ) => {
+					const relativePosition =
+						block?.autoInsert?.[ props.blockName ];
+
+					if ( relativePosition === 'after' ) {
+						// Could do a `for` loop instead.
+						let clientId = props.clientId;
+						while (
+							( clientId = getNextBlockClientId( clientId ) )
+						) {
+							if (
+								getBlock( clientId )?.blockName ===
+								block.blockName
+							) {
+								acc.after[ block.name ] = clientId;
+								return acc;
+							}
+						}
+					}
+					return acc;
+				},
+				{ before: {}, after: {}, firstChild: {}, lastChild: {} }
+			);
+
 			return {
 				blockIndex: getBlockIndex( props.clientId ),
 				rootClientId: _rootClientId,
+				blocks: _blocks,
 			};
 		},
-		[ props.clientId ]
+		[ autoInsertedBlocksForCurrentBlock, props.blockName, props.clientId ]
 	);
 
-	const { insertBlock } = useDispatch( blockEditorStore );
-
-	const autoInsertedBlocksForCurrentBlock = blocks.filter(
-		( block ) =>
-			block.autoInsert &&
-			Object.keys( block.autoInsert ).includes( props.blockName )
-	);
+	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
 
 	// Group by block namespace (i.e. prefix before the slash).
 	const groupedAutoInsertedBlocks = autoInsertedBlocksForCurrentBlock.reduce(
@@ -72,6 +104,14 @@ function AutoInsertingBlocksControl( props ) {
 
 									const relativePosition =
 										block.autoInsert[ props.blockName ];
+
+									let checked = false;
+									if ( relativePosition === 'after' ) {
+										checked = Object.keys(
+											blocks.after
+										).includes( block.name );
+									}
+
 									const insertionIndex =
 										relativePosition === 'after'
 											? blockIndex + 1
@@ -79,11 +119,11 @@ function AutoInsertingBlocksControl( props ) {
 
 									return (
 										<ToggleControl
-											checked={ toggleStatus }
+											checked={ checked }
 											key={ block.title }
 											label={ block.title }
 											onChange={ () => {
-												if ( ! toggleStatus ) {
+												if ( ! checked ) {
 													if (
 														[
 															'before',
@@ -102,11 +142,16 @@ function AutoInsertingBlocksControl( props ) {
 														);
 													}
 													// TODO: Implement first_child and last_child insertion.
+												} else if (
+													// Remove block.
+													relativePosition === 'after'
+												) {
+													const clientId =
+														blocks.after[
+															block.name
+														];
+													removeBlock( clientId );
 												}
-
-												setToggleStatus(
-													! toggleStatus
-												);
 											} }
 										/>
 									);
