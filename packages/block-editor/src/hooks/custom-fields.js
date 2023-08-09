@@ -89,7 +89,7 @@ const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 										if ( nextValue === '' ) {
 											props.setAttributes( {
 												connections: undefined,
-												[ attributeName ]: undefined,
+												[ attributeName ]: '',
 												placeholder: undefined,
 											} );
 										} else {
@@ -105,7 +105,7 @@ const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 														},
 													},
 												},
-												[ attributeName ]: undefined,
+												[ attributeName ]: '',
 												placeholder: sprintf(
 													'This content will be replaced on the frontend by the value of "%s" custom field.',
 													nextValue

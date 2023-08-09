@@ -125,8 +125,23 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
+
 	/**
-	 * Renders the block meta attributes.
+	 * Renders the block connections.
+	 * Block connections allow to connect block attributes to custom fields or
+	 * other data sources (in the future).
+	 *
+	 * Rendering block connections is a 3-step process:
+	 * 1. Get the block attributes that have a connection. The connections are
+	 *    added in the editor and stored in the block attributes.
+	 * 2. For each "connected" attribute, get the value from the connection
+	 *    source. For now, the only supported source is meta (custom fields).
+	 * 3. Update the HTML of the block using the value from the connection. The
+	 *    HTML can be replaced in two ways:
+	 *      - If the attribute's "source" is `html`, replace the whole tag with the
+	 *        value from the connection.
+	 *      - If the attribute's "source" is `attribute`, replace the value of the
+	 *        corresponding HTML attribute with the value from the connection.
 	 *
 	 * @param string   $block_content Block Content.
 	 * @param array    $block Block attributes.
@@ -191,22 +206,47 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			}
 
 			// Get the content from the connection source.
-			$custom_value = $connection_sources[ $attribute_value['source'] ](
+			$connection_value = $connection_sources[ $attribute_value['source'] ](
 				$block_instance,
 				$attribute_value['value']
 			);
 
-			$tags  = new WP_HTML_Tag_Processor( $block_content );
-			$found = $tags->next_tag(
-				array(
-					// TODO: In the future, when blocks other than Paragraph and Image are
-					// supported, we should build the full query from CSS selector.
-					'tag_name' => $block_type->attributes[ $attribute_name ]['selector'],
-				)
-			);
-			if ( ! $found ) {
-				return $block_content;
-			};
+			$attribute_config = $block_type->attributes[ $attribute_name ];
+
+			// Generate the new block content with the custom value.
+			$block_content = gutenberg_render_block_with_connection_value( $block_content, $connection_value, $attribute_config );
+
+		}
+
+		return $block_content;
+	}
+	add_filter( 'render_block', 'gutenberg_render_block_connections', 10, 3 );
+
+
+	/**
+	 * Renders the block with the custom value from a connection source.
+	 *
+	 * @param string $block_content The HTML of the block originally passed to the `render_block` filter.
+	 * @param mixed  $custom_value The value obtained from the connection source (e.g. custom field).
+	 * @param array  $attribute_config The configuration of the connected
+	 * attribute. It should contain the following keys:
+	 * - selector: The HTML selector of the element that should be updated.
+	 * - source: The source of the connection. Currently, only "html" and "attribute" are supported.
+	 * - attribute: The name of the attribute that should be updated. Only used if the `source` is "attribute".
+	 */
+	function gutenberg_render_block_with_connection_value( $block_content, $custom_value, $attribute_config ) {
+		$tags               = new WP_HTML_Tag_Processor( $block_content );
+		$block_selector_tag = $tags->next_tag(
+			array(
+				'tag_name' => $attribute_config['selector'],
+			)
+		);
+		if ( ! $block_selector_tag ) {
+			return $block_content;
+		}
+
+		// If the source is "html", it means that we should replace the whole tag with the meta value.
+		if ( 'html' === $attribute_config['source'] ) {
 			$tag_name     = $tags->get_tag();
 			$markup       = "<$tag_name>$custom_value</$tag_name>";
 			$updated_tags = new WP_HTML_Tag_Processor( $markup );
@@ -217,11 +257,16 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			foreach ( $names as $name ) {
 				$updated_tags->set_attribute( $name, $tags->get_attribute( $name ) );
 			}
-
 			return $updated_tags->get_updated_html();
-		}
 
-		return $block_content;
+			// If the source is an attribute, it means that we should replace the attribute value with the custom value.
+		} elseif ( 'attribute' === $attribute_config['source'] ) {
+			$tags->set_attribute( $attribute_config['attribute'], $custom_value );
+			return $tags->get_updated_html();
+
+		} else {
+			// We don't support other sources yet.
+			return $block_content;
+		}
 	}
-	add_filter( 'render_block', 'gutenberg_render_block_connections', 10, 3 );
 }
