@@ -75,7 +75,7 @@ export class Metrics {
 	}
 
 	/**
-	 * Returns Largest Contentful Paint (LCP) time.
+	 * Returns Cumulative Layout Shift (CLS) value.
 	 */
 	async getCumulativeLayoutShift() {
 		return this.page.evaluate< number >(
