@@ -20,8 +20,6 @@ import { useCx } from '../utils';
  *
  * @example
  * ```jsx
- * import { __experimentalTheme as Theme } from '@wordpress/components';
- *
  * const Example = () => {
  *   return (
  *     <Theme accent="red">

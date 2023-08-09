@@ -20,6 +20,7 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
 /**
  * Internal dependencies
  */
+import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -123,8 +124,15 @@ function useSiteEditorBasicNavigationCommands() {
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
+	const isTemplatesAccessible = useIsTemplatesAccessible();
+	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {
 		const result = [];
+
+		if ( ! isTemplatesAccessible || ! isBlockBasedTheme ) {
+			return result;
+		}
+
 		result.push( {
 			name: 'core/edit-site/open-navigation',
 			label: __( 'Open navigation' ),
@@ -198,7 +206,7 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		return result;
-	}, [ history, isSiteEditor ] );
+	}, [ history, isSiteEditor, isTemplatesAccessible, isBlockBasedTheme ] );
 
 	return {
 		commands,

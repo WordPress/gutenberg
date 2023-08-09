@@ -12,7 +12,6 @@ import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
 import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
 import { cleanEmptyObject } from './hooks/utils';
-import { useBlockEditingMode } from './components/block-editing-mode';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
@@ -23,6 +22,7 @@ import {
 	default as ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
 } from './components/inserter/reusable-block-rename-hint';
+import { usesContextKey } from './components/rich-text/format-edit';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -39,7 +39,6 @@ lock( privateApis, {
 	BlockInfo,
 	useShouldContextualToolbarShow,
 	cleanEmptyObject,
-	useBlockEditingMode,
 	BlockQuickNavigation,
 	LayoutStyle,
 	BlockRemovalWarningModal,
@@ -49,4 +48,5 @@ lock( privateApis, {
 	ResolutionTool,
 	ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
+	usesContextKey,
 } );

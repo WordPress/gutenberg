@@ -18,13 +18,13 @@ import { Content } from './content';
  * except that it does not render the elements to a string, but instead collects
  * the values of all rich text `Content` elements.
  */
-function addValuesForElement( element, ...args ) {
+function addValuesForElement( element, values, innerBlocks ) {
 	if ( null === element || undefined === element || false === element ) {
 		return;
 	}
 
 	if ( Array.isArray( element ) ) {
-		return addValuesForElements( element, ...args );
+		return addValuesForElements( element, values, innerBlocks );
 	}
 
 	switch ( typeof element ) {
@@ -38,13 +38,12 @@ function addValuesForElement( element, ...args ) {
 	switch ( type ) {
 		case StrictMode:
 		case Fragment:
-			return addValuesForElements( props.children, ...args );
+			return addValuesForElements( props.children, values, innerBlocks );
 		case RawHTML:
 			return;
 		case InnerBlocks.Content:
-			return addValuesForBlocks( ...args );
+			return addValuesForBlocks( values, innerBlocks );
 		case Content:
-			const [ values ] = args;
 			values.push( props.value );
 			return;
 	}
@@ -52,21 +51,19 @@ function addValuesForElement( element, ...args ) {
 	switch ( typeof type ) {
 		case 'string':
 			if ( typeof props.children !== 'undefined' ) {
-				return addValuesForElements( props.children, ...args );
+				return addValuesForElements(
+					props.children,
+					values,
+					innerBlocks
+				);
 			}
 			return;
 		case 'function':
-			if (
-				type.prototype &&
-				typeof type.prototype.render === 'function'
-			) {
-				return addValuesForElement(
-					new type( props ).render(),
-					...args
-				);
-			}
-
-			return addValuesForElement( type( props ), ...args );
+			const el =
+				type.prototype && typeof type.prototype.render === 'function'
+					? new type( props ).render()
+					: type( props );
+			return addValuesForElement( el, values, innerBlocks );
 	}
 }
 
@@ -78,20 +75,17 @@ function addValuesForElements( children, ...args ) {
 	}
 }
 
-function _getSaveElement( name, attributes, innerBlocks ) {
-	return getSaveElement(
-		name,
-		attributes,
-		innerBlocks.map( ( block ) =>
-			_getSaveElement( block.name, block.attributes, block.innerBlocks )
-		)
-	);
-}
-
 function addValuesForBlocks( values, blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {
 		const { name, attributes, innerBlocks } = blocks[ i ];
-		const saveElement = _getSaveElement( name, attributes, innerBlocks );
+		const saveElement = getSaveElement(
+			name,
+			attributes,
+			// Instead of letting save elements use `useInnerBlocksProps.save`,
+			// force them to use InnerBlocks.Content instead so we can intercept
+			// a single component.
+			<InnerBlocks.Content />
+		);
 		addValuesForElement( saveElement, values, innerBlocks );
 	}
 }

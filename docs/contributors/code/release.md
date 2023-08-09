@@ -1,149 +1,303 @@
 # Gutenberg Release Process
 
-This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
+The [Gutenberg repository](https://github.com/WordPress/gutenberg) on GitHub is used to perform several types of releases. This document serves as a checklist for each of these releases, and it can help you understand the different workflows involved.
 
-To release a stable version of the Gutenberg plugin you need:
-- To be part of the [Gutenberg development team](/docs/block-editor/contributors/repository-management/#teams), to launch the GitHub actions related to the release process and to potentially backport PRs to the release branch.
-- Write permissions in [make.wordpress.org/core](make.wordpress.org/core), to draft the release post.
-- On top of that, for the last step of the process (uploading the new version to the WordPress.org.plugin directory), you will need approval from a member of the Gutenberg Core team -- see below for more details).
+Before you begin, there are some requirements that must be met in order to successfully release a stable version of the Gutenberg plugin. You will need to:
 
-To [release WordPress's npm packages](#packages-releases-to-npm-and-wordpress-core-updates), similar requirements apply.
+- Be a member of the [Gutenberg development team](https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams). This gives you the ability to launch the GitHub actions that are related to the release process and to backport pull requests (PRs) to the release branch.
+- Have write permissions on the [Make WordPress Core](http://make.wordpress.org/core) blog. This allows you to draft the release post.
+- Obtain approval from a member of the Gutenberg Core team in order to upload the new version Gutenberg to the WordPress.org plugin directory.
 
-## Plugin Releases
+Similar requirements apply to releasing WordPress's [npm packages](https://developer.wordpress.org/block-editor/contributors/code/release/#packages-releases-to-npm-and-wordpress-core-updates).
 
-### Schedule
+**Table of contents**
 
-We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date (the day when _the release candidate_ is to be tagged).
+- **[Gutenberg plugin releases](#gutenberg-plugin-releases)**
+    - [Release schedule](#release-schedule)
+    - [Release management](#release-management)
+    - [Preparing a release](#preparing-a-release)
+        - [Organizing and labeling milestone PRs](#organizing-and-labeling-milestone-prs)
+        - [Running the release workflow](#running-the-release-workflow)
+        - [Publishing the @wordpress packages to NPM](#publishing-the-wordpress-packages-to-npm)
+        - [Viewing the release draft](#viewing-the-release-draft)
+        - [Curating the release changelog](#curating-the-release-changelog)
+        - [Creating release candidate patches (cherry-picking)](#creating-release-candidate-patches-cherry-picking)
+            - [Automated cherry-picking](#automated-cherry-picking)
+            - [Manual cherry-picking](#manual-cherry-picking)
+        - [Publishing the release](#publishing-the-release)
+    - [Documenting the release](#documenting-the-release)
+        - [Selecting the release highlights](#selecting-the-release-highlights)
+        - [Requesting release assets](#requesting-release-assets)
+        - [Drafting the release post](#drafting-the-release-post)
+        - [Publishing the release post](#publishing-the-release-post)
+    - [Creating minor releases](#creating-minor-releases)
+        - [Updating the release branch](#updating-the-release-branch)
+        - [Running the minor release](#running-the-minor-release)
+        - [Creating a minor release for previous stable releases](#creating-a-minor-release-for-previous-stable-releases)
+        - [Troubleshooting](#troubleshooting)
+- [Packages releases to NPM and WordPress Core updates](#packages-releases-to-npm-and-wordpress-core-updates)
+    - [Synchronizing the Gutenberg plugin](#synchronizing-the-gutenberg-plugin)
+    - [WordPress releases](#wordpress-releases)
+    - [Development releases](#development-releases)
 
--   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on. [Preparation of the release post starts here](/docs/block-editor/contributors/code/release/#writing-the-release-notes-and-post) and spans until the final release.
+## Gutenberg plugin releases
 
--   **One week after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released and the release post is published.  
+The first step in releasing a stable version of the Gutenberg plugin is to [create an issue](https://github.com/WordPress/gutenberg/issues/new?assignees=&labels=&projects=&template=New_release.md) in the Gutenberg repository. The issue template is called "Gutenberg Release," and it contains a checklist for the complete release process, from release candidate to changelog curation to cherry-picking, stable release, and release post. The issue for [Gutenberg 15.7](https://github.com/WordPress/gutenberg/issues/50092) is a good example.
 
-If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
+The checklist helps you coordinate with developers and other teams involved in the release process. It ensures that all of the necessary steps are completed and that everyone is aware of the schedule and important milestones.
 
-### Release Tool
+### Release schedule
 
-The plugin release process is entirely automated and happens solely on GitHub -- i.e. it doesn't require any steps to be run locally on your machine.
+A new major version of Gutenberg is released approximately every two weeks. The current and next versions are tracked in [GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with the date when each version will be tagged.
 
-For your convenience, here's an [11-minute video walkthrough](https://youtu.be/TnSgJd3zpJY) that demonstrates the release process. It's recommended to watch this if you're unfamiliar with it. The process is also documented in the following paragraphs.
+**On the date of the current milestone**, also called the tagging date, the first release candidate (RC) of Gutenberg is published. This is a pre-release version of the plugin that is made available for testing by plugin authors and users. If any regressions are found, a new RC can be published.
 
-#### Running workflow
+Release candidates are versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on. As soon as the first RC (RC1) is published, preparation for the release post begins.
 
-In order to start the release process, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
+**One week after the RC1**, the stable version is created based on the last RC and any necessary regression fixes. Once the stable version is released, the release post is published.
 
-![Run workflow dropdown for the plugin release](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/workflow-dispatch-plugin-banner.png)
+If critical bugs are discovered in stable versions of the plugin, patch versions can be released at any time.
 
-To release a release candidate (RC) version of the plugin, enter `rc`. To release a stable version, enter `stable`. In each case, press the green "Run workflow" button.
+### Release management
 
-This will trigger a GitHub Actions (GHA) workflow that bumps the plugin version, builds the Gutenberg plugin .zip file, creates a release draft, and attaches the plugin .zip file to it. This part of the process typically takes a little under six minutes. You'll see that workflow appear at the top of the list, right under the blue banner. Once it's finished, it'll change its status icon from a yellow dot to a green checkmark. You can follow along in a more detailed view by clicking on the workflow.
+Each major Gutenberg release is run by a release manager, also known as a release lead. This individual, or small team of individuals, is responsible for the release of Gutenberg with support from the broader [Gutenberg development team](https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams). 
+
+The release manager is responsible for initiating all release activities, and their approval is required for any changes to the release plan. In the event of an emergency or if the release manager is unavailable, other team members may take appropriate action, but they should keep the release manager informed.
+
+<div class="callout callout-tip">
+If you are a member of the <a href="https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams">Gutenberg development team</a> and are interested in leading a Gutenberg release, reach out in the <a href="https://wordpress.slack.com/messages/C02QB2JS7">#core-editor</a> Slack channel.</div>
+
+### Preparing a release
+
+The plugin release process is mostly automated and happens on GitHub. You do not need to run any steps locally on your machine. However, it’s a good idea to have a local copy of Gutenberg for changelog preparation, general testing, and in case multiple release candidates are required. But more on that later.
+
+Here is an [11-minute video](https://youtu.be/TnSgJd3zpJY) that demonstrates the plugin release process. If you are unfamiliar with the process, we recommend watching the video first. The process is also documented in the following paragraphs, which provide more detailed instructions.
+
+#### Organizing and labeling milestone PRs
+
+<div class="callout callout-info">
+    <strong>Quick reference</strong>
+    <ul> 
+        <li>Ensure all PRs are properly labeled.</li>
+        <li>Each PR must have one label prefixed by <code>[Type]</code>.</li>
+    </ul>
+</div>
+
+The first step in preparing a Gutenberg release is to organize all PRs assigned to the current [milestone](https://github.com/WordPress/gutenberg/milestones) and ensure that each is properly labeled. [Labels](https://github.com/WordPress/gutenberg/labels) are used to automatically generate the changelog, and changing the labels on PRs is much faster than reorganizing an existing changelog in the release section afterward.
+
+To test the changelog automation that will be run as part of the release workflow, you can use the following command in your local copy of Gutenberg using the milestone of the stable release version you are working on:
+
+```
+npm run other:changelog -- --milestone="Gutenberg 16.2"  
+```
+
+The output of this command is the changelog for the provided milestone, which in the above example is Gutenberg 16.2. You can copy and paste the output into a Markdown document, which will make it easier to view and allow you to follow the links to each PR.
+
+All PRs should have a label prefixed by `[Type]` as well as labels for sub-categories. The two most common labels are `[Type] Bug` and `[Type] Enhancement`. When reviewing the generated changelog, pay close attention to the following:
+
+* **Enhancements:** Look for PRs that don't have any subcategories attached.
+* **Bug fixes:** Also look for PRs that don't have any subcategories attached.
+* **Various:** PRs in this section don't have any labels at all.
+
+Update the labels on each PR as needed. You can continue generating the changelog until you are comfortable proceeding. Now you are ready to start the release candidate workflow.
+
+<div class="callout callout-tip">
+You can see how the changelog is generated from the PR labels in the <a href="https://github.com/WordPress/gutenberg/blob/trunk/bin/plugin/commands/changelog.js">changelog.js</a> file. 
+</div>
+
+#### Running the release workflow
+
+<div class="callout callout-info">
+    <strong>Quick reference</strong>
+    <ul> 
+        <li>
+            Announce in <a href="https://wordpress.slack.com/messages/C02QB2JS7">#core-editor</a> that you are about to start the release workflow.
+        </li>
+        <li>
+            Run the <a href="https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml">Build Gutenberg Plugin Zip</a> workflow.
+        </li>
+    </ul>
+</div>
+
+Before you begin, announce in [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel that you are about to start the workflow and indicate whether you are releasing a stable version of Gutenberg or an RC.
+
+Then go to the Gutenberg repository, click on the Actions tab, and then locate the [Build Gutenberg Plugin Zip](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) action. Note the blue banner that says, “This workflow has a `workflow_dispatch` event trigger.” Expand the “Run workflow” dropdown on its right-hand side.
+
+![Run workflow dropdown for the plugin release](https://developer.wordpress.org/files/2023/07/image-3-1.png)
+
+To release an RC version of the plugin, enter `rc `in the text field. To release a stable version, enter `stable`. In each case, press the button “Run workflow”.
+
+This will trigger a GitHub Actions (GHA) workflow that will bump the plugin version, build the Gutenberg plugin `.zip` file, create a release draft, and attach the plugin `.zip` file. This part of the process typically takes about six minutes. The workflow will appear at the top of the list, right under the blue banner. Once it is finished, the workflow's status icon will change from a yellow dot to a green checkmark. You can follow along for a more detailed view by clicking on the workflow.
 
 #### Publishing the @wordpress packages to NPM
 
-As part of the release candidate (RC) process, all of the `@wordpress` packages are published to NPM. You may see messaging after the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) action has created the draft release that the ["Publish npm packages"](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) action requires someone with appropriate permissions to trigger the action.
+As part of the release workflow, all of the @wordpress packages are published to NPM. After the [Build Gutenberg Plugin Zip](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) action has created the draft release, you may see a message that the [Publish npm packages](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) action requires someone with appropriate permissions to trigger it.
 
-This message is misleading and no action is required by the release coordinator. The process is automated and it will automatically run after the release notes are published.
+This message is misleading. You do not need to take any action to publish the @wordpress packages to NPM. The process is automated and will automatically run after the release notes are published.
 
-#### View the release draft
+#### Viewing the release draft
 
-As soon as the workflow has finished, you'll find the release draft under [Gutenberg Releases](https://github.com/WordPress/gutenberg/releases). The draft is pre-populated with changelog entries based on previous release candidates for this version and any changes that have since been cherry-picked to the release branch. Thus, when releasing the first stable version of a series, delete any RC version headers (that are only there for your information) and move the more recent changes to the correct section (see below).
+As soon as the workflow has finished, you’ll find the release draft under [Gutenberg Releases](https://github.com/WordPress/gutenberg/releases). The draft is pre-populated with changelog entries based on previous RCs for this version and any changes that have since been cherry-picked to the release branch. Thus, when releasing the first stable version of a series, delete any RC version headers (that are only there for your information) and move the more recent changes to the correct section (see below).
 
-The changelog draft will be partially pre-organized (based on GitHub labels) into sections and, within those, into “features.” Take some time to read the generated notes and then edit them to ensure legibility and accuracy.
+#### Curating the release changelog
 
-Don't rush this part. It's important to ensure the release notes are as organized as possible, and it doesn't need to be completed in one go. You can save the draft and come back to it later.
+The best time to work on the changelog is when it is first created during the release candidate workflow. This is when the changelog automation is called, and the first version of the changelog becomes available. The changelog process is mostly automated, but it depends heavily on the proper labeling of the PRs in the milestone, as mentioned above.
 
-When editing the notes, you should be sure to:
+The stable release process takes the changelogs of the RCs and adds them to the stable release. However, there is one important thing to note: the stable release only "remembers" the first version of the changelog, which is the version that was available when RC1 was published. Any subsequent changes to the changelog of RC1 will not be included in the stable release.
 
-1. Delete the `Various` section and move anything under it to a more appropriate section.
-2. Move all features under `Uncategorized` bullet points to a more suitable feature.
+That means if you curate the whole changelog before you publish RC1, you won’t have to work on it for the stable release, except for the few items of subsequent RC2 or RC3 releases that will also be added to the stable release. 
 
-You can find some more tips on writing the release notes and post in the section below.
+Once the release changelog is available in the draft, take some time to read the notes and edit them to make sure they are easy to read and accurate. Don't rush this part. It's important to make sure the release notes are as organized as possible, but you don't have to finish them all at once. You can save the draft and come back to it later.
 
-#### Creating Release Candidate Patches
+If you're worried that people won't be able to access the release candidate version until you publish the release, you can share the release artifact with the [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel. This will give people access to the release candidate version while you finish curating the changelog.
 
-At any point after the release candidate has been published but before the final stable release, some bugs related to this release might be fixed and committed to `trunk`. These fixes won't automatically be incorporated into the final stable release, including them is a manual process.
+Here are some additional tips for preparing clear and concise changelogs:
 
-There are a couple of ways a release coordinator might be made aware of these bugs:
+* Move all entries under the `Various` section to a more appropriate section.
+* Fix spelling errors or clarify wording. Phrasing should be easy to understand where the intended audience is those who use the plugin or are keeping up with ongoing development.
+* Create new groupings as applicable, and move pull requests between.
+* When multiple PRs relate to the same task (such as a follow-up pull request), try to combine them into a single entry. Good examples for this are PRs around removing Lodash for performance purposes, replacement of Puppeteer E2D tests with Playwright or efforts to convert public components to TypeScript.
+* If subtasks of a related set of PRs are substantial, consider organizing as entries in a nested list.
+* Remove PRs that revert other PRs in the same release if the net change in code is zero. 
+* Remove all PRs that only update the mobile app. The only exception to this rule is if the mobile app pull request also updates functionality for the web.
+* If a subheader only has one PR listed, remove the subheader and move the PR to the next matching subheader with more than one item listed.
 
-- Contributors may add the `Backport to Gutenberg RC` label to a closed PR. [Do a search for any of these PRs](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed) before publishing the final release.
-- You may receive a direct message or a ping in the #core-editor channel in slack notifying you of PRs that need to be included in the release candidate. Even when this is the case, the `Backport to Gutenberg RC` should be added to the PR.
+#### Creating release candidate patches (cherry-picking)
 
-The cherry-picking process is handled as follows:
-
-1. Checkout the corresponding release branch with: `git checkout release/x.x`.
-2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`. The cherry-picking process can be automated with the [`npm run cherry-pick` script](/docs/contributors/code/auto-cherry-picking.md), but make sure to use the `Backport to Gutenberg RC` label when running the command.
-3. When done, push the changes to GitHub: `git push`.
-
-<div class="callout callout-tip">
-To find the `[SHA]` for a pull request, open the PR and near the end you'll see a message "[Username] merged commit [SHA] into `trunk`".
+<div class="callout callout-info">
+    <strong>Quick reference</strong>
+    <ul> 
+        <li>Ensure all PRs that need cherry-picking have the <code>Backport to Gutenberg RC</code> label.</li>
+        <li>In your local clone of the Gutenberg repository, switch to the release branch: <code>git checkout release/X.Y</code></li>
+        <li>Cherry-pick all merged PRs using the automated script: </code>npm run other:cherry-pick "Backport to Gutenberg RC"</code></li> 
+    </ul>
 </div>
 
-Once the commits have been cherry-picked, remove the `Backport to Gutenberg RC` label and update the milestone to the current release for all cherry-picked PRs.
+After an RC is published but before the final stable release, some bugs related to the release might be fixed and committed to `trunk`. The stable release will not automatically include these fixes. Including them is a manual process, which is called cherry-picking.
 
-If you decide that the fixes deserve another release candidate before the stable version is published, create one by following the instructions above. Let other contributors know that a new release candidate has been released in the [`#core-editor`](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel.
+There are a couple of ways you might be made aware of these bugs as a release manager:
+
+* Contributors may add the `Backport to Gutenberg RC` label to a closed PR. [Do a search for any of these PRs](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed) before publishing the final release.
+* You may receive a direct message or a ping in the [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel notifying you of PRs that need to be included in the RC. Even when this is the case, the `Backport to Gutenberg RC` should always be added to the PR.
+
+##### Automated cherry-picking
+
+The cherry-picking process can be automated with the `npm run other:cherry-pick "[Insert Label]"` script, which is included in Gutenberg. You will need to use the label `Backport to Gutenberg RC` when running the command and ensure all PRs that need cherry-picking have the label assigned.
+
+<div class="callout callout-warning">
+To cherry-pick PRs, you must clone (not fork) the Gutenberg repository and have write access. Only members of the <a href="https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams">Gutenberg development team</a> have the necessary permissions to perform this action.</div>
+
+Once you have cloned the Gutenberg repository to your local development environment, begin by switching to the release branch: 
+
+```
+git checkout release/X.Y
+```
+
+Next, cherry-pick all the merged PRs with the appropriate backport label:
+
+```
+npm run other:cherry-pick "Backport to Gutenberg RC"
+```
+
+Behind the scenes, the script will:
+
+* Cherry-pick all PRs with the label `Backport to Gutenberg RC`
+* Add them to the release milestone
+* `git push` all changes to the release branch
+* Add a comment to the PR indicating it’s been cherry-picked 
+* Remove the label `Backport to Gutenberg RC` from the PR
+
+Here is a screenshot of the process:
+
+![Automated cherry-picking](https://developer.wordpress.org/files/2023/07/image-7.png)
+
+##### Manual cherry-picking
+
+If you need to handle cherry-picking one at a time and one step at a time, you can follow this sequence manually. After checking out the corresponding release branch:
+
+1. Cherry-pick each PR (in chronological order) using `git cherry-pick [SHA]`.
+2. When done, push the changes to GitHub using `git push`.
+3. Remove the `Backport to Gutenberg RC` label and update the milestone to the current release for all cherry-picked PRs.
+
+To find the `[SHA]` for a pull request, open the PR, and you’ll see a message “`[Username]` merged commit `[SHA]` into `trunk`” near the end.
+
+![Manual cherry-picking](https://developer.wordpress.org/files/2023/07/image-5.png)
+
+If the cherry-picked fixes deserve another release candidate before the stable version is published, create one by following the instructions above. Let other contributors know that a new release candidate has been released in the [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel.
 
 #### Publishing the release
 
-Only once you're happy with the shape of the release notes, press the green "Publish release" button. This will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) with a twofold purpose:
-
-1. Use the release notes that you just edited to update `changelog.txt`, and
-2. Upload the new plugin version to the WordPress.org plugin repository (SVN) (only if you're releasing a stable version).
-
-The last step needs approval by a member of either the Gutenberg Core team, WordPress core team, or Gutenberg Release team. These teams get a notification email when the release is ready to be approved, but if time is of the essence you can ask in the [#core-editor Slack channel] or ping the [Gutenberg Release team]([url](https://github.com/orgs/WordPress/teams/gutenberg-release)) to speed up the process; reaching out _before_ launching the release process so that somebody is ready to approve is recommended. Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
-
-Once approved, the new Gutenberg version will be available to WordPress users all over the globe. You should check that folks can install the latest version from their WordPress Dashboard.
-
-Once released, all that's left to do is writing a release post on [make.wordpress.org/core](https://make.wordpress.org/core/). You can find some tips on that below.
-
-### Documenting the release with the Release Notes and Post
-
 <div class="callout callout-info">
-Documenting the release is a group effort between the release manager, Gutenberg core team developers, and designers , comprised of a series of sequential steps that, because of the amount of people involved and the coordination required, need to adhere to a timeline between the RC and stable releases. The release manager will get pinged by a core member to kick-off and coordinate this process.
+    <strong>Quick reference</strong>
+    <ul> 
+        <li>In the release draft, press the “Publish release” button.</li>
+        <li>If publishing a stable release, get approval from a member of the <a href="https://github.com/orgs/WordPress/teams/gutenberg-release">Gutenberg Release</a>, <a href="https://github.com/orgs/WordPress/teams/gutenberg-core">Gutenberg Core</a>, or the <a href="https://github.com/orgs/WordPress/teams/wordpress-core">WordPress Core</a> teams to upload the new plugin version to the WordPress.org plugin repository (SVN).</li>
+        <li>Once uploaded, confirm that the latest version can be downloaded and updated from the WordPress plugin dashboard.</li> 
+    </ul>
 </div>
 
-1. Curating the changelog - Wednesday after the RC release to Friday
-2. Selecting the release highlights - Friday to Monday
-3. Drafting the release post - Monday to Wednesday
-4. Publishing the post - Wednesday after stable release
+Only once you’re happy with the shape of the changelog in the release draft, press the “Publish release” button. 
 
-#### 1. Curating the changelog
+Note that you do not need to change the checkboxes above the button. If you are publishing an RC, the “Set as a pre-release” will automatically be selected, and “Set as the latest release” will be selected if you are publishing the stable version.
 
-The release notes draft is auto-generated by a script that looks for pull requests for the current milestone, and:
+![Publishing the release checkboxes for an RC](https://developer.wordpress.org/files/2023/07/image.png)
 
-1. Groups them into sections (by pull request label).
-2. Sub-groups them into "features" within each section (again by pull request label)
+Publishing the release will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) with a twofold purpose:
 
-This is intended to be a starting point for release notes, and manually reviewing and curating the changelog entries is still required. The release candidate changelog is reused in the stable release and greatly helps select the highlights; because depending on the release it can be a very time-consuming process, **it is recommended to start this process as soon as the milestone is closed** and the release candidate is published.
+1. Use the release notes that you just edited to update `changelog.txt`, and
+2. Upload the new plugin version to the WordPress.org plugin repository (SVN) (only if you’re releasing a stable version).
 
-Guidelines for proof-reading include:
+The last step needs approval by a member of either the [Gutenberg Release](https://github.com/orgs/WordPress/teams/gutenberg-release), [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core), or the [WordPress Core](https://github.com/orgs/WordPress/teams/wordpress-core) teams. These teams get a notification email when the release is ready to be approved, but if time is of the essence, you can ask in the #core-editor Slack channel or ping the [Gutenberg Release team](https://github.com/orgs/WordPress/teams/gutenberg-release)) to accelerate the process. Reaching out before launching the release process so that somebody is ready to approve is recommended. Locate the [“Upload Gutenberg plugin to WordPress.org plugin repo” workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
--   Move _all_ entries under the `Various` section to a more appropriate section.
--   Move _all_ features listed under the `Uncategorized` bullet points to a more suitable feature grouping.
--   Fix spelling errors or clarify wording. Phrasing should be easy to understand where the intended audience is those who use the plugin or are keeping up with ongoing development.
--   Create new groupings as applicable, and move pull requests between.
--   When multiple pull requests relate to the same task (such as a follow-up pull request), try to combine them to a single entry.
--   If subtasks of a related set of pull requests are substantial, consider organizing as entries in a nested list.
--   If one or more pull requests revert one or more pull requests in the same release netting a zero-sum of code changes, remove them.
--   Remove all mobile app pull request entries (the only exception to this rule is if the mobile PR also updates functionality for the web).
+Once approved, the new Gutenberg version will be available to WordPress users all over the globe. Once uploaded, confirm that the latest version can be downloaded and updated from the WordPress plugin dashboard.
 
-#### 2. Selecting the release highlights
+The final step is to write a release post on [make.wordpress.org/core](https://make.wordpress.org/core/). You can find some tips on that below.
+
+### Documenting the release
+
+Documenting the release is led by the release manager with the help of [Gutenberg development team](https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams) members. This process is comprised of a series of sequential steps that, because of the number of people involved, and the coordination required, need to adhere to a timeline between the RC and stable releases. Stable Gutenberg releases happen on Wednesdays, one week after the initial RC.
+
+<div class="callout callout-info">
+    <strong>Timeline</strong>
+    <ol> 
+        <li>Make a copy of the <a href="https://docs.google.com/document/d/1D-MTOCmL9eMlP9TDTXqlzuKVOg_ghCPm9_whHFViqMk/edit">Google Doc Template for release posts</a> – Wednesday to Friday</li>
+        <li>Select the release highlights – Friday to Monday</li>
+        <li>Request release assets (images, videos) from the Design team once highlights are finalized – Friday to Monday</li>
+        <li>Draft the release post and request peer review – Monday to Wednesday</li>
+        <li>Publishing the post after the stable version is released – Wednesday</li>
+    </ol>
+</div>
+
+#### Selecting the release highlights
 
 Once the changelog is cleaned up, the next step is to choose a few changes to highlight in the release post. These highlights usually focus on new features and enhancements, including performance and accessibility ones, but can also include important API changes or critical bug fixes.
 
-Given the big scope of Gutenberg and the high number of pull requests merged in each milestone, it is not uncommon to overlook impactful changes worth highlighting; because of this, this step is a collaborative effort between the release manager, design, and Gutenberg Core team members.
+Given the big scope of Gutenberg and the high number of PRs merged in each milestone, it is not uncommon to overlook impactful changes worth highlighting; because of this, this step is a collaborative effort between the release manager and other Gutenberg development team members. If you don’t know what to pick, reach out to others on the team for assistance.
 
-#### 3. Drafting the release post
+#### Requesting release assets
 
-Because of the nature of the release post content, responsibilities are divided in this step. While the post **can either be drafted by the release manager or delegated to another core member** agreed upon in advance, **visual assets are created by the design team**.
+After identifying the highlights of a new WordPress release, the release manager requests visual assets from the Design team. The request is made in the [#design](https://wordpress.slack.com/archives/C02S78ZAL) Slack channel, and an example post for 15.8 can be found [here](https://wordpress.slack.com/archives/C02S78ZAL/p1684161811926279). The assets will be provided in a [Google Drive folder](https://drive.google.com/drive/folders/1U8bVbjOc0MekWjpMjNaVFVhHFEzQkYLB) assigned to the specific release.
 
-When possible, the highlighted changes in the release post should include an animation (video or GIF) or a static image of them in use. Choosing between an animation or a static image will depend on the best way to showcase each highlight: while animations are better to demonstrate workflows, more direct highlights can be shown with an image; having too many video players adds a layer of friction for users to see the highlight, whereas too many simultaneous animated GIFs can distract and overwhelm the reader.
+When creating visual assets for a WordPress release, use animations (video or GIF) or static images to showcase the highlights. Use [previous release posts](https://make.wordpress.org/core/tag/gutenberg-new/) as a guide, and keep in mind that animations are better for demonstrating workflows, while more direct highlights can be shown with an image. When creating assets, avoid using copyrighted material and disable browser plugins that can be seen in the browser canvas.
 
-These visual assets should maintain consistency with previous release posts; using lean, white themes helps in this regard and visually integrate well with the [make.wordpress.org/core](https://make.wordpress.org/core/) blog aesthetics. Including copyrighted material should be avoided, and browser plugins that can be seen in the browser canvas (spell checkers, form fillers, etc.) disabled when capturing the assets.
+#### Drafting the release post
 
-#### 5. Publishing the post
+The release manager is responsible for drafting the release post based on the [Google Doc Template](https://docs.google.com/document/d/1D-MTOCmL9eMlP9TDTXqlzuKVOg_ghCPm9_whHFViqMk/edit). That said, because of the nature of the release post content, responsibilities can be divided up and delegated to other team members if agreed upon in advance. Once the draft is complete, ask for peer review.
 
-Once the post content is ready, an author already having permissions to post in [make.wordpress.org/core](https://make.wordpress.org/core/) will create a new draft and import the content; this post should be published after the actual release, helping external media to echo and amplify the release news. Remember asking for peer review is encouraged by the [make/core posting guidelines](https://make.wordpress.org/core/handbook/best-practices/post-comment-guidelines/#peer-review)!
+#### Publishing the release post
 
-### Creating Minor Releases
+Once the post content is ready, an author with permission to post on [make.wordpress.org/core](https://make.wordpress.org/core/) will create a new draft and import the content. The post should include the following tags:
+
+* [#block-editor](https://make.wordpress.org/core/tag/block-editor/)
+* [#core-editor](https://make.wordpress.org/core/tag/core-editor/)
+* [#gutenberg](https://make.wordpress.org/core/tag/gutenberg/)
+* [#gutenberg-new](https://make.wordpress.org/core/tag/gutenberg-new/)
+
+The author should then enable public preview on the post and ask for a final peer review. This is encouraged by the [make/core posting guidelines](https://make.wordpress.org/core/handbook/best-practices/post-comment-guidelines/#peer-review).
+
+Finally, the post should be published after the stable version is released and is available on WordPress.org. This will help external media to echo and amplify the release.
+
+### Creating minor releases
 
 Occasionally it's necessary to create a minor release (i.e. X.Y.**Z**) of the Plugin. This is usually done to expedite fixes for bad regressions or bugs. The `Backport to Gutenberg Minor Release` is usually used to identify PRs that need to be included in a minor release, but as release coordinator you may also be notified more informally through slack. Even so, it's good to ensure all relevant PRs have the correct label.
 
@@ -171,7 +325,7 @@ Once you have the stable release branch in order and the correct Milestone assig
 
 #### Running the minor release
 
-![Run workflow dropdown for the plugin release](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/workflow-dispatch-plugin-banner.png)
+![Run workflow dropdown for the plugin release](https://developer.wordpress.org/files/2023/07/image-1.png)
 
 Go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). You should now _carefully_ choose the next action based on information about the current Plugin release version:
 
@@ -213,7 +367,7 @@ Yes. The method for this is identical to the main Plugin release process. You wi
 
 First, confirm that the step failed by checking the latest commits on `trunk` do not include the version bump commit. Then revert the version bump commit on the release branch - `git revert --no-edit {commitHash}`. Finally, push the changes and start the release process again.
 
-## Packages Releases to npm and WordPress Core Updates
+## Packages releases to NPM and WordPress Core updates
 
 The Gutenberg repository follows the [WordPress SVN repository's](https://make.wordpress.org/core/handbook/about/release-cycle/) branching strategy for every major WordPress release. In addition to that, it also contains two other special branches that control npm publishing workflows:
 
@@ -229,7 +383,7 @@ Release types and their schedule:
 
 There is also an option to perform [Standalone Bugfix Package Releases](#standalone-bugfix-package-releases) at will. It should be reserved only for critical bug fixes or security releases that must be published to _npm_ outside of regular cycles.
 
-### Synchronizing Gutenberg Plugin
+### Synchronizing the Gutenberg plugin
 
 For each Gutenberg plugin release, we also publish to npm an updated version of WordPress packages. This is automated with the [Release Tool](#release-tool) that handles releases for the Gutenberg plugin. A successful RC1 release triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Build Gutenberg Plugin Zip" workflow](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
@@ -252,7 +406,7 @@ Behind the scenes, all steps are automated via `./bin/plugin/cli.js npm-latest` 
     - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
 11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
-### WordPress Releases
+### WordPress releases
 
 The following workflow is needed when bug or security fixes need to be backported into WordPress Core. This can happen in a few use-cases:
 
@@ -266,7 +420,7 @@ The following workflow is needed when bug or security fixes need to be backporte
 
 Now, the `wp/X.Y` branch is ready for publishing npm packages. In order to start the process, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
 
-![Run workflow dropdown for npm publishing](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/workflow-dispatch-npm-banner.png)
+![Run workflow dropdown for npm publishing](https://developer.wordpress.org/files/2023/07/image-2.png)
 
 To publish packages to npm for the WordPress major release, select `wp` from the "Release type" dropdown and enter `X.Y` (example `5.2`) in the "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
@@ -283,7 +437,7 @@ For the record, the manual process would look like the following:
 
 Now, the npm packages should be ready and a patch can be created and committed into the corresponding WordPress SVN branch.
 
-### Standalone Bugfix Package Releases
+### Standalone bugfix package releases
 
 The following workflow is needed when packages require bug fixes or security releases to be published to _npm_ outside of a regular release cycle.
 
@@ -330,7 +484,7 @@ Note: You may discover the current version of each package is not up to date, if
 
 Now, the `wp/latest` branch is ready for publishing npm packages. In order to start the process, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
 
-![Run workflow dropdown for npm publishing](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/workflow-dispatch-npm-banner.png)
+![Run workflow dropdown for npm publishing](https://developer.wordpress.org/files/2023/07/image-6.png)
 
 To publish packages to npm with bugfixes, select `bugfix` from the "Release type" dropdown and leave empty "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
@@ -346,7 +500,7 @@ Behind the scenes, the rest of the process is automated with `./bin/plugin/cli.j
     - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/main/libs/commands/publish#bump-from-package).
 6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
-### Development Releases
+### Development releases
 
 As noted in the [Synchronizing Gutenberg Plugin](#synchronizing-gutenberg-plugin) section, packages publishing happens every two weeks from the `wp/latest` branch. It's also possible to use the development release to test the upcoming changes present in the `trunk` branch at any time. We are taking advantage of [package distribution tags](https://docs.npmjs.com/cli/v7/commands/npm-dist-tag) that make it possible to consume the future version of the codebase according to npm guidelines:
 
@@ -360,7 +514,7 @@ npm install @wordpress/components@next
 
 In order to start the publishing process for development version of npm packages, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
 
-![Run workflow dropdown for npm publishing](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/workflow-dispatch-npm-banner.png)
+![Run workflow dropdown for npm publishing](https://developer.wordpress.org/files/2023/07/image-4.png)
 
 To publish development packages to npm, select `development` from the "Release type" dropdown and leave empty "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 

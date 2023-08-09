@@ -194,6 +194,13 @@ If this property is true, it will focus the first tabbable element rendered in t
 -   Required: No
 -   Default: `true`
 
+#### headerActions
+
+An optional React node intended to contain additional actions or other elements related to the modal, for example, buttons. Content is rendered in the top right corner of the modal and to the left of the close button, if visible.
+
+-   Required: No
+-   Default: `null`
+
 #### `isDismissible`: `boolean`
 
 If this property is set to false, the modal will not display a close icon and cannot be dismissed.
