@@ -113,6 +113,10 @@ function AutoInsertingBlocksControl( props ) {
 
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
 
+	if ( ! autoInsertedBlocksForCurrentBlock.length ) {
+		return null;
+	}
+
 	// Group by block namespace (i.e. prefix before the slash).
 	const groupedAutoInsertedBlocks = autoInsertedBlocksForCurrentBlock.reduce(
 		( groups, block ) => {
