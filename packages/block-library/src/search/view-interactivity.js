@@ -32,9 +32,9 @@ wpStore( {
 				ariaLabel: ( { state, context } ) => {
 					const { ariaLabelCollapsed, ariaLabelExpanded } =
 						state.core.search;
-					return context.core.search.isSearchCollapsed
-						? ariaLabelCollapsed
-						: ariaLabelExpanded;
+					return context.core.search.isSearchInputVisible
+						? ariaLabelExpanded
+						: ariaLabelCollapsed;
 				},
 			},
 		},
@@ -43,6 +43,9 @@ wpStore( {
 		core: {
 			search: {
 				toggleSearch,
+				openSearchInput: ( { context } ) => {
+					context.core.search.isSearchInputVisible = true;
+				},
 			},
 		},
 	},

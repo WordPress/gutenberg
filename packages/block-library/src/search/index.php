@@ -199,7 +199,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 				%2s
 				data-wp-interactive
 				data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": false } } }\'
-				data-wp-class--wp-block-search__searchfield-hidden="context.core.search.isSearchInputVisible"
+				data-wp-class--wp-block-search__searchfield-hidden="!context.core.search.isSearchInputVisible"
 			>
 				%3s
 			</form>',
