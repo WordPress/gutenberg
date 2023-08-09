@@ -54,9 +54,7 @@ describe( 'CSS selector wrap', () => {
 		const callback = wrap( '.my-namespace' );
 		const input = `
 		@container (width > 400px) {
-  			h2 {
-				font-size: 1.5em;
-			}
+  			h1 { color: red; }
 		}`;
 		const output = traverse( input, callback );
 
