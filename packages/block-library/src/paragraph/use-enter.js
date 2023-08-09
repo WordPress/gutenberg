@@ -6,7 +6,11 @@ import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { hasBlockSupport, createBlock } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	createBlock,
+	getDefaultBlockName,
+} from '@wordpress/blocks';
 
 export function useOnEnter( props ) {
 	const { batch } = useRegistry();
@@ -85,9 +89,11 @@ export function useOnEnter( props ) {
 				return;
 			}
 
+			const defaultBlockName = getDefaultBlockName();
+
 			if (
 				! canInsertBlockType(
-					'core/paragraph',
+					defaultBlockName,
 					getBlockRootClientId( wrapperClientId )
 				)
 			) {
@@ -111,7 +117,7 @@ export function useOnEnter( props ) {
 					wrapperBlock.innerBlocks.slice( position + 1 )
 				);
 				insertBlock(
-					createBlock( 'core/paragraph' ),
+					createBlock( defaultBlockName ),
 					blockIndex + 1,
 					getBlockRootClientId( wrapperClientId ),
 					true
