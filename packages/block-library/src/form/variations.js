@@ -2,6 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+/**
+ * Internal dependencies
+ */
+import {
+	formSubmissionNotificationSuccess,
+	formSubmissionNotificationError,
+} from './utils.js';
 
 const variations = [
 	{
@@ -65,6 +72,8 @@ const variations = [
 		},
 		isDefault: false,
 		innerBlocks: [
+			formSubmissionNotificationSuccess,
+			formSubmissionNotificationError,
 			[
 				'core/paragraph',
 				{

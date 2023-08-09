@@ -149,13 +149,28 @@ function gutenberg_block_core_form_send_email() {
 	$content = apply_filters( 'render_block_core_form_email_content', $content, $params );
 
 	// Send the email.
-	wp_mail( $params['wp-email-address'], __( 'Form submission', 'gutenberg' ), $content );
+	$result = wp_mail( $params['wp-email-address'], __( 'Form submission', 'gutenberg' ), $content );
+
+	/**
+	 * Determine whether the core/form-submission-notification block should be shown.
+	 *
+	 * @param bool   $show       Whether to show the core/form-submission-notification block.
+	 * @param array  $attributes The block attributes.
+	 *
+	 * @return bool Whether to show the core/form-submission-notification block.
+	 */
+	$show_notification = static function( $show, $attributes ) use ( $result ) {
+		return ( 'success' === $attributes['type'] && $result )
+			|| ( 'error' === $attributes['type'] && ! $result );
+	};
+	// Add filter to show the notification block.
+	add_filter( 'show_form_submission_notification_block', $show_notification, 10, 2 );
 
 	/**
 	 * Fires after the email has been sent.
 	 *
 	 * This will allow 3rd-party plugins to redirect to a different page
-	 * by removing the default redirect, or add a success message etc.
+	 * by removing the default redirect, etc.
 	 *
 	 * @param array $params The POST data.
 	 */
@@ -225,31 +240,29 @@ function gutenberg_block_core_form_privacy_form() {
 		$actions_performed[] = $action_name;
 	}
 
-	// Add feedback to the top of the form when the page re-renders.
-	$privacy_form_feedback = static function( $block_content ) use ( $actions_errored, $actions_performed ) {
-		// Bail early if no actions were detected.
-		if ( empty( $actions_errored ) && empty( $actions_performed ) ) {
-			return $block_content;
-		}
+	/**
+	 * Determine whether the core/form-submission-notification block should be shown.
+	 *
+	 * @param bool   $show       Whether to show the core/form-submission-notification block.
+	 * @param array  $attributes The block attributes.
+	 *
+	 * @return bool Whether to show the core/form-submission-notification block.
+	 */
+	$show_notification = static function( $show, $attributes ) use ( $actions_performed, $actions_errored ) {
+		switch ( $attributes['type'] ) {
+			case 'success':
+				return ! empty( $actions_performed ) && empty( $actions_errored );
 
-		// Bail early if this is not a privacy form.
-		if ( false === strpos( $block_content, 'wp_privacy_send_request' ) ) {
-			return $block_content;
-		}
+			case 'error':
+				return ! empty( $actions_errored );
 
-		if ( ! empty( $actions_errored ) ) {
-			$feedback  = '<div class="wp-privacy-request-error" style="padding:1em;border:1px solid #EA8484;background:#FBEAEA;color:#9A2323;border-radius:3px;">';
-			$feedback .= '<p>' . __( 'There was a problem with your action. Please try again later.', 'gutenberg' ) . '</p>';
-			$feedback .= '</div>';
-		} else {
-			$feedback  = '<div class="wp-privacy-request-success" style="padding:1em;border:1px solid #B5E1B9;background:#ECF7ED;color:#31843F;border-radius:3px;">';
-			$feedback .= '<p>' . __( 'Confirmation request initiated successfully. Please check your email for confirmation.', 'gutenberg' ) . '</p>';
-			$feedback .= '</div>';
+			default:
+				return $show;
 		}
-
-		return $feedback . $block_content;
 	};
-	add_action( 'render_block_core/form', $privacy_form_feedback );
+
+	// Add filter to show the core/form-submission-notification block.
+	add_filter( 'show_form_submission_notification_block', $show_notification, 10, 2 );
 }
 add_action( 'wp', 'gutenberg_block_core_form_privacy_form' );
 

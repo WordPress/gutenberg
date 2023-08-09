@@ -12,6 +12,14 @@ import {
 import { TextControl, SelectControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import {
+	formSubmissionNotificationSuccess,
+	formSubmissionNotificationError,
+} from './utils.js';
+
 const ALLOWED_BLOCKS = [
 	'core/paragraph',
 	'core/heading',
@@ -21,6 +29,8 @@ const ALLOWED_BLOCKS = [
 ];
 
 const TEMPLATE = [
+	formSubmissionNotificationSuccess,
+	formSubmissionNotificationError,
 	[
 		'core/form-input',
 		{
