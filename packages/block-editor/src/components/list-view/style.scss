@@ -342,19 +342,20 @@
 
 	.block-editor-list-view-block-select-button__images {
 		display: flex;
-		align-items: center;
-		flex-direction: row;
 	}
 
 	.block-editor-list-view-block-select-button__image {
 		background-size: cover;
-		width: $grid-unit-30;
-		height: $grid-unit-30;
+		width: 20px;
+		height: 20px;
 		border-radius: $radius-block-ui;
-		box-shadow: 0 0 0 $radius-block-ui $white;
+
+		&:not(:only-child) {
+			box-shadow: 0 0 0 $radius-block-ui $white;
+		}
 
 		&:not(:first-child) {
-			margin-left: -$grid-unit-10;
+			margin-left: -5px;
 		}
 	}
 
