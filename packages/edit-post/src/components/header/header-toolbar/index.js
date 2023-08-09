@@ -7,6 +7,7 @@ import { __, _x } from '@wordpress/i18n';
 import {
 	NavigableToolbar,
 	ToolSelector,
+	_experimentalSelectedBlockTools,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -132,6 +133,7 @@ function HeaderToolbar( { setListViewToggleElement } ) {
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
 
 	return (
+		<>
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
@@ -156,30 +158,36 @@ function HeaderToolbar( { setListViewToggleElement } ) {
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
 						{ isLargeViewport && ! hasFixedToolbar && (
+								<ToolbarItem
+									as={ ToolSelector }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+									disabled={ isTextModeEnabled }
+								/>
+							) }
 							<ToolbarItem
-								as={ ToolSelector }
+								as={ EditorHistoryUndo }
 								showTooltip={ ! showIconLabels }
 								variant={
 									showIconLabels ? 'tertiary' : undefined
 								}
-								disabled={ isTextModeEnabled }
 							/>
-						) }
-						<ToolbarItem
-							as={ EditorHistoryUndo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-						/>
-						<ToolbarItem
-							as={ EditorHistoryRedo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-						/>
-						{ overflowItems }
-					</>
-				) }
-			</div>
-		</NavigableToolbar>
+							<ToolbarItem
+								as={ EditorHistoryRedo }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+							/>
+							{ overflowItems }
+						</>
+					) }
+				</div>
+			</NavigableToolbar>
+			<_experimentalSelectedBlockTools isFixed={ hasFixedToolbar } />
+		</>
 	);
 }
 
