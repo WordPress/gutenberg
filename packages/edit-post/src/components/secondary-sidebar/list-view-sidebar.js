@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalListView as ListView } from '@wordpress/block-editor';
-import { Button, TabPanel } from '@wordpress/components';
+import { Button, TabPanel, ResizableBox } from '@wordpress/components';
 import {
 	useFocusOnMount,
 	useFocusReturn,
@@ -119,46 +119,59 @@ export default function ListViewSidebar() {
 	}
 
 	return (
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div
-			className="edit-post-editor__document-overview-panel"
-			onKeyDown={ closeOnEscape }
-			ref={ sidebarRef }
+		<ResizableBox
+			className="edit-post-editor__document-overview-panel__resizable-box"
+			enable={ {
+				top: false,
+				right: true, // TODO: update with an isRTL check.
+				bottom: false,
+				left: false, // TODO: update with a ! isRTL check.
+			} }
+			minWidth={ 350 }
+			maxWidth={ 700 }
+			showHandle={ true }
 		>
-			<Button
-				className="edit-post-editor__document-overview-panel__close-button"
-				ref={ headerFocusReturnRef }
-				icon={ closeSmall }
-				label={ __( 'Close' ) }
-				onClick={ () => setIsListViewOpened( false ) }
-			/>
-			<TabPanel
-				className="edit-post-editor__document-overview-panel__tab-panel"
-				ref={ tabPanelRef }
-				onSelect={ ( tabName ) => setTab( tabName ) }
-				selectOnMove={ false }
-				tabs={ [
-					{
-						name: 'list-view',
-						title: _x( 'List View', 'Post overview' ),
-						className: 'edit-post-sidebar__panel-tab',
-					},
-					{
-						name: 'outline',
-						title: _x( 'Outline', 'Post overview' ),
-						className: 'edit-post-sidebar__panel-tab',
-					},
-				] }
+			{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */ }
+			<div
+				className="edit-post-editor__document-overview-panel"
+				onKeyDown={ closeOnEscape }
+				ref={ sidebarRef }
 			>
-				{ ( currentTab ) => (
-					<div
-						className="edit-post-editor__list-view-container"
-						ref={ listViewContainerRef }
-					>
-						{ renderTabContent( currentTab.name ) }
-					</div>
-				) }
-			</TabPanel>
-		</div>
+				<Button
+					className="edit-post-editor__document-overview-panel__close-button"
+					ref={ headerFocusReturnRef }
+					icon={ closeSmall }
+					label={ __( 'Close' ) }
+					onClick={ () => setIsListViewOpened( false ) }
+				/>
+				<TabPanel
+					className="edit-post-editor__document-overview-panel__tab-panel"
+					ref={ tabPanelRef }
+					onSelect={ ( tabName ) => setTab( tabName ) }
+					selectOnMove={ false }
+					tabs={ [
+						{
+							name: 'list-view',
+							title: _x( 'List View', 'Post overview' ),
+							className: 'edit-post-sidebar__panel-tab',
+						},
+						{
+							name: 'outline',
+							title: _x( 'Outline', 'Post overview' ),
+							className: 'edit-post-sidebar__panel-tab',
+						},
+					] }
+				>
+					{ ( currentTab ) => (
+						<div
+							className="edit-post-editor__list-view-container"
+							ref={ listViewContainerRef }
+						>
+							{ renderTabContent( currentTab.name ) }
+						</div>
+					) }
+				</TabPanel>
+			</div>
+		</ResizableBox>
 	);
 }
