@@ -9,7 +9,7 @@ export function QueryPaginationNumbersMidSizeControl( { value, onChange } ) {
 		<RangeControl
 			label={ __( 'Number of links' ) }
 			help={ __(
-				'Maximum amount of numbered pages to be shown before and after the current page link if available.'
+				'Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.'
 			) }
 			value={ value }
 			onChange={ onChange }
