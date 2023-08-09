@@ -16,7 +16,7 @@ wpStore( {
 				},
 				ariaControls: ( { context } ) => {
 					return context.core.search.isSearchInputVisible
-						? ''
+						? undefined
 						: context.core.search.inputId;
 				},
 				type: ( { context } ) => {
@@ -35,9 +35,11 @@ wpStore( {
 	actions: {
 		core: {
 			search: {
-				openSearchInput: ( { context } ) => {
+				openSearchInput: ( { context, event, ref } ) => {
 					if ( ! context.core.search.isSearchInputVisible ) {
+						event.preventDefault();
 						context.core.search.isSearchInputVisible = true;
+						ref.parentElement.querySelector( 'input' ).focus();
 					}
 				},
 				closeSearchInput: ( { context } ) => {
