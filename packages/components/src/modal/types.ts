@@ -34,13 +34,6 @@ export type ModalProps = {
 		labelledby?: string;
 	};
 	/**
-	 * Elements that are injected into the modal header to the left of the close button (if rendered).
-	 * Hidden if `__experimentalHideHeader` is `true`.
-	 *
-	 * @default null
-	 */
-	auxiliaryActions?: ReactNode;
-	/**
 	 * Class name added to the body element when the modal is open.
 	 *
 	 * @default 'modal-open'
@@ -76,6 +69,14 @@ export type ModalProps = {
 	 * @default true
 	 */
 	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
+	/**
+	 * Elements that are injected into the modal header to the left of the close button (if rendered).
+	 * Hidden if `__experimentalHideHeader` is `true`.
+	 *
+	 * @default null
+	 */
+	headerActions?: ReactNode;
+
 	/**
 	 * If this property is added, an icon will be added before the title.
 	 */

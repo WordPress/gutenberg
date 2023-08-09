@@ -89,7 +89,7 @@ const Template: ComponentStory< typeof Modal > = ( {
 	);
 };
 
-const TemplateWithAuxiliaryAction: ComponentStory< typeof Modal > = ( {
+const TemplateWithHeaderActions: ComponentStory< typeof Modal > = ( {
 	onRequestClose,
 	...args
 } ) => {
@@ -100,7 +100,7 @@ const TemplateWithAuxiliaryAction: ComponentStory< typeof Modal > = ( {
 		setOpen( false );
 		onRequestClose( event );
 	};
-	const auxiliaryActions = (
+	const headerActions = (
 		<>
 			<Button
 				icon={ isLiked ? starFilled : starEmpty }
@@ -116,14 +116,14 @@ const TemplateWithAuxiliaryAction: ComponentStory< typeof Modal > = ( {
 	return (
 		<>
 			<Button variant="secondary" onClick={ openModal }>
-				Open Modal with Auxiliary Actions
+				Open Modal with Header Actions
 			</Button>
 			{ isOpen && (
 				<Modal
 					style={ { maxWidth: '600px' } }
 					isDismissible={ false }
 					onRequestClose={ closeModal }
-					auxiliaryActions={ auxiliaryActions }
+					headerActions={ headerActions }
 					{ ...args }
 				>
 					<p>
@@ -151,16 +151,16 @@ Default.parameters = {
 	},
 };
 
-export const WithAuxiliaryActions: ComponentStory< typeof Modal > =
-	TemplateWithAuxiliaryAction.bind( {} );
-WithAuxiliaryActions.args = {
+export const WithHeaderActions: ComponentStory< typeof Modal > =
+	TemplateWithHeaderActions.bind( {} );
+WithHeaderActions.args = {
 	...Default.args,
 };
-WithAuxiliaryActions.argTypes = {
+WithHeaderActions.argTypes = {
 	isDismissible: {
 		control: { type: 'boolean' },
 	},
 };
-WithAuxiliaryActions.parameters = {
+WithHeaderActions.parameters = {
 	...Default.parameters,
 };

@@ -116,10 +116,10 @@ describe( 'Modal', () => {
 		expect( opener ).toHaveFocus();
 	} );
 
-	it( 'should render `auxiliaryActions` React nodes', async () => {
+	it( 'should render `headerActions` React nodes', async () => {
 		render(
 			<Modal
-				auxiliaryActions={ <button>A sweet button</button> }
+				headerActions={ <button>A sweet button</button> }
 				onRequestClose={ noop }
 			>
 				<p>Modal content</p>

@@ -166,14 +166,6 @@ Titles are required for accessibility reasons, see `contentLabel` and `title` fo
 -   Required: No
 -   Default: if the `title` prop is provided, this will default to the id of the element that renders `title`
 
-
-#### auxiliaryActions
-
-An optional React node intended to contain auxiliary actions of the modal, for example, buttons. Content is rendered in the top right corner of the modal and to the left of the close button, if visible.
-
--   Required: No
--   Default: `null`
-
 #### `bodyOpenClassName`: `string`
 
 Class name added to the body element when the modal is open.
@@ -201,6 +193,13 @@ If this property is true, it will focus the first tabbable element rendered in t
 
 -   Required: No
 -   Default: `true`
+
+#### headerActions
+
+An optional React node intended to contain additional actions or other elements related the modal, for example, buttons. Content is rendered in the top right corner of the modal and to the left of the close button, if visible.
+
+-   Required: No
+-   Default: `null`
 
 #### `isDismissible`: `boolean`
 
