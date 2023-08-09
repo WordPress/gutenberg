@@ -7,13 +7,12 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { help, starEmpty, starFilled } from '@wordpress/icons';
+import { starEmpty, starFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Button from '../../button';
-import Tooltip from '../../tooltip';
 import InputControl from '../../input-control';
 import Modal from '../';
 import type { ModalProps } from '../types';
@@ -36,6 +35,9 @@ const meta: ComponentMeta< typeof Modal > = {
 		},
 		onRequestClose: {
 			action: 'onRequestClose',
+		},
+		isDismissible: {
+			control: { type: 'boolean' },
 		},
 	},
 	parameters: {
@@ -89,56 +91,6 @@ const Template: ComponentStory< typeof Modal > = ( {
 	);
 };
 
-const TemplateWithHeaderActions: ComponentStory< typeof Modal > = ( {
-	onRequestClose,
-	...args
-} ) => {
-	const [ isLiked, setIsLiked ] = useState( false );
-	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
-	const closeModal: ModalProps[ 'onRequestClose' ] = ( event ) => {
-		setOpen( false );
-		onRequestClose( event );
-	};
-	const headerActions = (
-		<>
-			<Button
-				icon={ isLiked ? starFilled : starEmpty }
-				label="Like"
-				onClick={ () => setIsLiked( ! isLiked ) }
-			/>
-			<Tooltip text="We are here to help!">
-				<Button icon={ help } label="Help" />
-			</Tooltip>
-		</>
-	);
-
-	return (
-		<>
-			<Button variant="secondary" onClick={ openModal }>
-				Open Modal with Header Actions
-			</Button>
-			{ isOpen && (
-				<Modal
-					style={ { maxWidth: '600px' } }
-					isDismissible={ false }
-					onRequestClose={ closeModal }
-					headerActions={ headerActions }
-					{ ...args }
-				>
-					<p>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-						sed do eiusmod tempor incididunt ut labore et magna
-						aliqua.
-					</p>
-					<Button variant="secondary" onClick={ closeModal }>
-						Close Modal
-					</Button>
-				</Modal>
-			) }
-		</>
-	);
-};
 export const Default: ComponentStory< typeof Modal > = Template.bind( {} );
 Default.args = {
 	title: 'Title',
@@ -151,15 +103,24 @@ Default.parameters = {
 	},
 };
 
-export const WithHeaderActions: ComponentStory< typeof Modal > =
-	TemplateWithHeaderActions.bind( {} );
+const LikeButton = () => {
+	const [ isLiked, setIsLiked ] = useState( false );
+	return (
+		<Button
+			icon={ isLiked ? starFilled : starEmpty }
+			label="Like"
+			onClick={ () => setIsLiked( ! isLiked ) }
+		/>
+	);
+};
+
+export const WithHeaderActions: ComponentStory< typeof Modal > = Template.bind(
+	{}
+);
 WithHeaderActions.args = {
 	...Default.args,
-};
-WithHeaderActions.argTypes = {
-	isDismissible: {
-		control: { type: 'boolean' },
-	},
+	headerActions: <LikeButton />,
+	isDismissible: false,
 };
 WithHeaderActions.parameters = {
 	...Default.parameters,
