@@ -85,14 +85,40 @@ function AutoInsertingBlocksControl( props ) {
 							return acc;
 						}
 
-						const { clientId } = innerBlocks.at(
+						// Note that the direction is reversed, compared to before/after:
+						// E.g. when looking for a potential last child, we have to start at the
+						// last element and then go backwards.
+						const direction =
+							relativePosition === 'last_child' ? -1 : 1;
+						let { clientId } = innerBlocks.at(
 							relativePosition === 'first_child' ? 0 : -1
 						);
 
-						// TODO: Keep iterating if it's not the last/first child.
-						if ( getBlock( clientId )?.name === block.name ) {
-							acc[ block.name ] = clientId;
-							return acc;
+						while ( clientId ) {
+							if ( getBlock( clientId )?.name === block.name ) {
+								acc[ block.name ] = clientId;
+								return acc;
+							}
+
+							// Stop if we encounter a non-auto-inserted block. Any block on the other side
+							// of a manually inserted block cannot qualify as an auto-inserted block.
+							if (
+								! autoInsertedBlocksForCurrentBlock.some(
+									( autoInsertedBlock ) =>
+										autoInsertedBlock.name ===
+											getBlock( clientId )?.name &&
+										autoInsertedBlock.autoInsert[
+											props.blockName
+										] === relativePosition
+								)
+							) {
+								return acc;
+							}
+
+							clientId = getAdjacentBlockClientId(
+								clientId,
+								direction
+							);
 						}
 					}
 					return acc;
