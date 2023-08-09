@@ -7,7 +7,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>ading
+<pre class="wp-block-code"><code>ding
 
 Paragra</code></pre>
 <!-- /wp:code -->

@@ -5,6 +5,7 @@ import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig, devices } from '@playwright/test';
+import { devices as replayDevices } from '@replayio/playwright';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
@@ -80,6 +81,12 @@ const config = defineConfig( {
 			use: { ...devices[ 'Desktop Firefox' ] },
 			grep: /@firefox/,
 			grepInvert: /-firefox/,
+		},
+		{
+			name: 'replay-chromium',
+			use: { ...( replayDevices[ 'Replay Chromium' ] as any ) },
+			snapshotPathTemplate:
+				'{testDir}/{testFileDir}/__snapshots__/{arg}-chromium{ext}',
 		},
 	],
 } );
