@@ -4,9 +4,7 @@
 		"incremental": false,
 		"composite": false,
 		"module": "CommonJS",
-		/* Ensure dynamic imports are left untouched */
 		"moduleResolution": "node16",
-		/* Ignore error flagged in node_modules/lighthouse/core/index.d.cts */
 		"skipLibCheck": true,
 		"types": [ "node" ],
 		"rootDir": "src",
