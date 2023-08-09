@@ -59,7 +59,6 @@ function MenuItemsChoice( {
 						key={ item.value }
 						role="menuitemradio"
 						disabled={ item.disabled }
-						aria-disabled={ item.disabled }
 						icon={ isSelected && check }
 						info={ item.info }
 						isSelected={ isSelected }
