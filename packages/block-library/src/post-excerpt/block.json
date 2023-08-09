@@ -20,6 +20,10 @@
 		"excerptLength": {
 			"type": "number",
 			"default": 55
+		},
+		"titleReplacement": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],

@@ -19,6 +19,30 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	}
 
 	/*
+	* We can use the excerpt block in query loops
+	* to render titleless posts.
+	* The behaviour of the block is that if there is no title
+	* just render whatever the 1st block in the post content is.
+	*/
+
+	if ( $attributes['titleReplacement'] === true ) {
+		$post_id = $block->context['postId'];
+
+		// get the post title
+		$post_title = get_the_title( $post_id );
+
+		// if there is no title get the 1st block in the post content
+		if ( empty( $post_title ) ) {
+			$post = get_post( $post_id );
+			$post_blocks = parse_blocks( $post->post_content );
+			return sprintf( '<a href="%1$s">%2$s</a>', get_permalink( $post_id ), $post_blocks[0]['innerHTML'] );
+			return ;
+		} else {
+			return false;
+		}
+	}
+
+	/*
 	* The purpose of the excerpt length setting is to limit the length of both
 	* automatically generated and user-created excerpts.
 	* Because the excerpt_length filter only applies to auto generated excerpts,

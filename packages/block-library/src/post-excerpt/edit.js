@@ -28,7 +28,13 @@ import { useCanEditEntity } from '../utils/hooks';
 const ELLIPSIS = '…';
 
 export default function PostExcerptEditor( {
-	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
+	attributes: {
+		textAlign,
+		moreText,
+		showMoreOnNewLine,
+		excerptLength,
+		titleReplacement,
+	},
 	setAttributes,
 	isSelected,
 	context: { postId, postType, queryId },
@@ -219,23 +225,37 @@ export default function PostExcerptEditor( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Show link on new line' ) }
-						checked={ showMoreOnNewLine }
-						onChange={ ( newShowMoreOnNewLine ) =>
+						label={ __( 'Behave as title replacement' ) }
+						checked={ titleReplacement }
+						onChange={ ( newTitleReplacement ) =>
 							setAttributes( {
-								showMoreOnNewLine: newShowMoreOnNewLine,
+								titleReplacement: newTitleReplacement,
 							} )
 						}
 					/>
-					<RangeControl
-						label={ __( 'Max number of words' ) }
-						value={ excerptLength }
-						onChange={ ( value ) => {
-							setAttributes( { excerptLength: value } );
-						} }
-						min="10"
-						max="100"
-					/>
+					{ ! titleReplacement && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show link on new line' ) }
+							checked={ showMoreOnNewLine }
+							onChange={ ( newShowMoreOnNewLine ) =>
+								setAttributes( {
+									showMoreOnNewLine: newShowMoreOnNewLine,
+								} )
+							}
+						/>
+					) }
+					{ ! titleReplacement && (
+						<RangeControl
+							label={ __( 'Max number of words' ) }
+							value={ excerptLength }
+							onChange={ ( value ) => {
+								setAttributes( { excerptLength: value } );
+							} }
+							min="10"
+							max="100"
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
