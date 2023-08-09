@@ -71,9 +71,11 @@ export function useFormatTypes( {
 				return false;
 			}
 
+			// The "Footnote" format requires special handling due to its nested interactive content tag.
 			if (
 				withoutInteractiveFormatting &&
-				interactiveContentTags.has( tagName )
+				( name === 'core/footnote' ||
+					interactiveContentTags.has( tagName ) )
 			) {
 				return false;
 			}
