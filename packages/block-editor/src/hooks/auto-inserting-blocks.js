@@ -38,9 +38,10 @@ function AutoInsertingBlocksControl( props ) {
 			} = select( blockEditorStore );
 			const _rootClientId = getBlockRootClientId( props.clientId );
 
-			// Iterate over all auto-inserted blocks after the current block, until there are no more
-			// Probably there won't be that many auto-inserted blocks.
-			// We still need to check everything after.
+			// It's possible that there are multiple auto-inserted blocks, so in order to
+			// locate them all, we have to iterate over all auto-inserted sibiling blocks
+			// before or after the current block, respectively. We stop iterating once there
+			// are no more blocks, or if we encounter a manually inserted block.
 			const _blocks = autoInsertedBlocksForCurrentBlock.reduce(
 				( acc, block ) => {
 					const relativePosition =
