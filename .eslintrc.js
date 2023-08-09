@@ -132,6 +132,13 @@ module.exports = {
 				],
 			},
 		],
+		'@typescript-eslint/consistent-type-imports': [
+			'error',
+			{
+				prefer: 'type-imports',
+				disallowTypeAnnotations: false,
+			},
+		],
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or

@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Display custom color value in mobile Cover Block color picker [#51414]
 -   [**] Replace third party dependency on react-native-hsv-color-picker
+-   [**] Display outline around selected Social Link block [#51414]
 
 ## 1.101.0
 -   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]

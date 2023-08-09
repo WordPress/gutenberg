@@ -28,6 +28,7 @@ Note that the commands described here should be run in the top-level directory o
 ```sh
 nvm install
 npm ci
+npm run native preios
 ```
 
 ## Run

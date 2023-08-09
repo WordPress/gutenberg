@@ -212,7 +212,6 @@ export default function Layout() {
 					animate={ headerAnimationState }
 				>
 					<SiteHub
-						as={ motion.div }
 						variants={ {
 							isDistractionFree: { x: '-100%' },
 							isDistractionFreeHovering: { x: 0 },
