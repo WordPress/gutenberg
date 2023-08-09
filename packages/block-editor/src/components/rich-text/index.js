@@ -402,7 +402,7 @@ function RichTextWrapper(
 						disableLineBreaks,
 						onSplitAtEnd,
 					} ),
-					useFirefoxCompat( { value, onChange } ),
+					useFirefoxCompat(),
 					anchorRef,
 				] ) }
 				contentEditable={ true }

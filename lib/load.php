@@ -99,6 +99,15 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-tag-processor.php';
 }
 
+if ( ! class_exists( 'WP_HTML_Processor' ) ) {
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-active-formatting-elements.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-open-elements.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor-state.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-token.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-unsupported-exception.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor.php';
+}
+
 // WordPress 6.3 compat.
 require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.3/block-template-utils.php';
@@ -115,6 +124,7 @@ require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
+require __DIR__ . '/experimental/synchronization.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';

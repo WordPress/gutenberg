@@ -8,12 +8,104 @@ import { useRef, useCallback } from 'preact/hooks';
  */
 import { rawStore as store } from './store';
 
+/** @typedef {import('preact').VNode} VNode */
+/** @typedef {typeof context} Context */
+/** @typedef {ReturnType<typeof getEvaluate>} Evaluate */
+
+/**
+ * @typedef {Object} DirectiveCallbackParams Callback parameters.
+ * @property {Object}   directives Object map with the defined directives of the element being evaluated.
+ * @property {Object}   props      Props present in the current element.
+ * @property {VNode}    element    Virtual node representing the original element.
+ * @property {Context}  context    The inherited context.
+ * @property {Evaluate} evaluate   Function that resolves a given path to a value either in the store or the context.
+ */
+
+/**
+ * @callback DirectiveCallback Callback that runs the directive logic.
+ * @param {DirectiveCallbackParams} params Callback parameters.
+ */
+
+/**
+ * @typedef DirectiveOptions Options object.
+ * @property {number} [priority=10] Value that specifies the priority to
+ *                                  evaluate directives of this type. Lower
+ *                                  numbers correspond with earlier execution.
+ *                                  Default is `10`.
+ */
+
 // Main context.
 const context = createContext( {} );
 
 // WordPress Directives.
 const directiveCallbacks = {};
 const directivePriorities = {};
+
+/**
+ * Register a new directive type in the Interactivity API runtime.
+ *
+ * @example
+ * ```js
+ * directive(
+ *   'alert', // Name without the `data-wp-` prefix.
+ *   ( { directives: { alert }, element, evaluate }) => {
+ *     element.props.onclick = () => {
+ *       alert( evaluate( alert.default ) );
+ *     }
+ *   }
+ * )
+ * ```
+ *
+ * The previous code registers a custom directive type for displaying an alert
+ * message whenever an element using it is clicked. The message text is obtained
+ * from the store using `evaluate`.
+ *
+ * When the HTML is processed by the Interactivity API, any element containing
+ * the `data-wp-alert` directive will have the `onclick` event handler, e.g.,
+ *
+ * ```html
+ * <button data-wp-alert="state.messages.alert">Click me!</button>
+ * ```
+ * Note that, in the previous example, you access `alert.default` in order to
+ * retrieve the `state.messages.alert` value passed to the directive. You can
+ * also define custom names by appending `--` to the directive attribute,
+ * followed by a suffix, like in the following HTML snippet:
+ *
+ * ```html
+ * <button
+ *   data-wp-color--text="state.theme.text"
+ *   data-wp-color--background="state.theme.background"
+ * >Click me!</button>
+ * ```
+ *
+ * This could be an hypothetical implementation of the custom directive used in
+ * the snippet above.
+ *
+ * @example
+ * ```js
+ * directive(
+ *   'color', // Name without prefix and suffix.
+ *   ( { directives: { color }, ref, evaluate }) => {
+ *     if ( color.text ) {
+ * 	     ref.style.setProperty(
+ *         'color',
+ *         evaluate( color.text )
+ *       );
+ *     }
+ *     if ( color.background ) {
+ *       ref.style.setProperty(
+ *         'background-color',
+ *         evaluate( color.background )
+ *       );
+ *     }
+ *   }
+ * )
+ * ```
+ *
+ * @param {string}            name     Directive name, without the `data-wp-` prefix.
+ * @param {DirectiveCallback} callback Function that runs the directive logic.
+ * @param {DirectiveOptions=} options  Options object.
+ */
 export const directive = ( name, callback, { priority = 10 } = {} ) => {
 	directiveCallbacks[ name ] = callback;
 	directivePriorities[ name ] = priority;

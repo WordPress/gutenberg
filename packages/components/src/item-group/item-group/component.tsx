@@ -6,7 +6,8 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
 import { useItemGroup } from './hook';
 import { ItemGroupContext, useItemGroupContext } from '../context';
 import { View } from '../../view';

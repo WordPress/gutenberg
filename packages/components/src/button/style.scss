@@ -28,6 +28,7 @@
 	}
 
 	// Unset some hovers, instead of adding :not specificity.
+	&:disabled:hover,
 	&[aria-disabled="true"]:hover {
 		color: initial;
 	}

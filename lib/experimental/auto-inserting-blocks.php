@@ -6,16 +6,24 @@
  */
 
 /**
- * Return a function that auto-inserts blocks relative to a given block.
+ * Return a function that auto-inserts a block next to a given "anchor" block.
+ *
+ * The auto-inserted block can be inserted before or after the anchor block,
+ * or as the first or last child of the anchor block.
+ *
+ * Note that the returned function mutates the auto-inserted block's designated
+ * parent block by inserting into the parent's `innerBlocks` array, and by
+ * updating the parent's `innerContent` array accordingly.
  *
  * @param array  $inserted_block    The block to insert.
  * @param string $relative_position The position relative to the given block.
- * @param string $anchor_block      The block to insert relative to.
+ *                                  Can be 'before', 'after', 'first_child', or 'last_child'.
+ * @param string $anchor_block_type The auto-inserted block will be inserted next to instances of this block type.
  * @return callable A function that accepts a block's content and returns the content with the inserted block.
  */
-function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anchor_block ) {
-	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block ) {
-		if ( $anchor_block === $block['blockName'] ) {
+function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anchor_block_type ) {
+	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block_type ) {
+		if ( $anchor_block_type === $block['blockName'] ) {
 			if ( 'first_child' === $relative_position ) {
 				array_unshift( $block['innerBlocks'], $inserted_block );
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
@@ -32,7 +40,7 @@ function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anch
 			return $block;
 		}
 
-		$anchor_block_index = array_search( $anchor_block, array_column( $block['innerBlocks'], 'blockName' ), true );
+		$anchor_block_index = array_search( $anchor_block_type, array_column( $block['innerBlocks'], 'blockName' ), true );
 		if ( false !== $anchor_block_index && ( 'after' === $relative_position || 'before' === $relative_position ) ) {
 			if ( 'after' === $relative_position ) {
 				$anchor_block_index++;
@@ -144,7 +152,9 @@ function gutenberg_register_auto_inserted_block( $inserted_block, $position, $an
  *
  * By parsing a block template's content and then reserializing it
  * via `gutenberg_serialize_blocks()`, we are able to run filters
- * on the parsed blocks.
+ * on the parsed blocks. This allows us to modify (parsed) blocks during
+ * depth-first traversal already provided by the serialization process,
+ * rather than having to do so in a separate pass.
  *
  * @param WP_Block_Template[] $query_result Array of found block templates.
  * @return WP_Block_Template[] Updated array of found block templates.
@@ -167,7 +177,9 @@ add_filter( 'get_block_templates', 'gutenberg_parse_and_serialize_block_template
  *
  * By parsing a block template's content and then reserializing it
  * via `gutenberg_serialize_blocks()`, we are able to run filters
- * on the parsed blocks.
+ * on the parsed blocks. This allows us to modify (parsed) blocks during
+ * depth-first traversal already provided by the serialization process,
+ * rather than having to do so in a separate pass.
  *
  * @param WP_Block_Template|null $block_template The found block template, or null if there is none.
  */

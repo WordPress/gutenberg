@@ -96,3 +96,9 @@ WithTabIconsAndTooltips.args = {
 		},
 	],
 };
+
+export const ManualActivation = Template.bind( {} );
+ManualActivation.args = {
+	...Default.args,
+	selectOnMove: false,
+};

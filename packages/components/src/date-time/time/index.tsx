@@ -33,9 +33,9 @@ import { HStack } from '../../h-stack';
 import { Spacer } from '../../spacer';
 import type { InputChangeCallback } from '../../input-control/types';
 import type { InputState } from '../../input-control/reducer/state';
+import type { InputAction } from '../../input-control/reducer/actions';
 import {
 	COMMIT,
-	InputAction,
 	PRESS_DOWN,
 	PRESS_UP,
 } from '../../input-control/reducer/actions';

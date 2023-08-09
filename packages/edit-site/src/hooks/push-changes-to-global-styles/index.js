@@ -7,6 +7,7 @@ import {
 	InspectorAdvancedControls,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -27,7 +28,6 @@ import { unlock } from '../../lock-unlock';
 
 const {
 	GlobalStylesContext,
-	useBlockEditingMode,
 	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
 	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
 } = unlock( blockEditorPrivateApis );

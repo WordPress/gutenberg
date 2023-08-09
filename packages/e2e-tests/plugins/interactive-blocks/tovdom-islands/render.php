@@ -7,14 +7,14 @@
 
 ?>
 <div>
-	<div data-wp-show="state.falseValue">
+	<div data-wp-show-mock="state.falseValue">
 		<span data-testid="not inside an island">
 			This should be shown because it is inside an island.
 		</span>
 	</div>
 
 	<div data-wp-interactive>
-		<div data-wp-show="state.falseValue">
+		<div data-wp-show-mock="state.falseValue">
 			<span data-testid="inside an island">
 				This should not be shown because it is inside an island.
 			</span>
@@ -23,7 +23,7 @@
 
 	<div data-wp-interactive>
 		<div data-wp-ignore>
-			<div data-wp-show="state.falseValue">
+			<div data-wp-show-mock="state.falseValue">
 				<span
 					data-testid="inside an inner block of an isolated island"
 				>
@@ -37,7 +37,7 @@
 	<div data-wp-interactive>
 		<div data-wp-interactive>
 			<div
-				data-wp-show="state.falseValue"
+				data-wp-show-mock="state.falseValue"
 				data-testid="island inside another island"
 			>
 				<span>
@@ -51,7 +51,7 @@
 	<div data-wp-interactive>
 		<div>
 			<div data-wp-interactive data-wp-ignore>
-				<div data-wp-show="state.falseValue">
+				<div data-wp-show-mock="state.falseValue">
 					<span
 						data-testid="island inside inner block of isolated island"
 					>
