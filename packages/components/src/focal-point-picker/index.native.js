@@ -20,7 +20,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  * Internal dependencies
  */
 import FocalPoint from './focal-point';
-import Tooltip from './tooltip';
+import Tooltip from '../tooltip';
 import styles from './style.scss';
 import { isVideoType } from './utils';
 import { clamp } from '../utils/math';
@@ -38,7 +38,6 @@ function FocalPointPicker( props ) {
 	const [ sliderKey, setSliderKey ] = useState( 0 );
 	const [ displayPlaceholder, setDisplayPlaceholder ] = useState( true );
 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
-	const [ tooltipVisible, setTooltipVisible ] = useState( false );
 
 	const locationPageOffsetX = useRef();
 	const locationPageOffsetY = useRef();
@@ -47,7 +46,6 @@ function FocalPointPicker( props ) {
 	useEffect( () => {
 		requestFocalPointPickerTooltipShown( ( tooltipShown ) => {
 			if ( ! tooltipShown ) {
-				setTooltipVisible( true );
 				setFocalPointPickerTooltipShown( true );
 			}
 		} );
@@ -174,7 +172,6 @@ function FocalPointPicker( props ) {
 		},
 	] );
 
-	const onTooltipPress = () => setTooltipVisible( false );
 	const onMediaLayout = ( event ) => {
 		const { height, width } = event.nativeEvent.layout;
 
@@ -203,76 +200,76 @@ function FocalPointPicker( props ) {
 
 	return (
 		<View style={ styles.container }>
-			<Tooltip onPress={ onTooltipPress } visible={ tooltipVisible }>
-				<View style={ [ styles.media, mediaBackground ] }>
-					<View
-						{ ...panResponder.panHandlers }
-						onLayout={ onMediaLayout }
-						style={ styles.mediaContainer }
-					>
-						{ ! isVideo && (
-							<Image
-								editButton={ false }
-								highlightSelected={ false }
-								isSelected={ ! displayPlaceholder }
-								height="100%"
-								url={ url }
-								style={ imagePreviewStyles }
-								onImageDataLoad={ onImageDataLoad }
-							/>
-						) }
-						{ isVideo && (
-							<Video
-								muted
-								paused
-								disableFocus
-								onLoad={ onVideoLoad }
-								ref={ videoRef }
-								resizeMode="contain"
-								source={ { uri: url } }
-								style={ videoPreviewStyles }
-							/>
-						) }
-						{ ! displayPlaceholder && (
-							<Animated.View
-								pointerEvents="none"
-								style={ focalPointGroupStyles }
+			<View style={ [ styles.media, mediaBackground ] }>
+				<View
+					{ ...panResponder.panHandlers }
+					onLayout={ onMediaLayout }
+					style={ styles.mediaContainer }
+				>
+					{ ! isVideo && (
+						<Image
+							editButton={ false }
+							highlightSelected={ false }
+							isSelected={ ! displayPlaceholder }
+							height="100%"
+							url={ url }
+							style={ imagePreviewStyles }
+							onImageDataLoad={ onImageDataLoad }
+						/>
+					) }
+					{ isVideo && (
+						<Video
+							muted
+							paused
+							disableFocus
+							onLoad={ onVideoLoad }
+							ref={ videoRef }
+							resizeMode="contain"
+							source={ { uri: url } }
+							style={ videoPreviewStyles }
+						/>
+					) }
+					{ ! displayPlaceholder && (
+						<Animated.View
+							pointerEvents="none"
+							style={ focalPointGroupStyles }
+						>
+							<Tooltip
+								visible={ true }
+								text={ __( 'Drag to adjust focal point' ) }
+								// yOffset={ -( FOCAL_POINT_SIZE / 2 ) }
 							>
-								<Tooltip.Label
-									text={ __( 'Drag to adjust focal point' ) }
-									yOffset={ -( FOCAL_POINT_SIZE / 2 ) }
-								/>
 								<FocalPoint
 									height={ focalPointStyles.height }
 									style={ focalPointStyles }
 									testID="focal-point-picker-handle"
 									width={ focalPointStyles.width }
 								/>
-							</Animated.View>
-						) }
-					</View>
+							</Tooltip>
+						</Animated.View>
+					) }
 				</View>
-				<UnitControl
-					key={ `xAxis-${ sliderKey }` }
-					label={ __( 'X-Axis Position' ) }
-					max={ MAX_POSITION_VALUE }
-					min={ MIN_POSITION_VALUE }
-					onChange={ onXCoordinateChange }
-					unit="%"
-					units={ FOCAL_POINT_UNITS }
-					value={ Math.round( focalPoint.x * 100 ) }
-				/>
-				<UnitControl
-					key={ `yAxis-${ sliderKey }` }
-					label={ __( 'Y-Axis Position' ) }
-					max={ MAX_POSITION_VALUE }
-					min={ MIN_POSITION_VALUE }
-					onChange={ onYCoordinateChange }
-					unit="%"
-					units={ FOCAL_POINT_UNITS }
-					value={ Math.round( focalPoint.y * 100 ) }
-				/>
-			</Tooltip>
+			</View>
+			<UnitControl
+				key={ `xAxis-${ sliderKey }` }
+				label={ __( 'X-Axis Position' ) }
+				max={ MAX_POSITION_VALUE }
+				min={ MIN_POSITION_VALUE }
+				onChange={ onXCoordinateChange }
+				unit="%"
+				units={ FOCAL_POINT_UNITS }
+				value={ Math.round( focalPoint.x * 100 ) }
+			/>
+			<UnitControl
+				key={ `yAxis-${ sliderKey }` }
+				label={ __( 'Y-Axis Position' ) }
+				max={ MAX_POSITION_VALUE }
+				min={ MIN_POSITION_VALUE }
+				onChange={ onYCoordinateChange }
+				unit="%"
+				units={ FOCAL_POINT_UNITS }
+				value={ Math.round( focalPoint.y * 100 ) }
+			/>
 		</View>
 	);
 }
