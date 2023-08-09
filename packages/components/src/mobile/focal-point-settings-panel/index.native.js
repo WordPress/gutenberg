@@ -9,6 +9,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  */
 import { __ } from '@wordpress/i18n';
 import { memo, useContext, useState, useCallback } from '@wordpress/element';
+import { blockSettingsScreens } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -19,19 +20,18 @@ import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 import FocalPointPicker from '../../focal-point-picker';
 
 const FocalPointSettingsPanelMemo = memo(
-	( {
-		focalPoint,
-		onFocalPointChange,
-		shouldEnableBottomSheetScroll,
-		url,
-	} ) => {
+	( { focalPoint, shouldEnableBottomSheetScroll, url } ) => {
 		const navigation = useNavigation();
 
 		function onButtonPress( action ) {
-			navigation.goBack();
 			if ( action === 'apply' ) {
-				onFocalPointChange( draftFocalPoint );
+				navigation.navigate( blockSettingsScreens.settings, {
+					draftFocalPoint,
+				} );
+				return;
 			}
+
+			navigation.goBack();
 		}
 
 		const [ draftFocalPoint, setDraftFocalPoint ] = useState( focalPoint );
