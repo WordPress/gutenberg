@@ -162,29 +162,8 @@ function gutenberg_block_core_form_send_email() {
 	};
 	// Add filter to show the notification block.
 	add_filter( 'show_form_submission_notification_block', $show_notification, 10, 2 );
-
-	/**
-	 * Fires after the email has been sent.
-	 *
-	 * This will allow 3rd-party plugins to redirect to a different page
-	 * by removing the default redirect, etc.
-	 *
-	 * @param array $params The POST data.
-	 */
-	do_action( 'render_block_core_form_email_sent', $params );
 }
 add_action( 'wp', 'gutenberg_block_core_form_send_email' );
-
-/**
- * Redirect to the same page when the form has been submitted and an email was sent.
- *
- * @param array $params The POST data.
- */
-function gutenberg_block_core_form_email_sent( $params ) {
-	wp_safe_redirect( get_site_url( null, $params['_wp_http_referer'] ) );
-	exit;
-}
-add_action( 'render_block_core_form_email_sent', 'gutenberg_block_core_form_email_sent' );
 
 /**
  * Send the data export/remove request if the form is a privacy-request form.
