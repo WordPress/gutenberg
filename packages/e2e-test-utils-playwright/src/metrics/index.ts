@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import lighthouse from 'lighthouse';
 import type { Page } from '@playwright/test';
+import * as lighthouse from 'lighthouse/core/index.cjs';
 
 export class Metrics {
 	constructor( public readonly page: Page, public readonly port: number ) {
@@ -121,6 +121,7 @@ export class Metrics {
 			this.page.url(),
 			{ port: this.port },
 			{
+				extends: 'lighthouse:default',
 				settings: {
 					// Only run certain audits to speed things up.
 					onlyAudits: Object.keys( audits ),
@@ -137,7 +138,7 @@ export class Metrics {
 		const { lhr } = report;
 
 		for ( const [ audit, acronym ] of Object.entries( audits ) ) {
-			result[ acronym ] = lhr.audits[ audit ].numericValue || 0;
+			result[ acronym ] = lhr.audits[ audit ]?.numericValue || 0;
 		}
 
 		return result;

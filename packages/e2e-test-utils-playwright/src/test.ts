@@ -5,7 +5,7 @@ import * as path from 'path';
 import { test as base, expect } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
 import { type Browser, chromium } from 'playwright';
-import getPort from 'get-port';
+import * as getPort from 'get-port';
 
 /**
  * Internal dependencies
