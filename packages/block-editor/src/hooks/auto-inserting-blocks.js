@@ -66,21 +66,20 @@ function AutoInsertingBlocksControl( props ) {
 							relativePosition
 						)
 					) {
-						let clientId = props.clientId;
-						const { innerBlocks } = getBlock( clientId );
+						const { innerBlocks } = getBlock( props.clientId );
+
+						if ( ! innerBlocks?.length ) {
+							return acc;
+						}
+
+						const { clientId } = innerBlocks.at(
+							relativePosition === 'first_child' ? 0 : -1
+						);
+
 						// TODO: Keep iterating if it's not the last/first child.
-						if ( innerBlocks?.length ) {
-							if ( relativePosition === 'first_child' ) {
-								clientId = innerBlocks[ 0 ].clientId;
-							} else {
-								clientId =
-									innerBlocks[ innerBlocks.length - 1 ]
-										.clientId;
-							}
-							if ( getBlock( clientId )?.name === block.name ) {
-								acc[ block.name ] = clientId;
-								return acc;
-							}
+						if ( getBlock( clientId )?.name === block.name ) {
+							acc[ block.name ] = clientId;
+							return acc;
 						}
 					}
 					return acc;
