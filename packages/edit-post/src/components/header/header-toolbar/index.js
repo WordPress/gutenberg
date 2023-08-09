@@ -7,6 +7,7 @@ import { __, _x } from '@wordpress/i18n';
 import {
 	NavigableToolbar,
 	ToolSelector,
+	_experimentalSelectedBlockTools,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -130,52 +131,59 @@ function HeaderToolbar() {
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
 
 	return (
-		<NavigableToolbar
-			className="edit-post-header-toolbar"
-			aria-label={ toolbarAriaLabel }
-			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
-		>
-			<div className="edit-post-header-toolbar__left">
-				<ToolbarItem
-					ref={ inserterButton }
-					as={ Button }
-					className="edit-post-header-toolbar__inserter-toggle"
-					variant="primary"
-					isPressed={ isInserterOpened }
-					onMouseDown={ preventDefault }
-					onClick={ toggleInserter }
-					disabled={ ! isInserterEnabled }
-					icon={ plus }
-					label={ showIconLabels ? shortLabel : longLabel }
-					showTooltip={ ! showIconLabels }
-				/>
-				{ ( isWideViewport || ! showIconLabels ) && (
-					<>
-						{ isLargeViewport && ! hasFixedToolbar && (
+		<>
+			<NavigableToolbar
+				className="edit-post-header-toolbar"
+				aria-label={ toolbarAriaLabel }
+				shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
+			>
+				<div className="edit-post-header-toolbar__left">
+					<ToolbarItem
+						ref={ inserterButton }
+						as={ Button }
+						className="edit-post-header-toolbar__inserter-toggle"
+						variant="primary"
+						isPressed={ isInserterOpened }
+						onMouseDown={ preventDefault }
+						onClick={ toggleInserter }
+						disabled={ ! isInserterEnabled }
+						icon={ plus }
+						label={ showIconLabels ? shortLabel : longLabel }
+						showTooltip={ ! showIconLabels }
+					/>
+					{ ( isWideViewport || ! showIconLabels ) && (
+						<>
+							{ isLargeViewport && ! hasFixedToolbar && (
+								<ToolbarItem
+									as={ ToolSelector }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+									disabled={ isTextModeEnabled }
+								/>
+							) }
 							<ToolbarItem
-								as={ ToolSelector }
+								as={ EditorHistoryUndo }
 								showTooltip={ ! showIconLabels }
 								variant={
 									showIconLabels ? 'tertiary' : undefined
 								}
-								disabled={ isTextModeEnabled }
 							/>
-						) }
-						<ToolbarItem
-							as={ EditorHistoryUndo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-						/>
-						<ToolbarItem
-							as={ EditorHistoryRedo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-						/>
-						{ overflowItems }
-					</>
-				) }
-			</div>
-		</NavigableToolbar>
+							<ToolbarItem
+								as={ EditorHistoryRedo }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+							/>
+							{ overflowItems }
+						</>
+					) }
+				</div>
+			</NavigableToolbar>
+			<_experimentalSelectedBlockTools isFixed={ hasFixedToolbar } />
+		</>
 	);
 }
 
