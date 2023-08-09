@@ -137,17 +137,17 @@ jobs:
               if: ${{ github.ref != 'refs/heads/trunk' }}
               run: git fetch --depth=1 origin trunk
 
-            - name: Cherry-pick the version bump commit to trunk
-              id: commit_version_bump_to_trunk
-              run: |
-                  git checkout trunk
-                  git pull
-                  TRUNK_VERSION=$(jq --raw-output '.version' package.json)
-                  if [[ ${{ steps.get_version.outputs.old_version }} == "$TRUNK_VERSION" ]]; then
-                    git cherry-pick "${{ steps.get_version.outputs.release_branch }}"
-                    git push
-                    echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> $GITHUB_OUTPUT
-                  fi
+            # - name: Cherry-pick the version bump commit to trunk
+            #   id: commit_version_bump_to_trunk
+            #   run: |
+            #       git checkout trunk
+            #       git pull
+            #       TRUNK_VERSION=$(jq --raw-output '.version' package.json)
+            #       if [[ ${{ steps.get_version.outputs.old_version }} == "$TRUNK_VERSION" ]]; then
+            #         git cherry-pick "${{ steps.get_version.outputs.release_branch }}"
+            #         git push
+            #         echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> $GITHUB_OUTPUT
+            #       fi
 
     build:
         name: Build Release Artifact
