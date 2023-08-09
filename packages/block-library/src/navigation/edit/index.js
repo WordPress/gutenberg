@@ -75,20 +75,20 @@ import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import { unlock } from '../../lock-unlock';
 
-function AccessibleDescription( { id } ) {
-	const [ menuTitle ] = useEntityProp( 'postType', 'wp_navigation', 'title' );
-
+function AccessibleDescription( { id, content } ) {
 	return (
-		<div
-			id={ `block-${ id }-desc` }
-			className="wp-block-navigation__desc screen-reader-text"
-		>
-			{
-				/* translators: %s: Title of a Navigation Menu post. */
-				sprintf( __( `Navigation menu: "%s"` ), menuTitle )
-			}
+		<div id={ id } className="wp-block-navigation__desc screen-reader-text">
+			{ content }
 		</div>
 	);
+}
+
+function AccessibleMenuDescription( { id } ) {
+	const [ menuTitle ] = useEntityProp( 'postType', 'wp_navigation', 'title' );
+	/* translators: %s: Title of a Navigation Menu post. */
+	const description = sprintf( __( `Navigation menu: "%s"` ), menuTitle );
+
+	return <AccessibleDescription id={ id } content={ description } />;
 }
 
 function Navigation( {
@@ -685,12 +685,23 @@ function Navigation( {
 		</>
 	);
 
+	const accessibleDescriptionId = `${ clientId }-desc`;
+
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
 	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
-			<TagName { ...blockProps }>
+			<TagName
+				{ ...blockProps }
+				aria-describedby={
+					! isPlaceholder ? accessibleDescriptionId : undefined
+				}
+			>
+				<AccessibleDescription
+					id={ accessibleDescriptionId }
+					content={ __( 'Unsaved Navigation Menu.' ) }
+				/>
 				<MenuInspectorControls
 					clientId={ clientId }
 					createNavigationMenuIsSuccess={
@@ -860,11 +871,13 @@ function Navigation( {
 						{ ...blockProps }
 						aria-describedby={
 							! isPlaceholder
-								? `block-${ clientId }-desc`
+								? accessibleDescriptionId
 								: undefined
 						}
 					>
-						<AccessibleDescription id={ clientId } />
+						<AccessibleMenuDescription
+							id={ accessibleDescriptionId }
+						/>
 						<ResponsiveWrapper
 							id={ clientId }
 							onToggle={ setResponsiveMenuVisibility }
