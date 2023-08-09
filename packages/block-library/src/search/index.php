@@ -220,7 +220,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
 		$form_directives,
-		$label . $field_markup,
+		$label . $field_markup
 	);
 }
 
