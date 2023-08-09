@@ -216,11 +216,11 @@ function render_block_core_search( $attributes, $content, $block ) {
 	};
 
 	return sprintf(
-			'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
-			esc_url( home_url( '/' ) ),
-			$wrapper_attributes,
-			$form_directives,
-			$label . $field_markup,
+		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
+		esc_url( home_url( '/' ) ),
+		$wrapper_attributes,
+		$form_directives,
+		$label . $field_markup,
 	);
 }
 
