@@ -130,7 +130,7 @@
 	</rule>
 
 	<rule ref="Gutenberg.NamingConventions.ValidBlockLibraryFunctionName">
-		<include-pattern>./packages/block-library/src/*/index.php</include-pattern>
+		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="block_core_"/>
