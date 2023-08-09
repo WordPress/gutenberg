@@ -26,6 +26,19 @@ function toggleSearch( { context, ref } ) {
 }
 
 wpStore( {
+	selectors: {
+		core: {
+			search: {
+				ariaLabel: ( { state, context } ) => {
+					const { ariaLabelCollapsed, ariaLabelExpanded } =
+						state.core.search;
+					return context.core.search.isSearchCollapsed
+						? ariaLabelCollapsed
+						: ariaLabelExpanded;
+				},
+			},
+		},
+	},
 	actions: {
 		core: {
 			search: {

@@ -154,18 +154,32 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$button_classes[] = wp_theme_get_element_class_name( 'button' );
 		$button           = new WP_HTML_Tag_Processor( sprintf( '<button type="submit" %s>%s</button>', $inline_styles['button'], $button_internal_markup ) );
 
+		wp_store(
+			array(
+				'state' => array(
+					'core' => array(
+						'search' => array(
+							'ariaLabelCollapsed' => __( 'Expand search field' ),
+							'ariaLabelExpanded'  => __( 'Submit Search' ),
+						),
+					),
+				),
+			)
+		);
+
 		if ( $button->next_tag() ) {
 			$button->add_class( implode( ' ', $button_classes ) );
 			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
-				$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
 				$button->set_attribute( 'data-toggled-aria-label', __( 'Submit Search' ) );
 				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
 				$button->set_attribute( 'aria-expanded', 'false' );
 				$button->set_attribute( 'type', 'button' ); // Will be set to submit after clicking.
 				$button->set_attribute( 'data-wp-on--click', 'actions.core.search.toggleSearch' );
 			} else {
-				$button->set_attribute( 'aria-label', wp_strip_all_tags( $attributes['buttonText'] ) );
 			}
+
+			$button->set_attribute( 'data-wp-bind--aria-label', 'selectors.core.search.ariaLabel' );
+
 		}
 	}
 
