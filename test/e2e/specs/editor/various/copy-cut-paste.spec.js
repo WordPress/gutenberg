@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Copy/cut/paste (@webkit)', () => {
+test.describe( 'Copy/cut/paste (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -58,7 +58,7 @@ test.describe( 'Copy/cut/paste (@webkit)', () => {
 		] );
 	} );
 
-	test( 'should cut and paste individual blocks with collapsed selection', async ( {
+	test( 'should cut and paste individual blocks with collapsed selection (-firefox)', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -215,7 +215,7 @@ test.describe( 'Copy/cut/paste (@webkit)', () => {
 		] );
 	} );
 
-	test( 'should respect inline copy in places like input fields and textareas (-webkit)', async ( {
+	test( 'should respect inline copy in places like input fields and textareas (-webkit, -firefox)', async ( {
 		editor,
 		page,
 		pageUtils,
