@@ -9,6 +9,7 @@ import { select } from '@wordpress/data';
 import { store as richTextStore } from './store';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
+import { RichTextState as RTS } from './rich-text-state';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
@@ -16,14 +17,6 @@ import {
 } from './special-characters';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
-
-function createEmptyValue() {
-	return {
-		formats: [],
-		replacements: [],
-		text: '',
-	};
-}
 
 function toFormat( { tagName, attributes } ) {
 	let formatType;
@@ -149,7 +142,7 @@ function toFormat( { tagName, attributes } ) {
  *                                                space characters.
  * @param {boolean} [$1.__unstableIsEditableTree]
  *
- * @return {RichTextValue} A rich text value.
+ * @return {RTS} A rich text value.
  */
 export function create( {
 	element,
@@ -162,11 +155,7 @@ export function create( {
 	preserveWhiteSpace,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
-		return {
-			formats: Array( text.length ),
-			replacements: Array( text.length ),
-			text,
-		};
+		return RTS.fromText( text );
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
@@ -176,7 +165,7 @@ export function create( {
 	}
 
 	if ( typeof element !== 'object' ) {
-		return createEmptyValue();
+		return new RTS();
 	}
 
 	if ( ! multilineTag ) {
@@ -202,64 +191,67 @@ export function create( {
  * Helper to accumulate the value's selection start and end from the current
  * node and range.
  *
- * @param {Object} accumulator Object to accumulate into.
+ * This function creates a "fake" RichTextState which is used to create one
+ * large selection span across multiple RichTextStates.
+ *
+ * @param {RTS} rts Object to accumulate into.
  * @param {Node}   node        Node to create value with.
  * @param {Range}  range       Range to create value with.
- * @param {Object} value       Value that is being accumulated.
+ * @param {RTS} value       Value that is being accumulated.
  */
-function accumulateSelection( accumulator, node, range, value ) {
+function accumulateSelection( rts, node, range, value ) {
 	if ( ! range ) {
 		return;
 	}
 
 	const { parentNode } = node;
 	const { startContainer, startOffset, endContainer, endOffset } = range;
-	const currentLength = accumulator.text.length;
+	const currentLength = rts.codeUnitLength();
 
 	// Selection can be extracted from value.
-	if ( value.start !== undefined ) {
-		accumulator.start = currentLength + value.start;
+	if ( null !== value.selectionStartsAt() ) {
+		rts.startSelectionAt( currentLength + value.selectionStartsAt() );
 		// Range indicates that the current node has selection.
 	} else if ( node === startContainer && node.nodeType === node.TEXT_NODE ) {
-		accumulator.start = currentLength + startOffset;
+		rts.startSelectionAt( currentLength + startOffset );
 		// Range indicates that the current node is selected.
 	} else if (
 		parentNode === startContainer &&
 		node === startContainer.childNodes[ startOffset ]
 	) {
-		accumulator.start = currentLength;
+		rts.startSelectionAt( currentLength );
 		// Range indicates that the selection is after the current node.
 	} else if (
 		parentNode === startContainer &&
 		node === startContainer.childNodes[ startOffset - 1 ]
 	) {
-		accumulator.start = currentLength + value.text.length;
+		rts.startSelectionAt( currentLength + value.codeUnitLength() );
 		// Fallback if no child inside handled the selection.
 	} else if ( node === startContainer ) {
-		accumulator.start = currentLength;
+		rts.startSelectionAt( currentLength );
 	}
 
 	// Selection can be extracted from value.
 	if ( value.end !== undefined ) {
-		accumulator.end = currentLength + value.end;
+		rts.endSelectionAt( currentLength + value.selectionEndsAt() );
 		// Range indicates that the current node has selection.
 	} else if ( node === endContainer && node.nodeType === node.TEXT_NODE ) {
-		accumulator.end = currentLength + endOffset;
+		rts.endSelectionAt( currentLength + endOffset );
 		// Range indicates that the current node is selected.
 	} else if (
 		parentNode === endContainer &&
 		node === endContainer.childNodes[ endOffset - 1 ]
 	) {
-		accumulator.end = currentLength + value.text.length;
+		rts.endSelectionAt( currentLength + value.codeUnitLength() );
 		// Range indicates that the selection is before the current node.
 	} else if (
 		parentNode === endContainer &&
 		node === endContainer.childNodes[ endOffset ]
 	) {
-		accumulator.end = currentLength;
+		rts.endSelectionAt( currentLength );
 		// Fallback if no child inside handled the selection.
 	} else if ( node === endContainer ) {
-		accumulator.end = currentLength + endOffset;
+		rts.endSelectionAt( currentLength + endOffset );
 	}
 }
 
@@ -329,7 +321,7 @@ export function removeReservedCharacters( string ) {
  * @param {Array}   [$1.currentWrapperTags]
  * @param {boolean} [$1.isEditableTree]
  *
- * @return {RichTextValue} A rich text value.
+ * @return {RTS} A rich text value.
  */
 function createFromElement( {
 	element,
@@ -340,14 +332,14 @@ function createFromElement( {
 	isEditableTree,
 	preserveWhiteSpace,
 } ) {
-	const accumulator = createEmptyValue();
+	const accumulator = new RTS();
 
 	if ( ! element ) {
 		return accumulator;
 	}
 
 	if ( ! element.hasChildNodes() ) {
-		accumulateSelection( accumulator, element, range, createEmptyValue() );
+		accumulateSelection( accumulator, element, range, new RTS() );
 		return accumulator;
 	}
 
@@ -368,12 +360,15 @@ function createFromElement( {
 
 			const text = filter( node.nodeValue );
 			range = filterRange( node, range, filter );
-			accumulateSelection( accumulator, node, range, { text } );
+			accumulateSelection(
+				accumulator,
+				node,
+				range,
+				RTS.fromText( text )
+			);
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
-			accumulator.formats.length += text.length;
-			accumulator.replacements.length += text.length;
-			accumulator.text += text;
+			accumulator.extendText( text );
 			continue;
 		}
 
@@ -389,32 +384,26 @@ function createFromElement( {
 				( tagName === 'br' &&
 					! node.getAttribute( 'data-rich-text-line-break' ) ) )
 		) {
-			accumulateSelection( accumulator, node, range, createEmptyValue() );
+			accumulateSelection( accumulator, node, range, new RTS() );
 			continue;
 		}
 
 		if ( tagName === 'script' ) {
-			const value = {
-				formats: [ , ],
-				replacements: [
-					{
-						type: tagName,
-						attributes: {
-							'data-rich-text-script':
-								node.getAttribute( 'data-rich-text-script' ) ||
-								encodeURIComponent( node.innerHTML ),
-						},
-					},
-				],
-				text: OBJECT_REPLACEMENT_CHARACTER,
-			};
+			const value = RTS.fromReplacement( {
+				type: tagName,
+				attributes: {
+					'data-rich-text-script':
+						node.getAttribute( 'data-rich-text-script' ) ||
+						encodeURIComponent( node.innerHTML ),
+				},
+			} );
 			accumulateSelection( accumulator, node, range, value );
 			mergePair( accumulator, value );
 			continue;
 		}
 
 		if ( tagName === 'br' ) {
-			accumulateSelection( accumulator, node, range, createEmptyValue() );
+			accumulateSelection( accumulator, node, range, new RTS() );
 			mergePair( accumulator, create( { text: '\n' } ) );
 			continue;
 		}
@@ -476,17 +465,14 @@ function createFromElement( {
 
 		if ( ! format ) {
 			mergePair( accumulator, value );
-		} else if ( value.text.length === 0 ) {
+		} else if ( value.codeUnitLength() === 0 ) {
 			if ( format.attributes ) {
-				mergePair( accumulator, {
-					formats: [ , ],
-					replacements: [ format ],
-					text: OBJECT_REPLACEMENT_CHARACTER,
-				} );
+				mergePair( accumulator, RTS.fromReplacement( format ) );
 			}
 		} else {
 			// Indices should share a reference to the same formats array.
 			// Only create a new reference if `formats` changes.
+			// @TODO: What is going on here?
 			function mergeFormats( formats ) {
 				if ( mergeFormats.formats === formats ) {
 					return mergeFormats.newFormats;
@@ -533,7 +519,7 @@ function createFromElement( {
  *                                            space characters.
  * @param {boolean} [$1.isEditableTree]
  *
- * @return {RichTextValue} A rich text value.
+ * @return {RTS} A rich text value.
  */
 function createFromMultilineElement( {
 	element,
@@ -544,7 +530,7 @@ function createFromMultilineElement( {
 	isEditableTree,
 	preserveWhiteSpace,
 } ) {
-	const accumulator = createEmptyValue();
+	const accumulator = new RTS();
 
 	if ( ! element || ! element.hasChildNodes() ) {
 		return accumulator;
@@ -572,14 +558,11 @@ function createFromMultilineElement( {
 
 		// Multiline value text should be separated by a line separator.
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
-			mergePair( accumulator, {
-				formats: [ , ],
-				replacements:
-					currentWrapperTags.length > 0
-						? [ currentWrapperTags ]
-						: [ , ],
-				text: LINE_SEPARATOR,
-			} );
+			const lineSeparator = RTS.fromText( LINE_SEPARATOR );
+			if ( currentWrapperTags.length > 0 ) {
+				lineSeparator.replaceAt( 0, currentWrapperTags );
+			}
+			mergePair( accumulator, lineSeparator );
 		}
 
 		accumulateSelection( accumulator, node, range, value );
