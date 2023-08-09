@@ -97,12 +97,14 @@ add_action( 'init', 'register_block_core_comments' );
 
 /**
  * Use the button block classes for the form-submit button.
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param array $fields The default comment form arguments.
  *
  * @return array Returns the modified fields.
  */
 function comments_block_form_defaults( $fields ) {
+	//phpcs:enable
 	if ( wp_is_block_theme() ) {
 		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="%3$s wp-block-button__link ' . wp_theme_get_element_class_name( 'button' ) . '" value="%4$s" />';
 		$fields['submit_field']  = '<p class="form-submit wp-block-button">%1$s %2$s</p>';
@@ -115,10 +117,12 @@ add_filter( 'comment_form_defaults', 'comments_block_form_defaults' );
 /**
  * Enqueues styles from the legacy `core/post-comments` block. These styles are
  * required only by the block's fallback.
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param string $block_name Name of the new block type.
  */
 function enqueue_legacy_post_comments_block_styles( $block_name ) {
+	//phpcs:enable
 	static $are_styles_enqueued = false;
 
 	if ( ! $are_styles_enqueued ) {
@@ -140,11 +144,13 @@ function enqueue_legacy_post_comments_block_styles( $block_name ) {
  *
  * The same approach was followed when core/query-loop was renamed to
  * core/post-template.
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @see https://github.com/WordPress/gutenberg/pull/41807
  * @see https://github.com/WordPress/gutenberg/pull/32514
  */
 function register_legacy_post_comments_block() {
+	//phpcs:enable
 	$registry = WP_Block_Type_Registry::get_instance();
 
 	/*
