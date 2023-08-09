@@ -28,7 +28,7 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
-import useListViewImages from './use-list-view-images';
+import useListViewImages, { MAX_IMAGES } from './use-list-view-images';
 
 function ListViewBlockSelectButton(
 	{
@@ -187,17 +187,31 @@ function ListViewBlockSelectButton(
 						</Tooltip>
 					) }
 					{ images.length ? (
-						<span className="block-editor-list-view-block-select-button__images">
-							{ images.map( ( image, index ) => (
-								<span
-									className="block-editor-list-view-block-select-button__image"
-									key={ index }
-									style={ {
-										backgroundImage: `url(${ image.url })`,
-										zIndex: images.length - index, // Ensure the first image is on top, and subsequent images are behind.
-									} }
-								/>
-							) ) }
+						<span
+							className="block-editor-list-view-block-select-button__images"
+							aria-hidden
+						>
+							{ images
+								.slice( 0, MAX_IMAGES )
+								.map( ( image, index ) => (
+									<span
+										className="block-editor-list-view-block-select-button__image"
+										key={ `img-${ image.url }` }
+										style={ {
+											backgroundImage: `url(${ image.url })`,
+											zIndex: images.length - index, // Ensure the first image is on top, and subsequent images are behind.
+										} }
+									/>
+								) ) }
+							{ images.length > MAX_IMAGES && (
+								<span className="block-editor-list-view-block-select-button__image-count">
+									{ sprintf(
+										/* translators: %d: Number of additional images within a block. */
+										__( '+%d' ),
+										images.length - MAX_IMAGES
+									) }
+								</span>
+							) }
 						</span>
 					) : null }
 					{ isLocked && (
