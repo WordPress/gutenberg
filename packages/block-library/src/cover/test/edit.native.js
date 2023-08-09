@@ -12,13 +12,12 @@ import {
 	getBlock,
 	openBlockSettings,
 } from 'test/helpers';
-import HsvColorPicker from 'react-native-hsv-color-picker';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheetSettings, BlockEdit } from '@wordpress/block-editor';
-import { SlotFillProvider } from '@wordpress/components';
+import { ColorPicker, SlotFillProvider } from '@wordpress/components';
 import { setDefaultBlockName, unregisterBlockType } from '@wordpress/blocks';
 import {
 	requestMediaPicker,
@@ -541,7 +540,7 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'displays the hex color value in the custom color picker', async () => {
-		HsvColorPicker.mockImplementation( ( props ) => {
+		ColorPicker.mockImplementation( ( props ) => {
 			return <Pressable { ...props } testID="hsv-color-picker" />;
 		} );
 		const screen = await initializeEditor( {

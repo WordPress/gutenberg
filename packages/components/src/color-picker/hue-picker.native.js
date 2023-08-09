@@ -12,7 +12,6 @@ import React, { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import LinearGradient from 'react-native-linear-gradient';
-import tinycolor from 'tinycolor2';
 import styles from './style.native.scss';
 
 export default class HuePicker extends Component {
@@ -97,11 +96,6 @@ export default class HuePicker extends Component {
 				paddingRight: paddingLeft,
 			},
 		];
-	}
-
-	getCurrentColor() {
-		const { hue = 0 } = this.props;
-		return tinycolor( `hue ${ hue } 1.0 0.5` ).toHexString();
 	}
 
 	computeHueValueDrag( gestureState ) {

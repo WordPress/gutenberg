@@ -20,6 +20,7 @@ const HsvColorPicker = ( props ) => {
 
 	const {
 		containerStyle = {},
+		currentColor,
 		huePickerContainerStyle = {},
 		huePickerBorderRadius = 0,
 		huePickerHue = 0,
@@ -49,6 +50,7 @@ const HsvColorPicker = ( props ) => {
 		<View style={ [ styles.container, containerStyle ] }>
 			<SaturationValuePicker
 				containerStyle={ satValPickerContainerStyle }
+				currentColor={ currentColor }
 				borderRadius={ satValPickerBorderRadius }
 				size={ satValPickerSize }
 				sliderSize={ satValPickerSliderSize }

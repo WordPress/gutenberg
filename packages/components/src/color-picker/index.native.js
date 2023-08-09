@@ -122,6 +122,7 @@ function ColorPicker( {
 		<>
 			<HsvColorPicker
 				huePickerHue={ hue }
+				currentColor={ currentColor }
 				onHuePickerDragMove={ updateColor }
 				onHuePickerPress={
 					! isBottomSheetContentScrolling && updateColor

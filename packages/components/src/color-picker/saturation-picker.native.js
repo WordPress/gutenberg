@@ -12,7 +12,7 @@ import React, { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import LinearGradient from 'react-native-linear-gradient';
-import tinycolor from 'tinycolor2';
+import { colord } from 'colord';
 import styles from './style.native.scss';
 
 export default class SaturationValuePicker extends Component {
@@ -61,13 +61,6 @@ export default class SaturationValuePicker extends Component {
 		return value;
 	}
 
-	getCurrentColor() {
-		const { hue = 0, saturation = 1, value = 1 } = this.props;
-		return tinycolor(
-			`hsv ${ hue } ${ saturation } ${ value }`
-		).toHexString();
-	}
-
 	computeSatValDrag( gestureState ) {
 		const { dx, dy } = gestureState;
 		const { size } = this.props;
@@ -109,6 +102,7 @@ export default class SaturationValuePicker extends Component {
 			saturation = 1,
 			containerStyle = {},
 			borderRadius = 0,
+			currentColor,
 		} = this.props;
 
 		return (
@@ -132,7 +126,7 @@ export default class SaturationValuePicker extends Component {
 					] }
 					colors={ [
 						'#fff',
-						tinycolor( `hsl ${ hue } 1 0.5` ).toHexString(),
+						colord( { h: hue, s: 100, l: 50 } ).toHex(),
 					] }
 					start={ { x: 0, y: 0.5 } }
 					end={ { x: 1, y: 0.5 } }
@@ -155,7 +149,7 @@ export default class SaturationValuePicker extends Component {
 							height: sliderSize,
 							borderRadius: sliderSize / 2,
 							borderWidth: sliderSize / 10,
-							backgroundColor: this.getCurrentColor(),
+							backgroundColor: currentColor,
 							transform: [
 								{ translateX: size.width * saturation },
 								{ translateY: size.height * ( 1 - value ) },
