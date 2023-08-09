@@ -1,5 +1,5 @@
 ( ( { wp } ) => {
-	const { store, directive, useContext, useMemo } = wp.interactivity;
+	const { store, directive, useContext } = wp.interactivity;
 
 	// Mock `data-wp-show` directive to test when things are removed from the
 	// DOM.  Replace with `data-wp-show` when it's ready.
@@ -14,17 +14,10 @@
 			context,
 		} ) => {
 			const contextValue = useContext( context );
-			const children = useMemo(
-				() =>
-					element.type === 'template'
-						? element.props.templateChildren
-						: element,
-				[]
-			);
 			if ( ! evaluate( showMock, { context: contextValue } ) ) {
 				return null;
 			}
-			return children;
+			return element;
 		}
 	);
 
