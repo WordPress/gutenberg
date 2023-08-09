@@ -115,6 +115,7 @@ function SelectedBlockTools( {
 	if ( isFixed ) {
 		return (
 			<BlockContextualToolbar
+				isFixed={ isFixed }
 				__experimentalInitialIndex={
 					initialToolbarItemIndexRef.current
 				}
