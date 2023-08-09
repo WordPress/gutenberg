@@ -47,19 +47,19 @@ jobs:
         name: Bump version
         runs-on: ubuntu-latest
         needs: compute-stable-branches
-        if: |
-            github.event_name == 'workflow_dispatch' && (
-              (
-                github.ref == 'refs/heads/trunk' ||
-                endsWith( github.ref, needs.compute-stable-branches.outputs.next_stable_branch )
-              ) && (
-                github.event.inputs.version == 'rc' ||
-                github.event.inputs.version == 'stable'
-              ) || (
-                startsWith( github.ref, 'refs/heads/release/' ) &&
-                github.event.inputs.version == 'stable'
-              )
-            )
+        #if: |
+        #    github.event_name == 'workflow_dispatch' && (
+        #      (
+        #        github.ref == 'refs/heads/trunk' ||
+        #        endsWith( github.ref, needs.compute-stable-branches.outputs.next_stable_branch )
+        #      ) && (
+        #        github.event.inputs.version == 'rc' ||
+        #        github.event.inputs.version == 'stable'
+        #      ) || (
+        #        startsWith( github.ref, 'refs/heads/release/' ) &&
+        #        github.event.inputs.version == 'stable'
+        #      )
+        #    )
         outputs:
             old_version: ${{ steps.get_version.outputs.old_version }}
             new_version: ${{ steps.get_version.outputs.new_version }}
