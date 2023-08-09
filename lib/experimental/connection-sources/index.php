@@ -1,6 +1,6 @@
 <?php
 /**
- * Custom sources that block attributes can be connected to.
+ * Connection sources that block attributes can be connected to.
  *
  * @package gutenberg
  */

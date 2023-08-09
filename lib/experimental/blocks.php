@@ -136,7 +136,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		$connection_sources = require __DIR__ . '/connection-sources/index.php';
 		$block_type         = $block_instance->block_type;
 
-		// Allowlist of blocks that support custom connections
+		// Allowlist of blocks that support block connections.
 		// Currently, we only allow the following blocks and attributes:
 		// - Paragraph: content.
 		// - Image: url.
@@ -145,8 +145,8 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			'core/image'     => array( 'url' ),
 		);
 
-		// Whitelist of the block types that support custom connection sources
-		// Currently, we only allow the Paragraph and Image blocks to use custom sources.
+		// Whitelist of the block types that support block connections.
+		// Currently, we only allow the Paragraph and Image blocks to use block connections.
 		if ( ! in_array( $block['blockName'], array_keys( $blocks_attributes_allowlist ), true ) ) {
 			return $block_content;
 		}
@@ -156,7 +156,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			return $block_content;
 		}
 
-		// If the block does not have support for connections, skip it.
+		// If the block does not have support for block connections, skip it.
 		if ( ! block_has_support( $block_type, array( '__experimentalConnections' ), false ) ) {
 			return $block_content;
 		}
@@ -174,8 +174,8 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				continue;
 			}
 
-			// If the source value is not meta, skip it because we only support meta
-			// sources for now.
+			// If the source value is not "meta_fields", skip it because the only supported
+			// connection source is meta (custom fields) for now.
 			if ( 'meta_fields' !== $attribute_value['source'] ) {
 				continue;
 			}
@@ -190,7 +190,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				continue;
 			}
 
-			// Get the content from the connection.
+			// Get the content from the connection source.
 			$custom_value = $connection_sources[ $attribute_value['source'] ](
 				$block_instance,
 				$attribute_value['value']
@@ -211,6 +211,8 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			$markup       = "<$tag_name>$custom_value</$tag_name>";
 			$updated_tags = new WP_HTML_Tag_Processor( $markup );
 			$updated_tags->next_tag();
+
+			// Get all the attributes from the original block and add them to the new markup.
 			$names = $tags->get_attribute_names_with_prefix( '' );
 			foreach ( $names as $name ) {
 				$updated_tags->set_attribute( $name, $tags->get_attribute( $name ) );
