@@ -95,8 +95,8 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		$is_expandable_searchfield = 'button-only' === $button_position && 'expand-searchfield' === $button_behavior;
 		if ( $is_expandable_searchfield ) {
-			$input->set_attribute( 'aria-hidden', 'true' );
-			$input->set_attribute( 'tabindex', '-1' );
+			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.core.search.isSearchInputVisible' );
+			$input->set_attribute( 'data-wp-bind--tabindex', 'selectors.core.search.tabindex' );
 		}
 
 		// If the script already exists, there is no point in removing it from viewScript.
@@ -200,6 +200,8 @@ function render_block_core_search( $attributes, $content, $block ) {
 				data-wp-interactive
 				data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": false, "inputId": "' . $input_id . '" } } }\'
 				data-wp-class--wp-block-search__searchfield-hidden="!context.core.search.isSearchInputVisible"
+				data-wp-on--keydown="actions.core.search.handleSearchKeydown"
+				data-wp-on--focusout="actions.core.search.handleSearchFocusout"
 			>
 				%3s
 			</form>',
