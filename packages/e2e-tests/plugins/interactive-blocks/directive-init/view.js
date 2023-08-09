@@ -39,6 +39,8 @@
 		actions: {
 			initOne: ( { context: { isReady, calls } } ) => {
 				isReady[0] = true;
+				// Subscribe to changes in that prop.
+				isReady[0] = isReady[0];
 				calls[0]++;
 			},
 			initTwo: ( { context: { isReady, calls } } ) => {
