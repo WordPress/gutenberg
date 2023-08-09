@@ -222,7 +222,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	}, [ openGlobalStyles, setEditorCanvasContainerView ] );
 
 	// If there are no revisions, do not render a footer.
-	const hasRevisions = revisionsCount >= 2;
+	const hasRevisions = revisionsCount > 0;
 	const modifiedDateTime = revisions?.[ 0 ]?.modified;
 	const shouldShowGlobalStylesFooter =
 		hasRevisions && ! isLoadingRevisions && modifiedDateTime;

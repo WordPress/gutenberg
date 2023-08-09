@@ -209,6 +209,35 @@ _Returns_
 
 -   `number`: Number of blocks in the post.
 
+### getBlockEditingMode
+
+Returns the block editing mode for a given block.
+
+The mode can be one of three options:
+
+-   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be selected.
+-   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the toolbar, the block movers, block settings.
+-   `'default'`: Allows editing the block as normal.
+
+Blocks can set a mode using the `useBlockEditingMode` hook.
+
+The mode is inherited by all of the block's inner blocks, unless they have their own mode.
+
+A template lock can also set a mode. If the template lock is `'contentOnly'`, the block's mode is overridden to `'contentOnly'` if the block has a content role attribute, or `'disabled'` otherwise.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
+
+_Returns_
+
+-   `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
+
 ### getBlockHierarchyRootClientId
 
 Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -1554,6 +1583,23 @@ _Parameters_
 -   _clientId_ `string`: Block client ID.
 -   _fallbackToParent_ `boolean`: If true, select the first parent if there is no previous block.
 
+### setBlockEditingMode
+
+Sets the block editing mode for a given block.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
+-   _mode_ `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setBlockMovingClientId
 
 Action that enables or disables the block moving mode.
@@ -1706,6 +1752,22 @@ Action that enables or disables block selection.
 _Parameters_
 
 -   _isSelectionEnabled_ `[boolean]`: Whether block selection should be enabled.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### unsetBlockEditingMode
+
+Clears the block editing mode for a given block.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
 
 _Returns_
 

@@ -15,7 +15,6 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 function DefaultAppender( { rootClientId } ) {
 	const canInsertDefaultBlock = useSelect( ( select ) =>
@@ -48,7 +47,7 @@ function useAppender( rootClientId, CustomAppender ) {
 				getSelectedBlockClientId,
 				__unstableGetEditorMode,
 				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 
 			if ( CustomAppender === false ) {
 				return false;
