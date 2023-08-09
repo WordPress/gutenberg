@@ -11,7 +11,7 @@ const variations = [
 		attributes: {
 			type: 'success',
 		},
-		isDefault: false,
+		isDefault: true,
 		innerBlocks: [
 			[
 				'core/paragraph',
