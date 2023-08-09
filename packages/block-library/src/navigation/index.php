@@ -144,12 +144,14 @@ if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) ) {
 
 	/**
 	 * Replaces view script for the Navigation block with version using Interactivity API.
+	 * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
 	 *
 	 * @param array $metadata Block metadata as read in via block.json.
 	 *
 	 * @return array Filtered block type metadata.
 	 */
 	function gutenberg_block_core_navigation_update_interactive_view_script( $metadata ) {
+		//phpcs:enable
 		if ( 'core/navigation' === $metadata['name'] ) {
 			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
 			$metadata['supports']['interactivity'] = true;
