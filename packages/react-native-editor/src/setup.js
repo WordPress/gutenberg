@@ -22,21 +22,6 @@ import setupApiFetch from './api-fetch-setup';
 const reactNativeSetup = () => {
 	LogBox.ignoreLogs( [
 		'Require cycle:', // TODO: Refactor to remove require cycles
-		'lineHeight', // TODO: Remove lineHeight warning from Aztec
-		/**
-		 * TODO: Migrate to @gorhom/bottom-sheet or replace usage of
-		 * LayoutAnimation to Animated. KeyboardAvoidingView's usage of
-		 * LayoutAnimation collides with both BottomSheet and NavigationContainer
-		 * usage of LayoutAnimation simultaneously https://github.com/facebook/react-native/issues/12663,
-		 * https://github.com/facebook/react-native/issues/10606
-		 */
-		'Overriding previous layout animation',
-	] );
-
-	// "@react-navigation" package uses the old API of gesture handler,
-	// so the warning will be silenced until it gets updated.
-	LogBox.ignoreLogs( [
-		"[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
 	] );
 
 	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
@@ -49,10 +34,6 @@ const gutenbergSetup = () => {
 	wpData.use( wpData.plugins.persistence, { storageKey } );
 
 	setupApiFetch();
-
-	const isHermes = () => global.HermesInternal !== null;
-	// eslint-disable-next-line no-console
-	console.log( 'Hermes is: ' + isHermes() );
 
 	setupInitHooks();
 };

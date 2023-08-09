@@ -16,7 +16,8 @@ import {
 	isCompleteBorder,
 	isEmptyBorder,
 } from '../utils';
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 
 import type { Border } from '../../border-control/types';

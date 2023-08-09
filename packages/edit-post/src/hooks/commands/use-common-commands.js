@@ -59,6 +59,7 @@ export default function useCommonCommands() {
 	const { toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
 	const { __unstableSaveForPreview } = useDispatch( editorStore );
+	const { getCurrentPostId } = useSelect( editorStore );
 
 	useCommand( {
 		name: 'core/open-settings-sidebar',
@@ -214,8 +215,9 @@ export default function useCommonCommands() {
 		icon: external,
 		callback: async ( { close } ) => {
 			close();
-			const link = await __unstableSaveForPreview( {} );
-			window.open( link, '_blank' );
+			const postId = getCurrentPostId();
+			const link = await __unstableSaveForPreview();
+			window.open( link, `wp-preview-${ postId }` );
 		},
 	} );
 }
