@@ -61,7 +61,8 @@ function AutoInsertingBlocksControl( props ) {
 								return acc;
 							}
 
-							// Stop if we encounter a non-auto-inserted block.
+							// Stop if we encounter a non-auto-inserted block. Any block on the other side
+							// of a manually inserted block cannot qualify as an auto-inserted block.
 							if (
 								! autoInsertedBlocksForCurrentBlock.some(
 									( autoInsertedBlock ) =>
