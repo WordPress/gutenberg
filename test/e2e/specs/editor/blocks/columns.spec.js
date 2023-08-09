@@ -122,4 +122,122 @@ test.describe( 'Columns', () => {
 			},
 		] );
 	} );
+
+	test( 'can exit on Enter', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+				},
+			],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+		);
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '1' },
+							},
+						],
+					},
+					{
+						name: 'core/column',
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
+			},
+		] );
+	} );
+
+	test( 'should not split in middle', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: '2' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+				},
+			],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.locator(
+				'role=document[name="Paragraph block"i] >> text="1"'
+			)
+		);
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '1' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: '' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: '3' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: '2' },
+							},
+						],
+					},
+					{
+						name: 'core/column',
+					},
+				],
+			},
+		] );
+	} );
 } );

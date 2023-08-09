@@ -23,6 +23,7 @@
 		}
 	},
 	"supports": {
+		"__experimentalOnEnter": true,
 		"anchor": true,
 		"reusable": false,
 		"html": false,

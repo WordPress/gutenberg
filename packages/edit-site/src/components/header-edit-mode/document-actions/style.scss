@@ -55,7 +55,9 @@
 	overflow: hidden;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
-	padding-left: $grid-unit-40;
+	@include break-small() {
+		padding-left: $grid-unit-40;
+	}
 
 	&:hover {
 		color: var(--wp-block-synced-color);
@@ -95,6 +97,10 @@
 .edit-site-document-actions__shortcut {
 	color: $gray-800;
 	min-width: $grid-unit-40;
+	display: none;
+	@include break-small() {
+		display: initial;
+	}
 }
 
 .edit-site-document-actions__back.components-button.has-icon.has-text {

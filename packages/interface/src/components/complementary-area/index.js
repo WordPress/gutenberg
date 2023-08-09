@@ -79,7 +79,15 @@ function useAdjustComplementaryListener(
 		if ( isSmall !== previousIsSmall.current ) {
 			previousIsSmall.current = isSmall;
 		}
-	}, [ isActive, isSmall, scope, identifier, activeArea ] );
+	}, [
+		isActive,
+		isSmall,
+		scope,
+		identifier,
+		activeArea,
+		disableComplementaryArea,
+		enableComplementaryArea,
+	] );
 }
 
 function ComplementaryArea( {
@@ -145,7 +153,15 @@ function ComplementaryArea( {
 		} else if ( activeArea === undefined && isSmall ) {
 			disableComplementaryArea( scope, identifier );
 		}
-	}, [ activeArea, isActiveByDefault, scope, identifier, isSmall ] );
+	}, [
+		activeArea,
+		isActiveByDefault,
+		scope,
+		identifier,
+		isSmall,
+		enableComplementaryArea,
+		disableComplementaryArea,
+	] );
 
 	return (
 		<>

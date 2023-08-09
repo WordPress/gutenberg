@@ -19,7 +19,8 @@ import MenuItem from '../../menu-item';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
 import { ResetLabel } from '../styles';
 import type {
 	ToolsPanelControlsGroupProps,
