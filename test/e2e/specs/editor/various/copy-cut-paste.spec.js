@@ -460,4 +460,32 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.type( 'y' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	test( 'should convert internal paste to inline', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'ab' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+c' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '> ' );
+		// Select cite.
+		await page.keyboard.press( 'ArrowDown' );
+		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a' },
+			},
+			{
+				name: 'core/quote',
+				attributes: { citation: 'b‸' },
+			},
+		] );
+	} );
 } );
