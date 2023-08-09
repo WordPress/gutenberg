@@ -86,7 +86,8 @@
 			}
 		},
 		"layout": {
-			"allowSizingOnChildren": true
+			"allowSizingOnChildren": true,
+			"allowSwitching": true
 		},
 		"interactivity": {
 			"clientNavigation": true
