@@ -14,6 +14,10 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 
 /**
  *
+ * This sniff checks function names to ensure they adhere to specified prefixes
+ * determined by the parent directory name. It enforces that function names start
+ * with one of the allowed prefixes defined in the sniffer configuration.
+ *
  * @package gutenberg/gutenberg-coding-standards
  *
  * @since   1.0.0
@@ -29,8 +33,6 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	/**
 	 * Registers the tokens that this sniff wants to listen for.
 	 *
-	 * @since 3.0.0
-	 *
 	 * @return array
 	 */
 	public function register() {
@@ -40,7 +42,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	}
 
 	/**
-	 * Processes function and class tokens.
+	 * Processes function tokens.
 	 *
 	 * @param File $phpcsFile The file being scanned.
 	 * @param int  $stackPtr  The position of the current token
@@ -60,6 +62,9 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	}
 
 	/**
+	 * This method analyzes the function token and its name within the provided file.
+	 * It checks if the function name adheres to allowed prefixes based on the parent directory name.
+	 * If the function name is not valid, an error message is added to the code sniffer report.
 	 *
 	 * @param File $phpcsFile    The file being scanned.
 	 * @param int  $stackPointer The position of the current token
@@ -120,6 +125,9 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	}
 
 	/**
+	 * Sanitize a directory name by converting it to lowercase and replacing non-letter
+	 * and non-digit characters with underscores.
+	 *
 	 * @param string $directory_name
 	 *
 	 * @return string
@@ -133,7 +141,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	}
 
 	/**
-	 * Input data needs to be sanitized.
+	 * Sanitize an array of values by trimming each element and removing empty elements.
 	 *
 	 * @param array $values The values being sanitized.
 	 *
