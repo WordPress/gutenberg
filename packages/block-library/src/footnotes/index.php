@@ -85,12 +85,14 @@ add_action( 'init', 'register_block_core_footnotes' );
 
 /**
  * Saves the footnotes meta value to the revision.
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 6.3.0
  *
  * @param int $revision_id The revision ID.
  */
 function wp_save_footnotes_meta( $revision_id ) {
+	//phpcs:enable
 	$post_id = wp_is_post_revision( $revision_id );
 
 	if ( $post_id ) {
@@ -106,6 +108,7 @@ add_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' );
 
 /**
  * Keeps track of the revision ID for "rest_after_insert_{$post_type}".
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 6.3.0
  *
@@ -114,6 +117,7 @@ add_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' );
  * @param int $revision_id The revision ID.
  */
 function wp_keep_footnotes_revision_id( $revision_id ) {
+	//phpcs:enable
 	global $wp_temporary_footnote_revision_id;
 	$wp_temporary_footnote_revision_id = $revision_id;
 }
@@ -129,6 +133,7 @@ add_action( '_wp_put_post_revision', 'wp_keep_footnotes_revision_id' );
  * added to the `post_updated` action, which means the meta is not
  * available at the time, so we have to add it afterwards through the
  * `"rest_after_insert_{$post_type}"` action.
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 6.3.0
  *
@@ -137,6 +142,7 @@ add_action( '_wp_put_post_revision', 'wp_keep_footnotes_revision_id' );
  * @param WP_Post $post The post object.
  */
 function wp_add_footnotes_revisions_to_post_meta( $post ) {
+	//phpcs:enable
 	global $wp_temporary_footnote_revision_id;
 
 	if ( $wp_temporary_footnote_revision_id ) {
@@ -165,6 +171,7 @@ add_action( 'rest_after_insert_page', 'wp_add_footnotes_revisions_to_post_meta' 
 
 /**
  * Restores the footnotes meta value from the revision.
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 6.3.0
  *
@@ -172,6 +179,7 @@ add_action( 'rest_after_insert_page', 'wp_add_footnotes_revisions_to_post_meta' 
  * @param int $revision_id The revision ID.
  */
 function wp_restore_footnotes_from_revision( $post_id, $revision_id ) {
+	//phpcs:enable
 	$footnotes = get_post_meta( $revision_id, 'footnotes', true );
 
 	if ( $footnotes ) {
@@ -184,6 +192,7 @@ add_action( 'wp_restore_post_revision', 'wp_restore_footnotes_from_revision', 10
 
 /**
  * Adds the footnotes field to the revision.
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 6.3.0
  *
@@ -191,6 +200,7 @@ add_action( 'wp_restore_post_revision', 'wp_restore_footnotes_from_revision', 10
  * @return array The revision fields.
  */
 function wp_add_footnotes_to_revision( $fields ) {
+	//phpcs:enable
 	$fields['footnotes'] = __( 'Footnotes' );
 	return $fields;
 }
@@ -198,6 +208,7 @@ add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
 
 /**
  * Gets the footnotes field from the revision.
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 6.3.0
  *
@@ -208,6 +219,7 @@ add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
  * @return string The field value.
  */
 function wp_get_footnotes_from_revision( $revision_field, $field, $revision ) {
+	//phpcs:enable
 	return get_metadata( 'post', $revision->ID, $field, true );
 }
 add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );
@@ -216,12 +228,14 @@ add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision
  * The REST API autosave endpoint doesn't save meta, so we can use the
  * `wp_creating_autosave` when it updates an exiting autosave, and
  * `_wp_put_post_revision` when it creates a new autosave.
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 6.3.0
  *
  * @param int|array $autosave The autosave ID or array.
  */
 function _wp_rest_api_autosave_meta( $autosave ) {
+	//phpcs:enable
 	// Ensure it's a REST API request.
 	if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
 		return;
@@ -259,6 +273,7 @@ add_action( '_wp_put_post_revision', '_wp_rest_api_autosave_meta' );
  * cause the autosave endpoint to always update the latest revision. That should
  * be fine, it should be ok to update the revision even if nothing changed. Of
  * course, this is temporary fix.
+ * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 6.3.0
  *
@@ -269,6 +284,7 @@ add_action( '_wp_put_post_revision', '_wp_rest_api_autosave_meta' );
  * See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L219.
  */
 function _wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
+	//phpcs:enable
 	// We only want to be altering POST requests.
 	if ( $request->get_method() !== 'POST' ) {
 		return $prepared_post;
