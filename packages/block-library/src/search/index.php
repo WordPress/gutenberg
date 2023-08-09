@@ -193,21 +193,22 @@ function render_block_core_search( $attributes, $content, $block ) {
 	$wrapper_attributes   = get_block_wrapper_attributes(
 		array( 'class' => $classnames )
 	);
-	$form                 = new WP_HTML_Tag_Processor(
-		sprintf(
-			'<form role="search" method="get" action="%1s" %2s>%3s</form>',
+	return sprintf(
+			'<form
+				role="search"
+				method="get"
+				action="%1s"
+				%2s
+				data-wp-interactive
+				data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": false } } }\'
+				data-wp-class--wp-block-search__searchfield-hidden="context.core.search.isSearchInputVisible"
+			>
+				%3s
+			</form>',
 			esc_url( home_url( '/' ) ),
 			$wrapper_attributes,
 			$label . $field_markup
-		)
 	);
-	if ( $form->next_tag() ) {
-		$form->set_attribute( 'data-wp-interactive', true );
-		$form->set_attribute( 'data-wp-context', '{ "core": { "search": { "isSearchCollapsed": true } } }' );
-		$form->set_attribute( 'data-wp-class--wp-block-search__searchfield-hidden', 'context.core.search.isSearchCollapsed' );
-	}
-
-	return $form->get_updated_html();
 }
 
 /**
