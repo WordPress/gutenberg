@@ -95,14 +95,13 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		$is_expandable_searchfield = 'button-only' === $button_position && 'expand-searchfield' === $button_behavior;
 		if ( $is_expandable_searchfield ) {
-			if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) { 
+			if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
 				$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.core.search.isSearchInputVisible' );
 				$input->set_attribute( 'data-wp-bind--tabindex', 'selectors.core.search.tabindex' );
 			} else {
 				$input->set_attribute( 'aria-hidden', 'true' );
 				$input->set_attribute( 'tabindex', '-1' );
 			}
-			
 		}
 
 		// If the script already exists, there is no point in removing it from viewScript.
@@ -176,7 +175,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		if ( $button->next_tag() ) {
 			$button->add_class( implode( ' ', $button_classes ) );
 			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
-				if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) { 
+				if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
 					$button->set_attribute( 'data-wp-bind--aria-label', 'selectors.core.search.ariaLabel' );
 					$button->set_attribute( 'data-wp-bind--aria-controls', 'selectors.core.search.ariaControls' );
 					$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.core.search.isSearchInputVisible' );
@@ -206,8 +205,8 @@ function render_block_core_search( $attributes, $content, $block ) {
 		array( 'class' => $classnames )
 	);
 	$form_directives      = '';
-	if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) { 
-		$form_directives      = '
+	if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
+		$form_directives = '
 			data-wp-interactive
 			data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": false, "inputId": "' . $input_id . '" } } }\'
 			data-wp-class--wp-block-search__searchfield-hidden="!context.core.search.isSearchInputVisible"
@@ -217,15 +216,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 	};
 
 	return sprintf(
-			'<form
-				role="search"
-				method="get"
-				action="%1s"
-				%2s
-				%3s
-			>
-				%4s
-			</form>',
+			'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
 			esc_url( home_url( '/' ) ),
 			$wrapper_attributes,
 			$form_directives,
