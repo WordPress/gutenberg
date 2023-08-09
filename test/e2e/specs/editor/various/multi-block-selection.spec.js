@@ -608,6 +608,10 @@ test.describe( 'Multi-block selection', () => {
 		await page.mouse.click( coord1.x, coord1.y );
 		await page.mouse.down();
 		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
+		// Simulate moving once in and out of the paragraph.
+		// Fixes https://github.com/WordPress/gutenberg/issues/48747.
+		await page.mouse.move( coord1.x, coord1.y, { steps: 10 } );
+		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
 		await page.mouse.up();
 
 		// Wait for:
