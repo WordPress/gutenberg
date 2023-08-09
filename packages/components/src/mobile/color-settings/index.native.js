@@ -45,13 +45,15 @@ const ColorSettingsMemo = memo(
 					name={ colorsUtils.screens.palette }
 					initialParams={ {
 						defaultSettings,
-						onColorChange,
 						colorValue,
 						gradientValue,
-						onGradientChange,
-						onColorCleared,
 						label,
 						hideNavigation,
+					} }
+					screenProps={ {
+						onColorChange,
+						onColorCleared,
+						onGradientChange,
 					} }
 				>
 					<PaletteScreen />
