@@ -141,9 +141,9 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		)
 	);
 	$w->next_tag( 'img' );
-	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setCurrentSrc' );
-	$w->set_attribute( 'data-wp-init', 'effects.core.image.initButtonStyles' );
-	$w->set_attribute( 'data-wp-on--load', 'effects.core.image.initButtonStyles' );
+	$w->set_attribute( 'data-wp-init', 'effects.core.image.setCurrentSrc' );
+	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
+	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setButtonStyles' );
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
