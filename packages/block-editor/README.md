@@ -811,6 +811,40 @@ _Returns_
 
 -   `Object`: Block edit context
 
+### useBlockEditingMode
+
+Allows a block to restrict the user interface that is displayed for editing that block and its inner blocks.
+
+_Usage_
+
+```js
+function MyBlock( { attributes, setAttributes } ) {
+	useBlockEditingMode( 'disabled' );
+	return <div { ...useBlockProps() }></div>;
+}
+```
+
+`mode` can be one of three options:
+
+-   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
+    selected.
+-   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
+    toolbar, the block movers, block settings.
+-   `'default'`: Allows editing the block as normal.
+
+The mode is inherited by all of the block's inner blocks, unless they have
+their own mode.
+
+If called outside of a block context, the mode is applied to all blocks.
+
+_Parameters_
+
+-   _mode_ `?BlockEditingMode`: The editing mode to apply. If undefined, the current editing mode is not changed.
+
+_Returns_
+
+-   `BlockEditingMode`: The current editing mode.
+
 ### useBlockProps
 
 This hook is used to lightly mark an element as a block element. The element should be the outermost element of a block. Call this hook and pass the returned props to the element to mark as a block. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.

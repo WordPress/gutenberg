@@ -59,9 +59,8 @@ export default function NavigationBlockEditorProvider( { children } ) {
 		};
 	}, [] );
 
-	const { selectBlock, setBlockEditingMode, unsetBlockEditingMode } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { selectBlock, setBlockEditingMode, unsetBlockEditingMode } =
+		useDispatch( blockEditorStore );
 
 	const navigationBlockClientId = blocks && blocks[ 0 ]?.clientId;
 
