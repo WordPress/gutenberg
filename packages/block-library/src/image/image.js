@@ -326,7 +326,12 @@ export default function Image( {
 
 	function updateAlignment( nextAlign ) {
 		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
+			? {
+					width: undefined,
+					height: undefined,
+					aspectRatio: undefined,
+					scale: undefined,
+			  }
 			: {};
 		setAttributes( {
 			...extraUpdatedAttributes,
