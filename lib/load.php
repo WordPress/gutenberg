@@ -99,6 +99,15 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-tag-processor.php';
 }
 
+if ( ! class_exists( 'WP_HTML_Processor' ) ) {
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-active-formatting-elements.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-open-elements.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor-state.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-token.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-unsupported-exception.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor.php';
+}
+
 // WordPress 6.3 compat.
 require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.3/block-template-utils.php';

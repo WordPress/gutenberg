@@ -12,11 +12,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	ContextSystemProvider,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect, ContextSystemProvider } from '../../ui/context';
 import { Elevation } from '../../elevation';
 import { View } from '../../view';
 import * as styles from '../styles';

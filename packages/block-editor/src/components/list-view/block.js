@@ -39,7 +39,6 @@ import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
-import { unlock } from '../../lock-unlock';
 import AriaReferencedText from './aria-referenced-text';
 
 function ListViewBlock( {
@@ -84,9 +83,7 @@ function ListViewBlock( {
 	);
 	const blockEditingMode = useSelect(
 		( select ) =>
-			unlock( select( blockEditorStore ) ).getBlockEditingMode(
-				clientId
-			),
+			select( blockEditorStore ).getBlockEditingMode( clientId ),
 		[ clientId ]
 	);
 

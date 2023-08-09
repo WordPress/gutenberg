@@ -30,4 +30,11 @@ module.exports = {
 		emotionAlias: false,
 		storyStoreV7: true,
 	},
+	typescript: {
+		// TODO: this can likely be removed after upgrading to Storybook 7, along
+		// with the root-level dependency on react-docgen-typescript-plugin. Without
+		// this, Storybook crashes when building with Typescript 5.x.
+		// See https://github.com/hipstersmoothie/react-docgen-typescript-plugin/issues/78#issuecomment-1409224863.
+		reactDocgen: 'react-docgen-typescript-plugin',
+	},
 };

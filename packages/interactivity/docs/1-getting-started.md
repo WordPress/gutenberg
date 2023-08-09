@@ -5,17 +5,16 @@ To get started with the Interactivity API, you can follow this [**Quick Start Gu
 ## Table of Contents
 
 - [Quick Start Guide](#quick-start-guide)
-    [1. Scaffold an interactive block](#1-scaffold-an-interactive-block)
-    [2. Generate the build](#2-generate-the-build) 
-    [3. Use it in your WordPress installation ](#3-use-it-in-your-wordpress-installation)
+    - [1. Scaffold an interactive block](#1-scaffold-an-interactive-block)
+    - [2. Generate the build](#2-generate-the-build) 
+    - [3. Use it in your WordPress installation ](#3-use-it-in-your-wordpress-installation)
 - [Requirements of the Interactivity API](#requirements-of-the-interactivity-aPI)
     - [A local WordPress installation](#a-local-wordpress-installation)
     - [Latest vesion of Gutenberg](#latest-vesion-of-gutenberg)
     - [Node.js](#nodejs)
     - [Code requirements](#code-requirements)  
         - [Add `interactivity` support to `block.json`](#add-interactivity-support-to-blockjson)
-
-        
+        - [Add `wp-interactive` directive to a DOM element](#add-wp-interactive-directive-to-a-dom-element)
 
 ## Quick Start Guide
 
@@ -45,11 +44,12 @@ npx @wp-now/wp-now start
 
 At this point you should be able to insert the "My First Interactive Block" block into any post, and see how it behaves in the frontend when published. 
 
+> **Note**
+> We recommend you to also check the [API Reference](./2-api-reference.md) docs for your first exploration of the Interactivity API
+
 ## Requirements of the Interactivity API
 
-To start working with the Interactivity API you'll need to have a [proper WordPress development environment for blocks](https://developer.wordpress.org/block-editor/getting-started/devenv/) which should include:
-
-
+To start working with the Interactivity API you'll need to have a [proper WordPress development environment for blocks](https://developer.wordpress.org/block-editor/getting-started/devenv/)  and some specific code in your block, which should include:
 
 #### A local WordPress installation
 
@@ -69,7 +69,7 @@ Block development requires [Node](https://nodejs.org/en), so you'll need to have
 
 ##### Add `interactivity` support to `block.json`
 
-To indicate that our block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Inteactivity API features, we do so by adding `"interactivity": true` to the `supports` attribute of our block's `block.json`
+To indicate that our block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Interactivity API features, we do so by adding `"interactivity": true` to the `supports` attribute of our block's `block.json`
 
 ```
 "supports": {
@@ -79,7 +79,7 @@ To indicate that our block [supports](https://developer.wordpress.org/block-edit
 
 ##### Add `wp-interactive` directive to a DOM element
 
-To "activate" the Interactivity API in a DOM elements and its children we add the [`wp-interactive` directive](./2-api-reference.md#wp-interactive) in our `render.php` or `save.js`
+To "activate" the Interactivity API in a DOM element (and its children) we add the [`wp-interactive` directive](./2-api-reference.md#wp-interactive) to it from our `render.php` or `save.js`
 
 
 ```html
