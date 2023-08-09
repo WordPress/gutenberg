@@ -28,7 +28,7 @@ function AutoInsertingBlocksControl( props ) {
 		[ props.blockName ]
 	);
 
-	const { blocks, blockIndex, rootClientId } = useSelect(
+	const { blocks, blockIndex, rootClientId, innerBlocksLength } = useSelect(
 		( select ) => {
 			const {
 				getBlock,
@@ -61,6 +61,27 @@ function AutoInsertingBlocksControl( props ) {
 								return acc;
 							}
 						}
+					} else if (
+						[ 'first_child', 'last_child' ].includes(
+							relativePosition
+						)
+					) {
+						let clientId = props.clientId;
+						const { innerBlocks } = getBlock( clientId );
+						// TODO: Keep iterating if it's not the last/first child.
+						if ( innerBlocks?.length ) {
+							if ( relativePosition === 'first_child' ) {
+								clientId = innerBlocks[ 0 ].clientId;
+							} else {
+								clientId =
+									innerBlocks[ innerBlocks.length - 1 ]
+										.clientId;
+							}
+							if ( getBlock( clientId )?.name === block.name ) {
+								acc[ block.name ] = clientId;
+								return acc;
+							}
+						}
 					}
 					return acc;
 				},
@@ -69,6 +90,8 @@ function AutoInsertingBlocksControl( props ) {
 
 			return {
 				blockIndex: getBlockIndex( props.clientId ),
+				innerBlocksLength: getBlock( props.clientId )?.innerBlocks
+					?.length,
 				rootClientId: _rootClientId,
 				blocks: _blocks,
 			};
@@ -110,11 +133,6 @@ function AutoInsertingBlocksControl( props ) {
 										blocks
 									).includes( block.name );
 
-									const insertionIndex =
-										relativePosition === 'after'
-											? blockIndex + 1
-											: blockIndex;
-
 									return (
 										<ToggleControl
 											checked={ checked }
@@ -130,12 +148,51 @@ function AutoInsertingBlocksControl( props ) {
 													)
 												) {
 													if ( ! checked ) {
+														const insertionIndex =
+															relativePosition ===
+															'after'
+																? blockIndex + 1
+																: blockIndex;
+
 														insertBlock(
 															createBlock(
 																block.name
 															),
 															insertionIndex,
 															rootClientId,
+															false
+														);
+													} else {
+														// Remove block.
+														const clientId =
+															blocks[
+																block.name
+															];
+														removeBlock(
+															clientId,
+															false
+														);
+													}
+												} else if (
+													[
+														'first_child',
+														'last_child',
+													].includes(
+														relativePosition
+													)
+												) {
+													if ( ! checked ) {
+														const insertionIndex =
+															relativePosition ===
+															'first_child'
+																? 0
+																: innerBlocksLength;
+														insertBlock(
+															createBlock(
+																block.name
+															),
+															insertionIndex,
+															props.clientId,
 															false
 														);
 													} else {
