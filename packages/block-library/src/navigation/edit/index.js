@@ -28,7 +28,11 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import {
+	EntityProvider,
+	store as coreStore,
+	useEntityProp,
+} from '@wordpress/core-data';
 
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -70,6 +74,22 @@ import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import { unlock } from '../../lock-unlock';
+
+function AccessibleDescription( { id } ) {
+	const [ menuTitle ] = useEntityProp( 'postType', 'wp_navigation', 'title' );
+
+	return (
+		<div
+			id={ `block-${ id }-desc` }
+			className="wp-block-navigation__desc screen-reader-text"
+		>
+			{
+				/* translators: %s: Title of a Navigation Menu post. */
+				sprintf( __( `Navigation menu: "%s"` ), menuTitle )
+			}
+		</div>
+	);
+}
 
 function Navigation( {
 	attributes,
@@ -836,7 +856,15 @@ function Navigation( {
 				) }
 
 				{ ! isLoading && (
-					<TagName { ...blockProps }>
+					<TagName
+						{ ...blockProps }
+						aria-describedby={
+							! isPlaceholder
+								? `block-${ clientId }-desc`
+								: undefined
+						}
+					>
+						<AccessibleDescription id={ clientId } />
 						<ResponsiveWrapper
 							id={ clientId }
 							onToggle={ setResponsiveMenuVisibility }
