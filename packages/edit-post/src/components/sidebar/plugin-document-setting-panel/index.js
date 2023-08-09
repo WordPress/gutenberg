@@ -4,6 +4,7 @@
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { usePluginContext } from '@wordpress/plugins';
 import { useDispatch, useSelect } from '@wordpress/data';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -17,7 +18,7 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  * Renders items below the Status & Availability panel in the Document Sidebar.
  *
  * @param {Object}                props                                 Component properties.
- * @param {string}                props.name                            The machine-friendly name for the panel.
+ * @param {string}                props.name                            Required. A machine-friendly name for the panel.
  * @param {string}                [props.className]                     An optional class name added to the row.
  * @param {string}                [props.title]                         The title of the panel
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
@@ -88,11 +89,8 @@ const PluginDocumentSettingPanel = ( {
 	);
 	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
 
-	if ( ! name ) {
-		// eslint-disable-next-line no-console
-		console.warn(
-			`PluginDocumentSettingPanel requires a 'name' property.`
-		);
+	if ( undefined === name ) {
+		warning( 'PluginDocumentSettingPanel requires a name property.' );
 	}
 
 	return (
