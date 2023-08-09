@@ -75,47 +75,45 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		}
 
 		$tokens        = $phpcsFile->getTokens();
-		$functionToken = $phpcsFile->findNext( T_STRING, $stackPointer );
+		$function_token = $phpcsFile->findNext( T_STRING, $stackPointer );
 
-		$wrappingTokensToCheck = array(
+		$wrapping_tokens_to_check = array(
 			T_CLASS,
 			T_INTERFACE,
 			T_TRAIT,
 		);
 
-		foreach ( $wrappingTokensToCheck as $wrappingTokenToCheck ) {
-			if ( false !== $phpcsFile->getCondition( $functionToken, $wrappingTokenToCheck, false ) ) {
+		foreach ( $wrapping_tokens_to_check as $wrapping_token_to_check ) {
+			if ( false !== $phpcsFile->getCondition( $function_token, $wrapping_token_to_check, false ) ) {
 				// This sniff only processes functions, not class methods.
 				return;
 			}
 		}
 
-		$functionName          = $tokens[ $functionToken ]['content'];
+		$function_name          = $tokens[ $function_token ]['content'];
 		$parent_directory_name = basename( dirname( $phpcsFile->getFilename() ) );
 
 		$allowed_function_prefixes = array();
+		$is_function_name_valid    = false;
 		foreach ( $this->prefixes as $prefix ) {
 			$prefix                      = rtrim( $prefix, '_' );
-			$allowed_function_prefixes[] = $prefix . '_' . str_replace( '-', '_', $parent_directory_name );
-		}
-
-		$is_function_name_valid = false;
-		foreach ( $allowed_function_prefixes as $allowed_function_name ) {
-			$is_function_name_valid |= 0 === strpos( $functionName, $allowed_function_name );
+			$allowed_function_prefix     = $prefix . '_' . str_replace( '-', '_', $parent_directory_name );
+			$allowed_function_prefixes[] = $allowed_function_prefix;
+			$is_function_name_valid      |= 0 === strpos( $function_name, $allowed_function_prefix );
 		}
 
 		if ( $is_function_name_valid ) {
 			return;
 		}
 
-		$errorMessage = "The function name \"{$functionName}()\" is invalid because PHP function names in this file should start with one of the following prefixes: \""
+		$error_message = "The function name \"{$function_name}()\" is invalid because PHP function names in this file should start with one of the following prefixes: \""
 		                . implode( '", "', $allowed_function_prefixes ) . '".';
-		$phpcsFile->addError( $errorMessage, $functionToken, 'FunctionNameInvalid' );
+		$phpcsFile->addError( $error_message, $function_token, 'FunctionNameInvalid' );
 	}
 
 	/**
-	 * The purpose of this method is to sanitize the input data
-	 * after the properties have been set.
+	 * The purpose of this method is to run callbacks
+	 * after the class properties have been set.
 	 */
 	private function onRegisterEvent() {
 		$this->prefixes = self::sanitize( $this->prefixes );
