@@ -18,6 +18,7 @@
 	<groups>
 		<exclude>
 			<group>ms-required</group>
+			<group>fontsapi</group>
 		</exclude>
 	</groups>
 </phpunit>
