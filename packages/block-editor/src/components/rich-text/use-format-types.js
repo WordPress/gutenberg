@@ -82,7 +82,7 @@ export function useFormatTypes( {
 
 			return true;
 		} );
-	}, [ allFormatTypes, allowedFormats, interactiveContentTags ] );
+	}, [ allFormatTypes, allowedFormats, withoutInteractiveFormatting ] );
 	const keyedSelected = useSelect(
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {
