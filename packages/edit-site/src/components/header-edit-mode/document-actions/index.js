@@ -33,6 +33,13 @@ import { store as coreStore } from '@wordpress/core-data';
 import useEditedEntityRecord from '../../use-edited-entity-record';
 import { store as editSiteStore } from '../../../store';
 
+const typeLabels = {
+	wp_block: __( 'Editing pattern:' ),
+	wp_navigation: __( 'Editing navigation menu:' ),
+	wp_template: __( 'Editing template:' ),
+	wp_template_part: __( 'Editing template part:' ),
+};
+
 export default function DocumentActions() {
 	const isPage = useSelect(
 		( select ) => select( editSiteStore ).isPage(),
@@ -138,7 +145,7 @@ function TemplateDocumentActions( { className, onBack } ) {
 			onBack={ onBack }
 		>
 			<VisuallyHidden as="span">
-				{ getEntityLabel( record.type ) }
+				{ typeLabels[ record.type ] ?? typeLabels.wp_template }
 			</VisuallyHidden>
 			{ getTitle() }
 		</BaseDocumentActions>
@@ -183,15 +190,4 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			</Button>
 		</div>
 	);
-}
-
-function getEntityLabel( entityType ) {
-	const labels = {
-		wp_block: __( 'Editing pattern:' ),
-		wp_navigation: __( 'Editing navigation menu:' ),
-		wp_template: __( 'Editing template:' ),
-		wp_template_part: __( 'Editing template part:' ),
-	};
-
-	return labels[ entityType ] ?? labels.wp_template;
 }
