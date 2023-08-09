@@ -97,7 +97,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		$is_function_name_valid    = false;
 		foreach ( $this->prefixes as $prefix ) {
 			$prefix                      = rtrim( $prefix, '_' );
-			$allowed_function_prefix     = $prefix . '_' . str_replace( '-', '_', $parent_directory_name );
+			$allowed_function_prefix     = $prefix . '_' . $this->sanitize_directory_name( $parent_directory_name );
 			$allowed_function_prefixes[] = $allowed_function_prefix;
 			$is_function_name_valid      |= 0 === strpos( $function_name, $allowed_function_prefix );
 		}
@@ -117,6 +117,19 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	 */
 	private function onRegisterEvent() {
 		$this->prefixes = self::sanitize( $this->prefixes );
+	}
+
+	/**
+	 * @param string $directory_name
+	 *
+	 * @return string
+	 */
+	private function sanitize_directory_name( $directory_name ) {
+		// Convert to lowercase.
+		$directory_name = strtolower($directory_name);
+
+		// Replace non-letter and non-digit characters with underscores.
+		return preg_replace('/[^a-z0-9]/', '_', $directory_name);
 	}
 
 	/**
