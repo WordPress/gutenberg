@@ -36,6 +36,16 @@ wpStore( {
 						? ariaLabelExpanded
 						: ariaLabelCollapsed;
 				},
+				ariaControls: ( { context } ) => {
+					return context.core.search.isSearchInputVisible
+						? ''
+						: context.core.search.inputId;
+				},
+				type: ( { context } ) => {
+					return context.core.search.isSearchInputVisible
+						? 'submit'
+						: 'button';
+				},
 			},
 		},
 	},
@@ -44,7 +54,9 @@ wpStore( {
 			search: {
 				toggleSearch,
 				openSearchInput: ( { context } ) => {
-					context.core.search.isSearchInputVisible = true;
+					if ( ! context.core.search.isSearchInputVisible ) {
+						context.core.search.isSearchInputVisible = true;
+					}
 				},
 			},
 		},

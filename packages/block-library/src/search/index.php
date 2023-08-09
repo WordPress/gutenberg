@@ -171,10 +171,10 @@ function render_block_core_search( $attributes, $content, $block ) {
 			$button->add_class( implode( ' ', $button_classes ) );
 			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
 				$button->set_attribute( 'data-wp-bind--aria-label', 'selectors.core.search.ariaLabel' );
-				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
-				$button->set_attribute( 'aria-expanded', 'false' );
-				$button->set_attribute( 'type', 'button' ); // Will be set to submit after clicking.
-				$button->set_attribute( 'data-wp-on--click', 'actions.core.search.toggleSearch' );
+				$button->set_attribute( 'data-wp-bind--aria-controls', 'selectors.core.search.ariaControls' );
+				$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.core.search.isSearchInputVisible' );
+				$button->set_attribute( 'data-wp-bind--type', 'selectors.core.search.type' );
+				$button->set_attribute( 'data-wp-on--click', 'actions.core.search.openSearchInput' );
 			} else {
 				$button->set_attribute( 'aria-label', wp_strip_all_tags( $attributes['buttonText'] ) );
 			}
@@ -198,7 +198,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 				action="%1s"
 				%2s
 				data-wp-interactive
-				data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": false } } }\'
+				data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": false, "inputId": "' . $input_id . '" } } }\'
 				data-wp-class--wp-block-search__searchfield-hidden="!context.core.search.isSearchInputVisible"
 			>
 				%3s
