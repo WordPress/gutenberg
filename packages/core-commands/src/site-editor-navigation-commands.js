@@ -10,6 +10,7 @@ import {
 	post,
 	page,
 	layout,
+	symbol,
 	symbolFilled,
 	styles,
 	navigation,
@@ -135,7 +136,7 @@ function useSiteEditorBasicNavigationCommands() {
 
 		result.push( {
 			name: 'core/edit-site/open-navigation',
-			label: __( 'Open navigation' ),
+			label: __( 'Navigation' ),
 			icon: navigation,
 			callback: ( { close } ) => {
 				const args = {
@@ -152,26 +153,8 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		result.push( {
-			name: 'core/edit-site/open-pages',
-			label: __( 'Open pages' ),
-			icon: page,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/page',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-style-variations',
-			label: __( 'Open style variations' ),
+			name: 'core/edit-site/open-styles',
+			label: __( 'Styles' ),
 			icon: styles,
 			callback: ( { close } ) => {
 				const args = {
@@ -188,12 +171,48 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		result.push( {
+			name: 'core/edit-site/open-pages',
+			label: __( 'Pages' ),
+			icon: page,
+			callback: ( { close } ) => {
+				const args = {
+					path: '/page',
+				};
+				const targetUrl = addQueryArgs( 'site-editor.php', args );
+				if ( isSiteEditor ) {
+					history.push( args );
+				} else {
+					document.location = targetUrl;
+				}
+				close();
+			},
+		} );
+
+		result.push( {
 			name: 'core/edit-site/open-templates',
-			label: __( 'Open templates' ),
+			label: __( 'Templates' ),
 			icon: layout,
 			callback: ( { close } ) => {
 				const args = {
 					path: '/wp_template',
+				};
+				const targetUrl = addQueryArgs( 'site-editor.php', args );
+				if ( isSiteEditor ) {
+					history.push( args );
+				} else {
+					document.location = targetUrl;
+				}
+				close();
+			},
+		} );
+
+		result.push( {
+			name: 'core/edit-site/open-patterns',
+			label: __( 'Patterns' ),
+			icon: symbol,
+			callback: ( { close } ) => {
+				const args = {
+					path: '/patterns',
 				};
 				const targetUrl = addQueryArgs( 'site-editor.php', args );
 				if ( isSiteEditor ) {
