@@ -17,7 +17,7 @@ function gutenberg_site_editor_enqueue_code_mirror( $settings, $context ) {
 		return $settings;
 	}
 
-	wp_enqueue_code_editor( array( 'type' => 'text/css' ) );
+	wp_enqueue_code_editor(array( 'type' => 'text/css'));
 
 	return $settings;
 }
