@@ -165,8 +165,9 @@ export function FlatTermSelector( { slug } ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
 	}
 
+	const { createErrorNotice } = wp.data.dispatch('core/notices'); // Importing dispatch function
+
 	function onChange( termNames ) {
-		const MAX_TAG_NAME_LENGTH = 200;
 		const availableTerms = [
 			...( terms ?? [] ),
 			...( searchResults ?? [] ),
@@ -180,23 +181,6 @@ export function FlatTermSelector( { slug } ) {
 			return acc;
 		}, [] );
 
-		// Check the length of the term name and show an alert for invalid term names
-		const invalidTermNames = uniqueTerms.filter(
-		  ( termName ) => termName.length > MAX_TAG_NAME_LENGTH
-		);
-	  
-		if ( invalidTermNames.length > 0 ) {
-			const errorMessage = ( 0, external_wp_i18n_namespaceObject.sprintf )(
-			  /* translators: %d: maximum term name length */
-			  ( 0, external_wp_i18n_namespaceObject.__ )(
-				'The tag name should not exceed %d characters.'
-			  ),
-			  MAX_TAG_NAME_LENGTH
-			);
-			alert( errorMessage );
-			return;
-		}
-	  
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>
 				! availableTerms.find( ( term ) =>
@@ -218,16 +202,20 @@ export function FlatTermSelector( { slug } ) {
 			return;
 		}
 
-		Promise.all(
-			newTermNames.map( ( termName ) =>
+		try {
+			const newTerms = Promise.all(
+			  newTermNames.map( termName =>
 				findOrCreateTerm( { name: termName } )
-			)
-		).then( ( newTerms ) => {
-			const newAvailableTerms = availableTerms.concat( newTerms );
-			return onUpdateTerms(
-				termNamesToIds( uniqueTerms, newAvailableTerms )
+			  )
 			);
-		} );
+			const newAvailableTerms = availableTerms.concat( newTerms );
+			return onUpdateTerms( termNamesToIds( uniqueTerms, newAvailableTerms ) );
+		  } catch ( error ) {		
+			// Handle the error by creating an error notice
+			const errorMessage = error.message || 'An error occurred';
+			createErrorNotice( errorMessage );
+			return;
+		  }
 	}
 
 	function appendTerm( newTerm ) {
