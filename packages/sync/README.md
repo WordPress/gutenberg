@@ -30,7 +30,7 @@ _Returns_
 
 ### connectWebRTC
 
-Connect function to the IndexedDB persistence provider.
+Connect function to the WebRTC provider.
 
 _Parameters_
 
