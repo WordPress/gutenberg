@@ -8,12 +8,14 @@
 if ( gutenberg_should_block_use_interactivity_api( 'core/file' ) ) {
 	/**
 	 * Replaces view script for the File block with version using Interactivity API.
+	 * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
 	 *
 	 * @param array $metadata Block metadata as read in via block.json.
 	 *
 	 * @return array Filtered block type metadata.
 	 */
 	function gutenberg_block_core_file_update_interactive_view_script( $metadata ) {
+		//phpcs:enable
 		if ( 'core/file' === $metadata['name'] ) {
 			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
 			$metadata['supports']['interactivity'] = true;
