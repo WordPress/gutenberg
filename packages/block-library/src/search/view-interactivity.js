@@ -48,10 +48,11 @@ wpStore( {
 					}
 				},
 				handleSearchKeydown: ( store ) => {
-					const { actions, event } = store;
+					const { actions, event, ref } = store;
 					// If Escape close the menu.
 					if ( event?.key === 'Escape' ) {
 						actions.core.search.closeSearchInput( store );
+						ref.querySelector( 'button' ).focus();
 					}
 				},
 				handleSearchFocusout: ( store ) => {
