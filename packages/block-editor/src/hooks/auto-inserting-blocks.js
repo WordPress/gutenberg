@@ -49,6 +49,7 @@ function AutoInsertingBlocksControl( props ) {
 					if ( [ 'before', 'after' ].includes( relativePosition ) ) {
 						const direction = relativePosition === 'after' ? 1 : -1;
 						let clientId = props.clientId;
+						// TODO: Also stop when we encounter a non-auto-inserted block.
 						while (
 							( clientId = getAdjacentBlockClientId(
 								clientId,
