@@ -65,7 +65,7 @@ jobs:
             new_version: ${{ steps.get_version.outputs.new_version }}
             release_branch: ${{ steps.get_version.outputs.release_branch }}
             release_branch_commit: ${{ steps.commit_version_bump_to_release_branch.outputs.version_bump_commit }}
-            trunk_commit: ${{ steps.commit_version_bump_to_trunk.outputs.version_bump_commit }}
+            #trunk_commit: ${{ steps.commit_version_bump_to_trunk.outputs.version_bump_commit }}
 
         steps:
             - name: Checkout code
@@ -245,13 +245,13 @@ jobs:
               run: |
                   git push origin :"${{ needs.bump-version.outputs.release_branch }}"
 
-            - name: Revert version bump on trunk
-              if: ${{ needs.bump-version.outputs.trunk_commit }}
-              run: |
-                  git fetch --depth=2 origin trunk
-                  git checkout trunk
-                  git revert --no-edit ${{ needs.bump-version.outputs.trunk_commit }}
-                  git push --set-upstream origin trunk
+            #- name: Revert version bump on trunk
+            #  if: ${{ needs.bump-version.outputs.trunk_commit }}
+            #  run: |
+            #      git fetch --depth=2 origin trunk
+            #      git checkout trunk
+            #      git revert --no-edit ${{ needs.bump-version.outputs.trunk_commit }}
+            #      git push --set-upstream origin trunk
 
     create-release:
         name: Create Release Draft and Attach Asset
