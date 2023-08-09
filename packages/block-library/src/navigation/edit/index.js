@@ -543,7 +543,6 @@ function Navigation( {
 								<div id={ overlayMenuPreviewId }>
 									{ overlayMenuPreview && (
 										<OverlayMenuPreview
-											id={ overlayMenuPreviewId }
 											setAttributes={ setAttributes }
 											hasIcon={ hasIcon }
 											icon={ icon }
