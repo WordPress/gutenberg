@@ -12,7 +12,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## How it works
 
-This package is used internally by the Gutenberg project to manage the creation and editing of user patterns using the `wp_block` CPT.
+This package is used internally by the Gutenberg project to manage the creation and editing of user patterns using the `wp_block` CPT in the context of the block editor. The likes of the `PatternsMenuItems` component expect to be rendered within a `BlockEditorProvider` in order to work.
 
 ## Components
 
