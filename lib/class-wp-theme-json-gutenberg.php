@@ -346,6 +346,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added `dimensions.minHeight`, 'shadow.presets', 'shadow.defaultPresets',
 	 *              `position.fixed` and `position.sticky`.
 	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
+	 * @since 6.4.0 Added `layout.allowEditing`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
