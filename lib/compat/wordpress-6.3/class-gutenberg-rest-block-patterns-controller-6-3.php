@@ -13,7 +13,7 @@
  *
  * @see WP_REST_Controller
  */
-class Gutenberg_REST_Block_Patterns_Controller_6_3 extends Gutenberg_REST_Block_Patterns_Controller_6_2 {
+class Gutenberg_REST_Block_Patterns_Controller_6_3 extends WP_REST_Block_Patterns_Controller {
 	/**
 	 * Prepare a raw block pattern before it gets output in a REST API response.
 	 *
