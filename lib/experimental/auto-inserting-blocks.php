@@ -64,9 +64,18 @@ function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anch
 	};
 }
 
-function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_block, $position, $anchor_block ) {
-	return function( $response, $block_type ) use ( $inserted_block, $position, $anchor_block ) {
-		if ( $block_type->name !== $inserted_block ) {
+/**
+ * Add auto-insertion information to a block type's controller.
+ *
+ * @param array  $inserted_block_type The type of block to insert.
+ * @param string $relative_position   The position relative to the anchor block.
+ *                                    Can be 'before', 'after', 'first_child', or 'last_child'.
+ * @param string $anchor_block_type   The auto-inserted block will be inserted next to instances of this block type.
+ * @return callable A filter for the `rest_prepare_block_type` hook that adds an `auto_insert` field to the network response.
+ */
+function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_block_type, $position, $anchor_block_type ) {
+	return function( $response, $block_type ) use ( $inserted_block_type, $position, $anchor_block_type ) {
+		if ( $block_type->name !== $inserted_block_type ) {
 			return $response;
 		}
 
@@ -74,7 +83,7 @@ function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_blo
 		if ( ! isset( $data['auto_insert'] ) ) {
 			$data['auto_insert'] = array();
 		}
-		$data['auto_insert'][ $anchor_block ] = $position;
+		$data['auto_insert'][ $anchor_block_type ] = $position;
 		$response->set_data( $data );
 		return $response;
 	};
@@ -315,6 +324,11 @@ function gutenberg_serialize_blocks( $blocks ) {
 	return implode( '', array_map( 'gutenberg_serialize_block', $blocks ) );
 }
 
+/**
+ * Register the `auto_insert` field for the block-types REST API controller.
+ *
+ * @return void
+ */
 function gutenberg_register_auto_insert_rest_field() {
 	register_rest_field(
 		'block-type',
