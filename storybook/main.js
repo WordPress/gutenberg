@@ -27,12 +27,12 @@ const scssLoaders = ( { isLazy } ) => [
 ];
 
 const stories = [
-	process.env.NODE_ENV !== 'test' && './stories/**/*.story.@(js|tsx|mdx)',
+	process.env.NODE_ENV !== 'test' && './stories/**/*.story.@(js|tsx)',
+	process.env.NODE_ENV !== 'test' && './stories/**/*.mdx',
 	'../packages/block-editor/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/components/README.mdx',
 ].filter( Boolean );
 
 module.exports = {
