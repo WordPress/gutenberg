@@ -270,6 +270,12 @@ export function isReady( state = false, action ) {
 export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'UPDATE_EDITOR_SETTINGS':
+			if ( typeof action.settings === 'function' ) {
+				return {
+					...state,
+					...action.settings( state ),
+				};
+			}
 			return {
 				...state,
 				...action.settings,

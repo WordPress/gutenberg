@@ -43,19 +43,18 @@ describe( 'iframed block editor settings styles', () => {
 		);
 
 		await page.evaluate( () => {
-			const settings = window.wp.data
-				.select( 'core/editor' )
-				.getEditorSettings();
-			wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
-				...settings,
-				styles: [
-					...settings.styles,
-					{
-						css: 'p { border-width: 2px; }',
-						__unstableType: 'plugin',
-					},
-				],
-			} );
+			wp.data
+				.dispatch( 'core/editor' )
+				.updateEditorSettings( ( settings ) => ( {
+					...settings,
+					styles: [
+						...settings.styles,
+						{
+							css: 'p { border-width: 2px; }',
+							__unstableType: 'plugin',
+						},
+					],
+				} ) );
 		} );
 
 		// Expect a 2px border (added in JS).
@@ -73,19 +72,18 @@ describe( 'iframed block editor settings styles', () => {
 			window.wp.data
 				.dispatch( 'core/edit-post' )
 				.toggleFeature( 'themeStyles' );
-			const settings = window.wp.data
-				.select( 'core/editor' )
-				.getEditorSettings();
-			wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
-				...settings,
-				styles: [
-					...settings.styles,
-					{
-						css: 'p { border-width: 2px; }',
-						__unstableType: 'theme',
-					},
-				],
-			} );
+			wp.data
+				.dispatch( 'core/editor' )
+				.updateEditorSettings( ( settings ) => ( {
+					...settings,
+					styles: [
+						...settings.styles,
+						{
+							css: 'p { border-width: 2px; }',
+							__unstableType: 'theme',
+						},
+					],
+				} ) );
 		} );
 
 		// Expect a 1px border because theme styles are disabled.
