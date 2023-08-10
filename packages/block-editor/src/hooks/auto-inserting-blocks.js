@@ -249,7 +249,6 @@ function AutoInsertingBlocksControl( props ) {
 														);
 													}
 												}
-												// TODO: Implement first_child and last_child insertion and removal.
 											} }
 										/>
 									);
