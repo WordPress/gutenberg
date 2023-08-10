@@ -74,7 +74,7 @@
 		"memize": "^2.1.0",
 		"react-autosize-textarea": "^7.1.0",
 		"rememo": "^4.0.2",
-		"remove-accents": "^0.4.2"
+		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
