@@ -270,7 +270,7 @@ final class WP_Style_Engine {
 				),
 				'path'          => array( 'typography', 'writingMode' ),
 				'classnames'    => array(
-					'has-writing-mode'  => true,
+					'has-writing-mode' => true,
 				),
 			),
 			'textOrientation' => array(
@@ -279,7 +279,7 @@ final class WP_Style_Engine {
 				),
 				'path'          => array( 'typography', 'textOrientation' ),
 				'classnames'    => array(
-					'has-text-orientation'  => true,
+					'has-text-orientation' => true,
 				),
 			),
 		),
