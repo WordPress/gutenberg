@@ -20,6 +20,8 @@ import {
 	getBlockTypes,
 	getBlockFromExample,
 	createBlock,
+	hasBlockSupport,
+	getBlockVariations,
 } from '@wordpress/blocks';
 import {
 	BlockList,
@@ -114,9 +116,12 @@ const STYLE_BOOK_IFRAME_STYLES = `
 `;
 
 function getExamples() {
+	const examples = [];
+
 	// Use our own example for the Heading block so that we can show multiple
 	// heading levels.
-	const headingsExample = {
+	examples.push( {
+		key: 'core/heading',
 		name: 'core/heading',
 		title: __( 'Headings' ),
 		category: 'text',
@@ -142,25 +147,64 @@ function getExamples() {
 				level: 5,
 			} ),
 		],
-	};
+	} );
 
-	const otherExamples = getBlockTypes()
-		.filter( ( blockType ) => {
-			const { name, example, supports } = blockType;
-			return (
-				name !== 'core/heading' &&
-				!! example &&
-				supports.inserter !== false
-			);
-		} )
-		.map( ( blockType ) => ( {
-			name: blockType.name,
-			title: blockType.title,
-			category: blockType.category,
-			blocks: getBlockFromExample( blockType.name, blockType.example ),
-		} ) );
+	for ( const blockType of getBlockTypes() ) {
+		if (
+			blockType.name === 'core/heading' ||
+			! hasBlockSupport( blockType, 'inserter', true )
+		) {
+			continue;
+		}
 
-	return [ headingsExample, ...otherExamples ];
+		const variations =
+			getBlockVariations( blockType.name, 'inserter' ) ?? [];
+		const hasDefaultVariation = variations.some(
+			( variation ) => variation.isDefault
+		);
+
+		if ( blockType.example && ! hasDefaultVariation ) {
+			examples.push( {
+				key: blockType.name,
+				name: blockType.name,
+				title: blockType.title,
+				category: blockType.category,
+				blocks: getBlockFromExample(
+					blockType.name,
+					blockType.example
+				),
+			} );
+		}
+
+		for ( const variation of variations ) {
+			// If `example` is explicitly undefined for the variation, it will
+			// not be shown.
+			const example = variation.hasOwnProperty( 'example' )
+				? variation.example
+				: blockType.example;
+			if ( example ) {
+				examples.push( {
+					key: `${ blockType.name }/${ variation.name }`,
+					name: blockType.name,
+					title: variation.title || blockType.title,
+					// TODO: Can't decide between showing both titles or only showing one.
+					// title: variation.title
+					// 	? `${ blockType.title } / ${ variation.title }`
+					// 	: blockType.title,
+					category: variation.category || blockType.category,
+					blocks: getBlockFromExample( blockType.name, {
+						...example,
+						attributes: {
+							...example.attributes,
+							...variation.attributes,
+						},
+					} ),
+				} );
+			}
+		}
+	}
+
+	return examples;
 }
 
 function StyleBook( {
@@ -352,8 +396,8 @@ const Examples = memo(
 					)
 					.map( ( example ) => (
 						<Example
-							key={ example.name }
-							id={ `example-${ example.name }` }
+							key={ example.key }
+							id={ `example-${ example.key }` }
 							composite={ composite }
 							title={ example.title }
 							blocks={ example.blocks }
