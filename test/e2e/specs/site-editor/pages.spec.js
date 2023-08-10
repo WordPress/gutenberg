@@ -54,7 +54,7 @@ test.describe( 'Pages', () => {
 		// Insert into Page Content using appender.
 		await page
 			.getByRole( 'region', { name: 'Editor footer' } )
-			.getByRole( 'button', { name: 'Post Content' } )
+			.getByRole( 'button', { name: 'Content' } )
 			.click();
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add block' } )
