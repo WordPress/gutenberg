@@ -106,7 +106,7 @@
 
 	&.is-fixed {
 		position: fixed;
-		top: 107px; // Magic number. Needs updated. Should be whatever the toolbar + admin toolbar is?
+		top: $admin-bar-height-big + $header-height;
 		z-index: z-index(".block-editor-block-popover");
 		width: 100%;
 		overflow: hidden;
@@ -118,6 +118,7 @@
 
 		border: none;
 		border-bottom: $border-width solid $gray-200;
+		border-top: $border-width solid $gray-200;
 		border-radius: 0;
 
 		.block-editor-block-toolbar .components-toolbar-group,
@@ -147,7 +148,7 @@
 			width: auto;
 
 			// remove the border
-			border-bottom: none;
+			border: none;
 
 			&.is-collapsed {
 				width: initial;
