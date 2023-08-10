@@ -4,7 +4,12 @@
 	margin: 0;
 	padding: 0;
 
-	.block-editor-text-orientation__buttons {
+	// The legend is hidden, but takes up space so that the controls are aligned.
+	legend {
+		visibility: hidden;
+	}
+
+	.block-editor-text-orientation-control__buttons {
 		// 4px of padding makes the row 40px high, same as an input.
 		padding: $grid-unit-05 0;
 		display: flex;

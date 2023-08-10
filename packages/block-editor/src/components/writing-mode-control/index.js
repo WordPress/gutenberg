@@ -42,7 +42,7 @@ export default function WritingModeControl( { className, value, onChange } ) {
 			) }
 		>
 			<BaseControl.VisualLabel as="legend">
-				{ __( 'Writing Mode' ) }
+				{ __( 'Orientation' ) }
 			</BaseControl.VisualLabel>
 			<div className="block-editor-writing-mode-control__buttons">
 				{ WRITING_MODES.map( ( writingMode ) => {

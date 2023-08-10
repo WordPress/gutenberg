@@ -46,7 +46,7 @@ export default function TextOrientationControl( {
 			) }
 		>
 			<BaseControl.VisualLabel as="legend">
-				{ __( 'Orientation' ) }
+				{ __( 'Character rotation' ) }
 			</BaseControl.VisualLabel>
 			<div className="block-editor-text-orientation-control__buttons">
 				{ TEXT_ORIENTATIONS.map( ( textOrientation ) => {

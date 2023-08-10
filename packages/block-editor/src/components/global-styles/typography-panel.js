@@ -539,7 +539,11 @@ export default function TypographyPanel( {
 						! hasTextOrientationControl ? 'single-column' : ''
 					}
 					style={
-						hasTextOrientationControl ? { display: 'grid' } : {}
+						hasTextOrientationControl &&
+						( writingMode === 'vertical-lr' ||
+							writingMode === 'vertical-rl' )
+							? { display: 'grid' }
+							: {}
 					}
 					label={ __( 'Text orientation' ) }
 					hasValue={ hasWritingMode && hasTextOrientation }
@@ -558,14 +562,16 @@ export default function TypographyPanel( {
 								: {}
 						}
 					/>
-					{ hasTextOrientationControl && (
-						<TextOrientationControl
-							value={ textOrientation }
-							onChange={ setTextOrientation }
-							size="__unstable-large"
-							__nextHasNoMarginBottom
-						/>
-					) }
+					{ hasTextOrientationControl &&
+						( writingMode === 'vertical-lr' ||
+							writingMode === 'vertical-rl' ) && (
+							<TextOrientationControl
+								value={ textOrientation }
+								onChange={ setTextOrientation }
+								size="__unstable-large"
+								__nextHasNoMarginBottom
+							/>
+						) }
 				</ToolsPanelItem>
 			) }
 		</Wrapper>

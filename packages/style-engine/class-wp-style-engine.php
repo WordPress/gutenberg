@@ -269,12 +269,18 @@ final class WP_Style_Engine {
 					'default' => 'writing-mode',
 				),
 				'path'          => array( 'typography', 'writingMode' ),
+				'classnames'    => array(
+					'has-writing-mode'  => true,
+				),
 			),
 			'textOrientation' => array(
 				'property_keys' => array(
 					'default' => 'text-orientation',
 				),
 				'path'          => array( 'typography', 'textOrientation' ),
+				'classnames'    => array(
+					'has-text-orientation'  => true,
+				),
 			),
 		),
 	);
