@@ -30,50 +30,24 @@ function AutoInsertingBlocksControl( props ) {
 
 	const { blocks, blockIndex, rootClientId, innerBlocksLength } = useSelect(
 		( select ) => {
-			const {
-				getBlock,
-				getBlockIndex,
-				getBlockRootClientId,
-				getAdjacentBlockClientId,
-			} = select( blockEditorStore );
+			const { getBlock, getBlockIndex, getBlockRootClientId } =
+				select( blockEditorStore );
 			const _rootClientId = getBlockRootClientId( props.clientId );
 
-			// It's possible that there are multiple auto-inserted blocks, so in order to
-			// locate them all, we have to iterate over all auto-inserted sibiling blocks
-			// before or after the current block, respectively. We stop iterating once there
-			// are no more blocks, or if we encounter a manually inserted block.
 			const _blocks = autoInsertedBlocksForCurrentBlock.reduce(
 				( acc, block ) => {
 					const relativePosition =
 						block?.autoInsert?.[ props.blockName ];
-
+					let autoInsertedBlock;
 					if ( [ 'before', 'after' ].includes( relativePosition ) ) {
-						const direction = relativePosition === 'after' ? 1 : -1;
-						let clientId = props.clientId;
+						const siblings = getBlock( _rootClientId )?.innerBlocks;
 
-						while (
-							( clientId = getAdjacentBlockClientId(
-								clientId,
-								direction
-							) )
-						) {
-							if ( getBlock( clientId )?.name === block.name ) {
-								acc[ block.name ] = clientId;
-								return acc;
-							}
-
-							// Stop if we encounter a non-auto-inserted block. Any block on the other side
-							// of a manually inserted block cannot qualify as an auto-inserted block.
-							if (
-								! autoInsertedBlocksForCurrentBlock.some(
-									( autoInsertedBlock ) =>
-										autoInsertedBlock.name ===
-										getBlock( clientId )?.name
-								)
-							) {
-								return acc;
-							}
-						}
+						// Any of the current block's siblings (with the right block type) qualifies
+						// as an auto-inserted block (inserted `before` or `after` the current one),
+						// as the block might've been auto-inserted and then moved around a bit by the user.
+						autoInsertedBlock = siblings.find(
+							( { name } ) => name === block.name
+						);
 					} else if (
 						[ 'first_child', 'last_child' ].includes(
 							relativePosition
@@ -81,45 +55,16 @@ function AutoInsertingBlocksControl( props ) {
 					) {
 						const { innerBlocks } = getBlock( props.clientId );
 
-						if ( ! innerBlocks?.length ) {
-							return acc;
-						}
-
-						// Note that the direction is reversed, compared to before/after:
-						// E.g. when looking for a potential last child, we have to start at the
-						// last element and then go backwards.
-						const direction =
-							relativePosition === 'last_child' ? -1 : 1;
-						let { clientId } = innerBlocks.at(
-							relativePosition === 'first_child' ? 0 : -1
+						// Any of the current block's child blocks (with the right block type) qualifies
+						// as an auto-inserted first or last child block, as the block might've been
+						// auto-inserted and then moved around a bit by the user.
+						autoInsertedBlock = innerBlocks.find(
+							( { name } ) => name === block.name
 						);
+					}
 
-						while ( clientId ) {
-							if ( getBlock( clientId )?.name === block.name ) {
-								acc[ block.name ] = clientId;
-								return acc;
-							}
-
-							// Stop if we encounter a non-auto-inserted block. Any block on the other side
-							// of a manually inserted block cannot qualify as an auto-inserted block.
-							if (
-								! autoInsertedBlocksForCurrentBlock.some(
-									( autoInsertedBlock ) =>
-										autoInsertedBlock.name ===
-											getBlock( clientId )?.name &&
-										autoInsertedBlock.autoInsert[
-											props.blockName
-										] === relativePosition
-								)
-							) {
-								return acc;
-							}
-
-							clientId = getAdjacentBlockClientId(
-								clientId,
-								direction
-							);
-						}
+					if ( autoInsertedBlock ) {
+						acc[ block.name ] = autoInsertedBlock.clientId;
 					}
 					return acc;
 				},
