@@ -43,7 +43,7 @@ module.exports = {
 	addons: [
 		{
 			name: '@storybook/addon-docs',
-			options: { configureJSX: true, transcludeMarkdown: true },
+			options: { configureJSX: true },
 		},
 		'@storybook/addon-controls',
 		'@storybook/addon-viewport',
