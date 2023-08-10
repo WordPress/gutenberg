@@ -135,13 +135,6 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
 
-// Fonts Library.
-require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
-require __DIR__ . '/experimental/fonts-library/class-wp-font-family-utils.php';
-require __DIR__ . '/experimental/fonts-library/class-wp-font-family.php';
-require __DIR__ . '/experimental/fonts-library/class-wp-rest-fonts-library-controller.php';
-require __DIR__ . '/experimental/fonts-library/fonts-library.php';
-
 // Fonts API / Font Face.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.
 
@@ -151,7 +144,14 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
  * the Font Face (redesigned Fonts API) to be merged before the Fonts Library while
  * keeping Fonts API available for sites that are using it.
  */
-if ( class_exists( 'WP_Font_Family' ) || class_exists( 'WP_REST_Fonts_Library_Controller' ) ) {
+if ( defined( 'FONTS_LIBRARY_ENABLE' ) && FONTS_LIBRARY_ENABLE ) {
+	// Loads the Fonts Library.
+	require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
+	require __DIR__ . '/experimental/fonts-library/class-wp-font-family-utils.php';
+	require __DIR__ . '/experimental/fonts-library/class-wp-font-family.php';
+	require __DIR__ . '/experimental/fonts-library/class-wp-rest-fonts-library-controller.php';
+	require __DIR__ . '/experimental/fonts-library/fonts-library.php';
+
 	if ( ! class_exists( 'WP_Font_Face' ) ) {
 		require __DIR__ . '/experimental/fonts/class-wp-font-face.php';
 		require __DIR__ . '/experimental/fonts/class-wp-font-face-resolver.php';
