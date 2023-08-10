@@ -9,7 +9,8 @@ import classnames from 'classnames';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import {
 	CustomSelectControl,
 	FlexBlock,
@@ -699,6 +700,64 @@ export const withLayoutStyles = createHigherOrderComponent(
 		);
 	},
 	'withLayoutStyles'
+);
+
+/**
+ * Override the default block element to add the child layout styles.
+ *
+ * @param {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
+ */
+export const withChildLayoutStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const { attributes } = props;
+		const { style: { layout = {} } = {} } = attributes;
+		const { selfStretch, flexSize } = layout;
+		// const hasChildLayout = selfStretch || flexSize;
+		const disableLayoutStyles = useSelect( ( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return !! getSettings().disableLayoutStyles;
+		} );
+		const shouldRenderChildLayoutStyles = ! disableLayoutStyles;
+
+		const id = useInstanceId( BlockListBlock );
+		const selector = `.wp-container-content-${ id }`;
+
+		let css = '';
+
+		if ( selfStretch === 'fixed' && flexSize ) {
+			css += `${ selector } {
+				flex-basis: ${ flexSize };
+				box-sizing: border-box;
+			}`;
+		} else if ( selfStretch === 'fill' ) {
+			css += `${ selector } {
+				flex-grow: 1;
+			}`;
+		}
+
+		// Attach a `wp-container-content` id-based classname.
+		const className = classnames( props?.className, {
+			[ `wp-container-content-${ id }` ]:
+				shouldRenderChildLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+		} );
+
+		const { setStyleOverride, deleteStyleOverride } = unlock(
+			useDispatch( blockEditorStore )
+		);
+
+		useEffect( () => {
+			if ( ! css ) return;
+			setStyleOverride( id, { css } );
+			return () => {
+				deleteStyleOverride( id );
+			};
+		}, [ id, css, setStyleOverride, deleteStyleOverride ] );
+
+		return <BlockListBlock { ...props } className={ className } />;
+	},
+	'withChildLayoutStyles'
 );
 
 addFilter(

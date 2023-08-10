@@ -85,17 +85,17 @@ function useHasAspectRatio( settings ) {
 }
 
 function useHasChildLayout( settings ) {
-	const {
-		type: parentLayoutType = 'default',
-		default: { type: defaultParentLayoutType = 'default' } = {},
-		allowSizingOnChildren = false,
-	} = settings?.parentLayout ?? {};
+	// const {
+	// 	type: parentLayoutType = 'default',
+	// 	default: { type: defaultParentLayoutType = 'default' } = {},
+	// 	allowSizingOnChildren = false,
+	// } = settings?.parentLayout ?? {};
 
-	const support =
-		( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
-		allowSizingOnChildren;
+	// const support =
+	// 	( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
+	// 	allowSizingOnChildren;
 
-	return !! settings?.layout && support;
+	return !! settings?.layout;
 }
 
 function useHasSpacingPresets( settings ) {
@@ -212,6 +212,7 @@ export default function DimensionsPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	onVisualize = () => {},
+	align = null,
 	// Special case because the layout controls are not part of the dimensions panel
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
@@ -683,6 +684,7 @@ export default function DimensionsPanel( {
 						value={ childLayout }
 						onChange={ setChildLayout }
 						parentLayout={ settings?.parentLayout }
+						align={ align }
 					/>
 				</VStack>
 			) }
