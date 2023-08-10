@@ -335,7 +335,11 @@ function LinkControl( {
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
 	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
-	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
+	const showSettings =
+		!! settings?.length &&
+		isEditingLink &&
+		hasLinkValue &&
+		! currentInputIsEmpty;
 
 	return (
 		<div
@@ -440,7 +444,7 @@ function LinkControl( {
 
 			{ showSettings && (
 				<div className="block-editor-link-control__tools">
-					{ ! currentInputIsEmpty && (
+					{ settings?.length > 1 ? (
 						<LinkControlSettingsDrawer
 							settingsOpen={ isSettingsOpen }
 							setSettingsOpen={ setSettingsOpenWithPreference }
@@ -453,6 +457,14 @@ function LinkControl( {
 								) }
 							/>
 						</LinkControlSettingsDrawer>
+					) : (
+						<LinkSettings
+							value={ internalControlValue }
+							settings={ settings }
+							onChange={ createSetInternalSettingValueHandler(
+								settingsKeys
+							) }
+						/>
 					) }
 				</div>
 			) }
