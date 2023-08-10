@@ -521,9 +521,7 @@ function Navigation( {
 											! overlayMenuPreview
 										);
 									} }
-									aria-label={ __(
-										'Overlay menu controls'
-									) }
+									aria-label={ __( 'Overlay menu controls' ) }
 									aria-controls={ overlayMenuPreviewId }
 									aria-expanded={ overlayMenuPreview }
 								>
