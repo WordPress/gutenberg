@@ -45,19 +45,6 @@ store(
 						document.documentElement.classList.add(
 							'wp-has-lightbox-open'
 						);
-
-						// Since the img is hidden and its src not loaded until
-						// the lightbox is opened, let's create an img element on the fly
-						// so we can get the dimensions we need to calculate the styles
-						context.core.image.preloadInitialized = true;
-						const imgDom = document.createElement( 'img' );
-						imgDom.onload = function () {
-							context.core.image.activateLargeImage = true;
-						};
-						imgDom.setAttribute(
-							'src',
-							context.core.image.imageUploadedSrc
-						);
 					},
 					hideLightbox: async ( { context, event } ) => {
 						context.core.image.hideAnimationEnabled = true;
@@ -147,16 +134,6 @@ store(
 							context,
 							ref,
 						} );
-					},
-					preloadLightboxImage: ( { context } ) => {
-						if ( ! context.core.image.preloadInitialized ) {
-							context.core.image.preloadInitialized = true;
-							const imgDom = document.createElement( 'img' );
-							imgDom.setAttribute(
-								'src',
-								context.core.image.imageUploadedSrc
-							);
-						}
 					},
 				},
 			},
