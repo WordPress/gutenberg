@@ -107,7 +107,6 @@
 	&.is-fixed {
 		position: fixed;
 		top: $admin-bar-height-big + $header-height;
-		z-index: z-index(".block-editor-block-popover");
 		width: 100%;
 		overflow: hidden;
 
