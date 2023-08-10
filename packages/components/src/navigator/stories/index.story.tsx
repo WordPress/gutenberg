@@ -22,7 +22,6 @@ import {
 const meta: ComponentMeta< typeof NavigatorProvider > = {
 	component: NavigatorProvider,
 	title: 'Components (Experimental)/Navigator',
-	subcomponents: { NavigatorScreen, NavigatorButton, NavigatorBackButton },
 	argTypes: {
 		as: { control: { type: null } },
 		children: { control: { type: null } },

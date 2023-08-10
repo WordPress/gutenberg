@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { Story, Meta } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,13 +14,13 @@ import { wordpress } from '@wordpress/icons';
 import { Button } from '../..';
 import type { ButtonAsButtonProps } from '../../types';
 
-const meta: ComponentMeta< typeof Button > = {
+const meta: Meta< typeof Button > = {
 	component: Button,
 	title: 'Components/Button',
 };
 export default meta;
 
-export const VariantStates: ComponentStory< typeof Button > = (
+export const VariantStates: Story< typeof Button > = (
 	props: ButtonAsButtonProps
 ) => {
 	const variants: ( typeof props.variant )[] = [
@@ -57,7 +57,7 @@ Icon.args = {
 	icon: wordpress,
 };
 
-export const Dashicons: ComponentStory< typeof Button > = ( props ) => {
+export const Dashicons: Story< typeof Button > = ( props ) => {
 	return (
 		<div style={ { display: 'flex', gap: 8 } }>
 			<Button { ...props } />

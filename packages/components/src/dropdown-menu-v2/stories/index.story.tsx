@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import styled from '@emotion/styled';
 
 /**
@@ -36,20 +36,9 @@ import { menu, wordpress } from '@wordpress/icons';
 import Icon from '../../icon';
 import { ContextSystemProvider } from '../../ui/context';
 
-const meta: ComponentMeta< typeof DropdownMenu > = {
+const meta: Meta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2',
 	component: DropdownMenu,
-	subcomponents: {
-		DropdownMenuItem,
-		DropdownSubMenu,
-		DropdownSubMenuTrigger,
-		DropdownMenuSeparator,
-		DropdownMenuCheckboxItem,
-		DropdownMenuGroup,
-		DropdownMenuLabel,
-		DropdownMenuRadioGroup,
-		DropdownMenuRadioItem,
-	},
 	argTypes: {
 		children: { control: { type: null } },
 		trigger: { control: { type: null } },
@@ -130,7 +119,7 @@ const RadioItemsGroup = () => {
 	);
 };
 
-const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
+const Template: Story< typeof DropdownMenu > = ( props ) => (
 	<SlotFillProvider>
 		<DropdownMenu { ...props } />
 		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
@@ -205,9 +194,7 @@ const toolbarVariantContextValue = {
 		variant: 'toolbar',
 	},
 };
-export const ToolbarVariant: ComponentStory< typeof DropdownMenu > = (
-	props
-) => (
+export const ToolbarVariant: Story< typeof DropdownMenu > = ( props ) => (
 	<ContextSystemProvider value={ toolbarVariantContextValue }>
 		<DropdownMenu { ...props } />
 	</ContextSystemProvider>

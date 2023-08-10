@@ -13,7 +13,6 @@ import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
 const meta: ComponentMeta< typeof InputControl > = {
 	title: 'Components (Experimental)/InputControl',
 	component: InputControl,
-	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
 	argTypes: {
 		__unstableInputWidth: { control: { type: 'text' } },
 		__unstableStateReducer: { control: { type: null } },

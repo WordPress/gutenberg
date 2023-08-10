@@ -21,7 +21,6 @@ import Button from '../../button';
 const meta: ComponentMeta< typeof Card > = {
 	component: Card,
 	title: 'Components/Card',
-	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
 	argTypes: {
 		as: {
 			control: { type: null },

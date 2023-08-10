@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 import type { ReactNode } from 'react';
 
 /**
@@ -21,7 +21,7 @@ import {
 import './style.css';
 import Button from '..';
 
-const meta: ComponentMeta< typeof Button > = {
+const meta: Meta< typeof Button > = {
 	title: 'Components/Button',
 	component: Button,
 	argTypes: {
@@ -44,54 +44,52 @@ const meta: ComponentMeta< typeof Button > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Button > = ( props ) => {
+const Template: Story< typeof Button > = ( props ) => {
 	return <Button { ...props }></Button>;
 };
 
-export const Default: ComponentStory< typeof Button > = Template.bind( {} );
+export const Default: Story< typeof Button > = Template.bind( {} );
 Default.args = {
 	children: 'Code is poetry',
 };
 
-export const Primary: ComponentStory< typeof Button > = Template.bind( {} );
+export const Primary: Story< typeof Button > = Template.bind( {} );
 Primary.args = {
 	...Default.args,
 	variant: 'primary',
 };
 
-export const Secondary: ComponentStory< typeof Button > = Template.bind( {} );
+export const Secondary: Story< typeof Button > = Template.bind( {} );
 Secondary.args = {
 	...Default.args,
 	variant: 'secondary',
 };
 
-export const Tertiary: ComponentStory< typeof Button > = Template.bind( {} );
+export const Tertiary: Story< typeof Button > = Template.bind( {} );
 Tertiary.args = {
 	...Default.args,
 	variant: 'tertiary',
 };
 
-export const Link: ComponentStory< typeof Button > = Template.bind( {} );
+export const Link: Story< typeof Button > = Template.bind( {} );
 Link.args = {
 	...Default.args,
 	variant: 'link',
 };
 
-export const IsDestructive: ComponentStory< typeof Button > = Template.bind(
-	{}
-);
+export const IsDestructive: Story< typeof Button > = Template.bind( {} );
 IsDestructive.args = {
 	...Default.args,
 	isDestructive: true,
 };
 
-export const Icon: ComponentStory< typeof Button > = Template.bind( {} );
+export const Icon: Story< typeof Button > = Template.bind( {} );
 Icon.args = {
 	label: 'Code is poetry',
 	icon: 'wordpress',
 };
 
-export const GroupedIcons: ComponentStory< typeof Button > = () => {
+export const GroupedIcons: Story< typeof Button > = () => {
 	const GroupContainer = ( { children }: { children: ReactNode } ) => (
 		<div style={ { display: 'inline-flex' } }>{ children }</div>
 	);

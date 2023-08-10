@@ -19,7 +19,6 @@ import type { NoticeListProps } from '../types';
 const meta: ComponentMeta< typeof Notice > = {
 	title: 'Components/Notice',
 	component: Notice,
-	subcomponents: { NoticeList },
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },

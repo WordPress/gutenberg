@@ -14,7 +14,6 @@ type ItemProps = React.ComponentPropsWithoutRef< typeof Item >;
 const meta: ComponentMeta< typeof ItemGroup > = {
 	component: ItemGroup,
 	title: 'Components (Experimental)/ItemGroup',
-	subcomponents: { Item },
 	argTypes: {
 		as: { control: { type: null } },
 		children: { control: { type: null } },

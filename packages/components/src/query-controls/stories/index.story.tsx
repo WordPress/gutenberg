@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -37,7 +37,7 @@ const meta: ComponentMeta< typeof QueryControls > = {
 };
 export default meta;
 
-export const Default: ComponentStory< typeof QueryControls > = ( args ) => {
+export const Default: Story< typeof QueryControls > = ( args ) => {
 	const {
 		onAuthorChange,
 		onCategoryChange,
@@ -146,9 +146,7 @@ Default.args = {
 	selectedAuthorId: 1,
 };
 
-const SingleCategoryTemplate: ComponentStory< typeof QueryControls > = (
-	args
-) => {
+const SingleCategoryTemplate: Story< typeof QueryControls > = ( args ) => {
 	const {
 		onAuthorChange,
 		onCategoryChange,
@@ -186,7 +184,7 @@ const SingleCategoryTemplate: ComponentStory< typeof QueryControls > = (
 		/>
 	);
 };
-export const SelectSingleCategory: ComponentStory< typeof QueryControls > =
+export const SelectSingleCategory: Story< typeof QueryControls > =
 	SingleCategoryTemplate.bind( {} );
 SelectSingleCategory.args = {
 	categoriesList: [

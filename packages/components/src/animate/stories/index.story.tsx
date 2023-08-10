@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -19,11 +19,9 @@ const meta: ComponentMeta< typeof Animate > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Animate > = ( props ) => (
-	<Animate { ...props } />
-);
+const Template: Story< typeof Animate > = ( props ) => <Animate { ...props } />;
 
-export const Default: ComponentStory< typeof Animate > = Template.bind( {} );
+export const Default: Story< typeof Animate > = Template.bind( {} );
 Default.args = {
 	children: ( { className } ) => (
 		<Notice className={ className } status="success">
@@ -32,9 +30,7 @@ Default.args = {
 	),
 };
 
-export const AppearTopLeft: ComponentStory< typeof Animate > = Template.bind(
-	{}
-);
+export const AppearTopLeft: Story< typeof Animate > = Template.bind( {} );
 AppearTopLeft.args = {
 	type: 'appear',
 	options: { origin: 'top left' },
@@ -44,9 +40,7 @@ AppearTopLeft.args = {
 		</Notice>
 	),
 };
-export const AppearTopRight: ComponentStory< typeof Animate > = Template.bind(
-	{}
-);
+export const AppearTopRight: Story< typeof Animate > = Template.bind( {} );
 AppearTopRight.args = {
 	type: 'appear',
 	options: { origin: 'top right' },
@@ -56,9 +50,7 @@ AppearTopRight.args = {
 		</Notice>
 	),
 };
-export const AppearBottomLeft: ComponentStory< typeof Animate > = Template.bind(
-	{}
-);
+export const AppearBottomLeft: Story< typeof Animate > = Template.bind( {} );
 AppearBottomLeft.args = {
 	type: 'appear',
 	options: { origin: 'bottom left' },
@@ -68,8 +60,7 @@ AppearBottomLeft.args = {
 		</Notice>
 	),
 };
-export const AppearBottomRight: ComponentStory< typeof Animate > =
-	Template.bind( {} );
+export const AppearBottomRight: Story< typeof Animate > = Template.bind( {} );
 AppearBottomRight.args = {
 	type: 'appear',
 	options: { origin: 'bottom right' },
@@ -80,7 +71,7 @@ AppearBottomRight.args = {
 	),
 };
 
-export const Loading: ComponentStory< typeof Animate > = Template.bind( {} );
+export const Loading: Story< typeof Animate > = Template.bind( {} );
 Loading.args = {
 	type: 'loading',
 	children: ( { className } ) => (
@@ -90,7 +81,7 @@ Loading.args = {
 	),
 };
 
-export const SlideIn: ComponentStory< typeof Animate > = Template.bind( {} );
+export const SlideIn: Story< typeof Animate > = Template.bind( {} );
 SlideIn.args = {
 	type: 'slide-in',
 	options: { origin: 'left' },

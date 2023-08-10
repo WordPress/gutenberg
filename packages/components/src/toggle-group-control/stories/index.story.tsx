@@ -26,7 +26,6 @@ import type {
 const meta: ComponentMeta< typeof ToggleGroupControl > = {
 	component: ToggleGroupControl,
 	title: 'Components (Experimental)/ToggleGroupControl',
-	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
 	argTypes: {
 		help: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
