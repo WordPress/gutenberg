@@ -11,6 +11,7 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { getScrollContainer } from '@wordpress/dom';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -70,6 +71,7 @@ function SelectedBlockTools( {
 		},
 		[ clientId ]
 	);
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const isToolbarForced = useRef( false );
 	const { shouldShowContextualToolbar, canFocusHiddenToolbar } =
 		useShouldContextualToolbarShow();
@@ -112,10 +114,11 @@ function SelectedBlockTools( {
 		clientId,
 	} );
 
-	if ( isFixed ) {
+	// We need to show the toolbar as fixed when we're on the tablet breakpoint.
+	if ( isFixed || ! isLargeViewport ) {
 		return (
 			<BlockContextualToolbar
-				isFixed={ isFixed }
+				isFixed={ true }
 				__experimentalInitialIndex={
 					initialToolbarItemIndexRef.current
 				}
