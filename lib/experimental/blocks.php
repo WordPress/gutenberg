@@ -136,6 +136,30 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		$connection_sources = require __DIR__ . '/connection-sources/index.php';
 		$block_type         = $block_instance->block_type;
 
+		if ( $block['blockName'] === 'core/paragraph' ) {
+			$p = WP_HTML_Processor::createFragment( $block_content );
+			while ( $p->next_tag() ) {
+				if ( $p->get_attribute( 'data-wp-dynamic-content' ) !== null ) {
+					$connections = json_decode( $p->get_attribute( 'data-wp-dynamic-content' ) );
+					foreach ( $connections->html_attributes as $attribute_name => $attribute_value ) {
+						$dynamic_content_source = $attribute_value->source;
+						$dynamic_content_source_key = $attribute_value->key;
+						$dynamic_value = $connection_sources[ $dynamic_content_source ](
+							$block_instance,
+							$dynamic_content_source_key
+						);
+						if ( 'inner_content' === $attribute_name ) {
+							$p->set_inner_markup( $dynamic_value );
+						} else {
+							$p->set_attribute( $attribute_name, $dynamic_value);
+						}
+					}
+				}
+			};
+
+			return $p->get_updated_html();
+		}		
+
 		// Allowlist of blocks that support block connections.
 		// Currently, we only allow the following blocks and attributes:
 		// - Paragraph: content.
