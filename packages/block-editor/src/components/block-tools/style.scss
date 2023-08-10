@@ -110,6 +110,13 @@
 		z-index: z-index(".block-editor-block-popover");
 		display: block;
 		width: 100%;
+		overflow: hidden;
+
+		.block-editor-block-toolbar {
+			overflow-y: hidden;
+			overflow-x: scroll;
+			scrollbar-gutter: stable;
+		}
 
 		border: none;
 		border-bottom: $border-width solid $gray-200;

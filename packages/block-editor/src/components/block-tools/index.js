@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useRef } from '@wordpress/element';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -63,6 +63,53 @@ export default function BlockTools( {
 		moveBlocksUp,
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
+
+	useLayoutEffect( () => {
+		// don't do anything if not fixed toolbar
+		if ( ! hasFixedToolbar ) {
+			return;
+		}
+
+		const blockToolbar = document.querySelector(
+			'.block-editor-block-contextual-toolbar'
+		);
+
+		if ( ! blockToolbar ) {
+			return;
+		}
+
+		// get the width of the pinned items in the post editor
+		const pinnedItems = document.querySelector(
+			'.edit-post-header__settings'
+		);
+
+		// get the width of the left header in the site editor
+		const leftHeader = document.querySelector(
+			'.edit-site-header-edit-mode__end'
+		);
+
+		const computedToolbarStyle = window.getComputedStyle( blockToolbar );
+		const computedPinnedItemsStyle = pinnedItems
+			? window.getComputedStyle( pinnedItems )
+			: false;
+		const computedLeftHeaderStyle = leftHeader
+			? window.getComputedStyle( leftHeader )
+			: false;
+
+		const marginLeft = parseFloat( computedToolbarStyle.marginLeft );
+		const pinnedItemsWidth = computedPinnedItemsStyle
+			? parseFloat( computedPinnedItemsStyle.width ) + 10 // 10 is the pinned items padding
+			: 0;
+		const leftHeaderWidth = computedLeftHeaderStyle
+			? parseFloat( computedLeftHeaderStyle.width )
+			: 0;
+		// set the new witdth of the toolbar
+		document.querySelector(
+			'.block-editor-block-contextual-toolbar'
+		).style.width = `calc(100% - ${
+			leftHeaderWidth + pinnedItemsWidth + marginLeft
+		}px)`;
+	}, [ hasFixedToolbar ] );
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) return;
