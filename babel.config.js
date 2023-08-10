@@ -3,7 +3,7 @@ module.exports = ( api ) => {
 
 	return {
 		presets: [ '@wordpress/babel-preset-default' ],
-		plugins: [ '@emotion/babel-plugin', 'babel-plugin-inline-json-import' ],
+		plugins: [ '@emotion/babel-plugin' ],
 		overrides: [
 			{
 				test: 'packages/block-library/src/index.js',

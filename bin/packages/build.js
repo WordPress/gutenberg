@@ -148,46 +148,6 @@ function createStyleEntryTransform() {
 	} );
 }
 
-/**
- * Returns a stream transform which maps an individual block.json to the
- * index.js that imports it. Presently, babel resolves the import of json
- * files by inlining them as a JavaScript primitive in the importing file.
- * This transform ensures the importing file is rebuilt.
- *
- * @return {Transform} Stream transform instance.
- */
-function createBlockJsonEntryTransform() {
-	const blocks = new Set();
-
-	return new Transform( {
-		objectMode: true,
-		async transform( file, encoding, callback ) {
-			const matches =
-				/block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(
-					file
-				);
-			const blockName = matches ? matches[ 1 ] : undefined;
-
-			// Only block.json files in the block-library folder are subject to this transform.
-			if ( ! blockName ) {
-				this.push( file );
-				callback();
-				return;
-			}
-
-			// Only operate once per block, assuming entries are common.
-			if ( blockName && blocks.has( blockName ) ) {
-				callback();
-				return;
-			}
-
-			blocks.add( blockName );
-			this.push( file.replace( 'block.json', 'index.js' ) );
-			callback();
-		},
-	} );
-}
-
 let onFileComplete = () => {};
 
 let stream;
@@ -199,9 +159,7 @@ if ( files.length ) {
 	} );
 
 	stream.push( null );
-	stream = stream
-		.pipe( createStyleEntryTransform() )
-		.pipe( createBlockJsonEntryTransform() );
+	stream = stream.pipe( createStyleEntryTransform() );
 } else {
 	const bar = new ProgressBar( 'Build Progress: [:bar] :percent', {
 		width: 30,
@@ -215,6 +173,7 @@ if ( files.length ) {
 		[
 			`${ PACKAGES_DIR }/*/src/**/*.{js,ts,tsx}`,
 			`${ PACKAGES_DIR }/*/src/*.scss`,
+			`${ PACKAGES_DIR }/*/src/**/*.json`,
 			`${ PACKAGES_DIR }/block-library/src/**/*.js`,
 			`${ PACKAGES_DIR }/block-library/src/*/style.scss`,
 			`${ PACKAGES_DIR }/block-library/src/*/theme.scss`,
@@ -224,7 +183,7 @@ if ( files.length ) {
 		{
 			ignore: [
 				`**/benchmark/**`,
-				`**/{__mocks__,__tests__,test}/**`,
+				`**/{__mocks__,__tests__,__fixtures__,test}/**`,
 				`**/{storybook,stories}/**`,
 				`**/e2e-test-utils-playwright/**`,
 			],

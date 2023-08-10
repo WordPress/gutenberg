@@ -170,7 +170,6 @@
 		"appium": "1.22.3",
 		"babel-jest": "29.5.0",
 		"babel-loader": "8.2.3",
-		"babel-plugin-inline-json-import": "0.3.2",
 		"babel-plugin-react-native-classname-to-style": "1.2.2",
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-transform-remove-console": "6.9.4",
