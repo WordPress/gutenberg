@@ -21,9 +21,13 @@ if ( ! function_exists( 'gutenberg_init_fonts_library' ) ) {
 	 * @since 6.4.0
 	 */
 	function gutenberg_init_fonts_library() {
-		// @core-merge: This code will not go into Core. Rather,
-		// the code in the static method goes into Core's `create_initial_post_types()`.
-		WP_Fonts_Library::register_post_type();
+		// @core-merge: This code will go into Core's `create_initial_post_types()`.
+		$args = array(
+			'public'       => true,
+			'label'        => 'Font Library',
+			'show_in_rest' => true,
+		);
+		register_post_type( 'wp_font_family', $args );
 
 		// @core-merge: This code will go into Core's `create_initial_rest_routes()`.
 		$fonts_library_controller = new WP_REST_Fonts_Library_Controller();
