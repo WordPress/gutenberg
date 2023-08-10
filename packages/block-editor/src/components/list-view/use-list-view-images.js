@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 
 // Maximum number of images to display in a list view row.
-export const MAX_IMAGES = 5;
+const MAX_IMAGES = 3;
 
 function getImageUrl( block ) {
 	if ( block.name !== 'core/image' ) {
@@ -33,6 +33,9 @@ function getImagesFromGallery( block ) {
 		const img = getImageUrl( innerBlock );
 		if ( img ) {
 			images.push( img );
+		}
+		if ( images.length >= MAX_IMAGES ) {
+			return images;
 		}
 	}
 
