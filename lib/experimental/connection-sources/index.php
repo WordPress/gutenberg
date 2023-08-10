@@ -12,4 +12,9 @@ return array(
 		// if it doesn't, `get_post_meta()` will just return an empty string.
 		return get_post_meta( $block_instance->context['postId'], $meta_field, true );
 	},
+	'shortcode' => function ( $block_instance, $shortcode_value ) {
+		// We should probably also check if the meta field exists but for now it's okay because
+		// if it doesn't, `get_post_meta()` will just return an empty string.
+		return do_shortcode( $shortcode_value );
+	}
 );
