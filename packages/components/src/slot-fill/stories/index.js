@@ -10,7 +10,6 @@ import { Slot, Fill, Provider as SlotFillProvider } from '../';
 
 export default {
 	title: 'Components/SlotFill',
-	subcomponents: { Fill, SlotFillProvider },
 	component: Slot,
 	parameters: {
 		controls: { expanded: true },

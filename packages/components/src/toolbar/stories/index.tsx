@@ -40,12 +40,6 @@ import DropdownMenu from '../../dropdown-menu';
 const meta: ComponentMeta< typeof Toolbar > = {
 	title: 'Components/Toolbar',
 	component: Toolbar,
-	subcomponents: {
-		ToolbarButton,
-		ToolbarGroup,
-		ToolbarItem,
-		ToolbarDropdownMenu,
-	},
 	argTypes: {
 		children: { control: { type: null } },
 	},

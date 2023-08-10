@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -25,16 +25,14 @@ const meta: ComponentMeta< typeof Icon > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Icon > = ( args ) => (
-	<Icon { ...args } />
-);
+const Template: Story< typeof Icon > = ( args ) => <Icon { ...args } />;
 
 export const Default = Template.bind( {} );
 Default.args = {
 	icon: wordpress,
 };
 
-export const FillColor: ComponentStory< typeof Icon > = ( args ) => {
+export const FillColor: Story< typeof Icon > = ( args ) => {
 	return (
 		<div
 			style={ {
@@ -86,7 +84,7 @@ WithAnSVG.args = {
  * as long as you are in a context where the Dashicons stylesheet is loaded. To simulate that here,
  * use the Global CSS Injector in the Storybook toolbar at the top and select the "WordPress" preset.
  */
-export const WithADashicon: ComponentStory< typeof Icon > = ( args ) => {
+export const WithADashicon: Story< typeof Icon > = ( args ) => {
 	return (
 		<VStack>
 			<Icon { ...args } />

@@ -19,9 +19,6 @@ import type { AlignmentMatrixControlProps } from '../types';
 const meta: ComponentMeta< typeof AlignmentMatrixControl > = {
 	title: 'Components (Experimental)/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
-	subcomponents: {
-		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
-	},
 	argTypes: {
 		onChange: { action: 'onChange', control: { type: null } },
 		value: { control: { type: null } },

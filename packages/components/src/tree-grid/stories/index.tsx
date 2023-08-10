@@ -18,7 +18,6 @@ import InputControl from '../../input-control';
 const meta: ComponentMeta< typeof TreeGrid > = {
 	title: 'Components (Experimental)/TreeGrid',
 	component: TreeGrid,
-	subcomponents: { TreeGridRow, TreeGridCell },
 	argTypes: {
 		children: { control: { type: null } },
 	},

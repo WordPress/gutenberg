@@ -28,9 +28,6 @@ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 const meta: ComponentMeta< typeof ToolsPanel > = {
 	title: 'Components (Experimental)/ToolsPanel',
 	component: ToolsPanel,
-	subcomponents: {
-		ToolsPanelItem,
-	},
 	argTypes: {
 		as: { control: { type: null } },
 		children: { control: { type: null } },

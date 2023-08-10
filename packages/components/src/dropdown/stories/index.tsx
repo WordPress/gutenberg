@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -13,7 +13,6 @@ import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 const meta: ComponentMeta< typeof Dropdown > = {
 	title: 'Components/Dropdown',
 	component: Dropdown,
-	subcomponents: { DropdownContentWrapper },
 	argTypes: {
 		focusOnMount: {
 			options: [ 'firstElement', true, false ],
@@ -33,7 +32,7 @@ const meta: ComponentMeta< typeof Dropdown > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Dropdown > = ( args ) => {
+const Template: Story< typeof Dropdown > = ( args ) => {
 	return (
 		<div style={ { height: 150 } }>
 			<Dropdown { ...args } />
@@ -41,7 +40,7 @@ const Template: ComponentStory< typeof Dropdown > = ( args ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Dropdown > = Template.bind( {} );
+export const Default: Story< typeof Dropdown > = Template.bind( {} );
 Default.args = {
 	renderToggle: ( { isOpen, onToggle } ) => (
 		<Button onClick={ onToggle } aria-expanded={ isOpen } variant="primary">
@@ -55,9 +54,7 @@ Default.args = {
  * To apply more padding to the dropdown content, use the provided `<DropdownContentWrapper>`
  * convenience wrapper. A `paddingSize` of `"medium"` is suitable for relatively larger dropdowns (default is `"small"`).
  */
-export const WithMorePadding: ComponentStory< typeof Dropdown > = Template.bind(
-	{}
-);
+export const WithMorePadding: Story< typeof Dropdown > = Template.bind( {} );
 WithMorePadding.args = {
 	...Default.args,
 	renderContent: () => (
@@ -72,9 +69,7 @@ WithMorePadding.args = {
  * with a `paddingSize` of `"none"`. This can also serve as a clean foundation to add arbitrary
  * paddings, for example when child components already have padding on their own.
  */
-export const WithNoPadding: ComponentStory< typeof Dropdown > = Template.bind(
-	{}
-);
+export const WithNoPadding: Story< typeof Dropdown > = Template.bind( {} );
 WithNoPadding.args = {
 	...Default.args,
 	renderContent: () => (

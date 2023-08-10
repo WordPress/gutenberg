@@ -9,7 +9,7 @@ const stories = [
 
 module.exports = {
 	core: {
-		builder: 'webpack5',
+		disableTelemetry: true,
 	},
 	stories,
 	addons: [
@@ -24,7 +24,10 @@ module.exports = {
 		'@storybook/addon-actions',
 		'storybook-source-link',
 	],
-	framework: '@storybook/react',
+	framework: {
+		name: '@storybook/react-webpack5',
+		options: {},
+	},
 	features: {
 		babelModeV7: true,
 		emotionAlias: false,
@@ -36,5 +39,8 @@ module.exports = {
 		// this, Storybook crashes when building with Typescript 5.x.
 		// See https://github.com/hipstersmoothie/react-docgen-typescript-plugin/issues/78#issuecomment-1409224863.
 		reactDocgen: 'react-docgen-typescript-plugin',
+	},
+	docs: {
+		autodocs: true,
 	},
 };

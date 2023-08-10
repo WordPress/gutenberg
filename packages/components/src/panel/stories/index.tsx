@@ -19,7 +19,6 @@ import { wordpress } from '@wordpress/icons';
 const meta: ComponentMeta< typeof Panel > = {
 	title: 'Components/Panel',
 	component: Panel,
-	subcomponents: { PanelRow, PanelBody },
 	argTypes: {
 		children: { control: { type: null } },
 	},

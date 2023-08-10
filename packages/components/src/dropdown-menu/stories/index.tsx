@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ComponentMeta, Story } from '@storybook/react';
 /**
  * Internal dependencies
  */
@@ -38,7 +38,7 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
+const Template: Story< typeof DropdownMenu > = ( props ) => (
 	<div style={ { height: 150 } }>
 		<DropdownMenu { ...props } />
 	</div>
