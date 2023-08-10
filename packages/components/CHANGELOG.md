@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 25.5.0 (2023-08-10)
-
 ### New Feature
 
 -   Add a new `ProgressBar` component. ([#53030](https://github.com/WordPress/gutenberg/pull/53030)).
