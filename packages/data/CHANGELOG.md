@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.9.0 (2023-08-10)
+
 ### Bug Fix
 
 -   Update the type definitions for dispatched actions by accounting for Promisified return values and thunks. Previously, a dispatched action's return type was the same as the return type of the original action creator, which did not account for how dispatch works internally. (Plain actions get wrapped in a Promise, and thunk actions ultimately resolve to the innermost function's return type).
