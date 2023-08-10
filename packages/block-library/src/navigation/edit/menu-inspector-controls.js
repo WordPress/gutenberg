@@ -103,7 +103,7 @@ const MainContent = ( {
 		? sprintf(
 				/* translators: %s: The name of a menu. */
 				__( 'Structure for navigation menu: %s' ),
-				navigationMenu?.title?.rendered || __( 'Untitled menu' )
+				navigationMenu?.title || __( 'Untitled menu' )
 		  )
 		: __(
 				'You have not yet created any menus. Displaying a list of your Pages'

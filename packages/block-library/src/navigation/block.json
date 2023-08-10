@@ -131,8 +131,7 @@
 					}
 				}
 			}
-		},
-		"interactivity": true
+		}
 	},
 	"viewScript": [ "wp-interactivity", "file:./view.min.js" ],
 	"editorStyle": "wp-block-navigation-editor",

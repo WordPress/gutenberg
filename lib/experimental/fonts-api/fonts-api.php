@@ -243,3 +243,17 @@ add_filter(
  * during the build. See: tools/webpack/blocks.js.
  */
 add_action( 'init', 'WP_Fonts_Resolver::register_fonts_from_theme_json', 21 );
+
+add_filter(
+	'block_editor_settings_all',
+	static function( $settings ) {
+		ob_start();
+		wp_print_fonts( true );
+		$styles = ob_get_clean();
+
+		// Add the font-face styles to iframed editor assets.
+		$settings['__unstableResolvedAssets']['styles'] .= $styles;
+		return $settings;
+	},
+	11
+);

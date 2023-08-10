@@ -212,13 +212,10 @@ export default function PageStatus( {
 													} )
 												}
 												value={ password }
-												/* eslint-disable jsx-a11y/no-autofocus */
-												autoFocus={ ! password }
-												/* eslint-enable jsx-a11y/no-autofocus */
 												placeholder={ __(
-													'Enter a secure password'
+													'Use a secure password'
 												) }
-												type="password"
+												type="text"
 											/>
 										) }
 									</BaseControl>

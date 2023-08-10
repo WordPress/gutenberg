@@ -42,7 +42,6 @@ function ColumnEdit( {
 	hasChildren,
 	isSelected,
 	getStylesFromColorScheme,
-	isParentSelected,
 	contentStyle,
 	columns,
 	selectedColumnIndex,
@@ -140,12 +139,10 @@ function ColumnEdit( {
 		return (
 			<View
 				style={ [
-					! isParentSelected &&
-						getStylesFromColorScheme(
-							styles.columnPlaceholder,
-							styles.columnPlaceholderDark
-						),
-					styles.columnPlaceholderNotSelected,
+					getStylesFromColorScheme(
+						styles.columnPlaceholder,
+						styles.columnPlaceholderDark
+					),
 					contentStyle[ clientId ],
 				] }
 			/>
@@ -258,8 +255,6 @@ export default compose( [
 
 		const parentId = getBlockRootClientId( clientId );
 		const hasChildren = !! getBlockCount( clientId );
-		const isParentSelected =
-			selectedBlockClientId && selectedBlockClientId === parentId;
 
 		const blockOrder = getBlockOrder( parentId );
 
@@ -271,7 +266,6 @@ export default compose( [
 
 		return {
 			hasChildren,
-			isParentSelected,
 			isSelected,
 			selectedColumnIndex,
 			columns,

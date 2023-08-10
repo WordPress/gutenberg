@@ -14,8 +14,8 @@ import { __unstableIframe as Iframe } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import Button from '../../button';
-import { Provider as SlotFillProvider } from '../../slot-fill';
 import { Popover } from '..';
+import { PopoverInsideIframeRenderedInExternalSlot } from '../test/utils';
 import type { PopoverProps } from '../types';
 
 const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
@@ -249,51 +249,7 @@ DynamicHeight.args = {
 export const WithSlotOutsideIframe: ComponentStory< typeof Popover > = (
 	args
 ) => {
-	const anchorRef = useRef( null );
-	const slotName = 'popover-with-slot-outside-iframe';
-
-	return (
-		<SlotFillProvider>
-			<div>
-				{ /* @ts-expect-error Slot is not currently typed on Popover */ }
-				<Popover.Slot name={ slotName } />
-				<Iframe
-					style={ {
-						width: '100%',
-						height: '400px',
-						border: '0',
-						outline: '1px solid purple',
-					} }
-				>
-					<div
-						style={ {
-							height: '200vh',
-							paddingTop: '10vh',
-						} }
-					>
-						<p
-							style={ {
-								padding: '8px',
-								background: 'salmon',
-								maxWidth: '200px',
-								marginTop: '100px',
-								marginLeft: 'auto',
-								marginRight: 'auto',
-							} }
-							ref={ anchorRef }
-						>
-							Popover&apos;s anchor
-						</p>
-						<Popover
-							{ ...args }
-							__unstableSlotName={ slotName }
-							anchorRef={ anchorRef }
-						/>
-					</div>
-				</Iframe>
-			</div>
-		</SlotFillProvider>
-	);
+	return <PopoverInsideIframeRenderedInExternalSlot { ...args } />;
 };
 WithSlotOutsideIframe.args = {
 	...Default.args,

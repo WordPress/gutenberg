@@ -12,7 +12,9 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
+	EditorKeyboardShortcuts,
 	EditorSnackbars,
+	PostSyncStatusModal,
 	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -54,7 +56,7 @@ import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
+const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -69,13 +71,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-const blockRemovalRules = {
-	'core/footnotes': __(
-		'The Footnotes block displays all footnotes found in the content. Note that any footnotes in the content will persist after removing this block.'
-	),
-};
-
-function Layout( { styles } ) {
+function Layout() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isLargeViewport = useViewportMatch( 'large' );
@@ -99,10 +95,45 @@ function Layout( { styles } ) {
 		showBlockBreadcrumbs,
 		isTemplateMode,
 		documentLabel,
+		styles,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const { isFeatureActive } = select( editPostStore );
 		const editorSettings = getEditorSettings();
 		const postTypeLabel = getPostTypeLabel();
+		const hasThemeStyles = isFeatureActive( 'themeStyles' );
+
+		const themeStyles = [];
+		const presetStyles = [];
+		editorSettings.styles?.forEach( ( style ) => {
+			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
+				themeStyles.push( style );
+			} else {
+				presetStyles.push( style );
+			}
+		} );
+
+		const defaultEditorStyles = [
+			...editorSettings.defaultEditorStyles,
+			...presetStyles,
+		];
+
+		// If theme styles are not present or displayed, ensure that
+		// base layout styles are still present in the editor.
+		if (
+			! editorSettings.disableLayoutStyles &&
+			! ( hasThemeStyles && themeStyles.length )
+		) {
+			defaultEditorStyles.push( {
+				css: getLayoutStyles( {
+					style: {},
+					selector: 'body',
+					hasBlockGapSupport: false,
+					hasFallbackGapSupport: true,
+					fallbackGapValue: '0.5em',
+				} ),
+			} );
+		}
 
 		return {
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
@@ -135,6 +166,10 @@ function Layout( { styles } ) {
 			),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
+			styles:
+				hasThemeStyles && themeStyles.length
+					? editorSettings.styles
+					: defaultEditorStyles,
 		};
 	}, [] );
 
@@ -214,7 +249,7 @@ function Layout( { styles } ) {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
-			<BlockRemovalWarningModal rules={ blockRemovalRules } />
+			<EditorKeyboardShortcuts />
 			<SettingsSidebar />
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isLargeViewport }
@@ -304,6 +339,7 @@ function Layout( { styles } ) {
 			<EditPostPreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
+			<PostSyncStatusModal />
 			<StartPageOptions />
 			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />

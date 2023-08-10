@@ -26,7 +26,7 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
-	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
@@ -38,6 +38,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Button,
 	Spinner,
+	Notice,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -69,7 +70,6 @@ import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import { unlock } from '../../lock-unlock';
-const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 function Navigation( {
 	attributes,
@@ -196,7 +196,7 @@ function Navigation( {
 		convert: convertClassicMenu,
 		status: classicMenuConversionStatus,
 		error: classicMenuConversionError,
-	} = useConvertClassicToBlockMenu( clientId );
+	} = useConvertClassicToBlockMenu( createNavigationMenu );
 
 	const isConvertingClassicMenu =
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
@@ -485,6 +485,21 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
+	const submenuAccessibilityNotice =
+		! showSubmenuIcon && ! openSubmenusOnClick
+			? __(
+					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
+			  )
+			: '';
+
+	const isFirstRender = useRef( true ); // Don't speak on first render.
+	useEffect( () => {
+		if ( ! isFirstRender.current && submenuAccessibilityNotice ) {
+			speak( submenuAccessibilityNotice );
+		}
+		isFirstRender.current = false;
+	}, [ submenuAccessibilityNotice ] );
+
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const stylingInspectorControls = (
 		<>
@@ -578,6 +593,18 @@ function Navigation( {
 									disabled={ attributes.openSubmenusOnClick }
 									label={ __( 'Show arrow' ) }
 								/>
+
+								{ submenuAccessibilityNotice && (
+									<div>
+										<Notice
+											spokenMessage={ null }
+											status="warning"
+											isDismissible={ false }
+										>
+											{ submenuAccessibilityNotice }
+										</Notice>
+									</div>
+								) }
 							</>
 						) }
 					</PanelBody>

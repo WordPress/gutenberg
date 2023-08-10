@@ -58,9 +58,10 @@ const interfaceLabels = {
 };
 
 const typeLabels = {
-	wp_template: __( 'Template Part' ),
+	wp_template: __( 'Template' ),
 	wp_template_part: __( 'Template Part' ),
 	wp_block: __( 'Pattern' ),
+	wp_navigation: __( 'Navigation' ),
 };
 
 // Prevent accidental removal of certain blocks, asking the user for
@@ -70,8 +71,8 @@ const blockRemovalRules = {
 	'core/post-content': __(
 		'Post Content displays the content of a post or page.'
 	),
-	'core/footnotes': __(
-		'The Footnotes block displays all footnotes found in the content. Note that any footnotes in the content will persist after removing this block.'
+	'core/post-template': __(
+		'Post Template displays each post or page in a Query Loop.'
 	),
 };
 
@@ -165,12 +166,11 @@ export default function Editor( { isLoading } ) {
 
 	let title;
 	if ( hasLoadedPost ) {
-		const type = typeLabels[ editedPostType ] ?? __( 'Template' );
 		title = sprintf(
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s ‹ Editor' ),
 			getTitle(),
-			type
+			typeLabels[ editedPostType ] ?? typeLabels.wp_template
 		);
 	}
 

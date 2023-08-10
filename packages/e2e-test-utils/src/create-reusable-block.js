@@ -15,8 +15,6 @@ import { canvas } from './canvas';
 export const createReusableBlock = async ( content, title ) => {
 	const reusableBlockNameInputSelector =
 		'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
-	const syncToggleSelector =
-		'.reusable-blocks-menu-items__convert-modal .components-form-toggle__input';
 	const syncToggleSelectorChecked =
 		'.reusable-blocks-menu-items__convert-modal .components-form-toggle.is-checked';
 	// Insert a paragraph block
@@ -31,14 +29,12 @@ export const createReusableBlock = async ( content, title ) => {
 	await nameInput.click();
 	await page.keyboard.type( title );
 
-	const syncToggle = await page.waitForSelector( syncToggleSelector );
-	syncToggle.click();
 	await page.waitForSelector( syncToggleSelectorChecked );
 	await page.keyboard.press( 'Enter' );
 
 	// Wait for creation to finish
 	await page.waitForXPath(
-		'//*[contains(@class, "components-snackbar")]/*[text()="Synced Pattern created."]'
+		'//*[contains(@class, "components-snackbar")]/*[contains(text(),"Pattern created:")]'
 	);
 
 	// Check that we have a reusable block on the page

@@ -417,8 +417,8 @@ const fontSize = getComputedFluidTypographyValue( {
 _Parameters_
 
 -   _args_ `Object`:
--   _args.minimumViewPortWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
--   _args.maximumViewPortWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+-   _args.minimumViewportWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+-   _args.maximumViewportWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
 -   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
 -   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
@@ -680,10 +680,6 @@ _Related_
 
 Private @wordpress/block-editor APIs.
 
-### ReusableBlocksRenameHint
-
-Undocumented declaration.
-
 ### RichText
 
 _Related_
@@ -814,6 +810,40 @@ The `useBlockEditContext` hook provides information about the block this hook is
 _Returns_
 
 -   `Object`: Block edit context
+
+### useBlockEditingMode
+
+Allows a block to restrict the user interface that is displayed for editing that block and its inner blocks.
+
+_Usage_
+
+```js
+function MyBlock( { attributes, setAttributes } ) {
+	useBlockEditingMode( 'disabled' );
+	return <div { ...useBlockProps() }></div>;
+}
+```
+
+`mode` can be one of three options:
+
+-   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
+    selected.
+-   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
+    toolbar, the block movers, block settings.
+-   `'default'`: Allows editing the block as normal.
+
+The mode is inherited by all of the block's inner blocks, unless they have
+their own mode.
+
+If called outside of a block context, the mode is applied to all blocks.
+
+_Parameters_
+
+-   _mode_ `?BlockEditingMode`: The editing mode to apply. If undefined, the current editing mode is not changed.
+
+_Returns_
+
+-   `BlockEditingMode`: The current editing mode.
 
 ### useBlockProps
 

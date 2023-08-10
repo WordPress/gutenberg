@@ -2,20 +2,112 @@
  * External dependencies
  */
 import { h, options, createContext, cloneElement } from 'preact';
-import { useRef, useMemo } from 'preact/hooks';
+import { useRef, useCallback } from 'preact/hooks';
 /**
  * Internal dependencies
  */
 import { rawStore as store } from './store';
 
+/** @typedef {import('preact').VNode} VNode */
+/** @typedef {typeof context} Context */
+/** @typedef {ReturnType<typeof getEvaluate>} Evaluate */
+
+/**
+ * @typedef {Object} DirectiveCallbackParams Callback parameters.
+ * @property {Object}   directives Object map with the defined directives of the element being evaluated.
+ * @property {Object}   props      Props present in the current element.
+ * @property {VNode}    element    Virtual node representing the original element.
+ * @property {Context}  context    The inherited context.
+ * @property {Evaluate} evaluate   Function that resolves a given path to a value either in the store or the context.
+ */
+
+/**
+ * @callback DirectiveCallback Callback that runs the directive logic.
+ * @param {DirectiveCallbackParams} params Callback parameters.
+ */
+
+/**
+ * @typedef DirectiveOptions Options object.
+ * @property {number} [priority=10] Value that specifies the priority to
+ *                                  evaluate directives of this type. Lower
+ *                                  numbers correspond with earlier execution.
+ *                                  Default is `10`.
+ */
+
 // Main context.
 const context = createContext( {} );
 
 // WordPress Directives.
-const directiveMap = {};
+const directiveCallbacks = {};
 const directivePriorities = {};
-export const directive = ( name, cb, { priority = 10 } = {} ) => {
-	directiveMap[ name ] = cb;
+
+/**
+ * Register a new directive type in the Interactivity API runtime.
+ *
+ * @example
+ * ```js
+ * directive(
+ *   'alert', // Name without the `data-wp-` prefix.
+ *   ( { directives: { alert }, element, evaluate }) => {
+ *     element.props.onclick = () => {
+ *       alert( evaluate( alert.default ) );
+ *     }
+ *   }
+ * )
+ * ```
+ *
+ * The previous code registers a custom directive type for displaying an alert
+ * message whenever an element using it is clicked. The message text is obtained
+ * from the store using `evaluate`.
+ *
+ * When the HTML is processed by the Interactivity API, any element containing
+ * the `data-wp-alert` directive will have the `onclick` event handler, e.g.,
+ *
+ * ```html
+ * <button data-wp-alert="state.messages.alert">Click me!</button>
+ * ```
+ * Note that, in the previous example, you access `alert.default` in order to
+ * retrieve the `state.messages.alert` value passed to the directive. You can
+ * also define custom names by appending `--` to the directive attribute,
+ * followed by a suffix, like in the following HTML snippet:
+ *
+ * ```html
+ * <button
+ *   data-wp-color--text="state.theme.text"
+ *   data-wp-color--background="state.theme.background"
+ * >Click me!</button>
+ * ```
+ *
+ * This could be an hypothetical implementation of the custom directive used in
+ * the snippet above.
+ *
+ * @example
+ * ```js
+ * directive(
+ *   'color', // Name without prefix and suffix.
+ *   ( { directives: { color }, ref, evaluate }) => {
+ *     if ( color.text ) {
+ * 	     ref.style.setProperty(
+ *         'color',
+ *         evaluate( color.text )
+ *       );
+ *     }
+ *     if ( color.background ) {
+ *       ref.style.setProperty(
+ *         'background-color',
+ *         evaluate( color.background )
+ *       );
+ *     }
+ *   }
+ * )
+ * ```
+ *
+ * @param {string}            name     Directive name, without the `data-wp-` prefix.
+ * @param {DirectiveCallback} callback Function that runs the directive logic.
+ * @param {DirectiveOptions=} options  Options object.
+ */
+export const directive = ( name, callback, { priority = 10 } = {} ) => {
+	directiveCallbacks[ name ] = callback;
 	directivePriorities[ name ] = priority;
 };
 
@@ -47,69 +139,50 @@ const getEvaluate =
 
 // Separate directives by priority. The resulting array contains objects
 // of directives grouped by same priority, and sorted in ascending order.
-const usePriorityLevels = ( directives ) =>
-	useMemo( () => {
-		const byPriority = Object.entries( directives ).reduce(
-			( acc, [ name, values ] ) => {
-				const priority = directivePriorities[ name ];
-				if ( ! acc[ priority ] ) acc[ priority ] = {};
-				acc[ priority ][ name ] = values;
+const getPriorityLevels = ( directives ) => {
+	const byPriority = Object.keys( directives ).reduce( ( obj, name ) => {
+		if ( directiveCallbacks[ name ] ) {
+			const priority = directivePriorities[ name ];
+			( obj[ priority ] = obj[ priority ] || [] ).push( name );
+		}
+		return obj;
+	}, {} );
 
-				return acc;
-			},
-			{}
-		);
-
-		return Object.entries( byPriority )
-			.sort( ( [ p1 ], [ p2 ] ) => p1 - p2 )
-			.map( ( [ , obj ] ) => obj );
-	}, [ directives ] );
-
-// Directive wrapper.
-const Directive = ( { type, directives, props: originalProps } ) => {
-	const ref = useRef( null );
-	const element = h( type, { ...originalProps, ref } );
-	const evaluate = useMemo( () => getEvaluate( { ref } ), [] );
-
-	// Add wrappers recursively for each priority level.
-	const byPriorityLevel = usePriorityLevels( directives );
-	return (
-		<RecursivePriorityLevel
-			directives={ byPriorityLevel }
-			element={ element }
-			evaluate={ evaluate }
-			originalProps={ originalProps }
-		/>
-	);
+	return Object.entries( byPriority )
+		.sort( ( [ p1 ], [ p2 ] ) => p1 - p2 )
+		.map( ( [ , arr ] ) => arr );
 };
 
 // Priority level wrapper.
-const RecursivePriorityLevel = ( {
-	directives: [ directives, ...rest ],
+const Directives = ( {
+	directives,
+	priorityLevels: [ currentPriorityLevel, ...nextPriorityLevels ],
 	element,
 	evaluate,
 	originalProps,
+	elemRef,
 } ) => {
-	// This element needs to be a fresh copy so we are not modifying an already
-	// rendered element with Preact's internal properties initialized. This
-	// prevents an error with changes in `element.props.children` not being
-	// reflected in `element.__k`.
-	element = cloneElement( element );
+	// Initialize the DOM reference.
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	elemRef = elemRef || useRef( null );
+
+	// Create a reference to the evaluate function using the DOM reference.
+	// eslint-disable-next-line react-hooks/rules-of-hooks, react-hooks/exhaustive-deps
+	evaluate = evaluate || useCallback( getEvaluate( { ref: elemRef } ), [] );
+
+	// Create a fresh copy of the vnode element.
+	element = cloneElement( element, { ref: elemRef } );
 
 	// Recursively render the wrapper for the next priority level.
-	//
-	// Note that, even though we're instantiating a vnode with a
-	// `RecursivePriorityLevel` here, its render function will not be executed
-	// just yet. Actually, it will be delayed until the current render function
-	// has finished. That ensures directives in the current priorty level have
-	// run (and thus modified the passed `element`) before the next level.
 	const children =
-		rest.length > 0 ? (
-			<RecursivePriorityLevel
-				directives={ rest }
+		nextPriorityLevels.length > 0 ? (
+			<Directives
+				directives={ directives }
+				priorityLevels={ nextPriorityLevels }
 				element={ element }
 				evaluate={ evaluate }
 				originalProps={ originalProps }
+				elemRef={ elemRef }
 			/>
 		) : (
 			element
@@ -118,8 +191,8 @@ const RecursivePriorityLevel = ( {
 	const props = { ...originalProps, children };
 	const directiveArgs = { directives, props, element, context, evaluate };
 
-	for ( const d in directives ) {
-		const wrapper = directiveMap[ d ]?.( directiveArgs );
+	for ( const directiveName of currentPriorityLevel ) {
+		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
 		if ( wrapper !== undefined ) props.children = wrapper;
 	}
 
@@ -133,12 +206,18 @@ options.vnode = ( vnode ) => {
 		const props = vnode.props;
 		const directives = props.__directives;
 		delete props.__directives;
-		vnode.props = {
-			type: vnode.type,
-			directives,
-			props,
-		};
-		vnode.type = Directive;
+		const priorityLevels = getPriorityLevels( directives );
+		if ( priorityLevels.length > 0 ) {
+			vnode.props = {
+				directives,
+				priorityLevels,
+				originalProps: props,
+				type: vnode.type,
+				element: h( vnode.type, props ),
+				top: true,
+			};
+			vnode.type = Directives;
+		}
 	}
 
 	if ( old ) old( vnode );

@@ -83,6 +83,10 @@ describe( 'Text color', () => {
 		const pinkColorButton = await screen.findByA11yHint( COLOR_PINK );
 		expect( pinkColorButton ).toBeDefined();
 		fireEvent.press( pinkColorButton );
+		// TODO(jest-console): Fix the warning and remove the expect below.
+		expect( console ).toHaveWarnedWith(
+			`Non-serializable values were found in the navigation state. Check:\n\ntext-color > Palette > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		);
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );

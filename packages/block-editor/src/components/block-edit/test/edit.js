@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import { Edit } from '../edit';
+import Edit from '../edit';
 import { BlockContextProvider } from '../../block-context';
 
 const noop = () => {};

@@ -66,6 +66,7 @@ export default function HeaderEditMode() {
 		homeUrl,
 		showIconLabels,
 		editorCanvasView,
+		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -83,6 +84,8 @@ export default function HeaderEditMode() {
 			getUnstableBase, // Site index.
 		} = select( coreStore );
 
+		const { get: getPreference } = select( preferencesStore );
+
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			templateType: postType,
@@ -94,22 +97,23 @@ export default function HeaderEditMode() {
 			isVisualMode: getEditorMode() === 'visual',
 			blockEditorMode: __unstableGetEditorMode(),
 			homeUrl: getUnstableBase()?.home,
-			showIconLabels: select( preferencesStore ).get(
-				'core/edit-site',
+			showIconLabels: getPreference(
+				editSiteStore.name,
 				'showIconLabels'
 			),
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
-			isDistractionFree: select( preferencesStore ).get(
-				'core/edit-site',
+			isDistractionFree: getPreference(
+				editSiteStore.name,
 				'distractionFree'
+			),
+			hasFixedToolbar: getPreference(
+				editSiteStore.name,
+				'fixedToolbar'
 			),
 		};
 	}, [] );
-
-	const { get: getPreference } = useSelect( preferencesStore );
-	const hasFixedToolbar = getPreference( editSiteStore.name, 'fixedToolbar' );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
@@ -275,7 +279,7 @@ export default function HeaderEditMode() {
 											label={ __( 'Zoom-out View' ) }
 											onClick={ () => {
 												setPreviewDeviceType(
-													'desktop'
+													'Desktop'
 												);
 												__unstableSetEditorMode(
 													isZoomedOutView
@@ -319,21 +323,24 @@ export default function HeaderEditMode() {
 								setDeviceType={ setPreviewDeviceType }
 								label={ __( 'View' ) }
 							>
-								<MenuGroup>
-									<MenuItem
-										href={ homeUrl }
-										target="_blank"
-										icon={ external }
-									>
-										{ __( 'View site' ) }
-										<VisuallyHidden as="span">
-											{
-												/* translators: accessibility text */
-												__( '(opens in a new tab)' )
-											}
-										</VisuallyHidden>
-									</MenuItem>
-								</MenuGroup>
+								{ ( { onClose } ) => (
+									<MenuGroup>
+										<MenuItem
+											href={ homeUrl }
+											target="_blank"
+											icon={ external }
+											onClick={ onClose }
+										>
+											{ __( 'View site' ) }
+											<VisuallyHidden as="span">
+												{
+													/* translators: accessibility text */
+													__( '(opens in a new tab)' )
+												}
+											</VisuallyHidden>
+										</MenuItem>
+									</MenuGroup>
+								) }
 							</PreviewOptions>
 						</div>
 					) }

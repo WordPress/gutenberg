@@ -54,6 +54,8 @@ const {
 	updateSettings,
 	validateBlocksToTemplate,
 	registerInserterMediaCategory,
+	setBlockEditingMode,
+	unsetBlockEditingMode,
 } = actions;
 
 describe( 'actions', () => {
@@ -216,6 +218,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlock( 'chicken', block )( { select, dispatch } );
 
@@ -281,6 +284,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlocks( [ 'chicken' ], blocks )( { select, dispatch } );
 
@@ -314,6 +318,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlocks(
 				[ 'chicken' ],
@@ -1317,6 +1322,32 @@ describe( 'actions', () => {
 						{ ...category, isExternalResource: true },
 					],
 				},
+			} );
+		} );
+	} );
+
+	describe( 'setBlockEditingMode', () => {
+		it( 'should return the SET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				setBlockEditingMode(
+					'14501cc2-90a6-4f52-aa36-ab6e896135d1',
+					'default'
+				)
+			).toEqual( {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'unsetBlockEditingMode', () => {
+		it( 'should return the UNSET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				unsetBlockEditingMode( '14501cc2-90a6-4f52-aa36-ab6e896135d1' )
+			).toEqual( {
+				type: 'UNSET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
 			} );
 		} );
 	} );
