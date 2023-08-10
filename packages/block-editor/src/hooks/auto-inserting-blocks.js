@@ -71,6 +71,12 @@ function AutoInsertingBlocksControl( props ) {
 					if ( autoInsertedBlock ) {
 						acc[ block.name ] = autoInsertedBlock.clientId;
 					}
+
+					// TOOD: If no auto-inserted block was found in any of its designated locations,
+					// we want to check if it's present elsewhere in the block tree.
+					// If it is, we'd consider it manually inserted and would want to remove the
+					// corresponding toggle from the block inspector panel.
+
 					return acc;
 				}, {} );
 
