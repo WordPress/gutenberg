@@ -11,6 +11,8 @@
 
 -   Add JSDoc comments to `store()` and `directive()` functions. ([#52469](https://github.com/WordPress/gutenberg/pull/52469))
 
+## 2.0.0 (2023-08-10)
+
 ### Breaking Change
 
 -   Remove the `wp-show` directive until we figure out its final implementation. ([#53240](https://github.com/WordPress/gutenberg/pull/53240))
