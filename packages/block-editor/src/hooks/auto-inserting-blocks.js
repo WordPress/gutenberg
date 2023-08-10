@@ -156,29 +156,21 @@ function AutoInsertingBlocksControl( props ) {
 		{}
 	);
 
-	const insertBlockIntoDesignatedLocation = (
-		blockName,
-		relativePosition
-	) => {
+	const insertBlockIntoDesignatedLocation = ( block, relativePosition ) => {
 		if ( [ 'before', 'after' ].includes( relativePosition ) ) {
-			const insertionIndex =
-				relativePosition === 'after' ? blockIndex + 1 : blockIndex;
-
 			insertBlock(
-				createBlock( blockName ),
-				insertionIndex,
-				rootClientId,
+				block,
+				relativePosition === 'after' ? blockIndex + 1 : blockIndex,
+				rootClientId, // Insert as a child of the current block's parent
 				false
 			);
 		} else if (
 			[ 'first_child', 'last_child' ].includes( relativePosition )
 		) {
-			const insertionIndex =
-				relativePosition === 'first_child' ? 0 : innerBlocksLength;
 			insertBlock(
-				createBlock( blockName ),
-				insertionIndex,
-				props.clientId,
+				block,
+				relativePosition === 'first_child' ? 0 : innerBlocksLength,
+				props.clientId, // Insert as a child of the current block.
 				false
 			);
 		}
@@ -220,9 +212,9 @@ function AutoInsertingBlocksControl( props ) {
 													return;
 												}
 
-												// Insert block.
+												// Create and insert block.
 												insertBlockIntoDesignatedLocation(
-													block.name,
+													createBlock( block.name ),
 													relativePosition
 												);
 											} }
