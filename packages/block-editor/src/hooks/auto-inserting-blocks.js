@@ -156,6 +156,34 @@ function AutoInsertingBlocksControl( props ) {
 		{}
 	);
 
+	const insertBlockIntoDesignatedLocation = (
+		blockName,
+		relativePosition
+	) => {
+		if ( [ 'before', 'after' ].includes( relativePosition ) ) {
+			const insertionIndex =
+				relativePosition === 'after' ? blockIndex + 1 : blockIndex;
+
+			insertBlock(
+				createBlock( blockName ),
+				insertionIndex,
+				rootClientId,
+				false
+			);
+		} else if (
+			[ 'first_child', 'last_child' ].includes( relativePosition )
+		) {
+			const insertionIndex =
+				relativePosition === 'first_child' ? 0 : innerBlocksLength;
+			insertBlock(
+				createBlock( blockName ),
+				insertionIndex,
+				props.clientId,
+				false
+			);
+		}
+	};
+
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Plugins' ) } initialOpen={ true }>
@@ -193,50 +221,10 @@ function AutoInsertingBlocksControl( props ) {
 												}
 
 												// Insert block.
-												if (
-													[
-														'before',
-														'after',
-													].includes(
-														relativePosition
-													)
-												) {
-													const insertionIndex =
-														relativePosition ===
-														'after'
-															? blockIndex + 1
-															: blockIndex;
-
-													insertBlock(
-														createBlock(
-															block.name
-														),
-														insertionIndex,
-														rootClientId,
-														false
-													);
-												} else if (
-													[
-														'first_child',
-														'last_child',
-													].includes(
-														relativePosition
-													)
-												) {
-													const insertionIndex =
-														relativePosition ===
-														'first_child'
-															? 0
-															: innerBlocksLength;
-													insertBlock(
-														createBlock(
-															block.name
-														),
-														insertionIndex,
-														props.clientId,
-														false
-													);
-												}
+												insertBlockIntoDesignatedLocation(
+													block.name,
+													relativePosition
+												);
 											} }
 										/>
 									);
