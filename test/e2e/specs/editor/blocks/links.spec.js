@@ -233,4 +233,62 @@ test.describe( 'Links', () => {
 		// This verifies that the editor preference was persisted.
 		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeVisible();
 	} );
+
+	test( 'correctly updates the link when caret at outer edge of format boundary', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg WordPress' );
+
+		// Select "WordPress".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Create a link.
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'w.org' );
+		await page.keyboard.press( 'Enter' );
+
+		// Move into the Link at the rightmost edge of the link format boundary.
+		await pageUtils.pressKeys( 'ArrowLeft' );
+
+		// Switch Link UI to "edit" mode.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// focus the input with the accessible name of `Link`
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+
+		await urlInput.clear();
+		await urlInput.focus();
+
+		// Update the link.
+		await page.keyboard.type( 'wordpress.org' );
+
+		// press the Save buttobn
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		// Reactive the link again
+		await pageUtils.pressKeys( 'ArrowLeft' );
+
+		// Switch Link UI to "edit" mode.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Check the contents of the Link input has changed
+		await expect(
+			page.getByRole( 'combobox', {
+				name: 'Link',
+			} )
+		).toHaveValue( 'http://wordpress.org' );
+	} );
 } );
