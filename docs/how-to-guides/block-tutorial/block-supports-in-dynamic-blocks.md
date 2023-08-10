@@ -19,6 +19,8 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 
+import { __ } from '@wordpress/i18n';
+
 registerBlockType( 'gutenberg-examples/example-dynamic', {
 	apiVersion: 3,
 	title: 'Example: last post title',
