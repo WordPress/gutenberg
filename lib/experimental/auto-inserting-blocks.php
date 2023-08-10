@@ -149,6 +149,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 		'example'          => 'example',
 		'variations'       => 'variations',
 	);
+	// Add `auto_insert` to the list of fields to pick.
 	$fields_to_pick['auto_insert'] = 'autoInsert';
 
 	$exposed_settings = array_intersect_key( $settings, $fields_to_pick );
@@ -156,7 +157,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 	// TODO: Make work for blocks registered via direct call to gutenberg_register_auto_inserted_block().
 	wp_add_inline_script(
 		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( array( $inserted_block_name => $exposed_settings ) ) . ');',
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( array( $inserted_block_name => $exposed_settings ) ) . ');'
 	);
 
 	return $settings;
