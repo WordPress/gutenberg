@@ -57,7 +57,9 @@ import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { getLayoutStyles } = unlock( blockEditorPrivateApis );
+const { getLayoutStyles, useShouldContextualToolbarShow } = unlock(
+	blockEditorPrivateApis
+);
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -194,6 +196,10 @@ function Layout() {
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
 		);
 
+	// Using this to determine if the toolbar is present or not on smaller screens as
+	// the post editor content needs to be pushed down when the toolbar is visible.
+	const { fixedToolbarCanBeFocused } = useShouldContextualToolbarShow();
+
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
 		if ( sidebarIsOpened && ! isHugeViewport ) {
@@ -222,6 +228,7 @@ function Layout() {
 
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
+		'is-fixed-toolbar-visible': !! fixedToolbarCanBeFocused,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,

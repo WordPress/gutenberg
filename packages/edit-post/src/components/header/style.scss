@@ -7,6 +7,14 @@
 	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
 
+	.is-fixed-toolbar-visible & {
+		margin-bottom: 47px; // Magic number for the height of the toolbar. Address this is we merge this.
+
+		@include break-medium() {
+			margin-bottom: 0;
+		}
+	}
+
 	// Make toolbar sticky on larger breakpoints
 	@include break-zoomed-in {
 		flex-wrap: nowrap;
