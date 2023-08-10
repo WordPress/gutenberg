@@ -117,6 +117,7 @@ function AutoInsertingBlocksControl( props ) {
 		) {
 			insertBlock(
 				block,
+				// TODO: It'd be great if insertBlock() would accept negative indices for insertion.
 				relativePosition === 'first_child' ? 0 : innerBlocksLength,
 				props.clientId, // Insert as a child of the current block.
 				false
