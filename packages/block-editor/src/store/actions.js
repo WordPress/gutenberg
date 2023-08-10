@@ -1042,9 +1042,7 @@ export const mergeBlocks =
 					clientIdA
 				);
 				dispatch.removeBlock( clientIdB );
-				dispatch.selectBlock(
-					blockWithSameType.innerBlocks[ 0 ].clientId
-				);
+				dispatch.selectBlock( firstInnerBlock.clientId );
 			} );
 			return;
 		}
