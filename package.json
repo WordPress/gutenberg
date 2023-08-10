@@ -225,7 +225,6 @@
 		"prettier": "npm:wp-prettier@2.8.5",
 		"progress": "2.0.3",
 		"react": "18.2.0",
-		"react-docgen-typescript-plugin": "1.0.5",
 		"react-dom": "18.2.0",
 		"react-native": "0.71.11",
 		"react-native-url-polyfill": "1.1.2",
