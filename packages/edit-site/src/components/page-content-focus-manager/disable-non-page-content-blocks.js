@@ -49,7 +49,7 @@ export function useDisableNonPageContentBlocks() {
 
 const withDisableNonPageContentBlocks = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const isDescendentOfQueryLoop = !! props.context.queryId;
+		const isDescendentOfQueryLoop = props.context.queryId !== undefined;
 		const isPageContent =
 			PAGE_CONTENT_BLOCK_TYPES.includes( props.name ) &&
 			! isDescendentOfQueryLoop;

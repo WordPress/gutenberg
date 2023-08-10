@@ -11,7 +11,7 @@ import {
 import { useDispatch } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -140,12 +140,12 @@ export default function ListViewSidebar() {
 				tabs={ [
 					{
 						name: 'list-view',
-						title: 'List View',
+						title: _x( 'List View', 'Post overview' ),
 						className: 'edit-post-sidebar__panel-tab',
 					},
 					{
 						name: 'outline',
-						title: 'Outline',
+						title: _x( 'Outline', 'Post overview' ),
 						className: 'edit-post-sidebar__panel-tab',
 					},
 				] }

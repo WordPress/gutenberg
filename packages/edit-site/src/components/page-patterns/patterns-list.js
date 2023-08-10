@@ -27,7 +27,7 @@ import usePatterns from './use-patterns';
 import SidebarButton from '../sidebar-button';
 import useDebouncedInput from '../../utils/use-debounced-input';
 import { unlock } from '../../lock-unlock';
-import { SYNC_TYPES, USER_PATTERN_CATEGORY } from './utils';
+import { SYNC_TYPES, USER_PATTERN_CATEGORY, PATTERNS } from './utils';
 import Pagination from './pagination';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -63,9 +63,12 @@ export default function PatternsList( { categoryId, type } ) {
 
 	const deferredSyncedFilter = useDeferredValue( syncFilter );
 
+	const isUncategorizedThemePatterns =
+		type === PATTERNS && categoryId === 'uncategorized';
+
 	const { patterns, isResolving } = usePatterns(
 		type,
-		categoryId !== 'uncategorized' ? categoryId : '',
+		isUncategorizedThemePatterns ? '' : categoryId,
 		{
 			search: deferredFilterValue,
 			syncStatus:
@@ -74,6 +77,16 @@ export default function PatternsList( { categoryId, type } ) {
 					: deferredSyncedFilter,
 		}
 	);
+
+	const updateSearchFilter = ( value ) => {
+		setCurrentPage( 1 );
+		setFilterValue( value );
+	};
+
+	const updateSyncFilter = ( value ) => {
+		setCurrentPage( 1 );
+		setSyncFilter( value );
+	};
 
 	const id = useId();
 	const titleId = `${ id }-title`;
@@ -87,14 +100,12 @@ export default function PatternsList( { categoryId, type } ) {
 	const pageIndex = currentPage - 1;
 	const numPages = Math.ceil( patterns.length / PAGE_SIZE );
 
-	const list = useMemo(
-		() =>
-			patterns.slice(
-				pageIndex * PAGE_SIZE,
-				pageIndex * PAGE_SIZE + PAGE_SIZE
-			),
-		[ pageIndex, patterns ]
-	);
+	const list = useMemo( () => {
+		return patterns.slice(
+			pageIndex * PAGE_SIZE,
+			pageIndex * PAGE_SIZE + PAGE_SIZE
+		);
+	}, [ pageIndex, patterns ] );
 
 	const asyncList = useAsyncList( list, { step: 10 } );
 
@@ -135,7 +146,9 @@ export default function PatternsList( { categoryId, type } ) {
 					<FlexBlock className="edit-site-patterns__search-block">
 						<SearchControl
 							className="edit-site-patterns__search"
-							onChange={ ( value ) => setFilterValue( value ) }
+							onChange={ ( value ) =>
+								updateSearchFilter( value )
+							}
 							placeholder={ __( 'Search patterns' ) }
 							label={ __( 'Search patterns' ) }
 							value={ filterValue }
@@ -149,7 +162,7 @@ export default function PatternsList( { categoryId, type } ) {
 							label={ __( 'Filter by sync status' ) }
 							value={ syncFilter }
 							isBlock
-							onChange={ ( value ) => setSyncFilter( value ) }
+							onChange={ ( value ) => updateSyncFilter( value ) }
 							__nextHasNoMarginBottom
 						>
 							{ Object.entries( SYNC_FILTERS ).map(

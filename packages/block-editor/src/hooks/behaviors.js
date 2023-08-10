@@ -22,15 +22,13 @@ function BehaviorsControl( {
 	onChangeAnimation,
 	disabled = false,
 } ) {
-	const { settings, themeBehaviors } = useSelect(
+	const { settings } = useSelect(
 		( select ) => {
-			const { getBehaviors, getSettings } = select( blockEditorStore );
-
+			const { getSettings } = select( blockEditorStore );
 			return {
 				settings:
 					getSettings()?.__experimentalFeatures?.blocks?.[ blockName ]
-						?.behaviors,
-				themeBehaviors: getBehaviors()?.blocks?.[ blockName ],
+						?.behaviors || {},
 			};
 		},
 		[ blockName ]
@@ -46,7 +44,6 @@ function BehaviorsControl( {
 			label: __( 'No behaviors' ),
 		},
 	};
-
 	const behaviorsOptions = Object.entries( settings )
 		.filter(
 			( [ behaviorName, behaviorValue ] ) =>
@@ -60,7 +57,6 @@ function BehaviorsControl( {
 				.slice( 1 )
 				.toLowerCase() }`,
 		} ) );
-
 	const options = [
 		...Object.values( defaultBehaviors ),
 		...behaviorsOptions,
@@ -68,7 +64,6 @@ function BehaviorsControl( {
 
 	const { behaviors, behaviorsValue } = useMemo( () => {
 		const mergedBehaviors = {
-			...themeBehaviors,
 			...( blockBehaviors || {} ),
 		};
 
@@ -83,7 +78,8 @@ function BehaviorsControl( {
 			behaviors: mergedBehaviors,
 			behaviorsValue: value,
 		};
-	}, [ blockBehaviors, themeBehaviors ] );
+	}, [ blockBehaviors ] );
+
 	// If every behavior is disabled, do not show the behaviors inspector control.
 	if ( behaviorsOptions.length === 0 ) {
 		return null;
@@ -203,10 +199,8 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 	};
 }, 'withBehaviors' );
 
-if ( window?.__experimentalInteractivityAPI ) {
-	addFilter(
-		'editor.BlockEdit',
-		'core/behaviors/with-inspector-control',
-		withBehaviors
-	);
-}
+addFilter(
+	'editor.BlockEdit',
+	'core/behaviors/with-inspector-control',
+	withBehaviors
+);

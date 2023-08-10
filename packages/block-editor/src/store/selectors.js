@@ -1962,51 +1962,8 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createSelector(
 	( state, rootClientId = null ) => {
-		/*
-		 * Matches block comment delimiters amid serialized content.
-		 *
-		 * @see `tokenizer` in `@wordpress/block-serialization-default-parser`
-		 * package
-		 *
-		 * blockParserTokenizer differs from the original tokenizer in the
-		 * following ways:
-		 *
-		 * - removed global flag (/g)
-		 * - prepended ^\s*
-		 *
-		 */
-		const blockParserTokenizer =
-			/^\s*<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
-
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
-			let icon = symbol;
-
-			/*
-			 * Instead of always displaying a generic "symbol" icon for every
-			 * reusable block, try to use an icon that represents the first
-			 * outermost block contained in the reusable block. This requires
-			 * scanning the serialized form of the reusable block to find its
-			 * first block delimiter, then looking up the corresponding block
-			 * type, if available.
-			 */
-			if ( Platform.OS === 'web' ) {
-				const content =
-					typeof reusableBlock.content.raw === 'string'
-						? reusableBlock.content.raw
-						: reusableBlock.content;
-				const rawBlockMatch = content.match( blockParserTokenizer );
-				if ( rawBlockMatch ) {
-					const [ , , namespace = 'core/', blockName ] =
-						rawBlockMatch;
-					const referencedBlockType = getBlockType(
-						namespace + blockName
-					);
-					if ( referencedBlockType ) {
-						icon = referencedBlockType.icon;
-					}
-				}
-			}
-
+			const icon = symbol;
 			const id = `core/block/${ reusableBlock.id }`;
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const frecency = calculateFrecency( time, count );
@@ -2023,6 +1980,7 @@ export const getInserterItems = createSelector(
 				utility: 1, // Deprecated.
 				frecency,
 				content: reusableBlock.content.raw,
+				syncStatus: reusableBlock.wp_pattern_sync_status,
 			};
 		};
 
@@ -2031,18 +1989,7 @@ export const getInserterItems = createSelector(
 			'core/block',
 			rootClientId
 		)
-			? getReusableBlocks( state )
-					.filter(
-						( reusableBlock ) =>
-							// Reusable blocks that are fully synced should have no sync status set
-							// for backwards compat between patterns and old reusable blocks, but
-							// some in release 16.1 may have had sync status inadvertantly set to
-							// 'fully' if created in the site editor.
-							reusableBlock.wp_pattern_sync_status === 'fully' ||
-							reusableBlock.wp_pattern_sync_status === '' ||
-							! reusableBlock.wp_pattern_sync_status
-					)
-					.map( buildReusableBlockInserterItem )
+			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
 			: [];
 
 		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
@@ -2575,30 +2522,6 @@ export function getBlockListSettings( state, clientId ) {
  */
 export function getSettings( state ) {
 	return state.settings;
-}
-
-/**
- * Returns the behaviors registered with the editor.
- *
- * Behaviors are named, reusable pieces of functionality that can be
- * attached to blocks. They are registered with the editor using the
- * `theme.json` file.
- *
- * @example
- *
- * ```js
- * const behaviors = select( blockEditorStore ).getBehaviors();
- * if ( behaviors?.lightbox ) {
- * 	 // Do something with the lightbox.
- * }
- *```
- *
- * @param {Object} state Editor state.
- *
- * @return {Object} The editor behaviors object.
- */
-export function getBehaviors( state ) {
-	return state.settings.behaviors;
 }
 
 /**

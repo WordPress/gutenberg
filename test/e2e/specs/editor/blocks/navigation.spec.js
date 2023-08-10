@@ -4,25 +4,19 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		//TT3 is preferable to emptytheme because it already has the navigation block on its templates.
-		await requestUtils.activateTheme( 'twentytwentythree' );
-	} );
-
 	test.beforeEach( async ( { requestUtils } ) => {
-		await Promise.all( [ requestUtils.deleteAllMenus() ] );
+		await requestUtils.deleteAllMenus();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllMenus(),
-			requestUtils.activateTheme( 'twentytwentyone' ),
-		] );
+		await requestUtils.deleteAllMenus();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
-		await requestUtils.deleteAllMenus();
+		await Promise.all( [
+			requestUtils.deleteAllPosts(),
+			requestUtils.deleteAllMenus(),
+		] );
 	} );
 
 	test.describe( 'As a user I want the navigation block to fallback to the best possible default', () => {
@@ -74,8 +68,9 @@ test.describe( 'Navigation block', () => {
 				)
 			).toBeVisible();
 
+			const postId = await editor.publishPost();
+
 			// Check the markup of the block is correct.
-			await editor.publishPost();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/navigation',
@@ -84,7 +79,7 @@ test.describe( 'Navigation block', () => {
 			] );
 
 			// Check the block in the frontend.
-			await page.goto( `/` );
+			await page.goto( `/?p=${ postId }` );
 
 			await expect(
 				page.locator(
@@ -118,8 +113,9 @@ test.describe( 'Navigation block', () => {
 				)
 			).toBeVisible( { timeout: 10000 } ); // allow time for network request.
 
+			const postId = await editor.publishPost();
 			// Check the block in the frontend.
-			await page.goto( `/` );
+			await page.goto( `/?p=${ postId }` );
 
 			await expect(
 				page.locator(
@@ -154,7 +150,7 @@ test.describe( 'Navigation block', () => {
 			await editor.insertBlock( { name: 'core/navigation' } );
 
 			// Check the markup of the block is correct.
-			await editor.publishPost();
+			const postId = await editor.publishPost();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/navigation',
@@ -170,7 +166,7 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible();
 
 			// Check the block in the frontend.
-			await page.goto( `/` );
+			await page.goto( `/?p=${ postId }` );
 
 			await expect(
 				page.locator(
@@ -208,8 +204,8 @@ test.describe( 'Navigation block', () => {
 			} );
 			await addSubmenuButton.click();
 
-			await editor.publishPost();
-			await page.goto( `/` );
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
 
 			await expect(
 				page.locator(

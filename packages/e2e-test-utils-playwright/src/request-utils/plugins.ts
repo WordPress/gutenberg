@@ -27,9 +27,43 @@ async function getPluginsMap( this: RequestUtils, forceRefetch = false ) {
 	for ( const plugin of plugins ) {
 		// Ideally, we should be using sanitize_title() in PHP rather than kebabCase(),
 		// but we don't have the exact port of it in JS.
-		this.pluginsMap[ kebabCase( plugin.name ) ] = plugin.plugin;
+		// This is a good approximation though.
+		const slug = kebabCase( plugin.name.toLowerCase() );
+		this.pluginsMap[ slug ] = plugin.plugin;
 	}
 	return this.pluginsMap;
+}
+
+/**
+ * Finds a plugin in the plugin map.
+ *
+ * Attempts to provide a helpful error message if not found.
+ *
+ * @param slug       Plugin slug.
+ * @param pluginsMap Plugins map.
+ */
+function getPluginFromMap(
+	slug: string,
+	pluginsMap: Record< string, string >
+) {
+	const plugin = pluginsMap[ slug ];
+
+	if ( ! plugin ) {
+		for ( const key of Object.keys( pluginsMap ) ) {
+			if (
+				key.toLowerCase().replace( /-/g, '' ) ===
+				slug.toLowerCase().replace( /-/g, '' )
+			) {
+				throw new Error(
+					`The plugin "${ slug }" isn't installed. Did you perhaps mean "${ key }"?`
+				);
+			}
+		}
+
+		throw new Error( `The plugin "${ slug }" isn't installed` );
+	}
+
+	return plugin;
 }
 
 /**
@@ -40,11 +74,7 @@ async function getPluginsMap( this: RequestUtils, forceRefetch = false ) {
  */
 async function activatePlugin( this: RequestUtils, slug: string ) {
 	const pluginsMap = await this.getPluginsMap();
-	const plugin = pluginsMap[ slug ];
-
-	if ( ! plugin ) {
-		throw new Error( `The plugin "${ slug }" isn't installed` );
-	}
+	const plugin = getPluginFromMap( slug, pluginsMap );
 
 	await this.rest( {
 		method: 'PUT',
@@ -61,11 +91,7 @@ async function activatePlugin( this: RequestUtils, slug: string ) {
  */
 async function deactivatePlugin( this: RequestUtils, slug: string ) {
 	const pluginsMap = await this.getPluginsMap();
-	const plugin = pluginsMap[ slug ];
-
-	if ( ! plugin ) {
-		throw new Error( `The plugin "${ slug }" isn't installed` );
-	}
+	const plugin = getPluginFromMap( slug, pluginsMap );
 
 	await this.rest( {
 		method: 'PUT',
