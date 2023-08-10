@@ -4,9 +4,9 @@
  *
  * This file contains the class for the REST API Fonts Library Controller.
  *
- * @package    Gutenberg
+ * @package    WordPress
  * @subpackage Fonts Library
- * @since      X.X.X
+ * @since      6.4.0
  */
 
 if ( class_exists( 'WP_REST_Fonts_Library_Controller' ) ) {
@@ -15,11 +15,15 @@ if ( class_exists( 'WP_REST_Fonts_Library_Controller' ) ) {
 
 /**
  * Fonts Library Controller class.
+ *
+ * @since 6.4.0
  */
 class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructor.
+	 *
+	 * @since 6.4.0
 	 */
 	public function __construct() {
 		$this->rest_base = 'fonts';
@@ -28,6 +32,8 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
 	/**
 	 * Registers the routes for the objects of the controller.
+	 *
+	 * @since 6.4.0
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -66,9 +72,10 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Returns validation errors in font families data for installation.
 	 *
-	 * @param array[] $font_families Array of font families to install.
-	 * @param array   $files Array of files to install.
+	 * @since 6.4.0
 	 *
+	 * @param array[] $font_families Font families to install.
+	 * @param array   $files         Files to install.
 	 * @return array $error_messages Array of error messages.
 	 */
 	private function get_validation_errors( $font_families, $files ) {
@@ -88,7 +95,11 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		for ( $family_index = 0; $family_index < count( $font_families ); $family_index++ ) {
 			$font_family = $font_families[ $family_index ];
 
-			if ( ! isset( $font_family['slug'] ) || ! isset( $font_family['name'] ) || ! isset( $font_family['fontFamily'] ) ) {
+			if (
+				! isset( $font_family['slug'] ) ||
+				! isset( $font_family['name'] ) ||
+				! isset( $font_family['fontFamily'] )
+			) {
 				$error_messages[] = sprintf(
 					// translators: 1: font family index.
 					__( 'Font family [%s] should have slug, name and fontFamily properties defined.', 'gutenberg' ),
@@ -149,15 +160,17 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 				}
 			}
 		}
+
 		return $error_messages;
 	}
 
 	/**
 	 * Validate input for the install endpoint.
 	 *
+	 * @since 6.4.0
+	 *
 	 * @param string          $param The font families to install.
 	 * @param WP_REST_Request $request The request object.
-	 *
 	 * @return true|WP_Error True if the parameter is valid, WP_Error otherwise.
 	 */
 	public function validate_install_font_families( $param, $request ) {
@@ -173,7 +186,9 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Schema for the uninstall endpoint.
+	 * Gets the schema for the uninstall endpoint.
+	 *
+	 * @since 6.4.0
 	 *
 	 * @return array Schema array.
 	 */
@@ -199,9 +214,10 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		);
 	}
 
-
 	/**
 	 * Removes font families from the fonts library and all their assets.
+	 *
+	 * @since 6.4.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -224,6 +240,8 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 
 	/**
 	 * Checks whether the user has permissions to update the fonts library.
+	 *
+	 * @since 6.4.0
 	 *
 	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
@@ -257,9 +275,13 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Installs new fonts.
 	 *
-	 * Takes a request containing new fonts to install, downloads their assets, and adds them to the fonts library.
+	 * Takes a request containing new fonts to install, downloads their assets, and adds them
+	 * to the fonts library.
 	 *
-	 * @param WP_REST_Request $request The request object containing the new fonts to install in the request parameters.
+	 * @since 6.4.0
+	 *
+	 * @param WP_REST_Request $request The request object containing the new fonts to install
+	 *                                 in the request parameters.
 	 * @return WP_REST_Response|WP_Error The updated fonts library post content.
 	 */
 	public function install_fonts( $request ) {
@@ -267,13 +289,18 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		$fonts_param = $request->get_param( 'fontFamilies' );
 
 		/*
-		 * As we are receiving form data, the font families are encoded as a string.
-		 * We are using form data because local fonts need to use that format to attach the files in the request.
+		 * As this is receiving form data, the font families are encoded as a string.
+		 * The form data is used  because local fonts need to use that format to
+		 * attach the files in the request.
 		 */
 		$fonts_to_install = json_decode( $fonts_param, true );
 
 		if ( empty( $fonts_to_install ) ) {
-			return new WP_Error( 'no_fonts_to_install', __( 'No fonts to install', 'gutenberg' ), array( 'status' => 400 ) );
+			return new WP_Error(
+				'no_fonts_to_install',
+				__( 'No fonts to install', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
 		}
 
 		// Get uploaded files (used when installing local fonts).
@@ -288,14 +315,18 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 		}
 
 		if ( empty( $fonts_installed ) ) {
-			return new WP_Error( 'error_installing_fonts', __( 'Error installing fonts. No font was installed.', 'gutenberg' ), array( 'status' => 500 ) );
+			return new WP_Error(
+				'error_installing_fonts',
+				__( 'Error installing fonts. No font was installed.', 'gutenberg' ),
+				array( 'status' => 500 )
+			);
 		}
 
 		$response = array();
 		foreach ( $fonts_installed as $font ) {
 			$response[] = $font->get_data();
 		}
+
 		return new WP_REST_Response( $response );
 	}
-
 }

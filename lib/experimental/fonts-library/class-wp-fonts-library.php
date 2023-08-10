@@ -4,9 +4,9 @@
  *
  * This file contains the Fonts Library class definition.
  *
- * @package    Gutenberg
+ * @package    WordPress
  * @subpackage Fonts Library
- * @since      X.X.X
+ * @since      6.4.0
  */
 
 if ( class_exists( 'WP_Fonts_Library' ) ) {
@@ -15,6 +15,8 @@ if ( class_exists( 'WP_Fonts_Library' ) ) {
 
 /**
  * Fonts Library class.
+ *
+ * @since 6.4.0
  */
 class WP_Fonts_Library {
 
@@ -28,6 +30,8 @@ class WP_Fonts_Library {
 	/**
 	 * Gets the upload directory for fonts.
 	 *
+	 * @since 6.4.0
+	 *
 	 * @return string Path of the upload directory for fonts.
 	 */
 	public static function get_fonts_dir() {
@@ -37,27 +41,31 @@ class WP_Fonts_Library {
 	/**
 	 * Sets the upload directory for fonts.
 	 *
+	 * @since 6.4.0
+	 *
 	 * @param array $defaults {
 	 *     Default upload directory.
 	 *
-	 *     @type string $path   Path to the directory.
-	 *     @type string $url    URL for the directory.
-	 *     @type string $subdir Sub-directory of the directory.
+	 *     @type string $path    Path to the directory.
+	 *     @type string $url     URL for the directory.
+	 *     @type string $subdir  Sub-directory of the directory.
 	 *     @type string $basedir Base directory.
 	 *     @type string $baseurl Base URL.
 	 * }
-	 *
 	 * @return array Modified upload directory.
 	 */
 	public static function set_upload_dir( $defaults ) {
 		$defaults['subdir'] = '/fonts';
 		$defaults['path']   = $defaults['basedir'] . $defaults['subdir'];
 		$defaults['url']    = $defaults['baseurl'] . $defaults['subdir'];
+
 		return $defaults;
 	}
 
 	/**
 	 * Registers the fonts library post type.
+	 *
+	 * @since 6.4.0
 	 */
 	public static function register_post_type() {
 		$args = array(
@@ -67,5 +75,4 @@ class WP_Fonts_Library {
 		);
 		register_post_type( 'wp_font_family', $args );
 	}
-
 }

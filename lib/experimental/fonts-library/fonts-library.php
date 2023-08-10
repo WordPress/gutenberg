@@ -4,18 +4,16 @@
  *
  * This file contains fonts library init calls.
  *
- * @package    Gutenberg
+ * @package    WordPress
  * @subpackage Fonts Library
- * @since      X.X.X
- */
-
-/**
- * Registers the routes for the objects of the controller.
+ * @since      6.4.0
  */
 
 if ( ! function_exists( 'fonts_library_init' ) ) {
 	/**
 	 * Registers the routes for the objects of the controller.
+	 *
+	 * @since 6.4.0
 	 */
 	function fonts_library_init() {
 		WP_Fonts_Library::register_post_type();
