@@ -1025,6 +1025,16 @@ export const mergeBlocks =
 				dispatch.selectBlock( blockA.clientId );
 				return;
 			}
+			const firstInnerBlock = blockWithSameType.innerBlocks[ 0 ];
+			// After switching to the block type, if the first inner block is
+			// not the same type, avoid merging because it's too complex. For
+			// example, a paragraph can be switched to columns block, but the
+			// paragraph is moved two levels deep. Merging resulting in an
+			// additional column would be strange.
+			if ( firstInnerBlock.name !== blockAType.name ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
