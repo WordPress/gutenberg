@@ -14,5 +14,7 @@ export default function AccessibleMenuDescription( { id } ) {
 	/* translators: %s: Title of a Navigation Menu post. */
 	const description = sprintf( __( `Navigation menu: "%s"` ), menuTitle );
 
-	return <AccessibleDescription id={ id } content={ description } />;
+	return (
+		<AccessibleDescription id={ id }>{ description }</AccessibleDescription>
+	);
 }
