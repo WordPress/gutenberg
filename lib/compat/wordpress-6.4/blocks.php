@@ -14,7 +14,7 @@
  */
 function gutenberg_add_custom_capabilities_to_wp_block( $args ) {
 	if ( is_array( $args ) ) {
-		if ( is_array( $args['capabilities'] ) || ! isset( $args['capabilities'] ) ) {
+		if ( ! isset( $args['capabilities'] ) || is_array( $args['capabilities'] ) ) {
 			$args['capabilities']['delete_posts'] = 'delete_posts';
 		}
 	}
