@@ -7,6 +7,7 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { starEmpty, starFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -34,6 +35,9 @@ const meta: ComponentMeta< typeof Modal > = {
 		},
 		onRequestClose: {
 			action: 'onRequestClose',
+		},
+		isDismissible: {
+			control: { type: 'boolean' },
 		},
 	},
 	parameters: {
@@ -97,4 +101,27 @@ Default.parameters = {
 			code: '',
 		},
 	},
+};
+
+const LikeButton = () => {
+	const [ isLiked, setIsLiked ] = useState( false );
+	return (
+		<Button
+			icon={ isLiked ? starFilled : starEmpty }
+			label="Like"
+			onClick={ () => setIsLiked( ! isLiked ) }
+		/>
+	);
+};
+
+export const WithHeaderActions: ComponentStory< typeof Modal > = Template.bind(
+	{}
+);
+WithHeaderActions.args = {
+	...Default.args,
+	headerActions: <LikeButton />,
+	isDismissible: false,
+};
+WithHeaderActions.parameters = {
+	...Default.parameters,
 };

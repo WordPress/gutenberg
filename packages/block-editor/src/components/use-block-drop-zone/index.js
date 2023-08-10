@@ -19,7 +19,6 @@ import {
 	isPointContainedByRect,
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 /** @typedef {import('../use-on-block-drop/types').WPDropOperation} WPDropOperation */
@@ -155,7 +154,7 @@ export default function useBlockDropZone( {
 				__unstableIsWithinBlockOverlay,
 				__unstableHasActiveBlockOverlayActive,
 				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 			const blockEditingMode = getBlockEditingMode( targetRootClientId );
 			return (
 				blockEditingMode !== 'default' ||

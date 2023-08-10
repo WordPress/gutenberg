@@ -291,6 +291,11 @@
 						"wideSize": {
 							"description": "Sets the max-width of wide (`.alignwide`) content. Also used as the maximum viewport when calculating fluid font sizes",
 							"type": "string"
+						},
+						"allowEditing": {
+							"description": "Disable the layout UI controls.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false

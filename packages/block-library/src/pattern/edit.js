@@ -9,11 +9,6 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
-
 const PatternEdit = ( { attributes, clientId } ) => {
 	const selectedPattern = useSelect(
 		( select ) =>
@@ -25,10 +20,9 @@ const PatternEdit = ( { attributes, clientId } ) => {
 
 	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	const { setBlockEditingMode } = unlock( useDispatch( blockEditorStore ) );
-	const { getBlockRootClientId, getBlockEditingMode } = unlock(
-		useSelect( blockEditorStore )
-	);
+	const { setBlockEditingMode } = useDispatch( blockEditorStore );
+	const { getBlockRootClientId, getBlockEditingMode } =
+		useSelect( blockEditorStore );
 
 	// Run this effect when the component loads.
 	// This adds the Pattern's contents to the post.
