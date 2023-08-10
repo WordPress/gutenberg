@@ -311,5 +311,6 @@ module.exports = {
 	resetDatabase,
 	setupWordPressDirectories,
 	readWordPressVersion,
+	canAccessWPORG,
 	getLatestWordPressVersion,
 };
