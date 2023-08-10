@@ -136,9 +136,6 @@ function AutoInsertingBlocksControl( props ) {
 									// TODO: Display block icon.
 									// <BlockIcon icon={ block.icon } />
 
-									const relativePosition =
-										block.autoInsert[ props.blockName ];
-
 									const checked = Object.keys(
 										autoInsertedBlockClientIds
 									).includes( block.name );
@@ -149,24 +146,27 @@ function AutoInsertingBlocksControl( props ) {
 											key={ block.title }
 											label={ block.title }
 											onChange={ () => {
-												if ( checked ) {
-													// Remove block.
-													const clientId =
-														autoInsertedBlockClientIds[
-															block.name
+												if ( ! checked ) {
+													// Create and insert block.
+													const relativePosition =
+														block.autoInsert[
+															props.blockName
 														];
-													removeBlock(
-														clientId,
-														false
+													insertBlockIntoDesignatedLocation(
+														createBlock(
+															block.name
+														),
+														relativePosition
 													);
 													return;
 												}
 
-												// Create and insert block.
-												insertBlockIntoDesignatedLocation(
-													createBlock( block.name ),
-													relativePosition
-												);
+												// Remove block.
+												const clientId =
+													autoInsertedBlockClientIds[
+														block.name
+													];
+												removeBlock( clientId, false );
 											} }
 										/>
 									);
