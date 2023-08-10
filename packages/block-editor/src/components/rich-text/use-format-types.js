@@ -66,16 +66,14 @@ export function useFormatTypes( {
 } ) {
 	const allFormatTypes = useSelect( formatTypesSelector, [] );
 	const formatTypes = useMemo( () => {
-		return allFormatTypes.filter( ( { name, tagName } ) => {
+		return allFormatTypes.filter( ( { name, interactive, tagName } ) => {
 			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
 				return false;
 			}
 
-			// The "Footnote" format requires special handling due to its nested interactive content tag.
 			if (
 				withoutInteractiveFormatting &&
-				( name === 'core/footnote' ||
-					interactiveContentTags.has( tagName ) )
+				( interactive || interactiveContentTags.has( tagName ) )
 			) {
 				return false;
 			}
