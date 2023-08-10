@@ -87,6 +87,7 @@ module.exports = {
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
+		'plugin:storybook/recommended',
 	],
 	globals: {
 		wp: 'off',
@@ -130,6 +131,13 @@ module.exports = {
 						allowTypeImports: true,
 					},
 				],
+			},
+		],
+		'@typescript-eslint/consistent-type-imports': [
+			'error',
+			{
+				prefer: 'type-imports',
+				disallowTypeAnnotations: false,
 			},
 		],
 		'no-restricted-syntax': [

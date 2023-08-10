@@ -3,8 +3,12 @@
  */
 import PostTypeSupportCheck from '../post-type-support-check';
 
-function PostExcerptCheck( props ) {
-	return <PostTypeSupportCheck { ...props } supportKeys="excerpt" />;
+function PostExcerptCheck( { children } ) {
+	return (
+		<PostTypeSupportCheck supportKeys="excerpt">
+			{ children }
+		</PostTypeSupportCheck>
+	);
 }
 
 export default PostExcerptCheck;

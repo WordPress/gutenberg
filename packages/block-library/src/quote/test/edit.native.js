@@ -69,7 +69,7 @@ describe( 'Quote', () => {
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-		selectRangeInRichText( citationTextInput, 2, 2 );
+		selectRangeInRichText( citationTextInput, 2 );
 		fireEvent( citationTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},

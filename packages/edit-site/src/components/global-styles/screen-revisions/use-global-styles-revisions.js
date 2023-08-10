@@ -99,6 +99,12 @@ export default function useGlobalStylesRevisions() {
 
 				_modifiedRevisions.unshift( unsavedRevision );
 			}
+
+			_modifiedRevisions.push( {
+				id: 'parent',
+				styles: {},
+				settings: {},
+			} );
 		}
 
 		return {

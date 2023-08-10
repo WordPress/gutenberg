@@ -117,6 +117,15 @@ export const notifyInputChange = () => {
 };
 
 /**
+ * Sets the current focused element ref held within TextInputState.
+ *
+ * @param {RefObject} element Element to be set as the focused element.
+ */
+export const focusInput = ( element ) => {
+	TextInputState.focusInput( element );
+};
+
+/**
  * Focuses the specified element.
  *
  * @param {RefObject} element Element to be focused.

@@ -13,6 +13,7 @@ import { store as richTextStore } from './store';
  *                                  unique across all registered formats.
  * @property {string}   tagName     The HTML tag this format will wrap the
  *                                  selection with.
+ * @property {boolean}  interactive Whether format makes content interactive or not.
  * @property {string}   [className] A class to match the format.
  * @property {string}   title       Name of the format.
  * @property {Function} edit        Should return a component for the user to

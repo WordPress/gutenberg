@@ -20,19 +20,19 @@ import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 
 function buildMenuLabel( title, id, status ) {
-	if ( ! title?.rendered ) {
+	if ( ! title ) {
 		/* translators: %s is the index of the menu in the list of menus. */
 		return sprintf( __( '(no title %s)' ), id );
 	}
 
 	if ( status === 'publish' ) {
-		return decodeEntities( title?.rendered );
+		return decodeEntities( title );
 	}
 
 	return sprintf(
 		// translators: %1s: title of the menu; %2s: status of the menu (draft, pending, etc.).
 		__( '%1$s (%2$s)' ),
-		decodeEntities( title?.rendered ),
+		decodeEntities( title ),
 		status
 	);
 }
@@ -72,7 +72,11 @@ function NavigationMenuSelector( {
 	const menuChoices = useMemo( () => {
 		return (
 			navigationMenus?.map( ( { id, title, status }, index ) => {
-				const label = buildMenuLabel( title, index + 1, status );
+				const label = buildMenuLabel(
+					title?.rendered,
+					index + 1,
+					status
+				);
 
 				return {
 					value: id,

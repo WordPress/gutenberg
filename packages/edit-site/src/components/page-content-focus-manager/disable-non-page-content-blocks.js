@@ -3,15 +3,12 @@
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter, removeFilter } from '@wordpress/hooks';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useBlockEditingMode } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-
-const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 const PAGE_CONTENT_BLOCK_TYPES = [
 	'core/post-title',
@@ -49,7 +46,7 @@ export function useDisableNonPageContentBlocks() {
 
 const withDisableNonPageContentBlocks = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const isDescendentOfQueryLoop = !! props.context.queryId;
+		const isDescendentOfQueryLoop = props.context.queryId !== undefined;
 		const isPageContent =
 			PAGE_CONTENT_BLOCK_TYPES.includes( props.name ) &&
 			! isDescendentOfQueryLoop;

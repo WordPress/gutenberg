@@ -20,6 +20,9 @@ const PatternEdit = ( { attributes, clientId } ) => {
 
 	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
+	const { setBlockEditingMode } = useDispatch( blockEditorStore );
+	const { getBlockRootClientId, getBlockEditingMode } =
+		useSelect( blockEditorStore );
 
 	// Run this effect when the component loads.
 	// This adds the Pattern's contents to the post.
@@ -33,13 +36,22 @@ const PatternEdit = ( { attributes, clientId } ) => {
 			// because nested pattern blocks cannot be inserted if the parent block supports
 			// inner blocks but doesn't have blockSettings in the state.
 			window.queueMicrotask( () => {
+				const rootClientId = getBlockRootClientId( clientId );
 				// Clone blocks from the pattern before insertion to ensure they receive
 				// distinct client ids. See https://github.com/WordPress/gutenberg/issues/50628.
 				const clonedBlocks = selectedPattern.blocks.map( ( block ) =>
 					cloneBlock( block )
 				);
+				const rootEditingMode = getBlockEditingMode( rootClientId );
+				// Temporarily set the root block to default mode to allow replacing the pattern.
+				// This could happen when the page is disabling edits of non-content blocks.
+				__unstableMarkNextChangeAsNotPersistent();
+				setBlockEditingMode( rootClientId, 'default' );
 				__unstableMarkNextChangeAsNotPersistent();
 				replaceBlocks( clientId, clonedBlocks );
+				// Restore the root block's original mode.
+				__unstableMarkNextChangeAsNotPersistent();
+				setBlockEditingMode( rootClientId, rootEditingMode );
 			} );
 		}
 	}, [
@@ -47,6 +59,9 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		selectedPattern?.blocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceBlocks,
+		getBlockEditingMode,
+		setBlockEditingMode,
+		getBlockRootClientId,
 	] );
 
 	const props = useBlockProps();
