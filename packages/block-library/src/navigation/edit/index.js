@@ -522,7 +522,7 @@ function Navigation( {
 										);
 									} }
 									aria-label={ __(
-										'Toggle overlay menu controls'
+										'Overlay menu controls'
 									) }
 									aria-controls={ overlayMenuPreviewId }
 									aria-expanded={ overlayMenuPreview }
