@@ -28,14 +28,19 @@ function AutoInsertingBlocksControl( props ) {
 		[ props.blockName ]
 	);
 
-	const { blocks, blockIndex, rootClientId, innerBlocksLength } = useSelect(
+	const {
+		autoInsertedBlockClientIds,
+		blockIndex,
+		rootClientId,
+		innerBlocksLength,
+	} = useSelect(
 		( select ) => {
 			const { getBlock, getBlockIndex, getBlockRootClientId } =
 				select( blockEditorStore );
 			const _rootClientId = getBlockRootClientId( props.clientId );
 
-			const _blocks = autoInsertedBlocksForCurrentBlock.reduce(
-				( acc, block ) => {
+			const _autoInsertedBlockClientIds =
+				autoInsertedBlocksForCurrentBlock.reduce( ( acc, block ) => {
 					const relativePosition =
 						block?.autoInsert?.[ props.blockName ];
 					let autoInsertedBlock;
@@ -67,16 +72,14 @@ function AutoInsertingBlocksControl( props ) {
 						acc[ block.name ] = autoInsertedBlock.clientId;
 					}
 					return acc;
-				},
-				{}
-			);
+				}, {} );
 
 			return {
 				blockIndex: getBlockIndex( props.clientId ),
 				innerBlocksLength: getBlock( props.clientId )?.innerBlocks
 					?.length,
 				rootClientId: _rootClientId,
-				blocks: _blocks,
+				autoInsertedBlockClientIds: _autoInsertedBlockClientIds,
 			};
 		},
 		[ autoInsertedBlocksForCurrentBlock, props.blockName, props.clientId ]
@@ -137,7 +140,7 @@ function AutoInsertingBlocksControl( props ) {
 										block.autoInsert[ props.blockName ];
 
 									const checked = Object.keys(
-										blocks
+										autoInsertedBlockClientIds
 									).includes( block.name );
 
 									return (
@@ -149,7 +152,9 @@ function AutoInsertingBlocksControl( props ) {
 												if ( checked ) {
 													// Remove block.
 													const clientId =
-														blocks[ block.name ];
+														autoInsertedBlockClientIds[
+															block.name
+														];
 													removeBlock(
 														clientId,
 														false
