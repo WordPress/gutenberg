@@ -120,7 +120,6 @@
 		"@testing-library/react": "13.4.0",
 		"@testing-library/react-native": "12.1.2",
 		"@testing-library/user-event": "14.4.3",
-		"@types/classnames": "2.3.1",
 		"@types/eslint": "7.28.0",
 		"@types/estree": "0.0.50",
 		"@types/highlight-words-core": "1.2.1",
