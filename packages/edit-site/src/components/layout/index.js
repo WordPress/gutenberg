@@ -27,6 +27,7 @@ import {
 } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
+	_experimentalSelectedBlockTools,
 	privateApis as blockEditorPrivateApis,
 	useBlockCommands,
 } from '@wordpress/block-editor';
@@ -229,35 +230,40 @@ export default function Layout() {
 
 					<AnimatePresence initial={ false }>
 						{ isEditorPage && isEditing && (
-							<NavigableRegion
-								key="header"
-								className="edit-site-layout__header"
-								ariaLabel={ __( 'Editor top bar' ) }
-								as={ motion.div }
-								variants={ {
-									isDistractionFree: { opacity: 0, y: 0 },
-									isDistractionFreeHovering: {
-										opacity: 1,
-										y: 0,
-									},
-									view: { opacity: 1, y: '-100%' },
-									edit: { opacity: 1, y: 0 },
-								} }
-								exit={ {
-									y: '-100%',
-								} }
-								initial={ {
-									opacity: isDistractionFree ? 1 : 0,
-									y: isDistractionFree ? 0 : '-100%',
-								} }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion ? 0 : 0.2,
-									ease: 'easeOut',
-								} }
-							>
-								<Header />
-							</NavigableRegion>
+							<>
+								<NavigableRegion
+									key="header"
+									className="edit-site-layout__header"
+									ariaLabel={ __( 'Editor top bar' ) }
+									as={ motion.div }
+									variants={ {
+										isDistractionFree: { opacity: 0, y: 0 },
+										isDistractionFreeHovering: {
+											opacity: 1,
+											y: 0,
+										},
+										view: { opacity: 1, y: '-100%' },
+										edit: { opacity: 1, y: 0 },
+									} }
+									exit={ {
+										y: '-100%',
+									} }
+									initial={ {
+										opacity: isDistractionFree ? 1 : 0,
+										y: isDistractionFree ? 0 : '-100%',
+									} }
+									transition={ {
+										type: 'tween',
+										duration: disableMotion ? 0 : 0.2,
+										ease: 'easeOut',
+									} }
+								>
+									<Header />
+								</NavigableRegion>
+								<_experimentalSelectedBlockTools
+									isFixed={ hasFixedToolbar }
+								/>
+							</>
 						) }
 					</AnimatePresence>
 				</motion.div>
