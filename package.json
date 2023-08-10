@@ -210,7 +210,7 @@
 		"make-dir": "3.0.0",
 		"metro-react-native-babel-preset": "0.73.10",
 		"metro-react-native-babel-transformer": "0.73.10",
-		"mkdirp": "0.5.1",
+		"mkdirp": "3.0.1",
 		"mock-match-media": "0.4.2",
 		"moment-timezone-data-webpack-plugin": "1.5.1",
 		"nock": "12.0.3",
