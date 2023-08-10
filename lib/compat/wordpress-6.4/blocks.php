@@ -13,7 +13,11 @@
  * @return array Register post type args.
  */
 function gutenberg_add_custom_capabilities_to_wp_block( $args ) {
-	$args['capabilities']['delete_posts'] = 'delete_posts';
+	if ( is_array( $args ) ) {
+		if ( is_array( $args['capabilities'] ) || ! isset( $args['capabilities'] ) ) {
+			$args['capabilities']['delete_posts'] = 'delete_posts';
+		}
+	}
 	return $args;
 }
 add_filter( 'register_wp_block_post_type_args', 'gutenberg_add_custom_capabilities_to_wp_block', 10, 1 );
