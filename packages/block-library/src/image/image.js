@@ -326,7 +326,12 @@ export default function Image( {
 
 	function updateAlignment( nextAlign ) {
 		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
+			? {
+					width: undefined,
+					height: undefined,
+					aspectRatio: undefined,
+					scale: undefined,
+			  }
 			: {};
 		setAttributes( {
 			...extraUpdatedAttributes,
@@ -477,24 +482,26 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
-					<DimensionsTool
-						value={ { width, height, scale, aspectRatio } }
-						onChange={ ( newValue ) => {
-							// Rebuilding the object forces setting `undefined`
-							// for values that are removed since setAttributes
-							// doesn't do anything with keys that aren't set.
-							setAttributes( {
-								width: newValue.width,
-								height: newValue.height,
-								scale: newValue.scale,
-								aspectRatio: newValue.aspectRatio,
-							} );
-						} }
-						defaultScale="cover"
-						defaultAspectRatio="auto"
-						scaleOptions={ scaleOptions }
-						unitsOptions={ dimensionsUnitsOptions }
-					/>
+					{ isResizable && (
+						<DimensionsTool
+							value={ { width, height, scale, aspectRatio } }
+							onChange={ ( newValue ) => {
+								// Rebuilding the object forces setting `undefined`
+								// for values that are removed since setAttributes
+								// doesn't do anything with keys that aren't set.
+								setAttributes( {
+									width: newValue.width,
+									height: newValue.height,
+									scale: newValue.scale,
+									aspectRatio: newValue.aspectRatio,
+								} );
+							} }
+							defaultScale="cover"
+							defaultAspectRatio="auto"
+							scaleOptions={ scaleOptions }
+							unitsOptions={ dimensionsUnitsOptions }
+						/>
+					) }
 					<ResolutionTool
 						value={ sizeSlug }
 						onChange={ updateImage }
@@ -602,8 +609,8 @@ export default function Image( {
 	} else {
 		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );
 		const customRatio = numericWidth / numericHeight;
-		const ratio =
-			numericRatio || customRatio || naturalWidth / naturalHeight || 1;
+		const naturalRatio = naturalWidth / naturalHeight;
+		const ratio = numericRatio || customRatio || naturalRatio || 1;
 		const currentWidth =
 			! numericWidth && numericHeight
 				? numericHeight * ratio
@@ -694,7 +701,10 @@ export default function Image( {
 					setAttributes( {
 						width: `${ elt.offsetWidth }px`,
 						height: 'auto',
-						aspectRatio: `${ ratio }`,
+						aspectRatio:
+							ratio === naturalRatio
+								? undefined
+								: String( ratio ),
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }

@@ -167,6 +167,7 @@ function Iframe( {
 		node.addEventListener( 'load', onLoad );
 
 		return () => {
+			delete node._load;
 			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',

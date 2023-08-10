@@ -66,6 +66,7 @@ function UnforwardedModal(
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
+		headerActions = null,
 		__experimentalHideHeader = false,
 	} = props;
 
@@ -257,6 +258,7 @@ function UnforwardedModal(
 										</h1>
 									) }
 								</div>
+								{ headerActions }
 								{ isDismissible && (
 									<Button
 										onClick={ onRequestClose }

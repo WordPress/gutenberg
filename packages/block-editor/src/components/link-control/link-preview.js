@@ -68,6 +68,7 @@ export default function LinkPreview( {
 				'is-fetching': !! isFetching,
 				'is-preview': true,
 				'is-error': isEmptyURL,
+				'is-url-title': displayTitle === displayURL,
 			} ) }
 		>
 			<div className="block-editor-link-control__search-item-top">

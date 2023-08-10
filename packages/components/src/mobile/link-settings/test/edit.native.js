@@ -138,7 +138,6 @@ describe.each( [
 					)
 				);
 				if ( type === 'core/image' ) {
-					// Wait for side effects produced by Clipboard and link suggestions
 					fireEvent.press( subject.getByLabelText( /Custom URL/ ) );
 				}
 				await subject.findByLabelText( 'Apply' );
