@@ -104,7 +104,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			$prefix                      = rtrim( $prefix, '_' );
 			$allowed_function_prefix     = $prefix . '_' . self::sanitize_directory_name( $parent_directory_name );
 			$allowed_function_prefixes[] = $allowed_function_prefix;
-			// Verify the validity of the name and ensure that a function name does not end with an underscore.
+			// Validate the name's correctness and ensure it does not end with an underscore.
 			$regexp                      = sprintf( '/^%s(|_.+)$/', preg_quote( $allowed_function_prefix, '/' ) );
 			$is_function_name_valid      |= (1 === preg_match( $regexp, $function_name ));
 		}
