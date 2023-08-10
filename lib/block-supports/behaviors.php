@@ -186,9 +186,9 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	// We set the 'src' attribute to an empty string to prevent the browser from loading the image
 	// on initial page load, then bind the attribute to a selector that returns the full-sized image src when
 	// the lightbox is opened. We could use 'loading=lazy' in combination with the 'hidden' attribute to
-	// accomplish the same behavior, but that appraoch breaks progressive loading of the image in Safari
-	// and Chrome (see LINK). Until that is resolved, manually setting the 'src' attribute
-	// in this way seems to be the best solution to load the large image only when needed.
+	// accomplish the same behavior, but that approach breaks progressive loading of the image in Safari
+	// and Chrome (see https://github.com/WordPress/gutenberg/pull/52765#issuecomment-1674008151). Until that
+	// is resolved, manually setting the 'src' seems to be the best solution to load the large image on demand.
 	$q->set_attribute( 'src', '' );
 	$q->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
 	$q->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
