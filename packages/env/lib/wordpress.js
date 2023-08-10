@@ -7,11 +7,17 @@ const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const got = require( 'got' );
+const dns = require( 'dns' ).promises;
 
 /**
  * Promisified dependencies
  */
 const copyDir = util.promisify( require( 'copy-dir' ) );
+
+/**
+ * Internal dependencies
+ */
+const { getCache, setCache } = require( './cache' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -244,16 +250,45 @@ async function readWordPressVersion( coreSource, spinner, debug ) {
 }
 
 /**
+ * Basically a quick check to see if we can connect to the internet.
+ *
+ * @return {boolean} True if we can connect to WordPress.org, false otherwise.
+ */
+async function canAccessWPORG() {
+	return !! ( await dns.resolve( 'WordPress.org' ).catch( () => {} ) );
+}
+
+/**
  * Returns the latest stable version of WordPress by requesting the stable-check
  * endpoint on WordPress.org.
  *
+ * @param {Object} options an object with cacheDirectoryPath set to the path to the cache directory in ~/.wp-env.
  * @return {string} The latest stable version of WordPress, like "6.0.1"
  */
 let CACHED_WP_VERSION;
-async function getLatestWordPressVersion() {
+async function getLatestWordPressVersion( options ) {
 	// Avoid extra network requests.
 	if ( CACHED_WP_VERSION ) {
 		return CACHED_WP_VERSION;
+	}
+
+	const cacheOptions = {
+		workDirectoryPath: options.cacheDirectoryPath,
+	};
+
+	// When we can't connect to the internet, we don't want to break wp-env or
+	// wait for the stable-check result to timeout.
+	if ( ! ( await canAccessWPORG() ) ) {
+		const latestVersion = await getCache(
+			'latestWordPressVersion',
+			cacheOptions
+		);
+		if ( ! latestVersion ) {
+			throw new Error(
+				'Could not find the current WordPress version in the cache and the network is not available.'
+			);
+		}
+		return latestVersion;
 	}
 
 	const versions = await got(
@@ -263,6 +298,7 @@ async function getLatestWordPressVersion() {
 	for ( const [ version, status ] of Object.entries( versions ) ) {
 		if ( status === 'latest' ) {
 			CACHED_WP_VERSION = version;
+			await setCache( 'latestWordPressVersion', version, cacheOptions );
 			return version;
 		}
 	}
