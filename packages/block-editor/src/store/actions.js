@@ -12,6 +12,7 @@ import {
 	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
+	getBlockSupport,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -1006,9 +1007,17 @@ export const mergeBlocks =
 
 		if ( ! blockAType ) return;
 
+		if (
+			! blockAType.merge &&
+			! getBlockSupport( blockA.name, '__experimentalOnMerge' )
+		) {
+			dispatch.selectBlock( blockA.clientId );
+			return;
+		}
+
 		const blockB = select.getBlock( clientIdB );
 
-		if ( blockAType && ! blockAType.merge ) {
+		if ( ! blockAType.merge ) {
 			// If there's no merge function defined, attempt merging inner
 			// blocks.
 			const blocksWithTheSameType = switchToBlockType(
@@ -1025,16 +1034,6 @@ export const mergeBlocks =
 				dispatch.selectBlock( blockA.clientId );
 				return;
 			}
-			const firstInnerBlock = blockWithSameType.innerBlocks[ 0 ];
-			// After switching to the block type, if the first inner block is
-			// not the same type, avoid merging because it's too complex. For
-			// example, a paragraph can be switched to columns block, but the
-			// paragraph is moved two levels deep. Merging resulting in an
-			// additional column would be strange.
-			if ( firstInnerBlock.name !== blockAType.name ) {
-				dispatch.selectBlock( blockA.clientId );
-				return;
-			}
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
@@ -1042,7 +1041,9 @@ export const mergeBlocks =
 					clientIdA
 				);
 				dispatch.removeBlock( clientIdB );
-				dispatch.selectBlock( firstInnerBlock.clientId );
+				dispatch.selectBlock(
+					blockWithSameType.innerBlocks[ 0 ].clientId
+				);
 			} );
 			return;
 		}
