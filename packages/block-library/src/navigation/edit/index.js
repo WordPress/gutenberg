@@ -28,11 +28,7 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import {
-	EntityProvider,
-	store as coreStore,
-	useEntityProp,
-} from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -73,23 +69,9 @@ import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
+import AccessibleDescription from './accessible-description';
+import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
-
-function AccessibleDescription( { id, content } ) {
-	return (
-		<div id={ id } className="wp-block-navigation__desc screen-reader-text">
-			{ content }
-		</div>
-	);
-}
-
-function AccessibleMenuDescription( { id } ) {
-	const [ menuTitle ] = useEntityProp( 'postType', 'wp_navigation', 'title' );
-	/* translators: %s: Title of a Navigation Menu post. */
-	const description = sprintf( __( `Navigation menu: "%s"` ), menuTitle );
-
-	return <AccessibleDescription id={ id } content={ description } />;
-}
 
 function Navigation( {
 	attributes,
