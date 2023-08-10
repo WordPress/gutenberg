@@ -459,9 +459,10 @@ test.describe( 'Image', () => {
 					attributes: { url },
 				},
 			] = blocks;
-			expect(
-				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
-			).toBe( url );
+			await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+				'src',
+				url
+			);
 			expect(
 				new URL( url ).host,
 				'should be updated to the media library'
@@ -492,9 +493,10 @@ test.describe( 'Image', () => {
 				},
 			] = blocks;
 			expect( url ).not.toBe( firstUrl );
-			expect(
-				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
-			).toBe( url );
+			await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+				'src',
+				url
+			);
 			expect(
 				new URL( url ).host,
 				'should be updated to the media library'
@@ -1178,7 +1180,7 @@ test.describe( 'Image - interactivity', () => {
 					page.getByRole( 'combobox', {
 						name: 'Animation',
 					} )
-				).not.toBeVisible();
+				).toBeHidden();
 			} );
 			test( 'Animation selector should NOT appear if Behavior is Default', async ( {
 				page,
@@ -1211,7 +1213,7 @@ test.describe( 'Image - interactivity', () => {
 					page.getByRole( 'combobox', {
 						name: 'Animation',
 					} )
-				).not.toBeVisible();
+				).toBeHidden();
 			} );
 		} );
 

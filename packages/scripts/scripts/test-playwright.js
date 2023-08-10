@@ -14,22 +14,23 @@ process.on( 'unhandledRejection', ( err ) => {
  */
 const { resolve } = require( 'path' );
 const { sync: spawn } = require( 'cross-spawn' );
-const { installDefaultBrowsersForNpmInstall } = require('playwright-core/lib/server');
+const {
+	installDefaultBrowsersForNpmInstall,
+} = require( 'playwright-core/lib/server' );
 
 /**
  * Internal dependencies
  */
-const {
-	fromConfigRoot,
-	hasProjectFile,
-} = require( '../utils' );
+const { fromConfigRoot, hasProjectFile } = require( '../utils' );
 
 // TODO: await.
 installDefaultBrowsersForNpmInstall();
 
-const config = ( ! hasProjectFile( 'playwright.config.ts' ) && ! hasProjectFile( 'playwright.config.ts' ) )
-	? [ '--config', fromConfigRoot( 'playwright.config.ts' ) ]
-	: [];
+const config =
+	! hasProjectFile( 'playwright.config.ts' ) &&
+	! hasProjectFile( 'playwright.config.ts' )
+		? [ '--config', fromConfigRoot( 'playwright.config.ts' ) ]
+		: [];
 
 // Set the default artifacts path.
 if ( ! process.env.WP_ARTIFACTS_PATH ) {
@@ -39,9 +40,13 @@ if ( ! process.env.WP_ARTIFACTS_PATH ) {
 	);
 }
 
-const testResult = spawn( 'npx', [ require.resolve( '@playwright/test/cli' ), 'test', ...config ], {
-	stdio: 'inherit',
-} );
+const testResult = spawn(
+	'npx',
+	[ require.resolve( '@playwright/test/cli' ), 'test', ...config ],
+	{
+		stdio: 'inherit',
+	}
+);
 
 if ( testResult.status > 0 ) {
 	process.exit( testResult.status );
