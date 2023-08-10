@@ -206,7 +206,7 @@
 		"jest-junit": "13.0.0",
 		"jest-message-util": "29.5.0",
 		"jest-watch-typeahead": "2.2.2",
-		"lerna": "5.5.2",
+		"lerna": "7.1.4",
 		"lint-staged": "10.0.1",
 		"make-dir": "3.0.0",
 		"metro-react-native-babel-preset": "0.73.10",
