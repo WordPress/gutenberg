@@ -102,7 +102,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 						'selectors' => array(
 							'core' => array(
 								'search' => array(
-									'tabindex' => $open_by_default === 'true' ? '0' : '-1',
+									'tabindex' => 'true' === $open_by_default ? '0' : '-1',
 								),
 							),
 						),
@@ -179,7 +179,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 					$aria_label_collapsed = __( 'Expand search field' );
 					wp_store(
 						array(
-							'state' => array(
+							'state'     => array(
 								'core' => array(
 									'search' => array(
 										'ariaLabelCollapsed' => $aria_label_collapsed,
@@ -190,9 +190,9 @@ function render_block_core_search( $attributes, $content, $block ) {
 							'selectors' => array(
 								'core' => array(
 									'search' => array(
-										'ariaLabel'    => $open_by_default === 'true' ? $aria_label_expanded : $aria_label_collapsed,
-										'ariaControls' => $open_by_default === 'true' ? null : $input_id,
-										'type'         => $open_by_default === 'true' ? 'submit' : 'button',
+										'ariaLabel'    => 'true' === $open_by_default ? $aria_label_expanded : $aria_label_collapsed,
+										'ariaControls' => 'true' === $open_by_default ? null : $input_id,
+										'type'         => 'true' === $open_by_default ? 'submit' : 'button',
 									),
 								),
 							),
@@ -230,7 +230,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 	if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
 		$form_directives = '
 			data-wp-interactive
-			data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": ' . $open_by_default  . ', "inputId": "' . $input_id . '" } } }\'
+			data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": ' . $open_by_default . ', "inputId": "' . $input_id . '" } } }\'
 			data-wp-class--wp-block-search__searchfield-hidden="!context.core.search.isSearchInputVisible"
 			data-wp-on--keydown="actions.core.search.handleSearchKeydown"
 			data-wp-on--focusout="actions.core.search.handleSearchFocusout"
