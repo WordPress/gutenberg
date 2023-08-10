@@ -174,6 +174,11 @@ store(
 							return 'cover';
 						}
 					},
+					enlargedImgSrc: ( { context } ) => {
+						return context.core.image.initialized
+							? context.core.image.imageUploadedSrc
+							: '';
+					},
 				},
 			},
 		},
