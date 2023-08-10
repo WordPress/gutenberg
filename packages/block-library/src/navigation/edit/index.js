@@ -680,10 +680,10 @@ function Navigation( {
 					! isPlaceholder ? accessibleDescriptionId : undefined
 				}
 			>
-				<AccessibleDescription
-					id={ accessibleDescriptionId }
-					content={ __( 'Unsaved Navigation Menu.' ) }
-				/>
+				<AccessibleDescription id={ accessibleDescriptionId }>
+					{ __( 'Unsaved Navigation Menu.' ) }
+				</AccessibleDescription>
+
 				<MenuInspectorControls
 					clientId={ clientId }
 					createNavigationMenuIsSuccess={
