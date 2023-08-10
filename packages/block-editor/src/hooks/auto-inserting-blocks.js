@@ -181,6 +181,18 @@ function AutoInsertingBlocksControl( props ) {
 											key={ block.title }
 											label={ block.title }
 											onChange={ () => {
+												if ( checked ) {
+													// Remove block.
+													const clientId =
+														blocks[ block.name ];
+													removeBlock(
+														clientId,
+														false
+													);
+													return;
+												}
+
+												// Insert block.
 												if (
 													[
 														'before',
@@ -189,32 +201,20 @@ function AutoInsertingBlocksControl( props ) {
 														relativePosition
 													)
 												) {
-													if ( ! checked ) {
-														const insertionIndex =
-															relativePosition ===
-															'after'
-																? blockIndex + 1
-																: blockIndex;
+													const insertionIndex =
+														relativePosition ===
+														'after'
+															? blockIndex + 1
+															: blockIndex;
 
-														insertBlock(
-															createBlock(
-																block.name
-															),
-															insertionIndex,
-															rootClientId,
-															false
-														);
-													} else {
-														// Remove block.
-														const clientId =
-															blocks[
-																block.name
-															];
-														removeBlock(
-															clientId,
-															false
-														);
-													}
+													insertBlock(
+														createBlock(
+															block.name
+														),
+														insertionIndex,
+														rootClientId,
+														false
+													);
 												} else if (
 													[
 														'first_child',
@@ -223,31 +223,19 @@ function AutoInsertingBlocksControl( props ) {
 														relativePosition
 													)
 												) {
-													if ( ! checked ) {
-														const insertionIndex =
-															relativePosition ===
-															'first_child'
-																? 0
-																: innerBlocksLength;
-														insertBlock(
-															createBlock(
-																block.name
-															),
-															insertionIndex,
-															props.clientId,
-															false
-														);
-													} else {
-														// Remove block.
-														const clientId =
-															blocks[
-																block.name
-															];
-														removeBlock(
-															clientId,
-															false
-														);
-													}
+													const insertionIndex =
+														relativePosition ===
+														'first_child'
+															? 0
+															: innerBlocksLength;
+													insertBlock(
+														createBlock(
+															block.name
+														),
+														insertionIndex,
+														props.clientId,
+														false
+													);
 												}
 											} }
 										/>
