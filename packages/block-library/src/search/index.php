@@ -64,6 +64,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
 	$border_color_classes = get_border_color_classes_for_block_core_search( $attributes );
+	$open_by_default      = 'false';
 
 	$label_inner_html = empty( $attributes['label'] ) ? __( 'Search' ) : wp_kses_post( $attributes['label'] );
 	$label            = new WP_HTML_Tag_Processor( sprintf( '<label %1$s>%2$s</label>', $inline_styles['label'], $label_inner_html ) );
@@ -96,6 +97,17 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$is_expandable_searchfield = 'button-only' === $button_position && 'expand-searchfield' === $button_behavior;
 		if ( $is_expandable_searchfield ) {
 			if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
+				wp_store(
+					array(
+						'selectors' => array(
+							'core' => array(
+								'search' => array(
+									'tabindex' => $open_by_default === 'true' ? '0' : '-1',
+								),
+							),
+						),
+					)
+				);
 				$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.core.search.isSearchInputVisible' );
 				$input->set_attribute( 'data-wp-bind--tabindex', 'selectors.core.search.tabindex' );
 			} else {
@@ -159,23 +171,33 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$button_classes[] = wp_theme_get_element_class_name( 'button' );
 		$button           = new WP_HTML_Tag_Processor( sprintf( '<button type="submit" %s>%s</button>', $inline_styles['button'], $button_internal_markup ) );
 
-		wp_store(
-			array(
-				'state' => array(
-					'core' => array(
-						'search' => array(
-							'ariaLabelCollapsed' => __( 'Expand search field' ),
-							'ariaLabelExpanded'  => __( 'Submit Search' ),
-						),
-					),
-				),
-			)
-		);
-
 		if ( $button->next_tag() ) {
 			$button->add_class( implode( ' ', $button_classes ) );
 			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
 				if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
+					$aria_label_expanded  = __( 'Submit Search' );
+					$aria_label_collapsed = __( 'Expand search field' );
+					wp_store(
+						array(
+							'state' => array(
+								'core' => array(
+									'search' => array(
+										'ariaLabelCollapsed' => $aria_label_collapsed,
+										'ariaLabelExpanded'  => $aria_label_expanded,
+									),
+								),
+							),
+							'selectors' => array(
+								'core' => array(
+									'search' => array(
+										'ariaLabel'    => $open_by_default === 'true' ? $aria_label_expanded : $aria_label_collapsed,
+										'ariaControls' => $open_by_default === 'true' ? null : $input_id,
+										'type'         => $open_by_default === 'true' ? 'submit' : 'button',
+									),
+								),
+							),
+						)
+					);
 					$button->set_attribute( 'data-wp-bind--aria-label', 'selectors.core.search.ariaLabel' );
 					$button->set_attribute( 'data-wp-bind--aria-controls', 'selectors.core.search.ariaControls' );
 					$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.core.search.isSearchInputVisible' );
@@ -208,7 +230,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 	if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
 		$form_directives = '
 			data-wp-interactive
-			data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": false, "inputId": "' . $input_id . '" } } }\'
+			data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": ' . $open_by_default  . ', "inputId": "' . $input_id . '" } } }\'
 			data-wp-class--wp-block-search__searchfield-hidden="!context.core.search.isSearchInputVisible"
 			data-wp-on--keydown="actions.core.search.handleSearchKeydown"
 			data-wp-on--focusout="actions.core.search.handleSearchFocusout"
