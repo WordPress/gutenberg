@@ -1,9 +1,37 @@
+/**
+ * External dependencies
+ */
+const path = require( 'path' );
+
+/**
+ * WordPress dependencies
+ */
+const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
+
+const scssLoaders = ( { isLazy } ) => [
+	{
+		loader: 'style-loader',
+		options: { injectType: isLazy ? 'lazyStyleTag' : 'styleTag' },
+	},
+	'css-loader',
+	{
+		loader: 'postcss-loader',
+		options: {
+			postcssOptions: {
+				ident: 'postcss',
+				plugins: postcssPlugins,
+			},
+		},
+	},
+	'sass-loader',
+];
+
 const stories = [
-	process.env.NODE_ENV !== 'test' && './stories/**/*.@(js|tsx|mdx)',
-	'../packages/block-editor/src/**/stories/*.@(js|tsx|mdx)',
-	'../packages/components/src/**/stories/*.@(js|tsx|mdx)',
-	'../packages/icons/src/**/stories/*.@(js|tsx|mdx)',
-	'../packages/edit-site/src/**/stories/*.@(js|tsx|mdx)',
+	process.env.NODE_ENV !== 'test' && './stories/**/*.story.@(js|tsx|mdx)',
+	'../packages/block-editor/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/components/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/components/README.mdx',
 ].filter( Boolean );
 
@@ -33,14 +61,29 @@ module.exports = {
 		emotionAlias: false,
 		storyStoreV7: true,
 	},
-	typescript: {
-		// TODO: this can likely be removed after upgrading to Storybook 7, along
-		// with the root-level dependency on react-docgen-typescript-plugin. Without
-		// this, Storybook crashes when building with Typescript 5.x.
-		// See https://github.com/hipstersmoothie/react-docgen-typescript-plugin/issues/78#issuecomment-1409224863.
-		reactDocgen: 'react-docgen-typescript-plugin',
-	},
 	docs: {
 		autodocs: true,
+	},
+	webpackFinal: async ( config ) => {
+		return {
+			...config,
+			module: {
+				...config.module,
+				rules: [
+					...config.module.rules,
+					{
+						test: /\.scss$/,
+						exclude: /\.lazy\.scss$/,
+						use: scssLoaders( { isLazy: false } ),
+						include: path.resolve( __dirname ),
+					},
+					{
+						test: /\.lazy\.scss$/,
+						use: scssLoaders( { isLazy: true } ),
+						include: path.resolve( __dirname ),
+					},
+				],
+			},
+		};
 	},
 };
