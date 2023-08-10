@@ -105,6 +105,7 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor-state.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-token.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-unsupported-exception.php';
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-tag-processor.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor.php';
 }
 

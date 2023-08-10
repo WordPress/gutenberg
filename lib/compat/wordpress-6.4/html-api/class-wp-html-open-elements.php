@@ -42,6 +42,17 @@ class WP_HTML_Open_Elements {
 	public $stack = array();
 
 	/**
+	 * Holds functions added to be called after popping an element off the stack.
+	 *
+	 * Listeners are passed the WP_HTML_Token for the item that was removed.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @var array
+	 */
+	private $after_pop_listeners = array();
+
+	/**
 	 * Whether a P element is in button scope currently.
 	 *
 	 * This class optimizes scope lookup by pre-calculating
@@ -119,6 +130,15 @@ class WP_HTML_Open_Elements {
 			if ( $node->node_name === $tag_name ) {
 				return true;
 			}
+
+			switch ( $node->node_name ) {
+				case 'HTML':
+					return false;
+			}
+
+			if ( in_array( $node->node_name, $termination_list, true ) ) {
+				return true;
+			}
 		}
 
 		return false;
@@ -135,19 +155,7 @@ class WP_HTML_Open_Elements {
 	 * @return bool Whether given element is in scope.
 	 */
 	public function has_element_in_scope( $tag_name ) {
-		return $this->has_element_in_specific_scope(
-			$tag_name,
-			array(
-
-				/*
-				 * Because it's not currently possible to encounter
-				 * one of the termination elements, they don't need
-				 * to be listed here. If they were, they would be
-				 * unreachable and only waste CPU cycles while
-				 * scanning through HTML.
-				 */
-			)
-		);
+		return $this->has_element_in_specific_scope( $tag_name, array( 'BUTTON' ) );
 	}
 
 	/**
@@ -398,6 +406,10 @@ class WP_HTML_Open_Elements {
 		 * cases where the precalculated value needs to change.
 		 */
 		switch ( $item->node_name ) {
+			case 'BUTTON':
+				$this->has_p_in_button_scope = false;
+				break;
+
 			case 'P':
 				$this->has_p_in_button_scope = true;
 				break;
@@ -423,9 +435,46 @@ class WP_HTML_Open_Elements {
 		 * cases where the precalculated value needs to change.
 		 */
 		switch ( $item->node_name ) {
+			case 'BUTTON':
+				$this->has_p_in_button_scope = $this->has_element_in_button_scope( 'P' );
+				break;
+
 			case 'P':
 				$this->has_p_in_button_scope = $this->has_element_in_button_scope( 'P' );
 				break;
 		}
+
+		// Call any listeners that are registered.
+		foreach ( $this->after_pop_listeners as $listener ) {
+			call_user_func( $listener, $item );
+		}
+	}
+	/**
+	 * Creates a context in which a given listener is called after
+	 * popping an element off of the stack of open elements.
+	 *
+	 * It's unlikely that you will need this function. It exists
+	 * to aid an optimization in the `WP_HTML_Processor` and the
+	 * strange form of calling a generator inside a `foreach`
+	 * loop ensures that proper cleanup of the listener occurs.
+	 *
+	 * Example:
+	 *
+	 *     $did_close  = false;
+	 *     $closed_a_p = function ( $item ) use ( &$did_close ) { $did_close = 'P' === $item->node_name; };
+	 *     foreach ( $stack_of_open_elements->with_pop_listener( $closed_a_p ) ) {
+	 *         while ( ! $did_close && $processor->next_tag() ) {
+	 *             // This loop executes until _any_ P element is closed.
+	 *         }
+	 *     }
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param callable $listener Called with the WP_HTML_Token for the item that was popped off of the stack.
+	 */
+	public function with_pop_listener( $listener ) {
+		$this->after_pop_listeners[] = $listener;
+		yield;
+		array_pop( $this->after_pop_listeners );
 	}
 }
