@@ -1,10 +1,14 @@
+/**
+ * WordPress dependencies
+ */
+import { VisuallyHidden } from '@wordpress/components';
+
 export default function AccessibleDescription( { id, children } ) {
 	return (
-		<div
-			id={ id }
-			className="wp-block-navigation__description screen-reader-text"
-		>
-			{ children }
-		</div>
+		<VisuallyHidden>
+			<div id={ id } className="wp-block-navigation__description">
+				{ children }
+			</div>
+		</VisuallyHidden>
 	);
 }
