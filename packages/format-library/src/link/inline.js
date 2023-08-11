@@ -160,7 +160,6 @@ function InlineLinkUI( {
 			}
 
 			newValue.start = newValue.end;
-			newValue.activeFormats = [];
 			onChange( newValue );
 		}
 
