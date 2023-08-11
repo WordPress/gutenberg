@@ -408,6 +408,17 @@ function LinkControl( {
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
+					additionalControls={ () => (
+						<LinkSettings
+							value={ internalControlValue }
+							settings={ settings }
+							onChange={ ( { opensInNewTab } ) => {
+								onChange( {
+									opensInNewTab,
+								} );
+							} }
+						/>
+					) }
 					onRemove={ () => {
 						onRemove();
 						setIsEditingLink( true );
