@@ -201,22 +201,21 @@ export function FlatTermSelector( { slug } ) {
 			return;
 		}
 
-		try {
-			const newTerms = Promise.all(
-			  newTermNames.map( termName =>
+		Promise.all(
+			newTermNames.map( ( termName ) =>
 				findOrCreateTerm( { name: termName } )
-			  )
-			);
+			)
+		).then( ( newTerms ) => {
 			const newAvailableTerms = availableTerms.concat( newTerms );
-			return onUpdateTerms( termNamesToIds( uniqueTerms, newAvailableTerms ) );
-		  } catch ( error ) {		
-			// Handle the error by creating an error notice
-			const errorMessage = error.message || 'An error occurred';
-			createErrorNotice((0,external_wp_i18n_namespaceObject.__)(errorMessage), {
-				type: 'snackbar'
-				});
+			return onUpdateTerms(
+				termNamesToIds( uniqueTerms, newAvailableTerms )
+			);
+		} ).catch( ( error ) => {
+			createErrorNotice( error.message, {
+			  type: 'snackbar',
+			} );
 			return;
-		  }
+		} );
 	}
 
 	function appendTerm( newTerm ) {

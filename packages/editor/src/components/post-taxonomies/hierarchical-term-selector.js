@@ -229,7 +229,9 @@ export function HierarchicalTermSelector( { slug } ) {
 	 * @return {Promise} A promise that resolves to save term object.
 	 */
 	const addTerm = ( term ) => {
-		return saveEntityRecord( 'taxonomy', slug, term );
+		return saveEntityRecord( 'taxonomy', slug, term, {
+			throwOnError: true,
+		  } );
 	};
 
 	/**
@@ -272,51 +274,49 @@ export function HierarchicalTermSelector( { slug } ) {
 	};
 
 	const onAddTerm = async ( event ) => {
+		event.preventDefault();
+		if ( formName === '' || adding ) {
+			return;
+		}
+
+		// Check if the term we are adding already exists.
+		const existingTerm = findTerm( availableTerms, formParent, formName );
+		if ( existingTerm ) {
+			// If the term we are adding exists but is not selected select it.
+			if ( ! terms.some( ( term ) => term === existingTerm.id ) ) {
+				onUpdateTerms( [ ...terms, existingTerm.id ] );
+			}
+
+			setFormName( '' );
+			setFormParent( '' );
+
+			return;
+		}
+		setAdding( true );
+		let newTerm;
 		try {
-			event.preventDefault();
-			if ( formName === '' || adding ) {
-				return;
-			}
-
-			// Check if the term we are adding already exists.
-			const existingTerm = findTerm( availableTerms, formParent, formName );
-			if ( existingTerm ) {
-				// If the term we are adding exists but is not selected select it.
-				if ( ! terms.some( ( term ) => term === existingTerm.id ) ) {
-					onUpdateTerms( [ ...terms, existingTerm.id ] );
-				}
-
-				setFormName( '' );
-				setFormParent( '' );
-
-				return;
-			}
-			setAdding( true );
-
-			const newTerm = await addTerm( {
+			newTerm = await addTerm( {
 				name: formName,
 				parent: formParent ? formParent : undefined,
 			} );
-
-			const defaultName =
-				slug === 'category' ? __( 'Category' ) : __( 'Term' );
-			const termAddedMessage = sprintf(
-				/* translators: %s: taxonomy name */
-				_x( '%s added', 'term' ),
-				taxonomy?.labels?.singular_name ?? defaultName
-			);
-			speak( termAddedMessage, 'assertive' );
-			setAdding( false );
-			setFormName( '' );
-			setFormParent( '' );
-			onUpdateTerms( [ ...terms, newTerm.id ] );
-		} catch ( error ){
-			// Handle the error by creating an error notice
-			const errorMessage = error.message || 'An error occurred';
-			createErrorNotice((0,external_wp_i18n_namespaceObject.__)(errorMessage), {
-				type: 'snackbar'
-			  });
+		} catch ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+			} );
+			return;
 		}
+		const defaultName =
+			slug === 'category' ? __( 'Category' ) : __( 'Term' );
+		const termAddedMessage = sprintf(
+			/* translators: %s: taxonomy name */
+			_x( '%s added', 'term' ),
+			taxonomy?.labels?.singular_name ?? defaultName
+		);
+		speak( termAddedMessage, 'assertive' );
+		setAdding( false );
+		setFormName( '' );
+		setFormParent( '' );
+		onUpdateTerms( [ ...terms, newTerm.id ] );
 	};
 
 	const setFilter = ( value ) => {
