@@ -42,6 +42,14 @@ color: red;
 }"
 `;
 
+exports[`CSS selector wrap should wrap selectors inside container queries 1`] = `
+"@container (width > 400px) {
+.my-namespace h1 {
+color: red;
+}
+}"
+`;
+
 exports[`CSS selector wrap should replace :root selectors 1`] = `
 ".my-namespace {
 --my-color: #ff0000;

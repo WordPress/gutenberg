@@ -170,14 +170,8 @@
 	{
 		"title": "Building a custom block editor",
 		"slug": "custom-block-editor",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/README.md",
+		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor.md",
 		"parent": "platform"
-	},
-	{
-		"title": "Tutorial: building a custom block editor",
-		"slug": "tutorial",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
-		"parent": "custom-block-editor"
 	},
 	{
 		"title": "Create your First App with Gutenberg Data",
@@ -1893,6 +1887,12 @@
 		"title": "@wordpress/stylelint-config",
 		"slug": "packages-stylelint-config",
 		"markdown_source": "../packages/stylelint-config/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/sync",
+		"slug": "packages-sync",
+		"markdown_source": "../packages/sync/README.md",
 		"parent": "packages"
 	},
 	{

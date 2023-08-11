@@ -948,36 +948,30 @@ export const __unstableSplitSelection =
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = remove( valueB, 0, selectionB.offset );
 
-		dispatch.replaceBlocks(
-			select.getSelectedBlockClientIds(),
-			[
-				{
-					// Preserve the original client ID.
-					...blockA,
-					attributes: {
-						...blockA.attributes,
-						[ selectionA.attributeKey ]: toHTMLString( {
-							value: valueA,
-							...mapRichTextSettings( attributeDefinitionA ),
-						} ),
-					},
+		dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
+			{
+				// Preserve the original client ID.
+				...blockA,
+				attributes: {
+					...blockA.attributes,
+					[ selectionA.attributeKey ]: toHTMLString( {
+						value: valueA,
+						...mapRichTextSettings( attributeDefinitionA ),
+					} ),
 				},
-				createBlock( getDefaultBlockName() ),
-				{
-					// Preserve the original client ID.
-					...blockB,
-					attributes: {
-						...blockB.attributes,
-						[ selectionB.attributeKey ]: toHTMLString( {
-							value: valueB,
-							...mapRichTextSettings( attributeDefinitionB ),
-						} ),
-					},
+			},
+			{
+				// Preserve the original client ID.
+				...blockB,
+				attributes: {
+					...blockB.attributes,
+					[ selectionB.attributeKey ]: toHTMLString( {
+						value: valueB,
+						...mapRichTextSettings( attributeDefinitionB ),
+					} ),
 				},
-			],
-			1, // If we don't pass the `indexToSelect` it will default to the last block.
-			select.getSelectedBlocksInitialCaretPosition()
-		);
+			},
+		] );
 	};
 
 /**
@@ -1884,3 +1878,42 @@ export const registerInserterMediaCategory =
 			},
 		} );
 	};
+
+/**
+ * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
+ */
+
+/**
+ * Sets the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string}           clientId The block client ID, or `''` for the root container.
+ * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
+ *                                    `'contentOnly'`, or `'default'`.
+ *
+ * @return {Object} Action object.
+ */
+export function setBlockEditingMode( clientId = '', mode ) {
+	return {
+		type: 'SET_BLOCK_EDITING_MODE',
+		clientId,
+		mode,
+	};
+}
+
+/**
+ * Clears the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string} clientId The block client ID, or `''` for the root container.
+ *
+ * @return {Object} Action object.
+ */
+export function unsetBlockEditingMode( clientId = '' ) {
+	return {
+		type: 'UNSET_BLOCK_EDITING_MODE',
+		clientId,
+	};
+}

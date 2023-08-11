@@ -88,15 +88,6 @@ $header-toolbar-min-width: 335px;
 	@include break-small() {
 		gap: $grid-unit-10;
 	}
-
-	// Pinned items.
-	.interface-pinned-items {
-		display: none;
-
-		@include break-medium() {
-			display: inline-flex;
-		}
-	}
 }
 
 .edit-site-header-edit-mode__preview-options {

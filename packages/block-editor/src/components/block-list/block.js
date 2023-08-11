@@ -37,7 +37,6 @@ import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
-import { unlock } from '../../lock-unlock';
 import { BlockListBlockContext } from './block-list-block-context';
 
 /**
@@ -102,7 +101,7 @@ function BlockListBlock( {
 				getSettings,
 				__unstableGetTemporarilyEditingAsBlocks,
 				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
 				isTemporarilyEditingAsBlocks:
@@ -505,9 +504,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 			) {
 				__unstableMarkLastChangeAsPersistent();
 			}
+			//Unsynced patterns are nested in an array so we need to flatten them.
+			const replacementBlocks =
+				blocks?.length === 1 && Array.isArray( blocks[ 0 ] )
+					? blocks[ 0 ]
+					: blocks;
 			replaceBlocks(
 				[ ownProps.clientId ],
-				blocks,
+				replacementBlocks,
 				indexToSelect,
 				initialPosition
 			);

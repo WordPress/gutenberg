@@ -22,29 +22,14 @@ const {
 	typeString,
 	waitForVisible,
 	clickIfClickable,
+	launchApp,
 } = require( '../helpers/utils' );
 
-const ADD_BLOCK_ID = isAndroid()
-	? 'Add block, Double tap to add a block'
-	: 'add-block-button';
+const ADD_BLOCK_ID = isAndroid() ? 'Add block' : 'add-block-button';
 
-const initializeEditorPage = async () => {
+const setupEditor = async () => {
 	const driver = await setupDriver();
-	await isEditorVisible( driver );
-	const initialValues = await setupInitialValues( driver );
-	return new EditorPage( driver, initialValues );
-};
-
-// Stores initial values from the editor for different helpers.
-const setupInitialValues = async ( driver ) => {
-	const initialValues = {};
-	const addButton = await driver.elementsByAccessibilityId( ADD_BLOCK_ID );
-
-	if ( addButton.length !== 0 ) {
-		initialValues.addButtonLocation = await addButton[ 0 ].getLocation();
-	}
-
-	return initialValues;
+	return new EditorPage( driver );
 };
 
 class EditorPage {
@@ -55,16 +40,33 @@ class EditorPage {
 	verseBlockName = 'Verse';
 	orderedListButtonName = 'Ordered';
 
-	constructor( driver, initialValues ) {
+	constructor( driver ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
 		this.accessibilityIdXPathAttrib = 'name';
-		this.initialValues = initialValues;
+		this.initialValues = {};
+		this.blockNames = blockNames;
 
 		if ( isAndroid() ) {
 			this.accessibilityIdXPathAttrib = 'content-desc';
 			this.accessibilityIdKey = 'contentDescription';
 		}
+	}
+
+	async initializeEditor( { initialData } = {} ) {
+		await launchApp( this.driver, { initialData } );
+
+		// Stores initial values from the editor for different helpers.
+		const addButton = await this.driver.elementsByAccessibilityId(
+			ADD_BLOCK_ID
+		);
+
+		if ( addButton.length !== 0 ) {
+			this.initialValues.addButtonLocation =
+				await addButton[ 0 ].getLocation();
+		}
+
+		await isEditorVisible( this.driver );
 	}
 
 	async getBlockList() {
@@ -188,7 +190,7 @@ class EditorPage {
 
 	async getTitleElement( options = { autoscroll: false } ) {
 		const titleElement = isAndroid()
-			? 'Post title. Welcome to Gutenberg!, Updates the title.'
+			? 'Post title. Welcome to Gutenberg!'
 			: 'post-title';
 
 		if ( options.autoscroll ) {
@@ -292,9 +294,7 @@ class EditorPage {
 		}
 
 		const hideKeyboardButton = isAndroid()
-			? await this.waitForElementToBeDisplayedById(
-					'Hide keyboard, Tap to hide the keyboard'
-			  )
+			? await this.waitForElementToBeDisplayedById( 'Hide keyboard' )
 			: await this.waitForElementToBeDisplayedByXPath(
 					'(//XCUIElementTypeOther[@name="Hide keyboard"])[1]'
 			  );
@@ -433,15 +433,7 @@ class EditorPage {
 		// Click on block of choice.
 		const blockButton = await this.findBlockButton( blockName );
 
-		if ( isAndroid() ) {
-			await blockButton.click();
-		} else {
-			await this.driver.execute( 'mobile: tap', {
-				element: blockButton,
-				x: 10,
-				y: 10,
-			} );
-		}
+		await blockButton.click();
 	}
 
 	static getInserterPageHeight( screenHeight ) {
@@ -530,6 +522,8 @@ class EditorPage {
 				toY: EditorPage.getInserterPageHeight( height ),
 				duration: 0.5,
 			} );
+			// Wait for dragging gesture
+			await this.driver.sleep( 2000 );
 		}
 
 		return blockButton;
@@ -556,6 +550,29 @@ class EditorPage {
 				break;
 			}
 		} while ( navigateUpElements.length > 0 );
+	}
+
+	// Adds a block by tapping on the appender button of blocks with inner blocks (e.g. Group block)
+	async addBlockUsingAppender( block, blockName ) {
+		const appenderButton = isAndroid()
+			? await this.waitForElementToBeDisplayedByXPath(
+					`//android.widget.Button[@resource-id="appender-button"]`
+			  )
+			: await this.waitForElementToBeDisplayedById( 'appender-button' );
+		await appenderButton.click();
+
+		// Click on block of choice.
+		const blockButton = await this.findBlockButton( blockName );
+
+		if ( isAndroid() ) {
+			await blockButton.click();
+		} else {
+			await this.driver.execute( 'mobile: tap', {
+				element: blockButton,
+				x: 10,
+				y: 10,
+			} );
+		}
 	}
 
 	// =========================
@@ -672,7 +689,7 @@ class EditorPage {
 
 			await this.typeTextToTextBlock( block, paragraphs[ i ], clear );
 			if ( i !== paragraphs.length - 1 ) {
-				await this.typeTextToTextBlock( block, '\n', false );
+				await this.typeTextToTextBlock( block, '\n' );
 			}
 		}
 	}
@@ -968,7 +985,7 @@ class EditorPage {
 	async addButtonWithInlineAppender( position = 1 ) {
 		const appenderButton = isAndroid()
 			? await this.waitForElementToBeDisplayedByXPath(
-					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.Button[${ position }]`
+					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[${ position }]/android.view.ViewGroup/android.widget.Button`
 			  )
 			: await this.waitForElementToBeDisplayedById( 'appender-button' );
 		await appenderButton.click();
@@ -1017,4 +1034,4 @@ const blockNames = {
 	unsupported: 'Unsupported',
 };
 
-module.exports = { initializeEditorPage, blockNames };
+module.exports = { setupEditor, blockNames };

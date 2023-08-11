@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	trash,
-	backup,
+	rotateLeft,
+	rotateRight,
 	layout,
 	page,
 	drawerLeft,
@@ -13,12 +14,14 @@ import {
 	blockDefault,
 	cog,
 	code,
-	keyboardClose,
+	keyboard,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
+import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -34,6 +37,7 @@ import { unlock } from '../../lock-unlock';
 const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
+	const { record: template } = useEditedEntityRecord();
 	const { isPage, canvasMode, hasPageContentFocus } = useSelect(
 		( select ) => ( {
 			isPage: select( editSiteStore ).isPage(),
@@ -53,7 +57,11 @@ function usePageContentFocusCommands() {
 	if ( hasPageContentFocus ) {
 		commands.push( {
 			name: 'core/switch-to-template-focus',
-			label: __( 'Edit template' ),
+			/* translators: %1$s: template title */
+			label: sprintf(
+				'Edit template: %s',
+				decodeEntities( template.title )
+			),
 			icon: layout,
 			callback: ( { close } ) => {
 				setHasPageContentFocus( false );
@@ -93,12 +101,20 @@ function useManipulateDocumentCommands() {
 	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
 		const label =
 			template.type === 'wp_template'
-				? __( 'Reset template' )
-				: __( 'Reset template part' );
+				? /* translators: %1$s: template title */
+				  sprintf(
+						'Reset template: %s',
+						decodeEntities( template.title )
+				  )
+				: /* translators: %1$s: template part title */
+				  sprintf(
+						'Reset template part: %s',
+						decodeEntities( template.title )
+				  );
 		commands.push( {
 			name: 'core/reset-template',
 			label,
-			icon: backup,
+			icon: isRTL() ? rotateRight : rotateLeft,
 			callback: ( { close } ) => {
 				revertTemplate( template );
 				close();
@@ -109,8 +125,16 @@ function useManipulateDocumentCommands() {
 	if ( isTemplateRemovable( template ) && ! hasPageContentFocus ) {
 		const label =
 			template.type === 'wp_template'
-				? __( 'Delete template' )
-				: __( 'Delete template part' );
+				? /* translators: %1$s: template title */
+				  sprintf(
+						'Delete template: %s',
+						decodeEntities( template.title )
+				  )
+				: /* translators: %1$s: template part title */
+				  sprintf(
+						'Delete template part: %s',
+						decodeEntities( template.title )
+				  );
 		const path =
 			template.type === 'wp_template'
 				? '/wp_template'
@@ -137,20 +161,32 @@ function useManipulateDocumentCommands() {
 }
 
 function useEditUICommands() {
-	const { openGeneralSidebar, closeGeneralSidebar, switchEditorMode } =
-		useDispatch( editSiteStore );
-	const { canvasMode, editorMode, activeSidebar } = useSelect(
-		( select ) => ( {
-			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-			editorMode: select( editSiteStore ).getEditorMode(),
-			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
-				editSiteStore.name
-			),
-		} ),
-		[]
-	);
+	const {
+		openGeneralSidebar,
+		closeGeneralSidebar,
+		setIsInserterOpened,
+		setIsListViewOpened,
+		switchEditorMode,
+	} = useDispatch( editSiteStore );
+	const { canvasMode, editorMode, activeSidebar, showBlockBreadcrumbs } =
+		useSelect(
+			( select ) => ( {
+				canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+				editorMode: select( editSiteStore ).getEditorMode(),
+				activeSidebar: select(
+					interfaceStore
+				).getActiveComplementaryArea( editSiteStore.name ),
+				showBlockBreadcrumbs: select( preferencesStore ).get(
+					'core/edit-site',
+					'showBlockBreadcrumbs'
+				),
+			} ),
+			[]
+		);
 	const { openModal } = useDispatch( interfaceStore );
-	const { toggle } = useDispatch( preferencesStore );
+	const { get: getPreference } = useSelect( preferencesStore );
+	const { set: setPreference, toggle } = useDispatch( preferencesStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
 
 	if ( canvasMode !== 'edit' ) {
 		return { isLoading: false, commands: [] };
@@ -197,6 +233,29 @@ function useEditUICommands() {
 	} );
 
 	commands.push( {
+		name: 'core/toggle-distraction-free',
+		label: __( 'Toggle distraction free' ),
+		icon: cog,
+		callback: ( { close } ) => {
+			setPreference( 'core/edit-site', 'fixedToolbar', false );
+			setIsInserterOpened( false );
+			setIsListViewOpened( false );
+			closeGeneralSidebar();
+			toggle( 'core/edit-site', 'distractionFree' );
+			createInfoNotice(
+				getPreference( 'core/edit-site', 'distractionFree' )
+					? __( 'Distraction free mode turned on.' )
+					: __( 'Distraction free mode turned off.' ),
+				{
+					id: 'core/edit-site/distraction-free-mode/notice',
+					type: 'snackbar',
+				}
+			);
+			close();
+		},
+	} );
+
+	commands.push( {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
 		icon: cog,
@@ -228,9 +287,21 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/open-shortcut-help',
 		label: __( 'Open keyboard shortcuts' ),
-		icon: keyboardClose,
+		icon: keyboard,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
+		},
+	} );
+
+	commands.push( {
+		name: 'core/toggle-breadcrumbs',
+		label: showBlockBreadcrumbs
+			? __( 'Hide block breadcrumbs' )
+			: __( 'Show block breadcrumbs' ),
+		icon: cog,
+		callback: ( { close } ) => {
+			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
+			close();
 		},
 	} );
 

@@ -124,7 +124,7 @@ function DimensionsTool( {
 					}
 
 					// Auto-update width and height.
-					if ( nextAspectRatio && width && height ) {
+					if ( 'custom' !== nextAspectRatio && width && height ) {
 						delete nextValue.height;
 					}
 

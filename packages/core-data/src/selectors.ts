@@ -1266,7 +1266,7 @@ export function getBlockPatternCategories( state: State ): Array< any > {
  */
 export function getCurrentThemeGlobalStylesRevisions(
 	state: State
-): Object | null {
+): Array< object > | null {
 	const currentGlobalStylesId =
 		__experimentalGetCurrentGlobalStylesId( state );
 

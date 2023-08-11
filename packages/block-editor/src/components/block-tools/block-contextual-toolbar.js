@@ -24,7 +24,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import NavigableToolbar from '../navigable-toolbar';
 import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	// When the toolbar is fixed it can be collapsed
@@ -32,48 +32,58 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	const toolbarButtonRef = useRef();
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { blockType, hasParents, showParentSelector, selectedBlockClientId } =
-		useSelect( ( select ) => {
-			const {
-				getBlockName,
-				getBlockParents,
-				getSelectedBlockClientIds,
-				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
-			const { getBlockType } = select( blocksStore );
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
-			const parents = getBlockParents( _selectedBlockClientId );
-			const firstParentClientId = parents[ parents.length - 1 ];
-			const parentBlockName = getBlockName( firstParentClientId );
-			const parentBlockType = getBlockType( parentBlockName );
+	const {
+		blockType,
+		blockEditingMode,
+		hasParents,
+		showParentSelector,
+		selectedBlockClientId,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getBlockParents,
+			getSelectedBlockClientIds,
+			getBlockEditingMode,
+		} = select( blockEditorStore );
+		const { getBlockType } = select( blocksStore );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
+		const parents = getBlockParents( _selectedBlockClientId );
+		const firstParentClientId = parents[ parents.length - 1 ];
+		const parentBlockName = getBlockName( firstParentClientId );
+		const parentBlockType = getBlockType( parentBlockName );
 
-			return {
-				selectedBlockClientId: _selectedBlockClientId,
-				blockType:
-					_selectedBlockClientId &&
-					getBlockType( getBlockName( _selectedBlockClientId ) ),
-				hasParents: parents.length,
-				showParentSelector:
-					parentBlockType &&
-					getBlockEditingMode( firstParentClientId ) === 'default' &&
-					hasBlockSupport(
-						parentBlockType,
-						'__experimentalParentSelector',
-						true
-					) &&
-					selectedBlockClientIds.length <= 1 &&
-					getBlockEditingMode( _selectedBlockClientId ) === 'default',
-			};
-		}, [] );
+		return {
+			selectedBlockClientId: _selectedBlockClientId,
+			blockType:
+				_selectedBlockClientId &&
+				getBlockType( getBlockName( _selectedBlockClientId ) ),
+			blockEditingMode: getBlockEditingMode( _selectedBlockClientId ),
+			hasParents: parents.length,
+			showParentSelector:
+				parentBlockType &&
+				getBlockEditingMode( firstParentClientId ) === 'default' &&
+				hasBlockSupport(
+					parentBlockType,
+					'__experimentalParentSelector',
+					true
+				) &&
+				selectedBlockClientIds.length <= 1 &&
+				getBlockEditingMode( _selectedBlockClientId ) === 'default',
+		};
+	}, [] );
 
 	useEffect( () => {
 		setIsCollapsed( false );
 	}, [ selectedBlockClientId ] );
 
+	const isToolbarEnabled =
+		! blockType ||
+		hasBlockSupport( blockType, '__experimentalToolbar', true );
+	const hasAnyBlockControls = useHasAnyBlockControls();
 	if (
-		blockType &&
-		! hasBlockSupport( blockType, '__experimentalToolbar', true )
+		! isToolbarEnabled ||
+		( blockEditingMode !== 'default' && ! hasAnyBlockControls )
 	) {
 		return null;
 	}

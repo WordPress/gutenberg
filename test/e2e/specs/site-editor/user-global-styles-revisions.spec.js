@@ -22,16 +22,16 @@ test.describe( 'Global styles revisions', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
 	} );
 
-	test( 'should display revisions UI when there is more than 1 revision', async ( {
+	test( 'should display revisions UI when there is 1 revision', async ( {
 		page,
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
+		await editor.canvas.click( 'body' );
 		const currentRevisions =
 			await userGlobalStylesRevisions.getGlobalStylesRevisions();
 		await userGlobalStylesRevisions.openStylesPanel();
@@ -39,19 +39,6 @@ test.describe( 'Global styles revisions', () => {
 		// Change a style and save it.
 		await page.getByRole( 'button', { name: 'Colors styles' } ).click();
 
-		await page
-			.getByRole( 'button', { name: 'Color Background styles' } )
-			.click();
-		await page
-			.getByRole( 'button', { name: 'Color: Black' } )
-			.click( { force: true } );
-
-		await editor.saveSiteEditorEntities();
-
-		/*
-		 * Change a style and save it again.
-		 * We need more than 2 revisions to show the UI.
-		 */
 		await page
 			.getByRole( 'button', { name: 'Color Background styles' } )
 			.click();
@@ -68,8 +55,9 @@ test.describe( 'Global styles revisions', () => {
 			name: /^Changes saved by /,
 		} );
 
+		// There should be 2 revisions not including the reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(
-			currentRevisions.length + 2
+			currentRevisions.length + 1
 		);
 	} );
 
@@ -78,6 +66,7 @@ test.describe( 'Global styles revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
+		await editor.canvas.click( 'body' );
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Colors styles' } ).click();
 		await page
@@ -105,7 +94,7 @@ test.describe( 'Global styles revisions', () => {
 		const confirm = page.getByRole( 'dialog' );
 		await expect( confirm ).toBeVisible();
 		await expect( confirm ).toHaveText(
-			/^Loading this revision will discard all unsaved changes/
+			/^Any unsaved changes will be lost when you apply this revision./
 		);
 
 		// This is to make sure there are no lingering unsaved changes.
@@ -114,6 +103,25 @@ test.describe( 'Global styles revisions', () => {
 			.getByRole( 'button', { name: 'Cancel' } )
 			.click();
 		await editor.saveSiteEditorEntities();
+	} );
+
+	test( 'should have a reset to defaults button', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.click( 'body' );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await userGlobalStylesRevisions.openRevisions();
+		const lastRevisionButton = page
+			.getByLabel( 'Global styles revisions' )
+			.getByRole( 'button' )
+			.last();
+		await expect( lastRevisionButton ).toContainText( 'Default styles' );
+		await lastRevisionButton.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Reset to defaults' } )
+		).toBeVisible();
 	} );
 } );
 

@@ -13,7 +13,6 @@ import {
 	symbolFilled,
 	styles,
 	navigation,
-	symbol,
 } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
@@ -21,6 +20,7 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
 /**
  * Internal dependencies
  */
+import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -124,8 +124,15 @@ function useSiteEditorBasicNavigationCommands() {
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
+	const isTemplatesAccessible = useIsTemplatesAccessible();
+	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {
 		const result = [];
+
+		if ( ! isTemplatesAccessible || ! isBlockBasedTheme ) {
+			return result;
+		}
+
 		result.push( {
 			name: 'core/edit-site/open-navigation',
 			label: __( 'Open navigation' ),
@@ -198,25 +205,8 @@ function useSiteEditorBasicNavigationCommands() {
 			},
 		} );
 
-		result.push( {
-			name: 'core/edit-site/open-template-parts',
-			label: __( 'Open patterns' ),
-			icon: symbol,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/patterns',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
 		return result;
-	}, [ history, isSiteEditor ] );
+	}, [ history, isSiteEditor, isTemplatesAccessible, isBlockBasedTheme ] );
 
 	return {
 		commands,
