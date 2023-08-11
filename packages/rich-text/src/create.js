@@ -161,6 +161,16 @@ export function create( {
 	__unstableIsEditableTree: isEditableTree,
 	preserveWhiteSpace,
 } = {} ) {
+	// If the HTML is a single string without any tags and HTML entities, treat
+	// it as text, which is faster than parsing.
+	if (
+		typeof html === 'string' &&
+		html.indexOf( '<' ) === -1 &&
+		html.indexOf( '&' ) === -1
+	) {
+		text = html;
+	}
+
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
