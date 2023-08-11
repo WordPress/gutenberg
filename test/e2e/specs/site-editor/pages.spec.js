@@ -79,6 +79,11 @@ test.describe( 'Pages', () => {
 
 		// Switch to template editing focus.
 		await editor.openDocumentSettingsSidebar();
+		await expect(
+			page.locator(
+				'.edit-site-page-panels__edit-template-preview iframe'
+			)
+		).toBeVisible();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Edit template' } )
