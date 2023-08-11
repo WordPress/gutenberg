@@ -3,6 +3,7 @@
  */
 import registerDirectives from './directives';
 import { init } from './hydration';
+import { rawStore, afterLoads } from './store';
 export { store } from './store';
 export { directive } from './hooks';
 export { h as createElement } from 'preact';
@@ -16,4 +17,5 @@ registerDirectives();
 
 document.addEventListener( 'DOMContentLoaded', async () => {
 	await init();
+	afterLoads.forEach( ( afterLoad ) => afterLoad( rawStore ) );
 } );
