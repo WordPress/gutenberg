@@ -71,7 +71,7 @@ function UnforwardedNumberControl(
 	const constrainValue = (
 		value: number | string,
 		stepOverride?: number
-	): string => {
+	) => {
 		// When step is "any" clamp the value, otherwise round and clamp it.
 		// Use '' + to convert to string for use in input value attribute.
 		return isStepAny
