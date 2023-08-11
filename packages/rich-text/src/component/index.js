@@ -193,9 +193,15 @@ export function useRichText( {
 		forceRender();
 	}
 
-	function applyFromProps() {
+	function applyFromProps( mount = false ) {
 		setRecordFromProps();
-		applyRecord( record.current );
+
+		// Don't bother diffing on mount.
+		if ( mount ) {
+			ref.current.innerHTML = value;
+		} else {
+			applyRecord( record.current );
+		}
 	}
 
 	const didMount = useRef( false );
@@ -244,7 +250,7 @@ export function useRichText( {
 		} ),
 		useSelectionChangeCompat(),
 		useRefEffect( () => {
-			applyFromProps();
+			applyFromProps( true );
 			didMount.current = true;
 		}, [ placeholder, ...__unstableDependencies ] ),
 	] );
