@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	Button,
 	__experimentalHStack as HStack,
@@ -55,13 +56,15 @@ function ListViewBlockSelectButton(
 	} );
 	const { isLocked } = useBlockLock( clientId );
 	const {
+		canInsertBlockType,
 		getSelectedBlockClientIds,
 		getPreviousBlockClientId,
 		getBlockRootClientId,
 		getBlockOrder,
+		getBlocksByClientId,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
-	const { removeBlocks } = useDispatch( blockEditorStore );
+	const { duplicateBlocks, removeBlocks } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
@@ -83,6 +86,33 @@ function ListViewBlockSelectButton(
 		onDragStart?.( event );
 	};
 
+	// Determine which blocks to update using logic that if the current block
+	// is part of the block selection, then use the whole block selection for the
+	// update. Otherwise, only update the current block. This way, where the user is
+	// currently focused has a logical impact on what happens when they perform an action.
+	// This is used by actions to delete and duplicate blocks.
+	function getBlocksToUpdate() {
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const isUpdatingSelectedBlocks =
+			selectedBlockClientIds.includes( clientId );
+		const firstBlockClientId = isUpdatingSelectedBlocks
+			? selectedBlockClientIds[ 0 ]
+			: clientId;
+		const firstBlockRootClientId =
+			getBlockRootClientId( firstBlockClientId );
+
+		const blocksToUpdate = isUpdatingSelectedBlocks
+			? selectedBlockClientIds
+			: [ clientId ];
+
+		return {
+			blocksToUpdate,
+			firstBlockClientId,
+			firstBlockRootClientId,
+			selectedBlockClientIds,
+		};
+	}
+
 	/**
 	 * @param {KeyboardEvent} event
 	 */
@@ -94,18 +124,12 @@ function ListViewBlockSelectButton(
 			event.keyCode === DELETE ||
 			isMatch( 'core/block-editor/remove', event )
 		) {
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const isDeletingSelectedBlocks =
-				selectedBlockClientIds.includes( clientId );
-			const firstBlockClientId = isDeletingSelectedBlocks
-				? selectedBlockClientIds[ 0 ]
-				: clientId;
-			const firstBlockRootClientId =
-				getBlockRootClientId( firstBlockClientId );
-
-			const blocksToDelete = isDeletingSelectedBlocks
-				? selectedBlockClientIds
-				: [ clientId ];
+			const {
+				blocksToUpdate: blocksToDelete,
+				firstBlockClientId,
+				firstBlockRootClientId,
+				selectedBlockClientIds,
+			} = getBlocksToUpdate();
 
 			// Don't update the selection if the blocks cannot be deleted.
 			if ( ! canRemoveBlocks( blocksToDelete, firstBlockRootClientId ) ) {
@@ -131,6 +155,35 @@ function ListViewBlockSelectButton(
 			}
 
 			updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
+		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+
+			const { blocksToUpdate, firstBlockRootClientId } =
+				getBlocksToUpdate();
+
+			const canDuplicate = getBlocksByClientId( blocksToUpdate ).every(
+				( block ) => {
+					return (
+						!! block &&
+						hasBlockSupport( block.name, 'multiple', true ) &&
+						canInsertBlockType( block.name, firstBlockRootClientId )
+					);
+				}
+			);
+
+			if ( canDuplicate ) {
+				const duplicatedBlocks = duplicateBlocks(
+					blocksToUpdate,
+					false
+				);
+
+				if ( duplicatedBlocks ) {
+					updateFocusAndSelection( duplicatedBlocks, true );
+				}
+			}
 		}
 	}
 
