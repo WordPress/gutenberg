@@ -33,7 +33,7 @@ The first parameter in the **registerBlockType** function is the block name, thi
 
 The second parameter to the function is the block object. See the [block registration documentation](/docs/reference-guides/block-api/block-registration.md) for full details.
 
-The two block object properties are **edit** and **save**, these are the key parts of a block. Both properties are functions that are included via the import above.
+Two common object properties are **edit** and **save**, these are the key parts of a block. Both properties are functions that are included via the import above.
 
 The results of the edit function is what the editor will render to the editor page when the block is inserted.
 
