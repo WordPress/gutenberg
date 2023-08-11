@@ -110,14 +110,12 @@ add_action( 'init', 'register_block_core_site_logo' );
 
 /**
  * Overrides the custom logo with a site logo, if the option is set.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param string $custom_logo The custom logo set by a theme.
  *
  * @return string The site logo if set.
  */
 function _override_custom_logo_theme_mod( $custom_logo ) {
-	//phpcs:enable
 	$site_logo = get_option( 'site_logo' );
 	return false === $site_logo ? $custom_logo : $site_logo;
 }
@@ -126,13 +124,11 @@ add_filter( 'theme_mod_custom_logo', '_override_custom_logo_theme_mod' );
 
 /**
  * Updates the site_logo option when the custom_logo theme-mod gets updated.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param  mixed $value Attachment ID of the custom logo or an empty value.
  * @return mixed
  */
 function _sync_custom_logo_to_site_logo( $value ) {
-	//phpcs:enable
 	if ( empty( $value ) ) {
 		delete_option( 'site_logo' );
 	} else {
@@ -146,13 +142,11 @@ add_filter( 'pre_set_theme_mod_custom_logo', '_sync_custom_logo_to_site_logo' );
 
 /**
  * Deletes the site_logo when the custom_logo theme mod is removed.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param array $old_value Previous theme mod settings.
  * @param array $value     Updated theme mod settings.
  */
 function _delete_site_logo_on_remove_custom_logo( $old_value, $value ) {
-	//phpcs:enable
 	global $_ignore_site_logo_changes;
 
 	if ( $_ignore_site_logo_changes ) {
@@ -167,10 +161,8 @@ function _delete_site_logo_on_remove_custom_logo( $old_value, $value ) {
 
 /**
  * Deletes the site logo when all theme mods are being removed.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  */
 function _delete_site_logo_on_remove_theme_mods() {
-	//phpcs:enable
 	global $_ignore_site_logo_changes;
 
 	if ( $_ignore_site_logo_changes ) {
@@ -187,10 +179,8 @@ function _delete_site_logo_on_remove_theme_mods() {
  * Hooks `_delete_site_logo_on_remove_theme_mods` in `delete_option_theme_mods_$theme`.
  *
  * Runs on `setup_theme` to account for dynamically-switched themes in the Customizer.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  */
 function _delete_site_logo_on_remove_custom_logo_on_setup_theme() {
-	//phpcs:enable
 	$theme = get_option( 'stylesheet' );
 	add_action( "update_option_theme_mods_$theme", '_delete_site_logo_on_remove_custom_logo', 10, 2 );
 	add_action( "delete_option_theme_mods_$theme", '_delete_site_logo_on_remove_theme_mods' );
@@ -199,10 +189,8 @@ add_action( 'setup_theme', '_delete_site_logo_on_remove_custom_logo_on_setup_the
 
 /**
  * Removes the custom_logo theme-mod when the site_logo option gets deleted.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  */
 function _delete_custom_logo_on_remove_site_logo() {
-	//phpcs:enable
 	global $_ignore_site_logo_changes;
 
 	// Prevent _delete_site_logo_on_remove_custom_logo and

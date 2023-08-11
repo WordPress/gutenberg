@@ -115,12 +115,10 @@ add_filter( 'comment_form_defaults', 'comments_block_form_defaults' );
 /**
  * Enqueues styles from the legacy `core/post-comments` block. These styles are
  * required only by the block's fallback.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param string $block_name Name of the new block type.
  */
 function enqueue_legacy_post_comments_block_styles( $block_name ) {
-	//phpcs:enable
 	static $are_styles_enqueued = false;
 
 	if ( ! $are_styles_enqueued ) {

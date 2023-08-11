@@ -106,7 +106,6 @@ add_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' );
 
 /**
  * Keeps track of the revision ID for "rest_after_insert_{$post_type}".
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 6.3.0
  *
@@ -115,7 +114,6 @@ add_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' );
  * @param int $revision_id The revision ID.
  */
 function wp_keep_footnotes_revision_id( $revision_id ) {
-	//phpcs:enable
 	global $wp_temporary_footnote_revision_id;
 	$wp_temporary_footnote_revision_id = $revision_id;
 }

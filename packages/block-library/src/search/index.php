@@ -231,7 +231,6 @@ function classnames_for_block_core_search( $attributes ) {
  * Based on whether the Search block is configured to display the button inside
  * or not, the generated rule is injected into the appropriate collection of
  * styles for later application in the block's markup.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param array  $attributes     The block attributes.
  * @param string $property       Border property to generate rule for e.g. width or color.
@@ -243,7 +242,6 @@ function classnames_for_block_core_search( $attributes ) {
  * @return void
  */
 function apply_block_core_search_border_style( $attributes, $property, $side, &$wrapper_styles, &$button_styles, &$input_styles ) {
-	//phpcs:enable
 	$is_button_inside = 'button-inside' === _wp_array_get( $attributes, array( 'buttonPosition' ), false );
 
 	$path = array( 'style', 'border', $property );
@@ -280,7 +278,6 @@ function apply_block_core_search_border_style( $attributes, $property, $side, &$
  * This adds CSS rules for a given border property e.g. width or color. It
  * injects rules into the provided wrapper, button and input style arrays for
  * uniform "flat" borders or those with individual sides configured.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param array  $attributes     The block attributes.
  * @param string $property       Border property to generate rule for e.g. width or color.
@@ -291,7 +288,6 @@ function apply_block_core_search_border_style( $attributes, $property, $side, &$
  * @return void
  */
 function apply_block_core_search_border_styles( $attributes, $property, &$wrapper_styles, &$button_styles, &$input_styles ) {
-	//phpcs:enable
 	apply_block_core_search_border_style( $attributes, $property, null, $wrapper_styles, $button_styles, $input_styles );
 	apply_block_core_search_border_style( $attributes, $property, 'top', $wrapper_styles, $button_styles, $input_styles );
 	apply_block_core_search_border_style( $attributes, $property, 'right', $wrapper_styles, $button_styles, $input_styles );
@@ -305,14 +301,12 @@ function apply_block_core_search_border_styles( $attributes, $property, &$wrappe
  * The result will contain one entry for shared styles such as those for the
  * inner input or button and a second for the inner wrapper should the block
  * be positioning the button "inside".
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param  array $attributes The block attributes.
  *
  * @return array Style HTML attribute.
  */
 function styles_for_block_core_search( $attributes ) {
-	//phpcs:enable
 	$wrapper_styles   = array();
 	$button_styles    = array();
 	$input_styles     = array();
@@ -434,15 +428,13 @@ function styles_for_block_core_search( $attributes ) {
 }
 
 /**
- * Returns typography classnames depending on whether there are named font sizes/families.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
+ * Returns typography classnames depending on whether there are named font sizes/families .
  *
  * @param array $attributes The block attributes.
  *
  * @return string The typography color classnames to be applied to the block elements.
  */
 function get_typography_classes_for_block_core_search( $attributes ) {
-	//phpcs:enable
 	$typography_classes    = array();
 	$has_named_font_family = ! empty( $attributes['fontFamily'] );
 	$has_named_font_size   = ! empty( $attributes['fontSize'] );
@@ -461,14 +453,12 @@ function get_typography_classes_for_block_core_search( $attributes ) {
 /**
  * Returns typography styles to be included in an HTML style tag.
  * This excludes text-decoration, which is applied only to the label and button elements of the search block.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param array $attributes The block attributes.
  *
  * @return string A string of typography CSS declarations.
  */
 function get_typography_styles_for_block_core_search( $attributes ) {
-	//phpcs:enable
 	$typography_styles = array();
 
 	// Add typography styles.
@@ -513,14 +503,12 @@ function get_typography_styles_for_block_core_search( $attributes ) {
 
 /**
  * Returns border color classnames depending on whether there are named or custom border colors.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param array $attributes The block attributes.
  *
  * @return string The border color classnames to be applied to the block elements.
  */
 function get_border_color_classes_for_block_core_search( $attributes ) {
-	//phpcs:enable
 	$border_color_classes    = array();
 	$has_custom_border_color = ! empty( $attributes['style']['border']['color'] );
 	$has_named_border_color  = ! empty( $attributes['borderColor'] );
@@ -538,14 +526,12 @@ function get_border_color_classes_for_block_core_search( $attributes ) {
 
 /**
  * Returns color classnames depending on whether there are named or custom text and background colors.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param array $attributes The block attributes.
  *
  * @return string The color classnames to be applied to the block elements.
  */
 function get_color_classes_for_block_core_search( $attributes ) {
-	//phpcs:enable
 	$classnames = array();
 
 	// Text color.

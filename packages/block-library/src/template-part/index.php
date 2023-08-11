@@ -208,12 +208,10 @@ function build_template_part_block_area_variations( $instance_variations ) {
 
 /**
  * Returns an array of instance variation objects for the template part block
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @return array Array containing the block variation objects.
  */
 function build_template_part_block_instance_variations() {
-	//phpcs:enable
 	// Block themes are unavailable during installation.
 	if ( wp_installing() ) {
 		return array();
@@ -264,12 +262,10 @@ function build_template_part_block_instance_variations() {
 
 /**
  * Returns an array of all template part block variations.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @return array Array containing the block variation objects.
  */
 function build_template_part_block_variations() {
-	//phpcs:enable
 	$instance_variations = build_template_part_block_instance_variations();
 	$area_variations     = build_template_part_block_area_variations( $instance_variations );
 	return array_merge( $area_variations, $instance_variations );
