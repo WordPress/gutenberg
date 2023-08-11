@@ -181,11 +181,13 @@ export default function PostNavigationLinkEdit( {
 					/>
 					<InputControl
 						label={ __( 'Add terms to exclude' ) }
-						help={ __( 'Separate terms with comma.' ) }
 						value={ excludedTerms }
 						onChange={ ( value ) =>
 							setAttributes( { excludedTerms: value } )
 						}
+						help={ __(
+							'Exclude terms from any taxonomy by entering the term name. Separate multiple terms with a comma.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
