@@ -78,7 +78,7 @@ export default function DuplicateMenuItem( {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
-					__( 'Duplicated "%s"' ),
+					__( '"%s" duplicated.' ),
 					item.title
 				),
 				{
@@ -137,7 +137,7 @@ export default function DuplicateMenuItem( {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
-					__( 'Duplicated "%s"' ),
+					__( '"%s" duplicated.' ),
 					item.title
 				),
 				{
