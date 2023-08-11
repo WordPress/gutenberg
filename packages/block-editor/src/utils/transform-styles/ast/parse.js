@@ -456,6 +456,36 @@ export default function ( css, options ) {
 	}
 
 	/**
+	 * Parse container.
+	 */
+
+	function atcontainer() {
+		const pos = position();
+		const m = match( /^@container *([^{]+)/ );
+
+		if ( ! m ) {
+			return;
+		}
+		const container = trim( m[ 1 ] );
+
+		if ( ! open() ) {
+			return error( "@container missing '{'" );
+		}
+
+		const style = comments().concat( rules() );
+
+		if ( ! close() ) {
+			return error( "@container missing '}'" );
+		}
+
+		return pos( {
+			type: 'container',
+			container,
+			rules: style,
+		} );
+	}
+
+	/**
 	 * Parse custom-media.
 	 */
 
@@ -624,6 +654,7 @@ export default function ( css, options ) {
 		return (
 			atkeyframes() ||
 			atmedia() ||
+			atcontainer() ||
 			atcustommedia() ||
 			atsupports() ||
 			atimport() ||

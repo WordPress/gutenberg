@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/url",
-	"version": "3.39.0",
+	"version": "3.40.0",
 	"description": "WordPress URL utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,7 +28,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"remove-accents": "^0.4.2"
+		"remove-accents": "^0.5.0"
 	},
 	"publishConfig": {
 		"access": "public"

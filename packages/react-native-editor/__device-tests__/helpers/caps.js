@@ -9,6 +9,7 @@ const ios = {
 	processArguments: {
 		args: [ 'uitesting' ],
 	},
+	autoLaunch: false,
 };
 
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
@@ -39,4 +40,5 @@ exports.android = {
 	appiumVersion: '1.22.1',
 	app: undefined,
 	disableWindowAnimation: true,
+	autoLaunch: false,
 };

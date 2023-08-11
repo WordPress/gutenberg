@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Theme`: Expose via private APIs ([#53262](https://github.com/WordPress/gutenberg/pull/53262)).
+-   `ProgressBar`: Use the theme system accent for indicator color ([#53347](https://github.com/WordPress/gutenberg/pull/53347)).
+-   `ProgressBar`: Use gray 300 for track color ([#53349](https://github.com/WordPress/gutenberg/pull/53349)).
+-   `Modal`: add `headerActions` prop to render buttons in the header. ([#53328](https://github.com/WordPress/gutenberg/pull/53328)).
+-   `Snackbar`: Snackbar design and motion improvements ([#53248](https://github.com/WordPress/gutenberg/pull/53248))
+
+### Bug Fix
+
+-   `Button`: add `:disabled` selector to reset hover color for disabled buttons ([#53411](https://github.com/WordPress/gutenberg/pull/53411)).
+
+### Internal
+
+-   `ControlGroup`, `FormGroup`, `ControlLabel`, `Spinner`: Remove unused `ui/` components from the codebase ([#52953](https://github.com/WordPress/gutenberg/pull/52953)).
+-   `MenuItem`: Convert to TypeScript ([#53132](https://github.com/WordPress/gutenberg/pull/53132)).
+-   `MenuGroup`: Add Storybook stories ([#53090](https://github.com/WordPress/gutenberg/pull/53090)).
+
+## 25.5.0 (2023-08-10)
+
 ### New Feature
 
 -   Add a new `ProgressBar` component. ([#53030](https://github.com/WordPress/gutenberg/pull/53030)).
@@ -11,15 +31,10 @@
 -   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
 -   `MenuItemsChoice`, `MenuItem`: Support a `disabled` prop on a menu item ([#52737](https://github.com/WordPress/gutenberg/pull/52737)).
 -   `TabPanel`: Introduce a new version of `TabPanel` with updated internals and improved adherence to ARIA guidance on `tabpanel` focus behavior while maintaining the same functionality and API surface.([#52133](https://github.com/WordPress/gutenberg/pull/52133)).
--   `Theme`: Expose via private APIs ([#53262](https://github.com/WordPress/gutenberg/pull/53262)).
 
 ### Bug Fix
 
 -   `Modal`: Fix loss of focus when clicking outside ([#52653](https://github.com/WordPress/gutenberg/pull/52653)).
-
-### Internal
-
--   `ControlGroup`, `FormGroup`, `ControlLabel`, `Spinner`: Remove unused `ui/` components from the codebase ([#52953](https://github.com/WordPress/gutenberg/pull/52953)).
 
 ## 25.4.0 (2023-07-20)
 

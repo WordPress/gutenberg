@@ -24,7 +24,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import NavigableToolbar from '../navigable-toolbar';
 import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	// When the toolbar is fixed it can be collapsed
@@ -34,17 +34,17 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		blockType,
+		blockEditingMode,
 		hasParents,
 		showParentSelector,
 		selectedBlockClientId,
-		isContentOnly,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
 			getBlockParents,
 			getSelectedBlockClientIds,
 			getBlockEditingMode,
-		} = unlock( select( blockEditorStore ) );
+		} = select( blockEditorStore );
 		const { getBlockType } = select( blocksStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -58,9 +58,8 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			blockType:
 				_selectedBlockClientId &&
 				getBlockType( getBlockName( _selectedBlockClientId ) ),
+			blockEditingMode: getBlockEditingMode( _selectedBlockClientId ),
 			hasParents: parents.length,
-			isContentOnly:
-				getBlockEditingMode( _selectedBlockClientId ) === 'contentOnly',
 			showParentSelector:
 				parentBlockType &&
 				getBlockEditingMode( firstParentClientId ) === 'default' &&
@@ -78,10 +77,13 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 		setIsCollapsed( false );
 	}, [ selectedBlockClientId ] );
 
+	const isToolbarEnabled =
+		! blockType ||
+		hasBlockSupport( blockType, '__experimentalToolbar', true );
+	const hasAnyBlockControls = useHasAnyBlockControls();
 	if (
-		isContentOnly ||
-		( blockType &&
-			! hasBlockSupport( blockType, '__experimentalToolbar', true ) )
+		! isToolbarEnabled ||
+		( blockEditingMode !== 'default' && ! hasAnyBlockControls )
 	) {
 		return null;
 	}
