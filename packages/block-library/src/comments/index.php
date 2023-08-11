@@ -140,13 +140,11 @@ function enqueue_legacy_post_comments_block_styles( $block_name ) {
  *
  * The same approach was followed when core/query-loop was renamed to
  * core/post-template.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @see https://github.com/WordPress/gutenberg/pull/41807
  * @see https://github.com/WordPress/gutenberg/pull/32514
  */
 function register_legacy_post_comments_block() {
-	//phpcs:enable
 	$registry = WP_Block_Type_Registry::get_instance();
 
 	/*
