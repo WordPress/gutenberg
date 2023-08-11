@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -13,6 +13,7 @@ import { useRef } from '@wordpress/element';
  */
 import HuePicker from './hue-picker';
 import SaturationValuePicker from './saturation-picker';
+import styles from './style.native.scss';
 
 const HsvColorPicker = ( props ) => {
 	const maxWidth = Dimensions.get( 'window' ).width - 32;
@@ -47,7 +48,7 @@ const HsvColorPicker = ( props ) => {
 	} = props;
 
 	return (
-		<View style={ [ styles.container, containerStyle ] }>
+		<View style={ [ styles[ 'hsv-container' ], containerStyle ] }>
 			<SaturationValuePicker
 				containerStyle={ satValPickerContainerStyle }
 				currentColor={ currentColor }
@@ -80,12 +81,5 @@ const HsvColorPicker = ( props ) => {
 		</View>
 	);
 };
-
-const styles = StyleSheet.create( {
-	container: {
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-} );
 
 export default HsvColorPicker;
