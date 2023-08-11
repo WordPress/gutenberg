@@ -434,7 +434,7 @@ test.describe( 'Links', () => {
 		).toBeVisible();
 
 		// Expect the escape key to dismiss the popover normally.
-		await pageUtils.pressKeys( 'Escape' ); //page.keyboard.press( 'Escape' );
+		await page.keyboard.press( 'Escape' );
 		await expect(
 			page.locator(
 				'.components-popover__content .block-editor-link-control'
