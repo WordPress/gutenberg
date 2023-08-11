@@ -118,12 +118,16 @@ require __DIR__ . '/compat/wordpress-6.3/navigation-fallback.php';
 require __DIR__ . '/compat/wordpress-6.3/block-editor-settings.php';
 require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
+// WordPress 6.4 compat.
+require __DIR__ . '/compat/wordpress-6.4/blocks.php';
+
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
+require __DIR__ . '/experimental/synchronization.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';

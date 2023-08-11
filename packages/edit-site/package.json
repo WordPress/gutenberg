@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "5.15.0",
+	"version": "5.16.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -74,7 +74,7 @@
 		"memize": "^2.1.0",
 		"react-autosize-textarea": "^7.1.0",
 		"rememo": "^4.0.2",
-		"remove-accents": "^0.4.2"
+		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

@@ -326,7 +326,12 @@ export default function Image( {
 
 	function updateAlignment( nextAlign ) {
 		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
+			? {
+					width: undefined,
+					height: undefined,
+					aspectRatio: undefined,
+					scale: undefined,
+			  }
 			: {};
 		setAttributes( {
 			...extraUpdatedAttributes,
@@ -480,15 +485,27 @@ export default function Image( {
 					{ isResizable && (
 						<DimensionsTool
 							value={ { width, height, scale, aspectRatio } }
-							onChange={ ( newValue ) => {
+							onChange={ ( {
+								width: newWidth,
+								height: newHeight,
+								scale: newScale,
+								aspectRatio: newAspectRatio,
+							} ) => {
 								// Rebuilding the object forces setting `undefined`
 								// for values that are removed since setAttributes
 								// doesn't do anything with keys that aren't set.
 								setAttributes( {
-									width: newValue.width,
-									height: newValue.height,
-									scale: newValue.scale,
-									aspectRatio: newValue.aspectRatio,
+									// CSS includes `height: auto`, but we need
+									// `width: auto` to fix the aspect ratio when
+									// only height is set due to the width and
+									// height attributes set via the server.
+									width:
+										! newWidth && newHeight
+											? 'auto'
+											: newWidth,
+									height: newHeight,
+									scale: newScale,
+									aspectRatio: newAspectRatio,
 								} );
 							} }
 							defaultScale="cover"

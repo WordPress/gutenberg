@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-const {
-	initializeEditorPage,
-	blockNames,
-} = require( './__device-tests__/pages/editor-page' );
+const { setupEditor } = require( './__device-tests__/pages/editor-page' );
 const utils = require( './__device-tests__/helpers/utils' );
 const testData = require( './__device-tests__/helpers/test-data' );
 
@@ -18,8 +15,7 @@ class CustomEnvironment extends JSDOMEnvironment {
 	async setup() {
 		try {
 			await super.setup();
-			this.global.editorPage = await initializeEditorPage();
-			this.global.editorPage.blockNames = blockNames;
+			this.global.editorPage = await setupEditor();
 			this.global.e2eUtils = utils;
 			this.global.e2eTestData = testData;
 		} catch ( error ) {
