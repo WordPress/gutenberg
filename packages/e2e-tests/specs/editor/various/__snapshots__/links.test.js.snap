@@ -1,11 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Links allows use of escape key to dismiss the url popover 1`] = `
-"<!-- wp:paragraph -->
-<p>This is Gutenberg.</p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`Links can be modified using the keyboard once a link has been set 1`] = `
 "<!-- wp:paragraph -->
 <p>This is <a href="https://wordpress.org/gutenberg">Gutenberg</a>.</p>
