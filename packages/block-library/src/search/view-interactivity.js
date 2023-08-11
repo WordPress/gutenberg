@@ -60,7 +60,7 @@ wpStore( {
 					// If focus is outside search form, and in the document, close menu
 					// event.target === The element losing focus
 					// event.relatedTarget === The element receiving focus (if any)
-					// When focusout is outsite the document,
+					// When focusout is outside the document,
 					// `window.document.activeElement` doesn't change.
 					if (
 						! ref.contains( event.relatedTarget ) &&
