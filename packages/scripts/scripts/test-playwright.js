@@ -12,21 +12,33 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
-const { resolve } = require( 'path' );
+const { resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
-const {
-	installDefaultBrowsersForNpmInstall,
-} = require( 'playwright-core/lib/server' );
 
 /**
  * Internal dependencies
  */
-const { fromConfigRoot, hasProjectFile } = require( '../utils' );
+const {
+	fromConfigRoot,
+	hasProjectFile,
+	hasArgInCLI,
+	getArgsFromCLI,
+} = require( '../utils' );
 
-// TODO: await.
-installDefaultBrowsersForNpmInstall();
+const result = spawn(
+	'node',
+	[ require.resolve( 'playwright-core/cli' ), 'install' ],
+	{
+		stdio: 'inherit',
+	}
+);
+
+if ( result.status > 0 ) {
+	process.exit( result.status );
+}
 
 const config =
+	! hasArgInCLI( '--config' ) &&
 	! hasProjectFile( 'playwright.config.ts' ) &&
 	! hasProjectFile( 'playwright.config.ts' )
 		? [ '--config', fromConfigRoot( 'playwright.config.ts' ) ]
@@ -42,7 +54,12 @@ if ( ! process.env.WP_ARTIFACTS_PATH ) {
 
 const testResult = spawn(
 	'npx',
-	[ require.resolve( '@playwright/test/cli' ), 'test', ...config ],
+	[
+		require.resolve( '@playwright/test/cli' ),
+		'test',
+		...config,
+		...getArgsFromCLI(),
+	],
 	{
 		stdio: 'inherit',
 	}
