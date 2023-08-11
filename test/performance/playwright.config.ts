@@ -10,7 +10,7 @@ import { defineConfig } from '@playwright/test';
 const baseConfig = require( '@wordpress/scripts/config/playwright.config' );
 
 const config = defineConfig( {
-	...baseConfig,
+	...baseConfig.default,
 	reporter: process.env.CI
 		? undefined // We're using another reporter in CI.
 		: [ [ 'list' ], [ './config/performance-reporter.ts' ] ],
@@ -22,7 +22,7 @@ const config = defineConfig( {
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
 	use: {
-		...baseConfig.use,
+		...baseConfig.default.use,
 		video: 'off',
 	},
 } );
