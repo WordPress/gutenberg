@@ -186,7 +186,7 @@ export default function PostNavigationLinkEdit( {
 							setAttributes( { excludedTerms: value } )
 						}
 						help={ __(
-							'Exclude terms from any taxonomy by entering the term name. Separate multiple terms with a comma.'
+							'Exclude terms from any taxonomy by entering the term name, slug, or ID. Separate multiple terms with a comma. Posts with excluded terms will not be linked to, even if they have other matching terms.'
 						) }
 					/>
 				</PanelBody>
