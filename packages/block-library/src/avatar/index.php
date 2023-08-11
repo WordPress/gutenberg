@@ -87,13 +87,11 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 /**
  * Generates class names and styles to apply the border support styles for
  * the Avatar block.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param array $attributes The block attributes.
  * @return array The border-related classnames and styles for the block.
  */
 function get_block_core_avatar_border_attributes( $attributes ) {
-	//phpcs:enable
 	$border_styles = array();
 	$sides         = array( 'top', 'right', 'bottom', 'left' );
 

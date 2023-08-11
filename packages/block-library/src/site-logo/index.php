@@ -79,10 +79,8 @@ add_action( 'rest_api_init', 'register_block_core_site_logo_setting', 10 );
 
 /**
  * Register a core site setting for a site icon
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  */
 function register_block_core_site_icon_setting() {
-	//phpcs:enable
 	register_setting(
 		'general',
 		'site_icon',

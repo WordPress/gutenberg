@@ -264,7 +264,6 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 /**
  * Returns a navigation link variation
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param WP_Taxonomy|WP_Post_Type $entity post type or taxonomy entity.
  * @param string                   $kind string of value 'taxonomy' or 'post-type'.
@@ -272,7 +271,6 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
  * @return array
  */
 function build_variation_for_navigation_link( $entity, $kind ) {
-	//phpcs:enable
 	$title       = '';
 	$description = '';
 

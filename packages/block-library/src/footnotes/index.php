@@ -85,14 +85,12 @@ add_action( 'init', 'register_block_core_footnotes' );
 
 /**
  * Saves the footnotes meta value to the revision.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 6.3.0
  *
  * @param int $revision_id The revision ID.
  */
 function wp_save_footnotes_meta( $revision_id ) {
-	//phpcs:enable
 	$post_id = wp_is_post_revision( $revision_id );
 
 	if ( $post_id ) {

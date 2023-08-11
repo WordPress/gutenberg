@@ -19,7 +19,6 @@
  * 2. It's in the admin; ideally we *shouldn't* be including files from the
  *    admin for a block's output. It's a very small/simple function as well,
  *    so duplicating it isn't too terrible.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @since 3.3.0
  *
@@ -27,7 +26,6 @@
  * @return string The post title if set; "(no title)" if no title is set.
  */
 function wp_latest_comments_draft_or_post_title( $post = 0 ) {
-	//phpcs:enable
 	$title = get_the_title( $post );
 	if ( empty( $title ) ) {
 		$title = __( '(no title)' );

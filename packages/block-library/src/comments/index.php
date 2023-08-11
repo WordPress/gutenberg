@@ -97,14 +97,12 @@ add_action( 'init', 'register_block_core_comments' );
 
 /**
  * Use the button block classes for the form-submit button.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param array $fields The default comment form arguments.
  *
  * @return array Returns the modified fields.
  */
 function comments_block_form_defaults( $fields ) {
-	//phpcs:enable
 	if ( wp_is_block_theme() ) {
 		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="%3$s wp-block-button__link ' . wp_theme_get_element_class_name( 'button' ) . '" value="%4$s" />';
 		$fields['submit_field']  = '<p class="form-submit wp-block-button">%1$s %2$s</p>';

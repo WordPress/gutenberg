@@ -62,14 +62,12 @@ function render_block_core_categories( $attributes ) {
 
 /**
  * Generates the inline script for a categories dropdown field.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param string $dropdown_id ID of the dropdown field.
  *
  * @return string Returns the dropdown onChange redirection script.
  */
 function build_dropdown_script_block_core_categories( $dropdown_id ) {
-	//phpcs:enable
 	ob_start();
 	?>
 	<script type='text/javascript'>

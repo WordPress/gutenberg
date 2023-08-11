@@ -184,14 +184,12 @@ add_action( 'init', 'register_block_core_search' );
 
 /**
  * Builds the correct top level classnames for the 'core/search' block.
- * //phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName
  *
  * @param array $attributes The block attributes.
  *
  * @return string The classnames used in the block.
  */
 function classnames_for_block_core_search( $attributes ) {
-	//phpcs:enable
 	$classnames = array();
 
 	if ( ! empty( $attributes['buttonPosition'] ) ) {
