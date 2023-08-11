@@ -186,8 +186,12 @@ function UnforwardedModal(
 				event.preventDefault();
 			}
 		},
-		// Requests closing only for primary pointer/button and if the
-		// target was the same as the one that was pressed.
+		// Closes the modal with two exceptions. 1. Opening the context menu on
+		// the overlay. 2. Pressing on the overlay then dragging the pointer
+		// over the modal and releasing. Due to the modal being a child of the
+		// overlay, such a gesture is a `click` on the overlay and cannot be
+		// excepted by a `click` handler. Thus the tactic of handling
+		// `pointerup` and comparing its target to that of the `pointerdown`.
 		onPointerUp: ( { target, isPrimary, button } ) => {
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
