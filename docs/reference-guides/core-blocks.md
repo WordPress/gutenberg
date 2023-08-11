@@ -568,7 +568,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 
 ## Date
 
-Add the date of this post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-date))
+Display the publish date for an entry such as a post or page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-date))
 
 -	**Name:** core/post-date
 -	**Category:** theme
@@ -612,7 +612,7 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Supports:** align (full, wide), color (background, gradients, link, text), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
-## Terms
+## Post Terms
 
 Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-terms))
 
