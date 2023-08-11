@@ -9,6 +9,7 @@
 	>
 	<php>
 		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
+		<const name="FONTS_LIBRARY_ENABLE" value="true"/>
 	</php>
 	<testsuites>
 		<testsuite name="default">
@@ -18,6 +19,7 @@
 	<groups>
 		<exclude>
 			<group>ms-required</group>
+			<group>fontsapi</group>
 		</exclude>
 	</groups>
 </phpunit>
