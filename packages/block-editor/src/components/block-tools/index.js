@@ -64,9 +64,11 @@ export default function BlockTools( {
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
 
+	const isLargerThanTabletViewport = useViewportMatch( 'medium', '>' );
+
 	useLayoutEffect( () => {
 		// don't do anything if not fixed toolbar
-		if ( ! hasFixedToolbar ) {
+		if ( ! hasFixedToolbar || ! isLargerThanTabletViewport ) {
 			return;
 		}
 
@@ -109,7 +111,7 @@ export default function BlockTools( {
 		).style.width = `calc(100% - ${
 			leftHeaderWidth + pinnedItemsWidth + marginLeft
 		}px)`;
-	}, [ hasFixedToolbar ] );
+	}, [ hasFixedToolbar, isLargerThanTabletViewport ] );
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) return;
