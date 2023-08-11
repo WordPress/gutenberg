@@ -346,7 +346,7 @@ export default function VisualEditor( { styles } ) {
 			__unstableContentRef={ ref }
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
-				'is-isolated': isToBeIframed,
+				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
 			<motion.div
