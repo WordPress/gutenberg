@@ -143,7 +143,7 @@
 				<element value="_delete_site_logo_on_remove_custom_logo_on_setup_theme"/>
 				<element value="_delete_site_logo_on_remove_theme_mods"/>
 				<element value="_override_custom_logo_theme_mod"/>
-				<element value="_sydnc_custom_logo_to_site_logo"/>
+				<element value="_sync_custom_logo_to_site_logo"/>
 				<element value="_wp_rest_api_autosave_meta"/>
 				<element value="_wp_rest_api_force_autosave_difference"/>
 				<element value="apply_block_core_search_border_style"/>
