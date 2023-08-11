@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Internal
-
--   Added `phpcs:ignore` statements to ensure compatibility of the package's code with the `ValidBlockLibraryFunctionName` linting rule ([#53438](https://github.com/WordPress/gutenberg/pull/53438)).
-
 ## 8.16.0 (2023-08-10)
 
 ## 8.15.0 (2023-07-20)
