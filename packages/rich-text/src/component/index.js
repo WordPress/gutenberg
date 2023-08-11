@@ -79,7 +79,7 @@ export function useRichText( {
 	function setRecordFromProps() {
 		_value.current = value;
 		record.current = create( {
-			html: value,
+			html: ref.current,
 			multilineTag,
 			multilineWrapperTags:
 				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
@@ -100,7 +100,11 @@ export function useRichText( {
 
 	if ( ! record.current ) {
 		hadSelectionUpdate.current = isSelected;
-		setRecordFromProps();
+		record.current = {
+			formats: [],
+			replacements: [],
+			text: '',
+		};
 		// Sometimes formats are added programmatically and we need to make
 		// sure it's persisted to the block store / markup. If these formats
 		// are not applied, they could cause inconsistencies between the data
@@ -194,8 +198,8 @@ export function useRichText( {
 	}
 
 	function applyFromProps() {
+		ref.current.innerHTML = value;
 		setRecordFromProps();
-		applyRecord( record.current );
 	}
 
 	const didMount = useRef( false );
