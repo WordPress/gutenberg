@@ -19,6 +19,7 @@ import {
 } from '../utils';
 import Popover from '..';
 import type { PopoverProps } from '../types';
+import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
 
 type PositionToPlacementTuple = [
 	NonNullable< PopoverProps[ 'position' ] >,
@@ -172,6 +173,19 @@ describe( 'Popover', () => {
 
 				expect( document.body ).toHaveFocus();
 			} );
+		} );
+	} );
+
+	describe( 'Slot outside iframe', () => {
+		it( 'should support cross-document rendering', async () => {
+			render(
+				<PopoverInsideIframeRenderedInExternalSlot>
+					<span>content</span>
+				</PopoverInsideIframeRenderedInExternalSlot>
+			);
+			await waitFor( async () =>
+				expect( screen.getByText( 'content' ) ).toBeVisible()
+			);
 		} );
 	} );
 

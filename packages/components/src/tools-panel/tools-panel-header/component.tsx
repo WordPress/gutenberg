@@ -112,7 +112,7 @@ const OptionalControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
-						icon={ isSelected && check }
+						icon={ isSelected ? check : null }
 						isSelected={ isSelected }
 						label={ itemLabel }
 						onClick={ () => {

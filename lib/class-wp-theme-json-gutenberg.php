@@ -2900,6 +2900,20 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! empty( $output ) ) {
 				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}
+
+			if ( isset( $metadata['variations'] ) ) {
+				foreach ( $metadata['variations'] as $variation ) {
+					$variation_input = _wp_array_get( $theme_json, $variation['path'], array() );
+					if ( empty( $variation_input ) ) {
+						continue;
+					}
+
+					$variation_output = static::remove_insecure_styles( $variation_input );
+					if ( ! empty( $variation_output ) ) {
+						_wp_array_set( $sanitized, $variation['path'], $variation_output );
+					}
+				}
+			}
 		}
 
 		$setting_nodes = static::get_setting_nodes( $theme_json );

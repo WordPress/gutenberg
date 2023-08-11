@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -52,7 +52,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 					return (
 						<Button
 							key={ widthValue }
-							isSmall
+							size="small"
 							variant={
 								widthValue === selectedWidth
 									? 'primary'
@@ -149,6 +149,13 @@ function ButtonEdit( props ) {
 		}
 	}, [ isSelected ] );
 
+	// Memoize link value to avoid overriding the LinkControl's internal state.
+	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
+	const linkValue = useMemo(
+		() => ( { url, opensInNewTab } ),
+		[ url, opensInNewTab ]
+	);
+
 	return (
 		<>
 			<div
@@ -235,7 +242,7 @@ function ButtonEdit( props ) {
 					shift
 				>
 					<LinkControl
-						value={ { url, opensInNewTab } }
+						value={ linkValue }
 						onChange={ ( {
 							url: newURL = '',
 							opensInNewTab: newOpensInNewTab,

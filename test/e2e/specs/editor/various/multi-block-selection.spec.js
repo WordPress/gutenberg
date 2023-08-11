@@ -1179,7 +1179,7 @@ test.describe( 'Multi-block selection', () => {
 		] );
 	} );
 
-	test( 'should partially select with shift + click', async ( {
+	test( 'should partially select with shift + click (@webkit)', async ( {
 		page,
 		editor,
 	} ) => {
@@ -1213,6 +1213,8 @@ test.describe( 'Multi-block selection', () => {
 			// Ensure clicking on the right half of the element.
 			position: { x: strongBox.width, y: strongBox.height / 2 },
 			modifiers: [ 'Shift' ],
+			// "<p>" intercepts pointer events in WebKit.
+			force: true,
 		} );
 		await page.keyboard.press( 'Backspace' );
 
