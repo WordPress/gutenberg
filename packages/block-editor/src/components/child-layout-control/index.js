@@ -22,7 +22,7 @@ import { useEffect } from '@wordpress/element';
  * @return {Element} child layout edit element.
  */
 export default function ChildLayoutControl( {
-	value: childLayout = {},
+	value = {},
 	onChange,
 	parentLayout,
 	align,
@@ -35,6 +35,8 @@ export default function ChildLayoutControl( {
 
 	const parentLayoutTypeToUse = parentLayoutType ?? defaultParentLayoutType;
 
+	const { layout: childLayout = {} } = value;
+
 	const { selfStretch, flexSize } = childLayout;
 
 	useEffect( () => {
@@ -45,44 +47,6 @@ export default function ChildLayoutControl( {
 			} );
 		}
 	}, [] );
-
-	const selectedWidth = (
-		_selfStretch,
-		_align,
-		_parentLayoutTypeToUse,
-		_orientation
-	) => {
-		if ( _parentLayoutTypeToUse === 'constrained' ) {
-			// Replace "full" with "fill" for full width alignments.
-			const alignmentValue = _align === 'full' ? 'fill' : _align;
-			return alignmentValue || 'content';
-		} else if (
-			_parentLayoutTypeToUse === 'flex' &&
-			_orientation === 'vertical'
-		) {
-			return 'fit';
-		} else if (
-			_parentLayoutTypeToUse === 'flex' &&
-			_orientation === 'horizontal'
-		) {
-			return _selfStretch || 'fit';
-		}
-		return 'fill';
-	};
-
-	const selectedHeight = (
-		_selfStretch,
-		_parentLayoutTypeToUse,
-		_orientation
-	) => {
-		if (
-			_parentLayoutTypeToUse === 'flex' &&
-			_orientation === 'vertical'
-		) {
-			return _selfStretch || 'fit';
-		}
-		return 'fit';
-	};
 
 	const widthOptions = [
 		{
@@ -164,7 +128,86 @@ export default function ChildLayoutControl( {
 		} );
 	}
 
-	const onChangeWidth = () => {};
+	const selectedWidth = (
+		_selfStretch,
+		_align,
+		_parentLayoutTypeToUse,
+		_orientation
+	) => {
+		let selectedValue;
+		if ( _parentLayoutTypeToUse === 'constrained' ) {
+			// Replace "full" with "fill" for full width alignments.
+			const alignmentValue = _align === 'full' ? 'fill' : _align;
+			selectedValue = alignmentValue || 'content';
+		} else if (
+			_parentLayoutTypeToUse === 'flex' &&
+			_orientation === 'vertical'
+		) {
+			selectedValue = 'fit';
+		} else if (
+			_parentLayoutTypeToUse === 'flex' &&
+			_orientation === 'horizontal'
+		) {
+			selectedValue = _selfStretch || 'fit';
+		} else {
+			selectedValue = 'fill';
+		}
+
+		return widthOptions.find(
+			( { _value } ) => _value.key === selectedValue
+		);
+	};
+
+	const selectedHeight = (
+		_selfStretch,
+		_parentLayoutTypeToUse,
+		_orientation
+	) => {
+		let selectedValue;
+		if (
+			_parentLayoutTypeToUse === 'flex' &&
+			_orientation === 'vertical'
+		) {
+			selectedValue = _selfStretch || 'fit';
+		} else {
+			selectedValue = 'fit';
+		}
+		return heightOptions.find(
+			( { _value } ) => _value.key === selectedValue
+		);
+	};
+
+	const onChangeWidth = ( newWidth ) => {
+		const { selectedItem } = newWidth;
+		const { key } = selectedItem;
+		if ( parentLayoutTypeToUse === 'constrained' ) {
+			if ( key === 'fill' ) {
+				onChange( {
+					align: 'full',
+				} );
+			} else if ( key === 'wide' ) {
+				onChange( {
+					align: 'wide',
+				} );
+			} else {
+				onChange( {
+					align: null,
+				} );
+			}
+		} else if (
+			parentLayoutTypeToUse === 'flex' &&
+			orientation === 'horizontal'
+		) {
+			onChange( {
+				style: {
+					...value,
+					layout: {
+						selfStretch: key,
+					},
+				},
+			} );
+		}
+	};
 
 	const onChangeHeight = () => {};
 
@@ -189,10 +232,10 @@ export default function ChildLayoutControl( {
 				<FlexBlock>
 					<UnitControl
 						size={ '__unstable-large' }
-						onChange={ ( value ) => {
+						onChange={ ( _value ) => {
 							onChange( {
 								...childLayout,
-								flexSize: value,
+								flexSize: _value,
 							} );
 						} }
 						value={ flexSize }
@@ -217,10 +260,10 @@ export default function ChildLayoutControl( {
 				<FlexBlock>
 					<UnitControl
 						size={ '__unstable-large' }
-						onChange={ ( value ) => {
+						onChange={ ( _value ) => {
 							onChange( {
 								...childLayout,
-								flexSize: value,
+								flexSize: _value,
 							} );
 						} }
 						value={ flexSize }

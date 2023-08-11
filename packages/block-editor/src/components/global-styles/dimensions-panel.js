@@ -253,13 +253,12 @@ export default function DimensionsPanel( {
 		useHasContentSize( settings ) && includeLayoutControls;
 	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
 	const setContentSizeValue = ( newValue ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'layout', 'contentSize' ],
-				newValue || undefined
-			)
+		const immutableValue = setImmutably(
+			value,
+			[ 'layout', 'contentSize' ],
+			newValue || undefined
 		);
+		onChange( { style: immutableValue } );
 	};
 	const hasUserSetContentSizeValue = () => !! value?.layout?.contentSize;
 	const resetContentSizeValue = () => setContentSizeValue( undefined );
@@ -269,13 +268,12 @@ export default function DimensionsPanel( {
 		useHasWideSize( settings ) && includeLayoutControls;
 	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
 	const setWideSizeValue = ( newValue ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'layout', 'wideSize' ],
-				newValue || undefined
-			)
+		const immutableValue = setImmutably(
+			value,
+			[ 'layout', 'wideSize' ],
+			newValue || undefined
 		);
+		onChange( { style: immutableValue } );
 	};
 	const hasUserSetWideSizeValue = () => !! value?.layout?.wideSize;
 	const resetWideSizeValue = () => setWideSizeValue( undefined );
@@ -292,7 +290,12 @@ export default function DimensionsPanel( {
 		paddingSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setPaddingValues = ( newPaddingValues ) => {
 		const padding = filterValuesBySides( newPaddingValues, paddingSides );
-		onChange( setImmutably( value, [ 'spacing', 'padding' ], padding ) );
+		const immutableValue = setImmutably(
+			value,
+			[ 'spacing', 'padding' ],
+			padding
+		);
+		onChange( { style: immutableValue } );
 	};
 	const hasPaddingValue = () =>
 		!! value?.spacing?.padding &&
@@ -312,7 +315,12 @@ export default function DimensionsPanel( {
 		marginSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setMarginValues = ( newMarginValues ) => {
 		const margin = filterValuesBySides( newMarginValues, marginSides );
-		onChange( setImmutably( value, [ 'spacing', 'margin' ], margin ) );
+		const immutableValue = setImmutably(
+			value,
+			[ 'spacing', 'margin' ],
+			margin
+		);
+		onChange( { style: immutableValue } );
 	};
 	const hasMarginValue = () =>
 		!! value?.spacing?.margin &&
@@ -330,9 +338,12 @@ export default function DimensionsPanel( {
 	const isAxialGap =
 		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setGapValue = ( newGapValue ) => {
-		onChange(
-			setImmutably( value, [ 'spacing', 'blockGap' ], newGapValue )
+		const immutableValue = setImmutably(
+			value,
+			[ 'spacing', 'blockGap' ],
+			newGapValue
 		);
+		onChange( { style: immutableValue } );
 	};
 	const setGapValues = ( nextBoxGapValue ) => {
 		if ( ! nextBoxGapValue ) {
@@ -361,13 +372,13 @@ export default function DimensionsPanel( {
 			newValue
 		);
 		// Apply min-height, while removing any applied aspect ratio.
-		onChange(
-			setImmutably(
+		onChange( {
+			style: setImmutably(
 				tempValue,
 				[ 'dimensions', 'aspectRatio' ],
 				undefined
-			)
-		);
+			),
+		} );
 	};
 	const resetMinHeightValue = () => {
 		setMinHeightValue( undefined );
@@ -394,23 +405,22 @@ export default function DimensionsPanel( {
 
 	// Child Layout
 	const showChildLayoutControl = useHasChildLayout( settings );
-	const childLayout = inheritedValue?.layout;
+	// const childLayout = inheritedValue?.layout;
 	const { orientation = 'horizontal' } = settings?.parentLayout ?? {};
 	const childLayoutOrientationLabel =
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
 	const setChildLayout = ( newChildLayout ) => {
-		onChange( {
-			...value,
-			layout: {
-				...value?.layout,
-				...newChildLayout,
-			},
-		} );
+		onChange( newChildLayout );
 	};
 	const resetChildLayoutValue = () => {
 		setChildLayout( {
-			selfStretch: undefined,
-			flexSize: undefined,
+			align: null,
+			style: {
+				layout: {
+					selfStretch: undefined,
+					flexSize: undefined,
+				},
+			},
 		} );
 	};
 	const hasChildLayoutValue = () => !! value?.layout;
@@ -681,7 +691,7 @@ export default function DimensionsPanel( {
 					panelId={ panelId }
 				>
 					<ChildLayoutControl
-						value={ childLayout }
+						value={ inheritedValue }
 						onChange={ setChildLayout }
 						parentLayout={ settings?.parentLayout }
 						align={ align }

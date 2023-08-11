@@ -77,9 +77,10 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId ]
 	);
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
-	const onChange = ( newStyle ) => {
+	const onChange = ( newAttributes ) => {
 		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
+			...attributes,
+			...cleanEmptyObject( newAttributes ),
 		} );
 	};
 
