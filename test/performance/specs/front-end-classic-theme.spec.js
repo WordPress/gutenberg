@@ -27,6 +27,7 @@ test.describe( 'Front End Performance', () => {
 		let i = 16;
 		while ( i-- ) {
 			// Go to the base URL.
+			// eslint-disable-next-line playwright/no-networkidle
 			await page.goto( '/', { waitUntil: 'networkidle' } );
 
 			// Take the measurements.
