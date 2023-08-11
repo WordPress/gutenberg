@@ -138,6 +138,7 @@ export function FlatTermSelector( { slug } ) {
 
 	const { editPost } = useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	if ( ! hasAssignAction ) {
 		return null;
@@ -164,8 +165,6 @@ export function FlatTermSelector( { slug } ) {
 	function onUpdateTerms( newTermIds ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
 	}
-
-	const { createErrorNotice } = wp.data.dispatch('core/notices'); // Importing dispatch function
 
 	function onChange( termNames ) {
 		const availableTerms = [
@@ -213,7 +212,9 @@ export function FlatTermSelector( { slug } ) {
 		  } catch ( error ) {		
 			// Handle the error by creating an error notice
 			const errorMessage = error.message || 'An error occurred';
-			createErrorNotice( errorMessage );
+			createErrorNotice((0,external_wp_i18n_namespaceObject.__)(errorMessage), {
+				type: 'snackbar'
+				});
 			return;
 		  }
 	}

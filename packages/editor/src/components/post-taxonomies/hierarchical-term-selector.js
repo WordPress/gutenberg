@@ -216,6 +216,8 @@ export function HierarchicalTermSelector( { slug } ) {
 		[ availableTerms ]
 	);
 
+	const { createErrorNotice } = useDispatch( noticesStore );
+
 	if ( ! hasAssignAction ) {
 		return null;
 	}
@@ -269,8 +271,6 @@ export function HierarchicalTermSelector( { slug } ) {
 		setShowForm( ! showForm );
 	};
 
-	const { createErrorNotice } = wp.data.dispatch('core/notices'); // Importing dispatch function
-
 	const onAddTerm = async ( event ) => {
 		try {
 			event.preventDefault();
@@ -313,7 +313,9 @@ export function HierarchicalTermSelector( { slug } ) {
 		} catch ( error ){
 			// Handle the error by creating an error notice
 			const errorMessage = error.message || 'An error occurred';
-			createErrorNotice( errorMessage );
+			createErrorNotice((0,external_wp_i18n_namespaceObject.__)(errorMessage), {
+				type: 'snackbar'
+			  });
 		}
 	};
 
