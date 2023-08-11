@@ -20,8 +20,12 @@ const focusableSelectors = [
 store(
 	{
 		state: {
-			windowWidth: window.innerWidth,
-			windowHeight: window.innerHeight,
+			core: {
+				image: {
+					windowWidth: window.innerWidth,
+					windowHeight: window.innerHeight,
+				},
+			},
 		},
 		actions: {
 			core: {
@@ -203,7 +207,8 @@ store(
 						// Subscribe to the window dimensions so we can
 						// recalculate the styles if the window is resized.
 						if (
-							( state.windowWidth || state.windowHeight ) &&
+							( state.core.image.windowWidth ||
+								state.core.image.windowHeight ) &&
 							context.core.image.scaleAttr === 'contain'
 						) {
 							// In the case of an image with object-fit: contain, the
@@ -253,8 +258,8 @@ store(
 			window.addEventListener(
 				'resize',
 				debounce( () => {
-					state.windowWidth = window.innerWidth;
-					state.windowHeight = window.innerHeight;
+					state.core.image.windowWidth = window.innerWidth;
+					state.core.image.windowHeight = window.innerHeight;
 				} )
 			);
 		},
