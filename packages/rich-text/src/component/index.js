@@ -218,7 +218,7 @@ export function useRichText( {
 			ref.current.focus();
 		}
 
-		applyFromProps();
+		applyRecord( record.current );
 		hadSelectionUpdate.current = false;
 	}, [ hadSelectionUpdate.current ] );
 
