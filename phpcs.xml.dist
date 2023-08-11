@@ -138,7 +138,7 @@
 				<element value="register_block_core_"/>
 			</property>
 			<!--
-				This list of functions is final and must not be extended.
+				The following list of functions is final and must not be extended.
 				It includes functions that cannot be renamed due to backward compatibility concerns.
 				The purpose of maintaining this list here is to prevent cluttering Core with Gutenberg-specific `phpcs:disable` statements,
 				as block-library code is backported to Core.
