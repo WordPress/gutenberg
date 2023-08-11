@@ -322,6 +322,18 @@ describe( 'NumberControl', () => {
 			expect( input ).toHaveValue( 20 );
 		} );
 
+		it( 'should increment by shiftStep multiplied by spinFactor on key UP + shift press', async () => {
+			const user = userEvent.setup();
+
+			render( <StatefulNumberControl value={ 5 } spinFactor={ 5 } /> );
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
+
+			expect( input ).toHaveValue( 50 );
+		} );
+
 		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', async () => {
 			const user = userEvent.setup();
 
@@ -461,6 +473,18 @@ describe( 'NumberControl', () => {
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
 			expect( input ).toHaveValue( 0 );
+		} );
+
+		it( 'should decrement by shiftStep multiplied by spinFactor on key DOWN + shift press', async () => {
+			const user = userEvent.setup();
+
+			render( <StatefulNumberControl value={ 100 } spinFactor={ 5 } /> );
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
+
+			expect( input ).toHaveValue( 50 );
 		} );
 
 		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', async () => {
