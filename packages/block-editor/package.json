@@ -31,6 +31,7 @@
 		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
+		"@codemirror/lang-css": "6.2.1",
 		"@babel/runtime": "^7.16.0",
 		"@emotion/react": "^11.7.1",
 		"@emotion/styled": "^11.6.0",
@@ -66,6 +67,7 @@
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
 		"classnames": "^2.3.1",
+		"codemirror": "6.0.1",
 		"colord": "^2.7.0",
 		"deepmerge": "^4.3.0",
 		"diff": "^4.0.2",
