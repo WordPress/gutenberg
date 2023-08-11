@@ -292,6 +292,24 @@ describe( 'NumberControl', () => {
 			expect( input ).toHaveValue( 867.5309 );
 		} );
 
+		it( 'should increment by step multiplied by spinFactor when spinFactor is provided', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<StatefulNumberControl
+					step={ 0.01 }
+					spinFactor={ 10 }
+					value={ 1.65 }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '[ArrowUp]' );
+
+			expect( input ).toHaveValue( 1.75 );
+		} );
+
 		it( 'should increment by shiftStep on key UP + shift press', async () => {
 			const user = userEvent.setup();
 
@@ -415,6 +433,24 @@ describe( 'NumberControl', () => {
 			expect( input ).toHaveValue( 867.5309 );
 		} );
 
+		it( 'should decrement by step multiplied by spinFactor when spinFactor is provided', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<StatefulNumberControl
+					step={ 0.01 }
+					spinFactor={ 10 }
+					value={ 1.65 }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '[ArrowDown]' );
+
+			expect( input ).toHaveValue( 1.55 );
+		} );
+
 		it( 'should decrement by shiftStep on key DOWN + shift press', async () => {
 			const user = userEvent.setup();
 
@@ -511,10 +547,12 @@ describe( 'NumberControl', () => {
 			[ 'up', '2', { value: '1' } ],
 			[ 'up', '12', { value: '10', step: '2' } ],
 			[ 'up', '10', { value: '10', max: 10 } ],
+			[ 'up', '10.1', { value: '10', step: '0.01', spinFactor: 10 } ],
 			[ 'down', '-1', {} ],
 			[ 'down', '1', { value: '2' } ],
 			[ 'down', '10', { value: '12', step: '2' } ],
 			[ 'down', '10', { value: '10', min: 10 } ],
+			[ 'down', '9.9', { value: '10', step: '0.01', spinFactor: 10 } ],
 		] )(
 			'should spin %s to %s when props = %o',
 			async ( direction, expectedValue, props ) => {
