@@ -606,6 +606,16 @@ describe( 'typography utils', () => {
 				},
 				expected: { fluid: { maxViewportWidth: '10px' } },
 			},
+			{
+				message: 'should not merge `layout.wideSize` if it is fluid',
+				settings: {
+					typography: { fluid: { minFontSize: '16px' } },
+					layout: { wideSize: 'clamp(1000px, 85vw, 2000px)' },
+				},
+				expected: {
+					fluid: { minFontSize: '16px' },
+				},
+			},
 		].forEach( ( { message, settings, expected } ) => {
 			it( `${ message }`, () => {
 				expect(
