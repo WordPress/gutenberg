@@ -72,8 +72,8 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
  * Add Interactivity API directives to the navigation-submenu and page-list
  * blocks markup using the Tag Processor.
  *
- * @param string $w Markup of the navigation block.
- * @param array  $block_attributes Block attributes.
+ * @param WP_HTML_Tag_Processor $w                Markup of the navigation block.
+ * @param array                 $block_attributes Block attributes.
  *
  * @return string Submenu markup with the directives injected.
  */
