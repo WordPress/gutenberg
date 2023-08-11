@@ -173,6 +173,13 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$m->next_tag( 'figure' );
 	$m->add_class( 'responsive-image' );
 	$m->next_tag( 'img' );
+	// We want to set the 'src' attribute to an empty string in the responsive image
+	// because otherwise, as of this writing, the wp_filter_content_tags() function in
+	// WordPress will automatically add a 'srcset' attribute to the image, which will at
+	// times cause the incorrectly sized image to be loaded in the lightbox on Firefox.
+	// Because of this, we bind the 'src' attribute explicitly the current src to reliably
+	// use the exact same image as in the content when the lightbox is first opened while
+	// we wait for the larger image to load.
 	$m->set_attribute( 'src', '' );
 	$m->set_attribute( 'data-wp-bind--src', 'context.core.image.imageCurrentSrc' );
 	$m->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
