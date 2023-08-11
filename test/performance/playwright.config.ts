@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig } from '@playwright/test';
 
@@ -8,6 +9,8 @@ import { defineConfig } from '@playwright/test';
  * WordPress dependencies
  */
 const baseConfig = require( '@wordpress/scripts/config/playwright.config' );
+
+process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
 
 const config = defineConfig( {
 	...baseConfig.default,
