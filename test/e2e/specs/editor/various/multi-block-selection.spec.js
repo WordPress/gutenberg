@@ -1209,13 +1209,15 @@ test.describe( 'Multi-block selection', () => {
 			.getByRole( 'region', { name: 'Editor content' } )
 			.getByText( '1', { exact: true } );
 		const strongBox = await strongText.boundingBox();
-		await strongText.click( {
-			// Ensure clicking on the right half of the element.
-			position: { x: strongBox.width, y: strongBox.height / 2 },
-			modifiers: [ 'Shift' ],
-			// "<p>" intercepts pointer events in WebKit.
-			force: true,
-		} );
+		// Focus and move the caret to the end.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Paragraph block' } )
+			.filter( { hasText: '1[' } )
+			.click( {
+				// Ensure clicking on the right half of the element.
+				position: { x: strongBox.width - 1, y: strongBox.height / 2 },
+				modifiers: [ 'Shift' ],
+			} );
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure selection is in the correct place.

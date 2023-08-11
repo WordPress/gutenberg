@@ -12,6 +12,7 @@ import {
 	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
+	getBlockSupport,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -1006,9 +1007,17 @@ export const mergeBlocks =
 
 		if ( ! blockAType ) return;
 
+		if (
+			! blockAType.merge &&
+			! getBlockSupport( blockA.name, '__experimentalOnMerge' )
+		) {
+			dispatch.selectBlock( blockA.clientId );
+			return;
+		}
+
 		const blockB = select.getBlock( clientIdB );
 
-		if ( blockAType && ! blockAType.merge ) {
+		if ( ! blockAType.merge ) {
 			// If there's no merge function defined, attempt merging inner
 			// blocks.
 			const blocksWithTheSameType = switchToBlockType(
