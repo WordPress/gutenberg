@@ -14,7 +14,17 @@
  * @return string The content of the block being rendered.
  */
 function render_block_core_form_submission_notification( $attributes, $content ) {
-	$show = apply_filters( 'show_form_submission_notification_block', false, $attributes, $content );
+	$show = isset( $_GET['wp-form-result'] ) && sanitize_text_field( wp_unslash( $_GET['wp-form-result'] ) ) === $attributes['type'];
+	/**
+	 * Filters whether to show the form submission notification block.
+	 *
+	 * @param bool   $show       Whether to show the form submission notification block.
+	 * @param array  $attributes The block attributes.
+	 * @param string $content    The saved content.
+	 *
+	 * @return bool Whether to show the form submission notification block.
+	 */
+	$show = apply_filters( 'show_form_submission_notification_block', $show, $attributes, $content );
 	if ( ! $show ) {
 		return '';
 	}

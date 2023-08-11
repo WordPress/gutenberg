@@ -106,11 +106,14 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						autoComplete="off"
 						label={ __( 'Email for form submissions' ) }
 						value={ email }
-						onChange={ ( value ) =>
-							setAttributes( { email: value } )
-						}
+						required
+						onChange={ ( value ) => {
+							setAttributes( { email: value } );
+							setAttributes( { action: `mailto:${ value }` } );
+							setAttributes( { method: 'post' } );
+						} }
 						help={ __(
-							'The email address where form submissions will be sent. Separate multiple email addresses with a comma, or leave empty to use the site admin address.'
+							'The email address where form submissions will be sent. Separate multiple email addresses with a comma.'
 						) }
 					/>
 				) }
@@ -148,7 +151,11 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					</InspectorControls>
 				) }
 			</InspectorControls>
-			<form { ...innerBlocksProps } />
+			<form
+				{ ...innerBlocksProps }
+				className="wp-block-form"
+				encType={ submissionMethod === 'email' ? 'text/plain' : null }
+			/>
 		</>
 	);
 };

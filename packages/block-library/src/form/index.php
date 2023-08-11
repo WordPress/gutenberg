@@ -43,6 +43,22 @@ function render_block_core_form( $attributes, $content ) {
 }
 
 /**
+ * Additional data to add to the view.js script for this block.
+ */
+function gutenberg_block_core_form_view_script() {
+	wp_localize_script(
+		'wp-block-form-view',
+		'wpBlockFormSettings',
+		array(
+			'nonce'   => wp_create_nonce( 'wp-block-form' ),
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'action'  => 'wp_block_form_email_submit',
+		)
+	);
+}
+add_action( 'wp_enqueue_scripts', 'gutenberg_block_core_form_view_script' );
+
+/**
  * Adds extra settings to the block editor, for the forms block.
  *
  * @param array $settings The block editor settings.
@@ -86,47 +102,15 @@ function gutenberg_block_core_form_extra_fields_comment_form( $extra_fields, $at
 add_filter( 'render_block_core_form_extra_fields', 'gutenberg_block_core_form_extra_fields_comment_form', 10, 2 );
 
 /**
- * Adds extra fields to the form.
- *
- * If the form does not have an `action` defined, assume this is a contact form.
- * Adds a nonce field and a hidden input to enable sending an email
- * to the admin when the form is submitted.
- *
- * @param string $extra_fields The extra fields.
- * @param array  $attributes   The block attributes.
- *
- * @return string The extra fields.
- */
-function gutenberg_block_core_form_extra_fields_email( $extra_fields, $attributes ) {
-	if ( 'email' === $attributes['submissionMethod'] ) {
-		$extra_fields .= wp_nonce_field( 'wp-block-form', 'wp_block_form', true, false );
-		$extra_fields .= '<input type="hidden" name="wp-send-email" value="1">';
-		$email_address = empty( $attributes['email'] ) ? get_option( 'admin_email' ) : $attributes['email'];
-		$extra_fields .= '<input type="hidden" name="wp-email-address" value="' . esc_attr( $email_address ) . '">';
-	}
-	return $extra_fields;
-}
-add_filter( 'render_block_core_form_extra_fields', 'gutenberg_block_core_form_extra_fields_email', 10, 2 );
-
-/**
  * Sends an email if the form is a contact form.
  *
  * @return void
  */
 function gutenberg_block_core_form_send_email() {
-	// Get the POST or GET data.
+	check_ajax_referer( 'wp-block-form' );
+
+	// Get the POST data.
 	$params = wp_unslash( $_POST );
-
-	// Bail early if not a form submission, or if the nonce is not valid.
-	if ( empty( $params['wp_block_form'] )
-		|| empty( $params['wp-send-email'] )
-		|| '1' !== $params['wp-send-email']
-		|| ! wp_verify_nonce( $params['wp_block_form'], 'wp-block-form' )
-		|| empty( $params['wp-email-address'] )
-	) {
-		return;
-	}
-
 	// Start building the email content.
 	$content = sprintf(
 		/* translators: %s: The request URI. */
@@ -134,7 +118,7 @@ function gutenberg_block_core_form_send_email() {
 		'<a href="' . esc_url( get_site_url( null, $params['_wp_http_referer'] ) ) . '">' . get_bloginfo( 'name' ) . '</a>'
 	);
 
-	$skip_fields = array( 'wp_block_form', '_wp_http_referer', 'wp-send-email', 'wp-email-address' );
+	$skip_fields = array( 'formAction', '_ajax_nonce', 'action' );
 	foreach ( $params as $key => $value ) {
 		if ( in_array( $key, $skip_fields, true ) ) {
 			continue;
@@ -146,24 +130,19 @@ function gutenberg_block_core_form_send_email() {
 	$content = apply_filters( 'render_block_core_form_email_content', $content, $params );
 
 	// Send the email.
-	$result = wp_mail( $params['wp-email-address'], __( 'Form submission', 'gutenberg' ), $content );
+	$result = wp_mail(
+		str_replace( 'mailto:', '', $params['wp-email-address'] ),
+		__( 'Form submission', 'gutenberg' ),
+		$content
+	);
 
-	/**
-	 * Determine whether the core/form-submission-notification block should be shown.
-	 *
-	 * @param bool   $show       Whether to show the core/form-submission-notification block.
-	 * @param array  $attributes The block attributes.
-	 *
-	 * @return bool Whether to show the core/form-submission-notification block.
-	 */
-	$show_notification = static function( $show, $attributes ) use ( $result ) {
-		return ( 'success' === $attributes['type'] && $result )
-			|| ( 'error' === $attributes['type'] && ! $result );
-	};
-	// Add filter to show the notification block.
-	add_filter( 'show_form_submission_notification_block', $show_notification, 10, 2 );
+	if ( ! $result ) {
+		wp_send_json_error( $result );
+	}
+	wp_send_json_success( $result );
 }
-add_action( 'wp', 'gutenberg_block_core_form_send_email' );
+add_action( 'wp_ajax_wp_block_form_email_submit', 'gutenberg_block_core_form_send_email' );
+add_action( 'wp_ajax_nopriv_wp_block_form_email_submit', 'gutenberg_block_core_form_send_email' );
 
 /**
  * Send the data export/remove request if the form is a privacy-request form.
