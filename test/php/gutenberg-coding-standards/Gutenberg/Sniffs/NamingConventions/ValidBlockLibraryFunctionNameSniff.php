@@ -31,6 +31,13 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	public $prefixes = array();
 
 	/**
+	 * These functions are considered permissible and will be ignored by the sniffer.
+	 *
+	 * @var array
+	 */
+	public $allowed_functions = array();
+
+	/**
 	 * Registers the tokens that this sniff wants to listen for.
 	 *
 	 * @return array
@@ -79,7 +86,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			return;
 		}
 
-		$tokens        = $phpcsFile->getTokens();
+		$tokens         = $phpcsFile->getTokens();
 		$function_token = $phpcsFile->findNext( T_STRING, $stackPointer );
 
 		$wrapping_tokens_to_check = array(
@@ -95,7 +102,13 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			}
 		}
 
-		$function_name          = $tokens[ $function_token ]['content'];
+		$function_name = $tokens[ $function_token ]['content'];
+
+		if ( in_array( $function_name, $this->allowed_functions, true ) ) {
+			// The function name is included in the list of allowed functions; bypassing further checks.
+			return;
+		}
+
 		$parent_directory_name = basename( dirname( $phpcsFile->getFilename() ) );
 
 		$allowed_function_prefixes = array();
@@ -105,8 +118,8 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			$allowed_function_prefix     = $prefix . '_' . self::sanitize_directory_name( $parent_directory_name );
 			$allowed_function_prefixes[] = $allowed_function_prefix;
 			// Validate the name's correctness and ensure it does not end with an underscore.
-			$regexp                      = sprintf( '/^%s(|_.+)$/', preg_quote( $allowed_function_prefix, '/' ) );
-			$is_function_name_valid      |= (1 === preg_match( $regexp, $function_name ));
+			$regexp                 = sprintf( '/^%s(|_.+)$/', preg_quote( $allowed_function_prefix, '/' ) );
+			$is_function_name_valid |= ( 1 === preg_match( $regexp, $function_name ) );
 		}
 
 		if ( $is_function_name_valid ) {
@@ -114,7 +127,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		}
 
 		$error_message = "The function name `{$function_name}()` is invalid because PHP function names in this file should start with one of the following prefixes: `"
-		                . implode( '`, `', $allowed_function_prefixes ) . '`.';
+		                 . implode( '`, `', $allowed_function_prefixes ) . '`.';
 		$phpcsFile->addError( $error_message, $function_token, 'FunctionNameInvalid' );
 	}
 
@@ -123,7 +136,8 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	 * after the class properties have been set.
 	 */
 	private function onRegisterEvent() {
-		$this->prefixes = self::sanitize( $this->prefixes );
+		$this->prefixes          = self::sanitize( $this->prefixes );
+		$this->allowed_functions = self::sanitize( $this->allowed_functions );
 	}
 
 	/**
