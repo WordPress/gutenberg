@@ -3,7 +3,6 @@
  */
 import {
 	clickBlockAppender,
-	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
 	showBlockToolbar,
@@ -52,57 +51,6 @@ describe( 'Links', () => {
 		// Reselect the link.
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 	};
-
-	it( 'can be modified using the keyboard once a link has been set', async () => {
-		const URL = 'https://wordpress.org/gutenberg';
-
-		// Create a block with some text and format it as a link.
-		await clickBlockAppender();
-		await page.keyboard.type( 'This is Gutenberg' );
-		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressKeyWithModifier( 'primary', 'K' );
-		await waitForURLFieldAutoFocus();
-		await page.keyboard.type( URL );
-		await page.keyboard.press( 'Enter' );
-
-		// Deselect the link text by moving the caret to the end of the line
-		// and the link popover should not be displayed.
-		await page.keyboard.press( 'End' );
-		expect(
-			await page.$(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeNull();
-
-		// Move the caret back into the link text and the link popover
-		// should be displayed.
-		await page.keyboard.press( 'ArrowLeft' );
-		expect(
-			await page.$(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).not.toBeNull();
-
-		// Press Cmd+K to edit the link and the url-input should become
-		// focused with the value previously inserted.
-		await pressKeyWithModifier( 'primary', 'K' );
-		await waitForURLFieldAutoFocus();
-		const isInURLInput = await page.evaluate(
-			() => !! document.activeElement.closest( '.block-editor-url-input' )
-		);
-		expect( isInURLInput ).toBe( true );
-		const activeElementValue = await page.evaluate(
-			() => document.activeElement.value
-		);
-		expect( activeElementValue ).toBe( URL );
-
-		// Confirm that submitting the input without any changes keeps the same
-		// value and moves focus back to the paragraph.
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( '.' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
 
 	it( 'adds an assertive message for screenreader users when an invalid link is set', async () => {
 		await clickBlockAppender();

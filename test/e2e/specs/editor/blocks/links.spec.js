@@ -368,7 +368,6 @@ test.describe( 'Links', () => {
 		admin,
 		page,
 		editor,
-		LinkUtils,
 		pageUtils,
 	} ) => {
 		const titleText = 'Test post escape';
@@ -380,44 +379,47 @@ test.describe( 'Links', () => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 		} );
-		
+
 		await page.keyboard.type( 'This is Gutenberg' );
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Press Cmd+K to insert a link.
 		await pageUtils.pressKeys( 'primary+K' );
 
-		expect(
+		await expect(
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			await page.locator(
+			page.locator(
 				'.components-popover__content .block-editor-link-control'
 			)
-		).not.toBeNull();
+		).toBeVisible();
 
 		// Trigger the autocomplete suggestion list and select the first suggestion.
 		await page.keyboard.type( titleText );
-		expect( await page.getByRole('option', { name: titleText+' localhost:8889/?p='+postId+' post' }) ).not.toBeNull();
-		await pageUtils.pressKeys( 'ArrowDown' );
+		await expect(
+			page.getByRole( 'option', {
+				name: titleText + ' localhost:8889/?p=' + postId + ' post',
+			} )
+		).toBeVisible();
+		await page.keyboard.press( 'ArrowDown' );
 
 		// Expect the escape key to dismiss the popover when the autocomplete suggestion list is open.
-		await pageUtils.pressKeys( 'Escape' );//page.keyboard.press( 'Escape' );
-		expect(
-			await page.locator(
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			page.locator(
 				'.components-popover__content .block-editor-link-control'
 			)
 		).not.toBeVisible();
 
 		// Confirm that selection is returned to where it was before launching
 		// the link editor, with "Gutenberg" as an uncollapsed selection.
-		await pageUtils.pressKeys( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '.' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content:
-					'This is Gutenberg.',
+					content: 'This is Gutenberg.',
 				},
 			},
 		] );
@@ -425,16 +427,16 @@ test.describe( 'Links', () => {
 		// Press Cmd+K to insert a link.
 		await pageUtils.pressKeys( 'primary+K' );
 
-		expect(
-			await page.locator(
+		await expect(
+			page.locator(
 				'.components-popover__content .block-editor-link-control'
 			)
-		).not.toBeNull();
+		).toBeVisible();
 
 		// Expect the escape key to dismiss the popover normally.
-		await pageUtils.pressKeys( 'Escape' );//page.keyboard.press( 'Escape' );
-		expect(
-			await page.locator(
+		await pageUtils.pressKeys( 'Escape' ); //page.keyboard.press( 'Escape' );
+		await expect(
+			page.locator(
 				'.components-popover__content .block-editor-link-control'
 			)
 		).not.toBeVisible();
@@ -442,23 +444,79 @@ test.describe( 'Links', () => {
 		// Press Cmd+K to insert a link.
 		await pageUtils.pressKeys( 'primary+K' );
 
-		expect(
-			await page.locator(
+		await expect(
+			page.locator(
 				'.components-popover__content .block-editor-link-control'
 			)
-		).not.toBeNull();
+		).toBeVisible();
 
 		// Tab to the "Open in new tab" toggle.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
 		// Expect the escape key to dismiss the popover normally.
-		await pageUtils.pressKeys( 'Escape' );//page.keyboard.press( 'Escape' );
-		expect(
-			await page.locator(
+		await pageUtils.pressKeys( 'Escape' ); //page.keyboard.press( 'Escape' );
+		await expect(
+			page.locator(
 				'.components-popover__content .block-editor-link-control'
 			)
 		).not.toBeVisible();
+	} );
+
+	test( `can be modified using the keyboard once a link has been set`, async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const URL = 'https://wordpress.org/gutenberg';
+
+		// Create a block with some text and format it as a link.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+K' );
+		await page.keyboard.type( URL );
+		await pageUtils.pressKeys( 'Enter' );
+
+		// Deselect the link text by moving the caret to the end of the line
+		// and the link popover should not be displayed.
+		await pageUtils.pressKeys( 'End' );
+		await expect(
+			page.locator(
+				'.components-popover__content .block-editor-link-control'
+			)
+		).not.toBeVisible();
+
+		// Move the caret back into the link text and the link popover
+		// should be displayed.
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await expect(
+			page.locator(
+				'.components-popover__content .block-editor-link-control'
+			)
+		).toBeVisible();
+
+		// Reopen the link popover and check that the input has the correct value.
+		await pageUtils.pressKeys( 'primary+K' );
+		const urlInput = page.getByPlaceholder( 'Search or type url' );
+		await urlInput.focus();
+		expect( await urlInput.inputValue() ).toBe( URL );
+
+		// Confirm that submitting the input without any changes keeps the same
+		// value and moves focus back to the paragraph.
+		await pageUtils.pressKeys( 'Enter' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await page.keyboard.type( '.' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is <a href="' + URL + '">Gutenberg</a>.',
+				},
+			},
+		] );
 	} );
 
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {

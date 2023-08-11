@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Links can be modified using the keyboard once a link has been set 1`] = `
-"<!-- wp:paragraph -->
-<p>This is <a href="https://wordpress.org/gutenberg">Gutenberg</a>.</p>
-<!-- /wp:paragraph -->"
-`;
