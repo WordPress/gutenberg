@@ -411,8 +411,11 @@ function setStyles( context, event ) {
 		document.head.appendChild( styleTag );
 	}
 
-	// Add 1 pixel to the container width and height
-	// to avoid whitespace around the image on iOS.
+	// As of this writing, using the calculations above will render the lightbox
+	// with a small, erroneous whitespace on the left side of the image in iOS Safari,
+	// perhaps due to an inconsistency in how browsers handle absolute positioning and CSS
+	// transformation. In any case, adding 1 pixel to the container width and height solves
+	// the problem, though this can be removed if the issue is fixed in the future.
 	styleTag.innerHTML = `
 		:root {
 			--wp--lightbox-initial-top-position: ${ screenPosY }px;
