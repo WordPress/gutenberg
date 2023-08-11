@@ -13,6 +13,7 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import Button from '../../button';
+import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
 
 const props = {
@@ -270,5 +271,31 @@ describe( 'Tooltip', () => {
 			'aria-label',
 			'Control + Shift + Comma'
 		);
+	} );
+
+	it( 'esc should close modal even when tooltip is visible', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = jest.fn();
+		render(
+			<Modal onRequestClose={ onRequestClose }>
+				<p>Modal content</p>
+			</Modal>
+		);
+
+		const tooltip = await screen.findByRole( 'tooltip', { hidden: true } );
+
+		expect( tooltip ).toBeInTheDocument();
+
+		const button = screen.getByRole( 'button', {
+			name: /Close/i,
+		} );
+
+		await user.hover( button );
+
+		await waitFor( () => expect( tooltip ).toBeVisible() );
+
+		await user.keyboard( '[Escape]' );
+
+		expect( onRequestClose ).toHaveBeenCalled();
 	} );
 } );
