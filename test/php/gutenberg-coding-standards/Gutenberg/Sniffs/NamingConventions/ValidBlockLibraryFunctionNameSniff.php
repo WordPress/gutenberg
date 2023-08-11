@@ -150,10 +150,10 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	 */
 	private static function sanitize_directory_name( $directory_name ) {
 		// Convert to lowercase.
-		$directory_name = strtolower($directory_name);
+		$directory_name = strtolower( $directory_name );
 
 		// Replace non-letter and non-digit characters with underscores.
-		return preg_replace('/[^a-z0-9]/', '_', $directory_name);
+		return preg_replace( '/[^a-z0-9]/', '_', $directory_name );
 	}
 
 	/**
