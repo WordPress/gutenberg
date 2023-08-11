@@ -137,9 +137,6 @@
 				<element value="render_block_core_"/>
 				<element value="register_block_core_"/>
 			</property>
-			<property name="disallowed_prefixes" type="array">
-				<element value="gutenberg_"/>
-			</property>
 			<!--
 				This list of functions is final and must not be extended.
 				It includes functions that cannot be renamed due to backward compatibility issues.
