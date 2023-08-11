@@ -125,6 +125,7 @@ export function useRichText( {
 			...record.current,
 			start: selectionStart,
 			end: selectionEnd,
+			activeFormats: undefined,
 		};
 	}
 
