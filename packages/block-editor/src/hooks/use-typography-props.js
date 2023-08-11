@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -13,6 +12,7 @@ import {
 	getTypographyFontSizeValue,
 	getFluidTypographyOptionsFromSettings,
 } from '../components/global-styles/typography-utils';
+import { kebabCase } from '../utils/object';
 
 /*
  * This utility is intended to assist where the serialization of the typography

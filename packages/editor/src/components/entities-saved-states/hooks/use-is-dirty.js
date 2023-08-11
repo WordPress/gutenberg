@@ -13,6 +13,8 @@ const TRANSLATED_SITE_PROPERTIES = {
 	site_icon: __( 'Icon' ),
 	show_on_front: __( 'Show on front' ),
 	page_on_front: __( 'Page on front' ),
+	posts_per_page: __( 'Maximum posts per page' ),
+	default_comment_status: __( 'Allow comments on new posts' ),
 };
 
 export const useIsDirty = () => {

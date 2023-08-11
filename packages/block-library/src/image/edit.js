@@ -17,7 +17,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
-	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -28,7 +28,6 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import Image from './image';
-import { unlock } from '../lock-unlock';
 
 /**
  * Module constants
@@ -40,8 +39,6 @@ import {
 	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 } from './constants';
-
-const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 export const pickRelevantMediaFiles = ( image, size ) => {
 	const imageProps = Object.fromEntries(
@@ -183,8 +180,6 @@ export function ImageEdit( {
 		// Reset the dimension attributes if changing to a different image.
 		if ( ! media.id || media.id !== id ) {
 			additionalAttributes = {
-				width: undefined,
-				height: undefined,
 				// Fallback to size "full" if there's no default image size.
 				// It means the image is smaller, and the block will use a full-size URL.
 				sizeSlug: hasDefaultSize( media, imageDefaultSize )
@@ -248,8 +243,6 @@ export function ImageEdit( {
 			setAttributes( {
 				url: newURL,
 				id: undefined,
-				width: undefined,
-				height: undefined,
 				sizeSlug: imageDefaultSize,
 			} );
 		}

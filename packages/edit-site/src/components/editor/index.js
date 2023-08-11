@@ -15,6 +15,7 @@ import {
 	BlockContextProvider,
 	BlockBreadcrumb,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -43,6 +44,8 @@ import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 
+const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
+
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
 	body: __( 'Editor content' ),
@@ -52,6 +55,25 @@ const interfaceLabels = {
 	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
+};
+
+const typeLabels = {
+	wp_template: __( 'Template' ),
+	wp_template_part: __( 'Template Part' ),
+	wp_block: __( 'Pattern' ),
+	wp_navigation: __( 'Navigation' ),
+};
+
+// Prevent accidental removal of certain blocks, asking the user for
+// confirmation.
+const blockRemovalRules = {
+	'core/query': __( 'Query Loop displays a list of posts or pages.' ),
+	'core/post-content': __(
+		'Post Content displays the content of a post or page.'
+	),
+	'core/post-template': __(
+		'Post Template displays each post or page in a Query Loop.'
+	),
 };
 
 export default function Editor( { isLoading } ) {
@@ -114,7 +136,7 @@ export default function Editor( { isLoading } ) {
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
-	const shouldShowBlockBreakcrumbs =
+	const shouldShowBlockBreadcrumbs =
 		showBlockBreadcrumbs &&
 		isEditMode &&
 		showVisualEditor &&
@@ -144,20 +166,16 @@ export default function Editor( { isLoading } ) {
 
 	let title;
 	if ( hasLoadedPost ) {
-		const type =
-			editedPostType === 'wp_template'
-				? __( 'Template' )
-				: __( 'Template Part' );
 		title = sprintf(
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s ‹ Editor' ),
 			getTitle(),
-			type
+			typeLabels[ editedPostType ] ?? typeLabels.wp_template
 		);
 	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
-	// action in <URlQueryController> from double-announcing.
+	// action in <URLQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
 	return (
@@ -174,6 +192,7 @@ export default function Editor( { isLoading } ) {
 						<SidebarComplementaryAreaFills />
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton
+							isDistractionFree={ true }
 							enableRegionNavigation={ false }
 							className={ classnames(
 								'edit-site-editor__interface-skeleton',
@@ -188,7 +207,12 @@ export default function Editor( { isLoading } ) {
 									<GlobalStylesRenderer />
 									{ isEditMode && <EditorNotices /> }
 									{ showVisualEditor && editedPost && (
-										<BlockEditor />
+										<>
+											<BlockEditor />
+											<BlockRemovalWarningModal
+												rules={ blockRemovalRules }
+											/>
+										</>
 									) }
 									{ editorMode === 'text' &&
 										editedPost &&
@@ -227,7 +251,7 @@ export default function Editor( { isLoading } ) {
 								)
 							}
 							footer={
-								shouldShowBlockBreakcrumbs && (
+								shouldShowBlockBreadcrumbs && (
 									<BlockBreadcrumb
 										rootLabelText={
 											hasPageContentFocus

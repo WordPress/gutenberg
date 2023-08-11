@@ -25,8 +25,8 @@ describe( 'RichText', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await insertBlock( 'Heading' );
-		await page.waitForSelector( '[aria-label="Change heading level"]' );
-		await page.click( '[aria-label="Change heading level"]' );
+		await page.waitForSelector( '[aria-label="Change level"]' );
+		await page.click( '[aria-label="Change level"]' );
 		await page.click( '[aria-label="Heading 3"]' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -554,6 +554,17 @@ describe( 'RichText', () => {
 		await page.keyboard.type( '-' );
 
 		// Expect: <strong>1</strong>-<em>2</em>
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'should copy/paste heading', async () => {
+		await insertBlock( 'Heading' );
+		await page.keyboard.type( 'Heading' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'v' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

@@ -5,6 +5,7 @@ import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import {
 	BlockSettingsMenuControls,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
@@ -14,10 +15,11 @@ import {
 	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	ToggleControl,
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -25,6 +27,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -38,13 +41,27 @@ export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
 } ) {
+	const { useReusableBlocksRenameHint, ReusableBlocksRenameHint } = unlock(
+		blockEditorPrivateApis
+	);
+	const showRenameHint = useReusableBlocksRenameHint();
+	const [ syncType, setSyncType ] = useState( undefined );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getBlocksByClientId, canInsertBlockType } =
-				select( blockEditorStore );
+			const {
+				getBlocksByClientId,
+				canInsertBlockType,
+				getBlockRootClientId,
+			} = select( blockEditorStore );
+
+			const rootId =
+				rootClientId ||
+				( clientIds.length > 0
+					? getBlockRootClientId( clientIds[ 0 ] )
+					: undefined );
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
@@ -62,7 +79,7 @@ export default function ReusableBlockConvertButton( {
 				// Hide when this is already a reusable block.
 				! isReusable &&
 				// Hide when reusable blocks are disabled.
-				canInsertBlockType( 'core/block', rootClientId ) &&
+				canInsertBlockType( 'core/block', rootId ) &&
 				blocks.every(
 					( block ) =>
 						// Guard against the case where a regular block has *just* been converted.
@@ -77,7 +94,7 @@ export default function ReusableBlockConvertButton( {
 
 			return _canConvert;
 		},
-		[ clientIds ]
+		[ clientIds, rootClientId ]
 	);
 
 	const { __experimentalConvertBlocksToReusable: convertBlocksToReusable } =
@@ -88,17 +105,42 @@ export default function ReusableBlockConvertButton( {
 	const onConvert = useCallback(
 		async function ( reusableBlockTitle ) {
 			try {
-				await convertBlocksToReusable( clientIds, reusableBlockTitle );
-				createSuccessNotice( __( 'Reusable block created.' ), {
-					type: 'snackbar',
-				} );
+				await convertBlocksToReusable(
+					clientIds,
+					reusableBlockTitle,
+					syncType
+				);
+				createSuccessNotice(
+					! syncType
+						? sprintf(
+								// translators: %s: the name the user has given to the pattern.
+								__( 'Synced Pattern created: %s' ),
+								reusableBlockTitle
+						  )
+						: sprintf(
+								// translators: %s: the name the user has given to the pattern.
+								__( 'Unsynced Pattern created: %s' ),
+								reusableBlockTitle
+						  ),
+					{
+						type: 'snackbar',
+						id: 'convert-to-reusable-block-success',
+					}
+				);
 			} catch ( error ) {
 				createErrorNotice( error.message, {
 					type: 'snackbar',
+					id: 'convert-to-reusable-block-error',
 				} );
 			}
 		},
-		[ clientIds ]
+		[
+			convertBlocksToReusable,
+			clientIds,
+			syncType,
+			createSuccessNotice,
+			createErrorNotice,
+		]
 	);
 
 	if ( ! canConvert ) {
@@ -111,15 +153,15 @@ export default function ReusableBlockConvertButton( {
 				<>
 					<MenuItem
 						icon={ symbol }
-						onClick={ () => {
-							setIsModalOpen( true );
-						} }
+						onClick={ () => setIsModalOpen( true ) }
 					>
-						{ __( 'Create Reusable block' ) }
+						{ showRenameHint
+							? __( 'Create pattern/reusable block' )
+							: __( 'Create pattern' ) }
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
-							title={ __( 'Create Reusable block' ) }
+							title={ __( 'Create pattern' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );
@@ -136,11 +178,28 @@ export default function ReusableBlockConvertButton( {
 								} }
 							>
 								<VStack spacing="5">
+									<ReusableBlocksRenameHint />
 									<TextControl
 										__nextHasNoMarginBottom
 										label={ __( 'Name' ) }
 										value={ title }
 										onChange={ setTitle }
+										placeholder={ __( 'My pattern' ) }
+									/>
+
+									<ToggleControl
+										label={ __( 'Synced' ) }
+										help={ __(
+											'Editing the pattern will update it anywhere it is used.'
+										) }
+										checked={ ! syncType }
+										onChange={ () => {
+											setSyncType(
+												! syncType
+													? 'unsynced'
+													: undefined
+											);
+										} }
 									/>
 									<HStack justify="right">
 										<Button
@@ -154,7 +213,7 @@ export default function ReusableBlockConvertButton( {
 										</Button>
 
 										<Button variant="primary" type="submit">
-											{ __( 'Save' ) }
+											{ __( 'Create' ) }
 										</Button>
 									</HStack>
 								</VStack>

@@ -8,6 +8,7 @@ import { BlockContextProvider, BlockPreview } from '@wordpress/block-editor';
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editSiteStore } from '../../../store';
 
 export default function EditTemplate() {
-	const { context, hasResolved, title, blocks } = useSelect( ( select ) => {
+	const { context, hasResolved, title, content } = useSelect( ( select ) => {
 		const { getEditedPostContext, getEditedPostType, getEditedPostId } =
 			select( editSiteStore );
 		const { getEditedEntityRecord, hasFinishedResolution } =
@@ -34,7 +35,7 @@ export default function EditTemplate() {
 				queryArgs
 			),
 			title: template?.title,
-			blocks: template?.blocks,
+			content: template?.content,
 		};
 	}, [] );
 
@@ -43,6 +44,12 @@ export default function EditTemplate() {
 	const blockContext = useMemo(
 		() => ( { ...context, postType: null, postId: null } ),
 		[ context ]
+	);
+
+	const blocks = useMemo(
+		() =>
+			content && typeof content !== 'function' ? parse( content ) : [],
+		[ content ]
 	);
 
 	if ( ! hasResolved ) {

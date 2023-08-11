@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,6 +30,8 @@ import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
+import { kebabCase } from '../utils/object';
+import { useBlockSettings } from './utils';
 
 const layoutBlockSupportKey = 'layout';
 
@@ -69,9 +70,12 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 	if ( LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className ) {
 		const baseClassName =
 			LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className;
-		const compoundClassName = `wp-block-${ blockName
-			.split( '/' )
-			.pop() }-${ baseClassName }`;
+		const splitBlockName = blockName.split( '/' );
+		const fullBlockName =
+			splitBlockName[ 0 ] === 'core'
+				? splitBlockName.pop()
+				: splitBlockName.join( '-' );
+		const compoundClassName = `wp-block-${ fullBlockName }-${ baseClassName }`;
 		layoutClassnames.push( baseClassName, compoundClassName );
 	}
 
@@ -133,6 +137,11 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 }
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
+	const settings = useBlockSettings( blockName );
+	const {
+		layout: { allowEditing: allowEditingSetting },
+	} = settings;
+
 	const { layout } = attributes;
 	const defaultThemeLayout = useSetting( 'layout' );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
@@ -150,7 +159,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 	const {
 		allowSwitching,
-		allowEditing = true,
+		allowEditing = allowEditingSetting ?? true,
 		allowInheriting = true,
 		default: defaultBlockLayout,
 	} = layoutBlockSupport;

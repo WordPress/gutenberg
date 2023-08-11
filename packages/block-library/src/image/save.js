@@ -24,6 +24,8 @@ export default function save( { attributes } ) {
 		linkClass,
 		width,
 		height,
+		aspectRatio,
+		scale,
 		id,
 		linkTarget,
 		sizeSlug,
@@ -52,9 +54,13 @@ export default function save( { attributes } ) {
 			src={ url }
 			alt={ alt }
 			className={ imageClasses || undefined }
-			style={ borderProps.style }
-			width={ width }
-			height={ height }
+			style={ {
+				...borderProps.style,
+				aspectRatio,
+				objectFit: scale,
+				width,
+				height,
+			} }
 			title={ title }
 		/>
 	);

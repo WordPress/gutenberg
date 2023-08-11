@@ -9,56 +9,56 @@
  * Updates `wp_template` and `wp_template_part` post types to use
  * Gutenberg's REST controllers
  *
- * Adds `_edit_link` to the `wp_global_styles`, `wp_template`,
- * and `wp_template_part` post type schemata. See https://github.com/WordPress/gutenberg/issues/48065
+ * Adds `_edit_link` to the following post type schemata:
+ *
+ * - wp_global_styles
+ * - wp_template
+ * - wp_template_part
+ * - wp_navigation
+ *
+ * See https://github.com/WordPress/gutenberg/issues/48065
  *
  * @param array  $args Array of arguments for registering a post type.
  * @param string $post_type Post type key.
  */
 function gutenberg_update_templates_template_parts_rest_controller( $args, $post_type ) {
 	if ( in_array( $post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
-		$template_edit_link            = 'site-editor.php?' . build_query(
+		$template_edit_link = 'site-editor.php?' . build_query(
 			array(
 				'postType' => $post_type,
 				'postId'   => '%s',
 				'canvas'   => 'edit',
 			)
 		);
-		$args['_edit_link']            = $template_edit_link;
-		$args['rest_controller_class'] = 'Gutenberg_REST_Templates_Controller_6_3';
+		$args['_edit_link'] = $template_edit_link;
 	}
 
 	if ( in_array( $post_type, array( 'wp_global_styles' ), true ) ) {
 		$args['_edit_link'] = '/site-editor.php?canvas=edit';
 	}
+
+	if ( 'wp_navigation' === $post_type ) {
+		$navigation_edit_link = 'site-editor.php?' . build_query(
+			array(
+				'postId'   => '%s',
+				'postType' => 'wp_navigation',
+				'canvas'   => 'edit',
+			)
+		);
+		$args['_edit_link']   = $navigation_edit_link;
+	}
+
 	return $args;
 }
 add_filter( 'register_post_type_args', 'gutenberg_update_templates_template_parts_rest_controller', 10, 2 );
 
-/**
- * Registers the Global Styles Revisions REST API routes.
- */
-function gutenberg_register_global_styles_revisions_endpoints() {
-	$global_styles_revisions_controller = new Gutenberg_REST_Global_Styles_Revisions_Controller_6_3();
-	$global_styles_revisions_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoints' );
-
-/**
- * Registers the Global Styles REST API routes.
- */
-function gutenberg_register_global_styles_endpoints() {
-	$global_styles_controller = new Gutenberg_REST_Global_Styles_Controller_6_3();
-	$global_styles_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
-
-/**
- * Add the `modified` value to the `wp_template` schema.
- *
- * @since 6.3.0 Added 'modified' property and response value.
- */
-function add_modified_wp_template_schema() {
+if ( ! function_exists( 'add_modified_wp_template_schema' ) ) {
+	/**
+	 * Add the `modified` value to the `wp_template` schema.
+	 *
+	 * @since 6.3.0 Added 'modified' property and response value.
+	 */
+	function add_modified_wp_template_schema() {
 		register_rest_field(
 			array( 'wp_template', 'wp_template_part' ),
 			'modified',
@@ -81,5 +81,28 @@ function add_modified_wp_template_schema() {
 				},
 			)
 		);
+	}
 }
 add_filter( 'rest_api_init', 'add_modified_wp_template_schema' );
+
+// If the Auto-inserting Blocks experiment is enabled, we load the block patterns
+// controller in lib/experimental/rest-api.php instead.
+if ( ! gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+	/**
+	 * Registers the block patterns REST API routes.
+	 */
+	function gutenberg_register_rest_block_patterns() {
+		$block_patterns = new Gutenberg_REST_Block_Patterns_Controller_6_3();
+		$block_patterns->register_routes();
+	}
+	add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
+}
+
+/**
+ * Registers the Navigation Fallbacks REST API routes.
+ */
+function gutenberg_register_rest_navigation_fallbacks() {
+	$editor_settings = new Gutenberg_REST_Navigation_Fallback_Controller();
+	$editor_settings->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_navigation_fallbacks' );

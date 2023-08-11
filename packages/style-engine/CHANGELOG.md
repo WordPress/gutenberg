@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 1.22.0 (2023-08-10)
+
+### Bug Fixes
+-   Style engine: switch off optimize by default [#53085](https://github.com/WordPress/gutenberg/pull/53085).
+
+## 1.21.0 (2023-07-20)
+
+## 1.20.0 (2023-07-05)
+
+## 1.19.0 (2023-06-23)
+
 ## 1.18.0 (2023-06-07)
 
 ## 1.17.0 (2023-05-24)

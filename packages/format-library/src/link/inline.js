@@ -3,7 +3,8 @@
  */
 import { useState, useRef, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { withSpokenMessages, Popover } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
+import { Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
 import {
 	create,
@@ -36,7 +37,6 @@ function InlineLinkUI( {
 	addingLink,
 	value,
 	onChange,
-	speak,
 	stopAddingLink,
 	contentRef,
 } ) {
@@ -243,7 +243,7 @@ function InlineLinkUI( {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: %s: search term. */
-				__( 'Create Page: <mark>%s</mark>' ),
+				__( 'Create page: <mark>%s</mark>' ),
 				searchTerm
 			),
 			{ mark: <mark /> }
@@ -255,6 +255,7 @@ function InlineLinkUI( {
 			anchor={ popoverAnchor }
 			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
+			onFocusOutside={ () => stopAddingLink( false ) }
 			placement="bottom"
 			shift
 		>
@@ -298,4 +299,4 @@ function getRichTextValueFromSelection( value, isActive ) {
 	return slice( value, textStart, textEnd );
 }
 
-export default withSpokenMessages( InlineLinkUI );
+export default InlineLinkUI;

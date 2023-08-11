@@ -23,11 +23,13 @@
 		}
 	},
 	"supports": {
+		"__experimentalOnEnter": true,
 		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"color": {
 			"gradients": true,
+			"heading": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,

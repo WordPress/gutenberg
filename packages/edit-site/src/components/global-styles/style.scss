@@ -179,3 +179,14 @@
 .edit-site-global-styles-sidebar__panel .block-editor-block-icon svg {
 	fill: currentColor;
 }
+
+[class][class].edit-site-global-styles-sidebar__revisions-count-badge {
+	align-items: center;
+	background: $gray-800;
+	border-radius: 2px;
+	color: $white;
+	display: inline-flex;
+	justify-content: center;
+	min-height: $icon-size;
+	min-width: $icon-size;
+}

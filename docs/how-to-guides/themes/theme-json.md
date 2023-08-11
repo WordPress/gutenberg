@@ -342,8 +342,9 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 | `editor-color-palette`      | Provide the list of colors via `color.palette`.           |
 | `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`. |
 | `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.      |
-| `experimental-link-color`   | Set `color.link` to `true`. `experimental-link-color` will be removed when the plugin requires WordPress 5.9 as the minimum version. |
 | `appearance-tools`          | Set `appearanceTools` to `true`.                          |
+| `border`                    | Set `border: color, radius, style, width` to `true`.      |
+| `link-color `               | Set `color.link` to `true`.                               |
 
 #### Presets
 
@@ -1330,7 +1331,7 @@ As a result of this change, it’s now the block author and theme author’s res
 
 ### What is blockGap and how can I use it?
 
-For blocks that contain inner blocks, such as Group, Columns, Buttons, and Social Icons, `blockGap` controls the spacing between inner blocks. Depending on the layout of the block, the `blockGap` value will be output as either a vertical margin or a `gap` value. In the editor, the control for the `blockGap` value is called _Block spacing_, located in the Dimensions panel.
+For blocks that contain inner blocks, such as Group, Columns, Buttons, and Social Icons, `blockGap` controls the spacing between inner blocks. For `blockGap` to work, the block must also opt in to the [`layout` block support](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout), which provides layout styles that can be adjusted via the block spacing controls. Depending on the layout of the block, the `blockGap` value will be output as either a vertical margin or a `gap` value. In the editor, the control for the `blockGap` value is called _Block spacing_, located in the Dimensions panel.
 
 ```json
 {

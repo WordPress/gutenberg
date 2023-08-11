@@ -56,6 +56,6 @@ test.describe( 'changing image size', () => {
 		).toHaveCSS( 'width', '499px' );
 		await expect(
 			page.locator( 'role=spinbutton[name="Width"i]' )
-		).toHaveValue( '499' );
+		).toHaveValue( '' );
 	} );
 } );

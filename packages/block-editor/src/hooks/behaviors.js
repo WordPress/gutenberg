@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,15 +22,13 @@ function BehaviorsControl( {
 	onChangeAnimation,
 	disabled = false,
 } ) {
-	const { settings, themeBehaviors } = useSelect(
+	const { settings } = useSelect(
 		( select ) => {
-			const { getBehaviors, getSettings } = select( blockEditorStore );
-
+			const { getSettings } = select( blockEditorStore );
 			return {
 				settings:
 					getSettings()?.__experimentalFeatures?.blocks?.[ blockName ]
-						?.behaviors,
-				themeBehaviors: getBehaviors()?.blocks?.[ blockName ],
+						?.behaviors || {},
 			};
 		},
 		[ blockName ]
@@ -45,7 +44,6 @@ function BehaviorsControl( {
 			label: __( 'No behaviors' ),
 		},
 	};
-
 	const behaviorsOptions = Object.entries( settings )
 		.filter(
 			( [ behaviorName, behaviorValue ] ) =>
@@ -59,41 +57,45 @@ function BehaviorsControl( {
 				.slice( 1 )
 				.toLowerCase() }`,
 		} ) );
-
 	const options = [
 		...Object.values( defaultBehaviors ),
 		...behaviorsOptions,
 	];
 
+	const { behaviors, behaviorsValue } = useMemo( () => {
+		const mergedBehaviors = {
+			...( blockBehaviors || {} ),
+		};
+
+		let value = '';
+		if ( blockBehaviors === undefined ) {
+			value = 'default';
+		}
+		if ( blockBehaviors?.lightbox.enabled ) {
+			value = 'lightbox';
+		}
+		return {
+			behaviors: mergedBehaviors,
+			behaviorsValue: value,
+		};
+	}, [ blockBehaviors ] );
+
 	// If every behavior is disabled, do not show the behaviors inspector control.
 	if ( behaviorsOptions.length === 0 ) {
 		return null;
 	}
-	// Block behaviors take precedence over theme behaviors.
-	const behaviors = { ...themeBehaviors, ...( blockBehaviors || {} ) };
 
 	const helpText = disabled
 		? __( 'The lightbox behavior is disabled for linked images.' )
 		: '';
 
-	const value = () => {
-		if ( blockBehaviors === undefined ) {
-			return 'default';
-		}
-		if ( behaviors?.lightbox.enabled ) {
-			return 'lightbox';
-		}
-		return '';
-	};
-
 	return (
 		<InspectorControls group="advanced">
-			{ /* This div is needed to prevent a margin bottom between the dropdown and the button. */ }
 			<div>
 				<SelectControl
 					label={ __( 'Behaviors' ) }
 					// At the moment we are only supporting one behavior (Lightbox)
-					value={ value() }
+					value={ behaviorsValue }
 					options={ options }
 					onChange={ onChangeBehavior }
 					hideCancelButton={ true }
@@ -101,7 +103,7 @@ function BehaviorsControl( {
 					size="__unstable-large"
 					disabled={ disabled }
 				/>
-				{ behaviors?.lightbox.enabled && (
+				{ behaviorsValue === 'lightbox' && (
 					<SelectControl
 						label={ __( 'Animation' ) }
 						// At the moment we are only supporting one behavior (Lightbox)
@@ -115,7 +117,10 @@ function BehaviorsControl( {
 								value: 'zoom',
 								label: __( 'Zoom' ),
 							},
-							{ value: 'fade', label: 'Fade' },
+							{
+								value: 'fade',
+								label: __( 'Fade' ),
+							},
 						] }
 						onChange={ onChangeAnimation }
 						hideCancelButton={ false }
@@ -194,10 +199,8 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 	};
 }, 'withBehaviors' );
 
-if ( window?.__experimentalInteractivityAPI ) {
-	addFilter(
-		'editor.BlockEdit',
-		'core/behaviors/with-inspector-control',
-		withBehaviors
-	);
-}
+addFilter(
+	'editor.BlockEdit',
+	'core/behaviors/with-inspector-control',
+	withBehaviors
+);

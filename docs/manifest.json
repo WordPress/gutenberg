@@ -170,14 +170,8 @@
 	{
 		"title": "Building a custom block editor",
 		"slug": "custom-block-editor",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/README.md",
+		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor.md",
 		"parent": "platform"
-	},
-	{
-		"title": "Tutorial: building a custom block editor",
-		"slug": "tutorial",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
-		"parent": "custom-block-editor"
 	},
 	{
 		"title": "Create your First App with Gutenberg Data",
@@ -1506,6 +1500,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/create-block-interactive-template",
+		"slug": "packages-create-block-interactive-template",
+		"markdown_source": "../packages/create-block-interactive-template/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/create-block-tutorial-template",
 		"slug": "packages-create-block-tutorial-template",
 		"markdown_source": "../packages/create-block-tutorial-template/README.md",
@@ -1674,6 +1674,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/interactivity",
+		"slug": "packages-interactivity",
+		"markdown_source": "../packages/interactivity/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/interface",
 		"slug": "packages-interface",
 		"markdown_source": "../packages/interface/README.md",
@@ -1743,6 +1749,12 @@
 		"title": "@wordpress/npm-package-json-lint-config",
 		"slug": "packages-npm-package-json-lint-config",
 		"markdown_source": "../packages/npm-package-json-lint-config/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/nux",
+		"slug": "packages-nux",
+		"markdown_source": "../packages/nux/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1878,6 +1890,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/sync",
+		"slug": "packages-sync",
+		"markdown_source": "../packages/sync/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",
@@ -1989,6 +2007,12 @@
 		"title": "Notices Data",
 		"slug": "data-core-notices",
 		"markdown_source": "../docs/reference-guides/data/data-core-notices.md",
+		"parent": "data"
+	},
+	{
+		"title": "The NUX (New User Experience) Data",
+		"slug": "data-core-nux",
+		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
 		"parent": "data"
 	},
 	{

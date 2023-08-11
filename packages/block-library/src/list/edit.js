@@ -177,10 +177,12 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 			{ controls }
 			{ ordered && (
 				<OrderedListSettings
-					setAttributes={ setAttributes }
-					ordered={ ordered }
-					reversed={ reversed }
-					start={ start }
+					{ ...{
+						setAttributes,
+						reversed,
+						start,
+						type,
+					} }
 				/>
 			) }
 		</>

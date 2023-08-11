@@ -4,12 +4,15 @@
 import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
-	PanelBody,
 	ResizableBox,
 	Spinner,
 	TextareaControl,
 	TextControl,
 	ToolbarButton,
+	ToolbarGroup,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -17,7 +20,6 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
@@ -25,6 +27,7 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	useEffect,
@@ -33,7 +36,7 @@ import {
 	useRef,
 	useCallback,
 } from '@wordpress/element';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import {
 	createBlock,
@@ -52,6 +55,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import { isExternalImage } from './edit';
@@ -60,6 +64,22 @@ import { isExternalImage } from './edit';
  * Module constants
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
+import { evalAspectRatio } from './utils';
+
+const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
+
+const scaleOptions = [
+	{
+		value: 'cover',
+		label: _x( 'Cover', 'Scale option for dimensions control' ),
+		help: __( 'Image covers the space evenly.' ),
+	},
+	{
+		value: 'contain',
+		label: _x( 'Contain', 'Scale option for dimensions control' ),
+		help: __( 'Image is contained without distortion.' ),
+	},
+];
 
 export default function Image( {
 	temporaryURL,
@@ -89,9 +109,16 @@ export default function Image( {
 		title,
 		width,
 		height,
+		aspectRatio,
+		scale,
 		linkTarget,
 		sizeSlug,
 	} = attributes;
+
+	// The only supported unit is px, so we can parseInt to strip the px here.
+	const numericWidth = width ? parseInt( width, 10 ) : undefined;
+	const numericHeight = height ? parseInt( height, 10 ) : undefined;
+
 	const imageRef = useRef();
 	const prevCaption = usePrevious( caption );
 	const [ showCaption, setShowCaption ] = useState( !! caption );
@@ -175,14 +202,17 @@ export default function Image( {
 		if (
 			! isExternalImage( id, url ) ||
 			! isSelected ||
-			! canUploadMedia ||
-			externalBlob
+			! canUploadMedia
 		) {
+			setExternalBlob();
 			return;
 		}
 
+		if ( externalBlob ) return;
+
 		window
-			.fetch( url )
+			// Avoid cache, which seems to help avoid CORS problems.
+			.fetch( url.includes( '?' ) ? url : url + '?' )
 			.then( ( response ) => response.blob() )
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
@@ -268,8 +298,6 @@ export default function Image( {
 
 		setAttributes( {
 			url: newUrl,
-			width: undefined,
-			height: undefined,
 			sizeSlug: newSizeSlug,
 		} );
 	}
@@ -298,7 +326,12 @@ export default function Image( {
 
 	function updateAlignment( nextAlign ) {
 		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
+			? {
+					width: undefined,
+					height: undefined,
+					aspectRatio: undefined,
+					scale: undefined,
+			  }
 			: {};
 		setAttributes( {
 			...extraUpdatedAttributes,
@@ -324,6 +357,13 @@ export default function Image( {
 			switchToBlockType( getBlock( clientId ), 'core/cover' )
 		);
 	}
+
+	// TODO: Can allow more units after figuring out how they should interact
+	// with the ResizableBox and ImageEditor components. Calculations later on
+	// for those components are currently assuming px units.
+	const dimensionsUnitsOptions = useCustomUnits( {
+		availableUnits: [ 'px' ],
+	} );
 
 	const controls = (
 		<>
@@ -370,13 +410,6 @@ export default function Image( {
 						label={ __( 'Crop' ) }
 					/>
 				) }
-				{ externalBlob && (
-					<ToolbarButton
-						onClick={ uploadExternal }
-						icon={ upload }
-						label={ __( 'Upload external image' ) }
-					/>
-				) }
 				{ ! multiImageSelection && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
@@ -398,42 +431,95 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
+			{ ! multiImageSelection && externalBlob && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ uploadExternal }
+							icon={ upload }
+							label={ __( 'Upload external image' ) }
+						/>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () =>
+						setAttributes( {
+							width: undefined,
+							height: undefined,
+							scale: undefined,
+							aspectRatio: undefined,
+						} )
+					}
+				>
 					{ ! multiImageSelection && (
-						<TextareaControl
-							__nextHasNoMarginBottom
+						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
-							value={ alt }
-							onChange={ updateAlt }
-							help={
-								<>
-									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-										{ __(
-											'Describe the purpose of the image.'
-										) }
-									</ExternalLink>
-									<br />
-									{ __( 'Leave empty if decorative.' ) }
-								</>
+							isShownByDefault={ true }
+							hasValue={ () => alt !== '' }
+							onDeselect={ () =>
+								setAttributes( { alt: undefined } )
 							}
+						>
+							<TextareaControl
+								label={ __( 'Alternative text' ) }
+								value={ alt }
+								onChange={ updateAlt }
+								help={
+									<>
+										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											{ __(
+												'Describe the purpose of the image.'
+											) }
+										</ExternalLink>
+										<br />
+										{ __( 'Leave empty if decorative.' ) }
+									</>
+								}
+								__nextHasNoMarginBottom
+							/>
+						</ToolsPanelItem>
+					) }
+					{ isResizable && (
+						<DimensionsTool
+							value={ { width, height, scale, aspectRatio } }
+							onChange={ ( {
+								width: newWidth,
+								height: newHeight,
+								scale: newScale,
+								aspectRatio: newAspectRatio,
+							} ) => {
+								// Rebuilding the object forces setting `undefined`
+								// for values that are removed since setAttributes
+								// doesn't do anything with keys that aren't set.
+								setAttributes( {
+									// CSS includes `height: auto`, but we need
+									// `width: auto` to fix the aspect ratio when
+									// only height is set due to the width and
+									// height attributes set via the server.
+									width:
+										! newWidth && newHeight
+											? 'auto'
+											: newWidth,
+									height: newHeight,
+									scale: newScale,
+									aspectRatio: newAspectRatio,
+								} );
+							} }
+							defaultScale="cover"
+							defaultAspectRatio="auto"
+							scaleOptions={ scaleOptions }
+							unitsOptions={ dimensionsUnitsOptions }
 						/>
 					) }
-					<ImageSizeControl
-						onChangeImage={ updateImage }
-						onChange={ ( value ) => setAttributes( value ) }
-						slug={ sizeSlug }
-						width={ width }
-						height={ height }
-						imageSizeOptions={ imageSizeOptions }
-						isResizable={ isResizable }
-						imageWidth={ naturalWidth }
-						imageHeight={ naturalHeight }
-						imageSizeHelp={ __(
-							'Select the size of the source image.'
-						) }
+					<ResolutionTool
+						value={ sizeSlug }
+						onChange={ updateImage }
+						options={ imageSizeOptions }
 					/>
-				</PanelBody>
+				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
@@ -475,9 +561,6 @@ export default function Image( {
 
 	const borderProps = useBorderProps( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
-	const hasCustomBorder =
-		!! borderProps.className ||
-		( borderProps.style && Object.keys( borderProps.style ).length > 0 );
 
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
@@ -496,24 +579,19 @@ export default function Image( {
 				} }
 				ref={ imageRef }
 				className={ borderProps.className }
-				style={ borderProps.style }
+				style={ {
+					width:
+						( width && height ) || aspectRatio ? '100%' : undefined,
+					height:
+						( width && height ) || aspectRatio ? '100%' : undefined,
+					objectFit: scale,
+					...borderProps.style,
+				} }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
-
-	let imageWidthWithinContainer;
-	let imageHeightWithinContainer;
-
-	if ( clientWidth && naturalWidth && naturalHeight ) {
-		const exceedMaxWidth = naturalWidth > clientWidth;
-		const ratio = naturalHeight / naturalWidth;
-		imageWidthWithinContainer = exceedMaxWidth ? clientWidth : naturalWidth;
-		imageHeightWithinContainer = exceedMaxWidth
-			? clientWidth * ratio
-			: naturalHeight;
-	}
 
 	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
 	// So we try using the imageRef width first and fallback to clientWidth.
@@ -524,8 +602,8 @@ export default function Image( {
 			<ImageEditor
 				id={ id }
 				url={ url }
-				width={ width }
-				height={ height }
+				width={ numericWidth }
+				height={ numericHeight }
 				clientWidth={ fallbackClientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
@@ -538,13 +616,22 @@ export default function Image( {
 				borderProps={ isRounded ? undefined : borderProps }
 			/>
 		);
-	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
-		img = <div style={ { width, height } }>{ img }</div>;
+	} else if ( ! isResizable ) {
+		img = <div style={ { width, height, aspectRatio } }>{ img }</div>;
 	} else {
-		const currentWidth = width || imageWidthWithinContainer;
-		const currentHeight = height || imageHeightWithinContainer;
+		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );
+		const customRatio = numericWidth / numericHeight;
+		const naturalRatio = naturalWidth / naturalHeight;
+		const ratio = numericRatio || customRatio || naturalRatio || 1;
+		const currentWidth =
+			! numericWidth && numericHeight
+				? numericHeight * ratio
+				: numericWidth;
+		const currentHeight =
+			! numericHeight && numericWidth
+				? numericWidth / ratio
+				: numericHeight;
 
-		const ratio = naturalWidth / naturalHeight;
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
 		const minHeight =
@@ -592,16 +679,24 @@ export default function Image( {
 
 		img = (
 			<ResizableBox
+				style={ {
+					display: 'block',
+					objectFit: scale,
+					aspectRatio:
+						! width && ! height && aspectRatio
+							? aspectRatio
+							: undefined,
+				} }
 				size={ {
-					width: width ?? 'auto',
-					height: height && ! hasCustomBorder ? height : 'auto',
+					width: currentWidth ?? 'auto',
+					height: currentHeight ?? 'auto',
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
 				minHeight={ minHeight }
 				maxHeight={ maxWidthBuffer / ratio }
-				lockAspectRatio
+				lockAspectRatio={ ratio }
 				enable={ {
 					top: false,
 					right: showRightHandle,
@@ -609,11 +704,19 @@ export default function Image( {
 					left: showLeftHandle,
 				} }
 				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt, delta ) => {
+				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
+					// Since the aspect ratio is locked when resizing, we can
+					// use the width of the resized element to calculate the
+					// height in CSS to prevent stretching when the max-width
+					// is reached.
 					setAttributes( {
-						width: parseInt( currentWidth + delta.width, 10 ),
-						height: parseInt( currentHeight + delta.height, 10 ),
+						width: `${ elt.offsetWidth }px`,
+						height: 'auto',
+						aspectRatio:
+							ratio === naturalRatio
+								? undefined
+								: String( ratio ),
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
