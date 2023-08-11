@@ -192,10 +192,10 @@ function UnforwardedModal(
 		// overlay, such a gesture is a `click` on the overlay and cannot be
 		// excepted by a `click` handler. Thus the tactic of handling
 		// `pointerup` and comparing its target to that of the `pointerdown`.
-		onPointerUp: ( { target, isPrimary, button } ) => {
+		onPointerUp: ( { target, button } ) => {
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
-			if ( isPrimary && button === 0 && isSameTarget ) onRequestClose();
+			if ( button === 0 && isSameTarget ) onRequestClose();
 		},
 	};
 
