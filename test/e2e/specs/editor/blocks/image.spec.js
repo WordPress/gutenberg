@@ -916,7 +916,10 @@ test.describe( 'Image - interactivity', () => {
 				} );
 				await closeButton.click();
 
-				await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+				await expect( responsiveImage ).toHaveAttribute(
+					'src',
+					contentImageCurrentSrc
+				);
 				await expect( enlargedImage ).toHaveAttribute(
 					'src',
 					imageUploadedSrc
@@ -1011,7 +1014,10 @@ test.describe( 'Image - interactivity', () => {
 				} );
 				await closeButton.click();
 
-				await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+				await expect( responsiveImage ).toHaveAttribute(
+					'src',
+					contentImageCurrentSrc
+				);
 				await expect( enlargedImage ).toHaveAttribute(
 					'src',
 					imageUploadedSrc
@@ -1360,7 +1366,7 @@ test.describe( 'Image - interactivity', () => {
 
 		await page.getByRole( 'button', { name: 'Close' } ).click();
 
-		await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+		await expect( responsiveImage ).toHaveAttribute( 'src', imgUrl );
 		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
 	} );
 } );
