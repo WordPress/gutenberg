@@ -167,7 +167,7 @@ function InlineLinkUI( {
 		// Focus should only be shifted back to the formatted segment when the
 		// URL is submitted.
 		if ( ! didToggleSetting ) {
-			// stopAddingLink();
+			stopAddingLink();
 		}
 
 		if ( ! isValidHref( newUrl ) ) {
