@@ -144,7 +144,7 @@
 				This list of functions is final and must not be extended.
 				It includes functions that cannot be renamed due to backward compatibility issues.
 				Its purpose is to avoid cluttering Core code with `phpcs:disable` statements specific to Gutenberg,
-				as block library code is backported to Core.
+				as block-library code is backported to Core.
 			-->
 			<property name="allowed_functions" type="array">
 				<element value="_delete_custom_logo_on_remove_site_logo"/>
