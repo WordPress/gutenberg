@@ -93,7 +93,7 @@ function useEditorModeCommands() {
 		[]
 	);
 
-	if ( canvasMode !== 'edit' ) {
+	if ( canvasMode !== 'edit' || editorMode !== 'text' ) {
 		return { isLoading: false, commands: [] };
 	}
 
