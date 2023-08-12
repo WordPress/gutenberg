@@ -12,9 +12,8 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import Button from '../../../button';
-import { ToolTip } from '..';
-import { TOOLTIP_DELAY } from '../../../tooltip/';
+import Button from '../../button';
+import Tooltip, { TOOLTIP_DELAY } from '..';
 
 const props = {
 	children: <Button>Button</Button>,
@@ -22,7 +21,7 @@ const props = {
 	delay: TOOLTIP_DELAY,
 };
 
-describe( 'ToolTip', () => {
+describe( 'Tooltip', () => {
 	// TODO: may need to be tested with Playwright; further context:
 	// https://github.com/WordPress/gutenberg/pull/52133#issuecomment-1613691258
 	// below workaround ensures tooltip is umounted after each test to prevent leaking
@@ -45,10 +44,10 @@ describe( 'ToolTip', () => {
 			render(
 				// expected TS error since Tooltip cannot have more than one child element
 				// @ts-expect-error
-				<ToolTip { ...props }>
+				<Tooltip { ...props }>
 					<Button>This is a button</Button>
 					<Button>This is another button</Button>
-				</ToolTip>
+				</Tooltip>
 			);
 		} ).toThrow();
 
@@ -65,7 +64,7 @@ describe( 'ToolTip', () => {
 	} );
 
 	it( 'should not render the tooltip if there is no focus', () => {
-		render( <ToolTip { ...props } /> );
+		render( <Tooltip { ...props } /> );
 
 		expect(
 			screen.getByRole( 'button', { name: /Button/i } )
@@ -79,7 +78,7 @@ describe( 'ToolTip', () => {
 	it( 'should render the tooltip when focusing on the tooltip anchor via tab', async () => {
 		const user = userEvent.setup();
 
-		render( <ToolTip { ...props } /> );
+		render( <Tooltip { ...props } /> );
 
 		await user.tab();
 
@@ -97,7 +96,7 @@ describe( 'ToolTip', () => {
 	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
 		const user = userEvent.setup();
 
-		render( <ToolTip { ...props } /> );
+		render( <Tooltip { ...props } /> );
 
 		const button = screen.getByRole( 'button', { name: /Button/i } );
 
@@ -113,7 +112,7 @@ describe( 'ToolTip', () => {
 	it( 'should not show tooltip on focus as result of mouse click', async () => {
 		const user = userEvent.setup();
 
-		render( <ToolTip { ...props } /> );
+		render( <Tooltip { ...props } /> );
 
 		await user.click( screen.getByRole( 'button', { name: /Button/i } ) );
 
@@ -126,7 +125,7 @@ describe( 'ToolTip', () => {
 		const user = userEvent.setup( { delay: TOOLTIP_DELAY } );
 		const CUSTOM_DELAY = TOOLTIP_DELAY + 25;
 
-		render( <ToolTip { ...props } delay={ CUSTOM_DELAY } /> );
+		render( <Tooltip { ...props } delay={ CUSTOM_DELAY } /> );
 
 		const button = screen.getByRole( 'button', { name: /Button/i } );
 
@@ -147,9 +146,9 @@ describe( 'ToolTip', () => {
 		const user = userEvent.setup();
 
 		render(
-			<ToolTip { ...props }>
+			<Tooltip { ...props }>
 				<Button aria-disabled>Button</Button>
-			</ToolTip>
+			</Tooltip>
 		);
 
 		const button = screen.getByRole( 'button', { name: /Button/i } );
@@ -174,14 +173,14 @@ describe( 'ToolTip', () => {
 
 		render(
 			<>
-				<ToolTip { ...props }>
+				<Tooltip { ...props }>
 					<Button
 						onMouseEnter={ onMouseEnterMock }
 						onMouseLeave={ onMouseLeaveMock }
 					>
 						Button 1
 					</Button>
-				</ToolTip>
+				</Tooltip>
 				<Button>Button 2</Button>
 			</>
 		);
@@ -192,7 +191,7 @@ describe( 'ToolTip', () => {
 			} )
 		);
 
-		// ToolTip hasn't appeared yet
+		// Tooltip hasn't appeared yet
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
@@ -214,7 +213,7 @@ describe( 'ToolTip', () => {
 			} )
 		);
 
-		// ToolTip still hasn't appeared yet
+		// Tooltip still hasn't appeared yet
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
@@ -226,7 +225,7 @@ describe( 'ToolTip', () => {
 			setTimeout( resolve, TOOLTIP_DELAY )
 		);
 
-		// ToolTip won't show, since the mouse has left the tooltip anchor
+		// Tooltip won't show, since the mouse has left the tooltip anchor
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
@@ -235,7 +234,7 @@ describe( 'ToolTip', () => {
 	it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
 		const user = userEvent.setup();
 
-		render( <ToolTip { ...props } shortcut="shortcut text" /> );
+		render( <Tooltip { ...props } shortcut="shortcut text" /> );
 
 		const button = screen.getByRole( 'button', { name: /Button/i } );
 
@@ -250,7 +249,7 @@ describe( 'ToolTip', () => {
 		const user = userEvent.setup();
 
 		render(
-			<ToolTip
+			<Tooltip
 				{ ...props }
 				shortcut={ {
 					display: '⇧⌘,',
