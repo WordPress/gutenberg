@@ -231,7 +231,7 @@ export default function CoverInspectorControls( {
 						<PanelRow>
 							<Button
 								variant="secondary"
-								isSmall
+								size="small"
 								className="block-library-cover__reset-button"
 								onClick={ onClearMedia }
 							>

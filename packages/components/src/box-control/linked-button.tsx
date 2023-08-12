@@ -21,7 +21,7 @@ export default function LinkedButton( {
 			<Button
 				{ ...props }
 				className="component-box-control__linked-button"
-				isSmall
+				size="small"
 				icon={ isLinked ? link : linkOff }
 				iconSize={ 24 }
 				aria-label={ label }

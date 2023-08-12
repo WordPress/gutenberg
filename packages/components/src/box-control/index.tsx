@@ -167,7 +167,7 @@ function BoxControl( {
 						<Button
 							className="component-box-control__reset-button"
 							variant="secondary"
-							isSmall
+							size="small"
 							onClick={ handleOnReset }
 							disabled={ ! isDirty }
 						>

@@ -439,7 +439,7 @@ export default function SearchEdit( {
 								return (
 									<Button
 										key={ widthValue }
-										isSmall
+										size="small"
 										variant={
 											widthValue === width &&
 											widthUnit === '%'

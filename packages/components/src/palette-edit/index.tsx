@@ -237,7 +237,7 @@ function Option< T extends Color | Gradient >( {
 				{ isEditing && ! canOnlyChangeValues && (
 					<FlexItem>
 						<RemoveButton
-							isSmall
+							size="small"
 							icon={ lineSolid }
 							label={ __( 'Remove color' ) }
 							onClick={ onRemove }
@@ -436,7 +436,7 @@ export function PaletteEdit( {
 				<PaletteActionsContainer>
 					{ hasElements && isEditing && (
 						<DoneButton
-							isSmall
+							size="small"
 							onClick={ () => {
 								setIsEditing( false );
 								setEditingElement( null );
@@ -447,7 +447,7 @@ export function PaletteEdit( {
 					) }
 					{ ! canOnlyChangeValues && (
 						<Button
-							isSmall
+							size="small"
 							isPressed={ isAdding }
 							icon={ plus }
 							label={

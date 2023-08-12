@@ -152,7 +152,7 @@ const UnforwardedFontSizePicker = (
 								);
 							} }
 							isPressed={ showCustomValueControl }
-							isSmall
+							size="small"
 						/>
 					) }
 				</Header>

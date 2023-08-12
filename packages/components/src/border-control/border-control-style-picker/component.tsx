@@ -63,7 +63,7 @@ const BorderControlStylePicker = (
 						key={ borderStyle.value }
 						className={ buttonClassName }
 						icon={ borderStyle.icon }
-						isSmall
+						size="small"
 						isPressed={ borderStyle.value === value }
 						onClick={ () =>
 							onChange(
