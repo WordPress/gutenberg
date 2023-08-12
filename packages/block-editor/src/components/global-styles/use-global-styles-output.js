@@ -1127,9 +1127,26 @@ const processCSSNesting = ( css, blockSelector ) => {
 	// Split CSS nested rules.
 	const parts = css.split( '&' );
 	parts.forEach( ( part ) => {
-		processedCSS += ! part.includes( '{' )
-			? blockSelector + '{' + part + '}' // If the part doesn't contain braces, it applies to the root level.
-			: blockSelector + part; // Prepend the selector, which effectively replaces the "&" character.
+		const isRootCss = ! part.includes( '{' );
+		if ( isRootCss ) {
+			// If the part doesn't contain braces, it applies to the root level.
+			processedCSS += `${ blockSelector }{${ part }}`;
+		} else {
+			// If the part contains braces, it's a nested CSS rule.
+			const splittedPart = part.replace( '}', '' ).split( '{' );
+			if ( splittedPart.length !== 2 ) {
+				return;
+			}
+
+			const [ nestedSelector, cssValue ] = splittedPart;
+			const rootSelectors = blockSelector.split( ',' );
+			const combinedSelectors = rootSelectors.map(
+				( rootSelector ) => rootSelector + nestedSelector
+			);
+			processedCSS += `${ combinedSelectors.join(
+				', '
+			) }{${ cssValue.trim() }}`;
+		}
 	} );
 	return processedCSS;
 };

@@ -1138,9 +1138,27 @@ class WP_Theme_JSON_Gutenberg {
 		// Split CSS nested rules.
 		$parts = explode( '&', $css );
 		foreach ( $parts as $part ) {
-			$processed_css .= ( ! str_contains( $part, '{' ) )
-				? trim( $selector ) . '{' . trim( $part ) . '}' // If the part doesn't contain braces, it applies to the root level.
-				: trim( $selector . $part ); // Prepend the selector, which effectively replaces the "&" character.
+			$is_root_css = ( ! str_contains( $part, '{' ) );
+			if ( $is_root_css ) {
+				// If the part doesn't contain braces, it applies to the root level.
+				$processed_css .= trim( $selector ) . '{' . trim( $part ) . '}';
+			} else {
+				// If the part contains braces, it's a nested CSS rule.
+				$part = explode( '{', str_replace( '}', '', $part ) );
+				if ( count( $part ) !== 2 ) {
+					continue;
+				}
+				$nested_selector    = $part[0];
+				$css_value          = $part[1];
+				$root_selectors     = explode( ',', $selector );
+				$combined_selectors = array_map(
+					static function( $root_selector ) use ( $nested_selector ) {
+						return $root_selector . $nested_selector;
+					},
+					$root_selectors
+				);
+				$processed_css     .= implode( ',', $combined_selectors ) . '{' . trim( $css_value ) . '}';
+			}
 		}
 		return $processed_css;
 	}

@@ -2033,6 +2033,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected' => '.foo{color: red; margin: auto;}.foo .bar{color: blue;}.foo::before{color: green;}',
 			),
+			// CSS with multiple root selectors.
+			'with multiple root selectors'      => array(
+				'input'    => array(
+					'selector' => '.foo, .bar',
+					'css'      => 'color: red; margin: auto; & .baz{color: blue;} &::before{color: green;}',
+				),
+				'expected' => '.foo, .bar{color: red; margin: auto;}.foo .baz, .bar .baz{color: blue;}.foo::before, .bar::before{color: green;}',
+			),
 		);
 	}
 
