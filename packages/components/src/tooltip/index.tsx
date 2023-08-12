@@ -7,6 +7,7 @@ import * as Ariakit from '@ariakit/react/tooltip';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { Children } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,6 +28,17 @@ function Tooltip( props: TooltipProps ) {
 
 	const baseId = useInstanceId( Tooltip, 'tooltip' );
 	const describedById = text || shortcut ? baseId : undefined;
+
+	const isOnlyChild = Children.count( children ) === 1;
+	// console error if more than one child element is added
+	if ( ! isOnlyChild ) {
+		if ( 'development' === process.env.NODE_ENV ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				'Tooltip should be called with only a single child element.'
+			);
+		}
+	}
 
 	const DEFAULT_PLACEMENT = 'bottom';
 
@@ -53,10 +65,12 @@ function Tooltip( props: TooltipProps ) {
 		<>
 			<Ariakit.TooltipAnchor
 				onBlur={ () => tooltipStore.hide() }
-				render={ children }
 				store={ tooltipStore }
-			/>
-			{ ( text || shortcut ) && (
+				render={ isOnlyChild ? children : undefined }
+			>
+				{ ! isOnlyChild ? children : null }
+			</Ariakit.TooltipAnchor>
+			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
 					className="components-tooltip"
 					gutter={ 4 }

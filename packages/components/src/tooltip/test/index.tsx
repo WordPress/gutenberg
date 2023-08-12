@@ -35,33 +35,18 @@ describe( 'Tooltip', () => {
 	} );
 
 	it( 'should not render the tooltip if multiple children are passed', async () => {
-		const user = userEvent.setup();
-		// mock expected console error
-		const err = jest
-			.spyOn( console, 'error' )
-			.mockImplementation( () => {} );
-
-		expect( () => {
-			render(
-				// expected TS error since Tooltip cannot have more than one child element
-				// @ts-expect-error
-				<Tooltip { ...props }>
-					<Button>This is a button</Button>
-					<Button>This is another button</Button>
-				</Tooltip>
-			);
-		} ).toThrow();
-
-		expect( console ).toHaveErrored();
-		expect( err ).toHaveBeenCalled();
-
-		await user.tab();
+		render(
+			// expected TS error since Tooltip cannot have more than one child element
+			// @ts-expect-error
+			<Tooltip { ...props }>
+				<Button>This is a button</Button>
+				<Button>This is another button</Button>
+			</Tooltip>
+		);
 
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
-
-		err.mockReset();
 	} );
 
 	it( 'should not render the tooltip if there is no focus', () => {
