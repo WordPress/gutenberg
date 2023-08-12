@@ -10,11 +10,10 @@
  *
  * @param array    $attributes The block attributes.
  * @param string   $content    The block rendered content.
- * @param WP_Block $block    The block being rendered.
  *
  * @return string Returns the Media & Text block markup, if useFeaturedImage is true.
  */
-function render_block_core_media_text( $attributes, $content, $block ) {
+function render_block_core_media_text( $attributes, $content ) {
 	if ( false === $attributes['useFeaturedImage'] ) {
 		return $content;
 	}
