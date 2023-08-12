@@ -115,10 +115,7 @@ function useEditorStyles() {
 		} );
 	}
 
-	return useMemo(
-		() => ( hasThemeStyles ? editorSettings.styles : defaultEditorStyles ),
-		[ hasThemeStyles, editorSettings.styles, defaultEditorStyles ]
-	);
+	return hasThemeStyles ? editorSettings.styles : defaultEditorStyles;
 }
 
 function Layout() {
