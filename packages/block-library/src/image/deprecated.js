@@ -310,6 +310,13 @@ const v4 = {
 	supports: {
 		anchor: true,
 	},
+	migrate( { width, height, ...attributes } ) {
+		return {
+			...attributes,
+			width: `${ width }px`,
+			height: `${ height }px`,
+		};
+	},
 	save( { attributes } ) {
 		const {
 			url,
@@ -479,6 +486,13 @@ const v5 = {
 				margin: '0 0 1em 0',
 			},
 		},
+	},
+	migrate( { width, height, ...attributes } ) {
+		return {
+			...attributes,
+			width: `${ width }px`,
+			height: `${ height }px`,
+		};
 	},
 	save( { attributes } ) {
 		const {
@@ -653,6 +667,13 @@ const v6 = {
 				width: true,
 			},
 		},
+	},
+	migrate( { width, height, ...attributes } ) {
+		return {
+			...attributes,
+			width: `${ width }px`,
+			height: `${ height }px`,
+		};
 	},
 	save( { attributes } ) {
 		const {

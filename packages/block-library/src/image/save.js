@@ -49,6 +49,22 @@ export default function save( { attributes } ) {
 		[ `wp-image-${ id }` ]: !! id,
 	} );
 
+	const imgStyle = { aspectRatio, objectFit: scale };
+
+	// Branch by whether width and height both have size.
+	// If the image block is very old and has not been migrated to a string type, the size will be int.
+	// Note that only width may be "auto".
+	if ( ! aspectRatio && height && width && 'auto' !== width ) {
+		const w = parseInt( width );
+		const h = parseInt( height );
+		if ( ! isNaN( w ) && ! isNaN( h ) ) {
+			imgStyle.aspectRatio = `${ w }/${ h }`;
+		}
+	} else {
+		if ( 'string' === typeof width ) imgStyle.width = width;
+		if ( 'string' === typeof height ) imgStyle.height = height;
+	}
+
 	const image = (
 		<img
 			src={ url }
@@ -56,10 +72,7 @@ export default function save( { attributes } ) {
 			className={ imageClasses || undefined }
 			style={ {
 				...borderProps.style,
-				aspectRatio,
-				objectFit: scale,
-				width,
-				height,
+				...imgStyle,
 			} }
 			title={ title }
 		/>
