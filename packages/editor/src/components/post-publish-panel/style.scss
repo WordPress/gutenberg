@@ -152,21 +152,18 @@
 	}
 
 	input[readonly] {
-		padding: 10px;
-		background: $gray-300;
+		padding: $grid-unit-20;
+		background: $gray-100;
+		border-color: $gray-400;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		height: $button-size;
 	}
 }
 
 .post-publish-panel__postpublish-post-address__copy-button-wrap {
 	flex-shrink: 0;
-	margin-left: $grid-unit-10;
-
-	// match copy button height to the address field height
-	.components-button {
-		height: 38px;
-	}
+	margin-left: $grid-unit-20;
 }
 
 .post-publish-panel__postpublish-header {
