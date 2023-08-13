@@ -33,7 +33,11 @@ export class Metrics {
 	}
 
 	/**
-	 * Returns time to first byte (TTFB) from PerformanceObserver.
+	 * Returns time to first byte (TTFB) using the Navigation Timing API.
+	 *
+	 * @see https://web.dev/ttfb/#measure-ttfb-in-javascript
+	 *
+	 * @return {Promise<number>} TTFB value.
 	 */
 	async getTimeToFirstByte() {
 		return this.page.evaluate< number >(
@@ -54,7 +58,12 @@ export class Metrics {
 	}
 
 	/**
-	 * Returns Largest Contentful Paint (LCP) time.
+	 * Returns the Largest Contentful Paint (LCP) value using the dedicated API.
+	 *
+	 * @see https://w3c.github.io/largest-contentful-paint/
+	 * @see https://web.dev/lcp/#measure-lcp-in-javascript
+	 *
+	 * @return {Promise<number>} LCP value.
 	 */
 	async getLargestContentfulPaint() {
 		return this.page.evaluate< number >(
@@ -75,7 +84,12 @@ export class Metrics {
 	}
 
 	/**
-	 * Returns Cumulative Layout Shift (CLS) value.
+	 * Returns the Cumulative Layout Shift (CLS) value using the dedicated API.
+	 *
+	 * @see https://github.com/WICG/layout-instability
+	 * @see https://web.dev/cls/#measure-layout-shifts-in-javascript
+	 *
+	 * @return {Promise<number>} CLS value.
 	 */
 	async getCumulativeLayoutShift() {
 		return this.page.evaluate< number >(
