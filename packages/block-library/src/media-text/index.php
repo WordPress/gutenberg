@@ -8,8 +8,8 @@
 /**
  * Renders the `core/media-text` block on server.
  *
- * @param array    $attributes The block attributes.
- * @param string   $content    The block rendered content.
+ * @param array  $attributes The block attributes.
+ * @param string $content    The block rendered content.
  *
  * @return string Returns the Media & Text block markup, if useFeaturedImage is true.
  */
