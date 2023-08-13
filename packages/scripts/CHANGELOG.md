@@ -4,7 +4,9 @@
 
 ### Bug Fix
 
-- Fix prevent watch mode from aborting when encountering a `block.json` file that contains invalid JSON. ([#51971](https://github.com/WordPress/gutenberg/pull/51971))
+-   Fix prevent watch mode from aborting when encountering a `block.json` file that contains invalid JSON. ([#51971](https://github.com/WordPress/gutenberg/pull/51971))
+
+## 26.10.0 (2023-08-10)
 
 ## 26.9.0 (2023-07-20)
 
