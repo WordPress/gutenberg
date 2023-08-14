@@ -431,7 +431,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should delete blocks using keyboard', async ( {
+	test( 'should duplicate and delete blocks using keyboard', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -474,6 +474,20 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', selected: true, focused: true },
 			] );
 
+		await page.keyboard.press( 'Meta+Shift+d' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Duplicating a block should retain focus and selection on existing block.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{ name: 'core/columns' },
+				{ name: 'core/file', selected: true, focused: true },
+				{ name: 'core/file' },
+			] );
+
 		await page.keyboard.press( 'Delete' );
 		await expect
 			.poll(
@@ -483,6 +497,7 @@ test.describe( 'List View', () => {
 			.toMatchObject( [
 				{ name: 'core/group' },
 				{ name: 'core/columns', selected: true, focused: true },
+				{ name: 'core/file' },
 			] );
 
 		// Expand the current column.
@@ -504,6 +519,7 @@ test.describe( 'List View', () => {
 						{ name: 'core/column', focused: true },
 					],
 				},
+				{ name: 'core/file' },
 			] );
 
 		await page.keyboard.press( 'Delete' );
@@ -525,6 +541,7 @@ test.describe( 'List View', () => {
 						},
 					],
 				},
+				{ name: 'core/file' },
 			] );
 
 		// Expand the current column.
@@ -555,6 +572,7 @@ test.describe( 'List View', () => {
 						},
 					],
 				},
+				{ name: 'core/file' },
 			] );
 
 		// Move focus and select the first block.
@@ -573,14 +591,17 @@ test.describe( 'List View', () => {
 					selected: true,
 					focused: true,
 				},
+				{ name: 'core/file' },
 			] );
 
+		// Delete remaining blocks.
 		// Keyboard shortcut should also work.
+		await pageUtils.pressKeys( 'access+z' );
 		await pageUtils.pressKeys( 'access+z' );
 		await expect
 			.poll(
 				listViewUtils.getBlocksWithA11yAttributes,
-				'Deleting the only block left will create a default block and focus/select it'
+				'Deleting the only blocks left will create a default block and focus/select it'
 			)
 			.toMatchObject( [
 				{
