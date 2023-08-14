@@ -21,6 +21,9 @@
 		}
 	},
 	"supports": {
+		"behaviors": {
+			"showInView": true
+		},
 		"__experimentalOnEnter": true,
 		"__experimentalOnMerge": true,
 		"__experimentalSettings": true,
@@ -82,5 +85,6 @@
 		}
 	},
 	"editorStyle": "wp-block-group-editor",
-	"style": "wp-block-group"
+	"style": "wp-block-group",
+	"viewScript": "file:./view-interactivity.min.js"
 }

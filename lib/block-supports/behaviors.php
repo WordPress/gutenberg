@@ -28,10 +28,14 @@ function gutenberg_register_behaviors_support( $block_type ) {
 	// If it supports the lightbox behavior, add the hook to that block.
 	// In the future, this should be a loop with all the behaviors.
 	$has_lightbox_support = block_has_support( $block_type, array( 'behaviors', 'lightbox' ), false );
+	$has_show_in_view_support = block_has_support( $block_type, array( 'behaviors', 'showInView' ), false );
 	if ( $has_lightbox_support ) {
 		// Use priority 15 to run this hook after other hooks/plugins.
 		// They could use the `render_block_{$this->name}` filter to modify the markup.
 		add_filter( 'render_block_' . $block_type->name, 'gutenberg_render_behaviors_support_lightbox', 15, 2 );
+	}
+	if ( $has_show_in_view_support ) {
+		add_filter( 'render_block_' . $block_type->name, 'gutenberg_render_behaviors_support_show_in_view', 15, 2 );
 	}
 }
 
@@ -192,6 +196,22 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 HTML;
 
 	return str_replace( '</figure>', $lightbox_html . '</figure>', $body_content );
+}
+
+function gutenberg_render_behaviors_support_show_in_view( $block_content, $block ) { 
+	// TODO: Use an object instead of a variable like in the lightbox.
+	if ( ! isset( $block['attrs']['showInView'] ) ) {
+		return $block_content;
+	}
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	$processor->next_tag();
+	$processor->set_attribute( 'data-wp-interactive', true );
+	$processor->set_attribute( 'data-wp-context', '{ "core": { "isVisible": false } }' );
+	$processor->add_class( 'show-in-view-animation' );
+	$processor->set_attribute( 'data-wp-class--hidden-on-first-load', 'context.core.hiddenOnFirstLoad' );
+	$processor->set_attribute( 'data-wp-class--is-visible', 'context.core.isVisible' );
+	$processor->set_attribute( 'data-wp-effect', 'effects.core.showInView' );
+	return $processor->get_updated_html();
 }
 
 // Register the block support.

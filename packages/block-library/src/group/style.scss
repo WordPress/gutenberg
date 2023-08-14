@@ -2,3 +2,24 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 }
+
+.show-in-view-animation.hidden-on-first-load:not(.is-visible) {
+	visibility: hidden;
+}
+
+.show-in-view-animation.hidden-on-first-load.is-visible {
+	animation: show-in-view 0.6s ease-out forwards;
+}
+
+@keyframes show-in-view {
+	0% {
+		opacity: 0;
+		transform: translateY(20vh);
+		visibility: hidden;
+	}
+	100% {
+		opacity: 1;
+		transform: none;
+		visibility: visible;
+	}
+}
