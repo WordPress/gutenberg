@@ -347,6 +347,9 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 	 * @covers ::install_fonts
 	 *
 	 * @dataProvider data_install_with_improper_inputs
+	 *
+	 * @param array $font_families     Font families to install in theme.json format.
+	 * @param array $files             Font files to install.
 	 */
 	public function test_install_with_improper_inputs( $font_families, $files = array() ) {
 		wp_set_current_user( self::$admin_id );
@@ -366,15 +369,15 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 		file_put_contents( $temp_file_path1, 'Mocking file content' );
 
 		return array(
-			'not a font families array'             => array(
+			'not a font families array'       => array(
 				'font_families' => 'This is not an array',
 			),
 
-			'empty array'                           => array(
+			'empty array'                     => array(
 				'font_families' => array(),
 			),
 
-			'without slug'                          => array(
+			'without slug'                    => array(
 				'font_families' => array(
 					array(
 						'fontFamily' => 'Piazzolla',
@@ -383,7 +386,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'with improper font face propety'       => array(
+			'with improper font face propety' => array(
 				'font_families' => array(
 					array(
 						'fontFamily' => 'Piazzolla',
@@ -394,7 +397,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'with empty font face propety'          => array(
+			'with empty font face propety'    => array(
 				'font_families' => array(
 					array(
 						'fontFamily' => 'Piazzolla',
