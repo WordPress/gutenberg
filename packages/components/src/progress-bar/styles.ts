@@ -43,7 +43,10 @@ export const Indicator = styled.div< {
 	top: 0;
 	height: 100%;
 	border-radius: ${ CONFIG.radiusBlockUi };
-	background-color: var( --wp-components-color-accent, ${ COLORS.ui.theme } );
+	background-color: var(
+		--wp-components-color-accent,
+		${ COLORS.theme.accent }
+	);
 
 	${ ( { isIndeterminate, value } ) =>
 		isIndeterminate

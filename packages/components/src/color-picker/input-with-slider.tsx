@@ -42,7 +42,7 @@ export const InputWithSlider = ( {
 					<Spacer
 						as={ Text }
 						paddingLeft={ space( 4 ) }
-						color={ COLORS.ui.theme }
+						color={ COLORS.theme.accent }
 						lineHeight={ 1 }
 					>
 						{ abbreviation }
