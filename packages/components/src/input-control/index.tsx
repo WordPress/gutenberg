@@ -19,6 +19,7 @@ import type { InputControlProps } from './types';
 import { space } from '../ui/utils/space';
 import { useDraft } from './utils';
 import BaseControl from '../base-control';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 const noop = () => {};
 
@@ -30,8 +31,11 @@ function useUniqueId( idProp?: string ) {
 }
 
 export function UnforwardedInputControl(
-	{
-		__next36pxDefaultSize,
+	props: InputControlProps,
+	ref: ForwardedRef< HTMLInputElement >
+) {
+	const {
+		__next40pxDefaultSize,
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
 		className,
@@ -50,10 +54,12 @@ export function UnforwardedInputControl(
 		style,
 		suffix,
 		value,
-		...props
-	}: InputControlProps,
-	ref: ForwardedRef< HTMLInputElement >
-) {
+		...restProps
+	} = useDeprecated36pxDefaultSizeProp< InputControlProps >(
+		props,
+		'wp.components.InputControl'
+	);
+
 	const [ isFocused, setIsFocused ] = useState( false );
 
 	const id = useUniqueId( idProp );
@@ -61,7 +67,7 @@ export function UnforwardedInputControl(
 
 	const draftHookProps = useDraft( {
 		value,
-		onBlur: props.onBlur,
+		onBlur: restProps.onBlur,
 		onChange,
 	} );
 
@@ -78,7 +84,7 @@ export function UnforwardedInputControl(
 			__nextHasNoMarginBottom
 		>
 			<InputBase
-				__next36pxDefaultSize={ __next36pxDefaultSize }
+				__next40pxDefaultSize={ __next40pxDefaultSize }
 				__unstableInputWidth={ __unstableInputWidth }
 				disabled={ disabled }
 				gap={ 3 }
@@ -94,9 +100,9 @@ export function UnforwardedInputControl(
 				suffix={ suffix }
 			>
 				<InputField
-					{ ...props }
+					{ ...restProps }
 					{ ...helpProp }
-					__next36pxDefaultSize={ __next36pxDefaultSize }
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					className="components-input-control__input"
 					disabled={ disabled }
 					id={ id }

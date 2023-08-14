@@ -24,11 +24,15 @@ import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 const noop = () => {};
 
 function InputField(
-	{
+	props: WordPressComponentProps< InputFieldProps, 'input', false >,
+	ref: ForwardedRef< HTMLInputElement >
+) {
+	const {
 		disabled = false,
 		dragDirection = 'n',
 		dragThreshold = 10,
@@ -49,10 +53,9 @@ function InputField(
 		stateReducer = ( state: any ) => state,
 		value: valueProp,
 		type,
-		...props
-	}: WordPressComponentProps< InputFieldProps, 'input', false >,
-	ref: ForwardedRef< HTMLInputElement >
-) {
+		...restProps
+	} = useDeprecated36pxDefaultSizeProp( props, 'wp.components.InputField' );
+
 	const {
 		// State.
 		state,
@@ -200,7 +203,7 @@ function InputField(
 	let handleOnMouseDown;
 	if ( type === 'number' ) {
 		handleOnMouseDown = ( event: MouseEvent< HTMLInputElement > ) => {
-			props.onMouseDown?.( event );
+			restProps.onMouseDown?.( event );
 			if (
 				event.currentTarget !==
 				event.currentTarget.ownerDocument.activeElement
@@ -212,7 +215,7 @@ function InputField(
 
 	return (
 		<Input
-			{ ...props }
+			{ ...restProps }
 			{ ...dragProps }
 			className="components-input-control__input"
 			disabled={ disabled }
