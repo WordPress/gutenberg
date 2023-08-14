@@ -40,6 +40,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
           class="components-circular-option-picker__option-wrapper"
         >
           <button
+            aria-describedby="tooltip-15"
             aria-label="Color: red"
             aria-pressed="true"
             class="components-button components-circular-option-picker__option is-pressed"
@@ -64,6 +65,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
           class="components-circular-option-picker__option-wrapper"
         >
           <button
+            aria-describedby="tooltip-16"
             aria-label="Color: green"
             aria-pressed="false"
             class="components-button components-circular-option-picker__option"
@@ -75,6 +77,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
           class="components-circular-option-picker__option-wrapper"
         >
           <button
+            aria-describedby="tooltip-17"
             aria-label="Color: blue"
             aria-pressed="false"
             class="components-button components-circular-option-picker__option"
@@ -229,6 +232,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           class="components-circular-option-picker__option-wrapper"
         >
           <button
+            aria-describedby="tooltip-0"
             aria-label="Color: red"
             aria-pressed="true"
             class="components-button components-circular-option-picker__option is-pressed"
@@ -253,6 +257,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           class="components-circular-option-picker__option-wrapper"
         >
           <button
+            aria-describedby="tooltip-1"
             aria-label="Color: green"
             aria-pressed="false"
             class="components-button components-circular-option-picker__option"
@@ -264,6 +269,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           class="components-circular-option-picker__option-wrapper"
         >
           <button
+            aria-describedby="tooltip-2"
             aria-label="Color: blue"
             aria-pressed="false"
             class="components-button components-circular-option-picker__option"
