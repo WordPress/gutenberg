@@ -156,7 +156,7 @@ async function runPerformanceTests( branches, options ) {
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
 		[
-			'bash -c "source $HOME/.nvm/nvm.sh',
+			'bash -c "source $HOME/.nvm/nvm.sh"',
 			'nvm install',
 			'npm ci',
 			'npx playwright install chromium --with-deps',
