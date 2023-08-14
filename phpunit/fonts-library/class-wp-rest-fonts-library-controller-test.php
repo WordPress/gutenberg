@@ -354,8 +354,6 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 		$font_families_json = json_encode( $font_families );
 		$install_request->set_param( 'fontFamilies', $font_families_json );
 		$response = rest_get_server()->dispatch( $install_request );
-		$data     = $response->get_data();
-
 		$this->assertEquals( 400, $response->get_status(), 'Response status is not 400 when font face has both donwload_from_url and uploaded_file properties.' );
 	}
 
