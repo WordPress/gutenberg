@@ -340,4 +340,141 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Tests failure when fonfaces has improper inputs
+	 *
+	 * @covers ::install_fonts
+	 *
+	 * @dataProvider data_install_with_improper_inputs
+	 *
+	 * @param array $font_families Font families to install in theme.json format.
+	 * @param array $files         Font files to install.
+	 */
+	public function test_install_with_improper_inputs( $font_families, $files = array() ) {
+		wp_set_current_user( self::$admin_id );
+
+		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
+		$font_families_json = json_encode( $font_families );
+		$install_request->set_param( 'fontFamilies', $font_families_json );
+		$install_request->set_file_params( $files );
+
+		$response = rest_get_server()->dispatch( $install_request );
+		$this->assertSame( 400, $response->get_status() );
+	}
+
+	/**
+	 * Data provider for test_install_with_improper_inputs
+	 */
+	public function data_install_with_improper_inputs() {
+		$temp_file_path1 = wp_tempnam( 'Piazzola1-' );
+		file_put_contents( $temp_file_path1, 'Mocking file content' );
+
+		return array(
+			'not a font families array'        => array(
+				'font_families' => 'This is not an array',
+			),
+
+			'empty array'                      => array(
+				'font_families' => array(),
+			),
+
+			'without slug'                     => array(
+				'font_families' => array(
+					array(
+						'fontFamily' => 'Piazzolla',
+						'name'       => 'Piazzolla',
+					),
+				),
+			),
+
+			'with improper font face property' => array(
+				'font_families' => array(
+					array(
+						'fontFamily' => 'Piazzolla',
+						'name'       => 'Piazzolla',
+						'slug'       => 'piazzolla',
+						'fontFace'   => 'This is not an array',
+					),
+				),
+			),
+
+			'with empty font face property'    => array(
+				'font_families' => array(
+					array(
+						'fontFamily' => 'Piazzolla',
+						'name'       => 'Piazzolla',
+						'slug'       => 'piazzolla',
+						'fontFace'   => array(),
+					),
+				),
+			),
+
+			'fontface referencing uploaded file without uploaded files' => array(
+				'font_families' => array(
+					array(
+						'fontFamily' => 'Piazzolla',
+						'name'       => 'Piazzolla',
+						'slug'       => 'piazzolla',
+						'fontFace'   => array(
+							array(
+								'fontFamily'    => 'Piazzolla',
+								'fontStyle'     => 'normal',
+								'fontWeight'    => '400',
+								'uploaded_file' => 'files0',
+							),
+						),
+					),
+				),
+				'files'         => array(),
+			),
+
+			'fontface referencing uploaded file without uploaded files' => array(
+				'font_families' => array(
+					array(
+						'fontFamily' => 'Piazzolla',
+						'name'       => 'Piazzolla',
+						'slug'       => 'piazzolla',
+						'fontFace'   => array(
+							array(
+								'fontFamily'    => 'Piazzolla',
+								'fontStyle'     => 'normal',
+								'fontWeight'    => '400',
+								'uploaded_file' => 'files666',
+							),
+						),
+					),
+				),
+				'files'         => array(
+					'files0' => array(
+						'name'     => 'piazzola1.ttf',
+						'type'     => 'font/ttf',
+						'tmp_name' => $temp_file_path1,
+						'error'    => 0,
+						'size'     => 123,
+					),
+				),
+			),
+
+			'fontface with incompatible properties (download_from_url and uploaded_file together)' => array(
+				'font_families' => array(
+					array(
+						'fontFamily' => 'Piazzolla',
+						'slug'       => 'piazzolla',
+						'name'       => 'Piazzolla',
+						'fontFace'   => array(
+							array(
+								'fontFamily'        => 'Piazzolla',
+								'fontStyle'         => 'normal',
+								'fontWeight'        => '400',
+								'src'               => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+								'download_from_url' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+								'uploaded_file'     => 'files0',
+							),
+						),
+					),
+				),
+			),
+		);
+	}
 }

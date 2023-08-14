@@ -114,6 +114,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 						__( 'Font family [%s] should have fontFace property defined as an array.', 'gutenberg' ),
 						$family_index
 					);
+					continue;
 				}
 
 				if ( count( $font_family['fontFace'] ) < 1 ) {
@@ -137,7 +138,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 							);
 						}
 
-						if ( isset( $font_face['download_from_url'] ) && isset( $font_face['uplodaded_file'] ) ) {
+						if ( isset( $font_face['download_from_url'] ) && isset( $font_face['uploaded_file'] ) ) {
 							$error_messages[] = sprintf(
 								// translators: 1: font family index, 2: font face index.
 								__( 'Font family [%1$s] Font face [%2$s] should have only one of the download_from_url or uploaded_file properties defined and not both.', 'gutenberg' ),
