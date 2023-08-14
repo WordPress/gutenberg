@@ -200,6 +200,10 @@ beforeEach( () => {
 		MOCK_EMBED_PHOTO_SUCCESS_RESPONSE,
 		MOCK_BAD_EMBED_PROVIDER_RESPONSE,
 	] );
+
+	// Intentionally suppress the expected console logs to reduce noise in the
+	// test output.
+	jest.spyOn( console, 'log' ).mockImplementation( () => {} );
 } );
 
 afterAll( () => {
