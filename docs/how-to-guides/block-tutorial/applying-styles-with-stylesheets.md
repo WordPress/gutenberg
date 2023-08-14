@@ -113,6 +113,10 @@ For example the block name: `gutenberg-examples/example-02-stylesheets` would ge
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
 
+// import the stylesheets
+import './style.css';
+import './editor.css';
+
 registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 	edit() {
 		const blockProps = useBlockProps();
@@ -168,6 +172,7 @@ In order to include the blockEditor as a dependency, make sure to run the build 
 {% JSX %}
 
 Build the scripts and update the asset file which is used to keep track of dependencies and the build version.
+
 ```bash
 npm run build
 ```
@@ -199,7 +204,7 @@ Use the `editorStyle` property to a CSS file you want to load in the editor view
 
 It is worth noting that, if the editor content is iframed, both of these will
 load in the iframe. `editorStyle` will also load outside the iframe, so it can
-be used for editor content as well as UI. 
+be used for editor content as well as UI.
 
 For example:
 
