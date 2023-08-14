@@ -23,8 +23,6 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { useNotifyCopy } from '../copy-handler';
-import usePasteStyles from '../use-paste-styles';
 
 export const useTransformCommands = () => {
 	const { clientIds } = useSelect( ( select ) => {
@@ -135,14 +133,6 @@ const useActionsCommands = () => {
 	const blocks = getBlocksByClientId( clientIds );
 	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 
-	const canCopyStyles = blocks.every( ( block ) => {
-		return (
-			!! block &&
-			( hasBlockSupport( block.name, 'color' ) ||
-				hasBlockSupport( block.name, 'typography' ) )
-		);
-	} );
-
 	const canDuplicate = blocks.every( ( block ) => {
 		return (
 			!! block &&
@@ -165,14 +155,10 @@ const useActionsCommands = () => {
 		duplicateBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		flashBlock,
 		setBlockMovingClientId,
 		setNavigationMode,
 		selectBlock,
 	} = useDispatch( blockEditorStore );
-
-	const notifyCopy = useNotifyCopy();
-	const pasteStyles = usePasteStyles();
 
 	const onDuplicate = () => {
 		if ( ! canDuplicate ) {
@@ -238,29 +224,12 @@ const useActionsCommands = () => {
 
 		replaceBlocks( clientIds, innerBlocks );
 	};
-	const onCopy = () => {
-		const selectedBlockClientIds = blocks.map(
-			( { clientId } ) => clientId
-		);
-		if ( blocks.length === 1 ) {
-			flashBlock( selectedBlockClientIds[ 0 ] );
-		}
-		notifyCopy( 'copy', selectedBlockClientIds );
-	};
-	const onPasteStyles = async () => {
-		if ( ! canCopyStyles ) {
-			return;
-		}
-		await pasteStyles( blocks );
-	};
 
 	if ( ! clientIds || clientIds.length < 1 ) {
 		return { isLoading: false, commands: [] };
 	}
 
 	const icons = {
-		paste: copy,
-		copy,
 		ungroup,
 		group,
 		move,
@@ -270,8 +239,6 @@ const useActionsCommands = () => {
 	};
 
 	const commands = [
-		onPasteStyles,
-		onCopy,
 		onUngroup,
 		onGroup,
 		onMoveTo,
