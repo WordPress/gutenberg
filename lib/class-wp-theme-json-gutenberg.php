@@ -1772,7 +1772,7 @@ class WP_Theme_JSON_Gutenberg {
 	protected static function compute_preset_vars( $settings, $origins ) {
 		$declarations = array();
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
-			if ( ! isset( $preset_metadata['css_vars'] ) ) {
+			if ( empty( $preset_metadata['css_vars'] ) ) {
 				continue;
 			}
 
