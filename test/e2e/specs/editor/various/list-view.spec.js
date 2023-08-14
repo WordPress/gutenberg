@@ -474,7 +474,7 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', selected: true, focused: true },
 			] );
 
-		await page.keyboard.press( 'Meta+Shift+d' );
+		await pageUtils.pressKeys( 'primaryShift+d' );
 
 		await expect
 			.poll(
