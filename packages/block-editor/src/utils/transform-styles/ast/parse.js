@@ -610,7 +610,17 @@ export default function ( css, options ) {
 	 * Parse import
 	 */
 
-	const atimport = _compileAtrule( 'import' );
+	const atimport = function () {
+		const re = new RegExp( '^@import\\s*(url\\(.*?\\)|[^;]+);' );
+		const pos = position();
+		const m = match( re );
+		if ( ! m ) {
+			return;
+		}
+		const ret = { type: 'import' };
+		ret.import = m[ 1 ].trim();
+		return pos( ret );
+	};
 
 	/**
 	 * Parse charset
