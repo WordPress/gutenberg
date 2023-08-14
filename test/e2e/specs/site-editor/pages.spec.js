@@ -90,7 +90,7 @@ test.describe( 'Pages', () => {
 			.click();
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Post Content',
+				name: 'Block: Content',
 			} )
 		).toContainText(
 			'This is the Post Content block, it will display all the blocks in any single post or page.'

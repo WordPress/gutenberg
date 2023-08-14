@@ -170,7 +170,7 @@ test.describe( 'Site Editor Performance', () => {
 
 		// Insert a new paragraph right under the first one.
 		await canvas
-			.getByRole( 'document', { name: 'Block: Post Content' } )
+			.getByRole( 'document', { name: 'Block: Content' } )
 			.click();
 		await firstParagraph.click();
 		await pageUtils.pressKeys( 'primary+a' );
