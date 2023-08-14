@@ -9,15 +9,8 @@ import { useSelect } from '@wordpress/data';
 import { store as editSiteStore } from '../../store';
 import DefaultBlockEditor from './providers/default-block-editor-provider';
 import NavigationBlockEditor from './providers/navigation-block-editor-provider';
-import ContentBlockEditorProvider from './providers/content-block-editor-provider';
 
-/**
- * Factory to isolate choosing the appropriate block editor
- * component to handle a given entity type.
- *
- * @return {JSX.Element} the block editor component to use.
- */
-export default function useBlockEditorProvider() {
+export default function BlockEditorProvider( { children } ) {
 	const { entityType, pageContentFocusMode } = useSelect(
 		( select ) => ( {
 			entityType: select( editSiteStore ).getEditedPostType(),
@@ -27,14 +20,17 @@ export default function useBlockEditorProvider() {
 		[]
 	);
 
-	switch ( entityType ) {
-		case 'wp_navigation':
-			return NavigationBlockEditor;
-		case 'wp_template':
-		case 'wp_template_part':
-		default:
-			return pageContentFocusMode === 'withoutTemplate'
-				? ContentBlockEditorProvider
-				: DefaultBlockEditor;
+	if ( entityType === 'wp_navigation' ) {
+		return <NavigationBlockEditor>{ children }</NavigationBlockEditor>;
+	}
+
+	if ( entityType === 'wp_template' || entityType === 'wp_template_part' ) {
+		return (
+			<DefaultBlockEditor
+				contentOnly={ pageContentFocusMode === 'withoutTemplate' }
+			>
+				{ children }
+			</DefaultBlockEditor>
+		);
 	}
 }
