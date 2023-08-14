@@ -14,6 +14,14 @@
 		"dimensions": {
 			"minHeight": true
 		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": false,
+				"text": false
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

@@ -55,13 +55,8 @@ export default () => {
 	);
 
 	// data-wp-body
-	directive( 'body', ( { props: { children }, context: inherited } ) => {
-		const { Provider } = inherited;
-		const inheritedValue = useContext( inherited );
-		return createPortal(
-			<Provider value={ inheritedValue }>{ children }</Provider>,
-			document.body
-		);
+	directive( 'body', ( { props: { children } } ) => {
+		return createPortal( children, document.body );
 	} );
 
 	// data-wp-effect--[name]

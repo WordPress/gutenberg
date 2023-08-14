@@ -11,11 +11,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect, useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks';
 import BaseControl from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';

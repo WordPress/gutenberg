@@ -94,7 +94,7 @@
 		max-height: 368px; // Specific to not have commands overflow oddly.
 		overflow: auto;
 
-		& > [cmdk-list-sizer]:not(:empty) {
+		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
 			padding: 0 $grid-unit $grid-unit;
 		}
 	}
@@ -103,9 +103,9 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		height: $grid-unit-80;
 		white-space: pre-wrap;
 		color: $gray-900;
+		padding: $grid-unit-10 0 $grid-unit-40;
 	}
 
 	[cmdk-loading] {

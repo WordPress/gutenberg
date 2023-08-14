@@ -238,7 +238,8 @@ export function getCommentAttributes( blockType, attributes ) {
 			// Ignore default value.
 			if (
 				'default' in attributeSchema &&
-				attributeSchema.default === value
+				JSON.stringify( attributeSchema.default ) ===
+					JSON.stringify( value )
 			) {
 				return accumulator;
 			}

@@ -608,6 +608,10 @@ test.describe( 'Multi-block selection', () => {
 		await page.mouse.click( coord1.x, coord1.y );
 		await page.mouse.down();
 		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
+		// Simulate moving once in and out of the paragraph.
+		// Fixes https://github.com/WordPress/gutenberg/issues/48747.
+		await page.mouse.move( coord1.x, coord1.y, { steps: 10 } );
+		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
 		await page.mouse.up();
 
 		// Wait for:
@@ -1175,7 +1179,7 @@ test.describe( 'Multi-block selection', () => {
 		] );
 	} );
 
-	test( 'should partially select with shift + click', async ( {
+	test( 'should partially select with shift + click (@webkit)', async ( {
 		page,
 		editor,
 	} ) => {
@@ -1205,11 +1209,15 @@ test.describe( 'Multi-block selection', () => {
 			.getByRole( 'region', { name: 'Editor content' } )
 			.getByText( '1', { exact: true } );
 		const strongBox = await strongText.boundingBox();
-		await strongText.click( {
-			// Ensure clicking on the right half of the element.
-			position: { x: strongBox.width, y: strongBox.height / 2 },
-			modifiers: [ 'Shift' ],
-		} );
+		// Focus and move the caret to the end.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Paragraph block' } )
+			.filter( { hasText: '1[' } )
+			.click( {
+				// Ensure clicking on the right half of the element.
+				position: { x: strongBox.width - 1, y: strongBox.height / 2 },
+				modifiers: [ 'Shift' ],
+			} );
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure selection is in the correct place.
