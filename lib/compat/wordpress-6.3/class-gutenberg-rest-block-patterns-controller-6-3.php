@@ -15,6 +15,14 @@
  */
 class Gutenberg_REST_Block_Patterns_Controller_6_3 extends WP_REST_Block_Patterns_Controller {
 	/**
+	 * Defines whether remote patterns should be loaded.
+	 *
+	 * @since 6.0.0
+	 * @var bool
+	 */
+	private $remote_patterns_loaded;
+
+	/**
 	 * Prepare a raw block pattern before it gets output in a REST API response.
 	 *
 	 * @since 6.0.0
