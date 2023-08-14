@@ -58,7 +58,7 @@ function wp_get_something_useful() {
 
 Plugin code that is stable and expected to be merged "as-is" into Core in the near future can use the `wp_` prefix for functions or a `WP_` prefix for classes.
 
-The caveat is that no functions or classes with the same names already exist in Core. A quick codebase search will also help you know if your new names are unique.
+When doing so, care must be taken to ensure that no duplicate declarations to create functions or classes exist between Gutenberg and WordPress core code. A quick codebase search will also help you know if your new names are unique.
 
 Wrapping such code in `class_exists()` and `function_exists()` checks should be used to ensure it executes in the plugin up until it is merged to Core, or when running the plugin on older versions of WordPress.
 
