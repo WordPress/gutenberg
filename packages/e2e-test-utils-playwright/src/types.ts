@@ -4,12 +4,17 @@ declare global {
 		wp: any;
 	}
 
+	// Experimental API that is subject to change.
+	// See https://developer.mozilla.org/en-US/docs/Web/API/LayoutShiftAttribution
 	interface LayoutShiftAttribution {
 		readonly node: Node;
 		readonly previousRect: DOMRectReadOnly;
 		readonly currentRect: DOMRectReadOnly;
 		readonly toJSON: () => string;
 	}
+
+	// Experimental API that is subject to change.
+	// See https://developer.mozilla.org/en-US/docs/Web/API/LayoutShift
 	interface LayoutShift extends PerformanceEntry {
 		readonly duration: number;
 		readonly entryType: 'layout-shift';
