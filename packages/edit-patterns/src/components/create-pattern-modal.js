@@ -24,7 +24,7 @@ export const SYNC_TYPES = {
 /**
  * Internal dependencies
  */
-import { store } from '../../store';
+import { store } from '../store';
 
 export default function CreatePatternModal( {
 	onSuccess,

@@ -11,6 +11,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/edit-patterns';
 
 /**
  * Internal dependencies
@@ -19,9 +20,9 @@ import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
-import PatternsMenuItems from '../create-pattern';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 export const ExperimentalEditorProvider = withRegistryProvider(
 	( {

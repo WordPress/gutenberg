@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { plus, symbol, symbolFilled } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/edit-patterns';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 const { useHistory } = unlock( routerPrivateApis );
-const { CreatePatternModal } = unlock( editorPrivateApis );
+const { CreatePatternModal } = unlock( editPatternsPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();

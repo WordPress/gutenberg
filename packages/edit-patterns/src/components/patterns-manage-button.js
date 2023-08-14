@@ -15,7 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
+import { store as editorStore } from '../store';
 
 function PatternsManageButton( { clientId } ) {
 	const { canRemove, isVisible, innerBlockCount, managePatternsUrl } =
