@@ -1,0 +1,105 @@
+.font-library-modal {
+    .components-modal__header {
+        border-bottom: none;
+    }
+}
+
+.font-library-modal__tab-layout{
+
+    main {
+        padding-bottom: 4rem;
+    }
+
+    footer{
+        border-top: 1px solid #e5e5e5;
+        margin: 0 -32px -32px;
+        padding: 16px 32px;
+        position: absolute;
+        bottom: 32px;
+        width: 100%;
+        background-color: #fff;
+    }
+
+}
+
+.font-library-modal__fonts-grid {
+    .font-library-modal__fonts-grid__subtitle {
+        text-transform: uppercase;
+        font-weight: 500;
+        font-size: 11px;
+    }
+
+    .font-library-modal__fonts-grid__main  {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(100px, 1fr));
+        gap: 4px * 4;
+    }
+}
+
+.font-library-modal__font-card {
+    overflow-wrap: break-word;
+    & > div {
+        height: 100%;
+    }
+
+    .font-library-modal__font-card__name {
+        font-weight: bold;
+    }
+
+    .font-library-modal__font-card__count {
+        color: #6e6e6e;
+    }
+}
+
+.font-library-modal__font-variant {
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 1rem;
+}
+
+.font-library-modal__tab-panel {
+    [role="tablist"] {
+        position: sticky;
+        top: 0;
+        width: calc(100% + 64px);
+        border-bottom: 1px solid #e6e6e6;
+        background: #fff;
+        margin: 0 -32px;
+        padding: 0 16px;
+        z-index: 1;
+    }
+}
+
+.font-library-modal__upload-area {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    min-height: calc(100vh - 360px);
+    width: 100%;
+    border: 1px dashed #e5e5e5;
+    border-radius: 8px;
+}
+
+.font-library-modal__font-name {
+    font-weight: bold;
+}
+
+.font-library-modal__font-filename {
+    color: #6e6e6e;
+}
+
+.font-library-modal__font-variant_demo-wrapper {
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+
+    &:after{
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 30vw;
+        height: 100%;
+        background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,1));
+    }
+}
