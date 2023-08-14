@@ -31,6 +31,22 @@ const PatternEdit = ( { attributes, clientId } ) => {
 
 	function injectThemeAttributeInBlockTemplateContent( block ) {
 		if (
+			block.innerBlocks.find(
+				( innerBlock ) => innerBlock.name === 'core/template-part'
+			)
+		) {
+			block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
+				if (
+					innerBlock.name === 'core/template-part' &&
+					innerBlock.attributes.theme === undefined
+				) {
+					innerBlock.attributes.theme = currentThemeStylesheet;
+				}
+				return innerBlock;
+			} );
+		}
+
+		if (
 			block.name === 'core/template-part' &&
 			block.attributes.theme === undefined
 		) {
