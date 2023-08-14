@@ -198,7 +198,6 @@ function flattenTree( input = {}, prefix, token ) {
  *
  * @param {string} styleVariationSelector The style variation selector.
  * @return {string} Combined selector string.
- *
  */
 function concatFeatureVariationSelectorString(
 	featureSelector,

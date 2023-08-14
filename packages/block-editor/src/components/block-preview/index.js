@@ -106,7 +106,6 @@ export default memo( BlockPreview );
  * @param {Object}    options.props  Optional. Props to pass to the element. Must contain
  *                                   the ref if one is defined.
  * @param {Object}    options.layout Layout settings to be used in the preview.
- *
  */
 export function useBlockPreview( { blocks, props = {}, layout } ) {
 	const originalSettings = useSelect(
