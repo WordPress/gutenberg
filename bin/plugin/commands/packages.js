@@ -372,16 +372,6 @@ async function publishPackagesToNpm( {
 	minimumVersionBump,
 	releaseType,
 } ) {
-	const { stdout: nodeVersion } = await command( 'node -v', {
-		cwd: gitWorkingDirectoryPath,
-	} );
-	log( `>> Current node version: ${ nodeVersion }.` );
-
-	const { stdout: npmVersion } = await command( 'npm -v', {
-		cwd: gitWorkingDirectoryPath,
-	} );
-	log( `>> Current node version: ${ npmVersion }.` );
-
 	log( '>> Installing npm packages.' );
 	await command( 'npm ci', {
 		cwd: gitWorkingDirectoryPath,
