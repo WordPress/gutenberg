@@ -69,6 +69,7 @@
 		padding: $grid-unit;
 		color: $gray-900;
 		font-size: $default-font-size;
+		min-height: $button-size-next-default-40px;
 
 		&[aria-selected="true"],
 		&:active {
@@ -87,6 +88,10 @@
 
 		svg {
 			fill: $gray-900;
+		}
+
+		> .with-no-icon {
+			padding-left: $grid-unit-40; // Align text, even without icons.
 		}
 	}
 
