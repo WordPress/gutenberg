@@ -4,7 +4,7 @@
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { trash, backup, help, styles, external } from '@wordpress/icons';
+import { trash, backup, help, styles, external, brush } from '@wordpress/icons';
 import { useCommandLoader, useCommand } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -218,8 +218,8 @@ function useGlobalStylesOpenCssCommands() {
 		return [
 			{
 				name: 'core/edit-site/open-styles-css',
-				label: __( 'Open CSS' ),
-				icon: styles,
+				label: __( 'Customize CSS' ),
+				icon: brush,
 				callback: ( { close } ) => {
 					close();
 					if ( ! isEditorPage ) {
@@ -272,7 +272,7 @@ function useGlobalStylesOpenRevisionsCommands() {
 		return [
 			{
 				name: 'core/edit-site/open-global-styles-revisions',
-				label: __( 'Open styles revisions' ),
+				label: __( 'Style revisions' ),
 				icon: backup,
 				callback: ( { close } ) => {
 					close();
