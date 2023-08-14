@@ -849,6 +849,31 @@ _Returns_
 
 This hook is used to lightly mark an element as a block element. The element should be the outermost element of a block. Call this hook and pass the returned props to the element to mark as a block. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
 
+Use of this hook on the outermost element of a block is required if using API >= v2.
+
+_Usage_
+
+```js
+import { useBlockProps } from '@wordpress/block-editor';
+
+export default function Edit() {
+
+  const blockProps = useBlockProps(
+    className: 'my-custom-class',
+    style: {
+      color: '#222222',
+      backgroundColor: '#eeeeee'
+    }
+  )
+
+  return (
+    <div { ...blockProps }>
+
+    </div>
+  )
+}
+```
+
 _Parameters_
 
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
