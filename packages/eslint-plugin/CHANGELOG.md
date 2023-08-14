@@ -6,6 +6,8 @@
 
 -   Support Typescript 5 and 5.1 by updating both `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` to version `^5.62.0`. ([#52621](https://github.com/WordPress/gutenberg/pull/52621)).
 
+## 14.12.0 (2023-08-10)
+
 ## 14.11.0 (2023-07-20)
 
 ## 14.10.0 (2023-07-05)

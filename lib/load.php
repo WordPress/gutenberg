@@ -28,7 +28,7 @@ function gutenberg_is_experiment_enabled( $name ) {
 	return ! empty( $experiments[ $name ] );
 }
 
-// These files only need to be loaded if within a rest server instance
+// These files only need to be loaded if within a rest server instance.
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
@@ -118,12 +118,16 @@ require __DIR__ . '/compat/wordpress-6.3/navigation-fallback.php';
 require __DIR__ . '/compat/wordpress-6.3/block-editor-settings.php';
 require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
+// WordPress 6.4 compat.
+require __DIR__ . '/compat/wordpress-6.4/blocks.php';
+
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
+require __DIR__ . '/experimental/synchronization.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
@@ -153,7 +157,14 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
  * the Font Face (redesigned Fonts API) to be merged before the Fonts Library while
  * keeping Fonts API available for sites that are using it.
  */
-if ( class_exists( 'WP_Fonts_Library' ) || class_exists( 'WP_Fonts_Library_Controller' ) ) {
+if ( defined( 'FONTS_LIBRARY_ENABLE' ) && FONTS_LIBRARY_ENABLE ) {
+	// Loads the Fonts Library.
+	require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
+	require __DIR__ . '/experimental/fonts-library/class-wp-font-family-utils.php';
+	require __DIR__ . '/experimental/fonts-library/class-wp-font-family.php';
+	require __DIR__ . '/experimental/fonts-library/class-wp-rest-fonts-library-controller.php';
+	require __DIR__ . '/experimental/fonts-library/fonts-library.php';
+
 	if ( ! class_exists( 'WP_Font_Face' ) ) {
 		require __DIR__ . '/experimental/fonts/class-wp-font-face.php';
 		require __DIR__ . '/experimental/fonts/class-wp-font-face-resolver.php';

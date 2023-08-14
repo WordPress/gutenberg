@@ -21,6 +21,7 @@
 		state: {
 			isOpen: true,
 			isElementInTheDOM: false,
+			counter: 0,
 		},
 		selectors: {
 			elementInTheDOM: ( { state } ) =>
@@ -31,6 +32,9 @@
 		actions: {
 			toggle( { state } ) {
 				state.isOpen = ! state.isOpen;
+			},
+			increment( { state } ) {
+				state.counter = state.counter + 1;
 			},
 		},
 		effects: {
@@ -46,6 +50,9 @@
 					document.querySelector( "[data-testid='input']" ).focus();
 				}
 			},
+			infiniteLoop: ({ state }) => {
+				state.counter = state.counter + 1;
+			}
 		},
 	} );
 

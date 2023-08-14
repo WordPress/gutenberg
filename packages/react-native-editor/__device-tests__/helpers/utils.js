@@ -41,6 +41,9 @@ const backspace = '\u0008';
 // $block-edge-to-content value
 const blockEdgeToContent = 16;
 
+const IOS_BUNDLE_ID = 'org.wordpress.gutenberg.development';
+const ANDROID_COMPONENT_NAME = 'com.gutenberg/.MainActivity';
+
 const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
@@ -750,6 +753,30 @@ const clearClipboard = async ( driver, contentType = 'plaintext' ) => {
 	await driver.setClipboard( '', contentType );
 };
 
+const launchApp = async ( driver, initialProps = {} ) => {
+	if ( isAndroid() ) {
+		await driver.execute( 'mobile: startActivity', {
+			component: ANDROID_COMPONENT_NAME,
+			stop: true,
+			extras: [
+				[
+					's',
+					'initialProps',
+					`'${ JSON.stringify( initialProps ) }'`,
+				],
+			],
+		} );
+	} else {
+		await driver.execute( 'mobile: terminateApp', {
+			bundleId: IOS_BUNDLE_ID,
+		} );
+		await driver.execute( 'mobile: launchApp', {
+			bundleId: IOS_BUNDLE_ID,
+			arguments: [ 'uitesting', JSON.stringify( initialProps ) ],
+		} );
+	}
+};
+
 module.exports = {
 	backspace,
 	clearClipboard,
@@ -763,10 +790,11 @@ module.exports = {
 	isEditorVisible,
 	isElementVisible,
 	isLocalEnvironment,
+	launchApp,
 	longPressMiddleOfElement,
+	selectTextFromElement,
 	setClipboard,
 	setupDriver,
-	selectTextFromElement,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,
