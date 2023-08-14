@@ -9,6 +9,7 @@ import {
 	MenuItem,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -26,28 +27,37 @@ const POPOVER_PROPS = {
 };
 
 export default function EditTemplate() {
-	const { hasResolved, template } = useSelect( ( select ) => {
-		const { getEditedPostContext, getEditedPostType, getEditedPostId } =
-			select( editSiteStore );
-		const { getEditedEntityRecord, hasFinishedResolution } =
-			select( coreStore );
-		const _context = getEditedPostContext();
-		const queryArgs = [
-			'postType',
-			getEditedPostType(),
-			getEditedPostId(),
-		];
-		return {
-			context: _context,
-			hasResolved: hasFinishedResolution(
-				'getEditedEntityRecord',
-				queryArgs
-			),
-			template: getEditedEntityRecord( ...queryArgs ),
-		};
-	}, [] );
+	const { hasResolved, template, pageContentFocusType } = useSelect(
+		( select ) => {
+			const {
+				getEditedPostContext,
+				getEditedPostType,
+				getEditedPostId,
+				getPageContentFocusType,
+			} = select( editSiteStore );
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const _context = getEditedPostContext();
+			const queryArgs = [
+				'postType',
+				getEditedPostType(),
+				getEditedPostId(),
+			];
+			return {
+				context: _context,
+				hasResolved: hasFinishedResolution(
+					'getEditedEntityRecord',
+					queryArgs
+				),
+				template: getEditedEntityRecord( ...queryArgs ),
+				pageContentFocusType: getPageContentFocusType(),
+			};
+		},
+		[]
+	);
 
-	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+	const { setHasPageContentFocus, setPageContentFocusType } =
+		useDispatch( editSiteStore );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -83,6 +93,20 @@ export default function EditTemplate() {
 							<SwapTemplateButton onClick={ onClose } />
 						</MenuGroup>
 						<ResetDefaultTemplate onClick={ onClose } />
+						<MenuItem
+							onClick={ () => {
+								setPageContentFocusType(
+									pageContentFocusType === 'disableTemplate'
+										? 'hideTemplate'
+										: 'disableTemplate'
+								);
+								onClose();
+							} }
+						>
+							{ pageContentFocusType === 'disableTemplate'
+								? __( 'Hide template' )
+								: __( 'Show template' ) }
+						</MenuItem>
 					</>
 				) }
 			</DropdownMenu>
