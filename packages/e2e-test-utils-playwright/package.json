@@ -40,8 +40,7 @@
 		"mime": "^3.0.0"
 	},
 	"peerDependencies": {
-		"@playwright/test": ">=1",
-		"playwright": ">=1"
+		"@playwright/test": ">=1"
 	},
 	"publishConfig": {
 		"access": "public"

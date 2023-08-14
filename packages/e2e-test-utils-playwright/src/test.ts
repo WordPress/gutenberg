@@ -2,9 +2,8 @@
  * External dependencies
  */
 import * as path from 'path';
-import { test as base, expect } from '@playwright/test';
-import type { ConsoleMessage } from '@playwright/test';
-import { type Browser, chromium } from 'playwright';
+import { test as base, expect, chromium } from '@playwright/test';
+import type { ConsoleMessage, Browser } from '@playwright/test';
 import * as getPort from 'get-port';
 
 /**
