@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Animated, View, PanResponder } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 /**
  * WordPress dependencies
@@ -11,8 +12,7 @@ import React, { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import LinearGradient from 'react-native-linear-gradient';
-import styles from './style.native.scss';
+import styles from './style.scss';
 
 export default class HuePicker extends Component {
 	constructor( props ) {

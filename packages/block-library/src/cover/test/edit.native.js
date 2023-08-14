@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, Pressable } from 'react-native';
+import { Image } from 'react-native';
 import {
 	getEditorHtml,
 	initializeEditor,
@@ -17,7 +17,7 @@ import {
  * WordPress dependencies
  */
 import { BottomSheetSettings, BlockEdit } from '@wordpress/block-editor';
-import { ColorPicker, SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/components';
 import { setDefaultBlockName, unregisterBlockType } from '@wordpress/blocks';
 import {
 	requestMediaPicker,
@@ -540,9 +540,6 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'displays the hex color value in the custom color picker', async () => {
-		ColorPicker.mockImplementation( ( props ) => {
-			return <Pressable { ...props } testID="hsv-color-picker" />;
-		} );
 		const screen = await initializeEditor( {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );
@@ -561,7 +558,7 @@ describe( 'color settings', () => {
 		expect( screen.getByText( 'Select a color' ) ).toBeVisible();
 
 		// Tap color picker
-		const colorPicker = screen.getByTestId( 'hsv-color-picker' );
+		const colorPicker = screen.getByTestId( 'color-picker' );
 		fireEvent( colorPicker, 'onHuePickerPress', {
 			hue: 120,
 			saturation: 12,
