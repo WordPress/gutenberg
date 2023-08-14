@@ -3,7 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { BlockInspector } from '@wordpress/block-editor';
-import { privateApis as editPatternsPrivateApis } from '@wordpress/edit-patterns';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 
 /**
  * Internal dependencies

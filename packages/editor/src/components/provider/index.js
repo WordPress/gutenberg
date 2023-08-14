@@ -11,7 +11,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
-import { privateApis as editPatternsPrivateApis } from '@wordpress/edit-patterns';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 
 /**
  * Internal dependencies

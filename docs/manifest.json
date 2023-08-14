@@ -1596,12 +1596,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/edit-patterns",
-		"slug": "packages-edit-patterns",
-		"markdown_source": "../packages/edit-patterns/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "../packages/edit-post/README.md",
@@ -1761,6 +1755,12 @@
 		"title": "@wordpress/nux",
 		"slug": "packages-nux",
 		"markdown_source": "../packages/nux/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/patterns",
+		"slug": "packages-patterns",
+		"markdown_source": "../packages/patterns/README.md",
 		"parent": "packages"
 	},
 	{

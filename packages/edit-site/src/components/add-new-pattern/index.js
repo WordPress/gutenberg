@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { plus, symbol, symbolFilled } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as editPatternsPrivateApis } from '@wordpress/edit-patterns';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 
 /**
  * Internal dependencies

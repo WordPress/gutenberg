@@ -15,7 +15,7 @@ import {
 	CopyHandler,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { privateApis as editPatternsPrivateApis } from '@wordpress/edit-patterns';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 
