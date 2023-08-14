@@ -42,7 +42,7 @@ jobs:
                   fetch-depth: 1
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+              uses: actions/setup-node@bea5baf987ba7aa777a8a0b4ace377a21c45c381 # v3.8.0
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
