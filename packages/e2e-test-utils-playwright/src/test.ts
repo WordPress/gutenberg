@@ -108,8 +108,8 @@ const test = base.extend<
 	},
 	{
 		requestUtils: RequestUtils;
-		port: number;
-		browser: Browser;
+		lighthousePort: number;
+		lighthouseBrowser: Browser;
 	}
 >( {
 	admin: async ( { page, pageUtils }, use ) => {
@@ -144,17 +144,17 @@ const test = base.extend<
 		},
 		{ scope: 'worker', auto: true },
 	],
-	port: [
+	lighthousePort: [
 		async ( {}, use ) => {
 			const port = await getPort();
 			await use( port );
 		},
 		{ scope: 'worker' },
 	],
-	browser: [
-		async ( { port }, use ) => {
+	lighthouseBrowser: [
+		async ( { lighthousePort }, use ) => {
 			const browser = await chromium.launch( {
-				args: [ `--remote-debugging-port=${ port }` ],
+				args: [ `--remote-debugging-port=${ lighthousePort }` ],
 			} );
 			await use( browser );
 
@@ -162,8 +162,8 @@ const test = base.extend<
 		},
 		{ scope: 'worker' },
 	],
-	metrics: async ( { page, port }, use ) => {
-		await use( new Metrics( page, port ) );
+	metrics: async ( { page, lighthousePort }, use ) => {
+		await use( new Metrics( page, lighthousePort ) );
 	},
 } );
 
