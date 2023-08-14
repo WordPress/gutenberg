@@ -353,6 +353,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
 		$font_families_json = json_encode( $font_families );
 		$install_request->set_param( 'fontFamilies', $font_families_json );
+		$install_request->set_file_params( $files );
 		$response = rest_get_server()->dispatch( $install_request );
 		$this->assertEquals( 400, $response->get_status(), 'Response status is not 400 when font face has both donwload_from_url and uploaded_file properties.' );
 	}
@@ -423,7 +424,34 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 				'files'         => array(),
 			),
 
-			'fontface with incompatible properties' => array(
+			'fontface referencing uploaded file without uploaded files' => array(
+				'font_families' => array(
+					array(
+						'fontFamily' => 'Piazzolla',
+						'name'       => 'Piazzolla',
+						'slug'       => 'piazzolla',
+						'fontFace'   => array(
+							array(
+								'fontFamily'    => 'Piazzolla',
+								'fontStyle'     => 'normal',
+								'fontWeight'    => '400',
+								'uploaded_file' => 'files666',
+							),
+						),
+					),
+				),
+				'files'         => array(
+					'files0' => array(
+						'name'     => 'piazzola1.ttf',
+						'type'     => 'font/ttf',
+						'tmp_name' => $temp_file_path1,
+						'error'    => 0,
+						'size'     => 123,
+					),
+				),
+			),
+
+			'fontface with incompatible properties (download_from_url and uploaded_file together)' => array(
 				'font_families' => array(
 					array(
 						'fontFamily' => 'Piazzolla',
