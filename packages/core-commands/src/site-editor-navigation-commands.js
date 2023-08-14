@@ -23,6 +23,7 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
  */
 import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
+import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -69,8 +70,21 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 			[ supportsSearch, search ]
 		);
 
+		/*
+		 * wp_template and wp_template_part endpoints do not support per_page or orderby parameters.
+		 * We need to sort the results based on the search query to avoid removing relevant
+		 * records below using .slice().
+		 */
+		const orderedRecords = useMemo( () => {
+			if ( supportsSearch ) {
+				return records ?? [];
+			}
+
+			return orderEntityRecordsBySearch( records, search ).slice( 0, 10 );
+		}, [ supportsSearch, records, search ] );
+
 		const commands = useMemo( () => {
-			return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
+			return orderedRecords.map( ( record ) => {
 				const isSiteEditor = getPath( window.location.href )?.includes(
 					'site-editor.php'
 				);
@@ -103,7 +117,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					},
 				};
 			} );
-		}, [ records, history ] );
+		}, [ orderedRecords, history ] );
 
 		return {
 			commands,
