@@ -348,8 +348,8 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_install_with_improper_inputs
 	 *
-	 * @param array $font_families     Font families to install in theme.json format.
-	 * @param array $files             Font files to install.
+	 * @param array $font_families Font families to install in theme.json format.
+	 * @param array $files         Font files to install.
 	 */
 	public function test_install_with_improper_inputs( $font_families, $files = array() ) {
 		wp_set_current_user( self::$admin_id );
@@ -358,7 +358,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 		$install_request->set_param( 'fontFamilies', $font_families_json );
 		$install_request->set_file_params( $files );
 		$response = rest_get_server()->dispatch( $install_request );
-		$this->assertEquals( 400, $response->get_status(), 'Response status is not 400 when font face has both donwload_from_url and uploaded_file properties.' );
+		$this->assertSame( 400, $response->get_status(), 'Response status is not 400 when font face has both donwload_from_url and uploaded_file properties.' );
 	}
 
 	/**
@@ -386,7 +386,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'with improper font face propety' => array(
+			'with improper font face property' => array(
 				'font_families' => array(
 					array(
 						'fontFamily' => 'Piazzolla',
@@ -476,6 +476,4 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 
 		);
 	}
-
-
 }
