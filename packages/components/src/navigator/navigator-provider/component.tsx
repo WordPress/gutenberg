@@ -268,7 +268,6 @@ function UnconnectedNavigatorProvider(
  * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
  * `useNavigator` hook).
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalNavigatorProvider as NavigatorProvider,
