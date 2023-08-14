@@ -69,11 +69,8 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			sprintf(
 				'/%s/themes/(?P<stylesheet>%s)',
 				$this->rest_base,
-
-				/*
-				 * Matches theme's directory: `/themes/<subdirectory>/<theme>/` or `/themes/<theme>/`.
-				 * Excludes invalid directory name characters: `/:<>*?"|`.
-				 */
+				// Matches theme's directory: `/themes/<subdirectory>/<theme>/` or `/themes/<theme>/`.
+				// Excludes invalid directory name characters: `/:<>*?"|`.
 				'[^\/:<>\*\?"\|]+(?:\/[^\/:<>\*\?"\|]+)?'
 			),
 			array(
