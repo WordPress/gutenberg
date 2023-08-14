@@ -1,16 +1,10 @@
 /**
- * External dependencies
- */
-import Clipboard from 'clipboard';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	hasBlockSupport,
 	store as blocksStore,
-	serialize,
 	switchToBlockType,
 	isTemplatePart,
 } from '@wordpress/blocks';
@@ -245,7 +239,6 @@ const useActionsCommands = () => {
 		replaceBlocks( clientIds, innerBlocks );
 	};
 	const onCopy = () => {
-		Clipboard.copy( serialize( blocks ) );
 		const selectedBlockClientIds = blocks.map(
 			( { clientId } ) => clientId
 		);
