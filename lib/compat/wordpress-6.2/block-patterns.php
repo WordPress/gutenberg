@@ -200,7 +200,7 @@ function gutenberg_register_theme_block_patterns() {
 			continue;
 		}
 		if ( file_exists( $dirpath ) ) {
-			$files = glob( $dirpath . '*.php' );
+			$files = _get_block_pattern_paths( $dirpath);
 			if ( $files ) {
 				foreach ( $files as $file ) {
 					$pattern_data = get_file_data( $file, $default_headers );
@@ -330,4 +330,25 @@ function gutenberg_normalize_remote_pattern( $pattern ) {
 	}
 
 	return (array) $pattern;
+}
+
+/**
+ * Finds all nested pattern file paths in a theme's directory.
+ *
+ * @since ?
+ * @access private
+ *
+ * @param string $base_directory The theme's file path.
+ * @return string[] A list of paths to all pattern files.
+ */
+function _get_block_pattern_paths( $base_directory ) {
+	$path_list = array();
+	if ( file_exists( $base_directory ) ) {
+		$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory ) );
+		$nested_html_files = new RegexIterator( $nested_files, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH );
+		foreach ( $nested_html_files as $path => $file ) {
+			$path_list[] = $path;
+		}
+	}
+	return $path_list;
 }
