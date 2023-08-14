@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: WP_REST_Global_Styles_Controller_Gutenberg class
+ * REST API: Try: bundle WP_Theme_JSON class instead of inheriting per WordPress version class
  *
  * Changes to this class should be synced to the corresponding class
  * in WordPress core: src/wp-includes/rest-api/endpoints/class-wp-rest-global-styles-controller.php.
