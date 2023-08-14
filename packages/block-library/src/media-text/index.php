@@ -28,17 +28,23 @@ function render_block_core_media_text( $attributes, $content ) {
 	}
 
 	$processor = new WP_HTML_Tag_Processor( $content );
-	if ( isset( $attributes['imageFill'] ) ) {
+	if ( isset( $attributes['imageFill'] ) && $attributes['imageFill'] ) {
 		if ( isset( $attributes['focalPoint'] ) ) {
 			$position = round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
 		} else {
 			$position = '50% 50%';
 		}
 		$processor->next_tag( 'figure' );
-		$processor->set_attribute( 'style', 'background-image:url(' . esc_url( $current_featured_image ) . '); background-position:' . $position . ';' );
+		$processor->set_attribute( 'style', 'background-image:url(' . esc_url( $current_featured_image ) . ');background-position:' . $position . ';' );
 	}
 	$processor->next_tag( 'img' );
-	$processor->set_attribute( 'src', esc_url( $current_featured_image ) );
+	$media_size_slug = 'full';
+	if ( isset( $attributes['mediaSizeSlug'] ) ) {
+		$media_size_slug = $attributes['mediaSizeSlug'];
+	}
+	$processor->set_attribute( 'src', esc_url( $current_featured_image ) ); 
+	$processor->set_attribute( 'alt', esc_attr( $processor->get_attribute( 'alt' ) ) );
+	$processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
 
 	$content = $processor->get_updated_html();
 
