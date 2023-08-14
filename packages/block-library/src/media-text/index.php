@@ -42,7 +42,7 @@ function render_block_core_media_text( $attributes, $content ) {
 	if ( isset( $attributes['mediaSizeSlug'] ) ) {
 		$media_size_slug = $attributes['mediaSizeSlug'];
 	}
-	$processor->set_attribute( 'src', esc_url( $current_featured_image ) ); 
+	$processor->set_attribute( 'src', esc_url( $current_featured_image ) );
 	$processor->set_attribute( 'alt', esc_attr( $processor->get_attribute( 'alt' ) ) );
 	$processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
 
