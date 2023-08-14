@@ -7,7 +7,10 @@
 /**
  * Internal dependencies
  */
-import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
+import {
+	getComputedFluidTypographyValue,
+	getTypographyValueAndUnit,
+} from '../font-sizes/fluid-utils';
 
 /**
  * @typedef {Object} FluidPreset
@@ -25,8 +28,8 @@ import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
 
 /**
  * @typedef {Object} TypographySettings
- * @property {?string} minViewPortWidth  Minimum viewport size from which type will have fluidity. Optional if size is specified.
- * @property {?string} maxViewPortWidth  Maximum size up to which type will have fluidity. Optional if size is specified.
+ * @property {?string} minViewportWidth  Minimum viewport size from which type will have fluidity. Optional if size is specified.
+ * @property {?string} maxViewportWidth  Maximum size up to which type will have fluidity. Optional if size is specified.
  * @property {?number} scaleFactor       A scale factor to determine how fast a font scales within boundaries. Optional.
  * @property {?number} minFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
  * @property {?string} minFontSize       The smallest a calculated font size may be. Optional.
@@ -67,7 +70,8 @@ export function getTypographyFontSizeValue( preset, typographyOptions ) {
 		maximumFontSize: preset?.fluid?.max,
 		fontSize: defaultSize,
 		minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
-		maximumViewPortWidth: fluidTypographySettings?.maxViewPortWidth,
+		maximumViewportWidth: fluidTypographySettings?.maxViewportWidth,
+		minimumViewportWidth: fluidTypographySettings?.minViewportWidth,
 	} );
 
 	if ( !! fluidFontSizeValue ) {
@@ -98,11 +102,16 @@ function isFluidTypographyEnabled( typographySettings ) {
 export function getFluidTypographyOptionsFromSettings( settings ) {
 	const typographySettings = settings?.typography;
 	const layoutSettings = settings?.layout;
-	return isFluidTypographyEnabled( typographySettings ) &&
+	const defaultMaxViewportWidth = getTypographyValueAndUnit(
 		layoutSettings?.wideSize
+	)
+		? layoutSettings?.wideSize
+		: null;
+	return isFluidTypographyEnabled( typographySettings ) &&
+		defaultMaxViewportWidth
 		? {
 				fluid: {
-					maxViewPortWidth: layoutSettings.wideSize,
+					maxViewportWidth: defaultMaxViewportWidth,
 					...typographySettings.fluid,
 				},
 		  }

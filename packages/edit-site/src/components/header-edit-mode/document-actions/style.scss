@@ -1,7 +1,6 @@
 .edit-site-document-actions {
 	display: flex;
 	align-items: center;
-	gap: $grid-unit;
 	height: $button-size;
 	justify-content: space-between;
 	// Flex items will, by default, refuse to shrink below a minimum
@@ -10,18 +9,25 @@
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
 	background: $gray-100;
-	border-radius: 4px;
+	border-radius: $grid-unit-05;
 	width: min(100%, 450px);
 
+	// Make the document title shorter in top-toolbar mode, as it has to be covered.
+	.has-fixed-toolbar & {
+		width: min(100%, 380px);
+	}
+
+	&:hover {
+		background-color: $gray-200;
+	}
+
 	.components-button {
+		border-radius: $grid-unit-05;
+
 		&:hover {
 			color: var(--wp-block-synced-color);
 			background: $gray-200;
 		}
-	}
-
-	@include break-medium() {
-		width: 50%;
 	}
 
 	@include break-large() {
@@ -48,6 +54,11 @@
 	flex-grow: 1;
 	overflow: hidden;
 
+	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
+	@include break-small() {
+		padding-left: $grid-unit-40;
+	}
+
 	&:hover {
 		color: var(--wp-block-synced-color);
 	}
@@ -61,6 +72,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		max-width: 50%;
 	}
 
 	.edit-site-document-actions.is-page & {
@@ -84,6 +96,11 @@
 
 .edit-site-document-actions__shortcut {
 	color: $gray-800;
+	min-width: $grid-unit-40;
+	display: none;
+	@include break-small() {
+		display: initial;
+	}
 }
 
 .edit-site-document-actions__back.components-button.has-icon.has-text {
@@ -92,9 +109,11 @@
 	color: $gray-700;
 	gap: 0;
 	z-index: 1;
+	position: absolute;
 
 	&:hover {
 		color: currentColor;
+		background-color: transparent;
 	}
 
 	.edit-site-document-actions.is-animated & {

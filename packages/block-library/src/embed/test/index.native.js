@@ -200,6 +200,10 @@ beforeEach( () => {
 		MOCK_EMBED_PHOTO_SUCCESS_RESPONSE,
 		MOCK_BAD_EMBED_PROVIDER_RESPONSE,
 	] );
+
+	// Intentionally suppress the expected console logs to reduce noise in the
+	// test output.
+	jest.spyOn( console, 'log' ).mockImplementation( () => {} );
 } );
 
 afterAll( () => {
@@ -898,6 +902,10 @@ describe( 'Embed block', () => {
 
 			// Select create embed option.
 			fireEvent.press( editor.getByText( 'Create embed' ) );
+			expect( console ).toHaveLoggedWith(
+				'Processed HTML piece:\n\n',
+				`<p>${ expectedURL }</p>`
+			);
 
 			// Get the created embed block.
 			const [ embedBlock ] = await editor.findAllByLabelText(
@@ -942,6 +950,10 @@ describe( 'Embed block', () => {
 
 			// Select create link option.
 			fireEvent.press( editor.getByText( 'Create link' ) );
+			expect( console ).toHaveLoggedWith(
+				'Processed HTML piece:\n\n',
+				`<p>${ expectedURL }</p>`
+			);
 
 			// Get the link text.
 			const linkText = await editor.findByDisplayValue(

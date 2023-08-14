@@ -1,3 +1,19 @@
+buildscript {
+    ext {
+        // libs
+        wordpressUtilsVersion = '3.3.0'
+
+        // main
+        googleMaterialVersion = '1.2.1'
+
+        // react native
+        facebookFrescoVersion = '2.0.0'
+
+        // test
+        junitVersion = '4.13'
+    }
+}
+
 plugins {
     id "com.android.library"
     id "org.jetbrains.kotlin.android"
@@ -14,6 +30,11 @@ group='org.wordpress-mobile.gutenberg-mobile'
 def buildAssetsFolder = 'build/assets'
 
 android {
+    // IMPORTANT: Any updates to the namespace should be reflected in
+    // the `package` attribute of the main `AndroidManifest.xml` file.
+    // File reference: `react-native-bridge/android/react-native-bridge/src/main/AndroidManifest.xml`
+    namespace "org.wordpress.mobile.ReactNativeGutenbergBridge"
+
     compileSdkVersion 33
 
     defaultConfig {
@@ -22,7 +43,7 @@ android {
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
-    lintOptions {
+    lint {
         abortOnError false
     }
 
@@ -41,6 +62,10 @@ android {
             assets.srcDirs += '../../../../../resources/unsupported-block-editor'
         }
     }
+
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 repositories {
@@ -52,11 +77,11 @@ repositories {
 
 dependencies {
     // For animated GIF support
-    implementation 'com.facebook.fresco:animated-gif:2.0.0'
-    implementation 'com.google.android.material:material:1.2.1'
-    implementation "org.wordpress:utils:3.3.0"
+    implementation "com.facebook.fresco:animated-gif:$facebookFrescoVersion"
+    implementation "com.google.android.material:material:$googleMaterialVersion"
+    implementation "org.wordpress:utils:$wordpressUtilsVersion"
 
-    testImplementation "junit:junit:4.13"
+    testImplementation "junit:junit:$junitVersion"
 
     def rnVersion = readReactNativeVersion('../../../../package.json', 'devDependencies')
     println "react-native version for react-native-bridge: $rnVersion"
@@ -100,7 +125,6 @@ project.afterEvaluate {
 
                 groupId 'org.wordpress-mobile.gutenberg-mobile'
                 artifactId 'react-native-gutenberg-bridge'
-                artifact tasks.named("androidSourcesJar")
                 // version is set by 'publish-to-s3' plugin
 
                 addDependenciesToPom(pom)

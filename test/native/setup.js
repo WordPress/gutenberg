@@ -188,9 +188,11 @@ jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
 	virtual: true,
 } );
 
-jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
-	virtual: true,
-} );
+jest.mock(
+	'react-native-hsv-color-picker',
+	() => jest.fn( () => 'HsvColorPicker' ),
+	{ virtual: true }
+);
 
 jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
