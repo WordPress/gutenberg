@@ -48,7 +48,7 @@ export class Metrics {
 							'navigation'
 						) as PerformanceNavigationTiming[];
 
-						resolve( pageNav.responseStart );
+						resolve( pageNav.responseStart - pageNav.startTime );
 					} ).observe( {
 						type: 'navigation',
 						buffered: true,
