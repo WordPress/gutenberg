@@ -17,7 +17,7 @@ const transformStyles = ( styles, wrapperClassName = '' ) => {
 		return postcss( [
 			wrap( { scopeTo: wrapperClassName } ),
 			rebaseUrl( { rootUrl: baseURL } ),
-		] ).process( css, {} );
+		] ).process( css, {} ).css; // use sync PostCSS API
 	} );
 };
 
