@@ -16,7 +16,7 @@ import { parse } from '@wordpress/blocks';
 import { store as editSiteStore } from '../../../store';
 
 export default function EditTemplate() {
-	const { context, hasResolved, title, content } = useSelect( ( select ) => {
+	const { context, hasResolved, template } = useSelect( ( select ) => {
 		const { getEditedPostContext, getEditedPostType, getEditedPostId } =
 			select( editSiteStore );
 		const { getEditedEntityRecord, hasFinishedResolution } =
@@ -27,15 +27,13 @@ export default function EditTemplate() {
 			getEditedPostType(),
 			getEditedPostId(),
 		];
-		const template = getEditedEntityRecord( ...queryArgs );
 		return {
 			context: _context,
 			hasResolved: hasFinishedResolution(
 				'getEditedEntityRecord',
 				queryArgs
 			),
-			title: template?.title,
-			content: template?.content,
+			template: getEditedEntityRecord( ...queryArgs ),
 		};
 	}, [] );
 
@@ -48,8 +46,11 @@ export default function EditTemplate() {
 
 	const blocks = useMemo(
 		() =>
-			content && typeof content !== 'function' ? parse( content ) : [],
-		[ content ]
+			template.blocks ??
+			( template.content && typeof template.content !== 'function'
+				? parse( template.content )
+				: [] ),
+		[ template.blocks, template.content ]
 	);
 
 	if ( ! hasResolved ) {
@@ -58,7 +59,7 @@ export default function EditTemplate() {
 
 	return (
 		<VStack>
-			<div>{ decodeEntities( title ) }</div>
+			<div>{ decodeEntities( template.title ) }</div>
 			<div className="edit-site-page-panels__edit-template-preview">
 				<BlockContextProvider value={ blockContext }>
 					<BlockPreview viewportWidth={ 1024 } blocks={ blocks } />
