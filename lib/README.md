@@ -40,7 +40,7 @@ function gutenberg_get_something_useful() {
 }
 ```
 
-When merging or updating these functions into Core, they must use the `wp_` prefix for functions or a `WP_` prefix for classes.
+When porting new functions into Core, the function must be renamed to use the `wp_` prefix for functions or a `WP_` prefix for classes.
 
 ```php
 /**
@@ -57,8 +57,6 @@ function wp_get_something_useful() {
 ```
 
 Plugin code that is stable and expected to be merged "as-is" into Core in the near future can use the `wp_` prefix for functions or a `WP_` prefix for classes.
-
-Files can be placed within the `lib/compat/wordpress-X.Y` directory, where `X.Y` is the target version of WordPress.
 
 The caveat is that no functions or classes with the same names already exist in Core. A quick codebase search will also help you know if your new names are unique.
 
@@ -98,15 +96,15 @@ if ( class_exists( 'WP_A_Stable_Class' ) ) {
 class WP_A_Stable_Class { ... }
 ```
 
-Wrapping code in `class_exists()` and `function_exists()` is usually inappropriate for evergreen code, or any plugin code that we expect to undergo constant change, because it would prevent the latest versions of the code from being used. For example, the statement `class_exists( 'WP_Theme_JSON' )` would return `true` because the class already exists in Core.
+Wrapping code in `class_exists()` and `function_exists()` is usually inappropriate for evergreen code, or any plugin code that we expect to undergo constant change between WordPress releases, because it would prevent the latest versions of the code from being used. For example, the statement `class_exists( 'WP_Theme_JSON' )` would return `true` because the class already exists in Core.
 
-When to use which prefix is a judgement call, but the general rule is that if you're unsure, use the `gutenberg` prefix because it will less likely to give rise to naming conflicts. What's more, it can be changed more easily after the fact.
+When to use which prefix is a judgement call, but the general rule is that if you're unsure, use the `gutenberg` prefix because it will less likely give rise to naming conflicts.
 
 As always, get in touch with your fellow contributors if you're unsure.
 
 ### Documentation and annotations
 
-For every class, method and function in the plugin, use the [WordPress PHP documentation standards](https://developer.wordpress.org/coding-standards/inline-documentation-standards/php/) to document the code.
+For every class, method and function in the plugin, refer to the [WordPress PHP documentation standards](https://developer.wordpress.org/coding-standards/inline-documentation-standards/php/) when documenting your code.
 
 It's particularly important to observe annotation standards, and `@since` descriptions that specify the target WordPress version, so that all contributors can easily identify what needs to be (or what already has been) merged to Core and when.
 
