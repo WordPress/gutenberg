@@ -1569,6 +1569,10 @@ class WP_Theme_JSON_Gutenberg {
 
 		$stylesheet = '';
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+			if ( empty( $preset_metadata['classes'] ) ) {
+				continue;
+			}
+
 			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
 			foreach ( $preset_metadata['classes'] as $class => $property ) {
 				foreach ( $slugs as $slug ) {
@@ -1768,6 +1772,10 @@ class WP_Theme_JSON_Gutenberg {
 	protected static function compute_preset_vars( $settings, $origins ) {
 		$declarations = array();
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+			if ( empty( $preset_metadata['css_vars'] ) ) {
+				continue;
+			}
+
 			$values_by_slug = static::get_settings_values_by_slug( $settings, $preset_metadata, $origins );
 			foreach ( $values_by_slug as $slug => $value ) {
 				$declarations[] = array(
