@@ -86,11 +86,9 @@ function ListViewBlockSelectButton(
 		onDragStart?.( event );
 	};
 
-	// Determine which blocks to update using logic that if the current block
-	// is part of the block selection, then use the whole block selection for the
-	// update. Otherwise, only update the current block. This way, where the user is
-	// currently focused has a logical impact on what happens when they perform an action.
-	// This is used by actions to delete and duplicate blocks.
+	// Determine which blocks to update:
+	// If the current (focused) block is part of the block selection, use the whole selection.
+	// If the focused block is not part of the block selection, only update the focused block.
 	function getBlocksToUpdate() {
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const isUpdatingSelectedBlocks =
@@ -175,14 +173,8 @@ function ListViewBlockSelectButton(
 			);
 
 			if ( canDuplicate ) {
-				const duplicatedBlocks = duplicateBlocks(
-					blocksToUpdate,
-					false
-				);
-
-				if ( duplicatedBlocks ) {
-					updateFocusAndSelection( duplicatedBlocks, true );
-				}
+				// Duplicate blocks, but do not update the selection.
+				duplicateBlocks( blocksToUpdate, false );
 			}
 		}
 	}
