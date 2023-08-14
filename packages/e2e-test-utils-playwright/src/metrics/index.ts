@@ -40,21 +40,14 @@ export class Metrics {
 	 * @return {Promise<number>} TTFB value.
 	 */
 	async getTimeToFirstByte() {
-		return this.page.evaluate< number >(
-			() =>
-				new Promise( ( resolve ) => {
-					new PerformanceObserver( ( entryList ) => {
-						const [ pageNav ] = entryList.getEntriesByType(
-							'navigation'
-						) as PerformanceNavigationTiming[];
-
-						resolve( pageNav.responseStart - pageNav.startTime );
-					} ).observe( {
-						type: 'navigation',
-						buffered: true,
-					} );
-				} )
-		);
+		return this.page.evaluate< number >( () => {
+			const { responseStart, startTime } = (
+				performance.getEntriesByType(
+					'navigation'
+				) as PerformanceNavigationTiming[]
+			 )[ 0 ];
+			return responseStart - startTime;
+		} );
 	}
 
 	/**
