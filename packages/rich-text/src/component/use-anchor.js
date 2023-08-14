@@ -31,6 +31,13 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 	if ( element === editableContentElement ) return;
 	if ( ! editableContentElement.contains( element ) ) return;
 
+	// Check if the candidate element is within the selected range.
+	// This avoids situations where two format elements can exist within the
+	// same parent element and the wrong element is mistakenly returned.
+	if ( ! range.isPointInRange( element, 0 ) ) {
+		return;
+	}
+
 	const selector = tagName + ( className ? '.' + className : '' );
 
 	// .closest( selector ), but with a boundary. Check if the element matches
@@ -39,6 +46,7 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 	// wrapper, which is what .closest( selector ) would do. When the element is
 	// the editable wrapper (which is most likely the case because most text is
 	// unformatted), this never runs.
+
 	while ( element !== editableContentElement ) {
 		if ( element.matches( selector ) ) {
 			return element;
