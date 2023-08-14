@@ -114,6 +114,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 						__( 'Font family [%s] should have fontFace property defined as an array.', 'gutenberg' ),
 						$family_index
 					);
+					continue;
 				}
 
 				if ( count( $font_family['fontFace'] ) < 1 ) {
