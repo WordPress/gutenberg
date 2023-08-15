@@ -43,6 +43,7 @@ function Store( registry, suspense ) {
 	let lastMapResultValid = false;
 	let lastIsAsync;
 	let subscriber;
+	let didWarnUnstableReference;
 
 	const createSubscriber = ( stores ) => {
 		// The set of stores the `subscribe` function is supposed to subscribe to. Here it is
@@ -133,6 +134,24 @@ function Store( registry, suspense ) {
 				() => mapSelect( select, registry ),
 				listeningStores
 			);
+
+			if ( process.env.NODE_ENV === 'development' ) {
+				if ( ! didWarnUnstableReference ) {
+					const secondMapResult =
+						registry.__unstableMarkListeningStores(
+							() => mapSelect( select, registry ),
+							listeningStores
+						);
+
+					if ( ! isShallowEqual( mapResult, secondMapResult ) ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`The values returned by the 'useSelect' hook aren't referentially stable. This can lead to unnecessary rerenders.`
+						);
+						didWarnUnstableReference = true;
+					}
+				}
+			}
 
 			if ( ! subscriber ) {
 				subscriber = createSubscriber( listeningStores.current );
