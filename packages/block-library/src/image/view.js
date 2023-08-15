@@ -17,6 +17,14 @@ const focusableSelectors = [
 	'[tabindex]:not([tabindex^="-"])',
 ];
 
+let scrollCallback;
+
+function handleScroll( event, context, actions ) {
+	event.preventDefault();
+	window.scrollTo( 0, context.core.image.lastScrollTop );
+	actions.core.image.hideLightbox( { context, event } );
+}
+
 store(
 	{
 		state: {
@@ -30,7 +38,7 @@ store(
 		actions: {
 			core: {
 				image: {
-					showLightbox: ( { context, event } ) => {
+					showLightbox: ( { context, event, actions } ) => {
 						// We can't initialize the lightbox until the reference
 						// image is loaded, otherwise the UX is broken.
 						if ( ! context.core.image.imageLoaded ) {
@@ -43,55 +51,45 @@ store(
 
 						context.core.image.lightboxEnabled = true;
 						setStyles( context, event );
-						// Hide overflow only when the animation is in progress,
-						// otherwise the removal of the scrollbars will draw attention
-						// to itself and look like an error
-						document.documentElement.classList.add(
-							'wp-has-lightbox-open'
+
+						context.core.image.lastScrollTop =
+							window.pageYOffset ||
+							document.documentElement.scrollTop;
+
+						scrollCallback = handleScroll.bind(
+							null,
+							event,
+							context,
+							actions
+						);
+						window.addEventListener(
+							'scroll',
+							scrollCallback,
+							false
 						);
 					},
-					hideLightbox: async ( { context, event } ) => {
+					hideLightbox: async ( { context } ) => {
 						context.core.image.hideAnimationEnabled = true;
 						if ( context.core.image.lightboxEnabled ) {
 							// If scrolling, wait a moment before closing the lightbox.
 							if (
 								context.core.image.lightboxAnimation === 'fade'
 							) {
-								context.core.image.scrollDelta += event.deltaY;
-								if (
-									event.type === 'mousewheel' &&
-									Math.abs(
-										window.scrollY -
-											context.core.image.scrollDelta
-									) < 10
-								) {
-									return;
-								}
+								window.removeEventListener(
+									'scroll',
+									scrollCallback
+								);
 							} else if (
 								context.core.image.lightboxAnimation === 'zoom'
 							) {
-								// Disable scroll until the zoom animation ends.
-								// Get the current page scroll position
-								const scrollTop =
-									window.pageYOffset ||
-									document.documentElement.scrollTop;
-								const scrollLeft =
-									window.pageXOffset ||
-									document.documentElement.scrollLeft;
-								// if any scroll is attempted, set this to the previous value.
-								window.onscroll = function () {
-									window.scrollTo( scrollLeft, scrollTop );
-								};
 								// Enable scrolling after the animation finishes
 								setTimeout( function () {
-									window.onscroll = function () {};
-								}, 400 );
+									window.removeEventListener(
+										'scroll',
+										scrollCallback
+									);
+								}, 450 );
 							}
-
-							document.documentElement.classList.remove(
-								'wp-has-lightbox-open'
-							);
-
 							context.core.image.lightboxEnabled = false;
 							context.core.image.lastFocusedElement.focus( {
 								preventScroll: true,
