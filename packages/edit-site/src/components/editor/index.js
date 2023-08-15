@@ -78,6 +78,7 @@ const blockRemovalRules = {
 };
 
 export default function Editor( { isLoading } ) {
+	isLoading = true;
 	const {
 		record: editedPost,
 		getTitle,
