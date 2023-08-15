@@ -408,6 +408,29 @@ function LinkControl( {
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
+					additionalControls={ () => {
+						// Expose the "Opens in new tab" settings in the preview
+						// as it is the most common setting to change.
+						if (
+							settings?.find(
+								( setting ) => setting.id === 'opensInNewTab'
+							)
+						) {
+							return (
+								<LinkSettings
+									value={ internalControlValue }
+									settings={ settings?.filter(
+										( { id } ) => id === 'opensInNewTab'
+									) }
+									onChange={ ( { opensInNewTab } ) => {
+										onChange( {
+											opensInNewTab,
+										} );
+									} }
+								/>
+							);
+						}
+					} }
 					onRemove={ () => {
 						onRemove();
 						setIsEditingLink( true );
