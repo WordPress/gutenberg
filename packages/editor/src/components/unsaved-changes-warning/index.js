@@ -13,13 +13,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * @return {WPComponent} The component.
  */
 export default function UnsavedChangesWarning() {
-	const isDirty = useSelect( ( select ) => {
-		return () => {
-			const { __experimentalGetDirtyEntityRecords } = select( coreStore );
-			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-			return dirtyEntityRecords.length > 0;
-		};
-	}, [] );
+	const { __experimentalGetDirtyEntityRecords } = useSelect( coreStore );
 
 	/**
 	 * Warns the user if there are unsaved changes before leaving the editor.
@@ -33,7 +27,8 @@ export default function UnsavedChangesWarning() {
 		// conditions with `BrowserURL` where `componentDidUpdate` gets the
 		// new value of `isEditedPostDirty` before this component does,
 		// causing this component to incorrectly think a trashed post is still dirty.
-		if ( isDirty() ) {
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		if ( dirtyEntityRecords.length > 0 ) {
 			event.returnValue = __(
 				'You have unsaved changes. If you proceed, they will be lost.'
 			);
