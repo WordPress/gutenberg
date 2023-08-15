@@ -11,7 +11,6 @@ import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	ToolSelector,
-	__experimentalPreviewOptions as PreviewOptions,
 	NavigableToolbar,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -35,6 +34,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import MoreMenu from './more-menu';
+import PreviewOptions from '../preview-options';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';

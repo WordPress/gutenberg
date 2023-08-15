@@ -5,7 +5,6 @@ import { Icon, MenuGroup } from '@wordpress/components';
 import { PostPreviewButton, store as editorStore } from '@wordpress/editor';
 import { external } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { __experimentalPreviewOptions as PreviewOptions } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -13,6 +12,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+import PreviewOptions from '../preview-options';
 
 export default function DevicePreview() {
 	const { hasActiveMetaboxes, isPostSaveable, isViewable, deviceType } =
