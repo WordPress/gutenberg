@@ -65,8 +65,8 @@ test.describe( 'Site editor url navigation', () => {
 			await page.click( 'role=button[name="Patterns"i]' );
 			await page.click( 'role=button[name="Create pattern"i]' );
 			await page
-				.getByRole( 'menu', { name: 'Create pattern' } )
-				.getByRole( 'menuitem', { name: 'Create template part' } )
+				.getByRole( 'menu', { name: 'Create pattern…' } )
+				.getByRole( 'menuitem', { name: 'Create template part…' } )
 				.click();
 			// Fill in a name in the dialog that pops up.
 			await page.type(
