@@ -243,7 +243,7 @@ function _wp_rest_api_autosave_meta( $autosave ) {
 		return;
 	}
 
-	update_post_meta( $id, 'footnotes', json_encode( $body['meta']['footnotes'] ) );
+	update_post_meta( $id, 'footnotes', wp_slash( $body['meta']['footnotes'] ) );
 }
 // See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L391C1-L391C1.
 add_action( 'wp_creating_autosave', '_wp_rest_api_autosave_meta' );
