@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
-import {
-	BlockSettingsMenuControls,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
@@ -24,9 +21,14 @@ import CreatePatternModal from './create-pattern-modal';
  * @param {Object}   props              Component props.
  * @param {string[]} props.clientIds    Client ids of selected blocks.
  * @param {string}   props.rootClientId ID of the currently selected top-level block.
+ * @param {()=>void} props.onClose      Callback to close the menu.
  * @return {import('@wordpress/element').WPComponent} The menu control or null.
  */
-export default function PatternConvertButton( { clientIds, rootClientId } ) {
+export default function PatternConvertButton( {
+	clientIds,
+	rootClientId,
+	onClose,
+} ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const canConvert = useSelect(
@@ -103,34 +105,27 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 		setIsModalOpen( false );
 	};
 	return (
-		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
-				<>
-					<MenuItem
-						icon={ symbol }
-						onClick={ () => setIsModalOpen( true ) }
-					>
-						{ __( 'Create pattern' ) }
-					</MenuItem>
-					{ isModalOpen && (
-						<CreatePatternModal
-							clientIds={ clientIds }
-							onSuccess={ ( pattern ) => {
-								handleSuccess( pattern );
-								onClose();
-							} }
-							onError={ () => {
-								setIsModalOpen( false );
-								onClose();
-							} }
-							onClose={ () => {
-								setIsModalOpen( false );
-								onClose();
-							} }
-						/>
-					) }
-				</>
+		<>
+			<MenuItem icon={ symbol } onClick={ () => setIsModalOpen( true ) }>
+				{ __( 'Create pattern' ) }
+			</MenuItem>
+			{ isModalOpen && (
+				<CreatePatternModal
+					clientIds={ clientIds }
+					onSuccess={ ( pattern ) => {
+						handleSuccess( pattern );
+						onClose();
+					} }
+					onError={ () => {
+						setIsModalOpen( false );
+						onClose();
+					} }
+					onClose={ () => {
+						setIsModalOpen( false );
+						onClose();
+					} }
+				/>
 			) }
-		</BlockSettingsMenuControls>
+		</>
 	);
 }
