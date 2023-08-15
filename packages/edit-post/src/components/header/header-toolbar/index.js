@@ -107,6 +107,7 @@ function HeaderToolbar() {
 				shortcut={ listViewShortcut }
 				showTooltip={ ! showIconLabels }
 				variant={ showIconLabels ? 'tertiary' : undefined }
+				aria-expanded={ isListViewOpen }
 			/>
 		</>
 	);

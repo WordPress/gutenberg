@@ -265,6 +265,7 @@ export default function HeaderEditMode() {
 												? 'tertiary'
 												: undefined
 										}
+										aria-expanded={ isListViewOpen }
 									/>
 								) }
 								{ isZoomedOutViewExperimentEnabled &&
