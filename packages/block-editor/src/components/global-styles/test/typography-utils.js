@@ -96,6 +96,36 @@ describe( 'typography utils', () => {
 			},
 
 			{
+				message:
+					'should override default max viewport width fluid typography settings',
+				preset: {
+					size: '1.75rem',
+				},
+				typographySettings: {
+					fluid: {
+						maxViewportWidth: '1200px',
+					},
+				},
+				expected:
+					'clamp(1.119rem, 1.119rem + ((1vw - 0.2rem) * 1.147), 1.75rem)',
+			},
+
+			{
+				message:
+					'should override default min viewport width fluid typography settings',
+				preset: {
+					size: '1.75rem',
+				},
+				typographySettings: {
+					fluid: {
+						minViewportWidth: '800px',
+					},
+				},
+				expected:
+					'clamp(1.119rem, 1.119rem + ((1vw - 0.5rem) * 1.262), 1.75rem)',
+			},
+
+			{
 				message: 'should return clamp value with em min and max units',
 				preset: {
 					size: '1.75em',
@@ -478,6 +508,21 @@ describe( 'typography utils', () => {
 				expected:
 					'clamp(100px, 6.25rem + ((1vw - 3.2px) * 7.813), 200px)',
 			},
+
+			{
+				message: 'should apply all custom fluid typography settings',
+				preset: {
+					size: '17px',
+				},
+				typographySettings: {
+					fluid: {
+						minFontSize: '16px',
+						maxViewportWidth: '1200px',
+						minViewportWidth: '640px',
+					},
+				},
+				expected: 'clamp(16px, 1rem + ((1vw - 6.4px) * 0.179), 17px)',
+			},
 		].forEach( ( { message, preset, typographySettings, expected } ) => {
 			it( `${ message }`, () => {
 				expect(
@@ -560,6 +605,16 @@ describe( 'typography utils', () => {
 					layout: { wideSize: '1000rem' },
 				},
 				expected: { fluid: { maxViewportWidth: '10px' } },
+			},
+			{
+				message: 'should not merge `layout.wideSize` if it is fluid',
+				settings: {
+					typography: { fluid: { minFontSize: '16px' } },
+					layout: { wideSize: 'clamp(1000px, 85vw, 2000px)' },
+				},
+				expected: {
+					fluid: { minFontSize: '16px' },
+				},
 			},
 		].forEach( ( { message, settings, expected } ) => {
 			it( `${ message }`, () => {

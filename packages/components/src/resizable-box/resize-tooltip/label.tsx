@@ -12,7 +12,8 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { Position, POSITIONS } from './utils';
+import type { Position } from './utils';
+import { POSITIONS } from './utils';
 import {
 	TooltipWrapper,
 	Tooltip,

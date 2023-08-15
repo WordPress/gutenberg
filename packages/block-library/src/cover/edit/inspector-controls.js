@@ -93,6 +93,8 @@ export default function CoverInspectorControls( {
 	setOverlayColor,
 	coverRef,
 	currentSettings,
+	updateDimRatio,
+	onClearMedia,
 } ) {
 	const {
 		useFeaturedImage,
@@ -231,17 +233,7 @@ export default function CoverInspectorControls( {
 								variant="secondary"
 								isSmall
 								className="block-library-cover__reset-button"
-								onClick={ () =>
-									setAttributes( {
-										url: undefined,
-										id: undefined,
-										backgroundType: undefined,
-										focalPoint: undefined,
-										hasParallax: undefined,
-										isRepeated: undefined,
-										useFeaturedImage: false,
-									} )
-								}
+								onClick={ onClearMedia }
 							>
 								{ __( 'Clear Media' ) }
 							</Button>
@@ -281,9 +273,7 @@ export default function CoverInspectorControls( {
 								: dimRatio !== ( url ? 50 : 100 );
 						} }
 						label={ __( 'Overlay opacity' ) }
-						onDeselect={ () =>
-							setAttributes( { dimRatio: url ? 50 : 100 } )
-						}
+						onDeselect={ () => updateDimRatio( url ? 50 : 100 ) }
 						resetAllFilter={ () => ( {
 							dimRatio: url ? 50 : 100,
 						} ) }
@@ -294,10 +284,8 @@ export default function CoverInspectorControls( {
 							__nextHasNoMarginBottom
 							label={ __( 'Overlay opacity' ) }
 							value={ dimRatio }
-							onChange={ ( newDimRation ) =>
-								setAttributes( {
-									dimRatio: newDimRation,
-								} )
+							onChange={ ( newDimRatio ) =>
+								updateDimRatio( newDimRatio )
 							}
 							min={ 0 }
 							max={ 100 }

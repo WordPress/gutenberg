@@ -13,11 +13,8 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect, useContextSystem } from '../../ui/context';
 import type {
 	ToggleGroupControlOptionBaseProps,
 	WithToolTipProps,

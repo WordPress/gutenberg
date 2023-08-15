@@ -36,4 +36,11 @@ test.describe( 'data-wp-effect', () => {
 		await page.getByTestId( 'toggle' ).click();
 		await expect( el ).toBeFocused();
 	} );
+
+	test( 'short-circuit infinite loops', async ( { page } ) => {
+		const el = page.getByTestId( 'short-circuit infinite loops' );
+		await expect( el ).toContainText( '1' );
+		await page.getByTestId( 'increment' ).click();
+		await expect( el ).toContainText( '3' );
+	} );
 } );

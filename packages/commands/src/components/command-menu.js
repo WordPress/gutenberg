@@ -24,7 +24,7 @@ import {
 	store as keyboardShortcutsStore,
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
-import { Icon } from '@wordpress/icons';
+import { Icon, search as inputIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -168,8 +168,9 @@ function CommandInput( { isOpen, search, setSearch } ) {
 			ref={ commandMenuInput }
 			value={ search }
 			onValueChange={ setSearch }
-			placeholder={ __( 'Type a command or search' ) }
+			placeholder={ __( 'Search for commands' ) }
 			aria-activedescendant={ selectedItemId }
+			icon={ search }
 		/>
 	);
 }
@@ -188,7 +189,7 @@ export function CommandMenu() {
 		registerShortcut( {
 			name: 'core/commands',
 			category: 'global',
-			description: __( 'Open the command palette' ),
+			description: __( 'Open the command palette.' ),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'k',
@@ -260,6 +261,7 @@ export function CommandMenu() {
 					onKeyDown={ onKeyDown }
 				>
 					<div className="commands-command-menu__header">
+						<Icon icon={ inputIcon } />
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }

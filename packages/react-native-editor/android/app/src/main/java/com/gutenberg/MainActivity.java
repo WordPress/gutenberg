@@ -1,6 +1,7 @@
 package com.gutenberg;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,8 @@ import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.wordpress.mobile.WPAndroidGlue.GutenbergProps;
 
 import java.util.Locale;
@@ -23,6 +26,8 @@ public class MainActivity extends ReactActivity {
 
     private ReactRootView mReactRootView;
     private Menu mMenu;
+
+    private static final String EXTRAS_INITIAL_PROPS = "initialProps";
 
     private void openReactNativeDebugMenu() {
         ReactInstanceManager devSettingsModule = getReactInstanceManager();
@@ -160,6 +165,21 @@ public class MainActivity extends ReactActivity {
     private Bundle getAppOptions() {
         Bundle bundle = new Bundle();
 
+        // Parse initial props from launch arguments
+        String initialData = null;
+        Bundle extrasBundle = getIntent().getExtras();
+        if(extrasBundle != null) {
+            String initialProps = extrasBundle.getString(EXTRAS_INITIAL_PROPS, "{}");
+            try {
+                JSONObject jsonObject = new JSONObject(initialProps);
+                if (jsonObject.has(GutenbergProps.PROP_INITIAL_DATA)) {
+                    initialData = jsonObject.getString(GutenbergProps.PROP_INITIAL_DATA);
+                }
+            } catch (final JSONException e) {
+                Log.e("MainActivity", "Json parsing error: " + e.getMessage());
+            }
+        }
+
         // Add locale
         String languageString = Locale.getDefault().toString();
         String localeSlug = languageString.replace("_", "-").toLowerCase(Locale.ENGLISH);
@@ -179,6 +199,11 @@ public class MainActivity extends ReactActivity {
         capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_LOOM_EMBED_BLOCK, true);
         capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK, true);
         bundle.putBundle(GutenbergProps.PROP_CAPABILITIES, capabilities);
+
+        if(initialData != null) {
+            bundle.putString(GutenbergProps.PROP_INITIAL_DATA, initialData);
+        }
+
         return bundle;
     }
 }

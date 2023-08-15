@@ -5,10 +5,7 @@ import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	BlockSettingsMenuControls,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -62,7 +59,7 @@ function ReusableBlocksManageButton( { clientId } ) {
 	}
 
 	return (
-		<BlockSettingsMenuControls>
+		<>
 			<MenuItem href={ managePatternsUrl }>
 				{ __( 'Manage patterns' ) }
 			</MenuItem>
@@ -73,7 +70,7 @@ function ReusableBlocksManageButton( { clientId } ) {
 						: __( 'Detach pattern' ) }
 				</MenuItem>
 			) }
-		</BlockSettingsMenuControls>
+		</>
 	);
 }
 

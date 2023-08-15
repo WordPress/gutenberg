@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "12.6.0",
+	"version": "12.7.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,6 +39,7 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/commands": "file:../commands",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
@@ -75,7 +76,7 @@
 		"react-autosize-textarea": "^7.1.0",
 		"react-easy-crop": "^4.5.1",
 		"rememo": "^4.0.2",
-		"remove-accents": "^0.4.2",
+		"remove-accents": "^0.5.0",
 		"traverse": "^0.6.6"
 	},
 	"peerDependencies": {

@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { PostTypeSupportCheck } from '../';
+import PostTypeSupportCheck from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test.
