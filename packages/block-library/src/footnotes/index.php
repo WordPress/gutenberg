@@ -98,7 +98,7 @@ function wp_save_footnotes_meta( $revision_id ) {
 
 		if ( $footnotes ) {
 			// Can't use update_post_meta() because it doesn't allow revisions.
-			update_metadata( 'post', $revision_id, 'footnotes', $footnotes );
+			update_metadata( 'post', $revision_id, 'footnotes', wp_slash( $footnotes ) );
 		}
 	}
 }
@@ -154,7 +154,7 @@ function wp_add_footnotes_revisions_to_post_meta( $post ) {
 
 			if ( $footnotes ) {
 				// Can't use update_post_meta() because it doesn't allow revisions.
-				update_metadata( 'post', $wp_temporary_footnote_revision_id, 'footnotes', $footnotes );
+				update_metadata( 'post', $wp_temporary_footnote_revision_id, 'footnotes', wp_slash( $footnotes ) );
 			}
 		}
 	}
@@ -176,7 +176,7 @@ function wp_restore_footnotes_from_revision( $post_id, $revision_id ) {
 	$footnotes = get_post_meta( $revision_id, 'footnotes', true );
 
 	if ( $footnotes ) {
-		update_post_meta( $post_id, 'footnotes', $footnotes );
+		update_post_meta( $post_id, 'footnotes', wp_slash( $footnotes ) );
 	} else {
 		delete_post_meta( $post_id, 'footnotes' );
 	}

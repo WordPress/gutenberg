@@ -291,7 +291,8 @@ test.describe( 'Footnotes', () => {
 		await editor.clickBlockToolbarButton( 'More' );
 		await page.locator( 'button:text("Footnote")' ).click();
 
-		await page.keyboard.type( 'first footnote' );
+		// Check if content is correctly slashed on save and restore.
+		await page.keyboard.type( 'first footnote"' );
 
 		const id1 = await editor.canvas.evaluate( () => {
 			return document.activeElement.id;
@@ -316,7 +317,7 @@ test.describe( 'Footnotes', () => {
 				id: id2,
 			},
 			{
-				content: 'first footnote',
+				content: 'first footnote"',
 				id: id1,
 			},
 		] );
@@ -329,7 +330,7 @@ test.describe( 'Footnotes', () => {
 		// This also saves the post!
 		expect( await getFootnotes( page ) ).toMatchObject( [
 			{
-				content: 'first footnote',
+				content: 'first footnote"',
 				id: id1,
 			},
 			{
@@ -337,6 +338,16 @@ test.describe( 'Footnotes', () => {
 				id: id2,
 			},
 		] );
+
+		const editorPage = page;
+		const previewPage = await editor.openPreviewPage();
+
+		await expect(
+			previewPage.locator( 'ol.wp-block-footnotes' )
+		).toHaveText( 'first footnote” ↩︎second footnote ↩︎' );
+
+		await previewPage.close();
+		await editorPage.bringToFront();
 
 		// Open revisions.
 		await editor.openDocumentSettingsSidebar();
@@ -355,10 +366,19 @@ test.describe( 'Footnotes', () => {
 				id: id2,
 			},
 			{
-				content: 'first footnote',
+				content: 'first footnote"',
 				id: id1,
 			},
 		] );
+
+		const previewPage2 = await editor.openPreviewPage();
+
+		await expect(
+			previewPage2.locator( 'ol.wp-block-footnotes' )
+		).toHaveText( 'second footnote ↩︎first footnote” ↩︎' );
+
+		await previewPage2.close();
+		await editorPage.bringToFront();
 	} );
 
 	test( 'can be previewed when published', async ( { editor, page } ) => {
