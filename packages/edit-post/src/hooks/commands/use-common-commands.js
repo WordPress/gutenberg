@@ -151,7 +151,7 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/open-preferences',
-		label: __( 'Open editor preferences' ),
+		label: __( 'Editor preferences' ),
 		icon: cog,
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
@@ -160,7 +160,7 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/open-shortcut-help',
-		label: __( 'Open keyboard shortcuts' ),
+		label: __( 'Keyboard shortcuts' ),
 		icon: keyboard,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
@@ -178,8 +178,8 @@ export default function useCommonCommands() {
 			close();
 			createInfoNotice(
 				showBlockBreadcrumbs
-					? __( 'Breadcrumbs off.' )
-					: __( 'Breadcrumbs on.' ),
+					? __( 'Breadcrumbs hidden.' )
+					: __( 'Breadcrumbs visible.' ),
 				{
 					id: 'core/edit-post/toggle-breadcrumbs/notice',
 					type: 'snackbar',

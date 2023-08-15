@@ -83,6 +83,37 @@ function usePageContentFocusCommands() {
 	return { isLoading: false, commands };
 }
 
+function useEditorModeCommands() {
+	const { switchEditorMode } = useDispatch( editSiteStore );
+	const { canvasMode, editorMode } = useSelect(
+		( select ) => ( {
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+			editorMode: select( editSiteStore ).getEditorMode(),
+		} ),
+		[]
+	);
+
+	if ( canvasMode !== 'edit' || editorMode !== 'text' ) {
+		return { isLoading: false, commands: [] };
+	}
+
+	const commands = [];
+
+	if ( editorMode === 'text' ) {
+		commands.push( {
+			name: 'core/exit-code-editor',
+			label: __( 'Exit code editor' ),
+			icon: code,
+			callback: ( { close } ) => {
+				switchEditorMode( 'visual' );
+				close();
+			},
+		} );
+	}
+
+	return { isLoading: false, commands };
+}
+
 function useManipulateDocumentCommands() {
 	const { isLoaded, record: template } = useEditedEntityRecord();
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
@@ -244,8 +275,8 @@ function useEditUICommands() {
 			toggle( 'core/edit-site', 'distractionFree' );
 			createInfoNotice(
 				getPreference( 'core/edit-site', 'distractionFree' )
-					? __( 'Distraction free mode turned on.' )
-					: __( 'Distraction free mode turned off.' ),
+					? __( 'Distraction free on.' )
+					: __( 'Distraction free off.' ),
 				{
 					id: 'core/edit-site/distraction-free-mode/notice',
 					type: 'snackbar',
@@ -265,19 +296,21 @@ function useEditUICommands() {
 		},
 	} );
 
-	commands.push( {
-		name: 'core/toggle-code-editor',
-		label: __( 'Toggle code editor' ),
-		icon: code,
-		callback: ( { close } ) => {
-			switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
-			close();
-		},
-	} );
+	if ( editorMode === 'visual' ) {
+		commands.push( {
+			name: 'core/toggle-code-editor',
+			label: __( 'Open code editor' ),
+			icon: code,
+			callback: ( { close } ) => {
+				switchEditorMode( 'text' );
+				close();
+			},
+		} );
+	}
 
 	commands.push( {
 		name: 'core/open-preferences',
-		label: __( 'Open editor preferences' ),
+		label: __( 'Editor preferences' ),
 		icon: cog,
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
@@ -286,7 +319,7 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/open-shortcut-help',
-		label: __( 'Open keyboard shortcuts' ),
+		label: __( 'Keyboard shortcuts' ),
 		icon: keyboard,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
@@ -302,6 +335,15 @@ function useEditUICommands() {
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
 			close();
+			createInfoNotice(
+				showBlockBreadcrumbs
+					? __( 'Breadcrumbs hidden.' )
+					: __( 'Breadcrumbs visible.' ),
+				{
+					id: 'core/edit-site/toggle-breadcrumbs/notice',
+					type: 'snackbar',
+				}
+			);
 		},
 	} );
 
@@ -312,6 +354,12 @@ function useEditUICommands() {
 }
 
 export function useEditModeCommands() {
+	useCommandLoader( {
+		name: 'core/exit-code-editor',
+		hook: useEditorModeCommands,
+		context: 'site-editor-edit',
+	} );
+
 	useCommandLoader( {
 		name: 'core/edit-site/page-content-focus',
 		hook: usePageContentFocusCommands,

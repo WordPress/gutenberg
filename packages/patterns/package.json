@@ -1,0 +1,54 @@
+{
+	"name": "@wordpress/patterns",
+	"version": "1.0.0",
+	"description": "Management of user pattern editing.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"patterns"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/patterns/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/patterns"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=16.0.0",
+		"npm": ">=8 <9"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss",
+		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
+	],
+	"dependencies": {
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/notices": "file:../notices",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/url": "file:../url"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
