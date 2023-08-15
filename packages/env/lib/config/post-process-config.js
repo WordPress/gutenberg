@@ -59,6 +59,24 @@ function mergeRootToEnvironments( config ) {
 		config.env.tests.port = config.testsPort;
 		delete config.testsPort;
 	}
+	if ( config.ssl !== undefined ) {
+		if (
+			config.ssl.port !== undefined &&
+			config.env.development.ssl.port === undefined
+		) {
+			removedRootOptions.ssl.port = config.ssl.port;
+			config.env.development.ssl.port = config.ssl.port;
+			delete config.ssl.port;
+		}
+		if (
+			config.ssl.testsPort !== undefined &&
+			config.env.tests.ssl.port === undefined
+		) {
+			removedRootOptions.ssl.testsPort = config.ssl.testsPort;
+			config.env.tests.ssl.port = config.ssl.testsPort;
+			delete config.ssl.testsPort;
+		}
+	}
 	if ( config.lifecycleScripts !== undefined ) {
 		removedRootOptions.lifecycleScripts = config.lifecycleScripts;
 		delete config.lifecycleScripts;
@@ -110,9 +128,16 @@ function appendPortToWPConfigs( config ) {
 				continue;
 			}
 
+			let port = config.env[ env ].port;
+			if ( config.env[ env ].ssl ) {
+				port = config.env[ env ].ssl.port;
+				if ( config.env[ env ].config[ option ].startsWith( 'http://' ) ) {
+					config.env[ env ].config[ option ] = 'https://' + config.env[ env ].config[ option ].substring( 7 );
+				}
+			}
 			config.env[ env ].config[ option ] = addOrReplacePort(
 				config.env[ env ].config[ option ],
-				config.env[ env ].port,
+				port,
 				// Don't replace the port if one is already set on WP_HOME.
 				option !== 'WP_HOME'
 			);
@@ -131,6 +156,7 @@ function validatePortUniqueness( config ) {
 	// We're going to build a map of the environments and their port
 	// so we can accomodate root-level config options more easily.
 	const environmentPorts = {};
+	const environmentSSLPorts = {};
 
 	// Add all of the environments to the map. This will
 	// overwrite any root-level options if necessary.
@@ -140,8 +166,20 @@ function validatePortUniqueness( config ) {
 				`The "${ env }" environment has an invalid port.`
 			);
 		}
+		if (
+			config.env[ env ].ssl !== undefined &&
+			config.env[ env ].ssl.port === undefined
+		) {
+			throw new ValidationError(
+				`The "${ env }" environment has an invalid SSL port.`
+			);
+		}
 
 		environmentPorts[ env ] = config.env[ env ].port;
+
+		if ( config.env[ env ].ssl !== undefined ) {
+			environmentSSLPorts[ env ] = config.env[ env ].ssl.port;
+		}
 	}
 
 	// This search isn't very performant, but, we won't ever be
@@ -155,6 +193,20 @@ function validatePortUniqueness( config ) {
 			if ( environmentPorts[ env ] === environmentPorts[ check ] ) {
 				throw new ValidationError(
 					`The "${ env }" and "${ check }" environments may not have the same port.`
+				);
+			}
+		}
+	}
+
+	for ( const env in environmentSSLPorts ) {
+		for ( const check in environmentSSLPorts ) {
+			if ( env === check ) {
+				continue;
+			}
+
+			if ( environmentSSLPorts[ env ] === environmentSSLPorts[ check ] ) {
+				throw new ValidationError(
+					`The "${ env }" and "${ check }" environments may not have the same SSL port.`
 				);
 			}
 		}
