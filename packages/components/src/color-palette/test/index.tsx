@@ -225,6 +225,9 @@ describe( 'ColorPalette', () => {
 
 		render( <ControlledColorPalette /> );
 
+		const colorName = EXAMPLE_COLORS[ 0 ].name;
+		const colorCode = EXAMPLE_COLORS[ 0 ].color;
+
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
 
 		// Click the first unpressed button
@@ -236,11 +239,13 @@ describe( 'ColorPalette', () => {
 		);
 
 		// Confirm the correct color name, color value, and button label are used
-		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].name ) ).toBeVisible();
-		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].color ) ).toBeVisible();
+		expect(
+			screen.getByText( colorName, { selector: 'span' } )
+		).toBeVisible();
+		expect( screen.getByText( colorCode ) ).toBeVisible();
 		expect(
 			screen.getByRole( 'button', {
-				name: `Custom color picker. The currently selected color is called "${ EXAMPLE_COLORS[ 0 ].name }" and has a value of "${ EXAMPLE_COLORS[ 0 ].color }".`,
+				name: `Custom color picker. The currently selected color is called "${ colorName }" and has a value of "${ EXAMPLE_COLORS[ 0 ].color }".`,
 				expanded: false,
 			} )
 		).toBeInTheDocument();
@@ -248,12 +253,11 @@ describe( 'ColorPalette', () => {
 		// Clear the color, confirm that the relative values are cleared/updated.
 		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
+
 		expect(
-			screen.queryByText( EXAMPLE_COLORS[ 0 ].name )
+			screen.queryByText( colorName, { selector: 'span' } )
 		).not.toBeInTheDocument();
-		expect(
-			screen.queryByText( EXAMPLE_COLORS[ 0 ].color )
-		).not.toBeInTheDocument();
+		expect( screen.queryByText( colorCode ) ).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', {
 				name: /^Custom color picker.$/,
