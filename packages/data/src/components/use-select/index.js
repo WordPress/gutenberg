@@ -137,16 +137,11 @@ function Store( registry, suspense ) {
 
 			if ( process.env.NODE_ENV === 'development' ) {
 				if ( ! didWarnUnstableReference ) {
-					const secondMapResult =
-						registry.__unstableMarkListeningStores(
-							() => mapSelect( select, registry ),
-							listeningStores
-						);
-
+					const secondMapResult = mapSelect( select, registry );
 					if ( ! isShallowEqual( mapResult, secondMapResult ) ) {
 						// eslint-disable-next-line no-console
 						console.warn(
-							`The values returned by the 'useSelect' hook aren't referentially stable. This can lead to unnecessary rerenders.`
+							`The 'useSelect' hook returns different values when called with the same state and parameters. This can lead to unnecessary rerenders.`
 						);
 						didWarnUnstableReference = true;
 					}
