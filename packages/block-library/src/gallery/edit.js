@@ -532,6 +532,7 @@ function GalleryEdit( props ) {
 		allowedBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
+		__experimentalCaptureToolbars: true,
 		...nativeInnerBlockProps,
 	} );
 
