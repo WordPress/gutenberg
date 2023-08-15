@@ -240,7 +240,7 @@ HTML;
 
 function gutenberg_render_behaviors_support_show_in_view( $block_content, $block ) { 
 	// TODO: Use an object instead of a variable like in the lightbox.
-	if ( ! isset( $block['attrs']['showInView'] ) ) {
+	if ( ! isset( $block['attrs']['showInView'] ) || true !== $block['attrs']['showInView'] ) {
 		return $block_content;
 	}
 	$processor = new WP_HTML_Tag_Processor( $block_content );
@@ -248,9 +248,9 @@ function gutenberg_render_behaviors_support_show_in_view( $block_content, $block
 	$processor->set_attribute( 'data-wp-interactive', true );
 	$processor->set_attribute( 'data-wp-context', '{ "core": { "isVisible": false } }' );
 	$processor->add_class( 'show-in-view-animation' );
-	$processor->set_attribute( 'data-wp-class--hidden-on-first-load', 'context.core.hiddenOnFirstLoad' );
-	$processor->set_attribute( 'data-wp-class--is-visible', 'context.core.isVisible' );
-	$processor->set_attribute( 'data-wp-effect', 'effects.core.showInView' );
+	$processor->set_attribute( 'data-wp-class--should-animate-in-view', 'context.core.shouldAnimateInView' );
+	$processor->set_attribute( 'data-wp-class--is-loaded', 'context.core.isLoaded' );
+	$processor->set_attribute( 'data-wp-init', 'effects.core.showInView' );
 	return $processor->get_updated_html();
 }
 

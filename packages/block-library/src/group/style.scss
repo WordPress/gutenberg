@@ -3,11 +3,11 @@
 	box-sizing: border-box;
 }
 
-.show-in-view-animation.hidden-on-first-load:not(.is-visible) {
+.show-in-view-animation.should-animate-in-view:not(.is-loaded) {
 	visibility: hidden;
 }
 
-.show-in-view-animation.hidden-on-first-load.is-visible {
+.show-in-view-animation.should-animate-in-view.is-loaded {
 	animation: show-in-view 0.6s ease-out forwards;
 }
 
