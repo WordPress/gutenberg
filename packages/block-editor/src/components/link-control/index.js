@@ -419,7 +419,9 @@ function LinkControl( {
 							return (
 								<LinkSettings
 									value={ internalControlValue }
-									settings={ settings }
+									settings={ settings?.filter(
+										( { id } ) => id === 'opensInNewTab'
+									) }
 									onChange={ ( { opensInNewTab } ) => {
 										onChange( {
 											opensInNewTab,
@@ -445,9 +447,7 @@ function LinkControl( {
 						>
 							<LinkSettings
 								value={ internalControlValue }
-								settings={ settings?.filter(
-									( { id } ) => id === 'opensInNewTab'
-								) }
+								settings={ settings }
 								onChange={ createSetInternalSettingValueHandler(
 									settingsKeys
 								) }
