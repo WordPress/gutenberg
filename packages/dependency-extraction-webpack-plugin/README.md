@@ -207,7 +207,7 @@ function requestToHandle( request ) {
 }
 
 module.exports = {
-	plugins: [ new DependencyExtractionWebpackPlugin( { requestToExternal } ) ],
+	plugins: [ new DependencyExtractionWebpackPlugin( { requestToHandle } ) ],
 };
 ```
 
