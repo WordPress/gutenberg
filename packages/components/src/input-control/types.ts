@@ -73,7 +73,8 @@ export type InputChangeCallback< P = {} > = (
 	extra: { event: SyntheticEvent } & P
 ) => void;
 
-export interface InputFieldProps extends BaseProps {
+export interface InputFieldProps
+	extends Omit< BaseProps, '__next36pxDefaultSize' > {
 	/**
 	 * Determines the drag axis.
 	 *
