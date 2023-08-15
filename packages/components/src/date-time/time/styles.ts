@@ -14,8 +14,6 @@ import {
 	BackdropUI,
 } from '../../input-control/styles/input-control-styles';
 import NumberControl from '../../number-control';
-import SelectControl from '../../select-control';
-import { Select } from '../../select-control/styles/select-control-styles';
 
 export const Wrapper = styled.div`
 	box-sizing: border-box;
@@ -90,14 +88,6 @@ export const MinutesInput = styled( NumberControl )`
 // <BaseControl> in <SelectControl>
 export const MonthSelectWrapper = styled.div`
 	flex-grow: 1;
-`;
-
-export const MonthSelect = styled( SelectControl )`
-	height: 36px;
-
-	${ Select } {
-		line-height: 30px;
-	}
 `;
 
 export const DayInput = styled( NumberControl )`
