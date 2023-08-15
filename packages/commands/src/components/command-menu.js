@@ -57,7 +57,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 							className={ classnames(
 								'commands-command-menu__item',
 								{
-									'with-no-icon': ! command.icon,
+									'has-icon': command.icon,
 								}
 							) }
 						>
@@ -130,7 +130,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 					<HStack
 						alignment="left"
 						className={ classnames( 'commands-command-menu__item', {
-							'with-no-icon': ! command.icon,
+							'has-icon': command.icon,
 						} ) }
 					>
 						{ command.icon && <Icon icon={ command.icon } /> }

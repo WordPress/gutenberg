@@ -66,7 +66,6 @@
 		cursor: pointer;
 		display: flex;
 		align-items: center;
-		padding: $grid-unit;
 		color: $gray-900;
 		font-size: $default-font-size;
 		min-height: $button-size-next-default-40px;
@@ -90,8 +89,13 @@
 			fill: $gray-900;
 		}
 
-		> .with-no-icon {
-			padding-left: $grid-unit-40; // Align text, even without icons.
+		> div {
+			padding: $grid-unit;
+			padding-left: $grid-unit-50; // Account for commands without icons.
+		}
+
+		> .has-icon {
+			padding-left: $grid-unit;
 		}
 	}
 
