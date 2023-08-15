@@ -392,12 +392,14 @@ test.describe( 'Footnotes', () => {
 		// path).
 		await editor.canvas.click( 'ol.wp-block-footnotes li span' );
 		await page.keyboard.press( 'End' );
+		// Test slashing.
 		await page.keyboard.type( '3"' );
 
 		const previewPage2 = await editor.openPreviewPage();
 
+		// Note: quote will get curled by wptexturize.
 		await expect(
 			previewPage2.locator( 'ol.wp-block-footnotes li' )
-		).toHaveText( '123"  ↩︎' );
+		).toHaveText( '123″  ↩︎' );
 	} );
 } );
