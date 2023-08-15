@@ -680,6 +680,10 @@ _Related_
 
 Private @wordpress/block-editor APIs.
 
+### ReusableBlocksRenameHint
+
+Undocumented declaration.
+
 ### RichText
 
 _Related_
@@ -788,6 +792,10 @@ _Related_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
+
+### useBlockCommands
+
+Undocumented declaration.
 
 ### useBlockDisplayInformation
 
