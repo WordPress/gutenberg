@@ -1735,7 +1735,7 @@ describe( 'Selecting links', () => {
 
 describe( 'Link Settings', () => {
 	describe( 'Previewing links', () => {
-		it( 'should allow toggling the "Opens in new tab" setting control (only) on the link preview', async () => {
+		it( 'should allow toggling the "Opens in new tab" setting control (only)', async () => {
 			const user = userEvent.setup();
 			const selectedLink = fauxEntitySuggestions[ 0 ];
 			const mockOnChange = jest.fn();
@@ -1794,7 +1794,7 @@ describe( 'Link Settings', () => {
 			} );
 		} );
 
-		it( 'should hide advanced link settings and toggle when not editing a link', async () => {
+		it( 'should hide advanced link settings and toggle', async () => {
 			const selectedLink = fauxEntitySuggestions[ 0 ];
 
 			const customSettings = [
@@ -1825,16 +1825,18 @@ describe( 'Link Settings', () => {
 	} );
 
 	describe( 'Editing links', () => {
-		it( 'should not display "Advanced" toggle for settings when "Open in new tab" is the only setting', async () => {
+		it( 'should display "Open in new tab" setting outside of advanced settings area when it is the only setting', async () => {
+			const user = userEvent.setup();
 			const selectedLink = fauxEntitySuggestions[ 0 ];
 			const expectedSettingText = 'Open in new tab';
 
 			const LinkControlConsumer = () => {
-				const [ link ] = useState( selectedLink );
+				const [ link, setLink ] = useState( selectedLink );
 
 				return (
 					<LinkControl
 						value={ link }
+						onChange={ setLink }
 						forceIsEditingLink
 						settings={ [
 							{
@@ -1864,20 +1866,41 @@ describe( 'Link Settings', () => {
 			} );
 
 			expect( openInNewTabSettingControl ).toBeVisible();
+
+			await user.click( openInNewTabSettingControl );
+
+			expect( openInNewTabSettingControl ).toBeChecked();
 		} );
 
-		it( 'should provide a means to toggle the advanced link settings when editing a link', async () => {
+		it( 'should show an advanced link settings area when multiple settings are provided', async () => {
 			const selectedLink = fauxEntitySuggestions[ 0 ];
+			const user = userEvent.setup();
+
+			const customSettings = [
+				{
+					id: 'opensInNewTab',
+					title: 'Open in new tab',
+				},
+				{
+					id: 'noFollow',
+					title: 'No follow',
+				},
+			];
 
 			const LinkControlConsumer = () => {
-				const [ link ] = useState( selectedLink );
+				const [ link, setLink ] = useState( selectedLink );
 
-				return <LinkControl value={ link } forceIsEditingLink />;
+				return (
+					<LinkControl
+						value={ link }
+						onChange={ setLink }
+						forceIsEditingLink
+						settings={ customSettings }
+					/>
+				);
 			};
 
 			render( <LinkControlConsumer /> );
-
-			const user = userEvent.setup();
 
 			const settingsToggle = getSettingsDrawerToggle();
 
@@ -1897,6 +1920,19 @@ describe( 'Link Settings', () => {
 			} );
 
 			expect( newTabSettingInput ).toBeVisible();
+
+			const noFollowSettingInput = screen.getByRole( 'checkbox', {
+				name: 'No follow',
+			} );
+
+			expect( noFollowSettingInput ).toBeVisible();
+
+			// check both settings and check they are now checked
+			await user.click( newTabSettingInput );
+			await user.click( noFollowSettingInput );
+
+			expect( newTabSettingInput ).toBeChecked();
+			expect( noFollowSettingInput ).toBeChecked();
 
 			await user.click( settingsToggle );
 
