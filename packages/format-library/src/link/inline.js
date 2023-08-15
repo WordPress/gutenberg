@@ -160,6 +160,9 @@ function InlineLinkUI( {
 			}
 
 			newValue.start = newValue.end;
+
+			// Hides the Link UI.
+			newValue.activeFormats = [];
 			onChange( newValue );
 		}
 
