@@ -60,7 +60,7 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
 					icon={ lock }
-					label={ __( 'Unlock' ) }
+					label={ __( 'Unlock…' ) }
 					onClick={ toggleModal }
 					ref={ lockButtonRef }
 				/>
