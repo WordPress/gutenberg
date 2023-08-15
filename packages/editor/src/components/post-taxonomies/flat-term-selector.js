@@ -8,6 +8,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies

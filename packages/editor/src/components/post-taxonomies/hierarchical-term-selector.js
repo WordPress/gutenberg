@@ -3,6 +3,7 @@
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
 	CheckboxControl,
