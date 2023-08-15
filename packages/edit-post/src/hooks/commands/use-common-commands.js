@@ -5,7 +5,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	code,
-	cog,
 	drawerLeft,
 	drawerRight,
 	blockDefault,
@@ -92,7 +91,6 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-distraction-free',
 		label: __( 'Toggle distraction free' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'distractionFree' );
 			close();
@@ -102,7 +100,6 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'focusMode' );
 			close();
@@ -132,7 +129,6 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'fixedToolbar' );
 			close();
@@ -152,7 +148,6 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/open-preferences',
 		label: __( 'Editor preferences' ),
-		icon: cog,
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
 		},
@@ -172,7 +167,6 @@ export default function useCommonCommands() {
 		label: showBlockBreadcrumbs
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
 			close();
