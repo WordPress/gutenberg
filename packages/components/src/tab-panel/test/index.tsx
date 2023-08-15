@@ -13,8 +13,6 @@ import { wordpress, category, media } from '@wordpress/icons';
  * Internal dependencies
  */
 import TabPanel from '..';
-import Popover from '../../popover';
-import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const TABS = [
 	{
@@ -107,17 +105,10 @@ describe.each( [
 			];
 
 			render(
-				// In order for the tooltip to display properly, there needs to be
-				// `Popover.Slot` in which the `Popover` renders outside of the
-				// `TabPanel` component, otherwise the tooltip renders inline.
-				<SlotFillProvider>
-					<Component
-						tabs={ TABS_WITH_ICON }
-						children={ panelRenderFunction }
-					/>
-					{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
-					<Popover.Slot />
-				</SlotFillProvider>
+				<Component
+					tabs={ TABS_WITH_ICON }
+					children={ panelRenderFunction }
+				/>
 			);
 
 			const allTabs = screen.getAllByRole( 'tab' );
@@ -125,7 +116,7 @@ describe.each( [
 			for ( let i = 0; i < allTabs.length; i++ ) {
 				expect(
 					screen.queryByText( TABS_WITH_ICON[ i ].title )
-				).not.toBeInTheDocument();
+				).not.toBeVisible();
 
 				await user.hover( allTabs[ i ] );
 
@@ -152,18 +143,11 @@ describe.each( [
 			];
 
 			render(
-				// In order for the tooltip to display properly, there needs to be
-				// `Popover.Slot` in which the `Popover` renders outside of the
-				// `TabPanel` component, otherwise the tooltip renders inline.
-				<SlotFillProvider>
-					<Component
-						tabs={ TABS_WITH_ICON }
-						children={ panelRenderFunction }
-						onSelect={ mockOnSelect }
-					/>
-					{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
-					<Popover.Slot />
-				</SlotFillProvider>
+				<Component
+					tabs={ TABS_WITH_ICON }
+					children={ panelRenderFunction }
+					onSelect={ mockOnSelect }
+				/>
 			);
 
 			expect( await getSelectedTab() ).not.toHaveTextContent( 'Alpha' );
@@ -173,37 +157,37 @@ describe.each( [
 
 			// Tab to focus the tablist. Make sure alpha is focused, and that the
 			// corresponding tooltip is shown.
-			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Alpha' ) ).not.toBeVisible();
 			await user.keyboard( '[Tab]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
-			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Alpha' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure beta is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Beta' ) ).not.toBeVisible();
 			await user.keyboard( '[ArrowRight]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Beta' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure gamma is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Gamma' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Gamma' ) ).not.toBeVisible();
 			await user.keyboard( '[ArrowRight]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
-			expect( screen.getByText( 'Gamma' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Gamma' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure beta is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Beta' ) ).not.toBeVisible();
 			await user.keyboard( '[ArrowLeft]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Beta' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 		} );
 	} );

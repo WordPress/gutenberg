@@ -193,7 +193,7 @@ describe( 'Button', () => {
 
 			render( <Button icon={ plusCircle } label="WordPress" /> );
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
 
 			// Move focus to the button
 			await user.tab();
@@ -230,7 +230,7 @@ describe( 'Button', () => {
 				/>
 			);
 
-			expect( screen.queryByText( 'Label' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Label' ) ).not.toBeVisible();
 
 			// Move focus to the button
 			await user.tab();
@@ -287,7 +287,7 @@ describe( 'Button', () => {
 				<Button icon={ plusCircle } label="WordPress" children={ [] } />
 			);
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
 
 			// Move focus to the button
 			await user.tab();
@@ -321,7 +321,7 @@ describe( 'Button', () => {
 				</Button>
 			);
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
 
 			// Move focus to the button
 			await user.tab();
