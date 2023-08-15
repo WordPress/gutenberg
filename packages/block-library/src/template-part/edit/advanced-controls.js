@@ -34,20 +34,19 @@ export function TemplatePartAdvancedControls( {
 		templatePartId
 	);
 
-	const { areaOptions } = useSelect( ( select ) => {
+	const definedAreas = useSelect( ( select ) => {
 		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 		// Blocks can be loaded into a *non-post* block editor.
-		/* eslint-disable @wordpress/data-no-store-string-literals */
-		const definedAreas =
-			select( 'core/editor' ).__experimentalGetDefaultTemplatePartAreas();
-		/* eslint-enable @wordpress/data-no-store-string-literals */
-		return {
-			areaOptions: definedAreas.map( ( { label, area: _area } ) => ( {
-				label,
-				value: _area,
-			} ) ),
-		};
+		/* eslint-disable-next-line @wordpress/data-no-store-string-literals */
+		return select(
+			'core/editor'
+		).__experimentalGetDefaultTemplatePartAreas();
 	}, [] );
+
+	const areaOptions = definedAreas.map( ( { label, area: _area } ) => ( {
+		label,
+		value: _area,
+	} ) );
 
 	const htmlElementMessages = {
 		header: __(
