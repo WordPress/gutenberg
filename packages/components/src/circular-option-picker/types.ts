@@ -38,7 +38,8 @@ export type CircularOptionPickerProps = {
 	children?: ReactNode;
 	/**
 	 * Whether the keyboard interaction should wrap around.
-	 * Defaults to `true`.
+	 *
+	 * @default true
 	 */
 	loop?: boolean;
 };

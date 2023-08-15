@@ -6,19 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Icon, check } from '@wordpress/icons';
+import { useInstanceId } from '@wordpress/compose';
 import { createContext, useContext } from '@wordpress/element';
+import { Icon, check } from '@wordpress/icons';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
-import {
-	Composite,
-	CompositeGroup,
-	CompositeItem,
-	useCompositeState,
-} from '../composite';
+import { Composite, CompositeItem, useCompositeState } from '../composite';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 import type {
@@ -32,6 +29,8 @@ import type { ButtonAsButtonProps } from '../button/types';
 
 const CircularOptionPickerContext = createContext( {} );
 
+const hasSelectedOption = new Map();
+
 export function Option( {
 	className,
 	isSelected,
@@ -40,16 +39,40 @@ export function Option( {
 	...additionalProps
 }: OptionProps ) {
 	const compositeState = useContext( CircularOptionPickerContext );
+	const {
+		baseId = 'option',
+		currentId,
+		setCurrentId,
+	} = compositeState as any;
+	const id = useInstanceId( Option, baseId );
 
 	const optionControl = (
 		<CompositeItem
 			as={ Button }
-			className={ 'components-circular-option-picker__option' }
-			isPressed={ isSelected }
+			className={ classnames(
+				'components-circular-option-picker__option',
+				{
+					'is-pressed': isSelected,
+				}
+			) }
+			id={ id }
 			{ ...additionalProps }
 			{ ...compositeState }
+			role="option"
+			aria-selected={ !! isSelected }
 		/>
 	);
+
+	// If we call `setCurrentId` here, it doesn't update for other
+	// Option renders in the same pass. So we have to store our own
+	// map to make sure that we only set the first selected option.
+	// We still need to check `currentId` because the control will
+	// update this as the user moves around, and that state should
+	// be maintained as the group gains and loses focus.
+	if ( isSelected && ! currentId && ! hasSelectedOption.get( baseId ) ) {
+		hasSelectedOption.set( baseId, true );
+		setCurrentId( id );
+	}
 
 	return (
 		<div
@@ -78,26 +101,18 @@ export function OptionGroup( {
 	options,
 	...additionalProps
 }: OptionGroupProps ) {
-	const compositeState = useContext( CircularOptionPickerContext );
-
-	// This is unlikely to happen, but on the off-chance that we've ended up
-	// with a list of `OptionGroup`s, we will just return those instead.
-	if ( Array.isArray( options ) && options[ 0 ] instanceof OptionGroup ) {
-		return <>options</>;
-	}
-
 	return (
-		<CompositeGroup
-			role={ 'group' }
+		<div
 			{ ...additionalProps }
-			{ ...compositeState }
+			role="group"
 			className={ classnames(
+				'components-circular-option-picker__option-group',
 				'components-circular-option-picker__swatches',
 				className
 			) }
 		>
 			{ options }
-		</CompositeGroup>
+		</div>
 	);
 }
 
@@ -196,7 +211,8 @@ export function ButtonAction( {
 
 function CircularOptionPicker( props: CircularOptionPickerProps ) {
 	const { actions, className, options, children, loop = true } = props;
-	const compositeState = useCompositeState( { loop } );
+	const rtl = isRTL();
+	const compositeState = useCompositeState( { loop, rtl } );
 
 	return (
 		<Composite
@@ -208,11 +224,11 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 			) }
 		>
 			<CircularOptionPickerContext.Provider value={ compositeState }>
-				{ Array.isArray( options ) ? (
-					<OptionGroup options={ options } />
-				) : (
-					options
-				) }
+				<div
+					className={ 'components-circular-option-picker__swatches' }
+				>
+					{ options }
+				</div>
 				{ children }
 				{ actions && (
 					<div className="components-circular-option-picker__custom-clear-wrapper">

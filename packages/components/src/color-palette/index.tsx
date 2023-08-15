@@ -108,7 +108,7 @@ function MultiplePalettes( {
 	value,
 	headingLevel,
 }: MultiplePalettesProps ) {
-	const instanceId = useInstanceId( MultiplePalettes );
+	const instanceId = useInstanceId( MultiplePalettes, 'color-palette' );
 
 	if ( colors.length === 0 ) {
 		return null;
@@ -117,7 +117,7 @@ function MultiplePalettes( {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
-				const id = `color-palette-${ instanceId }-${ index }`;
+				const id = `${ instanceId }-${ index }`;
 				return (
 					<VStack spacing={ 2 } key={ index }>
 						<ColorHeading id={ id } level={ headingLevel }>
