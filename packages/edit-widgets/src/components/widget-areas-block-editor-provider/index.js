@@ -15,7 +15,7 @@ import {
 	CopyHandler,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -30,7 +30,7 @@ import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
 import { unlock } from '../../lock-unlock';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-
+const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,
@@ -112,7 +112,7 @@ export default function WidgetAreasBlockEditorProvider( {
 					{ ...props }
 				>
 					<CopyHandler>{ children }</CopyHandler>
-					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
+					<PatternsMenuItems rootClientId={ widgetAreaId } />
 				</ExperimentalBlockEditorProvider>
 			</SlotFillProvider>
 		</ShortcutProvider>
