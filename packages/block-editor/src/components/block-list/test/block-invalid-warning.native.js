@@ -11,6 +11,13 @@ import {
 
 setupCoreBlocks();
 
+beforeEach( () => {
+	// Intentionally suppress the expected console errors and warnings to reduce
+	// noise in the test output.
+	jest.spyOn( console, 'error' ).mockImplementation( () => {} );
+	jest.spyOn( console, 'warn' ).mockImplementation( () => {} );
+} );
+
 describe( 'Block invalid warning', () => {
 	it( 'shows invalid placeholder', async () => {
 		// Arrange
