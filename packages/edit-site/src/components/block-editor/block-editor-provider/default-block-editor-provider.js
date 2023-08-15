@@ -16,43 +16,52 @@ import { createBlock } from '@wordpress/blocks';
 import { store as editSiteStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 import useSiteEditorSettings from '../use-site-editor-settings';
+import { PAGE_CONTENT_BLOCK_TYPES } from '../../page-content-focus-manager/constants';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 const noop = () => {};
 
+/**
+ * The default block editor provider for the site editor. Typically used when
+ * the post type is `'wp_template_part'` or `'wp_template'` and allows editing
+ * of the template and its nested entities.
+ *
+ * If the page content focus type is `'hideTemplate'`, the provider will provide
+ * a set of "ghost" blocks that mimick the look and feel of the post editor and
+ * allow editing of the page content only.
+ *
+ * @param {Object}    props
+ * @param {WPElement} props.children
+ */
 export default function DefaultBlockEditorProvider( { children } ) {
 	const settings = useSiteEditorSettings();
 
-	const { templateType, pageContentFocusMode } = useSelect( ( select ) => {
-		const { getEditedPostType, getPageContentFocusMode } =
+	const { templateType, pageContentFocusType } = useSelect( ( select ) => {
+		const { getEditedPostType, getPageContentFocusType } =
 			select( editSiteStore );
 
 		return {
 			templateType: getEditedPostType(),
-			pageContentFocusMode: getPageContentFocusMode(),
+			pageContentFocusType: getPageContentFocusType(),
 		};
 	}, [] );
+
+	const pageGhostBlocks = usePageGhostBlocks();
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		templateType
 	);
 
-	const pageBlocks = usePageBlocks();
+	const isTemplateHidden = pageContentFocusType === 'hideTemplate';
 
 	return (
 		<ExperimentalBlockEditorProvider
 			settings={ settings }
-			value={
-				pageContentFocusMode === 'withoutTemplate' ? pageBlocks : blocks
-			}
-			onInput={
-				pageContentFocusMode === 'withoutTemplate' ? noop : onInput
-			}
-			onChange={
-				pageContentFocusMode === 'withoutTemplate' ? noop : onChange
-			}
+			value={ isTemplateHidden ? pageGhostBlocks : blocks }
+			onInput={ isTemplateHidden ? noop : onInput }
+			onChange={ isTemplateHidden ? noop : onChange }
 			useSubRegistry={ false }
 		>
 			{ children }
@@ -60,20 +69,18 @@ export default function DefaultBlockEditorProvider( { children } ) {
 	);
 }
 
-function usePageBlocks() {
-	const pageBlockNames = useSelect( ( select ) => {
+function usePageGhostBlocks() {
+	const pageContentBlockNames = useSelect( ( select ) => {
 		const { __experimentalGetGlobalBlocksByName, getBlockNamesByClientId } =
 			select( blockEditorStore );
+		// Show only the content blocks that appear in the page's template, and
+		// in the same order that they appear in the template.
 		return getBlockNamesByClientId(
-			__experimentalGetGlobalBlocksByName( [
-				'core/post-title',
-				'core/post-featured-image',
-				'core/post-content',
-			] )
+			__experimentalGetGlobalBlocksByName( PAGE_CONTENT_BLOCK_TYPES )
 		);
 	}, [] );
 
-	return useMemo( () => {
+	const ghostBlocks = useMemo( () => {
 		return [
 			createBlock(
 				'core/group',
@@ -82,13 +89,15 @@ function usePageBlocks() {
 					style: {
 						spacing: {
 							margin: {
-								top: '4em',
+								top: '4em', // Mimicks the post editor.
 							},
 						},
 					},
 				},
-				pageBlockNames.map( ( name ) => createBlock( name ) )
+				pageContentBlockNames.map( ( name ) => createBlock( name ) )
 			),
 		];
-	}, [ pageBlockNames ] );
+	}, [ pageContentBlockNames ] );
+
+	return ghostBlocks;
 }

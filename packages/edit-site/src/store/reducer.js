@@ -166,12 +166,29 @@ function editorCanvasContainerView( state = undefined, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function pageContentFocusMode( state = null, action ) {
+export function hasPageContentFocus( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_EDITED_POST':
-			return action.context?.postId ? 'withTemplate' : null;
-		case 'SET_PAGE_CONTENT_FOCUS_MODE':
-			return action.pageContentFocusMode;
+			return !! action.context?.postId;
+		case 'SET_HAS_PAGE_CONTENT_FOCUS':
+			return action.hasPageContentFocus;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer used to track the type of page content focus.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function pageContentFocusType( state = 'disableTemplate', action ) {
+	switch ( action.type ) {
+		case 'SET_PAGE_CONTENT_FOCUS_TYPE':
+			return action.pageContentFocusType;
 	}
 
 	return state;
@@ -186,5 +203,6 @@ export default combineReducers( {
 	saveViewPanel,
 	canvasMode,
 	editorCanvasContainerView,
-	pageContentFocusMode,
+	hasPageContentFocus,
+	pageContentFocusType,
 } );

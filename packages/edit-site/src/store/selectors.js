@@ -373,9 +373,22 @@ export function isPage( state ) {
  * @return {boolean} Whether or not focus is on editing page content.
  */
 export function hasPageContentFocus( state ) {
-	return !! getPageContentFocusMode( state );
+	return isPage( state ) ? state.hasPageContentFocus : false;
 }
 
-export function getPageContentFocusMode( state ) {
-	return isPage( state ) ? state.pageContentFocusMode : null;
+/**
+ * Returns the type of the current page content focus, or null if there is no
+ * page content focus.
+ *
+ * Possible values are:
+ *
+ * - `'disableTemplate'`: Disable the blocks belonging to the page's template.
+ * - `'hideTemplate'`: Hide the blocks belonging to the page's template.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {'disableTemplate'|'hideTemplate'|null} Type of the current page content focus.
+ */
+export function getPageContentFocusType( state ) {
+	return hasPageContentFocus( state ) ? state.pageContentFocusType : null;
 }

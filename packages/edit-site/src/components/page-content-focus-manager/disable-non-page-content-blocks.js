@@ -9,12 +9,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-
-const PAGE_CONTENT_BLOCK_TYPES = [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-];
+import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
 
 /**
  * Component that when rendered, makes it so that the site editor allows only

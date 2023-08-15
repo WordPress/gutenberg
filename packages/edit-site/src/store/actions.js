@@ -616,7 +616,7 @@ export const switchEditorMode =
 	};
 
 /**
- * Sets whether or not the editor allows only page content to be edited.
+ * Sets whether the editor allows only page content to be edited.
  *
  * @param {boolean} hasPageContentFocus True to allow only page content to be
  *                                      edited, false to allow template to be
@@ -624,21 +624,13 @@ export const switchEditorMode =
  */
 export const setHasPageContentFocus =
 	( hasPageContentFocus ) =>
-	( { dispatch } ) => {
-		dispatch.setPageContentFocusMode(
-			hasPageContentFocus ? 'withTemplate' : null
-		);
-	};
-
-export const setPageContentFocusMode =
-	( pageContentFocusMode ) =>
 	( { dispatch, registry } ) => {
-		if ( pageContentFocusMode ) {
+		if ( hasPageContentFocus ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		}
 		dispatch( {
-			type: 'SET_PAGE_CONTENT_FOCUS_MODE',
-			pageContentFocusMode,
+			type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+			hasPageContentFocus,
 		} );
 	};
 
@@ -684,3 +676,20 @@ export const toggleDistractionFree =
 				);
 		} );
 	};
+
+/**
+ * Sets the type of page content focus. Can be one of:
+ *
+ * - `'disableTemplate'`: Disable the blocks belonging to the page's template.
+ * - `'hideTemplate'`: Hide the blocks belonging to the page's template.
+ *
+ * @param {'disbleTemplate'|'hideTemplate'} pageContentFocusType The type of page content focus.
+ *
+ * @return {Object} Action object.
+ */
+export function setPageContentFocusType( pageContentFocusType ) {
+	return {
+		type: 'SET_PAGE_CONTENT_FOCUS_TYPE',
+		pageContentFocusType,
+	};
+}

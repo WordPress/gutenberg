@@ -106,9 +106,22 @@ _Returns_
 
 -   `Object`: Page.
 
-### getPageContentFocusMode
+### getPageContentFocusType
 
-Undocumented declaration.
+Returns the type of the current page content focus, or null if there is no page content focus.
+
+Possible values are:
+
+-   `'disableTemplate'`: Disable the blocks belonging to the page's template.
+-   `'hideTemplate'`: Hide the blocks belonging to the page's template.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `'disableTemplate'|'hideTemplate'|null`: Type of the current page content focus.
 
 ### getReusableBlocks
 
@@ -383,9 +396,20 @@ _Returns_
 
 -   `number`: The resolved template ID for the page route.
 
-### setPageContentFocusMode
+### setPageContentFocusType
 
-Undocumented declaration.
+Sets the type of page content focus. Can be one of:
+
+-   `'disableTemplate'`: Disable the blocks belonging to the page's template.
+-   `'hideTemplate'`: Hide the blocks belonging to the page's template.
+
+_Parameters_
+
+-   _pageContentFocusType_ `'disbleTemplate'|'hideTemplate'`: The type of page content focus.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### setTemplate
 
