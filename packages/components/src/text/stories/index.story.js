@@ -12,7 +12,7 @@ export const _default = () => {
 	return <Text>Hello</Text>;
 };
 
-export const truncate = () => {
+export const Truncate = () => {
 	return (
 		<Text numberOfLines={ 2 } truncate>
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
@@ -32,7 +32,7 @@ export const truncate = () => {
 	);
 };
 
-export const highlight = () => {
+export const Highlight = () => {
 	return (
 		<Text highlightWords={ [ 'con' ] }>
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
