@@ -110,7 +110,7 @@ test.describe( 'Block Locking', () => {
 		} );
 		await paragraph.click();
 
-		await editor.clickBlockToolbarButton( 'Unlock' );
+		await editor.clickBlockToolbarButton( 'Unlock…' );
 		await page.click( 'role=checkbox[name="Lock all"]' );
 		await page.click( 'role=button[name="Apply"]' );
 
