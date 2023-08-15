@@ -27,11 +27,15 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$block_type                    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$skip_link_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
-	$skip_heading_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'heading' );
+	$block_type                            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$skip_link_color_serialization         = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
+	$skip_heading_color_serialization      = wp_should_skip_block_supports_serialization( $block_type, 'color', 'heading' );
+	$skip_button_color_serialization       = wp_should_skip_block_supports_serialization( $block_type, 'color', 'button' );
+	$skips_all_element_color_serialization = $skip_link_color_serialization &&
+		$skip_heading_color_serialization &&
+		$skip_button_color_serialization;
 
-	if ( $skip_link_color_serialization && $skip_heading_color_serialization ) {
+	if ( $skips_all_element_color_serialization ) {
 		return $block_content;
 	}
 
@@ -77,7 +81,21 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	foreach ( $heading_color_paths as $element_color_path ) {
 		$element_color = _wp_array_get( $block['attrs'], explode( '.', $element_color_path, ), null );
 
-		if ( null !== $element_color && $skip_heading_color_serialization ) {
+		if ( null !== $element_color && ! $skip_heading_color_serialization ) {
+			$element_colors_set++;
+		}
+	}
+
+	$button_color_paths = array(
+		'style.elements.button.color.text',
+		'style.elements.button.color.background',
+		'style.elements.button.color.gradient',
+	);
+
+	foreach ( $button_color_paths as $element_color_path ) {
+		$element_color = _wp_array_get( $block['attrs'], explode( '.', $element_color_path, ), null );
+
+		if ( null !== $element_color && ! $skip_button_color_serialization ) {
 			$element_colors_set++;
 		}
 	}
@@ -116,14 +134,18 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		return null;
 	}
 
-	$skip_link_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
-	$skip_heading_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'heading' );
+	$skip_link_color_serialization         = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
+	$skip_heading_color_serialization      = wp_should_skip_block_supports_serialization( $block_type, 'color', 'heading' );
+	$skip_button_color_serialization       = wp_should_skip_block_supports_serialization( $block_type, 'color', 'button' );
+	$skips_all_element_color_serialization = $skip_link_color_serialization &&
+		$skip_heading_color_serialization &&
+		$skip_button_color_serialization;
 
-	if ( $skip_link_color_serialization && $skip_heading_color_serialization ) {
+	if ( $skips_all_element_color_serialization ) {
 		return null;
 	}
 
-	$class_name        = gutenberg_get_elements_class_name( $block );
+	$class_name = gutenberg_get_elements_class_name( $block );
 
 	// Link colors
 	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
@@ -168,6 +190,19 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 				);
 			}
 		}
+	}
+
+	// Button colors
+	$button_block_styles = isset( $element_block_styles['button'] ) ? $element_block_styles['button'] : null;
+
+	if ( ! $skip_button_color_serialization && $button_block_styles ) {
+		gutenberg_style_engine_get_styles(
+			$button_block_styles,
+			array(
+				'selector' => ".$class_name .wp-element-button, .$class_name .wp-block-button__link",
+				'context'  => 'block-supports',
+			)
+		);
 	}
 
 	return null;

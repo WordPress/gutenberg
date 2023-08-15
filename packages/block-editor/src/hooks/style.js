@@ -397,6 +397,12 @@ const withElementsStyles = createHigherOrderComponent(
 			'heading'
 		);
 
+		const skipButtonColorSerialization = shouldSkipSerialization(
+			props.name,
+			COLOR_SUPPORT_KEY,
+			'button'
+		);
+
 		const styles = useMemo( () => {
 			// The .editor-styles-wrapper selector is required on elements styles. As it is
 			// added to all other editor styles, not providing it causes reset and global
@@ -460,6 +466,15 @@ const withElementsStyles = createHigherOrderComponent(
 					selector: scopeSelector( baseElementSelector, ELEMENTS.h6 ),
 				},
 				//TODO: Refactor this to a helper that can more concisely flesh out the rest of the heading elements.
+				{
+					styles: ! skipButtonColorSerialization
+						? props.attributes.style?.elements?.button
+						: undefined,
+					selector: scopeSelector(
+						baseElementSelector,
+						ELEMENTS.button
+					),
+				},
 			];
 			const elementCssRules = [];
 			for ( const { styles: elementStyles, selector } of elements ) {
