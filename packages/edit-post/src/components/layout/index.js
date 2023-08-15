@@ -81,41 +81,44 @@ function useEditorStyles() {
 	);
 
 	// Compute the default styles.
-	const { defaultEditorStyles, presetStyles } = useMemo( () => {
-		const _presetStyles =
+	return useMemo( () => {
+		const presetStyles =
 			editorSettings.styles?.filter(
 				( style ) =>
 					style.__unstableType && style.__unstableType !== 'theme'
 			) ?? [];
-		return {
-			presetStyles: _presetStyles,
-			defaultEditorStyles: [
-				...editorSettings.defaultEditorStyles,
-				..._presetStyles,
-			],
-		};
-	}, [ editorSettings.defaultEditorStyles, editorSettings.styles ] );
 
-	// Has theme styles if the theme supports them and if some styles were not preset styles (in which case they're theme styles).
-	const hasThemeStyles =
-		hasThemeStyleSupport &&
-		presetStyles.length !== ( editorSettings.styles?.length ?? 0 );
+		const defaultEditorStyles = [
+			...editorSettings.defaultEditorStyles,
+			...presetStyles,
+		];
 
-	// If theme styles are not present or displayed, ensure that
-	// base layout styles are still present in the editor.
-	if ( ! editorSettings.disableLayoutStyles && ! hasThemeStyles ) {
-		defaultEditorStyles.push( {
-			css: getLayoutStyles( {
-				style: {},
-				selector: 'body',
-				hasBlockGapSupport: false,
-				hasFallbackGapSupport: true,
-				fallbackGapValue: '0.5em',
-			} ),
-		} );
-	}
+		// Has theme styles if the theme supports them and if some styles were not preset styles (in which case they're theme styles).
+		const hasThemeStyles =
+			hasThemeStyleSupport &&
+			presetStyles.length !== ( editorSettings.styles?.length ?? 0 );
 
-	return hasThemeStyles ? editorSettings.styles : defaultEditorStyles;
+		// If theme styles are not present or displayed, ensure that
+		// base layout styles are still present in the editor.
+		if ( ! editorSettings.disableLayoutStyles && ! hasThemeStyles ) {
+			defaultEditorStyles.push( {
+				css: getLayoutStyles( {
+					style: {},
+					selector: 'body',
+					hasBlockGapSupport: false,
+					hasFallbackGapSupport: true,
+					fallbackGapValue: '0.5em',
+				} ),
+			} );
+		}
+
+		return hasThemeStyles ? editorSettings.styles : defaultEditorStyles;
+	}, [
+		editorSettings.defaultEditorStyles,
+		editorSettings.disableLayoutStyles,
+		editorSettings.styles,
+		hasThemeStyleSupport,
+	] );
 }
 
 function Layout() {
