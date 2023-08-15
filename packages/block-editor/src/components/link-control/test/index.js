@@ -1733,245 +1733,282 @@ describe( 'Selecting links', () => {
 	} );
 } );
 
-describe( 'Addition Settings UI', () => {
-	it( 'should allow toggling the "Opens in new tab" setting control (only) on the link preview', async () => {
-		const user = userEvent.setup();
-		const selectedLink = fauxEntitySuggestions[ 0 ];
-		const mockOnChange = jest.fn();
+describe( 'Link Settings', () => {
+	describe( 'Previewing links', () => {
+		it( 'should allow toggling the "Opens in new tab" setting control (only) on the link preview', async () => {
+			const user = userEvent.setup();
+			const selectedLink = fauxEntitySuggestions[ 0 ];
+			const mockOnChange = jest.fn();
 
-		const customSettings = [
-			{
-				id: 'opensInNewTab',
-				title: 'Open in new tab',
-			},
-			{
-				id: 'noFollow',
-				title: 'No follow',
-			},
-		];
+			const customSettings = [
+				{
+					id: 'opensInNewTab',
+					title: 'Open in new tab',
+				},
+				{
+					id: 'noFollow',
+					title: 'No follow',
+				},
+			];
 
-		const LinkControlConsumer = () => {
-			const [ link, setLink ] = useState( selectedLink );
+			const LinkControlConsumer = () => {
+				const [ link, setLink ] = useState( selectedLink );
 
-			return (
-				<LinkControl
-					value={ link }
-					settings={ customSettings }
-					onChange={ ( newVal ) => {
-						mockOnChange( newVal );
-						setLink( newVal );
-					} }
-				/>
-			);
-		};
+				return (
+					<LinkControl
+						value={ link }
+						settings={ customSettings }
+						onChange={ ( newVal ) => {
+							mockOnChange( newVal );
+							setLink( newVal );
+						} }
+					/>
+				);
+			};
 
-		render( <LinkControlConsumer /> );
+			render( <LinkControlConsumer /> );
 
-		const opensInNewTabField = screen.queryByRole( 'checkbox', {
-			name: 'Open in new tab',
-			checked: false,
-		} );
+			const opensInNewTabField = screen.queryByRole( 'checkbox', {
+				name: 'Open in new tab',
+				checked: false,
+			} );
 
-		expect( opensInNewTabField ).toBeInTheDocument();
+			expect( opensInNewTabField ).toBeInTheDocument();
 
-		// No matter which settings are passed in only the `Opens in new tab`
-		// setting should be shown on the link preview (non-editing) state.
-		const noFollowField = screen.queryByRole( 'checkbox', {
-			name: 'No follow',
-		} );
-		expect( noFollowField ).not.toBeInTheDocument();
+			// No matter which settings are passed in only the `Opens in new tab`
+			// setting should be shown on the link preview (non-editing) state.
+			const noFollowField = screen.queryByRole( 'checkbox', {
+				name: 'No follow',
+			} );
+			expect( noFollowField ).not.toBeInTheDocument();
 
-		// Check that the link value is updated immediately upon checking
-		// the checkbox.
-		await user.click( opensInNewTabField );
+			// Check that the link value is updated immediately upon checking
+			// the checkbox.
+			await user.click( opensInNewTabField );
 
-		expect( opensInNewTabField ).toBeChecked();
+			expect( opensInNewTabField ).toBeChecked();
 
-		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-		expect( mockOnChange ).toHaveBeenCalledWith( {
-			opensInNewTab: true,
-		} );
-	} );
-
-	it( 'should hide advanced link settings and toggle when not editing a link', async () => {
-		const selectedLink = fauxEntitySuggestions[ 0 ];
-
-		const LinkControlConsumer = () => {
-			const [ link ] = useState( selectedLink );
-
-			return <LinkControl value={ link } />;
-		};
-
-		render( <LinkControlConsumer /> );
-
-		const settingsToggle = getSettingsDrawerToggle();
-
-		expect( settingsToggle ).not.toBeInTheDocument();
-	} );
-
-	it( 'should provides a means to toggle the advanced link settings when editing a link', async () => {
-		const selectedLink = fauxEntitySuggestions[ 0 ];
-
-		const LinkControlConsumer = () => {
-			const [ link ] = useState( selectedLink );
-
-			return <LinkControl value={ link } forceIsEditingLink />;
-		};
-
-		render( <LinkControlConsumer /> );
-
-		const user = userEvent.setup();
-
-		const settingsToggle = getSettingsDrawerToggle();
-
-		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
-
-		expect( settingsToggle ).toBeVisible();
-
-		await user.click( settingsToggle );
-
-		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'true' );
-
-		const newTabSettingInput = screen.getByRole( 'checkbox', {
-			name: 'Open in new tab',
-		} );
-
-		expect( newTabSettingInput ).toBeVisible();
-
-		await user.click( settingsToggle );
-
-		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
-		expect( newTabSettingInput ).not.toBeVisible();
-	} );
-
-	it( 'should display "New Tab" setting (in "off" mode) by default when a link is edited', async () => {
-		const selectedLink = fauxEntitySuggestions[ 0 ];
-		const expectedSettingText = 'Open in new tab';
-
-		const LinkControlConsumer = () => {
-			const [ link ] = useState( selectedLink );
-
-			return <LinkControl value={ link } forceIsEditingLink />;
-		};
-
-		render( <LinkControlConsumer /> );
-
-		const user = userEvent.setup();
-
-		await toggleSettingsDrawer( user );
-
-		const newTabSettingLabel = screen.getByText( expectedSettingText );
-		expect( newTabSettingLabel ).toBeVisible();
-
-		const newTabSettingInput = screen.getByRole( 'checkbox', {
-			name: expectedSettingText,
-			checked: false,
-		} );
-
-		expect( newTabSettingInput ).toBeVisible();
-	} );
-
-	it( 'should display a setting control with correct default state for each of the custom settings provided', async () => {
-		const selectedLink = fauxEntitySuggestions[ 0 ];
-
-		const customSettings = [
-			{
-				id: 'opensInNewTab',
-				title: 'Open in new tab',
-			},
-			{
-				id: 'noFollow',
-				title: 'No follow',
-			},
-		];
-
-		const LinkControlConsumer = () => {
-			const [ link ] = useState( selectedLink );
-
-			return (
-				<LinkControl
-					value={ { ...link, newTab: false, noFollow: true } }
-					settings={ customSettings }
-					forceIsEditingLink
-				/>
-			);
-		};
-
-		render( <LinkControlConsumer /> );
-
-		const user = userEvent.setup();
-
-		await toggleSettingsDrawer( user );
-
-		expect( screen.queryAllByRole( 'checkbox' ) ).toHaveLength( 2 );
-
-		expect(
-			screen.getByRole( 'checkbox', {
-				name: customSettings[ 0 ].title,
-			} )
-		).not.toBeChecked();
-		expect(
-			screen.getByRole( 'checkbox', {
-				name: customSettings[ 1 ].title,
-			} )
-		).toBeChecked();
-	} );
-
-	it( 'should require settings changes to be submitted/applied', async () => {
-		const user = userEvent.setup();
-
-		const mockOnChange = jest.fn();
-
-		const selectedLink = {
-			...fauxEntitySuggestions[ 0 ],
-			// Including a setting here helps to assert on a potential bug
-			// whereby settings on the suggestion override the current (internal)
-			// settings values set by the user in the UI.
-			opensInNewTab: false,
-		};
-
-		render(
-			<LinkControl
-				value={ selectedLink }
-				forceIsEditingLink
-				hasTextControl
-				onChange={ mockOnChange }
-			/>
-		);
-
-		// check that the "Apply" button is disabled by default.
-		const submitButton = screen.queryByRole( 'button', {
-			name: 'Save',
-		} );
-
-		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
-
-		await toggleSettingsDrawer( user );
-
-		const opensInNewTabToggle = screen.queryByRole( 'checkbox', {
-			name: 'Open in new tab',
-		} );
-
-		// toggle the checkbox
-		await user.click( opensInNewTabToggle );
-
-		// Check settings are **not** directly submitted
-		// which would trigger the onChange handler.
-		expect( mockOnChange ).not.toHaveBeenCalled();
-
-		// Check Apply button is now enabled because changes
-		// have been detected.
-		expect( submitButton ).toBeEnabled();
-
-		// Submit the changed setting value using the Apply button
-		await user.click( submitButton );
-
-		// Assert the value is updated.
-		expect( mockOnChange ).toHaveBeenCalledWith(
-			expect.objectContaining( {
+			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChange ).toHaveBeenCalledWith( {
 				opensInNewTab: true,
-			} )
-		);
+			} );
+		} );
+
+		it( 'should hide advanced link settings and toggle when not editing a link', async () => {
+			const selectedLink = fauxEntitySuggestions[ 0 ];
+
+			const customSettings = [
+				{
+					id: 'opensInNewTab',
+					title: 'Open in new tab',
+				},
+				{
+					id: 'noFollow',
+					title: 'No follow',
+				},
+			];
+
+			const LinkControlConsumer = () => {
+				const [ link ] = useState( selectedLink );
+
+				return (
+					<LinkControl value={ link } settings={ customSettings } />
+				);
+			};
+
+			render( <LinkControlConsumer /> );
+
+			const settingsToggle = getSettingsDrawerToggle();
+
+			expect( settingsToggle ).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'Editing links', () => {
+		it( 'should not display "Advanced" toggle for settings when "Open in new tab" is the only setting', async () => {
+			const selectedLink = fauxEntitySuggestions[ 0 ];
+			const expectedSettingText = 'Open in new tab';
+
+			const LinkControlConsumer = () => {
+				const [ link ] = useState( selectedLink );
+
+				return (
+					<LinkControl
+						value={ link }
+						forceIsEditingLink
+						settings={ [
+							{
+								id: 'opensInNewTab',
+								title: 'Open in new tab',
+							},
+						] }
+					/>
+				);
+			};
+
+			render( <LinkControlConsumer /> );
+
+			const advancedSettingsToggle = screen.queryByRole( 'button', {
+				name: 'Advanced',
+			} );
+
+			expect( advancedSettingsToggle ).not.toBeInTheDocument();
+
+			const openInNewTabSettingLabel =
+				screen.getByLabelText( expectedSettingText );
+			expect( openInNewTabSettingLabel ).toBeVisible();
+
+			const openInNewTabSettingControl = screen.getByRole( 'checkbox', {
+				name: expectedSettingText,
+				checked: false,
+			} );
+
+			expect( openInNewTabSettingControl ).toBeVisible();
+		} );
+
+		it( 'should provide a means to toggle the advanced link settings when editing a link', async () => {
+			const selectedLink = fauxEntitySuggestions[ 0 ];
+
+			const LinkControlConsumer = () => {
+				const [ link ] = useState( selectedLink );
+
+				return <LinkControl value={ link } forceIsEditingLink />;
+			};
+
+			render( <LinkControlConsumer /> );
+
+			const user = userEvent.setup();
+
+			const settingsToggle = getSettingsDrawerToggle();
+
+			expect( settingsToggle ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+
+			expect( settingsToggle ).toBeVisible();
+
+			await user.click( settingsToggle );
+
+			expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			const newTabSettingInput = screen.getByRole( 'checkbox', {
+				name: 'Open in new tab',
+			} );
+
+			expect( newTabSettingInput ).toBeVisible();
+
+			await user.click( settingsToggle );
+
+			expect( settingsToggle ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+			expect( newTabSettingInput ).not.toBeVisible();
+		} );
+
+		it( 'should display a setting control with correct default state for each of the custom settings provided', async () => {
+			const selectedLink = fauxEntitySuggestions[ 0 ];
+
+			const customSettings = [
+				{
+					id: 'opensInNewTab',
+					title: 'Open in new tab',
+				},
+				{
+					id: 'noFollow',
+					title: 'No follow',
+				},
+			];
+
+			const LinkControlConsumer = () => {
+				const [ link ] = useState( selectedLink );
+
+				return (
+					<LinkControl
+						value={ { ...link, newTab: false, noFollow: true } }
+						settings={ customSettings }
+						forceIsEditingLink
+					/>
+				);
+			};
+
+			render( <LinkControlConsumer /> );
+
+			const user = userEvent.setup();
+
+			await toggleSettingsDrawer( user );
+
+			expect( screen.queryAllByRole( 'checkbox' ) ).toHaveLength( 2 );
+
+			expect(
+				screen.getByRole( 'checkbox', {
+					name: customSettings[ 0 ].title,
+				} )
+			).not.toBeChecked();
+			expect(
+				screen.getByRole( 'checkbox', {
+					name: customSettings[ 1 ].title,
+				} )
+			).toBeChecked();
+		} );
+
+		it( 'should require settings changes to be submitted/applied', async () => {
+			const user = userEvent.setup();
+
+			const mockOnChange = jest.fn();
+
+			const selectedLink = {
+				...fauxEntitySuggestions[ 0 ],
+				// Including a setting here helps to assert on a potential bug
+				// whereby settings on the suggestion override the current (internal)
+				// settings values set by the user in the UI.
+				opensInNewTab: false,
+			};
+
+			render(
+				<LinkControl
+					value={ selectedLink }
+					forceIsEditingLink
+					hasTextControl
+					onChange={ mockOnChange }
+				/>
+			);
+
+			// check that the "Apply" button is disabled by default.
+			const submitButton = screen.queryByRole( 'button', {
+				name: 'Save',
+			} );
+
+			expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+			await toggleSettingsDrawer( user );
+
+			const opensInNewTabToggle = screen.queryByRole( 'checkbox', {
+				name: 'Open in new tab',
+			} );
+
+			// toggle the checkbox
+			await user.click( opensInNewTabToggle );
+
+			// Check settings are **not** directly submitted
+			// which would trigger the onChange handler.
+			expect( mockOnChange ).not.toHaveBeenCalled();
+
+			// Check Apply button is now enabled because changes
+			// have been detected.
+			expect( submitButton ).toBeEnabled();
+
+			// Submit the changed setting value using the Apply button
+			await user.click( submitButton );
+
+			// Assert the value is updated.
+			expect( mockOnChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					opensInNewTab: true,
+				} )
+			);
+		} );
 	} );
 } );
 
