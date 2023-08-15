@@ -34,6 +34,7 @@ import {
 } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 import { shouldSkipSerialization } from './utils';
+import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const styleSupportKeys = [
@@ -382,11 +383,18 @@ const withElementsStyles = createHigherOrderComponent(
 		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 			BlockListBlock
 		) }`;
+		const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }`;
 
 		const skipLinkColorSerialization = shouldSkipSerialization(
 			props.name,
 			COLOR_SUPPORT_KEY,
 			'link'
+		);
+
+		const skipHeadingColorSerialization = shouldSkipSerialization(
+			props.name,
+			COLOR_SUPPORT_KEY,
+			'heading'
 		);
 
 		const styles = useMemo( () => {
@@ -398,14 +406,60 @@ const withElementsStyles = createHigherOrderComponent(
 					styles: ! skipLinkColorSerialization
 						? props.attributes.style?.elements?.link
 						: undefined,
-					selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS.link }`,
+					selector: `${ baseElementSelector } ${ ELEMENTS.link }`,
 				},
 				{
 					styles: ! skipLinkColorSerialization
 						? props.attributes.style?.elements?.link?.[ ':hover' ]
 						: undefined,
-					selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS.link }:hover`,
+					selector: `${ baseElementSelector } ${ ELEMENTS.link }:hover`,
 				},
+				{
+					styles: ! skipHeadingColorSerialization
+						? props.attributes.style?.elements?.heading
+						: undefined,
+					selector: scopeSelector(
+						baseElementSelector,
+						ELEMENTS.heading
+					),
+				},
+				{
+					styles: ! skipHeadingColorSerialization
+						? props.attributes.style?.elements?.h1
+						: undefined,
+					selector: scopeSelector( baseElementSelector, ELEMENTS.h1 ),
+				},
+				{
+					styles: ! skipHeadingColorSerialization
+						? props.attributes.style?.elements?.h2
+						: undefined,
+					selector: scopeSelector( baseElementSelector, ELEMENTS.h2 ),
+				},
+				{
+					styles: ! skipHeadingColorSerialization
+						? props.attributes.style?.elements?.h3
+						: undefined,
+					selector: scopeSelector( baseElementSelector, ELEMENTS.h3 ),
+				},
+				{
+					styles: ! skipHeadingColorSerialization
+						? props.attributes.style?.elements?.h4
+						: undefined,
+					selector: scopeSelector( baseElementSelector, ELEMENTS.h4 ),
+				},
+				{
+					styles: ! skipHeadingColorSerialization
+						? props.attributes.style?.elements?.h5
+						: undefined,
+					selector: scopeSelector( baseElementSelector, ELEMENTS.h5 ),
+				},
+				{
+					styles: ! skipHeadingColorSerialization
+						? props.attributes.style?.elements?.h6
+						: undefined,
+					selector: scopeSelector( baseElementSelector, ELEMENTS.h6 ),
+				},
+				//TODO: Refactor this to a helper that can more concisely flesh out the rest of the heading elements.
 			];
 			const elementCssRules = [];
 			for ( const { styles: elementStyles, selector } of elements ) {
@@ -421,7 +475,7 @@ const withElementsStyles = createHigherOrderComponent(
 				: undefined;
 		}, [
 			props.attributes.style?.elements,
-			blockElementsContainerIdentifier,
+			baseElementSelector,
 			skipLinkColorSerialization,
 		] );
 

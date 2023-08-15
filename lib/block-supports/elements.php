@@ -23,34 +23,66 @@ function gutenberg_get_elements_class_name( $block ) {
  * @return string                Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content, $block ) {
-	if ( ! $block_content ) {
+	if ( ! $block_content || empty( $block['attrs'] ) ) {
 		return $block_content;
 	}
 
 	$block_type                    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$skip_link_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
+	$skip_heading_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'heading' );
 
-	if ( $skip_link_color_serialization ) {
+	if ( $skip_link_color_serialization && $skip_heading_color_serialization ) {
 		return $block_content;
 	}
 
-	$link_color = null;
-	if ( ! empty( $block['attrs'] ) ) {
-		$link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', 'color', 'text' ), null );
+	$element_colors_set = 0;
+
+	$link_color_paths = array(
+		'style.elements.link.color.text',
+		'style.elements.link.:hover.color.text',
+	);
+
+	foreach ( $link_color_paths as $element_color_path ) {
+		$element_color = _wp_array_get( $block['attrs'], explode( '.', $element_color_path, ), null );
+
+		if ( null !== $element_color && ! $skip_link_color_serialization ) {
+			$element_colors_set++;
+		}
 	}
 
-	$hover_link_color = null;
-	if ( ! empty( $block['attrs'] ) ) {
-		$hover_link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', ':hover', 'color', 'text' ), null );
+	$heading_color_paths = array(
+		'style.elements.heading.color.text',
+		'style.elements.heading.color.background',
+		'style.elements.heading.color.gradient',
+		'style.elements.h1.color.text',
+		'style.elements.h1.color.background',
+		'style.elements.h1.color.gradient',
+		'style.elements.h2.color.text',
+		'style.elements.h2.color.background',
+		'style.elements.h2.color.gradient',
+		'style.elements.h3.color.text',
+		'style.elements.h3.color.background',
+		'style.elements.h3.color.gradient',
+		'style.elements.h4.color.text',
+		'style.elements.h4.color.background',
+		'style.elements.h4.color.gradient',
+		'style.elements.h5.color.text',
+		'style.elements.h5.color.background',
+		'style.elements.h5.color.gradient',
+		'style.elements.h6.color.text',
+		'style.elements.h6.color.background',
+		'style.elements.h6.color.gradient',
+	);
+
+	foreach ( $heading_color_paths as $element_color_path ) {
+		$element_color = _wp_array_get( $block['attrs'], explode( '.', $element_color_path, ), null );
+
+		if ( null !== $element_color && $skip_heading_color_serialization ) {
+			$element_colors_set++;
+		}
 	}
 
-	/*
-	* For now we only care about link colors.
-	* This code in the future when we have a public API
-	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
-	* and work for any element and style.
-	*/
-	if ( null === $link_color && null === $hover_link_color ) {
+	if ( ! $element_colors_set ) {
 		return $block_content;
 	}
 
@@ -80,33 +112,62 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	$block_type           = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$element_block_styles = isset( $block['attrs']['style']['elements'] ) ? $block['attrs']['style']['elements'] : null;
 
-	/*
-	* For now we only care about link color.
-	*/
-	$skip_link_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
-
-	if ( $skip_link_color_serialization ) {
+	if ( ! $element_block_styles ) {
 		return null;
 	}
+
+	$skip_link_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
+	$skip_heading_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'heading' );
+
+	if ( $skip_link_color_serialization && $skip_heading_color_serialization ) {
+		return null;
+	}
+
 	$class_name        = gutenberg_get_elements_class_name( $block );
+
+	// Link colors
 	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
-	gutenberg_style_engine_get_styles(
-		$link_block_styles,
-		array(
-			'selector' => ".$class_name a",
-			'context'  => 'block-supports',
-		)
-	);
-
-	if ( isset( $link_block_styles[':hover'] ) ) {
+	if ( ! $skip_link_color_serialization && $link_block_styles ) {
 		gutenberg_style_engine_get_styles(
-			$link_block_styles[':hover'],
+			$link_block_styles,
 			array(
-				'selector' => ".$class_name a:hover",
+				'selector' => ".$class_name a",
 				'context'  => 'block-supports',
 			)
 		);
+
+		if ( isset( $link_block_styles[':hover'] ) ) {
+			gutenberg_style_engine_get_styles(
+				$link_block_styles[':hover'],
+				array(
+					'selector' => ".$class_name a:hover",
+					'context'  => 'block-supports',
+				)
+			);
+		}
+	}
+
+	// Heading colors
+	if ( ! $skip_heading_color_serialization ) {
+		$heading_levels = array( 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
+
+		foreach ( $heading_levels as $heading_level ) {
+			$heading_block_styles = isset( $element_block_styles[ $heading_level ] ) ? $element_block_styles[ $heading_level ] : null;
+			$heading_selector = 'heading' !== $heading_level
+				? ".$class_name $heading_level"
+				: ".$class_name h1, .$class_name h2, .$class_name h3, .$class_name h4, .$class_name h5, .$class_name h6";
+
+			if ( $heading_block_styles ) {
+				gutenberg_style_engine_get_styles(
+					$heading_block_styles,
+					array(
+						'selector' => $heading_selector,
+						'context'  => 'block-supports',
+					)
+				);
+			}
+		}
 	}
 
 	return null;
