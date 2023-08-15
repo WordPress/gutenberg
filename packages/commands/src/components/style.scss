@@ -1,7 +1,7 @@
 // dirty hack to clean up modal
 .commands-command-menu {
 	border-radius: $grid-unit-05;
-	width: 100%;
+	width: calc(100% - #{$grid-unit-40});
 	margin: auto;
 	max-width: 420px;
 	position: relative;
