@@ -5,7 +5,7 @@ import { SlotFillProvider, Popover } from '@wordpress/components';
 import { UnsavedChangesWarning } from '@wordpress/editor';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -15,6 +15,8 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import Layout from '../layout';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
+import getBlockEditorProvider from '../block-editor/get-block-editor-provider';
+import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { RouterProvider } = unlock( routerPrivateApis );
@@ -34,16 +36,27 @@ export default function App() {
 		);
 	}
 
+	const entityType = useSelect(
+		( select ) => select( editSiteStore ).getEditedPostType(),
+		[]
+	);
+
+	// Choose the provider based on the entity type currently
+	// being edited.
+	const BlockEditorProvider = getBlockEditorProvider( entityType );
+
 	return (
 		<ShortcutProvider style={ { height: '100%' } }>
 			<SlotFillProvider>
 				<GlobalStylesProvider>
-					<Popover.Slot />
-					<UnsavedChangesWarning />
-					<RouterProvider>
-						<Layout />
-						<PluginArea onError={ onPluginAreaError } />
-					</RouterProvider>
+					<BlockEditorProvider>
+						<Popover.Slot />
+						<UnsavedChangesWarning />
+						<RouterProvider>
+							<Layout />
+							<PluginArea onError={ onPluginAreaError } />
+						</RouterProvider>
+					</BlockEditorProvider>
 				</GlobalStylesProvider>
 			</SlotFillProvider>
 		</ShortcutProvider>
