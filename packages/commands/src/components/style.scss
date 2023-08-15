@@ -1,6 +1,8 @@
 // dirty hack to clean up modal
 .commands-command-menu {
+	border-radius: $radius-block-ui;
 	width: 100%;
+	margin: auto;
 	max-width: 420px;
 	position: relative;
 	top: 15%;
