@@ -77,7 +77,8 @@ function useEditorStyles() {
 			hasThemeStyleSupport:
 				select( editPostStore ).isFeatureActive( 'themeStyles' ),
 			editorSettings: select( editorStore ).getEditorSettings(),
-		} )
+		} ),
+		[]
 	);
 
 	// Compute the default styles.
