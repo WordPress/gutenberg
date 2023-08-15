@@ -14,15 +14,15 @@ import { canvas } from './canvas';
  */
 export const createReusableBlock = async ( content, title ) => {
 	const reusableBlockNameInputSelector =
-		'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
+		'.patterns-menu-items__convert-modal .components-text-control__input';
 	const syncToggleSelectorChecked =
-		'.reusable-blocks-menu-items__convert-modal .components-form-toggle.is-checked';
+		'.patterns-menu-items__convert-modal .components-form-toggle.is-checked';
 	// Insert a paragraph block
 	await insertBlock( 'Paragraph' );
 	await page.keyboard.type( content );
 
 	await clickBlockToolbarButton( 'Options' );
-	await clickMenuItem( 'Create pattern/reusable block' );
+	await clickMenuItem( 'Create pattern' );
 	const nameInput = await page.waitForSelector(
 		reusableBlockNameInputSelector
 	);
