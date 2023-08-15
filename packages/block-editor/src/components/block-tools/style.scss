@@ -113,9 +113,8 @@
 		overflow: hidden;
 
 		.block-editor-block-toolbar {
+			overflow: auto;
 			overflow-y: hidden;
-			overflow-x: scroll;
-			scrollbar-gutter: stable;
 		}
 
 		border: none;
@@ -140,11 +139,11 @@
 
 	// on desktop and tablet viewports the toolbar is fixed
 	// on top of interface header
+	$toolbar-margin: $grid-unit-80 * 3 - 2 * $grid-unit + $grid-unit-05;
 	@include break-medium() {
 		&.is-fixed {
-
 			// leave room for block inserter, undo and redo, list view
-			margin-left: $grid-unit-80 * 3 - 2 * $grid-unit + $grid-unit-05;
+			margin-left: $toolbar-margin;
 			// position on top of interface header
 			position: fixed;
 			top: $admin-bar-height + $grid-unit - $border-width;
@@ -163,7 +162,12 @@
 				// leave room for block inserter, undo and redo, list view
 				// and some margin left
 				margin-left: $grid-unit-80 * 4 - 2 * $grid-unit;
-				top: $grid-unit - $border-width;
+
+				// Mimic the height of the parent, vertically align center, and provide a max-height.
+				top: 0;
+				height: $header-height;
+				align-items: center;
+
 				&.is-collapsed {
 					width: initial;
 				}
@@ -325,7 +329,7 @@
 	// except for the inserter on the left
 	@include break-medium() {
 		&.is-fixed {
-			width: 100%;
+			width: calc(100% - #{$toolbar-margin});
 		}
 	}
 
