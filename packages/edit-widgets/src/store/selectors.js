@@ -254,8 +254,7 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID and index to insert at.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex } = state.blockInserterPanel;
-	return { rootClientId, insertionIndex };
+	return state.blockInserterPanel;
 }
 
 /**
