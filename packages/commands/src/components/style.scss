@@ -5,7 +5,11 @@
 	margin: auto;
 	max-width: 420px;
 	position: relative;
-	top: 15%;
+	top: calc(15% + #{$header-height});
+
+	@include break-small() {
+		top: 15%;
+	}
 
 	.components-modal__content {
 		margin: 0;
