@@ -189,7 +189,7 @@ export function CommandMenu() {
 		registerShortcut( {
 			name: 'core/commands',
 			category: 'global',
-			description: __( 'Open the command palette' ),
+			description: __( 'Open the command palette.' ),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'k',

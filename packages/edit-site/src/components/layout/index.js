@@ -26,7 +26,10 @@ import {
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	useBlockCommands,
+} from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
@@ -66,6 +69,7 @@ export default function Layout() {
 	useCommands();
 	useEditModeCommands();
 	useCommonCommands();
+	useBlockCommands();
 
 	const hubRef = useRef();
 	const { params } = useLocation();
