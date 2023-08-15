@@ -184,6 +184,13 @@ export default function Editor( { isLoading } ) {
 		'edit-site-editor__loading-progress'
 	);
 
+	const contentProps = isLoading
+		? {
+				'aria-busy': 'true',
+				'aria-describedby': loadingProgressId,
+		  }
+		: undefined;
+
 	return (
 		<>
 			{ isLoading ? <CanvasSpinner id={ loadingProgressId } /> : null }
@@ -238,10 +245,7 @@ export default function Editor( { isLoading } ) {
 									) }
 								</>
 							}
-							contentProps={ {
-								'aria-busy': 'true',
-								'aria-describedby': loadingProgressId,
-							} }
+							contentProps={ contentProps }
 							secondarySidebar={
 								isEditMode &&
 								( ( shouldShowInserter && (
