@@ -140,8 +140,6 @@
 			<!--
 				The following list of functions is final and must not be extended.
 				It includes functions that cannot be renamed due to backward compatibility concerns.
-				The purpose of maintaining this list here is to prevent cluttering Core with Gutenberg-specific `phpcs:disable` statements,
-				as Core consumes block-library code.
 			-->
 			<property name="allowed_functions" type="array">
 				<element value="_delete_custom_logo_on_remove_site_logo"/>
