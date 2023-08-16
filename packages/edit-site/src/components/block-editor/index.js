@@ -3,7 +3,6 @@
  */
 import { BlockInspector } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
-import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -25,7 +24,6 @@ export default function BlockEditor() {
 			<SiteEditorCanvas />
 
 			<PatternsMenuItems />
-			<ReusableBlocksMenuItems />
 		</>
 	);
 }
