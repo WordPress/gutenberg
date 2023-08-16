@@ -133,9 +133,9 @@ class Tests_FontsLibrary_WpFontFamily_Uninstall extends WP_Font_Family_UnitTestC
 					'fontFamily' => 'Inter',
 					'fontFace'   => array(
 						array(
-							'fontFamily'    => 'Inter',
-							'fontStyle'     => 'italic',
-							'fontWeight'    => '900',
+							'fontFamily'   => 'Inter',
+							'fontStyle'    => 'italic',
+							'fontWeight'   => '900',
 							'uploadedFile' => 'files0',
 						),
 					),
@@ -158,15 +158,15 @@ class Tests_FontsLibrary_WpFontFamily_Uninstall extends WP_Font_Family_UnitTestC
 					'fontFamily' => 'Lato',
 					'fontFace'   => array(
 						array(
-							'fontFamily'    => 'Lato',
-							'fontStyle'     => 'normal',
-							'fontWeight'    => '400',
+							'fontFamily'   => 'Lato',
+							'fontStyle'    => 'normal',
+							'fontWeight'   => '400',
 							'uploadedFile' => 'files1',
 						),
 						array(
-							'fontFamily'    => 'Lato',
-							'fontStyle'     => 'normal',
-							'fontWeight'    => '500',
+							'fontFamily'   => 'Lato',
+							'fontStyle'    => 'normal',
+							'fontWeight'   => '500',
 							'uploadedFile' => 'files2',
 						),
 					),

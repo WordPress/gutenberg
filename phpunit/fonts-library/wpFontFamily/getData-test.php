@@ -36,10 +36,10 @@ class Tests_FontsLibrary_WpFontsLibrary_GetData extends WP_UnitTestCase {
 					'fontFamily' => 'Piazzolla',
 					'fontFace'   => array(
 						array(
-							'fontFamily'        => 'Piazzolla',
-							'fontStyle'         => 'italic',
-							'fontWeight'        => '400',
-							'src'               => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+							'fontFamily'      => 'Piazzolla',
+							'fontStyle'       => 'italic',
+							'fontWeight'      => '400',
+							'src'             => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
 							'downloadFromUrl' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
 						),
 					),
@@ -75,15 +75,15 @@ class Tests_FontsLibrary_WpFontsLibrary_GetData extends WP_UnitTestCase {
 					'fontFamily' => 'Inter',
 					'fontFace'   => array(
 						array(
-							'fontFamily'    => 'Inter',
-							'fontStyle'     => 'normal',
-							'fontWeight'    => '400',
+							'fontFamily'   => 'Inter',
+							'fontStyle'    => 'normal',
+							'fontWeight'   => '400',
 							'uploadedFile' => 'files0',
 						),
 						array(
-							'fontFamily'    => 'Inter',
-							'fontStyle'     => 'normal',
-							'fontWeight'    => '500',
+							'fontFamily'   => 'Inter',
+							'fontStyle'    => 'normal',
+							'fontWeight'   => '500',
 							'uploadedFile' => 'files1',
 						),
 					),
