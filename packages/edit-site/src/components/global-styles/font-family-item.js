@@ -12,7 +12,7 @@ import { useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { FontLibraryContext } from './font-library-modal/context';
+import { FontLibraryContext } from './fonts-library-modal/context';
 
 function FontFamilyItem( { font } ) {
 	const { handleSetLibraryFontSelected, toggleModal } =

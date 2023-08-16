@@ -21,7 +21,7 @@ function FontLibraryModal( {
 			title={ __( 'Fonts' ) }
 			onRequestClose={ onRequestClose }
 			isFullScreen={ true }
-			className="font-library-modal"
+			className="fonts-library-modal"
 		>
 			<TabPanel
 				className="font-library-modal__tab-panel"

@@ -17,8 +17,8 @@ import { useContext } from '@wordpress/element';
  */
 import FontLibraryProvider, {
 	FontLibraryContext,
-} from './font-library-modal/context';
-import FontLibraryModal from './font-library-modal';
+} from './fonts-library-modal/context';
+import FontLibraryModal from './fonts-library-modal';
 import FontFamilyItem from './font-family-item';
 import Subtitle from './subtitle';
 
