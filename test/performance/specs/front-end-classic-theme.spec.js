@@ -3,6 +3,11 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * Internal dependencies
+ */
+const { saveResultsFile } = require( '../utils' );
+
 const results = {
 	timeToFirstByte: [],
 	largestContentfulPaint: [],
@@ -10,27 +15,17 @@ const results = {
 };
 
 test.describe( 'Front End Performance', () => {
-	test.use( { storageState: {} } ); // User will be logged out.
-
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.afterAll( async ( {}, testInfo ) => {
-		await testInfo.attach( 'results', {
-			body: JSON.stringify( results, null, 2 ),
-			contentType: 'application/json',
-		} );
+	test.afterAll( async () => {
+		saveResultsFile( __filename, results );
 	} );
 
-	const samples = 16;
-	const throwaway = 0;
-	const rounds = samples + throwaway;
-	for ( let i = 1; i <= rounds; i++ ) {
-		test( `Report TTFB, LCP, and LCP-TTFB (${ i } of ${ rounds })`, async ( {
-			page,
-			metrics,
-		} ) => {
+	test( 'Measure TTFB, LCP, and LCP-TTFB', async ( { page, metrics } ) => {
+		let i = 16;
+		while ( i-- ) {
 			// Go to the base URL.
 			await page.goto( '/', { waitUntil: 'networkidle' } );
 
@@ -43,11 +38,9 @@ test.describe( 'Front End Performance', () => {
 			expect( ttfb ).toBeGreaterThan( 0 );
 
 			// Save the results.
-			if ( i >= throwaway ) {
-				results.largestContentfulPaint.push( lcp );
-				results.timeToFirstByte.push( ttfb );
-				results.lcpMinusTtfb.push( lcp - ttfb );
-			}
-		} );
-	}
+			results.largestContentfulPaint.push( lcp );
+			results.timeToFirstByte.push( ttfb );
+			results.lcpMinusTtfb.push( lcp - ttfb );
+		}
+	} );
 } );

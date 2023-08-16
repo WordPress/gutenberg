@@ -105,7 +105,7 @@ export function getHoverEventDurations( trace ) {
 	];
 }
 
-export async function getLoadingDurations( page ) {
+export async function getLoadingDurations() {
 	return await page.evaluate( () => {
 		const [
 			{
@@ -131,7 +131,7 @@ export async function getLoadingDurations( page ) {
 				paintTimings.find(
 					( { name } ) => name === 'first-contentful-paint'
 				).startTime - responseEnd,
-			// This is evaluated right after Playwright found the block selector.
+			// This is evaluated right after Puppeteer found the block selector.
 			firstBlock: performance.now() - responseEnd,
 		};
 	} );
@@ -141,43 +141,6 @@ export function sum( arr ) {
 	return arr.reduce( ( a, b ) => a + b, 0 );
 }
 
-export function average( array ) {
-	return array.reduce( ( a, b ) => a + b ) / array.length;
-}
-
-export function round( number, decimalPlaces = 2 ) {
-	const factor = Math.pow( 10, decimalPlaces );
-	return Math.round( number * factor ) / factor;
-}
-
-export async function loadBlocksFromHtml( page, filepath ) {
-	if ( ! existsSync( filepath ) ) {
-		throw new Error( `File not found (${ filepath })` );
-	}
-
-	return await page.evaluate( ( html ) => {
-		const { parse } = window.wp.blocks;
-		const { dispatch } = window.wp.data;
-		const blocks = parse( html );
-
-		blocks.forEach( ( block ) => {
-			if ( block.name === 'core/image' ) {
-				delete block.attributes.id;
-				delete block.attributes.url;
-			}
-		} );
-
-		dispatch( 'core/block-editor' ).resetBlocks( blocks );
-	}, readFile( filepath ) );
-}
-
-export async function load1000Paragraphs( page ) {
-	await page.evaluate( () => {
-		const { createBlock } = window.wp.blocks;
-		const { dispatch } = window.wp.data;
-		const blocks = Array.from( { length: 1000 } ).map( () =>
-			createBlock( 'core/paragraph' )
-		);
-		dispatch( 'core/block-editor' ).resetBlocks( blocks );
-	} );
+export function sequence( start, length ) {
+	return Array.from( { length }, ( _, i ) => i + start );
 }
