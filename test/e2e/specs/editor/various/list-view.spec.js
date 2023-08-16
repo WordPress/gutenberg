@@ -479,15 +479,17 @@ test.describe( 'List View', () => {
 		await expect
 			.poll(
 				listViewUtils.getBlocksWithA11yAttributes,
-				'Duplicating a block should retain focus and selection on existing block.'
+				'Duplicating a block should retain selection on existing block, move focus to duplicated block.'
 			)
 			.toMatchObject( [
 				{ name: 'core/group' },
 				{ name: 'core/columns' },
-				{ name: 'core/file', selected: true, focused: true },
-				{ name: 'core/file' },
+				{ name: 'core/file', selected: true },
+				{ name: 'core/file', focused: true },
 			] );
 
+		// Move focus to the first file block, and then delete it.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Delete' );
 		await expect
 			.poll(
