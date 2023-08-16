@@ -6,14 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Tooltip,
 } from '@wordpress/components';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -28,13 +28,17 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
-import { store as blockEditorStore } from '../../store';
 import useListViewImages from './use-list-view-images';
+import ListViewBlockRenameUI from './block-rename-ui';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const SINGLE_CLICK = 1;
 
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId },
+		block: { clientId, attributes: blockAttributes, name: blockName },
 		onClick,
 		onToggleExpanded,
 		tabIndex,
@@ -49,6 +53,7 @@ function ListViewBlockSelectButton(
 	},
 	ref
 ) {
+	const blockNameElementRef = useRef();
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
@@ -64,7 +69,9 @@ function ListViewBlockSelectButton(
 		getBlocksByClientId,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
-	const { duplicateBlocks, removeBlocks } = useDispatch( blockEditorStore );
+	const { duplicateBlocks, removeBlocks, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
+
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
@@ -76,6 +83,31 @@ function ListViewBlockSelectButton(
 				blockInformation.positionLabel
 		  )
 		: '';
+
+	const { isRenamingBlock } = useSelect(
+		( select ) => {
+			const { isBlockBeingRenamed } = unlock(
+				select( blockEditorStore )
+			);
+
+			return {
+				isRenamingBlock: isBlockBeingRenamed( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	const { setBlockBeingRenamed } = unlock( useDispatch( blockEditorStore ) );
+
+	const metaDataSupport = getBlockSupport(
+		blockName,
+		'__experimentalMetadata',
+		false
+	);
+
+	const supportsBlockNaming = !! (
+		true === metaDataSupport || metaDataSupport?.name
+	);
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -193,7 +225,24 @@ function ListViewBlockSelectButton(
 					'block-editor-list-view-block-select-button',
 					className
 				) }
-				onClick={ onClick }
+				onClick={ ( event ) => {
+					// Avoid click delays for blocks that don't support naming interaction.
+					if ( ! supportsBlockNaming ) {
+						onClick( event );
+						return;
+					}
+
+					if ( event.detail === SINGLE_CLICK ) {
+						onClick( event );
+					}
+				} }
+				onDoubleClick={ ( event ) => {
+					event.preventDefault();
+					if ( ! supportsBlockNaming ) {
+						return;
+					}
+					setBlockBeingRenamed( clientId );
+				} }
 				onKeyDown={ onKeyDownHandler }
 				ref={ ref }
 				tabIndex={ tabIndex }
@@ -218,9 +267,12 @@ function ListViewBlockSelectButton(
 					justify="flex-start"
 					spacing={ 1 }
 				>
-					<span className="block-editor-list-view-block-select-button__title">
-						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
-					</span>
+					<div
+						ref={ blockNameElementRef }
+						className="block-editor-list-view-block-select-button__title"
+					>
+						{ blockTitle }
+					</div>
 					{ blockInformation?.anchor && (
 						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
 							<Truncate
@@ -260,6 +312,29 @@ function ListViewBlockSelectButton(
 					) }
 				</HStack>
 			</Button>
+
+			{ isRenamingBlock && (
+				<ListViewBlockRenameUI
+					ref={ blockNameElementRef }
+					blockTitle={ blockTitle }
+					onCancel={ () => setBlockBeingRenamed( null ) }
+					onSubmit={ ( newName ) => {
+						if ( newName === undefined ) {
+							setBlockBeingRenamed( null );
+						}
+
+						setBlockBeingRenamed( null );
+						updateBlockAttributes( clientId, {
+							// Include existing metadata (if present) to avoid overwriting existing.
+							metadata: {
+								...( blockAttributes?.metadata &&
+									blockAttributes?.metadata ),
+								name: newName,
+							},
+						} );
+					} }
+				/>
+			) }
 		</>
 	);
 }

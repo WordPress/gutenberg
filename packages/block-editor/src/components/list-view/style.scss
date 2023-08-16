@@ -1,3 +1,6 @@
+
+$list-view-item-content-height: 32px;
+
 .block-editor-list-view-tree {
 	width: 100%;
 	border-collapse: collapse;
@@ -10,6 +13,49 @@
 		width: calc(100% + #{ $grid-unit-15 });
 	}
 }
+
+
+// Render in Popover.
+// Todo: find a better way to match height and avoid important.
+.block-editor-list-view-block-rename__form {
+	position: relative;
+
+	.components-input-control__input {
+		height: $list-view-item-content-height !important; // force match height of block title UI.
+		min-height: $list-view-item-content-height !important; // force match height of block title UI.
+		padding-right: 30px !important; // allow space for submit button.
+	}
+
+	// Cancel focused styles as contrast is already sufficiently high.
+	.components-input-control__backdrop {
+		box-shadow: none !important;
+		border-color: initial !important;
+	}
+
+	.block-editor-list-view-block-rename__actions {
+		position: absolute;
+		top: 0;
+		right: 0;
+		z-index: 9999;
+
+		.block-editor-list-view-block-rename__action {
+			height: $list-view-item-content-height;
+		}
+
+		.block-editor-list-view-block-rename__action--submit {
+			position: relative;
+			top: -2px; // Ensure that the submit button is always visible.
+		}
+	}
+}
+
+
+.block-editor-list-view-block-rename__popover {
+	// Important required to overide inline positioning
+	// until such time as we can specify a horizontal offset.
+	left: -8px !important; // todo: use input padding instead.
+}
+
 
 .block-editor-list-view-leaf {
 	// Use position relative for row animation.
@@ -131,7 +177,7 @@
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
+		padding: 2px $grid-unit-05 2px 0;
 		text-align: left;
 		border-radius: $radius-block-ui;
 		position: relative;
@@ -301,11 +347,16 @@
 
 	.block-editor-list-view-block-select-button__label-wrapper {
 		min-width: 120px;
+
 	}
+
 
 	.block-editor-list-view-block-select-button__title {
 		flex: 1;
 		position: relative;
+		height: $list-view-item-content-height;
+		display: flex;
+		align-items: center;
 
 		.components-truncate {
 			position: absolute;
