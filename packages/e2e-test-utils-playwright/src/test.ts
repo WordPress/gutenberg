@@ -143,6 +143,11 @@ const test = base.extend<
 		},
 		{ scope: 'worker', auto: true },
 	],
+	// Spins up a new browser for use by the Metrics fixture
+	// so that Lighthouse can connect to the debugging port.
+	// As a worker-scoped fixture, this will only launch 1
+	// instance for the whole test worker, so multiple tests
+	// will share the same instance with the same port.
 	lighthousePort: [
 		async ( {}, use ) => {
 			const port = await getPort();
