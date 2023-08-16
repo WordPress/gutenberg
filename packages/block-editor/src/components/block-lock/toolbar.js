@@ -61,7 +61,7 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 				<ToolbarButton
 					ref={ lockButtonRef }
 					icon={ lock }
-					label={ __( 'Unlock' ) }
+					label={ __( 'Unlock…' ) }
 					onClick={ toggleModal }
 					aria-expanded={ isModalOpen }
 					aria-haspopup="dialog"

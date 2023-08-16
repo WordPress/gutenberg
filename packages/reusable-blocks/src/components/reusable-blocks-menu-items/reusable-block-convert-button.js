@@ -152,8 +152,8 @@ export default function ReusableBlockConvertButton( {
 		<>
 			<MenuItem icon={ symbol } onClick={ () => setIsModalOpen( true ) }>
 				{ showRenameHint
-					? __( 'Create pattern/reusable block' )
-					: __( 'Create pattern' ) }
+					? __( 'Create pattern/reusable block…' )
+					: __( 'Create pattern…' ) }
 			</MenuItem>
 			{ isModalOpen && (
 				<Modal

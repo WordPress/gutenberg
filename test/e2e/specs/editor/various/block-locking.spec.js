@@ -12,7 +12,7 @@ test.describe( 'Block Locking', () => {
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Some paragraph' );
 
-		await editor.clickBlockOptionsMenuItem( 'Lock' );
+		await editor.clickBlockOptionsMenuItem( 'Lock…' );
 
 		await page.click( 'role=checkbox[name="Prevent removal"]' );
 		await page.click( 'role=button[name="Apply"]' );
@@ -29,7 +29,7 @@ test.describe( 'Block Locking', () => {
 		await page.keyboard.type( 'Enter' );
 		await page.keyboard.type( 'Second paragraph' );
 
-		await editor.clickBlockOptionsMenuItem( 'Lock' );
+		await editor.clickBlockOptionsMenuItem( 'Lock…' );
 
 		await page.click( 'role=checkbox[name="Disable movement"]' );
 		await page.click( 'role=button[name="Apply"]' );
@@ -52,7 +52,7 @@ test.describe( 'Block Locking', () => {
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Some paragraph' );
 
-		await editor.clickBlockOptionsMenuItem( 'Lock' );
+		await editor.clickBlockOptionsMenuItem( 'Lock…' );
 
 		await page.click( 'role=checkbox[name="Lock all"]' );
 		await page.click( 'role=button[name="Apply"]' );
@@ -67,12 +67,12 @@ test.describe( 'Block Locking', () => {
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Some paragraph' );
 
-		await editor.clickBlockOptionsMenuItem( 'Lock' );
+		await editor.clickBlockOptionsMenuItem( 'Lock…' );
 
 		await page.click( 'role=checkbox[name="Lock all"]' );
 		await page.click( 'role=button[name="Apply"]' );
 
-		await editor.clickBlockToolbarButton( 'Unlock' );
+		await editor.clickBlockToolbarButton( 'Unlock…' );
 		await page.click( 'role=checkbox[name="Lock all"]' );
 		await page.click( 'role=button[name="Apply"]' );
 
@@ -110,7 +110,7 @@ test.describe( 'Block Locking', () => {
 		} );
 		await paragraph.click();
 
-		await editor.clickBlockToolbarButton( 'Unlock' );
+		await editor.clickBlockToolbarButton( 'Unlock…' );
 		await page.click( 'role=checkbox[name="Lock all"]' );
 		await page.click( 'role=button[name="Apply"]' );
 

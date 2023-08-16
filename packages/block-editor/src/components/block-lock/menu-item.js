@@ -24,7 +24,7 @@ export default function BlockLockMenuItem( { clientId } ) {
 		return null;
 	}
 
-	const label = isLocked ? __( 'Unlock' ) : __( 'Lock' );
+	const label = isLocked ? __( 'Unlock…' ) : __( 'Lock…' );
 
 	return (
 		<>

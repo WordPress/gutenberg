@@ -57,7 +57,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 					setIsModalOpen( true );
 				} }
 			>
-				{ __( 'Create template part' ) }
+				{ __( 'Create template part…' ) }
 			</MenuItem>
 			{ isModalOpen && (
 				<CreateTemplatePartModal

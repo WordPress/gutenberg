@@ -102,7 +102,7 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 	return (
 		<>
 			<MenuItem icon={ symbol } onClick={ () => setIsModalOpen( true ) }>
-				{ __( 'Create pattern' ) }
+				{ __( 'Create pattern…' ) }
 			</MenuItem>
 			{ isModalOpen && (
 				<CreatePatternModal
