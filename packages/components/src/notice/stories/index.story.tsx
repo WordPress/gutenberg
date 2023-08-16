@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import Button from '../../button';
 import NoticeList from '../list';
 import type { NoticeListProps } from '../types';
 
-const meta: ComponentMeta< typeof Notice > = {
+const meta: Meta< typeof Notice > = {
 	title: 'Components/Notice',
 	component: Notice,
 	parameters: {

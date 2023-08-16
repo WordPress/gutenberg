@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import KeyboardShortcuts from '..';
 
-const meta: ComponentMeta< typeof KeyboardShortcuts > = {
+const meta: Meta< typeof KeyboardShortcuts > = {
 	component: KeyboardShortcuts,
 	title: 'Components/KeyboardShortcuts',
 	parameters: {

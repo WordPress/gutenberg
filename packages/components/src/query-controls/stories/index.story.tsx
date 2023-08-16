@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ import type {
 	QueryControlsWithMultipleCategorySelectionProps,
 } from '../types';
 
-const meta: ComponentMeta< typeof QueryControls > = {
+const meta: Meta< typeof QueryControls > = {
 	title: 'Components/QueryControls',
 	component: QueryControls,
 	argTypes: {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -37,7 +37,7 @@ import {
 } from '..';
 import DropdownMenu from '../../dropdown-menu';
 
-const meta: ComponentMeta< typeof Toolbar > = {
+const meta: Meta< typeof Toolbar > = {
 	title: 'Components/Toolbar',
 	component: Toolbar,
 	argTypes: {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { ComponentStory, Meta } from '@storybook/react';
 /**
  * Internal dependencies
  */
@@ -40,7 +40,7 @@ const JUSTIFICATIONS = {
 	start: 'start',
 };
 
-const meta: ComponentMeta< typeof HStack > = {
+const meta: Meta< typeof HStack > = {
 	component: HStack,
 	title: 'Components (Experimental)/HStack',
 	argTypes: {

@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { VisuallyHidden } from '..';
 
-const meta: ComponentMeta< typeof VisuallyHidden > = {
+const meta: Meta< typeof VisuallyHidden > = {
 	component: VisuallyHidden,
 	title: 'Components/VisuallyHidden',
 	argTypes: {

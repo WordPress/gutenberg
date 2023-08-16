@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import Dropdown from '..';
 import Button from '../../button';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
-const meta: ComponentMeta< typeof Dropdown > = {
+const meta: Meta< typeof Dropdown > = {
 	title: 'Components/Dropdown',
 	component: Dropdown,
 	argTypes: {

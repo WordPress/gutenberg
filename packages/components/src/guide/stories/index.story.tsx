@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import Button from '../../button';
 import Guide from '..';
 
-const meta: ComponentMeta< typeof Guide > = {
+const meta: Meta< typeof Guide > = {
 	title: 'Components/Guide',
 	component: Guide,
 	argTypes: {

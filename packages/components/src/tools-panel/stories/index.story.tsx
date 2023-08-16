@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 import styled from '@emotion/styled';
 
 /**
@@ -25,7 +25,7 @@ import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
-const meta: ComponentMeta< typeof ToolsPanel > = {
+const meta: Meta< typeof ToolsPanel > = {
 	title: 'Components (Experimental)/ToolsPanel',
 	component: ToolsPanel,
 	argTypes: {

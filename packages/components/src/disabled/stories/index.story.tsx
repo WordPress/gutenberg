@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import TextControl from '../../text-control/';
 import TextareaControl from '../../textarea-control/';
 import { VStack } from '../../v-stack/';
 
-const meta: ComponentMeta< typeof Disabled > = {
+const meta: Meta< typeof Disabled > = {
 	title: 'Components/Disabled',
 	component: Disabled,
 	argTypes: {

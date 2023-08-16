@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import TabPanel from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 
-const meta: ComponentMeta< typeof TabPanel > = {
+const meta: Meta< typeof TabPanel > = {
 	title: 'Components/TabPanel',
 	component: TabPanel,
 	parameters: {

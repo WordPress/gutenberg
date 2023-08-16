@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import { wordpress } from '@wordpress/icons';
 import Icon from '..';
 import { VStack } from '../../v-stack';
 
-const meta: ComponentMeta< typeof Icon > = {
+const meta: Meta< typeof Icon > = {
 	title: 'Components/Icon',
 	component: Icon,
 	parameters: {

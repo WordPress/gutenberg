@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import { View } from '../../view';
 import { Grid } from '..';
 
-const meta: ComponentMeta< typeof Grid > = {
+const meta: Meta< typeof Grid > = {
 	component: Grid,
 	title: 'Components (Experimental)/Grid',
 	argTypes: {

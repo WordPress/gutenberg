@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { Heading } from '..';
 
-const meta: ComponentMeta< typeof Heading > = {
+const meta: Meta< typeof Heading > = {
 	component: Heading,
 	title: 'Components (Experimental)/Heading',
 	argTypes: {

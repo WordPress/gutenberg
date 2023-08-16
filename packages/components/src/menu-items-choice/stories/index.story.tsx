@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import MenuItemsChoice from '..';
 import MenuGroup from '../../menu-group';
 
-const meta: ComponentMeta< typeof MenuItemsChoice > = {
+const meta: Meta< typeof MenuItemsChoice > = {
 	component: MenuItemsChoice,
 	title: 'Components/MenuItemsChoice',
 	argTypes: {

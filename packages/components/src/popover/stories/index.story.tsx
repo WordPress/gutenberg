@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { ComponentStory, Meta } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 	'overlay',
 ];
 
-const meta: ComponentMeta< typeof Popover > = {
+const meta: Meta< typeof Popover > = {
 	title: 'Components/Popover',
 	component: Popover,
 	argTypes: {

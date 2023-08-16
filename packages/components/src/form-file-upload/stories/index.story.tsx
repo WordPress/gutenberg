@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { upload as uploadIcon } from '@wordpress/icons';
  */
 import FormFileUpload from '..';
 
-const meta: ComponentMeta< typeof FormFileUpload > = {
+const meta: Meta< typeof FormFileUpload > = {
 	title: 'Components/FormFileUpload',
 	component: FormFileUpload,
 	argTypes: {

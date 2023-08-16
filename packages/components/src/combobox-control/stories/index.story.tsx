@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -22,7 +22,7 @@ const countries = [
 	{ name: 'American Samoa', code: 'AS' },
 ];
 
-const meta: ComponentMeta< typeof ComboboxControl > = {
+const meta: Meta< typeof ComboboxControl > = {
 	title: 'Components/ComboboxControl',
 	component: ComboboxControl,
 	argTypes: {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 import type { ReactNode } from 'react';
 
 /**
@@ -15,7 +15,7 @@ import { useState } from '@wordpress/element';
 import Button from '../../button';
 import ScrollLock from '..';
 
-const meta: ComponentMeta< typeof ScrollLock > = {
+const meta: Meta< typeof ScrollLock > = {
 	component: ScrollLock,
 	title: 'Components/ScrollLock',
 	parameters: {

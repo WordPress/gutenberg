@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import { UnitControl } from '../';
 import { CSS_UNITS } from '../utils';
 
-const meta: ComponentMeta< typeof UnitControl > = {
+const meta: Meta< typeof UnitControl > = {
 	component: UnitControl,
 	title: 'Components (Experimental)/UnitControl',
 	argTypes: {

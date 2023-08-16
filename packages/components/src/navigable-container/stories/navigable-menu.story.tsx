@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { NavigableMenu } from '..';
 
-const meta: ComponentMeta< typeof NavigableMenu > = {
+const meta: Meta< typeof NavigableMenu > = {
 	title: 'Components/NavigableMenu',
 	component: NavigableMenu,
 	argTypes: {

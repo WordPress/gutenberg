@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import InputControl from '..';
 import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
 import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
 
-const meta: ComponentMeta< typeof InputControl > = {
+const meta: Meta< typeof InputControl > = {
 	title: 'Components (Experimental)/InputControl',
 	component: InputControl,
 	argTypes: {

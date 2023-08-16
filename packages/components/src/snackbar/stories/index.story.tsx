@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import Snackbar from '..';
 
-const meta: ComponentMeta< typeof Snackbar > = {
+const meta: Meta< typeof Snackbar > = {
 	title: 'Components/Snackbar',
 	component: Snackbar,
 	argTypes: {

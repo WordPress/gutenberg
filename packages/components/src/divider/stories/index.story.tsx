@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { Text } from '../../text';
 import { Divider } from '..';
 import { Flex } from '../../flex';
 
-const meta: ComponentMeta< typeof Divider > = {
+const meta: Meta< typeof Divider > = {
 	component: Divider,
 	title: 'Components (Experimental)/Divider',
 	argTypes: {

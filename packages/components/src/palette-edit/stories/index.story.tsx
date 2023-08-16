@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import PaletteEdit from '..';
 import type { Color, Gradient } from '../types';
 
-const meta: ComponentMeta< typeof PaletteEdit > = {
+const meta: Meta< typeof PaletteEdit > = {
 	title: 'Components/PaletteEdit',
 	component: PaletteEdit,
 	parameters: {

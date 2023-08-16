@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Surface } from '..';
 import { Text } from '../../text';
 
-const meta: ComponentMeta< typeof Surface > = {
+const meta: Meta< typeof Surface > = {
 	component: Surface,
 	title: 'Components (Experimental)/Surface',
 	argTypes: {

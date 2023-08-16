@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { ComponentStory, Meta } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import InputControl from '../../input-control';
 import Modal from '../';
 import type { ModalProps } from '../types';
 
-const meta: ComponentMeta< typeof Modal > = {
+const meta: Meta< typeof Modal > = {
 	component: Modal,
 	title: 'Components/Modal',
 	argTypes: {

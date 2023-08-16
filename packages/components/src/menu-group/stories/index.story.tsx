@@ -13,9 +13,9 @@ import MenuItemsChoice from '../../menu-items-choice';
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
-const meta: ComponentMeta< typeof MenuGroup > = {
+const meta: Meta< typeof MenuGroup > = {
 	title: 'Components/MenuGroup',
 	component: MenuGroup,
 	argTypes: {

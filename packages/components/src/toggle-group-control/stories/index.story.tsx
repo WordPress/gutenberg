@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,7 @@ import type {
 	ToggleGroupControlProps,
 } from '../types';
 
-const meta: ComponentMeta< typeof ToggleGroupControl > = {
+const meta: Meta< typeof ToggleGroupControl > = {
 	component: ToggleGroupControl,
 	title: 'Components (Experimental)/ToggleGroupControl',
 	argTypes: {

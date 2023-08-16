@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { ComponentMeta, Story } from '@storybook/react';
 import { Animate } from '..';
 import Notice from '../../notice';
 
-const meta: ComponentMeta< typeof Animate > = {
+const meta: Meta< typeof Animate > = {
 	title: 'Components/Animate',
 	component: Animate,
 	parameters: {

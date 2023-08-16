@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import TextareaControl from '..';
 
-const meta: ComponentMeta< typeof TextareaControl > = {
+const meta: Meta< typeof TextareaControl > = {
 	component: TextareaControl,
 	title: 'Components/TextareaControl',
 	argTypes: {

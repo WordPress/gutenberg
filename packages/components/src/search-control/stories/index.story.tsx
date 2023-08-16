@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import SearchControl from '..';
 
-const meta: ComponentMeta< typeof SearchControl > = {
+const meta: Meta< typeof SearchControl > = {
 	title: 'Components/SearchControl',
 	component: SearchControl,
 	argTypes: {

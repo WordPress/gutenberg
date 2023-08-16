@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 /**
  * Internal dependencies
  */
 import DropZone from '..';
 
-const meta: ComponentMeta< typeof DropZone > = {
+const meta: Meta< typeof DropZone > = {
 	component: DropZone,
 	title: 'Components/DropZone',
 	parameters: {

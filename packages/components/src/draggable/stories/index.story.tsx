@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 import type { DragEvent } from 'react';
 
 /**
@@ -16,7 +16,7 @@ import { Icon, more } from '@wordpress/icons';
  */
 import Draggable from '..';
 
-const meta: ComponentMeta< typeof Draggable > = {
+const meta: Meta< typeof Draggable > = {
 	component: Draggable,
 	title: 'Components/Draggable',
 	argTypes: {

@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import TextHighlight from '..';
 
-const meta: ComponentMeta< typeof TextHighlight > = {
+const meta: Meta< typeof TextHighlight > = {
 	component: TextHighlight,
 	title: 'Components/TextHighlight',
 	parameters: {

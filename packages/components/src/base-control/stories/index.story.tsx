@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
-const meta: ComponentMeta< typeof BaseControl > = {
+const meta: Meta< typeof BaseControl > = {
 	title: 'Components/BaseControl',
 	component: BaseControl,
 	argTypes: {

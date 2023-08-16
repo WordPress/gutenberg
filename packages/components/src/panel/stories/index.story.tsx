@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -16,7 +16,7 @@ import InputControl from '../../input-control';
  */
 import { wordpress } from '@wordpress/icons';
 
-const meta: ComponentMeta< typeof Panel > = {
+const meta: Meta< typeof Panel > = {
 	title: 'Components/Panel',
 	component: Panel,
 	argTypes: {

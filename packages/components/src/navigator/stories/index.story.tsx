@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -19,7 +19,7 @@ import {
 	useNavigator,
 } from '..';
 
-const meta: ComponentMeta< typeof NavigatorProvider > = {
+const meta: Meta< typeof NavigatorProvider > = {
 	component: NavigatorProvider,
 	title: 'Components (Experimental)/Navigator',
 	argTypes: {

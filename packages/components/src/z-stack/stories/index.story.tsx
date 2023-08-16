@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { CSSProperties } from 'react';
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import { Elevation } from '../../elevation';
 import { View } from '../../view';
 import { ZStack } from '..';
 
-const meta: ComponentMeta< typeof ZStack > = {
+const meta: Meta< typeof ZStack > = {
 	component: ZStack,
 	title: 'Components (Experimental)/ZStack',
 	argTypes: {

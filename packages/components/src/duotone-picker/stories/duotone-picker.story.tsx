@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import { DuotonePicker } from '..';
 import type { DuotonePickerProps } from '../types';
 
-const meta: ComponentMeta< typeof DuotonePicker > = {
+const meta: Meta< typeof DuotonePicker > = {
 	title: 'Components/DuotonePicker',
 	component: DuotonePicker,
 	argTypes: {

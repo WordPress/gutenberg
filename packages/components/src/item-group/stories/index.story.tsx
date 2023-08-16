@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import { Item } from '../item/component';
 
 type ItemProps = React.ComponentPropsWithoutRef< typeof Item >;
 
-const meta: ComponentMeta< typeof ItemGroup > = {
+const meta: Meta< typeof ItemGroup > = {
 	component: ItemGroup,
 	title: 'Components (Experimental)/ItemGroup',
 	argTypes: {

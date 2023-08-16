@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { View } from '..';
 
-const meta: ComponentMeta< typeof View > = {
+const meta: Meta< typeof View > = {
 	component: View,
 	title: 'Components (Experimental)/View',
 	argTypes: {

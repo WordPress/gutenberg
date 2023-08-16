@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import TextControl from '../../text-control';
 
 const ICONS = { starEmpty, starFilled, styles, wordpress };
 
-const meta: ComponentMeta< typeof Placeholder > = {
+const meta: Meta< typeof Placeholder > = {
 	component: Placeholder,
 	title: 'Components/Placeholder',
 	argTypes: {

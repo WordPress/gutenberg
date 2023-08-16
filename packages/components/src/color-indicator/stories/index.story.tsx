@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import ColorIndicator from '..';
 
-const meta: ComponentMeta< typeof ColorIndicator > = {
+const meta: Meta< typeof ColorIndicator > = {
 	component: ColorIndicator,
 	title: 'Components/ColorIndicator',
 	argTypes: {

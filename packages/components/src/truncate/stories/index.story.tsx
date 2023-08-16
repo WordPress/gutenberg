@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { Truncate } from '..';
 
-const meta: ComponentMeta< typeof Truncate > = {
+const meta: Meta< typeof Truncate > = {
 	component: Truncate,
 	title: 'Components (Experimental)/Truncate',
 	argTypes: {

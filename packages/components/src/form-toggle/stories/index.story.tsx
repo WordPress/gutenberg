@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import { FormToggle } from '..';
 
-const meta: ComponentMeta< typeof FormToggle > = {
+const meta: Meta< typeof FormToggle > = {
 	component: FormToggle,
 	title: 'Components/FormToggle',
 	argTypes: {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import RangeControl from '..';
 
 const ICONS = { starEmpty, starFilled, styles, wordpress };
 
-const meta: ComponentMeta< typeof RangeControl > = {
+const meta: Meta< typeof RangeControl > = {
 	component: RangeControl,
 	title: 'Components/RangeControl',
 	argTypes: {

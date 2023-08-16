@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -23,7 +23,7 @@ const ALIGNMENTS = {
 	stretch: 'stretch',
 };
 
-const meta: ComponentMeta< typeof VStack > = {
+const meta: Meta< typeof VStack > = {
 	component: VStack,
 	title: 'Components (Experimental)/VStack',
 	argTypes: {

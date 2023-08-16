@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState, useEffect } from '@wordpress/element';
  */
 import TimePicker from '../time';
 
-const meta: ComponentMeta< typeof TimePicker > = {
+const meta: Meta< typeof TimePicker > = {
 	title: 'Components/TimePicker',
 	component: TimePicker,
 	argTypes: {

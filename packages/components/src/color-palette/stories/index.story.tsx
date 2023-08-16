@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { CSSProperties } from 'react';
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import ColorPalette from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 
-const meta: ComponentMeta< typeof ColorPalette > = {
+const meta: Meta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
 	component: ColorPalette,
 	argTypes: {

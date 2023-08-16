@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 import type { ComponentProps } from 'react';
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import TreeSelect from '../';
 
-const meta: ComponentMeta< typeof TreeSelect > = {
+const meta: Meta< typeof TreeSelect > = {
 	title: 'Components/TreeSelect',
 	component: TreeSelect,
 	argTypes: {

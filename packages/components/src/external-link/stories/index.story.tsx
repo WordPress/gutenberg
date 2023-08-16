@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import ExternalLink from '..';
 
-const meta: ComponentMeta< typeof ExternalLink > = {
+const meta: Meta< typeof ExternalLink > = {
 	component: ExternalLink,
 	title: 'Components/ExternalLink',
 	argTypes: {

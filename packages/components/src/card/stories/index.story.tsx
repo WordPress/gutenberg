@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ import { Text } from '../../text';
 import { Heading } from '../../heading';
 import Button from '../../button';
 
-const meta: ComponentMeta< typeof Card > = {
+const meta: Meta< typeof Card > = {
 	component: Card,
 	title: 'Components/Card',
 	argTypes: {

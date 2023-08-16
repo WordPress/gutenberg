@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Flex, FlexItem, FlexBlock } from '../';
 import { View } from '../../view';
 
-const meta: ComponentMeta< typeof Flex > = {
+const meta: Meta< typeof Flex > = {
 	component: Flex,
 	title: 'Components/Flex',
 	argTypes: {

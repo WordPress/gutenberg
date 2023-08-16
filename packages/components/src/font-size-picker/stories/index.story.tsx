@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import FontSizePicker from '../';
 
-const meta: ComponentMeta< typeof FontSizePicker > = {
+const meta: Meta< typeof FontSizePicker > = {
 	title: 'Components/FontSizePicker',
 	component: FontSizePicker,
 	argTypes: {

@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { TabbableContainer } from '..';
 
-const meta: ComponentMeta< typeof TabbableContainer > = {
+const meta: Meta< typeof TabbableContainer > = {
 	title: 'Components/TabbableContainer',
 	component: TabbableContainer,
 	argTypes: {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, Story } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import { ColorPicker } from '../component';
 
-const meta: ComponentMeta< typeof ColorPicker > = {
+const meta: Meta< typeof ColorPicker > = {
 	component: ColorPicker,
 	title: 'Components/ColorPicker',
 	argTypes: {

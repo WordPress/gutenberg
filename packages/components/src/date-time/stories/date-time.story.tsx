@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useState, useEffect } from '@wordpress/element';
 import DateTimePicker from '../date-time';
 import { daysFromNow, isWeekend } from './utils';
 
-const meta: ComponentMeta< typeof DateTimePicker > = {
+const meta: Meta< typeof DateTimePicker > = {
 	title: 'Components/DateTimePicker',
 	component: DateTimePicker,
 	argTypes: {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { ComponentStory, Meta } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import Spinner from '../';
 import { space } from '../../ui/utils/space';
 
-const meta: ComponentMeta< typeof Spinner > = {
+const meta: Meta< typeof Spinner > = {
 	title: 'Components/Spinner',
 	component: Spinner,
 	parameters: {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -29,7 +29,7 @@ const controls = [
 	{}
 );
 
-const meta: ComponentMeta< typeof Spacer > = {
+const meta: Meta< typeof Spacer > = {
 	component: Spacer,
 	title: 'Components (Experimental)/Spacer',
 	argTypes: {

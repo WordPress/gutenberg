@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 /**
  * WordPress dependencies
  */
@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
  */
 import CustomGradientPicker from '../';
 
-const meta: ComponentMeta< typeof CustomGradientPicker > = {
+const meta: Meta< typeof CustomGradientPicker > = {
 	title: 'Components/CustomGradientPicker',
 	component: CustomGradientPicker,
 	parameters: {

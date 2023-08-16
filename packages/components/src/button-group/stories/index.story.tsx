@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import ButtonGroup from '..';
 import Button from '../../button';
 
-const meta: ComponentMeta< typeof ButtonGroup > = {
+const meta: Meta< typeof ButtonGroup > = {
 	title: 'Components/ButtonGroup',
 	component: ButtonGroup,
 	argTypes: {

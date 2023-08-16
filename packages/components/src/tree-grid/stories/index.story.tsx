@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import TreeGrid, { TreeGridRow, TreeGridCell } from '..';
 import { Button } from '../../button';
 import InputControl from '../../input-control';
 
-const meta: ComponentMeta< typeof TreeGrid > = {
+const meta: Meta< typeof TreeGrid > = {
 	title: 'Components (Experimental)/TreeGrid',
 	component: TreeGrid,
 	argTypes: {

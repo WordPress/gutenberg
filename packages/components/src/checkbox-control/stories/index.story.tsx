@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import CheckboxControl from '..';
 import { VStack } from '../../v-stack';
 
-const meta: ComponentMeta< typeof CheckboxControl > = {
+const meta: Meta< typeof CheckboxControl > = {
 	component: CheckboxControl,
 	title: 'Components/CheckboxControl',
 	argTypes: {

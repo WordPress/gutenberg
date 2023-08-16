@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 import type { ComponentProps } from 'react';
 
 /**
@@ -17,7 +17,7 @@ import { Provider as SlotFillProvider } from '../../slot-fill';
 import Popover from '../../popover';
 import type { Border } from '../types';
 
-const meta: ComponentMeta< typeof BorderControl > = {
+const meta: Meta< typeof BorderControl > = {
 	title: 'Components (Experimental)/BorderControl',
 	component: BorderControl,
 	argTypes: {

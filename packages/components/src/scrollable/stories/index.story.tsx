@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useRef } from '@wordpress/element';
 import { View } from '../../view';
 import { Scrollable } from '..';
 
-const meta: ComponentMeta< typeof Scrollable > = {
+const meta: Meta< typeof Scrollable > = {
 	component: Scrollable,
 	title: 'Components (Experimental)/Scrollable',
 	argTypes: {
