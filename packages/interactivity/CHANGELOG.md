@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Support region-based client-side navigation. ([#53733](https://github.com/WordPress/gutenberg/pull/53733))
 -   Allow passing optional `afterLoad` callbacks to `store` calls. ([#53363](https://github.com/WordPress/gutenberg/pull/53363))
 
 ### Bug Fix
