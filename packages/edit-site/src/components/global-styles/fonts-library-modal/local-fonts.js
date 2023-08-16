@@ -96,7 +96,7 @@ function LocalFonts() {
 			formData.append( `files${ i }`, item.file, item.file.name );
 			// Add the posted file id to the fontFace object
 			// This is needed to associate the fontFace with the file on the server
-			const face = { ...item, file: `files${ i }` };
+			const face = { ...item, uploadedFile: `files${ i }` };
 			acc[ item.fontFamily ].fontFace.push( face );
 			return acc;
 		}, {} );

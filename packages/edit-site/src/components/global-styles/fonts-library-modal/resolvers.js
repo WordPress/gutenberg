@@ -9,7 +9,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 export async function fetchGoogleFonts() {
 	const config = {
-		path: '/wp/v2/fonts_library/google_fonts',
+		path: '/wp/v2/fonts/google_fonts',
 	};
 	const { fontFamilies, categories } = await apiFetch( config );
 	return {
@@ -34,7 +34,7 @@ export async function fetchInstallFonts( data ) {
 	}
 
 	const config = {
-		path: '/wp/v2/fonts_library',
+		path: '/wp/v2/fonts',
 		method: 'POST',
 		body,
 	};
@@ -45,7 +45,7 @@ export async function fetchInstallFonts( data ) {
 
 export async function fetchUninstallFonts( data ) {
 	const config = {
-		path: '/wp/v2/fonts_library',
+		path: '/wp/v2/fonts',
 		method: 'DELETE',
 		data,
 	};

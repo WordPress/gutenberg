@@ -64,8 +64,6 @@ function LocalFontVariant( { fontFile, onFontFaceLoad, onFontFaceRemove } ) {
 
 				const fontFaceData = {
 					file: fontFile,
-					// files as base64 uri
-					// src: font.toBase64(),
 					fontFamily: fontName,
 					fontStyle: isItalic ? 'italic' : 'normal',
 					fontWeight: !! weightAxis ? weightRange : fontWeight,
