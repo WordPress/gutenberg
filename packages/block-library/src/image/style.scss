@@ -186,8 +186,8 @@
 
 	.close-button {
 		position: absolute;
-		top: calc(env(safe-area-inset-top) + 12.5px);
-		right: calc(env(safe-area-inset-right) + 12.5px);
+		top: calc(env(safe-area-inset-top) + 20px);
+		right: calc(env(safe-area-inset-right) + 20px);
 		padding: 0;
 		cursor: pointer;
 		z-index: 5000000;
