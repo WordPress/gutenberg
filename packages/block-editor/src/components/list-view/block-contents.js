@@ -171,6 +171,7 @@ const ListViewBlockContents = forwardRef(
 							toggleLabelEditingMode={ toggleLabelEditingMode }
 							supportsBlockNaming={ supportsBlockNaming }
 							blockTitle={ blockTitle }
+							clientId={ clientId }
 							{ ...props }
 						/>
 					) }
