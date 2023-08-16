@@ -22,10 +22,11 @@ class Tests_Fonts_WpFontsLibrary_Uninstall extends WP_Font_Family_UnitTestCase {
 
 		// Test.
 		$actual = $font->uninstall();
-		$this->assertInstanceOf( WP_Error::class, $actual, 'WP_Error instance should have been returned' );
+		$this->assertWPError( $actual, 'WP_Error should have been returned' );
 		$this->assertSame(
 			array( 'font_family_not_found' => array( 'The font family could not be found.' ) ),
-			$actual->errors
+			$actual->errors,
+			'WP_Error should have "fonts_must_have_same_slug" error'
 		);
 	}
 
@@ -42,7 +43,7 @@ class Tests_Fonts_WpFontsLibrary_Uninstall extends WP_Font_Family_UnitTestCase {
 
 		// Test.
 		$actual = $font->uninstall();
-		$this->assertInstanceOf( WP_Error::class, $actual, 'WP_Error instance should be returned' );
+		$this->assertWPError( $actual, 'WP_Error should be returned' );
 		$this->assertSame(
 			array( 'font_family_not_deleted' => array( 'The font family could not be deleted.' ) ),
 			$actual->errors,
