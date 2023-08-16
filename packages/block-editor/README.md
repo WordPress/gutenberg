@@ -417,8 +417,8 @@ const fontSize = getComputedFluidTypographyValue( {
 _Parameters_
 
 -   _args_ `Object`:
--   _args.minimumViewPortWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
--   _args.maximumViewPortWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+-   _args.minimumViewportWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+-   _args.maximumViewportWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
 -   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
 -   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
@@ -793,6 +793,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+### useBlockCommands
+
+Undocumented declaration.
+
 ### useBlockDisplayInformation
 
 Hook used to try to find a matching block variation and return the appropriate information for display reasons. In order to to try to find a match we need to things: 1. Block's client id to extract it's current attributes. 2. A block variation should have set `isActive` prop to a proper function.
@@ -814,6 +818,40 @@ The `useBlockEditContext` hook provides information about the block this hook is
 _Returns_
 
 -   `Object`: Block edit context
+
+### useBlockEditingMode
+
+Allows a block to restrict the user interface that is displayed for editing that block and its inner blocks.
+
+_Usage_
+
+```js
+function MyBlock( { attributes, setAttributes } ) {
+	useBlockEditingMode( 'disabled' );
+	return <div { ...useBlockProps() }></div>;
+}
+```
+
+`mode` can be one of three options:
+
+-   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
+    selected.
+-   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
+    toolbar, the block movers, block settings.
+-   `'default'`: Allows editing the block as normal.
+
+The mode is inherited by all of the block's inner blocks, unless they have
+their own mode.
+
+If called outside of a block context, the mode is applied to all blocks.
+
+_Parameters_
+
+-   _mode_ `?BlockEditingMode`: The editing mode to apply. If undefined, the current editing mode is not changed.
+
+_Returns_
+
+-   `BlockEditingMode`: The current editing mode.
 
 ### useBlockProps
 

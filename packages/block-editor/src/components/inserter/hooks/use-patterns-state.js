@@ -15,7 +15,7 @@ import { store as blockEditorStore } from '../../../store';
 const CUSTOM_CATEGORY = {
 	name: 'custom',
 	label: __( 'My patterns' ),
-	description: __( 'Custom patterns add by site users' ),
+	description: __( 'Custom patterns added by site users.' ),
 };
 
 /**
@@ -61,6 +61,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 				),
 				{
 					type: 'snackbar',
+					id: 'block-pattern-inserted-notice',
 				}
 			);
 		},

@@ -679,12 +679,17 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			'returns clamp value using custom fluid config' => array(
 				'font_size_value' => '17px',
 				'theme_slug'      => 'block-theme-child-with-fluid-typography-config',
-				'expected_output' => 'font-size:clamp(16px, 1rem + ((1vw - 3.2px) * 0.147), 17px);',
+				'expected_output' => 'font-size:clamp(16px, 1rem + ((1vw - 6.4px) * 0.179), 17px);',
 			),
 			'returns value when font size <= custom min font size bound' => array(
 				'font_size_value' => '15px',
 				'theme_slug'      => 'block-theme-child-with-fluid-typography-config',
 				'expected_output' => 'font-size:15px;',
+			),
+			'returns clamp value using default config if layout is fluid' => array(
+				'font_size_value' => '15px',
+				'theme_slug'      => 'block-theme-child-with-fluid-layout',
+				'expected_output' => 'font-size:clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.078), 15px);',
 			),
 		);
 	}

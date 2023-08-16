@@ -575,6 +575,8 @@ class BottomSheet extends Component {
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
 								safeAreaBottomInset,
+								maxHeight,
+								isMaxHeightSet,
 							} }
 						>
 							{ hasNavigation ? (

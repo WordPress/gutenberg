@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	VisualEditorGlobalKeyboardShortcuts,
-	PostTitle,
-	store as editorStore,
-} from '@wordpress/editor';
+import { PostTitle, store as editorStore } from '@wordpress/editor';
 import {
 	WritingFlow,
 	BlockList,
@@ -338,14 +334,21 @@ export default function VisualEditor( { styles } ) {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
+	const isToBeIframed =
+		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
+			! hasMetaBoxes ) ||
+		isTemplateMode ||
+		deviceType === 'Tablet' ||
+		deviceType === 'Mobile';
+
 	return (
 		<BlockTools
 			__unstableContentRef={ ref }
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
+				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
-			<VisualEditorGlobalKeyboardShortcuts />
 			<motion.div
 				className="edit-post-visual-editor__content-area"
 				animate={ {
@@ -359,14 +362,7 @@ export default function VisualEditor( { styles } ) {
 					className={ previewMode }
 				>
 					<MaybeIframe
-						shouldIframe={
-							( ( hasV3BlocksOnly ||
-								( isGutenbergPlugin && isBlockBasedTheme ) ) &&
-								! hasMetaBoxes ) ||
-							isTemplateMode ||
-							deviceType === 'Tablet' ||
-							deviceType === 'Mobile'
-						}
+						shouldIframe={ isToBeIframed }
 						contentRef={ contentRef }
 						styles={ styles }
 					>

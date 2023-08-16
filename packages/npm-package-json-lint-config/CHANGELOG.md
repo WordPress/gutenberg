@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Updated `npm-package-json-lint` peer dependency to require v6.0.0 [#53636](https://github.com/WordPress/gutenberg/pull/53636)
+
+## 4.24.0 (2023-08-10)
+
+## 4.23.0 (2023-07-20)
+
 ## 4.22.0 (2023-07-05)
 
 ## 4.21.0 (2023-06-23)

@@ -115,6 +115,7 @@ Settings related to layout.
 | ---       | ---    | ---    |---   |
 | contentSize | string |  |  |
 | wideSize | string |  |  |
+| allowEditing | boolean | true |  |
 
 ---
 
@@ -170,6 +171,16 @@ Settings related to typography.
 
 Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.
 
+
+---
+
+### behaviors
+
+Settings related to behaviors.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| lightbox | boolean | false |  |
 
 ---
 ## Styles

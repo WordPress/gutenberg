@@ -3,6 +3,7 @@
  */
 import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
 import classnames from 'classnames';
+import type { Middleware, MiddlewareArguments } from '@floating-ui/react-dom';
 import {
 	useFloating,
 	flip as flipMiddleware,
@@ -11,16 +12,11 @@ import {
 	arrow,
 	offset as offsetMiddleware,
 	size,
-	Middleware,
-	MiddlewareArguments,
 } from '@floating-ui/react-dom';
 // eslint-disable-next-line no-restricted-imports
-import {
-	motion,
-	useReducedMotion,
-	HTMLMotionProps,
-	MotionProps,
-} from 'framer-motion';
+import type { HTMLMotionProps, MotionProps } from 'framer-motion';
+// eslint-disable-next-line no-restricted-imports
+import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * WordPress dependencies

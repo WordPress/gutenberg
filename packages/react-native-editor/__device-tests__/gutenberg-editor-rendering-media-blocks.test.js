@@ -5,7 +5,7 @@ import { mediaBlocks } from '../src/initial-html';
 
 describe( 'Gutenberg Editor Rendering Media Blocks test', () => {
 	it( 'should be able to render blocks correctly', async () => {
-		await editorPage.setHtmlContent( mediaBlocks );
+		await editorPage.initializeEditor( { initialData: mediaBlocks } );
 
 		// Give some time to media placeholders to render.
 		await editorPage.driver.sleep( 3000 );

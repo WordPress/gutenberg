@@ -7,6 +7,7 @@ import {
 	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
+import { symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -72,6 +73,7 @@ const {
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
+	getBlockEditingMode,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -121,7 +123,7 @@ describe( 'selectors', () => {
 			parent: [ 'core/test-block-b' ],
 		} );
 
-		registerBlockType( 'core/test-freeform', {
+		registerBlockType( 'core/freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
 			category: 'text',
 			title: 'Test Freeform Content Handler',
@@ -177,7 +179,7 @@ describe( 'selectors', () => {
 			ancestor: [ 'core/test-block-ancestor' ],
 		} );
 
-		setFreeformContentHandlerName( 'core/test-freeform' );
+		setFreeformContentHandlerName( 'core/freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
 	} );
@@ -187,7 +189,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
-		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/freeform' );
 		unregisterBlockType( 'core/post-content-child' );
 		unregisterBlockType( 'core/test-block-ancestor' );
 		unregisterBlockType( 'core/test-block-parent' );
@@ -3347,7 +3349,10 @@ describe( 'selectors', () => {
 				category: 'reusable',
 				content: '<!-- /wp:test-block-a -->',
 				frecency: 0,
-				icon: { src: 'test' },
+				icon: {
+					src: symbol,
+					foreground: 'var(--wp-block-synced-color)',
+				},
 				id: 'core/block/1',
 				initialAttributes: { ref: 1 },
 				isDisabled: false,
@@ -3450,7 +3455,7 @@ describe( 'selectors', () => {
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-a',
 				'core/test-block-b',
-				'core/test-freeform',
+				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
 				'core/block/1',
@@ -3466,7 +3471,7 @@ describe( 'selectors', () => {
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-a',
 				'core/test-block-b',
-				'core/test-freeform',
+				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
 				'core/block/1',
@@ -4785,5 +4790,203 @@ describe( '__unstableGetClientIdsTree', () => {
 				],
 			},
 		] );
+	} );
+} );
+
+describe( 'getBlockEditingMode', () => {
+	const baseState = {
+		settings: {},
+		blocks: {
+			byClientId: new Map( [
+				[ '6cf70164-9097-4460-bcbf-200560546988', {} ], // Header
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ], // Group
+				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', {} ], // |  Post Title
+				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ], // |  Post Content
+				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', {} ], // | |  Paragraph
+				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ], // | |  Paragraph
+			] ),
+			order: new Map( [
+				[
+					'',
+					[
+						'6cf70164-9097-4460-bcbf-200560546988',
+						'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+					],
+				],
+				[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
+				[
+					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+					[
+						'b26fc763-417d-4f01-b81c-2ec61e14a972',
+						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					],
+				],
+				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', [] ],
+				[
+					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					[
+						'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+						'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+					],
+				],
+				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', [] ],
+				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', [] ],
+			] ),
+			parents: new Map( [
+				[ '6cf70164-9097-4460-bcbf-200560546988', '' ],
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', '' ],
+				[
+					'b26fc763-417d-4f01-b81c-2ec61e14a972',
+					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+				],
+				[
+					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+				],
+				[
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+				],
+				[
+					'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+				],
+			] ),
+		},
+		blockListSettings: {
+			'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
+			'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
+		},
+		blockEditingModes: new Map( [] ),
+	};
+
+	const __experimentalHasContentRoleAttribute = jest.fn( () => false );
+	getBlockEditingMode.registry = {
+		select: jest.fn( () => ( {
+			__experimentalHasContentRoleAttribute,
+		} ) ),
+	};
+
+	it( 'should return default by default', () => {
+		expect(
+			getBlockEditingMode(
+				baseState,
+				'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+			)
+		).toBe( 'default' );
+	} );
+
+	it( 'should return disabled if explicitly set', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [
+				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+			] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'disabled' );
+	} );
+
+	it( 'should return contentOnly if explicitly set', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [
+				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+			] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'contentOnly' );
+	} );
+
+	it( 'should return disabled if explicitly set on a parent', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+			] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'disabled' );
+	} );
+
+	it( 'should return default if parent is set to contentOnly', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'contentOnly' ],
+			] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'default' );
+	} );
+
+	it( 'should return disabled if overridden by a parent', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [
+				[ '', 'disabled' ],
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'default' ],
+				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+			] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'disabled' );
+	} );
+
+	it( 'should return disabled if explicitly set on root', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'disabled' );
+	} );
+
+	it( 'should return default if root is contentOnly', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [ [ '', 'contentOnly' ] ] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'default' );
+	} );
+
+	it( 'should return disabled if parent is locked and the block has no content role', () => {
+		const state = {
+			...baseState,
+			blockListSettings: {
+				...baseState.blockListSettings,
+				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {
+					templateLock: 'contentOnly',
+				},
+			},
+		};
+		__experimentalHasContentRoleAttribute.mockReturnValueOnce( false );
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'disabled' );
+	} );
+
+	it( 'should return contentOnly if parent is locked and the block has a content role', () => {
+		const state = {
+			...baseState,
+			blockListSettings: {
+				...baseState.blockListSettings,
+				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {
+					templateLock: 'contentOnly',
+				},
+			},
+		};
+		__experimentalHasContentRoleAttribute.mockReturnValueOnce( true );
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'contentOnly' );
 	} );
 } );

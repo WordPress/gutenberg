@@ -279,7 +279,7 @@ export default function HeaderEditMode() {
 											label={ __( 'Zoom-out View' ) }
 											onClick={ () => {
 												setPreviewDeviceType(
-													'desktop'
+													'Desktop'
 												);
 												__unstableSetEditorMode(
 													isZoomedOutView

@@ -2,7 +2,8 @@
  * External dependencies
  */
 import 'react-native-gesture-handler/jestSetup';
-import { Image } from 'react-native';
+import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
+import { Image, Linking } from 'react-native';
 
 // React Native sets up a global navigator, but that is not executed in the
 // testing environment: https://github.com/facebook/react-native/blob/6c19dc3266b84f47a076b647a1c93b3c3b69d2c5/Libraries/Core/setUpNavigator.js#L17
@@ -172,21 +173,7 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
-// To be replaced with built in mocks when we upgrade to the latest version
-jest.mock( 'react-native-safe-area-context', () => {
-	const inset = { top: 0, right: 0, bottom: 0, left: 0 };
-	const frame = { x: 0, y: 0, width: 0, height: 0 };
-	return {
-		SafeAreaProvider: jest
-			.fn()
-			.mockImplementation( ( { children } ) => children ),
-		SafeAreaConsumer: jest
-			.fn()
-			.mockImplementation( ( { children } ) => children( inset ) ),
-		useSafeAreaInsets: jest.fn().mockImplementation( () => inset ),
-		useSafeAreaFrame: jest.fn().mockImplementation( () => frame ),
-	};
-} );
+jest.mock( 'react-native-safe-area-context', () => mockSafeAreaContext );
 
 jest.mock(
 	'@react-native-community/slider',
@@ -201,9 +188,11 @@ jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
 	virtual: true,
 } );
 
-jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
-	virtual: true,
-} );
+jest.mock(
+	'react-native-hsv-color-picker',
+	() => jest.fn( () => 'HsvColorPicker' ),
+	{ virtual: true }
+);
 
 jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
@@ -246,6 +235,7 @@ jest.mock(
 jest.mock( 'react-native/Libraries/ActionSheetIOS/ActionSheetIOS', () => ( {
 	showActionSheetWithOptions: jest.fn(),
 } ) );
+Linking.addEventListener.mockReturnValue( { remove: jest.fn() } );
 
 // The mock provided by the package itself does not appear to work correctly.
 // Specifically, the mock provides a named export, where the module itself uses

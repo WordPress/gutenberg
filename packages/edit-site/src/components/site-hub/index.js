@@ -21,6 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { forwardRef } from '@wordpress/element';
 import { search, external } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -31,7 +32,7 @@ import { unlock } from '../../lock-unlock';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
-const SiteHub = forwardRef( ( props, ref ) => {
+const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 	const { canvasMode, dashboardLink, homeUrl, siteTitle } = useSelect(
 		( select ) => {
 			const { getCanvasMode, getSettings } = unlock(
@@ -75,7 +76,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 					event.preventDefault();
 					if ( canvasMode === 'edit' ) {
 						clearSelectedBlock();
-						setPreviewDeviceType( 'desktop' );
+						setPreviewDeviceType( 'Desktop' );
 						setCanvasMode( 'view' );
 					}
 				},
@@ -84,8 +85,11 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	return (
 		<motion.div
 			ref={ ref }
-			{ ...props }
-			className={ classnames( 'edit-site-site-hub', props.className ) }
+			{ ...restProps }
+			className={ classnames(
+				'edit-site-site-hub',
+				restProps.className
+			) }
 			initial={ false }
 			transition={ {
 				type: 'tween',
@@ -104,7 +108,12 @@ const SiteHub = forwardRef( ( props, ref ) => {
 					spacing="0"
 				>
 					<motion.div
-						className="edit-site-site-hub__view-mode-toggle-container"
+						className={ classnames(
+							'edit-site-site-hub__view-mode-toggle-container',
+							{
+								'has-transparent-background': isTransparent,
+							}
+						) }
 						layout
 						transition={ {
 							type: 'tween',
@@ -148,7 +157,10 @@ const SiteHub = forwardRef( ( props, ref ) => {
 							exit={ {
 								opacity: 0,
 							} }
-							className="edit-site-site-hub__site-title"
+							className={ classnames(
+								'edit-site-site-hub__site-title',
+								{ 'is-transparent': isTransparent }
+							) }
 							transition={ {
 								type: 'tween',
 								duration: disableMotion ? 0 : 0.2,
@@ -163,7 +175,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 						<Button
 							href={ homeUrl }
 							target="_blank"
-							label={ __( 'View site' ) }
+							label={ __( 'View site (opens in a new tab)' ) }
 							aria-label={ __(
 								'View site (opens in a new tab)'
 							) }
@@ -174,10 +186,14 @@ const SiteHub = forwardRef( ( props, ref ) => {
 				</HStack>
 				{ canvasMode === 'view' && (
 					<Button
-						className="edit-site-site-hub_toggle-command-center"
+						className={ classnames(
+							'edit-site-site-hub_toggle-command-center',
+							{ 'is-transparent': isTransparent }
+						) }
 						icon={ search }
 						onClick={ () => openCommandCenter() }
 						label={ __( 'Open command palette' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
 					/>
 				) }
 			</HStack>

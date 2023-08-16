@@ -192,7 +192,7 @@ Check whether the selection is horizontally at the edge of the container.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: Set to true to check left, false for right.
 
 _Returns_
@@ -269,7 +269,7 @@ Check whether the selection is vertically at the edge of the container.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: Set to true to check top, false for bottom.
 
 _Returns_
