@@ -233,6 +233,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
             data-wp-bind--aria-modal="context.core.image.lightboxEnabled"
             data-wp-effect="effects.core.image.initLightbox"
             data-wp-on--keydown="actions.core.image.handleKeydown"
+			data-wp-on--touchmove="actions.core.image.handleTouchMove"
             data-wp-on--click="actions.core.image.hideLightbox"
             >
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">

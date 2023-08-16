@@ -17,8 +17,24 @@ const focusableSelectors = [
 	'[tabindex]:not([tabindex^="-"])',
 ];
 
+// I've defined the scroll handling outside of the store
+// to prevent confusion as to how this logic is called.
+// This logic is not referenced directly by the directives
+// in the markup because the scroll event we need to listen
+// to is triggered on the window; so we define it outside of
+// the store to signal that the behavior here is different.
+// If we find a compelling reason to move it to the store,
+// feel free to do so.
 let scrollCallback;
 
+// Using overflow: hidden to prevent scrolling while the lightbox
+// is open causes the content to shift and prevents the zoom
+// animation from working in some cases because we're unable to
+// account for the layout shift when doing the animation calculations.
+// Instead, here we use JavaScript to prevent and reset the scrolling
+// behavior. In the future, we may be able to use CSS or overflow: hidden
+// instead to not rely on JavaScript, but this seems to be the best approach
+// for now that provides the best visual experience.
 function handleScroll( event, context, actions ) {
 	event.preventDefault();
 	window.scrollTo( 0, context.core.image.lastScrollTop );
@@ -56,12 +72,21 @@ store(
 							window.pageYOffset ||
 							document.documentElement.scrollTop;
 
+						// We define and bind the scroll callback here so that
+						// we can pass the context and actions as arguments.
+						// We may be able to change this in the future if we
+						// define the scroll callback in the store instead, but
+						// this approach seems to tbe clearest for now.
 						scrollCallback = handleScroll.bind(
 							null,
-							event,
 							context,
 							actions
 						);
+
+						// We need to add a scroll event listener to the window
+						// here because we are unable to otherwise access it via
+						// the Interactivity API directives. If we add a native way
+						// to access the window, we can remove this.
 						window.addEventListener(
 							'scroll',
 							scrollCallback,
@@ -71,25 +96,20 @@ store(
 					hideLightbox: async ( { context } ) => {
 						context.core.image.hideAnimationEnabled = true;
 						if ( context.core.image.lightboxEnabled ) {
-							// If scrolling, wait a moment before closing the lightbox.
-							if (
-								context.core.image.lightboxAnimation === 'fade'
-							) {
+							// The lightbox will close once it detects a scroll event,
+							// but we want to wait until the close animation is completed
+							// before allowing a user to scroll again. The duration of this
+							// animation is defined in the styles.scss and depends on if the
+							// animation is 'zoom' or 'fade', but in any case we should wait
+							// a few milliseconds longer than the duration, otherwise a user
+							// may scroll too soon and cause the animation to look sloppy.
+							setTimeout( function () {
 								window.removeEventListener(
 									'scroll',
 									scrollCallback
 								);
-							} else if (
-								context.core.image.lightboxAnimation === 'zoom'
-							) {
-								// Enable scrolling after the animation finishes
-								setTimeout( function () {
-									window.removeEventListener(
-										'scroll',
-										scrollCallback
-									);
-								}, 450 );
-							}
+							}, 450 );
+
 							context.core.image.lightboxEnabled = false;
 							context.core.image.lastFocusedElement.focus( {
 								preventScroll: true,
@@ -136,6 +156,18 @@ store(
 							context,
 							ref,
 						} );
+					},
+					handleTouchMove: ( { context, event } ) => {
+						// On mobile devices, we want to prevent triggering the
+						// scroll event because otherwise the page jumps around as
+						// we reset the scroll position. This also means that the
+						// lightbox will not close on touch move, and will require
+						// that a user perform a simple tap to close instead. This
+						// may be changed in the future if we find a better alternative
+						// to override or reset the scroll position during swipe actions.
+						if ( context.core.image.lightboxEnabled ) {
+							event.preventDefault();
+						}
 					},
 				},
 			},

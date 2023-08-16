@@ -247,16 +247,16 @@
 	// or faster than the scrim to give a sense of depth.
 	&.active {
 		visibility: visible;
-		animation: both turn-on-visibility 0.25s;
+		animation: both turn-on-visibility-opaque 0.25s;
 		img {
-			animation: both turn-on-visibility 0.35s;
+			animation: both turn-on-visibility-opaque 0.35s;
 		}
 	}
 	&.hideanimationenabled {
 		&:not(.active) {
-			animation: both turn-off-visibility 0.35s;
+			animation: both turn-off-visibility-opaque 0.35s;
 			img {
-				animation: both turn-off-visibility 0.25s;
+				animation: both turn-off-visibility-opaque 0.25s;
 			}
 		}
 	}
@@ -275,7 +275,7 @@
 					}
 				}
 				.scrim {
-					animation: turn-on-visibility 0.4s forwards;
+					animation: turn-on-visibility-transparent 0.4s forwards;
 				}
 			}
 			&.hideanimationenabled {
@@ -289,7 +289,7 @@
 						}
 					}
 					.scrim {
-						animation: turn-off-visibility 0.4s forwards;
+						animation: turn-off-visibility-transparent 0.4s forwards;
 					}
 				}
 			}
@@ -297,7 +297,7 @@
 	}
 }
 
-@keyframes turn-on-visibility {
+@keyframes turn-on-visibility-opaque {
 	0% {
 		opacity: 0;
 	}
@@ -306,9 +306,33 @@
 	}
 }
 
-@keyframes turn-off-visibility {
+@keyframes turn-off-visibility-opaque {
 	0% {
 		opacity: 1;
+		visibility: visible;
+	}
+	99% {
+		opacity: 0;
+		visibility: visible;
+	}
+	100% {
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+
+@keyframes turn-on-visibility-transparent {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 0.9;
+	}
+}
+
+@keyframes turn-off-visibility-transparent {
+	0% {
+		opacity: 0.9;
 		visibility: visible;
 	}
 	99% {
