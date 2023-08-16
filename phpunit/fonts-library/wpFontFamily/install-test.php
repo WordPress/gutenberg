@@ -14,7 +14,7 @@ require_once __DIR__ . '/base.php';
  *
  * @covers WP_Font_Family::install
  */
-class Tests_Fonts_WpFontsLibrary_Install extends WP_Font_Family_UnitTestCase {
+class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 
 	/**
 	 * @dataProvider data_should_not_download_when_no_fontface

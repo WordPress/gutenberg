@@ -10,7 +10,7 @@
  *
  * @covers WP_Font_Family::__construct
  */
-class Tests_Fonts_WpFontsLibrary_Construct extends WP_UnitTestCase {
+class Tests_Fonts_WpFontFamily_Construct extends WP_UnitTestCase {
 
 	public function test_should_initialize_data() {
 		$property = new ReflectionProperty( WP_Font_Family::class, 'data' );

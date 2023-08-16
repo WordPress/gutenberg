@@ -14,7 +14,7 @@ require_once __DIR__ . '/base.php';
  *
  * @covers WP_Font_Family::uninstall
  */
-class Tests_Fonts_WpFontsLibrary_Uninstall extends WP_Font_Family_UnitTestCase {
+class Tests_Fonts_WpFontFamily_Uninstall extends WP_Font_Family_UnitTestCase {
 
 	public function test_should_return_error_when_font_not_found() {
 		// Set up.

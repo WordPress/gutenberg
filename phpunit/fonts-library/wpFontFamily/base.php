@@ -12,7 +12,7 @@ abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 	 *
 	 * @var string
 	 */
-	protected static $fonts_dir = '';
+	protected static $fonts_dir;
 
 	/**
 	 * Merriweather test data shared by tests.
