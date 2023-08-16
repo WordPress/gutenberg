@@ -640,6 +640,7 @@ To set up the e2e testing environment, checkout the Gutenberg repository and swi
 ```
 nvm use && npm install
 npm run build:packages
+npm run wp-env start
 ```
 
 To run the tests run the following command:
