@@ -12,7 +12,7 @@ import GoogleFonts from './google-fonts';
 import LocalFonts from './local-fonts';
 import { MODAL_TABS } from './constants';
 
-function FontLibraryModal( {
+function FontsLibraryModal( {
 	onRequestClose,
 	initialTabName = 'installed-fonts',
 } ) {
@@ -44,4 +44,4 @@ function FontLibraryModal( {
 	);
 }
 
-export default FontLibraryModal;
+export default FontsLibraryModal;
