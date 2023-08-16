@@ -14,7 +14,7 @@ This guide focuses on just the block, see the [Create a Block tutorial](/docs/ge
 
 Static blocks are implemented in JavaScript, so a basic level of JavaScript is helpful, see the [Getting Started with JavaScript](/docs/how-to-guides/javascript/README.md) for a refresher.
 
-Blocks are added to WordPress using plugins, so you will need a WordPress development environment.
+Blocks are added to WordPress using plugins, so you will need a WordPress development environment - see the [setup guide](/docs/getting-started/devenv/README.md).
 
 This tutorial demonstrates the creation of a block in two ways, using JSX and using plain JavaScript. JSX requires a build step, so if you choose to follow the JSX path you will need JavaScript build tools (node/npm). See Step 0 below for details on getting set up.
 
