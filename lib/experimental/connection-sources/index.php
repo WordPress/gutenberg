@@ -8,8 +8,10 @@
 return array(
 	'name'        => 'meta',
 	'meta_fields' => function ( $block_instance, $meta_field ) {
+		global $post;
+
 		// We should probably also check if the meta field exists but for now it's okay because
 		// if it doesn't, `get_post_meta()` will just return an empty string.
-		return get_post_meta( $block_instance->context['postId'], $meta_field, true );
+		return get_post_meta( $post->ID, $meta_field, true );
 	},
 );
