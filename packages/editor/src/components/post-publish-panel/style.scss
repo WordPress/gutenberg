@@ -82,7 +82,7 @@
 }
 
 .editor-post-publish-panel__footer {
-	padding: 16px;
+	padding: $grid-unit-20;
 }
 
 .components-button.editor-post-publish-panel__toggle.is-primary {
@@ -94,17 +94,17 @@
 	}
 
 	.dashicon {
-		margin-right: -4px;
+		margin-right: -$grid-unit-05;
 	}
 }
 
 .editor-post-publish-panel__link {
 	font-weight: 400;
-	padding-left: 4px;
+	padding-left: $grid-unit-05;
 }
 
 .editor-post-publish-panel__prepublish {
-	padding: 16px;
+	padding: $grid-unit-20;
 
 	strong {
 		color: $gray-900;
@@ -112,8 +112,8 @@
 
 	.components-panel__body {
 		background: $white;
-		margin-left: -16px;
-		margin-right: -16px;
+		margin-left: -$grid-unit-20;
+		margin-right: -$grid-unit-20;
 	}
 
 	.editor-post-visibility__dialog-legend {
@@ -130,21 +130,11 @@
 	display: flex;
 	align-content: space-between;
 	flex-wrap: wrap;
-	margin: -5px;
-
-	> * {
-		flex-grow: 1;
-		margin: 5px;
-	}
+	gap: $grid-unit-20;
 
 	.components-button {
-		height: auto;
 		justify-content: center;
-		padding: 3px 10px 4px;
 		flex: 1;
-		line-height: 1.6;
-		text-align: center;
-		white-space: normal;
 	}
 
 	.components-clipboard-button {
@@ -162,21 +152,18 @@
 	}
 
 	input[readonly] {
-		padding: 10px;
-		background: $gray-300;
+		padding: $grid-unit-20;
+		background: $gray-100;
+		border-color: $gray-400;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		height: $button-size;
 	}
 }
 
 .post-publish-panel__postpublish-post-address__copy-button-wrap {
 	flex-shrink: 0;
-	margin-left: 8px; // margin left for copy button
-
-	// match copy button height to the address field height
-	.components-button {
-		height: 38px;
-	}
+	margin-left: $grid-unit-20;
 }
 
 .post-publish-panel__postpublish-header {

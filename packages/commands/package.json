@@ -34,6 +34,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/private-apis": "file:../private-apis",
+		"classnames": "^2.3.1",
 		"cmdk": "^0.2.0",
 		"rememo": "^4.0.2"
 	},

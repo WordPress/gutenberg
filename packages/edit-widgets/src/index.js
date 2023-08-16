@@ -112,7 +112,6 @@ export function reinitializeEditor() {
  * Function to register an individual block.
  *
  * @param {Object} block The block to be registered.
- *
  */
 const registerBlock = ( block ) => {
 	if ( ! block ) {

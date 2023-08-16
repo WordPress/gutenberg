@@ -275,7 +275,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-reusable-blocks' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-patterns', 'wp-reusable-blocks' ),
 		$version
 	);
 	$styles->add_data( 'wp-editor', 'rtl', 'replace' );
@@ -324,6 +324,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		// The block library styles override the "reset" styles.
 		'wp-reset-editor-styles',
 		'wp-block-library',
+		'wp-patterns',
 		'wp-reusable-blocks',
 		// Until #37466, we can't specifically add them as editor styles yet,
 		// so we must hard-code it here as a dependency.
@@ -417,7 +418,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-reusable-blocks', 'wp-widgets' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-patterns', 'wp-reusable-blocks', 'wp-widgets' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );
@@ -439,6 +440,15 @@ function gutenberg_register_packages_styles( $styles ) {
 		$version
 	);
 	$styles->add_data( 'wp-customize-widgets', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-patterns',
+		gutenberg_url( 'build/patterns/style.css' ),
+		array( 'wp-components' ),
+		$version
+	);
+	$styles->add_data( 'wp-patterns', 'rtl', 'replace' );
 
 	gutenberg_override_style(
 		$styles,

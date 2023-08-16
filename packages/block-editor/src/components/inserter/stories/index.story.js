@@ -8,7 +8,7 @@ import Inserter from '../';
 
 export default { title: 'BlockEditor/Inserter' };
 
-export const libraryWithoutPatterns = () => {
+export const LibraryWithoutPatterns = () => {
 	const wrapperStyle = {
 		margin: '24px',
 		height: 400,
@@ -24,7 +24,7 @@ export const libraryWithoutPatterns = () => {
 	);
 };
 
-export const libraryWithPatterns = () => {
+export const LibraryWithPatterns = () => {
 	const wrapperStyle = {
 		margin: '24px',
 		height: 400,
@@ -45,7 +45,7 @@ export const libraryWithPatterns = () => {
 	);
 };
 
-export const libraryWithPatternsAndReusableBlocks = () => {
+export const LibraryWithPatternsAndReusableBlocks = () => {
 	const wrapperStyle = {
 		margin: '24px',
 		height: 400,
@@ -67,7 +67,7 @@ export const libraryWithPatternsAndReusableBlocks = () => {
 	);
 };
 
-export const quickInserter = () => {
+export const QuickInserter = () => {
 	const wrapperStyle = {
 		margin: '24px',
 		height: 400,

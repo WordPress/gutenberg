@@ -10,6 +10,7 @@
 	<php>
 		<env name="WP_MULTISITE" value="1" />
 		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
+		<const name="FONTS_LIBRARY_ENABLE" value="true"/>
 	</php>
 	<testsuites>
 		<testsuite name="default">
@@ -19,6 +20,7 @@
 	<groups>
 		<exclude>
 			<group>ms-excluded</group>
+			<group>fontsapi</group>
 		</exclude>
 	</groups>
 </phpunit>

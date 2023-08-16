@@ -105,7 +105,7 @@ export type RangeControlProps = Pick<
 		/**
 		 * CSS color string for the `RangeControl` wrapper.
 		 *
-		 * @default COLORS.ui.theme
+		 * @default COLORS.theme.accent
 		 * @see /packages/components/src/utils/colors-values.js
 		 */
 		color?: CSSProperties[ 'color' ];

@@ -15,6 +15,11 @@ import deprecated from '@wordpress/deprecated';
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
+const EMPTY_INSERTION_POINT = {
+	rootClientId: undefined,
+	insertionIndex: undefined,
+	filterValue: undefined,
+};
 
 /**
  * Returns the current editing mode.
@@ -472,9 +477,11 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex, filterValue } =
-		state.blockInserterPanel;
-	return { rootClientId, insertionIndex, filterValue };
+	if ( typeof state === 'boolean' ) {
+		return EMPTY_INSERTION_POINT;
+	}
+
+	return state.blockInserterPanel;
 }
 
 /**
