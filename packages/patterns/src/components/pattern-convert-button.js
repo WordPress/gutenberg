@@ -21,14 +21,9 @@ import CreatePatternModal from './create-pattern-modal';
  * @param {Object}   props              Component props.
  * @param {string[]} props.clientIds    Client ids of selected blocks.
  * @param {string}   props.rootClientId ID of the currently selected top-level block.
- * @param {()=>void} props.onClose      Callback to close the menu.
  * @return {import('@wordpress/element').WPComponent} The menu control or null.
  */
-export default function PatternConvertButton( {
-	clientIds,
-	rootClientId,
-	onClose,
-} ) {
+export default function PatternConvertButton( { clientIds, rootClientId } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const canConvert = useSelect(
@@ -114,15 +109,12 @@ export default function PatternConvertButton( {
 					clientIds={ clientIds }
 					onSuccess={ ( pattern ) => {
 						handleSuccess( pattern );
-						onClose();
 					} }
 					onError={ () => {
 						setIsModalOpen( false );
-						onClose();
 					} }
 					onClose={ () => {
 						setIsModalOpen( false );
-						onClose();
 					} }
 				/>
 			) }
