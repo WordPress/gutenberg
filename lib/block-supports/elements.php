@@ -176,7 +176,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 
 		foreach ( $heading_levels as $heading_level ) {
 			$heading_block_styles = isset( $element_block_styles[ $heading_level ] ) ? $element_block_styles[ $heading_level ] : null;
-			$heading_selector = 'heading' !== $heading_level
+			$heading_selector     = 'heading' !== $heading_level
 				? ".$class_name $heading_level"
 				: ".$class_name h1, .$class_name h2, .$class_name h3, .$class_name h4, .$class_name h5, .$class_name h6";
 
