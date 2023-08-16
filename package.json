@@ -258,6 +258,9 @@
 		"webpack-bundle-analyzer": "4.4.2",
 		"worker-farm": "1.7.0"
 	},
+	"overrides": {
+		"jsdom": "22.1.0"
+	},
 	"scripts": {
 		"build": "npm run build:packages && wp-scripts build",
 		"build:analyze-bundles": "npm run build -- --webpack-bundle-analyzer",
