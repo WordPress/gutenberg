@@ -10,7 +10,7 @@
  *
  * @covers WP_Font_Family_Utils::get_filename_from_font_face
  */
-class Tests_Fonts_WpFontsFamilyUtils_GetFilenameFromFontFace extends WP_UnitTestCase {
+class Tests_FontsLibrary_WpFontsFamilyUtils_GetFilenameFromFontFace extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_should_get_filename

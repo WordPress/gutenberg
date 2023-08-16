@@ -10,7 +10,7 @@
  *
  * @covers WP_Fonts_Library::get_fonts_dir
  */
-class Tests_Fonts_WpFontsLibrary_GetFontsDir extends WP_UnitTestCase {
+class Tests_FontsLibrary_WpFontsLibrary_GetFontsDir extends WP_UnitTestCase {
 
 	public function test_get_fonts_dir() {
 		$this->assertStringEndsWith( '/wp-content/uploads/fonts', WP_Fonts_Library::get_fonts_dir() );

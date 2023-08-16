@@ -10,7 +10,7 @@
  *
  * @covers WP_Font_Family_Utils::merge_fonts_data
  */
-class Tests_Fonts_WpFontsFamilyUtils_MergeFontsData extends WP_UnitTestCase {
+class Tests_FontsLibrary_WpFontsFamilyUtils_MergeFontsData extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_should_fail_merge

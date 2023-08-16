@@ -14,7 +14,7 @@ require_once __DIR__ . '/base.php';
  *
  * @covers WP_Font_Family::get_font_post
  */
-class Tests_Fonts_WpFontFamily_GetFontPost extends WP_Font_Family_UnitTestCase {
+class Tests_FontsLibrary_WpFontFamily_GetFontPost extends WP_Font_Family_UnitTestCase {
 
 	public function test_should_return_post() {
 		// Set up the post.
