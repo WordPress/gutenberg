@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -29,7 +29,7 @@ const meta: Meta< typeof ToggleControl > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof ToggleControl > = ( {
+const Template: StoryFn< typeof ToggleControl > = ( {
 	onChange,
 	...props
 } ) => {

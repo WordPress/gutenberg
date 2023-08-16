@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { ComponentProps } from 'react';
 
 /**
@@ -41,7 +41,7 @@ const colors = [
 	{ name: 'Yellow 40', color: '#bd8600' },
 ];
 
-const Template: ComponentStory< typeof BorderBoxControl > = ( props ) => {
+const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 	const { onChange, ...otherProps } = props;
 	const [ borders, setBorders ] = useState< ( typeof props )[ 'value' ] >();
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -30,7 +30,7 @@ const meta: Meta< typeof AlignmentMatrixControl > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof AlignmentMatrixControl > = ( {
+const Template: StoryFn< typeof AlignmentMatrixControl > = ( {
 	defaultValue,
 	onChange,
 	...props

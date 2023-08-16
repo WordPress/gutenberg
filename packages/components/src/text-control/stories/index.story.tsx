@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ const meta: Meta< typeof TextControl > = {
 };
 export default meta;
 
-const DefaultTemplate: ComponentStory< typeof TextControl > = ( {
+const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 	onChange,
 	...args
 } ) => {
@@ -49,11 +49,12 @@ const DefaultTemplate: ComponentStory< typeof TextControl > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof TextControl > =
-	DefaultTemplate.bind( {} );
+export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
+	{}
+);
 Default.args = {};
 
-export const WithLabelAndHelpText: ComponentStory< typeof TextControl > =
+export const WithLabelAndHelpText: StoryFn< typeof TextControl > =
 	DefaultTemplate.bind( {} );
 WithLabelAndHelpText.args = {
 	...Default.args,

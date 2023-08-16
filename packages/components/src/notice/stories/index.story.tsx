@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -27,7 +27,7 @@ const meta: Meta< typeof Notice > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Notice > = ( props ) => {
+const Template: StoryFn< typeof Notice > = ( props ) => {
 	return <Notice { ...props } />;
 };
 
@@ -81,9 +81,7 @@ WithActions.args = {
 	],
 };
 
-export const NoticeListSubcomponent: ComponentStory<
-	typeof NoticeList
-> = () => {
+export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
 	const exampleNotices = [
 		{
 			id: 'second-notice',

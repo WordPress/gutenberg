@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -22,9 +22,7 @@ const meta: Meta< typeof SandBox > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof SandBox > = ( args ) => (
-	<SandBox { ...args } />
-);
+const Template: StoryFn< typeof SandBox > = ( args ) => <SandBox { ...args } />;
 
 export const Default = Template.bind( {} );
 Default.args = {

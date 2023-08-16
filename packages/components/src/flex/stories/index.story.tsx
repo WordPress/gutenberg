@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -38,7 +38,7 @@ const GrayBox = ( { children }: { children: string } ) => (
 	<View style={ { backgroundColor: '#eee', padding: 10 } }>{ children }</View>
 );
 
-export const Default: ComponentStory< typeof Flex > = ( { ...args } ) => {
+export const Default: StoryFn< typeof Flex > = ( { ...args } ) => {
 	return (
 		<Flex { ...args }>
 			<FlexItem>
@@ -55,9 +55,7 @@ export const Default: ComponentStory< typeof Flex > = ( { ...args } ) => {
 };
 Default.args = {};
 
-export const ResponsiveDirection: ComponentStory< typeof Flex > = ( {
-	...args
-} ) => {
+export const ResponsiveDirection: StoryFn< typeof Flex > = ( { ...args } ) => {
 	return (
 		<Flex { ...args }>
 			<FlexItem>

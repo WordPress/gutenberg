@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { CSSProperties } from 'react';
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -52,7 +52,7 @@ const Avatar = ( {
 	);
 };
 
-const Template: ComponentStory< typeof ZStack > = ( args ) => {
+const Template: StoryFn< typeof ZStack > = ( args ) => {
 	return (
 		<ZStack { ...args }>
 			<Avatar backgroundColor="#444" />
@@ -63,7 +63,7 @@ const Template: ComponentStory< typeof ZStack > = ( args ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof ZStack > = Template.bind( {} );
+export const Default: StoryFn< typeof ZStack > = Template.bind( {} );
 Default.args = {
 	offset: 20,
 };

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ const meta: Meta< typeof KeyboardShortcuts > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof KeyboardShortcuts > = ( props ) => (
+const Template: StoryFn< typeof KeyboardShortcuts > = ( props ) => (
 	<KeyboardShortcuts { ...props } />
 );
 

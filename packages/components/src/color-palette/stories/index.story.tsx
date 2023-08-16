@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { CSSProperties } from 'react';
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -31,10 +31,7 @@ const meta: Meta< typeof ColorPalette > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof ColorPalette > = ( {
-	onChange,
-	...args
-} ) => {
+const Template: StoryFn< typeof ColorPalette > = ( { onChange, ...args } ) => {
 	const [ color, setColor ] = useState< string | undefined >();
 
 	return (
@@ -84,7 +81,7 @@ MultipleOrigins.args = {
 	],
 };
 
-export const CSSVariables: ComponentStory< typeof ColorPalette > = ( args ) => {
+export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
 	return (
 		<div
 			style={

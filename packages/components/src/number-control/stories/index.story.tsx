@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ const meta: Meta< typeof NumberControl > = {
 
 export default meta;
 
-const Template: ComponentStory< typeof NumberControl > = ( {
+const Template: StoryFn< typeof NumberControl > = ( {
 	onChange,
 	...props
 } ) => {

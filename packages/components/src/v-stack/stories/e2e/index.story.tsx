@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory, Meta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ const meta: Meta< typeof VStack > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof VStack > = ( props ) => {
+const Template: StoryFn< typeof VStack > = ( props ) => {
 	return (
 		<VStack
 			{ ...props }
@@ -30,7 +30,7 @@ const Template: ComponentStory< typeof VStack > = ( props ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof VStack > = Template.bind( {} );
+export const Default: StoryFn< typeof VStack > = Template.bind( {} );
 Default.args = {
 	spacing: 3,
 };

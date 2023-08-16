@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ const meta: Meta< typeof Surface > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Surface > = ( args ) => {
+const Template: StoryFn< typeof Surface > = ( args ) => {
 	return (
 		<Surface
 			{ ...args }
@@ -36,5 +36,5 @@ const Template: ComponentStory< typeof Surface > = ( args ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Surface > = Template.bind( {} );
+export const Default: StoryFn< typeof Surface > = Template.bind( {} );
 Default.args = {};

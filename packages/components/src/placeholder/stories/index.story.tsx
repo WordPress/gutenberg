@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -37,7 +37,7 @@ const meta: Meta< typeof Placeholder > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Placeholder > = ( args ) => {
+const Template: StoryFn< typeof Placeholder > = ( args ) => {
 	const [ value, setValue ] = useState( '' );
 
 	return (
@@ -55,9 +55,7 @@ const Template: ComponentStory< typeof Placeholder > = ( args ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Placeholder > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof Placeholder > = Template.bind( {} );
 Default.args = {
 	icon: 'wordpress',
 	label: 'My Placeholder Label',

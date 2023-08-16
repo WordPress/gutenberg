@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -43,7 +43,7 @@ const mapCountryOption = ( country: ( typeof countries )[ number ] ) => ( {
 
 const countryOptions = countries.map( mapCountryOption );
 
-const Template: ComponentStory< typeof ComboboxControl > = ( {
+const Template: StoryFn< typeof ComboboxControl > = ( {
 	onChange,
 	...args
 } ) => {

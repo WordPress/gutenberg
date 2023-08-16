@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -54,7 +54,7 @@ const BlackBox = () => (
 	/>
 );
 
-const Template: ComponentStory< typeof Spacer > = ( { onChange, ...args } ) => {
+const Template: StoryFn< typeof Spacer > = ( { onChange, ...args } ) => {
 	return (
 		<>
 			<BlackBox />
@@ -64,7 +64,7 @@ const Template: ComponentStory< typeof Spacer > = ( { onChange, ...args } ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Spacer > = Template.bind( {} );
+export const Default: StoryFn< typeof Spacer > = Template.bind( {} );
 Default.args = {
 	children: 'This is the spacer',
 };

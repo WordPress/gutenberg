@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * Internal dependencies
  */
@@ -36,7 +36,7 @@ export default {
 	},
 } as Meta< typeof DimensionControl >;
 
-const Template: ComponentStory< typeof DimensionControl > = ( args ) => (
+const Template: StoryFn< typeof DimensionControl > = ( args ) => (
 	<DimensionControl { ...args } />
 );
 

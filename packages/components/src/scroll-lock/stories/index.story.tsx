@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { ReactNode } from 'react';
 
 /**
@@ -59,7 +59,7 @@ function ToggleContainer( props: { children: ReactNode } ) {
 	);
 }
 
-export const Default: ComponentStory< typeof ScrollLock > = () => {
+export const Default: StoryFn< typeof ScrollLock > = () => {
 	const [ isScrollLocked, setScrollLocked ] = useState( false );
 	const toggleLock = () => setScrollLocked( ! isScrollLocked );
 

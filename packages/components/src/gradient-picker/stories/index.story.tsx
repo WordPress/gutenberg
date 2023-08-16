@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
@@ -65,7 +65,7 @@ const GRADIENTS = [
 	},
 ];
 
-const Template: ComponentStory< typeof GradientPicker > = ( {
+const Template: StoryFn< typeof GradientPicker > = ( {
 	onChange,
 	...props
 } ) => {

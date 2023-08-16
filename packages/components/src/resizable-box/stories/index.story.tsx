@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -28,7 +28,7 @@ const meta: Meta< typeof ResizableBox > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof ResizableBox > = ( {
+const Template: StoryFn< typeof ResizableBox > = ( {
 	onResizeStop,
 	...props
 } ) => {

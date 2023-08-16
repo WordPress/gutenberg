@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -33,7 +33,7 @@ const meta: Meta< typeof Heading > = {
 };
 export default meta;
 
-export const Default: ComponentStory< typeof Heading > = ( props ) => (
+export const Default: StoryFn< typeof Heading > = ( props ) => (
 	<Heading { ...props } />
 );
 Default.args = {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,7 @@ const meta: Meta< typeof Guide > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Guide > = ( { onFinish, ...props } ) => {
+const Template: StoryFn< typeof Guide > = ( { onFinish, ...props } ) => {
 	const [ isOpen, setOpen ] = useState( false );
 
 	const openGuide = () => setOpen( true );

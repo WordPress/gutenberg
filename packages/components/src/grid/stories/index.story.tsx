@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -51,7 +51,7 @@ const Item = ( props: { children: string } ) => (
 	/>
 );
 
-const Template: ComponentStory< typeof Grid > = ( props ) => (
+const Template: StoryFn< typeof Grid > = ( props ) => (
 	<Grid { ...props }>
 		<Item>One</Item>
 		<Item>Two</Item>
@@ -64,7 +64,7 @@ const Template: ComponentStory< typeof Grid > = ( props ) => (
 	</Grid>
 );
 
-export const Default: ComponentStory< typeof Grid > = Template.bind( {} );
+export const Default: StoryFn< typeof Grid > = Template.bind( {} );
 Default.args = {
 	alignment: 'bottom',
 	columns: 4,

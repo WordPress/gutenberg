@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -34,7 +34,7 @@ const meta: Meta< typeof NavigatorProvider > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof NavigatorProvider > = ( {
+const Template: StoryFn< typeof NavigatorProvider > = ( {
 	style,
 	...props
 } ) => (
@@ -178,8 +178,7 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 	</NavigatorProvider>
 );
 
-export const Default: ComponentStory< typeof NavigatorProvider > =
-	Template.bind( {} );
+export const Default: StoryFn< typeof NavigatorProvider > = Template.bind( {} );
 Default.args = {
 	initialPath: '/',
 };
@@ -233,7 +232,7 @@ function ProductDetails() {
 	);
 }
 
-const NestedNavigatorTemplate: ComponentStory< typeof NavigatorProvider > = ( {
+const NestedNavigatorTemplate: StoryFn< typeof NavigatorProvider > = ( {
 	style,
 	...props
 } ) => (
@@ -292,7 +291,7 @@ const NestedNavigatorTemplate: ComponentStory< typeof NavigatorProvider > = ( {
 	</NavigatorProvider>
 );
 
-export const NestedNavigator: ComponentStory< typeof NavigatorProvider > =
+export const NestedNavigator: StoryFn< typeof NavigatorProvider > =
 	NestedNavigatorTemplate.bind( {} );
 NestedNavigator.args = {
 	initialPath: '/child2/grandchild',
@@ -316,9 +315,7 @@ const NavigatorButtonWithSkipFocus = ( {
 	);
 };
 
-export const SkipFocus: ComponentStory< typeof NavigatorProvider > = (
-	args
-) => {
+export const SkipFocus: StoryFn< typeof NavigatorProvider > = ( args ) => {
 	return <NavigatorProvider { ...args } />;
 };
 SkipFocus.args = {

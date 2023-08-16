@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -22,11 +22,11 @@ const meta: Meta< typeof View > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof View > = ( args ) => {
+const Template: StoryFn< typeof View > = ( args ) => {
 	return <View { ...args } />;
 };
 
-export const Default: ComponentStory< typeof View > = Template.bind( {} );
+export const Default: StoryFn< typeof View > = Template.bind( {} );
 Default.args = {
 	children: 'An example tip',
 };

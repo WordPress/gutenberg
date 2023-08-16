@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,7 @@ const meta: Meta< typeof FormFileUpload > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof FormFileUpload > = ( props ) => {
+const Template: StoryFn< typeof FormFileUpload > = ( props ) => {
 	return <FormFileUpload { ...props } />;
 };
 

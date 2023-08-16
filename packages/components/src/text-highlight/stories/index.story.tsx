@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -20,13 +20,11 @@ const meta: Meta< typeof TextHighlight > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof TextHighlight > = ( args ) => {
+const Template: StoryFn< typeof TextHighlight > = ( args ) => {
 	return <TextHighlight { ...args } />;
 };
 
-export const Default: ComponentStory< typeof TextHighlight > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof TextHighlight > = Template.bind( {} );
 Default.args = {
 	text: 'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.',
 	highlight: 'Gutenberg',

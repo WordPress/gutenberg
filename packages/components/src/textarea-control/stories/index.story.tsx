@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ const meta: Meta< typeof TextareaControl > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof TextareaControl > = ( {
+const Template: StoryFn< typeof TextareaControl > = ( {
 	onChange,
 	...args
 } ) => {
@@ -49,9 +49,7 @@ const Template: ComponentStory< typeof TextareaControl > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof TextareaControl > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof TextareaControl > = Template.bind( {} );
 Default.args = {
 	label: 'Text',
 	help: 'Enter some text',

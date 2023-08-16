@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -59,7 +59,7 @@ function InlineImageIcon() {
 	);
 }
 
-const Template: ComponentStory< typeof Toolbar > = ( props ) => (
+const Template: StoryFn< typeof Toolbar > = ( props ) => (
 	<div style={ { height: 280 } }>
 		<Toolbar { ...props } />
 	</div>

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -48,10 +48,7 @@ const COLOR_PALETTE = [
 	{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
 ];
 
-const Template: ComponentStory< typeof DuotonePicker > = ( {
-	onChange,
-	...args
-} ) => {
+const Template: StoryFn< typeof DuotonePicker > = ( { onChange, ...args } ) => {
 	const [ value, setValue ] = useState< DuotonePickerProps[ 'value' ] >();
 
 	return (

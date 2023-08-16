@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ const meta: Meta< typeof MenuItemsChoice > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof MenuItemsChoice > = ( {
+const Template: StoryFn< typeof MenuItemsChoice > = ( {
 	onHover,
 	onSelect,
 	choices,
@@ -53,9 +53,7 @@ const Template: ComponentStory< typeof MenuItemsChoice > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof MenuItemsChoice > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof MenuItemsChoice > = Template.bind( {} );
 
 Default.args = {
 	choices: [

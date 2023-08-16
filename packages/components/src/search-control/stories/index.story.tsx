@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -26,7 +26,7 @@ const meta: Meta< typeof SearchControl > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof SearchControl > = ( {
+const Template: StoryFn< typeof SearchControl > = ( {
 	onChange,
 	...props
 } ) => {

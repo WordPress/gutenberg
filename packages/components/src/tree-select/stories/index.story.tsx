@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { ComponentProps } from 'react';
 /**
  * WordPress dependencies
@@ -33,7 +33,7 @@ const meta: Meta< typeof TreeSelect > = {
 
 export default meta;
 
-const TreeSelectWithState: ComponentStory< typeof TreeSelect > = ( props ) => {
+const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 	const [ selection, setSelection ] =
 		useState< ComponentProps< typeof TreeSelect >[ 'selectedId' ] >();
 

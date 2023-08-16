@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ const meta: Meta< typeof Scrollable > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Scrollable > = ( { ...args } ) => {
+const Template: StoryFn< typeof Scrollable > = ( { ...args } ) => {
 	const targetRef = useRef< HTMLInputElement >( null );
 
 	const onButtonClick = () => {
@@ -76,7 +76,7 @@ const Template: ComponentStory< typeof Scrollable > = ( { ...args } ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Scrollable > = Template.bind( {} );
+export const Default: StoryFn< typeof Scrollable > = Template.bind( {} );
 Default.args = {
 	smoothScroll: false,
 	scrollDirection: 'y',

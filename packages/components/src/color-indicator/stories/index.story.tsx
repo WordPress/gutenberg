@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -25,13 +25,11 @@ const meta: Meta< typeof ColorIndicator > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof ColorIndicator > = ( { ...args } ) => (
+const Template: StoryFn< typeof ColorIndicator > = ( { ...args } ) => (
 	<ColorIndicator { ...args } />
 );
 
-export const Default: ComponentStory< typeof ColorIndicator > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof ColorIndicator > = Template.bind( {} );
 Default.args = {
 	colorValue: '#0073aa',
 };

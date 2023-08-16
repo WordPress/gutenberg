@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -23,11 +23,9 @@ const meta: Meta< typeof ProgressBar > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof ProgressBar > = ( { ...args } ) => {
+const Template: StoryFn< typeof ProgressBar > = ( { ...args } ) => {
 	return <ProgressBar { ...args } />;
 };
 
-export const Default: ComponentStory< typeof ProgressBar > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof ProgressBar > = Template.bind( {} );
 Default.args = {};

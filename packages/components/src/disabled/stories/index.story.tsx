@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -66,7 +66,7 @@ const Form = () => {
 	);
 };
 
-export const Default: ComponentStory< typeof Disabled > = ( args ) => {
+export const Default: StoryFn< typeof Disabled > = ( args ) => {
 	return (
 		<Disabled { ...args }>
 			<Form />
@@ -77,7 +77,7 @@ Default.args = {
 	isDisabled: true,
 };
 
-export const ContentEditable: ComponentStory< typeof Disabled > = ( args ) => {
+export const ContentEditable: StoryFn< typeof Disabled > = ( args ) => {
 	return (
 		<Disabled { ...args }>
 			<div contentEditable tabIndex={ 0 }>

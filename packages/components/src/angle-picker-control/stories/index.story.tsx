@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ const meta: Meta< typeof AnglePickerControl > = {
 
 export default meta;
 
-const AnglePickerWithState: ComponentStory< typeof AnglePickerControl > = ( {
+const AnglePickerWithState: StoryFn< typeof AnglePickerControl > = ( {
 	onChange,
 	...args
 } ) => {

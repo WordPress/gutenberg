@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * Internal dependencies
  */
@@ -18,7 +18,7 @@ const meta: Meta< typeof DropZone > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof DropZone > = ( props ) => {
+const Template: StoryFn< typeof DropZone > = ( props ) => {
 	return (
 		<div style={ { background: 'lightgray', padding: 16 } }>
 			Drop something here

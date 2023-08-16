@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -44,7 +44,7 @@ const meta: Meta< typeof VStack > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof VStack > = ( props ) => {
+const Template: StoryFn< typeof VStack > = ( props ) => {
 	return (
 		<VStack
 			{ ...props }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { ComponentProps } from 'react';
 
 /**
@@ -70,7 +70,7 @@ const multipleOriginColors = [
 	},
 ];
 
-const Template: ComponentStory< typeof BorderControl > = ( {
+const Template: StoryFn< typeof BorderControl > = ( {
 	onChange,
 	...props
 } ) => {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -133,7 +133,7 @@ const Rows = ( {
 	);
 };
 
-const Template: ComponentStory< typeof TreeGrid > = ( args ) => (
+const Template: StoryFn< typeof TreeGrid > = ( args ) => (
 	<TreeGrid { ...args } />
 );
 

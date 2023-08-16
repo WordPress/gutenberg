@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -39,9 +39,7 @@ const meta: Meta< typeof Card > = {
 
 export default meta;
 
-const Template: ComponentStory< typeof Card > = ( args ) => (
-	<Card { ...args } />
-);
+const Template: StoryFn< typeof Card > = ( args ) => <Card { ...args } />;
 
 export const Default = Template.bind( {} );
 Default.args = {

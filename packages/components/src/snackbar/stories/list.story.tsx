@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ const meta: Meta< typeof SnackbarList > = {
 };
 export default meta;
 
-export const Default: ComponentStory< typeof SnackbarList > = ( {
+export const Default: StoryFn< typeof SnackbarList > = ( {
 	children,
 	notices: noticesProp,
 	...props

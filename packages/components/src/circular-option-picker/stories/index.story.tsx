@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
@@ -92,7 +92,7 @@ const DefaultActions = () => {
 	);
 };
 
-const Template: ComponentStory< typeof CircularOptionPicker > = ( props ) => (
+const Template: StoryFn< typeof CircularOptionPicker > = ( props ) => (
 	<CircularOptionPicker { ...props } />
 );
 

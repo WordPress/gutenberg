@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -36,7 +36,7 @@ const meta: Meta< typeof CheckboxControl > = {
 };
 export default meta;
 
-const DefaultTemplate: ComponentStory< typeof CheckboxControl > = ( {
+const DefaultTemplate: StoryFn< typeof CheckboxControl > = ( {
 	onChange,
 	...args
 } ) => {
@@ -54,14 +54,15 @@ const DefaultTemplate: ComponentStory< typeof CheckboxControl > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof CheckboxControl > =
-	DefaultTemplate.bind( {} );
+export const Default: StoryFn< typeof CheckboxControl > = DefaultTemplate.bind(
+	{}
+);
 Default.args = {
 	label: 'Is author',
 	help: 'Is the user an author or not?',
 };
 
-export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
+export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
 	onChange,
 	...args
 } ) => {

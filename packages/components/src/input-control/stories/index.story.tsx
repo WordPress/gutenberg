@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -29,7 +29,7 @@ const meta: Meta< typeof InputControl > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof InputControl > = ( args ) => (
+const Template: StoryFn< typeof InputControl > = ( args ) => (
 	<InputControl { ...args } />
 );
 

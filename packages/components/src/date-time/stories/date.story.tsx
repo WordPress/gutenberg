@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,7 @@ const meta: Meta< typeof DatePicker > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof DatePicker > = ( {
+const Template: StoryFn< typeof DatePicker > = ( {
 	currentDate,
 	onChange,
 	...args
@@ -49,11 +49,9 @@ const Template: ComponentStory< typeof DatePicker > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof DatePicker > = Template.bind( {} );
+export const Default: StoryFn< typeof DatePicker > = Template.bind( {} );
 
-export const WithEvents: ComponentStory< typeof DatePicker > = Template.bind(
-	{}
-);
+export const WithEvents: StoryFn< typeof DatePicker > = Template.bind( {} );
 WithEvents.args = {
 	currentDate: new Date(),
 	events: [
@@ -64,8 +62,9 @@ WithEvents.args = {
 	],
 };
 
-export const WithInvalidDates: ComponentStory< typeof DatePicker > =
-	Template.bind( {} );
+export const WithInvalidDates: StoryFn< typeof DatePicker > = Template.bind(
+	{}
+);
 WithInvalidDates.args = {
 	currentDate: new Date(),
 	isInvalidDate: isWeekend,

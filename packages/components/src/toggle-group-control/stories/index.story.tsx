@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,7 @@ const meta: Meta< typeof ToggleGroupControl > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof ToggleGroupControl > = ( {
+const Template: StoryFn< typeof ToggleGroupControl > = ( {
 	onChange,
 	...props
 } ) => {
@@ -72,8 +72,9 @@ const mapPropsToOptionIconComponent = ( {
 	<ToggleGroupControlOptionIcon value={ value } key={ value } { ...props } />
 );
 
-export const Default: ComponentStory< typeof ToggleGroupControl > =
-	Template.bind( {} );
+export const Default: StoryFn< typeof ToggleGroupControl > = Template.bind(
+	{}
+);
 Default.args = {
 	children: [
 		{ value: 'left', label: 'Left' },
@@ -90,8 +91,9 @@ Default.args = {
  * The `aria-label` will be used in the tooltip if provided. Otherwise, the
  * `label` will be used.
  */
-export const WithTooltip: ComponentStory< typeof ToggleGroupControl > =
-	Template.bind( {} );
+export const WithTooltip: StoryFn< typeof ToggleGroupControl > = Template.bind(
+	{}
+);
 WithTooltip.args = {
 	...Default.args,
 	children: [
@@ -114,8 +116,9 @@ WithTooltip.args = {
  * The `ToggleGroupControlOptionIcon` component can be used for icon options. A `label` is required
  * on each option for accessibility, which will be shown in a tooltip.
  */
-export const WithIcons: ComponentStory< typeof ToggleGroupControl > =
-	Template.bind( {} );
+export const WithIcons: StoryFn< typeof ToggleGroupControl > = Template.bind(
+	{}
+);
 WithIcons.args = {
 	...Default.args,
 	children: [
@@ -128,8 +131,9 @@ WithIcons.args = {
 /**
  * When the `isDeselectable` prop is true, the option can be deselected by clicking on it again.
  */
-export const Deselectable: ComponentStory< typeof ToggleGroupControl > =
-	Template.bind( {} );
+export const Deselectable: StoryFn< typeof ToggleGroupControl > = Template.bind(
+	{}
+);
 Deselectable.args = {
 	...WithIcons.args,
 	isDeselectable: true,
