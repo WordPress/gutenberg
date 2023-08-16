@@ -7,6 +7,12 @@
 					"enabled": false,
 					"animation": ""
 				}
+			},
+			"core/group": {
+				"showInView": {
+					"enabled": false,
+					"animation": ""
+				}
 			}
 		}
 	},
@@ -294,6 +300,11 @@
 			"core/image": {
 				"behaviors": {
 					"lightbox": true
+				}
+			},
+			"core/group": {
+				"behaviors": {
+					"showInView": true
 				}
 			}
 		}

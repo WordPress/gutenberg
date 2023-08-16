@@ -70,9 +70,14 @@ function BehaviorsControl( {
 		let value = '';
 		if ( blockBehaviors === undefined ) {
 			value = 'default';
-		}
-		if ( blockBehaviors?.lightbox.enabled ) {
-			value = 'lightbox';
+		} else {
+			for ( const [ behavior, object ] of Object.entries(
+				blockBehaviors
+			) ) {
+				if ( object.enabled ) {
+					value = behavior;
+				}
+			}
 		}
 		return {
 			behaviors: mergedBehaviors,
@@ -160,24 +165,48 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 					blockName={ props.name }
 					blockBehaviors={ props.attributes.behaviors }
 					onChangeBehavior={ ( nextValue ) => {
-						if ( nextValue === 'default' ) {
-							props.setAttributes( {
-								behaviors: undefined,
-							} );
-						} else {
+						switch ( nextValue ) {
+							case 'default':
+								props.setAttributes( {
+									behaviors: undefined,
+								} );
+								break;
 							// If the user selects something, it means that they want to
 							// change the default value (true) so we save it in the attributes.
-							props.setAttributes( {
-								behaviors: {
-									lightbox: {
-										enabled: nextValue === 'lightbox',
-										animation:
-											nextValue === 'lightbox'
-												? 'zoom'
-												: '',
+							case 'lightbox':
+								props.setAttributes( {
+									behaviors: {
+										lightbox: {
+											enabled: true,
+											animation: 'zoom',
+										},
 									},
-								},
-							} );
+								} );
+								break;
+							case 'showInView':
+								props.setAttributes( {
+									behaviors: {
+										showInView: {
+											enabled: true,
+											animation: 'vertical',
+										},
+									},
+								} );
+								break;
+							case '':
+								props.setAttributes( {
+									behaviors: {
+										lightbox: {
+											enabled: false,
+											animation: '',
+										},
+										showInView: {
+											enabled: false,
+											animation: '',
+										},
+									},
+								} );
+								break;
 						}
 					} }
 					onChangeAnimation={ ( nextValue ) => {

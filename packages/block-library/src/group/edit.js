@@ -10,7 +10,7 @@ import {
 	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { CheckboxControl, SelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { View } from '@wordpress/primitives';
 
@@ -22,20 +22,13 @@ import GroupPlaceHolder, { useShouldShowPlaceHolder } from './placeholder';
 /**
  * Render inspector controls for the Group block.
  *
- * @param {Object}   props                    Component props.
- * @param {string}   props.tagName            The HTML tag name.
- * @param {Function} props.onSelectTagName    onChange function for the SelectControl.
- * @param {boolean}  props.showInView         The showInView attribute value.
- * @param {Function} props.onSelectShowInView onChange function for the Show In View Control.
+ * @param {Object}   props                 Component props.
+ * @param {string}   props.tagName         The HTML tag name.
+ * @param {Function} props.onSelectTagName onChange function for the SelectControl.
  *
  * @return {JSX.Element}                The control group.
  */
-function GroupEditControls( {
-	tagName,
-	onSelectTagName,
-	showInView,
-	onSelectShowInView,
-} ) {
+function GroupEditControls( { tagName, onSelectTagName } ) {
 	const htmlElementMessages = {
 		header: __(
 			'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
@@ -74,11 +67,6 @@ function GroupEditControls( {
 				onChange={ onSelectTagName }
 				help={ htmlElementMessages[ tagName ] }
 			/>
-			<CheckboxControl
-				label="Show In View"
-				checked={ showInView }
-				onChange={ onSelectShowInView }
-			/>
 		</InspectorControls>
 	);
 }
@@ -107,7 +95,6 @@ function GroupEdit( {
 		templateLock,
 		allowedBlocks,
 		layout = {},
-		showInView = false,
 	} = attributes;
 
 	// Layout settings.
@@ -169,10 +156,6 @@ function GroupEdit( {
 				tagName={ TagName }
 				onSelectTagName={ ( value ) =>
 					setAttributes( { tagName: value } )
-				}
-				showInView={ showInView }
-				onSelectShowInView={ ( value ) =>
-					setAttributes( { showInView: value } )
 				}
 			/>
 			{ showPlaceholder && (

@@ -239,8 +239,23 @@ HTML;
 }
 
 function gutenberg_render_behaviors_support_show_in_view( $block_content, $block ) { 
-	// TODO: Use an object instead of a variable like in the lightbox.
-	if ( ! isset( $block['attrs']['showInView'] ) || true !== $block['attrs']['showInView'] ) {
+	// Get the showInView setting from the block attributes.
+	if ( isset( $block['attrs']['behaviors']['showInView'] ) ) {
+		$show_in_view_settings = $block['attrs']['behaviors']['showInView'];
+		// If the lightbox setting is not set in the block attributes, get it from the theme.json file.
+	} else {
+		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
+		if ( isset( $theme_data['behaviors']['blocks'][ $block['blockName'] ]['showInView'] ) ) {
+			$show_in_view_settings = $theme_data['behaviors']['blocks'][ $block['blockName'] ]['showInView'];
+		} else {
+			$show_in_view_settings = null;
+		}
+	}
+	if ( isset( $show_in_view_settings['enabled'] ) && false === $show_in_view_settings['enabled'] ) {
+		return $block_content;
+	}
+
+	if ( ! $show_in_view_settings ) {
 		return $block_content;
 	}
 	$processor = new WP_HTML_Tag_Processor( $block_content );

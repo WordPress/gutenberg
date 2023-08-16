@@ -267,6 +267,11 @@
 							"type": "boolean",
 							"description": "This property adds a 'lightbox' behavior to the block. It allows to open the block's content in a lightbox when clicking on it.",
 							"default": false
+						},
+						"showInView": {
+							"type": "boolean",
+							"description": "This property adds a 'showInView' behavior to the block. It allows to show the block's content when enters the viewport.",
+							"default": false
 						}
 					}
 				},

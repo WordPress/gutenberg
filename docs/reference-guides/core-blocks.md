@@ -303,7 +303,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 -	**Name:** core/group
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, ariaLabel, behaviors (showInView), color (background, gradients, heading, link, text), dimensions (minHeight), layout (allowSizingOnChildren), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** allowedBlocks, showInView, tagName, templateLock
+-	**Attributes:** allowedBlocks, tagName, templateLock
 
 ## Heading
 

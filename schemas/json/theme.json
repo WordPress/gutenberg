@@ -26,6 +26,23 @@
 						}
 					},
 					"additionalProperties": false
+				},
+				"showInView": {
+					"description": "Settings related to the showInView behavior.",
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"description": "Allow users to enable the showInView behavior.",
+							"type": "boolean",
+							"default": false
+						},
+						"animation": {
+							"description": "Set showInView animation. Possible values: `vertical`, `left`, `right`, `''` (empty string).",
+							"type": "string",
+							"enum": [ "vertical", "left", "right", "" ]
+						}
+					},
+					"additionalProperties": false
 				}
 			},
 			"additionalProperties": false
