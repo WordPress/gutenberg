@@ -23,7 +23,10 @@ class Tests_FontsLibrary_WpFontFamily_Construct extends WP_UnitTestCase {
 		);
 		$font_family = new WP_Font_Family( $font_data );
 
-		$this->assertSame( $font_data, $property->getValue( $font_family ) );
+		$actual = $property->getValue( $font_family );
+		$property->setAccessible( false );
+
+		$this->assertSame( $font_data, $actual );
 	}
 
 	/**
