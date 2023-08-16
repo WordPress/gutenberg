@@ -90,7 +90,7 @@ export const DayButton = styled( Button, {
 		${ ( props ) =>
 			props.isSelected &&
 			`
-			background: ${ COLORS.ui.theme };
+			background: ${ COLORS.theme.accent };
 			color: ${ COLORS.white };
 			` }
 
@@ -106,7 +106,7 @@ export const DayButton = styled( Button, {
 		props.hasEvents &&
 		`
 		::before {
-			background: ${ props.isSelected ? COLORS.white : COLORS.ui.theme };
+			background: ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
 			border-radius: 2px;
 			bottom: 0;
 			content: " ";

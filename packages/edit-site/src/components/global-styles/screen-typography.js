@@ -10,7 +10,6 @@ import { __experimentalVStack as VStack } from '@wordpress/components';
 import TypographyElements from './typogrphy-elements';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
-import BlockPreviewPanel from './block-preview-panel';
 
 function ScreenTypography() {
 	return (
@@ -21,9 +20,6 @@ function ScreenTypography() {
 					'Manage the typography settings for different elements.'
 				) }
 			/>
-
-			<BlockPreviewPanel />
-
 			<div className="edit-site-global-styles-screen-typography">
 				<VStack spacing={ 6 }>
 					<FontFamilies />

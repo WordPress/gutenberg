@@ -33,7 +33,7 @@ export const _default = () => {
 	);
 };
 
-export const withFillProps = () => {
+export const WithFillProps = () => {
 	return (
 		<SlotFillProvider>
 			<h2>Profile</h2>
@@ -61,7 +61,7 @@ export const withFillProps = () => {
 	);
 };
 
-export const withContext = () => {
+export const WithContext = () => {
 	const Context = createContext();
 	const ContextFill = ( { name } ) => {
 		const value = useContext( Context );
