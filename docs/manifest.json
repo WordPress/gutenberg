@@ -1758,6 +1758,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/patterns",
+		"slug": "packages-patterns",
+		"markdown_source": "../packages/patterns/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",

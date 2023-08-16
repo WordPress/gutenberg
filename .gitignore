@@ -6,7 +6,6 @@ build-types
 node_modules
 gutenberg.zip
 coverage
-*-performance-results.json
 .phpunit.result.cache
 .reassure
 

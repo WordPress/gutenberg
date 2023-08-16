@@ -12,7 +12,6 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	cog,
 	code,
 	keyboard,
 } from '@wordpress/icons';
@@ -256,7 +255,6 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'focusMode' );
 			close();
@@ -266,7 +264,6 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/toggle-distraction-free',
 		label: __( 'Toggle distraction free' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			setPreference( 'core/edit-site', 'fixedToolbar', false );
 			setIsInserterOpened( false );
@@ -289,7 +286,6 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'fixedToolbar' );
 			close();
@@ -311,7 +307,6 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/open-preferences',
 		label: __( 'Editor preferences' ),
-		icon: cog,
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
 		},
@@ -331,7 +326,6 @@ function useEditUICommands() {
 		label: showBlockBreadcrumbs
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
 			close();
