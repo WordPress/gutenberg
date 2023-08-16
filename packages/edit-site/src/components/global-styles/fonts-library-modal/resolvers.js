@@ -43,7 +43,10 @@ export async function fetchInstallFonts( data ) {
 	return response;
 }
 
-export async function fetchUninstallFonts( data ) {
+export async function fetchUninstallFonts( fonts ) {
+	const data = { 
+		fontFamilies: fonts
+	};
 	const config = {
 		path: '/wp/v2/fonts',
 		method: 'DELETE',

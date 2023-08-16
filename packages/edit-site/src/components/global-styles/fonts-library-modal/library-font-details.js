@@ -39,7 +39,7 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 
 	const handleConfirmUninstall = async () => {
 		try {
-			await uninstallFont( font );
+			await uninstallFont( [ font ] );
 			createSuccessNotice(
 				__( `${ font?.name || font.fontFamily } was uninstalled.` ),
 				{ type: 'snackbar' }

@@ -187,8 +187,8 @@ function FontLibraryProvider( { children } ) {
 		const newLibraryFonts = await fetchInstallFonts( libraryFonts );
 	}
 
-	async function uninstallFont( font ) {
-		await fetchUninstallFonts( font );
+	async function uninstallFont( fonts ) {
+		await fetchUninstallFonts( fonts );
 		refreshLibrary();
 	}
 
