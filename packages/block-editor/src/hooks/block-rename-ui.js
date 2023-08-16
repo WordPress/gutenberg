@@ -1,20 +1,87 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
+import {
+	MenuItem,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	Button,
+	TextControl,
+	Modal,
+} from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../store';
 import { BlockSettingsMenuControls } from '../components';
+
+const notEmptyString = ( testString ) => testString?.trim()?.length > 0;
+
+function RenameModal( { blockName, onClose, onSave } ) {
+	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
+
+	const nameHasChanged = editedBlockName !== blockName;
+
+	const isNameValid = nameHasChanged && notEmptyString( editedBlockName );
+
+	return (
+		<Modal title={ __( 'Rename block' ) } onRequestClose={ onClose }>
+			<p>{ __( 'Choose a custom name for this block.' ) }</p>
+			<form className="sidebar-navigation__rename-modal-form">
+				<VStack spacing="3">
+					<TextControl
+						__nextHasNoMarginBottom
+						value={ editedBlockName }
+						placeholder={ __( 'Navigation title' ) }
+						onChange={ setEditedBlockName }
+					/>
+					<HStack justify="right">
+						<Button variant="tertiary" onClick={ onClose }>
+							{ __( 'Cancel' ) }
+						</Button>
+
+						<Button
+							disabled={ ! isNameValid }
+							variant="primary"
+							type="submit"
+							onClick={ ( e ) => {
+								e.preventDefault();
+
+								if ( ! isNameValid ) {
+									return;
+								}
+								onSave( editedBlockName );
+
+								// Immediate close avoids ability to hit save multiple times.
+								onClose();
+							} }
+						>
+							{ __( 'Save' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</form>
+		</Modal>
+	);
+}
 
 export const withBlockRenameControl = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { clientId, name: blockName } = props;
+		const [ renamingBlock, setRenamingBlock ] = useState( false );
+		const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+		const {
+			clientId,
+			name: blockName,
+			attributes: blockAttributes,
+		} = props;
 
 		const metaDataSupport = getBlockSupport(
 			blockName,
@@ -30,7 +97,7 @@ export const withBlockRenameControl = createHigherOrderComponent(
 			<>
 				{ supportsBlockNaming && (
 					<BlockSettingsMenuControls>
-						{ ( { selectedClientIds } ) => {
+						{ ( { selectedClientIds, onClose } ) => {
 							// Only enabled for single selections.
 							const canRename =
 								selectedClientIds.length === 1 &&
@@ -50,13 +117,36 @@ export const withBlockRenameControl = createHigherOrderComponent(
 							}
 
 							return (
-								<MenuItem onClick={ () => {} }>
+								<MenuItem
+									onClick={ () => {
+										setRenamingBlock( true );
+										onClose();
+									} }
+								>
 									{ __( 'Rename' ) }
 								</MenuItem>
 							);
 						} }
 					</BlockSettingsMenuControls>
 				) }
+
+				{ renamingBlock && (
+					<RenameModal
+						blockName={ blockAttributes?.metadata?.name || '' }
+						onClose={ () => setRenamingBlock( false ) }
+						onSave={ ( newName ) => {
+							updateBlockAttributes( clientId, {
+								// Include existing metadata (if present) to avoid overwriting existing.
+								metadata: {
+									...( blockAttributes?.metadata &&
+										blockAttributes?.metadata ),
+									name: newName,
+								},
+							} );
+						} }
+					/>
+				) }
+
 				<BlockEdit key="edit" { ...props } />
 			</>
 		);
