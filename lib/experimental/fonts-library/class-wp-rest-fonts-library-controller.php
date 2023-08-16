@@ -67,6 +67,36 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 				),
 			)
 		);
+
+		/* 
+		 * DO NOT MERGE: This is a temporary endpoint to allow testing googe fonts installation.
+		 * See: https://github.com/WordPress/gutenberg/issues/52795
+		 */
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/google_fonts',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'google_fonts' ),
+					'permission_callback' => array( $this, 'update_fonts_library_permissions_check' ),
+				),
+			)
+		);
+
+
+	}
+
+	/* 
+	* DO NOT MERGE: This is a temporary endpoint to allow testing googe fonts installation.
+	* See: https://github.com/WordPress/gutenberg/issues/52795
+	*/
+	public function google_fonts() {
+		$file = file_get_contents(
+			path_join( dirname( __FILE__ ), 'google-fonts.json' )
+		);
+        $json_data = json_decode($file, true);
+        return new WP_REST_Response($json_data, 200);
 	}
 
 	/**
