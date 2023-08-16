@@ -10,7 +10,7 @@
  *
  * @covers WP_Font_Family::get_data_as_json
  */
-class Tests_FontsLibrary_WpFontFamily_GetDataAsJson extends WP_UnitTestCase {
+class Tests_Fonts_WpFontFamily_GetDataAsJson extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_should_get_data_as_json

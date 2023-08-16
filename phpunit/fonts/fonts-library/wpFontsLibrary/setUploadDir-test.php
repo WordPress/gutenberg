@@ -10,7 +10,7 @@
  *
  * @covers WP_Fonts_Library::set_upload_dir
  */
-class Tests_FontsLibrary_WpFontsLibrary_SetUploadDir extends WP_UnitTestCase {
+class Tests_Fonts_WpFontsLibrary_SetUploadDir extends WP_UnitTestCase {
 
 	public function test_should_set_fonts_upload_dir() {
 		$defaults = array(
