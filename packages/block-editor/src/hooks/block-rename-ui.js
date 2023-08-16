@@ -51,7 +51,7 @@ function RenameModal( { blockName, onClose, onSave } ) {
 						</Button>
 
 						<Button
-							disabled={ ! isNameValid }
+							aria-disabled={ ! isNameValid }
 							variant="primary"
 							type="submit"
 							onClick={ ( e ) => {
