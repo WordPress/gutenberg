@@ -3,7 +3,7 @@
  */
 import * as path from 'path';
 import { test as base, expect, chromium } from '@playwright/test';
-import type { ConsoleMessage, Browser } from '@playwright/test';
+import type { ConsoleMessage } from '@playwright/test';
 import * as getPort from 'get-port';
 
 /**
@@ -109,7 +109,6 @@ const test = base.extend<
 	{
 		requestUtils: RequestUtils;
 		lighthousePort: number;
-		lighthouseBrowser: Browser;
 	}
 >( {
 	admin: async ( { page, pageUtils }, use ) => {
@@ -147,16 +146,11 @@ const test = base.extend<
 	lighthousePort: [
 		async ( {}, use ) => {
 			const port = await getPort();
-			await use( port );
-		},
-		{ scope: 'worker' },
-	],
-	lighthouseBrowser: [
-		async ( { lighthousePort }, use ) => {
 			const browser = await chromium.launch( {
-				args: [ `--remote-debugging-port=${ lighthousePort }` ],
+				args: [ `--remote-debugging-port=${ port }` ],
 			} );
-			await use( browser );
+
+			await use( port );
 
 			await browser.close();
 		},
