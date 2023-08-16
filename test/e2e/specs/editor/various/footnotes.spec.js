@@ -351,6 +351,8 @@ test.describe( 'Footnotes', () => {
 
 		// Open revisions.
 		await editor.openDocumentSettingsSidebar();
+		// Ensure the preview dropdown popover closes.
+		await editor.canvas.click( 'body' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Post' } )
