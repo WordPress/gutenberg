@@ -160,9 +160,8 @@ function wp_add_footnotes_revisions_to_post_meta( $post ) {
 	}
 }
 
-foreach ( array( 'post', 'page' ) as $post_type ) {
-	add_action( "rest_after_insert_{$post_type}", 'wp_add_footnotes_revisions_to_post_meta' );
-}
+add_action( 'rest_after_insert_post', 'wp_add_footnotes_revisions_to_post_meta' );
+add_action( 'rest_after_insert_page', 'wp_add_footnotes_revisions_to_post_meta' );
 
 /**
  * Restores the footnotes meta value from the revision.
