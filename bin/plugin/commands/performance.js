@@ -355,9 +355,12 @@ async function runPerformanceTests( branches, options ) {
 		results[ testSuite ] = {};
 
 		for ( const branch of branches ) {
+			const sanitizedBranch = sanitizeBranchName( branch );
 			const resultsRounds = resultFiles
 				.filter( ( file ) =>
-					file.includes( `${ testSuite }_${ branch }_round-` )
+					file.includes(
+						`${ testSuite }_${ sanitizedBranch }_round-`
+					)
 				)
 				.map( ( file ) => readJSONFile( file ) );
 
