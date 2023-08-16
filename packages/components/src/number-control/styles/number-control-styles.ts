@@ -36,7 +36,7 @@ export const Input = styled( InputControl )`
 
 export const SpinButton = styled( Button )`
 	&&&&& {
-		color: ${ COLORS.ui.theme };
+		color: ${ COLORS.theme.accent };
 	}
 `;
 

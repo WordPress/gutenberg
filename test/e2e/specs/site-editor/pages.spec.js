@@ -54,7 +54,7 @@ test.describe( 'Pages', () => {
 		// Insert into Page Content using appender.
 		await page
 			.getByRole( 'region', { name: 'Editor footer' } )
-			.getByRole( 'button', { name: 'Post Content' } )
+			.getByRole( 'button', { name: 'Content' } )
 			.click();
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add block' } )
@@ -90,7 +90,7 @@ test.describe( 'Pages', () => {
 			.click();
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Post Content',
+				name: 'Block: Content',
 			} )
 		).toContainText(
 			'This is the Post Content block, it will display all the blocks in any single post or page.'
