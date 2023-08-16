@@ -19,6 +19,8 @@ import type { NoticeListProps } from '../types';
 const meta: ComponentMeta< typeof Notice > = {
 	title: 'Components/Notice',
 	component: Notice,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { NoticeList },
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },

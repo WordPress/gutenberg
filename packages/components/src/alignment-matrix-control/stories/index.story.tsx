@@ -19,6 +19,10 @@ import type { AlignmentMatrixControlProps } from '../types';
 const meta: ComponentMeta< typeof AlignmentMatrixControl > = {
 	title: 'Components (Experimental)/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
+	},
 	argTypes: {
 		onChange: { action: 'onChange', control: { type: null } },
 		value: { control: { type: null } },

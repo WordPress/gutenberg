@@ -18,6 +18,8 @@ import InputControl from '../../input-control';
 const meta: ComponentMeta< typeof TreeGrid > = {
 	title: 'Components (Experimental)/TreeGrid',
 	component: TreeGrid,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { TreeGridRow, TreeGridCell },
 	argTypes: {
 		children: { control: { type: null } },
 	},

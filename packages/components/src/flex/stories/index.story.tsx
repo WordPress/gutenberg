@@ -12,6 +12,8 @@ import { View } from '../../view';
 const meta: ComponentMeta< typeof Flex > = {
 	component: Flex,
 	title: 'Components/Flex',
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { FlexBlock, FlexItem },
 	argTypes: {
 		align: { control: { type: 'text' } },
 		as: { control: { type: 'text' } },

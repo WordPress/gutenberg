@@ -13,6 +13,8 @@ import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 const meta: ComponentMeta< typeof Dropdown > = {
 	title: 'Components/Dropdown',
 	component: Dropdown,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { DropdownContentWrapper },
 	argTypes: {
 		focusOnMount: {
 			options: [ 'firstElement', true, false ],

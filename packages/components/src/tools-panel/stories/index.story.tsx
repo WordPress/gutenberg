@@ -28,6 +28,8 @@ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 const meta: ComponentMeta< typeof ToolsPanel > = {
 	title: 'Components (Experimental)/ToolsPanel',
 	component: ToolsPanel,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { ToolsPanelItem },
 	argTypes: {
 		as: { control: { type: null } },
 		children: { control: { type: null } },

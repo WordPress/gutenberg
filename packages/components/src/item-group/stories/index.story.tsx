@@ -13,6 +13,8 @@ type ItemProps = React.ComponentPropsWithoutRef< typeof Item >;
 
 const meta: ComponentMeta< typeof ItemGroup > = {
 	component: ItemGroup,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { Item },
 	title: 'Components (Experimental)/ItemGroup',
 	argTypes: {
 		as: { control: { type: null } },

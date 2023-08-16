@@ -25,6 +25,8 @@ import type {
 
 const meta: ComponentMeta< typeof ToggleGroupControl > = {
 	component: ToggleGroupControl,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
 	title: 'Components (Experimental)/ToggleGroupControl',
 	argTypes: {
 		help: { control: { type: 'text' } },
