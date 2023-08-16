@@ -284,3 +284,86 @@ function _wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
 }
 
 add_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference', 10, 2 );
+
+/**
+ * Parses footnotes values for unescaped quotes and replaces with "&quot;".
+ *
+ * @param string $meta_value  Footnotes metavalue.
+ * @return string|array The parsed footnotes.
+ */
+function _wp_footnotes_sanitize_saved_metadata( $meta_value ) {
+	if ( ! json_decode( $meta_value, true ) ) {
+
+		$re = '/{"content":([^{}]+),"id":([^{}]+)/';
+
+		preg_match_all( $re, $meta_value, $matches, PREG_SET_ORDER, 0 );
+
+		if ( ! is_array( $matches ) ) {
+			return $meta_value;
+		}
+
+		$json_array = array();
+
+		foreach ( $matches as $match_value ) {
+			$footnote_array = array();
+			$content_value  = preg_replace( '/^(")(.+)(")$/', '${2}', $match_value[1] );
+			$id_value       = preg_replace( '/^(")(.+)(")$/', '${2}', $match_value[2] );
+			$content_value  = preg_replace( '/\\\\/', '', $content_value );
+			// Can't use wp_slash because frontend will render apostrophes as \”.
+			// So we substitute with &quot; instead.
+			$content_value = preg_replace( '/"/', '&quot;', $content_value );
+			if ( ! empty( $match_value[1] ) && ! empty( $match_value[2] ) ) {
+				$footnote_array['content'] = $content_value;
+				$footnote_array['id']      = $id_value;
+				$json_array[]              = $footnote_array;
+			}
+		}
+
+		if ( ! empty( $json_array ) ) {
+			return wp_json_encode( $json_array );
+		}
+	}
+	return $meta_value;
+}
+
+/**
+ * Short-circuits the return value of a footnotes meta field,
+ * and tests if its valid JSON.
+ *
+ * @param mixed  $value The value to return, either a single metadata value or an array
+ *                           of values depending on the value of `$single`. Default null.
+ * @param int    $object_id ID of the object metadata is for.
+ * @param string $meta_key Metadata key.
+ * @return mixed
+ */
+function _wp_footnotes_get_post_metadata( $value, $object_id, $meta_key ) {
+	if ( 'footnotes' !== $meta_key ) {
+		return $value;
+	}
+	// Avoid infinite recursion.
+	remove_filter( current_filter(), __FUNCTION__ );
+
+	$value = get_metadata( 'post', $object_id, 'footnotes', true );
+
+	return _wp_footnotes_sanitize_saved_metadata( $value );
+}
+
+add_filter( 'get_post_metadata', '_wp_footnotes_get_post_metadata', 10, 5 );
+
+/**
+ * Filters the post data for a REST API response.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @return WP_REST_Response Modified response object.
+ */
+function _wp_footnotes_rest_prepare_post( $response ) {
+	$data = $response->get_data();
+	if ( isset( $data['meta']['footnotes'] ) && ! empty( isset( $data['meta']['footnotes'] ) ) ) {
+		$data['meta']['footnotes'] = _wp_footnotes_sanitize_saved_metadata( $data['meta']['footnotes'] );
+		$response->set_data( $data );
+		return $response;
+	}
+	return $response;
+}
+
+add_filter( 'rest_prepare_post', '_wp_footnotes_rest_prepare_post', 10, 3 );
