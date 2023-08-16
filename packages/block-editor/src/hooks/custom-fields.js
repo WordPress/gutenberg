@@ -37,8 +37,8 @@ function addAttribute( settings ) {
 /**
  * Override the default edit UI to include a new block inspector control for
  * assigning a connection to blocks that has support for connections.
- * Currently, only the `core/paragraph` block is supported and there is only a relation
- * between paragraph content and a custom field.
+ * Currently, only the `core/paragraph` and `core/image` blocks are supported
+ * and only the `content` and `url` attributes of these blocks are supported respectively.
  *
  * @param {WPComponent} BlockEdit Original component.
  *
