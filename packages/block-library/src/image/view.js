@@ -37,7 +37,10 @@ let scrollCallback;
 // for now that provides the best visual experience.
 function handleScroll( event, context, actions ) {
 	event.preventDefault();
-	window.scrollTo( 0, context.core.image.lastScrollTop );
+	window.scrollTo(
+		context.core.image.lastScrollLeft,
+		context.core.image.lastScrollTop
+	);
 	actions.core.image.hideLightbox( { context, event } );
 }
 
@@ -71,6 +74,12 @@ store(
 						context.core.image.lastScrollTop =
 							window.pageYOffset ||
 							document.documentElement.scrollTop;
+
+						// In most cases, this value will be 0, but this is included
+						// in case a user has created a page with horizontal scrolling.
+						context.core.image.lastScrollLeft =
+							window.pageXOffset ||
+							document.documentElement.scrollLeft;
 
 						// We define and bind the scroll callback here so that
 						// we can pass the context and actions as arguments.
