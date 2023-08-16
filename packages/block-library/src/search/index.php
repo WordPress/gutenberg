@@ -64,6 +64,8 @@ function render_block_core_search( $attributes, $content, $block ) {
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
 	$border_color_classes = get_border_color_classes_for_block_core_search( $attributes );
+	// This variable is a constant and its value is always false at this moment.
+	// It is defined this way because some values depend on it, in case it changes in the future.
 	$open_by_default      = 'false';
 
 	$label_inner_html = empty( $attributes['label'] ) ? __( 'Search' ) : wp_kses_post( $attributes['label'] );
