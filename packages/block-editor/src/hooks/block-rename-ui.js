@@ -37,7 +37,21 @@ function RenameModal( { blockName, onClose, onSave } ) {
 	return (
 		<Modal title={ __( 'Rename block' ) } onRequestClose={ onClose }>
 			<p>{ __( 'Choose a custom name for this block.' ) }</p>
-			<form className="sidebar-navigation__rename-modal-form">
+			<form
+				className="sidebar-navigation__rename-modal-form"
+				onSubmit={ ( e ) => {
+					e.preventDefault();
+
+					if ( ! isNameValid ) {
+						return;
+					}
+
+					onSave( editedBlockName );
+
+					// Immediate close avoids ability to hit save multiple times.
+					onClose();
+				} }
+			>
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
@@ -54,17 +68,6 @@ function RenameModal( { blockName, onClose, onSave } ) {
 							aria-disabled={ ! isNameValid }
 							variant="primary"
 							type="submit"
-							onClick={ ( e ) => {
-								e.preventDefault();
-
-								if ( ! isNameValid ) {
-									return;
-								}
-								onSave( editedBlockName );
-
-								// Immediate close avoids ability to hit save multiple times.
-								onClose();
-							} }
 						>
 							{ __( 'Save' ) }
 						</Button>
