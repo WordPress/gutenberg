@@ -45,16 +45,6 @@ test.describe( 'Links', () => {
 		// Edit link.
 		await page.getByRole( 'button', { name: 'Edit' } ).click();
 
-		// Open settings.
-		await page
-			.getByRole( 'region', {
-				name: 'Editor content',
-			} )
-			.getByRole( 'button', {
-				name: 'Advanced',
-			} )
-			.click();
-
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		const checkbox = page.getByLabel( 'Open in new tab' );
 		await checkbox.click();
@@ -63,7 +53,7 @@ test.describe( 'Links', () => {
 		await expect( checkbox ).toBeChecked();
 		await expect( checkbox ).toBeFocused();
 
-		// Tab back to the Submit and apply the link.
+		// Save the change.
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
@@ -210,16 +200,6 @@ test.describe( 'Links', () => {
 		// and I can see the open in new tab checkbox. This verifies
 		// that the editor preference was persisted.
 		await expect( page.getByLabel( 'Open in new tab' ) ).toBeVisible();
-
-		// Toggle the Advanced settings back to being closed.
-		await page
-			.getByRole( 'region', {
-				name: 'Editor content',
-			} )
-			.getByRole( 'button', {
-				name: 'Advanced',
-			} )
-			.click();
 
 		// Move focus out of Link UI and into Paragraph block.
 		await pageUtils.pressKeys( 'Escape' );
