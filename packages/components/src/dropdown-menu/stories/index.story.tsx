@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * Internal dependencies
  */
@@ -38,7 +38,7 @@ const meta: Meta< typeof DropdownMenu > = {
 };
 export default meta;
 
-const Template: Story< typeof DropdownMenu > = ( props ) => (
+const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<div style={ { height: 150 } }>
 		<DropdownMenu { ...props } />
 	</div>

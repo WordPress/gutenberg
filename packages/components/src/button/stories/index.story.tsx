@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { ReactNode } from 'react';
 
 /**
@@ -44,52 +44,52 @@ const meta: Meta< typeof Button > = {
 };
 export default meta;
 
-const Template: Story< typeof Button > = ( props ) => {
+const Template: StoryFn< typeof Button > = ( props ) => {
 	return <Button { ...props }></Button>;
 };
 
-export const Default: Story< typeof Button > = Template.bind( {} );
+export const Default = Template.bind( {} );
 Default.args = {
 	children: 'Code is poetry',
 };
 
-export const Primary: Story< typeof Button > = Template.bind( {} );
+export const Primary = Template.bind( {} );
 Primary.args = {
 	...Default.args,
 	variant: 'primary',
 };
 
-export const Secondary: Story< typeof Button > = Template.bind( {} );
+export const Secondary = Template.bind( {} );
 Secondary.args = {
 	...Default.args,
 	variant: 'secondary',
 };
 
-export const Tertiary: Story< typeof Button > = Template.bind( {} );
+export const Tertiary = Template.bind( {} );
 Tertiary.args = {
 	...Default.args,
 	variant: 'tertiary',
 };
 
-export const Link: Story< typeof Button > = Template.bind( {} );
+export const Link = Template.bind( {} );
 Link.args = {
 	...Default.args,
 	variant: 'link',
 };
 
-export const IsDestructive: Story< typeof Button > = Template.bind( {} );
+export const IsDestructive = Template.bind( {} );
 IsDestructive.args = {
 	...Default.args,
 	isDestructive: true,
 };
 
-export const Icon: Story< typeof Button > = Template.bind( {} );
+export const Icon = Template.bind( {} );
 Icon.args = {
 	label: 'Code is poetry',
 	icon: 'wordpress',
 };
 
-export const GroupedIcons: Story< typeof Button > = () => {
+export const GroupedIcons = () => {
 	const GroupContainer = ( { children }: { children: ReactNode } ) => (
 		<div style={ { display: 'inline-flex' } }>{ children }</div>
 	);

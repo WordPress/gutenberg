@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import styled from '@emotion/styled';
 
 /**
@@ -119,7 +119,7 @@ const RadioItemsGroup = () => {
 	);
 };
 
-const Template: Story< typeof DropdownMenu > = ( props ) => (
+const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<SlotFillProvider>
 		<DropdownMenu { ...props } />
 		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
@@ -194,7 +194,7 @@ const toolbarVariantContextValue = {
 		variant: 'toolbar',
 	},
 };
-export const ToolbarVariant: Story< typeof DropdownMenu > = ( props ) => (
+export const ToolbarVariant: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<ContextSystemProvider value={ toolbarVariantContextValue }>
 		<DropdownMenu { ...props } />
 	</ContextSystemProvider>

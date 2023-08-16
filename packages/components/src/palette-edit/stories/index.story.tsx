@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,7 @@ const meta: Meta< typeof PaletteEdit > = {
 };
 export default meta;
 
-const Template: Story< typeof PaletteEdit > = ( args ) => {
+const Template: StoryFn< typeof PaletteEdit > = ( args ) => {
 	const { colors, gradients, onChange, ...props } = args;
 	const [ value, setValue ] = useState( gradients || colors );
 

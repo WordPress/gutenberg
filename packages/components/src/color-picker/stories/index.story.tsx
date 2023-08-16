@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -30,7 +30,7 @@ const meta: Meta< typeof ColorPicker > = {
 };
 export default meta;
 
-const Template: Story< typeof ColorPicker > = ( { onChange, ...props } ) => {
+const Template: StoryFn< typeof ColorPicker > = ( { onChange, ...props } ) => {
 	const [ color, setColor ] = useState< string | undefined >();
 
 	return (
