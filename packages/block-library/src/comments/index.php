@@ -37,7 +37,11 @@ function render_block_core_comments( $attributes, $content, $block ) {
 	// If this isn't the legacy block, we need to render the static version of this block.
 	$is_legacy = 'core/post-comments' === $block->name || ! empty( $attributes['legacy'] );
 	if ( ! $is_legacy ) {
-		return $block->render( array( 'dynamic' => false ) );
+		$p = new WP_HTML_Tag_Processor( $block->render( array( 'dynamic' => false ) ) );
+		if ( $p->next_tag() ) {
+			$p->set_attribute( 'data-wp-navigation-id', 'comments' );
+		}
+		return $p;
 	}
 
 	$post_before = $post;
