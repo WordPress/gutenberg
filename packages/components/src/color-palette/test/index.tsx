@@ -222,11 +222,14 @@ describe( 'ColorPalette', () => {
 
 	it( 'should display the selected color name and value', async () => {
 		const user = userEvent.setup();
+		// selector for Truncate component to make test queries more explicit
+		const truncateComponent = {
+			selector: 'span[data-wp-component="Truncate"]',
+		};
 
 		render( <ControlledColorPalette /> );
 
-		const colorName = EXAMPLE_COLORS[ 0 ].name;
-		const colorCode = EXAMPLE_COLORS[ 0 ].color;
+		const { name: colorName, color: colorCode } = EXAMPLE_COLORS[ 0 ];
 
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
 
@@ -240,12 +243,14 @@ describe( 'ColorPalette', () => {
 
 		// Confirm the correct color name, color value, and button label are used
 		expect(
-			screen.getByText( colorName, { selector: 'span' } )
+			screen.getByText( colorName, truncateComponent )
 		).toBeVisible();
-		expect( screen.getByText( colorCode ) ).toBeVisible();
+		expect(
+			screen.getByText( colorCode, truncateComponent )
+		).toBeVisible();
 		expect(
 			screen.getByRole( 'button', {
-				name: `Custom color picker. The currently selected color is called "${ colorName }" and has a value of "${ EXAMPLE_COLORS[ 0 ].color }".`,
+				name: `Custom color picker. The currently selected color is called "${ colorName }" and has a value of "${ colorCode }".`,
 				expanded: false,
 			} )
 		).toBeInTheDocument();
@@ -255,9 +260,11 @@ describe( 'ColorPalette', () => {
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
 
 		expect(
-			screen.queryByText( colorName, { selector: 'span' } )
+			screen.queryByText( colorName, truncateComponent )
 		).not.toBeInTheDocument();
-		expect( screen.queryByText( colorCode ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( colorCode, truncateComponent )
+		).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', {
 				name: /^Custom color picker.$/,
