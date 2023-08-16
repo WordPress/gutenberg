@@ -20,7 +20,10 @@ import { useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
-import { BlockSettingsMenuControls } from '../components';
+import {
+	BlockSettingsMenuControls,
+	useBlockDisplayInformation,
+} from '../components';
 
 const notEmptyString = ( testString ) => testString?.trim()?.length > 0;
 
@@ -39,7 +42,7 @@ function RenameModal( { blockName, onClose, onSave } ) {
 					<TextControl
 						__nextHasNoMarginBottom
 						value={ editedBlockName }
-						placeholder={ __( 'Navigation title' ) }
+						placeholder={ __( 'Block name' ) }
 						onChange={ setEditedBlockName }
 					/>
 					<HStack justify="right">
@@ -82,6 +85,8 @@ export const withBlockRenameControl = createHigherOrderComponent(
 			name: blockName,
 			attributes: blockAttributes,
 		} = props;
+
+		const blockInformation = useBlockDisplayInformation( clientId );
 
 		const metaDataSupport = getBlockSupport(
 			blockName,
@@ -132,7 +137,11 @@ export const withBlockRenameControl = createHigherOrderComponent(
 
 				{ renamingBlock && (
 					<RenameModal
-						blockName={ blockAttributes?.metadata?.name || '' }
+						blockName={
+							blockAttributes?.metadata?.name ||
+							blockInformation?.title ||
+							''
+						}
 						onClose={ () => setRenamingBlock( false ) }
 						onSave={ ( newName ) => {
 							updateBlockAttributes( clientId, {
