@@ -1,24 +1,27 @@
 /**
  * External dependencies
  */
-import path from 'path';
-import chalk from 'chalk';
-import { readFileSync, existsSync } from 'fs';
-import type { Reporter, TestCase } from '@playwright/test/reporter';
+const { readFileSync, existsSync } = require( 'fs' );
+const path = require( 'path' );
+const chalk = require( 'chalk' );
 
-/**
- * Internal dependencies
- */
-import { average, round } from '../utils';
+function average( array ) {
+	return array.reduce( ( a, b ) => a + b ) / array.length;
+}
+
+function round( number, decimalPlaces = 2 ) {
+	const factor = Math.pow( 10, decimalPlaces );
+	return Math.round( number * factor ) / factor;
+}
 
 const title = chalk.bold;
 const success = chalk.bold.green;
 
-class PerformanceReporter implements Reporter {
-	onTestEnd( test: TestCase ) {
-		const basename = path.basename( test.location.file, '.js' );
+class PerformanceReporter {
+	onTestResult( test ) {
+		const basename = path.basename( test.path, '.js' );
 		const filepath = path.join(
-			process.env.WP_ARTIFACTS_PATH as string,
+			process.env.WP_ARTIFACTS_PATH,
 			basename + '.performance-results.json'
 		);
 
@@ -171,4 +174,4 @@ Fastest time to move mouse between two block item in the inserter: ${ success(
 	}
 }
 
-export default PerformanceReporter;
+module.exports = PerformanceReporter;
