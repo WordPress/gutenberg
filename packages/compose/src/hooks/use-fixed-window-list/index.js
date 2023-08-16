@@ -59,7 +59,10 @@ export default function useFixedWindowList(
 		if ( ! useWindowing ) {
 			return;
 		}
-		const scrollContainer = getScrollContainer( elementRef.current );
+		const scrollContainer = elementRef.current?.closest(
+			'.edit-post-editor__list-view-panel-content'
+		);
+
 		const measureWindow = (
 			/** @type {boolean | undefined} */ initRender
 		) => {
