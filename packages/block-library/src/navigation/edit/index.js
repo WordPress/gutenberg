@@ -26,7 +26,7 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
-	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
@@ -43,6 +43,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -69,8 +70,9 @@ import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
+import AccessibleDescription from './accessible-description';
+import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
-const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 function Navigation( {
 	attributes,
@@ -501,6 +503,11 @@ function Navigation( {
 		isFirstRender.current = false;
 	}, [ submenuAccessibilityNotice ] );
 
+	const overlayMenuPreviewId = useInstanceId(
+		OverlayMenuPreview,
+		`overlay-menu-preview`
+	);
+
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const stylingInspectorControls = (
 		<>
@@ -516,6 +523,9 @@ function Navigation( {
 											! overlayMenuPreview
 										);
 									} }
+									aria-label={ __( 'Overlay menu controls' ) }
+									aria-controls={ overlayMenuPreviewId }
+									aria-expanded={ overlayMenuPreview }
 								>
 									{ hasIcon && (
 										<>
@@ -530,13 +540,16 @@ function Navigation( {
 										</>
 									) }
 								</Button>
-								{ overlayMenuPreview && (
-									<OverlayMenuPreview
-										setAttributes={ setAttributes }
-										hasIcon={ hasIcon }
-										icon={ icon }
-									/>
-								) }
+								<div id={ overlayMenuPreviewId }>
+									{ overlayMenuPreview && (
+										<OverlayMenuPreview
+											setAttributes={ setAttributes }
+											hasIcon={ hasIcon }
+											icon={ icon }
+											hidden={ ! overlayMenuPreview }
+										/>
+									) }
+								</div>
 							</>
 						) }
 						<h3>{ __( 'Overlay Menu' ) }</h3>
@@ -666,12 +679,23 @@ function Navigation( {
 		</>
 	);
 
+	const accessibleDescriptionId = `${ clientId }-desc`;
+
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
 	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
-			<TagName { ...blockProps }>
+			<TagName
+				{ ...blockProps }
+				aria-describedby={
+					! isPlaceholder ? accessibleDescriptionId : undefined
+				}
+			>
+				<AccessibleDescription id={ accessibleDescriptionId }>
+					{ __( 'Unsaved Navigation Menu.' ) }
+				</AccessibleDescription>
+
 				<MenuInspectorControls
 					clientId={ clientId }
 					createNavigationMenuIsSuccess={
@@ -837,7 +861,17 @@ function Navigation( {
 				) }
 
 				{ ! isLoading && (
-					<TagName { ...blockProps }>
+					<TagName
+						{ ...blockProps }
+						aria-describedby={
+							! isPlaceholder
+								? accessibleDescriptionId
+								: undefined
+						}
+					>
+						<AccessibleMenuDescription
+							id={ accessibleDescriptionId }
+						/>
 						<ResponsiveWrapper
 							id={ clientId }
 							onToggle={ setResponsiveMenuVisibility }

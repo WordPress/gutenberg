@@ -1734,7 +1734,66 @@ describe( 'Selecting links', () => {
 } );
 
 describe( 'Addition Settings UI', () => {
-	it( 'should hide advanced link settings when not editing a link', async () => {
+	it( 'should allow toggling the "Opens in new tab" setting control (only) on the link preview', async () => {
+		const user = userEvent.setup();
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+		const mockOnChange = jest.fn();
+
+		const customSettings = [
+			{
+				id: 'opensInNewTab',
+				title: 'Open in new tab',
+			},
+			{
+				id: 'noFollow',
+				title: 'No follow',
+			},
+		];
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( selectedLink );
+
+			return (
+				<LinkControl
+					value={ link }
+					settings={ customSettings }
+					onChange={ ( newVal ) => {
+						mockOnChange( newVal );
+						setLink( newVal );
+					} }
+				/>
+			);
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const opensInNewTabField = screen.queryByRole( 'checkbox', {
+			name: 'Open in new tab',
+			checked: false,
+		} );
+
+		expect( opensInNewTabField ).toBeInTheDocument();
+
+		// No matter which settings are passed in only the `Opens in new tab`
+		// setting should be shown on the link preview (non-editing) state.
+		const noFollowField = screen.queryByRole( 'checkbox', {
+			name: 'No follow',
+		} );
+		expect( noFollowField ).not.toBeInTheDocument();
+
+		// Check that the link value is updated immediately upon checking
+		// the checkbox.
+		await user.click( opensInNewTabField );
+
+		expect( opensInNewTabField ).toBeChecked();
+
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenCalledWith( {
+			opensInNewTab: true,
+		} );
+	} );
+
+	it( 'should hide advanced link settings and toggle when not editing a link', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
@@ -1750,7 +1809,7 @@ describe( 'Addition Settings UI', () => {
 		expect( settingsToggle ).not.toBeInTheDocument();
 	} );
 
-	it( 'should provides a means to toggle the link settings', async () => {
+	it( 'should provides a means to toggle the advanced link settings when editing a link', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
@@ -1785,7 +1844,7 @@ describe( 'Addition Settings UI', () => {
 		expect( newTabSettingInput ).not.toBeVisible();
 	} );
 
-	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
+	it( 'should display "New Tab" setting (in "off" mode) by default when a link is edited', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 		const expectedSettingText = 'Open in new tab';
 
@@ -1817,7 +1876,7 @@ describe( 'Addition Settings UI', () => {
 
 		const customSettings = [
 			{
-				id: 'newTab',
+				id: 'opensInNewTab',
 				title: 'Open in new tab',
 			},
 			{

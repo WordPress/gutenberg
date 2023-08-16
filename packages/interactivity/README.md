@@ -25,7 +25,7 @@ You can test it, but it's still very experimental.
 
 ### How do I get started?
 
-A "Getting started guide" section of the Interactivity API Docs is in progress. In the meantime check the **Docs & Examples** section below for resources to learn. You can also ask for guidance at the [“Interactivity API” category](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) in Gutenberg repo discussions.
+The best place to start with the Interactivity API is this [**Getting started guide**](https://github.com/WordPress/gutenberg/blob/trunk/packages/interactivity/docs/1-getting-started.md). There you'll will find a very quick start guide and the current requirements of the Interactivity API.
 
 ### Where can I ask questions?
 
@@ -47,10 +47,15 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Docs & Examples
 
-Interactivity API is a recent proposal and its Documentation is still in progress. In the meantime, here you have these resources to learn/read more about the Interactivity API:
+**[Interactivity API Documentation](https://github.com/WordPress/gutenberg/tree/trunk/packages/interactivity/docs)** is the best place to learn about this proposal. Although it's still in progress, some key pages are already available:
 
+- **[Getting Started Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/interactivity/docs/1-getting-started.md)**: Follow this Getting Started guide to learn how to scaffold a new project and create your first interactive blocks.
+- **[API Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/interactivity/docs/2-api-reference.md)**: Check this page for technical  detailed explanations and examples of the directives and the store.
+
+Here you have some more resources to learn/read more about the Interactivity API:
+
+- **[Interactivity API Discussions](https://github.com/WordPress/gutenberg/discussions/52882)**
 - [Proposal: The Interactivity API – A better developer experience in building interactive blocks](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/)
-- [“Interactivity API” category](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) in Gutenberg repo discussions
 - Developer Hours sessions ([Americas](https://www.youtube.com/watch?v=RXNoyP2ZiS8&t=664s) & [APAC/EMEA](https://www.youtube.com/watch?v=6ghbrhyAcvA))
 - [wpmovies.dev](http://wpmovies.dev/) demo and its [wp-movies-demo](https://github.com/WordPress/wp-movies-demo) repo
 

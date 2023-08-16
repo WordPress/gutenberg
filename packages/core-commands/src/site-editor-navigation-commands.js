@@ -10,6 +10,7 @@ import {
 	post,
 	page,
 	layout,
+	symbol,
 	symbolFilled,
 	styles,
 	navigation,
@@ -20,8 +21,9 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useIsSiteEditorAccessible } from './hooks';
+import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
+import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -68,8 +70,21 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 			[ supportsSearch, search ]
 		);
 
+		/*
+		 * wp_template and wp_template_part endpoints do not support per_page or orderby parameters.
+		 * We need to sort the results based on the search query to avoid removing relevant
+		 * records below using .slice().
+		 */
+		const orderedRecords = useMemo( () => {
+			if ( supportsSearch ) {
+				return records ?? [];
+			}
+
+			return orderEntityRecordsBySearch( records, search ).slice( 0, 10 );
+		}, [ supportsSearch, records, search ] );
+
 		const commands = useMemo( () => {
-			return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
+			return orderedRecords.map( ( record ) => {
 				const isSiteEditor = getPath( window.location.href )?.includes(
 					'site-editor.php'
 				);
@@ -102,7 +117,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					},
 				};
 			} );
-		}, [ records, history ] );
+		}, [ orderedRecords, history ] );
 
 		return {
 			commands,
@@ -124,16 +139,18 @@ function useSiteEditorBasicNavigationCommands() {
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
-	const isSiteEditorAccessible = useIsSiteEditorAccessible();
+	const isTemplatesAccessible = useIsTemplatesAccessible();
+	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {
 		const result = [];
 
-		if ( ! isSiteEditorAccessible ) {
+		if ( ! isTemplatesAccessible || ! isBlockBasedTheme ) {
 			return result;
 		}
+
 		result.push( {
 			name: 'core/edit-site/open-navigation',
-			label: __( 'Open navigation' ),
+			label: __( 'Navigation' ),
 			icon: navigation,
 			callback: ( { close } ) => {
 				const args = {
@@ -150,26 +167,8 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		result.push( {
-			name: 'core/edit-site/open-pages',
-			label: __( 'Open pages' ),
-			icon: page,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/page',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-style-variations',
-			label: __( 'Open style variations' ),
+			name: 'core/edit-site/open-styles',
+			label: __( 'Styles' ),
 			icon: styles,
 			callback: ( { close } ) => {
 				const args = {
@@ -186,8 +185,26 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		result.push( {
+			name: 'core/edit-site/open-pages',
+			label: __( 'Pages' ),
+			icon: page,
+			callback: ( { close } ) => {
+				const args = {
+					path: '/page',
+				};
+				const targetUrl = addQueryArgs( 'site-editor.php', args );
+				if ( isSiteEditor ) {
+					history.push( args );
+				} else {
+					document.location = targetUrl;
+				}
+				close();
+			},
+		} );
+
+		result.push( {
 			name: 'core/edit-site/open-templates',
-			label: __( 'Open templates' ),
+			label: __( 'Templates' ),
 			icon: layout,
 			callback: ( { close } ) => {
 				const args = {
@@ -203,8 +220,26 @@ function useSiteEditorBasicNavigationCommands() {
 			},
 		} );
 
+		result.push( {
+			name: 'core/edit-site/open-patterns',
+			label: __( 'Patterns' ),
+			icon: symbol,
+			callback: ( { close } ) => {
+				const args = {
+					path: '/patterns',
+				};
+				const targetUrl = addQueryArgs( 'site-editor.php', args );
+				if ( isSiteEditor ) {
+					history.push( args );
+				} else {
+					document.location = targetUrl;
+				}
+				close();
+			},
+		} );
+
 		return result;
-	}, [ history, isSiteEditor, isSiteEditorAccessible ] );
+	}, [ history, isSiteEditor, isTemplatesAccessible, isBlockBasedTheme ] );
 
 	return {
 		commands,

@@ -129,29 +129,6 @@ export function usePasteHandler( props ) {
 			}
 
 			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
-			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
-
-			// If the data comes from a rich text instance, we can directly use it
-			// without filtering the data. The filters are only meant for externally
-			// pasted content and remove inline styles.
-			if ( isInternal ) {
-				const pastedMultilineTag =
-					clipboardData.getData( 'rich-text-multi-line-tag' ) ||
-					undefined;
-				let pastedValue = create( {
-					html,
-					multilineTag: pastedMultilineTag,
-					multilineWrapperTags:
-						pastedMultilineTag === 'li'
-							? [ 'ul', 'ol' ]
-							: undefined,
-					preserveWhiteSpace,
-				} );
-				pastedValue = adjustLines( pastedValue, !! multilineTag );
-				addActiveFormats( pastedValue, value.activeFormats );
-				onChange( insert( value, pastedValue ) );
-				return;
-			}
 
 			if ( pastePlainText ) {
 				onChange( insert( value, create( { text: plainText } ) ) );
@@ -238,6 +215,10 @@ export function usePasteHandler( props ) {
 				mode,
 				tagName,
 				preserveWhiteSpace,
+				// If the data comes from a rich text instance, we can directly
+				// use it without filtering the data. The filters are only meant
+				// for externally pasted content and remove inline styles.
+				disableFilters: !! clipboardData.getData( 'rich-text' ),
 			} );
 
 			if ( typeof content === 'string' ) {

@@ -94,7 +94,7 @@ _Example:_
                 "eslint": "^7.1.0",
 -               "jest": "^29.5.0",
                 "minimist": "^1.2.0",
-                "npm-package-json-lint": "^3.6.0",
+                "npm-package-json-lint": "^6.4.0",
 ```
 
 Next, you need to run `npm install` in the root of the project to ensure that `package-lock.json` file gets properly regenerated.
