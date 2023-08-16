@@ -72,11 +72,9 @@ describe( 'Tooltip', () => {
 			screen.getByRole( 'button', { name: /Button/i } )
 		).toHaveFocus();
 
-		await waitFor( () =>
-			expect(
-				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
-			).toBeVisible()
-		);
+		expect(
+			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
+		).toBeVisible();
 	} );
 
 	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
@@ -88,11 +86,9 @@ describe( 'Tooltip', () => {
 
 		await user.hover( button );
 
-		await waitFor( () =>
-			expect(
-				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
-			).toBeVisible()
-		);
+		expect(
+			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
+		).toBeVisible();
 	} );
 
 	it( 'should not show tooltip on focus as result of mouse click', async () => {
@@ -121,11 +117,9 @@ describe( 'Tooltip', () => {
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
 
-		await waitFor( () =>
-			expect(
-				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
-			).toBeVisible()
-		);
+		expect(
+			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
+		).toBeVisible();
 	} );
 
 	it( 'should show tooltip when an element is disabled', async () => {
@@ -144,11 +138,9 @@ describe( 'Tooltip', () => {
 
 		await user.hover( button );
 
-		await waitFor( () =>
-			expect(
-				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
-			).toBeVisible()
-		);
+		expect(
+			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
+		).toBeVisible();
 	} );
 
 	it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
@@ -226,9 +218,7 @@ describe( 'Tooltip', () => {
 
 		await user.hover( button );
 
-		await waitFor( () =>
-			expect( screen.getByText( 'shortcut text' ) ).toBeVisible()
-		);
+		expect( await screen.findByText( 'shortcut text' ) ).toBeVisible();
 	} );
 
 	it( 'should render the keyboard shortcut display text and aria-label when an object is passed as the shortcut', async () => {
