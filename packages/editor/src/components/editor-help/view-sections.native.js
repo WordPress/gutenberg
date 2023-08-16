@@ -10,6 +10,7 @@ import {
 	usePreferredColorScheme,
 	usePreferredColorSchemeStyle,
 } from '@wordpress/compose';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -53,19 +54,41 @@ export const HelpDetailImage = ( {
 	source,
 	sourceDarkMode,
 } ) => {
-	const imageStyle = usePreferredColorSchemeStyle(
-		styles.helpDetailImage,
-		styles.helpDetailImageDark
-	);
+	const getUri = () => {
+		const sourceFromScheme =
+			darkModeEnabled && sourceDarkMode ? sourceDarkMode : source;
+
+		// TODO: Find an image CDN instead of GitHub
+		const sourcePrefix =
+			'https://raw.githubusercontent.com/WordPress/gutenberg/trunk/packages/editor/src/components/editor-help/images/';
+		const sourceSuffix = '.png';
+
+		return `${ sourcePrefix }${ sourceFromScheme }${ sourceSuffix }`;
+	};
+
+	const [ imageSize, setImageSize ] = useState( {
+		width: 0,
+		height: 0,
+	} );
+
+	useEffect( () => {
+		Image.getSize( getUri(), ( width, height ) => {
+			setImageSize( { width, height } );
+		} );
+	}, [ source, sourceDarkMode, getUri ] );
+
 	const darkModeEnabled = usePreferredColorScheme() === 'dark';
+
 	return (
 		<Image
 			accessible={ accessible }
 			accessibilityLabel={ accessibilityLabel }
-			source={
-				darkModeEnabled && sourceDarkMode ? sourceDarkMode : source
-			}
-			style={ imageStyle }
+			resizeMode="contain"
+			source={ {
+				uri: getUri(),
+			} }
+			// TODO: fix aspect ratio
+			style={ { width: imageSize.width, height: imageSize.height } }
 		/>
 	);
 };

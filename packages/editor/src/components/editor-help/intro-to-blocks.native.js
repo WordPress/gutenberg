@@ -26,9 +26,7 @@ const IntroToBlocks = () => {
 	);
 	return (
 		<>
-			<HelpDetailImage
-				source={ require( './images/block-layout-collage.png' ) }
-			/>
+			<HelpDetailImage source={ 'block-layout-collage' } />
 			<View style={ styles.helpDetailContainer }>
 				<Text
 					accessibilityRole="header"
@@ -55,8 +53,8 @@ const IntroToBlocks = () => {
 					accessibilityLabel={ __(
 						'Text formatting controls are located within the toolbar positioned above the keyboard while editing a text block'
 					) }
-					source={ require( './images/rich-text-light.png' ) }
-					sourceDarkMode={ require( './images/rich-text-dark.png' ) }
+					source={ 'rich-text' }
+					sourceDarkMode={ 'rich-text-dark' }
 				/>
 				<HelpDetailSectionHeadingText text={ __( 'Embed media' ) } />
 				<HelpDetailBodyText
@@ -65,8 +63,8 @@ const IntroToBlocks = () => {
 					) }
 				/>
 				<HelpDetailImage
-					source={ require( './images/embed-media-light.png' ) }
-					sourceDarkMode={ require( './images/embed-media-dark.png' ) }
+					source={ 'embed-media-light' }
+					sourceDarkMode={ 'embed-media-dark' }
 				/>
 				<HelpDetailSectionHeadingText text={ __( 'Build layouts' ) } />
 				<HelpDetailBodyText
@@ -75,8 +73,8 @@ const IntroToBlocks = () => {
 					) }
 				/>
 				<HelpDetailImage
-					source={ require( './images/build-layouts-light.png' ) }
-					sourceDarkMode={ require( './images/build-layouts-dark.png' ) }
+					source={ 'build-layouts-light' }
+					sourceDarkMode={ 'build-layouts-dark' }
 				/>
 				<HelpDetailBodyText
 					text={ __(

@@ -18,8 +18,8 @@ const CustomizeBlocks = () => {
 	return (
 		<>
 			<HelpDetailImage
-				source={ require( './images/settings-light.png' ) }
-				sourceDarkMode={ require( './images/settings-dark.png' ) }
+				source={ 'settings-light' }
+				sourceDarkMode={ 'settings-light' }
 			/>
 			<View style={ styles.helpDetailContainer }>
 				<HelpDetailBodyText

@@ -22,8 +22,8 @@ const MoveBlocks = () => {
 	return (
 		<>
 			<HelpDetailImage
-				source={ require( './images/drag-and-drop-light.png' ) }
-				sourceDarkMode={ require( './images/drag-and-drop-dark.png' ) }
+				source={ 'drag-and-drop-light' }
+				sourceDarkMode={ 'drag-and-drop-dark' }
 			/>
 			<View style={ styles.helpDetailContainer }>
 				<HelpDetailSectionHeadingText
@@ -37,8 +37,8 @@ const MoveBlocks = () => {
 				/>
 			</View>
 			<HelpDetailImage
-				source={ require( './images/move-light.png' ) }
-				sourceDarkMode={ require( './images/move-dark.png' ) }
+				source={ 'move-light' }
+				sourceDarkMode={ 'move-dark' }
 			/>
 			<View style={ styles.helpDetailContainer }>
 				<HelpDetailSectionHeadingText text={ __( 'Arrow buttons' ) } />

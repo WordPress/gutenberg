@@ -18,8 +18,8 @@ const AddBlocks = () => {
 	return (
 		<>
 			<HelpDetailImage
-				source={ require( './images/add-light.png' ) }
-				sourceDarkMode={ require( './images/add-dark.png' ) }
+				source={ 'add-light' }
+				sourceDarkMode={ 'add-dark' }
 			/>
 			<View style={ styles.helpDetailContainer }>
 				<HelpDetailBodyText
