@@ -160,11 +160,11 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
  */
 if ( defined( 'FONTS_LIBRARY_ENABLE' ) && FONTS_LIBRARY_ENABLE ) {
 	// Loads the Fonts Library.
-	require __DIR__ . '/experimental/fonts-library/class-wp-fonts-library.php';
-	require __DIR__ . '/experimental/fonts-library/class-wp-font-family-utils.php';
-	require __DIR__ . '/experimental/fonts-library/class-wp-font-family.php';
-	require __DIR__ . '/experimental/fonts-library/class-wp-rest-fonts-library-controller.php';
-	require __DIR__ . '/experimental/fonts-library/fonts-library.php';
+	require __DIR__ . '/experimental/fonts/fonts-library/class-wp-fonts-library.php';
+	require __DIR__ . '/experimental/fonts/fonts-library/class-wp-font-family-utils.php';
+	require __DIR__ . '/experimental/fonts/fonts-library/class-wp-font-family.php';
+	require __DIR__ . '/experimental/fonts/fonts-library/class-wp-rest-fonts-library-controller.php';
+	require __DIR__ . '/experimental/fonts/fonts-library/fonts-library.php';
 
 	if ( ! class_exists( 'WP_Font_Face' ) ) {
 		require __DIR__ . '/experimental/fonts/font-face/class-wp-font-face.php';

@@ -10,7 +10,7 @@
  *
  * @covers WP_Font_Family_Utils::has_font_mime_type
  */
-class Tests_FontsLibrary_WpFontsFamilyUtils_HasFontMimeType extends WP_UnitTestCase {
+class Tests_Fonts_WpFontsFamilyUtils_HasFontMimeType extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_should_succeed_when_has_mime_type
