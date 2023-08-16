@@ -44,10 +44,10 @@ abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 				'fontFamily' => 'Merriweather',
 				'fontFace'   => array(
 					array(
-						'fontFamily'    => 'Merriweather',
-						'fontStyle'     => 'normal',
-						'fontWeight'    => '400',
-						'uploaded_file' => 'files0',
+						'fontFamily'   => 'Merriweather',
+						'fontStyle'    => 'normal',
+						'fontWeight'   => '400',
+						'uploadedFile' => 'files0',
 					),
 				),
 			),
