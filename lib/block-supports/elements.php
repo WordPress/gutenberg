@@ -47,7 +47,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	);
 
 	foreach ( $link_color_paths as $element_color_path ) {
-		$element_color = _wp_array_get( $block['attrs'], explode( '.', $element_color_path, ), null );
+		$element_color = _wp_array_get( $block['attrs'], explode( '.', $element_color_path ), null );
 
 		if ( null !== $element_color && ! $skip_link_color_serialization ) {
 			$element_colors_set++;
@@ -79,7 +79,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	);
 
 	foreach ( $heading_color_paths as $element_color_path ) {
-		$element_color = _wp_array_get( $block['attrs'], explode( '.', $element_color_path, ), null );
+		$element_color = _wp_array_get( $block['attrs'], explode( '.', $element_color_path ), null );
 
 		if ( null !== $element_color && ! $skip_heading_color_serialization ) {
 			$element_colors_set++;
@@ -93,7 +93,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	);
 
 	foreach ( $button_color_paths as $element_color_path ) {
-		$element_color = _wp_array_get( $block['attrs'], explode( '.', $element_color_path, ), null );
+		$element_color = _wp_array_get( $block['attrs'], explode( '.', $element_color_path ), null );
 
 		if ( null !== $element_color && ! $skip_button_color_serialization ) {
 			$element_colors_set++;
@@ -147,7 +147,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 
 	$class_name = gutenberg_get_elements_class_name( $block );
 
-	// Link colors
+	// Link colors.
 	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
 	if ( ! $skip_link_color_serialization && $link_block_styles ) {
@@ -170,7 +170,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		}
 	}
 
-	// Heading colors
+	// Heading colors.
 	if ( ! $skip_heading_color_serialization ) {
 		$heading_levels = array( 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
 
@@ -192,7 +192,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		}
 	}
 
-	// Button colors
+	// Button colors.
 	$button_block_styles = isset( $element_block_styles['button'] ) ? $element_block_styles['button'] : null;
 
 	if ( ! $skip_button_color_serialization && $button_block_styles ) {
