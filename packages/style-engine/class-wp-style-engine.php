@@ -31,7 +31,7 @@ final class WP_Style_Engine {
 	 *                    to match the incoming value, e.g., "color" to match var:preset|color|somePresetSlug.
 	 *  - css_vars      => (array) an array of key value pairs used to generate CSS var values.
 	 *                     The key should be the CSS property name that matches the second element of the preset string value,
-	 *                     i.e., "color" in var:preset|color|somePresetSlug. The value is a CSS var pattern,
+	 *                     i.e., "color" in var:preset|color|somePresetSlug. The value is a CSS var pattern (e.g. `--wp--preset--color--$slug`),
 	 *                     whose `$slug` fragment will be replaced with the preset slug, which is the third element of the preset string value,
 	 *                     i.e., `somePresetSlug` in var:preset|color|somePresetSlug.
 	 *  - property_keys => (array) array of keys whose values represent a valid CSS property, e.g., "margin" or "border".
