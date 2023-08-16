@@ -181,8 +181,8 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 		$this->assertSame( $installed_font_data['fontFamily'], $content['fontFamily'], 'The font post content has the wrong font family.' );
 		$this->assertSame( $installed_font_data['slug'], $content['slug'], 'The font post content has the wrong slug.' );
 
-		$this->assertArrayNotHasKey( 'download_from_url', $content, 'The installed font should not have the url from where it was downloaded.' );
-		$this->assertArrayNotHasKey( 'uploaded_file', $content, 'The installed font should not have the reference to the file from it was installed.' );
+		$this->assertArrayNotHasKey( 'downloadFromUrl', $content, 'The installed font should not have the url from where it was downloaded.' );
+		$this->assertArrayNotHasKey( 'uploadedFile', $content, 'The installed font should not have the reference to the file from it was installed.' );
 
 		$this->assertCount( count( $installed_font_data['fontFace'] ), $content['fontFace'], 'One or more font faces could not be installed.' );
 
@@ -216,7 +216,7 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 							'fontStyle'         => 'italic',
 							'fontWeight'        => '400',
 							'src'               => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-							'download_from_url' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+							'downloadFromUrl' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
 						),
 					),
 				),
@@ -289,13 +289,13 @@ class WP_Font_Family_Test extends WP_UnitTestCase {
 							'fontFamily'    => 'Inter',
 							'fontStyle'     => 'normal',
 							'fontWeight'    => '400',
-							'uploaded_file' => 'files0',
+							'uploadedFile' => 'files0',
 						),
 						array(
 							'fontFamily'    => 'Inter',
 							'fontStyle'     => 'normal',
 							'fontWeight'    => '500',
-							'uploaded_file' => 'files1',
+							'uploadedFile' => 'files1',
 						),
 					),
 				),
