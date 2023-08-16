@@ -26,13 +26,26 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 		return;
 	}
 
-	$footnotes = get_post_meta( $block->context['postId'], 'footnotes', true );
+	$raw_footnotes = get_post_meta( $block->context['postId'], 'footnotes', true );
 
-	if ( ! $footnotes ) {
+	if ( ! $raw_footnotes ) {
 		return;
 	}
 
-	$footnotes = json_decode( $footnotes, true );
+	$footnotes = json_decode( $raw_footnotes, true );
+
+	// The post meta contains malformed JSON. See
+	// https://core.trac.wordpress.org/ticket/59103.
+	if ( ! is_array( $footnotes ) ) {
+		// This will slash everything, including the keys value boundaries.
+		$footnotes = wp_slash( $raw_footnotes );
+		// So we need to unslash the keys, which are limited to "content" and
+		// "id".
+		$footnotes = str_replace( '{\\"content\\":\\"', '{"content":"', $footnotes );
+		$footnotes = str_replace( '\\",\\"id\\":\\"', '","id":"', $footnotes );
+		$footnotes = str_replace( '\\"}', '"}', $footnotes );
+		$footnotes = json_decode( $footnotes, true );
+	}
 
 	if ( ! is_array( $footnotes ) || count( $footnotes ) === 0 ) {
 		return '';
