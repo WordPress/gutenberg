@@ -135,7 +135,7 @@ export const withBlockRenameControl = createHigherOrderComponent(
 					</BlockSettingsMenuControls>
 				) }
 
-				{ renamingBlock && (
+				{ renamingBlock && supportsBlockNaming && (
 					<RenameModal
 						blockName={
 							blockAttributes?.metadata?.name ||
