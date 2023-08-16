@@ -114,7 +114,7 @@ function ListViewBlockSelectButton(
 	/**
 	 * @param {KeyboardEvent} event
 	 */
-	function onKeyDownHandler( event ) {
+	async function onKeyDownHandler( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
 		} else if (
@@ -173,8 +173,15 @@ function ListViewBlockSelectButton(
 			);
 
 			if ( canDuplicate ) {
-				// Duplicate blocks, but do not update the selection.
-				duplicateBlocks( blocksToUpdate, false );
+				const updatedBlocks = await duplicateBlocks(
+					blocksToUpdate,
+					false
+				);
+
+				if ( updatedBlocks?.length ) {
+					// If blocks have been duplicated, focus the first duplicated block.
+					updateFocusAndSelection( updatedBlocks[ 0 ], false );
+				}
 			}
 		}
 	}
