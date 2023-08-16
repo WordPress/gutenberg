@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { EntityProvider } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -178,9 +179,21 @@ export default function Editor( { isLoading } ) {
 	// action in <URLQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
+	const loadingProgressId = useInstanceId(
+		CanvasSpinner,
+		'edit-site-editor__loading-progress'
+	);
+
+	const contentProps = isLoading
+		? {
+				'aria-busy': 'true',
+				'aria-describedby': loadingProgressId,
+		  }
+		: undefined;
+
 	return (
 		<>
-			{ isLoading ? <CanvasSpinner /> : null }
+			{ isLoading ? <CanvasSpinner id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
@@ -232,6 +245,7 @@ export default function Editor( { isLoading } ) {
 									) }
 								</>
 							}
+							contentProps={ contentProps }
 							secondarySidebar={
 								isEditMode &&
 								( ( shouldShowInserter && (

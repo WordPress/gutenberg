@@ -21,7 +21,7 @@ describe( 'props', () => {
 
 	test( 'should render correctly', () => {
 		render( <VisibleTooltip /> );
-		const tooltip = screen.getByRole( /tooltip/i );
+		const tooltip = screen.getByRole( 'tooltip' );
 		expect( tooltip ).toMatchSnapshot();
 	} );
 
@@ -37,7 +37,7 @@ describe( 'props', () => {
 				<Text>{ invisibleTooltipTriggerContent }</Text>
 			</Tooltip>
 		);
-		const tooltip = screen.getByRole( /tooltip/i );
+		const tooltip = screen.getByRole( 'tooltip' );
 		const invisibleTooltipTrigger = screen.getByText(
 			invisibleTooltipTriggerContent
 		);
@@ -59,7 +59,7 @@ describe( 'props', () => {
 				visible
 			/>
 		);
-		const tooltips = screen.getAllByRole( /tooltip/i );
+		const tooltips = screen.getAllByRole( 'tooltip' );
 		const childlessTooltip = tooltips.find( byId( childlessTooltipId ) );
 		expect( childlessTooltip ).not.toBeUndefined();
 	} );
@@ -72,7 +72,7 @@ describe( 'props', () => {
 				<Text>WordPress.org</Text>
 			</Tooltip>
 		);
-		const tooltip = screen.getByRole( /tooltip/i );
+		const tooltip = screen.getByRole( 'tooltip' );
 		// Assert only the base tooltip rendered.
 		expect( tooltip ).toBeInTheDocument();
 		expect( tooltip.id ).toBe( baseTooltipId );

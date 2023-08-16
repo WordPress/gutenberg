@@ -85,6 +85,8 @@
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
 	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
+		<!-- Ignore until squizlabs/PHP_CodeSniffer#3685 is fixed: it thinks that a caught exception escapes the function. -->
+		<exclude-pattern>lib/compat/wordpress-6.4/html-api/class-wp-html-processor.php</exclude-pattern>
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
 

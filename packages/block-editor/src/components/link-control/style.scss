@@ -413,6 +413,10 @@ $preview-image-height: 140px;
 	&.block-editor-link-control__setting:last-child {
 		margin-bottom: 0;
 	}
+
+	.is-preview & {
+		padding: 20px $grid-unit-10 $grid-unit-10 0;
+	}
 }
 
 .block-editor-link-control__tools {

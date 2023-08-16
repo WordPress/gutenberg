@@ -1,0 +1,14 @@
+{
+	"apiVersion": 2,
+	"name": "test/store-afterload",
+	"title": "E2E Interactivity tests - store afterload",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScript": "store-afterload-view",
+	"render": "file:./render.php"
+}

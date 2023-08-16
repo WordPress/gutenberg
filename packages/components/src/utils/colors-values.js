@@ -37,8 +37,6 @@ const ADMIN = {
 };
 
 const UI = {
-	theme: ADMIN.theme,
-	themeDark10: ADMIN.themeDark10,
 	background: white,
 	backgroundDisabled: GRAY[ 100 ],
 	border: GRAY[ 600 ],
@@ -53,6 +51,11 @@ const UI = {
 	lightGrayPlaceholder: rgba( white, 0.65 ),
 };
 
+const THEME = {
+	accent: ADMIN.theme,
+	accentDarker10: ADMIN.themeDark10,
+};
+
 export const COLORS = Object.freeze( {
 	/**
 	 * The main gray color object.
@@ -60,6 +63,7 @@ export const COLORS = Object.freeze( {
 	gray: GRAY,
 	white,
 	alert: ALERT,
+	theme: THEME,
 	ui: UI,
 } );
 

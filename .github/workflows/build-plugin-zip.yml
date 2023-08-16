@@ -122,7 +122,7 @@ jobs:
                   VERSION: ${{ steps.get_version.outputs.new_version }}
               run: |
                   cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package.json) > package.json
-                  cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package-lock.json) > package-lock.json
+                  cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version | .packages[""].version = $version' package-lock.json) > package-lock.json
                   sed -i "s/${{ steps.get_version.outputs.old_version }}/${VERSION}/g" gutenberg.php
 
             - name: Commit the version bump to the release branch
