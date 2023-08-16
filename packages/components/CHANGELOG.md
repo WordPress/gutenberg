@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.6.0 (2023-08-16)
+
 ### Enhancements
 
 -   `Theme`: Expose via private APIs ([#53262](https://github.com/WordPress/gutenberg/pull/53262)).
