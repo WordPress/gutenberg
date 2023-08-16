@@ -193,7 +193,7 @@
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.25.2",
 		"eslint-plugin-jest": "27.2.1",
-		"eslint-plugin-jest-dom": "4.0.2",
+		"eslint-plugin-jest-dom": "5.0.2",
 		"eslint-plugin-playwright": "0.8.0",
 		"eslint-plugin-ssr-friendly": "1.0.6",
 		"eslint-plugin-storybook": "0.6.13",
@@ -256,9 +256,6 @@
 		"webpack": "5.65.0",
 		"webpack-bundle-analyzer": "4.4.2",
 		"worker-farm": "1.7.0"
-	},
-	"overrides": {
-		"@testing-library/dom": "^9.3.1"
 	},
 	"scripts": {
 		"build": "npm run build:packages && wp-scripts build",
