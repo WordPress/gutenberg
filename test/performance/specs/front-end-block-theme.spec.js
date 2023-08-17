@@ -27,10 +27,10 @@ test.describe( 'Front End Performance', () => {
 	const samples = 16;
 	const throwaway = 0;
 	const rounds = samples + throwaway;
-	for ( let i = 1; i <= rounds; i++ ) {
-		test( `Measure TTFB, LCP, and LCP-TTFB (${ i } of ${ rounds })`, async ( {
-			page,
-		} ) => {
+	for ( let i = 0; i < rounds; i++ ) {
+		test( `Measure TTFB, LCP, and LCP-TTFB (${
+			i + 1
+		} of ${ rounds })`, async ( { page } ) => {
 			// Go to the base URL.
 			await page.goto( '/', { waitUntil: 'networkidle' } );
 
