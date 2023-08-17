@@ -17,6 +17,7 @@ const {
 	getHoverEventDurations,
 	getSelectionEventDurations,
 	getLoadingDurations,
+	disableAutosave,
 	loadBlocksFromHtml,
 	load1000Paragraphs,
 	sum,
@@ -49,83 +50,70 @@ test.describe( 'Post Editor Performance', () => {
 		} );
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
-		await admin.createNewPost();
-		// Disable auto-save to avoid impacting the metrics.
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
-				autosaveInterval: 100000000000,
-				localAutosaveInterval: 100000000000,
-			} );
+	test.describe( 'Loading', () => {
+		let draftURL = null;
+
+		test( 'Setup the test page', async ( { admin, page } ) => {
+			await admin.createNewPost();
+			await loadBlocksFromHtml(
+				page,
+				path.join( process.env.ASSETS_PATH, 'large-post.html' )
+			);
+
+			await page
+				.getByRole( 'button', { name: 'Save draft' } )
+				.click( { timeout: 60_000 } );
+
+			await expect(
+				page.getByRole( 'button', { name: 'Saved' } )
+			).toBeDisabled();
+
+			// Get the URL that we will be testing against.
+			draftURL = page.url();
 		} );
-	} );
 
-	test( 'Loading', async ( { browser, page } ) => {
-		// Turn the large post HTML into blocks and insert.
-		await loadBlocksFromHtml(
-			page,
-			path.join( process.env.ASSETS_PATH, 'large-post.html' )
-		);
-
-		// Save the draft.
-		await page
-			.getByRole( 'button', { name: 'Save draft' } )
-			.click( { timeout: 60_000 } );
-		await expect(
-			page.getByRole( 'button', { name: 'Saved' } )
-		).toBeDisabled();
-
-		// Get the URL that we will be testing against.
-		const draftURL = page.url();
-
-		// Start the measurements.
 		const samples = 10;
 		const throwaway = 1;
 		const rounds = throwaway + samples;
 		for ( let i = 0; i < rounds; i++ ) {
-			// Open a fresh page in a new context to prevent caching.
-			const testPage = await browser.newPage();
+			test( `Get the durations (${ i + 1 } of ${ rounds })`, async ( {
+				page,
+				editor,
+			} ) => {
+				// Go to the test page.
+				await page.goto( draftURL );
 
-			// Go to the test page URL.
-			await testPage.goto( draftURL );
+				// Wait for canvas (legacy or iframed).
+				await Promise.any( [
+					page.locator( '.wp-block-post-content' ).waitFor(),
+					page
+						.frameLocator( '[name=editor-canvas]' )
+						.locator( 'body > *' )
+						.first()
+						.waitFor(),
+				] );
 
-			// Get canvas (handles both legacy and iframed canvas).
-			const canvas = await Promise.any( [
-				( async () => {
-					const legacyCanvasLocator = page.locator(
-						'.wp-block-post-content'
+				await editor.canvas.locator( '.wp-block' ).first().waitFor( {
+					timeout: 120_000,
+				} );
+
+				// Save the results.
+				if ( i >= throwaway ) {
+					const loadingDurations = await getLoadingDurations( page );
+					Object.entries( loadingDurations ).forEach(
+						( [ metric, duration ] ) => {
+							results[ metric ].push( duration );
+						}
 					);
-					await legacyCanvasLocator.waitFor();
-					return legacyCanvasLocator;
-				} )(),
-				( async () => {
-					const iframedCanvasLocator = page.frameLocator(
-						'[name=editor-canvas]'
-					);
-					await iframedCanvasLocator.locator( 'body' ).waitFor();
-					return iframedCanvasLocator;
-				} )(),
-			] );
-
-			await canvas.locator( '.wp-block' ).first().waitFor( {
-				timeout: 120_000,
+				}
 			} );
-
-			// Save the results.
-			if ( i >= throwaway ) {
-				const loadingDurations = await getLoadingDurations( testPage );
-				Object.entries( loadingDurations ).forEach(
-					( [ metric, duration ] ) => {
-						results[ metric ].push( duration );
-					}
-				);
-			}
-
-			await testPage.close();
 		}
 	} );
 
-	test( 'Typing', async ( { browser, page, editor } ) => {
+	test( 'Typing', async ( { admin, browser, page, editor } ) => {
+		await admin.createNewPost();
+		await disableAutosave( page );
+
 		// Load the large post fixture.
 		await loadBlocksFromHtml(
 			page,
@@ -166,7 +154,15 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	test( 'Typing within containers', async ( { browser, page, editor } ) => {
+	test( 'Typing within containers', async ( {
+		admin,
+		browser,
+		page,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await disableAutosave( page );
+
 		await loadBlocksFromHtml(
 			page,
 			path.join(
@@ -208,7 +204,10 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	test( 'Selecting blocks', async ( { browser, page, editor } ) => {
+	test( 'Selecting blocks', async ( { admin, browser, page, editor } ) => {
+		await admin.createNewPost();
+		await disableAutosave( page );
+
 		await load1000Paragraphs( page );
 		const paragraphs = editor.canvas.locator( '.wp-block' );
 
@@ -240,7 +239,14 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	test( 'Opening persistent list view', async ( { browser, page } ) => {
+	test( 'Opening persistent list view', async ( {
+		admin,
+		browser,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await disableAutosave( page );
+
 		await load1000Paragraphs( page );
 		const listViewToggle = page.getByRole( 'button', {
 			name: 'Document Overview',
@@ -275,7 +281,10 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	test( 'Opening the inserter', async ( { browser, page } ) => {
+	test( 'Opening the inserter', async ( { admin, browser, page } ) => {
+		await admin.createNewPost();
+		await disableAutosave( page );
+
 		await load1000Paragraphs( page );
 		const globalInserterToggle = page.getByRole( 'button', {
 			name: 'Toggle block inserter',
@@ -310,7 +319,10 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	test( 'Searching the inserter', async ( { browser, page } ) => {
+	test( 'Searching the inserter', async ( { admin, browser, page } ) => {
+		await admin.createNewPost();
+		await disableAutosave( page );
+
 		await load1000Paragraphs( page );
 		const globalInserterToggle = page.getByRole( 'button', {
 			name: 'Toggle block inserter',
@@ -351,7 +363,10 @@ test.describe( 'Post Editor Performance', () => {
 		await globalInserterToggle.click();
 	} );
 
-	test( 'Hovering Inserter Items', async ( { browser, page } ) => {
+	test( 'Hovering Inserter Items', async ( { admin, browser, page } ) => {
+		await admin.createNewPost();
+		await disableAutosave( page );
+
 		await load1000Paragraphs( page );
 		const globalInserterToggle = page.getByRole( 'button', {
 			name: 'Toggle block inserter',

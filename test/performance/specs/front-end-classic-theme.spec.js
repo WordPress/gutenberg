@@ -27,7 +27,7 @@ test.describe( 'Front End Performance', () => {
 	const throwaway = 0;
 	const rounds = samples + throwaway;
 	for ( let i = 1; i <= rounds; i++ ) {
-		test( `Report TTFB, LCP, and LCP-TTFB (${ i } of ${ rounds })`, async ( {
+		test( `Measure TTFB, LCP, and LCP-TTFB (${ i } of ${ rounds })`, async ( {
 			page,
 		} ) => {
 			// Go to the base URL.

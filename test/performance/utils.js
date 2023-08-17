@@ -196,3 +196,12 @@ export async function load1000Paragraphs( page ) {
 		dispatch( 'core/block-editor' ).resetBlocks( blocks );
 	} );
 }
+
+export async function disableAutosave( page ) {
+	return await page.evaluate( () => {
+		window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+			autosaveInterval: 100000000000,
+			localAutosaveInterval: 100000000000,
+		} );
+	} );
+}

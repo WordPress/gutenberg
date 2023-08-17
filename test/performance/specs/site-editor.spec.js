@@ -14,6 +14,7 @@ const path = require( 'path' );
 const {
 	getTypingEventDurations,
 	getLoadingDurations,
+	disableAutosave,
 	loadBlocksFromHtml,
 } = require( '../utils' );
 
@@ -36,8 +37,6 @@ const results = {
 	listViewOpen: [],
 };
 
-let testPageId;
-
 test.describe( 'Site Editor Performance', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -56,87 +55,77 @@ test.describe( 'Site Editor Performance', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
-		// Start a new page.
-		await admin.createNewPost( { postType: 'page' } );
+	test.describe( 'Loading', () => {
+		let draftURL = null;
 
-		// Disable auto-save to avoid impacting the metrics.
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
-				autosaveInterval: 100000000000,
-				localAutosaveInterval: 100000000000,
+		test( 'Setup the test page', async ( { page, admin } ) => {
+			// Load the large post fixture.
+			await admin.createNewPost( { postType: 'page' } );
+			await loadBlocksFromHtml(
+				page,
+				path.join( process.env.ASSETS_PATH, 'large-post.html' )
+			);
+
+			// Save the draft.
+			await page
+				.getByRole( 'button', { name: 'Save draft' } )
+				.click( { timeout: 60_000 } );
+			await expect(
+				page.getByRole( 'button', { name: 'Saved' } )
+			).toBeDisabled();
+
+			// Get the ID of the saved page.
+			const testPageId = new URL( page.url() ).searchParams.get( 'post' );
+
+			// Open the test page in Site Editor.
+			await admin.visitSiteEditor( {
+				postId: testPageId,
+				postType: 'page',
 			} );
-		} );
-	} );
 
-	test( 'Loading', async ( { browser, page, admin } ) => {
-		// Load the large post fixture.
-		await loadBlocksFromHtml(
-			page,
-			path.join( process.env.ASSETS_PATH, 'large-post.html' )
-		);
-
-		// Save the draft.
-		await page
-			.getByRole( 'button', { name: 'Save draft' } )
-			.click( { timeout: 60_000 } );
-		await expect(
-			page.getByRole( 'button', { name: 'Saved' } )
-		).toBeDisabled();
-
-		// Get the ID of the saved page.
-		testPageId = await page.evaluate( () =>
-			new URL( document.location ).searchParams.get( 'post' )
-		);
-
-		// Open the test page in Site Editor.
-		await admin.visitSiteEditor( {
-			postId: testPageId,
-			postType: 'page',
+			// Get the URL that we will be testing against.
+			draftURL = page.url();
 		} );
 
-		// Get the URL that we will be testing against.
-		const draftURL = page.url();
-
-		// Start the measurements.
 		const samples = 10;
 		const throwaway = 1;
 		const rounds = samples + throwaway;
 		for ( let i = 0; i < rounds; i++ ) {
-			// Open a fresh page in a new context to prevent caching.
-			const testPage = await browser.newPage();
+			test( `Get the durations (${ i + 1 } of ${ rounds })`, async ( {
+				page,
+			} ) => {
+				// Go to the test page.
+				await page.goto( draftURL );
 
-			// Go to the test page URL.
-			await testPage.goto( draftURL );
+				// Wait for the canvas.
+				await page
+					.locator( '.edit-site-canvas-spinner' )
+					.waitFor( { state: 'hidden', timeout: 60_000 } );
 
-			// Wait for the canvas to appear.
-			await testPage
-				.locator( '.edit-site-canvas-spinner' )
-				.waitFor( { state: 'hidden', timeout: 60_000 } );
+				// Wait for the first block.
+				await page
+					.frameLocator( 'iframe[name="editor-canvas"]' )
+					.locator( '.wp-block' )
+					.first()
+					.waitFor( { timeout: 60_000 } );
 
-			// Wait for the first block.
-			await testPage
-				.frameLocator( 'iframe[name="editor-canvas"]' )
-				.locator( '.wp-block' )
-				.first()
-				.waitFor( { timeout: 60_000 } );
-
-			// Save the results.
-			if ( i >= throwaway ) {
-				const loadingDurations = await getLoadingDurations( testPage );
-				Object.entries( loadingDurations ).forEach(
-					( [ metric, duration ] ) => {
-						results[ metric ].push( duration );
-					}
-				);
-			}
-
-			await testPage.close();
+				// Save the results.
+				if ( i >= throwaway ) {
+					const loadingDurations = await getLoadingDurations( page );
+					Object.entries( loadingDurations ).forEach(
+						( [ metric, duration ] ) => {
+							results[ metric ].push( duration );
+						}
+					);
+				}
+			} );
 		}
 	} );
 
 	test( 'Typing', async ( { browser, page, admin, editor } ) => {
 		// Load the large post fixture.
+		await admin.createNewPost( { postType: 'page' } );
+		await disableAutosave( page );
 		await loadBlocksFromHtml(
 			page,
 			path.join( process.env.ASSETS_PATH, 'large-post.html' )
@@ -153,7 +142,7 @@ test.describe( 'Site Editor Performance', () => {
 		).toBeDisabled();
 
 		// Get the ID of the saved page.
-		testPageId = new URL( page.url() ).searchParams.get( 'post' );
+		const testPageId = new URL( page.url() ).searchParams.get( 'post' );
 
 		// Open the test page in Site Editor.
 		await admin.visitSiteEditor( {
