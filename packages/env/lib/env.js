@@ -3,11 +3,11 @@
  * Internal dependencies
  */
 const { ValidationError } = require( './config' );
-const { AfterSetupError } = require( './execute-after-setup' );
+const { LifecycleScriptError } = require( './execute-lifecycle-script' );
 const commands = require( './commands' );
 
 module.exports = {
 	...commands,
 	ValidationError,
-	AfterSetupError,
+	LifecycleScriptError,
 };

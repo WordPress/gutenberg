@@ -15,7 +15,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };

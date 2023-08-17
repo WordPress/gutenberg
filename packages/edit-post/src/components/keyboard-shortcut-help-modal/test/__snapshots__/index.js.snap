@@ -43,9 +43,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         </svg>
       </button>
     </div>
-    <div
-      class="components-modal__children-container"
-    >
+    <div>
       <section
         class="edit-post-keyboard-shortcut-help-modal__section edit-post-keyboard-shortcut-help-modal__main-shortcuts"
       >
@@ -270,6 +268,35 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
                   class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
                 >
                   escape
+                </kbd>
+              </kbd>
+            </div>
+          </li>
+          <li
+            class="edit-post-keyboard-shortcut-help-modal__shortcut"
+          >
+            <div
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+            >
+              Select text across multiple blocks.
+            </div>
+            <div
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+            >
+              <kbd
+                aria-label="Shift + Arrow"
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+              >
+                <kbd
+                  class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+                >
+                  Shift
+                </kbd>
+                +
+                <kbd
+                  class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+                >
+                  Arrow
                 </kbd>
               </kbd>
             </div>

@@ -3,6 +3,7 @@
  */
 import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
 import classnames from 'classnames';
+import type { Middleware, MiddlewareArguments } from '@floating-ui/react-dom';
 import {
 	useFloating,
 	flip as flipMiddleware,
@@ -11,16 +12,11 @@ import {
 	arrow,
 	offset as offsetMiddleware,
 	size,
-	Middleware,
-	MiddlewareArguments,
 } from '@floating-ui/react-dom';
 // eslint-disable-next-line no-restricted-imports
-import {
-	motion,
-	useReducedMotion,
-	HTMLMotionProps,
-	MotionProps,
-} from 'framer-motion';
+import type { HTMLMotionProps, MotionProps } from 'framer-motion';
+// eslint-disable-next-line no-restricted-imports
+import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -52,6 +48,7 @@ import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import {
+	computePopoverPosition,
 	getFrameOffset,
 	getFrameScale,
 	positionToPlacement,
@@ -74,7 +71,7 @@ import { overlayMiddlewares } from './overlay-middlewares';
  *
  * @type {string}
  */
-const SLOT_NAME = 'Popover';
+export const SLOT_NAME = 'Popover';
 
 // An SVG displaying a triangle facing down, filled with a solid
 // color and bordered in such a way to create an arrow-like effect.
@@ -499,8 +496,8 @@ const UnforwardedPopover = (
 							// to use `translateX` and `translateY` because those values would
 							// be overridden by the return value of the
 							// `placementToMotionAnimationProps` function in `AnimatedWrapper`
-							x: Math.round( x ?? 0 ) || undefined,
-							y: Math.round( y ?? 0 ) || undefined,
+							x: computePopoverPosition( x ),
+							y: computePopoverPosition( y ),
 					  }
 			}
 		>

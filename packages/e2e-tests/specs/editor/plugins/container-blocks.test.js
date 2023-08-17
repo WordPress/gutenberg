@@ -9,6 +9,7 @@ import {
 	insertBlock,
 	switchEditorModeTo,
 	pressKeyWithModifier,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'InnerBlocks Template Sync', () => {
@@ -75,7 +76,7 @@ describe( 'InnerBlocks Template Sync', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Trigger a template update and assert that a second block is now present.
-		const [ button ] = await page.$x(
+		const [ button ] = await canvas().$x(
 			`//button[contains(text(), 'Update template')]`
 		);
 		await button.click();

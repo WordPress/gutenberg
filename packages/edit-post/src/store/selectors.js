@@ -15,6 +15,11 @@ import deprecated from '@wordpress/deprecated';
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
+const EMPTY_INSERTION_POINT = {
+	rootClientId: undefined,
+	insertionIndex: undefined,
+	filterValue: undefined,
+};
 
 /**
  * Returns the current editing mode.
@@ -298,14 +303,22 @@ export const isEditorPanelOpened = createRegistrySelector(
 /**
  * Returns true if a modal is active, or false otherwise.
  *
+ * @deprecated since WP 6.3 use `core/interface` store's selector with the same name instead.
+ *
  * @param {Object} state     Global application state.
  * @param {string} modalName A string that uniquely identifies the modal.
  *
  * @return {boolean} Whether the modal is active.
  */
-export function isModalActive( state, modalName ) {
-	return state.activeModal === modalName;
-}
+export const isModalActive = createRegistrySelector(
+	( select ) => ( state, modalName ) => {
+		deprecated( `select( 'core/edit-post' ).isModalActive`, {
+			since: '6.3',
+			alternative: `select( 'core/interface' ).isModalActive`,
+		} );
+		return !! select( interfaceStore ).isModalActive( modalName );
+	}
+);
 
 /**
  * Returns whether the given feature is enabled or not.
@@ -464,9 +477,11 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex, filterValue } =
-		state.blockInserterPanel;
-	return { rootClientId, insertionIndex, filterValue };
+	if ( typeof state === 'boolean' ) {
+		return EMPTY_INSERTION_POINT;
+	}
+
+	return state.blockInserterPanel;
 }
 
 /**

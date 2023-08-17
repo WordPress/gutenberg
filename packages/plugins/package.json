@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "6.0.0",
+	"version": "6.7.0",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -33,10 +33,11 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"memize": "^1.1.0"
+		"memize": "^2.0.1"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

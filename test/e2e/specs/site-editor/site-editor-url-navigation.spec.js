@@ -45,7 +45,7 @@ test.describe( 'Site editor url navigation', () => {
 			] );
 			await page.click( 'role=button[name="Add New Template"i]' );
 			await page
-				.getByRole( 'menuitem', {
+				.getByRole( 'button', {
 					name: 'Single item: Post',
 				} )
 				.click();
@@ -62,8 +62,12 @@ test.describe( 'Site editor url navigation', () => {
 			page,
 		} ) => {
 			await admin.visitSiteEditor();
-			await page.click( 'role=button[name="Template Parts"i]' );
-			await page.click( 'role=button[name="Add New"i]' );
+			await page.click( 'role=button[name="Patterns"i]' );
+			await page.click( 'role=button[name="Create pattern"i]' );
+			await page
+				.getByRole( 'menu', { name: 'Create pattern' } )
+				.getByRole( 'menuitem', { name: 'Create template part' } )
+				.click();
 			// Fill in a name in the dialog that pops up.
 			await page.type(
 				'role=dialog >> role=textbox[name="Name"i]',

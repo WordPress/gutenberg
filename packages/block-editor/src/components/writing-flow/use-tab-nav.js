@@ -11,6 +11,7 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 
 export default function useTabNav() {
 	const container = useRef();
@@ -43,13 +44,24 @@ export default function useTabNav() {
 		} else {
 			setNavigationMode( true );
 
+			const canvasElement =
+				container.current.ownerDocument === event.target.ownerDocument
+					? container.current
+					: container.current.ownerDocument.defaultView.frameElement;
+
 			const isBefore =
 				// eslint-disable-next-line no-bitwise
-				event.target.compareDocumentPosition( container.current ) &
+				event.target.compareDocumentPosition( canvasElement ) &
 				event.target.DOCUMENT_POSITION_FOLLOWING;
-			const action = isBefore ? 'findNext' : 'findPrevious';
+			const tabbables = focus.tabbable.find( container.current );
 
-			focus.tabbable[ action ]( event.target ).focus();
+			if ( tabbables.length ) {
+				const next = isBefore
+					? tabbables[ 0 ]
+					: tabbables[ tabbables.length - 1 ];
+
+				next.focus();
+			}
 		}
 	}
 
@@ -75,7 +87,7 @@ export default function useTabNav() {
 				return;
 			}
 
-			if ( event.keyCode === ESCAPE ) {
+			if ( event.keyCode === ESCAPE && ! hasMultiSelection() ) {
 				event.preventDefault();
 				setNavigationMode( true );
 				return;
@@ -105,17 +117,29 @@ export default function useTabNav() {
 				return;
 			}
 
+			const nextTabbable = focus.tabbable[ direction ]( event.target );
+
+			// We want to constrain the tabbing to the block and its child blocks.
+			// If the preceding form element is within a different block,
+			// such as two sibling image blocks in the placeholder state,
+			// we want shift + tab from the first form element to move to the image
+			// block toolbar and not the previous image block's form element.
+			const currentBlock = event.target.closest( '[data-block]' );
+			const isElementPartOfSelectedBlock =
+				currentBlock &&
+				nextTabbable &&
+				( isInSameBlock( currentBlock, nextTabbable ) ||
+					isInsideRootBlock( currentBlock, nextTabbable ) );
+
 			// Allow tabbing from the block wrapper to a form element,
-			// and between form elements rendered in a block,
+			// and between form elements rendered in a block and its child blocks,
 			// such as inside a placeholder. Form elements are generally
 			// meant to be UI rather than part of the content. Ideally
 			// these are not rendered in the content and perhaps in the
 			// future they can be rendered in an iframe or shadow DOM.
 			if (
-				( isFormElement( event.target ) ||
-					event.target.getAttribute( 'data-block' ) ===
-						getSelectedBlockClientId() ) &&
-				isFormElement( focus.tabbable[ direction ]( event.target ) )
+				isFormElement( nextTabbable ) &&
+				isElementPartOfSelectedBlock
 			) {
 				return;
 			}

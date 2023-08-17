@@ -11,18 +11,22 @@ import { TabbableContainer } from '../tabbable';
 import type { TabbableContainerProps } from '../types';
 
 const TabbableContainerTestCase = ( props: TabbableContainerProps ) => (
-	<TabbableContainer { ...props }>
-		<button>Item 1</button>
-		<span>
-			<span tabIndex={ -1 }>Item 2 (not tabbable)</span>
-		</span>
-		<span>
-			<span tabIndex={ 0 }>Item 3</span>
-		</span>
-		<p>I can not be tabbed</p>
-		<input type="text" disabled name="disabled-input" />
-		<a href="https://example.com">Item 4</a>
-	</TabbableContainer>
+	<>
+		<button>Before container</button>
+		<TabbableContainer { ...props }>
+			<button>Item 1</button>
+			<span>
+				<span tabIndex={ -1 }>Item 2 (not tabbable)</span>
+			</span>
+			<span>
+				<span tabIndex={ 0 }>Item 3</span>
+			</span>
+			<p>I can not be tabbed</p>
+			<input type="text" disabled name="disabled-input" />
+			<a href="https://example.com">Item 4</a>
+		</TabbableContainer>
+		<button>After container</button>
+	</>
 );
 
 const getTabbableContainerTabbables = () => [
@@ -57,7 +61,11 @@ describe( 'TabbableContainer', () => {
 
 		const tabbables = getTabbableContainerTabbables();
 
-		// Move focus to first item.
+		await user.tab();
+		expect(
+			screen.getByRole( 'button', { name: 'Before container' } )
+		).toHaveFocus();
+
 		await user.tab();
 		expect( tabbables[ 0 ] ).toHaveFocus();
 
@@ -91,7 +99,11 @@ describe( 'TabbableContainer', () => {
 		const lastTabbableIndex = tabbables.length - 1;
 		const lastTabbable = tabbables[ lastTabbableIndex ];
 
-		// Move focus to first item.
+		await user.tab();
+		expect(
+			screen.getByRole( 'button', { name: 'Before container' } )
+		).toHaveFocus();
+
 		await user.tab();
 		expect( firstTabbable ).toHaveFocus();
 
@@ -116,12 +128,17 @@ describe( 'TabbableContainer', () => {
 			/>
 		);
 
-		// With the `cycle` prop set to `false`, cycling is not allowed.
 		// By default, cycling from first to last and from last to first is allowed.
+		// With the `cycle` prop set to `false`, cycling is not allowed.
+		// Therefore, focus will escape the `TabbableContainer` and continue its
+		// natural path in the page.
 		await user.tab( { shift: true } );
-		expect( firstTabbable ).toHaveFocus();
+		expect(
+			screen.getByRole( 'button', { name: 'Before container' } )
+		).toHaveFocus();
 		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
 
+		await user.tab();
 		await user.tab();
 		await user.tab();
 		expect( lastTabbable ).toHaveFocus();
@@ -131,8 +148,12 @@ describe( 'TabbableContainer', () => {
 			lastTabbable
 		);
 
+		// Focus will move to the next natively focusable elements after
+		// `TabbableContainer`
 		await user.tab();
-		expect( lastTabbable ).toHaveFocus();
+		expect(
+			screen.getByRole( 'button', { name: 'After container' } )
+		).toHaveFocus();
 		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
 	} );
 
@@ -151,21 +172,27 @@ describe( 'TabbableContainer', () => {
 
 		const tabbables = getTabbableContainerTabbables();
 
-		// Move focus to first item
+		await user.tab();
+		expect(
+			screen.getByRole( 'button', { name: 'Before container' } )
+		).toHaveFocus();
+		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 0 );
+
 		await user.tab();
 		expect( tabbables[ 0 ] ).toHaveFocus();
+		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 1 );
 
 		await user.keyboard( '[Space]' );
-		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 1 );
+		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
 
 		await user.tab();
-		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 1 );
+		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
 		await user.tab( { shift: true } );
 		// This extra call is caused by the "shift" key being pressed
 		// on its own before "tab"
-		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
+		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 3 );
 
 		await user.keyboard( '[Escape]' );
-		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 3 );
+		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 4 );
 	} );
 } );

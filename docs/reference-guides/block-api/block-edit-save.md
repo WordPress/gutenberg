@@ -14,7 +14,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 
 // ...
 const blockSettings = {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	// ...
 
@@ -30,7 +30,7 @@ const blockSettings = {
 
 ```js
 var blockSettings = {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	// ...
 
@@ -58,7 +58,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 
 // ...
 const blockSettings = {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	// ...
 
@@ -76,7 +76,7 @@ const blockSettings = {
 
 ```js
 var blockSettings = {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	// ...
 

@@ -184,7 +184,7 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: `core/edit-post/transform-heading-to-paragraph`,
+			name: 'core/edit-post/transform-heading-to-paragraph',
 			category: 'block-library',
 			description: __( 'Transform heading to paragraph.' ),
 			keyCombination: {
@@ -223,14 +223,12 @@ function KeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
-		closeGeneralSidebar();
-		setIsListViewOpened( false );
 		toggleDistractionFree();
 		toggleFeature( 'distractionFree' );
 		createInfoNotice(
 			isFeatureActive( 'distractionFree' )
-				? __( 'Distraction free mode turned on.' )
-				: __( 'Distraction free mode turned off.' ),
+				? __( 'Distraction free on.' )
+				: __( 'Distraction free off.' ),
 			{
 				id: 'core/edit-post/distraction-free-mode/notice',
 				type: 'snackbar',

@@ -194,6 +194,48 @@ describe( 'Confirm', () => {
 				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onConfirm ).toHaveBeenCalled();
 			} );
+
+			it( 'calls only the `onCancel` callback and not the `onConfirm` callback when the cancel button is submitted using the keyboard', async () => {
+				const user = userEvent.setup();
+
+				const onConfirm = jest.fn().mockName( 'onConfirm()' );
+				const onCancel = jest.fn().mockName( 'onCancel()' );
+
+				render(
+					<ConfirmDialog
+						onConfirm={ onConfirm }
+						onCancel={ onCancel }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				await user.keyboard( '[Tab][Enter]' );
+
+				expect( onConfirm ).not.toHaveBeenCalled();
+				expect( onCancel ).toHaveBeenCalledTimes( 1 );
+			} );
+
+			it( 'calls only the `onConfirm` callback when the confirm button is submitted using the keyboard', async () => {
+				const user = userEvent.setup();
+
+				const onConfirm = jest.fn().mockName( 'onConfirm()' );
+				const onCancel = jest.fn().mockName( 'onCancel()' );
+
+				render(
+					<ConfirmDialog
+						onConfirm={ onConfirm }
+						onCancel={ onCancel }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				await user.keyboard( '[Tab][Tab][Enter]' );
+
+				expect( onConfirm ).toHaveBeenCalledTimes( 1 );
+				expect( onCancel ).not.toHaveBeenCalled();
+			} );
 		} );
 	} );
 

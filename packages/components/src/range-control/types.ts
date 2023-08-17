@@ -105,7 +105,7 @@ export type RangeControlProps = Pick<
 		/**
 		 * CSS color string for the `RangeControl` wrapper.
 		 *
-		 * @default COLORS.ui.theme
+		 * @default COLORS.theme.accent
 		 * @see /packages/components/src/utils/colors-values.js
 		 */
 		color?: CSSProperties[ 'color' ];
@@ -203,6 +203,12 @@ export type RangeControlProps = Pick<
 		 * @default 10
 		 */
 		shiftStep?: number;
+		/**
+		 * Start opting into the larger default height that will become the default size in a future version.
+		 *
+		 * @default false
+		 */
+		__next40pxDefaultSize?: boolean;
 		/**
 		 * Forcing the Tooltip UI to show or hide. This is overridden to `false`
 		 * when `step` is set to the special string value `any`.

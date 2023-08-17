@@ -12,7 +12,7 @@ test.describe( 'Quote', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'core/quote' );

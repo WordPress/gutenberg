@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	VisualEditorGlobalKeyboardShortcuts,
-	PostTitle,
-	store as editorStore,
-} from '@wordpress/editor';
+import { PostTitle, store as editorStore } from '@wordpress/editor';
 import {
 	WritingFlow,
 	BlockList,
@@ -23,26 +19,27 @@ import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableEditorStyles as EditorStyles,
 	useSetting,
-	__experimentalLayoutStyle as LayoutStyle,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
 	__experimentalRecursionProvider as RecursionProvider,
-	__experimentaluseLayoutClasses as useLayoutClasses,
-	__experimentaluseLayoutStyles as useLayoutStyles,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
-import { Button, __unstableMotion as motion } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { __unstableMotion as motion } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
-import { arrowLeft } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
-import { parse } from '@wordpress/blocks';
+import { parse, store as blocksStore } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { LayoutStyle, useLayoutClasses, useLayoutStyles } = unlock(
+	blockEditorPrivateApis
+);
 
 const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
 
@@ -114,6 +111,7 @@ export default function VisualEditor( { styles } ) {
 		wrapperBlockName,
 		wrapperUniqueId,
 		isBlockBasedTheme,
+		hasV3BlocksOnly,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -123,6 +121,7 @@ export default function VisualEditor( { styles } ) {
 		} = select( editPostStore );
 		const { getCurrentPostId, getCurrentPostType, getEditorSettings } =
 			select( editorStore );
+		const { getBlockTypes } = select( blocksStore );
 		const _isTemplateMode = isEditingTemplate();
 		let _wrapperBlockName;
 
@@ -153,6 +152,9 @@ export default function VisualEditor( { styles } ) {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
+			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
+				return type.apiVersion >= 3;
+			} ),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -175,8 +177,6 @@ export default function VisualEditor( { styles } ) {
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
 		};
 	}, [] );
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
 		height: '100%',
 		width: '100%',
@@ -334,14 +334,21 @@ export default function VisualEditor( { styles } ) {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
+	const isToBeIframed =
+		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
+			! hasMetaBoxes ) ||
+		isTemplateMode ||
+		deviceType === 'Tablet' ||
+		deviceType === 'Mobile';
+
 	return (
 		<BlockTools
 			__unstableContentRef={ ref }
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
+				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
-			<VisualEditorGlobalKeyboardShortcuts />
 			<motion.div
 				className="edit-post-visual-editor__content-area"
 				animate={ {
@@ -349,32 +356,13 @@ export default function VisualEditor( { styles } ) {
 				} }
 				ref={ blockSelectionClearerRef }
 			>
-				{ isTemplateMode && (
-					<Button
-						className="edit-post-visual-editor__exit-template-mode"
-						icon={ arrowLeft }
-						onClick={ () => {
-							clearSelectedBlock();
-							setIsEditingTemplate( false );
-						} }
-					>
-						{ __( 'Back' ) }
-					</Button>
-				) }
 				<motion.div
 					animate={ animatedStyles }
 					initial={ desktopCanvasStyles }
 					className={ previewMode }
 				>
 					<MaybeIframe
-						shouldIframe={
-							( isGutenbergPlugin &&
-								isBlockBasedTheme &&
-								! hasMetaBoxes ) ||
-							isTemplateMode ||
-							deviceType === 'Tablet' ||
-							deviceType === 'Mobile'
-						}
+						shouldIframe={ isToBeIframed }
 						contentRef={ contentRef }
 						styles={ styles }
 					>
@@ -383,11 +371,12 @@ export default function VisualEditor( { styles } ) {
 							! isTemplateMode && (
 								<>
 									<LayoutStyle
-										selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+										selector=".edit-post-visual-editor__post-title-wrapper"
 										layout={ fallbackLayout }
-										layoutDefinitions={
-											globalLayoutSettings?.definitions
-										}
+									/>
+									<LayoutStyle
+										selector=".block-editor-block-list__layout.is-root-container"
+										layout={ blockListLayout }
 									/>
 									{ align && (
 										<LayoutStyle css={ alignCSS } />
@@ -396,9 +385,6 @@ export default function VisualEditor( { styles } ) {
 										<LayoutStyle
 											layout={ postContentLayout }
 											css={ postContentLayoutStyles }
-											layoutDefinitions={
-												globalLayoutSettings?.definitions
-											}
 										/>
 									) }
 								</>
@@ -428,7 +414,7 @@ export default function VisualEditor( { styles } ) {
 										? 'wp-site-blocks'
 										: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 								}
-								__experimentalLayout={ blockListLayout }
+								layout={ blockListLayout }
 							/>
 						</RecursionProvider>
 					</MaybeIframe>

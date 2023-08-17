@@ -44,9 +44,9 @@ If your project already has a package.json, it's also possible to use `wp-env` a
 $ npm i @wordpress/env --save-dev
 ```
 
-At this point, you can use the local, project-level version of wp-env via [`npx`](https://www.npmjs.com/package/npx), a utility automatically installed with `npm`.`npx` finds binaries like wp-env installed through node modules. As an example: `npx wp-env start --update`.
+If you have also installed `wp-env` globally, running it will automatically execute the local, project-level package. Alternatively, you can execute `wp-env` via [`npx`](https://www.npmjs.com/package/npx), a utility automatically installed with `npm`.`npx` finds binaries like `wp-env` installed through node modules. As an example: `npx wp-env start --update`.
 
-If you don't wish to use `npx`, modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
+If you don't wish to use the global installation or `npx`, modify your `package.json` and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
 
 ```json
 "scripts": {
@@ -183,6 +183,26 @@ Out of the box `wp-env` includes the [WordPress' PHPUnit test files](https://dev
 
 While we do provide a default `wp-tests-config.php` file within the environment, there may be cases where you want to use your own. WordPress provides a `WP_TESTS_CONFIG_FILE_PATH` constant that you can use to change the `wp-config.php` file used for testing. Set this to a desired path in your `bootstrap.php` file and the file you've chosen will be used instead of the one included in the environment.
 
+## Using `composer`, `phpunit`, and `wp-cli` tools.
+
+For ease of use, Composer, PHPUnit, and wp-cli are available for in the environment. To run these executables, use `wp-env run <env> <tool> <command>`. For example, `wp-env run cli composer install`, or `wp-env run tests-cli phpunit`. You can also access various shells like `wp-env run cli bash` or `wp-env run cli wp shell`.
+
+For the `env` part, `cli` and `wordpress` share a database and mapped volumes, but more tools are available in the cli environment. You should use the `tests-cli` / `tests-wordpress` environments for a separate testing database.
+
+By default, the cwd of the run command is the root of the WordPress install. If you're working on a plugin, you likely need to pass `--env-cwd` to make sure composer/phpunit commands are executed relative to the plugin you're working on. For example, `wp-env run cli --env-cwd=wp-content/plugins/gutenberg composer install`.
+
+To make this easier, it's often helpful to add scripts in your `package.json` file:
+
+```json
+{
+	"scripts": {
+		"composer": "wp-env run cli --env-cwd=wp-content/plugins/gutenberg composer"
+	}
+}
+```
+
+Then, `npm run composer install` would run composer install in the environment. You could also do this for phpunit, wp-cli, etc.
+
 ## Using Xdebug
 
 Xdebug is installed in the wp-env environment, but it is turned off by default. To enable Xdebug, you can use the `--xdebug` flag with the `wp-env start` command. Here is a reference to how the flag works:
@@ -299,39 +319,38 @@ Options:
   --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
-### `wp-env run [container] [command]`
+### `wp-env run <container> [command...]`
 
-The run command can be used to open shell sessions or invoke WP-CLI commands.
+The run command can be used to open shell sessions, invoke WP-CLI commands, or run any arbitrary commands inside of a container.
 
-<div class="callout callout-alert">In some cases, <code>wp-env</code> may consume options that you are attempting to pass to
-the container. This happens with options that <code>wp-env</code> has already declared,
-such as <code>--env-cwd</code>, <code>--debug</code>, <code>--help</code>, and <code>--version</code>. When this happens, you should fall
-back to using quotation marks; <code>wp-env</code> considers everything inside the
-quotation marks to be command argument.
+<div class="callout callout-alert">
+<p>
+In some cases <code class="language-sh">wp-env run</code> may conflict with options that you are passing to the container.
+When this happens, <code class="language-sh">wp-env</code> will treat the option as its own and take action accordingly.
+For example, if you try <code class="language-sh">wp-env run cli php --help</code>, you will receive the <code class="language-sh">wp-env</code> help text.
+</p>
 
-For example, to ask <code>WP-CLI</code> for its help text:
-<pre>sh
-<code class="language-sh">wp-env run cli "wp --help"</code></pre>
-	
-Without the quotation marks, <code>wp-env</code> will print its own help text instead of
-passing it to the container. If you experience any problems where the command
-is not being passed correctly, fall back to using quotation marks.
-
+<p>
+You can get around this by passing any conflicting options after a double dash. <code class="language-sh">wp-env</code> will not process anything after
+the double dash and will simply pass it on to the container. To get the PHP help text you would use <code class="language-sh">wp-env run cli php -- --help</code>.
+</p>
 </div>
 
 ```sh
-wp-env run <container> [command..]
+wp-env run <container> [command...]
 
-Runs an arbitrary command in one of the underlying Docker containers. The
-"container" param should reference one of the underlying Docker services like
-"development", "tests", or "cli". To run a wp-cli command, use the "cli" or
-"tests-cli" service. You can also use this command to open shell sessions like
-bash and the WordPress shell in the WordPress instance. For example, `wp-env run
-cli bash` will open bash in the development WordPress instance.
+Runs an arbitrary command in one of the underlying Docker containers. A double
+dash can be used to pass arguments to the container without parsing them. This
+is necessary if you are using an option that is defined below. You can use
+`bash` to open a shell session and both `composer` and `phpunit` are available
+in all WordPress and CLI containers. WP-CLI is also available in the CLI
+containers.
 
 Positionals:
-  container  The container to run the command on.            [string] [required]
-  command    The command to run.                           [array] [default: []]
+  container  The Docker service to run the command on.
+              [string] [required] [choices: "mysql", "tests-mysql", "wordpress",
+                   "tests-wordpress", "cli", "tests-cli", "composer", "phpunit"]
+  command    The command to run.                                      [required]
 
 Options:
   --debug    Enable debug output.                     [boolean] [default: false]
@@ -396,6 +415,7 @@ Success: Installed 1 of 1 plugins.
 ```
 
 #### Changing the permalink structure
+
 You might want to do this to enable access to the REST API (`wp-env/wp/v2/`) endpoint in your wp-env environment. The endpoint is not available with plain permalinks.
 
 **Examples**
@@ -421,7 +441,8 @@ Destroy the WordPress environment. Deletes docker containers, volumes, and
 networks associated with the WordPress environment and removes local files.
 
 Options:
-  --debug            Enable debug output.             [boolean] [default: false]
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
 ### `wp-env logs [environment]`
@@ -537,19 +558,16 @@ These can be overridden by setting a value within the `config` configuration. Se
 
 Additionally, the values referencing a URL include the specified port for the given environment. So if you set `testsPort: 3000, port: 2000`, `WP_HOME` (for example) will be `http://localhost:3000` on the tests instance and `http://localhost:2000` on the development instance.
 
-## Lifecycle Hooks
+## Lifecycle Scripts
 
-These hooks are executed at certain points during the lifecycle of a command's execution. Keep in mind that these will be executed on both fresh and existing
-environments, so, ensure any commands you build won't break on subsequent executions. 
+Using the `lifecycleScripts` option in `.wp-env.json` will allow you to set arbitrary commands to be executed at certain points in the lifecycle. This configuration
+can also be overridden using `WP_ENV_LIFECYCLE_SCRIPT_{LIFECYCLE_EVENT}` environment variables, with the remainder being the all-caps snake_case name of the option, for
+example, `WP_ENV_LIFECYCLE_SCRIPT_AFTER_START`. Keep in mind that these will be executed on both fresh and existing environments, so, ensure any commands you
+build won't break on subsequent executions.
 
-### After Setup
-
-Using the `afterSetup` option in `.wp-env.json` files will allow you to configure an arbitrary command to execute after the environment's setup is complete:
-
-- `wp-env start`: Runs when the config changes, WordPress updates, or you pass the `--update` flag.
-- `wp-env clean`: Runs after the selected environments have been cleaned.
-
-You can override the `afterSetup` option using the `WP_ENV_AFTER_SETUP` environment variable.
+* `afterStart`: Runs after `wp-env start` has finished setting up the environment.
+* `afterClean`: Runs after `wp-env clean` has finished cleaning the environment.
+* `afterDestroy`: Runs after `wp-env destroy` has destroyed the environment.
 
 ## Examples
 
@@ -685,9 +703,34 @@ This is useful for performing some actions after setting up the environment, suc
 
 ```json
 {
-	"afterSetup": "node tests/e2e/bin/setup-env.js"
+	"lifecycleScripts": {
+		"afterStart": "node tests/e2e/bin/setup-env.js"
+	}
 }
 ```
+
+### Advanced PHP settings
+
+You can set PHP settings by mapping an `.htaccess` file. This maps an `.htaccess` file to the WordPress root (`/var/www/html`) from the directory in which you run `wp-env`.
+
+```json
+{
+	"mappings": {
+		".htaccess": ".htaccess"
+	}
+}
+```
+
+Then, your .htaccess file can contain various settings like this:
+
+```
+# Note: the default upload value is 1G.
+php_value post_max_size 2G
+php_value upload_max_filesize 2G
+php_value memory_limit 2G
+```
+
+This is useful if there are options you'd like to add to `php.ini`, which is difficult to access in this environment.
 
 ## Contributing to this package
 

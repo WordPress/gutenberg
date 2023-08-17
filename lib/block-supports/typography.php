@@ -29,6 +29,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_text_columns_support    = _wp_array_get( $typography_supports, array( 'textColumns' ), false );
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
+	$has_writing_mode_support    = _wp_array_get( $typography_supports, array( '__experimentalWritingMode' ), false );
 
 	$has_typography_support = $has_font_family_support
 		|| $has_font_size_support
@@ -38,7 +39,8 @@ function gutenberg_register_typography_support( $block_type ) {
 		|| $has_line_height_support
 		|| $has_text_columns_support
 		|| $has_text_decoration_support
-		|| $has_text_transform_support;
+		|| $has_text_transform_support
+		|| $has_writing_mode_support;
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
@@ -96,6 +98,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_columns_support    = _wp_array_get( $typography_supports, array( 'textColumns' ), false );
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
+	$has_writing_mode_support    = _wp_array_get( $typography_supports, array( '__experimentalWritingMode' ), false );
 
 	// Whether to skip individual block support features.
 	$should_skip_font_size       = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
@@ -107,6 +110,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$should_skip_text_decoration = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textDecoration' );
 	$should_skip_text_transform  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
 	$should_skip_letter_spacing  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' );
+	$should_skip_writing_mode    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'writingMode' );
 
 	$typography_block_styles = array();
 	if ( $has_font_size_support && ! $should_skip_font_size ) {
@@ -156,6 +160,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	if ( $has_letter_spacing_support && ! $should_skip_letter_spacing && isset( $block_attributes['style']['typography']['letterSpacing'] ) ) {
 		$typography_block_styles['letterSpacing'] =
 			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['letterSpacing'], 'letter-spacing' );
+	}
+
+	if ( $has_writing_mode_support && ! $should_skip_writing_mode && isset( $block_attributes['style']['typography']['writingMode'] ) ) {
+		$typography_block_styles['writingMode'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'writingMode' ), null );
 	}
 
 	$attributes = array();
@@ -381,12 +389,18 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 			'coerce_to' => $font_size_unit,
 		)
 	);
+
 	$minimum_viewport_width = gutenberg_get_typography_value_and_unit(
 		$minimum_viewport_width_raw,
 		array(
 			'coerce_to' => $font_size_unit,
 		)
 	);
+
+	// Protects against unsupported units in min and max viewport widths.
+	if ( ! $minimum_viewport_width || ! $maximum_viewport_width ) {
+		return null;
+	}
 
 	// Build CSS rule.
 	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
@@ -428,7 +442,10 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	}
 
 	// Checks if fluid font sizes are activated.
-	$typography_settings         = gutenberg_get_global_settings( array( 'typography' ) );
+	$global_settings     = gutenberg_get_global_settings();
+	$typography_settings = isset( $global_settings['typography'] ) ? $global_settings['typography'] : array();
+	$layout_settings     = isset( $global_settings['layout'] ) ? $global_settings['layout'] : array();
+
 	$should_use_fluid_typography
 		= isset( $typography_settings['fluid'] ) &&
 		( true === $typography_settings['fluid'] || is_array( $typography_settings['fluid'] ) ) ?
@@ -447,8 +464,16 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	$default_minimum_font_size_factor_max = 0.75;
 	$default_minimum_font_size_factor_min = 0.25;
 	$default_scale_factor                 = 1;
-	$has_min_font_size                    = isset( $fluid_settings['minFontSize'] ) && ! empty( gutenberg_get_typography_value_and_unit( $fluid_settings['minFontSize'] ) );
-	$default_minimum_font_size_limit      = $has_min_font_size ? $fluid_settings['minFontSize'] : '14px';
+	$default_minimum_font_size_limit      = '14px';
+
+	// Defaults overrides.
+	$minimum_viewport_width = isset( $fluid_settings['minViewportWidth'] ) ? $fluid_settings['minViewportWidth'] : $default_minimum_viewport_width;
+	$maximum_viewport_width = isset( $layout_settings['wideSize'] ) && ! empty( gutenberg_get_typography_value_and_unit( $layout_settings['wideSize'] ) ) ? $layout_settings['wideSize'] : $default_maximum_viewport_width;
+	if ( isset( $fluid_settings['maxViewportWidth'] ) ) {
+		$maximum_viewport_width = $fluid_settings['maxViewportWidth'];
+	}
+	$has_min_font_size       = isset( $fluid_settings['minFontSize'] ) && ! empty( gutenberg_get_typography_value_and_unit( $fluid_settings['minFontSize'] ) );
+	$minimum_font_size_limit = $has_min_font_size ? $fluid_settings['minFontSize'] : $default_minimum_font_size_limit;
 
 	// Font sizes.
 	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
@@ -472,7 +497,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 
 	// Parses the minimum font size limit, so we can perform checks using it.
 	$minimum_font_size_limit = gutenberg_get_typography_value_and_unit(
-		$default_minimum_font_size_limit,
+		$minimum_font_size_limit,
 		array(
 			'coerce_to' => $preferred_size['unit'],
 		)
@@ -521,8 +546,8 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 
 	$fluid_font_size_value = gutenberg_get_computed_fluid_typography_value(
 		array(
-			'minimum_viewport_width' => $default_minimum_viewport_width,
-			'maximum_viewport_width' => $default_maximum_viewport_width,
+			'minimum_viewport_width' => $minimum_viewport_width,
+			'maximum_viewport_width' => $maximum_viewport_width,
 			'minimum_font_size'      => $minimum_font_size_raw,
 			'maximum_font_size'      => $maximum_font_size_raw,
 			'scale_factor'           => $default_scale_factor,

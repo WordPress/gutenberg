@@ -60,14 +60,13 @@ describe( `${ block } block transforms`, () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'unwraps content', async () => {
+	it( 'ungroups block', async () => {
 		const screen = await initializeEditor( { initialHtml } );
 		const { getByText } = screen;
 		fireEvent.press( getBlock( screen, block ) );
 
 		await openBlockActionsMenu( screen );
-		fireEvent.press( getByText( 'Transform block…' ) );
-		fireEvent.press( getByText( 'Unwrap' ) );
+		fireEvent.press( getByText( 'Ungroup' ) );
 
 		// The first block created is the content of the Paragraph block.
 		const paragraph = getBlock( screen, 'Paragraph', 0 );
@@ -83,8 +82,7 @@ describe( `${ block } block transforms`, () => {
 		const screen = await initializeEditor( { initialHtml } );
 		const transformOptions = await getBlockTransformOptions(
 			screen,
-			block,
-			{ canUnwrap: true }
+			block
 		);
 		expect( transformOptions ).toHaveLength( blockTransforms.length );
 	} );

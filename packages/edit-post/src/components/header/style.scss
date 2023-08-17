@@ -44,6 +44,12 @@
 	}
 }
 
+.edit-post-header__center {
+	flex-grow: 1;
+	display: flex;
+	justify-content: center;
+}
+
 /**
  * Buttons on the right side
  */

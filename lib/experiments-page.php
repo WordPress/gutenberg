@@ -5,26 +5,28 @@
  * @package gutenberg
  */
 
-/**
- * The main entry point for the Gutenberg experiments page.
- *
- * @since 6.3.0
- */
-function the_gutenberg_experiments() {
-	?>
-	<div
-		id="experiments-editor"
-		class="wrap"
-	>
-	<h1><?php echo __( 'Experimental settings', 'gutenberg' ); ?></h1>
-	<?php settings_errors(); ?>
-	<form method="post" action="options.php">
-		<?php settings_fields( 'gutenberg-experiments' ); ?>
-		<?php do_settings_sections( 'gutenberg-experiments' ); ?>
-		<?php submit_button(); ?>
-	</form>
-	</div>
-	<?php
+if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
+	/**
+	 * The main entry point for the Gutenberg experiments page.
+	 *
+	 * @since 6.3.0
+	 */
+	function the_gutenberg_experiments() {
+		?>
+		<div
+			id="experiments-editor"
+			class="wrap"
+		>
+		<h1><?php echo __( 'Experimental settings', 'gutenberg' ); ?></h1>
+		<?php settings_errors(); ?>
+		<form method="post" action="options.php">
+			<?php settings_fields( 'gutenberg-experiments' ); ?>
+			<?php do_settings_sections( 'gutenberg-experiments' ); ?>
+			<?php submit_button(); ?>
+		</form>
+		</div>
+		<?php
+	}
 }
 
 /**
@@ -39,6 +41,18 @@ function gutenberg_initialize_experiments_settings() {
 		'',
 		'gutenberg_display_experiment_section',
 		'gutenberg-experiments'
+	);
+
+	add_settings_field(
+		'gutenberg-sync-collaboration',
+		__( 'Live Collaboration and offline persistence ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable the live collaboration and offline persistence between peers', 'gutenberg' ),
+			'id'    => 'gutenberg-sync-collaboration',
+		)
 	);
 
 	add_settings_field(
@@ -66,18 +80,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-command-center',
-		__( 'Command center ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test the command center; Open it using cmd + k in the site editor.', 'gutenberg' ),
-			'id'    => 'gutenberg-command-center',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-group-grid-variation',
 		__( 'Grid variation for Group block ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -90,26 +92,38 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-details-blocks',
-		__( 'Details block', 'gutenberg' ),
+		'gutenberg-no-tinymce',
+		__( 'Disable TinyMCE and Classic block', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the Details block', 'gutenberg' ),
-			'id'    => 'gutenberg-details-blocks',
+			'label' => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
+			'id'    => 'gutenberg-no-tinymce',
 		)
 	);
 
 	add_settings_field(
-		'gutenberg-theme-previews',
-		__( 'Block Theme Previews', 'gutenberg' ),
+		'gutenberg-auto-inserting-blocks',
+		__( 'Auto-inserting blocks', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Block Theme Previews', 'gutenberg' ),
-			'id'    => 'gutenberg-theme-previews',
+			'label' => __( 'Test Auto-inserting blocks', 'gutenberg' ),
+			'id'    => 'gutenberg-auto-inserting-blocks',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-custom-fields',
+		__( 'Connections', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test Connections', 'gutenberg' ),
+			'id'    => 'gutenberg-connections',
 		)
 	);
 

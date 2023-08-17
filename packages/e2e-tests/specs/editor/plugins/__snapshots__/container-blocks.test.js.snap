@@ -22,10 +22,11 @@ exports[`InnerBlocks Template Sync Ensures blocks without locking are kept intac
 <p class="wp-block-paragraph has-large-font-size">Content…</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p class="wp-block-paragraph">added paragraph</p>
-<!-- /wp:paragraph -->
-<!-- /wp:test/test-inner-blocks-no-locking -->"
+			<!-- wp:paragraph -->
+			<pc lass="wp-block-paragraph">added paragraph</p>
+			<!-- /wp:paragraph -->
+		<!-- /wp:test/test-inner-blocks-no-locking -->
+"
 `;
 
 exports[`InnerBlocks Template Sync Removes blocks that are not expected by the template if a lock all exists 1`] = `

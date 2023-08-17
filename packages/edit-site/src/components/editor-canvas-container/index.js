@@ -12,12 +12,14 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import ResizableEditor from '../block-editor/resizable-editor';
 
 /**
  * Returns a translated string for the title of the editor canvas container.
@@ -30,6 +32,8 @@ function getEditorCanvasContainerTitle( view ) {
 	switch ( view ) {
 		case 'style-book':
 			return __( 'Style Book' );
+		case 'global-styles-revisions':
+			return __( 'Global styles revisions' );
 		default:
 			return '';
 	}
@@ -47,11 +51,25 @@ const {
 function EditorCanvasContainer( {
 	children,
 	closeButtonLabel,
-	onClose = () => {},
+	onClose,
+	enableResizing = false,
 } ) {
-	const editorCanvasContainerView = useSelect(
-		( select ) =>
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+	const { editorCanvasContainerView, showListViewByDefault } = useSelect(
+		( select ) => {
+			const _editorCanvasContainerView = unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView();
+
+			const _showListViewByDefault = select( preferencesStore ).get(
+				'core/edit-site',
+				'showListViewByDefault'
+			);
+
+			return {
+				editorCanvasContainerView: _editorCanvasContainerView,
+				showListViewByDefault: _showListViewByDefault,
+			};
+		},
 		[]
 	);
 	const [ isClosed, setIsClosed ] = useState( false );
@@ -64,8 +82,14 @@ function EditorCanvasContainer( {
 		() => getEditorCanvasContainerTitle( editorCanvasContainerView ),
 		[ editorCanvasContainerView ]
 	);
+
+	const { setIsListViewOpened } = useDispatch( editSiteStore );
+
 	function onCloseContainer() {
-		onClose();
+		if ( typeof onClose === 'function' ) {
+			onClose();
+		}
+		setIsListViewOpened( showListViewByDefault );
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
 	}
@@ -93,24 +117,30 @@ function EditorCanvasContainer( {
 		return null;
 	}
 
+	const shouldShowCloseButton = onClose || closeButtonLabel;
+
 	return (
 		<EditorCanvasContainerFill>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<section
-				className="edit-site-editor-canvas-container"
-				ref={ focusOnMountRef }
-				onKeyDown={ closeOnEscape }
-				aria-label={ title }
-			>
-				<Button
-					className="edit-site-editor-canvas-container__close-button"
-					icon={ closeSmall }
-					label={ closeButtonLabel || __( 'Close' ) }
-					onClick={ onCloseContainer }
-					showTooltip={ false }
-				/>
-				{ childrenWithProps }
-			</section>
+			<ResizableEditor enableResizing={ enableResizing }>
+				{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+				<section
+					className="edit-site-editor-canvas-container"
+					ref={ shouldShowCloseButton ? focusOnMountRef : null }
+					onKeyDown={ closeOnEscape }
+					aria-label={ title }
+				>
+					{ shouldShowCloseButton && (
+						<Button
+							className="edit-site-editor-canvas-container__close-button"
+							icon={ closeSmall }
+							label={ closeButtonLabel || __( 'Close' ) }
+							onClick={ onCloseContainer }
+							showTooltip={ false }
+						/>
+					) }
+					{ childrenWithProps }
+				</section>
+			</ResizableEditor>
 		</EditorCanvasContainerFill>
 	);
 }

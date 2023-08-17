@@ -7,6 +7,7 @@ import {
 	clickBlockAppender,
 	clickBlockToolbarButton,
 	setPostContent,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'invalid blocks', () => {
@@ -39,7 +40,7 @@ describe( 'invalid blocks', () => {
 		await page.click( '.editor-post-save-draft' );
 
 		// Click on the 'three-dots' menu toggle.
-		await page.click(
+		await canvas().click(
 			'.block-editor-warning__actions button[aria-label="More options"]'
 		);
 
@@ -80,7 +81,7 @@ describe( 'invalid blocks', () => {
 		expect( hasAlert ).toBe( false );
 	} );
 
-	it( 'should strip potentially malicious script tags', async () => {
+	it( 'should not trigger malicious script tags when using a shortcode block', async () => {
 		let hasAlert = false;
 
 		page.on( 'dialog', () => {
@@ -99,9 +100,6 @@ describe( 'invalid blocks', () => {
 
 		// Give the browser time to show the alert.
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
-
-		expect( console ).toHaveWarned();
-		expect( console ).toHaveErrored();
 		expect( hasAlert ).toBe( false );
 	} );
 } );

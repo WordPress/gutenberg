@@ -26,7 +26,7 @@ SauceLabs is a cloud hosting platform that provides access to a variety of simul
 
 ## Running the tests locally
 
-TLDR; to run the tests locally ensure metro isn't running and then run `npm run native test:e2e:ios:local` and `npm run native test:e2e:android:local` for the desired platform.
+TL;DR: to run the tests locally ensure metro isn't running and then run `npm run native test:e2e:ios:local` and `npm run native test:e2e:android:local` for the desired platform.
 
 Those commands include the process to build a testable version of the app with these steps:
 
@@ -50,7 +50,13 @@ You can also write `debugger;` in the JS code in any line to add a breakpoint.
 
 ### Starting the Appium Server
 
-One of the Caveats to using Appium is the need for the Appium server to be running to interact with the Simulator or Device through Webdriver, as a result the appium server will need to be started before running the tests. To make the entire process easier in the `beforeAll` block of the tests an Appium instance is fired up on a default port of 4723. If you already have something running on that port and would rather not stop that you can change the port within the code that starts that up. At the moment that port number is referenced from the config located at `__device-tests__/helpers/serverConfigs.js`. The process is killed in the `afterAll` block but at the time of writing this there's a small chance some errors might cause it not to get there so it might be best to kill the process yourself if you think something is up. The server output when running the tests are written to `appium-out.log`, this can provide useful information when debugging the issues with the tests.
+One of the Caveats to using Appium is the need for the Appium server to be running to interact with the Simulator or Device through Webdriver, as a result the appium server will need to be started before running the tests.
+
+To make the entire process easier in the `beforeAll` block of the tests an Appium instance is fired up on a default port of 4723. If you already have something running on that port and would rather not stop that you can change the port within the code that starts that up. At the moment that port number is referenced from the config located at `__device-tests__/helpers/serverConfigs.js`.
+
+The process is killed in the `afterAll` block but at the time of writing this there's a small chance some errors might cause it not to get there so it might be best to kill the process yourself if you think something is up. The server output when running the tests are written to `appium-out.log`, this can provide useful information when debugging the issues with the tests.
+
+If the `beforeAll` and `afterAll` functionality is not working correctly, you can start the Appium server manually by running `npm run native appium:start`.
 
 ### WebDriver capabilities
 
@@ -59,7 +65,7 @@ Appium uses a config object that contains `capabilities` to define how it will c
 -   `platformVersion` which is the platform version of a connected adb device. e.g `9.0` for Android or `12.2` for iOS. The version used here is upper bounded by the max allowed on CI but feel free to change this value locally as needed.
 -   `app` which is the absolute path to the `.app` or `.apk` file or the path relative to the **Appium root**. It's important to note that when using the relative paths it's not to the project folder but to the appium server, since by default we start up appium in the project root when running the paths appear relative to the root but if you were using another instance of the Appium server the relative path would need to come from there.
 
-A full spec on the capabilities can be found [here](http://appium.io/docs/en/writing-running-appium/caps/). If you'd like to change configurations like
+A full spec on the capabilities can be found [here](https://github.com/appium/appium/blob/1.x/docs/en/writing-running-appium/caps.md). If you'd like to change configurations like
 what port appium runs on or what device or emulator the tests should be executed on that file would be where you'd like to make that update.
 
 ## The run process
@@ -75,4 +81,4 @@ After the build is complete, an appium server is fired up on port 4723 and the d
 
 ---
 
-To read more about writing your own tests please read the [contributing guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/react-native-editor/__device-tests__/CONTRIBUTING.md)
+To read more about writing your own tests please read the [contributing guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/react-native-editor/__device-tests__/CONTRIBUTING.md).

@@ -5,6 +5,9 @@
 	.components-navigator-screen {
 		@include custom-scrollbars-on-hover(transparent, $gray-700);
 		scrollbar-gutter: stable;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
 	}
 }
 
@@ -13,10 +16,6 @@
 	flex-shrink: 0;
 	margin: 0 $canvas-padding;
 	padding: $canvas-padding 0;
-}
-
-.edit-site-sidebar__content.edit-site-sidebar__content {
-	overflow-x: unset;
 }
 
 .edit-site-sidebar__content > div {

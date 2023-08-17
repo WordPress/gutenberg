@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
@@ -14,7 +9,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { useSetting } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
-import { setImmutably } from '../utils/object';
+import { getValueFromObjectPath, setImmutably } from '../utils/object';
 
 /**
  * Removed falsy values from nested object.
@@ -30,12 +25,13 @@ export const cleanEmptyObject = ( object ) => {
 	) {
 		return object;
 	}
-	const cleanedNestedObjects = Object.fromEntries(
-		Object.entries( object )
-			.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
-			.filter( ( [ , value ] ) => value !== undefined )
-	);
-	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
+
+	const cleanedNestedObjects = Object.entries( object )
+		.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
+		.filter( ( [ , value ] ) => value !== undefined );
+	return ! cleanedNestedObjects.length
+		? undefined
+		: Object.fromEntries( cleanedNestedObjects );
 };
 
 export function transformStyles(
@@ -78,7 +74,10 @@ export function transformStyles(
 	Object.entries( activeSupports ).forEach( ( [ support, isActive ] ) => {
 		if ( isActive ) {
 			migrationPaths[ support ].forEach( ( path ) => {
-				const styleValue = get( referenceBlockAttributes, path );
+				const styleValue = getValueFromObjectPath(
+					referenceBlockAttributes,
+					path
+				);
 				if ( styleValue ) {
 					returnBlock = {
 						...returnBlock,
@@ -135,6 +134,7 @@ export function useBlockSettings( name, parentLayout ) {
 	const lineHeight = useSetting( 'typography.lineHeight' );
 	const textColumns = useSetting( 'typography.textColumns' );
 	const textDecoration = useSetting( 'typography.textDecoration' );
+	const writingMode = useSetting( 'typography.writingMode' );
 	const textTransform = useSetting( 'typography.textTransform' );
 	const letterSpacing = useSetting( 'typography.letterSpacing' );
 	const padding = useSetting( 'spacing.padding' );
@@ -210,6 +210,7 @@ export function useBlockSettings( name, parentLayout ) {
 				textDecoration,
 				textTransform,
 				letterSpacing,
+				writingMode,
 			},
 			spacing: {
 				spacingSizes: {
@@ -243,6 +244,7 @@ export function useBlockSettings( name, parentLayout ) {
 		textDecoration,
 		textTransform,
 		letterSpacing,
+		writingMode,
 		padding,
 		margin,
 		blockGap,

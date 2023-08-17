@@ -6,7 +6,6 @@ exports[`Babel preset default transpilation works properly 1`] = `
     await 1;
     yield 2;
   }
-
   test('support for async generator functions', async () => {
     const generator = foo();
     expect(await generator.next()).toEqual({
@@ -15,15 +14,13 @@ exports[`Babel preset default transpilation works properly 1`] = `
     });
   });
   test('support for optional chaining', () => {
-    var _obj$foo, _obj$foo2;
-
     const obj = {
       foo: {
         bar: 42
       }
     };
-    expect(obj === null || obj === void 0 ? void 0 : (_obj$foo = obj.foo) === null || _obj$foo === void 0 ? void 0 : _obj$foo.bar).toEqual(42);
-    expect(obj === null || obj === void 0 ? void 0 : (_obj$foo2 = obj.foo) === null || _obj$foo2 === void 0 ? void 0 : _obj$foo2.baz).toEqual(undefined);
+    expect(obj?.foo?.bar).toEqual(42);
+    expect(obj?.foo?.baz).toEqual(undefined);
   });
 });"
 `;

@@ -12,9 +12,14 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { positionToPlacement, placementToMotionAnimationProps } from '../utils';
+import {
+	computePopoverPosition,
+	positionToPlacement,
+	placementToMotionAnimationProps,
+} from '../utils';
 import Popover from '..';
 import type { PopoverProps } from '../types';
+import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
 
 type PositionToPlacementTuple = [
 	NonNullable< PopoverProps[ 'position' ] >,
@@ -171,6 +176,19 @@ describe( 'Popover', () => {
 		} );
 	} );
 
+	describe( 'Slot outside iframe', () => {
+		it( 'should support cross-document rendering', async () => {
+			render(
+				<PopoverInsideIframeRenderedInExternalSlot>
+					<span>content</span>
+				</PopoverInsideIframeRenderedInExternalSlot>
+			);
+			await waitFor( async () =>
+				expect( screen.getByText( 'content' ) ).toBeVisible()
+			);
+		} );
+	} );
+
 	describe( 'positionToPlacement', () => {
 		it.each( ALL_POSITIONS_TO_EXPECTED_PLACEMENTS )(
 			'converts `%s` to `%s`',
@@ -247,5 +265,22 @@ describe( 'Popover', () => {
 				}
 			);
 		} );
+	} );
+
+	describe( 'computePopoverPosition', () => {
+		it.each( [
+			[ 14, 14 ], // valid integers shouldn't be changes
+			[ 14.02, 14 ], // floating numbers are parsed to integers
+			[ 0, 0 ], // zero remains zero
+			[ null, undefined ],
+			[ NaN, undefined ],
+		] )(
+			'converts `%s` to `%s`',
+			( inputCoordinate, expectedCoordinated ) => {
+				expect( computePopoverPosition( inputCoordinate ) ).toEqual(
+					expectedCoordinated
+				);
+			}
+		);
 	} );
 } );

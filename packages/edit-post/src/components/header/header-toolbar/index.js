@@ -19,12 +19,15 @@ import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
-import { unlock } from '../../../private-apis';
+import { unlock } from '../../../lock-unlock';
+
+const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -41,27 +44,17 @@ function HeaderToolbar() {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
-		selectedBlockId,
 		hasFixedToolbar,
 	} = useSelect( ( select ) => {
-		const {
-			hasInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-			getSelectedBlockClientId,
-			getFirstMultiSelectedBlockClientId,
-			getSettings,
-		} = select( blockEditorStore );
+		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
+			select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
 		const { getEditorMode, isFeatureActive, isListViewOpened } =
 			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		const { get: getPreference } = select( preferencesStore );
 
 		return {
-			hasFixedToolbar: getSettings().hasFixedToolbar,
-			selectedBlockId:
-				getSelectedBlockClientId() ||
-				getFirstMultiSelectedBlockClientId(),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				getEditorMode() === 'visual' &&
@@ -76,21 +69,23 @@ function HeaderToolbar() {
 			listViewShortcut: getShortcutRepresentation(
 				'core/edit-post/toggle-list-view'
 			),
+			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
 		};
 	}, [] );
 
-	const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
-
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
-	const { shouldShowContextualToolbar, canFocusHiddenToolbar } =
-		useShouldContextualToolbarShow( selectedBlockId );
+	const {
+		shouldShowContextualToolbar,
+		canFocusHiddenToolbar,
+		fixedToolbarCanBeFocused,
+	} = useShouldContextualToolbarShow();
 	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
 	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
 	const blockToolbarCanBeFocused =
 		shouldShowContextualToolbar ||
 		canFocusHiddenToolbar ||
-		( ( hasFixedToolbar || ! isLargeViewport ) && selectedBlockId );
+		fixedToolbarCanBeFocused;
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
@@ -156,7 +151,7 @@ function HeaderToolbar() {
 				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ isLargeViewport && (
+						{ isLargeViewport && ! hasFixedToolbar && (
 							<ToolbarItem
 								as={ ToolSelector }
 								showTooltip={ ! showIconLabels }

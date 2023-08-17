@@ -18,6 +18,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	__experimentalImageSizeControl as ImageSizeControl,
 	store as blockEditorStore,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -126,7 +127,7 @@ function attributesFromMedia( {
 	};
 }
 
-function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
+function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const {
 		focalPoint,
 		href,
@@ -147,13 +148,10 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
-	const { imageSizes, image, isContentLocked } = useSelect(
+	const { imageSizes, image } = useSelect(
 		( select ) => {
-			const { __unstableGetContentLockingParent, getSettings } =
-				select( blockEditorStore );
+			const { getSettings } = select( blockEditorStore );
 			return {
-				isContentLocked:
-					!! __unstableGetContentLockingParent( clientId ),
 				image:
 					mediaId && isSelected
 						? select( coreStore ).getMedia( mediaId, {
@@ -163,8 +161,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 				imageSizes: getSettings()?.imageSizes,
 			};
 		},
-
-		[ isSelected, mediaId, clientId ]
+		[ isSelected, mediaId ]
 	);
 
 	const refMediaContainer = useRef();
@@ -319,11 +316,13 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		{ template: TEMPLATE, allowedBlocks }
 	);
 
+	const blockEditingMode = useBlockEditingMode();
+
 	return (
 		<>
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
 			<BlockControls group="block">
-				{ ! isContentLocked && (
+				{ blockEditingMode === 'default' && (
 					<>
 						<BlockVerticalAlignmentControl
 							onChange={ onVerticalAlignmentChange }
@@ -370,6 +369,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					onWidthChange={ onWidthChange }
 					commitWidthChange={ commitWidthChange }
 					ref={ refMediaContainer }
+					enableResize={ blockEditingMode === 'default' }
 					{ ...{
 						focalPoint,
 						imageFill,
@@ -381,7 +381,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						mediaType,
 						mediaUrl,
 						mediaWidth,
-						isContentLocked,
 					} }
 				/>
 				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }

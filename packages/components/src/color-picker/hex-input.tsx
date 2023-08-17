@@ -49,7 +49,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 				<Spacer
 					as={ Text }
 					marginLeft={ space( 4 ) }
-					color={ COLORS.ui.theme }
+					color={ COLORS.theme.accent }
 					lineHeight={ 1 }
 				>
 					#

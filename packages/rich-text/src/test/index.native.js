@@ -15,7 +15,6 @@ import {
 	setDefaultBlockName,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-import '@wordpress/jest-console';
 
 /**
  * Internal dependencies

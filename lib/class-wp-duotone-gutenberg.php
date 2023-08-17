@@ -32,6 +32,10 @@
  * @since 6.3.0
  */
 
+if ( class_exists( 'WP_Duotone_Gutenberg' ) ) {
+	return;
+}
+
 /**
  * Manages duotone block supports and global styles.
  *
@@ -530,10 +534,19 @@ class WP_Duotone_Gutenberg {
 		foreach ( $colors as $color_str ) {
 			$color = self::colord_parse( $color_str );
 
-			$duotone_values['r'][] = $color['r'] / 255;
-			$duotone_values['g'][] = $color['g'] / 255;
-			$duotone_values['b'][] = $color['b'] / 255;
-			$duotone_values['a'][] = $color['a'];
+			if ( null === $color ) {
+				$error_message = sprintf(
+					/* translators: %s: duotone colors */
+					__( '"%s" in theme.json settings.color.duotone is not a hex or rgb string.', 'gutenberg' ),
+					$color_str
+				);
+				_doing_it_wrong( __METHOD__, $error_message, '6.3.0' );
+			} else {
+				$duotone_values['r'][] = $color['r'] / 255;
+				$duotone_values['g'][] = $color['g'] / 255;
+				$duotone_values['b'][] = $color['b'] / 255;
+				$duotone_values['a'][] = $color['a'];
+			}
 		}
 
 		ob_start();
@@ -712,6 +725,15 @@ class WP_Duotone_Gutenberg {
 	 * @param string $filter_value     The filter CSS value. e.g. 'url(#wp-duotone-blue-orange)' or 'unset'.
 	 */
 	private static function enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value ) {
+		if ( ! array_key_exists( $filter_id, self::$global_styles_presets ) ) {
+			$error_message = sprintf(
+				/* translators: %s: duotone filter ID */
+				__( 'The duotone id "%s" is not registered in theme.json settings', 'gutenberg' ),
+				$filter_id
+			);
+			_doing_it_wrong( __METHOD__, $error_message, '6.3.0' );
+			return;
+		}
 		self::$used_global_styles_presets[ $filter_id ] = self::$global_styles_presets[ $filter_id ];
 		self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, self::$global_styles_presets[ $filter_id ] );
 	}

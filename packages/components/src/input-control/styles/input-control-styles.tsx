@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { css, SerializedStyles } from '@emotion/react';
+import type { SerializedStyles } from '@emotion/react';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { CSSProperties, ReactNode } from 'react';
 
@@ -270,9 +271,14 @@ const backdropFocusedStyles = ( {
 	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
 
 	let boxShadow;
+	let outline;
+	let outlineOffset;
 
 	if ( isFocused ) {
 		boxShadow = `0 0 0 1px ${ COLORS.ui.borderFocus } inset`;
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline = `2px solid transparent`;
+		outlineOffset = `-2px`;
 	}
 
 	if ( disabled ) {
@@ -284,6 +290,8 @@ const backdropFocusedStyles = ( {
 		borderColor,
 		borderStyle: 'solid',
 		borderWidth: 1,
+		outline,
+		outlineOffset,
 	} );
 };
 
