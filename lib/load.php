@@ -155,8 +155,8 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
 
 /*
  * If the Font Library is available, load the Font Face files, else load the Fonts API.
- * This strategy is temporary until the Fonts Library is merged. It's used here to allow
- * the Font Face (redesigned Fonts API) to be merged before the Fonts Library while
+ * This strategy is temporary until the Font Library is merged. It's used here to allow
+ * the Font Face (redesigned Fonts API) to be merged before the Font Library while
  * keeping Fonts API available for sites that are using it.
  */
 if (

@@ -3,7 +3,7 @@
  * Test WP_Font_Family_Utils::get_filename_from_font_face().
  *
  * @package WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  *
  * @group fonts
  * @group font-library

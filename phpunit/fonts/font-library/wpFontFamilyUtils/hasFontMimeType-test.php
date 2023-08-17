@@ -3,7 +3,7 @@
  * Test WP_Font_Family_Utils::has_font_mime_type().
  *
  * @package WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  *
  * @group fonts
  * @group font-library

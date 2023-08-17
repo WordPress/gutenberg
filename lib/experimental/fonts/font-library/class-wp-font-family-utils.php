@@ -5,7 +5,7 @@
  * This file contains utils fot Font Family class.
  *
  * @package    WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  * @since      6.4.0
  */
 
@@ -14,7 +14,7 @@ if ( class_exists( 'WP_Font_Family_Utils' ) ) {
 }
 
 /**
- * A class of utilities for working with the Fonts Library.
+ * A class of utilities for working with the Font Library.
  *
  * @since 6.4.0
  */

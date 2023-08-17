@@ -14,7 +14,7 @@ if ( class_exists( 'WP_Font_Family' ) ) {
 }
 
 /**
- * Fonts Library class.
+ * Font Library class.
  *
  * @since 6.4.0
  */
