@@ -54,6 +54,8 @@ function getMounts(
 			? `user-home:/home/${ hostUsername }`
 			: `tests-user-home:/home/${ hostUsername }`;
 
+	const sslMount = workDirectoryPath + `/ssl:/home/${ hostUsername }/ssl`
+
 	const corePHPUnitMount = `${ path.join(
 		workDirectoryPath,
 		wordpressDefault === 'wordpress'
@@ -72,6 +74,7 @@ function getMounts(
 			coreMount, // Must be first because of some operations later that expect it to be!
 			corePHPUnitMount,
 			userHomeMount,
+			sslMount,
 			...directoryMounts,
 			...pluginMounts,
 			...themeMounts,
