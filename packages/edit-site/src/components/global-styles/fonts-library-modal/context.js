@@ -10,6 +10,9 @@ import {
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -27,11 +30,12 @@ import { setUIValuesNeeded, isUrlEncoded } from './utils';
 export const FontLibraryContext = createContext( {} );
 
 function FontLibraryProvider( { children } ) {
+	const { createErrorNotice, createSuccessNotice } = useDispatch( noticesStore );
+
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 
 	const refreshLibrary = () => {
 		setRefreshKey( ( prevKey ) => prevKey + 1 );
-		console.log("refreshLibrary", refreshKey);
 	};
 
 	const { records: posts = [] } = useEntityRecords(
@@ -188,9 +192,22 @@ function FontLibraryProvider( { children } ) {
 		const newLibraryFonts = await fetchInstallFonts( libraryFonts );
 	}
 
-	async function uninstallFont( fonts ) {
-		await fetchUninstallFonts( fonts );
-		refreshLibrary();
+	async function uninstallFonts( fonts ) {
+		try {
+			await fetchUninstallFonts( fonts );
+			createSuccessNotice(
+				__( `Font families were uninstalled.` ),
+				{ type: 'snackbar' }
+			);
+			refreshLibrary();
+			return true;
+		} catch ( e ) {
+			createErrorNotice(
+				__( 'Error uninstallind fonts.' ),
+				{ type: 'snackbar' }
+			);
+			return false;
+		}
 	}
 
 	const toggleActivateFont = ( font, face ) => {
@@ -332,7 +349,7 @@ function FontLibraryProvider( { children } ) {
 				googleFontsCategories,
 				loadFontFaceAsset,
 				installFonts,
-				uninstallFont,
+				uninstallFonts,
 				toggleActivateFont,
 				getAvailableFontsOutline,
 				modalTabOepn,

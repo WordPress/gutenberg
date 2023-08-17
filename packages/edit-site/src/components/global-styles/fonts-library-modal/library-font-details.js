@@ -10,8 +10,7 @@ import {
 	__experimentalText as Text,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
-import { store as noticesStore } from '@wordpress/notices';
-import { useDispatch } from '@wordpress/data';
+
 
 /**
  * Internal dependencies
@@ -21,10 +20,8 @@ import LibraryFontVariant from './library-font-variant';
 import PreviewControls from './preview-controls';
 
 function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
-	const { uninstallFont, isFontActivated } = useContext( FontLibraryContext );
+	const { uninstallFonts, isFontActivated } = useContext( FontLibraryContext );
 	const [ isConfirmOpen, setIsConfirmOpen ] = useState( false );
-	const { createErrorNotice, createSuccessNotice } =
-		useDispatch( noticesStore );
 
 	const fontFaces =
 		font.fontFace && font.fontFace.length
@@ -38,23 +35,11 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 			  ];
 
 	const handleConfirmUninstall = async () => {
-		try {
-			await uninstallFont( [ font ] );
-			createSuccessNotice(
-				__( `${ font?.name || font.fontFamily } was uninstalled.` ),
-				{ type: 'snackbar' }
-			);
-		} catch ( e ) {
-			createErrorNotice(
-				__(
-					`Error deleting font. ${
-						font?.name || font.fontFamily
-					} could not be uninstalled.`
-				),
-				{ type: 'snackbar' }
-			);
+		const result = await uninstallFonts( [ font ] );
+		// If the font was succesfully uninstalled it is unselected
+		if ( result ) {
+			handleUnselectFont();
 		}
-		handleUnselectFont();
 	};
 
 	const handleUninstallClick = async () => {
