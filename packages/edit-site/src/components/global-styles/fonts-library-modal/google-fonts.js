@@ -109,6 +109,7 @@ function GoogleFonts() {
 		setIsSaving( true );
 		await installFonts( newFonts );
 		setIsSaving( false );
+		setFontSelected( null );
 		setNewFonts( [] );
 	};
 

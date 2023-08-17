@@ -188,8 +188,22 @@ function FontLibraryProvider( { children } ) {
 		return activatedFontsOutline[ slug ] || [];
 	};
 
-	async function installFonts( libraryFonts ) {
-		const newLibraryFonts = await fetchInstallFonts( libraryFonts );
+	async function installFonts( fonts ) {
+		try {
+			await fetchInstallFonts( fonts );
+			createSuccessNotice(
+				__( `Font families were installed succesfully.` ),
+				{ type: 'snackbar' }
+			);
+			refreshLibrary();
+			return true;
+		} catch ( e ) {
+			createErrorNotice(
+				__( 'Error installing fonts.' ),
+				{ type: 'snackbar' }
+			);
+			return false;
+		}
 	}
 
 	async function uninstallFonts( fonts ) {
