@@ -26,7 +26,7 @@ export {
 export { useDispatch } from './components/use-dispatch';
 export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
-export { createRegistrySelector, createRegistryControl } from './factory';
+export { createRegistrySelector, createRegistryControl } from './utils';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
 export { dispatch } from './dispatch';
@@ -142,7 +142,7 @@ export const suspendSelect = defaultRegistry.suspendSelect;
  */
 export const subscribe = defaultRegistry.subscribe;
 
-export const subscribeOnChange = defaultRegistry.subscribeOnChange;
+export const waitForTransition = defaultRegistry.waitForTransition;
 
 /**
  * Registers a generic store instance.

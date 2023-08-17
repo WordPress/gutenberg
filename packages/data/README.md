@@ -669,26 +669,6 @@ _Parameters_
 -   _listener_ `Function`: Callback function.
 -   _storeNameOrDescriptor_ `string|StoreDescriptor?`: Optional store name.
 
-## subscribeOnChange
-
-Given a listener function and a state test function, waits for when the test function
-returns true, then calls the listener function when the results of calling the test function is false.
-
-_Usage_
-
-```js
-import { subscribeOnChange } from '@wordpress/data;
-
-// Wait for isSavingPost() to become true, then false.
-subscribeOnChange( () => { console.log( "Post saved." ); }, () => wp.data.select( 'core/editor' ).isSavingPost() );
-
-_Parameters
-
--   _listener_ `Function`: Callback function.
--   _test_ `Function`: Callback function.
-
-```
-
 ### suspendSelect
 
 Given a store descriptor, returns an object containing the store's selectors pre-bound to state so that you only need to supply additional arguments, and modified so that they throw promises in case the selector is not resolved yet.
@@ -872,6 +852,10 @@ _Parameters_
 _Returns_
 
 -   `Object`: Data object returned by the `mapSelect` function.
+
+### waitForTransition
+
+Undocumented declaration.
 
 ### withDispatch
 
