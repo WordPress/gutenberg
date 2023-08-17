@@ -252,7 +252,10 @@ test.describe( 'Links', () => {
 		// we do this to avoid an layout edge case whereby
 		// the rich link preview popover will obscure the block toolbar
 		// under very specific circumstances and screensizes.
-		await page.getByRole( 'button', { name: 'Unlink' } ).nth( 1 ).click();
+		await page
+			.locator( '.block-editor-link-control__search-item-top' )
+			.getByRole( 'button', { name: 'Unlink' } )
+			.click();
 
 		// The link should have been removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
