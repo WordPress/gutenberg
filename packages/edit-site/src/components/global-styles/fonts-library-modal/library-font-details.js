@@ -11,7 +11,6 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 
-
 /**
  * Internal dependencies
  */
@@ -20,7 +19,8 @@ import LibraryFontVariant from './library-font-variant';
 import PreviewControls from './preview-controls';
 
 function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
-	const { uninstallFonts, isFontActivated } = useContext( FontLibraryContext );
+	const { uninstallFonts, isFontActivated } =
+		useContext( FontLibraryContext );
 	const [ isConfirmOpen, setIsConfirmOpen ] = useState( false );
 
 	const fontFaces =

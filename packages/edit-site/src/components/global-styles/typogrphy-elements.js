@@ -16,7 +16,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { NavigationButtonAsItem } from './navigation-button';
 import Subtitle from './subtitle';
 
-import { unlock } from "../../lock-unlock";
+import { unlock } from '../../lock-unlock';
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function ElementItem( { parentMenu, element, label } ) {

@@ -30,7 +30,8 @@ import { setUIValuesNeeded, isUrlEncoded } from './utils';
 export const FontLibraryContext = createContext( {} );
 
 function FontLibraryProvider( { children } ) {
-	const { createErrorNotice, createSuccessNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 
@@ -198,10 +199,9 @@ function FontLibraryProvider( { children } ) {
 			refreshLibrary();
 			return true;
 		} catch ( e ) {
-			createErrorNotice(
-				__( 'Error installing fonts.' ),
-				{ type: 'snackbar' }
-			);
+			createErrorNotice( __( 'Error installing fonts.' ), {
+				type: 'snackbar',
+			} );
 			return false;
 		}
 	}
@@ -209,17 +209,15 @@ function FontLibraryProvider( { children } ) {
 	async function uninstallFonts( fonts ) {
 		try {
 			await fetchUninstallFonts( fonts );
-			createSuccessNotice(
-				__( `Font families were uninstalled.` ),
-				{ type: 'snackbar' }
-			);
+			createSuccessNotice( __( `Font families were uninstalled.` ), {
+				type: 'snackbar',
+			} );
 			refreshLibrary();
 			return true;
 		} catch ( e ) {
-			createErrorNotice(
-				__( 'Error uninstallind fonts.' ),
-				{ type: 'snackbar' }
-			);
+			createErrorNotice( __( 'Error uninstallind fonts.' ), {
+				type: 'snackbar',
+			} );
 			return false;
 		}
 	}
