@@ -1108,6 +1108,80 @@ test.describe( 'Links', () => {
 				)
 			).not.toBeVisible();
 		} );
+
+		test( 'should not show the Link UI when selection extends into another link', async ( {
+			page,
+			pageUtils,
+			editor,
+		} ) => {
+			const linkedTextOne = `Gutenberg`;
+			const linkedTextTwo = `Block Editor`;
+			const linkOneURL = 'https://wordpress.org';
+			const linkTwoURL = 'https://wordpress.org/gutenberg';
+
+			// Create a block with some text.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+			await page.keyboard.type(
+				`This is the ${ linkedTextOne }${ linkedTextTwo }`
+			);
+
+			// Select the linkedTextTwo.
+			await pageUtils.pressKeys( 'shift+ArrowLeft', {
+				times: linkedTextTwo.length,
+			} );
+
+			// Click on the Link button.
+			await page.getByRole( 'button', { name: 'Link' } ).click();
+
+			// Type a URL.
+			await page.keyboard.type( linkTwoURL );
+
+			// Update the link.
+			await pageUtils.pressKeys( 'Enter' );
+
+			// Move cursor next to the **end** of `linkTextOne`
+			await pageUtils.pressKeys( 'ArrowLeft', {
+				times: linkedTextTwo.length,
+			} );
+
+			// Select `linkTextOne`
+			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+			// Click on the Link button.
+			await page.getByRole( 'button', { name: 'Link' } ).click();
+
+			// Type a URL.
+			await page.keyboard.type( linkOneURL );
+
+			// Update the link.
+			await pageUtils.pressKeys( 'Enter' );
+
+			// Move cursor within `linkTextOne`
+			await pageUtils.pressKeys( 'ArrowLeft', {
+				times: 3,
+			} );
+
+			// Link UI should activate for `linkTextOne`
+			await expect(
+				page.locator(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).toBeVisible();
+
+			// Expand selection so that it overlaps with `linkTextTwo`
+			await pageUtils.pressKeys( 'ArrowRight', {
+				times: 3,
+			} );
+
+			// Link UI should be inactive.
+			await expect(
+				page.locator(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).not.toBeVisible();
+		} );
 	} );
 } );
 
