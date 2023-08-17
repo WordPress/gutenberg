@@ -103,16 +103,10 @@ function BlockRenameControl( props ) {
 						selectedClientIds.length === 1 &&
 						clientId === selectedClientIds[ 0 ];
 
-					// This check ensures
-					// - the `BlockSettingsMenuControls` fill
+					// This check ensures the `BlockSettingsMenuControls` fill
 					// doesn't render multiple times and also that it renders for
 					// the block from which the menu was triggered.
-					// - `Rename` only appears in the ListView options.
-					// - `Rename` only appears for blocks that support renaming.
-					if (
-						// __unstableDisplayLocation !== 'list-view' ||
-						! canRename
-					) {
+					if ( ! canRename ) {
 						return null;
 					}
 
