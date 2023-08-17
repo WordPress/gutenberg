@@ -32,8 +32,9 @@ jobs:
             - name: Checkout (for CLI)
               uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
               with:
-                  path: main
-                  ref: trunk
+                  path: cli
+                  # Publishing for WP might require different Node and npm versions than trunk so we switch branch to avoid mismatch.
+                  ref: ${{ github.event.inputs.release_type == 'wp' && format( 'wp/{0}', github.event.inputs.wp_version ) || 'trunk' }}
 
             - name: Checkout (for publishing)
               uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
@@ -52,13 +53,13 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
-                  node-version-file: 'main/.nvmrc'
+                  node-version-file: 'cli/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
 
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}
               run: |
-                  cd main
+                  cd cli
                   npm ci
                   ./bin/plugin/cli.js npm-next --ci --repository-path ../publish
               env:
@@ -67,7 +68,7 @@ jobs:
             - name: Publish packages to npm with bug fixes ("latest" dist-tag)
               if: ${{ github.event.inputs.release_type == 'bugfix' }}
               run: |
-                  cd main
+                  cd cli
                   npm ci
                   ./bin/plugin/cli.js npm-bugfix --ci --repository-path ../publish
               env:
@@ -76,7 +77,7 @@ jobs:
             - name: Publish packages to npm for WP major ("wp/${{ github.event.inputs.wp_version || 'X.Y' }}" dist-tag)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
               run: |
-                  cd main
+                  cd cli
                   npm ci
                   ./bin/plugin/cli.js npm-wp --wp-version=${{ github.event.inputs.wp_version }} --ci --repository-path ../publish
               env:
