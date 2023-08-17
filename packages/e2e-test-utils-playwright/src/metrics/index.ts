@@ -130,6 +130,9 @@ export class Metrics {
 			{
 				extends: 'lighthouse:default',
 				settings: {
+					// "provided" means no throttling.
+					// TODO: Make configurable.
+					throttlingMethod: 'provided',
 					// Only run certain audits to speed things up.
 					onlyAudits: Object.keys( audits ),
 				},
