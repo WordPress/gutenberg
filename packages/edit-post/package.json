@@ -39,7 +39,7 @@
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/dom": "^3.20.0",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
