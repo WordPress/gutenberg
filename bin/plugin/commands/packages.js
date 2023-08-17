@@ -424,6 +424,7 @@ async function publishPackagesToNpm( {
 			log(
 				'>> Trying to finish failed publishing of modified npm packages.'
 			);
+			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
 			await command(
 				`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
 				{
@@ -457,6 +458,7 @@ async function publishPackagesToNpm( {
 			log(
 				'>> Trying to finish failed publishing of modified npm packages.'
 			);
+			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
 			await command(
 				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
 				{
