@@ -354,6 +354,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						</div>
 					</NavigableToolbar>
 					<Slot
+						className="selected-block-toolbar-wrapper"
 						name="__experimentalSelectedBlockTools"
 						bubblesVirtually
 					/>
