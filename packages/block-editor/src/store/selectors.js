@@ -1978,7 +1978,7 @@ export const getInserterItems = createSelector(
 				id,
 				name: 'core/block',
 				initialAttributes: { ref: reusableBlock.id },
-				title: reusableBlock.title.raw,
+				title: reusableBlock.title?.raw,
 				icon,
 				category: 'reusable',
 				keywords: [ 'reusable' ],

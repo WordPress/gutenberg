@@ -54,7 +54,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			height: 24px;
 			margin-inline-end: ${ space( 2 ) };
 			padding: ${ space( 1 ) };
-			color: ${ COLORS.ui.theme };
+			color: ${ COLORS.theme.accent };
 			font-size: 13px;
 			line-height: 1;
 			text-align-last: center;

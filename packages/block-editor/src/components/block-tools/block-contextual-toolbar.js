@@ -7,7 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useLayoutEffect,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
@@ -76,6 +81,77 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	useEffect( () => {
 		setIsCollapsed( false );
 	}, [ selectedBlockClientId ] );
+
+	const isLargerThanTabletViewport = useViewportMatch( 'large', '>=' );
+	const isFullscreen =
+		document.body.classList.contains( 'is-fullscreen-mode' );
+
+	useLayoutEffect( () => {
+		// don't do anything if not fixed toolbar
+		if ( ! isFixed || ! blockType ) {
+			return;
+		}
+
+		const blockToolbar = document.querySelector(
+			'.block-editor-block-contextual-toolbar'
+		);
+
+		if ( ! blockToolbar ) {
+			return;
+		}
+
+		if ( ! isLargerThanTabletViewport ) {
+			// set the width of the toolbar to auto
+			blockToolbar.style = {};
+			return;
+		}
+
+		if ( isCollapsed ) {
+			// set the width of the toolbar to auto
+			blockToolbar.style.width = 'auto';
+			return;
+		}
+
+		// get the width of the pinned items in the post editor
+		const pinnedItems = document.querySelector(
+			'.edit-post-header__settings'
+		);
+
+		// get the width of the left header in the site editor
+		const leftHeader = document.querySelector(
+			'.edit-site-header-edit-mode__end'
+		);
+
+		const computedToolbarStyle = window.getComputedStyle( blockToolbar );
+		const computedPinnedItemsStyle = pinnedItems
+			? window.getComputedStyle( pinnedItems )
+			: false;
+		const computedLeftHeaderStyle = leftHeader
+			? window.getComputedStyle( leftHeader )
+			: false;
+
+		const marginLeft = parseFloat( computedToolbarStyle.marginLeft );
+		const pinnedItemsWidth = computedPinnedItemsStyle
+			? parseFloat( computedPinnedItemsStyle.width ) + 10 // 10 is the pinned items padding
+			: 0;
+		const leftHeaderWidth = computedLeftHeaderStyle
+			? parseFloat( computedLeftHeaderStyle.width )
+			: 0;
+
+		// set the new witdth of the toolbar
+		blockToolbar.style.width = `calc(100% - ${
+			leftHeaderWidth +
+			pinnedItemsWidth +
+			marginLeft +
+			( isFullscreen ? 0 : 160 ) // the width of the admin sidebar expanded
+		}px)`;
+	}, [
+		isFixed,
+		isLargerThanTabletViewport,
+		isCollapsed,
+		isFullscreen,
+		blockType,
+	] );
 
 	const isToolbarEnabled =
 		! blockType ||

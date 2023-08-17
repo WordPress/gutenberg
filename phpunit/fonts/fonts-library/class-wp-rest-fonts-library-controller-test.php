@@ -131,11 +131,11 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 						'name'       => 'Piazzolla',
 						'fontFace'   => array(
 							array(
-								'fontFamily'        => 'Piazzolla',
-								'fontStyle'         => 'normal',
-								'fontWeight'        => '400',
-								'src'               => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-								'download_from_url' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+								'fontFamily'      => 'Piazzolla',
+								'fontStyle'       => 'normal',
+								'fontWeight'      => '400',
+								'src'             => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+								'downloadFromUrl' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
 							),
 						),
 					),
@@ -145,11 +145,11 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 						'name'       => 'Montserrat',
 						'fontFace'   => array(
 							array(
-								'fontFamily'        => 'Montserrat',
-								'fontStyle'         => 'normal',
-								'fontWeight'        => '100',
-								'src'               => 'http://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Uw-Y3tcoqK5.ttf',
-								'download_from_url' => 'http://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Uw-Y3tcoqK5.ttf',
+								'fontFamily'      => 'Montserrat',
+								'fontStyle'       => 'normal',
+								'fontWeight'      => '100',
+								'src'             => 'http://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Uw-Y3tcoqK5.ttf',
+								'downloadFromUrl' => 'http://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Uw-Y3tcoqK5.ttf',
 							),
 						),
 					),
@@ -272,10 +272,10 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 						'name'       => 'Piazzolla',
 						'fontFace'   => array(
 							array(
-								'fontFamily'    => 'Piazzolla',
-								'fontStyle'     => 'normal',
-								'fontWeight'    => '400',
-								'uploaded_file' => 'files0',
+								'fontFamily'   => 'Piazzolla',
+								'fontStyle'    => 'normal',
+								'fontWeight'   => '400',
+								'uploadedFile' => 'files0',
 							),
 						),
 					),
@@ -285,10 +285,10 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 						'name'       => 'Montserrat',
 						'fontFace'   => array(
 							array(
-								'fontFamily'    => 'Montserrat',
-								'fontStyle'     => 'normal',
-								'fontWeight'    => '100',
-								'uploaded_file' => 'files1',
+								'fontFamily'   => 'Montserrat',
+								'fontStyle'    => 'normal',
+								'fontWeight'   => '100',
+								'uploadedFile' => 'files1',
 							),
 						),
 					),
@@ -418,10 +418,10 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 						'slug'       => 'piazzolla',
 						'fontFace'   => array(
 							array(
-								'fontFamily'    => 'Piazzolla',
-								'fontStyle'     => 'normal',
-								'fontWeight'    => '400',
-								'uploaded_file' => 'files0',
+								'fontFamily'   => 'Piazzolla',
+								'fontStyle'    => 'normal',
+								'fontWeight'   => '400',
+								'uploadedFile' => 'files0',
 							),
 						),
 					),
@@ -437,10 +437,10 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 						'slug'       => 'piazzolla',
 						'fontFace'   => array(
 							array(
-								'fontFamily'    => 'Piazzolla',
-								'fontStyle'     => 'normal',
-								'fontWeight'    => '400',
-								'uploaded_file' => 'files666',
+								'fontFamily'   => 'Piazzolla',
+								'fontStyle'    => 'normal',
+								'fontWeight'   => '400',
+								'uploadedFile' => 'files666',
 							),
 						),
 					),
@@ -456,7 +456,7 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'fontface with incompatible properties (download_from_url and uploaded_file together)' => array(
+			'fontface with incompatible properties (downloadFromUrl and uploadedFile together)' => array(
 				'font_families' => array(
 					array(
 						'fontFamily' => 'Piazzolla',
@@ -464,12 +464,12 @@ class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
 						'name'       => 'Piazzolla',
 						'fontFace'   => array(
 							array(
-								'fontFamily'        => 'Piazzolla',
-								'fontStyle'         => 'normal',
-								'fontWeight'        => '400',
-								'src'               => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-								'download_from_url' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-								'uploaded_file'     => 'files0',
+								'fontFamily'      => 'Piazzolla',
+								'fontStyle'       => 'normal',
+								'fontWeight'      => '400',
+								'src'             => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+								'downloadFromUrl' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+								'uploadedFile'    => 'files0',
 							),
 						),
 					),

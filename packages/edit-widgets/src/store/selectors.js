@@ -19,6 +19,11 @@ import {
 } from './utils';
 import { STORE_NAME as editWidgetsStoreName } from './constants';
 
+const EMPTY_INSERTION_POINT = {
+	rootClientId: undefined,
+	insertionIndex: undefined,
+};
+
 /**
  * Returns all API widgets.
  *
@@ -254,8 +259,11 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID and index to insert at.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex } = state.blockInserterPanel;
-	return { rootClientId, insertionIndex };
+	if ( typeof state === 'boolean' ) {
+		return EMPTY_INSERTION_POINT;
+	}
+
+	return state.blockInserterPanel;
 }
 
 /**

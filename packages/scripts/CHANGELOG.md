@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Updated `npm-package-json-lint` peer dependency to require v6.0.0 [#53636](https://github.com/WordPress/gutenberg/pull/53636)
+-   The bundled `@svgr/webpack` dependency has been updated from requiring ^6.2.1 to requiring ^8.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
+-   The bundled `cssnano` dependency has been updated from requiring ^5.07 to requiring ^6.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
+
 ### Bug Fix
 
 -   Fix prevent watch mode from aborting when encountering a `block.json` file that contains invalid JSON. ([#51971](https://github.com/WordPress/gutenberg/pull/51971))

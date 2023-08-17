@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
-import {
-	BlockSettingsMenuControls,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
@@ -103,34 +100,29 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 		setIsModalOpen( false );
 	};
 	return (
-		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
-				<>
-					<MenuItem
-						icon={ symbol }
-						onClick={ () => setIsModalOpen( true ) }
-					>
-						{ __( 'Create pattern' ) }
-					</MenuItem>
-					{ isModalOpen && (
-						<CreatePatternModal
-							clientIds={ clientIds }
-							onSuccess={ ( pattern ) => {
-								handleSuccess( pattern );
-								onClose();
-							} }
-							onError={ () => {
-								setIsModalOpen( false );
-								onClose();
-							} }
-							onClose={ () => {
-								setIsModalOpen( false );
-								onClose();
-							} }
-						/>
-					) }
-				</>
+		<>
+			<MenuItem
+				icon={ symbol }
+				onClick={ () => setIsModalOpen( true ) }
+				aria-expanded={ isModalOpen }
+				aria-haspopup="dialog"
+			>
+				{ __( 'Create pattern' ) }
+			</MenuItem>
+			{ isModalOpen && (
+				<CreatePatternModal
+					clientIds={ clientIds }
+					onSuccess={ ( pattern ) => {
+						handleSuccess( pattern );
+					} }
+					onError={ () => {
+						setIsModalOpen( false );
+					} }
+					onClose={ () => {
+						setIsModalOpen( false );
+					} }
+				/>
 			) }
-		</BlockSettingsMenuControls>
+		</>
 	);
 }
