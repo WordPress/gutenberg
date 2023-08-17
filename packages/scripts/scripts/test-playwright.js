@@ -40,7 +40,7 @@ if ( result.status > 0 ) {
 const config =
 	! hasArgInCLI( '--config' ) &&
 	! hasProjectFile( 'playwright.config.ts' ) &&
-	! hasProjectFile( 'playwright.config.ts' )
+	! hasProjectFile( 'playwright.config.js' )
 		? [ '--config', fromConfigRoot( 'playwright.config.ts' ) ]
 		: [];
 
