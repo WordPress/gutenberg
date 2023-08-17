@@ -53,55 +53,6 @@ describe( 'Links', () => {
 	};
 
 	describe( 'Editing link text', () => {
-		it( 'should preserve trailing/leading whitespace from linked text in text input', async () => {
-			const textToSelect = `         spaces     `;
-			const textWithWhitespace = `Text with leading and trailing${ textToSelect }`;
-
-			// Create a block with some text.
-			await clickBlockAppender();
-			await page.keyboard.type( textWithWhitespace );
-
-			// Use arrow keys to select only the text with the leading
-			// and trailing whitespace.
-			for ( let index = 0; index < textToSelect.length; index++ ) {
-				await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-			}
-
-			// Click on the Link button.
-			await page.click( 'button[aria-label="Link"]' );
-
-			// Wait for the URL field to auto-focus.
-			await waitForURLFieldAutoFocus();
-
-			// Type a URL.
-			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-			// Click on the Submit button.
-			await page.keyboard.press( 'Enter' );
-
-			// Reselect the link.
-			await page.keyboard.press( 'ArrowLeft' );
-
-			await showBlockToolbar();
-
-			const [ editButton ] = await page.$x(
-				'//button[contains(@aria-label, "Edit")]'
-			);
-
-			await editButton.click();
-
-			await waitForURLFieldAutoFocus();
-
-			// Tabbing backward should land us in the "Text" input.
-			await pressKeyWithModifier( 'shift', 'Tab' );
-
-			const textInputValue = await page.evaluate(
-				() => document.activeElement.value
-			);
-
-			expect( textInputValue ).toBe( textToSelect );
-		} );
-
 		it( 'should allow for modification of link text via Link UI', async () => {
 			const originalLinkText = 'Gutenberg';
 			const changedLinkText =

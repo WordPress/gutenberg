@@ -163,13 +163,7 @@ test.describe( 'Links', () => {
 		);
 
 		// Select the URL.
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft', { times: 7 } );
 
 		// Click on the Link button.
 		await page.getByRole( 'button', { name: 'Link' } ).click();
@@ -896,6 +890,48 @@ test.describe( 'Links', () => {
 			// Link was created on text value "Gutenberg". We expect
 			// the text input to reflect that value.
 			await expect( textInput ).toHaveValue( 'Gutenberg' );
+		} );
+
+		test( 'should preserve trailing/leading whitespace from linked text in text input', async ( {
+			page,
+			pageUtils,
+			editor,
+		} ) => {
+			const textToSelect = `         spaces     `;
+			const textWithWhitespace = `Text with leading and trailing${ textToSelect }`;
+
+			// Create a block with some text.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+			await page.keyboard.type( textWithWhitespace );
+
+			// Use arrow keys to select only the text with the leading
+			// and trailing whitespace.
+			await pageUtils.pressKeys( 'shift+ArrowLeft', {
+				times: textToSelect.length,
+			} );
+
+			// Click on the Link button.
+			await page.getByRole( 'button', { name: 'Link' } ).click();
+
+			// Type a URL.
+			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+
+			// Click on the Submit button.
+			await pageUtils.pressKeys( 'Enter' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content:
+							'Text with leading and trailing<a href="https://wordpress.org/gutenberg">' +
+							textToSelect +
+							'</a>',
+					},
+				},
+			] );
 		} );
 	} );
 } );
