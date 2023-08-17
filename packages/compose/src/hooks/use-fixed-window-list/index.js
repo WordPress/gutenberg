@@ -27,6 +27,7 @@ const DEFAULT_INIT_WINDOW_SIZE = 30;
  * @property {number}  [windowOverscan] Renders windowOverscan number of items before and after the calculated visible window.
  * @property {boolean} [useWindowing]   When false avoids calculating the window size
  * @property {number}  [initWindowSize] Initial window size to use on first render before we can calculate the window size.
+ * @property {any}     [watch]          A variable to watch for changes to trigger a recalculation of the window size.
  */
 
 /**
@@ -59,9 +60,8 @@ export default function useFixedWindowList(
 		if ( ! useWindowing ) {
 			return;
 		}
-		const scrollContainer = elementRef.current?.closest(
-			'.edit-post-editor__list-view-panel-content'
-		);
+
+		const scrollContainer = getScrollContainer( elementRef.current );
 
 		const measureWindow = (
 			/** @type {boolean | undefined} */ initRender
@@ -128,7 +128,14 @@ export default function useFixedWindowList(
 				debounceMeasureList
 			);
 		};
-	}, [ itemHeight, elementRef, totalItems ] );
+	}, [
+		itemHeight,
+		elementRef,
+		totalItems,
+		options?.windowOverscan,
+		options?.watch,
+		useWindowing,
+	] );
 
 	useLayoutEffect( () => {
 		if ( ! useWindowing ) {
@@ -171,7 +178,14 @@ export default function useFixedWindowList(
 				handleKeyDown
 			);
 		};
-	}, [ totalItems, itemHeight, elementRef, fixedListWindow.visibleItems ] );
+	}, [
+		totalItems,
+		itemHeight,
+		elementRef,
+		fixedListWindow.visibleItems,
+		useWindowing,
+		options?.watch,
+	] );
 
 	return [ fixedListWindow, setFixedListWindow ];
 }
