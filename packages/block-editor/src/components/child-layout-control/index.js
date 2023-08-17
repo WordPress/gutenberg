@@ -154,7 +154,7 @@ export default function ChildLayoutControl( {
 		}
 
 		return widthOptions.find(
-			( { _value } ) => _value.key === selectedValue
+			( { _value } ) => _value?.key === selectedValue
 		);
 	};
 
@@ -173,7 +173,7 @@ export default function ChildLayoutControl( {
 			selectedValue = 'fit';
 		}
 		return heightOptions.find(
-			( { _value } ) => _value.key === selectedValue
+			( { _value } ) => _value?.key === selectedValue
 		);
 	};
 
