@@ -37,8 +37,8 @@ import {
 	isContentPositionCenter,
 	getPositionClassName,
 	mediaPosition,
+	getCoverIsDark,
 } from '../shared';
-import useCoverIsDark from './use-cover-is-dark';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
@@ -104,6 +104,8 @@ function CoverEdit( {
 		postId
 	);
 
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const media = useSelect(
 		( select ) =>
 			featuredImage &&
@@ -111,6 +113,26 @@ function CoverEdit( {
 		[ featuredImage ]
 	);
 	const mediaUrl = media?.source_url;
+
+	useEffect( () => {
+		async function setIsDark() {
+			__unstableMarkNextChangeAsNotPersistent();
+			const isDarkSetting = await getCoverIsDark(
+				mediaUrl,
+				dimRatio,
+				overlayColor.color
+			);
+			setAttributes( {
+				isDark: isDarkSetting,
+			} );
+		}
+		if ( useFeaturedImage ) {
+			setIsDark();
+		}
+		// We only ever want to run this effect if the mediaUrl changes.
+		// All other changes to the isDark state are handled in the appropriate event handlers.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ mediaUrl ] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -124,24 +146,64 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
-	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
+	const setMedia = attributesFromMedia( setAttributes, dimRatio );
+
+	const onSelectMedia = async ( newMedia ) => {
+		const isDarkSetting = await getCoverIsDark(
+			newMedia.url,
+			dimRatio,
+			overlayColor.color
+		);
+		setMedia( newMedia, isDarkSetting );
+	};
+
+	const onClearMedia = async () => {
+		const isDarkSetting = await getCoverIsDark(
+			undefined,
+			dimRatio,
+			overlayColor.color
+		);
+		setAttributes( {
+			url: undefined,
+			id: undefined,
+			backgroundType: undefined,
+			focalPoint: undefined,
+			hasParallax: undefined,
+			isRepeated: undefined,
+			useFeaturedImage: false,
+			isDark: isDarkSetting,
+		} );
+	};
+
+	const onSetOverlayColor = async ( colorValue ) => {
+		const isDarkSetting = await getCoverIsDark( url, dimRatio, colorValue );
+		setOverlayColor( colorValue );
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			isDark: isDarkSetting,
+		} );
+	};
+
+	const onUpdateDimRatio = async ( newDimRatio ) => {
+		const isDarkSetting = await getCoverIsDark(
+			url,
+			newDimRatio,
+			overlayColor.color
+		);
+
+		setAttributes( {
+			dimRatio: newDimRatio,
+			isDark: isDarkSetting,
+		} );
+	};
+
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
-
-	const isCoverDark = useCoverIsDark( url, dimRatio, overlayColor.color );
-
-	useEffect( () => {
-		// This side-effect should not create an undo level.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isDark: isCoverDark } );
-	}, [ isCoverDark ] );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -220,7 +282,10 @@ function CoverEdit( {
 		overlayColor,
 	};
 
-	const toggleUseFeaturedImage = () => {
+	const toggleUseFeaturedImage = async () => {
+		const isDarkSetting = await ( useFeaturedImage
+			? getCoverIsDark( undefined, dimRatio, overlayColor.color )
+			: getCoverIsDark( mediaUrl, dimRatio, overlayColor.color ) );
 		setAttributes( {
 			id: undefined,
 			url: undefined,
@@ -229,6 +294,7 @@ function CoverEdit( {
 			backgroundType: useFeaturedImage
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
+			isDark: isDarkSetting,
 		} );
 	};
 
@@ -247,10 +313,12 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			clientId={ clientId }
-			setOverlayColor={ setOverlayColor }
+			setOverlayColor={ onSetOverlayColor }
 			coverRef={ ref }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+			updateDimRatio={ onUpdateDimRatio }
+			onClearMedia={ onClearMedia }
 		/>
 	);
 
@@ -304,7 +372,7 @@ function CoverEdit( {
 							<ColorPalette
 								disableCustomColors={ true }
 								value={ overlayColor.color }
-								onChange={ setOverlayColor }
+								onChange={ onSetOverlayColor }
 								clearable={ false }
 							/>
 						</div>

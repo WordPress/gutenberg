@@ -108,6 +108,7 @@
 		"device-tests-canary": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --no-cache --maxWorkers=2 --testPathPattern=@canary --config ./jest_ui.config.js",
 		"device-tests:local": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit --config ./jest_ui.config.js",
 		"device-tests:debug": "cross-env NODE_ENV=test node $NODE_DEBUG_OPTION --inspect-brk node_modules/jest/bin/jest --runInBand --detectOpenHandles --verbose --config ./jest_ui.config.js",
+		"appium:start": "node ./__device-tests__/helpers/appium-local-start.js",
 		"test:e2e:bundle:android": "mkdir -p android/app/src/main/assets && npm run rn-bundle -- --reset-cache --platform android --dev false --minify false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
 		"test:e2e:build-app:android": "cd android && ./gradlew clean && ./gradlew assembleDebug",
 		"test:e2e:android:local": "npm run test:e2e:bundle:android && npm run test:e2e:build-app:android && TEST_RN_PLATFORM=android npm run device-tests:local",

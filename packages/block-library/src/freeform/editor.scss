@@ -376,14 +376,20 @@ div[data-type="core/freeform"] {
 }
 
 .block-editor-freeform-modal {
-	.components-modal__frame {
+	.block-editor-freeform-modal__content {
+		.mce-edit-area iframe {
+			height: 50vh !important;
+		}
 		// On large screens, make the TinyMCE edit area grow to take all the
 		// available height so that the Cancel/Save buttons are always into the
 		// view. On smaller screens, the modal content is scrollable.
 		@include break-large() {
+
 			// On medium and large screens, the modal component sets a max-height.
 			// We want the modal to be as tall as possible also when the content is short.
-			height: 9999rem;
+			&:not(.is-full-screen) {
+				height: 9999rem;
+			}
 
 			.components-modal__header + div {
 				height: 100%;
@@ -397,6 +403,7 @@ div[data-type="core/freeform"] {
 				height: 100%;
 				display: flex;
 				flex-direction: column;
+				min-width: 50vw;
 			}
 
 			.mce-edit-area {

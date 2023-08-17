@@ -155,7 +155,7 @@ export const ItemBaseUI = styled.li`
 	}
 
 	&.is-active {
-		background-color: ${ COLORS.ui.theme };
+		background-color: ${ COLORS.theme.accent };
 		color: ${ COLORS.white };
 
 		> button,

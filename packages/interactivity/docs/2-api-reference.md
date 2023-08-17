@@ -657,5 +657,31 @@ wp_store(
 );
 ```
 
+### Store options
+
+The `store` function accepts an object as a second argument with the following optional properties:
+
+#### `afterLoad`
+
+Callback to be executed after the Interactivity API has been set up and the store is ready. It receives the global store as argument.
+
+```js
+// view.js
+store(
+	{
+		state: {
+			cart: [],
+		},
+	},
+	{
+		afterLoad: async ( { state } ) => {
+			// Let's consider `clientId` is added
+			// during server-side rendering.
+			state.cart = await getCartData( state.clientId );
+		},
+	}
+);
+```
+
 
 
