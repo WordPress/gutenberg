@@ -116,7 +116,7 @@ function FontLibraryProvider( { children } ) {
 		useState( null );
 
 	// Demo
-	const loadedFontUrls = new Set();
+	const [ loadedFontUrls ] = useState( new Set() );
 	const [ demoConfig, setDemoConfig ] = useState( DEFAULT_DEMO_CONFIG );
 	const updateDemoConfig = ( key, value ) => {
 		setDemoConfig( {
@@ -310,7 +310,6 @@ function FontLibraryProvider( { children } ) {
 			// If the url is not valid we mark the font as loaded
 			console.error( e );
 		}
-
 		loadedFontUrls.add( src );
 	};
 
