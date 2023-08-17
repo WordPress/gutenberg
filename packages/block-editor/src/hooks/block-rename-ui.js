@@ -14,12 +14,10 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../store';
 import {
 	BlockSettingsMenuControls,
 	useBlockDisplayInformation,
@@ -92,12 +90,12 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 export const withBlockRenameControl = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const [ renamingBlock, setRenamingBlock ] = useState( false );
-		const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 		const {
 			clientId,
 			name: blockName,
 			attributes: blockAttributes,
+			setAttributes,
 		} = props;
 
 		const blockInformation = useBlockDisplayInformation( clientId );
@@ -165,7 +163,7 @@ export const withBlockRenameControl = createHigherOrderComponent(
 								newName = undefined;
 							}
 
-							updateBlockAttributes( clientId, {
+							setAttributes( {
 								// Include existing metadata (if present) to avoid overwriting existing.
 								metadata: {
 									...( blockAttributes?.metadata &&
