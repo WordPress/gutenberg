@@ -983,6 +983,52 @@ test.describe( 'Links', () => {
 				},
 			] );
 		} );
+
+		test( 'should display (capture the) text from the currently active link even if there is a rich text selection', async ( {
+			page,
+			pageUtils,
+			LinkUtils,
+		} ) => {
+			const originalLinkText = 'Gutenberg';
+
+			await LinkUtils.createAndReselectLink();
+
+			// Make a collapsed selection inside the link in order
+			// to activate the Link UI.
+			await pageUtils.pressKeys( 'ArrowLeft' );
+			await pageUtils.pressKeys( 'ArrowRight' );
+
+			await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+			await page
+				.getByRole( 'region', { name: 'Editor content' } )
+				.getByRole( 'button', { name: 'Advanced' } )
+				.click();
+
+			// Wait for settings to open.
+			await expect( page.getByLabel( 'Open in new tab' ) ).toBeVisible();
+
+			// Move focus back to RichText for the underlying link.
+			await pageUtils.pressKeys( 'shift+Tab', {
+				times: 3,
+			} );
+
+			// Make a selection within the RichText.
+			await pageUtils.pressKeys( 'shift+ArrowRight', {
+				times: 3,
+			} );
+
+			// Move back to the text input.
+			await page.keyboard.press( 'Tab' );
+
+			const textInput = page.getByLabel( 'Text', { exact: true } );
+
+			// Making a selection within the link text whilst the Link UI
+			// is open should not alter the value in the Link UI's text
+			// input. It should remain as the full text of the currently
+			// focused link format.
+			await expect( textInput ).toHaveValue( originalLinkText );
+		} );
 	} );
 } );
 
