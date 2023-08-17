@@ -10,7 +10,7 @@ require_once __DIR__ . '/base.php';
 
 /**
  * @group fonts
- * @group fonts-library
+ * @group font-library
  *
  * @covers WP_Font_Family::install
  */

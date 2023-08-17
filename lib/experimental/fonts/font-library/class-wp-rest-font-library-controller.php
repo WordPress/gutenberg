@@ -9,7 +9,7 @@
  * @since      6.4.0
  */
 
-if ( class_exists( 'WP_REST_Fonts_Library_Controller' ) ) {
+if ( class_exists( 'WP_REST_Font_Library_Controller' ) ) {
 	return;
 }
 
@@ -18,7 +18,7 @@ if ( class_exists( 'WP_REST_Fonts_Library_Controller' ) ) {
  *
  * @since 6.4.0
  */
-class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
+class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructor.
@@ -43,7 +43,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'install_fonts' ),
-					'permission_callback' => array( $this, 'update_fonts_library_permissions_check' ),
+					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
 					'args'                => array(
 						'fontFamilies' => array(
 							'required'          => true,
@@ -62,7 +62,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => array( $this, 'uninstall_fonts' ),
-					'permission_callback' => array( $this, 'update_fonts_library_permissions_check' ),
+					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
 					'args'                => $this->uninstall_schema(),
 				),
 			)
@@ -216,7 +216,7 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Removes font families from the fonts library and all their assets.
+	 * Removes font families from the Font Library and all their assets.
 	 *
 	 * @since 6.4.0
 	 *
@@ -240,17 +240,17 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Checks whether the user has permissions to update the fonts library.
+	 * Checks whether the user has permissions to update the Font Library.
 	 *
 	 * @since 6.4.0
 	 *
 	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
-	public function update_fonts_library_permissions_check() {
+	public function update_font_library_permissions_check() {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
-				'rest_cannot_update_fonts_library',
-				__( 'Sorry, you are not allowed to update the fonts library on this site.', 'gutenberg' ),
+				'rest_cannot_update_font_library',
+				__( 'Sorry, you are not allowed to update the Font Library on this site.', 'gutenberg' ),
 				array(
 					'status' => rest_authorization_required_code(),
 				)
@@ -277,13 +277,13 @@ class WP_REST_Fonts_Library_Controller extends WP_REST_Controller {
 	 * Installs new fonts.
 	 *
 	 * Takes a request containing new fonts to install, downloads their assets, and adds them
-	 * to the fonts library.
+	 * to the Font Library.
 	 *
 	 * @since 6.4.0
 	 *
 	 * @param WP_REST_Request $request The request object containing the new fonts to install
 	 *                                 in the request parameters.
-	 * @return WP_REST_Response|WP_Error The updated fonts library post content.
+	 * @return WP_REST_Response|WP_Error The updated Font Library post content.
 	 */
 	public function install_fonts( $request ) {
 		// Get new fonts to install.

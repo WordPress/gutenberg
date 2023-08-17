@@ -1,16 +1,16 @@
 <?php
 /**
- * Test WP_Fonts_Library::set_upload_dir().
+ * Test WP_Font_Library::set_upload_dir().
  *
  * @package WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  *
  * @group fonts
- * @group fonts-library
+ * @group font-library
  *
- * @covers WP_Fonts_Library::set_upload_dir
+ * @covers WP_Font_Library::set_upload_dir
  */
-class Tests_Fonts_WpFontsLibrary_SetUploadDir extends WP_UnitTestCase {
+class Tests_Fonts_WpFontLibrary_SetUploadDir extends WP_UnitTestCase {
 
 	public function test_should_set_fonts_upload_dir() {
 		$defaults = array(
@@ -25,6 +25,6 @@ class Tests_Fonts_WpFontsLibrary_SetUploadDir extends WP_UnitTestCase {
 			'path'    => '/var/www/html/wp-content/uploads/fonts',
 			'url'     => 'http://example.com/wp-content/uploads/fonts',
 		);
-		$this->assertSame( $expected, WP_Fonts_Library::set_upload_dir( $defaults ) );
+		$this->assertSame( $expected, WP_Font_Library::set_upload_dir( $defaults ) );
 	}
 }

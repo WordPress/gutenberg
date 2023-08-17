@@ -6,7 +6,7 @@
  * @subpackage Fonts Library
  *
  * @group fonts
- * @group fonts-library
+ * @group font-library
  *
  * @covers WP_Font_Family_Utils::get_filename_from_font_face
  */

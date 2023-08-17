@@ -6,7 +6,7 @@
  * @subpackage Fonts Library
  *
  * @group fonts
- * @group fonts-library
+ * @group font-library
  *
  * @covers WP_Font_Family_Utils::has_font_mime_type
  */
