@@ -1030,6 +1030,85 @@ test.describe( 'Links', () => {
 			await expect( textInput ).toHaveValue( originalLinkText );
 		} );
 	} );
+
+	test.describe( 'Disabling Link UI active state', () => {
+		test( 'should not show the Link UI when selection extends beyond link boundary', async ( {
+			page,
+			pageUtils,
+			editor,
+		} ) => {
+			const linkedText = `Gutenberg`;
+			const textBeyondLinkedText = ` and more text.`;
+
+			// Create a block with some text.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+			await page.keyboard.type(
+				`This is ${ linkedText }${ textBeyondLinkedText }`
+			);
+
+			// Move cursor next to end of `linkedText`
+			await pageUtils.pressKeys( 'ArrowLeft', {
+				times: textBeyondLinkedText.length,
+			} );
+
+			// Select the linkedText.
+			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+			// Click on the Link button.
+			await page.getByRole( 'button', { name: 'Link' } ).click();
+
+			// Type a URL.
+			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
+
+			// Update the link.
+			await pageUtils.pressKeys( 'Enter' );
+
+			await pageUtils.pressKeys( 'ArrowLeft' );
+			await pageUtils.pressKeys( 'ArrowLeft' );
+
+			await expect(
+				page.locator(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).toBeVisible();
+
+			// Make selection starting within the link and moving beyond boundary to the left.
+			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft', {
+				times: linkedText.length,
+			} );
+
+			// The Link UI should have disappeared (i.e. be inactive).
+			await expect(
+				page.locator(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).not.toBeVisible();
+
+			// Cancel selection and move back within the Link.
+			await pageUtils.pressKeys( 'ArrowRight' );
+
+			// We should see the Link UI displayed again.
+			await expect(
+				page.locator(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).toBeVisible();
+
+			// Make selection starting within the link and moving beyond boundary to the right.
+			await pageUtils.pressKeys( 'shift+ArrowRight', {
+				times: 3,
+			} );
+
+			// The Link UI should have disappeared (i.e. be inactive).
+			await expect(
+				page.locator(
+					'.components-popover__content .block-editor-link-control'
+				)
+			).not.toBeVisible();
+		} );
+	} );
 } );
 
 class LinkUtils {
