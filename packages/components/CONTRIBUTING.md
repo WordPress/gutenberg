@@ -622,7 +622,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 		const meta: ComponentMeta< typeof MyComponent > = {
 			parameters: {
 				controls: { expanded: true },
-				docs: { source: { state: 'open' } },
+				docs: { canvas: { sourceState: 'shown' } },
 			},
 		};
 		```

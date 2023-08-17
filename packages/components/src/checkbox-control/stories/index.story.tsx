@@ -31,7 +31,7 @@ const meta: ComponentMeta< typeof CheckboxControl > = {
 			expanded: true,
 			exclude: [ 'heading' ],
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;

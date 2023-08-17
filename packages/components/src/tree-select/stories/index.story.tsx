@@ -27,7 +27,7 @@ const meta: ComponentMeta< typeof TreeSelect > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 

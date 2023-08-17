@@ -32,7 +32,7 @@ const meta = {
 		children: 'Would you like to privately publish the post now?',
 	},
 	parameters: {
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 
