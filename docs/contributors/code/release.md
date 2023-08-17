@@ -4,41 +4,41 @@ The [Gutenberg repository](https://github.com/WordPress/gutenberg) on GitHub is 
 
 Before you begin, there are some requirements that must be met in order to successfully release a stable version of the Gutenberg plugin. You will need to:
 
-- Be a member of the [Gutenberg development team](https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams). This gives you the ability to launch the GitHub actions that are related to the release process and to backport pull requests (PRs) to the release branch.
-- Have write permissions on the [Make WordPress Core](http://make.wordpress.org/core) blog. This allows you to draft the release post.
-- Obtain approval from a member of the Gutenberg Core team in order to upload the new version Gutenberg to the WordPress.org plugin directory.
+-   Be a member of the [Gutenberg development team](https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams). This gives you the ability to launch the GitHub actions that are related to the release process and to backport pull requests (PRs) to the release branch.
+-   Have write permissions on the [Make WordPress Core](http://make.wordpress.org/core) blog. This allows you to draft the release post.
+-   Obtain approval from a member of the Gutenberg Core team in order to upload the new version Gutenberg to the WordPress.org plugin directory.
 
 Similar requirements apply to releasing WordPress's [npm packages](https://developer.wordpress.org/block-editor/contributors/code/release/#packages-releases-to-npm-and-wordpress-core-updates).
 
 **Table of contents**
 
-- **[Gutenberg plugin releases](#gutenberg-plugin-releases)**
-    - [Release schedule](#release-schedule)
-    - [Release management](#release-management)
-    - [Preparing a release](#preparing-a-release)
-        - [Organizing and labeling milestone PRs](#organizing-and-labeling-milestone-prs)
-        - [Running the release workflow](#running-the-release-workflow)
-        - [Publishing the @wordpress packages to NPM](#publishing-the-wordpress-packages-to-npm)
-        - [Viewing the release draft](#viewing-the-release-draft)
-        - [Curating the release changelog](#curating-the-release-changelog)
-        - [Creating release candidate patches (cherry-picking)](#creating-release-candidate-patches-cherry-picking)
-            - [Automated cherry-picking](#automated-cherry-picking)
-            - [Manual cherry-picking](#manual-cherry-picking)
-        - [Publishing the release](#publishing-the-release)
-    - [Documenting the release](#documenting-the-release)
-        - [Selecting the release highlights](#selecting-the-release-highlights)
-        - [Requesting release assets](#requesting-release-assets)
-        - [Drafting the release post](#drafting-the-release-post)
-        - [Publishing the release post](#publishing-the-release-post)
-    - [Creating minor releases](#creating-minor-releases)
-        - [Updating the release branch](#updating-the-release-branch)
-        - [Running the minor release](#running-the-minor-release)
-        - [Creating a minor release for previous stable releases](#creating-a-minor-release-for-previous-stable-releases)
-        - [Troubleshooting](#troubleshooting)
-- [Packages releases to NPM and WordPress Core updates](#packages-releases-to-npm-and-wordpress-core-updates)
-    - [Synchronizing the Gutenberg plugin](#synchronizing-the-gutenberg-plugin)
-    - [WordPress releases](#wordpress-releases)
-    - [Development releases](#development-releases)
+-   **[Gutenberg plugin releases](#gutenberg-plugin-releases)**
+    -   [Release schedule](#release-schedule)
+    -   [Release management](#release-management)
+    -   [Preparing a release](#preparing-a-release)
+        -   [Organizing and labeling milestone PRs](#organizing-and-labeling-milestone-prs)
+        -   [Running the release workflow](#running-the-release-workflow)
+        -   [Publishing the @wordpress packages to NPM](#publishing-the-wordpress-packages-to-npm)
+        -   [Viewing the release draft](#viewing-the-release-draft)
+        -   [Curating the release changelog](#curating-the-release-changelog)
+        -   [Creating release candidate patches (cherry-picking)](#creating-release-candidate-patches-cherry-picking)
+            -   [Automated cherry-picking](#automated-cherry-picking)
+            -   [Manual cherry-picking](#manual-cherry-picking)
+        -   [Publishing the release](#publishing-the-release)
+    -   [Documenting the release](#documenting-the-release)
+        -   [Selecting the release highlights](#selecting-the-release-highlights)
+        -   [Requesting release assets](#requesting-release-assets)
+        -   [Drafting the release post](#drafting-the-release-post)
+        -   [Publishing the release post](#publishing-the-release-post)
+    -   [Creating minor releases](#creating-minor-releases)
+        -   [Updating the release branch](#updating-the-release-branch)
+        -   [Running the minor release](#running-the-minor-release)
+        -   [Creating a minor release for previous stable releases](#creating-a-minor-release-for-previous-stable-releases)
+        -   [Troubleshooting](#troubleshooting)
+-   [Packages releases to NPM and WordPress Core updates](#packages-releases-to-npm-and-wordpress-core-updates)
+    -   [Synchronizing the Gutenberg plugin](#synchronizing-the-gutenberg-plugin)
+    -   [WordPress releases](#wordpress-releases)
+    -   [Development releases](#development-releases)
 
 ## Gutenberg plugin releases
 
@@ -95,9 +95,9 @@ The output of this command is the changelog for the provided milestone, which in
 
 All PRs should have a label prefixed by `[Type]` as well as labels for sub-categories. The two most common labels are `[Type] Bug` and `[Type] Enhancement`. When reviewing the generated changelog, pay close attention to the following:
 
-* **Enhancements:** Look for PRs that don't have any subcategories attached.
-* **Bug fixes:** Also look for PRs that don't have any subcategories attached.
-* **Various:** PRs in this section don't have any labels at all.
+-   **Enhancements:** Look for PRs that don't have any subcategories attached.
+-   **Bug fixes:** Also look for PRs that don't have any subcategories attached.
+-   **Various:** PRs in this section don't have any labels at all.
 
 Update the labels on each PR as needed. You can continue generating the changelog until you are comfortable proceeding. Now you are ready to start the release candidate workflow.
 
@@ -161,7 +161,6 @@ Here are some additional tips for preparing clear and concise changelogs:
 * Remove PRs that revert other PRs in the same release if the net change in code is zero.
 * Remove all PRs that only update the mobile app. The only exception to this rule is if the mobile app pull request also updates functionality for the web.
 * If a subheader only has one PR listed, remove the subheader and move the PR to the next matching subheader with more than one item listed.
-
 #### Creating release candidate patches (cherry-picking)
 
 <div class="callout callout-info">
@@ -177,8 +176,8 @@ After an RC is published but before the final stable release, some bugs related 
 
 There are a couple of ways you might be made aware of these bugs as a release manager:
 
-* Contributors may add the `Backport to Gutenberg RC` label to a closed PR. [Do a search for any of these PRs](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed) before publishing the final release.
-* You may receive a direct message or a ping in the [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel notifying you of PRs that need to be included in the RC. Even when this is the case, the `Backport to Gutenberg RC` should always be added to the PR.
+-   Contributors may add the `Backport to Gutenberg RC` label to a closed PR. [Do a search for any of these PRs](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed) before publishing the final release.
+-   You may receive a direct message or a ping in the [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel notifying you of PRs that need to be included in the RC. Even when this is the case, the `Backport to Gutenberg RC` should always be added to the PR.
 
 ##### Automated cherry-picking
 
@@ -288,10 +287,10 @@ The release manager is responsible for drafting the release post based on the [G
 
 Once the post content is ready, an author with permission to post on [make.wordpress.org/core](https://make.wordpress.org/core/) will create a new draft and import the content. The post should include the following tags:
 
-* [#block-editor](https://make.wordpress.org/core/tag/block-editor/)
-* [#core-editor](https://make.wordpress.org/core/tag/core-editor/)
-* [#gutenberg](https://make.wordpress.org/core/tag/gutenberg/)
-* [#gutenberg-new](https://make.wordpress.org/core/tag/gutenberg-new/)
+-   [#block-editor](https://make.wordpress.org/core/tag/block-editor/)
+-   [#core-editor](https://make.wordpress.org/core/tag/core-editor/)
+-   [#gutenberg](https://make.wordpress.org/core/tag/gutenberg/)
+-   [#gutenberg-new](https://make.wordpress.org/core/tag/gutenberg-new/)
 
 The author should then enable public preview on the post and ask for a final peer review. This is encouraged by the [make/core posting guidelines](https://make.wordpress.org/core/handbook/best-practices/post-comment-guidelines/#peer-review).
 
@@ -400,10 +399,10 @@ Behind the scenes, all steps are automated via `./bin/plugin/cli.js npm-latest` 
 7. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/latest` branch. Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version bumps gets applied. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version. This is important as the patch version numbers should be reserved in case bug fixes are needed for a minor WordPress release (see below).
 8. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
 9. From the `wp/latest` branch, install npm dependencies with `npm ci`.
-10. Run the script `npm run publish:latest`.
+10. Run the script `npx lerna publish --no-private`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
 11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### WordPress releases
@@ -428,7 +427,7 @@ For the record, the manual process would look like the following:
 
 1. Check out the WordPress branch used before (example `wp/5.2`).
 2. `git pull`.
-3. Run the `npm run publish:patch` command (see more in [package release process]) but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump only the `patch` version number. For example, if the last published package version for this WordPress branch was `5.6.0`, choose `5.6.1` as a version.
+3. Run the `npx lerna publish patch --no-private --dist-tag wp-5.2` command (see more in [package release process]) but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump only the `patch` version number. For example, if the last published package version for this WordPress branch was `5.6.0`, choose `5.6.1` as a version.
 
 **Note:** For WordPress `5.0` and WordPress `5.1`, a different release process was used. This means that when choosing npm package versions targeting these two releases, you won't be able to use the next `patch` version number as it may have been already used. You should use the "metadata" modifier for these. For example, if the last published package version for this WordPress branch was `5.6.1`, choose `5.6.1+patch.1` as a version.
 
@@ -457,7 +456,7 @@ Open a terminal and perform the following steps:
 Before porting commits check that the `wp/latest` branch does not have any outstanding packages waiting to be published:
 
 1. `git checkout wp/latest`
-2. `npm run publish:check`
+2. `npx lerna updated`
 
 Now _cherry-pick_ the commits from `trunk` to `wp/latest`, use `-m 1 commithash` if the commit was a pull request merge commit:
 
@@ -467,11 +466,11 @@ Now _cherry-pick_ the commits from `trunk` to `wp/latest`, use `-m 1 commithash`
 Whilst waiting for the GitHub actions build for `wp/latest`[branch to pass](https://github.com/WordPress/gutenberg/actions?query=branch%3Awp%2Ftrunk), identify and begin updating the `CHANGELOG.md` files:
 
 1. `git checkout wp/latest`
-2. `npm run publish:check`
+2. `npx lerna updated`
     > Example
     >
     > ```shell
-    > npm run publish:check
+    > npx lerna updated
     > @wordpress/e2e-tests
     > @wordpress/jest-preset-default
     > @wordpress/scripts
@@ -494,10 +493,10 @@ Behind the scenes, the rest of the process is automated with `./bin/plugin/cli.j
 2. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/latest` branch.
 3. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
 4. From the `wp/latest` branch, install npm dependencies with `npm ci`.
-5. Run the script `npm run publish:latest`.
+5. Run the script `npx lerna publish --no-private`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
 6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### Development releases
