@@ -33,7 +33,7 @@
 	"types": "types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"jest-matcher-utils": "^29.5.0"
+		"jest-matcher-utils": "^29.6.2"
 	},
 	"peerDependencies": {
 		"jest": ">=29"
