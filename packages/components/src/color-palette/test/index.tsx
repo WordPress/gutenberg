@@ -222,10 +222,6 @@ describe( 'ColorPalette', () => {
 
 	it( 'should display the selected color name and value', async () => {
 		const user = userEvent.setup();
-		// selector for Truncate component to make test queries more explicit
-		const truncateComponent = {
-			selector: 'span[data-wp-component="Truncate"]',
-		};
 
 		render( <ControlledColorPalette /> );
 
@@ -243,10 +239,14 @@ describe( 'ColorPalette', () => {
 
 		// Confirm the correct color name, color value, and button label are used
 		expect(
-			screen.getByText( colorName, truncateComponent )
+			screen.getByText( colorName, {
+				selector: '.components-color-palette__custom-color-name',
+			} )
 		).toBeVisible();
 		expect(
-			screen.getByText( colorCode, truncateComponent )
+			screen.getByText( colorCode, {
+				selector: '.components-color-palette__custom-color-value',
+			} )
 		).toBeVisible();
 		expect(
 			screen.getByRole( 'button', {
@@ -258,13 +258,8 @@ describe( 'ColorPalette', () => {
 		// Clear the color, confirm that the relative values are cleared/updated.
 		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
-
-		expect(
-			screen.queryByText( colorName, truncateComponent )
-		).not.toBeInTheDocument();
-		expect(
-			screen.queryByText( colorCode, truncateComponent )
-		).not.toBeInTheDocument();
+		expect( screen.queryByText( colorName ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( colorCode ) ).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', {
 				name: /^Custom color picker.$/,
