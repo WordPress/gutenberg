@@ -87,21 +87,85 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 	);
 }
 
+function BlockRenameControl( props ) {
+	const [ renamingBlock, setRenamingBlock ] = useState( false );
+
+	const { clientId, blockAttributes, onChange } = props;
+
+	const blockInformation = useBlockDisplayInformation( clientId );
+
+	return (
+		<>
+			<BlockSettingsMenuControls>
+				{ ( { selectedClientIds } ) => {
+					// Only enabled for single selections.
+					const canRename =
+						selectedClientIds.length === 1 &&
+						clientId === selectedClientIds[ 0 ];
+
+					// This check ensures
+					// - the `BlockSettingsMenuControls` fill
+					// doesn't render multiple times and also that it renders for
+					// the block from which the menu was triggered.
+					// - `Rename` only appears in the ListView options.
+					// - `Rename` only appears for blocks that support renaming.
+					if (
+						// __unstableDisplayLocation !== 'list-view' ||
+						! canRename
+					) {
+						return null;
+					}
+
+					return (
+						<MenuItem
+							onClick={ () => {
+								setRenamingBlock( true );
+							} }
+						>
+							{ __( 'Rename' ) }
+						</MenuItem>
+					);
+				} }
+			</BlockSettingsMenuControls>
+
+			{ renamingBlock && (
+				<RenameModal
+					blockName={
+						blockAttributes?.metadata?.name ||
+						blockInformation?.title ||
+						''
+					}
+					originalBlockName={ blockInformation?.title }
+					onClose={ () => setRenamingBlock( false ) }
+					onSave={ ( newName ) => {
+						// If the new value is the block's original name (e.g. `Group`)
+						// then assume the intent is to reset the value. Therefore reset
+						// the metadata.
+						if ( newName === blockInformation?.title ) {
+							newName = undefined;
+						}
+
+						onChange( {
+							// Include existing metadata (if present) to avoid overwriting existing.
+							metadata: {
+								...( blockAttributes?.metadata &&
+									blockAttributes?.metadata ),
+								name: newName,
+							},
+						} );
+					} }
+				/>
+			) }
+		</>
+	);
+}
+
 export const withBlockRenameControl = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const [ renamingBlock, setRenamingBlock ] = useState( false );
-
-		const {
-			clientId,
-			name: blockName,
-			attributes: blockAttributes,
-			setAttributes,
-		} = props;
-
-		const blockInformation = useBlockDisplayInformation( clientId );
+		const { clientId, name, attributes, setAttributes } = props;
 
 		const metaDataSupport = getBlockSupport(
-			blockName,
+			name,
 			'__experimentalMetadata',
 			false
 		);
@@ -113,65 +177,10 @@ export const withBlockRenameControl = createHigherOrderComponent(
 		return (
 			<>
 				{ supportsBlockNaming && (
-					<BlockSettingsMenuControls>
-						{ ( { selectedClientIds } ) => {
-							// Only enabled for single selections.
-							const canRename =
-								selectedClientIds.length === 1 &&
-								clientId === selectedClientIds[ 0 ];
-
-							// This check ensures
-							// - the `BlockSettingsMenuControls` fill
-							// doesn't render multiple times and also that it renders for
-							// the block from which the menu was triggered.
-							// - `Rename` only appears in the ListView options.
-							// - `Rename` only appears for blocks that support renaming.
-							if (
-								// __unstableDisplayLocation !== 'list-view' ||
-								! canRename
-							) {
-								return null;
-							}
-
-							return (
-								<MenuItem
-									onClick={ () => {
-										setRenamingBlock( true );
-									} }
-								>
-									{ __( 'Rename' ) }
-								</MenuItem>
-							);
-						} }
-					</BlockSettingsMenuControls>
-				) }
-
-				{ renamingBlock && supportsBlockNaming && (
-					<RenameModal
-						blockName={
-							blockAttributes?.metadata?.name ||
-							blockInformation?.title ||
-							''
-						}
-						originalBlockName={ blockInformation?.title }
-						onClose={ () => setRenamingBlock( false ) }
-						onSave={ ( newName ) => {
-							// If the new value is the block's original name (e.g. `Group`)
-							// then assume the intent is to reset the value. Therefore reset
-							// the metadata.
-							if ( newName === blockInformation?.title ) {
-								newName = undefined;
-							}
-
-							setAttributes( {
-								// Include existing metadata (if present) to avoid overwriting existing.
-								metadata: {
-									...( blockAttributes?.metadata &&
-										blockAttributes?.metadata ),
-									name: newName,
-								},
-							} );
-						} }
+					<BlockRenameControl
+						clientId={ clientId }
+						blockAttributes={ attributes }
+						onChange={ setAttributes }
 					/>
 				) }
 
