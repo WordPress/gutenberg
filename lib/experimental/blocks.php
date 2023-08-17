@@ -157,7 +157,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		// - Image: url.
 		$blocks_attributes_allowlist = array(
 			'core/paragraph' => array( 'content' ),
-			'core/image'     => array( 'url' ),
+			'core/image'     => array( 'url', 'title' ),
 		);
 
 		// Whitelist of the block types that support block connections.

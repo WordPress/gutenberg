@@ -45,6 +45,11 @@ function addAttribute( settings ) {
  * @return {WPComponent} Wrapped component.
  */
 const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
+	const blocksAttributesAllowlist = {
+		'core/paragraph': [ 'content' ],
+		'core/image': [ 'url', 'title' ],
+	};
+
 	return ( props ) => {
 		const blockEditingMode = useBlockEditingMode();
 		const hasCustomFieldsSupport = hasBlockSupport(
@@ -62,9 +67,7 @@ const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 		// If the block is a paragraph or image block, we need to know which
 		// attribute to use for the connection. Only the `content` attribute
 		// of the paragraph block and the `url` attribute of the image block are supported.
-		let attributeName;
-		if ( props.name === 'core/paragraph' ) attributeName = 'content';
-		if ( props.name === 'core/image' ) attributeName = 'url';
+		const attributeNames = blocksAttributesAllowlist[ props.name ];
 
 		if ( hasCustomFieldsSupport && props.isSelected ) {
 			return (
@@ -76,44 +79,58 @@ const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 								title={ __( 'Connections' ) }
 								initialOpen={ true }
 							>
-								<TextControl
-									__nextHasNoMarginBottom
-									autoComplete="off"
-									label={ __( 'Custom field meta_key' ) }
-									value={
-										props.attributes?.connections
-											?.attributes?.[ attributeName ]
-											?.value || ''
-									}
-									onChange={ ( nextValue ) => {
-										if ( nextValue === '' ) {
-											props.setAttributes( {
-												connections: undefined,
-												[ attributeName ]: '',
-												placeholder: undefined,
-											} );
-										} else {
-											props.setAttributes( {
-												connections: {
-													attributes: {
-														// The attributeName will be either `content` or `url`.
-														[ attributeName ]: {
-															// Source will be variable, could be post_meta, user_meta, term_meta, etc.
-															// Could even be a custom source like a social media attribute.
-															source: 'meta_fields',
-															value: nextValue,
+								{ attributeNames.map( ( attributeName ) => (
+									<TextControl
+										key={ attributeName }
+										__nextHasNoMarginBottom
+										autoComplete="off"
+										placeholder={ attributeName }
+										label={ __( `Custom field meta_key` ) }
+										value={
+											props.attributes?.connections
+												?.attributes?.[ attributeName ]
+												?.value || ''
+										}
+										onChange={ ( nextValue ) => {
+											if ( nextValue === '' ) {
+												props.setAttributes( {
+													connections: {
+														attributes: {
+															...props.attributes
+																?.connections
+																?.attributes,
+															[ attributeName ]:
+																undefined,
 														},
 													},
-												},
-												[ attributeName ]: '',
-												placeholder: sprintf(
-													'This content will be replaced on the frontend by the value of "%s" custom field.',
-													nextValue
-												),
-											} );
-										}
-									} }
-								/>
+													[ attributeName ]: '',
+													placeholder: undefined,
+												} );
+											} else {
+												props.setAttributes( {
+													connections: {
+														attributes: {
+															...props.attributes
+																?.connections
+																?.attributes,
+															[ attributeName ]: {
+																// Source will be variable in the future, could be post_meta, user_meta, term_meta, etc.
+																// Could even be a custom source like a social media attribute.
+																source: 'meta_fields',
+																value: nextValue,
+															},
+														},
+													},
+													[ attributeName ]: '',
+													placeholder: sprintf(
+														'This content will be replaced on the frontend by the value of "%s" custom field.',
+														nextValue
+													),
+												} );
+											}
+										} }
+									/>
+								) ) }
 							</PanelBody>
 						</InspectorControls>
 					) }
