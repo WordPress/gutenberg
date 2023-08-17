@@ -522,6 +522,29 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	test( `adds an assertive message for screenreader users when an invalid link is set`, async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg' );
+		// Select some text.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		// Press Cmd+K to insert a link.
+		await pageUtils.pressKeys( 'primary+K' );
+
+		await page.keyboard.type( 'http://#test.com' );
+		await pageUtils.pressKeys( 'Enter' );
+		expect(
+			page.getByText(
+				'Warning: the link has been inserted but may have errors. Please test it.'
+			)
+		).toBeTruthy();
+	} );
+
 	test( `can be created by selecting text and using keyboard shortcuts`, async ( {
 		page,
 		editor,
