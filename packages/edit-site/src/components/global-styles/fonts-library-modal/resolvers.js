@@ -39,8 +39,7 @@ export async function fetchInstallFonts( data ) {
 		body,
 	};
 
-	const response = await apiFetch( config );
-	return response;
+	return apiFetch( config );
 }
 
 export async function fetchUninstallFonts( fonts ) {
@@ -52,7 +51,5 @@ export async function fetchUninstallFonts( fonts ) {
 		method: 'DELETE',
 		data,
 	};
-	const response = await apiFetch( config );
-	const { fontFamilies } = await JSON.parse( response );
-	return fontFamilies;
+	return apiFetch( config );
 }

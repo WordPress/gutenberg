@@ -31,6 +31,7 @@ function FontLibraryProvider( { children } ) {
 
 	const refreshLibrary = () => {
 		setRefreshKey( ( prevKey ) => prevKey + 1 );
+		console.log("refreshLibrary", refreshKey);
 	};
 
 	const { records: posts = [] } = useEntityRecords(
