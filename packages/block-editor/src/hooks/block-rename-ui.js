@@ -35,7 +35,11 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 	const isNameValid = nameHasChanged && ! emptyString( editedBlockName );
 
 	return (
-		<Modal title={ __( 'Rename block' ) } onRequestClose={ onClose }>
+		<Modal
+			title={ __( 'Rename block' ) }
+			onRequestClose={ onClose }
+			overlayClassName="block-editor-block-rename-modal"
+		>
 			<p>{ __( 'Choose a custom name for this block.' ) }</p>
 			<form
 				className="sidebar-navigation__rename-modal-form"
@@ -112,7 +116,7 @@ export const withBlockRenameControl = createHigherOrderComponent(
 			<>
 				{ supportsBlockNaming && (
 					<BlockSettingsMenuControls>
-						{ ( { selectedClientIds, onClose } ) => {
+						{ ( { selectedClientIds } ) => {
 							// Only enabled for single selections.
 							const canRename =
 								selectedClientIds.length === 1 &&
@@ -135,7 +139,6 @@ export const withBlockRenameControl = createHigherOrderComponent(
 								<MenuItem
 									onClick={ () => {
 										setRenamingBlock( true );
-										onClose();
 									} }
 								>
 									{ __( 'Rename' ) }
