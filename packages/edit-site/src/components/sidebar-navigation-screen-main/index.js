@@ -7,9 +7,8 @@ import {
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
+import { layout, media, navigation, page, styles, symbol } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
-
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -45,6 +44,14 @@ export default function SidebarNavigationScreenMain() {
 			content={
 				<>
 					<ItemGroup>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/media"
+							withChevron
+							icon={ media }
+						>
+							{ __( 'Media' ) }
+						</NavigatorButton>
 						<NavigatorButton
 							as={ SidebarNavigationItem }
 							path="/navigation"

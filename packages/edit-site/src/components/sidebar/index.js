@@ -27,6 +27,7 @@ import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
+import SidebarNavigationScreenMedia from '../sidebar-navigation-screen-media';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -67,6 +68,9 @@ function SidebarScreens() {
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
+			</NavigatorScreen>
+			<NavigatorScreen path="/media">
+				<SidebarNavigationScreenMedia />
 			</NavigatorScreen>
 		</>
 	);

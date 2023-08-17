@@ -7,6 +7,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import PagePatterns from '../page-patterns';
+import PageMedia from '../page-media';
 import PageTemplateParts from '../page-template-parts';
 import PageTemplates from '../page-templates';
 import { unlock } from '../../lock-unlock';
@@ -17,13 +18,15 @@ export default function PageMain() {
 	const {
 		params: { path },
 	} = useLocation();
-
+console.log( 'path', path );
 	if ( path === '/wp_template/all' ) {
 		return <PageTemplates />;
 	} else if ( path === '/wp_template_part/all' ) {
 		return <PageTemplateParts />;
 	} else if ( path === '/patterns' ) {
 		return <PagePatterns />;
+	} else if ( path === '/media' ) {
+		return <PageMedia />;
 	}
 
 	return null;
