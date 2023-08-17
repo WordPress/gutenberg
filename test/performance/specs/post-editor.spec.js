@@ -89,14 +89,27 @@ test.describe( 'Post Editor Performance', () => {
 			// Go to the test page URL.
 			await testPage.goto( draftURL );
 
-			// Wait for the first block.
-			await testPage
-				.frameLocator( 'iframe[name="editor-canvas"]' )
-				.locator( '.wp-block' )
-				.first()
-				.waitFor( {
-					timeout: 120_000,
-				} );
+			// Get canvas (handles both legacy and iframed canvas).
+			const canvas = await Promise.any( [
+				( async () => {
+					const legacyCanvasLocator = page.locator(
+						'.wp-block-post-content'
+					);
+					await legacyCanvasLocator.waitFor();
+					return legacyCanvasLocator;
+				} )(),
+				( async () => {
+					const iframedCanvasLocator = page.frameLocator(
+						'[name=editor-canvas]'
+					);
+					await iframedCanvasLocator.locator( 'body' ).waitFor();
+					return iframedCanvasLocator;
+				} )(),
+			] );
+
+			await canvas.locator( '.wp-block' ).first().waitFor( {
+				timeout: 120_000,
+			} );
 
 			// Save the results.
 			if ( i >= throwaway ) {
@@ -153,7 +166,7 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	test( 'Typing within containers', async ( { browser, page } ) => {
+	test( 'Typing within containers', async ( { browser, page, editor } ) => {
 		await loadBlocksFromHtml(
 			page,
 			path.join(
@@ -163,8 +176,7 @@ test.describe( 'Post Editor Performance', () => {
 		);
 
 		// Select the block where we type in
-		await page
-			.frameLocator( 'iframe[name="editor-canvas"]' )
+		await editor.canvas
 			.getByRole( 'document', { name: 'Paragraph block' } )
 			.first()
 			.click();
@@ -196,11 +208,9 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	test( 'Selecting blocks', async ( { browser, page } ) => {
+	test( 'Selecting blocks', async ( { browser, page, editor } ) => {
 		await load1000Paragraphs( page );
-		const paragraphs = page
-			.frameLocator( 'iframe[name="editor-canvas"]' )
-			.locator( '.wp-block' );
+		const paragraphs = editor.canvas.locator( '.wp-block' );
 
 		const samples = 10;
 		const throwaway = 1;
