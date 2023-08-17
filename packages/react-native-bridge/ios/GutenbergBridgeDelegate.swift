@@ -28,7 +28,6 @@ public struct MediaInfo: Encodable {
 public enum Capabilities: String {
     case contactInfoBlock
     case layoutGridBlock
-    case paywallBlock
     case tiledGalleryBlock
     case videoPressBlock
     case mediaFilesCollectionBlock
