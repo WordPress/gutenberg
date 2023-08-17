@@ -83,7 +83,7 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
     }
     ```
 
-2.  Register the block in the `gutenberg_reregister_core_block_types()` function of the [`lib/blocks.php`](https://github.com/WordPress/gutenberg/blob/trunk/lib/blocks.php) file. Add it to the `block_folders` array if it's a [static block](https://developer.wordpress.org/block-editor/explanations/glossary/#static-block) or to the `block_names` array if it's a [dynamic block](https://developer.wordpress.org/block-editor/explanations/glossary/#dynamic-block).
+2.  Register the block in the `gutenberg_reregister_core_block_types()` function of the [`lib/blocks.php`](https://github.com/WordPress/gutenberg/blob/trunk/lib/blocks.php) file. Add it to the `block_directories` array if it's a [static block](https://developer.wordpress.org/block-editor/explanations/glossary/#static-block) or to the `block_names` array if it's a [dynamic block](https://developer.wordpress.org/block-editor/explanations/glossary/#dynamic-block).
 
 3.  Add `init.js` file to the directory of the new block:
 
@@ -118,5 +118,22 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
     	return $content;
     }
     ```
+
+### Naming convention for PHP functions
+
+All PHP function names within the subdirectories of the `packages/block-library/src/` directory should start with one of the following prefixes:
+
+- `block_core_<directory_name>`
+- `render_block_core_<directory_name>`
+- `register_block_core_<directory_name>`
+
+In this context, `<directory_name>` represents the name of the directory where the corresponding `.php` file is located.
+The directory name is converted to lowercase, and any characters except for letters and digits are replaced with underscores.
+
+#### Example:
+For the PHP functions in the `packages/block-library/src/my-block/index.php` file, the correct prefixes would be:
+- `block_core_my_block`
+- `render_block_core_my_block`
+- `register_block_core_my_block`
 
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
