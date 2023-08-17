@@ -69,4 +69,63 @@ test.describe( 'Block Renaming', () => {
 			},
 		] );
 	} );
+
+	test( 'allows custom name to be removed and reset to original block name', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Prefill with block that already has a custom name.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				metadata: {
+					name: 'My custom name',
+				},
+			},
+		} );
+
+		await editor.clickBlockOptionsMenuItem( 'Rename' );
+
+		const renameModal = page.getByRole( 'dialog', {
+			name: 'Rename block',
+		} );
+
+		const saveButton = renameModal.getByRole( 'button', {
+			name: 'Save',
+			type: 'submit',
+		} );
+
+		await expect( saveButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		const nameInput = renameModal.getByLabel( 'Block name' );
+
+		await expect( nameInput ).toHaveValue( 'My custom name' );
+
+		// Clear the input of text content.
+		await nameInput.focus();
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Delete' );
+
+		// Trigger blur event on input.
+		await saveButton.focus();
+
+		// Expect value to automatically revert to original block name.
+		await expect( nameInput ).toHaveValue( 'Group' );
+
+		await expect( saveButton ).toHaveAttribute( 'aria-disabled', 'false' );
+
+		await saveButton.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				attributes: {
+					metadata: {
+						name: undefined,
+					},
+				},
+			},
+		] );
+	} );
 } );
