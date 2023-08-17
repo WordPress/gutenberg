@@ -36,6 +36,9 @@ test.describe( 'Block Renaming', () => {
 			name: 'Rename block',
 		} );
 
+		// Check focus is transferred into modal.
+		await expect( renameModal ).toBeFocused();
+
 		// Check the Modal is perceivable.
 		await expect( renameModal ).toBeVisible();
 
@@ -57,6 +60,13 @@ test.describe( 'Block Renaming', () => {
 		await saveButton.click();
 
 		await expect( renameModal ).not.toBeVisible();
+
+		// Check that focus is transferred back to original "Rename" menu item.
+		await expect(
+			page.getByRole( 'menuitem', {
+				name: 'Rename',
+			} )
+		).toBeFocused();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
