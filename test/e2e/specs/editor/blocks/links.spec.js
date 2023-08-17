@@ -1182,6 +1182,57 @@ test.describe( 'Links', () => {
 				)
 			).not.toBeVisible();
 		} );
+
+		// Based on issue reported in https://github.com/WordPress/gutenberg/issues/41771/.
+		test( 'should correctly replace targetted links text within rich text value when multiple matching values exist', async ( {
+			page,
+			pageUtils,
+			editor,
+		} ) => {
+			// Create a block with some text.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+
+			// Note the two instances of the string "a".
+			await page.keyboard.type( `a b c a` );
+
+			// Select the last "a" only.
+			await pageUtils.pressKeys( 'shift+ArrowLeft' );
+
+			// Click on the Link button.
+			await page.getByRole( 'button', { name: 'Link' } ).click();
+
+			// Type a URL.
+			await page.keyboard.type( 'www.wordpress.org' );
+
+			// Update the link.
+			await pageUtils.pressKeys( 'Enter' );
+
+			await pageUtils.pressKeys( 'ArrowLeft' );
+
+			// Click the "Edit" button in Link UI
+			await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+			// Delete existing value from "Text" field
+			await pageUtils.pressKeys( 'Backspace' );
+
+			// Change text to "z"
+			await page.keyboard.type( 'z' );
+
+			await pageUtils.pressKeys( 'Enter' );
+
+			// Check that the correct (i.e. last) instance of "a" was replaced with "z".
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content:
+							'a b c <a href="http://www.wordpress.org">z</a>',
+					},
+				},
+			] );
+		} );
 	} );
 } );
 
