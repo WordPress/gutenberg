@@ -12,6 +12,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -49,10 +50,18 @@ function ButtonsEdit( { attributes, className } ) {
 		return preferredStyleVariations?.value?.[ buttonBlockName ];
 	}, [] );
 
+	const hasButtonVariations = useSelect( ( select ) => {
+		const buttonVariations = select( blocksStore ).getBlockVariations(
+			buttonBlockName,
+			'inserter'
+		);
+		return buttonVariations.length > 0;
+	}, [] );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		defaultBlock: DEFAULT_BLOCK,
-		directInsert: true,
+		directInsert: ! hasButtonVariations,
 		template: [
 			[
 				buttonBlockName,
