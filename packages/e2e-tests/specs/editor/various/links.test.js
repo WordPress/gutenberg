@@ -53,31 +53,6 @@ describe( 'Links', () => {
 	};
 
 	describe( 'Editing link text', () => {
-		it( 'should not display text input when initially creating the link', async () => {
-			// Create a block with some text.
-			await clickBlockAppender();
-			await page.keyboard.type( 'This is Gutenberg: ' );
-
-			// Press Cmd+K to insert a link.
-			await pressKeyWithModifier( 'primary', 'K' );
-
-			const [ settingsToggle ] = await page.$x(
-				'//button[contains(text(), "Advanced")]'
-			);
-			await settingsToggle.click();
-
-			const textInput = await page
-				.waitForXPath(
-					'//[contains(@class, "block-editor-link-control__search-input-wrapper")]//label[contains(text(), "Text")]',
-					{
-						timeout: 1000,
-					}
-				)
-				.catch( () => false );
-
-			expect( textInput ).toBeFalsy();
-		} );
-
 		it( 'should display text input when the link has a valid URL value', async () => {
 			await createAndReselectLink();
 

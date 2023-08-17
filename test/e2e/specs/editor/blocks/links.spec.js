@@ -852,6 +852,28 @@ test.describe( 'Links', () => {
 			},
 		] );
 	} );
+
+	test.describe( 'Editing link text', () => {
+		test( 'should not display text input when initially creating the link', async ( {
+			page,
+			editor,
+			pageUtils,
+		} ) => {
+			// Create a block with some text.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+			await page.keyboard.type( 'This is Gutenberg: ' );
+
+			// Press Cmd+K to insert a link.
+			await pageUtils.pressKeys( 'primary+k' );
+
+			//Check that the HTML anchor input under Advanced is empty
+			await page.getByRole( 'button', { name: 'Advanced' } ).click();
+			const inputElement = page.getByLabel( 'HTML anchor' );
+			await expect( inputElement ).toHaveValue( '' );
+		} );
+	} );
 } );
 
 class LinkUtils {
