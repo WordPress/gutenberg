@@ -5,7 +5,7 @@
  * This file contains utils fot Font Family class.
  *
  * @package    WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  * @since      6.4.0
  */
 
@@ -14,7 +14,7 @@ if ( class_exists( 'WP_Font_Family_Utils' ) ) {
 }
 
 /**
- * A class of utilities for working with the Fonts Library.
+ * A class of utilities for working with the Font Library.
  *
  * @since 6.4.0
  */
@@ -85,8 +85,8 @@ class WP_Font_Family_Utils {
 	 * @return bool True if the file has a font MIME type, false otherwise.
 	 */
 	public static function has_font_mime_type( $filepath ) {
-		$filetype = wp_check_filetype( $filepath, WP_Fonts_Library::ALLOWED_FONT_MIME_TYPES );
+		$filetype = wp_check_filetype( $filepath, WP_Font_Library::ALLOWED_FONT_MIME_TYPES );
 
-		return in_array( $filetype['type'], WP_Fonts_Library::ALLOWED_FONT_MIME_TYPES, true );
+		return in_array( $filetype['type'], WP_Font_Library::ALLOWED_FONT_MIME_TYPES, true );
 	}
 }

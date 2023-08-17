@@ -3,14 +3,14 @@
  * Test WP_Font_Family::get_font_post().
  *
  * @package WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  */
 
 require_once __DIR__ . '/base.php';
 
 /**
  * @group fonts
- * @group fonts-library
+ * @group font-library
  *
  * @covers WP_Font_Family::get_font_post
  */

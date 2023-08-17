@@ -1,15 +1,15 @@
 <?php
 /**
- * Tests for WP_REST_Fonts_Library_Controller class
+ * Tests for WP_REST_Font_Library_Controller class
  *
  * @package    Gutenberg
- * @subpackage Fonts Library
+ * @subpackage Font Library
  */
 
 /**
- * @coversDefaultClass WP_REST_Fonts_Library_Controller
+ * @coversDefaultClass WP_REST_Font_Library_Controller
  */
-class WP_REST_Fonts_Library_Controller_Test extends WP_UnitTestCase {
+class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
 	/**
 	 * @var int
 	 */

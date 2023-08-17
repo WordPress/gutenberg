@@ -3,7 +3,7 @@
  * Test Case for WP_Font_Family tests.
  *
  * @package WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  */
 abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 
