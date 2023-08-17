@@ -5,7 +5,6 @@ import {
 	clickBlockAppender,
 	createNewPost,
 	pressKeyWithModifier,
-	showBlockToolbar,
 	pressKeyTimes,
 	canvas,
 } from '@wordpress/e2e-test-utils';
@@ -53,56 +52,6 @@ describe( 'Links', () => {
 	};
 
 	describe( 'Editing link text', () => {
-		it( 'should allow for modification of link text via Link UI', async () => {
-			const originalLinkText = 'Gutenberg';
-			const changedLinkText =
-				'    link text that was modified via the Link UI to include spaces     ';
-
-			await createAndReselectLink();
-
-			// Make a collapsed selection inside the link. This is used
-			// as a stress test to ensure we can find the link text from a
-			// collapsed RichTextValue that contains a link format.
-			await page.keyboard.press( 'ArrowLeft' );
-			await page.keyboard.press( 'ArrowRight' );
-
-			await showBlockToolbar();
-			const [ editButton ] = await page.$x(
-				'//button[contains(@aria-label, "Edit")]'
-			);
-			await editButton.click();
-
-			await waitForURLFieldAutoFocus();
-
-			await pressKeyWithModifier( 'shift', 'Tab' );
-
-			const textInputValue = await page.evaluate(
-				() => document.activeElement.value
-			);
-
-			// At this point, we still expect the text input
-			// to reflect the original value with no modifications.
-			expect( textInputValue ).toBe( originalLinkText );
-
-			// Select all the link text in the input.
-			await pressKeyWithModifier( 'primary', 'a' );
-
-			// Modify the link text value.
-			await page.keyboard.type( changedLinkText );
-
-			// Submit the change.
-			await page.keyboard.press( 'Enter' );
-
-			// Check the created link reflects the link text.
-			const actualLinkText = await canvas().evaluate(
-				() =>
-					document.querySelector(
-						'.block-editor-rich-text__editable a'
-					).textContent
-			);
-			expect( actualLinkText ).toBe( changedLinkText );
-		} );
-
 		it( 'should display (capture the) text from the currently active link even if there is a rich text selection', async () => {
 			const originalLinkText = 'Gutenberg';
 

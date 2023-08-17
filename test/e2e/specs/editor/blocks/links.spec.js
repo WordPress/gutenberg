@@ -933,6 +933,56 @@ test.describe( 'Links', () => {
 				},
 			] );
 		} );
+
+		test( 'should allow for modification of link text via Link UI', async ( {
+			page,
+			pageUtils,
+			editor,
+			LinkUtils,
+		} ) => {
+			await LinkUtils.createAndReselectLink();
+
+			const originalLinkText = 'Gutenberg';
+			const changedLinkText =
+				'    link text that was modified via the Link UI to include spaces     ';
+
+			// Make a collapsed selection inside the link. This is used
+			// as a stress test to ensure we can find the link text from a
+			// collapsed RichTextValue that contains a link format.
+			await pageUtils.pressKeys( 'ArrowLeft' );
+			await pageUtils.pressKeys( 'ArrowRight' );
+
+			await editor.showBlockToolbar();
+			await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+			const textInput = page.getByLabel( 'Text', { exact: true } );
+
+			// At this point, we still expect the text input
+			// to reflect the original value with no modifications.
+			await expect( textInput ).toHaveValue( originalLinkText );
+
+			// Select all the link text in the input.
+			await pageUtils.pressKeys( 'primary+a' );
+
+			// Modify the link text value.
+			await page.keyboard.type( changedLinkText );
+
+			// Submit the change.
+			await pageUtils.pressKeys( 'Enter' );
+
+			// Check the created link reflects the link text.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content:
+							'This is <a href="https://wordpress.org/gutenberg">' +
+							changedLinkText +
+							'</a>',
+					},
+				},
+			] );
+		} );
 	} );
 } );
 
