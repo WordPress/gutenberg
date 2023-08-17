@@ -169,6 +169,10 @@ export default function TemplatePartEdit( {
 									onClick={ () => {
 										setIsTemplatePartSelectionOpen( true );
 									} }
+									aria-expanded={
+										isTemplatePartSelectionOpen
+									}
+									aria-haspopup="dialog"
 								>
 									{ createInterpolateElement(
 										__( 'Replace <BlockTitle />' ),
