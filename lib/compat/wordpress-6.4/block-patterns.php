@@ -15,7 +15,7 @@
  * @return void
  */
 function gutenberg_register_taxonomy_patterns() {
-	$args   = array(
+	$args = array(
 		array(
 			'public'            => false,
 			'hierarchical'      => false,
@@ -29,7 +29,7 @@ function gutenberg_register_taxonomy_patterns() {
 			'_builtin'          => true,
 			'show_in_nav_menus' => false,
 			'show_in_rest'      => true,
-		)
+		),
 	);
 	register_taxonomy( 'wp_pattern_category', array( 'wp_block' ), $args );
 }
