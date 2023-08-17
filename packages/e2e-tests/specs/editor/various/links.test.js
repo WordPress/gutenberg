@@ -53,42 +53,6 @@ describe( 'Links', () => {
 	};
 
 	describe( 'Editing link text', () => {
-		it( 'should display text input when the link has a valid URL value', async () => {
-			await createAndReselectLink();
-
-			// Make a collapsed selection inside the link. This is used
-			// as a stress test to ensure we can find the link text from a
-			// collapsed RichTextValue that contains a link format.
-			await page.keyboard.press( 'ArrowLeft' );
-			await page.keyboard.press( 'ArrowRight' );
-
-			const [ editButton ] = await page.$x(
-				'//button[contains(@aria-label, "Edit")]'
-			);
-			await editButton.click();
-
-			await waitForURLFieldAutoFocus();
-
-			await pressKeyWithModifier( 'shift', 'Tab' );
-
-			// Tabbing should land us in the text input.
-			const { isTextInput, textValue } = await page.evaluate( () => {
-				const el = document.activeElement;
-
-				return {
-					isTextInput: el.matches( 'input[type="text"]' ),
-					textValue: el.value,
-				};
-			} );
-
-			// Let's check we've focused a text input.
-			expect( isTextInput ).toBe( true );
-
-			// Link was created on text value "Gutenberg". We expect
-			// the text input to reflect that value.
-			expect( textValue ).toBe( 'Gutenberg' );
-		} );
-
 		it( 'should preserve trailing/leading whitespace from linked text in text input', async () => {
 			const textToSelect = `         spaces     `;
 			const textWithWhitespace = `Text with leading and trailing${ textToSelect }`;

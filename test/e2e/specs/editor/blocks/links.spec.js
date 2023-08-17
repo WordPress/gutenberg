@@ -873,6 +873,30 @@ test.describe( 'Links', () => {
 			const inputElement = page.getByLabel( 'HTML anchor' );
 			await expect( inputElement ).toHaveValue( '' );
 		} );
+
+		test( 'should display text input when the link has a valid URL value', async ( {
+			page,
+			pageUtils,
+			LinkUtils,
+		} ) => {
+			await LinkUtils.createAndReselectLink();
+
+			// Make a collapsed selection inside the link. This is used
+			// as a stress test to ensure we can find the link text from a
+			// collapsed RichTextValue that contains a link format.
+			await pageUtils.pressKeys( 'ArrowLeft' );
+			await pageUtils.pressKeys( 'ArrowRight' );
+
+			await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+			// Let's check we've focused a text input.
+			const textInput = page.getByLabel( 'Text', { exact: true } );
+			await expect( textInput ).toBeFocused();
+
+			// Link was created on text value "Gutenberg". We expect
+			// the text input to reflect that value.
+			await expect( textInput ).toHaveValue( 'Gutenberg' );
+		} );
 	} );
 } );
 
