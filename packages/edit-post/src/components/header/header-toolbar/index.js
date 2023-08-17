@@ -7,7 +7,6 @@ import { __, _x } from '@wordpress/i18n';
 import {
 	NavigableToolbar,
 	ToolSelector,
-	_experimentalSelectedBlockTools,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -16,7 +15,7 @@ import {
 	EditorHistoryUndo,
 	store as editorStore,
 } from '@wordpress/editor';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { Button, Slot, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -182,7 +181,7 @@ function HeaderToolbar() {
 					) }
 				</div>
 			</NavigableToolbar>
-			<_experimentalSelectedBlockTools isFixed={ hasFixedToolbar } />
+			<Slot name="__experimentalSelectedBlockTools" />
 		</>
 	);
 }
