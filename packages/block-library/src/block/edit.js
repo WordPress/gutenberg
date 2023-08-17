@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
@@ -10,30 +9,22 @@ import {
 import {
 	Placeholder,
 	Spinner,
-	ToolbarGroup,
-	ToolbarButton,
 	TextControl,
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	useInnerBlocksProps,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
-	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	Warning,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
-import { ungroup } from '@wordpress/icons';
 
-export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		ref
-	);
+export default function ReusableBlockEdit( { attributes: { ref } } ) {
+	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
@@ -41,20 +32,12 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	);
 	const isMissing = hasResolved && ! record;
 
-	const canRemove = useSelect(
-		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
-		[ clientId ]
-	);
-
-	const {
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( reusableBlocksStore );
-
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
 		{ id: ref }
 	);
+
 	const [ title, setTitle ] = useEntityProp(
 		'postType',
 		'wp_block',
@@ -62,15 +45,9 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 
-	const hasBlockOverlay = useBlockOverlayActive( clientId );
-	const blockProps = useBlockProps(
-		{
-			className: hasBlockOverlay
-				? 'block-library-block__reusable-block-container block-editor-block-content-overlay'
-				: 'block-library-block__reusable-block-container',
-		},
-		{ __unstableIsDisabled: hasBlockOverlay }
-	);
+	const blockProps = useBlockProps( {
+		className: 'block-library-block__reusable-block-container',
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,
@@ -112,22 +89,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	}
 
 	return (
-		<RecursionProvider>
-			{ canRemove && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ () => convertBlockToStatic( clientId ) }
-							label={ __( 'Convert to regular blocks' ) }
-							icon={ ungroup }
-							showTooltip
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
+		<RecursionProvider uniqueId={ ref }>
 			<InspectorControls>
 				<PanelBody>
 					<TextControl
+						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }

@@ -11,18 +11,16 @@ import {
 	BlockControls,
 	useBlockProps,
 	InspectorControls,
+	store as blockEditorStore,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 export default function Edit( {
 	attributes: { textAlign, showPostTitle, showCommentsCount, level },
@@ -39,9 +37,30 @@ export default function Edit( {
 		} ),
 	} );
 
+	const {
+		threadCommentsDepth,
+		threadComments,
+		commentsPerPage,
+		pageComments,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalDiscussionSettings;
+	} );
+
 	useEffect( () => {
 		if ( isSiteEditor ) {
-			setCommentsCount( 3 );
+			// Match the number of comments that will be shown in the comment-template/edit.js placeholder
+
+			const nestedCommentsNumber = threadComments
+				? Math.min( threadCommentsDepth, 3 ) - 1
+				: 0;
+			const topLevelCommentsNumber = pageComments ? commentsPerPage : 3;
+
+			const commentsNumber =
+				parseInt( nestedCommentsNumber ) +
+				parseInt( topLevelCommentsNumber );
+
+			setCommentsCount( Math.min( commentsNumber, 3 ) );
 			return;
 		}
 		const currentPostId = postId;
@@ -75,7 +94,7 @@ export default function Edit( {
 				}
 			/>
 			<HeadingLevelDropdown
-				selectedLevel={ level }
+				value={ level }
 				onChange={ ( newLevel ) =>
 					setAttributes( { level: newLevel } )
 				}
@@ -87,6 +106,7 @@ export default function Edit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Show post title' ) }
 					checked={ showPostTitle }
 					onChange={ ( value ) =>
@@ -94,6 +114,7 @@ export default function Edit( {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Show comments count' ) }
 					checked={ showCommentsCount }
 					onChange={ ( value ) =>
@@ -104,7 +125,7 @@ export default function Edit( {
 		</InspectorControls>
 	);
 
-	const postTitle = isSiteEditor ? __( '"Post Title"' ) : `"${ rawTitle }"`;
+	const postTitle = isSiteEditor ? __( '“Post Title”' ) : `"${ rawTitle }"`;
 
 	let placeholder;
 	if ( showCommentsCount && commentsCount !== undefined ) {
@@ -129,7 +150,7 @@ export default function Edit( {
 		} else {
 			placeholder = sprintf(
 				/* translators: %s: Number of comments. */
-				_n( '%s responses', '%s responses', commentsCount ),
+				_n( '%s response', '%s responses', commentsCount ),
 				commentsCount
 			);
 		}

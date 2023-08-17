@@ -9,16 +9,14 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import {
 	getCanUserCreateMedia,
 	getSettings,
-	getHomeTemplateId,
 	getEditedPostType,
 	getEditedPostId,
-	getPage,
-	getNavigationPanelActiveMenu,
 	getReusableBlocks,
-	isNavigationOpened,
 	isInserterOpened,
 	isListViewOpened,
 	__unstableGetPreference,
+	isPage,
+	hasPageContentFocus,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -72,13 +70,14 @@ describe( 'selectors', () => {
 			const state = {
 				settings: {},
 				preferences: {},
-				editedPost: { type: 'wp_template' },
+				editedPost: { postType: 'wp_template' },
 			};
 			const setInserterOpened = () => {};
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
 				outlineMode: true,
 				focusMode: false,
 				hasFixedToolbar: false,
+				isDistractionFree: false,
 				keepCaretInsideBlock: false,
 				showIconLabels: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
@@ -95,7 +94,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				settings: { key: 'value' },
-				editedPost: { type: 'wp_template_part' },
+				editedPost: { postType: 'wp_template_part' },
 			};
 			const setInserterOpened = () => {};
 
@@ -104,6 +103,7 @@ describe( 'selectors', () => {
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,
+				isDistractionFree: false,
 				keepCaretInsideBlock: false,
 				showIconLabels: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
@@ -111,13 +111,6 @@ describe( 'selectors', () => {
 				mediaUpload: expect.any( Function ),
 				__experimentalPreferPatternsOnRoot: false,
 			} );
-		} );
-	} );
-
-	describe( 'getHomeTemplateId', () => {
-		it( 'returns the home template ID', () => {
-			const state = { homeTemplateId: {} };
-			expect( getHomeTemplateId( state ) ).toBe( state.homeTemplateId );
 		} );
 	} );
 
@@ -130,36 +123,8 @@ describe( 'selectors', () => {
 
 	describe( 'getEditedPostType', () => {
 		it( 'returns the template type', () => {
-			const state = { editedPost: { type: 'wp_template' } };
+			const state = { editedPost: { postType: 'wp_template' } };
 			expect( getEditedPostType( state ) ).toBe( 'wp_template' );
-		} );
-	} );
-
-	describe( 'getPage', () => {
-		it( 'returns the page object', () => {
-			const page = {};
-			const state = { editedPost: { page } };
-			expect( getPage( state ) ).toBe( page );
-		} );
-	} );
-
-	describe( 'getNavigationPanelActiveMenu', () => {
-		it( 'returns the current navigation menu', () => {
-			const state = {
-				navigationPanel: { menu: 'test-menu', isOpen: false },
-			};
-			expect( getNavigationPanelActiveMenu( state ) ).toBe( 'test-menu' );
-		} );
-	} );
-
-	describe( 'isNavigationOpened', () => {
-		it( 'returns the navigation panel isOpened state', () => {
-			const state = {
-				navigationPanel: { menu: 'test-menu', isOpen: false },
-			};
-			expect( isNavigationOpened( state ) ).toBe( false );
-			state.navigationPanel.isOpen = true;
-			expect( isNavigationOpened( state ) ).toBe( true );
 		} );
 	} );
 
@@ -182,6 +147,61 @@ describe( 'selectors', () => {
 			expect( isListViewOpened( state ) ).toBe( true );
 			state.listViewPanel = false;
 			expect( isListViewOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isPage', () => {
+		it( 'returns true if the edited post type is a page', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+			};
+			expect( isPage( state ) ).toBe( true );
+		} );
+
+		it( 'returns false if the edited post type is a template', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+				},
+			};
+			expect( isPage( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'hasPageContentFocus', () => {
+		it( 'returns true if locked and the edited post type is a page', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+				hasPageContentFocus: true,
+			};
+			expect( hasPageContentFocus( state ) ).toBe( true );
+		} );
+
+		it( 'returns false if not locked and the edited post type is a page', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+				hasPageContentFocus: false,
+			};
+			expect( hasPageContentFocus( state ) ).toBe( false );
+		} );
+
+		it( 'returns false if locked and the edited post type is a template', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+				},
+				hasPageContentFocus: true,
+			};
+			expect( hasPageContentFocus( state ) ).toBe( false );
 		} );
 	} );
 } );

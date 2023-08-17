@@ -2,8 +2,8 @@
  * External dependencies
  */
 import memize from 'memize';
-import { size, map, without } from 'lodash';
 import { I18nManager } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
@@ -62,7 +62,7 @@ class Editor extends Component {
 		};
 
 		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
+		if ( hiddenBlockTypes.length > 0 ) {
 			if ( settings.allowedBlockTypes === undefined ) {
 				// If no specific flags for allowedBlockTypes are set, assume `true`
 				// meaning allow all block types.
@@ -73,12 +73,11 @@ class Editor extends Component {
 			// all block types).
 			const defaultAllowedBlockTypes =
 				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
+					? blockTypes.map( ( { name } ) => name )
 					: settings.allowedBlockTypes || [];
 
-			settings.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
+			settings.allowedBlockTypes = defaultAllowedBlockTypes.filter(
+				( type ) => ! hiddenBlockTypes.includes( type )
 			);
 		}
 
@@ -92,12 +91,15 @@ class Editor extends Component {
 			() => {
 				if ( this.postTitleRef ) {
 					this.postTitleRef.focus();
+				} else {
+					// If the post title ref is not available, we postpone setting focus to when it's available.
+					this.focusTitleWhenAvailable = true;
 				}
 			}
 		);
 
-		this.subscriptionParentFeaturedImageIdNativeUpdated = subscribeFeaturedImageIdNativeUpdated(
-			( payload ) => {
+		this.subscriptionParentFeaturedImageIdNativeUpdated =
+			subscribeFeaturedImageIdNativeUpdated( ( payload ) => {
 				editEntityRecord(
 					'postType',
 					postType,
@@ -107,8 +109,7 @@ class Editor extends Component {
 						undoIgnore: true,
 					}
 				);
-			}
-		);
+			} );
 	}
 
 	componentWillUnmount() {
@@ -122,6 +123,11 @@ class Editor extends Component {
 	}
 
 	setTitleRef( titleRef ) {
+		if ( this.focusTitleWhenAvailable && ! this.postTitleRef ) {
+			this.focusTitleWhenAvailable = false;
+			titleRef.focus();
+		}
+
 		this.postTitleRef = titleRef;
 	}
 
@@ -167,17 +173,19 @@ class Editor extends Component {
 		};
 
 		return (
-			<SlotFillProvider>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ normalizedPost }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<Layout setTitleRef={ this.setTitleRef } />
-				</EditorProvider>
-			</SlotFillProvider>
+			<GestureHandlerRootView style={ { flex: 1 } }>
+				<SlotFillProvider>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ normalizedPost }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						<Layout setTitleRef={ this.setTitleRef } />
+					</EditorProvider>
+				</SlotFillProvider>
+			</GestureHandlerRootView>
 		);
 	}
 }

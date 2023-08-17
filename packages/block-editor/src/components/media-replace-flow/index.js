@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { noop, uniqueId } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -16,10 +16,15 @@ import {
 	ToolbarButton,
 	Dropdown,
 	withFilters,
+	Tooltip,
 } from '@wordpress/components';
 import { useSelect, withDispatch } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
-import { upload, media as mediaIcon } from '@wordpress/icons';
+import {
+	postFeaturedImage,
+	upload,
+	media as mediaIcon,
+} from '@wordpress/icons';
 import { compose } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
@@ -32,6 +37,9 @@ import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
 
+const noop = () => {};
+let uniqueId = 0;
+
 const MediaReplaceFlow = ( {
 	mediaURL,
 	mediaId,
@@ -41,8 +49,9 @@ const MediaReplaceFlow = ( {
 	onError,
 	onSelect,
 	onSelectURL,
+	onToggleFeaturedImage,
+	useFeaturedImage,
 	onFilesUpload = noop,
-	onCloseModal = noop,
 	name = __( 'Replace' ),
 	createNotice,
 	removeNotice,
@@ -50,15 +59,14 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
+	popoverProps,
 } ) => {
-	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
+	const canUpload = !! mediaUpload;
 	const editMediaButtonRef = useRef();
-	const errorNoticeID = uniqueId(
-		'block-editor/media-replace-flow/error-notice/'
-	);
+	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
 
 	const onUploadError = ( message ) => {
 		const safeMessage = stripHTML( message );
@@ -82,8 +90,10 @@ const MediaReplaceFlow = ( {
 	};
 
 	const selectMedia = ( media, closeMenu ) => {
+		if ( useFeaturedImage && onToggleFeaturedImage ) {
+			onToggleFeaturedImage();
+		}
 		closeMenu();
-		setMediaURLValue( media?.url );
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
@@ -127,13 +137,9 @@ const MediaReplaceFlow = ( {
 
 	const gallery = multiple && onlyAllowsImages();
 
-	const POPOVER_PROPS = {
-		isAlternate: true,
-	};
-
 	return (
 		<Dropdown
-			popoverProps={ POPOVER_PROPS }
+			popoverProps={ popoverProps }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<ToolbarButton
@@ -149,23 +155,25 @@ const MediaReplaceFlow = ( {
 			renderContent={ ( { onClose } ) => (
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
-						<MediaUpload
-							gallery={ gallery }
-							addToGallery={ addToGallery }
-							multiple={ multiple }
-							value={ multiple ? mediaIds : mediaId }
-							onSelect={ ( media ) =>
-								selectMedia( media, onClose )
-							}
-							allowedTypes={ allowedTypes }
-							onClose={ onCloseModal }
-							render={ ( { open } ) => (
-								<MenuItem icon={ mediaIcon } onClick={ open }>
-									{ __( 'Open Media Library' ) }
-								</MenuItem>
-							) }
-						/>
 						<MediaUploadCheck>
+							<MediaUpload
+								gallery={ gallery }
+								addToGallery={ addToGallery }
+								multiple={ multiple }
+								value={ multiple ? mediaIds : mediaId }
+								onSelect={ ( media ) =>
+									selectMedia( media, onClose )
+								}
+								allowedTypes={ allowedTypes }
+								render={ ( { open } ) => (
+									<MenuItem
+										icon={ mediaIcon }
+										onClick={ open }
+									>
+										{ __( 'Open Media Library' ) }
+									</MenuItem>
+								) }
+							/>
 							<FormFileUpload
 								onChange={ ( event ) => {
 									uploadFiles( event, onClose );
@@ -186,24 +194,45 @@ const MediaReplaceFlow = ( {
 								} }
 							/>
 						</MediaUploadCheck>
+						{ onToggleFeaturedImage && (
+							<MenuItem
+								icon={ postFeaturedImage }
+								onClick={ onToggleFeaturedImage }
+								isPressed={ useFeaturedImage }
+							>
+								{ __( 'Use featured image' ) }
+							</MenuItem>
+						) }
 						{ children }
 					</NavigableMenu>
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-						<form className="block-editor-media-flow__url-input">
+						<form
+							className={ classnames(
+								'block-editor-media-flow__url-input',
+								{
+									'has-siblings':
+										canUpload || onToggleFeaturedImage,
+								}
+							) }
+						>
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
 							</span>
-							<LinkControl
-								value={ { url: mediaURLValue } }
-								settings={ [] }
-								showSuggestions={ false }
-								onChange={ ( { url } ) => {
-									setMediaURLValue( url );
-									onSelectURL( url );
-									editMediaButtonRef.current.focus();
-								} }
-							/>
+
+							<Tooltip text={ mediaURL } position="bottom">
+								<div>
+									<LinkControl
+										value={ { url: mediaURL } }
+										settings={ [] }
+										showSuggestions={ false }
+										onChange={ ( { url } ) => {
+											onSelectURL( url );
+											editMediaButtonRef.current.focus();
+										} }
+									/>
+								</div>
+							</Tooltip>
 						</form>
 					) }
 				</>

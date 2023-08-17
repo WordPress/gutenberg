@@ -6,77 +6,6 @@
  */
 
 /**
- * Build an array with CSS classes and inline styles defining the colors
- * which will be applied to the navigation markup in the front-end.
- *
- * @param  array $context    Navigation block context.
- * @param  array $attributes Block attributes.
- * @return array Colors CSS classes and inline styles.
- */
-function block_core_navigation_submenu_build_css_colors( $context, $attributes ) {
-	$colors = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	$is_sub_menu = isset( $attributes['isTopLevelItem'] ) ? ( ! $attributes['isTopLevelItem'] ) : false;
-
-	// Text color.
-	$named_text_color  = null;
-	$custom_text_color = null;
-
-	if ( $is_sub_menu && array_key_exists( 'customOverlayTextColor', $context ) ) {
-		$custom_text_color = $context['customOverlayTextColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'overlayTextColor', $context ) ) {
-		$named_text_color = $context['overlayTextColor'];
-	} elseif ( array_key_exists( 'customTextColor', $context ) ) {
-		$custom_text_color = $context['customTextColor'];
-	} elseif ( array_key_exists( 'textColor', $context ) ) {
-		$named_text_color = $context['textColor'];
-	} elseif ( isset( $context['style']['color']['text'] ) ) {
-		$custom_text_color = $context['style']['color']['text'];
-	}
-
-	// If has text color.
-	if ( ! is_null( $named_text_color ) ) {
-		// Add the color class.
-		array_push( $colors['css_classes'], 'has-text-color', sprintf( 'has-%s-color', $named_text_color ) );
-	} elseif ( ! is_null( $custom_text_color ) ) {
-		// Add the custom color inline style.
-		$colors['css_classes'][]  = 'has-text-color';
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $custom_text_color );
-	}
-
-	// Background color.
-	$named_background_color  = null;
-	$custom_background_color = null;
-
-	if ( $is_sub_menu && array_key_exists( 'customOverlayBackgroundColor', $context ) ) {
-		$custom_background_color = $context['customOverlayBackgroundColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'overlayBackgroundColor', $context ) ) {
-		$named_background_color = $context['overlayBackgroundColor'];
-	} elseif ( array_key_exists( 'customBackgroundColor', $context ) ) {
-		$custom_background_color = $context['customBackgroundColor'];
-	} elseif ( array_key_exists( 'backgroundColor', $context ) ) {
-		$named_background_color = $context['backgroundColor'];
-	} elseif ( isset( $context['style']['color']['background'] ) ) {
-		$custom_background_color = $context['style']['color']['background'];
-	}
-
-	// If has background color.
-	if ( ! is_null( $named_background_color ) ) {
-		// Add the background-color class.
-		array_push( $colors['css_classes'], 'has-background', sprintf( 'has-%s-background-color', $named_background_color ) );
-	} elseif ( ! is_null( $custom_background_color ) ) {
-		// Add the custom background-color inline style.
-		$colors['css_classes'][]  = 'has-background';
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $custom_background_color );
-	}
-
-	return $colors;
-}
-
-/**
  * Build an array with CSS classes and inline styles defining the font sizes
  * which will be applied to the navigation markup in the front-end.
  *
@@ -98,7 +27,14 @@ function block_core_navigation_submenu_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $context['style']['typography']['fontSize'],
+				)
+			)
+		);
 	}
 
 	return $font_sizes;
@@ -123,7 +59,6 @@ function block_core_navigation_submenu_render_submenu_icon() {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_submenu( $attributes, $content, $block ) {
-
 	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
 	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
@@ -138,17 +73,13 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$colors          = block_core_navigation_submenu_build_css_colors( $block->context, $attributes );
 	$font_sizes      = block_core_navigation_submenu_build_css_font_sizes( $block->context );
-	$classes         = array_merge(
-		$colors['css_classes'],
-		$font_sizes['css_classes']
-	);
-	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
+	$style_attribute = $font_sizes['inline_styles'];
 
-	$css_classes = trim( implode( ' ', $classes ) );
+	$css_classes = trim( implode( ' ', $font_sizes['css_classes'] ) );
 	$has_submenu = count( $block->inner_blocks ) > 0;
-	$is_active   = ! empty( $attributes['id'] ) && ( get_the_ID() === $attributes['id'] );
+	$kind        = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
+	$is_active   = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
 	$open_on_click           = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
@@ -183,7 +114,16 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	if ( ! $open_on_click ) {
 		$item_url = isset( $attributes['url'] ) ? $attributes['url'] : '';
 		// Start appending HTML attributes to anchor tag.
-		$html .= '<a class="wp-block-navigation-item__content" href="' . esc_url( $item_url ) . '"';
+		$html .= '<a class="wp-block-navigation-item__content"';
+
+		// The href attribute on a and area elements is not required;
+		// when those elements do not have href attributes they do not create hyperlinks.
+		// But also The href attribute must have a value that is a valid URL potentially
+		// surrounded by spaces.
+		// see: https://html.spec.whatwg.org/multipage/links.html#links-created-by-a-and-area-elements.
+		if ( ! empty( $item_url ) ) {
+			$html .= ' href="' . esc_url( $item_url ) . '"';
+		}
 
 		if ( $is_active ) {
 			$html .= ' aria-current="page"';
@@ -234,15 +174,60 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	if ( $has_submenu ) {
+		// Copy some attributes from the parent block to this one.
+		// Ideally this would happen in the client when the block is created.
+		if ( array_key_exists( 'overlayTextColor', $block->context ) ) {
+			$attributes['textColor'] = $block->context['overlayTextColor'];
+		}
+		if ( array_key_exists( 'overlayBackgroundColor', $block->context ) ) {
+			$attributes['backgroundColor'] = $block->context['overlayBackgroundColor'];
+		}
+		if ( array_key_exists( 'customOverlayTextColor', $block->context ) ) {
+			$attributes['style']['color']['text'] = $block->context['customOverlayTextColor'];
+		}
+		if ( array_key_exists( 'customOverlayBackgroundColor', $block->context ) ) {
+			$attributes['style']['color']['background'] = $block->context['customOverlayBackgroundColor'];
+		}
+
+		// This allows us to be able to get a response from wp_apply_colors_support.
+		$block->block_type->supports['color'] = true;
+		$colors_supports                      = wp_apply_colors_support( $block->block_type, $attributes );
+		$css_classes                          = 'wp-block-navigation__submenu-container';
+		if ( array_key_exists( 'class', $colors_supports ) ) {
+			$css_classes .= ' ' . $colors_supports['class'];
+		}
+
+		$style_attribute = '';
+		if ( array_key_exists( 'style', $colors_supports ) ) {
+			$style_attribute = $colors_supports['style'];
+		}
+
 		$inner_blocks_html = '';
 		foreach ( $block->inner_blocks as $inner_block ) {
 			$inner_blocks_html .= $inner_block->render();
 		}
 
+		if ( strpos( $inner_blocks_html, 'current-menu-item' ) ) {
+			$tag_processor = new WP_HTML_Tag_Processor( $html );
+			while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-navigation-item__content' ) ) ) {
+				$tag_processor->add_class( 'current-menu-ancestor' );
+			}
+			$html = $tag_processor->get_updated_html();
+		}
+
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class' => $css_classes,
+				'style' => $style_attribute,
+			)
+		);
+
 		$html .= sprintf(
-			'<ul class="wp-block-navigation__submenu-container">%s</ul>',
+			'<ul %s>%s</ul>',
+			$wrapper_attributes,
 			$inner_blocks_html
 		);
+
 	}
 
 	$html .= '</li>';

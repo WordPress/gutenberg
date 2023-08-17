@@ -19,9 +19,8 @@ import { store as editPostStore } from '../../store';
 
 export default function InserterSidebar() {
 	const { insertionPoint, showMostUsedBlocks } = useSelect( ( select ) => {
-		const { isFeatureActive, __experimentalGetInsertionPoint } = select(
-			editPostStore
-		);
+		const { isFeatureActive, __experimentalGetInsertionPoint } =
+			select( editPostStore );
 		return {
 			insertionPoint: __experimentalGetInsertionPoint(),
 			showMostUsedBlocks: isFeatureActive( 'mostUsedBlocks' ),

@@ -11,6 +11,7 @@ import { chevronRightSmall, Icon } from '@wordpress/icons';
  */
 import BlockTitle from '../block-title';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -25,11 +26,11 @@ function BlockBreadcrumb( { rootLabelText } ) {
 		const {
 			getSelectionStart,
 			getSelectedBlockClientId,
-			getBlockParents,
-		} = select( blockEditorStore );
+			getEnabledBlockParents,
+		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			parents: getBlockParents( selectedBlockClientId ),
+			parents: getEnabledBlockParents( selectedBlockClientId ),
 			clientId: selectedBlockClientId,
 			hasSelection: !! getSelectionStart().clientId,
 		};

@@ -1,0 +1,65 @@
+.spacing-sizes-control {
+	.spacing-sizes-control__custom-value-input,
+	.spacing-sizes-control__label {
+		margin-bottom: 0;
+	}
+
+	.spacing-sizes-control__range-control,
+	.spacing-sizes-control__custom-value-range {
+		height: 40px;
+		/* Vertically center the RangeControl until it has true 40px height. */
+		display: flex;
+		align-items: center;
+		margin-bottom: 0;
+		flex: 1;
+
+		> .components-base-control__field {
+			/* Fixes RangeControl contents when the outer wrapper is flex */
+			flex: 1;
+		}
+	}
+
+	.components-range-control__mark {
+		height: $grid-unit-05;
+		width: 3px;
+		background-color: #fff;
+		z-index: 1;
+	}
+
+	.components-range-control__marks {
+		margin-top: 17px;
+
+		:first-child {
+			display: none;
+		}
+	}
+
+	.components-range-control__thumb-wrapper {
+		z-index: 3;
+	}
+}
+
+.spacing-sizes-control__wrapper {
+	& + & {
+		margin-top: $grid-unit-10;
+	}
+}
+
+.spacing-sizes-control__header {
+	height: $grid-unit-20;
+	margin-bottom: $grid-unit-10;
+}
+
+.spacing-sizes-control__dropdown {
+	height: $grid-unit-30;
+}
+
+.spacing-sizes-control__custom-select-control,
+.spacing-sizes-control__custom-value-input {
+	flex: 1;
+}
+
+.spacing-sizes-control__icon,
+.spacing-sizes-control__custom-toggle {
+	flex: 0 0 auto;
+}

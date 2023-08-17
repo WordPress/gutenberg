@@ -1,8 +1,16 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -17,13 +25,7 @@ export default function save( { attributes } ) {
 		previewHeight,
 	} = attributes;
 
-	const pdfEmbedLabel = RichText.isEmpty( fileName )
-		? __( 'PDF embed' )
-		: sprintf(
-				/* translators: %s: filename. */
-				__( 'Embed of %s.' ),
-				fileName
-		  );
+	const pdfEmbedLabel = RichText.isEmpty( fileName ) ? 'PDF embed' : fileName;
 
 	const hasFilename = ! RichText.isEmpty( fileName );
 
@@ -63,7 +65,10 @@ export default function save( { attributes } ) {
 				{ showDownloadButton && (
 					<a
 						href={ href }
-						className="wp-block-file__button"
+						className={ classnames(
+							'wp-block-file__button',
+							__experimentalGetElementClassName( 'button' )
+						) }
 						download={ true }
 						aria-describedby={ describedById }
 					>

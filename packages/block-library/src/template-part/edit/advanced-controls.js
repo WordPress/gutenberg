@@ -7,12 +7,39 @@ import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { TemplatePartImportControls } from './import-controls';
+
+const htmlElementMessages = {
+	header: __(
+		'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
+	),
+	main: __(
+		'The <main> element should be used for the primary content of your document only.'
+	),
+	section: __(
+		"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+	),
+	article: __(
+		'The <article> element should represent a self-contained, syndicatable portion of the document.'
+	),
+	aside: __(
+		"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+	),
+	footer: __(
+		'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
+	),
+};
+
 export function TemplatePartAdvancedControls( {
 	tagName,
 	setAttributes,
 	isEntityAvailable,
 	templatePartId,
 	defaultWrapper,
+	hasInnerBlocks,
 } ) {
 	const [ area, setArea ] = useEntityProp(
 		'postType',
@@ -28,26 +55,26 @@ export function TemplatePartAdvancedControls( {
 		templatePartId
 	);
 
-	const { areaOptions } = useSelect( ( select ) => {
+	const definedAreas = useSelect( ( select ) => {
 		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 		// Blocks can be loaded into a *non-post* block editor.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const definedAreas = select(
+		/* eslint-disable-next-line @wordpress/data-no-store-string-literals */
+		return select(
 			'core/editor'
 		).__experimentalGetDefaultTemplatePartAreas();
-		return {
-			areaOptions: definedAreas.map( ( { label, area: _area } ) => ( {
-				label,
-				value: _area,
-			} ) ),
-		};
 	}, [] );
 
+	const areaOptions = definedAreas.map( ( { label, area: _area } ) => ( {
+		label,
+		value: _area,
+	} ) );
+
 	return (
-		<InspectorControls __experimentalGroup="advanced">
+		<InspectorControls group="advanced">
 			{ isEntityAvailable && (
 				<>
 					<TextControl
+						__nextHasNoMarginBottom
 						label={ __( 'Title' ) }
 						value={ title }
 						onChange={ ( value ) => {
@@ -57,6 +84,7 @@ export function TemplatePartAdvancedControls( {
 					/>
 
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Area' ) }
 						labelPosition="top"
 						options={ areaOptions }
@@ -66,6 +94,7 @@ export function TemplatePartAdvancedControls( {
 				</>
 			) }
 			<SelectControl
+				__nextHasNoMarginBottom
 				label={ __( 'HTML element' ) }
 				options={ [
 					{
@@ -86,7 +115,14 @@ export function TemplatePartAdvancedControls( {
 				] }
 				value={ tagName || '' }
 				onChange={ ( value ) => setAttributes( { tagName: value } ) }
+				help={ htmlElementMessages[ tagName ] }
 			/>
+			{ ! hasInnerBlocks && (
+				<TemplatePartImportControls
+					area={ area }
+					setAttributes={ setAttributes }
+				/>
+			) }
 		</InspectorControls>
 	);
 }

@@ -2,9 +2,153 @@
 
 ## Unreleased
 
+## 26.11.0 (2023-08-16)
+
+### Enhancement
+
+-   Updated `npm-package-json-lint` peer dependency to require v6.0.0 [#53636](https://github.com/WordPress/gutenberg/pull/53636)
+-   The bundled `@svgr/webpack` dependency has been updated from requiring ^6.2.1 to requiring ^8.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
+-   The bundled `cssnano` dependency has been updated from requiring ^5.07 to requiring ^6.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
+
+### Bug Fix
+
+-   Fix prevent watch mode from aborting when encountering a `block.json` file that contains invalid JSON. ([#51971](https://github.com/WordPress/gutenberg/pull/51971))
+
+## 26.10.0 (2023-08-10)
+
+## 26.9.0 (2023-07-20)
+
+## 26.8.0 (2023-07-05)
+
+## 26.7.0 (2023-06-23)
+
+## 26.6.0 (2023-06-07)
+
+### Enhancements
+
+-   The bundled `terser-webpack-plugin` dependency has been updated from requiring `^5.1.4` to requiring `^5.3.9` ([#50994](https://github.com/WordPress/gutenberg/pull/50994)).
+-   Optimize updating render paths when developing blocks with the `start` command ([#51162](https://github.com/WordPress/gutenberg/pull/51162)).
+
+### Bug Fixes
+
+-   Ensure files listed in `render` field of `block.json` files are always copied to the build folder when using the `start` command ([#50939](https://github.com/WordPress/gutenberg/pull/50939)).
+
+## 26.5.0 (2023-05-24)
+
+## 26.4.0 (2023-05-10)
+
+## 26.3.0 (2023-04-26)
+
+### Enhancements
+
+-   License check script supports conjunctive (AND) licenses ([46801](https://github.com/WordPress/gutenberg/pull/46801)).
+
+## 26.2.0 (2023-04-12)
+
+## 26.1.0 (2023-03-29)
+
+### Enhancements
+
+-   The bundled `wp-prettier` dependency has been upgraded from `2.6.2` to `2.8.5` ([#49258](https://github.com/WordPress/gutenberg/pull/49258)).
+
+## 26.0.0 (2023-03-15)
+
+### Breaking Changes
+
+-   Started using Jest v29 instead of v27 as a dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
+
+## 25.5.1 (2023-03-06)
+
+### Bug Fix
+
+-   Fix `render.php` isn't copied in Windows OS ([#48735](https://github.com/WordPress/gutenberg/pull/48735)).
+
+## 25.5.0 (2023-03-01)
+
+## 25.4.0 (2023-02-15)
+
+### New Features
+
+-   The `WP_DEVTOOL` environment variable can now be used to set the Webpack devtool option for sourcemaps in production builds ([#46812](https://github.com/WordPress/gutenberg/pull/46812)). Previously, this only worked for development builds.
+-   Update default webpack config and lint-style script to allow PostCSS (`.pcss` extension) file usage ([#45352](https://github.com/WordPress/gutenberg/pull/45352)).
+-   Add `--no-watch` option to allow creating the unminified/dev JS without starting the watcher ([#44237](https://github.com/WordPress/gutenberg/pull/44237)).
+
+## 25.3.0 (2023-02-01)
+
+## 25.2.0 (2023-01-11)
+
+## 25.1.0 (2023-01-02)
+
+## 25.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 24.6.0 (2022-11-16)
+
+## 24.5.0 (2022-11-02)
+
+## 24.4.0 (2022-10-19)
+
+## 24.3.0 (2022-10-05)
+
+## 24.2.0 (2022-09-21)
+
+## 24.1.0 (2022-09-13)
+
+### New Features
+
+-   Update the default webpack config to allow `webp` image format ([#43880](https://github.com/WordPress/gutenberg/pull/43880)).
+-   Update webpack configuration for the `build` and `start` commands to automatically copy PHP files listed in the `render` field of `block.json` files from the source to the build folder ([#43917](https://github.com/WordPress/gutenberg/pull/43917)).
+
+## 24.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+-   The bundled `@wordpress/eslint-plugin` package got updated to the new major version and the default linting for Jest unit tests is now handled in the default config in this package ([#43272](https://github.com/WordPress/gutenberg/pull/43272)).
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 23.7.2 (2022-08-17)
+
+### Bug Fix
+
+-   Jest Preset: Improve `is-plain-obj` transformation ignore ([#43271](https://github.com/WordPress/gutenberg/pull/43271)).
+
+## 23.7.1 (2022-08-12)
+
+### Bug Fix
+
+-   Jest Preset: Ignore `is-plain-obj` transformation ([#43179](https://github.com/WordPress/gutenberg/pull/43179)).
+
+## 23.6.0 (2022-07-27)
+
+### Bug Fix
+
+-   Fix the incorrect exit error code when status missing in `webpack` call for `build` and `start` commands ([#42396](https://github.com/WordPress/gutenberg/pull/42396)).
+
+## 23.3.0 (2022-06-15)
+
+### Enhancements
+
+-   The bundled `wp-prettier` dependency has been upgraded from `2.2.1` to `2.6.2` ([#40542](https://github.com/WordPress/gutenberg/pull/40542)).
+
+## 23.2.0 (2022-06-01)
+
+### Bug Fix
+
+-   Fix incorrect handling in `plugin-zip` for root-level files and some specific platform conditions ([#41439](https://github.com/WordPress/gutenberg/pull/41439)).
+
+## 23.1.0 (2022-05-18)
+
 ### New Feature
 
 -   Enable by default code formatting for JSON files in the `format` command ([#40994](https://github.com/WordPress/gutenberg/pull/40994)). You can opt-out of this behavior by providing a custom file matcher, example: `wp-scripts format src/**/*.js`.
+-   Support tsx files in `viewScript`, `script`, `editorScript` ([#41068](https://github.com/WordPress/gutenberg/pull/41068)).
 
 ### Bug Fixes
 
@@ -17,7 +161,7 @@
 -   Remove `lint-md-js` script that was broken for some time and it's extemely hard to make it work correctly with the recommended ESLint config in Markdown files ([#40511](https://github.com/WordPress/gutenberg/pull/40511)).
 -   Remove the previously deprecated and undocumented `format-js` command ([#40512](https://github.com/WordPress/gutenberg/pull/40512)). You should use the `format` command instead.
 
-### New Feature
+### New Features
 
 -   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages ([#40514](https://github.com/WordPress/gutenberg/pull/
 
@@ -109,7 +253,7 @@
 ### New Features
 
 -   Added a new `plugin-zip` command to create a zip file for a WordPress plugin ([#37687](https://github.com/WordPress/gutenberg/pull/37687)).
--   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)). For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed.
+-   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)). For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed.
 -   Automatically copy `block.json` files located in the `src` folder and its subfolders to the output folder (`build` by default) ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
 -   Scan the `src` directory for `block.json` files to detect defined scripts to use them as entry points with the `start` and `build` commands. ([#37661](https://github.com/WordPress/gutenberg/pull/37661)).
 

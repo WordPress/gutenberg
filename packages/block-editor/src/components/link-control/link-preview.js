@@ -29,6 +29,7 @@ export default function LinkPreview( {
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
+	additionalControls,
 } ) {
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
@@ -42,10 +43,12 @@ export default function LinkPreview( {
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
 
-	const displayTitle = richData?.title || value?.title || displayURL;
-
 	// url can be undefined if the href attribute is unset
 	const isEmptyURL = ! value?.url?.length;
+
+	const displayTitle =
+		! isEmptyURL &&
+		stripHTML( richData?.title || value?.title || displayURL );
 
 	let icon;
 
@@ -60,13 +63,13 @@ export default function LinkPreview( {
 	return (
 		<div
 			aria-label={ __( 'Currently selected' ) }
-			aria-selected="true"
 			className={ classnames( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
 				'is-preview': true,
 				'is-error': isEmptyURL,
+				'is-url-title': displayTitle === displayURL,
 			} ) }
 		>
 			<div className="block-editor-link-control__search-item-top">
@@ -88,10 +91,10 @@ export default function LinkPreview( {
 									className="block-editor-link-control__search-item-title"
 									href={ value.url }
 								>
-									{ stripHTML( displayTitle ) }
+									{ displayTitle }
 								</ExternalLink>
 
-								{ value?.url && (
+								{ value?.url && displayTitle !== displayURL && (
 									<span className="block-editor-link-control__search-item-info">
 										{ displayURL }
 									</span>
@@ -124,9 +127,11 @@ export default function LinkPreview( {
 				<ViewerSlot fillProps={ value } />
 			</div>
 
-			{ ( ( hasRichData &&
-				( richData?.image || richData?.description ) ) ||
-				isFetching ) && (
+			{ !! (
+				( hasRichData &&
+					( richData?.image || richData?.description ) ) ||
+				isFetching
+			) && (
 				<div className="block-editor-link-control__search-item-bottom">
 					{ ( richData?.image || isFetching ) && (
 						<div
@@ -163,6 +168,8 @@ export default function LinkPreview( {
 					) }
 				</div>
 			) }
+
+			{ additionalControls && additionalControls() }
 		</div>
 	);
 }

@@ -7,14 +7,23 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { useEffect, useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useBlockListContext } from './block-list-context';
+import { store as blockEditorStore } from '../../store';
 
-function BlockListItemCell( { children, clientId, rootClientId } ) {
+function BlockListItemCell( { children, item: clientId, onLayout } ) {
 	const { blocksLayouts, updateBlocksLayouts } = useBlockListContext();
+	const { rootClientId } = useSelect(
+		( select ) => {
+			const { getBlockRootClientId } = select( blockEditorStore );
+			return { rootClientId: getBlockRootClientId( clientId ) };
+		},
+		[ clientId ]
+	);
 
 	useEffect( () => {
 		return () => {
@@ -25,18 +34,25 @@ function BlockListItemCell( { children, clientId, rootClientId } ) {
 		};
 	}, [] );
 
-	const onLayout = useCallback(
-		( { nativeEvent: { layout } } ) => {
+	const onCellLayout = useCallback(
+		( event ) => {
+			const {
+				nativeEvent: { layout },
+			} = event;
 			updateBlocksLayouts( blocksLayouts, {
 				clientId,
 				rootClientId,
 				...layout,
 			} );
+
+			if ( onLayout ) {
+				onLayout( event );
+			}
 		},
-		[ clientId, rootClientId, updateBlocksLayouts ]
+		[ clientId, rootClientId, updateBlocksLayouts, onLayout ]
 	);
 
-	return <View onLayout={ onLayout }>{ children }</View>;
+	return <View onLayout={ onCellLayout }>{ children }</View>;
 }
 
 export default BlockListItemCell;

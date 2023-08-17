@@ -1,8 +1,4 @@
-/**
- * External dependencies
- */
-import { castArray, findKey, first, isObject, last, some } from 'lodash';
-
+/* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
 /**
  * WordPress dependencies
  */
@@ -16,6 +12,7 @@ import {
 	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
+	getBlockSupport,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -26,31 +23,19 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
+import {
+	retrieveSelectedAttribute,
+	START_OF_SELECTED_AREA,
+} from '../utils/selection';
+import {
+	__experimentalUpdateSettings,
+	privateRemoveBlocks,
+} from './private-actions';
 
-/**
- * Action which will insert a default block insert action if there
- * are no other blocks at the root of the editor. This action should be used
- * in actions which may result in no blocks remaining in the editor (removal,
- * replacement, etc).
- */
-const ensureDefaultBlock = () => ( { select, dispatch } ) => {
-	// To avoid a focus loss when removing the last block, assure there is
-	// always a default block if the last of the blocks have been removed.
-	const count = select.getBlockCount();
-	if ( count > 0 ) {
-		return;
-	}
+/** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
-	// If there's an custom appender, don't insert default block.
-	// We have to remember to manually move the focus elsewhere to
-	// prevent it from being lost though.
-	const { __unstableHasCustomAppender } = select.getSettings();
-	if ( __unstableHasCustomAppender ) {
-		return;
-	}
-
-	dispatch.insertDefaultBlock();
-};
+const castArray = ( maybeArray ) =>
+	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
 /**
  * Action that resets blocks state to the specified array of blocks, taking precedence
@@ -58,41 +43,42 @@ const ensureDefaultBlock = () => ( { select, dispatch } ) => {
  *
  * @param {Array} blocks Array of blocks.
  */
-export const resetBlocks = ( blocks ) => ( { dispatch } ) => {
-	dispatch( { type: 'RESET_BLOCKS', blocks } );
-	dispatch( validateBlocksToTemplate( blocks ) );
-};
+export const resetBlocks =
+	( blocks ) =>
+	( { dispatch } ) => {
+		dispatch( { type: 'RESET_BLOCKS', blocks } );
+		dispatch( validateBlocksToTemplate( blocks ) );
+	};
 
 /**
  * Block validity is a function of blocks state (at the point of a
  * reset) and the template setting. As a compromise to its placement
- * across distinct parts of state, it is implemented here as a side-
+ * across distinct parts of state, it is implemented here as a side
  * effect of the block reset action.
  *
  * @param {Array} blocks Array of blocks.
  */
-export const validateBlocksToTemplate = ( blocks ) => ( {
-	select,
-	dispatch,
-} ) => {
-	const template = select.getTemplate();
-	const templateLock = select.getTemplateLock();
+export const validateBlocksToTemplate =
+	( blocks ) =>
+	( { select, dispatch } ) => {
+		const template = select.getTemplate();
+		const templateLock = select.getTemplateLock();
 
-	// Unlocked templates are considered always valid because they act
-	// as default values only.
-	const isBlocksValidToTemplate =
-		! template ||
-		templateLock !== 'all' ||
-		doBlocksMatchTemplate( blocks, template );
+		// Unlocked templates are considered always valid because they act
+		// as default values only.
+		const isBlocksValidToTemplate =
+			! template ||
+			templateLock !== 'all' ||
+			doBlocksMatchTemplate( blocks, template );
 
-	// Update if validity has changed.
-	const isValidTemplate = select.isValidTemplate();
+		// Update if validity has changed.
+		const isValidTemplate = select.isValidTemplate();
 
-	if ( isBlocksValidToTemplate !== isValidTemplate ) {
-		dispatch.setTemplateValidity( isBlocksValidToTemplate );
-		return isBlocksValidToTemplate;
-	}
-};
+		if ( isBlocksValidToTemplate !== isValidTemplate ) {
+			dispatch.setTemplateValidity( isBlocksValidToTemplate );
+			return isBlocksValidToTemplate;
+		}
+	};
 
 /**
  * A block selection object.
@@ -224,16 +210,26 @@ export function selectBlock( clientId, initialPosition = 0 ) {
 
 /**
  * Yields action objects used in signalling that the block preceding the given
- * clientId should be selected.
+ * clientId (or optionally, its first parent from bottom to top)
+ * should be selected.
  *
- * @param {string} clientId Block client ID.
+ * @param {string}  clientId         Block client ID.
+ * @param {boolean} fallbackToParent If true, select the first parent if there is no previous block.
  */
-export const selectPreviousBlock = ( clientId ) => ( { select, dispatch } ) => {
-	const previousBlockClientId = select.getPreviousBlockClientId( clientId );
-	if ( previousBlockClientId ) {
-		dispatch.selectBlock( previousBlockClientId, -1 );
-	}
-};
+export const selectPreviousBlock =
+	( clientId, fallbackToParent = false ) =>
+	( { select, dispatch } ) => {
+		const previousBlockClientId =
+			select.getPreviousBlockClientId( clientId );
+		if ( previousBlockClientId ) {
+			dispatch.selectBlock( previousBlockClientId, -1 );
+		} else if ( fallbackToParent ) {
+			const firstParentClientId = select.getBlockRootClientId( clientId );
+			if ( firstParentClientId ) {
+				dispatch.selectBlock( firstParentClientId, -1 );
+			}
+		}
+	};
 
 /**
  * Yields action objects used in signalling that the block following the given
@@ -241,12 +237,14 @@ export const selectPreviousBlock = ( clientId ) => ( { select, dispatch } ) => {
  *
  * @param {string} clientId Block client ID.
  */
-export const selectNextBlock = ( clientId ) => ( { select, dispatch } ) => {
-	const nextBlockClientId = select.getNextBlockClientId( clientId );
-	if ( nextBlockClientId ) {
-		dispatch.selectBlock( nextBlockClientId );
-	}
-};
+export const selectNextBlock =
+	( clientId ) =>
+	( { select, dispatch } ) => {
+		const nextBlockClientId = select.getNextBlockClientId( clientId );
+		if ( nextBlockClientId ) {
+			dispatch.selectBlock( nextBlockClientId );
+		}
+	};
 
 /**
  * Action that starts block multi-selection.
@@ -277,37 +275,35 @@ export function stopMultiSelect() {
  * @param {string}      end                           Last block of the multiselection.
  * @param {number|null} __experimentalInitialPosition Optional initial position. Pass as null to skip focus within editor canvas.
  */
-export const multiSelect = (
-	start,
-	end,
-	__experimentalInitialPosition = 0
-) => ( { select, dispatch } ) => {
-	const startBlockRootClientId = select.getBlockRootClientId( start );
-	const endBlockRootClientId = select.getBlockRootClientId( end );
+export const multiSelect =
+	( start, end, __experimentalInitialPosition = 0 ) =>
+	( { select, dispatch } ) => {
+		const startBlockRootClientId = select.getBlockRootClientId( start );
+		const endBlockRootClientId = select.getBlockRootClientId( end );
 
-	// Only allow block multi-selections at the same level.
-	if ( startBlockRootClientId !== endBlockRootClientId ) {
-		return;
-	}
+		// Only allow block multi-selections at the same level.
+		if ( startBlockRootClientId !== endBlockRootClientId ) {
+			return;
+		}
 
-	dispatch( {
-		type: 'MULTI_SELECT',
-		start,
-		end,
-		initialPosition: __experimentalInitialPosition,
-	} );
+		dispatch( {
+			type: 'MULTI_SELECT',
+			start,
+			end,
+			initialPosition: __experimentalInitialPosition,
+		} );
 
-	const blockCount = select.getSelectedBlockCount();
+		const blockCount = select.getSelectedBlockCount();
 
-	speak(
-		sprintf(
-			/* translators: %s: number of selected blocks */
-			_n( '%s block selected.', '%s blocks selected.', blockCount ),
-			blockCount
-		),
-		'assertive'
-	);
-};
+		speak(
+			sprintf(
+				/* translators: %s: number of selected blocks */
+				_n( '%s block selected.', '%s blocks selected.', blockCount ),
+				blockCount
+			),
+			'assertive'
+		);
+	};
 
 /**
  * Action that clears the block selection.
@@ -377,42 +373,38 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  *
  * @return {Object} Action object.
  */
-export const replaceBlocks = (
-	clientIds,
-	blocks,
-	indexToSelect,
-	initialPosition = 0,
-	meta
-) => ( { select, dispatch } ) => {
-	/* eslint-enable jsdoc/valid-types */
-	clientIds = castArray( clientIds );
-	blocks = getBlocksWithDefaultStylesApplied(
-		castArray( blocks ),
-		select.getSettings()
-	);
-	const rootClientId = select.getBlockRootClientId( first( clientIds ) );
-	// Replace is valid if the new blocks can be inserted in the root block.
-	for ( let index = 0; index < blocks.length; index++ ) {
-		const block = blocks[ index ];
-		const canInsertBlock = select.canInsertBlockType(
-			block.name,
-			rootClientId
+export const replaceBlocks =
+	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
+	( { select, dispatch } ) => {
+		/* eslint-enable jsdoc/valid-types */
+		clientIds = castArray( clientIds );
+		blocks = getBlocksWithDefaultStylesApplied(
+			castArray( blocks ),
+			select.getSettings()
 		);
-		if ( ! canInsertBlock ) {
-			return;
+		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+		// Replace is valid if the new blocks can be inserted in the root block.
+		for ( let index = 0; index < blocks.length; index++ ) {
+			const block = blocks[ index ];
+			const canInsertBlock = select.canInsertBlockType(
+				block.name,
+				rootClientId
+			);
+			if ( ! canInsertBlock ) {
+				return;
+			}
 		}
-	}
-	dispatch( {
-		type: 'REPLACE_BLOCKS',
-		clientIds,
-		blocks,
-		time: Date.now(),
-		indexToSelect,
-		initialPosition,
-		meta,
-	} );
-	dispatch( ensureDefaultBlock() );
-};
+		dispatch( {
+			type: 'REPLACE_BLOCKS',
+			clientIds,
+			blocks,
+			time: Date.now(),
+			indexToSelect,
+			initialPosition,
+			meta,
+		} );
+		dispatch.ensureDefaultBlock();
+	};
 
 /**
  * Action that replaces a single block with one or more replacement blocks.
@@ -434,18 +426,18 @@ export function replaceBlock( clientId, block ) {
  *
  * @return {Function} Action creator.
  */
-const createOnMove = ( type ) => ( clientIds, rootClientId ) => ( {
-	select,
-	dispatch,
-} ) => {
-	// If one of the blocks is locked or the parent is locked, we cannot move any block.
-	const canMoveBlocks = select.canMoveBlocks( clientIds, rootClientId );
-	if ( ! canMoveBlocks ) {
-		return;
-	}
+const createOnMove =
+	( type ) =>
+	( clientIds, rootClientId ) =>
+	( { select, dispatch } ) => {
+		// If one of the blocks is locked or the parent is locked, we cannot move any block.
+		const canMoveBlocks = select.canMoveBlocks( clientIds, rootClientId );
+		if ( ! canMoveBlocks ) {
+			return;
+		}
 
-	dispatch( { type, clientIds: castArray( clientIds ), rootClientId } );
-};
+		dispatch( { type, clientIds: castArray( clientIds ), rootClientId } );
+	};
 
 export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );
 export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
@@ -458,51 +450,51 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * @param {?string} toRootClientId   Root client ID destination.
  * @param {number}  index            The index to move the blocks to.
  */
-export const moveBlocksToPosition = (
-	clientIds,
-	fromRootClientId = '',
-	toRootClientId = '',
-	index
-) => ( { select, dispatch } ) => {
-	const canMoveBlocks = select.canMoveBlocks( clientIds, fromRootClientId );
-
-	// If one of the blocks is locked or the parent is locked, we cannot move any block.
-	if ( ! canMoveBlocks ) {
-		return;
-	}
-
-	// If moving inside the same root block the move is always possible.
-	if ( fromRootClientId !== toRootClientId ) {
-		const canRemoveBlocks = select.canRemoveBlocks(
+export const moveBlocksToPosition =
+	( clientIds, fromRootClientId = '', toRootClientId = '', index ) =>
+	( { select, dispatch } ) => {
+		const canMoveBlocks = select.canMoveBlocks(
 			clientIds,
 			fromRootClientId
 		);
 
-		// If we're moving to another block, it means we're deleting blocks from
-		// the original block, so we need to check if removing is possible.
-		if ( ! canRemoveBlocks ) {
+		// If one of the blocks is locked or the parent is locked, we cannot move any block.
+		if ( ! canMoveBlocks ) {
 			return;
 		}
 
-		const canInsertBlocks = select.canInsertBlocks(
+		// If moving inside the same root block the move is always possible.
+		if ( fromRootClientId !== toRootClientId ) {
+			const canRemoveBlocks = select.canRemoveBlocks(
+				clientIds,
+				fromRootClientId
+			);
+
+			// If we're moving to another block, it means we're deleting blocks from
+			// the original block, so we need to check if removing is possible.
+			if ( ! canRemoveBlocks ) {
+				return;
+			}
+
+			const canInsertBlocks = select.canInsertBlocks(
+				clientIds,
+				toRootClientId
+			);
+
+			// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
+			if ( ! canInsertBlocks ) {
+				return;
+			}
+		}
+
+		dispatch( {
+			type: 'MOVE_BLOCKS_TO_POSITION',
+			fromRootClientId,
+			toRootClientId,
 			clientIds,
-			toRootClientId
-		);
-
-		// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
-		if ( ! canInsertBlocks ) {
-			return;
-		}
-	}
-
-	dispatch( {
-		type: 'MOVE_BLOCKS_TO_POSITION',
-		fromRootClientId,
-		toRootClientId,
-		clientIds,
-		index,
-	} );
-};
+			index,
+		} );
+	};
 
 /**
  * Action that moves given block to a new position.
@@ -528,6 +520,9 @@ export function moveBlockToPosition(
 
 /**
  * Action that inserts a single block, optionally at a specific index respective a root block list.
+ *
+ * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
+ * a templateLock is active on the block list.
  *
  * @param {Object}   block           Block object to insert.
  * @param {?number}  index           Index at which block should be inserted.
@@ -558,64 +553,79 @@ export function insertBlock(
 /**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
+ * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
+ * a templateLock is active on the block list.
+ *
  * @param {Object[]}  blocks          Block objects to insert.
  * @param {?number}   index           Index at which block should be inserted.
  * @param {?string}   rootClientId    Optional root client ID of block list on which to insert.
  * @param {?boolean}  updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
  * @param {0|-1|null} initialPosition Initial focus position. Setting it to null prevent focusing the inserted block.
  * @param {?Object}   meta            Optional Meta values to be passed to the action object.
+ *
  * @return {Object} Action object.
  */
-export const insertBlocks = (
-	blocks,
-	index,
-	rootClientId,
-	updateSelection = true,
-	initialPosition = 0,
-	meta
-) => ( { select, dispatch } ) => {
-	/* eslint-enable jsdoc/valid-types */
-	if ( isObject( initialPosition ) ) {
-		meta = initialPosition;
-		initialPosition = 0;
-		deprecated( "meta argument in wp.data.dispatch('core/block-editor')", {
-			since: '5.8',
-			hint: 'The meta argument is now the 6th argument of the function',
-		} );
-	}
-
-	blocks = getBlocksWithDefaultStylesApplied(
-		castArray( blocks ),
-		select.getSettings()
-	);
-	const allowedBlocks = [];
-	for ( const block of blocks ) {
-		const isValid = select.canInsertBlockType( block.name, rootClientId );
-		if ( isValid ) {
-			allowedBlocks.push( block );
+export const insertBlocks =
+	(
+		blocks,
+		index,
+		rootClientId,
+		updateSelection = true,
+		initialPosition = 0,
+		meta
+	) =>
+	( { select, dispatch } ) => {
+		/* eslint-enable jsdoc/valid-types */
+		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
+			meta = initialPosition;
+			initialPosition = 0;
+			deprecated(
+				"meta argument in wp.data.dispatch('core/block-editor')",
+				{
+					since: '5.8',
+					hint: 'The meta argument is now the 6th argument of the function',
+				}
+			);
 		}
-	}
-	if ( allowedBlocks.length ) {
-		dispatch( {
-			type: 'INSERT_BLOCKS',
-			blocks: allowedBlocks,
-			index,
-			rootClientId,
-			time: Date.now(),
-			updateSelection,
-			initialPosition: updateSelection ? initialPosition : null,
-			meta,
-		} );
-	}
-};
+
+		blocks = getBlocksWithDefaultStylesApplied(
+			castArray( blocks ),
+			select.getSettings()
+		);
+		const allowedBlocks = [];
+		for ( const block of blocks ) {
+			const isValid = select.canInsertBlockType(
+				block.name,
+				rootClientId
+			);
+			if ( isValid ) {
+				allowedBlocks.push( block );
+			}
+		}
+		if ( allowedBlocks.length ) {
+			dispatch( {
+				type: 'INSERT_BLOCKS',
+				blocks: allowedBlocks,
+				index,
+				rootClientId,
+				time: Date.now(),
+				updateSelection,
+				initialPosition: updateSelection ? initialPosition : null,
+				meta,
+			} );
+		}
+	};
 
 /**
  * Action that shows the insertion point.
  *
- * @param {?string} rootClientId      Optional root client ID of block list on
- *                                    which to insert.
- * @param {?number} index             Index at which block should be inserted.
- * @param {Object}  __unstableOptions Whether or not to show an inserter button.
+ * @param    {?string}         rootClientId           Optional root client ID of block list on
+ *                                                    which to insert.
+ * @param    {?number}         index                  Index at which block should be inserted.
+ * @param    {?Object}         __unstableOptions      Additional options.
+ * @property {boolean}         __unstableWithInserter Whether or not to show an inserter button.
+ * @property {WPDropOperation} operation              The operation to perform when applied,
+ *                                                    either 'insert' or 'replace' for now.
  *
  * @return {Object} Action object.
  */
@@ -624,25 +634,28 @@ export function showInsertionPoint(
 	index,
 	__unstableOptions = {}
 ) {
-	const { __unstableWithInserter } = __unstableOptions;
+	const { __unstableWithInserter, operation } = __unstableOptions;
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
 		__unstableWithInserter,
+		operation,
 	};
 }
-
 /**
  * Action that hides the insertion point.
- *
- * @return {Object} Action object.
  */
-export function hideInsertionPoint() {
-	return {
-		type: 'HIDE_INSERTION_POINT',
+export const hideInsertionPoint =
+	() =>
+	( { select, dispatch } ) => {
+		if ( ! select.isBlockInsertionPointVisible() ) {
+			return;
+		}
+		dispatch( {
+			type: 'HIDE_INSERTION_POINT',
+		} );
 	};
-}
 
 /**
  * Action that resets the template validity.
@@ -663,281 +676,280 @@ export function setTemplateValidity( isValid ) {
  *
  * @return {Object} Action object.
  */
-export const synchronizeTemplate = () => ( { select, dispatch } ) => {
-	dispatch( { type: 'SYNCHRONIZE_TEMPLATE' } );
-	const blocks = select.getBlocks();
-	const template = select.getTemplate();
-	const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
+export const synchronizeTemplate =
+	() =>
+	( { select, dispatch } ) => {
+		dispatch( { type: 'SYNCHRONIZE_TEMPLATE' } );
+		const blocks = select.getBlocks();
+		const template = select.getTemplate();
+		const updatedBlockList = synchronizeBlocksWithTemplate(
+			blocks,
+			template
+		);
 
-	dispatch.resetBlocks( updatedBlockList );
-};
+		dispatch.resetBlocks( updatedBlockList );
+	};
 
 /**
  * Delete the current selection.
  *
  * @param {boolean} isForward
  */
-export const __unstableDeleteSelection = ( isForward ) => ( {
-	registry,
-	select,
-	dispatch,
-} ) => {
-	const selectionAnchor = select.getSelectionStart();
-	const selectionFocus = select.getSelectionEnd();
+export const __unstableDeleteSelection =
+	( isForward ) =>
+	( { registry, select, dispatch } ) => {
+		const selectionAnchor = select.getSelectionStart();
+		const selectionFocus = select.getSelectionEnd();
 
-	if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
+		if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
 
-	// It's not mergeable if there's no rich text selection.
-	if (
-		! selectionAnchor.attributeKey ||
-		! selectionFocus.attributeKey ||
-		typeof selectionAnchor.offset === 'undefined' ||
-		typeof selectionFocus.offset === 'undefined'
-	)
-		return false;
+		// It's not mergeable if there's no rich text selection.
+		if (
+			! selectionAnchor.attributeKey ||
+			! selectionFocus.attributeKey ||
+			typeof selectionAnchor.offset === 'undefined' ||
+			typeof selectionFocus.offset === 'undefined'
+		)
+			return false;
 
-	const anchorRootClientId = select.getBlockRootClientId(
-		selectionAnchor.clientId
-	);
-	const focusRootClientId = select.getBlockRootClientId(
-		selectionFocus.clientId
-	);
+		const anchorRootClientId = select.getBlockRootClientId(
+			selectionAnchor.clientId
+		);
+		const focusRootClientId = select.getBlockRootClientId(
+			selectionFocus.clientId
+		);
 
-	// It's not mergeable if the selection doesn't start and end in the same
-	// block list. Maybe in the future it should be allowed.
-	if ( anchorRootClientId !== focusRootClientId ) {
-		return;
-	}
+		// It's not mergeable if the selection doesn't start and end in the same
+		// block list. Maybe in the future it should be allowed.
+		if ( anchorRootClientId !== focusRootClientId ) {
+			return;
+		}
 
-	const blockOrder = select.getBlockOrder( anchorRootClientId );
-	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
-	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+		const blockOrder = select.getBlockOrder( anchorRootClientId );
+		const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
+		const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
 
-	// Reassign selection start and end based on order.
-	let selectionStart, selectionEnd;
+		// Reassign selection start and end based on order.
+		let selectionStart, selectionEnd;
 
-	if ( anchorIndex > focusIndex ) {
-		selectionStart = selectionFocus;
-		selectionEnd = selectionAnchor;
-	} else {
-		selectionStart = selectionAnchor;
-		selectionEnd = selectionFocus;
-	}
+		if ( anchorIndex > focusIndex ) {
+			selectionStart = selectionFocus;
+			selectionEnd = selectionAnchor;
+		} else {
+			selectionStart = selectionAnchor;
+			selectionEnd = selectionFocus;
+		}
 
-	const targetSelection = isForward ? selectionEnd : selectionStart;
-	const targetBlock = select.getBlock( targetSelection.clientId );
-	const targetBlockType = getBlockType( targetBlock.name );
+		const targetSelection = isForward ? selectionEnd : selectionStart;
+		const targetBlock = select.getBlock( targetSelection.clientId );
+		const targetBlockType = getBlockType( targetBlock.name );
 
-	if ( ! targetBlockType.merge ) {
-		return;
-	}
+		if ( ! targetBlockType.merge ) {
+			return;
+		}
 
-	const selectionA = selectionStart;
-	const selectionB = selectionEnd;
+		const selectionA = selectionStart;
+		const selectionB = selectionEnd;
 
-	const blockA = select.getBlock( selectionA.clientId );
-	const blockAType = getBlockType( blockA.name );
+		const blockA = select.getBlock( selectionA.clientId );
+		const blockAType = getBlockType( blockA.name );
 
-	const blockB = select.getBlock( selectionB.clientId );
-	const blockBType = getBlockType( blockB.name );
+		const blockB = select.getBlock( selectionB.clientId );
+		const blockBType = getBlockType( blockB.name );
 
-	const htmlA = blockA.attributes[ selectionA.attributeKey ];
-	const htmlB = blockB.attributes[ selectionB.attributeKey ];
+		const htmlA = blockA.attributes[ selectionA.attributeKey ];
+		const htmlB = blockB.attributes[ selectionB.attributeKey ];
 
-	const attributeDefinitionA =
-		blockAType.attributes[ selectionA.attributeKey ];
-	const attributeDefinitionB =
-		blockBType.attributes[ selectionB.attributeKey ];
+		const attributeDefinitionA =
+			blockAType.attributes[ selectionA.attributeKey ];
+		const attributeDefinitionB =
+			blockBType.attributes[ selectionB.attributeKey ];
 
-	let valueA = create( {
-		html: htmlA,
-		...mapRichTextSettings( attributeDefinitionA ),
-	} );
-	let valueB = create( {
-		html: htmlB,
-		...mapRichTextSettings( attributeDefinitionB ),
-	} );
-
-	// A robust way to retain selection position through various transforms
-	// is to insert a special character at the position and then recover it.
-	const START_OF_SELECTED_AREA = '\u0086';
-
-	valueA = remove( valueA, selectionA.offset, valueA.text.length );
-	valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
-
-	// Clone the blocks so we don't manipulate the original.
-	const cloneA = cloneBlock( blockA, {
-		[ selectionA.attributeKey ]: toHTMLString( {
-			value: valueA,
+		let valueA = create( {
+			html: htmlA,
 			...mapRichTextSettings( attributeDefinitionA ),
-		} ),
-	} );
-	const cloneB = cloneBlock( blockB, {
-		[ selectionB.attributeKey ]: toHTMLString( {
-			value: valueB,
+		} );
+		let valueB = create( {
+			html: htmlB,
 			...mapRichTextSettings( attributeDefinitionB ),
-		} ),
-	} );
+		} );
 
-	const followingBlock = isForward ? cloneA : cloneB;
+		valueA = remove( valueA, selectionA.offset, valueA.text.length );
+		valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
 
-	// We can only merge blocks with similar types
-	// thus, we transform the block to merge first
-	const blocksWithTheSameType =
-		blockA.name === blockB.name
-			? [ followingBlock ]
-			: switchToBlockType( followingBlock, targetBlockType.name );
+		// Clone the blocks so we don't manipulate the original.
+		const cloneA = cloneBlock( blockA, {
+			[ selectionA.attributeKey ]: toHTMLString( {
+				value: valueA,
+				...mapRichTextSettings( attributeDefinitionA ),
+			} ),
+		} );
+		const cloneB = cloneBlock( blockB, {
+			[ selectionB.attributeKey ]: toHTMLString( {
+				value: valueB,
+				...mapRichTextSettings( attributeDefinitionB ),
+			} ),
+		} );
 
-	// If the block types can not match, do nothing
-	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
-		return;
-	}
+		const followingBlock = isForward ? cloneA : cloneB;
 
-	let updatedAttributes;
+		// We can only merge blocks with similar types
+		// thus, we transform the block to merge first
+		const blocksWithTheSameType =
+			blockA.name === blockB.name
+				? [ followingBlock ]
+				: switchToBlockType( followingBlock, targetBlockType.name );
 
-	if ( isForward ) {
-		const blockToMerge = blocksWithTheSameType.pop();
-		updatedAttributes = targetBlockType.merge(
-			blockToMerge.attributes,
-			cloneB.attributes
-		);
-	} else {
-		const blockToMerge = blocksWithTheSameType.shift();
-		updatedAttributes = targetBlockType.merge(
-			cloneA.attributes,
-			blockToMerge.attributes
-		);
-	}
+		// If the block types can not match, do nothing
+		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+			return;
+		}
 
-	const newAttributeKey = findKey(
-		updatedAttributes,
-		( v ) =>
-			typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
-	);
+		let updatedAttributes;
 
-	const convertedHtml = updatedAttributes[ newAttributeKey ];
-	const convertedValue = create( {
-		html: convertedHtml,
-		...mapRichTextSettings( targetBlockType.attributes[ newAttributeKey ] ),
-	} );
-	const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
-	const newValue = remove( convertedValue, newOffset, newOffset + 1 );
-	const newHtml = toHTMLString( {
-		value: newValue,
-		...mapRichTextSettings( targetBlockType.attributes[ newAttributeKey ] ),
-	} );
+		if ( isForward ) {
+			const blockToMerge = blocksWithTheSameType.pop();
+			updatedAttributes = targetBlockType.merge(
+				blockToMerge.attributes,
+				cloneB.attributes
+			);
+		} else {
+			const blockToMerge = blocksWithTheSameType.shift();
+			updatedAttributes = targetBlockType.merge(
+				cloneA.attributes,
+				blockToMerge.attributes
+			);
+		}
 
-	updatedAttributes[ newAttributeKey ] = newHtml;
+		const newAttributeKey = retrieveSelectedAttribute( updatedAttributes );
 
-	const selectedBlockClientIds = select.getSelectedBlockClientIds();
-	const replacement = [
-		...( isForward ? blocksWithTheSameType : [] ),
-		{
-			// Preserve the original client ID.
-			...targetBlock,
-			attributes: {
-				...targetBlock.attributes,
-				...updatedAttributes,
+		const convertedHtml = updatedAttributes[ newAttributeKey ];
+		const convertedValue = create( {
+			html: convertedHtml,
+			...mapRichTextSettings(
+				targetBlockType.attributes[ newAttributeKey ]
+			),
+		} );
+		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
+		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
+		const newHtml = toHTMLString( {
+			value: newValue,
+			...mapRichTextSettings(
+				targetBlockType.attributes[ newAttributeKey ]
+			),
+		} );
+
+		updatedAttributes[ newAttributeKey ] = newHtml;
+
+		const selectedBlockClientIds = select.getSelectedBlockClientIds();
+		const replacement = [
+			...( isForward ? blocksWithTheSameType : [] ),
+			{
+				// Preserve the original client ID.
+				...targetBlock,
+				attributes: {
+					...targetBlock.attributes,
+					...updatedAttributes,
+				},
 			},
-		},
-		...( isForward ? [] : blocksWithTheSameType ),
-	];
+			...( isForward ? [] : blocksWithTheSameType ),
+		];
 
-	registry.batch( () => {
-		dispatch.selectionChange(
-			targetBlock.clientId,
-			newAttributeKey,
-			newOffset,
-			newOffset
-		);
+		registry.batch( () => {
+			dispatch.selectionChange(
+				targetBlock.clientId,
+				newAttributeKey,
+				newOffset,
+				newOffset
+			);
 
-		dispatch.replaceBlocks(
-			selectedBlockClientIds,
-			replacement,
-			0, // If we don't pass the `indexToSelect` it will default to the last block.
-			select.getSelectedBlocksInitialCaretPosition()
-		);
-	} );
-};
+			dispatch.replaceBlocks(
+				selectedBlockClientIds,
+				replacement,
+				0, // If we don't pass the `indexToSelect` it will default to the last block.
+				select.getSelectedBlocksInitialCaretPosition()
+			);
+		} );
+	};
 
 /**
  * Split the current selection.
  */
-export const __unstableSplitSelection = () => ( { select, dispatch } ) => {
-	const selectionAnchor = select.getSelectionStart();
-	const selectionFocus = select.getSelectionEnd();
+export const __unstableSplitSelection =
+	() =>
+	( { select, dispatch } ) => {
+		const selectionAnchor = select.getSelectionStart();
+		const selectionFocus = select.getSelectionEnd();
 
-	if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
+		if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
 
-	// Can't split if the selection is not set.
-	if (
-		! selectionAnchor.attributeKey ||
-		! selectionFocus.attributeKey ||
-		typeof selectionAnchor.offset === 'undefined' ||
-		typeof selectionFocus.offset === 'undefined'
-	)
-		return;
+		// Can't split if the selection is not set.
+		if (
+			! selectionAnchor.attributeKey ||
+			! selectionFocus.attributeKey ||
+			typeof selectionAnchor.offset === 'undefined' ||
+			typeof selectionFocus.offset === 'undefined'
+		)
+			return;
 
-	const anchorRootClientId = select.getBlockRootClientId(
-		selectionAnchor.clientId
-	);
-	const focusRootClientId = select.getBlockRootClientId(
-		selectionFocus.clientId
-	);
+		const anchorRootClientId = select.getBlockRootClientId(
+			selectionAnchor.clientId
+		);
+		const focusRootClientId = select.getBlockRootClientId(
+			selectionFocus.clientId
+		);
 
-	// It's not splittable if the selection doesn't start and end in the same
-	// block list. Maybe in the future it should be allowed.
-	if ( anchorRootClientId !== focusRootClientId ) {
-		return;
-	}
+		// It's not splittable if the selection doesn't start and end in the same
+		// block list. Maybe in the future it should be allowed.
+		if ( anchorRootClientId !== focusRootClientId ) {
+			return;
+		}
 
-	const blockOrder = select.getBlockOrder( anchorRootClientId );
-	const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
-	const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+		const blockOrder = select.getBlockOrder( anchorRootClientId );
+		const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
+		const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
 
-	// Reassign selection start and end based on order.
-	let selectionStart, selectionEnd;
+		// Reassign selection start and end based on order.
+		let selectionStart, selectionEnd;
 
-	if ( anchorIndex > focusIndex ) {
-		selectionStart = selectionFocus;
-		selectionEnd = selectionAnchor;
-	} else {
-		selectionStart = selectionAnchor;
-		selectionEnd = selectionFocus;
-	}
+		if ( anchorIndex > focusIndex ) {
+			selectionStart = selectionFocus;
+			selectionEnd = selectionAnchor;
+		} else {
+			selectionStart = selectionAnchor;
+			selectionEnd = selectionFocus;
+		}
 
-	const selectionA = selectionStart;
-	const selectionB = selectionEnd;
+		const selectionA = selectionStart;
+		const selectionB = selectionEnd;
 
-	const blockA = select.getBlock( selectionA.clientId );
-	const blockAType = getBlockType( blockA.name );
+		const blockA = select.getBlock( selectionA.clientId );
+		const blockAType = getBlockType( blockA.name );
 
-	const blockB = select.getBlock( selectionB.clientId );
-	const blockBType = getBlockType( blockB.name );
+		const blockB = select.getBlock( selectionB.clientId );
+		const blockBType = getBlockType( blockB.name );
 
-	const htmlA = blockA.attributes[ selectionA.attributeKey ];
-	const htmlB = blockB.attributes[ selectionB.attributeKey ];
+		const htmlA = blockA.attributes[ selectionA.attributeKey ];
+		const htmlB = blockB.attributes[ selectionB.attributeKey ];
 
-	const attributeDefinitionA =
-		blockAType.attributes[ selectionA.attributeKey ];
-	const attributeDefinitionB =
-		blockBType.attributes[ selectionB.attributeKey ];
+		const attributeDefinitionA =
+			blockAType.attributes[ selectionA.attributeKey ];
+		const attributeDefinitionB =
+			blockBType.attributes[ selectionB.attributeKey ];
 
-	let valueA = create( {
-		html: htmlA,
-		...mapRichTextSettings( attributeDefinitionA ),
-	} );
-	let valueB = create( {
-		html: htmlB,
-		...mapRichTextSettings( attributeDefinitionB ),
-	} );
+		let valueA = create( {
+			html: htmlA,
+			...mapRichTextSettings( attributeDefinitionA ),
+		} );
+		let valueB = create( {
+			html: htmlB,
+			...mapRichTextSettings( attributeDefinitionB ),
+		} );
 
-	valueA = remove( valueA, selectionA.offset, valueA.text.length );
-	valueB = remove( valueB, 0, selectionB.offset );
+		valueA = remove( valueA, selectionA.offset, valueA.text.length );
+		valueB = remove( valueB, 0, selectionB.offset );
 
-	dispatch.replaceBlocks(
-		select.getSelectedBlockClientIds(),
-		[
+		dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
 			{
 				// Preserve the original client ID.
 				...blockA,
@@ -949,7 +961,6 @@ export const __unstableSplitSelection = () => ( { select, dispatch } ) => {
 					} ),
 				},
 			},
-			createBlock( getDefaultBlockName() ),
 			{
 				// Preserve the original client ID.
 				...blockB,
@@ -961,23 +972,22 @@ export const __unstableSplitSelection = () => ( { select, dispatch } ) => {
 					} ),
 				},
 			},
-		],
-		1, // If we don't pass the `indexToSelect` it will default to the last block.
-		select.getSelectedBlocksInitialCaretPosition()
-	);
-};
+		] );
+	};
 
 /**
  * Expand the selection to cover the entire blocks, removing partial selection.
  */
-export const __unstableExpandSelection = () => ( { select, dispatch } ) => {
-	const selectionAnchor = select.getSelectionStart();
-	const selectionFocus = select.getSelectionEnd();
-	dispatch.selectionChange( {
-		start: { clientId: selectionAnchor.clientId },
-		end: { clientId: selectionFocus.clientId },
-	} );
-};
+export const __unstableExpandSelection =
+	() =>
+	( { select, dispatch } ) => {
+		const selectionAnchor = select.getSelectionStart();
+		const selectionFocus = select.getSelectionEnd();
+		dispatch.selectionChange( {
+			start: { clientId: selectionAnchor.clientId },
+			end: { clientId: selectionFocus.clientId },
+		} );
+	};
 
 /**
  * Action that merges two blocks.
@@ -985,174 +995,188 @@ export const __unstableExpandSelection = () => ( { select, dispatch } ) => {
  * @param {string} firstBlockClientId  Client ID of the first block to merge.
  * @param {string} secondBlockClientId Client ID of the second block to merge.
  */
-export const mergeBlocks = ( firstBlockClientId, secondBlockClientId ) => ( {
-	select,
-	dispatch,
-} ) => {
-	const blocks = [ firstBlockClientId, secondBlockClientId ];
-	dispatch( { type: 'MERGE_BLOCKS', blocks } );
+export const mergeBlocks =
+	( firstBlockClientId, secondBlockClientId ) =>
+	( { registry, select, dispatch } ) => {
+		const blocks = [ firstBlockClientId, secondBlockClientId ];
+		dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
-	const [ clientIdA, clientIdB ] = blocks;
-	const blockA = select.getBlock( clientIdA );
-	const blockAType = getBlockType( blockA.name );
+		const [ clientIdA, clientIdB ] = blocks;
+		const blockA = select.getBlock( clientIdA );
+		const blockAType = getBlockType( blockA.name );
 
-	// Only focus the previous block if it's not mergeable.
-	if ( blockAType && ! blockAType.merge ) {
-		dispatch.selectBlock( blockA.clientId );
-		return;
-	}
+		if ( ! blockAType ) return;
 
-	const blockB = select.getBlock( clientIdB );
-	const blockBType = getBlockType( blockB.name );
-	const { clientId, attributeKey, offset } = select.getSelectionStart();
-	const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
-	const attributeDefinition = selectedBlockType.attributes[ attributeKey ];
-	const canRestoreTextSelection =
-		( clientId === clientIdA || clientId === clientIdB ) &&
-		attributeKey !== undefined &&
-		offset !== undefined &&
-		// We cannot restore text selection if the RichText identifier
-		// is not a defined block attribute key. This can be the case if the
-		// fallback intance ID is used to store selection (and no RichText
-		// identifier is set), or when the identifier is wrong.
-		!! attributeDefinition;
+		if (
+			! blockAType.merge &&
+			! getBlockSupport( blockA.name, '__experimentalOnMerge' )
+		) {
+			dispatch.selectBlock( blockA.clientId );
+			return;
+		}
 
-	if ( ! attributeDefinition ) {
-		if ( typeof attributeKey === 'number' ) {
-			window.console.error(
-				`RichText needs an identifier prop that is the block attribute key of the attribute it controls. Its type is expected to be a string, but was ${ typeof attributeKey }`
+		const blockB = select.getBlock( clientIdB );
+
+		if ( ! blockAType.merge ) {
+			// If there's no merge function defined, attempt merging inner
+			// blocks.
+			const blocksWithTheSameType = switchToBlockType(
+				blockB,
+				blockAType.name
 			);
-		} else {
-			window.console.error(
-				'The RichText identifier prop does not match any attributes defined by the block.'
+			// Only focus the previous block if it's not mergeable.
+			if ( blocksWithTheSameType?.length !== 1 ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
+			const [ blockWithSameType ] = blocksWithTheSameType;
+			if ( blockWithSameType.innerBlocks.length < 1 ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
+			registry.batch( () => {
+				dispatch.insertBlocks(
+					blockWithSameType.innerBlocks,
+					undefined,
+					clientIdA
+				);
+				dispatch.removeBlock( clientIdB );
+				dispatch.selectBlock(
+					blockWithSameType.innerBlocks[ 0 ].clientId
+				);
+			} );
+			return;
+		}
+
+		const blockBType = getBlockType( blockB.name );
+		const { clientId, attributeKey, offset } = select.getSelectionStart();
+		const selectedBlockType =
+			clientId === clientIdA ? blockAType : blockBType;
+		const attributeDefinition =
+			selectedBlockType.attributes[ attributeKey ];
+		const canRestoreTextSelection =
+			( clientId === clientIdA || clientId === clientIdB ) &&
+			attributeKey !== undefined &&
+			offset !== undefined &&
+			// We cannot restore text selection if the RichText identifier
+			// is not a defined block attribute key. This can be the case if the
+			// fallback intance ID is used to store selection (and no RichText
+			// identifier is set), or when the identifier is wrong.
+			!! attributeDefinition;
+
+		if ( ! attributeDefinition ) {
+			if ( typeof attributeKey === 'number' ) {
+				window.console.error(
+					`RichText needs an identifier prop that is the block attribute key of the attribute it controls. Its type is expected to be a string, but was ${ typeof attributeKey }`
+				);
+			} else {
+				window.console.error(
+					'The RichText identifier prop does not match any attributes defined by the block.'
+				);
+			}
+		}
+
+		// Clone the blocks so we don't insert the character in a "live" block.
+		const cloneA = cloneBlock( blockA );
+		const cloneB = cloneBlock( blockB );
+
+		if ( canRestoreTextSelection ) {
+			const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
+			const html = selectedBlock.attributes[ attributeKey ];
+			const value = insert(
+				create( {
+					html,
+					...mapRichTextSettings( attributeDefinition ),
+				} ),
+				START_OF_SELECTED_AREA,
+				offset,
+				offset
+			);
+
+			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
+				value,
+				...mapRichTextSettings( attributeDefinition ),
+			} );
+		}
+
+		// We can only merge blocks with similar types
+		// thus, we transform the block to merge first.
+		const blocksWithTheSameType =
+			blockA.name === blockB.name
+				? [ cloneB ]
+				: switchToBlockType( cloneB, blockA.name );
+
+		// If the block types can not match, do nothing.
+		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+			return;
+		}
+
+		// Calling the merge to update the attributes and remove the block to be merged.
+		const updatedAttributes = blockAType.merge(
+			cloneA.attributes,
+			blocksWithTheSameType[ 0 ].attributes
+		);
+
+		if ( canRestoreTextSelection ) {
+			const newAttributeKey =
+				retrieveSelectedAttribute( updatedAttributes );
+			const convertedHtml = updatedAttributes[ newAttributeKey ];
+			const convertedValue = create( {
+				html: convertedHtml,
+				...mapRichTextSettings(
+					blockAType.attributes[ newAttributeKey ]
+				),
+			} );
+			const newOffset = convertedValue.text.indexOf(
+				START_OF_SELECTED_AREA
+			);
+			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
+			const newHtml = toHTMLString( {
+				value: newValue,
+				...mapRichTextSettings(
+					blockAType.attributes[ newAttributeKey ]
+				),
+			} );
+
+			updatedAttributes[ newAttributeKey ] = newHtml;
+
+			dispatch.selectionChange(
+				blockA.clientId,
+				newAttributeKey,
+				newOffset,
+				newOffset
 			);
 		}
-	}
 
-	// A robust way to retain selection position through various transforms
-	// is to insert a special character at the position and then recover it.
-	const START_OF_SELECTED_AREA = '\u0086';
-
-	// Clone the blocks so we don't insert the character in a "live" block.
-	const cloneA = cloneBlock( blockA );
-	const cloneB = cloneBlock( blockB );
-
-	if ( canRestoreTextSelection ) {
-		const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
-		const html = selectedBlock.attributes[ attributeKey ];
-		const value = insert(
-			create( {
-				html,
-				...mapRichTextSettings( attributeDefinition ),
-			} ),
-			START_OF_SELECTED_AREA,
-			offset,
-			offset
-		);
-
-		selectedBlock.attributes[ attributeKey ] = toHTMLString( {
-			value,
-			...mapRichTextSettings( attributeDefinition ),
-		} );
-	}
-
-	// We can only merge blocks with similar types
-	// thus, we transform the block to merge first.
-	const blocksWithTheSameType =
-		blockA.name === blockB.name
-			? [ cloneB ]
-			: switchToBlockType( cloneB, blockA.name );
-
-	// If the block types can not match, do nothing.
-	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
-		return;
-	}
-
-	// Calling the merge to update the attributes and remove the block to be merged.
-	const updatedAttributes = blockAType.merge(
-		cloneA.attributes,
-		blocksWithTheSameType[ 0 ].attributes
-	);
-
-	if ( canRestoreTextSelection ) {
-		const newAttributeKey = findKey(
-			updatedAttributes,
-			( v ) =>
-				typeof v === 'string' &&
-				v.indexOf( START_OF_SELECTED_AREA ) !== -1
-		);
-		const convertedHtml = updatedAttributes[ newAttributeKey ];
-		const convertedValue = create( {
-			html: convertedHtml,
-			...mapRichTextSettings( blockAType.attributes[ newAttributeKey ] ),
-		} );
-		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
-		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
-		const newHtml = toHTMLString( {
-			value: newValue,
-			...mapRichTextSettings( blockAType.attributes[ newAttributeKey ] ),
-		} );
-
-		updatedAttributes[ newAttributeKey ] = newHtml;
-
-		dispatch.selectionChange(
-			blockA.clientId,
-			newAttributeKey,
-			newOffset,
-			newOffset
-		);
-	}
-
-	dispatch.replaceBlocks(
-		[ blockA.clientId, blockB.clientId ],
-		[
-			{
-				...blockA,
-				attributes: {
-					...blockA.attributes,
-					...updatedAttributes,
+		dispatch.replaceBlocks(
+			[ blockA.clientId, blockB.clientId ],
+			[
+				{
+					...blockA,
+					attributes: {
+						...blockA.attributes,
+						...updatedAttributes,
+					},
 				},
-			},
-			...blocksWithTheSameType.slice( 1 ),
-		],
-		0 // If we don't pass the `indexToSelect` it will default to the last block.
-	);
-};
+				...blocksWithTheSameType.slice( 1 ),
+			],
+			0 // If we don't pass the `indexToSelect` it will default to the last block.
+		);
+	};
 
 /**
  * Yields action objects used in signalling that the blocks corresponding to
  * the set of specified client IDs are to be removed.
  *
  * @param {string|string[]} clientIds      Client IDs of blocks to remove.
- * @param {boolean}         selectPrevious True if the previous block should be
- *                                         selected when a block is removed.
+ * @param {boolean}         selectPrevious True if the previous block
+ *                                         or the immediate parent
+ *                                         (if no previous block exists)
+ *                                         should be selected
+ *                                         when a block is removed.
  */
-export const removeBlocks = ( clientIds, selectPrevious = true ) => ( {
-	select,
-	dispatch,
-} ) => {
-	if ( ! clientIds || ! clientIds.length ) {
-		return;
-	}
-
-	clientIds = castArray( clientIds );
-	const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
-	const canRemoveBlocks = select.canRemoveBlocks( clientIds, rootClientId );
-
-	if ( ! canRemoveBlocks ) {
-		return;
-	}
-
-	if ( selectPrevious ) {
-		dispatch.selectPreviousBlock( clientIds[ 0 ] );
-	}
-
-	dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
-
-	// To avoid a focus loss when removing the last block, assure there is
-	// always a default block if the last of the blocks have been removed.
-	dispatch( ensureDefaultBlock() );
-};
+export const removeBlocks = ( clientIds, selectPrevious = true ) =>
+	privateRemoveBlocks( clientIds, selectPrevious );
 
 /**
  * Returns an action object used in signalling that the block with the
@@ -1329,19 +1353,19 @@ export function selectionChange(
  *                               to append.
  * @param {?number} index        Optional index where to insert the default block.
  */
-export const insertDefaultBlock = ( attributes, rootClientId, index ) => ( {
-	dispatch,
-} ) => {
-	// Abort if there is no default block type (if it has been unregistered).
-	const defaultBlockName = getDefaultBlockName();
-	if ( ! defaultBlockName ) {
-		return;
-	}
+export const insertDefaultBlock =
+	( attributes, rootClientId, index ) =>
+	( { dispatch } ) => {
+		// Abort if there is no default block type (if it has been unregistered).
+		const defaultBlockName = getDefaultBlockName();
+		if ( ! defaultBlockName ) {
+			return;
+		}
 
-	const block = createBlock( defaultBlockName, attributes );
+		const block = createBlock( defaultBlockName, attributes );
 
-	return dispatch.insertBlock( block, index, rootClientId );
-};
+		return dispatch.insertBlock( block, index, rootClientId );
+	};
 
 /**
  * Action that changes the nested settings of a given block.
@@ -1368,10 +1392,9 @@ export function updateBlockListSettings( clientId, settings ) {
  * @return {Object} Action object
  */
 export function updateSettings( settings ) {
-	return {
-		type: 'UPDATE_SETTINGS',
-		settings,
-	};
+	return __experimentalUpdateSettings( settings, {
+		stripExperimentalSettings: true,
+	} );
 }
 
 /**
@@ -1416,57 +1439,87 @@ export function __unstableMarkNextChangeAsNotPersistent() {
  * consequence of it, so it is recommended to be called at the next idle period to ensure all
  * selection changes have been recorded.
  */
-export const __unstableMarkAutomaticChange = () => ( { dispatch } ) => {
-	dispatch( { type: 'MARK_AUTOMATIC_CHANGE' } );
-	const { requestIdleCallback = ( cb ) => setTimeout( cb, 100 ) } = window;
-	requestIdleCallback( () => {
-		dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
-	} );
-};
+export const __unstableMarkAutomaticChange =
+	() =>
+	( { dispatch } ) => {
+		dispatch( { type: 'MARK_AUTOMATIC_CHANGE' } );
+		const { requestIdleCallback = ( cb ) => setTimeout( cb, 100 ) } =
+			window;
+		requestIdleCallback( () => {
+			dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
+		} );
+	};
 
 /**
  * Action that enables or disables the navigation mode.
  *
- * @param {string} isNavigationMode Enable/Disable navigation mode.
+ * @param {boolean} isNavigationMode Enable/Disable navigation mode.
  */
-export const setNavigationMode = ( isNavigationMode = true ) => ( {
-	dispatch,
-} ) => {
-	dispatch( { type: 'SET_NAVIGATION_MODE', isNavigationMode } );
+export const setNavigationMode =
+	( isNavigationMode = true ) =>
+	( { dispatch } ) => {
+		dispatch.__unstableSetEditorMode(
+			isNavigationMode ? 'navigation' : 'edit'
+		);
+	};
 
-	if ( isNavigationMode ) {
-		speak(
-			__(
-				'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
-			)
-		);
-	} else {
-		speak(
-			__(
-				'You are currently in edit mode. To return to the navigation mode, press Escape.'
-			)
-		);
-	}
-};
+/**
+ * Action that sets the editor mode
+ *
+ * @param {string} mode Editor mode
+ */
+export const __unstableSetEditorMode =
+	( mode ) =>
+	( { dispatch, select } ) => {
+		// When switching to zoom-out mode, we need to select the root block
+		if ( mode === 'zoom-out' ) {
+			const firstSelectedClientId = select.getBlockSelectionStart();
+			if ( firstSelectedClientId ) {
+				dispatch.selectBlock(
+					select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					)
+				);
+			}
+		}
+
+		dispatch( { type: 'SET_EDITOR_MODE', mode } );
+
+		if ( mode === 'navigation' ) {
+			speak(
+				__(
+					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
+				)
+			);
+		} else if ( mode === 'edit' ) {
+			speak(
+				__(
+					'You are currently in edit mode. To return to the navigation mode, press Escape.'
+				)
+			);
+		} else if ( mode === 'zoom-out' ) {
+			speak( __( 'You are currently in zoom-out mode.' ) );
+		}
+	};
 
 /**
  * Action that enables or disables the block moving mode.
  *
  * @param {string|null} hasBlockMovingClientId Enable/Disable block moving mode.
  */
-export const setBlockMovingClientId = ( hasBlockMovingClientId = null ) => ( {
-	dispatch,
-} ) => {
-	dispatch( { type: 'SET_BLOCK_MOVING_MODE', hasBlockMovingClientId } );
+export const setBlockMovingClientId =
+	( hasBlockMovingClientId = null ) =>
+	( { dispatch } ) => {
+		dispatch( { type: 'SET_BLOCK_MOVING_MODE', hasBlockMovingClientId } );
 
-	if ( hasBlockMovingClientId ) {
-		speak(
-			__(
-				'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'
-			)
-		);
-	}
-};
+		if ( hasBlockMovingClientId ) {
+			speak(
+				__(
+					'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'
+				)
+			);
+		}
+	};
 
 /**
  * Action that duplicates a list of blocks.
@@ -1474,93 +1527,102 @@ export const setBlockMovingClientId = ( hasBlockMovingClientId = null ) => ( {
  * @param {string[]} clientIds
  * @param {boolean}  updateSelection
  */
-export const duplicateBlocks = ( clientIds, updateSelection = true ) => ( {
-	select,
-	dispatch,
-} ) => {
-	if ( ! clientIds || ! clientIds.length ) {
-		return;
-	}
+export const duplicateBlocks =
+	( clientIds, updateSelection = true ) =>
+	( { select, dispatch } ) => {
+		if ( ! clientIds || ! clientIds.length ) {
+			return;
+		}
 
-	// Return early if blocks don't exist.
-	const blocks = select.getBlocksByClientId( clientIds );
-	if ( some( blocks, ( block ) => ! block ) ) {
-		return;
-	}
+		// Return early if blocks don't exist.
+		const blocks = select.getBlocksByClientId( clientIds );
+		if ( blocks.some( ( block ) => ! block ) ) {
+			return;
+		}
 
-	// Return early if blocks don't support multiple usage.
-	const blockNames = blocks.map( ( block ) => block.name );
-	if (
-		blockNames.some(
-			( blockName ) => ! hasBlockSupport( blockName, 'multiple', true )
-		)
-	) {
-		return;
-	}
+		// Return early if blocks don't support multiple usage.
+		const blockNames = blocks.map( ( block ) => block.name );
+		if (
+			blockNames.some(
+				( blockName ) =>
+					! hasBlockSupport( blockName, 'multiple', true )
+			)
+		) {
+			return;
+		}
 
-	const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
-	const lastSelectedIndex = select.getBlockIndex(
-		last( castArray( clientIds ) )
-	);
-	const clonedBlocks = blocks.map( ( block ) =>
-		__experimentalCloneSanitizedBlock( block )
-	);
-	dispatch.insertBlocks(
-		clonedBlocks,
-		lastSelectedIndex + 1,
-		rootClientId,
-		updateSelection
-	);
-	if ( clonedBlocks.length > 1 && updateSelection ) {
-		dispatch.multiSelect(
-			first( clonedBlocks ).clientId,
-			last( clonedBlocks ).clientId
+		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+		const clientIdsArray = castArray( clientIds );
+		const lastSelectedIndex = select.getBlockIndex(
+			clientIdsArray[ clientIdsArray.length - 1 ]
 		);
-	}
-	return clonedBlocks.map( ( block ) => block.clientId );
-};
+		const clonedBlocks = blocks.map( ( block ) =>
+			__experimentalCloneSanitizedBlock( block )
+		);
+		dispatch.insertBlocks(
+			clonedBlocks,
+			lastSelectedIndex + 1,
+			rootClientId,
+			updateSelection
+		);
+		if ( clonedBlocks.length > 1 && updateSelection ) {
+			dispatch.multiSelect(
+				clonedBlocks[ 0 ].clientId,
+				clonedBlocks[ clonedBlocks.length - 1 ].clientId
+			);
+		}
+		return clonedBlocks.map( ( block ) => block.clientId );
+	};
 
 /**
  * Action that inserts an empty block before a given block.
  *
  * @param {string} clientId
  */
-export const insertBeforeBlock = ( clientId ) => ( { select, dispatch } ) => {
-	if ( ! clientId ) {
-		return;
-	}
-	const rootClientId = select.getBlockRootClientId( clientId );
-	const isLocked = select.getTemplateLock( rootClientId );
-	if ( isLocked ) {
-		return;
-	}
+export const insertBeforeBlock =
+	( clientId ) =>
+	( { select, dispatch } ) => {
+		if ( ! clientId ) {
+			return;
+		}
+		const rootClientId = select.getBlockRootClientId( clientId );
+		const isLocked = select.getTemplateLock( rootClientId );
+		if ( isLocked ) {
+			return;
+		}
 
-	const firstSelectedIndex = select.getBlockIndex( clientId );
-	return dispatch.insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
-};
+		const firstSelectedIndex = select.getBlockIndex( clientId );
+		return dispatch.insertDefaultBlock(
+			{},
+			rootClientId,
+			firstSelectedIndex
+		);
+	};
 
 /**
  * Action that inserts an empty block after a given block.
  *
  * @param {string} clientId
  */
-export const insertAfterBlock = ( clientId ) => ( { select, dispatch } ) => {
-	if ( ! clientId ) {
-		return;
-	}
-	const rootClientId = select.getBlockRootClientId( clientId );
-	const isLocked = select.getTemplateLock( rootClientId );
-	if ( isLocked ) {
-		return;
-	}
+export const insertAfterBlock =
+	( clientId ) =>
+	( { select, dispatch } ) => {
+		if ( ! clientId ) {
+			return;
+		}
+		const rootClientId = select.getBlockRootClientId( clientId );
+		const isLocked = select.getTemplateLock( rootClientId );
+		if ( isLocked ) {
+			return;
+		}
 
-	const firstSelectedIndex = select.getBlockIndex( clientId );
-	return dispatch.insertDefaultBlock(
-		{},
-		rootClientId,
-		firstSelectedIndex + 1
-	);
-};
+		const firstSelectedIndex = select.getBlockIndex( clientId );
+		return dispatch.insertDefaultBlock(
+			{},
+			rootClientId,
+			firstSelectedIndex + 1
+		);
+	};
 
 /**
  * Action that toggles the highlighted block state.
@@ -1581,11 +1643,13 @@ export function toggleBlockHighlight( clientId, isHighlighted ) {
  *
  * @param {string} clientId Target block client ID.
  */
-export const flashBlock = ( clientId ) => async ( { dispatch } ) => {
-	dispatch( toggleBlockHighlight( clientId, true ) );
-	await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
-	dispatch( toggleBlockHighlight( clientId, false ) );
-};
+export const flashBlock =
+	( clientId ) =>
+	async ( { dispatch } ) => {
+		dispatch( toggleBlockHighlight( clientId, true ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
+		dispatch( toggleBlockHighlight( clientId, false ) );
+	};
 
 /**
  * Action that sets whether a block has controlled inner blocks.
@@ -1600,6 +1664,264 @@ export function setHasControlledInnerBlocks(
 	return {
 		type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
 		hasControlledInnerBlocks,
+		clientId,
+	};
+}
+
+/**
+ * Action that sets whether given blocks are visible on the canvas.
+ *
+ * @param {Record<string,boolean>} updates For each block's clientId, its new visibility setting.
+ */
+export function setBlockVisibility( updates ) {
+	return {
+		type: 'SET_BLOCK_VISIBILITY',
+		updates,
+	};
+}
+
+/**
+ * Action that sets whether a block is being temporaritly edited as blocks.
+ *
+ * DO-NOT-USE in production.
+ * This action is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporaritly edited as blocks.
+ */
+export function __unstableSetTemporarilyEditingAsBlocks(
+	temporarilyEditingAsBlocks
+) {
+	return {
+		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
+		temporarilyEditingAsBlocks,
+	};
+}
+
+/**
+ * Interface for inserter media requests.
+ *
+ * @typedef {Object} InserterMediaRequest
+ * @property {number} per_page How many items to fetch per page.
+ * @property {string} search   The search term to use for filtering the results.
+ */
+
+/**
+ * Interface for inserter media responses. Any media resource should
+ * map their response to this interface, in order to create the core
+ * WordPress media blocks (image, video, audio).
+ *
+ * @typedef {Object} InserterMediaItem
+ * @property {string}        title        The title of the media item.
+ * @property {string}        url          The source url of the media item.
+ * @property {string}        [previewUrl] The preview source url of the media item to display in the media list.
+ * @property {number}        [id]         The WordPress id of the media item.
+ * @property {number|string} [sourceId]   The id of the media item from external source.
+ * @property {string}        [alt]        The alt text of the media item.
+ * @property {string}        [caption]    The caption of the media item.
+ */
+
+/**
+ * Registers a new inserter media category. Once registered, the media category is
+ * available in the inserter's media tab.
+ *
+ * The following interfaces are used:
+ *
+ * _Type Definition_
+ *
+ * - _InserterMediaRequest_ `Object`: Interface for inserter media requests.
+ *
+ * _Properties_
+ *
+ * - _per_page_ `number`: How many items to fetch per page.
+ * - _search_ `string`: The search term to use for filtering the results.
+ *
+ * _Type Definition_
+ *
+ * - _InserterMediaItem_ `Object`: Interface for inserter media responses. Any media resource should
+ * map their response to this interface, in order to create the core
+ * WordPress media blocks (image, video, audio).
+ *
+ * _Properties_
+ *
+ * - _title_ `string`: The title of the media item.
+ * - _url_ `string: The source url of the media item.
+ * - _previewUrl_ `[string]`: The preview source url of the media item to display in the media list.
+ * - _id_ `[number]`: The WordPress id of the media item.
+ * - _sourceId_ `[number|string]`: The id of the media item from external source.
+ * - _alt_ `[string]`: The alt text of the media item.
+ * - _caption_ `[string]`: The caption of the media item.
+ *
+ * @param    {InserterMediaCategory}                                  category                       The inserter media category to register.
+ *
+ * @example
+ * ```js
+ *
+ * wp.data.dispatch('core/block-editor').registerInserterMediaCategory( {
+ * 	 name: 'openverse',
+ * 	 labels: {
+ * 	 	name: 'Openverse',
+ * 	 	search_items: 'Search Openverse',
+ * 	 },
+ * 	 mediaType: 'image',
+ * 	 async fetch( query = {} ) {
+ * 	 	const defaultArgs = {
+ * 	 		mature: false,
+ * 	 		excluded_source: 'flickr,inaturalist,wikimedia',
+ * 	 		license: 'pdm,cc0',
+ * 	 	};
+ * 	 	const finalQuery = { ...query, ...defaultArgs };
+ * 	 	// Sometimes you might need to map the supported request params according to `InserterMediaRequest`.
+ * 	 	// interface. In this example the `search` query param is named `q`.
+ * 	 	const mapFromInserterMediaRequest = {
+ * 	 		per_page: 'page_size',
+ * 	 		search: 'q',
+ * 	 	};
+ * 	 	const url = new URL( 'https://api.openverse.engineering/v1/images/' );
+ * 	 	Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
+ * 	 		const queryKey = mapFromInserterMediaRequest[ key ] || key;
+ * 	 		url.searchParams.set( queryKey, value );
+ * 	 	} );
+ * 	 	const response = await window.fetch( url, {
+ * 	 		headers: {
+ * 	 			'User-Agent': 'WordPress/inserter-media-fetch',
+ * 	 		},
+ * 	 	} );
+ * 	 	const jsonResponse = await response.json();
+ * 	 	const results = jsonResponse.results;
+ * 	 	return results.map( ( result ) => ( {
+ * 	 		...result,
+ * 	 		// If your response result includes an `id` prop that you want to access later, it should
+ * 	 		// be mapped to `InserterMediaItem`'s `sourceId` prop. This can be useful if you provide
+ * 	 		// a report URL getter.
+ * 	 		// Additionally you should always clear the `id` value of your response results because
+ * 	 		// it is used to identify WordPress media items.
+ * 	 		sourceId: result.id,
+ * 	 		id: undefined,
+ * 	 		caption: result.caption,
+ * 	 		previewUrl: result.thumbnail,
+ * 	 	} ) );
+ * 	 },
+ * 	 getReportUrl: ( { sourceId } ) =>
+ * 	 	`https://wordpress.org/openverse/image/${ sourceId }/report/`,
+ * 	 isExternalResource: true,
+ * } );
+ * ```
+ *
+ * @typedef {Object} InserterMediaCategory Interface for inserter media category.
+ * @property {string}                                                 name                           The name of the media category, that should be unique among all media categories.
+ * @property {Object}                                                 labels                         Labels for the media category.
+ * @property {string}                                                 labels.name                    General name of the media category. It's used in the inserter media items list.
+ * @property {string}                                                 [labels.search_items='Search'] Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
+ * @property {('image'|'audio'|'video')}                              mediaType                      The media type of the media category.
+ * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]>} fetch                          The function to fetch media items for the category.
+ * @property {(InserterMediaItem) => string}                          [getReportUrl]                 If the media category supports reporting media items, this function should return
+ *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
+ * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
+ *                                                                                                   This is used to avoid making a request to the external resource when the user
+ */
+export const registerInserterMediaCategory =
+	( category ) =>
+	( { select, dispatch } ) => {
+		if ( ! category || typeof category !== 'object' ) {
+			console.error(
+				'Category should be an `InserterMediaCategory` object.'
+			);
+			return;
+		}
+		if ( ! category.name ) {
+			console.error(
+				'Category should have a `name` that should be unique among all media categories.'
+			);
+			return;
+		}
+		if ( ! category.labels?.name ) {
+			console.error( 'Category should have a `labels.name`.' );
+			return;
+		}
+		if ( ! [ 'image', 'audio', 'video' ].includes( category.mediaType ) ) {
+			console.error(
+				'Category should have `mediaType` property that is one of `image|audio|video`.'
+			);
+			return;
+		}
+		if ( ! category.fetch || typeof category.fetch !== 'function' ) {
+			console.error(
+				'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]>`.'
+			);
+			return;
+		}
+		const { inserterMediaCategories = [] } = select.getSettings();
+		if (
+			inserterMediaCategories.some(
+				( { name } ) => name === category.name
+			)
+		) {
+			console.error(
+				`A category is already registered with the same name: "${ category.name }".`
+			);
+			return;
+		}
+		if (
+			inserterMediaCategories.some(
+				( { labels: { name } } ) => name === category.labels?.name
+			)
+		) {
+			console.error(
+				`A category is already registered with the same labels.name: "${ category.labels.name }".`
+			);
+			return;
+		}
+		// `inserterMediaCategories` is a private block editor setting, which means it cannot
+		// be updated through the public `updateSettings` action. We preserve this setting as
+		// private, so extenders can only add new inserter media categories and don't have any
+		// control over the core media categories.
+		dispatch( {
+			type: 'UPDATE_SETTINGS',
+			settings: {
+				inserterMediaCategories: [
+					...inserterMediaCategories,
+					{ ...category, isExternalResource: true },
+				],
+			},
+		} );
+	};
+
+/**
+ * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
+ */
+
+/**
+ * Sets the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string}           clientId The block client ID, or `''` for the root container.
+ * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
+ *                                    `'contentOnly'`, or `'default'`.
+ *
+ * @return {Object} Action object.
+ */
+export function setBlockEditingMode( clientId = '', mode ) {
+	return {
+		type: 'SET_BLOCK_EDITING_MODE',
+		clientId,
+		mode,
+	};
+}
+
+/**
+ * Clears the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string} clientId The block client ID, or `''` for the root container.
+ *
+ * @return {Object} Action object.
+ */
+export function unsetBlockEditingMode( clientId = '' ) {
+	return {
+		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,
 	};
 }

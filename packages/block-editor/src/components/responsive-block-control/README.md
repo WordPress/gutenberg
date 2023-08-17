@@ -171,8 +171,10 @@ const renderDefaultControl = ( labelComponent, viewport ) => {
 An optional render function (prop) used to render the controls for the _responsive_ settings. If not provided, by default, responsive controls will be _automatically_ rendered using the component returned by the `renderDefaultControl` prop. For _complete_ control over the output of the responsive controls, you may return a component here and it will be rendered when the control group is in "responsive" mode.
 
 ```jsx
+let uniqueId = 0;
+
 const renderResponsiveControls = ( viewports ) => {
-	const inputId = uniqueId(); // lodash
+	const inputId = ++uniqueId;
 
 	return viewports.map( ( { id, label } ) => {
 		return (

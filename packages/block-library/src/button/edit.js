@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -17,6 +17,7 @@ import {
 	Popover,
 } from '@wordpress/components';
 import {
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -25,10 +26,13 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { useMergeRefs } from '@wordpress/compose';
+import { prependHTTP } from '@wordpress/url';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
@@ -48,7 +52,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 					return (
 						<Button
 							key={ widthValue }
-							isSmall
+							size="small"
 							variant={
 								widthValue === selectedWidth
 									? 'primary'
@@ -74,21 +78,8 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 	} = props;
-	const {
-		linkTarget,
-		placeholder,
-		rel,
-		style,
-		text,
-		url,
-		width,
-	} = attributes;
-	const onSetLinkRel = useCallback(
-		( value ) => {
-			setAttributes( { rel: value } );
-		},
-		[ setAttributes ]
-	);
+	const { textAlign, linkTarget, placeholder, rel, style, text, url, width } =
+		attributes;
 
 	function onToggleOpenInNewTab( value ) {
 		const newLinkTarget = value ? '_blank' : undefined;
@@ -120,12 +111,19 @@ function ButtonEdit( props ) {
 		}
 	}
 
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
 	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const ref = useRef();
 	const richTextRef = useRef();
-	const blockProps = useBlockProps( { ref, onKeyDown } );
+	const blockProps = useBlockProps( {
+		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
+		onKeyDown,
+	} );
 
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
@@ -151,12 +149,20 @@ function ButtonEdit( props ) {
 		}
 	}, [ isSelected ] );
 
+	// Memoize link value to avoid overriding the LinkControl's internal state.
+	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
+	const linkValue = useMemo(
+		() => ( { url, opensInNewTab } ),
+		[ url, opensInNewTab ]
+	);
+
 	return (
 		<>
 			<div
 				{ ...blockProps }
 				className={ classnames( blockProps.className, {
-					[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+					[ `has-custom-width wp-block-button__width-${ width }` ]:
+						width,
 					[ `has-custom-font-size` ]: blockProps.style.fontSize,
 				} ) }
 			>
@@ -173,10 +179,12 @@ function ButtonEdit( props ) {
 						colorProps.className,
 						borderProps.className,
 						{
+							[ `has-text-align-${ textAlign }` ]: textAlign,
 							// For backwards compatibility add style that isn't
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
-						}
+						},
+						__experimentalGetElementClassName( 'button' )
 					) }
 					style={ {
 						...borderProps.style,
@@ -195,6 +203,12 @@ function ButtonEdit( props ) {
 				/>
 			</div>
 			<BlockControls group="block">
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
 				{ ! isURLSet && (
 					<ToolbarButton
 						name="link"
@@ -217,23 +231,23 @@ function ButtonEdit( props ) {
 			</BlockControls>
 			{ isSelected && ( isEditingURL || isURLSet ) && (
 				<Popover
-					position="bottom center"
+					placement="bottom"
 					onClose={ () => {
 						setIsEditingURL( false );
 						richTextRef.current?.focus();
 					} }
-					anchorRef={ ref?.current }
+					anchor={ popoverAnchor }
 					focusOnMount={ isEditingURL ? 'firstElement' : false }
 					__unstableSlotName={ '__unstable-block-tools-after' }
+					shift
 				>
 					<LinkControl
-						className="wp-block-navigation-link__inline-link-input"
-						value={ { url, opensInNewTab } }
+						value={ linkValue }
 						onChange={ ( {
 							url: newURL = '',
 							opensInNewTab: newOpensInNewTab,
 						} ) => {
-							setAttributes( { url: newURL } );
+							setAttributes( { url: prependHTTP( newURL ) } );
 
 							if ( opensInNewTab !== newOpensInNewTab ) {
 								onToggleOpenInNewTab( newOpensInNewTab );
@@ -253,11 +267,12 @@ function ButtonEdit( props ) {
 					setAttributes={ setAttributes }
 				/>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
-					onChange={ onSetLinkRel }
+					onChange={ ( newRel ) => setAttributes( { rel: newRel } ) }
 				/>
 			</InspectorControls>
 		</>

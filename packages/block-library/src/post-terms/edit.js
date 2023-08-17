@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +17,7 @@ import {
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Spinner, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -40,6 +40,7 @@ export default function PostTermsEdit( {
 	attributes,
 	clientId,
 	context,
+	isSelected,
 	setAttributes,
 	insertBlocksAfter,
 } ) {
@@ -57,7 +58,6 @@ export default function PostTermsEdit( {
 	);
 	const { postTerms, hasPostTerms, isLoading } = usePostTerms( {
 		postId,
-		postType,
 		term: selectedTerm,
 	} );
 	const hasPost = postId && postType;
@@ -69,10 +69,6 @@ export default function PostTermsEdit( {
 		} ),
 	} );
 
-	if ( ! hasPost || ! term ) {
-		return <div { ...blockProps }>{ blockInformation.title }</div>;
-	}
-
 	return (
 		<>
 			<BlockControls>
@@ -83,8 +79,9 @@ export default function PostTermsEdit( {
 					} }
 				/>
 			</BlockControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Separator' ) }
 					value={ separator || '' }
@@ -95,8 +92,8 @@ export default function PostTermsEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ isLoading && <Spinner /> }
-				{ ! isLoading && hasPostTerms && (
+				{ isLoading && hasPost && <Spinner /> }
+				{ ! isLoading && hasPostTerms && ( isSelected || prefix ) && (
 					<RichText
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__prefix"
@@ -110,7 +107,11 @@ export default function PostTermsEdit( {
 						tagName="span"
 					/>
 				) }
-				{ ! isLoading &&
+				{ ( ! hasPost || ! term ) && (
+					<span>{ blockInformation.title }</span>
+				) }
+				{ hasPost &&
+					! isLoading &&
 					hasPostTerms &&
 					postTerms
 						.map( ( postTerm ) => (
@@ -119,7 +120,7 @@ export default function PostTermsEdit( {
 								href={ postTerm.link }
 								onClick={ ( event ) => event.preventDefault() }
 							>
-								{ unescape( postTerm.name ) }
+								{ decodeEntities( postTerm.name ) }
 							</a>
 						) )
 						.reduce( ( prev, curr ) => (
@@ -131,11 +132,12 @@ export default function PostTermsEdit( {
 								{ curr }
 							</>
 						) ) }
-				{ ! isLoading &&
+				{ hasPost &&
+					! isLoading &&
 					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
-				{ ! isLoading && hasPostTerms && (
+				{ ! isLoading && hasPostTerms && ( isSelected || suffix ) && (
 					<RichText
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__suffix"

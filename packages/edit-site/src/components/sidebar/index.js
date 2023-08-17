@@ -1,96 +1,92 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { cog } from '@wordpress/icons';
-import { useEffect, Fragment } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { memo, useRef } from '@wordpress/element';
+import {
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+} from '@wordpress/components';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import DefaultSidebar from './default-sidebar';
-import GlobalStylesSidebar from './global-styles-sidebar';
-import NavigationMenuSidebar from './navigation-menu-sidebar';
-import { STORE_NAME } from '../../store/constants';
-import SettingsHeader from './settings-header';
-import TemplateCard from './template-card';
-import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
+import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
+import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
+import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
+import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
+import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
+import useSyncPathWithURL, {
+	getPathFromURL,
+} from '../sync-state-with-url/use-sync-path-with-url';
+import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
+import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
+import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
+import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
+import SaveHub from '../save-hub';
+import { unlock } from '../../lock-unlock';
+import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
+import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 
-const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
-	'EditSiteSidebarInspector'
-);
-export const SidebarInspectorFill = InspectorFill;
+const { useLocation } = unlock( routerPrivateApis );
 
-export function SidebarComplementaryAreaFills() {
-	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
-		( select ) => {
-			const _sidebar = select(
-				interfaceStore
-			).getActiveComplementaryArea( STORE_NAME );
-			const _isEditorSidebarOpened = [
-				SIDEBAR_BLOCK,
-				SIDEBAR_TEMPLATE,
-			].includes( _sidebar );
-			return {
-				sidebar: _sidebar,
-				isEditorSidebarOpened: _isEditorSidebarOpened,
-				hasBlockSelection: !! select(
-					blockEditorStore
-				).getBlockSelectionStart(),
-			};
-		},
-		[]
-	);
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-
-	useEffect( () => {
-		if ( ! isEditorSidebarOpened ) return;
-		if ( hasBlockSelection ) {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
-		} else {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
-		}
-	}, [ hasBlockSelection, isEditorSidebarOpened ] );
-
-	let sidebarName = sidebar;
-	if ( ! isEditorSidebarOpened ) {
-		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
-	}
-
-	// Conditionally include NavMenu sidebar in Plugin only.
-	// Optimise for dead code elimination.
-	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
-	let MaybeNavigationMenuSidebar = Fragment;
-
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		MaybeNavigationMenuSidebar = NavigationMenuSidebar;
-	}
+function SidebarScreens() {
+	useSyncPathWithURL();
 
 	return (
 		<>
-			<DefaultSidebar
-				identifier={ sidebarName }
-				title={ __( 'Settings' ) }
-				icon={ cog }
-				closeLabel={ __( 'Close settings sidebar' ) }
-				header={ <SettingsHeader sidebarName={ sidebarName } /> }
-				headerClassName="edit-site-sidebar__panel-tabs"
-			>
-				{ sidebarName === SIDEBAR_TEMPLATE && (
-					<PanelBody>
-						<TemplateCard />
-					</PanelBody>
-				) }
-				{ sidebarName === SIDEBAR_BLOCK && (
-					<InspectorSlot bubblesVirtually />
-				) }
-			</DefaultSidebar>
-			<GlobalStylesSidebar />
-			<MaybeNavigationMenuSidebar />
+			<NavigatorScreen path="/">
+				<SidebarNavigationScreenMain />
+			</NavigatorScreen>
+			<NavigatorScreen path="/navigation">
+				<SidebarNavigationScreenNavigationMenus />
+			</NavigatorScreen>
+			<NavigatorScreen path="/navigation/:postType/:postId">
+				<SidebarNavigationScreenNavigationMenu />
+			</NavigatorScreen>
+			<NavigatorScreen path="/wp_global_styles">
+				<SidebarNavigationScreenGlobalStyles />
+			</NavigatorScreen>
+			<NavigatorScreen path="/page">
+				<SidebarNavigationScreenPages />
+			</NavigatorScreen>
+			<NavigatorScreen path="/page/:postId">
+				<SidebarNavigationScreenPage />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template)">
+				<SidebarNavigationScreenTemplates />
+			</NavigatorScreen>
+			<NavigatorScreen path="/patterns">
+				<SidebarNavigationScreenPatterns />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+				<SidebarNavigationScreenTemplatesBrowse />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template_part|wp_block)/:postId">
+				<SidebarNavigationScreenPattern />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template)/:postId">
+				<SidebarNavigationScreenTemplate />
+			</NavigatorScreen>
 		</>
 	);
 }
+
+function Sidebar() {
+	const { params: urlParams } = useLocation();
+	const initialPath = useRef( getPathFromURL( urlParams ) );
+
+	return (
+		<>
+			<NavigatorProvider
+				className="edit-site-sidebar__content"
+				initialPath={ initialPath.current }
+			>
+				<SidebarScreens />
+			</NavigatorProvider>
+			<SaveHub />
+		</>
+	);
+}
+
+export default memo( Sidebar );

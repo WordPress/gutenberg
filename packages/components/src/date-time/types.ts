@@ -1,26 +1,3 @@
-/**
- * External dependencies
- */
-import type { Moment } from 'moment';
-import type { ReactNode } from 'react';
-
-export type UpdateOnBlurAsIntegerFieldProps = {
-	/**
-	 * The value of the integer field.
-	 */
-	value: number | string;
-
-	/**
-	 * Called when the field is changed.
-	 */
-	onUpdate: ( value: number ) => void;
-
-	/**
-	 * Children to render inside the field.
-	 */
-	children?: ReactNode;
-};
-
 export type TimePickerProps = {
 	/**
 	 * The initial current time the time picker should render.
@@ -46,20 +23,6 @@ export type DatePickerEvent = {
 	 * The date of the event.
 	 */
 	date: Date;
-};
-
-export type DatePickerDayProps = {
-	/**
-	 * The day to display.
-	 */
-	day: Moment;
-
-	/**
-	 * List of events to show on this day.
-	 *
-	 * @default []
-	 */
-	events?: DatePickerEvent[];
 };
 
 export type DatePickerProps = {
@@ -94,6 +57,13 @@ export type DatePickerProps = {
 	 * dot on the day of the event.
 	 */
 	events?: DatePickerEvent[];
+
+	/**
+	 * The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
+	 *
+	 * @default 0
+	 */
+	startOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 };
 
 export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &

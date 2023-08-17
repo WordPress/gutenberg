@@ -11,12 +11,11 @@ import {
 	Platform,
 	Text,
 } from 'react-native';
-import { map, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -63,11 +62,23 @@ function ColorPalette( {
 	const scale = useRef( new Animated.Value( 1 ) ).current;
 	const opacity = useRef( new Animated.Value( 1 ) ).current;
 
-	const defaultColors = uniq( map( defaultSettings.colors, 'color' ) );
-	const mergedColors = uniq( map( defaultSettings.allColors, 'color' ) );
-	const defaultGradientColors = uniq(
-		map( defaultSettings.gradients, 'gradient' )
-	);
+	const defaultColors = [
+		...new Set(
+			( defaultSettings.colors ?? [] ).map( ( { color } ) => color )
+		),
+	];
+	const mergedColors = [
+		...new Set(
+			( defaultSettings.allColors ?? [] ).map( ( { color } ) => color )
+		),
+	];
+	const defaultGradientColors = [
+		...new Set(
+			( defaultSettings.gradients ?? [] ).map(
+				( { gradient } ) => gradient
+			)
+		),
+	];
 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
 
 	const customIndicatorColor = isGradientSegment
@@ -92,6 +103,9 @@ function ColorPalette( {
 				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 			}
 		}
+		// Temporarily disabling exhuastive-deps until the component can be refactored and updated safely.
+		// Please see https://github.com/WordPress/gutenberg/pull/41253 for discussion and details.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {
@@ -159,6 +173,22 @@ function ColorPalette( {
 				}
 			}
 		}
+	}
+
+	function getColorGradientName( value ) {
+		const fallbackName = sprintf(
+			/* translators: %s: the hex color value */
+			__( 'Unlabeled color. %s' ),
+			value
+		);
+		const foundColorName = isGradientSegment
+			? defaultSettings.gradients?.find(
+					( gradient ) => gradient.gradient === value
+			  )
+			: defaultSettings.allColors?.find(
+					( color ) => color.color === value
+			  );
+		return foundColorName ? foundColorName?.name : fallbackName;
 	}
 
 	function onColorPress( color ) {
@@ -237,6 +267,8 @@ function ColorPalette( {
 					const scaleValue = isSelected( color )
 						? scaleInterpolation
 						: 1;
+					const colorName = getColorGradientName( color );
+
 					return (
 						<View key={ `${ color }-${ isSelected( color ) }` }>
 							<TouchableWithoutFeedback
@@ -246,6 +278,7 @@ function ColorPalette( {
 									selected: isSelected( color ),
 								} }
 								accessibilityHint={ color }
+								accessibilityLabel={ colorName }
 								testID={ color }
 							>
 								<Animated.View

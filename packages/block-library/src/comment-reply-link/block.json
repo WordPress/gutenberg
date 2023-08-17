@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/comment-reply-link",
 	"title": "Comment Reply Link",
 	"category": "theme",
@@ -11,10 +11,6 @@
 	"attributes": {
 		"textAlign": {
 			"type": "string"
-		},
-		"fontSize": {
-			"type": "string",
-			"default": "small"
 		}
 	},
 	"supports": {
@@ -27,6 +23,10 @@
 				"link": true
 			}
 		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -34,7 +34,11 @@
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
-			"__experimentalLetterSpacing": true
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		},
 		"html": false
 	}

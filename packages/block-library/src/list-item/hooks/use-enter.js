@@ -18,10 +18,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import useOutdentListItem from './use-outdent-list-item';
 
 export default function useEnter( props ) {
-	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const { getBlock, getBlockRootClientId, getBlockIndex } = useSelect(
-		blockEditorStore
-	);
+	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+	const { getBlock, getBlockRootClientId, getBlockIndex } =
+		useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	const [ canOutdent, outdentListItem ] = useOutdentListItem(
@@ -43,8 +42,9 @@ export default function useEnter( props ) {
 					return;
 				}
 				// Here we are in top level list so we need to split.
-				const blockRootClientId = getBlockRootClientId( clientId );
-				const topParentListBlock = getBlock( blockRootClientId );
+				const topParentListBlock = getBlock(
+					getBlockRootClientId( clientId )
+				);
 				const blockIndex = getBlockIndex( clientId );
 				const head = cloneBlock( {
 					...topParentListBlock,
@@ -70,11 +70,13 @@ export default function useEnter( props ) {
 					  ]
 					: [];
 				replaceBlocks(
-					blockRootClientId,
+					topParentListBlock.clientId,
 					[ head, middle, ...tail ],
-					1,
-					0
+					1
 				);
+				// We manually change the selection here because we are replacing
+				// a different block than the selected one.
+				selectionChange( middle.clientId );
 			}
 
 			element.addEventListener( 'keydown', onKeyDown );

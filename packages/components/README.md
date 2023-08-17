@@ -4,8 +4,6 @@ This package includes a library of generic WordPress components to be used for c
 
 ## Installation
 
-Install the module
-
 ```bash
 npm install @wordpress/components --save
 ```
@@ -27,7 +25,7 @@ export default function MyButton() {
 }
 ```
 
-Many components include CSS to add style, you will need to add in order to appear correctly. Within WordPress, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+Many components include CSS to add styles, which you will need to load in order for them to appear correctly. Within WordPress, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
 
 In non-WordPress projects, link to the `build-style/style.css` file directly, it is located at `node_modules/@wordpress/components/build-style/style.css`.
 
@@ -64,14 +62,14 @@ import { MyComponentWithPopover } from './my-component';
 const Example = () => {
 	<SlotFillProvider>
 		<MyComponentWithPopover />
-		<Popover.Slot>
+		<Popover.Slot />
 	</SlotFillProvider>
 };
 ```
 
 ## Docs & examples
 
-You can browse the components docs and examples at https://wordpress.github.io/gutenberg/
+You can browse the components docs and examples at [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
 
 ## Contributing to this package
 

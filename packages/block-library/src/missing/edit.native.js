@@ -5,7 +5,7 @@ import {
 	View,
 	Text,
 	TouchableWithoutFeedback,
-	TouchableHighlight,
+	TouchableOpacity,
 } from 'react-native';
 
 /**
@@ -83,7 +83,7 @@ export class UnsupportedBlockEdit extends Component {
 		);
 
 		return (
-			<TouchableHighlight
+			<TouchableOpacity
 				onPress={ this.onHelpButtonPressed }
 				style={ styles.helpIconContainer }
 				accessibilityLabel={ __( 'Help button' ) }
@@ -94,9 +94,9 @@ export class UnsupportedBlockEdit extends Component {
 					className="unsupported-icon-help"
 					label={ __( 'Help icon' ) }
 					icon={ help }
-					color={ infoIconStyle.color }
+					fill={ infoIconStyle.color }
 				/>
-			</TouchableHighlight>
+			</TouchableOpacity>
 		);
 	}
 
@@ -151,7 +151,8 @@ export class UnsupportedBlockEdit extends Component {
 		const infoTitle = sprintf( titleFormat, blockTitle );
 		const missingBlockDetail = applyFilters(
 			'native.missing_block_detail',
-			__( 'We are working hard to add more blocks with each release.' )
+			__( 'We are working hard to add more blocks with each release.' ),
+			blockName
 		);
 		const missingBlockActionButton = applyFilters(
 			'native.missing_block_action_button',
@@ -205,11 +206,17 @@ export class UnsupportedBlockEdit extends Component {
 					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 						{ infoTitle }
 					</Text>
-					{ isEditableInUnsupportedBlockEditor && (
-						<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-							{ missingBlockDetail }
-						</Text>
-					) }
+					{ isEditableInUnsupportedBlockEditor &&
+						missingBlockDetail && (
+							<Text
+								style={ [
+									infoTextStyle,
+									infoDescriptionStyle,
+								] }
+							>
+								{ missingBlockDetail }
+							</Text>
+						) }
 				</View>
 				{ ( isUnsupportedBlockEditorSupported ||
 					canEnableUnsupportedBlockEditor ) &&
@@ -248,6 +255,7 @@ export class UnsupportedBlockEdit extends Component {
 			styles.unsupportedBlockSubtitle,
 			styles.unsupportedBlockSubtitleDark
 		);
+
 		const subtitle = (
 			<Text style={ subTitleStyle }>{ __( 'Unsupported' ) }</Text>
 		);
@@ -275,12 +283,14 @@ export class UnsupportedBlockEdit extends Component {
 					) }
 				>
 					{ this.renderHelpIcon() }
-					<Icon
-						className={ iconClassName }
-						icon={ icon && icon.src ? icon.src : icon }
-						color={ iconStyle.color }
-					/>
-					<Text style={ titleStyle }>{ title }</Text>
+					<View style={ styles.unsupportedBlockHeader }>
+						<Icon
+							className={ iconClassName }
+							icon={ icon && icon.src ? icon.src : icon }
+							fill={ iconStyle.color }
+						/>
+						<Text style={ titleStyle }>{ title }</Text>
+					</View>
 					{ subtitle }
 					{ this.renderSheet( title, originalName ) }
 				</View>
@@ -291,16 +301,14 @@ export class UnsupportedBlockEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, { attributes } ) => {
-		const { getSettings } = select( blockEditorStore );
+		const { capabilities } = select( blockEditorStore ).getSettings();
 		return {
 			isUnsupportedBlockEditorSupported:
-				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
+				capabilities?.unsupportedBlockEditor === true,
 			canEnableUnsupportedBlockEditor:
-				getSettings( 'capabilities' )
-					.canEnableUnsupportedBlockEditor === true,
-			isEditableInUnsupportedBlockEditor: ! UBE_INCOMPATIBLE_BLOCKS.includes(
-				attributes.originalName
-			),
+				capabilities?.canEnableUnsupportedBlockEditor === true,
+			isEditableInUnsupportedBlockEditor:
+				! UBE_INCOMPATIBLE_BLOCKS.includes( attributes.originalName ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Fragment, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
-	BaseControl,
 	Button,
 	ExternalLink,
 	FocalPointPicker,
@@ -12,6 +11,7 @@ import {
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
+	SelectControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
@@ -21,8 +21,9 @@ import { useInstanceId } from '@wordpress/compose';
 import {
 	InspectorControls,
 	useSetting,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
-	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -72,18 +73,17 @@ function CoverHeightInput( {
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
-		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
-			<UnitControl
-				id={ inputId }
-				isResetValueOnUnitChange
-				min={ min }
-				onChange={ handleOnChange }
-				onUnitChange={ onUnitChange }
-				style={ { maxWidth: 80 } }
-				units={ units }
-				value={ computedValue }
-			/>
-		</BaseControl>
+		<UnitControl
+			label={ __( 'Minimum height of cover' ) }
+			id={ inputId }
+			isResetValueOnUnitChange
+			min={ min }
+			onChange={ handleOnChange }
+			onUnitChange={ onUnitChange }
+			__unstableInputWidth={ '80px' }
+			units={ units }
+			value={ computedValue }
+		/>
 	);
 }
 export default function CoverInspectorControls( {
@@ -93,6 +93,8 @@ export default function CoverInspectorControls( {
 	setOverlayColor,
 	coverRef,
 	currentSettings,
+	updateDimRatio,
+	onClearMedia,
 } ) {
 	const {
 		useFeaturedImage,
@@ -103,6 +105,7 @@ export default function CoverInspectorControls( {
 		minHeight,
 		minHeightUnit,
 		alt,
+		tagName,
 	} = attributes;
 	const {
 		isVideoBackground,
@@ -138,28 +141,55 @@ export default function CoverInspectorControls( {
 			: [ coverRef.current.style, 'backgroundPosition' ];
 		styleOfRef[ property ] = mediaPosition( value );
 	};
+
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
+	const htmlElementMessages = {
+		header: __(
+			'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
+		),
+		main: __(
+			'The <main> element should be used for the primary content of your document only. '
+		),
+		section: __(
+			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+		),
+		article: __(
+			'The <article> element should represent a self-contained, syndicatable portion of the document.'
+		),
+		aside: __(
+			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+		),
+		footer: __(
+			'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
+		),
+	};
+
 	return (
 		<>
 			<InspectorControls>
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
 						{ isImageBackground && (
-							<Fragment>
+							<>
 								<ToggleControl
+									__nextHasNoMarginBottom
 									label={ __( 'Fixed background' ) }
 									checked={ hasParallax }
 									onChange={ toggleParallax }
 								/>
 
 								<ToggleControl
+									__nextHasNoMarginBottom
 									label={ __( 'Repeated background' ) }
 									checked={ isRepeated }
 									onChange={ toggleIsRepeated }
 								/>
-							</Fragment>
+							</>
 						) }
 						{ showFocalPointPicker && (
 							<FocalPointPicker
+								__nextHasNoMarginBottom
 								label={ __( 'Focal point picker' ) }
 								url={ url }
 								value={ focalPoint }
@@ -177,9 +207,8 @@ export default function CoverInspectorControls( {
 							isImageBackground &&
 							isImgElement && (
 								<TextareaControl
-									label={ __(
-										'Alt text (alternative text)'
-									) }
+									__nextHasNoMarginBottom
+									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>
 										setAttributes( { alt: newAlt } )
@@ -188,11 +217,12 @@ export default function CoverInspectorControls( {
 										<>
 											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 												{ __(
-													'Describe the purpose of the image'
+													'Describe the purpose of the image.'
 												) }
 											</ExternalLink>
+											<br />
 											{ __(
-												'Leave empty if the image is purely decorative.'
+												'Leave empty if decorative.'
 											) }
 										</>
 									}
@@ -203,54 +233,70 @@ export default function CoverInspectorControls( {
 								variant="secondary"
 								isSmall
 								className="block-library-cover__reset-button"
-								onClick={ () =>
-									setAttributes( {
-										url: undefined,
-										id: undefined,
-										backgroundType: undefined,
-										focalPoint: undefined,
-										hasParallax: undefined,
-										isRepeated: undefined,
-										useFeaturedImage: false,
-									} )
-								}
+								onClick={ onClearMedia }
 							>
 								{ __( 'Clear Media' ) }
 							</Button>
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelColorGradientSettings
-					__experimentalHasMultipleOrigins
-					__experimentalIsRenderedInSidebar
-					title={ __( 'Overlay' ) }
-					initialOpen={ true }
-					settings={ [
-						{
-							colorValue: overlayColor.color,
-							gradientValue,
-							onColorChange: setOverlayColor,
-							onGradientChange: setGradient,
-							label: __( 'Color' ),
-						},
-					] }
-				>
-					<RangeControl
-						label={ __( 'Opacity' ) }
-						value={ dimRatio }
-						onChange={ ( newDimRation ) =>
-							setAttributes( {
-								dimRatio: newDimRation,
-							} )
-						}
-						min={ 0 }
-						max={ 100 }
-						step={ 10 }
-						required
-					/>
-				</PanelColorGradientSettings>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="dimensions">
+			{ colorGradientSettings.hasColorsOrGradients && (
+				<InspectorControls group="color">
+					<ColorGradientSettingsDropdown
+						__experimentalIsRenderedInSidebar
+						settings={ [
+							{
+								colorValue: overlayColor.color,
+								gradientValue,
+								label: __( 'Overlay' ),
+								onColorChange: setOverlayColor,
+								onGradientChange: setGradient,
+								isShownByDefault: true,
+								resetAllFilter: () => ( {
+									overlayColor: undefined,
+									customOverlayColor: undefined,
+									gradient: undefined,
+									customGradient: undefined,
+								} ),
+							},
+						] }
+						panelId={ clientId }
+						{ ...colorGradientSettings }
+					/>
+					<ToolsPanelItem
+						hasValue={ () => {
+							// If there's a media background the dimRatio will be
+							// defaulted to 50 whereas it will be 100 for colors.
+							return dimRatio === undefined
+								? false
+								: dimRatio !== ( url ? 50 : 100 );
+						} }
+						label={ __( 'Overlay opacity' ) }
+						onDeselect={ () => updateDimRatio( url ? 50 : 100 ) }
+						resetAllFilter={ () => ( {
+							dimRatio: url ? 50 : 100,
+						} ) }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<RangeControl
+							__nextHasNoMarginBottom
+							label={ __( 'Overlay opacity' ) }
+							value={ dimRatio }
+							onChange={ ( newDimRatio ) =>
+								updateDimRatio( newDimRatio )
+							}
+							min={ 0 }
+							max={ 100 }
+							step={ 10 }
+							required
+							__next40pxDefaultSize
+						/>
+					</ToolsPanelItem>
+				</InspectorControls>
+			) }
+			<InspectorControls group="dimensions">
 				<ToolsPanelItem
 					hasValue={ () => !! minHeight }
 					label={ __( 'Minimum height' ) }
@@ -280,6 +326,26 @@ export default function CoverInspectorControls( {
 						}
 					/>
 				</ToolsPanelItem>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<SelectControl
+					__nextHasNoMarginBottom
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<header>', value: 'header' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+						{ label: '<footer>', value: 'footer' },
+					] }
+					value={ tagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					help={ htmlElementMessages[ tagName ] }
+				/>
 			</InspectorControls>
 		</>
 	);

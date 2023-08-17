@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { difference } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
@@ -20,14 +15,12 @@ import { store as blockEditorStore } from '../../store';
 import { getCommonDepthClientIds } from './utils';
 
 export default function useBlockSelection() {
-	const { clearSelectedBlock, multiSelect, selectBlock } = useDispatch(
-		blockEditorStore
-	);
+	const { clearSelectedBlock, multiSelect, selectBlock } =
+		useDispatch( blockEditorStore );
 	const {
 		getBlockName,
 		getBlockParents,
 		getBlockSelectionStart,
-		getBlockSelectionEnd,
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		hasSelectedBlock,
@@ -36,10 +29,9 @@ export default function useBlockSelection() {
 	const { getBlockType } = useSelect( blocksStore );
 
 	const updateBlockSelection = useCallback(
-		async ( event, clientId, destinationClientId ) => {
+		async ( event, clientId, destinationClientId, focusPosition ) => {
 			if ( ! event?.shiftKey ) {
-				await clearSelectedBlock();
-				selectBlock( clientId );
+				selectBlock( clientId, focusPosition );
 				return;
 			}
 
@@ -127,15 +119,15 @@ export default function useBlockSelection() {
 				return;
 			}
 
-			const selectionDiff = difference(
-				selectedBlocks,
-				updatedSelectedBlocks
+			const selectionDiff = selectedBlocks.filter(
+				( blockId ) => ! updatedSelectedBlocks.includes( blockId )
 			);
 
 			let label;
 			if ( selectionDiff.length === 1 ) {
-				const title = getBlockType( getBlockName( selectionDiff[ 0 ] ) )
-					?.title;
+				const title = getBlockType(
+					getBlockName( selectionDiff[ 0 ] )
+				)?.title;
 				if ( title ) {
 					label = sprintf(
 						/* translators: %s: block name */
@@ -152,7 +144,7 @@ export default function useBlockSelection() {
 			}
 
 			if ( label ) {
-				speak( label );
+				speak( label, 'assertive' );
 			}
 		},
 		[
@@ -161,7 +153,6 @@ export default function useBlockSelection() {
 			getBlockType,
 			getBlockParents,
 			getBlockSelectionStart,
-			getBlockSelectionEnd,
 			getSelectedBlockClientIds,
 			hasMultiSelection,
 			hasSelectedBlock,

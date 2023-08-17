@@ -2,8 +2,13 @@
  * WordPress dependencies
  */
 import { SVG, Rect } from '@wordpress/primitives';
+import { Icon, menu } from '@wordpress/icons';
 
-export default function OverlayMenuIcon() {
+export default function OverlayMenuIcon( { icon } ) {
+	if ( icon === 'menu' ) {
+		return <Icon icon={ menu } />;
+	}
+
 	return (
 		<SVG
 			xmlns="http://www.w3.org/2000/svg"

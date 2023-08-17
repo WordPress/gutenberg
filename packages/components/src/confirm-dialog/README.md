@@ -4,7 +4,7 @@
 This feature is still experimental. "Experimental" means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`ConfirmDialog` is built of top of [`Modal`](/packages/components/src/modal/README.md] and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
+`ConfirmDialog` is built of top of [`Modal`](/packages/components/src/modal/README.md) and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
 
 The dialog is confirmed by clicking the _confirm_ button or by pressing the `Enter` key. It is cancelled (closed) by clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay).
 
@@ -17,7 +17,7 @@ The dialog is confirmed by clicking the _confirm_ button or by pressing the `Ent
 Allows the component to be used standalone, just by declaring it as part of another React's component render method:
 
 -   It will be automatically open (displayed) upon mounting;
--   It will be automatically closed when when clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay);
+-   It will be automatically closed when clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay);
 -   `onCancel` is not mandatory but can be passed. Even if passed, the dialog will still be able to close itself.
 
 Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback. The message is passed as the `children`. You can pass any JSX you'd like, which allows to further format the message or include sub-component if you'd like:
@@ -44,6 +44,7 @@ Let the parent component control when the dialog is open/closed. It's activated 
 
 ```jsx
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 function Example() {
 	const [ isOpen, setIsOpen ] = useState( true );
@@ -72,7 +73,7 @@ function Example() {
 
 ### Unsupported: Multiple instances
 
-Multiple `ConfirmDialog's is an edge case that's currently not officially supported by this component. At the moment, new instances will end up closing the last instance due to the way the `Modal` is implemented.
+Multiple `ConfirmDialog`s is an edge case that's currently not officially supported by this component. At the moment, new instances will end up closing the last instance due to the way the `Modal` is implemented.
 
 ## Custom Types
 

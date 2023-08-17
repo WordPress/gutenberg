@@ -7,10 +7,11 @@ import { I18nManager, LogBox } from 'react-native';
  * WordPress dependencies
  */
 import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
-import { addAction, addFilter } from '@wordpress/hooks';
+import { addAction, addFilter, doAction } from '@wordpress/hooks';
 import * as wpData from '@wordpress/data';
-import { initializeEditor } from '@wordpress/edit-post';
 import { registerCoreBlocks } from '@wordpress/block-library';
+// eslint-disable-next-line no-restricted-imports
+import { initializeEditor } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -21,21 +22,6 @@ import setupApiFetch from './api-fetch-setup';
 const reactNativeSetup = () => {
 	LogBox.ignoreLogs( [
 		'Require cycle:', // TODO: Refactor to remove require cycles
-		'lineHeight', // TODO: Remove lineHeight warning from Aztec
-		/**
-		 * TODO: Migrate to @gorhom/bottom-sheet or replace usage of
-		 * LayoutAnimation to Animated. KeyboardAvoidingView's usage of
-		 * LayoutAnimation collides with both BottomSheet and NavigationContainer
-		 * usage of LayoutAnimation simultaneously https://github.com/facebook/react-native/issues/12663,
-		 * https://github.com/facebook/react-native/issues/10606
-		 */
-		'Overriding previous layout animation',
-	] );
-
-	// "@react-navigation" package uses the old API of gesture handler,
-	// so the warning will be silenced until it gets updated.
-	LogBox.ignoreLogs( [
-		"[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
 	] );
 
 	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
@@ -49,21 +35,14 @@ const gutenbergSetup = () => {
 
 	setupApiFetch();
 
-	const isHermes = () => global.HermesInternal !== null;
-	// eslint-disable-next-line no-console
-	console.log( 'Hermes is: ' + isHermes() );
-
 	setupInitHooks();
 };
 
 const setupInitHooks = () => {
 	addAction( 'native.pre-render', 'core/react-native-editor', ( props ) => {
 		const capabilities = props.capabilities ?? {};
-		const blocksFlags = {
-			__experimentalEnableQuoteBlockV2: props?.quoteBlockV2,
-		};
 
-		registerBlocks( blocksFlags );
+		registerBlocks();
 
 		// Unregister non-supported blocks by capabilities
 		if (
@@ -72,6 +51,8 @@ const setupInitHooks = () => {
 		) {
 			unregisterBlockType( 'core/block' );
 		}
+
+		doAction( 'native.post-register-core-blocks', props );
 	} );
 
 	// Map native props to Editor props
@@ -85,6 +66,7 @@ const setupInitHooks = () => {
 				initialData,
 				initialTitle,
 				postType,
+				hostAppNamespace,
 				featuredImageId,
 				rawStyles,
 				rawFeatures,
@@ -107,6 +89,7 @@ const setupInitHooks = () => {
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
 				initialTitle,
 				postType,
+				hostAppNamespace,
 				featuredImageId,
 				capabilities,
 				rawStyles,
@@ -119,12 +102,12 @@ const setupInitHooks = () => {
 };
 
 let blocksRegistered = false;
-const registerBlocks = ( blocksFlags ) => {
+const registerBlocks = () => {
 	if ( blocksRegistered ) {
 		return;
 	}
 
-	registerCoreBlocks( blocksFlags );
+	registerCoreBlocks();
 
 	blocksRegistered = true;
 };

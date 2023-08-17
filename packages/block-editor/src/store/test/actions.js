@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -24,9 +23,10 @@ import reducer from '../reducer';
 import * as actions from '../actions';
 import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 
+const noop = () => {};
+
 const {
 	clearSelectedBlock,
-	hideInsertionPoint,
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
@@ -53,6 +53,9 @@ const {
 	updateBlockListSettings,
 	updateSettings,
 	validateBlocksToTemplate,
+	registerInserterMediaCategory,
+	setBlockEditingMode,
+	unsetBlockEditingMode,
 } = actions;
 
 describe( 'actions', () => {
@@ -215,6 +218,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlock( 'chicken', block )( { select, dispatch } );
 
@@ -280,6 +284,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlocks( [ 'chicken' ], blocks )( { select, dispatch } );
 
@@ -313,6 +318,7 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
 
 			replaceBlocks(
 				[ 'chicken' ],
@@ -609,14 +615,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'hideInsertionPoint', () => {
-		it( 'should return the HIDE_INSERTION_POINT action', () => {
-			expect( hideInsertionPoint() ).toEqual( {
-				type: 'HIDE_INSERTION_POINT',
-			} );
-		} );
-	} );
-
 	describe( 'removeBlocks', () => {
 		it( 'should dispatch REMOVE_BLOCKS action', () => {
 			const clientId = 'clientId';
@@ -625,6 +623,7 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => undefined,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
@@ -633,7 +632,8 @@ describe( 'actions', () => {
 			removeBlocks( clientIds )( { select, dispatch } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
-				clientId
+				clientId,
+				true
 			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
@@ -734,6 +734,7 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => null,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
@@ -742,7 +743,8 @@ describe( 'actions', () => {
 			removeBlock( clientId )( { select, dispatch } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
-				clientId
+				clientId,
+				true
 			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
@@ -757,6 +759,7 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => null,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
@@ -1213,6 +1216,139 @@ describe( 'actions', () => {
 			);
 
 			expect( result ).toEqual( false );
+		} );
+	} );
+
+	describe( 'registerInserterMediaCategory', () => {
+		describe( 'should log errors when invalid', () => {
+			it( 'valid object', () => {
+				registerInserterMediaCategory()( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should be an `InserterMediaCategory` object.'
+				);
+			} );
+			it( 'has name', () => {
+				registerInserterMediaCategory( {} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `name` that should be unique among all media categories.'
+				);
+			} );
+			it( 'has labels.name', () => {
+				registerInserterMediaCategory( { name: 'a' } )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `labels.name`.'
+				);
+			} );
+			it( 'has proper media type', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'b',
+				} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have `mediaType` property that is one of `image|audio|video`.'
+				);
+			} );
+			it( 'has fetch function', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: 'c',
+				} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]>`.'
+				);
+			} );
+			it( 'has unique name', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: () => {},
+				} )( {
+					select: {
+						getSettings: () => ( {
+							inserterMediaCategories: [ { name: 'a' } ],
+						} ),
+					},
+				} );
+				expect( console ).toHaveErroredWith(
+					'A category is already registered with the same name: "a".'
+				);
+			} );
+			it( 'has unique labels.name', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: () => {},
+				} )( {
+					select: {
+						getSettings: () => ( {
+							inserterMediaCategories: [
+								{ labels: { name: 'a' } },
+							],
+						} ),
+					},
+				} );
+				expect( console ).toHaveErroredWith(
+					'A category is already registered with the same labels.name: "a".'
+				);
+			} );
+		} );
+		it( 'should register a media category', () => {
+			const category = {
+				name: 'new',
+				labels: { name: 'new' },
+				mediaType: 'image',
+				fetch: () => {},
+			};
+			const inserterMediaCategories = [
+				{ name: 'a', labels: { name: 'a' } },
+			];
+			const dispatch = jest.fn();
+			registerInserterMediaCategory( category )( {
+				select: {
+					getSettings: () => ( { inserterMediaCategories } ),
+				},
+				dispatch,
+			} );
+			expect( dispatch ).toHaveBeenLastCalledWith( {
+				type: 'UPDATE_SETTINGS',
+				settings: {
+					inserterMediaCategories: [
+						...inserterMediaCategories,
+						{ ...category, isExternalResource: true },
+					],
+				},
+			} );
+		} );
+	} );
+
+	describe( 'setBlockEditingMode', () => {
+		it( 'should return the SET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				setBlockEditingMode(
+					'14501cc2-90a6-4f52-aa36-ab6e896135d1',
+					'default'
+				)
+			).toEqual( {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'unsetBlockEditingMode', () => {
+		it( 'should return the UNSET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				unsetBlockEditingMode( '14501cc2-90a6-4f52-aa36-ab6e896135d1' )
+			).toEqual( {
+				type: 'UNSET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+			} );
 		} );
 	} );
 } );

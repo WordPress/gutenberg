@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, mergeWith, isFunction } from 'lodash';
+import deepmerge from 'deepmerge';
 
 /**
  * WordPress dependencies
@@ -14,35 +14,8 @@ import { isPhrasingContent, getPhrasingContentSchema } from '@wordpress/dom';
 import { hasBlockSupport } from '..';
 import { getRawTransforms } from './get-raw-transforms';
 
-export function getBlockContentSchemaFromTransforms( transforms, context ) {
-	const phrasingContentSchema = getPhrasingContentSchema( context );
-	const schemaArgs = { phrasingContentSchema, isPaste: context === 'paste' };
-	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
-		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
-
-		schema = isFunction( schema ) ? schema( schemaArgs ) : schema;
-
-		// If the block does not has anchor support and the transform does not
-		// provides an isMatch we can return the schema right away.
-		if ( ! hasAnchorSupport && ! isMatch ) {
-			return schema;
-		}
-
-		return mapValues( schema, ( value ) => {
-			let attributes = value.attributes || [];
-			// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
-			if ( hasAnchorSupport ) {
-				attributes = [ ...attributes, 'id' ];
-			}
-			return {
-				...value,
-				attributes,
-				isMatch: isMatch ? isMatch : undefined,
-			};
-		} );
-	} );
-
-	return mergeWith( {}, ...schemas, ( objValue, srcValue, key ) => {
+const customMerge = ( key ) => {
+	return ( srcValue, objValue ) => {
 		switch ( key ) {
 			case 'children': {
 				if ( objValue === '*' || srcValue === '*' ) {
@@ -68,6 +41,54 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 				};
 			}
 		}
+
+		return deepmerge( objValue, srcValue, {
+			customMerge,
+			clone: false,
+		} );
+	};
+};
+
+export function getBlockContentSchemaFromTransforms( transforms, context ) {
+	const phrasingContentSchema = getPhrasingContentSchema( context );
+	const schemaArgs = { phrasingContentSchema, isPaste: context === 'paste' };
+	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
+		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
+
+		schema = typeof schema === 'function' ? schema( schemaArgs ) : schema;
+
+		// If the block does not has anchor support and the transform does not
+		// provides an isMatch we can return the schema right away.
+		if ( ! hasAnchorSupport && ! isMatch ) {
+			return schema;
+		}
+
+		if ( ! schema ) {
+			return {};
+		}
+
+		return Object.fromEntries(
+			Object.entries( schema ).map( ( [ key, value ] ) => {
+				let attributes = value.attributes || [];
+				// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
+				if ( hasAnchorSupport ) {
+					attributes = [ ...attributes, 'id' ];
+				}
+				return [
+					key,
+					{
+						...value,
+						attributes,
+						isMatch: isMatch ? isMatch : undefined,
+					},
+				];
+			} )
+		);
+	} );
+
+	return deepmerge.all( schemas, {
+		customMerge,
+		clone: false,
 	} );
 }
 

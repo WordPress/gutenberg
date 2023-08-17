@@ -12,6 +12,7 @@ import { COLORS } from '../colors-values';
 import { breakpoint } from '../breakpoint';
 
 export const inputControl = css`
+	display: block;
 	font-family: ${ font( 'default.fontFamily' ) };
 	padding: 6px 8px;
 	${ inputStyleNeutral };
@@ -33,30 +34,30 @@ export const inputControl = css`
 
 	// Use opacity to work in various editor styles.
 	&::-webkit-input-placeholder {
-		color: ${ COLORS.darkGray.placeholder };
+		color: ${ COLORS.ui.darkGrayPlaceholder };
 	}
 
 	&::-moz-placeholder {
 		opacity: 1; // Necessary because Firefox reduces this from 1.
-		color: ${ COLORS.darkGray.placeholder };
+		color: ${ COLORS.ui.darkGrayPlaceholder };
 	}
 
 	&:-ms-input-placeholder {
-		color: ${ COLORS.darkGray.placeholder };
+		color: ${ COLORS.ui.darkGrayPlaceholder };
 	}
 
 	.is-dark-theme & {
 		&::-webkit-input-placeholder {
-			color: ${ COLORS.lightGray.placeholder };
+			color: ${ COLORS.ui.lightGrayPlaceholder };
 		}
 
 		&::-moz-placeholder {
 			opacity: 1; // Necessary because Firefox reduces this from 1.
-			color: ${ COLORS.lightGray.placeholder };
+			color: ${ COLORS.ui.lightGrayPlaceholder };
 		}
 
 		&:-ms-input-placeholder {
-			color: ${ COLORS.lightGray.placeholder };
+			color: ${ COLORS.ui.lightGrayPlaceholder };
 		}
 	}
 `;

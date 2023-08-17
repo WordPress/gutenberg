@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { chunk } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -16,13 +11,23 @@ import apiFetch from '@wordpress/api-fetch';
  */
 let maxItems = null;
 
+function chunk( arr, chunkSize ) {
+	const tmp = [ ...arr ];
+	const cache = [];
+	while ( tmp.length ) {
+		cache.push( tmp.splice( 0, chunkSize ) );
+	}
+
+	return cache;
+}
+
 /**
  * Default batch processor. Sends its input requests to /batch/v1.
  *
  * @param {Array} requests List of API requests to perform at once.
  *
  * @return {Promise} Promise that resolves to a list of objects containing
- *                   either `output` (if that request was succesful) or `error`
+ *                   either `output` (if that request was successful) or `error`
  *                   (if not ).
  */
 export default async function defaultProcessor( requests ) {

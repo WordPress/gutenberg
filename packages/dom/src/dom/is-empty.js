@@ -19,9 +19,9 @@ export default function isEmpty( element ) {
 				return true;
 			}
 
-			return /** @type {Element[]} */ ( Array.from(
-				element.childNodes
-			) ).every( isEmpty );
+			return /** @type {Element[]} */ (
+				Array.from( element.childNodes )
+			).every( isEmpty );
 		default:
 			return true;
 	}

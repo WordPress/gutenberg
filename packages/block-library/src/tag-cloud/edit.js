@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map, filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -16,6 +11,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	Disabled,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -68,24 +64,22 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			value: '',
 			disabled: true,
 		};
-		const taxonomyOptions = map(
-			filter( taxonomies, 'show_cloud' ),
-			( item ) => {
+		const taxonomyOptions = ( taxonomies ?? [] )
+			.filter( ( tax ) => !! tax.show_cloud )
+			.map( ( item ) => {
 				return {
 					value: item.slug,
 					label: item.name,
 				};
-			}
-		);
+			} );
 
 		return [ selectOption, ...taxonomyOptions ];
 	};
 
 	const onFontSizeChange = ( fontSizeLabel, newValue ) => {
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const [ quantity, newUnit ] = parseQuantityAndUnitFromRawValue(
-			newValue
-		);
+		const [ quantity, newUnit ] =
+			parseQuantityAndUnitFromRawValue( newValue );
 		if ( ! Number.isFinite( quantity ) ) {
 			return;
 		}
@@ -96,10 +90,8 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			smallestFontSize,
 			largestFontSize,
 		} ).forEach( ( [ attribute, currentValue ] ) => {
-			const [
-				currentQuantity,
-				currentUnit,
-			] = parseQuantityAndUnitFromRawValue( currentValue );
+			const [ currentQuantity, currentUnit ] =
+				parseQuantityAndUnitFromRawValue( currentValue );
 			// Only add an update if the other font size attribute has a different unit.
 			if ( attribute !== fontSizeLabel && currentUnit !== newUnit ) {
 				updateObj[ attribute ] = `${ currentQuantity }${ newUnit }`;
@@ -112,6 +104,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __( 'Taxonomy' ) }
 					options={ getTaxonomyOptions() }
 					value={ taxonomy }
@@ -120,6 +113,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Show post counts' ) }
 					checked={ showTagCounts }
 					onChange={ () =>
@@ -127,6 +121,8 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 					}
 				/>
 				<RangeControl
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Number of tags' ) }
 					value={ numberOfTags }
 					onChange={ ( value ) =>
@@ -170,11 +166,13 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		<>
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
-				<ServerSideRender
-					key="tag-cloud"
-					block="core/tag-cloud"
-					attributes={ attributes }
-				/>
+				<Disabled>
+					<ServerSideRender
+						skipBlockSupportAttributes
+						block="core/tag-cloud"
+						attributes={ attributes }
+					/>
+				</Disabled>
 			</div>
 		</>
 	);

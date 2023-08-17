@@ -1,0 +1,17 @@
+[
+	{
+		"blockName": "core/list",
+		"attrs": {
+			"style": {
+				"typography": {
+					"fontFamily": "var:preset|font-family|cambria-georgia"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<ul style=\"font-family:var(--wp--preset--font-family--cambria-georgia)\"><li>one</li><li>two</li><li>three</li></ul>\n",
+		"innerContent": [
+			"\n<ul style=\"font-family:var(--wp--preset--font-family--cambria-georgia)\"><li>one</li><li>two</li><li>three</li></ul>\n"
+		]
+	}
+]

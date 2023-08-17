@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
-import { Text, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { TransitionPresets } from '@react-navigation/stack';
 
 /**
@@ -14,16 +13,9 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	helpFilled,
-	plusCircleFilled,
-	alignJustify,
-	trash,
-	cog,
-} from '@wordpress/icons';
+import { helpFilled, plusCircleFilled, trash, cog } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
 	requestContactCustomerSupport,
 	requestGotoCustomerSupportOptions,
@@ -41,41 +33,65 @@ import AddBlocks from './add-blocks';
 import MoveBlocks from './move-blocks';
 import RemoveBlocks from './remove-blocks';
 import CustomizeBlocks from './customize-blocks';
+import moveBlocksIcon from './icon-move-blocks';
+import HelpSectionTitle from './help-section-title';
 
 const HELP_TOPICS = [
 	{
 		label: __( 'What is a block?' ),
+		slug: 'what-is-a-block',
 		icon: helpFilled,
 		view: <IntroToBlocks />,
 	},
 	{
 		label: __( 'Add blocks' ),
+		slug: 'add-blocks',
 		icon: plusCircleFilled,
 		view: <AddBlocks />,
 	},
-	{ label: __( 'Move blocks' ), icon: alignJustify, view: <MoveBlocks /> },
-	{ label: __( 'Remove blocks' ), icon: trash, view: <RemoveBlocks /> },
+	{
+		label: __( 'Move blocks' ),
+		slug: 'move-blocks',
+		icon: moveBlocksIcon,
+		view: <MoveBlocks />,
+	},
+	{
+		label: __( 'Remove blocks' ),
+		slug: 'remove-blocks',
+		icon: trash,
+		view: <RemoveBlocks />,
+	},
 	{
 		label: __( 'Customize blocks' ),
+		slug: 'customize-blocks',
 		icon: cog,
 		view: <CustomizeBlocks />,
 	},
 ];
 
-function EditorHelpTopics( { close, isVisible, onClose } ) {
+function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 	const { postType } = useSelect( ( select ) => ( {
 		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
 	} ) );
-
-	const sectionTitle = usePreferredColorSchemeStyle(
-		styles.helpDetailSectionHeading,
-		styles.helpDetailSectionHeadingDark
-	);
 
 	const title =
 		postType === 'page'
 			? __( 'How to edit your page' )
 			: __( 'How to edit your post' );
+
+	const supportSection = (
+		<>
+			<HelpSectionTitle>{ __( 'Get support' ) }</HelpSectionTitle>
+			<HelpGetSupportButton
+				title={ __( 'Contact support' ) }
+				onPress={ requestContactCustomerSupport }
+			/>
+			<HelpGetSupportButton
+				title={ __( 'More support options' ) }
+				onPress={ requestGotoCustomerSupportOptions }
+			/>
+		</>
+	);
 
 	return (
 		<BottomSheet
@@ -86,7 +102,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 			contentStyle={ styles.contentContainer }
 			testID="editor-help-modal"
 		>
-			<SafeAreaView>
+			<SafeAreaView style={ styles.safeAreaContainer }>
 				<BottomSheet.NavigationContainer
 					animate
 					main
@@ -109,9 +125,10 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 							</BottomSheet.NavBar>
 							<BottomSheetConsumer>
 								{ ( { listProps } ) => {
-									const contentContainerStyle = StyleSheet.flatten(
-										listProps.contentContainerStyle
-									);
+									const contentContainerStyle =
+										StyleSheet.flatten(
+											listProps.contentContainerStyle
+										);
 									return (
 										<ScrollView
 											{ ...listProps }
@@ -130,56 +147,36 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											} }
 										>
 											<PanelBody>
-												<Text style={ sectionTitle }>
+												<HelpSectionTitle>
 													{ __( 'The basics' ) }
-												</Text>
+												</HelpSectionTitle>
 												{ /* Print out help topics. */ }
 												{ HELP_TOPICS.map(
-													( { label, icon } ) => {
-														const labelSlug = kebabCase(
-															label
-														);
+													(
+														{ label, icon, slug },
+														index
+													) => {
+														const isLastItem =
+															index ===
+															HELP_TOPICS.length -
+																1;
 														return (
 															<HelpTopicRow
-																key={
-																	labelSlug
-																}
+																key={ slug }
 																label={ label }
 																icon={ icon }
 																screenName={
-																	labelSlug
+																	slug
+																}
+																isLastItem={
+																	isLastItem
 																}
 															/>
 														);
 													}
 												) }
-												{
-													<Text
-														style={ sectionTitle }
-													>
-														{ __( 'Get support' ) }
-													</Text>
-												}
-												{
-													<HelpGetSupportButton
-														title={ __(
-															'Contact support'
-														) }
-														onPress={
-															requestContactCustomerSupport
-														}
-													/>
-												}
-												{
-													<HelpGetSupportButton
-														title={ __(
-															'More support options'
-														) }
-														onPress={
-															requestGotoCustomerSupportOptions
-														}
-													/>
-												}
+												{ showSupport &&
+													supportSection }
 											</PanelBody>
 										</ScrollView>
 									);
@@ -188,12 +185,11 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 						</View>
 					</BottomSheet.NavigationScreen>
 					{ /* Print out help detail screens. */ }
-					{ HELP_TOPICS.map( ( { view, label } ) => {
-						const labelSlug = kebabCase( label );
+					{ HELP_TOPICS.map( ( { view, label, slug } ) => {
 						return (
 							<HelpDetailNavigationScreen
-								key={ labelSlug }
-								name={ labelSlug }
+								key={ slug }
+								name={ slug }
 								content={ view }
 								label={ label }
 								options={ {

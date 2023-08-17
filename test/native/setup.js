@@ -2,7 +2,8 @@
  * External dependencies
  */
 import 'react-native-gesture-handler/jestSetup';
-import { Image, NativeModules as RNNativeModules } from 'react-native';
+import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
+import { Image, Linking } from 'react-native';
 
 // React Native sets up a global navigator, but that is not executed in the
 // testing environment: https://github.com/facebook/react-native/blob/6c19dc3266b84f47a076b647a1c93b3c3b69d2c5/Libraries/Core/setUpNavigator.js#L17
@@ -15,28 +16,52 @@ require( '../../packages/react-native-editor/src/globals' );
 // Set up Reanimated library for testing
 require( 'react-native-reanimated/lib/reanimated2/jestUtils' ).setUpTests();
 global.__reanimatedWorkletInit = jest.fn();
+global.ReanimatedDataMock = {
+	now: () => 0,
+};
 
-RNNativeModules.UIManager = RNNativeModules.UIManager || {};
-RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
-RNNativeModules.RNGestureHandlerModule = RNNativeModules.RNGestureHandlerModule || {
-	State: { BEGAN: 'BEGAN', FAILED: 'FAILED', ACTIVE: 'ACTIVE', END: 'END' },
-	attachGestureHandler: jest.fn(),
-	createGestureHandler: jest.fn(),
-	dropGestureHandler: jest.fn(),
-	updateGestureHandler: jest.fn(),
-};
-RNNativeModules.PlatformConstants = RNNativeModules.PlatformConstants || {
-	forceTouchAvailable: false,
-};
+jest.mock( 'react-native', () => {
+	const ReactNative = jest.requireActual( 'react-native' );
+	const RNNativeModules = ReactNative.NativeModules;
+
+	// Mock React Native modules
+	RNNativeModules.UIManager = RNNativeModules.UIManager || {};
+	RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
+	RNNativeModules.RNGestureHandlerModule =
+		RNNativeModules.RNGestureHandlerModule || {
+			State: {
+				BEGAN: 'BEGAN',
+				FAILED: 'FAILED',
+				ACTIVE: 'ACTIVE',
+				END: 'END',
+			},
+			attachGestureHandler: jest.fn(),
+			createGestureHandler: jest.fn(),
+			dropGestureHandler: jest.fn(),
+			updateGestureHandler: jest.fn(),
+		};
+	RNNativeModules.PlatformConstants = RNNativeModules.PlatformConstants || {
+		forceTouchAvailable: false,
+	};
+
+	// Mock WebView native module from `react-native-webview`
+	RNNativeModules.RNCWebView = {
+		isFileUploadSupported: jest.fn(),
+	};
+
+	return ReactNative;
+} );
 
 // Mock component to render with props rather than merely a string name so that
 // we may assert against it. ...args is used avoid warnings about ignoring
 // forwarded refs if React.forwardRef happens to be used.
-const mockComponent = ( element ) => ( ...args ) => {
-	const [ props ] = args;
-	const React = require( 'react' );
-	return React.createElement( element, props, props.children );
-};
+const mockComponent =
+	( element ) =>
+	( ...args ) => {
+		const [ props ] = args;
+		const React = require( 'react' );
+		return React.createElement( element, props, props.children );
+	};
 
 jest.mock( '@wordpress/element', () => {
 	return {
@@ -71,6 +96,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		subscribeFeaturedImageIdNativeUpdated: jest.fn(),
+		subscribePostSaveEvent: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
 		subscribeAndroidModalClosed: jest.fn(),
 		subscribeUpdateEditorSettings: jest.fn(),
@@ -79,6 +105,8 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeShowNotice: jest.fn(),
 		subscribeParentGetHtml: jest.fn(),
 		subscribeShowEditorHelp: jest.fn(),
+		subscribeOnUndoPressed: jest.fn(),
+		subscribeOnRedoPressed: jest.fn(),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
@@ -98,18 +126,22 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		},
 		fetchRequest: jest.fn(),
 		requestPreview: jest.fn(),
+		generateHapticFeedback: jest.fn(),
+		toggleUndoButton: jest.fn(),
+		toggleRedoButton: jest.fn(),
 	};
 } );
 
-jest.mock( 'react-native-modal', () => ( props ) =>
-	props.isVisible ? mockComponent( 'Modal' )( props ) : null
+jest.mock(
+	'react-native-modal',
+	() => ( props ) =>
+		props.isVisible ? mockComponent( 'Modal' )( props ) : null
 );
 
-jest.mock( 'react-native-hr', () => () => 'Hr' );
-
 jest.mock( 'react-native-svg', () => {
+	const { forwardRef } = require( 'react' );
 	return {
-		Svg: () => 'Svg',
+		Svg: forwardRef( mockComponent( 'Svg' ) ),
 		Path: () => 'Path',
 		Circle: () => 'Circle',
 		G: () => 'G',
@@ -117,6 +149,15 @@ jest.mock( 'react-native-svg', () => {
 		Rect: () => 'Rect',
 	};
 } );
+
+jest.mock(
+	'react-native-video',
+	() => {
+		const { forwardRef } = require( 'react' );
+		return forwardRef( mockComponent( 'ReactNativeVideo' ) );
+	},
+	{ virtual: true }
+);
 
 jest.mock( 'react-native-safe-area', () => {
 	const addEventListener = jest.fn();
@@ -132,21 +173,7 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
-// To be replaced with built in mocks when we upgrade to the latest version
-jest.mock( 'react-native-safe-area-context', () => {
-	const inset = { top: 0, right: 0, bottom: 0, left: 0 };
-	const frame = { x: 0, y: 0, width: 0, height: 0 };
-	return {
-		SafeAreaProvider: jest
-			.fn()
-			.mockImplementation( ( { children } ) => children ),
-		SafeAreaConsumer: jest
-			.fn()
-			.mockImplementation( ( { children } ) => children( inset ) ),
-		useSafeAreaInsets: jest.fn().mockImplementation( () => inset ),
-		useSafeAreaFrame: jest.fn().mockImplementation( () => frame ),
-	};
-} );
+jest.mock( 'react-native-safe-area-context', () => mockSafeAreaContext );
 
 jest.mock(
 	'@react-native-community/slider',
@@ -161,9 +188,11 @@ jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
 	virtual: true,
 } );
 
-jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
-	virtual: true,
-} );
+jest.mock(
+	'react-native-hsv-color-picker',
+	() => jest.fn( () => 'HsvColorPicker' ),
+	{ virtual: true }
+);
 
 jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
@@ -203,6 +232,10 @@ jest.mock(
 		},
 	} )
 );
+jest.mock( 'react-native/Libraries/ActionSheetIOS/ActionSheetIOS', () => ( {
+	showActionSheetWithOptions: jest.fn(),
+} ) );
+Linking.addEventListener.mockReturnValue( { remove: jest.fn() } );
 
 // The mock provided by the package itself does not appear to work correctly.
 // Specifically, the mock provides a named export, where the module itself uses

@@ -2,94 +2,32 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	FlexItem,
-	ColorIndicator,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
 import Palette from './palette';
-import { NavigationButtonAsItem } from './navigation-button';
-import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
-import Subtitle from './subtitle';
-import ColorIndicatorWrapper from './color-indicator-wrapper';
+import { unlock } from '../../lock-unlock';
 
-function BackgroundColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const hasSupport =
-		supports.includes( 'backgroundColor' ) ||
-		supports.includes( 'background' );
-	const [ backgroundColor ] = useStyle( 'color.background', name );
-	const [ gradientValue ] = useStyle( 'color.gradient', name );
+const {
+	useGlobalStyle,
+	useGlobalSetting,
+	useSettingsForBlockElement,
+	ColorPanel: StylesColorPanel,
+} = unlock( blockEditorPrivateApis );
 
-	if ( ! hasSupport ) {
-		return null;
-	}
-
-	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/background' }>
-			<HStack justify="flex-start">
-				<ColorIndicatorWrapper expanded={ false }>
-					<ColorIndicator
-						colorValue={ gradientValue ?? backgroundColor }
-					/>
-				</ColorIndicatorWrapper>
-				<FlexItem>{ __( 'Background' ) }</FlexItem>
-			</HStack>
-		</NavigationButtonAsItem>
-	);
-}
-
-function TextColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const hasSupport = supports.includes( 'color' );
-	const [ color ] = useStyle( 'color.text', name );
-
-	if ( ! hasSupport ) {
-		return null;
-	}
-
-	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/text' }>
-			<HStack justify="flex-start">
-				<ColorIndicatorWrapper expanded={ false }>
-					<ColorIndicator colorValue={ color } />
-				</ColorIndicatorWrapper>
-				<FlexItem>{ __( 'Text' ) }</FlexItem>
-			</HStack>
-		</NavigationButtonAsItem>
-	);
-}
-
-function LinkColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const hasSupport = supports.includes( 'linkColor' );
-	const [ color ] = useStyle( 'elements.link.color.text', name );
-
-	if ( ! hasSupport ) {
-		return null;
-	}
-
-	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/link' }>
-			<HStack justify="flex-start">
-				<ColorIndicatorWrapper expanded={ false }>
-					<ColorIndicator colorValue={ color } />
-				</ColorIndicatorWrapper>
-				<FlexItem>{ __( 'Links' ) }</FlexItem>
-			</HStack>
-		</NavigationButtonAsItem>
-	);
-}
-
-function ScreenColors( { name } ) {
-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
+function ScreenColors() {
+	const [ style ] = useGlobalStyle( '', undefined, 'user', {
+		shouldDecodeEncode: false,
+	} );
+	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
+		shouldDecodeEncode: false,
+	} );
+	const [ rawSettings ] = useGlobalSetting( '' );
+	const settings = useSettingsForBlockElement( rawSettings );
 
 	return (
 		<>
@@ -99,28 +37,16 @@ function ScreenColors( { name } ) {
 					'Manage palettes and the default color of different global elements on the site.'
 				) }
 			/>
-
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 10 }>
-					<Palette name={ name } />
+					<Palette />
 
-					<VStack spacing={ 3 }>
-						<Subtitle>{ __( 'Elements' ) }</Subtitle>
-						<ItemGroup isBordered isSeparated>
-							<BackgroundColorItem
-								name={ name }
-								parentMenu={ parentMenu }
-							/>
-							<TextColorItem
-								name={ name }
-								parentMenu={ parentMenu }
-							/>
-							<LinkColorItem
-								name={ name }
-								parentMenu={ parentMenu }
-							/>
-						</ItemGroup>
-					</VStack>
+					<StylesColorPanel
+						inheritedValue={ inheritedStyle }
+						value={ style }
+						onChange={ setStyle }
+						settings={ settings }
+					/>
 				</VStack>
 			</div>
 		</>

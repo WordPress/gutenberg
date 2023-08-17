@@ -1,9 +1,9 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/column",
 	"title": "Column",
-	"category": "text",
+	"category": "design",
 	"parent": [ "core/columns" ],
 	"description": "A single column within a columns block.",
 	"textdomain": "default",
@@ -19,15 +19,17 @@
 		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
-			"enum": [ "all", "insert", false ]
+			"enum": [ "all", "insert", "contentOnly", false ]
 		}
 	},
 	"supports": {
+		"__experimentalOnEnter": true,
 		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"color": {
 			"gradients": true,
+			"heading": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -38,7 +40,8 @@
 			"blockGap": true,
 			"padding": true,
 			"__experimentalDefaultControls": {
-				"padding": true
+				"padding": true,
+				"blockGap": true
 			}
 		},
 		"__experimentalBorder": {
@@ -51,6 +54,19 @@
 				"width": true
 			}
 		},
-		"__experimentalLayout": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"layout": true
 	}
 }

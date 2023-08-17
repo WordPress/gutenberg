@@ -7,7 +7,7 @@ The following is a set of guidelines for contributing to the `@wordpress/compone
 This set of guidelines should apply especially to newly introduced components. In fact, while these guidelines should also be retroactively applied to existing components, it is sometimes impossible to do so for legacy/compatibility reasons.
 
 For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group).
-
+- [Introducing new components](#introducing-new-components)
 - [Compatibility](#compatibility)
 - [Compound components](#compound-components)
 - [Components & Hooks](#components--hooks)
@@ -19,6 +19,72 @@ For an example of a component that follows these requirements, take a look at [`
 - [Documentation](#documentation)
 - [README example](#README-example)
 - [Folder structure](#folder-structure)
+- [TypeScript migration guide](#refactoring-a-component-to-typescript)
+- [Using Radix UI primitives](#using-radix-ui-primitives)
+
+## Introducing new components
+
+### Does it belong in the component library?
+
+A component library should include components that are generic and flexible enough to work across a variety of products. It should include what’s shared across many products and omit what’s not.
+
+To determine if a component should be added, ask yourself:
+
+-   Could this component be used by other products/plugins?
+-   Does the new component overlap (in functionality or visual design) with any existing components?
+-   How much effort will be required to make and maintain?
+-   Is there a clear purpose for the component?
+
+Here’s a flowchart that can help determine if a new component is necessary:
+
+[![New component flowchart](https://wordpress.org/gutenberg/files/2019/07/New_component_flowchart.png)](https://coggle.it/diagram/WtUSrld3uAYZHsn-/t/new-ui-component/992b38cbe685d897b4aec6d0dd93cc4b47c06e0d4484eeb0d7d9a47fb2c48d94)
+
+### First steps
+
+If you have a component you'd like added or changed, start by opening a GitHub issue. Include a detailed description in which you:
+
+-   Explain the rationale
+-   Detail the intended behavior
+-   Clarify whether it’s a variation of an existing component, or a new asset
+-   Include mockups of any fidelity (optional)
+-   Include any inspirations from other products (optional)
+
+This issue will be used to discuss the proposed changes and track progress. Reviewers start by discussing the proposal to determine if it's appropriate for WordPress Components, or if there's overlap with an existing component.
+
+It’s encouraged to surface works-in-progress. If you’re not able to complete all of the parts yourself, someone in the community may be able to pick up where you left off.
+
+### Next steps
+
+Once the team has discussed and approved the change, it's time to start implementing it.
+
+1. **Provide a rationale**: Explain how your component will add value to the system and the greater product ecosystem. Be sure to include any user experience and interaction descriptions.
+2. **Draft documentation**: New components need development, design, and accessibility guidelines. Additionally, if your change adds additional behavior or expands a component’s features, those changes will need to be fully documented as well. Read through existing component documentation for examples. Start with a rough draft, and reviewers will help polish documentation.
+3. **Provide working code**: The component or enhancement must be built in React. See the [developer contribution guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/README.md).
+4. **Create a design spec**: Create sizing and styling annotations for all aspects of the component. This spec should provide a developer with everything they need to create the design in code. [Figma automatically does this for you](https://help.figma.com/article/32-developer-handoff).
+
+Remember, it’s unlikely that all parts will be done by one person. Contribute where you can, and others will help.
+
+### Component refinement
+
+Before a component is published it will need to be fine-tuned:
+
+1. **Expand** the features of the component to a minimum. Agree on what features should be included.
+2. **Reduce** scope and leave off features lacking consensus.
+3. **Quality assurance**: each contribution must adhere to system standards.
+
+#### Quality assurance
+
+To ensure quality, each component should be tested. The testing process should be done during the development of the component and before the component is published.
+
+-   **Accessibility**: Has the design and implementation accounted for accessibility? Please use the [WordPress accessibility guidelines](https://make.wordpress.org/accessibility/handbook/best-practices/). You must use the "Needs Accessibility Feedback" label and get a review from the accessibility team. It's best to request a review early (at the documentation stage) in order to ensure the component is designed inclusively from the outset.
+-   **Visual quality**: Does the component apply visual style — color, typography, icons, space, borders, and more — using appropriate variables, and does it follow [visual guidelines](https://make.wordpress.org/design/handbook/design-guide/)? You must use the "Needs Design Feedback" label and get a review from the design team.
+-   **Documentation**: Ensure that the component has proper documentation for development, design, and accessibility.
+-   **Sufficient states & variations**: Does it cover all the necessary variations (primary, secondary, dense, etc.) and states (default, hover, active, disabled, loading, etc.), within the intended scope?
+-   **Functionality**: Do all behaviors function as expected?
+-   **Responsiveness**: Does it incorporate responsive behaviors as needed? Is the component designed from a mobile-first perspective? Do all touch interactions work as expected?
+-   **Content resilience**: Is each dynamic word or image element resilient to too much, too little, and no content at all, respectively? How long can labels be, and what happens when you run out of space?
+-   **Composability**: Does it fit well when placed next to or layered with other components to form a larger composition?
+-   **Browser support**: Has the component visual quality and accuracy been checked across Safari, Chrome, Firefox, IE, etc? Please adhere to our [browser support requirements](https://github.com/WordPress/gutenberg/blob/HEAD/packages/browserslist-config/index.js).
 
 ## Compatibility
 
@@ -155,8 +221,8 @@ function Example(
 
 A couple of good examples of how hooks are used for composition are:
 
-- the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.js);
-- the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.js).
+- the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.ts);
+- the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.tsx).
 
 <!-- ## API Consinstency
 
@@ -183,7 +249,6 @@ We strongly encourage using TypeScript for all new components. Components should
 All new component should be styled using [Emotion](https://emotion.sh/docs/introduction).
 
 Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
-
 
 ### Deprecating styles
 
@@ -261,7 +326,7 @@ An example of how this is used can be found in the [`Card` component family](/pa
 
 ```jsx
 //=========================================================================
-// Simplified snippet from `packages/components/src/card/card/hook.js`
+// Simplified snippet from `packages/components/src/card/card/hook.ts`
 //=========================================================================
 import { useContextSystem } from '../../ui/context';
 
@@ -275,7 +340,7 @@ export function useCard( props ) {
 }
 
 //=========================================================================
-// Simplified snippet from `packages/components/src/card/card/component.js`
+// Simplified snippet from `packages/components/src/card/card/component.ts`
 //=========================================================================
 import { contextConnect, ContextSystemProvider } from '../../ui/context';
 
@@ -300,7 +365,7 @@ function Card( props, forwardedRef ) {
 	}, [ isBorderless, size ] );
 
 	return (
-		{ /* Write additional values to the Context System */ }
+		/* Write additional values to the Context System */
 		<ContextSystemProvider value={ contextProviderValue }>
 			{ /* [...] */ }
 		</ContextSystemProvider>
@@ -312,7 +377,7 @@ const ConnectedCard = contextConnect( Card, 'Card' );
 export default ConnectedCard;
 
 //=========================================================================
-// Simplified snippet from `packages/components/src/card/card-body/hook.js`
+// Simplified snippet from `packages/components/src/card/card-body/hook.ts`
 //=========================================================================
 import { useContextSystem } from '../../ui/context';
 
@@ -361,9 +426,9 @@ Primary.args = {
 };
 ```
 
-A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Avoid using [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs) for new stories, as this addon is deprecated.
+A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Historically, we used [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs), but it was deprecated and later removed in [#47152](https://github.com/WordPress/gutenberg/pull/47152).
 
-The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.js)).
+The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.tsx)).
 
 Storybook can be started on a local machine by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 
@@ -479,7 +544,7 @@ component-family-name/
 
 Given a component folder (e.g. `packages/components/src/unit-control`):
 
-1. Add the folder to `tsconfig.json`, if it isn’t already.
+1. Remove the folder from the exclude list in `tsconfig.json`, if it isn’t already.
 2. Remove any `// @ts-nocheck` comments in the folder, if any.
 3. Rename `*.js{x}` files to `*.ts{x}` (except stories and unit tests).
 4. Run `npm run dev` and take note of all the errors (your IDE should also flag them).
@@ -489,13 +554,48 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 		2. Resume work on this component once all dependencies have been refactored.
 	2. Alternatively:
 		1. For each of those files, add `// @ts-nocheck` at the start of the file.
-		2. Add the folders to the `tsconfig.json` file.
-		3. If you’re still getting errors about a component’s props, the easiest way is to slightly refactor this component and perform the props destructuring inside the component’s body (as opposed as in the function signature) — this is to prevent TypeScript from inferring the types of these props.
-		4. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage).
+		2. If the components in the ignored files are destructuring props directly from the function's arguments, move the props destructuring to the function's body (this is to avoid TypeScript errors from trying to infer the props type):
+
+			```jsx
+			// Before:
+			function MyComponent( { myProp1, myProp2, ...restProps } ) { /* ... */ }
+
+			// After:
+			function MyComponent( props ) {
+				const {  myProp1, myProp2, ...restProps } = props;
+
+				/* ... */
+			}
+			```
+
+		3. Remove the folders from the exclude list in the `tsconfig.json` file.
+		4. If you’re still getting errors about a component’s props, the easiest way is to slightly refactor this component and perform the props destructuring inside the component’s body (as opposed as in the function signature) — this is to prevent TypeScript from inferring the types of these props.
+		5. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage).
 6. Create a new `types.ts` file.
 7. Slowly work your way through fixing the TypeScript errors in the folder:
 	1. Try to avoid introducing any runtime changes, if possible. The aim of this refactor is to simply rewrite the component to TypeScript.
-	2. Make sure you have a **named** export for the component, not just the default export ([example](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/divider/component.tsx)). This ensures that the docgen can properly extract the types data. The naming should be so that the connected/forwarded component has the plain component name (`MyComponent`), and the raw component is prefixed (`UnconnectedMyComponent` or `UnforwardedMyComponent`). This makes the component's `displayName` look nicer in React devtools and in the autogenerated Storybook code snippets.
+	2. Extract props to `types.ts`, and use them to type components. The README can be of help when determining a prop’s type.
+	3. Use existing HTML types when possible? (e.g. `required` for an input field?)
+	4. Use the `CSSProperties` type where it makes sense.
+	5. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
+	6. If the component forwards its `...restProps` to an underlying element/component, you should use the `WordPressComponentProps` type for the component's props:
+
+		```tsx
+		import type { WordPressComponentProps } from '../ui/context';
+		import type { ComponentOwnProps } from './types';
+
+		function UnconnectedMyComponent(
+			// The resulting type will include:
+			// - all props defined in `ComponentOwnProps`
+			// - all HTML props/attributes from the component specified as the second
+			//   parameter (`div` in this example)
+			// - the special `as` prop (which marks the component as polymorphic),
+			//   unless the third parameter is `false`
+			props:  WordPressComponentProps< ComponentOwnProps, 'div', true >
+		) { /* ... */ }
+		```
+
+	7. As shown in the previous examples, make sure you have a **named** export for the component, not just the default export ([example](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/divider/component.tsx)). This ensures that the docgen can properly extract the types data. The naming should be so that the connected/forwarded component has the plain component name (`MyComponent`), and the raw component is prefixed (`UnconnectedMyComponent` or `UnforwardedMyComponent`). This makes the component's `displayName` look nicer in React devtools and in the autogenerated Storybook code snippets.
 
 		```jsx
 		function UnconnectedMyComponent() { /* ... */ }
@@ -505,14 +605,9 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 		export default MyComponent;
 		```
 
-	3. Extract props to `types.ts`, and use them to type components. The README can be of help when determining a prop’s type.
-	4. Use existing HTML types when possible? (e.g. `required` for an input field?)
-	5. Use the `CSSProperties` type where it makes sense.
-	6. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
-	7. Use `WordPressComponent` type if possible.
 	8. Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README. Add `@default` values where appropriate.
 	9. Prefer `unknown` to `any`, and in general avoid it when possible.
-8. On the component's main export, add a JSDoc comment that includes the main description and `@example` code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/943cec92f21fedcd256502ea72d9903941f3b05a/packages/components/src/unit-control/index.tsx#L290-L306))
+8. On the component's main named export, add a JSDoc comment that includes the main description and the example code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/43d9c82922619c1d1ff6b454f86f75c3157d3de6/packages/components/src/date-time/date-time/index.tsx#L193-L217)). _At the time of writing, the `@example` JSDoc keyword is not recognized by StoryBook's docgen, so please avoid using it_.
 9. Make sure that:
 	1. tests still pass;
 	2. storybook examples work as expected.
@@ -527,7 +622,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 		const meta: ComponentMeta< typeof MyComponent > = {
 			parameters: {
 				controls: { expanded: true },
-				docs: { source: { state: 'open' } },
+				docs: { canvas: { sourceState: 'shown' } },
 			},
 		};
 		```
@@ -545,3 +640,12 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 11. Convert unit tests.
 	1. Rename test file extensions from `.js` to `.tsx`.
 	2. Fix all TypeScript errors.
+
+## Using Radix UI primitives
+
+Useful links:
+
+- [online docs](https://www.radix-ui.com/docs/primitives/overview/introduction)
+- [repo](https://github.com/radix-ui/primitives) — useful for:
+    - inspecting source code
+    - running storybook examples (`yarn install && yarn dev`)

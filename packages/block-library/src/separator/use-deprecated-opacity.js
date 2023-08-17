@@ -9,10 +9,8 @@ export default function useDeprecatedOpacity(
 	currentColor,
 	setAttributes
 ) {
-	const [
-		deprecatedOpacityWithNoColor,
-		setDeprecatedOpacityWithNoColor,
-	] = useState( false );
+	const [ deprecatedOpacityWithNoColor, setDeprecatedOpacityWithNoColor ] =
+		useState( false );
 	const previousColor = usePrevious( currentColor );
 
 	// A separator with no color set will always have previousColor set to undefined,

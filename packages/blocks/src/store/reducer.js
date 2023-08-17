@@ -1,23 +1,13 @@
 /**
- * External dependencies
- */
-import {
-	filter,
-	find,
-	get,
-	isEmpty,
-	keyBy,
-	map,
-	mapValues,
-	omit,
-	uniqBy,
-} from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { omit } from '../api/utils';
 
 /**
  * @typedef {Object} WPBlockCategory
@@ -40,6 +30,27 @@ export const DEFAULT_CATEGORIES = [
 	{ slug: 'embed', title: __( 'Embeds' ) },
 	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
+
+// Key block types by their name.
+function keyBlockTypesByName( types ) {
+	return types.reduce(
+		( newBlockTypes, block ) => ( {
+			...newBlockTypes,
+			[ block.name ]: block,
+		} ),
+		{}
+	);
+}
+
+// Filter items to ensure they're unique by their name.
+function getUniqueItemsByName( items ) {
+	return items.reduce( ( acc, currentItem ) => {
+		if ( ! acc.some( ( item ) => item.name === currentItem.name ) ) {
+			acc.push( currentItem );
+		}
+		return acc;
+	}, [] );
+}
 
 /**
  * Reducer managing the unprocessed block types in a form passed when registering the by block.
@@ -79,7 +90,7 @@ export function blockTypes( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...keyBy( action.blockTypes, 'name' ),
+				...keyBlockTypesByName( action.blockTypes ),
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
@@ -89,7 +100,7 @@ export function blockTypes( state = {}, action ) {
 }
 
 /**
- * Reducer managing the block style variations.
+ * Reducer managing the block styles.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -101,42 +112,37 @@ export function blockStyles( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues(
-					keyBy( action.blockTypes, 'name' ),
-					( blockType ) => {
-						return uniqBy(
-							[
-								...get( blockType, [ 'styles' ], [] ).map(
-									( style ) => ( {
-										...style,
-										source: 'block',
-									} )
-								),
-								...get( state, [ blockType.name ], [] ).filter(
-									( { source } ) => 'block' !== source
-								),
-							],
-							( style ) => style.name
-						);
-					}
+				...Object.fromEntries(
+					Object.entries(
+						keyBlockTypesByName( action.blockTypes )
+					).map( ( [ name, blockType ] ) => [
+						name,
+						getUniqueItemsByName( [
+							...( blockType.styles ?? [] ).map( ( style ) => ( {
+								...style,
+								source: 'block',
+							} ) ),
+							...( state[ blockType.name ] ?? [] ).filter(
+								( { source } ) => 'block' !== source
+							),
+						] ),
+					] )
 				),
 			};
 		case 'ADD_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: uniqBy(
-					[
-						...get( state, [ action.blockName ], [] ),
-						...action.styles,
-					],
-					( style ) => style.name
-				),
+				[ action.blockName ]: getUniqueItemsByName( [
+					...( state[ action.blockName ] ?? [] ),
+					...action.styles,
+				] ),
 			};
 		case 'REMOVE_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: filter(
-					get( state, [ action.blockName ], [] ),
+				[ action.blockName ]: (
+					state[ action.blockName ] ?? []
+				).filter(
 					( style ) => action.styleNames.indexOf( style.name ) === -1
 				),
 			};
@@ -158,42 +164,41 @@ export function blockVariations( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues(
-					keyBy( action.blockTypes, 'name' ),
-					( blockType ) => {
-						return uniqBy(
-							[
-								...get( blockType, [ 'variations' ], [] ).map(
+				...Object.fromEntries(
+					Object.entries(
+						keyBlockTypesByName( action.blockTypes )
+					).map( ( [ name, blockType ] ) => {
+						return [
+							name,
+							getUniqueItemsByName( [
+								...( blockType.variations ?? [] ).map(
 									( variation ) => ( {
 										...variation,
 										source: 'block',
 									} )
 								),
-								...get( state, [ blockType.name ], [] ).filter(
+								...( state[ blockType.name ] ?? [] ).filter(
 									( { source } ) => 'block' !== source
 								),
-							],
-							( variation ) => variation.name
-						);
-					}
+							] ),
+						];
+					} )
 				),
 			};
 		case 'ADD_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: uniqBy(
-					[
-						...get( state, [ action.blockName ], [] ),
-						...action.variations,
-					],
-					( variation ) => variation.name
-				),
+				[ action.blockName ]: getUniqueItemsByName( [
+					...( state[ action.blockName ] ?? [] ),
+					...action.variations,
+				] ),
 			};
 		case 'REMOVE_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: filter(
-					get( state, [ action.blockName ], [] ),
+				[ action.blockName ]: (
+					state[ action.blockName ] ?? []
+				).filter(
 					( variation ) =>
 						action.variationNames.indexOf( variation.name ) === -1
 				),
@@ -253,12 +258,17 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 		case 'SET_CATEGORIES':
 			return action.categories || [];
 		case 'UPDATE_CATEGORY': {
-			if ( ! action.category || isEmpty( action.category ) ) {
+			if (
+				! action.category ||
+				! Object.keys( action.category ).length
+			) {
 				return state;
 			}
-			const categoryToChange = find( state, [ 'slug', action.slug ] );
+			const categoryToChange = state.find(
+				( { slug } ) => slug === action.slug
+			);
 			if ( categoryToChange ) {
-				return map( state, ( category ) => {
+				return state.map( ( category ) => {
 					if ( category.slug === action.slug ) {
 						return {
 							...category,

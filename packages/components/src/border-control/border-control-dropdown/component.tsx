@@ -19,32 +19,35 @@ import ColorPalette from '../../color-palette';
 import Dropdown from '../../dropdown';
 import { HStack } from '../../h-stack';
 import { VStack } from '../../v-stack';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
 import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
+import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
-import type {
-	Color,
-	ColorOrigin,
-	Colors,
-	DropdownProps,
-	PopoverProps,
-} from '../types';
+import type { ColorObject } from '../../color-palette/types';
+import { isMultiplePaletteArray } from '../../color-palette/utils';
+import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
+import type { ColorProps, DropdownProps } from '../types';
 
-const noop = () => undefined;
+const getAriaLabelColorValue = ( colorValue: string ) => {
+	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
+	return colorValue.replace( /^var\((.+)\)$/, '$1' );
+};
+
 const getColorObject = (
 	colorValue: CSSProperties[ 'borderColor' ],
-	colors: Colors | undefined,
-	hasMultipleColorOrigins: boolean
+	colors: ColorProps[ 'colors' ] | undefined
 ) => {
 	if ( ! colorValue || ! colors ) {
 		return;
 	}
 
-	if ( hasMultipleColorOrigins ) {
+	if ( isMultiplePaletteArray( colors ) ) {
+		// Multiple origins
 		let matchedColor;
 
-		( colors as ColorOrigin[] ).some( ( origin ) =>
+		colors.some( ( origin ) =>
 			origin.colors.some( ( color ) => {
 				if ( color.color === colorValue ) {
 					matchedColor = color;
@@ -58,47 +61,48 @@ const getColorObject = (
 		return matchedColor;
 	}
 
-	return ( colors as Color[] ).find(
-		( color ) => color.color === colorValue
-	);
+	// Single origin
+	return colors.find( ( color ) => color.color === colorValue );
 };
 
 const getToggleAriaLabel = (
 	colorValue: CSSProperties[ 'borderColor' ],
-	colorObject: Color | undefined,
+	colorObject: ColorObject | undefined,
 	style: CSSProperties[ 'borderStyle' ],
 	isStyleEnabled: boolean
 ) => {
 	if ( isStyleEnabled ) {
 		if ( colorObject ) {
+			const ariaLabelValue = getAriaLabelColorValue( colorObject.color );
 			return style
 				? sprintf(
 						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:". %3$s: The current border style selection e.g. "solid".
 						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s". The currently selected style is "%3$s".',
 						colorObject.name,
-						colorObject.color,
+						ariaLabelValue,
 						style
 				  )
 				: sprintf(
 						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:".
 						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
 						colorObject.name,
-						colorObject.color
+						ariaLabelValue
 				  );
 		}
 
 		if ( colorValue ) {
+			const ariaLabelValue = getAriaLabelColorValue( colorValue );
 			return style
 				? sprintf(
 						// translators: %1$s: The color's hex code e.g.: "#f00:". %2$s: The current border style selection e.g. "solid".
 						'Border color and style picker. The currently selected color has a value of "%1$s". The currently selected style is "%2$s".',
-						colorValue,
+						ariaLabelValue,
 						style
 				  )
 				: sprintf(
-						// translators: %1$s: The color's hex code e.g.: "#f00:".
+						// translators: %1$s: The color's hex code e.g: "#f00".
 						'Border color and style picker. The currently selected color has a value of "%1$s".',
-						colorValue
+						ariaLabelValue
 				  );
 		}
 
@@ -107,18 +111,18 @@ const getToggleAriaLabel = (
 
 	if ( colorObject ) {
 		return sprintf(
-			// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:".
+			// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g: "#f00".
 			'Border color picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
 			colorObject.name,
-			colorObject.color
+			getAriaLabelColorValue( colorObject.color )
 		);
 	}
 
 	if ( colorValue ) {
 		return sprintf(
-			// translators: %1$s: The color's hex code e.g.: "#f00:".
+			// translators: %1$s: The color's hex code e.g: "#f00".
 			'Border color picker. The currently selected color has a value of "%1$s".',
-			colorValue
+			getAriaLabelColorValue( colorValue )
 		);
 	}
 
@@ -130,32 +134,27 @@ const BorderControlDropdown = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		border,
 		colors,
 		disableCustomColors,
 		enableAlpha,
+		enableStyle,
 		indicatorClassName,
 		indicatorWrapperClassName,
 		onReset,
 		onColorChange,
 		onStyleChange,
-		popoverClassName,
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
 		showDropdownHeader,
-		enableStyle = true,
+		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
 
 	const { color, style } = border || {};
-	const colorObject = getColorObject(
-		color,
-		colors,
-		!! __experimentalHasMultipleOrigins
-	);
+	const colorObject = getColorObject( color, colors );
 
 	const toggleAriaLabel = getToggleAriaLabel(
 		color,
@@ -169,12 +168,16 @@ const BorderControlDropdown = (
 		? 'bottom left'
 		: undefined;
 
-	const renderToggle = ( { onToggle = noop } ) => (
+	const renderToggle: DropdownComponentProps[ 'renderToggle' ] = ( {
+		onToggle,
+	} ) => (
 		<Button
 			onClick={ onToggle }
 			variant="tertiary"
 			aria-label={ toggleAriaLabel }
-			position={ dropdownPosition }
+			tooltipPosition={ dropdownPosition }
+			label={ __( 'Border color and style picker' ) }
+			showTooltip={ true }
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator
@@ -185,53 +188,56 @@ const BorderControlDropdown = (
 		</Button>
 	);
 
-	const renderContent = ( { onClose }: PopoverProps ) => (
+	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
+		onClose,
+	} ) => (
 		<>
-			<VStack className={ popoverControlsClassName } spacing={ 6 }>
-				{ showDropdownHeader ? (
-					<HStack>
-						<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
-						<Button
-							isSmall
-							label={ __( 'Close border color' ) }
-							icon={ closeSmall }
-							onClick={ onClose }
-						/>
-					</HStack>
-				) : undefined }
-				<ColorPalette
-					className={ popoverContentClassName }
-					value={ color }
-					onChange={ onColorChange }
-					{ ...{ colors, disableCustomColors } }
-					__experimentalHasMultipleOrigins={
-						__experimentalHasMultipleOrigins
-					}
-					__experimentalIsRenderedInSidebar={
-						__experimentalIsRenderedInSidebar
-					}
-					clearable={ false }
-					enableAlpha={ enableAlpha }
-				/>
-				{ enableStyle && (
-					<BorderControlStylePicker
-						label={ __( 'Style' ) }
-						value={ style }
-						onChange={ onStyleChange }
+			<DropdownContentWrapper paddingSize="medium">
+				<VStack className={ popoverControlsClassName } spacing={ 6 }>
+					{ showDropdownHeader ? (
+						<HStack>
+							<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
+							<Button
+								isSmall
+								label={ __( 'Close border color' ) }
+								icon={ closeSmall }
+								onClick={ onClose }
+							/>
+						</HStack>
+					) : undefined }
+					<ColorPalette
+						className={ popoverContentClassName }
+						value={ color }
+						onChange={ onColorChange }
+						{ ...{ colors, disableCustomColors } }
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
+						clearable={ false }
+						enableAlpha={ enableAlpha }
 					/>
-				) }
-			</VStack>
+					{ enableStyle && (
+						<BorderControlStylePicker
+							label={ __( 'Style' ) }
+							value={ style }
+							onChange={ onStyleChange }
+						/>
+					) }
+				</VStack>
+			</DropdownContentWrapper>
 			{ showResetButton && (
-				<Button
-					className={ resetButtonClassName }
-					variant="tertiary"
-					onClick={ () => {
-						onReset();
-						onClose();
-					} }
-				>
-					{ __( 'Reset to default' ) }
-				</Button>
+				<DropdownContentWrapper paddingSize="none">
+					<Button
+						className={ resetButtonClassName }
+						variant="tertiary"
+						onClick={ () => {
+							onReset();
+							onClose();
+						} }
+					>
+						{ __( 'Reset to default' ) }
+					</Button>
+				</DropdownContentWrapper>
 			) }
 		</>
 	);
@@ -240,7 +246,9 @@ const BorderControlDropdown = (
 		<Dropdown
 			renderToggle={ renderToggle }
 			renderContent={ renderContent }
-			contentClassName={ popoverClassName }
+			popoverProps={ {
+				...__unstablePopoverProps,
+			} }
 			{ ...otherProps }
 			ref={ forwardedRef }
 		/>

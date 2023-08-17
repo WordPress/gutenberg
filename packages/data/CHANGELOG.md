@@ -2,6 +2,103 @@
 
 ## Unreleased
 
+## 9.10.0 (2023-08-16)
+
+### Enhancements
+
+-  Warn if the `useSelect` hook returns different values when called with the same state and parameters ([#53666](https://github.com/WordPress/gutenberg/pull/53666)).
+
+## 9.9.0 (2023-08-10)
+
+### Bug Fix
+
+-   Update the type definitions for dispatched actions by accounting for Promisified return values and thunks. Previously, a dispatched action's return type was the same as the return type of the original action creator, which did not account for how dispatch works internally. (Plain actions get wrapped in a Promise, and thunk actions ultimately resolve to the innermost function's return type).
+-   Update the type definition for dispatch() to handle string store descriptors correctly.
+
+## 9.8.0 (2023-07-20)
+
+## 9.7.0 (2023-07-05)
+
+## 9.6.0 (2023-06-23)
+
+## 9.5.0 (2023-06-07)
+
+## 9.4.0 (2023-05-24)
+
+## 9.3.0 (2023-05-10)
+
+## 9.2.0 (2023-04-26)
+
+## 9.1.0 (2023-04-12)
+
+## 9.0.0 (2023-03-29)
+
+### Breaking Changes
+
+-   The `registry.register` function will no longer register a store if another instance is registered with the same name.
+
+## 8.6.0 (2023-03-15)
+
+## 8.5.0 (2023-03-01)
+
+## 8.4.0 (2023-02-15)
+
+## 8.3.0 (2023-02-01)
+
+## 8.2.0 (2023-01-11)
+
+## 8.1.0 (2023-01-02)
+
+## 8.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+### Enhancements
+
+-   The `registry.subscribe` function can now subscribe to updates only from one specific store, with a new optional parameter.
+
+## 7.6.0 (2022-11-16)
+
+## 7.5.0 (2022-11-02)
+
+## 7.4.0 (2022-10-19)
+
+## 7.3.0 (2022-10-05)
+
+## 7.2.0 (2022-09-21)
+
+## 7.1.0 (2022-09-13)
+
+## 7.0.0 (2022-08-24)
+
+### Breaking Changes
+
+– Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 6.15.0 (2022-08-10)
+
+## 6.14.0 (2022-07-27)
+
+## 6.13.0 (2022-07-13)
+
+### Enhancements
+
+-   Use `useDebugValue` in `useSelect` to better display data in React DevTools ([#42225](https://github.com/WordPress/gutenberg/pull/42225)).
+
+## 6.12.0 (2022-06-29)
+
+## 6.11.0 (2022-06-15)
+
+## 6.10.0 (2022-06-01)
+
+## 6.9.0 (2022-05-18)
+
 ## 6.8.0 (2022-05-04)
 
 ## 6.7.0 (2022-04-21)
@@ -16,9 +113,9 @@
 
 ### New Features
 
-- Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
-- Store the resolution errors in store metadata and expose them using `hasResolutionFailed` the `getResolutionError` meta-selectors ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
-- Expose the resolution status (undefined, resolving, finished, error) via the `getResolutionState` meta-selector ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+-   Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
+-   Store the resolution errors in store metadata and expose them using `hasResolutionFailed` the `getResolutionError` meta-selectors ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+-   Expose the resolution status (undefined, resolving, finished, error) via the `getResolutionState` meta-selector ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
 
 ## 6.2.1 (2022-02-10)
 

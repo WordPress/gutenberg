@@ -139,6 +139,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Page< C extends Context > = OmitNevers<
+export type Page< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Page< C >
 >;

@@ -1,6 +1,15 @@
+/**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
+
 export type ScrollableDirection = 'x' | 'y' | 'auto';
 
-export type Props = {
+export type ScrollableProps = {
+	/**
+	 * The children elements.
+	 */
+	children: ReactNode;
 	/**
 	 * Renders a scrollbar for a specific axis when content overflows.
 	 *
@@ -13,8 +22,4 @@ export type Props = {
 	 * @default false
 	 */
 	smoothScroll?: boolean;
-	/**
-	 * The children elements.
-	 */
-	children: React.ReactNode;
 };

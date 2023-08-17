@@ -8,7 +8,8 @@ import { useMemo } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 
 import type { DropdownProps } from '../types';
@@ -19,11 +20,13 @@ export function useBorderControlDropdown(
 	const {
 		border,
 		className,
-		colors,
-		contentClassName,
+		colors = [],
+		enableAlpha = false,
+		enableStyle = true,
 		onChange,
 		previousStyleSelection,
-		__next36pxDefaultSize,
+		size = 'default',
+		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
 
@@ -54,22 +57,16 @@ export function useBorderControlDropdown(
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.borderControlDropdown(), className );
-	}, [ className, cx ] );
+		return cx( styles.borderControlDropdown( size ), className );
+	}, [ className, cx, size ] );
 
 	const indicatorClassName = useMemo( () => {
 		return cx( styles.borderColorIndicator );
 	}, [ cx ] );
 
 	const indicatorWrapperClassName = useMemo( () => {
-		return cx(
-			styles.colorIndicatorWrapper( border, __next36pxDefaultSize )
-		);
-	}, [ border, cx, __next36pxDefaultSize ] );
-
-	const popoverClassName = useMemo( () => {
-		return cx( styles.borderControlPopover, contentClassName );
-	}, [ cx, contentClassName ] );
+		return cx( styles.colorIndicatorWrapper( border, size ) );
+	}, [ border, cx, size ] );
 
 	const popoverControlsClassName = useMemo( () => {
 		return cx( styles.borderControlPopoverControls );
@@ -88,14 +85,16 @@ export function useBorderControlDropdown(
 		border,
 		className: classes,
 		colors,
+		enableAlpha,
+		enableStyle,
 		indicatorClassName,
 		indicatorWrapperClassName,
 		onColorChange,
 		onStyleChange,
 		onReset,
-		popoverClassName,
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
+		__experimentalIsRenderedInSidebar,
 	};
 }

@@ -4,6 +4,7 @@
 import {
 	createUpgradedEmbedBlock,
 	getClassNames,
+	removeAspectRatioClasses,
 	fallback,
 	getEmbedInfoByProvider,
 	getMergedAttributesWithPreview,
@@ -56,61 +57,57 @@ const EmbedEdit = ( props ) => {
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const { invalidateResolution } = useDispatch( coreStore );
 
-	const {
-		preview,
-		fetching,
-		themeSupportsResponsive,
-		cannotEmbed,
-	} = useSelect(
-		( select ) => {
-			const {
-				getEmbedPreview,
-				isPreviewEmbedFallback,
-				isRequestingEmbedPreview,
-				getThemeSupports,
-			} = select( coreStore );
-			if ( ! attributesUrl ) {
-				return { fetching: false, cannotEmbed: false };
-			}
+	const { preview, fetching, themeSupportsResponsive, cannotEmbed } =
+		useSelect(
+			( select ) => {
+				const {
+					getEmbedPreview,
+					isPreviewEmbedFallback,
+					isRequestingEmbedPreview,
+					getThemeSupports,
+				} = select( coreStore );
+				if ( ! attributesUrl ) {
+					return { fetching: false, cannotEmbed: false };
+				}
 
-			const embedPreview = getEmbedPreview( attributesUrl );
-			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
+				const embedPreview = getEmbedPreview( attributesUrl );
+				const previewIsFallback =
+					isPreviewEmbedFallback( attributesUrl );
 
-			// The external oEmbed provider does not exist. We got no type info and no html.
-			const badEmbedProvider =
-				embedPreview?.html === false &&
-				embedPreview?.type === undefined;
-			// Some WordPress URLs that can't be embedded will cause the API to return
-			// a valid JSON response with no HTML and `data.status` set to 404, rather
-			// than generating a fallback response as other embeds do.
-			const wordpressCantEmbed = embedPreview?.data?.status === 404;
-			const validPreview =
-				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
-			return {
-				preview: validPreview ? embedPreview : undefined,
-				fetching: isRequestingEmbedPreview( attributesUrl ),
-				themeSupportsResponsive: getThemeSupports()[
-					'responsive-embeds'
-				],
-				cannotEmbed: ! validPreview || previewIsFallback,
-			};
-		},
-		[ attributesUrl ]
-	);
+				// The external oEmbed provider does not exist. We got no type info and no html.
+				const badEmbedProvider =
+					embedPreview?.html === false &&
+					embedPreview?.type === undefined;
+				// Some WordPress URLs that can't be embedded will cause the API to return
+				// a valid JSON response with no HTML and `data.status` set to 404, rather
+				// than generating a fallback response as other embeds do.
+				const wordpressCantEmbed = embedPreview?.data?.status === 404;
+				const validPreview =
+					!! embedPreview &&
+					! badEmbedProvider &&
+					! wordpressCantEmbed;
+				return {
+					preview: validPreview ? embedPreview : undefined,
+					fetching: isRequestingEmbedPreview( attributesUrl ),
+					themeSupportsResponsive:
+						getThemeSupports()[ 'responsive-embeds' ],
+					cannotEmbed: ! validPreview || previewIsFallback,
+				};
+			},
+			[ attributesUrl ]
+		);
 
 	/**
 	 * Returns the attributes derived from the preview, merged with the current attributes.
 	 *
-	 * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
 	 * @return {Object} Merged attributes.
 	 */
-	const getMergedAttributes = ( ignorePreviousClassName = false ) =>
+	const getMergedAttributes = () =>
 		getMergedAttributesWithPreview(
 			attributes,
 			preview,
 			title,
-			responsive,
-			ignorePreviousClassName
+			responsive
 		);
 
 	const toggleResponsive = () => {
@@ -138,21 +135,20 @@ const EmbedEdit = ( props ) => {
 		setURL( newURL );
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
-	}, [ preview?.html, attributesUrl ] );
+	}, [ preview?.html, attributesUrl, cannotEmbed, fetching ] );
 
 	// Handle incoming preview.
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
-			// When obtaining an incoming preview, we set the attributes derived from
-			// the preview data. In this case when getting the merged attributes,
-			// we ignore the previous classname because it might not match the expected
-			// classes by the new preview.
-			setAttributes( getMergedAttributes( true ) );
+			// When obtaining an incoming preview,
+			// we set the attributes derived from the preview data.
+			const mergedAttributes = getMergedAttributes();
+			setAttributes( mergedAttributes );
 
 			if ( onReplace ) {
 				const upgradedBlock = createUpgradedEmbedBlock(
 					props,
-					getMergedAttributes()
+					mergedAttributes
 				);
 
 				if ( upgradedBlock ) {
@@ -190,8 +186,14 @@ const EmbedEdit = ( props ) => {
 							event.preventDefault();
 						}
 
+						// If the embed URL was changed, we need to reset the aspect ratio class.
+						// To do this we have to remove the existing ratio class so it can be recalculated.
+						const blockClass = removeAspectRatioClasses(
+							attributes.className
+						);
+
 						setIsEditingURL( false );
-						setAttributes( { url } );
+						setAttributes( { url, className: blockClass } );
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }

@@ -64,6 +64,14 @@ If allowedTypes is unset all mime types should be allowed.
 -   Required: No
 -   Platform: Web | Mobile
 
+### mode
+
+Value of Frame content default mode like 'browse', 'upload' etc.
+
+-   Type: `String`
+-   Required: No
+-   Default: false
+-   Platform: Web
 ### multiple
 
 Whether to allow multiple selections or not.

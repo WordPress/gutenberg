@@ -12,6 +12,10 @@ import isInputOrTextArea from './is-input-or-text-area';
  * @return {boolean} True if form element and false otherwise.
  */
 export default function isFormElement( element ) {
+	if ( ! element ) {
+		return false;
+	}
+
 	const { tagName } = element;
 	const checkForInputTextarea = isInputOrTextArea( element );
 	return (

@@ -78,9 +78,17 @@ declare module './base-entity-records' {
 			 */
 			'align-wide': boolean;
 			/**
+			 * Whether appearanceTools are enabled in Global Styles.
+			 */
+			'appearance-tools': boolean;
+			/**
 			 * Whether posts and comments RSS feed links are added to head.
 			 */
 			'automatic-feed-links': boolean;
+			/**
+			 * Whether border settings are enabled.
+			 */
+			border: boolean;
 			/**
 			 * Custom background if defined by the theme.
 			 */
@@ -137,6 +145,10 @@ declare module './base-entity-records' {
 			 * Post formats supported.
 			 */
 			formats: PostFormat[];
+			/**
+			 * Whether link colors are enabled.
+			 */
+			'link-color': boolean;
 			/**
 			 * The post types that support thumbnails or true if all post types are supported.
 			 */
@@ -217,6 +229,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Theme< C extends Context > = OmitNevers<
+export type Theme< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Theme< C >
 >;

@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -16,6 +11,12 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+
+const CUSTOM_CATEGORY = {
+	name: 'custom',
+	label: __( 'My patterns' ),
+	description: __( 'Custom patterns added by site users.' ),
+};
 
 /**
  * Retrieves the block patterns inserter state.
@@ -28,36 +29,46 @@ import { store as blockEditorStore } from '../../../store';
 const usePatternsState = ( onInsert, rootClientId ) => {
 	const { patternCategories, patterns } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } = select(
-				blockEditorStore
-			);
+			const { __experimentalGetAllowedPatterns, getSettings } =
+				select( blockEditorStore );
+
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
-				patternCategories: getSettings()
-					.__experimentalBlockPatternCategories,
+				patternCategories:
+					getSettings().__experimentalBlockPatternCategories,
 			};
 		},
 		[ rootClientId ]
 	);
-	const { createSuccessNotice } = useDispatch( noticesStore );
-	const onClickPattern = useCallback( ( pattern, blocks ) => {
-		onInsert(
-			map( blocks, ( block ) => cloneBlock( block ) ),
-			pattern.name
-		);
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: block pattern title. */
-				__( 'Block pattern "%s" inserted.' ),
-				pattern.title
-			),
-			{
-				type: 'snackbar',
-			}
-		);
-	}, [] );
 
-	return [ patterns, patternCategories, onClickPattern ];
+	const allCategories = useMemo(
+		() => [ ...patternCategories, CUSTOM_CATEGORY ],
+		[ patternCategories ]
+	);
+
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const onClickPattern = useCallback(
+		( pattern, blocks ) => {
+			onInsert(
+				( blocks ?? [] ).map( ( block ) => cloneBlock( block ) ),
+				pattern.name
+			);
+			createSuccessNotice(
+				sprintf(
+					/* translators: %s: block pattern title. */
+					__( 'Block pattern "%s" inserted.' ),
+					pattern.title
+				),
+				{
+					type: 'snackbar',
+					id: 'block-pattern-inserted-notice',
+				}
+			);
+		},
+		[ createSuccessNotice, onInsert ]
+	);
+
+	return [ patterns, allCategories, onClickPattern ];
 };
 
 export default usePatternsState;

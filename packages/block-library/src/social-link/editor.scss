@@ -9,6 +9,9 @@
 		height: auto;
 		line-height: 0;
 
+		// This rule ensures social link buttons display correctly in template parts.
+		opacity: 1;
+
 		// This rule is duplicated from the style.scss and needs to be the same as there.
 		padding: 0.25em;
 	}

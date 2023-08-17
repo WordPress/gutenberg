@@ -8,8 +8,7 @@ import {
 	PostPingbacks,
 	PostTypeSupportCheck,
 } from '@wordpress/editor';
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,7 +20,18 @@ import { store as editPostStore } from '../../../store';
  */
 const PANEL_NAME = 'discussion-panel';
 
-function DiscussionPanel( { isEnabled, isOpened, onTogglePanel } ) {
+function DiscussionPanel() {
+	const { isEnabled, isOpened } = useSelect( ( select ) => {
+		const { isEditorPanelEnabled, isEditorPanelOpened } =
+			select( editPostStore );
+		return {
+			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
+			isOpened: isEditorPanelOpened( PANEL_NAME ),
+		};
+	}, [] );
+
+	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+
 	if ( ! isEnabled ) {
 		return null;
 	}
@@ -31,7 +41,7 @@ function DiscussionPanel( { isEnabled, isOpened, onTogglePanel } ) {
 			<PanelBody
 				title={ __( 'Discussion' ) }
 				opened={ isOpened }
-				onToggle={ onTogglePanel }
+				onToggle={ () => toggleEditorPanelOpened( PANEL_NAME ) }
 			>
 				<PostTypeSupportCheck supportKeys="comments">
 					<PanelRow>
@@ -49,20 +59,4 @@ function DiscussionPanel( { isEnabled, isOpened, onTogglePanel } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			isEnabled: select( editPostStore ).isEditorPanelEnabled(
-				PANEL_NAME
-			),
-			isOpened: select( editPostStore ).isEditorPanelOpened( PANEL_NAME ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onTogglePanel() {
-			return dispatch( editPostStore ).toggleEditorPanelOpened(
-				PANEL_NAME
-			);
-		},
-	} ) ),
-] )( DiscussionPanel );
+export default DiscussionPanel;

@@ -178,9 +178,7 @@ describe( 'Actions', () => {
 
 			await registry
 				.dispatch( reusableBlocksStore )
-				.__experimentalConvertBlockToStatic( [
-					associatedBlock.clientId,
-				] );
+				.__experimentalConvertBlockToStatic( associatedBlock.clientId );
 
 			// Check that blocks were converted to reusable.
 			const updatedBlocks = registry

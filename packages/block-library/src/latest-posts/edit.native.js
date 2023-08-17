@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback, View, Text } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,23 +37,18 @@ class LatestPostsEdit extends Component {
 		this.state = {
 			categoriesList: [],
 		};
-		this.onSetDisplayPostContent = this.onSetDisplayPostContent.bind(
-			this
-		);
-		this.onSetDisplayPostContentRadio = this.onSetDisplayPostContentRadio.bind(
-			this
-		);
+		this.onSetDisplayPostContent =
+			this.onSetDisplayPostContent.bind( this );
+		this.onSetDisplayPostContentRadio =
+			this.onSetDisplayPostContentRadio.bind( this );
 		this.onSetExcerptLength = this.onSetExcerptLength.bind( this );
 		this.onSetDisplayPostDate = this.onSetDisplayPostDate.bind( this );
-		this.onSetDisplayFeaturedImage = this.onSetDisplayFeaturedImage.bind(
-			this
-		);
-		this.onSetFeaturedImageAlign = this.onSetFeaturedImageAlign.bind(
-			this
-		);
-		this.onSetAddLinkToFeaturedImage = this.onSetAddLinkToFeaturedImage.bind(
-			this
-		);
+		this.onSetDisplayFeaturedImage =
+			this.onSetDisplayFeaturedImage.bind( this );
+		this.onSetFeaturedImageAlign =
+			this.onSetFeaturedImageAlign.bind( this );
+		this.onSetAddLinkToFeaturedImage =
+			this.onSetAddLinkToFeaturedImage.bind( this );
 		this.onSetOrder = this.onSetOrder.bind( this );
 		this.onSetOrderBy = this.onSetOrderBy.bind( this );
 		this.onSetPostsToShow = this.onSetPostsToShow.bind( this );
@@ -68,9 +62,7 @@ class LatestPostsEdit extends Component {
 			.then( ( categoriesList ) => {
 				if ( this.isStillMounted ) {
 					this.setState( {
-						categoriesList: isEmpty( categoriesList )
-							? []
-							: categoriesList,
+						categoriesList,
 					} );
 				}
 			} )
@@ -165,7 +157,7 @@ class LatestPostsEdit extends Component {
 
 		return (
 			<InspectorControls>
-				<PanelBody title={ __( 'Post content settings' ) }>
+				<PanelBody title={ __( 'Post content' ) }>
 					<ToggleControl
 						label={ __( 'Show post content' ) }
 						checked={ displayPostContent }
@@ -189,7 +181,7 @@ class LatestPostsEdit extends Component {
 					) }
 				</PanelBody>
 
-				<PanelBody title={ __( 'Post meta settings' ) }>
+				<PanelBody title={ __( 'Post meta' ) }>
 					<ToggleControl
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
@@ -197,7 +189,7 @@ class LatestPostsEdit extends Component {
 					/>
 				</PanelBody>
 
-				<PanelBody title={ __( 'Featured image settings' ) }>
+				<PanelBody title={ __( 'Featured image' ) }>
 					<ToggleControl
 						label={ __( 'Display featured image' ) }
 						checked={ displayFeaturedImage }

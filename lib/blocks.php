@@ -22,10 +22,12 @@ function gutenberg_reregister_core_block_types() {
 				'column',
 				'columns',
 				'comments',
+				'details',
 				'group',
-				'heading',
+				'footnotes',
 				'html',
 				'list',
+				'list-item',
 				'media-text',
 				'missing',
 				'more',
@@ -63,24 +65,26 @@ function gutenberg_reregister_core_block_types() {
 				'comments-pagination-numbers.php'  => 'core/comments-pagination-numbers',
 				'comments-pagination-previous.php' => 'core/comments-pagination-previous',
 				'comments-title.php'               => 'core/comments-title',
+				'comments.php'                     => 'core/comments',
+				'footnotes.php'                    => 'core/footnotes',
 				'file.php'                         => 'core/file',
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
 				'gallery.php'                      => 'core/gallery',
+				'heading.php'                      => 'core/heading',
 				'latest-comments.php'              => 'core/latest-comments',
 				'latest-posts.php'                 => 'core/latest-posts',
 				'loginout.php'                     => 'core/loginout',
 				'navigation.php'                   => 'core/navigation',
-				'navigation-area.php'              => 'core/navigation-area',
 				'navigation-link.php'              => 'core/navigation-link',
 				'navigation-submenu.php'           => 'core/navigation-submenu',
 				'page-list.php'                    => 'core/page-list',
+				'page-list-item.php'               => 'core/page-list-item',
 				'pattern.php'                      => 'core/pattern',
 				'post-author.php'                  => 'core/post-author',
 				'post-author-name.php'             => 'core/post-author-name',
 				'post-author-biography.php'        => 'core/post-author-biography',
 				'post-comment.php'                 => 'core/post-comment',
-				'post-comments.php'                => 'core/post-comments',
 				'post-comments-count.php'          => 'core/post-comments-count',
 				'post-comments-form.php'           => 'core/post-comments-form',
 				'post-comments-link.php'           => 'core/post-comments-link',
@@ -90,6 +94,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-featured-image.php'          => 'core/post-featured-image',
 				'post-navigation-link.php'         => 'core/post-navigation-link',
 				'post-terms.php'                   => 'core/post-terms',
+				'post-time-to-read.php'            => 'core/post-time-to-read',
 				'post-title.php'                   => 'core/post-title',
 				'query.php'                        => 'core/query',
 				'post-template.php'                => 'core/post-template',
@@ -133,8 +138,6 @@ function gutenberg_reregister_core_block_types() {
 		$block_folders = $details['block_folders'];
 		$block_names   = $details['block_names'];
 
-		$registry = WP_Block_Type_Registry::get_instance();
-
 		foreach ( $block_folders as $folder_name ) {
 			$block_json_file = $blocks_dir . $folder_name . '/block.json';
 
@@ -143,27 +146,22 @@ function gutenberg_reregister_core_block_types() {
 			// to replace paths with overrides defined by the plugin.
 			$metadata = json_decode( file_get_contents( $block_json_file ), true );
 			if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
-				return false;
+				continue;
 			}
 
-			if ( $registry->is_registered( $metadata['name'] ) ) {
-				$registry->unregister( $metadata['name'] );
-			}
-
+			gutenberg_deregister_core_block_and_assets( $metadata['name'] );
 			gutenberg_register_core_block_assets( $folder_name );
 			register_block_type_from_metadata( $block_json_file );
 		}
 
 		foreach ( $block_names as $file => $sub_block_names ) {
 			if ( ! file_exists( $blocks_dir . $file ) ) {
-				return;
+				continue;
 			}
 
 			$sub_block_names_normalized = is_string( $sub_block_names ) ? array( $sub_block_names ) : $sub_block_names;
 			foreach ( $sub_block_names_normalized as $block_name ) {
-				if ( $registry->is_registered( $block_name ) ) {
-					$registry->unregister( $block_name );
-				}
+				gutenberg_deregister_core_block_and_assets( $block_name );
 				gutenberg_register_core_block_assets( $block_name );
 			}
 
@@ -173,6 +171,62 @@ function gutenberg_reregister_core_block_types() {
 }
 
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
+
+/**
+ * Adds the defer loading strategy to all registered blocks.
+ *
+ * This function would not be part of core merge. Instead, the register_block_script_handle() function would be patched
+ * as follows.
+ *
+ * ```
+ * --- a/wp-includes/blocks.php
+ * +++ b/wp-includes/blocks.php
+ * @ @ -153,7 +153,8 @ @ function register_block_script_handle( $metadata, $field_name, $index = 0 ) {
+ *                 $script_handle,
+ *                 $script_uri,
+ *                 $script_dependencies,
+ * -           isset( $script_asset['version'] ) ? $script_asset['version'] : false
+ * +         isset( $script_asset['version'] ) ? $script_asset['version'] : false,
+ * +         array( 'strategy' => 'defer' )
+ *         );
+ *         if ( ! $result ) {
+ *                 return false;
+ * ```
+ *
+ * @see register_block_script_handle()
+ */
+function gutenberg_defer_block_view_scripts() {
+	$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+	foreach ( $block_types as $block_type ) {
+		foreach ( $block_type->view_script_handles as $view_script_handle ) {
+			wp_script_add_data( $view_script_handle, 'strategy', 'defer' );
+		}
+	}
+}
+
+add_action( 'init', 'gutenberg_defer_block_view_scripts', 100 );
+
+/**
+ * Deregisters the existing core block type and its assets.
+ *
+ * @param string $block_name The name of the block.
+ *
+ * @return void
+ */
+function gutenberg_deregister_core_block_and_assets( $block_name ) {
+	$registry = WP_Block_Type_Registry::get_instance();
+	if ( $registry->is_registered( $block_name ) ) {
+		$block_type = $registry->get_registered( $block_name );
+		if ( ! empty( $block_type->view_script_handles ) ) {
+			foreach ( $block_type->view_script_handles as $view_script_handle ) {
+				if ( str_starts_with( $view_script_handle, 'wp-block-' ) ) {
+					wp_deregister_script( $view_script_handle );
+				}
+			}
+		}
+		$registry->unregister( $block_name );
+	}
+}
 
 /**
  * Registers block styles for a core block.
@@ -190,25 +244,26 @@ function gutenberg_register_core_block_assets( $block_name ) {
 
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
-	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
+	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
-	$style_path        = "build/block-library/blocks/$block_name/style.css";
-	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
+	$style_path      = "build/block-library/blocks/$block_name/";
+	$stylesheet_url  = gutenberg_url( $style_path . 'style.css' );
+	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
 
-	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+	if ( file_exists( $stylesheet_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}" );
 		wp_register_style(
 			"wp-block-{$block_name}",
-			gutenberg_url( $style_path ),
+			$stylesheet_url,
 			array(),
 			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
 
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
-		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
+		wp_style_add_data( "wp-block-{$block_name}", 'path', $stylesheet_path );
 	} else {
-		wp_register_style( "wp-block-{$block_name}", false );
+		wp_register_style( "wp-block-{$block_name}", false, array() );
 	}
 
 	// If the current theme supports wp-block-styles, dequeue the full stylesheet
@@ -221,7 +276,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		if ( ! $stylesheet_removed ) {
 			add_action(
 				'wp_enqueue_scripts',
-				function() {
+				static function() {
 					wp_dequeue_style( 'wp-block-library-theme' );
 				}
 			);
@@ -236,7 +291,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		// If the file exists, enqueue it.
 		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
 
-			if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+			if ( file_exists( $stylesheet_path ) ) {
 				// If there is a main stylesheet for this block, append the theme styles to main styles.
 				wp_add_inline_style(
 					"wp-block-{$block_name}",
@@ -255,6 +310,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		}
 	}
 
+	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(
@@ -350,3 +406,31 @@ function gutenberg_register_legacy_social_link_blocks() {
 }
 
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
+
+/**
+ * Migrate the legacy `sync_status` meta key (added 16.1) to the new `wp_pattern_sync_status` meta key (16.1.1).
+ *
+ * This filter is INTENTIONALLY left out of core as the meta key was fist introduced to core in 6.3 as `wp_pattern_sync_status`.
+ * see https://github.com/WordPress/gutenberg/pull/52232
+ *
+ * @param mixed  $value     The value to return, either a single metadata value or an array of values depending on the value of $single.
+ * @param int    $object_id ID of the object metadata is for.
+ * @param string $meta_key  Metadata key.
+ * @param bool   $single    Whether to return only the first value of the specified $meta_key.
+ */
+function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $single ) {
+	if ( 'wp_pattern_sync_status' !== $meta_key ) {
+		return $value;
+	}
+
+	$sync_status = get_post_meta( $object_id, 'sync_status', $single );
+
+	if ( $single && 'unsynced' === $sync_status ) {
+		return $sync_status;
+	} elseif ( isset( $sync_status[0] ) && 'unsynced' === $sync_status[0] ) {
+		return $sync_status;
+	}
+
+	return $value;
+}
+add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 4 );

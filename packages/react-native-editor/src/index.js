@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import 'react-native-gesture-handler';
-
-/**
  * WordPress dependencies
  */
 import { applyFilters, doAction } from '@wordpress/hooks';
@@ -36,7 +31,6 @@ const registerGutenberg = ( {
 		constructor( props ) {
 			super( props );
 
-			// eslint-disable-next-line no-unused-vars
 			const { rootTag, ...parentProps } = this.props;
 
 			// Setup locale.
@@ -64,11 +58,6 @@ const registerGutenberg = ( {
 				'native.block_editor_props',
 				parentProps
 			);
-		}
-
-		componentDidMount() {
-			// Dispatch post-render hooks.
-			doAction( 'native.render', this.filteredProps );
 		}
 
 		render() {

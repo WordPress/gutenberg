@@ -6,36 +6,43 @@ import {
 	activateTheme,
 	setOption,
 	visitSiteEditor,
-	openSiteEditorNavigationPanel,
-	navigateSiteEditorBackToRoot,
+	enterEditMode,
 	deleteAllTemplates,
 	canvas,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Post Comments Form', () => {
+describe( 'Comments Form', () => {
+	let previousCommentStatus;
+
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
 		await deleteAllTemplates( 'wp_template' );
+		previousCommentStatus = await setOption(
+			'default_comment_status',
+			'closed'
+		);
+	} );
+
+	afterAll( async () => {
+		await setOption( 'default_comment_status', previousCommentStatus );
 	} );
 
 	describe( 'placeholder', () => {
 		it( 'displays in site editor even when comments are closed by default', async () => {
-			await setOption( 'default_comment_status', 'closed' );
-
 			// Navigate to "Singular" post template
 			await visitSiteEditor();
-			await openSiteEditorNavigationPanel();
-			await navigateSiteEditorBackToRoot();
 			await expect( page ).toClick(
-				'.components-navigation__item-title',
+				'.edit-site-sidebar-navigation-item',
 				{ text: /templates/i }
 			);
-			await expect( page ).toClick( '.components-heading > a', {
-				text: /singular/i,
-			} );
+			await expect( page ).toClick(
+				'.edit-site-sidebar-navigation-item',
+				{ text: /single entries/i }
+			);
+			await enterEditMode();
 
 			// Insert post comments form
-			await insertBlock( 'Post Comments Form' );
+			await insertBlock( 'Comments Form' );
 
 			// Ensure the placeholder is there
 			await expect( canvas() ).toMatchElement(

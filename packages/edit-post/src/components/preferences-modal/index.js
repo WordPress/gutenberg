@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 
@@ -19,12 +14,13 @@ import {
 	PostTypeSupportCheck,
 	store as editorStore,
 } from '@wordpress/editor';
-import { store as coreStore } from '@wordpress/core-data';
 import {
 	PreferencesModal,
 	PreferencesModalTabs,
 	PreferencesModalSection,
+	store as interfaceStore,
 } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -40,36 +36,46 @@ import MetaBoxesSection from './meta-boxes-section';
 import { store as editPostStore } from '../../store';
 import BlockManager from '../block-manager';
 
-const MODAL_NAME = 'edit-post/preferences';
+export const PREFERENCES_MODAL_NAME = 'edit-post/preferences';
 
 export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { closeModal } = useDispatch( editPostStore );
-	const { isModalActive, isViewable } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-		return {
-			isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
-			isViewable: get( postType, [ 'viewable' ], false ),
-		};
-	}, [] );
-	const showBlockBreadcrumbsOption = useSelect(
+	const { closeModal } = useDispatch( interfaceStore );
+	const [ isModalActive, showBlockBreadcrumbsOption ] = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
 			const { getEditorMode, isFeatureActive } = select( editPostStore );
+			const modalActive = select( interfaceStore ).isModalActive(
+				PREFERENCES_MODAL_NAME
+			);
 			const mode = getEditorMode();
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const hasReducedUI = isFeatureActive( 'reducedUI' );
-			return (
-				! hasReducedUI &&
-				isLargeViewport &&
-				isRichEditingEnabled &&
-				mode === 'visual'
-			);
+			const isDistractionFreeEnabled =
+				isFeatureActive( 'distractionFree' );
+			return [
+				modalActive,
+				! isDistractionFreeEnabled &&
+					isLargeViewport &&
+					isRichEditingEnabled &&
+					mode === 'visual',
+				isDistractionFreeEnabled,
+			];
 		},
 		[ isLargeViewport ]
 	);
+
+	const { closeGeneralSidebar, setIsListViewOpened, setIsInserterOpened } =
+		useDispatch( editPostStore );
+
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const toggleDistractionFree = () => {
+		setPreference( 'core/edit-post', 'fixedToolbar', false );
+		setIsInserterOpened( false );
+		setIsListViewOpened( false );
+		closeGeneralSidebar();
+	};
+
 	const sections = useMemo(
 		() => [
 			{
@@ -102,6 +108,14 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnableFeature
+								featureName="distractionFree"
+								onToggle={ toggleDistractionFree }
+								help={ __(
+									'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
+								) }
+								label={ __( 'Distraction free' ) }
+							/>
+							<EnableFeature
 								featureName="focusMode"
 								help={ __(
 									'Highlights the current block and fades other content.'
@@ -121,13 +135,6 @@ export default function EditPostPreferencesModal() {
 									'Opens the block list view sidebar by default.'
 								) }
 								label={ __( 'Always open list view' ) }
-							/>
-							<EnableFeature
-								featureName="reducedUI"
-								help={ __(
-									'Compacts options and outlines in the toolbar.'
-								) }
-								label={ __( 'Reduce the interface' ) }
 							/>
 							<EnableFeature
 								featureName="themeStyles"
@@ -200,25 +207,10 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnablePluginDocumentSettingPanelOption.Slot />
-							{ isViewable && (
-								<EnablePanelOption
-									label={ __( 'Permalink' ) }
-									panelName="post-link"
-								/>
-							) }
-							{ isViewable && (
-								<EnablePanelOption
-									label={ __( 'Template' ) }
-									panelName="template"
-								/>
-							) }
 							<PostTaxonomies
 								taxonomyWrapper={ ( content, taxonomy ) => (
 									<EnablePanelOption
-										label={ get( taxonomy, [
-											'labels',
-											'menu_name',
-										] ) }
+										label={ taxonomy.labels.menu_name }
 										panelName={ `taxonomy-panel-${ taxonomy.slug }` }
 									/>
 								) }
@@ -260,7 +252,7 @@ export default function EditPostPreferencesModal() {
 				),
 			},
 		],
-		[ isViewable, isLargeViewport, showBlockBreadcrumbsOption ]
+		[ isLargeViewport, showBlockBreadcrumbsOption ]
 	);
 
 	if ( ! isModalActive ) {

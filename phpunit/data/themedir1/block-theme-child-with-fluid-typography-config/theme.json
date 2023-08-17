@@ -1,0 +1,16 @@
+{
+	"version": 2,
+	"settings": {
+		"appearanceTools": true,
+		"layout": {
+			"wideSize": "1000px"
+		},
+		"typography": {
+			"fluid": {
+				"minFontSize": "16px",
+				"maxViewportWidth": "1200px",
+				"minViewportWidth": "640px"
+			}
+		}
+	}
+}

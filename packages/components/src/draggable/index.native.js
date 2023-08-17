@@ -34,10 +34,17 @@ const { Provider } = Context;
  * @param {Function}    [props.onDragEnd]   Callback when dragging ends.
  * @param {Function}    [props.onDragOver]  Callback when dragging happens over an element.
  * @param {Function}    [props.onDragStart] Callback when dragging starts.
+ * @param {string}      [props.testID]      Id used for querying the pan gesture in tests.
  *
  * @return {JSX.Element} The component to be rendered.
  */
-const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
+const Draggable = ( {
+	children,
+	onDragEnd,
+	onDragOver,
+	onDragStart,
+	testID,
+} ) => {
 	const isDragging = useSharedValue( false );
 	const isPanActive = useSharedValue( false );
 	const draggingId = useSharedValue( '' );
@@ -130,11 +137,21 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 			isDragging.value = false;
 		} )
 		.withRef( panGestureRef )
-		.shouldCancelWhenOutside( false );
+		.shouldCancelWhenOutside( false )
+		.withTestId( testID );
 
 	const providerValue = useMemo( () => {
 		return { panGestureRef, isDragging, isPanActive, draggingId };
-	}, [] );
+	}, [
+		// `isDragging`, `isPanActive` and `draggingId` are created using the
+		// `useSharedValue` hook provided by the `react-native-reanimated`, which in
+		// theory should guarantee that the value of these variables remains stable.
+		// ESLint can't pick this up, and that's why they have to be specified as
+		// dependencies for this hook call.
+		isDragging,
+		isPanActive,
+		draggingId,
+	] );
 
 	return (
 		<GestureDetector gesture={ panGesture }>
@@ -158,6 +175,7 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
  * @param {number}      [props.minDuration]    Minimum time, that a finger must remain pressed on the corresponding view.
  * @param {Function}    [props.onLongPress]    Callback when long-press gesture is triggered over an element.
  * @param {Function}    [props.onLongPressEnd] Callback when long-press gesture ends.
+ * @param {string}      [props.testID]         Id used for querying the long-press gesture handler in tests.
  *
  * @return {JSX.Element} The component to be rendered.
  */
@@ -169,10 +187,10 @@ const DraggableTrigger = ( {
 	minDuration = 500,
 	onLongPress,
 	onLongPressEnd,
+	testID,
 } ) => {
-	const { panGestureRef, isDragging, isPanActive, draggingId } = useContext(
-		Context
-	);
+	const { panGestureRef, isDragging, isPanActive, draggingId } =
+		useContext( Context );
 
 	const gestureHandler = useAnimatedGestureHandler( {
 		onActive: () => {
@@ -180,8 +198,8 @@ const DraggableTrigger = ( {
 				return;
 			}
 
-			isDragging.value = true;
 			draggingId.value = id;
+			isDragging.value = true;
 			if ( onLongPress ) {
 				runOnJS( onLongPress )( id );
 			}
@@ -205,6 +223,7 @@ const DraggableTrigger = ( {
 			simultaneousHandlers={ panGestureRef }
 			shouldCancelWhenOutside={ false }
 			onGestureEvent={ gestureHandler }
+			testID={ testID }
 		>
 			{ children }
 		</LongPressGestureHandler>

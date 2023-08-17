@@ -19,8 +19,14 @@ import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { pasteHandler } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { __unstableUseRichText as useRichText } from '@wordpress/rich-text';
+import {
+	__unstableUseRichText as useRichText,
+	create,
+	toHTMLString,
+	insert,
+} from '@wordpress/rich-text';
 import { useMergeRefs } from '@wordpress/compose';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -37,37 +43,25 @@ function PostTitle( _, forwardedRef ) {
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );
 	const { editPost } = useDispatch( editorStore );
-	const {
-		insertDefaultBlock,
-		clearSelectedBlock,
-		insertBlocks,
-	} = useDispatch( blockEditorStore );
-	const {
-		isCleanNewPost,
-		title,
-		placeholder,
-		isFocusMode,
-		hasFixedToolbar,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			isCleanNewPost: _isCleanNewPost,
-		} = select( editorStore );
-		const { getSettings } = select( blockEditorStore );
-		const {
-			titlePlaceholder,
-			focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		} = getSettings();
+	const { insertDefaultBlock, clearSelectedBlock, insertBlocks } =
+		useDispatch( blockEditorStore );
+	const { isCleanNewPost, title, placeholder, hasFixedToolbar } = useSelect(
+		( select ) => {
+			const { getEditedPostAttribute, isCleanNewPost: _isCleanNewPost } =
+				select( editorStore );
+			const { getSettings } = select( blockEditorStore );
+			const { titlePlaceholder, hasFixedToolbar: _hasFixedToolbar } =
+				getSettings();
 
-		return {
-			isCleanNewPost: _isCleanNewPost(),
-			title: getEditedPostAttribute( 'title' ),
-			placeholder: titlePlaceholder,
-			isFocusMode: focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		};
-	}, [] );
+			return {
+				isCleanNewPost: _isCleanNewPost(),
+				title: getEditedPostAttribute( 'title' ),
+				placeholder: titlePlaceholder,
+				hasFixedToolbar: _hasFixedToolbar,
+			};
+		},
+		[]
+	);
 
 	useImperativeHandle( forwardedRef, () => ( {
 		focus: () => {
@@ -80,7 +74,10 @@ function PostTitle( _, forwardedRef ) {
 			return;
 		}
 
-		const { ownerDocument } = ref.current;
+		const { defaultView } = ref.current.ownerDocument;
+		const { name, parent } = defaultView;
+		const ownerDocument =
+			name === 'editor-canvas' ? parent.document : defaultView.document;
 		const { activeElement, body } = ownerDocument;
 
 		// Only autofocus the title when the post is entirely empty. This should
@@ -159,9 +156,13 @@ function PostTitle( _, forwardedRef ) {
 			plainText,
 		} );
 
-		if ( typeof content !== 'string' && content.length ) {
-			event.preventDefault();
+		event.preventDefault();
 
+		if ( ! content.length ) {
+			return;
+		}
+
+		if ( typeof content !== 'string' ) {
 			const [ firstBlock ] = content;
 
 			if (
@@ -169,11 +170,25 @@ function PostTitle( _, forwardedRef ) {
 				( firstBlock.name === 'core/heading' ||
 					firstBlock.name === 'core/paragraph' )
 			) {
-				onUpdate( firstBlock.attributes.content );
+				onUpdate( stripHTML( firstBlock.attributes.content ) );
 				onInsertBlockAfter( content.slice( 1 ) );
 			} else {
 				onInsertBlockAfter( content );
 			}
+		} else {
+			const value = {
+				...create( { html: title } ),
+				...selection,
+			};
+			const newValue = insert(
+				value,
+				create( { html: stripHTML( content ) } )
+			);
+			onUpdate( toHTMLString( { value: newValue } ) );
+			setSelection( {
+				start: newValue.start,
+				end: newValue.end,
+			} );
 		}
 	}
 
@@ -183,7 +198,6 @@ function PostTitle( _, forwardedRef ) {
 		'wp-block wp-block-post-title block-editor-block-list__block editor-post-title editor-post-title__input rich-text',
 		{
 			'is-selected': isSelected,
-			'is-focus-mode': isFocusMode,
 			'has-fixed-toolbar': hasFixedToolbar,
 		}
 	);

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 import usePreferredColorScheme from '../../hooks/use-preferred-color-scheme';
 
 /**

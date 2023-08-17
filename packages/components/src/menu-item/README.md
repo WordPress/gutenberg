@@ -34,6 +34,13 @@ MenuItem supports the following props. Any additional props are passed through t
 
 Element to render as child of button.
 
+### `disabled`
+
+-   Type: `boolean`
+-   Required: No
+
+Refer to documentation for [Button's `disabled` prop](/packages/components/src/button/README.md#disabled-boolean).
+
 ### `info`
 
 -   Type: `string`
@@ -79,3 +86,10 @@ If shortcut is a string, it is expecting the display text. If shortcut is an obj
 -   Default: `'menuitem'`
 
 [Aria Spec](https://www.w3.org/TR/wai-aria-1.1/#aria-checked). If you need to have selectable menu items use menuitemradio for single select, and menuitemcheckbox for multiselect.
+
+### `suffix`
+
+-   Type: `WPElement`
+-   Required: No
+
+Allows for markup other than icons or shortcuts to be added to the menu item.

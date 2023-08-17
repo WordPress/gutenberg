@@ -55,16 +55,7 @@ describe( 'toFixed', () => {
 
 	it( 'function returns the number applying `decimalNum` all point numbers', () => {
 		const toCheck = [
-			1.01,
-			1.02,
-			1.03,
-			1.04,
-			1.05,
-			1.06,
-			1.07,
-			1.08,
-			1.09,
-			1.1,
+			1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.09, 1.1,
 		];
 		toCheck.forEach( ( num ) => {
 			const result = toFixed( num, 2 );
@@ -88,8 +79,8 @@ describe( 'isContainerRelated', () => {
 	];
 
 	beforeAll( () => {
-		const registerCoreBlocks = require( '@wordpress/block-library' )
-			.registerCoreBlocks;
+		const registerCoreBlocks =
+			require( '@wordpress/block-library' ).registerCoreBlocks;
 		registerCoreBlocks();
 	} );
 

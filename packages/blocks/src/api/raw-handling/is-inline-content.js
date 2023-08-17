@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { difference } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { isTextContent } from '@wordpress/dom';
@@ -33,7 +28,9 @@ function isInline( node, contextTag ) {
 	];
 
 	return inlineAllowedTagGroups.some(
-		( tagGroup ) => difference( [ tag, contextTag ], tagGroup ).length === 0
+		( tagGroup ) =>
+			[ tag, contextTag ].filter( ( t ) => ! tagGroup.includes( t ) )
+				.length === 0
 	);
 }
 

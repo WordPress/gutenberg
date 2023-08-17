@@ -1,9 +1,29 @@
 // Lower specificity - target list element.
 ol.wp-block-latest-comments {
 	// Removes left spacing in Customizer Widgets screen.
-	// Due to low specificity this will be safely overriden
+	// Due to low specificity this will be safely overridden
 	// by default wp-block layout styles in the Post/Site editor
 	margin-left: 0;
+
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+}
+
+// Following styles leverage :where so that typography block support styles and
+// global styles apply when necessary.
+:where(.wp-block-latest-comments:not([style*="line-height"] .wp-block-latest-comments__comment)) {
+	line-height: 1.1;
+}
+
+:where(.wp-block-latest-comments:not([style*="line-height"] .wp-block-latest-comments__comment-excerpt p)) {
+	line-height: 1.8;
+}
+
+.has-dates,
+.has-excerpts {
+	:where(.wp-block-latest-comments:not([style*="line-height"])) {
+		line-height: 1.5;
+	}
 }
 
 // Higher specificity - target list via wrapper.
@@ -14,7 +34,6 @@ ol.wp-block-latest-comments {
 }
 
 .wp-block-latest-comments__comment {
-	line-height: 1.1;
 	list-style: none;
 	margin-bottom: 1em;
 
@@ -27,16 +46,10 @@ ol.wp-block-latest-comments {
 			margin-left: 3.25em;
 		}
 	}
-
-	.has-dates &,
-	.has-excerpts & {
-		line-height: 1.5;
-	}
 }
 
 .wp-block-latest-comments__comment-excerpt p {
 	font-size: 0.875em;
-	line-height: 1.8;
 	margin: 0.36em 0 1.4em;
 }
 
@@ -53,4 +66,12 @@ ol.wp-block-latest-comments {
 	height: 2.5em;
 	margin-right: 0.75em;
 	width: 2.5em;
+}
+
+// Enforce font size when user has made selection at the individual block level.
+.wp-block-latest-comments[style*="font-size"],
+.wp-block-latest-comments[class*="-font-size"] {
+	a {
+		font-size: inherit;
+	}
 }

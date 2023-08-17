@@ -30,6 +30,15 @@ export default function useInput() {
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
+		function onBeforeInput( event ) {
+			// If writing flow is editable, NEVER allow the browser to alter the
+			// DOM. This will cause React errors (and the DOM should only be
+			// altered in a controlled fashion).
+			if ( node.contentEditable === 'true' ) {
+				event.preventDefault();
+			}
+		}
+
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
 				return;
@@ -102,9 +111,11 @@ export default function useInput() {
 			}
 		}
 
+		node.addEventListener( 'beforeinput', onBeforeInput );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'compositionstart', onCompositionStart );
 		return () => {
+			node.removeEventListener( 'beforeinput', onBeforeInput );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'compositionstart', onCompositionStart );
 		};

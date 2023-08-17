@@ -76,10 +76,10 @@ export function useUserAvatar( { userId, postId, postType } ) {
 		},
 		[ postType, postId, userId ]
 	);
-	const avatarUrls = authorDetails
+	const avatarUrls = authorDetails?.avatar_urls
 		? Object.values( authorDetails.avatar_urls )
 		: null;
-	const sizes = authorDetails
+	const sizes = authorDetails?.avatar_urls
 		? Object.keys( authorDetails.avatar_urls )
 		: null;
 	const { minSize, maxSize } = getAvatarSizes( sizes );

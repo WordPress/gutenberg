@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject } from 'lodash';
+import { isPlainObject } from 'is-plain-object';
+import deepmerge from 'deepmerge';
 
 /**
  * Internal dependencies
@@ -20,7 +21,6 @@ import { combineReducers } from '../../';
  *                                at least implement `getItem` and `setItem` of
  *                                the Web Storage API.
  * @property {string}  storageKey Key on which to set in persistent storage.
- *
  */
 
 /**
@@ -63,10 +63,8 @@ export const withLazySameState = ( reducer ) => ( state, action ) => {
  * @return {Object} Persistence interface.
  */
 export function createPersistenceInterface( options ) {
-	const {
-		storage = DEFAULT_STORAGE,
-		storageKey = DEFAULT_STORAGE_KEY,
-	} = options;
+	const { storage = DEFAULT_STORAGE, storageKey = DEFAULT_STORAGE_KEY } =
+		options;
 
 	let data;
 
@@ -194,7 +192,9 @@ function persistencePlugin( registry, pluginOptions ) {
 					//   subset of keys.
 					// - New keys in what would otherwise be used as initial
 					//   state are deeply merged as base for persisted value.
-					initialState = merge( {}, initialState, persistedState );
+					initialState = deepmerge( initialState, persistedState, {
+						isMergeableObject: isPlainObject,
+					} );
 				} else {
 					// If there is a mismatch in object-likeness of default
 					// initial or persisted state, defer to persisted value.

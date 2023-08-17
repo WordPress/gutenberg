@@ -28,7 +28,7 @@ The direction in which the tooltip should open relative to its parent node. Spec
 
 -   Type: `String`
 -   Required: No
--   Default: `"top center"`
+-   Default: `"bottom"`
 
 ### children
 
@@ -45,6 +45,13 @@ The tooltip text to show on focus or hover.
 
 -   Type: `String`
 -   Required: No
+
+### shortcut (web only)
+
+-   Type: `string` or `object`
+-   Required: No
+
+If shortcut is a string, it is expecting the display text. If shortcut is an object, it will accept the properties of `display` (string) and `ariaLabel` (string).
 
 ### delay (web only)
 

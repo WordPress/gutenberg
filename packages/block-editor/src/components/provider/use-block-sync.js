@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last, noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -14,6 +9,8 @@ import { cloneBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+
+const noop = () => {};
 
 /**
  * A function to call when the block value has been updated in the block-editor
@@ -79,10 +76,18 @@ export default function useBlockSync( {
 		resetBlocks,
 		resetSelection,
 		replaceInnerBlocks,
+		selectBlock,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const { getBlockName, getBlocks } = registry.select( blockEditorStore );
+	const {
+		hasSelectedBlock,
+		getBlockName,
+		getBlocks,
+		getSelectionStart,
+		getSelectionEnd,
+		getBlock,
+	} = registry.select( blockEditorStore );
 	const isControlled = useSelect(
 		( select ) => {
 			return (
@@ -129,6 +134,19 @@ export default function useBlockSync( {
 		}
 	};
 
+	// Clean up the changes made by setControlledBlocks() when the component
+	// containing useBlockSync() unmounts.
+	const unsetControlledBlocks = () => {
+		__unstableMarkNextChangeAsNotPersistent();
+		if ( clientId ) {
+			setHasControlledInnerBlocks( clientId, false );
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceInnerBlocks( clientId, [] );
+		} else {
+			resetBlocks( [] );
+		}
+	};
+
 	// Add a subscription to the block-editor registry to detect when changes
 	// have been made. This lets us inform the data source of changes. This
 	// is an effect so that the subscriber can run synchronously without
@@ -150,7 +168,9 @@ export default function useBlockSync( {
 			// to allow that the consumer may apply modifications to reflect
 			// back on the editor.
 			if (
-				last( pendingChanges.current.outgoing ) === controlledBlocks
+				pendingChanges.current.outgoing[
+					pendingChanges.current.outgoing.length - 1
+				] === controlledBlocks
 			) {
 				pendingChanges.current.outgoing = [];
 			}
@@ -160,6 +180,9 @@ export default function useBlockSync( {
 			// bound sync, unset the outbound value to avoid considering it in
 			// subsequent renders.
 			pendingChanges.current.outgoing = [];
+			const hadSelecton = hasSelectedBlock();
+			const selectionAnchor = getSelectionStart();
+			const selectionFocus = getSelectionEnd();
 			setControlledBlocks();
 
 			if ( controlledSelection ) {
@@ -168,6 +191,15 @@ export default function useBlockSync( {
 					controlledSelection.selectionEnd,
 					controlledSelection.initialPosition
 				);
+			} else {
+				const selectionStillExists = getBlock(
+					selectionAnchor.clientId
+				);
+				if ( hadSelecton && ! selectionStillExists ) {
+					selectBlock( clientId );
+				} else {
+					resetSelection( selectionAnchor, selectionFocus );
+				}
 			}
 		}
 	}, [ controlledBlocks, clientId ] );
@@ -183,8 +215,6 @@ export default function useBlockSync( {
 
 	useEffect( () => {
 		const {
-			getSelectionStart,
-			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
@@ -221,7 +251,6 @@ export default function useBlockSync( {
 			const newBlocks = getBlocks( clientId );
 			const areBlocksDifferent = newBlocks !== blocks;
 			blocks = newBlocks;
-
 			if (
 				areBlocksDifferent &&
 				( pendingChanges.current.incoming ||
@@ -258,13 +287,23 @@ export default function useBlockSync( {
 					selection: {
 						selectionStart: getSelectionStart(),
 						selectionEnd: getSelectionEnd(),
-						initialPosition: getSelectedBlocksInitialCaretPosition(),
+						initialPosition:
+							getSelectedBlocksInitialCaretPosition(),
 					},
 				} );
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;
 		} );
 
-		return () => unsubscribe();
+		return () => {
+			subscribed.current = false;
+			unsubscribe();
+		};
 	}, [ registry, clientId ] );
+
+	useEffect( () => {
+		return () => {
+			unsetControlledBlocks();
+		};
+	}, [] );
 }

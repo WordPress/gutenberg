@@ -16,12 +16,12 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import HeadingLevelDropdown from './heading-level-dropdown';
 import { generateAnchor, setAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
@@ -52,9 +52,8 @@ function HeadingEdit( {
 		};
 	}, [] );
 
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Initially set anchor for headings that have content but no anchor set.
 	// This is used when transforming a block to heading, or for legacy anchors.
@@ -93,7 +92,7 @@ function HeadingEdit( {
 		<>
 			<BlockControls group="block">
 				<HeadingLevelDropdown
-					selectedLevel={ level }
+					value={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

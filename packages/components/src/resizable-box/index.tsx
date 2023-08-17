@@ -88,14 +88,13 @@ const HANDLE_STYLES = {
 };
 
 type ResizableBoxProps = ResizableProps & {
-	className: string;
 	children: ReactNode;
-	showHandle: boolean;
-	__experimentalShowTooltip: boolean;
-	__experimentalTooltipProps: Parameters< typeof ResizeTooltip >[ 0 ];
+	showHandle?: boolean;
+	__experimentalShowTooltip?: boolean;
+	__experimentalTooltipProps?: Parameters< typeof ResizeTooltip >[ 0 ];
 };
 
-function ResizableBox(
+function UnforwardedResizableBox(
 	{
 		className,
 		children,
@@ -124,4 +123,6 @@ function ResizableBox(
 	);
 }
 
-export default forwardRef( ResizableBox );
+export const ResizableBox = forwardRef( UnforwardedResizableBox );
+
+export default ResizableBox;

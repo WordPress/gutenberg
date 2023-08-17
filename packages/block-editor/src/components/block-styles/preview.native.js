@@ -10,6 +10,7 @@ import {
 	Easing,
 	Image,
 } from 'react-native';
+
 /**
  * WordPress dependencies
  */

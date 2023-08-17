@@ -1,53 +1,17 @@
 .components-custom-select-control {
 	position: relative;
-}
-
-.components-custom-select-control__label {
-	display: block;
-	margin-bottom: $grid-unit-10;
+	font-size: $default-font-size;
 }
 
 .components-custom-select-control__button {
-	border: 1px solid $gray-700;
-	border-radius: $radius-block-ui;
-	min-width: 130px;
 	position: relative;
 	text-align: left;
+	outline: 0; // focus ring is handled elsewhere
+}
 
-	&:not(.is-next-36px-default-size) {
-		min-height: 30px;
-	}
-
-	// For all button sizes allow sufficient space for the
-	// dropdown "arrow" icon to display.
-	&.components-custom-select-control__button {
-		// TODO: Some of these can be removed after some internal inconsistencies are addressed, such as the chevron
-		// (https://github.com/WordPress/gutenberg/issues/39400) and Button padding (https://github.com/WordPress/gutenberg/issues/39431)
-		padding-left: $grid-unit-20;
-		padding-right: $icon-size + $grid-unit-10;
-
-		&:not(.is-next-36px-default-size) {
-			padding-left: $grid-unit-10;
-			padding-right: $icon-size;
-		}
-	}
-
-	&:focus:not(:disabled) {
-		border-color: var(--wp-admin-theme-color);
-		box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
-	}
-
-	.components-custom-select-control__button-icon {
-		height: 100%;
-		padding: 0;
-		position: absolute;
-		right: $grid-unit-10;
-		top: 0;
-
-		&:not(.is-next-36px-default-size) {
-			right: $grid-unit-05;
-		}
-	}
+.components-custom-select-control__hint {
+	color: $gray-600;
+	margin-left: 10px;
 }
 
 .components-custom-select-control__menu {
@@ -91,7 +55,7 @@
 		background: $gray-300;
 	}
 	.components-custom-select-control__item-hint {
-		color: $gray-700;
+		color: $gray-600;
 		text-align: right;
 		padding-right: $grid-unit-05;
 	}

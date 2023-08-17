@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { createBlock } from '../factory';
@@ -16,6 +11,8 @@ import {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '../templates';
+
+const noop = () => {};
 
 describe( 'templates', () => {
 	beforeAll( () => {

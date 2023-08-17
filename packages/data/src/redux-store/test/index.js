@@ -4,8 +4,6 @@
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
 
-jest.useRealTimers();
-
 describe( 'controls', () => {
 	let registry;
 
@@ -32,9 +30,10 @@ describe( 'controls', () => {
 				},
 				controls: {
 					DISPATCH: createRegistryControl(
-						( reg ) => ( { store, action } ) => {
-							return reg.dispatch( store )[ action ]();
-						}
+						( reg ) =>
+							( { store, action } ) => {
+								return reg.dispatch( store )[ action ]();
+							}
 					),
 				},
 			} );
@@ -46,7 +45,7 @@ describe( 'controls', () => {
 
 	it( 'resolves in expected order', async () => {
 		const actions = {
-			wait: () => ( { type: 'WAIT' } ),
+			standby: () => ( { type: 'STANDBY' } ),
 			receive: ( items ) => ( { type: 'RECEIVE', items } ),
 		};
 
@@ -63,12 +62,12 @@ describe( 'controls', () => {
 			},
 			resolvers: {
 				*getItems() {
-					yield actions.wait();
+					yield actions.standby();
 					yield actions.receive( [ 1, 2, 3 ] );
 				},
 			},
 			controls: {
-				WAIT() {
+				STANDBY() {
 					return new Promise( ( resolve ) =>
 						process.nextTick( resolve )
 					);

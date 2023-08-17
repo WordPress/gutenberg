@@ -6,31 +6,36 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { useContextSystem } from '../../ui/context';
 import Button from '../../button';
 import useNavigator from '../use-navigator';
-import type { NavigatorBackButtonProps } from '../types';
+import type { NavigatorBackButtonHookProps } from '../types';
 
 export function useNavigatorBackButton(
-	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >
+	props: WordPressComponentProps< NavigatorBackButtonHookProps, 'button' >
 ) {
-	const { onClick, as = Button, ...otherProps } = useContextSystem(
-		props,
-		'NavigatorBackButton'
-	);
+	const {
+		onClick,
+		as = Button,
+		goToParent: goToParentProp = false,
+		...otherProps
+	} = useContextSystem( props, 'NavigatorBackButton' );
 
-	const { goBack } = useNavigator();
-	const handleClick: React.MouseEventHandler< HTMLButtonElement > = useCallback(
-		( e ) => {
-			e.preventDefault();
-			goBack();
-			onClick?.( e );
-		},
-		[ goBack, onClick ]
-	);
+	const { goBack, goToParent } = useNavigator();
+	const handleClick: React.MouseEventHandler< HTMLButtonElement > =
+		useCallback(
+			( e ) => {
+				e.preventDefault();
+				if ( goToParentProp ) {
+					goToParent();
+				} else {
+					goBack();
+				}
+				onClick?.( e );
+			},
+			[ goToParentProp, goToParent, goBack, onClick ]
+		);
 
 	return {
 		as,

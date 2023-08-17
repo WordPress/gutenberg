@@ -8,67 +8,79 @@ import type { ReactNode } from 'react';
  */
 import type { SpaceInput } from '../ui/utils/space';
 
-export type Props = {
+export type SpacerProps = {
+	/**
+	 * The children elements.
+	 */
+	children?: ReactNode;
 	/**
 	 * Adjusts all margins.
 	 */
 	margin?: SpaceInput;
 	/**
-	 * Adjusts top and bottom margins.
-	 */
-	marginY?: SpaceInput;
-	/**
-	 * Adjusts left and right margins.
-	 */
-	marginX?: SpaceInput;
-	/**
-	 * Adjusts top margins.
-	 */
-	marginTop?: SpaceInput;
-	/**
-	 * Adjusts bottom margins.
+	 * Adjusts bottom margin, potentially overriding the value from the more
+	 * generic `margin` and `marginY` props.
 	 *
 	 * @default 2
 	 */
 	marginBottom?: SpaceInput;
 	/**
-	 * Adjusts left margins.
+	 * Adjusts left margin, potentially overriding the value from the more
+	 * generic `margin` and `marginX` props.
 	 */
 	marginLeft?: SpaceInput;
 	/**
-	 * Adjusts right margins.
+	 * Adjusts right margin, potentially overriding the value from the more
+	 * generic `margin` and `marginX` props.
 	 */
 	marginRight?: SpaceInput;
+	/**
+	 * Adjusts top margin, potentially overriding the value from the more
+	 * generic `margin` and `marginY` props.
+	 */
+	marginTop?: SpaceInput;
+	/**
+	 * Adjusts left and right margins, potentially overriding the value from the
+	 * more generic `margin` prop.
+	 */
+	marginX?: SpaceInput;
+	/**
+	 * Adjusts top and bottom margins, potentially overriding the value from the
+	 * more generic `margin` prop.
+	 */
+	marginY?: SpaceInput;
 	/**
 	 * Adjusts all padding.
 	 */
 	padding?: SpaceInput;
 	/**
-	 * Adjusts top and bottom padding.
-	 */
-	paddingY?: SpaceInput;
-	/**
-	 * Adjusts left and right padding.
-	 */
-	paddingX?: SpaceInput;
-	/**
-	 * Adjusts top padding.
-	 */
-	paddingTop?: SpaceInput;
-	/**
-	 * Adjusts bottom padding.
+	 * Adjusts bottom padding, potentially overriding the value from the more
+	 * generic `padding` and `paddingY` props.
 	 */
 	paddingBottom?: SpaceInput;
 	/**
-	 * Adjusts left padding.
+	 * Adjusts left padding, potentially overriding the value from the more
+	 * generic `padding` and `paddingX` props.
 	 */
 	paddingLeft?: SpaceInput;
 	/**
-	 * Adjusts right padding.
+	 * Adjusts right padding, potentially overriding the value from the more
+	 * generic `padding` and `paddingX` props.
 	 */
 	paddingRight?: SpaceInput;
 	/**
-	 * The children elements.
+	 * Adjusts top padding, potentially overriding the value from the more
+	 * generic `padding` and `paddingY` props.
 	 */
-	children?: ReactNode;
+	paddingTop?: SpaceInput;
+	/**
+	 * Adjusts left and right padding, potentially overriding the value from the
+	 * more generic `padding` prop.
+	 */
+	paddingX?: SpaceInput;
+	/**
+	 * Adjusts top and bottom padding, potentially overriding the value from the
+	 * more generic `padding` prop.
+	 */
+	paddingY?: SpaceInput;
 };

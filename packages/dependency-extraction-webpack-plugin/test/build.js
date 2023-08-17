@@ -3,15 +3,13 @@
  */
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
-const mkdirp = require( 'mkdirp' ).sync;
+const mkdirp = require( 'mkdirp' ).mkdirp.sync;
 const path = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
 
 const fixturesPath = path.join( __dirname, 'fixtures' );
 const configFixtures = fs.readdirSync( fixturesPath ).sort();
-
-jest.useRealTimers();
 
 describe( 'DependencyExtractionWebpackPlugin', () => {
 	afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );
@@ -52,17 +50,8 @@ describe( 'DependencyExtractionWebpackPlugin', () => {
 					const assetFiles = glob(
 						`${ outputDirectory }/+(*.asset|assets).@(json|php)`
 					);
-					const hasCombinedAssets = ( options.plugins || [] ).some(
-						( plugin ) => !! ( plugin.options || {} ).combineAssets
-					);
-					const entrypointCount =
-						typeof options.entry === 'object'
-							? Object.keys( options.entry ).length
-							: 1;
-					const expectedLength = hasCombinedAssets
-						? 1
-						: entrypointCount;
-					expect( assetFiles ).toHaveLength( expectedLength );
+
+					expect( assetFiles.length ).toBeGreaterThan( 0 );
 
 					// Asset files should match.
 					assetFiles.forEach( ( assetFile ) => {

@@ -53,9 +53,8 @@ export default compose( [
 		isValid: select( blockEditorStore ).isValidTemplate(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { setTemplateValidity, synchronizeTemplate } = dispatch(
-			blockEditorStore
-		);
+		const { setTemplateValidity, synchronizeTemplate } =
+			dispatch( blockEditorStore );
 		return {
 			resetTemplateValidity: () => setTemplateValidity( true ),
 			synchronizeTemplate,

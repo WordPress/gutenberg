@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { BlockBreadcrumb, BlockStyles } from '@wordpress/block-editor';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -36,11 +36,8 @@ const interfaceLabels = {
 function Interface( { blockEditorSettings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const {
-		setIsInserterOpened,
-		setIsListViewOpened,
-		closeGeneralSidebar,
-	} = useDispatch( editWidgetsStore );
+	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
+		useDispatch( editWidgetsStore );
 	const {
 		hasBlockBreadCrumbsEnabled,
 		hasSidebarEnabled,
@@ -109,7 +106,6 @@ function Interface( { blockEditorSettings } ) {
 					<WidgetAreasBlockEditorContent
 						blockEditorSettings={ blockEditorSettings }
 					/>
-					<BlockStyles.Slot scope="core/block-inspector" />
 				</>
 			}
 			footer={

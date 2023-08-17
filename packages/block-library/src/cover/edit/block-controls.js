@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { ToolbarButton } from '@wordpress/components';
 
 import {
 	BlockControls,
@@ -11,33 +10,26 @@ import {
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { postFeaturedImage } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { ALLOWED_MEDIA_TYPES, IMAGE_BACKGROUND_TYPE } from '../shared';
+import { ALLOWED_MEDIA_TYPES } from '../shared';
 
 export default function CoverBlockControls( {
 	attributes,
 	setAttributes,
 	onSelectMedia,
 	currentSettings,
+	toggleUseFeaturedImage,
 } ) {
-	const {
-		contentPosition,
-		id,
-		useFeaturedImage,
-		dimRatio,
-		minHeight,
-		minHeightUnit,
-	} = attributes;
+	const { contentPosition, id, useFeaturedImage, minHeight, minHeightUnit } =
+		attributes;
 	const { hasInnerBlocks, url } = currentSettings;
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
-	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
-		minHeightUnit
-	);
+	const [ prevMinHeightUnit, setPrevMinHeightUnit ] =
+		useState( minHeightUnit );
 	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
 	const toggleMinFullHeight = () => {
 		if ( isMinFullHeight ) {
@@ -66,17 +58,6 @@ export default function CoverBlockControls( {
 		} );
 	};
 
-	const toggleUseFeaturedImage = () => {
-		setAttributes( {
-			id: undefined,
-			url: undefined,
-			useFeaturedImage: ! useFeaturedImage,
-			dimRatio: dimRatio === 100 ? 50 : dimRatio,
-			backgroundType: useFeaturedImage
-				? IMAGE_BACKGROUND_TYPE
-				: undefined,
-		} );
-	};
 	return (
 		<>
 			<BlockControls group="block">
@@ -97,22 +78,16 @@ export default function CoverBlockControls( {
 				/>
 			</BlockControls>
 			<BlockControls group="other">
-				<ToolbarButton
-					icon={ postFeaturedImage }
-					label={ __( 'Use featured image' ) }
-					isPressed={ useFeaturedImage }
-					onClick={ toggleUseFeaturedImage }
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*,video/*"
+					onSelect={ onSelectMedia }
+					onToggleFeaturedImage={ toggleUseFeaturedImage }
+					useFeaturedImage={ useFeaturedImage }
+					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
 				/>
-				{ ! useFeaturedImage && (
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*,video/*"
-						onSelect={ onSelectMedia }
-						name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
-					/>
-				) }
 			</BlockControls>
 		</>
 	);

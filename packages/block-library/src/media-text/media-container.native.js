@@ -26,12 +26,12 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { media as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import icon from './media-container-icon';
 import SvgIconRetry from './icon-retry';
 
 /**
@@ -50,16 +50,13 @@ class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind( this );
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
-			this
-		);
+		this.onSelectMediaUploadOption =
+			this.onSelectMediaUploadOption.bind( this );
 		this.onMediaPressed = this.onMediaPressed.bind( this );
 
 		this.state = {
@@ -319,6 +316,7 @@ class MediaContainer extends Component {
 				onSelect={ this.onSelectMediaUploadOption }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ this.props.onFocus }
+				className={ 'no-block-outline' }
 			/>
 		);
 	}

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classNames from 'classnames';
 import type { ForwardedRef } from 'react';
 
@@ -17,6 +16,11 @@ import { useState, forwardRef } from '@wordpress/element';
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
+import { space } from '../ui/utils/space';
+import { useDraft } from './utils';
+import BaseControl from '../base-control';
+
+const noop = () => {};
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputControl );
@@ -27,10 +31,12 @@ function useUniqueId( idProp?: string ) {
 
 export function UnforwardedInputControl(
 	{
+		__next36pxDefaultSize,
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
 		className,
 		disabled = false,
+		help,
 		hideLabelFromVision = false,
 		id: idProp,
 		isPressEnterToChange = false,
@@ -41,6 +47,7 @@ export function UnforwardedInputControl(
 		onKeyDown = noop,
 		prefix,
 		size = 'default',
+		style,
 		suffix,
 		value,
 		...props
@@ -52,39 +59,61 @@ export function UnforwardedInputControl(
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
 
+	const draftHookProps = useDraft( {
+		value,
+		onBlur: props.onBlur,
+		onChange,
+	} );
+
+	// ARIA descriptions can only contain plain text, so fall back to aria-details if not.
+	const helpPropName =
+		typeof help === 'string' ? 'aria-describedby' : 'aria-details';
+	const helpProp = !! help ? { [ helpPropName ]: `${ id }__help` } : {};
+
 	return (
-		<InputBase
-			__unstableInputWidth={ __unstableInputWidth }
+		<BaseControl
 			className={ classes }
-			disabled={ disabled }
-			gap={ 3 }
-			hideLabelFromVision={ hideLabelFromVision }
+			help={ help }
 			id={ id }
-			isFocused={ isFocused }
-			justify="left"
-			label={ label }
-			labelPosition={ labelPosition }
-			prefix={ prefix }
-			size={ size }
-			suffix={ suffix }
+			__nextHasNoMarginBottom
 		>
-			<InputField
-				{ ...props }
-				className="components-input-control__input"
+			<InputBase
+				__next36pxDefaultSize={ __next36pxDefaultSize }
+				__unstableInputWidth={ __unstableInputWidth }
 				disabled={ disabled }
+				gap={ 3 }
+				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
 				isFocused={ isFocused }
-				isPressEnterToChange={ isPressEnterToChange }
-				onChange={ onChange }
-				onKeyDown={ onKeyDown }
-				onValidate={ onValidate }
-				ref={ ref }
-				setIsFocused={ setIsFocused }
+				justify="left"
+				label={ label }
+				labelPosition={ labelPosition }
+				prefix={ prefix }
 				size={ size }
-				stateReducer={ stateReducer }
-				value={ value }
-			/>
-		</InputBase>
+				style={ style }
+				suffix={ suffix }
+			>
+				<InputField
+					{ ...props }
+					{ ...helpProp }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
+					className="components-input-control__input"
+					disabled={ disabled }
+					id={ id }
+					isFocused={ isFocused }
+					isPressEnterToChange={ isPressEnterToChange }
+					onKeyDown={ onKeyDown }
+					onValidate={ onValidate }
+					paddingInlineStart={ prefix ? space( 2 ) : undefined }
+					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+					ref={ ref }
+					setIsFocused={ setIsFocused }
+					size={ size }
+					stateReducer={ stateReducer }
+					{ ...draftHookProps }
+				/>
+			</InputBase>
+		</BaseControl>
 	);
 }
 

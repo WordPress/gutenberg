@@ -49,35 +49,34 @@ const ColorSelectorIcon = ( { style, className } ) => {
  *
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( { TextColor, BackgroundColor } ) => ( {
-	onToggle,
-	isOpen,
-} ) => {
-	const openOnArrowDown = ( event ) => {
-		if ( ! isOpen && event.keyCode === DOWN ) {
-			event.preventDefault();
-			onToggle();
-		}
-	};
+const renderToggleComponent =
+	( { TextColor, BackgroundColor } ) =>
+	( { onToggle, isOpen } ) => {
+		const openOnArrowDown = ( event ) => {
+			if ( ! isOpen && event.keyCode === DOWN ) {
+				event.preventDefault();
+				onToggle();
+			}
+		};
 
-	return (
-		<ToolbarGroup>
-			<ToolbarButton
-				className="components-toolbar__control block-library-colors-selector__toggle"
-				label={ __( 'Open Colors Selector' ) }
-				onClick={ onToggle }
-				onKeyDown={ openOnArrowDown }
-				icon={
-					<BackgroundColor>
-						<TextColor>
-							<ColorSelectorIcon />
-						</TextColor>
-					</BackgroundColor>
-				}
-			/>
-		</ToolbarGroup>
-	);
-};
+		return (
+			<ToolbarGroup>
+				<ToolbarButton
+					className="components-toolbar__control block-library-colors-selector__toggle"
+					label={ __( 'Open Colors Selector' ) }
+					onClick={ onToggle }
+					onKeyDown={ openOnArrowDown }
+					icon={
+						<BackgroundColor>
+							<TextColor>
+								<ColorSelectorIcon />
+							</TextColor>
+						</BackgroundColor>
+					}
+				/>
+			</ToolbarGroup>
+		);
+	};
 
 const BlockColorsStyleSelector = ( { children, ...other } ) => {
 	deprecated( `wp.blockEditor.BlockColorsStyleSelector`, {
@@ -88,7 +87,7 @@ const BlockColorsStyleSelector = ( { children, ...other } ) => {
 
 	return (
 		<Dropdown
-			position="bottom right"
+			popoverProps={ { placement: 'bottom-start' } }
 			className="block-library-colors-selector"
 			contentClassName="block-library-colors-selector__popover"
 			renderToggle={ renderToggleComponent( other ) }

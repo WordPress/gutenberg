@@ -2,15 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isObject } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
-import { useRef, useEffect, useMemo, Platform } from '@wordpress/element';
+import { useMemo, Platform, useCallback } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -18,22 +16,22 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  */
 import {
 	getColorClassName,
-	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 } from '../components/colors';
-import {
-	__experimentalGetGradientClass,
-	getGradientValueBySlug,
-	getGradientSlugByValue,
-} from '../components/gradients';
+import { __experimentalGetGradientClass } from '../components/gradients';
 import {
 	cleanEmptyObject,
 	transformStyles,
-	immutableSet,
 	shouldSkipSerialization,
+	useBlockSettings,
 } from './utils';
-import ColorPanel from './color-panel';
 import useSetting from '../components/use-setting';
+import InspectorControls from '../components/inspector-controls';
+import {
+	useHasColorPanel,
+	default as StylesColorPanel,
+} from '../components/global-styles/color-panel';
+import BlockColorContrastChecker from './contrast-checker';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -55,13 +53,21 @@ const hasLinkColorSupport = ( blockType ) => {
 
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return isObject( colorSupport ) && !! colorSupport.link;
+	return (
+		colorSupport !== null &&
+		typeof colorSupport === 'object' &&
+		!! colorSupport.link
+	);
 };
 
 const hasGradientSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return isObject( colorSupport ) && !! colorSupport.gradients;
+	return (
+		colorSupport !== null &&
+		typeof colorSupport === 'object' &&
+		!! colorSupport.gradients
+	);
 };
 
 const hasBackgroundColorSupport = ( blockType ) => {
@@ -74,125 +80,6 @@ const hasTextColorSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return colorSupport && colorSupport.text !== false;
-};
-
-/**
- * Checks whether a color has been set either with a named preset color in
- * a top level block attribute or as a custom value within the style attribute
- * object.
- *
- * @param {string} name Name of the color to check.
- * @return {boolean} Whether or not a color has a value.
- */
-const hasColor = ( name ) => ( props ) => {
-	if ( name === 'background' ) {
-		return (
-			!! props.attributes.backgroundColor ||
-			!! props.attributes.style?.color?.background ||
-			!! props.attributes.gradient ||
-			!! props.attributes.style?.color?.gradient
-		);
-	}
-
-	if ( name === 'link' ) {
-		return !! props.attributes.style?.elements?.link?.color?.text;
-	}
-
-	return (
-		!! props.attributes[ `${ name }Color` ] ||
-		!! props.attributes.style?.color?.[ name ]
-	);
-};
-
-/**
- * Clears a single color property from a style object.
- *
- * @param {Array}  path  Path to color property to clear within styles object.
- * @param {Object} style Block attributes style object.
- * @return {Object} Styles with the color property omitted.
- */
-const clearColorFromStyles = ( path, style ) =>
-	cleanEmptyObject( immutableSet( style, path, undefined ) );
-
-/**
- * Resets the block attributes for text color.
- *
- * @param {Object}   props               Current block props.
- * @param {Object}   props.attributes    Block attributes.
- * @param {Function} props.setAttributes Block's setAttributes prop used to apply reset.
- */
-const resetTextColor = ( { attributes, setAttributes } ) => {
-	setAttributes( {
-		textColor: undefined,
-		style: clearColorFromStyles( [ 'color', 'text' ], attributes.style ),
-	} );
-};
-
-/**
- * Clears text color related properties from supplied attributes.
- *
- * @param {Object} attributes Block attributes.
- * @return {Object} Update block attributes with text color properties omitted.
- */
-const resetAllTextFilter = ( attributes ) => ( {
-	textColor: undefined,
-	style: clearColorFromStyles( [ 'color', 'text' ], attributes.style ),
-} );
-
-/**
- * Resets the block attributes for link color.
- *
- * @param {Object}   props               Current block props.
- * @param {Object}   props.attributes    Block attributes.
- * @param {Function} props.setAttributes Block's setAttributes prop used to apply reset.
- */
-const resetLinkColor = ( { attributes, setAttributes } ) => {
-	const path = [ 'elements', 'link', 'color', 'text' ];
-	setAttributes( { style: clearColorFromStyles( path, attributes.style ) } );
-};
-
-/**
- * Clears link color related properties from supplied attributes.
- *
- * @param {Object} attributes Block attributes.
- * @return {Object} Update block attributes with link color properties omitted.
- */
-const resetAllLinkFilter = ( attributes ) => ( {
-	style: clearColorFromStyles(
-		[ 'elements', 'link', 'color', 'text' ],
-		attributes.style
-	),
-} );
-
-/**
- * Clears all background color related properties including gradients from
- * supplied block attributes.
- *
- * @param {Object} attributes Block attributes.
- * @return {Object} Block attributes with background and gradient omitted.
- */
-const clearBackgroundAndGradient = ( attributes ) => ( {
-	backgroundColor: undefined,
-	gradient: undefined,
-	style: {
-		...attributes.style,
-		color: {
-			...attributes.style?.color,
-			background: undefined,
-			gradient: undefined,
-		},
-	},
-} );
-
-/**
- * Resets the block attributes for both background color and gradient.
- *
- * @param {Object}   props               Current block props.
- * @param {Object}   props.attributes    Block attributes.
- * @param {Function} props.setAttributes Block's setAttributes prop used to apply reset.
- */
-const resetBackgroundAndGradient = ( { attributes, setAttributes } ) => {
-	setAttributes( clearBackgroundAndGradient( attributes ) );
 };
 
 /**
@@ -331,256 +218,141 @@ export function addEditProps( settings ) {
 	return settings;
 }
 
-const getLinkColorFromAttributeValue = ( colors, value ) => {
-	const attributeParsed = /var:preset\|color\|(.+)/.exec( value );
-	if ( attributeParsed && attributeParsed[ 1 ] ) {
-		return getColorObjectByAttributeValues( colors, attributeParsed[ 1 ] )
-			.color;
-	}
-	return value;
-};
+function styleToAttributes( style ) {
+	const textColorValue = style?.color?.text;
+	const textColorSlug = textColorValue?.startsWith( 'var:preset|color|' )
+		? textColorValue.substring( 'var:preset|color|'.length )
+		: undefined;
+	const backgroundColorValue = style?.color?.background;
+	const backgroundColorSlug = backgroundColorValue?.startsWith(
+		'var:preset|color|'
+	)
+		? backgroundColorValue.substring( 'var:preset|color|'.length )
+		: undefined;
+	const gradientValue = style?.color?.gradient;
+	const gradientSlug = gradientValue?.startsWith( 'var:preset|gradient|' )
+		? gradientValue.substring( 'var:preset|gradient|'.length )
+		: undefined;
+	const updatedStyle = { ...style };
+	updatedStyle.color = {
+		...updatedStyle.color,
+		text: textColorSlug ? undefined : textColorValue,
+		background: backgroundColorSlug ? undefined : backgroundColorValue,
+		gradient: gradientSlug ? undefined : gradientValue,
+	};
+	return {
+		style: cleanEmptyObject( updatedStyle ),
+		textColor: textColorSlug,
+		backgroundColor: backgroundColorSlug,
+		gradient: gradientSlug,
+	};
+}
 
-/**
- * Inspector control panel containing the color related configuration
- *
- * @param {Object} props
- *
- * @return {WPElement} Color edit element.
- */
+function attributesToStyle( attributes ) {
+	return {
+		...attributes.style,
+		color: {
+			...attributes.style?.color,
+			text: attributes.textColor
+				? 'var:preset|color|' + attributes.textColor
+				: attributes.style?.color?.text,
+			background: attributes.backgroundColor
+				? 'var:preset|color|' + attributes.backgroundColor
+				: attributes.style?.color?.background,
+			gradient: attributes.gradient
+				? 'var:preset|gradient|' + attributes.gradient
+				: attributes.style?.color?.gradient,
+		},
+	};
+}
+
+function ColorInspectorControl( { children, resetAllFilter } ) {
+	const attributesResetAllFilter = useCallback(
+		( attributes ) => {
+			const existingStyle = attributesToStyle( attributes );
+			const updatedStyle = resetAllFilter( existingStyle );
+			return {
+				...attributes,
+				...styleToAttributes( updatedStyle ),
+			};
+		},
+		[ resetAllFilter ]
+	);
+
+	return (
+		<InspectorControls
+			group="color"
+			resetAllFilter={ attributesResetAllFilter }
+		>
+			{ children }
+		</InspectorControls>
+	);
+}
+
 export function ColorEdit( props ) {
-	const { name: blockName, attributes } = props;
-	// Some color settings have a special handling for deprecated flags in `useSetting`,
-	// so we can't unwrap them by doing const { ... } = useSetting('color')
-	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
-	const userPalette = useSetting( 'color.palette.custom' );
-	const themePalette = useSetting( 'color.palette.theme' );
-	const defaultPalette = useSetting( 'color.palette.default' );
-	const allSolids = useMemo(
-		() => [
-			...( userPalette || [] ),
-			...( themePalette || [] ),
-			...( defaultPalette || [] ),
-		],
-		[ userPalette, themePalette, defaultPalette ]
-	);
-	const userGradientPalette = useSetting( 'color.gradients.custom' );
-	const themeGradientPalette = useSetting( 'color.gradients.theme' );
-	const defaultGradientPalette = useSetting( 'color.gradients.default' );
-	const allGradients = useMemo(
-		() => [
-			...( userGradientPalette || [] ),
-			...( themeGradientPalette || [] ),
-			...( defaultGradientPalette || [] ),
-		],
-		[ userGradientPalette, themeGradientPalette, defaultGradientPalette ]
-	);
-	const areCustomSolidsEnabled = useSetting( 'color.custom' );
-	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
-	const isBackgroundEnabled = useSetting( 'color.background' );
-	const isLinkEnabled = useSetting( 'color.link' );
-	const isTextEnabled = useSetting( 'color.text' );
+	const { clientId, name, attributes, setAttributes } = props;
+	const settings = useBlockSettings( name );
+	const isEnabled = useHasColorPanel( settings );
+	const value = useMemo( () => {
+		return attributesToStyle( {
+			style: attributes.style,
+			textColor: attributes.textColor,
+			backgroundColor: attributes.backgroundColor,
+			gradient: attributes.gradient,
+		} );
+	}, [
+		attributes.style,
+		attributes.textColor,
+		attributes.backgroundColor,
+		attributes.gradient,
+	] );
 
-	const solidsEnabled =
-		areCustomSolidsEnabled || ! themePalette || themePalette?.length > 0;
+	const onChange = ( newStyle ) => {
+		setAttributes( styleToAttributes( newStyle ) );
+	};
 
-	const gradientsEnabled =
-		areCustomGradientsEnabled ||
-		! themeGradientPalette ||
-		themeGradientPalette?.length > 0;
-
-	// Shouldn't be needed but right now the ColorGradientsPanel
-	// can trigger both onChangeColor and onChangeBackground
-	// synchronously causing our two callbacks to override changes
-	// from each other.
-	const localAttributes = useRef( attributes );
-	useEffect( () => {
-		localAttributes.current = attributes;
-	}, [ attributes ] );
-
-	if ( ! hasColorSupport( blockName ) ) {
+	if ( ! isEnabled ) {
 		return null;
 	}
 
-	const hasLinkColor =
-		hasLinkColorSupport( blockName ) && isLinkEnabled && solidsEnabled;
-	const hasTextColor =
-		hasTextColorSupport( blockName ) && isTextEnabled && solidsEnabled;
-	const hasBackgroundColor =
-		hasBackgroundColorSupport( blockName ) &&
-		isBackgroundEnabled &&
-		solidsEnabled;
-	const hasGradientColor =
-		hasGradientSupport( blockName ) && gradientsEnabled;
-
-	if (
-		! hasLinkColor &&
-		! hasTextColor &&
-		! hasBackgroundColor &&
-		! hasGradientColor
-	) {
-		return null;
-	}
-
-	const { style, textColor, backgroundColor, gradient } = attributes;
-	let gradientValue;
-	if ( hasGradientColor && gradient ) {
-		gradientValue = getGradientValueBySlug( allGradients, gradient );
-	} else if ( hasGradientColor ) {
-		gradientValue = style?.color?.gradient;
-	}
-
-	const onChangeColor = ( name ) => ( value ) => {
-		const colorObject = getColorObjectByColorValue( allSolids, value );
-		const attributeName = name + 'Color';
-		const newStyle = {
-			...localAttributes.current.style,
-			color: {
-				...localAttributes.current?.style?.color,
-				[ name ]: colorObject?.slug ? undefined : value,
-			},
-		};
-
-		const newNamedColor = colorObject?.slug ? colorObject.slug : undefined;
-		const newAttributes = {
-			style: cleanEmptyObject( newStyle ),
-			[ attributeName ]: newNamedColor,
-		};
-
-		props.setAttributes( newAttributes );
-		localAttributes.current = {
-			...localAttributes.current,
-			...newAttributes,
-		};
-	};
-
-	const onChangeGradient = ( value ) => {
-		const slug = getGradientSlugByValue( allGradients, value );
-		let newAttributes;
-		if ( slug ) {
-			const newStyle = {
-				...localAttributes.current?.style,
-				color: {
-					...localAttributes.current?.style?.color,
-					gradient: undefined,
-				},
-			};
-			newAttributes = {
-				style: cleanEmptyObject( newStyle ),
-				gradient: slug,
-			};
-		} else {
-			const newStyle = {
-				...localAttributes.current?.style,
-				color: {
-					...localAttributes.current?.style?.color,
-					gradient: value,
-				},
-			};
-			newAttributes = {
-				style: cleanEmptyObject( newStyle ),
-				gradient: undefined,
-			};
-		}
-		props.setAttributes( newAttributes );
-		localAttributes.current = {
-			...localAttributes.current,
-			...newAttributes,
-		};
-	};
-
-	const onChangeLinkColor = ( value ) => {
-		const colorObject = getColorObjectByColorValue( allSolids, value );
-		const newLinkColorValue = colorObject?.slug
-			? `var:preset|color|${ colorObject.slug }`
-			: value;
-
-		const newStyle = cleanEmptyObject(
-			immutableSet(
-				style,
-				[ 'elements', 'link', 'color', 'text' ],
-				newLinkColorValue
-			)
-		);
-		props.setAttributes( { style: newStyle } );
-	};
-
-	const enableContrastChecking =
-		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
-
-	const defaultColorControls = getBlockSupport( props.name, [
+	const defaultControls = getBlockSupport( props.name, [
 		COLOR_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
 
+	const enableContrastChecking =
+		Platform.OS === 'web' &&
+		! value?.color?.gradient &&
+		( settings?.color?.text || settings?.color?.link ) &&
+		// Contrast checking is enabled by default.
+		// Deactivating it requires `enableContrastChecker` to have
+		// an explicit value of `false`.
+		false !==
+			getBlockSupport( props.name, [
+				COLOR_SUPPORT_KEY,
+				'enableContrastChecker',
+			] );
+
 	return (
-		<ColorPanel
-			enableContrastChecking={ enableContrastChecking }
-			clientId={ props.clientId }
-			enableAlpha={ true }
-			settings={ [
-				...( hasTextColor
-					? [
-							{
-								label: __( 'Text' ),
-								onColorChange: onChangeColor( 'text' ),
-								colorValue: getColorObjectByAttributeValues(
-									allSolids,
-									textColor,
-									style?.color?.text
-								).color,
-								isShownByDefault: defaultColorControls?.text,
-								hasValue: () => hasColor( 'text' )( props ),
-								onDeselect: () => resetTextColor( props ),
-								resetAllFilter: resetAllTextFilter,
-							},
-					  ]
-					: [] ),
-				...( hasBackgroundColor || hasGradientColor
-					? [
-							{
-								label: __( 'Background' ),
-								onColorChange: hasBackgroundColor
-									? onChangeColor( 'background' )
-									: undefined,
-								colorValue: getColorObjectByAttributeValues(
-									allSolids,
-									backgroundColor,
-									style?.color?.background
-								).color,
-								gradientValue,
-								onGradientChange: hasGradientColor
-									? onChangeGradient
-									: undefined,
-								isShownByDefault:
-									defaultColorControls?.background,
-								hasValue: () =>
-									hasColor( 'background' )( props ),
-								onDeselect: () =>
-									resetBackgroundAndGradient( props ),
-								resetAllFilter: clearBackgroundAndGradient,
-							},
-					  ]
-					: [] ),
-				...( hasLinkColor
-					? [
-							{
-								label: __( 'Link' ),
-								onColorChange: onChangeLinkColor,
-								colorValue: getLinkColorFromAttributeValue(
-									allSolids,
-									style?.elements?.link?.color?.text
-								),
-								clearable: !! style?.elements?.link?.color
-									?.text,
-								isShownByDefault: defaultColorControls?.link,
-								hasValue: () => hasColor( 'link' )( props ),
-								onDeselect: () => resetLinkColor( props ),
-								resetAllFilter: resetAllLinkFilter,
-							},
-					  ]
-					: [] ),
-			] }
-		/>
+		<StylesColorPanel
+			as={ ColorInspectorControl }
+			panelId={ clientId }
+			settings={ settings }
+			value={ value }
+			onChange={ onChange }
+			defaultControls={ defaultControls }
+			enableContrastChecker={
+				false !==
+				getBlockSupport( props.name, [
+					COLOR_SUPPORT_KEY,
+					'enableContrastChecker',
+				] )
+			}
+		>
+			{ enableContrastChecking && (
+				<BlockColorContrastChecker clientId={ clientId } />
+			) }
+		</StylesColorPanel>
 	);
 }
 
@@ -596,9 +368,9 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const userPalette = useSetting( 'color.palette.custom' ) || [];
-		const themePalette = useSetting( 'color.palette.theme' ) || [];
-		const defaultPalette = useSetting( 'color.palette.default' ) || [];
+		const userPalette = useSetting( 'color.palette.custom' );
+		const themePalette = useSetting( 'color.palette.theme' );
+		const defaultPalette = useSetting( 'color.palette.default' );
 		const colors = useMemo(
 			() => [
 				...( userPalette || [] ),
@@ -644,7 +416,8 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 		};
 
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	}
+	},
+	'withColorPaletteStyles'
 );
 
 const MIGRATION_PATHS = {

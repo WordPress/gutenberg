@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { SelectControl } from '@wordpress/components';
@@ -25,7 +20,7 @@ export default function FontFamilyControl( {
 		fontFamilies = blockLevelFontFamilies;
 	}
 
-	if ( isEmpty( fontFamilies ) ) {
+	if ( ! fontFamilies || fontFamilies.length === 0 ) {
 		return null;
 	}
 
@@ -40,7 +35,7 @@ export default function FontFamilyControl( {
 	];
 	return (
 		<SelectControl
-			label={ __( 'Font family' ) }
+			label={ __( 'Font' ) }
 			options={ options }
 			value={ value }
 			onChange={ onChange }

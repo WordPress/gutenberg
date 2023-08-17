@@ -68,15 +68,14 @@ describe( 'Missing block', () => {
 			beforeEach( () => {
 				// By default we set the web editor as available.
 				storeConfig.selectors.getSettings.mockReturnValue( {
-					unsupportedBlockEditor: true,
+					capabilities: { unsupportedBlockEditor: true },
 				} );
 			} );
 
 			it( 'renders edit action if UBE is available', () => {
 				const testInstance = getTestComponentWithContent();
-				const bottomSheet = testInstance.UNSAFE_getByType(
-					BottomSheet
-				);
+				const bottomSheet =
+					testInstance.UNSAFE_getByType( BottomSheet );
 				const bottomSheetCells = bottomSheet.props.children[ 1 ];
 				expect( bottomSheetCells ).toBeTruthy();
 				expect( bottomSheetCells.props.children.length ).toBe( 2 );
@@ -87,13 +86,12 @@ describe( 'Missing block', () => {
 
 			it( 'does not render edit action if UBE is not available', () => {
 				storeConfig.selectors.getSettings.mockReturnValue( {
-					unsupportedBlockEditor: false,
+					capabilities: { unsupportedBlockEditor: false },
 				} );
 
 				const testInstance = getTestComponentWithContent();
-				const bottomSheet = testInstance.UNSAFE_getByType(
-					BottomSheet
-				);
+				const bottomSheet =
+					testInstance.UNSAFE_getByType( BottomSheet );
 				expect( bottomSheet.props.children[ 1 ] ).toBeFalsy();
 			} );
 
@@ -101,9 +99,8 @@ describe( 'Missing block', () => {
 				const testInstance = getTestComponentWithContent( {
 					originalName: 'core/block',
 				} );
-				const bottomSheet = testInstance.UNSAFE_getByType(
-					BottomSheet
-				);
+				const bottomSheet =
+					testInstance.UNSAFE_getByType( BottomSheet );
 				expect( bottomSheet.props.children[ 1 ] ).toBeFalsy();
 			} );
 		} );

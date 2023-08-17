@@ -2,7 +2,7 @@
 
 Slot and Fill are a pair of components which enable developers to render elsewhere in a React element tree, a pattern often referred to as "portal" rendering. It is a pattern for component extensibility, where a single Slot may be occupied by an indeterminate number of Fills elsewhere in the application.
 
-Slot Fill is heavily inspired by the [`react-slot-fill` library](https://github.com/camwest/react-slot-fill), but uses React's own portal rendering API, exposed as an unstable API in React 16 and slated to be promoted to a stable API in React 17.
+Slot Fill is heavily inspired by the [`react-slot-fill` library](https://github.com/camwest/react-slot-fill), but uses React's own portal rendering API.
 
 ## Usage
 
@@ -70,7 +70,7 @@ Both `Slot` and `Fill` accept a `name` string prop, where a `Slot` with a given 
 
 `Slot` with `bubblesVirtually` set to true also accept an optional `className` to add to the slot container.
 
-`Slot` also accepts optional `children` function prop, which takes `fills` as a param. It allows to perform additional processing and wrap `fills` conditionally.
+`Slot` accepts an optional `children` function prop, which takes `fills` as a param. It allows you to perform additional processing and wrap `fills` conditionally.
 
 _Example_:
 
@@ -87,5 +87,30 @@ const Toolbar = ( { isMobile } ) => (
 			} }
 		</Slot>
 	</div>
+);
+```
+
+Props can also be passed from a `Slot` to a `Fill` by using the prop `fillProps` on the `Slot`:
+
+```jsx
+const { Fill, Slot } = createSlotFill( 'Toolbar' );
+
+const ToolbarItem = () => (
+	<Fill>
+		{ ( { hideToolbar } ) => {
+			<Button onClick={ hideToolbar }>Hide</Button>;
+		} }
+	</Fill>
+);
+
+const Toolbar = () => 
+	const hideToolbar() => {
+		console.log( 'Hide toolbar' );
+	}
+	return (
+		<div className="toolbar">
+			<Slot fillProps={ { hideToolbar } } />
+		</div>
+	);
 );
 ```

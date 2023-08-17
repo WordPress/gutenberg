@@ -1,15 +1,14 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { RichTextToolbarButton, useSetting } from '@wordpress/block-editor';
-import { Icon, textColor as textColorIcon } from '@wordpress/icons';
+import {
+	Icon,
+	color as colorIcon,
+	textColor as textColorIcon,
+} from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 
 /**
@@ -65,12 +64,14 @@ function TextColorEdit( {
 	const allowCustomControl = useSetting( 'color.custom' );
 	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
-	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
-		setIsAddingColor,
-	] );
-	const disableIsAddingColor = useCallback( () => setIsAddingColor( false ), [
-		setIsAddingColor,
-	] );
+	const enableIsAddingColor = useCallback(
+		() => setIsAddingColor( true ),
+		[ setIsAddingColor ]
+	);
+	const disableIsAddingColor = useCallback(
+		() => setIsAddingColor( false ),
+		[ setIsAddingColor ]
+	);
 	const colorIndicatorStyle = useMemo(
 		() =>
 			fillComputedColors(
@@ -80,7 +81,7 @@ function TextColorEdit( {
 		[ value, colors ]
 	);
 
-	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
+	const hasColorsToChoose = colors.length || ! allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {
 		return null;
 	}
@@ -92,7 +93,11 @@ function TextColorEdit( {
 				isActive={ isActive }
 				icon={
 					<Icon
-						icon={ textColorIcon }
+						icon={
+							Object.keys( activeAttributes ).length
+								? textColorIcon
+								: colorIcon
+						}
 						style={ colorIndicatorStyle }
 					/>
 				}

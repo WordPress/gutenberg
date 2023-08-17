@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/npm-package-json-lint-config",
-	"version": "4.1.2",
+	"version": "4.25.0",
 	"description": "WordPress npm-package-json-lint shareable configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,14 +20,14 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=14"
 	},
 	"files": [
 		"index.js"
 	],
 	"main": "index.js",
 	"peerDependencies": {
-		"npm-package-json-lint": ">=3.6.0"
+		"npm-package-json-lint": ">=6.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

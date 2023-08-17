@@ -18,11 +18,8 @@ export function useDelete( props ) {
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode } = event;
-			const {
-				createRecord,
-				handleChange,
-				multilineTag,
-			} = propsRef.current;
+			const { createRecord, handleChange, multilineTag } =
+				propsRef.current;
 
 			if ( event.defaultPrevented ) {
 				return;

@@ -9,17 +9,13 @@ $popover-padding: $grid-unit-20;
 $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover-padding, $swatch-size + $swatch-gap));
 
 .block-editor-duotone-control__popover {
-	> .components-popover__content > div {
+	> .components-popover__content {
 		padding: $popover-padding;
 		width: $popover-width;
 	}
 
 	.components-menu-group__label {
 		padding: 0;
-	}
-
-	.components-custom-gradient-picker__gradient-bar {
-		margin: $grid-unit-20 0 $grid-unit-15;
 	}
 
 	.components-circular-option-picker__swatches {
@@ -35,8 +31,7 @@ $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover
 	font-size: $helptext-font-size;
 }
 
-// Better align the popover under the swatch.
-// @todo: when the positioning for popovers gets refactored, this can presumably be removed.
-.block-editor-duotone-control__popover:not([data-y-axis="middle"][data-x-axis="right"]) > .components-popover__content {
-	margin-left: -14px;
+.block-editor-duotone-control__unset-indicator {
+	// Show a diagonal line (crossed out) for empty swatches.
+	background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 }

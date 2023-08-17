@@ -4,7 +4,11 @@
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-import { pasteHandler } from '@wordpress/blocks';
+import {
+	pasteHandler,
+	findTransform,
+	getBlockTransforms,
+} from '@wordpress/blocks';
 import {
 	isEmpty,
 	insert,
@@ -17,7 +21,6 @@ import { isURL } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { filePasteHandler } from './file-paste-handler';
 import { addActiveFormats, isShortcode } from './utils';
 import { splitValue } from './split-value';
 import { shouldDismissPastedFiles } from '../../utils/pasting';
@@ -126,33 +129,16 @@ export function usePasteHandler( props ) {
 			}
 
 			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
-			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
-
-			// If the data comes from a rich text instance, we can directly use it
-			// without filtering the data. The filters are only meant for externally
-			// pasted content and remove inline styles.
-			if ( isInternal ) {
-				const pastedMultilineTag =
-					clipboardData.getData( 'rich-text-multi-line-tag' ) ||
-					undefined;
-				let pastedValue = create( {
-					html,
-					multilineTag: pastedMultilineTag,
-					multilineWrapperTags:
-						pastedMultilineTag === 'li'
-							? [ 'ul', 'ol' ]
-							: undefined,
-					preserveWhiteSpace,
-				} );
-				pastedValue = adjustLines( pastedValue, !! multilineTag );
-				addActiveFormats( pastedValue, value.activeFormats );
-				onChange( insert( value, pastedValue ) );
-				return;
-			}
 
 			if ( pastePlainText ) {
 				onChange( insert( value, create( { text: plainText } ) ) );
 				return;
+			}
+
+			if ( files?.length ) {
+				// Allows us to ask for this information when we get a report.
+				// eslint-disable-next-line no-console
+				window.console.log( 'Received items:\n\n', files );
 			}
 
 			// Process any attached files, unless we infer that the files in
@@ -164,23 +150,33 @@ export function usePasteHandler( props ) {
 				files?.length &&
 				! shouldDismissPastedFiles( files, html, plainText )
 			) {
-				const content = pasteHandler( {
-					HTML: filePasteHandler( files ),
-					mode: 'BLOCKS',
-					tagName,
-					preserveWhiteSpace,
-				} );
-
-				// Allows us to ask for this information when we get a report.
-				// eslint-disable-next-line no-console
-				window.console.log( 'Received items:\n\n', files );
+				const fromTransforms = getBlockTransforms( 'from' );
+				const blocks = files
+					.reduce( ( accumulator, file ) => {
+						const transformation = findTransform(
+							fromTransforms,
+							( transform ) =>
+								transform.type === 'files' &&
+								transform.isMatch( [ file ] )
+						);
+						if ( transformation ) {
+							accumulator.push(
+								transformation.transform( [ file ] )
+							);
+						}
+						return accumulator;
+					}, [] )
+					.flat();
+				if ( ! blocks.length ) {
+					return;
+				}
 
 				if ( onReplace && isEmpty( value ) ) {
-					onReplace( content );
+					onReplace( blocks );
 				} else {
 					splitValue( {
 						value,
-						pastedBlocks: content,
+						pastedBlocks: blocks,
 						onReplace,
 						onSplit,
 						onSplitMiddle,
@@ -219,6 +215,10 @@ export function usePasteHandler( props ) {
 				mode,
 				tagName,
 				preserveWhiteSpace,
+				// If the data comes from a rich text instance, we can directly
+				// use it without filtering the data. The filters are only meant
+				// for externally pasted content and remove inline styles.
+				disableFilters: !! clipboardData.getData( 'rich-text' ),
 			} );
 
 			if ( typeof content === 'string' ) {
@@ -254,17 +254,29 @@ export function usePasteHandler( props ) {
 }
 
 /**
- * Normalizes a given string of HTML to remove the Windows specific "Fragment" comments
- * and any preceeding and trailing whitespace.
+ * Normalizes a given string of HTML to remove the Windows-specific "Fragment"
+ * comments and any preceding and trailing content.
  *
  * @param {string} html the html to be normalized
  * @return {string} the normalized html
  */
 function removeWindowsFragments( html ) {
-	const startReg = /.*<!--StartFragment-->/s;
-	const endReg = /<!--EndFragment-->.*/s;
+	const startStr = '<!--StartFragment-->';
+	const startIdx = html.indexOf( startStr );
+	if ( startIdx > -1 ) {
+		html = html.substring( startIdx + startStr.length );
+	} else {
+		// No point looking for EndFragment
+		return html;
+	}
 
-	return html.replace( startReg, '' ).replace( endReg, '' );
+	const endStr = '<!--EndFragment-->';
+	const endIdx = html.indexOf( endStr );
+	if ( endIdx > -1 ) {
+		html = html.substring( 0, endIdx );
+	}
+
+	return html;
 }
 
 /**

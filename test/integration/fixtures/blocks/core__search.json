@@ -6,7 +6,10 @@
 			"showLabel": true,
 			"placeholder": "",
 			"buttonPosition": "button-outside",
-			"buttonUseIcon": false
+			"buttonUseIcon": false,
+			"query": {},
+			"buttonBehavior": "expand-searchfield",
+			"isSearchFieldHidden": false
 		},
 		"innerBlocks": []
 	}

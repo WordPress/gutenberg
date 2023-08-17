@@ -9,13 +9,12 @@ import { getEditorHtml, render, initializeEditor } from 'test/helpers';
  */
 import { select } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { coreBlocks, registerBlock } from '@wordpress/block-library';
+import { coreBlocks } from '@wordpress/block-library';
 import {
 	getBlockTypes,
 	setDefaultBlockName,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-import '@wordpress/jest-console';
 
 /**
  * Internal dependencies
@@ -60,7 +59,7 @@ describe( '<RichText/>', () => {
 	beforeAll( () => {
 		// Register Paragraph block.
 		const paragraph = coreBlocks[ 'core/paragraph' ];
-		registerBlock( paragraph );
+		paragraph.init();
 		setDefaultBlockName( paragraph.name );
 	} );
 
@@ -84,11 +83,11 @@ describe( '<RichText/>', () => {
 			// Arrange.
 			const expectedFontSize = 16;
 			// Act.
-			const { getByA11yLabel } = render(
+			const { getByLabelText } = render(
 				<RichText accessibilityLabel={ 'editor' } />
 			);
 			// Assert.
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
@@ -96,14 +95,14 @@ describe( '<RichText/>', () => {
 			// Arrange.
 			const expectedFontSize = 32;
 			// Act.
-			const { getByA11yLabel } = render(
+			const { getByLabelText } = render(
 				<RichText
 					accessibilityLabel={ 'editor' }
 					fontSize={ 'min(2em, 3em)' }
 				/>
 			);
 			// Assert.
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
@@ -111,14 +110,14 @@ describe( '<RichText/>', () => {
 			// Arrange.
 			const expectedFontSize = 32;
 			// Act.
-			const { getByA11yLabel } = render(
+			const { getByLabelText } = render(
 				<RichText
 					accessibilityLabel={ 'editor' }
 					style={ { fontSize: 'min(2em, 3em)' } }
 				/>
 			);
 			// Assert.
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
@@ -128,11 +127,11 @@ describe( '<RichText/>', () => {
 			const defaultFontSize = 16;
 			mockGlobalSettings( { fontSize: 'min(2em, 3em)' } );
 			// Act.
-			const { getByA11yLabel } = render(
+			const { getByLabelText } = render(
 				<RichText accessibilityLabel={ 'editor' } tagName="div" />
 			);
 			// Assert.
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
 			expect( actualFontSize ).toBe( defaultFontSize );
 		} );
 
@@ -142,11 +141,11 @@ describe( '<RichText/>', () => {
 			const expectedFontSize = 32;
 			mockGlobalSettings( { fontSize: 'min(2em, 3em)' } );
 			// Act.
-			const { getByA11yLabel } = render(
+			const { getByLabelText } = render(
 				<RichText accessibilityLabel={ 'editor' } tagName="p" />
 			);
 			// Assert.
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
@@ -157,12 +156,12 @@ describe( '<RichText/>', () => {
 				// Arrange.
 				mockGlobalSettings( { fontSize: unit } );
 				// Act.
-				const { getByA11yLabel } = render(
+				const { getByLabelText } = render(
 					<RichText accessibilityLabel={ 'editor' } tagName="p" />
 				);
 				// Assert.
-				const actualFontSize = getByA11yLabel( 'editor' ).props
-					.fontSize;
+				const actualFontSize =
+					getByLabelText( 'editor' ).props.fontSize;
 				expect( actualFontSize ).toBe( expected );
 			}
 		);
@@ -173,7 +172,7 @@ describe( '<RichText/>', () => {
 			const expectedFontSize = 1;
 			mockGlobalSettings( { fontSize: '0' } );
 			// Act.
-			const { getByA11yLabel } = render(
+			const { getByLabelText } = render(
 				<RichText
 					accessibilityLabel={ 'editor' }
 					style={ { fontSize: '1' } }
@@ -182,7 +181,7 @@ describe( '<RichText/>', () => {
 				/>
 			);
 			// Assert.
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
@@ -192,7 +191,7 @@ describe( '<RichText/>', () => {
 			const expectedFontSize = 1;
 			mockGlobalSettings( { fontSize: '0' } );
 			// Act.
-			const { getByA11yLabel } = render(
+			const { getByLabelText } = render(
 				<RichText
 					accessibilityLabel={ 'editor' }
 					style={ { fontSize: '1' } }
@@ -200,7 +199,7 @@ describe( '<RichText/>', () => {
 				/>
 			);
 			// Assert.
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
@@ -209,11 +208,11 @@ describe( '<RichText/>', () => {
 			const expectedFontSize = 3;
 			Dimensions.set( { window: { ...window, width: 300 } } );
 			// Act.
-			const { getByA11yLabel } = render(
+			const { getByLabelText } = render(
 				<RichText accessibilityLabel={ 'editor' } fontSize={ '1vw' } />
 			);
 			// Assert.
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
@@ -222,11 +221,11 @@ describe( '<RichText/>', () => {
 			const expectedFontSize = 3;
 			Dimensions.set( { window: { ...window, height: 300 } } );
 			// Act.
-			const { getByA11yLabel } = render(
+			const { getByLabelText } = render(
 				<RichText accessibilityLabel={ 'editor' } fontSize={ '1vh' } />
 			);
 			// Assert.
-			const actualFontSize = getByA11yLabel( 'editor' ).props.fontSize;
+			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
 			expect( actualFontSize ).toBe( expectedFontSize );
 		} );
 
@@ -268,11 +267,11 @@ describe( '<RichText/>', () => {
 			const expectedLineHeight = 1;
 			const style = { lineHeight: 0.2 };
 			// Act.
-			const { getByA11yLabel } = render(
+			const { getByLabelText } = render(
 				<RichText accessibilityLabel={ 'editor' } style={ style } />
 			);
 			// Assert.
-			const actualFontSize = getByA11yLabel( 'editor' ).props.lineHeight;
+			const actualFontSize = getByLabelText( 'editor' ).props.lineHeight;
 			expect( actualFontSize ).toBe( expectedLineHeight );
 		} );
 	} );

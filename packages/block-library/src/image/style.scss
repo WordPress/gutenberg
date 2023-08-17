@@ -1,16 +1,25 @@
 .wp-block-image {
-	margin: 0 0 1em 0;
-
 	img {
 		height: auto;
 		max-width: 100%;
 		vertical-align: bottom;
+		box-sizing: border-box;
 	}
 
-	&:not(.is-style-rounded) {
+	// The following style maintains border radius application for deprecated
+	// image blocks that applied border radius to the outer `figure` element.
+	//
+	// See: https://github.com/WordPress/gutenberg/issues/47422
+	&[style*="border-radius"] {
 		> a,
 		img {
 			border-radius: inherit;
+		}
+	}
+
+	&.has-custom-border {
+		img {
+			box-sizing: border-box;
 		}
 	}
 
@@ -43,6 +52,7 @@
 		float: left;
 		/*rtl:ignore*/
 		margin-left: 0;
+		/*rtl:ignore*/
 		margin-right: 1em;
 		margin-top: 0.5em;
 		margin-bottom: 0.5em;
@@ -53,6 +63,7 @@
 		float: right;
 		/*rtl:ignore*/
 		margin-right: 0;
+		/*rtl:ignore*/
 		margin-left: 1em;
 		margin-top: 0.5em;
 		margin-bottom: 0.5em;
@@ -99,8 +110,240 @@
 			border-radius: 0;
 		}
 	}
+
+	// The following is required to overcome WP Core applying styles that clear
+	// img borders with a higher specificity than those added by the border
+	// block support to provide a default border-style of solid when a border
+	// color or width has been set.
+	:where(.has-border-color) {
+		border-style: solid;
+	}
+	:where([style*="border-top-color"]) {
+		border-top-style: solid;
+	}
+	:where([style*="border-right-color"]) {
+		border-right-style: solid;
+	}
+	:where([style*="border-bottom-color"]) {
+		border-bottom-style: solid;
+	}
+	:where([style*="border-left-color"]) {
+		border-left-style: solid;
+	}
+
+	:where([style*="border-width"]) {
+		border-style: solid;
+	}
+	:where([style*="border-top-width"]) {
+		border-top-style: solid;
+	}
+	:where([style*="border-right-width"]) {
+		border-right-style: solid;
+	}
+	:where([style*="border-bottom-width"]) {
+		border-bottom-style: solid;
+	}
+	:where([style*="border-left-width"]) {
+		border-left-style: solid;
+	}
 }
 
 .wp-block-image figure {
 	margin: 0;
+}
+
+.wp-lightbox-container {
+	position: relative;
+
+	button {
+		border: none;
+		background: none;
+		cursor: zoom-in;
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		z-index: 100;
+
+		&:focus-visible {
+			outline: 5px auto #212121;
+			outline: 5px auto -webkit-focus-ring-color;
+			outline-offset: 5px;
+		}
+	}
+}
+
+.wp-lightbox-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100000;
+	overflow: hidden;
+	width: 100vw;
+	height: 100vh;
+	box-sizing: border-box;
+	visibility: hidden;
+	cursor: zoom-out;
+
+	.close-button {
+		position: absolute;
+		top: calc(env(safe-area-inset-top) + 12.5px);
+		right: calc(env(safe-area-inset-right) + 12.5px);
+		padding: 0;
+		cursor: pointer;
+		z-index: 5000000;
+	}
+
+	.lightbox-image-container {
+		position: absolute;
+		overflow: hidden;
+		top: 50%;
+		left: 50%;
+		transform-origin: top left;
+		transform: translate(-50%, -50%);
+		width: var(--wp--lightbox-container-width);
+		height: var(--wp--lightbox-container-height);
+		z-index: 9999999999;
+	}
+
+	.wp-block-image {
+		position: relative;
+		transform-origin: 0 0;
+		display: flex;
+		width: 100%;
+		height: 100%;
+		justify-content: center;
+		align-items: center;
+		box-sizing: border-box;
+		z-index: 3000000;
+		margin: 0;
+
+		img {
+			min-width: var(--wp--lightbox-image-width);
+			min-height: var(--wp--lightbox-image-height);
+			width: var(--wp--lightbox-image-width);
+			height: var(--wp--lightbox-image-height);
+		}
+
+		figcaption {
+			display: none;
+		}
+	}
+
+	button {
+		border: none;
+		background: none;
+	}
+
+	.scrim {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		z-index: 2000000;
+		background-color: rgb(255, 255, 255);
+		opacity: 0.9;
+	}
+
+	// When fading, make the image come in slightly slower
+	// or faster than the scrim to give a sense of depth.
+	&.active {
+		visibility: visible;
+		animation: both turn-on-visibility 0.25s;
+		img {
+			animation: both turn-on-visibility 0.35s;
+		}
+	}
+	&.hideanimationenabled {
+		&:not(.active) {
+			animation: both turn-off-visibility 0.35s;
+			img {
+				animation: both turn-off-visibility 0.25s;
+			}
+		}
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		&.zoom {
+			&.active {
+				opacity: 1;
+				visibility: visible;
+				animation: none;
+				.lightbox-image-container {
+					animation: lightbox-zoom-in 0.4s;
+					// Override fade animation for image
+					img {
+						animation: none;
+					}
+				}
+				.scrim {
+					animation: turn-on-visibility 0.4s forwards;
+				}
+			}
+			&.hideanimationenabled {
+				&:not(.active) {
+					animation: none;
+					.lightbox-image-container {
+						animation: lightbox-zoom-out 0.4s;
+						// Override fade animation for image
+						img {
+							animation: none;
+						}
+					}
+					.scrim {
+						animation: turn-off-visibility 0.4s forwards;
+					}
+				}
+			}
+		}
+	}
+}
+
+html.wp-has-lightbox-open {
+	overflow: hidden;
+}
+
+@keyframes turn-on-visibility {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes turn-off-visibility {
+	0% {
+		opacity: 1;
+		visibility: visible;
+	}
+	99% {
+		opacity: 0;
+		visibility: visible;
+	}
+	100% {
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+
+@keyframes lightbox-zoom-in {
+	0% {
+		transform: translate(calc(-50vw + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+	}
+	100% {
+		transform: translate(-50%, -50%) scale(1, 1);
+	}
+}
+
+@keyframes lightbox-zoom-out {
+	0% {
+		visibility: visible;
+		transform: translate(-50%, -50%) scale(1, 1);
+	}
+	99% {
+		visibility: visible;
+	}
+	100% {
+		visibility: hidden;
+		transform: translate(calc(-50vw + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+	}
 }

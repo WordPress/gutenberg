@@ -17,9 +17,10 @@ import useBlockDisplayTitle from './use-block-display-title';
  * @param {Object}           props
  * @param {string}           props.clientId      Client ID of block.
  * @param {number|undefined} props.maximumLength The maximum length that the block title string may be before truncated.
+ * @param {string|undefined} props.context       The context to pass to `getBlockLabel`.
  *
  * @return {JSX.Element} Block title.
  */
-export default function BlockTitle( { clientId, maximumLength } ) {
-	return useBlockDisplayTitle( clientId, maximumLength );
+export default function BlockTitle( { clientId, maximumLength, context } ) {
+	return useBlockDisplayTitle( { clientId, maximumLength, context } );
 }

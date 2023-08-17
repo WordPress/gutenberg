@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import ReactTestRenderer from 'react-test-renderer';
+import { render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -15,15 +15,15 @@ import PluginPostStatusInfo from '../';
 
 describe( 'PluginPostStatusInfo', () => {
 	test( 'renders fill properly', () => {
-		const tree = ReactTestRenderer.create(
+		const { container } = render(
 			<SlotFillProvider>
 				<PluginPostStatusInfo className="my-plugin-post-status-info">
 					My plugin post status info
 				</PluginPostStatusInfo>
 				<PluginPostStatusInfo.Slot />
 			</SlotFillProvider>
-		).toJSON();
+		);
 
-		expect( tree ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

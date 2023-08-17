@@ -50,8 +50,8 @@ export default function getInserterOuterSection() {
 
 			this.activeElementBeforeExpanded = null;
 
-			const ownerWindow = this.contentContainer[ 0 ].ownerDocument
-				.defaultView;
+			const ownerWindow =
+				this.contentContainer[ 0 ].ownerDocument.defaultView;
 
 			// Handle closing the inserter when pressing the Escape key.
 			ownerWindow.addEventListener(
@@ -102,9 +102,8 @@ export default function getInserterOuterSection() {
 						// We have to do this in a "completeCallback" or else the elements will not yet be visible/tabbable.
 						// The first one should be the close button,
 						// we want to skip it and choose the second one instead, which is the search box.
-						const searchBox = focus.tabbable.find(
-							contentContainer
-						)[ 1 ];
+						const searchBox =
+							focus.tabbable.find( contentContainer )[ 1 ];
 						if ( searchBox ) {
 							searchBox.focus();
 						}

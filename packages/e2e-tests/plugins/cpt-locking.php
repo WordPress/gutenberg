@@ -19,7 +19,13 @@ function gutenberg_test_cpt_locking() {
 				'placeholder' => 'Add a description',
 			),
 		),
-		array( 'core/quote' ),
+		array(
+			'core/quote',
+			array(),
+			array(
+				array( 'core/paragraph' ),
+			),
+		),
 		array( 'core/columns' ),
 	);
 	register_post_type(
@@ -65,7 +71,13 @@ function gutenberg_test_cpt_locking() {
 						'templateLock' => false,
 					),
 					array(
-						array( 'core/quote' ),
+						array(
+							'core/quote',
+							array(),
+							array(
+								array( 'core/paragraph' ),
+							),
+						),
 						array(
 							'core/paragraph',
 							array(
@@ -91,7 +103,13 @@ function gutenberg_test_cpt_locking() {
 						'templateLock' => 'all',
 					),
 					array(
-						array( 'core/quote' ),
+						array(
+							'core/quote',
+							array(),
+							array(
+								array( 'core/paragraph' ),
+							),
+						),
 						array(
 							'core/paragraph',
 							array(
@@ -115,7 +133,13 @@ function gutenberg_test_cpt_locking() {
 					'core/group',
 					array(),
 					array(
-						array( 'core/quote' ),
+						array(
+							'core/quote',
+							array(),
+							array(
+								array( 'core/paragraph' ),
+							),
+						),
 						array(
 							'core/paragraph',
 							array(

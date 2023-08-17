@@ -7,11 +7,24 @@ import { Button } from '@wordpress/components';
 import { select } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
 import { useCopyToClipboard } from '@wordpress/compose';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+
+function getContent() {
+	try {
+		// While `select` in a component is generally discouraged, it is
+		// used here because it (a) reduces the chance of data loss in the
+		// case of additional errors by performing a direct retrieval and
+		// (b) avoids the performance cost associated with unnecessary
+		// content serialization throughout the lifetime of a non-erroring
+		// application.
+		return select( editorStore ).getEditedPostContent();
+	} catch ( error ) {}
+}
 
 function CopyButton( { text, children } ) {
 	const ref = useCopyToClipboard( text );
@@ -26,32 +39,17 @@ class ErrorBoundary extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.reboot = this.reboot.bind( this );
-		this.getContent = this.getContent.bind( this );
-
 		this.state = {
 			error: null,
 		};
 	}
 
 	componentDidCatch( error ) {
-		this.setState( { error } );
+		doAction( 'editor.ErrorBoundary.errorLogged', error );
 	}
 
-	reboot() {
-		this.props.onError();
-	}
-
-	getContent() {
-		try {
-			// While `select` in a component is generally discouraged, it is
-			// used here because it (a) reduces the chance of data loss in the
-			// case of additional errors by performing a direct retrieval and
-			// (b) avoids the performance cost associated with unnecessary
-			// content serialization throughout the lifetime of a non-erroring
-			// application.
-			return select( editorStore ).getEditedPostContent();
-		} catch ( error ) {}
+	static getDerivedStateFromError( error ) {
+		return { error };
 	}
 
 	render() {
@@ -60,25 +58,17 @@ class ErrorBoundary extends Component {
 			return this.props.children;
 		}
 
+		const actions = [
+			<CopyButton key="copy-post" text={ getContent }>
+				{ __( 'Copy Post Text' ) }
+			</CopyButton>,
+			<CopyButton key="copy-error" text={ error.stack }>
+				{ __( 'Copy Error' ) }
+			</CopyButton>,
+		];
+
 		return (
-			<Warning
-				className="editor-error-boundary"
-				actions={ [
-					<Button
-						key="recovery"
-						onClick={ this.reboot }
-						variant="secondary"
-					>
-						{ __( 'Attempt Recovery' ) }
-					</Button>,
-					<CopyButton key="copy-post" text={ this.getContent }>
-						{ __( 'Copy Post Text' ) }
-					</CopyButton>,
-					<CopyButton key="copy-error" text={ error.stack }>
-						{ __( 'Copy Error' ) }
-					</CopyButton>,
-				] }
-			>
+			<Warning className="editor-error-boundary" actions={ actions }>
 				{ __( 'The editor has encountered an unexpected error.' ) }
 			</Warning>
 		);

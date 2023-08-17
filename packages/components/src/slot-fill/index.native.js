@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import BaseSlot from './slot';
@@ -12,8 +7,8 @@ import Provider from './provider';
 
 export { Fill, Provider };
 
-export function Slot( props ) {
-	return <BaseSlot { ...omit( props, 'bubblesVirtually' ) } />;
+export function Slot( { bubblesVirtually, ...restProps } ) {
+	return <BaseSlot { ...restProps } />;
 }
 
 export function createSlotFill( name ) {

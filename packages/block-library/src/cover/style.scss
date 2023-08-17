@@ -1,37 +1,21 @@
 .wp-block-cover-image,
 .wp-block-cover {
 	position: relative;
-	background-size: cover;
 	background-position: center center;
 	min-height: 430px;
-	width: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	padding: 1em;
+	// Prevent the `wp-block-cover__background` span from overflowing the container when border-radius is applied.
+	// `overflow: hidden` is provided as a fallback for browsers that don't support `overflow: clip`.
+	overflow: hidden;
+	// Use clip instead of overflow: hidden so that sticky position works on child elements.
+	overflow: clip;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
-
-	&.has-parallax {
-		background-attachment: fixed;
-
-		// Mobile Safari does not support fixed background attachment properly.
-		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
-		// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
-		@supports (-webkit-touch-callout: inherit) {
-			background-attachment: scroll;
-		}
-
-		// Remove the appearance of scrolling based on OS-level animation preferences.
-		@media (prefers-reduced-motion: reduce) {
-			background-attachment: scroll;
-		}
-	}
-
-	&.is-repeated {
-		background-repeat: repeat;
-		background-size: auto;
-	}
+	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.
+	/*rtl:raw: direction: ltr; */
 
 	/**
 	 * Set a default background color for has-background-dim _unless_ it includes another
@@ -127,13 +111,9 @@
 	.wp-block-cover__inner-container {
 		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
-		color: $white;
-	}
-
-	&.is-light {
-		.wp-block-cover__inner-container {
-			color: $black;
-		}
+		color: inherit;
+		// Reset the fixed LTR direction at the root of the block in RTL languages.
+		/*rtl:raw: direction: rtl; */
 	}
 
 	p,
@@ -196,7 +176,7 @@
 	}
 
 	// Extra specificity for in edit mode where other styles would override it otherwise.
-	img.wp-block-cover__image-background,
+	.wp-block-cover__image-background,
 	video.wp-block-cover__video-background {
 		position: absolute;
 		top: 0;
@@ -213,6 +193,34 @@
 		outline: none;
 		border: none;
 		box-shadow: none;
+	}
+}
+
+.wp-block-cover-image,
+.wp-block-cover,
+.wp-block-cover__image-background,
+video.wp-block-cover__video-background {
+	&.has-parallax {
+		background-attachment: fixed;
+		background-size: cover;
+		background-repeat: no-repeat;
+
+		// Mobile Safari does not support fixed background attachment properly.
+		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
+		// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
+		@supports (-webkit-touch-callout: inherit) {
+			background-attachment: scroll;
+		}
+
+		// Remove the appearance of scrolling based on OS-level animation preferences.
+		@media (prefers-reduced-motion: reduce) {
+			background-attachment: scroll;
+		}
+	}
+
+	&.is-repeated {
+		background-repeat: repeat;
+		background-size: auto;
 	}
 }
 
@@ -275,4 +283,19 @@ section.wp-block-cover-image > h2,
 	max-width: $content-width;
 	padding: 0.44em;
 	text-align: center;
+}
+
+// If Cover block's text color has not been set adjust default color
+// based on if overlay is light or not. The following styles leverage
+// `:where` to allow for generic global styles that have a low specificity to
+// still take precedence.
+
+:where(.wp-block-cover:not(.has-text-color)),
+:where(.wp-block-cover-image:not(.has-text-color)) {
+	color: $white;
+}
+
+:where(.wp-block-cover.is-light:not(.has-text-color)),
+:where(.wp-block-cover-image.is-light:not(.has-text-color)) {
+	color: $black;
 }

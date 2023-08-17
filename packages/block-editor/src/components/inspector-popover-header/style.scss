@@ -1,0 +1,16 @@
+.block-editor-inspector-popover-header {
+	margin-bottom: $grid-unit-20;
+}
+
+[class].block-editor-inspector-popover-header__action {
+	height: $icon-size;
+
+	&.has-icon {
+		min-width: $icon-size;
+		padding: 0;
+	}
+
+	&:not(.has-icon) {
+		text-decoration: underline;
+	}
+}

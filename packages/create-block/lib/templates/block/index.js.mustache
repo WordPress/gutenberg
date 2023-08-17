@@ -18,20 +18,26 @@ import './style.scss';
  * Internal dependencies
  */
 import Edit from './edit';
+{{#isStaticVariant}}
 import save from './save';
+{{/isStaticVariant}}
+import metadata from './block.json';
 
 /**
  * Every block starts by registering a new block type definition.
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
-registerBlockType( '{{namespace}}/{{slug}}', {
+registerBlockType( metadata.name, {
 	/**
 	 * @see ./edit.js
 	 */
 	edit: Edit,
+	{{#isStaticVariant}}
+
 	/**
 	 * @see ./save.js
 	 */
 	save,
+	{{/isStaticVariant}}
 } );

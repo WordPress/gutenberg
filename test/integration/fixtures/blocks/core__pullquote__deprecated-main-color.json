@@ -3,13 +3,13 @@
 		"name": "core/pullquote",
 		"isValid": true,
 		"attributes": {
+			"value": "Pullquote custom color",
 			"className": "is-style-default",
 			"style": {
 				"border": {
 					"color": "#2207d0"
 				}
 			},
-			"value": "<p>Pullquote custom color</p>",
 			"citation": "my citation",
 			"textColor": "subtle-background"
 		},

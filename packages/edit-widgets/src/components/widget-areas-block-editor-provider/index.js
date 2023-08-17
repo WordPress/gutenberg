@@ -1,21 +1,21 @@
 /**
- * External dependencies
- */
-import { defaultTo } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { SlotFillProvider } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	useEntityBlockEditor,
+	store as coreStore,
+	useResourcePermissions,
+} from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
-	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
 	CopyHandler,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -23,49 +23,47 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
 import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
+import { unlock } from '../../lock-unlock';
 
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,
 	...props
 } ) {
-	const {
-		hasUploadPermissions,
-		reusableBlocks,
-		isFixedToolbarActive,
-		keepCaretInsideBlock,
-	} = useSelect(
-		( select ) => ( {
-			hasUploadPermissions: defaultTo(
-				select( coreStore ).canUser( 'create', 'media' ),
-				true
-			),
-			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
-			widgets: select( editWidgetsStore ).getWidgets(),
-			reusableBlocks: ALLOW_REUSABLE_BLOCKS
-				? select( coreStore ).getEntityRecords( 'postType', 'wp_block' )
-				: [],
-			isFixedToolbarActive: !! select( preferencesStore ).get(
-				'core/edit-widgets',
-				'fixedToolbar'
-			),
-			keepCaretInsideBlock: !! select( preferencesStore ).get(
-				'core/edit-widgets',
-				'keepCaretInsideBlock'
-			),
-		} ),
-		[]
-	);
+	const mediaPermissions = useResourcePermissions( 'media' );
+	const { reusableBlocks, isFixedToolbarActive, keepCaretInsideBlock } =
+		useSelect(
+			( select ) => ( {
+				widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
+				widgets: select( editWidgetsStore ).getWidgets(),
+				reusableBlocks: ALLOW_REUSABLE_BLOCKS
+					? select( coreStore ).getEntityRecords(
+							'postType',
+							'wp_block'
+					  )
+					: [],
+				isFixedToolbarActive: !! select( preferencesStore ).get(
+					'core/edit-widgets',
+					'fixedToolbar'
+				),
+				keepCaretInsideBlock: !! select( preferencesStore ).get(
+					'core/edit-widgets',
+					'keepCaretInsideBlock'
+				),
+			} ),
+			[]
+		);
 	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
-		if ( hasUploadPermissions ) {
+		if ( mediaPermissions.canCreate ) {
 			mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
 				uploadMedia( {
 					wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
@@ -87,7 +85,7 @@ export default function WidgetAreasBlockEditorProvider( {
 		blockEditorSettings,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
-		hasUploadPermissions,
+		mediaPermissions.canCreate,
 		reusableBlocks,
 		setIsInserterOpened,
 	] );
@@ -105,7 +103,7 @@ export default function WidgetAreasBlockEditorProvider( {
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
-				<BlockEditorProvider
+				<ExperimentalBlockEditorProvider
 					value={ blocks }
 					onInput={ onInput }
 					onChange={ onChange }
@@ -114,8 +112,8 @@ export default function WidgetAreasBlockEditorProvider( {
 					{ ...props }
 				>
 					<CopyHandler>{ children }</CopyHandler>
-					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
-				</BlockEditorProvider>
+					<PatternsMenuItems rootClientId={ widgetAreaId } />
+				</ExperimentalBlockEditorProvider>
 			</SlotFillProvider>
 		</ShortcutProvider>
 	);

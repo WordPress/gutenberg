@@ -41,7 +41,8 @@ export default function WidgetAreaInnerBlocks( { id } ) {
 			className={ classnames(
 				'wp-block-widget-area__inner-blocks block-editor-inner-blocks editor-styles-wrapper',
 				{
-					'wp-block-widget-area__highlight-drop-zone': shouldHighlightDropZone,
+					'wp-block-widget-area__highlight-drop-zone':
+						shouldHighlightDropZone,
 				}
 			) }
 		>

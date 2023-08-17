@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase } from 'lodash';
+import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -28,9 +28,8 @@ import { createTemplatePartId } from './create-template-part-id';
  */
 export function useAlternativeTemplateParts( area, excludedId ) {
 	const { templateParts, isResolving } = useSelect( ( select ) => {
-		const { getEntityRecords, isResolving: _isResolving } = select(
-			coreStore
-		);
+		const { getEntityRecords, isResolving: _isResolving } =
+			select( coreStore );
 		const query = { per_page: -1 };
 		return {
 			templateParts: getEntityRecords(
@@ -38,7 +37,7 @@ export function useAlternativeTemplateParts( area, excludedId ) {
 				'wp_template_part',
 				query
 			),
-			isLoading: _isResolving( 'getEntityRecords', [
+			isResolving: _isResolving( 'getEntityRecords', [
 				'postType',
 				'wp_template_part',
 				query,
@@ -62,7 +61,7 @@ export function useAlternativeTemplateParts( area, excludedId ) {
 						templatePart.area === area )
 			) || []
 		);
-	}, [ templateParts, area ] );
+	}, [ templateParts, area, excludedId ] );
 
 	return {
 		templateParts: filteredTemplateParts,
@@ -84,15 +83,10 @@ export function useAlternativeBlockPatterns( area, clientId ) {
 			const blockNameWithArea = area
 				? `core/template-part/${ area }`
 				: 'core/template-part';
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			return __experimentalGetPatternsByBlockTypes(
-				blockNameWithArea,
-				rootClientId
-			);
+			return getPatternsByBlockTypes( blockNameWithArea, rootClientId );
 		},
 		[ area, clientId ]
 	);
@@ -144,13 +138,19 @@ export function useTemplatePartArea( area ) {
 		( select ) => {
 			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 			// Blocks can be loaded into a *non-post* block editor.
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			const definedAreas = select(
-				'core/editor'
-			).__experimentalGetDefaultTemplatePartAreas();
+			/* eslint-disable @wordpress/data-no-store-string-literals */
+			const definedAreas =
+				select(
+					'core/editor'
+				).__experimentalGetDefaultTemplatePartAreas();
+			/* eslint-enable @wordpress/data-no-store-string-literals */
 
-			const selectedArea = find( definedAreas, { area } );
-			const defaultArea = find( definedAreas, { area: 'uncategorized' } );
+			const selectedArea = definedAreas.find(
+				( definedArea ) => definedArea.area === area
+			);
+			const defaultArea = definedAreas.find(
+				( definedArea ) => definedArea.area === 'uncategorized'
+			);
 
 			return {
 				icon: selectedArea?.icon || defaultArea?.icon,

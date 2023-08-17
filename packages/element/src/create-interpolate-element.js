@@ -16,7 +16,7 @@ let indoc, offset, output, stack;
  * There are four references extracted using this tokenizer:
  *
  * match: Full match of the tag (i.e. <strong>, </strong>, <br/>)
- * isClosing: The closing slash, it it exists.
+ * isClosing: The closing slash, if it exists.
  * name: The name portion of the tag (strong, br) (if )
  * isSelfClosed: The slash on a self closing tag, if it exists.
  *
@@ -101,9 +101,9 @@ function createFrame(
  * }
  * ```
  *
- * @param {string} interpolatedString The interpolation string to be parsed.
- * @param {Object} conversionMap      The map used to convert the string to
- *                                    a react element.
+ * @param {string}                    interpolatedString The interpolation string to be parsed.
+ * @param {Record<string, WPElement>} conversionMap      The map used to convert the string to
+ *                                                       a react element.
  * @throws {TypeError}
  * @return {WPElement}  A wp element.
  */
@@ -169,10 +169,8 @@ function proceed( conversionMap ) {
 	switch ( tokenType ) {
 		case 'no-more-tokens':
 			if ( stackDepth !== 0 ) {
-				const {
-					leadingTextStart: stackLeadingText,
-					tokenStart,
-				} = stack.pop();
+				const { leadingTextStart: stackLeadingText, tokenStart } =
+					stack.pop();
 				output.push( indoc.substr( stackLeadingText, tokenStart ) );
 			}
 			addText();
@@ -325,13 +323,8 @@ function addChild( frame ) {
  *                           the element.
  */
 function closeOuterElement( endOffset ) {
-	const {
-		element,
-		leadingTextStart,
-		prevOffset,
-		tokenStart,
-		children,
-	} = stack.pop();
+	const { element, leadingTextStart, prevOffset, tokenStart, children } =
+		stack.pop();
 
 	const text = endOffset
 		? indoc.substr( prevOffset, endOffset - prevOffset )

@@ -7,7 +7,6 @@ import {
 	ScrollView,
 	TouchableWithoutFeedback,
 } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -50,12 +49,10 @@ class GalleryImage extends Component {
 		this.onSelectMedia = this.onSelectMedia.bind( this );
 
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind( this );
 		this.renderContent = this.renderContent.bind( this );
 
 		this.state = {
@@ -79,11 +76,8 @@ class GalleryImage extends Component {
 
 	onMediaPressed() {
 		const { id, url, isSelected } = this.props;
-		const {
-			captionSelected,
-			isUploadInProgress,
-			didUploadFail,
-		} = this.state;
+		const { captionSelected, isUploadInProgress, didUploadFail } =
+			this.state;
 
 		this.onSelectImage();
 
@@ -303,12 +297,8 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const {
-			id,
-			onRemove,
-			getStylesFromColorScheme,
-			isSelected,
-		} = this.props;
+		const { id, onRemove, getStylesFromColorScheme, isSelected } =
+			this.props;
 
 		const containerStyle = getStylesFromColorScheme(
 			style.galleryImageContainer,
@@ -343,7 +333,7 @@ class GalleryImage extends Component {
 	accessibilityLabelImageContainer() {
 		const { caption, 'aria-label': ariaLabel } = this.props;
 
-		return isEmpty( caption )
+		return ! caption
 			? ariaLabel
 			: ariaLabel +
 					'. ' +

@@ -3,10 +3,16 @@
 Block Patterns are predefined block layouts, available from the patterns tab of the block inserter. Once inserted into content, the blocks are ready for additional or modified content and configuration.
 
 In this Document:
-* [`register_block_pattern`](#register_block_pattern)
-* [`unregister_block_pattern`](#unregister_block_pattern)
-* [`register_block_pattern_category`](#register_block_pattern_category)
-* [`unregister_block_pattern_category`](#unregister_block_pattern_category)
+- [Patterns](#patterns)
+	- [Block Patterns](#block-patterns)
+		- [register_block_pattern](#register_block_pattern)
+	- [Unregistering Block Patterns](#unregistering-block-patterns)
+		- [unregister_block_pattern](#unregister_block_pattern)
+	- [Block Pattern Categories](#block-pattern-categories)
+		- [register_block_pattern_category](#register_block_pattern_category)
+		- [unregister_block_pattern_category](#unregister_block_pattern_category)
+	- [Block patterns contextual to block types and pattern transformations](#block-patterns-contextual-to-block-types-and-pattern-transformations)
+	- [Semantic block patterns](#semantic-block-patterns)
 
 ## Block Patterns
 
@@ -27,7 +33,10 @@ The properties available for block patterns are:
 -   `keywords` (optional): An array of aliases or keywords that help users discover the pattern while searching.
 -   `viewportWidth` (optional): An integer specifying the intended width of the pattern to allow for a scaled preview of the pattern in the inserter.
 -   `blockTypes` (optional): An array of block types that the pattern is intended to be used with. Each value needs to be the declared block's `name`.
+-   `postTypes` (optional): An array of post types that the pattern is restricted to be used with. The pattern will only be available when editing one of the post types passed on the array, for all the other post types the pattern is not available at all.
+-   `templateTypes` (optional): An array of template types where the pattern makes sense e.g: '404' if the pattern is for a 404 page, single-post if the pattern is for showing a single post.
 -   `inserter` (optional): By default, all patterns will appear in the inserter. To hide a pattern so that it can only be inserted programmatically, set the `inserter` to `false`.
+-   `source` (optional): A string that denotes the source of the pattern. For a plugin registering a pattern, pass the string 'plugin'. For a theme, pass the string 'theme'.
 
 The following code sample registers a block pattern named 'my-plugin/my-awesome-pattern':
 
@@ -106,6 +115,8 @@ _Note:_
 
 `register_block_pattern_category()` should be called from a handler attached to the init hook.
 
+The category will not show under Patterns unless a pattern has been assigned to that category.
+
 ```php
 function my_plugin_register_my_pattern_categories() {
   register_block_pattern_category( ... );
@@ -183,7 +194,7 @@ register_block_pattern(
 );
 ```
 
-In the above example if we select **one of the two** block types, either a paragraph or a heading block, this pattern will be suggested by transforming the selected block using its content and will also add the remaing blocks from the pattern. If on the other hand we multi select one paragraph and one heading block, both blocks will be transformed.
+In the above example if we select **one of the two** block types, either a paragraph or a heading block, this pattern will be suggested by transforming the selected block using its content and will also add the remaining blocks from the pattern. If on the other hand we multi select one paragraph and one heading block, both blocks will be transformed.
 
 Blocks can also use these contextual block patterns in other places. For instance, when inserting a new Query Loop block, the user is provided with a list of all patterns attached to the block.
 

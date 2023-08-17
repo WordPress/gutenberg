@@ -22,6 +22,8 @@ export default (
 	pluginTranslations = []
 ) => {
 	const setDomainLocaleData = ( { getTranslation, domain = 'default' } ) => {
+		// Lowercase the locale value as translation filenames are also lowercased.
+		locale = locale?.toLowerCase();
 		let translations = getTranslation( locale );
 		if ( locale && ! translations ) {
 			// Try stripping out the regional
@@ -32,16 +34,6 @@ export default (
 			...translations,
 			...extraTranslations,
 		};
-
-		if ( domain === 'default' ) {
-			// eslint-disable-next-line no-console
-			console.log( 'locale', locale, allTranslations );
-		} else {
-			// Extra translations are already logged along with the default domain, so
-			// for other domains we can limit the output to their translations.
-			// eslint-disable-next-line no-console
-			console.log( `${ domain } - locale`, locale, translations );
-		}
 
 		// Only change the locale if it's supported by gutenberg
 		if ( translations || extraTranslations ) {

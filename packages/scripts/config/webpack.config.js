@@ -25,7 +25,9 @@ const {
 	hasArgInCLI,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
+	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
+	getRenderPropPaths,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -36,9 +38,27 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-const copyWebpackPatterns = process.env.WP_COPY_PHP_FILES_TO_DIST
-	? '**/{block.json,*.php}'
-	: '**/block.json';
+/**
+ * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
+ * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
+ * changes in `block.json` files are picked up in watch mode.
+ */
+class RenderPathsPlugin {
+	/**
+	 * Paths with the `render` props included in `block.json` files.
+	 *
+	 * @type {string[]}
+	 */
+	static renderPaths;
+
+	apply( compiler ) {
+		const pluginName = this.constructor.name;
+
+		compiler.hooks.thisCompilation.tap( pluginName, () => {
+			this.constructor.renderPaths = getRenderPropPaths();
+		} );
+	}
+}
 
 const cssLoaders = [
 	{
@@ -108,7 +128,7 @@ const config = {
 			cacheGroups: {
 				style: {
 					type: 'css/mini-extract',
-					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
+					test: /[\\/]style(\.module)?\.(pc|sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
 					name( _, chunks, cacheGroupKey ) {
@@ -180,6 +200,10 @@ const config = {
 				use: cssLoaders,
 			},
 			{
+				test: /\.pcss$/,
+				use: cssLoaders,
+			},
+			{
 				test: /\.(sc|sa)ss$/,
 				use: [
 					...cssLoaders,
@@ -199,11 +223,11 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
-				issuer: /\.(sc|sa|c)ss$/,
+				issuer: /\.(pc|sc|sa|c)ss$/,
 				type: 'asset/inline',
 			},
 			{
-				test: /\.(bmp|png|jpe?g|gif)$/i,
+				test: /\.(bmp|png|jpe?g|gif|webp)$/i,
 				type: 'asset/resource',
 				generator: {
 					filename: 'images/[name].[hash:8][ext]',
@@ -229,12 +253,53 @@ const config = {
 			// multiple configurations returned in the webpack config.
 			cleanStaleWebpackAssets: false,
 		} ),
+		new RenderPathsPlugin(),
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
-					from: copyWebpackPatterns,
-					context: process.env.WP_SRC_DIRECTORY,
+					from: '**/block.json',
+					context: getWordPressSrcDirectory(),
 					noErrorOnMissing: true,
+					transform( content, absoluteFrom ) {
+						const convertExtension = ( path ) => {
+							return path.replace( /\.(j|t)sx?$/, '.js' );
+						};
+
+						if ( basename( absoluteFrom ) === 'block.json' ) {
+							const blockJson = JSON.parse( content.toString() );
+							[ 'viewScript', 'script', 'editorScript' ].forEach(
+								( key ) => {
+									if ( Array.isArray( blockJson[ key ] ) ) {
+										blockJson[ key ] =
+											blockJson[ key ].map(
+												convertExtension
+											);
+									} else if (
+										typeof blockJson[ key ] === 'string'
+									) {
+										blockJson[ key ] = convertExtension(
+											blockJson[ key ]
+										);
+									}
+								}
+							);
+
+							return JSON.stringify( blockJson, null, 2 );
+						}
+
+						return content;
+					},
+				},
+				{
+					from: '**/*.php',
+					context: getWordPressSrcDirectory(),
+					noErrorOnMissing: true,
+					filter: ( filepath ) => {
+						return (
+							process.env.WP_COPY_PHP_FILES_TO_DIST ||
+							RenderPathsPlugin.renderPaths.includes( filepath )
+						);
+					},
 				},
 			],
 		} ),
@@ -255,16 +320,15 @@ const config = {
 	},
 };
 
+// WP_DEVTOOL global variable controls how source maps are generated.
+// See: https://webpack.js.org/configuration/devtool/#devtool.
+if ( process.env.WP_DEVTOOL ) {
+	config.devtool = process.env.WP_DEVTOOL;
+}
+
 if ( ! isProduction ) {
-	// WP_DEVTOOL global variable controls how source maps are generated.
-	// See: https://webpack.js.org/configuration/devtool/#devtool.
-	config.devtool = process.env.WP_DEVTOOL || 'source-map';
-	config.module.rules.unshift( {
-		test: /\.(j|t)sx?$/,
-		exclude: [ /node_modules/ ],
-		use: require.resolve( 'source-map-loader' ),
-		enforce: 'pre',
-	} );
+	// Set default sourcemap mode if it wasn't set by WP_DEVTOOL.
+	config.devtool = config.devtool || 'source-map';
 	config.devServer = {
 		devMiddleware: {
 			writeToDisk: true,
@@ -280,6 +344,16 @@ if ( ! isProduction ) {
 			},
 		},
 	};
+}
+
+// Add source-map-loader if devtool is set, whether in dev mode or not.
+if ( config.devtool ) {
+	config.module.rules.unshift( {
+		test: /\.(j|t)sx?$/,
+		exclude: [ /node_modules/ ],
+		use: require.resolve( 'source-map-loader' ),
+		enforce: 'pre',
+	} );
 }
 
 module.exports = config;

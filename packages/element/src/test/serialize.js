@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import { noop } from 'lodash';
+/* eslint-disable testing-library/render-result-naming-convention */
 
 /**
  * Internal dependencies
@@ -23,6 +20,8 @@ import serialize, {
 	renderAttributes,
 	renderStyle,
 } from '../serialize';
+
+const noop = () => {};
 
 describe( 'serialize()', () => {
 	it( 'should allow only valid attribute names', () => {
@@ -720,3 +719,5 @@ describe( 'renderStyle()', () => {
 		} );
 	} );
 } );
+
+/* eslint-enable testing-library/render-result-naming-convention */

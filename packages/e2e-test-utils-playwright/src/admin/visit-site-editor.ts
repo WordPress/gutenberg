@@ -8,7 +8,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import type { Admin } from './';
 
-interface SiteEditorQueryParams {
+export interface SiteEditorQueryParams {
 	postId: string | number;
 	postType: string;
 }
@@ -20,9 +20,9 @@ const CANVAS_SELECTOR = 'iframe[title="Editor canvas"i]';
  *
  * By default, it also skips the welcome guide. The option can be disabled if need be.
  *
- * @param {Admin}                 this
- * @param {SiteEditorQueryParams} query            Query params to be serialized as query portion of URL.
- * @param {boolean}               skipWelcomeGuide Whether to skip the welcome guide as part of the navigation.
+ * @param this
+ * @param query            Query params to be serialized as query portion of URL.
+ * @param skipWelcomeGuide Whether to skip the welcome guide as part of the navigation.
  */
 export async function visitSiteEditor(
 	this: Admin,
@@ -30,25 +30,41 @@ export async function visitSiteEditor(
 	skipWelcomeGuide = true
 ) {
 	const path = addQueryArgs( '', {
-		page: 'gutenberg-edit-site',
 		...query,
 	} ).slice( 1 );
 
-	await this.visitAdminPage( 'themes.php', path );
-	await this.page.waitForSelector( CANVAS_SELECTOR );
+	await this.visitAdminPage( 'site-editor.php', path );
 
 	if ( skipWelcomeGuide ) {
 		await this.page.evaluate( () => {
-			// TODO, type `window.wp`.
-			// @ts-ignore
 			window.wp.data
 				.dispatch( 'core/preferences' )
 				.set( 'core/edit-site', 'welcomeGuide', false );
 
-			// @ts-ignore
 			window.wp.data
 				.dispatch( 'core/preferences' )
-				.toggle( 'core/edit-site', 'welcomeGuideStyles', false );
+				.set( 'core/edit-site', 'welcomeGuideStyles', false );
+
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'welcomeGuidePage', false );
+
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'welcomeGuideTemplate', false );
 		} );
 	}
+
+	// The site editor initially loads with an empty body,
+	// we need to wait for the editor canvas to be rendered.
+	await this.page
+		.frameLocator( CANVAS_SELECTOR )
+		.locator( 'body > *' )
+		.first()
+		.waitFor();
+
+	// TODO: Ideally the content underneath the spinner should be marked inert until it's ready.
+	await this.page
+		.locator( '.edit-site-canvas-spinner' )
+		.waitFor( { state: 'hidden' } );
 }

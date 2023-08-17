@@ -5,18 +5,21 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
+	convertDeprecationsToExceptions="true"
 	>
+	<php>
+		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
+		<const name="FONT_LIBRARY_ENABLE" value="true"/>
+	</php>
 	<testsuites>
 		<testsuite name="default">
 			<directory suffix="-test.php">./phpunit/</directory>
-		</testsuite>
-		<testsuite name="packages">
-			<directory suffix="-test.php">./packages/**/phpunit/</directory>
 		</testsuite>
 	</testsuites>
 	<groups>
 		<exclude>
 			<group>ms-required</group>
+			<group>fontsapi</group>
 		</exclude>
 	</groups>
 </phpunit>

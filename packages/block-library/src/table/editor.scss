@@ -1,5 +1,4 @@
 .wp-block-table {
-
 	// Remove default <figure> style.
 	margin: 0;
 
@@ -31,6 +30,7 @@
 	td,
 	th {
 		border: $border-width solid;
+		padding: 0.5em;
 	}
 
 	td.is-selected,
@@ -38,10 +38,6 @@
 		border-color: var(--wp-admin-theme-color);
 		box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
 		border-style: double;
-	}
-
-	figcaption {
-		@include caption-style-theme();
 	}
 
 	// This is only required in the editor to overcome the fact the editor
@@ -84,10 +80,5 @@
 
 	input {
 		height: $button-size;
-	}
-
-
-	.components-base-control__field {
-		margin-bottom: 0;
 	}
 }

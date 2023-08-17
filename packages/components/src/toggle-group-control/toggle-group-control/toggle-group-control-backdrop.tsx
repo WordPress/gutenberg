@@ -36,10 +36,8 @@ function ToggleGroupControlBackdrop( {
 		}
 
 		const computeDimensions = () => {
-			const {
-				width: offsetWidth,
-				x,
-			} = targetNode.getBoundingClientRect();
+			const { width: offsetWidth, x } =
+				targetNode.getBoundingClientRect();
 
 			const { x: parentX } = containerNode.getBoundingClientRect();
 

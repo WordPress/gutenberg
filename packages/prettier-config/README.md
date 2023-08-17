@@ -10,7 +10,7 @@ Install the module
 $ npm install @wordpress/prettier-config --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
 
 ## Usage
 
@@ -23,7 +23,13 @@ Add this to your `package.json` file:
 Alternatively, add this to `.prettierrc` file:
 
 ```
-extends: ['@wordpress/prettier-config']
+"@wordpress/prettier-config"
+```
+
+Or add this to `.prettierrc.js` file:
+
+```js
+module.exports = require( '@wordpress/prettier-config' );
 ```
 
 ## Contributing to this package

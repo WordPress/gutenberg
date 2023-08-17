@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isObjectLike } from 'lodash';
-
-/**
  * Given a function, returns an enhanced function which caches the result and
  * tracks in WeakMap. The result is only cached if the original function is
  * passed a valid object-like argument (requirement for WeakMap key).
@@ -25,7 +20,7 @@ function withWeakMapCache( fn ) {
 			// Can reach here if key is not valid for WeakMap, since `has`
 			// will return false for invalid key. Since `set` will throw,
 			// ensure that key is valid before setting into cache.
-			if ( isObjectLike( key ) ) {
+			if ( key !== null && typeof key === 'object' ) {
 				cache.set( key, value );
 			}
 		}

@@ -6,19 +6,29 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
+	Tooltip,
+} from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lock } from '@wordpress/icons';
-import { SPACE, ENTER } from '@wordpress/keycodes';
+import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
+import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
-import BlockTitle from '../block-title';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
+import { store as blockEditorStore } from '../../store';
+import useListViewImages from './use-list-view-images';
 
 function ListViewBlockSelectButton(
 	{
@@ -31,11 +41,38 @@ function ListViewBlockSelectButton(
 		onDragStart,
 		onDragEnd,
 		draggable,
+		isExpanded,
+		ariaLabel,
+		ariaDescribedBy,
+		updateFocusAndSelection,
 	},
 	ref
 ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
 	const { isLocked } = useBlockLock( clientId );
+	const {
+		getSelectedBlockClientIds,
+		getPreviousBlockClientId,
+		getBlockRootClientId,
+		getBlockOrder,
+		canRemoveBlocks,
+	} = useSelect( blockEditorStore );
+	const { removeBlocks } = useDispatch( blockEditorStore );
+	const isMatch = useShortcutEventMatch();
+	const isSticky = blockInformation?.positionType === 'sticky';
+	const images = useListViewImages( { clientId, isExpanded } );
+
+	const positionLabel = blockInformation?.positionLabel
+		? sprintf(
+				// translators: 1: Position of selected block, e.g. "Sticky" or "Fixed".
+				__( 'Position: %1$s' ),
+				blockInformation.positionLabel
+		  )
+		: '';
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -46,9 +83,54 @@ function ListViewBlockSelectButton(
 		onDragStart?.( event );
 	};
 
+	/**
+	 * @param {KeyboardEvent} event
+	 */
 	function onKeyDownHandler( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
+		} else if (
+			event.keyCode === BACKSPACE ||
+			event.keyCode === DELETE ||
+			isMatch( 'core/block-editor/remove', event )
+		) {
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const isDeletingSelectedBlocks =
+				selectedBlockClientIds.includes( clientId );
+			const firstBlockClientId = isDeletingSelectedBlocks
+				? selectedBlockClientIds[ 0 ]
+				: clientId;
+			const firstBlockRootClientId =
+				getBlockRootClientId( firstBlockClientId );
+
+			const blocksToDelete = isDeletingSelectedBlocks
+				? selectedBlockClientIds
+				: [ clientId ];
+
+			// Don't update the selection if the blocks cannot be deleted.
+			if ( ! canRemoveBlocks( blocksToDelete, firstBlockRootClientId ) ) {
+				return;
+			}
+
+			let blockToFocus =
+				getPreviousBlockClientId( firstBlockClientId ) ??
+				// If the previous block is not found (when the first block is deleted),
+				// fallback to focus the parent block.
+				firstBlockRootClientId;
+
+			removeBlocks( blocksToDelete, false );
+
+			// Update the selection if the original selection has been removed.
+			const shouldUpdateSelection =
+				selectedBlockClientIds.length > 0 &&
+				getSelectedBlockClientIds().length === 0;
+
+			// If there's no previous block nor parent block, focus the first block.
+			if ( ! blockToFocus ) {
+				blockToFocus = getBlockOrder()[ 0 ];
+			}
+
+			updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
 		}
 	}
 
@@ -68,23 +150,65 @@ function ListViewBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
-				aria-hidden={ true }
+				aria-label={ ariaLabel }
+				aria-describedby={ ariaDescribedBy }
+				aria-expanded={ isExpanded }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
-				<BlockIcon icon={ blockInformation?.icon } showColors />
-				<span className="block-editor-list-view-block-select-button__title">
-					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
-				</span>
-				{ blockInformation?.anchor && (
-					<span className="block-editor-list-view-block-select-button__anchor">
-						{ blockInformation.anchor }
+				<BlockIcon
+					icon={ blockInformation?.icon }
+					showColors
+					context="list-view"
+				/>
+				<HStack
+					alignment="center"
+					className="block-editor-list-view-block-select-button__label-wrapper"
+					justify="flex-start"
+					spacing={ 1 }
+				>
+					<span className="block-editor-list-view-block-select-button__title">
+						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 					</span>
-				) }
-				{ isLocked && (
-					<span className="block-editor-list-view-block-select-button__lock">
-						<Icon icon={ lock } />
-					</span>
-				) }
+					{ blockInformation?.anchor && (
+						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+							<Truncate
+								className="block-editor-list-view-block-select-button__anchor"
+								ellipsizeMode="auto"
+							>
+								{ blockInformation.anchor }
+							</Truncate>
+						</span>
+					) }
+					{ positionLabel && isSticky && (
+						<Tooltip text={ positionLabel }>
+							<span className="block-editor-list-view-block-select-button__sticky">
+								<Icon icon={ pinSmall } />
+							</span>
+						</Tooltip>
+					) }
+					{ images.length ? (
+						<span
+							className="block-editor-list-view-block-select-button__images"
+							aria-hidden
+						>
+							{ images.map( ( image, index ) => (
+								<span
+									className="block-editor-list-view-block-select-button__image"
+									key={ `img-${ image.url }` }
+									style={ {
+										backgroundImage: `url(${ image.url })`,
+										zIndex: images.length - index, // Ensure the first image is on top, and subsequent images are behind.
+									} }
+								/>
+							) ) }
+						</span>
+					) : null }
+					{ isLocked && (
+						<span className="block-editor-list-view-block-select-button__lock">
+							<Icon icon={ lock } />
+						</span>
+					) }
+				</HStack>
 			</Button>
 		</>
 	);

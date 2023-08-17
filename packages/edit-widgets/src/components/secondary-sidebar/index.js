@@ -15,9 +15,8 @@ import ListViewSidebar from './list-view-sidebar';
 
 export default function SecondarySidebar() {
 	const { isInserterOpen, isListViewOpen } = useSelect( ( select ) => {
-		const { isInserterOpened, isListViewOpened } = select(
-			editWidgetsStore
-		);
+		const { isInserterOpened, isListViewOpened } =
+			select( editWidgetsStore );
 		return {
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),

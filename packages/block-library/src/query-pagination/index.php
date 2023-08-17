@@ -18,10 +18,11 @@ function render_block_core_query_pagination( $attributes, $content ) {
 		return '';
 	}
 
+	$classes            = ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) ? 'has-link-color' : '';
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'role'       => 'navigation',
 			'aria-label' => __( 'Pagination' ),
+			'class'      => $classes,
 		)
 	);
 

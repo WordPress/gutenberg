@@ -33,12 +33,8 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
 }
 
 export default function AspectRatioDropdown( { toggleProps } ) {
-	const {
-		isInProgress,
-		aspect,
-		setAspect,
-		defaultAspect,
-	} = useImageEditingContext();
+	const { isInProgress, aspect, setAspect, defaultAspect } =
+		useImageEditingContext();
 
 	return (
 		<DropdownMenu
@@ -58,6 +54,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						} }
 						value={ aspect }
 						aspectRatios={ [
+							// All ratios should be mirrored in AspectRatioTool in @wordpress/block-editor.
 							{
 								title: __( 'Original' ),
 								aspect: defaultAspect,

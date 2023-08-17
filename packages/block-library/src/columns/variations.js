@@ -57,7 +57,7 @@ const variations = [
 	},
 	{
 		name: 'two-columns-one-third-two-thirds',
-		title: __( '30 / 70' ),
+		title: __( '33 / 66' ),
 		description: __( 'Two columns; one-third, two-thirds split' ),
 		icon: (
 			<SVG
@@ -81,7 +81,7 @@ const variations = [
 	},
 	{
 		name: 'two-columns-two-thirds-one-third',
-		title: __( '70 / 30' ),
+		title: __( '66 / 33' ),
 		description: __( 'Two columns; two-thirds, one-third split' ),
 		icon: (
 			<SVG

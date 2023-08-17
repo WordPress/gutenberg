@@ -66,18 +66,17 @@ function Label( { align, text, xOffset, yOffset } ) {
 	}
 
 	useEffect( () => {
+		const startAnimation = () => {
+			Animated.timing( animationValue, {
+				toValue: visible ? 1 : 0,
+				duration: visible ? 300 : 150,
+				useNativeDriver: true,
+				delay: visible ? 500 : 0,
+				easing: Easing.out( Easing.quad ),
+			} ).start();
+		};
 		startAnimation();
-	}, [ visible ] );
-
-	const startAnimation = () => {
-		Animated.timing( animationValue, {
-			toValue: visible ? 1 : 0,
-			duration: visible ? 300 : 150,
-			useNativeDriver: true,
-			delay: visible ? 500 : 0,
-			easing: Easing.out( Easing.quad ),
-		} ).start();
-	};
+	}, [ animationValue, visible ] );
 
 	// Transforms rely upon onLayout to enable custom offsets additions.
 	let tooltipTransforms;

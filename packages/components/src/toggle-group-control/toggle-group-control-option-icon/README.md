@@ -17,18 +17,16 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
 
 function Example() {
 	return (
-		<ToggleGroupControl label="my label" value="lowercase" isBlock>
+		<ToggleGroupControl>
 			<ToggleGroupControlOptionIcon
 				value="uppercase"
 				icon={ formatUppercase }
-				showTooltip={ true }
-				aria-label="Uppercase"
+				label="Uppercase"
 			/>
 			<ToggleGroupControlOptionIcon
 				value="lowercase"
 				icon={ formatLowercase }
-				showTooltip={ true }
-				aria-label="Lowercase"
+				label="Lowercase"
 			/>
 		</ToggleGroupControl>
 	);
@@ -49,8 +47,8 @@ Icon displayed as the content of the option. Usually one of the icons from the `
 
 -   Required: Yes
 
-### `showTooltip`: `boolean`
+### `label`: `string`
 
-Whether to show a tooltip when hovering over the option. The tooltip will only show if a label for it is provided using the `aria-label` prop.
+The text to accessibly label the icon option. Will also be shown in a tooltip.
 
--   Required: No
+-   Required: Yes

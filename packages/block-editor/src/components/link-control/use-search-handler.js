@@ -6,34 +6,35 @@ import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
- * External dependencies
- */
-import { startsWith } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import isURLLike from './is-url-like';
-import { CREATE_TYPE } from './constants';
+import {
+	CREATE_TYPE,
+	TEL_TYPE,
+	MAILTO_TYPE,
+	INTERNAL_TYPE,
+	URL_TYPE,
+} from './constants';
 import { store as blockEditorStore } from '../../store';
 
 export const handleNoop = () => Promise.resolve( [] );
 
 export const handleDirectEntry = ( val ) => {
-	let type = 'URL';
+	let type = URL_TYPE;
 
 	const protocol = getProtocol( val ) || '';
 
 	if ( protocol.includes( 'mailto' ) ) {
-		type = 'mailto';
+		type = MAILTO_TYPE;
 	}
 
 	if ( protocol.includes( 'tel' ) ) {
-		type = 'tel';
+		type = TEL_TYPE;
 	}
 
-	if ( startsWith( val, '#' ) ) {
-		type = 'internal';
+	if ( val?.startsWith( '#' ) ) {
+		type = INTERNAL_TYPE;
 	}
 
 	return Promise.resolve( [
@@ -50,45 +51,22 @@ const handleEntitySearch = async (
 	val,
 	suggestionsQuery,
 	fetchSearchSuggestions,
-	directEntryHandler,
 	withCreateSuggestion,
-	withURLSuggestion,
 	pageOnFront
 ) => {
 	const { isInitialSuggestions } = suggestionsQuery;
-	let resultsIncludeFrontPage = false;
 
-	let results = await Promise.all( [
-		fetchSearchSuggestions( val, suggestionsQuery ),
-		directEntryHandler( val ),
-	] );
+	const results = await fetchSearchSuggestions( val, suggestionsQuery );
 
 	// Identify front page and update type to match.
-	results[ 0 ] = results[ 0 ].map( ( result ) => {
+	results.map( ( result ) => {
 		if ( Number( result.id ) === pageOnFront ) {
-			resultsIncludeFrontPage = true;
 			result.isFrontPage = true;
 			return result;
 		}
 
 		return result;
 	} );
-
-	const couldBeURL = ! val.includes( ' ' );
-
-	// If it's potentially a URL search then concat on a URL search suggestion
-	// just for good measure. That way once the actual results run out we always
-	// have a URL option to fallback on.
-	if (
-		! resultsIncludeFrontPage &&
-		couldBeURL &&
-		withURLSuggestion &&
-		! isInitialSuggestions
-	) {
-		results = results[ 0 ].concat( results[ 1 ] );
-	} else {
-		results = results[ 0 ];
-	}
 
 	// If displaying initial suggestions just return plain results.
 	if ( isInitialSuggestions ) {
@@ -132,8 +110,8 @@ export default function useSearchHandler(
 
 		return {
 			pageOnFront: getSettings().pageOnFront,
-			fetchSearchSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
+			fetchSearchSuggestions:
+				getSettings().__experimentalFetchLinkSuggestions,
 		};
 	}, [] );
 
@@ -149,12 +127,18 @@ export default function useSearchHandler(
 						val,
 						{ ...suggestionsQuery, isInitialSuggestions },
 						fetchSearchSuggestions,
-						directEntryHandler,
 						withCreateSuggestion,
 						withURLSuggestion,
 						pageOnFront
 				  );
 		},
-		[ directEntryHandler, fetchSearchSuggestions, withCreateSuggestion ]
+		[
+			directEntryHandler,
+			fetchSearchSuggestions,
+			pageOnFront,
+			suggestionsQuery,
+			withCreateSuggestion,
+			withURLSuggestion,
+		]
 	);
 }

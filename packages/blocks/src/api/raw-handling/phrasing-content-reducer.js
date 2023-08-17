@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { wrap, replaceTag } from '@wordpress/dom';
@@ -33,7 +28,7 @@ export default function phrasingContentReducer( node, doc ) {
 		// fallback.
 		if (
 			textDecorationLine === 'line-through' ||
-			includes( textDecoration, 'line-through' )
+			textDecoration.includes( 'line-through' )
 		) {
 			wrap( doc.createElement( 's' ), node );
 		}

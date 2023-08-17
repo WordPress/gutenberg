@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import {
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
 	PanelBody,
 	Placeholder,
@@ -21,7 +21,6 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { useDisabled } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { renderToString, useEffect } from '@wordpress/element';
@@ -55,17 +54,20 @@ export default function TableOfContentsEdit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps();
-	const disabledRef = useDisabled();
 
-	const listBlockExists = useSelect(
-		( select ) => !! select( blocksStore ).getBlockType( 'core/list' ),
-		[]
+	const canInsertList = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+
+			return canInsertBlockType( 'core/list', rootClientId );
+		},
+		[ clientId ]
 	);
 
-	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceBlocks,
-	} = useDispatch( blockEditorStore );
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlocks } =
+		useDispatch( blockEditorStore );
 
 	/**
 	 * The latest heading data, or null if the new data deeply equals the saved
@@ -177,9 +179,8 @@ export default function TableOfContentsEdit( {
 					headingPage === tocPage
 				) {
 					if ( blockName === 'core/heading' ) {
-						const headingAttributes = getBlockAttributes(
-							blockClientId
-						);
+						const headingAttributes =
+							getBlockAttributes( blockClientId );
 
 						const canBeLinked =
 							typeof headingPageLink === 'string' &&
@@ -187,7 +188,13 @@ export default function TableOfContentsEdit( {
 							headingAttributes.anchor !== '';
 
 						_latestHeadings.push( {
-							content: stripHTML( headingAttributes.content ),
+							// Convert line breaks to spaces, and get rid of HTML tags in the headings.
+							content: stripHTML(
+								headingAttributes.content.replace(
+									/(<br *\/?>)+/g,
+									' '
+								)
+							),
 							level: headingAttributes.level,
 							link: canBeLinked
 								? `${ headingPageLink }#${ headingAttributes.anchor }`
@@ -197,7 +204,7 @@ export default function TableOfContentsEdit( {
 				}
 			}
 
-			if ( isEqual( headings, _latestHeadings ) ) {
+			if ( fastDeepEqual( headings, _latestHeadings ) ) {
 				return null;
 			}
 			return _latestHeadings;
@@ -216,7 +223,7 @@ export default function TableOfContentsEdit( {
 
 	const headingTree = linearToNestedHeadingList( headings );
 
-	const toolbarControls = listBlockExists && (
+	const toolbarControls = canInsertList && (
 		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarButton
@@ -244,6 +251,7 @@ export default function TableOfContentsEdit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Only include current page' ) }
 					checked={ onlyIncludeCurrentPage }
 					onChange={ ( value ) =>
@@ -272,7 +280,7 @@ export default function TableOfContentsEdit( {
 				<div { ...blockProps }>
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } /> }
-						label="Table of Contents"
+						label={ __( 'Table of Contents' ) }
 						instructions={ __(
 							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
 						) }
@@ -286,7 +294,7 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ol ref={ disabledRef }>
+				<ol inert="true">
 					<TableOfContentsList nestedHeadingList={ headingTree } />
 				</ol>
 			</nav>

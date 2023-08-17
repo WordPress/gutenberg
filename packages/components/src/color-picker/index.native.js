@@ -8,7 +8,7 @@ import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BottomSheet } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -33,13 +33,15 @@ function ColorPicker( {
 	onHandleHardwareButtonPress,
 	bottomLabelText,
 } ) {
-	const didMount = useRef( false );
 	const isIOS = Platform.OS === 'ios';
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
-	const { h: initH, s: initS, v: initV } =
-		! isGradientColor && activeColor
-			? colord( activeColor ).toHsv()
-			: { h: 0, s: 50, v: 50 };
+	const {
+		h: initH,
+		s: initS,
+		v: initV,
+	} = ! isGradientColor && activeColor
+		? colord( activeColor ).toHsv()
+		: { h: 0, s: 50, v: 50 };
 	const [ hue, setHue ] = useState( initH );
 	const [ sat, setSaturation ] = useState( initS / 100 );
 	const [ val, setValue ] = useState( initV / 100 );
@@ -74,19 +76,17 @@ function ColorPicker( {
 		styles.footerDark
 	);
 
-	const currentColor = colord( {
-		h: hue,
-		s: sat * 100,
-		v: val * 100,
-	} ).toHex();
+	const combineToHex = ( h = hue, s = sat, v = val ) =>
+		colord( { h, s: s * 100, v: v * 100 } ).toHex();
 
-	useEffect( () => {
-		if ( ! didMount.current ) {
-			didMount.current = true;
-			return;
-		}
-		setColor( currentColor );
-	}, [ currentColor ] );
+	const currentColor = combineToHex();
+
+	const updateColor = ( { hue: h, saturation: s, value: v } ) => {
+		if ( h !== undefined ) setHue( h );
+		if ( s !== undefined ) setSaturation( s );
+		if ( v !== undefined ) setValue( v );
+		setColor( combineToHex( h, s, v ) );
+	};
 
 	useEffect( () => {
 		shouldEnableBottomSheetMaxHeight( false );
@@ -101,16 +101,12 @@ function ColorPicker( {
 		if ( onHandleHardwareButtonPress ) {
 			onHandleHardwareButtonPress( onButtonPress );
 		}
+		// TODO: Revisit this to discover if there's a good reason for omitting
+		// the hook’s dependencies and running it a single time. Ideally there
+		// may be a way to refactor and obviate the disabled lint rule. If not,
+		// this comment should be replaced by one that explains the reasoning.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
-
-	function onHuePickerChange( { hue: h } ) {
-		setHue( h );
-	}
-
-	function onSatValPickerChange( { saturation: s, value: v } ) {
-		setSaturation( s );
-		setValue( v );
-	}
 
 	function onButtonPress( action ) {
 		onNavigationBack();
@@ -126,16 +122,16 @@ function ColorPicker( {
 		<>
 			<HsvColorPicker
 				huePickerHue={ hue }
-				onHuePickerDragMove={ onHuePickerChange }
+				onHuePickerDragMove={ updateColor }
 				onHuePickerPress={
-					! isBottomSheetContentScrolling && onHuePickerChange
+					! isBottomSheetContentScrolling && updateColor
 				}
 				satValPickerHue={ hue }
 				satValPickerSaturation={ sat }
 				satValPickerValue={ val }
-				onSatValPickerDragMove={ onSatValPickerChange }
+				onSatValPickerDragMove={ updateColor }
 				onSatValPickerPress={
-					! isBottomSheetContentScrolling && onSatValPickerChange
+					! isBottomSheetContentScrolling && updateColor
 				}
 				onSatValPickerDragStart={ () => {
 					shouldEnableBottomSheetScroll( false );

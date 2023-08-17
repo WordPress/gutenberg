@@ -20,7 +20,8 @@ function InserterNoResults() {
 		'inserter-search-no-results__text-primary': textPrimaryBaseStyle,
 		'inserter-search-no-results__text-primary--dark': textPrimaryDarkStyle,
 		'inserter-search-no-results__text-secondary': textSecondaryBaseStyle,
-		'inserter-search-no-results__text-secondary--dark': textSecondaryDarkStyle,
+		'inserter-search-no-results__text-secondary--dark':
+			textSecondaryDarkStyle,
 	} = styles;
 	const textPrimaryStyle = usePreferredColorSchemeStyle(
 		textPrimaryBaseStyle,

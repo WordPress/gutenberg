@@ -3,7 +3,6 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { isEmpty, overEvery } = require( 'lodash' );
 
 /**
  * Absolute path to packages directory.
@@ -43,7 +42,7 @@ function hasModuleField( file ) {
 		return false;
 	}
 
-	return ! isEmpty( pkg.module );
+	return !! pkg.module;
 }
 
 /**
@@ -54,7 +53,9 @@ function hasModuleField( file ) {
  *
  * @return {boolean} Whether to include file in build.
  */
-const filterPackages = overEvery( isDirectory, hasModuleField );
+function filterPackages( pkg ) {
+	return [ isDirectory, hasModuleField ].every( ( check ) => check( pkg ) );
+}
 
 /**
  * Returns the absolute path of all WordPress packages

@@ -1,47 +1,35 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
-function useTransformState( { url, naturalWidth, naturalHeight } ) {
+export default function useTransformImage( {
+	url,
+	naturalWidth,
+	naturalHeight,
+} ) {
 	const [ editedUrl, setEditedUrl ] = useState();
 	const [ crop, setCrop ] = useState();
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
-	const [ zoom, setZoom ] = useState();
-	const [ rotation, setRotation ] = useState();
-	const [ aspect, setAspect ] = useState();
-	const [ defaultAspect, setDefaultAspect ] = useState();
-
-	const initializeTransformValues = useCallback( () => {
-		setPosition( { x: 0, y: 0 } );
-		setZoom( 100 );
-		setRotation( 0 );
-		setAspect( naturalWidth / naturalHeight );
-		setDefaultAspect( naturalWidth / naturalHeight );
-	}, [
-		naturalWidth,
-		naturalHeight,
-		setPosition,
-		setZoom,
-		setRotation,
-		setAspect,
-		setDefaultAspect,
-	] );
+	const [ zoom, setZoom ] = useState( 100 );
+	const [ rotation, setRotation ] = useState( 0 );
+	const defaultAspect = naturalWidth / naturalHeight;
+	const [ aspect, setAspect ] = useState( defaultAspect );
 
 	const rotateClockwise = useCallback( () => {
 		const angle = ( rotation + 90 ) % 360;
 
-		let naturalAspectRatio = naturalWidth / naturalHeight;
+		let naturalAspectRatio = defaultAspect;
 
 		if ( rotation % 180 === 90 ) {
-			naturalAspectRatio = naturalHeight / naturalWidth;
+			naturalAspectRatio = 1 / defaultAspect;
 		}
 
 		if ( angle === 0 ) {
 			setEditedUrl();
 			setRotation( angle );
-			setAspect( 1 / aspect );
+			setAspect( defaultAspect );
 			setPosition( {
 				x: -( position.y * naturalAspectRatio ),
 				y: position.x * naturalAspectRatio,
@@ -80,7 +68,7 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 			canvas.toBlob( ( blob ) => {
 				setEditedUrl( URL.createObjectURL( blob ) );
 				setRotation( angle );
-				setAspect( 1 / aspect );
+				setAspect( canvas.width / canvas.height );
 				setPosition( {
 					x: -( position.y * naturalAspectRatio ),
 					y: position.x * naturalAspectRatio,
@@ -100,15 +88,7 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 		if ( typeof imgCrossOrigin === 'string' ) {
 			el.crossOrigin = imgCrossOrigin;
 		}
-	}, [
-		rotation,
-		naturalWidth,
-		naturalHeight,
-		setEditedUrl,
-		setRotation,
-		setAspect,
-		setPosition,
-	] );
+	}, [ rotation, defaultAspect ] );
 
 	return useMemo(
 		() => ( {
@@ -126,37 +106,16 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 			aspect,
 			setAspect,
 			defaultAspect,
-			initializeTransformValues,
 		} ),
 		[
 			editedUrl,
-			setEditedUrl,
 			crop,
-			setCrop,
 			position,
-			setPosition,
 			zoom,
-			setZoom,
 			rotation,
-			setRotation,
 			rotateClockwise,
 			aspect,
-			setAspect,
 			defaultAspect,
-			initializeTransformValues,
 		]
 	);
-}
-
-export default function useTransformImage( imageProperties, isEditing ) {
-	const transformState = useTransformState( imageProperties );
-	const { initializeTransformValues } = transformState;
-
-	useEffect( () => {
-		if ( isEditing ) {
-			initializeTransformValues();
-		}
-	}, [ isEditing, initializeTransformValues ] );
-
-	return transformState;
 }

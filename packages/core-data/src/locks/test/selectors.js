@@ -186,7 +186,8 @@ describe( 'isLockAvailable', () => {
 																			exclusive: true,
 																		},
 																	],
-																	children: {},
+																	children:
+																		{},
 																},
 															},
 														},

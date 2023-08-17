@@ -206,9 +206,8 @@ describe( 'validation', () => {
 		} );
 
 		it( 'omits length units from zero values', () => {
-			const normalizedValue = getNormalizedStyleValue(
-				'44% 0% 18em 0em'
-			);
+			const normalizedValue =
+				getNormalizedStyleValue( '44% 0% 18em 0em' );
 
 			expect( normalizedValue ).toBe( '44% 0 18em 0' );
 		} );
@@ -220,9 +219,8 @@ describe( 'validation', () => {
 		} );
 
 		it( 'leaves zero values in calc() expressions alone', () => {
-			const normalizedValue = getNormalizedStyleValue(
-				'calc(0em + 5px)'
-			);
+			const normalizedValue =
+				getNormalizedStyleValue( 'calc(0em + 5px)' );
 
 			expect( normalizedValue ).toBe( 'calc(0em + 5px)' );
 		} );

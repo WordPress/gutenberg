@@ -12,7 +12,7 @@ Install the module
 npm install @wordpress/jest-puppeteer-axe --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
 
 ### Setup
 
@@ -41,8 +41,8 @@ test( 'checks the test page with Axe', async () => {
 
 It is also possible to pass optional params which allow Axe API to perform customized checks:
 
--   `include` - CSS selector(s) to to add the list of elements to include in analysis.
--   `exclude` - CSS selector(s) to to add the list of elements to exclude from analysis.
+-   `include` - CSS selector(s) to add the list of elements to include in analysis.
+-   `exclude` - CSS selector(s) to add the list of elements to exclude from analysis.
 -   `disabledRules` - the list of [Axe rules](https://github.com/dequelabs/axe-core/blob/HEAD/doc/rule-descriptions.md) to skip from verification.
 -   `options` - a flexible way to configure how Axe run operates. See [axe-core API documentation](https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#options-parameter) for information on the object structure.
 -   `config` - Axe configuration object. See [axe-core API documentation](https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#api-name-axeconfigure) for documentation on the object structure.

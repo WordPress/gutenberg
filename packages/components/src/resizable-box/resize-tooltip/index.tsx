@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
 import type { Ref, ForwardedRef } from 'react';
 
@@ -14,7 +13,8 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Label from './label';
-import { useResizeLabel, Axis, Position, POSITIONS } from './utils';
+import type { Axis, Position } from './utils';
+import { useResizeLabel, POSITIONS } from './utils';
 import { Root } from './styles/resize-tooltip.styles';
 
 type ResizeTooltipProps = React.ComponentProps< typeof Root > & {
@@ -29,6 +29,8 @@ type ResizeTooltipProps = React.ComponentProps< typeof Root > & {
 	showPx?: boolean;
 	zIndex?: number;
 };
+
+const noop = () => {};
 
 function ResizeTooltip(
 	{

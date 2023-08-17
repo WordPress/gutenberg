@@ -7,7 +7,7 @@ import { memo } from '@wordpress/element';
  */
 import PickerCell from '../mobile/bottom-sheet/picker-cell';
 
-const SelectControl = memo(
+export const SelectControl = memo(
 	( {
 		help,
 		instanceId,

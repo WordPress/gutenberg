@@ -2,14 +2,17 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { colord, extend } from 'colord';
+import { extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
  */
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { SVG } from '@wordpress/components';
+import {
+	getBlockSupport,
+	getBlockType,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useContext, createPortal } from '@wordpress/element';
@@ -19,149 +22,44 @@ import { useMemo, useContext, createPortal } from '@wordpress/element';
  */
 import {
 	BlockControls,
+	InspectorControls,
 	__experimentalDuotoneControl as DuotoneControl,
 	useSetting,
 } from '../components';
 import BlockList from '../components/block-list';
+import {
+	__unstableDuotoneFilter as DuotoneFilter,
+	__unstableDuotoneStylesheet as DuotoneStylesheet,
+	__unstableDuotoneUnsetStylesheet as DuotoneUnsetStylesheet,
+} from '../components/duotone';
+import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
+import { scopeSelector } from '../components/global-styles/utils';
+import { useBlockSettings } from './utils';
+import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const EMPTY_ARRAY = [];
 
 extend( [ namesPlugin ] );
 
 /**
- * Convert a list of colors to an object of R, G, and B values.
- *
- * @param {string[]} colors Array of RBG color strings.
- *
- * @return {Object} R, G, and B values.
- */
-export function getValuesFromColors( colors = [] ) {
-	const values = { r: [], g: [], b: [], a: [] };
-
-	colors.forEach( ( color ) => {
-		const rgbColor = colord( color ).toRgb();
-		values.r.push( rgbColor.r / 255 );
-		values.g.push( rgbColor.g / 255 );
-		values.b.push( rgbColor.b / 255 );
-		values.a.push( rgbColor.a );
-	} );
-
-	return values;
-}
-
-/**
- * Values for the SVG `feComponentTransfer`.
- *
- * @typedef Values {Object}
- * @property {number[]} r Red values.
- * @property {number[]} g Green values.
- * @property {number[]} b Blue values.
- * @property {number[]} a Alpha values.
- */
-
-/**
- * Stylesheet for rendering the duotone filter.
- *
- * @param {Object} props          Duotone props.
- * @param {string} props.selector Selector to apply the filter to.
- * @param {string} props.id       Unique id for this duotone filter.
- *
- * @return {WPElement} Duotone element.
- */
-function DuotoneStylesheet( { selector, id } ) {
-	const css = `
-${ selector } {
-	filter: url( #${ id } );
-}
-`;
-	return <style>{ css }</style>;
-}
-
-/**
- * SVG for rendering the duotone filter.
- *
- * @param {Object} props        Duotone props.
- * @param {string} props.id     Unique id for this duotone filter.
- * @param {Values} props.values R, G, B, and A values to filter with.
- *
- * @return {WPElement} Duotone element.
- */
-function DuotoneFilter( { id, values } ) {
-	return (
-		<SVG
-			xmlnsXlink="http://www.w3.org/1999/xlink"
-			viewBox="0 0 0 0"
-			width="0"
-			height="0"
-			focusable="false"
-			role="none"
-			style={ {
-				visibility: 'hidden',
-				position: 'absolute',
-				left: '-9999px',
-				overflow: 'hidden',
-			} }
-		>
-			<defs>
-				<filter id={ id }>
-					<feColorMatrix
-						// Use sRGB instead of linearRGB so transparency looks correct.
-						colorInterpolationFilters="sRGB"
-						type="matrix"
-						// Use perceptual brightness to convert to grayscale.
-						values="
-							.299 .587 .114 0 0
-							.299 .587 .114 0 0
-							.299 .587 .114 0 0
-							.299 .587 .114 0 0
-						"
-					/>
-					<feComponentTransfer
-						// Use sRGB instead of linearRGB to be consistent with how CSS gradients work.
-						colorInterpolationFilters="sRGB"
-					>
-						<feFuncR
-							type="table"
-							tableValues={ values.r.join( ' ' ) }
-						/>
-						<feFuncG
-							type="table"
-							tableValues={ values.g.join( ' ' ) }
-						/>
-						<feFuncB
-							type="table"
-							tableValues={ values.b.join( ' ' ) }
-						/>
-						<feFuncA
-							type="table"
-							tableValues={ values.a.join( ' ' ) }
-						/>
-					</feComponentTransfer>
-					<feComposite
-						// Re-mask the image with the original transparency since the feColorMatrix above loses that information.
-						in2="SourceGraphic"
-						operator="in"
-					/>
-				</filter>
-			</defs>
-		</SVG>
-	);
-}
-
-/**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param {Object} props          Duotone props.
- * @param {string} props.selector Selector to apply the filter to.
- * @param {string} props.id       Unique id for this duotone filter.
- * @param {Values} props.values   R, G, B, and A values to filter with.
+ * @param {Object}           props          Duotone props.
+ * @param {string}           props.selector Selector to apply the filter to.
+ * @param {string}           props.id       Unique id for this duotone filter.
+ * @param {string[]|"unset"} props.colors   Array of RGB color strings ordered from dark to light.
  *
  * @return {WPElement} Duotone element.
  */
-function InlineDuotone( { selector, id, values } ) {
+function InlineDuotone( { selector, id, colors } ) {
+	if ( colors === 'unset' ) {
+		return <DuotoneUnsetStylesheet selector={ selector } />;
+	}
+
 	return (
 		<>
-			<DuotoneFilter id={ id } values={ values } />
+			<DuotoneFilter id={ id } colors={ colors } />
 			<DuotoneStylesheet id={ id } selector={ selector } />
 		</>
 	);
@@ -185,9 +83,35 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 	);
 }
 
-function DuotonePanel( { attributes, setAttributes } ) {
+export function getColorsFromDuotonePreset( duotone, duotonePalette ) {
+	if ( ! duotone ) {
+		return;
+	}
+	const preset = duotonePalette?.find( ( { slug } ) => {
+		return duotone === `var:preset|duotone|${ slug }`;
+	} );
+
+	return preset ? preset.colors : undefined;
+}
+
+export function getDuotonePresetFromColors( colors, duotonePalette ) {
+	if ( ! colors || ! Array.isArray( colors ) ) {
+		return;
+	}
+
+	const preset = duotonePalette?.find( ( duotonePreset ) => {
+		return duotonePreset?.colors?.every(
+			( val, index ) => val === colors[ index ]
+		);
+	} );
+
+	return preset ? `var:preset|duotone|${ preset.slug }` : undefined;
+}
+
+function DuotonePanel( { attributes, setAttributes, name } ) {
 	const style = attributes?.style;
-	const duotone = style?.color?.duotone;
+	const duotoneStyle = style?.color?.duotone;
+	const settings = useBlockSettings( name );
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -206,26 +130,53 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		return null;
 	}
 
+	const duotonePresetOrColors = ! Array.isArray( duotoneStyle )
+		? getColorsFromDuotonePreset( duotoneStyle, duotonePalette )
+		: duotoneStyle;
+
 	return (
-		<BlockControls group="block" __experimentalShareWithChildBlocks>
-			<DuotoneControl
-				duotonePalette={ duotonePalette }
-				colorPalette={ colorPalette }
-				disableCustomDuotone={ disableCustomDuotone }
-				disableCustomColors={ disableCustomColors }
-				value={ duotone }
-				onChange={ ( newDuotone ) => {
-					const newStyle = {
-						...style,
-						color: {
-							...style?.color,
-							duotone: newDuotone,
-						},
-					};
-					setAttributes( { style: newStyle } );
-				} }
-			/>
-		</BlockControls>
+		<>
+			<InspectorControls group="filter">
+				<StylesFiltersPanel
+					value={ { filter: { duotone: duotonePresetOrColors } } }
+					onChange={ ( newDuotone ) => {
+						const newStyle = {
+							...style,
+							color: {
+								...newDuotone?.filter,
+							},
+						};
+						setAttributes( { style: newStyle } );
+					} }
+					settings={ settings }
+				/>
+			</InspectorControls>
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
+				<DuotoneControl
+					duotonePalette={ duotonePalette }
+					colorPalette={ colorPalette }
+					disableCustomDuotone={ disableCustomDuotone }
+					disableCustomColors={ disableCustomColors }
+					value={ duotonePresetOrColors }
+					onChange={ ( newDuotone ) => {
+						const maybePreset = getDuotonePresetFromColors(
+							newDuotone,
+							duotonePalette
+						);
+
+						const newStyle = {
+							...style,
+							color: {
+								...style?.color,
+								duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
+							},
+						};
+						setAttributes( { style: newStyle } );
+					} }
+					settings={ settings }
+				/>
+			</BlockControls>
+		</>
 	);
 }
 
@@ -238,7 +189,9 @@ function DuotonePanel( { attributes, setAttributes } ) {
  * @return {Object} Filtered block settings.
  */
 function addDuotoneAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, 'color.__experimentalDuotone' ) ) {
+	// Previous `color.__experimentalDuotone` support flag is migrated via
+	// block_type_metadata_settings filter in `lib/block-supports/duotone.php`.
+	if ( ! hasBlockSupport( settings, 'filter.duotone' ) ) {
 		return settings;
 	}
 
@@ -265,50 +218,97 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		// Previous `color.__experimentalDuotone` support flag is migrated via
+		// block_type_metadata_settings filter in `lib/block-supports/duotone.php`.
 		const hasDuotoneSupport = hasBlockSupport(
 			props.name,
-			'color.__experimentalDuotone'
+			'filter.duotone'
 		);
 
+		const blockEditingMode = useBlockEditingMode();
+
+		// CAUTION: code added before this line will be executed
+		// for all blocks, not just those that support duotone. Code added
+		// above this line should be carefully evaluated for its impact on
+		// performance.
 		return (
 			<>
+				{ hasDuotoneSupport && blockEditingMode === 'default' && (
+					<DuotonePanel { ...props } />
+				) }
 				<BlockEdit { ...props } />
-				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
 			</>
 		);
 	},
 	'withDuotoneControls'
 );
 
-/**
- * Function that scopes a selector with another one. This works a bit like
- * SCSS nesting except the `&` operator isn't supported.
- *
- * @example
- * ```js
- * const scope = '.a, .b .c';
- * const selector = '> .x, .y';
- * const merged = scopeSelector( scope, selector );
- * // merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
- * ```
- *
- * @param {string} scope    Selector to scope to.
- * @param {string} selector Original selector.
- *
- * @return {string} Scoped selector.
- */
-function scopeSelector( scope, selector ) {
-	const scopes = scope.split( ',' );
-	const selectors = selector.split( ',' );
+function DuotoneStyles( {
+	id: filterId,
+	selector: duotoneSelector,
+	attribute: duotoneAttr,
+} ) {
+	const element = useContext( BlockList.__unstableElementContext );
 
-	const selectorsScoped = [];
-	scopes.forEach( ( outer ) => {
-		selectors.forEach( ( inner ) => {
-			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
-		} );
+	const duotonePalette = useMultiOriginPresets( {
+		presetSetting: 'color.duotone',
+		defaultSetting: 'color.defaultDuotone',
 	} );
 
-	return selectorsScoped.join( ', ' );
+	// Possible values for duotone attribute:
+	// 1. Array of colors - e.g. ['#000000', '#ffffff'].
+	// 2. Variable for an existing Duotone preset - e.g. 'var:preset|duotone|green-blue' or 'var(--wp--preset--duotone--green-blue)''
+	// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
+	const isCustom = Array.isArray( duotoneAttr );
+	const duotonePreset = isCustom
+		? undefined
+		: getColorsFromDuotonePreset( duotoneAttr, duotonePalette );
+	const isPreset = typeof duotoneAttr === 'string' && duotonePreset;
+	const isCSS = typeof duotoneAttr === 'string' && ! isPreset;
+
+	// Match the structure of WP_Duotone_Gutenberg::render_duotone_support() in PHP.
+	let colors = null;
+	if ( isPreset ) {
+		// Array of colors.
+		colors = duotonePreset;
+	} else if ( isCSS ) {
+		// CSS filter property string (e.g. 'unset').
+		colors = duotoneAttr;
+	} else if ( isCustom ) {
+		// Array of colors.
+		colors = duotoneAttr;
+	}
+
+	// Build the CSS selectors to which the filter will be applied.
+	const selectors = duotoneSelector.split( ',' );
+
+	const selectorsScoped = selectors.map( ( selectorPart ) => {
+		// Extra .editor-styles-wrapper specificity is needed in the editor
+		// since we're not using inline styles to apply the filter. We need to
+		// override duotone applied by global styles and theme.json.
+
+		// Assuming the selector part is a subclass selector (not a tag name)
+		// so we can prepend the filter id class. If we want to support elements
+		// such as `img` or namespaces, we'll need to add a case for that here.
+		return `.editor-styles-wrapper .${ filterId }${ selectorPart.trim() }`;
+	} );
+
+	const selector = selectorsScoped.join( ', ' );
+
+	const isValidFilter = Array.isArray( colors ) || colors === 'unset';
+
+	return (
+		element &&
+		isValidFilter &&
+		createPortal(
+			<InlineDuotone
+				selector={ selector }
+				id={ filterId }
+				colors={ colors }
+			/>,
+			element
+		)
+	);
 }
 
 /**
@@ -320,56 +320,76 @@ function scopeSelector( scope, selector ) {
  */
 const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const duotoneSupport = getBlockSupport(
-			props.name,
-			'color.__experimentalDuotone'
-		);
-		const values = props?.attributes?.style?.color?.duotone;
+		const id = useInstanceId( BlockListBlock );
 
-		if ( ! duotoneSupport || ! values ) {
-			return <BlockListBlock { ...props } />;
-		}
+		const selector = useMemo( () => {
+			const blockType = getBlockType( props.name );
 
-		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
+			if ( blockType ) {
+				// Backwards compatibility for `supports.color.__experimentalDuotone`
+				// is provided via the `block_type_metadata_settings` filter. If
+				// `supports.filter.duotone` has not been set and the
+				// experimental property has been, the experimental property
+				// value is copied into `supports.filter.duotone`.
+				const duotoneSupport = getBlockSupport(
+					blockType,
+					'filter.duotone',
+					false
+				);
+				if ( ! duotoneSupport ) {
+					return null;
+				}
 
-		// Extra .editor-styles-wrapper specificity is needed in the editor
-		// since we're not using inline styles to apply the filter. We need to
-		// override duotone applied by global styles and theme.json.
-		const selectorsGroup = scopeSelector(
-			`.editor-styles-wrapper .${ id }`,
-			duotoneSupport
-		);
+				// If the experimental duotone support was set, that value is
+				// to be treated as a selector and requires scoping.
+				const experimentalDuotone = getBlockSupport(
+					blockType,
+					'color.__experimentalDuotone',
+					false
+				);
+				if ( experimentalDuotone ) {
+					const rootSelector = getBlockCSSSelector( blockType );
+					return typeof experimentalDuotone === 'string'
+						? scopeSelector( rootSelector, experimentalDuotone )
+						: rootSelector;
+				}
 
-		const className = classnames( props?.className, id );
+				// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
+				return getBlockCSSSelector( blockType, 'filter.duotone', {
+					fallback: true,
+				} );
+			}
+		}, [ props.name ] );
 
-		const element = useContext( BlockList.__unstableElementContext );
+		const attribute = props?.attributes?.style?.color?.duotone;
 
+		const filterClass = `wp-duotone-${ id }`;
+
+		const shouldRender = selector && attribute;
+
+		const className = shouldRender
+			? classnames( props?.className, filterClass )
+			: props?.className;
+
+		// CAUTION: code added before this line will be executed
+		// for all blocks, not just those that support duotone. Code added
+		// above this line should be carefully evaluated for its impact on
+		// performance.
 		return (
 			<>
-				{ element &&
-					createPortal(
-						<InlineDuotone
-							selector={ selectorsGroup }
-							id={ id }
-							values={ getValuesFromColors( values ) }
-						/>,
-						element
-					) }
+				{ shouldRender && (
+					<DuotoneStyles
+						id={ filterClass }
+						selector={ selector }
+						attribute={ attribute }
+					/>
+				) }
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
 	},
 	'withDuotoneStyles'
 );
-
-export function PresetDuotoneFilter( { preset } ) {
-	return (
-		<DuotoneFilter
-			id={ `wp-duotone-${ preset.slug }` }
-			values={ getValuesFromColors( preset.colors ) }
-		/>
-	);
-}
 
 addFilter(
 	'blocks.registerBlockType',

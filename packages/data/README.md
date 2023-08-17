@@ -164,7 +164,6 @@ Integrating an existing redux store with its own reducers, store enhancers and m
 _Example:_
 
 ```js
-import { mapValues } from 'lodash';
 import { register } from '@wordpress/data';
 import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
@@ -172,13 +171,27 @@ import createStore from './existing-app/store';
 
 const reduxStore = createStore();
 
+const mapValues = ( obj, callback ) =>
+	Object.entries( obj ).reduce(
+		( acc, [ key, value ] ) => ( {
+			...acc,
+			[ key ]: callback( value ),
+		} ),
+		{}
+	);
+
 const boundSelectors = mapValues(
 	existingSelectors,
-	( selector ) => ( ...args ) => selector( reduxStore.getState(), ...args )
+	( selector ) =>
+		( ...args ) =>
+			selector( reduxStore.getState(), ...args )
 );
 
-const boundActions = mapValues( existingActions, ( action ) => ( ...args ) =>
-	reduxStore.dispatch( action( ...args ) )
+const boundActions = mapValues(
+	existingActions,
+	( action ) =>
+		( ...args ) =>
+			reduxStore.dispatch( action( ...args ) )
 );
 
 const genericStore = {
@@ -266,17 +279,17 @@ Specific implementation differences from Redux and React Redux:
 
 ### AsyncModeProvider
 
-Context Provider Component used to switch the data module component rerendering
-between Sync and Async modes.
+Context Provider Component used to switch the data module component rerendering between Sync and Async modes.
 
 _Usage_
 
 ```js
 import { useSelect, AsyncModeProvider } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function BlockCount() {
 	const count = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlockCount();
+		return select( blockEditorStore ).getBlockCount();
 	}, [] );
 
 	return count;
@@ -306,8 +319,7 @@ _Returns_
 
 ### combineReducers
 
-The combineReducers helper function turns an object whose values are different
-reducing functions into a single reducing function you can pass to registerReducer.
+The combineReducers helper function turns an object whose values are different reducing functions into a single reducing function you can pass to registerReducer.
 
 _Usage_
 
@@ -336,6 +348,10 @@ const store = createReduxStore( 'my-shop', {
 register( store );
 ```
 
+_Type_
+
+-   `import('./types').combineReducers`
+
 _Parameters_
 
 -   _reducers_ `Object`: An object whose values correspond to different reducing functions that need to be combined into one.
@@ -350,8 +366,7 @@ Undocumented declaration.
 
 ### createReduxStore
 
-Creates a data store descriptor for the provided Redux store configuration containing
-properties describing reducer, actions, selectors, controls and resolvers.
+Creates a data store descriptor for the provided Redux store configuration containing properties describing reducer, actions, selectors, controls and resolvers.
 
 _Usage_
 
@@ -369,16 +384,15 @@ const store = createReduxStore( 'demo', {
 _Parameters_
 
 -   _key_ `string`: Unique namespace identifier.
--   _options_ `ReduxStoreConfig`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
+-   _options_ `ReduxStoreConfig<State,Actions,Selectors>`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
 
 _Returns_
 
--   `StoreDescriptor`: Store Object.
+-   `StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>`: Store Object.
 
 ### createRegistry
 
-Creates a new store registry, given an optional object of initial store
-configurations.
+Creates a new store registry, given an optional object of initial store configurations.
 
 _Parameters_
 
@@ -391,8 +405,7 @@ _Returns_
 
 ### createRegistryControl
 
-Creates a control function that takes additional curried argument with the `registry` object.
-While a regular control has signature
+Creates a control function that takes additional curried argument with the `registry` object. While a regular control has signature
 
 ```js
 ( action ) => iteratorOrPromise;
@@ -404,11 +417,9 @@ where the control works with the `action` that it's bound to, a registry control
 ( registry ) => ( action ) => iteratorOrPromise;
 ```
 
-A registry control is typically used to select data or dispatch an action to a registered
-store.
+A registry control is typically used to select data or dispatch an action to a registered store.
 
-When registering a control created with `createRegistryControl` with a store, the store
-knows which calling convention to use when executing the control.
+When registering a control created with `createRegistryControl` with a store, the store knows which calling convention to use when executing the control.
 
 _Parameters_
 
@@ -420,18 +431,18 @@ _Returns_
 
 ### createRegistrySelector
 
-Creates a selector function that takes additional curried argument with the
-registry `select` function. While a regular selector has signature
+Creates a selector function that takes additional curried argument with the registry `select` function. While a regular selector has signature
 
 ```js
 ( state, ...selectorArgs ) => result;
 ```
 
-that allows to select data from the store's `state`, a registry selector
-has signature:
+that allows to select data from the store's `state`, a registry selector has signature:
 
 ```js
-( select ) => ( state, ...selectorArgs ) => result;
+( select ) =>
+	( state, ...selectorArgs ) =>
+		result;
 ```
 
 that supports also selecting from other registered stores.
@@ -439,15 +450,18 @@ that supports also selecting from other registered stores.
 _Usage_
 
 ```js
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
+
 const getCurrentPostId = createRegistrySelector( ( select ) => ( state ) => {
-	return select( 'core/editor' ).getCurrentPostId();
+	return select( editorStore ).getCurrentPostId();
 } );
 
 const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
 	// calling another registry selector just like any other function
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	return select( 'core' ).getEntityRecordEdits(
+	return select( coreStore ).getEntityRecordEdits(
 		'postType',
 		postType,
 		postId
@@ -470,27 +484,26 @@ _Returns_
 
 ### dispatch
 
-Given the name of a registered store, returns an object of the store's action creators.
-Calling an action creator will cause it to be dispatched, updating the state value accordingly.
+Given a store descriptor, returns an object of the store's action creators. Calling an action creator will cause it to be dispatched, updating the state value accordingly.
 
-Note: Action creators returned by the dispatch will return a promise when
-they are called.
+Note: Action creators returned by the dispatch will return a promise when they are called.
 
 _Usage_
 
 ```js
 import { dispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
+dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 ```
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreNameOrDescriptor`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `Object`: Object containing the action creators.
+-   `DispatchReturn< StoreNameOrDescriptor >`: Object containing the action creators.
 
 ### plugins
 
@@ -554,11 +567,9 @@ _Returns_
 
 ### RegistryConsumer
 
-A custom react Context consumer exposing the provided `registry` to
-children components. Used along with the RegistryProvider.
+A custom react Context consumer exposing the provided `registry` to children components. Used along with the RegistryProvider.
 
-You can read more about the react context api here:
-<https://reactjs.org/docs/context.html#contextprovider>
+You can read more about the react context api here: <https://reactjs.org/docs/context.html#contextprovider>
 
 _Usage_
 
@@ -587,30 +598,26 @@ const App = ( { props } ) => {
 
 ### RegistryProvider
 
-A custom Context provider for exposing the provided `registry` to children
-components via a consumer.
+A custom Context provider for exposing the provided `registry` to children components via a consumer.
 
-See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for
-example.
+See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for example.
 
 ### resolveSelect
 
-Given the name of a registered store, returns an object containing the store's
-selectors pre-bound to state so that you only need to supply additional arguments,
-and modified so that they return promises that resolve to their eventual values,
-after any resolvers have ran.
+Given a store descriptor, returns an object containing the store's selectors pre-bound to state so that you only need to supply additional arguments, and modified so that they return promises that resolve to their eventual values, after any resolvers have ran.
 
 _Usage_
 
 ```js
 import { resolveSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then( console.log );
+resolveSelect( myCustomStore ).getPrice( 'hammer' ).then( console.log );
 ```
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -618,31 +625,30 @@ _Returns_
 
 ### select
 
-Given the name or descriptor of a registered store, returns an object of the store's selectors.
-The selector functions are been pre-bound to pass the current state automatically.
-As a consumer, you need only pass arguments of the selector, if applicable.
+Given a store descriptor, returns an object of the store's selectors. The selector functions are been pre-bound to pass the current state automatically. As a consumer, you need only pass arguments of the selector, if applicable.
 
 _Usage_
 
 ```js
 import { select } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-select( 'my-shop' ).getPrice( 'hammer' );
+select( myCustomStore ).getPrice( 'hammer' );
 ```
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `string | T`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `Object`: Object containing the store's selectors.
+-   `CurriedSelectorsOf< T >`: Object containing the store's selectors.
 
 ### subscribe
 
-Given a listener function, the function will be called any time the state value
-of one of the registered stores has changed. This function returns a `unsubscribe`
-function used to stop the subscription.
+Given a listener function, the function will be called any time the state value of one of the registered stores has changed. If you specify the optional `storeNameOrDescriptor` parameter, the listener function will be called only on updates on that one specific registered store.
+
+This function returns an `unsubscribe` function used to stop the subscription.
 
 _Usage_
 
@@ -661,6 +667,7 @@ unsubscribe();
 _Parameters_
 
 -   _listener_ `Function`: Callback function.
+-   _storeNameOrDescriptor_ `string|StoreDescriptor?`: Optional store name.
 
 ## subscribeOnChange
 
@@ -684,13 +691,11 @@ _Parameters
 
 ### suspendSelect
 
-Given the name of a registered store, returns an object containing the store's
-selectors pre-bound to state so that you only need to supply additional arguments,
-and modified so that they throw promises in case the selector is not resolved yet.
+Given a store descriptor, returns an object containing the store's selectors pre-bound to state so that you only need to supply additional arguments, and modified so that they throw promises in case the selector is not resolved yet.
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -698,9 +703,7 @@ _Returns_
 
 ### use
 
-Extends a registry to inherit functionality provided by a given plugin. A
-plugin is an object with properties aligning to that of a registry, merged
-to extend the default registry behavior.
+Extends a registry to inherit functionality provided by a given plugin. A plugin is an object with properties aligning to that of a registry, merged to extend the default registry behavior.
 
 _Parameters_
 
@@ -710,8 +713,7 @@ _Parameters_
 
 A custom react hook returning the current registry dispatch actions creators.
 
-Note: The component using this hook must be within the context of a
-RegistryProvider.
+Note: The component using this hook must be within the context of a RegistryProvider.
 
 _Usage_
 
@@ -722,6 +724,7 @@ action.
 ```jsx
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import { store as myCustomStore } from 'my-custom-store';
 
 function Button( { onClick, children } ) {
 	return (
@@ -733,10 +736,10 @@ function Button( { onClick, children } ) {
 
 const SaleButton = ( { children } ) => {
 	const { stockNumber } = useSelect(
-		( select ) => select( 'my-shop' ).getStockNumber(),
+		( select ) => select( myCustomStore ).getStockNumber(),
 		[]
 	);
-	const { startSale } = useDispatch( 'my-shop' );
+	const { startSale } = useDispatch( myCustomStore );
 	const onClick = useCallback( () => {
 		const discountPercent = stockNumber > 50 ? 10 : 20;
 		startSale( discountPercent );
@@ -751,26 +754,21 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `[string|StoreDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDescriptor_ `[StoreNameOrDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
--   `Function`: A custom react hook.
+-   `UseDispatchReturn<StoreNameOrDescriptor>`: A custom react hook.
 
 ### useRegistry
 
 A custom react hook exposing the registry context for use.
 
-This exposes the `registry` value provided via the
-<a href="#RegistryProvider">Registry Provider</a> to a component implementing
-this hook.
+This exposes the `registry` value provided via the <a href="#RegistryProvider">Registry Provider</a> to a component implementing this hook.
 
 It acts similarly to the `useContext` react hook.
 
-Note: Generally speaking, `useRegistry` is a low level hook that in most cases
-won't be needed for implementation. Most interactions with the `@wordpress/data`
-API can be performed via the `useSelect` hook, or the `withSelect` and
-`withDispatch` higher order components.
+Note: Generally speaking, `useRegistry` is a low level hook that in most cases won't be needed for implementation. Most interactions with the `@wordpress/data` API can be performed via the `useSelect` hook, or the `withSelect` and `withDispatch` higher order components.
 
 _Usage_
 
@@ -801,18 +799,18 @@ _Returns_
 
 Custom react hook for retrieving props from registered selectors.
 
-In general, this custom React hook follows the
-[rules of hooks](https://reactjs.org/docs/hooks-rules.html).
+In general, this custom React hook follows the [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
 
 _Usage_
 
 ```js
 import { useSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function HammerPriceDisplay( { currency } ) {
 	const price = useSelect(
 		( select ) => {
-			return select( 'my-shop' ).getPrice( 'hammer', currency );
+			return select( myCustomStore ).getPrice( 'hammer', currency );
 		},
 		[ currency ]
 	);
@@ -841,9 +839,10 @@ function because your component won't re-render on a data change.**
 
 ```js
 import { useSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function Paste( { children } ) {
-	const { getSettings } = useSelect( 'my-shop' );
+	const { getSettings } = useSelect( myCustomStore );
 	function onPaste() {
 		// Do something with the settings.
 		const settings = getSettings();
@@ -854,17 +853,16 @@ function Paste( { children } ) {
 
 _Parameters_
 
--   _mapSelect_ `Function|StoreDescriptor|string`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
--   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
+-   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
+-   _deps_ `unknown[]`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 
--   `Function`: A custom react hook.
+-   `UseSelectReturn<T>`: A custom react hook.
 
 ### useSuspenseSelect
 
-A variant of the `useSelect` hook that has the same API, but will throw a
-suspense Promise if any of the called selectors is in an unresolved state.
+A variant of the `useSelect` hook that has the same API, but will throw a suspense Promise if any of the called selectors is in an unresolved state.
 
 _Parameters_
 
@@ -877,8 +875,7 @@ _Returns_
 
 ### withDispatch
 
-Higher-order component used to add dispatch props using registered action
-creators.
+Higher-order component used to add dispatch props using registered action creators.
 
 _Usage_
 
@@ -892,9 +889,10 @@ function Button( { onClick, children } ) {
 }
 
 import { withDispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
-	const { startSale } = dispatch( 'my-shop' );
+	const { startSale } = dispatch( myCustomStore );
 	const { discountPercent } = ownProps;
 
 	return {
@@ -932,11 +930,12 @@ function Button( { onClick, children } ) {
 }
 
 import { withDispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// Stock number changes frequently.
-	const { getStockNumber } = select( 'my-shop' );
-	const { startSale } = dispatch( 'my-shop' );
+	const { getStockNumber } = select( myCustomStore );
+	const { startSale } = dispatch( myCustomStore );
 	return {
 		onClick() {
 			const discountPercent = getStockNumber() > 50 ? 10 : 20;
@@ -964,8 +963,7 @@ _Returns_
 
 ### withRegistry
 
-Higher-order component which renders the original component with the current
-registry context passed as its `registry` prop.
+Higher-order component which renders the original component with the current registry context passed as its `registry` prop.
 
 _Parameters_
 
@@ -977,13 +975,13 @@ _Returns_
 
 ### withSelect
 
-Higher-order component used to inject state-derived props using registered
-selectors.
+Higher-order component used to inject state-derived props using registered selectors.
 
 _Usage_
 
 ```js
 import { withSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function PriceDisplay( { price, currency } ) {
 	return new Intl.NumberFormat( 'en-US', {
@@ -993,7 +991,7 @@ function PriceDisplay( { price, currency } ) {
 }
 
 const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
-	const { getPrice } = select( 'my-shop' );
+	const { getPrice } = select( myCustomStore );
 	const { currency } = ownProps;
 
 	return {
@@ -1028,7 +1026,7 @@ As a response of `dispatch` calls, WordPress data based applications updates the
 -   The selectors are called with the update state.
 -   If the selectors return values that are different than the previous (strict equality), the component rerenders.
 
-As the application grows, this can become costful, so it's important to ensure that we avoid running both these if possible. One of these situations happen when an interaction requires multiple consisecutive `dispatch` calls in order to update the state properly. To avoid rerendering the components each time we call `dispatch`, we can wrap the sequential dispatch calls in `batch` which will ensure that the components only call selectors and rerender once at the end of the sequence.
+As the application grows, this can become costful, so it's important to ensure that we avoid running both these if possible. One of these situations happen when an interaction requires multiple consecutive `dispatch` calls in order to update the state properly. To avoid rerendering the components each time we call `dispatch`, we can wrap the sequential dispatch calls in `batch` which will ensure that the components only call selectors and rerender once at the end of the sequence.
 
 _Usage_
 
@@ -1049,6 +1047,105 @@ function Component() {
 	return <button onClick={ callback }>Click me</button>;
 }
 ```
+
+## Selectors
+
+The following selectors are available on the object returned by `wp.data.select( 'core' )`.
+
+_Example_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+
+function Component() {
+	const result = useSelect( ( select ) => {
+		const query = { per_page: 20 };
+		const selectorArgs = [ 'postType', 'page', query ];
+
+		return {
+			pages: select( coreDataStore ).getEntityRecords( ...selectorArgs ),
+			hasStartedResolution: select( coreDataStore ).hasStartedResolution(
+				'getEntityRecords', // _selectorName_
+				selectorArgs
+			),
+			hasFinishedResolution: select(
+				coreDataStore
+			).hasFinishedResolution( 'getEntityRecords', selectorArgs ),
+			isResolving: select( coreDataStore ).isResolving(
+				'getEntityRecords',
+				selectorArgs
+			),
+		};
+	} );
+
+	if ( result.hasStartedResolution ) {
+		return <>Fetching data...</>;
+	}
+
+	if ( result.isResolving ) {
+		return (
+			<>
+				{
+					// show a spinner
+				 }
+			</>
+		);
+	}
+
+	if ( result.hasFinishedResolution ) {
+		return (
+			<>
+				{
+					// data is ready
+				 }
+			</>
+		);
+	}
+}
+```
+
+### hasFinishedResolution
+
+Returns true if resolution has completed for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution has completed.
+
+### hasStartedResolution
+
+Returns true if resolution has already been triggered for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution has been triggered.
+
+### isResolving
+
+Returns true if resolution has been triggered but has not yet completed for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution is in progress.
 
 ## Going further
 

@@ -29,6 +29,7 @@ show "Mixed" placeholder text.
 ```jsx
 import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 const colors = [
 	{ name: 'Blue 20', color: '#72aee6' },
@@ -68,7 +69,7 @@ a `SlotFillProvider` overall.
 
 ## Props
 
-### `colors`: `Array`
+### `colors`: `( PaletteObject | ColorObject )[]`
 
 An array of color definitions. This may also be a multi-dimensional array where
 colors are organized by multiple origins.
@@ -76,6 +77,7 @@ colors are organized by multiple origins.
 Each color may be an object containing a `name` and `color` value.
 
 - Required: No
+- Default: `[]`
 
 ### `disableCustomColors`: `boolean`
 
@@ -89,6 +91,7 @@ This controls whether the alpha channel will be offered when selecting
 custom colors.
 
 - Required: No
+- Default: `false`
 
 ### `enableStyle`: `boolean`
 
@@ -122,25 +125,29 @@ _Note: The will be `undefined` if a user clears all borders._
 
 - Required: Yes
 
-### `popoverClassNames`: `Object`
+### `popoverPlacement`: `string`
 
-An object defining CSS classnames for all the inner `BorderControl` popover
-content.
+The position of the color popovers relative to the control wrapper.
 
-Example:
-```js
-{
-	linked: 'linked-border-popover-content',
-	top: 'top-border-popover-content',
-	right: 'right-border-popover-content',
-	bottom: 'bottom-border-popover-content',
-	left: 'left-border-popover-content',
-}
-```
+By default, popovers are displayed relative to the button that initiated the popover. By supplying a popover placement, you force the popover to display in a specific location.
 
-By default, popovers are displayed relative to the button that initiated the popover. By supplying classnames for each individual popover, it is possible to add styling rules to align the popover positions to an unrelated design element, for example, the sidebar inspector in the block editor.
+The available base placements are 'top', 'right', 'bottom', 'left'. Each of these base placements has an alignment in the form -start and -end. For example, 'right-start', or 'bottom-end'. These allow you to align the tooltip to the edges of the button, rather than centering it.
 
 - Required: No
+
+### `popoverOffset`: `number`
+
+The space between the popover and the control wrapper.
+
+- Required: No
+
+### `size`: `string`
+
+Size of the control.
+
+- Required: No
+- Default: `default`
+- Allowed values: `default`, `__unstable-large`
 
 ### `value`: `Object`
 
@@ -160,19 +167,5 @@ const splitBorders = {
 	left: { color: '#f2d675', style: 'dotted', width: '1em' },
 };
 ```
-
-- Required: No
-
-### `__experimentalHasMultipleOrigins`: `boolean`
-
-This is passed on to the color related sub-components which need to be made
-aware of whether the colors prop contains multiple origins.
-
-- Required: No
-
-### `__experimentalIsRenderedInSidebar`: `boolean`
-
-This is passed on to the color related sub-components so they may render more
-effectively when used within a sidebar.
 
 - Required: No

@@ -1,58 +1,70 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
-import { TextInput } from 'react-native';
+import { getEditorHtml, initializeEditor, fireEvent } from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
-import { BlockEdit } from '@wordpress/block-editor';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
-/**
- * Internal dependencies
- */
-import { metadata, settings, name } from '../index';
+beforeAll( () => {
+	// Register all core blocks
+	registerCoreBlocks();
+} );
 
-const Shortcode = ( { clientId, ...props } ) => (
-	<BlockEdit name={ name } clientId={ clientId || 0 } { ...props } />
-);
+afterAll( () => {
+	// Clean up registered blocks
+	getBlockTypes().forEach( ( block ) => {
+		unregisterBlockType( block.name );
+	} );
+} );
 
-describe( 'Shortcode', () => {
-	beforeAll( () => {
-		registerBlockType( name, {
-			...metadata,
-			...settings,
+describe( 'Shortcode block', () => {
+	it( 'inserts block', async () => {
+		const screen = await initializeEditor();
+
+		fireEvent.press( screen.getByLabelText( 'Add block' ) );
+
+		const blockList = screen.getByTestId( 'InserterUI-Blocks' );
+		// onScroll event used to force the FlatList to render all items
+		fireEvent.scroll( blockList, {
+			nativeEvent: {
+				contentOffset: { y: 0, x: 0 },
+				contentSize: { width: 100, height: 100 },
+				layoutMeasurement: { width: 100, height: 100 },
+			},
 		} );
+
+		fireEvent.press( await screen.findByText( 'Shortcode' ) );
+
+		const [ shortcodeBlock ] = screen.getAllByLabelText(
+			/Shortcode Block\. Row 1/
+		);
+		expect( shortcodeBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	afterAll( () => {
-		unregisterBlockType( name );
-	} );
+	it( 'edits content', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: '<!-- wp:shortcode /-->',
+		} );
+		const [ shortcodeBlock ] = screen.getAllByLabelText(
+			/Shortcode Block\. Row 1/
+		);
+		fireEvent.press( shortcodeBlock );
 
-	it( 'renders without crashing', () => {
-		const component = renderer.create(
-			<Shortcode attributes={ { text: '' } } />
-		);
-		const rendered = component.toJSON();
-		expect( rendered ).toBeTruthy();
-	} );
+		const textField = screen.getByPlaceholderText( 'Add a shortcode…' );
+		fireEvent( textField, 'focus' );
+		fireEvent( textField, 'onChange', {
+			nativeEvent: {
+				eventCount: 1,
+				target: undefined,
+				text: '[youtube https://www.youtube.com/watch?v=ssfHW5lwFZg]',
+			},
+		} );
 
-	it( 'renders given text without crashing', () => {
-		const component = renderer.create(
-			<Shortcode
-				attributes={ {
-					text:
-						'[youtube https://www.youtube.com/watch?v=ssfHW5lwFZg]',
-				} }
-			/>
-		);
-		const testInstance = component.root;
-		const textInput = testInstance.findByType( TextInput );
-		expect( textInput ).toBeTruthy();
-		expect( textInput.props.value ).toBe(
-			'[youtube https://www.youtube.com/watch?v=ssfHW5lwFZg]'
-		);
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );

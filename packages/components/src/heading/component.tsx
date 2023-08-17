@@ -6,9 +6,11 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect, WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../ui/context';
+import { contextConnect } from '../ui/context';
 import { View } from '../view';
-import { useHeading, HeadingProps } from './hook';
+import { useHeading } from './hook';
+import type { HeadingProps } from './types';
 
 function UnconnectedHeading(
 	props: WordPressComponentProps< HeadingProps, 'h1' >,
@@ -22,7 +24,6 @@ function UnconnectedHeading(
 /**
  * `Heading` renders headings and titles using the library's typography system.
  *
- * @example
  * ```jsx
  * import { __experimentalHeading as Heading } from "@wordpress/components";
  *

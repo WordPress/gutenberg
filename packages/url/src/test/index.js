@@ -1,36 +1,32 @@
 /**
- * External dependencies
- */
-import { every } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import {
-	isURL,
-	isEmail,
-	getProtocol,
-	isValidProtocol,
-	getAuthority,
-	isValidAuthority,
-	getPath,
-	isValidPath,
-	getQueryString,
-	buildQueryString,
-	isValidQueryString,
-	getFragment,
-	isValidFragment,
 	addQueryArgs,
-	getQueryArg,
-	hasQueryArg,
-	removeQueryArgs,
-	prependHTTP,
-	safeDecodeURI,
-	filterURLForDisplay,
+	buildQueryString,
 	cleanForSlug,
-	getQueryArgs,
+	filterURLForDisplay,
+	getAuthority,
 	getFilename,
+	getFragment,
+	getPath,
+	getProtocol,
+	getQueryArg,
+	getQueryArgs,
+	getQueryString,
+	hasQueryArg,
+	isEmail,
+	isURL,
+	isValidAuthority,
+	isValidFragment,
+	isValidPath,
+	isValidProtocol,
+	isValidQueryString,
 	normalizePath,
+	prependHTTP,
+	prependHTTPS,
+	removeQueryArgs,
+	safeDecodeURI,
 } from '../';
 import wptData from './fixtures/wpt-data';
 
@@ -44,35 +40,37 @@ describe( 'isURL', () => {
 } );
 
 describe( 'isEmail', () => {
-	it( 'returns true when given things that look like an email', () => {
-		const emails = [
-			'simple@wordpress.org',
-			'very.common@wordpress.org',
-			'disposable.style.email.with+symbol@wordpress.org',
-			'other.email-with-hyphen@wordpress.org',
-			'fully-qualified-domain@wordpress.org',
-			'user.name+tag+sorting@wordpress.org',
-			'x@wordpress.org',
-			'wordpress-indeed@strange-wordpress.org',
-			'wordpress@s.wordpress',
-		];
+	it.each( [
+		'simple@wordpress.org',
+		'very.common@wordpress.org',
+		'disposable.style.email.with+symbol@wordpress.org',
+		'other.email-with-hyphen@wordpress.org',
+		'fully-qualified-domain@wordpress.org',
+		'user.name+tag+sorting@wordpress.org',
+		'x@wordpress.org',
+		'wordpress-indeed@strange-wordpress.org',
+		'wordpress@s.wordpress',
+		'1234567890123456789012345678901234567890123456789012345678901234+x@wordpress.org',
+	] )(
+		'returns true when given things that look like an email: %s',
+		( email ) => {
+			expect( isEmail( email ) ).toBe( true );
+		}
+	);
 
-		expect( every( emails, isEmail ) ).toBe( true );
-	} );
-
-	it( "returns false when given things that don't look like an email", () => {
-		const emails = [
-			'Abc.wordpress.org',
-			'A@b@c@wordpress.org',
-			'a"b(c)d,e:f;g<h>i[jk]l@wordpress.org',
-			'just"not"right@wordpress.org',
-			'this is"notallowed@wordpress.org',
-			'this still"not\\allowed@wordpress.org',
-			'1234567890123456789012345678901234567890123456789012345678901234+x@wordpress.org',
-		];
-
-		expect( every( emails, isEmail ) ).toBe( false );
-	} );
+	it.each( [
+		'Abc.wordpress.org',
+		'A@b@c@wordpress.org',
+		'a"b(c)d,e:f;g<h>i[jk]l@wordpress.org',
+		'just"not"right@wordpress.org',
+		'this is"notallowed@wordpress.org',
+		'this still"not\\allowed@wordpress.org',
+	] )(
+		"returns false when given things that don't look like an email: %s",
+		( email ) => {
+			expect( isEmail( email ) ).toBe( false );
+		}
+	);
 } );
 
 describe( 'getProtocol', () => {
@@ -726,6 +724,16 @@ describe( 'getQueryArgs', () => {
 				)
 			).toEqual( data );
 		} );
+
+		it( 'should not blow up on malformed params', () => {
+			const url = 'https://andalouses.example/beach?foo=bar&baz=%E0%A4%A';
+
+			expect( () => getQueryArgs( url ) ).not.toThrow();
+			expect( getQueryArgs( url ) ).toEqual( {
+				baz: '%E0%A4%A',
+				foo: 'bar',
+			} );
+		} );
 	} );
 } );
 
@@ -883,6 +891,92 @@ describe( 'prependHTTP', () => {
 	} );
 } );
 
+describe( 'prependHTTPS', () => {
+	it( 'should prepend https to a domain', () => {
+		const url = 'wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+	} );
+
+	it( 'should not prepend https to an email', () => {
+		const url = 'foo@wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to an absolute URL', () => {
+		const url = '/wordpress';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a relative URL', () => {
+		const url = './wordpress';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to an anchor URL', () => {
+		const url = '#wordpress';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has https', () => {
+		const url = 'https://wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has http', () => {
+		const url = 'http://wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has ftp', () => {
+		const url = 'ftp://wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has mailto', () => {
+		const url = 'mailto:foo@wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should remove leading whitespace before prepending HTTPs', () => {
+		const url = ' wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://wordpress.org' );
+	} );
+
+	it( 'should not have trailing whitespaces', () => {
+		const url = 'wordpress.org ';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://wordpress.org' );
+	} );
+} );
+
+it( 'should prepend https to a domain with an anchor', () => {
+	const url = 'wordpress.org#something';
+
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
+
+it( 'should prepend https to a domain with path', () => {
+	const url = 'wordpress.org/some/thing';
+
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
+
+it( 'should prepend https to a domain with query arguments', () => {
+	const url = 'wordpress.org?foo=bar';
+
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
+
 describe( 'safeDecodeURI', () => {
 	it( 'should decode URI if formed well', () => {
 		const encoded = 'https://mozilla.org/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B';
@@ -1000,6 +1094,17 @@ describe( 'cleanForSlug', () => {
 		expect( cleanForSlug( 'Καλημέρα Κόσμε' ) ).toBe( 'καλημέρα-κόσμε' );
 		expect( cleanForSlug( '안녕하세요 ' ) ).toBe( '안녕하세요' );
 		expect( cleanForSlug( '繁体字 ' ) ).toBe( '繁体字' );
+	} );
+
+	it( 'Should trim multiple leading and trailing dashes', () => {
+		expect( cleanForSlug( '  -Is th@t Déjà_vu- 	' ) ).toBe(
+			'is-tht-deja_vu'
+		);
+	} );
+
+	it( 'Should replace multiple hyphens with a single one', () => {
+		expect( cleanForSlug( 'the long - cat' ) ).toBe( 'the-long-cat' );
+		expect( cleanForSlug( 'the----long---cat' ) ).toBe( 'the-long-cat' );
 	} );
 } );
 

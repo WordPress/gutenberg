@@ -26,7 +26,7 @@ You will need:
 -   A minimal plugin activated and ready to edit
 -   JavaScript setup for building and enqueuing
 
-A [complete meta-block example](https://github.com/WordPress/gutenberg-examples/tree/trunk/meta-block) is available that you can use as a reference for your setup.
+A [complete meta-block example](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-jsx/meta-block) is available that you can use as a reference for your setup.
 
 ## Step-by-step guide
 
@@ -152,7 +152,7 @@ function myguten_render_paragraph( $block_attributes, $content ) {
 }
 
 register_block_type( 'core/paragraph', array(
-	'api_version' => 2,
+	'api_version' => 3,
 	'render_callback' => 'myguten_render_paragraph',
 ) );
 ```

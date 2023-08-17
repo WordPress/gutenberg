@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -30,9 +29,8 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 		( select ) => {
 			const { getCurrentPostType } = select( editorStore );
 			const { isFeatureActive } = select( editPostStore );
-			const { getEntityRecord, getPostType, isResolving } = select(
-				coreStore
-			);
+			const { getEntityRecord, getPostType, isResolving } =
+				select( coreStore );
 			const siteData =
 				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
@@ -100,11 +98,7 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 						post_type: postType.slug,
 					} )
 				}
-				label={ get(
-					postType,
-					[ 'labels', 'view_items' ],
-					__( 'Back' )
-				) }
+				label={ postType?.labels?.view_items ?? __( 'Back' ) }
 				showTooltip={ showTooltip }
 			>
 				{ buttonIcon }

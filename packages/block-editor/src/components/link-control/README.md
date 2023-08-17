@@ -15,6 +15,16 @@ The distinction between the two components is perhaps best summarized by the fol
 -   `<URLInput>` - an input for presenting and managing selection behaviors associated with choosing a URL, optionally from a pool of available candidates.
 -   `<LinkControl>` - includes the features of `<URLInput>`, plus additional UI and behaviors to control how this URL applies to the concept of a "link". This includes link "settings" (eg: "opens in new tab", etc) and dynamic, "on the fly" link creation capabilities.
 
+## Persistent "Advanced" (settings) toggle state
+
+By default the link "settings" are hidden and can be toggled open/closed by way of a button labelled `Advanced` in the UI.
+
+In some circumstances if may be desirable to persist the toggle state of this portion of the UI so that it remains in the last state triggered by user interaction.
+
+For example, once the user has toggled the UI to "open", then it may remain open across all links on the site until such time as the user toggles the UI back again.
+
+Consumers who which to take advantage of this functionality should ensure that their block editor environment utilizes the [`@wordpress/preferences`](packages/preferences/README.md) package. By default the `<LinkControl>` component will attempt to persist the state of UI to a setting named `linkControlSettingsDrawer` with a scope of `core/block-editor`. If the preferences package is not available then local state is used and the setting will not be persisted.
+
 ## Search Suggestions
 
 When creating links the `LinkControl` component will handle two kinds of input from users:
@@ -69,9 +79,7 @@ An array of settings objects associated with a link (for example: a setting to d
 To disable settings, pass in an empty array. for example:
 
 ```jsx
-<LinkControl
-	settings={ [] }
-/>
+<LinkControl settings={ [] } />
 ```
 
 ### onChange
@@ -192,7 +200,8 @@ A `suggestion` should have the following shape:
 	)}
 />
 ```
-### renderControlBottom 
+
+### renderControlBottom
 
 -   Type: `Function`
 -   Required: No
@@ -322,10 +331,10 @@ The following properties are provided by URLInput:
 -   suggestions
 -   selectedSuggestion
 -   suggestionsListProps
+-   currentInputValue
 
 The following extra properties are provided by LinkControlSearchInput:
 
--   currentInputValue
 -   createSuggestionButtonText
 -   handleSuggestionClick
 -   instanceId
@@ -338,7 +347,7 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 <LinkControlSearchInput
     renderSuggestions={( { suggestions } ) => {
         return (
-            <Popover focusOnMount={ false } position="bottom">
+            <Popover focusOnMount={ false } placement="bottom">
                 <ul>
                     { suggestions.map( () => ( <li key={ `${ suggestion.id }-${ suggestion.type }` }>{ suggestion.title }</li> ) ) }
                 </ul>
@@ -352,7 +361,7 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 <LinkControlSearchInput
     renderSuggestions={( suggestionsProps ) => {
         return (
-            <Popover focusOnMount={ false } position="bottom">
+            <Popover focusOnMount={ false } placement="bottom">
                 <LinkControlSearchResults { ...suggestionsProps } />
             </Popover>
         );

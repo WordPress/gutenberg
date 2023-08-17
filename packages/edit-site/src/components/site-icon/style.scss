@@ -1,0 +1,15 @@
+.edit-site-site-icon__icon {
+	fill: currentColor;
+}
+
+.edit-site-site-icon__image {
+	width: 100%;
+	height: auto;
+	border-radius: $radius-block-ui * 2;
+	object-fit: cover;
+	background: #333;
+
+	.edit-site-layout.is-full-canvas.is-edit-mode & {
+		border-radius: 0;
+	}
+}

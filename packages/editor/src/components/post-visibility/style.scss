@@ -1,21 +1,4 @@
-.editor-post-visibility__close {
-	position: absolute;
-	right: $grid-unit-20;
-	top: $grid-unit-20;
-}
-
 .editor-post-visibility__fieldset {
-	padding: $grid-unit-10;
-
-	.editor-post-visibility__legend {
-		font-weight: 600;
-		padding: 1em 0 0 0;
-	}
-
-	.editor-post-visibility__description {
-		margin-top: 0.5em;
-	}
-
 	.editor-post-visibility__radio[type="radio"] {
 		@include radio-control;
 		margin-top: 2px;

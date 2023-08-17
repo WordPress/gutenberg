@@ -41,7 +41,7 @@ export default function Edit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-	const displayName = useSelect(
+	let displayName = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
 
@@ -70,14 +70,16 @@ export default function Edit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Link settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Link to authors URL' ) }
 					onChange={ () => setAttributes( { isLink: ! isLink } ) }
 					checked={ isLink }
 				/>
 				{ isLink && (
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Open in new tab' ) }
 						onChange={ ( value ) =>
 							setAttributes( {
@@ -92,15 +94,7 @@ export default function Edit( {
 	);
 
 	if ( ! commentId || ! displayName ) {
-		return (
-			<>
-				{ inspectorControls }
-				{ blockControls }
-				<div { ...blockProps }>
-					<p>{ _x( 'Comment Author', 'block title' ) }</p>
-				</div>
-			</>
-		);
+		displayName = _x( 'Comment Author', 'block title' );
 	}
 
 	const displayAuthor = isLink ? (
@@ -111,9 +105,8 @@ export default function Edit( {
 			{ displayName }
 		</a>
 	) : (
-		<p>{ displayName }</p>
+		displayName
 	);
-
 	return (
 		<>
 			{ inspectorControls }

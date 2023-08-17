@@ -31,17 +31,20 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
   box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.05 ) inset,0 -1px 0 rgba( 0, 0, 0, 0.1 ) inset;
 }
 
-<span
-  class="components-truncate components-text emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="Text"
->
+<div>
   <span
-    class=""
+    class="components-truncate components-text emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="Text"
+    role="heading"
   >
-    Lorem ipsum.
+    <span
+      class=""
+    >
+      Lorem ipsum.
+    </span>
   </span>
-</span>
+</div>
 `;
 
 exports[`Text snapshot tests should render correctly 1`] = `
@@ -53,11 +56,13 @@ exports[`Text snapshot tests should render correctly 1`] = `
   font-weight: normal;
 }
 
-<span
-  class="components-truncate components-text emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="Text"
->
-  Lorem ipsum.
-</span>
+<div>
+  <span
+    class="components-truncate components-text emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="Text"
+  >
+    Lorem ipsum.
+  </span>
+</div>
 `;

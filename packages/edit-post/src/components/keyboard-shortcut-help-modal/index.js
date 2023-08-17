@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +14,7 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { withSelect, withDispatch, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -22,9 +22,9 @@ import { compose } from '@wordpress/compose';
 import { textFormattingShortcuts } from './config';
 import Shortcut from './shortcut';
 import DynamicShortcut from './dynamic-shortcut';
-import { store as editPostStore } from '../../store';
 
-const MODAL_NAME = 'edit-post/keyboard-shortcut-help';
+export const KEYBOARD_SHORTCUT_HELP_MODAL_NAME =
+	'edit-post/keyboard-shortcut-help';
 
 const ShortcutList = ( { shortcuts } ) => (
 	/*
@@ -41,7 +41,7 @@ const ShortcutList = ( { shortcuts } ) => (
 				className="edit-post-keyboard-shortcut-help-modal__shortcut"
 				key={ index }
 			>
-				{ isString( shortcut ) ? (
+				{ typeof shortcut === 'string' ? (
 					<DynamicShortcut name={ shortcut } />
 				) : (
 					<Shortcut { ...shortcut } />
@@ -101,7 +101,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 		<Modal
 			className="edit-post-keyboard-shortcut-help-modal"
 			title={ __( 'Keyboard shortcuts' ) }
-			closeLabel={ __( 'Close' ) }
+			closeButtonLabel={ __( 'Close' ) }
 			onRequestClose={ toggleModal }
 		>
 			<ShortcutSection
@@ -142,14 +142,18 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
+		isModalActive: select( interfaceStore ).isModalActive(
+			KEYBOARD_SHORTCUT_HELP_MODAL_NAME
+		),
 	} ) ),
 	withDispatch( ( dispatch, { isModalActive } ) => {
-		const { openModal, closeModal } = dispatch( editPostStore );
+		const { openModal, closeModal } = dispatch( interfaceStore );
 
 		return {
 			toggleModal: () =>
-				isModalActive ? closeModal() : openModal( MODAL_NAME ),
+				isModalActive
+					? closeModal()
+					: openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME ),
 		};
 	} ),
 ] )( KeyboardShortcutHelpModal );

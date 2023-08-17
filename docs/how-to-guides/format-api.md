@@ -18,7 +18,7 @@ You will need:
 -   A minimal plugin activated and setup ready to edit
 -   JavaScript setup for building and enqueuing
 
-The [complete format-api example](https://github.com/WordPress/gutenberg-examples/tree/trunk/format-api) is available that you can use as a reference for your setup.
+The [complete format-api example](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/format-api) is available that you can use as a reference for your setup.
 
 ## Step-by-step guide
 
@@ -78,7 +78,7 @@ registerFormatType( 'my-custom-format/sample-output', {
 } );
 ```
 
-Let's check that everything is working as expected. Build and reload and then select a text block. Confirm the new button was added to the format toolbar.
+Let's check that everything is working as expected. Build and reload and then select any block containing text like for example the paragraph block. Confirm the new button was added to the format toolbar.
 
 ![Toolbar with custom button](https://developer.wordpress.org/files/2021/12/format-api-toolbar.png)
 
@@ -125,13 +125,13 @@ registerFormatType( 'my-custom-format/sample-output', {
 
 Confirm it is working: first build and reload, then make a text selection and click the button. Your browser will likely display that selection differently than the surrounding text.
 
-You can also confirm by switching to HTML view (Code editor Ctrl+Shift+Alt+M) and see the text selection wrapped with `<samp>` HTML tags.
+You can also confirm by switching to HTML view (Code editor `Ctrl+Shift+Alt+M`) and see the text selection wrapped with `<samp>` HTML tags.
 
 Use the `className` option when registering to add your own custom class to the tag. You can use that class and custom CSS to target that element and style as you wish.
 
 ### Step 4: Show the button only for specific blocks (Optional)
 
-By default, the button is rendered on every rich text toolbar (image captions, buttons, paragraphs, etc). You can render the button only on blocks of a certain type by using `wp.data.withSelect` together with `wp.compose.ifCondition`.
+By default, the button is rendered on every rich text toolbar (image captions, buttons, paragraphs, etc). You can render the button only on blocks of a certain type by using [the data API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data).
 
 Here is an example that only shows the button for Paragraph blocks:
 
@@ -173,6 +173,44 @@ registerFormatType( 'my-custom-format/sample-output', {
 } );
 ```
 
+### Step5: Add a button outside of the dropdown (Optional)
+
+Using the `RichTextToolbarButton` component, the button is added to the default dropdown menu. You can add the button directly to the toolbar by using the `BlockControls` component.
+
+```js
+import { registerFormatType, toggleFormat } from '@wordpress/rich-text';
+import { BlockControls } from '@wordpress/block-editor';
+import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+
+const MyCustomButton = ( { isActive, onChange, value } ) => {
+	return (
+		<BlockControls>
+			<ToolbarGroup>
+				<ToolbarButton
+					icon="editor-code"
+					title="Sample output"
+					onClick={ () => {
+						onChange(
+							toggleFormat( value, {
+								type: 'my-custom-format/sample-output',
+							} )
+						);
+					} }
+					isActive={ isActive }
+				/>
+			</ToolbarGroup>
+		</BlockControls>
+	);
+};
+
+registerFormatType( 'my-custom-format/sample-output', {
+	title: 'Sample output',
+	tagName: 'samp',
+	className: null,
+	edit: MyCustomButton,
+} );
+```
+
 ## Troubleshooting
 
 If you run into errors:
@@ -196,4 +234,4 @@ Reference documentation used in this guide:
 
 The guide showed you how to add a button to the toolbar and have it apply a format to the selected text. Try it out and see what you can build with it in your next plugin.
 
-Download the [format-api example](https://github.com/WordPress/gutenberg-examples/tree/trunk/format-api) from the [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository.
+Download the [format-api example](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/format-api) from the [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository.

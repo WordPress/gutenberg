@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -17,7 +16,7 @@ function PinnedItemsSlot( { scope, className, ...props } ) {
 	return (
 		<Slot name={ `PinnedItems/${ scope }` } { ...props }>
 			{ ( fills ) =>
-				! isEmpty( fills ) && (
+				fills?.length > 0 && (
 					<div
 						className={ classnames(
 							className,

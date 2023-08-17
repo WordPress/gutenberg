@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
@@ -20,13 +15,14 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 				keyCombination.character
 		  )
 		: keyCombination.character;
+	const shortcuts = Array.isArray( shortcut ) ? shortcut : [ shortcut ];
 
 	return (
 		<kbd
 			className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key-combination"
 			aria-label={ forceAriaLabel || ariaLabel }
 		>
-			{ castArray( shortcut ).map( ( character, index ) => {
+			{ shortcuts.map( ( character, index ) => {
 				if ( character === '+' ) {
 					return <Fragment key={ index }>{ character }</Fragment>;
 				}

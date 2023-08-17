@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef, ReactNode } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -13,35 +13,11 @@ import { isValidElement } from '@wordpress/element';
  */
 import { getValidChildren } from '../ui/utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../ui/context';
-import type { WordPressComponentProps } from '../ui/context';
 import { ZStackView, ZStackChildView } from './styles';
+import type { ZStackProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-export interface ZStackProps {
-	/**
-	 * Layers children elements on top of each other (first: highest z-index, last: lowest z-index).
-	 *
-	 * @default true
-	 */
-	isLayered?: boolean;
-	/**
-	 * Reverse the layer ordering (first: lowest z-index, last: highest z-index).
-	 *
-	 * @default false
-	 */
-	isReversed?: boolean;
-	/**
-	 * The amount of offset between each child element. The amount of space between each child element. Defaults to `0`. Its value is automatically inverted (i.e. from positive to negative, and viceversa) when switching from LTR to RTL.
-	 *
-	 * @default 0
-	 */
-	offset?: number;
-	/**
-	 * Child elements.
-	 */
-	children: ReactNode;
-}
-
-function ZStack(
+function UnconnectedZStack(
 	props: WordPressComponentProps< ZStackProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -59,13 +35,14 @@ function ZStack(
 
 	const clonedChildren = validChildren.map( ( child, index ) => {
 		const zIndex = isReversed ? childrenLastIndex - index : index;
-		const offsetAmount = offset * index;
+		// Only when the component is layered, the offset needs to be multiplied by
+		// the item's index, so that items can correctly stack at the right distance
+		const offsetAmount = isLayered ? offset * index : offset;
 
 		const key = isValidElement( child ) ? child.key : index;
 
 		return (
 			<ZStackChildView
-				isLayered={ isLayered }
 				offsetAmount={ offsetAmount }
 				zIndex={ zIndex }
 				key={ key }
@@ -79,6 +56,7 @@ function ZStack(
 		<ZStackView
 			{ ...otherProps }
 			className={ className }
+			isLayered={ isLayered }
 			ref={ forwardedRef }
 		>
 			{ clonedChildren }
@@ -86,4 +64,23 @@ function ZStack(
 	);
 }
 
-export default contextConnect( ZStack, 'ZStack' );
+/**
+ * `ZStack` allows you to stack things along the Z-axis.
+ *
+ * ```jsx
+ * import { __experimentalZStack as ZStack } from '@wordpress/components';
+ *
+ * function Example() {
+ *   return (
+ *     <ZStack offset={ 20 } isLayered>
+ *       <ExampleImage />
+ *       <ExampleImage />
+ *       <ExampleImage />
+ *     </ZStack>
+ *   );
+ * }
+ * ```
+ */
+export const ZStack = contextConnect( UnconnectedZStack, 'ZStack' );
+
+export default ZStack;

@@ -3,8 +3,7 @@
 		"name": "core/comment-date",
 		"isValid": true,
 		"attributes": {
-			"isLink": true,
-			"fontSize": "small"
+			"isLink": true
 		},
 		"innerBlocks": []
 	}

@@ -4,8 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"textAlign": "right",
-			"fontSize": "extra-large",
 			"fontFamily": "cambria-georgia",
+			"fontSize": "extra-large",
 			"style": {
 				"typography": {
 					"lineHeight": "0.8",

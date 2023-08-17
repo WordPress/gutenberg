@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -20,6 +20,9 @@ import BlockInsertionPoint from '../block-list/insertion-point';
 import styles from './style.scss';
 import { store as blockEditorStore } from '../../store';
 
+const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
+const noop = () => {};
+
 export function DefaultBlockAppender( {
 	isLocked,
 	isVisible,
@@ -37,33 +40,28 @@ export function DefaultBlockAppender( {
 			? decodeEntities( placeholder )
 			: __( 'Start writing…' );
 
+	const appenderStyles = [
+		styles.blockHolder,
+		showSeparator && containerStyle,
+	];
+
 	return (
-		<TouchableWithoutFeedback onPress={ onAppend }>
-			<View
-				style={ [
-					styles.blockHolder,
-					showSeparator && containerStyle,
-				] }
-				pointerEvents="box-only"
-			>
+		<Pressable onPress={ onAppend } hitSlop={ hitSlop }>
+			<View style={ appenderStyles } pointerEvents="box-only">
 				{ showSeparator ? (
 					<BlockInsertionPoint />
 				) : (
-					<RichText placeholder={ value } onChange={ () => {} } />
+					<RichText placeholder={ value } onChange={ noop } />
 				) }
 			</View>
-		</TouchableWithoutFeedback>
+		</Pressable>
 	);
 }
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const {
-			getBlockCount,
-			getBlockName,
-			isBlockValid,
-			getTemplateLock,
-		} = select( blockEditorStore );
+		const { getBlockCount, getBlockName, isBlockValid, getTemplateLock } =
+			select( blockEditorStore );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
 		const isLastBlockDefault =
@@ -77,9 +75,8 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { insertDefaultBlock, startTyping } = dispatch(
-			blockEditorStore
-		);
+		const { insertDefaultBlock, startTyping } =
+			dispatch( blockEditorStore );
 
 		return {
 			onAppend() {

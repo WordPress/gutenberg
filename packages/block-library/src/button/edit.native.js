@@ -31,6 +31,7 @@ import {
 	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import { link } from '@wordpress/icons';
+// eslint-disable-next-line no-restricted-imports
 import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
@@ -95,9 +96,8 @@ function ButtonEdit( props ) {
 	const { editorSidebarOpened, numOfButtons } = useSelect(
 		( select ) => {
 			const { isEditorSidebarOpened } = select( editPostStore );
-			const { getBlockCount, getBlockRootClientId } = select(
-				blockEditorStore
-			);
+			const { getBlockCount, getBlockRootClientId } =
+				select( blockEditorStore );
 			const parentId = getBlockRootClientId( clientId );
 			const blockCount = getBlockCount( parentId );
 			const currentIsEditorSidebarOpened = isEditorSidebarOpened();

@@ -108,9 +108,7 @@ describe( 'getColorLocations', () => {
 			'linear-gradient(45deg, red, blue, green)'
 		);
 		expect( getColorLocations( colorGroup ) ).toStrictEqual( [
-			0,
-			0.5,
-			1,
+			0, 0.5, 1,
 		] );
 	} );
 } );
