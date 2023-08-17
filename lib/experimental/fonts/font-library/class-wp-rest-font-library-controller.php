@@ -1,11 +1,11 @@
 <?php
 /**
- * Rest Fonts Library Controller.
+ * Rest Font Library Controller.
  *
- * This file contains the class for the REST API Fonts Library Controller.
+ * This file contains the class for the REST API Font Library Controller.
  *
  * @package    WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  * @since      6.4.0
  */
 
@@ -14,7 +14,7 @@ if ( class_exists( 'WP_REST_Font_Library_Controller' ) ) {
 }
 
 /**
- * Fonts Library Controller class.
+ * Font Library Controller class.
  *
  * @since 6.4.0
  */

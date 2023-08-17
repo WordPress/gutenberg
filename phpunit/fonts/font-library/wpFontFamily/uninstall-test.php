@@ -3,7 +3,7 @@
  * Test WP_Font_Family::uninstall().
  *
  * @package WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  */
 
 require_once __DIR__ . '/base.php';

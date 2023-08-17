@@ -3,7 +3,7 @@
  * Test WP_Font_Library::get_fonts_dir().
  *
  * @package WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  *
  * @group fonts
  * @group font-library
