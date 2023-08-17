@@ -56,6 +56,8 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 					<TextControl
 						__nextHasNoMarginBottom
 						value={ editedBlockName }
+						label={ __( 'Block name' ) }
+						hideLabelFromVision={ true }
 						placeholder={ __( 'Block name' ) }
 						onChange={ setEditedBlockName }
 						onBlur={ () => {
