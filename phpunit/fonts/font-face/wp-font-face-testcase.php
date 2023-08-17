@@ -62,7 +62,7 @@ abstract class WP_Font_Face_TestCase extends WP_UnitTestCase {
 		parent::set_up_before_class();
 
 		if ( self::$requires_switch_theme_fixtures ) {
-			self::$theme_root = realpath( __DIR__ . '/../data/themedir1' );
+			self::$theme_root = realpath( __DIR__ . '/../../data/themedir1' );
 		}
 	}
 

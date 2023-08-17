@@ -260,7 +260,7 @@ class WP_Font_Family {
 
 		// Remove the uploaded font asset reference from the font face definition
 		// because it is no longer needed.
-		unset( $new_font_face['uploaded_file'] );
+		unset( $new_font_face['uploadedFile'] );
 
 		// If the filename has no font mime type, don't move the file and
 		// return the font face definition without src to be ignored later.
@@ -329,7 +329,7 @@ class WP_Font_Family {
 	 */
 	private function download_font_face_assets( $font_face ) {
 		$new_font_face        = $font_face;
-		$sources              = (array) $font_face['download_from_url'];
+		$sources              = (array) $font_face['downloadFromUrl'];
 		$new_font_face['src'] = array();
 		$index                = 0;
 
@@ -353,7 +353,7 @@ class WP_Font_Family {
 
 		// Remove the download url reference from the font face definition
 		// because it is no longer needed.
-		unset( $new_font_face['download_from_url'] );
+		unset( $new_font_face['downloadFromUrl'] );
 
 		return $new_font_face;
 	}
@@ -380,16 +380,16 @@ class WP_Font_Family {
 			$new_font_face = $font_face;
 
 			// If installing google fonts, download the font face assets.
-			if ( ! empty( $font_face['download_from_url'] ) ) {
+			if ( ! empty( $font_face['downloadFromUrl'] ) ) {
 				$new_font_face = $this->download_font_face_assets( $new_font_face );
 			}
 
 			// If installing local fonts, move the font face assets from
 			// the temp folder to the wp fonts directory.
-			if ( ! empty( $font_face['uploaded_file'] ) && ! empty( $files ) ) {
+			if ( ! empty( $font_face['uploadedFile'] ) && ! empty( $files ) ) {
 				$new_font_face = $this->move_font_face_asset(
 					$new_font_face,
-					$files[ $new_font_face['uploaded_file'] ]
+					$files[ $new_font_face['uploadedFile'] ]
 				);
 			}
 
