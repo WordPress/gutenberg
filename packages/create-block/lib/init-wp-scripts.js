@@ -9,8 +9,8 @@ const { join } = require( 'path' );
  */
 const { info } = require( './log' );
 
-module.exports = async ( { slug } ) => {
-	const cwd = join( process.cwd(), slug );
+module.exports = async ( { targetDir, slug } ) => {
+	const cwd = join( process.cwd(), targetDir, slug );
 
 	info( '' );
 	info(

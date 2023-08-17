@@ -59,6 +59,7 @@ program
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
 	.option( '--no-plugin', 'scaffold only block files' )
 	.option( '--variant <variant>', 'the variant of the template to use' )
+	.option( '--targetDir <directory>', 'the variant of the template to use' )
 	.action(
 		async (
 			slug,
@@ -72,6 +73,7 @@ program
 				wpScripts,
 				wpEnv,
 				variant,
+				targetDir,
 			}
 		) => {
 			await checkSystemRequirements( engines );
@@ -102,6 +104,7 @@ program
 						title,
 						wpScripts,
 						wpEnv,
+						targetDir,
 					} ).filter( ( [ , value ] ) => value !== undefined )
 				);
 

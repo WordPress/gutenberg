@@ -25,8 +25,9 @@ module.exports = async ( {
 	customScripts,
 	isDynamicVariant,
 	customPackageJSON,
+	targetDir,
 } ) => {
-	const cwd = join( process.cwd(), slug );
+	const cwd = join( process.cwd(), targetDir, slug );
 
 	info( '' );
 	info( 'Creating a "package.json" file.' );
