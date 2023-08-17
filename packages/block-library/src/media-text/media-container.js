@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { ResizableBox, Spinner } from '@wordpress/components';
+import { ResizableBox, Spinner, Placeholder } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -139,7 +139,7 @@ function MediaContainer( props, ref ) {
 
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
-	if ( mediaUrl || featuredImageURL ) {
+	if ( mediaUrl || featuredImageURL || props.useFeaturedImage ) {
 		const onResizeStart = () => {
 			toggleSelection( false );
 		};
@@ -205,6 +205,12 @@ function MediaContainer( props, ref ) {
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
 				{ isTemporaryMedia && <Spinner /> }
 				{ ! useFeaturedImage && <PlaceholderContainer { ...props } /> }
+				{ ! featuredImageURL && useFeaturedImage && (
+					<Placeholder
+						className="wp-block-media-text--placeholder-image"
+						withIllustration={ true }
+					/>
+				) }
 			</ResizableBoxContainer>
 		);
 	}
