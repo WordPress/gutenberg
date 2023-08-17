@@ -11,12 +11,10 @@ import {
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { name as buttonBlockName } from '../button';
+const buttonBlockName = 'core/button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 
@@ -42,23 +40,28 @@ function ButtonsEdit( { attributes, className } ) {
 			'has-custom-font-size': fontSize || style?.typography?.fontSize,
 		} ),
 	} );
-	const preferredStyle = useSelect( ( select ) => {
+	const defaultButtonAttributes = useSelect( ( select ) => {
 		const preferredStyleVariations =
 			select( blockEditorStore ).getSettings()
 				.__experimentalPreferredStyleVariations;
-		return preferredStyleVariations?.value?.[ buttonBlockName ];
+		const preferredStyle =
+			preferredStyleVariations?.value?.[ buttonBlockName ];
+		const defaultButton = select( blocksStore ).getDefaultBlockVariation(
+			buttonBlockName
+		) || { attributes: {} };
+		return {
+			...defaultButton.attributes,
+			className: classnames( defaultButton.attributes.className, {
+				[ `is-style-${ preferredStyle }` ]: !! preferredStyle,
+			} ),
+		};
 	}, [] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		defaultBlock: DEFAULT_BLOCK,
+		defaultBlock: { ...DEFAULT_BLOCK, attributes: defaultButtonAttributes },
 		directInsert: true,
-		template: [
-			[
-				buttonBlockName,
-				{ className: preferredStyle && `is-style-${ preferredStyle }` },
-			],
-		],
+		template: [ [ buttonBlockName, defaultButtonAttributes ] ],
 		templateInsertUpdatesSelection: true,
 		orientation: layout?.orientation ?? 'horizontal',
 	} );
