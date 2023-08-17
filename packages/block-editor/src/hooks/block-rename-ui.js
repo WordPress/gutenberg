@@ -25,14 +25,14 @@ import {
 	useBlockDisplayInformation,
 } from '../components';
 
-const notEmptyString = ( testString ) => testString?.trim()?.length > 0;
+const emptyString = ( testString ) => testString?.trim()?.length === 0;
 
-function RenameModal( { blockName, onClose, onSave } ) {
+function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
 
 	const nameHasChanged = editedBlockName !== blockName;
 
-	const isNameValid = nameHasChanged && notEmptyString( editedBlockName );
+	const isNameValid = nameHasChanged && ! emptyString( editedBlockName );
 
 	return (
 		<Modal title={ __( 'Rename block' ) } onRequestClose={ onClose }>
@@ -58,6 +58,11 @@ function RenameModal( { blockName, onClose, onSave } ) {
 						value={ editedBlockName }
 						placeholder={ __( 'Block name' ) }
 						onChange={ setEditedBlockName }
+						onBlur={ () => {
+							if ( emptyString( editedBlockName ) ) {
+								setEditedBlockName( originalBlockName );
+							}
+						} }
 					/>
 					<HStack justify="right">
 						<Button variant="tertiary" onClick={ onClose }>
@@ -145,8 +150,16 @@ export const withBlockRenameControl = createHigherOrderComponent(
 							blockInformation?.title ||
 							''
 						}
+						originalBlockName={ blockInformation?.title }
 						onClose={ () => setRenamingBlock( false ) }
 						onSave={ ( newName ) => {
+							// If the new value is the block's original name (e.g. `Group`)
+							// then assume the intent is to reset the value. Therefore reset
+							// the metadata.
+							if ( newName === blockInformation?.title ) {
+								newName = undefined;
+							}
+
 							updateBlockAttributes( clientId, {
 								// Include existing metadata (if present) to avoid overwriting existing.
 								metadata: {
