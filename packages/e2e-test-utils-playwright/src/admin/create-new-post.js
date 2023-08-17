@@ -30,8 +30,10 @@ export async function createNewPost( {
 
 	await this.visitAdminPage( 'post-new.php', query );
 
-	// Wait for both iframed and non-iframed canvas locator and resolve once the
-	// currently available one is ready.
+	// Wait for both iframed and non-iframed canvas and resolve once the
+	// currently available one is ready. To make this work, we need an inner
+	// legacy canvas selector that is unavailable directly when the canvas is
+	// iframed.
 	await Promise.any( [
 		this.page.locator( '.wp-block-post-content' ).waitFor(),
 		this.page
