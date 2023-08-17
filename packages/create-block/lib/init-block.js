@@ -42,7 +42,7 @@ async function initBlockJSON( {
 
 	const outputFile = plugin
 		? join( process.cwd(), targetDir, slug, folderName, 'block.json' )
-		: join( process.cwd(), targetDir, folderName, slug, 'block.json' );
+		: join( process.cwd(), folderName, slug, 'block.json' );
 
 	await makeDir( dirname( outputFile ) );
 	await writeFile(
@@ -83,13 +83,7 @@ module.exports = async function ( outputTemplates, view ) {
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
 			const pathName = view.plugin
 				? join( view.folderName, outputFile )
-				: join(
-						process.cwd(),
-						view.targetDir,
-						view.folderName,
-						view.slug,
-						outputFile
-				  );
+				: join( process.cwd(), view.folderName, view.slug, outputFile );
 			await writeOutputTemplate(
 				outputTemplates[ outputFile ],
 				pathName,
