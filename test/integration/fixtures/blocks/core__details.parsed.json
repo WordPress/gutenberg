@@ -11,8 +11,10 @@
 					"placeholder": "Type / to add a hidden block"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<p>Details Content</p>\n\t",
-				"innerContent": [ "\n\t<p>Details Content</p>\n\t" ]
+				"innerHTML": "\n\t<p class=\"wp-block-paragraph\">Details Content</p>\n\t",
+				"innerContent": [
+					"\n\t<p class=\"wp-block-paragraph\">Details Content</p>\n\t"
+				]
 			}
 		],
 		"innerHTML": "\n<details class=\"wp-block-details\"><summary>Details Summary</summary>\n\t\n</details>\n",

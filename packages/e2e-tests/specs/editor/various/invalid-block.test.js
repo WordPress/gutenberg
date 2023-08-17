@@ -26,14 +26,9 @@ describe( 'invalid blocks', () => {
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Focus on the textarea and enter an invalid paragraph
-		await page.evaluate( () => {
-			document
-				.querySelector(
-					'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea'
-				)
-				.click();
-		} );
-
+		await canvas().click(
+			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea'
+		);
 		await page.keyboard.type( '<p>invalid paragraph' );
 
 		// Takes the focus away from the block so the invalid warning is triggered

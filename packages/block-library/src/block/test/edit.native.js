@@ -27,7 +27,7 @@ const getMockedReusableBlock = ( id ) => ( {
     <!-- /wp:heading -->
 
     <!-- wp:paragraph -->
-    <p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
+    <p class="wp-block-paragraph"><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
     <!-- /wp:paragraph -->
 
     !-- wp:heading {"level":4} -->
