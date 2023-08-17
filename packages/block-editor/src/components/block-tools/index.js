@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Popover } from '@wordpress/components';
+import { Fill, Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
 
@@ -14,6 +14,7 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import EmptyBlockInserter from './empty-block-inserter';
+import SelectedBlockTools from './selected-block-tools';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
@@ -43,7 +44,10 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { isZoomOutMode, isTyping } = useSelect( selector, [] );
+	const { hasFixedToolbar, isZoomOutMode, isTyping } = useSelect(
+		selector,
+		[]
+	);
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -135,6 +139,9 @@ export default function BlockTools( {
 				<EmptyBlockInserter
 					__unstableContentRef={ __unstableContentRef }
 				/>
+				<Fill name="__experimentalSelectedBlockTools">
+					<SelectedBlockTools isFixed={ hasFixedToolbar } />
+				</Fill>
 				{ /* Used for the inline rich text toolbar. */ }
 				<Popover.Slot name="block-toolbar" ref={ blockToolbarRef } />
 				{ children }
