@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
@@ -163,7 +163,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 						isBusy={ isBusy }
 						aria-disabled={ isBusy || ! selectedSidebar }
 					>
-						{ __( 'Import' ) }
+						{ _x( 'Import', 'button label' ) }
 					</Button>
 				</FlexItem>
 			</HStack>

@@ -556,4 +556,15 @@ describe( 'RichText', () => {
 		// Expect: <strong>1</strong>-<em>2</em>
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	test( 'should copy/paste heading', async () => {
+		await insertBlock( 'Heading' );
+		await page.keyboard.type( 'Heading' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'v' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

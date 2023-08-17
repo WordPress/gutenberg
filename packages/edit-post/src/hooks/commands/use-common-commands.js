@@ -5,17 +5,20 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	code,
-	cog,
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	keyboardClose,
+	keyboard,
 	desktop,
 	listView,
+	external,
+	formatListBullets,
 } from '@wordpress/icons';
 import { useCommand } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as editorStore } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -32,20 +35,30 @@ export default function useCommonCommands() {
 		setIsListViewOpened,
 	} = useDispatch( editPostStore );
 	const { openModal } = useDispatch( interfaceStore );
-	const { editorMode, activeSidebar, isListViewOpen } = useSelect(
-		( select ) => {
-			const { getEditorMode, isListViewOpened } = select( editPostStore );
-			return {
-				activeSidebar: select(
-					interfaceStore
-				).getActiveComplementaryArea( editPostStore.name ),
-				editorMode: getEditorMode(),
-				isListViewOpen: isListViewOpened(),
-			};
-		},
-		[]
-	);
+	const {
+		editorMode,
+		activeSidebar,
+		isListViewOpen,
+		isPublishSidebarEnabled,
+		showBlockBreadcrumbs,
+	} = useSelect( ( select ) => {
+		const { getEditorMode, isListViewOpened, isFeatureActive } =
+			select( editPostStore );
+		return {
+			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
+				editPostStore.name
+			),
+			editorMode: getEditorMode(),
+			isListViewOpen: isListViewOpened(),
+			isPublishSidebarEnabled:
+				select( editorStore ).isPublishSidebarEnabled(),
+			showBlockBreadcrumbs: isFeatureActive( 'showBlockBreadcrumbs' ),
+		};
+	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
+	const { __unstableSaveForPreview } = useDispatch( editorStore );
+	const { getCurrentPostId } = useSelect( editorStore );
 
 	useCommand( {
 		name: 'core/open-settings-sidebar',
@@ -78,7 +91,6 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-distraction-free',
 		label: __( 'Toggle distraction free' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'distractionFree' );
 			close();
@@ -88,7 +100,6 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'focusMode' );
 			close();
@@ -118,7 +129,6 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'fixedToolbar' );
 			close();
@@ -137,8 +147,7 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/open-preferences',
-		label: __( 'Open editor preferences' ),
-		icon: cog,
+		label: __( 'Editor preferences' ),
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
 		},
@@ -146,10 +155,63 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/open-shortcut-help',
-		label: __( 'Open keyboard shortcuts' ),
-		icon: keyboardClose,
+		label: __( 'Keyboard shortcuts' ),
+		icon: keyboard,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
+		},
+	} );
+
+	useCommand( {
+		name: 'core/toggle-breadcrumbs',
+		label: showBlockBreadcrumbs
+			? __( 'Hide block breadcrumbs' )
+			: __( 'Show block breadcrumbs' ),
+		callback: ( { close } ) => {
+			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
+			close();
+			createInfoNotice(
+				showBlockBreadcrumbs
+					? __( 'Breadcrumbs hidden.' )
+					: __( 'Breadcrumbs visible.' ),
+				{
+					id: 'core/edit-post/toggle-breadcrumbs/notice',
+					type: 'snackbar',
+				}
+			);
+		},
+	} );
+
+	useCommand( {
+		name: 'core/toggle-publish-sidebar',
+		label: isPublishSidebarEnabled
+			? __( 'Disable pre-publish checklist' )
+			: __( 'Enable pre-publish checklist' ),
+		icon: formatListBullets,
+		callback: ( { close } ) => {
+			close();
+			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
+			createInfoNotice(
+				isPublishSidebarEnabled
+					? __( 'Pre-publish checklist off.' )
+					: __( 'Pre-publish checklist on.' ),
+				{
+					id: 'core/edit-post/publish-sidebar/notice',
+					type: 'snackbar',
+				}
+			);
+		},
+	} );
+
+	useCommand( {
+		name: 'core/preview-link',
+		label: __( 'Preview in a new tab' ),
+		icon: external,
+		callback: async ( { close } ) => {
+			close();
+			const postId = getCurrentPostId();
+			const link = await __unstableSaveForPreview();
+			window.open( link, `wp-preview-${ postId }` );
 		},
 	} );
 }

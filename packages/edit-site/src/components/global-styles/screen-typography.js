@@ -16,7 +16,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
 import Subtitle from './subtitle';
-import BlockPreviewPanel from './block-preview-panel';
 import { unlock } from '../../lock-unlock';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -83,9 +82,6 @@ function ScreenTypography() {
 					'Manage the typography settings for different elements.'
 				) }
 			/>
-
-			<BlockPreviewPanel />
-
 			<div className="edit-site-global-styles-screen-typography">
 				<VStack spacing={ 3 }>
 					<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>

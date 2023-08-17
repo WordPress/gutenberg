@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { MouseEvent, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -30,15 +30,6 @@ type Tab = {
 	 */
 	disabled?: boolean;
 } & Record< any, any >;
-
-export type TabButtonProps = {
-	children: ReactNode;
-	label?: string;
-	onClick: ( event: MouseEvent ) => void;
-	selected: boolean;
-	showTooltip?: boolean;
-	tabId: string;
-} & Pick< Tab, 'className' | 'icon' | 'disabled' >;
 
 export type TabPanelProps = {
 	/**

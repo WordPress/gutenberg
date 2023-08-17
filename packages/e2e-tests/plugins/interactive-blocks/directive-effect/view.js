@@ -1,28 +1,19 @@
 ( ( { wp } ) => {
-	const { store, directive, useContext, useMemo } = wp.interactivity;
+	const { store, directive } = wp.interactivity;
 
-	// Fake `data-wp-fakeshow` directive to test when things are removed from the DOM.
-	// Replace with `data-wp-show` when it's ready.
+	// Fake `data-wp-show-mock` directive to test when things are removed from the
+	// DOM.  Replace with `data-wp-show` when it's ready.
 	directive(
-		'fakeshow',
+		'show-mock',
 		( {
 			directives: {
-				fakeshow: { default: fakeshow },
+				"show-mock": { default: showMock },
 			},
 			element,
 			evaluate,
-			context,
 		} ) => {
-			const contextValue = useContext( context );
-			const children = useMemo(
-				() =>
-					element.type === 'template'
-						? element.props.templateChildren
-						: element,
-				[]
-			);
-			if ( ! evaluate( fakeshow, { context: contextValue } ) ) return null;
-			return children;
+			if ( ! evaluate( showMock ) ) return null;
+			return element;
 		}
 	);
 
@@ -30,6 +21,7 @@
 		state: {
 			isOpen: true,
 			isElementInTheDOM: false,
+			counter: 0,
 		},
 		selectors: {
 			elementInTheDOM: ( { state } ) =>
@@ -40,6 +32,9 @@
 		actions: {
 			toggle( { state } ) {
 				state.isOpen = ! state.isOpen;
+			},
+			increment( { state } ) {
+				state.counter = state.counter + 1;
 			},
 		},
 		effects: {
@@ -55,6 +50,9 @@
 					document.querySelector( "[data-testid='input']" ).focus();
 				}
 			},
+			infiniteLoop: ({ state }) => {
+				state.counter = state.counter + 1;
+			}
 		},
 	} );
 

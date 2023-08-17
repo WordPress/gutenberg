@@ -43,6 +43,7 @@ function UnforwardedNumberControl(
 		required = false,
 		shiftStep = 10,
 		step = 1,
+		spinFactor = 1,
 		type: typeProp = 'number',
 		value: valueProp,
 		size = 'default',
@@ -65,15 +66,17 @@ function UnforwardedNumberControl(
 
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( step );
+	const baseSpin = ensureNumber( spinFactor ) * baseStep;
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = (
 		value: number | string,
 		stepOverride?: number
 	) => {
 		// When step is "any" clamp the value, otherwise round and clamp it.
+		// Use '' + to convert to string for use in input value attribute.
 		return isStepAny
-			? Math.min( max, Math.max( min, ensureNumber( value ) ) )
-			: roundClamp( value, min, max, stepOverride ?? baseStep );
+			? '' + Math.min( max, Math.max( min, ensureNumber( value ) ) )
+			: '' + roundClamp( value, min, max, stepOverride ?? baseStep );
 	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
@@ -88,7 +91,7 @@ function UnforwardedNumberControl(
 	) => {
 		event?.preventDefault();
 		const shift = event?.shiftKey && isShiftStepEnabled;
-		const delta = shift ? ensureNumber( shiftStep ) * baseStep : baseStep;
+		const delta = shift ? ensureNumber( shiftStep ) * baseSpin : baseSpin;
 		let nextValue = isValueEmpty( value ) ? baseValue : value;
 		if ( direction === 'up' ) {
 			nextValue = add( nextValue, delta );
@@ -120,7 +123,6 @@ function UnforwardedNumberControl(
 				type === inputControlActionTypes.PRESS_UP ||
 				type === inputControlActionTypes.PRESS_DOWN
 			) {
-				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 				nextState.value = spinValue(
 					currentValue,
 					type === inputControlActionTypes.PRESS_UP ? 'up' : 'down',
@@ -135,8 +137,8 @@ function UnforwardedNumberControl(
 				const [ x, y ] = payload.delta;
 				const enableShift = payload.shiftKey && isShiftStepEnabled;
 				const modifier = enableShift
-					? ensureNumber( shiftStep ) * baseStep
-					: baseStep;
+					? ensureNumber( shiftStep ) * baseSpin
+					: baseSpin;
 
 				let directionModifier;
 				let delta;
@@ -167,7 +169,6 @@ function UnforwardedNumberControl(
 					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
 					const distance = delta * modifier * directionModifier;
 
-					// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 					nextState.value = constrainValue(
 						// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
 						add( currentValue, distance ),
@@ -186,7 +187,6 @@ function UnforwardedNumberControl(
 				const applyEmptyValue =
 					required === false && currentValue === '';
 
-				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 				nextState.value = applyEmptyValue
 					? currentValue
 					: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined

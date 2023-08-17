@@ -26,7 +26,7 @@ SauceLabs is a cloud hosting platform that provides access to a variety of simul
 
 ## Running the tests locally
 
-TLDR; to run the tests locally ensure metro isn't running and then run `npm run native test:e2e:ios:local` and `npm run native test:e2e:android:local` for the desired platform.
+TL;DR: to run the tests locally ensure metro isn't running and then run `npm run native test:e2e:ios:local` and `npm run native test:e2e:android:local` for the desired platform.
 
 Those commands include the process to build a testable version of the app with these steps:
 
@@ -50,7 +50,13 @@ You can also write `debugger;` in the JS code in any line to add a breakpoint.
 
 ### Starting the Appium Server
 
-One of the Caveats to using Appium is the need for the Appium server to be running to interact with the Simulator or Device through Webdriver, as a result the appium server will need to be started before running the tests. To make the entire process easier in the `beforeAll` block of the tests an Appium instance is fired up on a default port of 4723. If you already have something running on that port and would rather not stop that you can change the port within the code that starts that up. At the moment that port number is referenced from the config located at `__device-tests__/helpers/serverConfigs.js`. The process is killed in the `afterAll` block but at the time of writing this there's a small chance some errors might cause it not to get there so it might be best to kill the process yourself if you think something is up. The server output when running the tests are written to `appium-out.log`, this can provide useful information when debugging the issues with the tests.
+One of the Caveats to using Appium is the need for the Appium server to be running to interact with the Simulator or Device through Webdriver, as a result the appium server will need to be started before running the tests.
+
+To make the entire process easier in the `beforeAll` block of the tests an Appium instance is fired up on a default port of 4723. If you already have something running on that port and would rather not stop that you can change the port within the code that starts that up. At the moment that port number is referenced from the config located at `__device-tests__/helpers/serverConfigs.js`.
+
+The process is killed in the `afterAll` block but at the time of writing this there's a small chance some errors might cause it not to get there so it might be best to kill the process yourself if you think something is up. The server output when running the tests are written to `appium-out.log`, this can provide useful information when debugging the issues with the tests.
+
+If the `beforeAll` and `afterAll` functionality is not working correctly, you can start the Appium server manually by running `npm run native appium:start`.
 
 ### WebDriver capabilities
 

@@ -12,12 +12,17 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
+	EditorKeyboardShortcuts,
 	EditorSnackbars,
 	PostSyncStatusModal,
 	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	useBlockCommands,
+	BlockBreadcrumb,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
@@ -28,7 +33,7 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -50,6 +55,9 @@ import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
 import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -64,7 +72,59 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout( { styles } ) {
+function useEditorStyles() {
+	const { hasThemeStyleSupport, editorSettings } = useSelect(
+		( select ) => ( {
+			hasThemeStyleSupport:
+				select( editPostStore ).isFeatureActive( 'themeStyles' ),
+			editorSettings: select( editorStore ).getEditorSettings(),
+		} ),
+		[]
+	);
+
+	// Compute the default styles.
+	return useMemo( () => {
+		const presetStyles =
+			editorSettings.styles?.filter(
+				( style ) =>
+					style.__unstableType && style.__unstableType !== 'theme'
+			) ?? [];
+
+		const defaultEditorStyles = [
+			...editorSettings.defaultEditorStyles,
+			...presetStyles,
+		];
+
+		// Has theme styles if the theme supports them and if some styles were not preset styles (in which case they're theme styles).
+		const hasThemeStyles =
+			hasThemeStyleSupport &&
+			presetStyles.length !== ( editorSettings.styles?.length ?? 0 );
+
+		// If theme styles are not present or displayed, ensure that
+		// base layout styles are still present in the editor.
+		if ( ! editorSettings.disableLayoutStyles && ! hasThemeStyles ) {
+			defaultEditorStyles.push( {
+				css: getLayoutStyles( {
+					style: {},
+					selector: 'body',
+					hasBlockGapSupport: false,
+					hasFallbackGapSupport: true,
+					fallbackGapValue: '0.5em',
+				} ),
+			} );
+		}
+
+		return hasThemeStyles ? editorSettings.styles : defaultEditorStyles;
+	}, [
+		editorSettings.defaultEditorStyles,
+		editorSettings.disableLayoutStyles,
+		editorSettings.styles,
+		hasThemeStyleSupport,
+	] );
+}
+
+function Layout() {
+	useBlockCommands();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isLargeViewport = useViewportMatch( 'large' );
@@ -126,6 +186,8 @@ function Layout( { styles } ) {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
+
+	const styles = useEditorStyles();
 
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -203,6 +265,7 @@ function Layout( { styles } ) {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
+			<EditorKeyboardShortcuts />
 			<SettingsSidebar />
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isLargeViewport }

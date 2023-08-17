@@ -14,19 +14,20 @@ import {
 	getPossibleBlockTransformations,
 	parse,
 	switchToBlockType,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
+import { createRegistrySelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
 import { orderBy } from '../utils/sorting';
-import { getBlockEditingMode } from './private-selectors';
 
 /**
  * A block selection object.
@@ -1962,51 +1963,13 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createSelector(
 	( state, rootClientId = null ) => {
-		/*
-		 * Matches block comment delimiters amid serialized content.
-		 *
-		 * @see `tokenizer` in `@wordpress/block-serialization-default-parser`
-		 * package
-		 *
-		 * blockParserTokenizer differs from the original tokenizer in the
-		 * following ways:
-		 *
-		 * - removed global flag (/g)
-		 * - prepended ^\s*
-		 *
-		 */
-		const blockParserTokenizer =
-			/^\s*<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
-
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
-			let icon = symbol;
-
-			/*
-			 * Instead of always displaying a generic "symbol" icon for every
-			 * reusable block, try to use an icon that represents the first
-			 * outermost block contained in the reusable block. This requires
-			 * scanning the serialized form of the reusable block to find its
-			 * first block delimiter, then looking up the corresponding block
-			 * type, if available.
-			 */
-			if ( Platform.OS === 'web' ) {
-				const content =
-					typeof reusableBlock.content.raw === 'string'
-						? reusableBlock.content.raw
-						: reusableBlock.content;
-				const rawBlockMatch = content.match( blockParserTokenizer );
-				if ( rawBlockMatch ) {
-					const [ , , namespace = 'core/', blockName ] =
-						rawBlockMatch;
-					const referencedBlockType = getBlockType(
-						namespace + blockName
-					);
-					if ( referencedBlockType ) {
-						icon = referencedBlockType.icon;
-					}
-				}
-			}
-
+			const icon = ! reusableBlock.wp_pattern_sync_status
+				? {
+						src: symbol,
+						foreground: 'var(--wp-block-synced-color)',
+				  }
+				: symbol;
 			const id = `core/block/${ reusableBlock.id }`;
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const frecency = calculateFrecency( time, count );
@@ -2015,7 +1978,7 @@ export const getInserterItems = createSelector(
 				id,
 				name: 'core/block',
 				initialAttributes: { ref: reusableBlock.id },
-				title: reusableBlock.title.raw,
+				title: reusableBlock.title?.raw,
 				icon,
 				category: 'reusable',
 				keywords: [ 'reusable' ],
@@ -2023,6 +1986,7 @@ export const getInserterItems = createSelector(
 				utility: 1, // Deprecated.
 				frecency,
 				content: reusableBlock.content.raw,
+				syncStatus: reusableBlock.wp_pattern_sync_status,
 			};
 		};
 
@@ -2031,18 +1995,7 @@ export const getInserterItems = createSelector(
 			'core/block',
 			rootClientId
 		)
-			? getReusableBlocks( state )
-					.filter(
-						( reusableBlock ) =>
-							// Reusable blocks that are fully synced should have no sync status set
-							// for backwards compat between patterns and old reusable blocks, but
-							// some in release 16.1 may have had sync status inadvertantly set to
-							// 'fully' if created in the site editor.
-							reusableBlock.wp_pattern_sync_status === 'fully' ||
-							reusableBlock.wp_pattern_sync_status === '' ||
-							! reusableBlock.wp_pattern_sync_status
-					)
-					.map( buildReusableBlockInserterItem )
+			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
 			: [];
 
 		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
@@ -2578,30 +2531,6 @@ export function getSettings( state ) {
 }
 
 /**
- * Returns the behaviors registered with the editor.
- *
- * Behaviors are named, reusable pieces of functionality that can be
- * attached to blocks. They are registered with the editor using the
- * `theme.json` file.
- *
- * @example
- *
- * ```js
- * const behaviors = select( blockEditorStore ).getBehaviors();
- * if ( behaviors?.lightbox ) {
- * 	 // Do something with the lightbox.
- * }
- *```
- *
- * @param {Object} state Editor state.
- *
- * @return {Object} The editor behaviors object.
- */
-export function getBehaviors( state ) {
-	return state.settings.behaviors;
-}
-
-/**
  * Returns true if the most recent block change is be considered persistent, or
  * false otherwise. A persistent change is one committed by BlockEditorProvider
  * via its `onChange` callback, in addition to `onInput`.
@@ -2956,3 +2885,59 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 	}
 	return false;
 }
+
+/**
+ * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
+ */
+
+/**
+ * Returns the block editing mode for a given block.
+ *
+ * The mode can be one of three options:
+ *
+ * - `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
+ *   selected.
+ * - `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
+ *   toolbar, the block movers, block settings.
+ * - `'default'`: Allows editing the block as normal.
+ *
+ * Blocks can set a mode using the `useBlockEditingMode` hook.
+ *
+ * The mode is inherited by all of the block's inner blocks, unless they have
+ * their own mode.
+ *
+ * A template lock can also set a mode. If the template lock is `'contentOnly'`,
+ * the block's mode is overridden to `'contentOnly'` if the block has a content
+ * role attribute, or `'disabled'` otherwise.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID, or `''` for the root container.
+ *
+ * @return {BlockEditingMode} The block editing mode. One of `'disabled'`,
+ *                            `'contentOnly'`, or `'default'`.
+ */
+export const getBlockEditingMode = createRegistrySelector(
+	( select ) =>
+		( state, clientId = '' ) => {
+			if ( state.blockEditingModes.has( clientId ) ) {
+				return state.blockEditingModes.get( clientId );
+			}
+			if ( ! clientId ) {
+				return 'default';
+			}
+			const rootClientId = getBlockRootClientId( state, clientId );
+			const templateLock = getTemplateLock( state, rootClientId );
+			if ( templateLock === 'contentOnly' ) {
+				const name = getBlockName( state, clientId );
+				const isContent =
+					select( blocksStore ).__experimentalHasContentRoleAttribute(
+						name
+					);
+				return isContent ? 'contentOnly' : 'disabled';
+			}
+			const parentMode = getBlockEditingMode( state, rootClientId );
+			return parentMode === 'contentOnly' ? 'default' : parentMode;
+		}
+);

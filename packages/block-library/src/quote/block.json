@@ -32,6 +32,7 @@
 		"anchor": true,
 		"html": false,
 		"__experimentalOnEnter": true,
+		"__experimentalOnMerge": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

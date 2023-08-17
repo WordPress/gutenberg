@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { sentenceCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -13,14 +14,15 @@ import {
 	MEDIA_TYPE_VIDEO,
 	MEDIA_TYPE_AUDIO,
 } from '@wordpress/block-editor';
-import { withPreferredColorScheme } from '@wordpress/compose';
-import { useRef } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { cloneElement, useCallback, useRef } from '@wordpress/element';
 import { Icon, plusCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+import { useBlockEditContext } from '../block-edit/context';
 
 const isMediaEqual = ( media1, media2 ) =>
 	media1.id === media2.id || media1.url === media2.url;
@@ -35,10 +37,13 @@ const dedupMedia = ( media ) =>
 		[]
 	);
 
+const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
+
 function MediaPlaceholder( props ) {
 	const {
 		addToGallery,
 		allowedTypes = [],
+		className = '',
 		labels = {},
 		icon,
 		onSelect,
@@ -46,7 +51,6 @@ function MediaPlaceholder( props ) {
 		__experimentalOnlyMediaLibrary,
 		isAppender,
 		disableMediaButtons,
-		getStylesFromColorScheme,
 		multiple,
 		value = [],
 		children,
@@ -60,6 +64,16 @@ function MediaPlaceholder( props ) {
 	// Use ref to keep media array current for callbacks during rerenders.
 	const mediaRef = useRef( value );
 	mediaRef.current = value;
+
+	const blockEditContext = useBlockEditContext();
+
+	const onButtonPress = useCallback(
+		( open ) => ( event ) => {
+			onFocus?.( event );
+			open();
+		},
+		[ onFocus ]
+	);
 
 	// Append and deduplicate media array for gallery use case.
 	const setMedia =
@@ -109,55 +123,104 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select an audio file' );
 	}
 
-	const emptyStateTitleStyle = getStylesFromColorScheme(
-		styles.emptyStateTitle,
-		styles.emptyStateTitleDark
+	const titleStyles = usePreferredColorSchemeStyle(
+		styles[ 'media-placeholder__header-title' ],
+		styles[ 'media-placeholder__header-title--dark' ]
 	);
-	const addMediaButtonStyle = getStylesFromColorScheme(
+	const addMediaButtonStyle = usePreferredColorSchemeStyle(
 		styles.addMediaButton,
 		styles.addMediaButtonDark
 	);
+	const buttonStyles = usePreferredColorSchemeStyle(
+		styles[ 'media-placeholder__button' ],
+		styles[ 'media-placeholder__button--dark' ]
+	);
+	const emptyStateDescriptionStyles = usePreferredColorSchemeStyle(
+		styles.emptyStateDescription,
+		styles.emptyStateDescriptionDark
+	);
+	const iconStyles = usePreferredColorSchemeStyle(
+		styles[ 'media-placeholder__header-icon' ],
+		styles[ 'media-placeholder__header-icon--dark' ]
+	);
+	const placeholderIcon = cloneElement( icon, {
+		fill: iconStyles.fill,
+	} );
+	const accessibilityLabel = sprintf(
+		/* translators: accessibility text for the media block empty state. %s: media type */
+		__( '%s block. Empty' ),
+		placeholderTitle
+	);
 
-	const renderContent = () => {
+	const renderContent = ( open ) => {
 		if ( isAppender === undefined || ! isAppender ) {
 			return (
 				<>
-					<View style={ styles.modalIcon }>{ icon }</View>
-					<Text style={ emptyStateTitleStyle }>
-						{ placeholderTitle }
-					</Text>
+					<View style={ styles[ 'media-placeholder__header' ] }>
+						<View style={ iconStyles }>{ placeholderIcon }</View>
+						<Text style={ titleStyles }>{ placeholderTitle }</Text>
+					</View>
 					{ children }
-					<Text style={ styles.emptyStateDescription }>
-						{ instructions }
-					</Text>
+					<TouchableOpacity
+						activeOpacity={ 0.5 }
+						accessibilityLabel={ accessibilityLabel }
+						style={ buttonStyles }
+						accessibilityRole={ 'button' }
+						accessibilityHint={ accessibilityHint }
+						hitSlop={ hitSlop }
+						onPress={ onButtonPress( open ) }
+					>
+						<Text style={ emptyStateDescriptionStyles }>
+							{ sentenceCase( instructions ) }
+						</Text>
+					</TouchableOpacity>
 				</>
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
 			return (
-				<View testID="media-placeholder-appender-icon">
-					<Icon
-						icon={ plusCircleFilled }
-						style={ addMediaButtonStyle }
-						color={ addMediaButtonStyle.color }
-						size={ addMediaButtonStyle.size }
-					/>
-				</View>
+				<TouchableOpacity
+					activeOpacity={ 0.5 }
+					accessibilityLabel={ accessibilityLabel }
+					style={ styles[ 'media-placeholder__appender' ] }
+					accessibilityRole={ 'button' }
+					accessibilityHint={ accessibilityHint }
+					hitSlop={ hitSlop }
+					onPress={ onButtonPress( open ) }
+				>
+					<View testID="media-placeholder-appender-icon">
+						<Icon
+							icon={ plusCircleFilled }
+							style={ addMediaButtonStyle }
+							color={ addMediaButtonStyle.color }
+							size={ addMediaButtonStyle.size }
+						/>
+					</View>
+				</TouchableOpacity>
 			);
 		}
 	};
 
-	if ( isAppender && disableMediaButtons ) {
-		return null;
-	}
-
-	const appenderStyle = getStylesFromColorScheme(
+	const appenderStyle = usePreferredColorSchemeStyle(
 		styles.appender,
 		styles.appenderDark
 	);
-	const emptyStateContainerStyle = getStylesFromColorScheme(
-		styles.emptyStateContainer,
-		styles.emptyStateContainerDark
+	const containerSelectedStyle = usePreferredColorSchemeStyle(
+		styles[ 'media-placeholder__container-selected' ],
+		styles[ 'media-placeholder__container-selected--dark' ]
 	);
+	const containerStyle = [
+		usePreferredColorSchemeStyle(
+			styles[ 'media-placeholder__container' ],
+			styles[ 'media-placeholder__container--dark' ]
+		),
+		blockEditContext?.isSelected &&
+			! className.includes( 'no-block-outline' ) &&
+			containerSelectedStyle,
+	];
+
+	if ( isAppender && disableMediaButtons ) {
+		return null;
+	}
 
 	return (
 		<View style={ { flex: 1 } }>
@@ -173,33 +236,19 @@ function MediaPlaceholder( props ) {
 				autoOpen={ autoOpenMediaUpload }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
-						<TouchableWithoutFeedback
-							accessibilityLabel={ sprintf(
-								/* translators: accessibility text for the media block empty state. %s: media type */
-								__( '%s block. Empty' ),
-								placeholderTitle
-							) }
-							accessibilityRole={ 'button' }
-							accessibilityHint={ accessibilityHint }
-							onPress={ ( event ) => {
-								onFocus?.( event );
-								open();
-							} }
+						<View
+							style={ [
+								[
+									containerStyle,
+									height && { height },
+									backgroundColor && { backgroundColor },
+								],
+								isAppender && appenderStyle,
+							] }
 						>
-							<View
-								style={ [
-									[
-										emptyStateContainerStyle,
-										height && { height },
-										backgroundColor && { backgroundColor },
-									],
-									isAppender && appenderStyle,
-								] }
-							>
-								{ getMediaOptions() }
-								{ ! hideContent && renderContent() }
-							</View>
-						</TouchableWithoutFeedback>
+							{ getMediaOptions() }
+							{ ! hideContent && renderContent( open ) }
+						</View>
 					);
 				} }
 			/>
@@ -207,4 +256,4 @@ function MediaPlaceholder( props ) {
 	);
 }
 
-export default withPreferredColorScheme( MediaPlaceholder );
+export default MediaPlaceholder;

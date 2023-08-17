@@ -6,8 +6,10 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
-import { Divider, DividerProps } from '../../divider';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
+import type { DividerProps } from '../../divider';
+import { Divider } from '../../divider';
 import { useCardDivider } from './hook';
 
 function UnconnectedCardDivider(
