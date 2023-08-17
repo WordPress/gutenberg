@@ -15,6 +15,7 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Button from '../../button';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
+import cleanupTooltip from './utils/';
 
 const props = {
 	children: <Button>Button</Button>,
@@ -23,17 +24,6 @@ const props = {
 };
 
 describe( 'Tooltip', () => {
-	// TODO: may need to be tested with Playwright; further context:
-	// https://github.com/WordPress/gutenberg/pull/52133#issuecomment-1613691258
-	// below workaround ensures tooltip is umounted after each test to prevent leaking
-	// similarly to ariakit tooltip tests: https://github.com/ariakit/ariakit/blob/249d376e41115e6d4ceba244e231a95fa457bd04/examples/tooltip/test.ts#L12-L14
-	afterEach( async () => {
-		const user = userEvent.setup();
-		await user.tab();
-		await user.tab();
-		await user.click( document.body );
-	} );
-
 	it( 'should not render the tooltip if multiple children are passed', async () => {
 		render(
 			// expected TS error since Tooltip cannot have more than one child element
@@ -75,6 +65,8 @@ describe( 'Tooltip', () => {
 		expect(
 			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
 		).toBeVisible();
+
+		await cleanupTooltip( user );
 	} );
 
 	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
@@ -89,6 +81,8 @@ describe( 'Tooltip', () => {
 		expect(
 			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
 		).toBeVisible();
+
+		await cleanupTooltip( user );
 	} );
 
 	it( 'should not show tooltip on focus as result of mouse click', async () => {
@@ -101,10 +95,12 @@ describe( 'Tooltip', () => {
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
+
+		await cleanupTooltip( user );
 	} );
 
 	it( 'should respect custom delay prop when showing tooltip', async () => {
-		const user = userEvent.setup( { delay: TOOLTIP_DELAY } );
+		const user = userEvent.setup();
 		const CUSTOM_DELAY = TOOLTIP_DELAY + 25;
 
 		render( <Tooltip { ...props } delay={ CUSTOM_DELAY } /> );
@@ -120,6 +116,8 @@ describe( 'Tooltip', () => {
 		expect(
 			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
 		).toBeVisible();
+
+		await cleanupTooltip( user );
 	} );
 
 	it( 'should show tooltip when an element is disabled', async () => {
@@ -141,6 +139,8 @@ describe( 'Tooltip', () => {
 		expect(
 			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
 		).toBeVisible();
+
+		await cleanupTooltip( user );
 	} );
 
 	it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
@@ -207,6 +207,8 @@ describe( 'Tooltip', () => {
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
+
+		await cleanupTooltip( user );
 	} );
 
 	it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
@@ -219,6 +221,8 @@ describe( 'Tooltip', () => {
 		await user.hover( button );
 
 		expect( await screen.findByText( 'shortcut text' ) ).toBeVisible();
+
+		await cleanupTooltip( user );
 	} );
 
 	it( 'should render the keyboard shortcut display text and aria-label when an object is passed as the shortcut', async () => {
@@ -246,6 +250,8 @@ describe( 'Tooltip', () => {
 			'aria-label',
 			'Control + Shift + Comma'
 		);
+
+		await cleanupTooltip( user );
 	} );
 
 	it( 'esc should close modal even when tooltip is visible', async () => {
@@ -272,5 +278,7 @@ describe( 'Tooltip', () => {
 		await user.keyboard( '[Escape]' );
 
 		expect( onRequestClose ).toHaveBeenCalled();
+
+		await cleanupTooltip( user );
 	} );
 } );
