@@ -60,7 +60,7 @@ If critical bugs are discovered in stable versions of the plugin, patch versions
 
 ### Release management
 
-Each major Gutenberg release is run by a release manager, also known as a release lead. This individual, or small team of individuals, is responsible for the release of Gutenberg with support from the broader [Gutenberg development team](https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams). 
+Each major Gutenberg release is run by a release manager, also known as a release lead. This individual, or small team of individuals, is responsible for the release of Gutenberg with support from the broader [Gutenberg development team](https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams).
 
 The release manager is responsible for initiating all release activities, and their approval is required for any changes to the release plan. In the event of an emergency or if the release manager is unavailable, other team members may take appropriate action, but they should keep the release manager informed.
 
@@ -77,7 +77,7 @@ Here is an [11-minute video](https://youtu.be/TnSgJd3zpJY) that demonstrates the
 
 <div class="callout callout-info">
     <strong>Quick reference</strong>
-    <ul> 
+    <ul>
         <li>Ensure all PRs are properly labeled.</li>
         <li>Each PR must have one label prefixed by <code>[Type]</code>.</li>
     </ul>
@@ -88,7 +88,7 @@ The first step in preparing a Gutenberg release is to organize all PRs assigned 
 To test the changelog automation that will be run as part of the release workflow, you can use the following command in your local copy of Gutenberg using the milestone of the stable release version you are working on:
 
 ```
-npm run other:changelog -- --milestone="Gutenberg 16.2"  
+npm run other:changelog -- --milestone="Gutenberg 16.2"
 ```
 
 The output of this command is the changelog for the provided milestone, which in the above example is Gutenberg 16.2. You can copy and paste the output into a Markdown document, which will make it easier to view and allow you to follow the links to each PR.
@@ -102,14 +102,14 @@ All PRs should have a label prefixed by `[Type]` as well as labels for sub-categ
 Update the labels on each PR as needed. You can continue generating the changelog until you are comfortable proceeding. Now you are ready to start the release candidate workflow.
 
 <div class="callout callout-tip">
-You can see how the changelog is generated from the PR labels in the <a href="https://github.com/WordPress/gutenberg/blob/trunk/bin/plugin/commands/changelog.js">changelog.js</a> file. 
+You can see how the changelog is generated from the PR labels in the <a href="https://github.com/WordPress/gutenberg/blob/trunk/bin/plugin/commands/changelog.js">changelog.js</a> file.
 </div>
 
 #### Running the release workflow
 
 <div class="callout callout-info">
     <strong>Quick reference</strong>
-    <ul> 
+    <ul>
         <li>
             Announce in <a href="https://wordpress.slack.com/messages/C02QB2JS7">#core-editor</a> that you are about to start the release workflow.
         </li>
@@ -145,7 +145,7 @@ The best time to work on the changelog is when it is first created during the re
 
 The stable release process takes the changelogs of the RCs and adds them to the stable release. However, there is one important thing to note: the stable release only "remembers" the first version of the changelog, which is the version that was available when RC1 was published. Any subsequent changes to the changelog of RC1 will not be included in the stable release.
 
-That means if you curate the whole changelog before you publish RC1, you won’t have to work on it for the stable release, except for the few items of subsequent RC2 or RC3 releases that will also be added to the stable release. 
+That means if you curate the whole changelog before you publish RC1, you won’t have to work on it for the stable release, except for the few items of subsequent RC2 or RC3 releases that will also be added to the stable release.
 
 Once the release changelog is available in the draft, take some time to read the notes and edit them to make sure they are easy to read and accurate. Don't rush this part. It's important to make sure the release notes are as organized as possible, but you don't have to finish them all at once. You can save the draft and come back to it later.
 
@@ -158,7 +158,7 @@ Here are some additional tips for preparing clear and concise changelogs:
 * Create new groupings as applicable, and move pull requests between.
 * When multiple PRs relate to the same task (such as a follow-up pull request), try to combine them into a single entry. Good examples for this are PRs around removing Lodash for performance purposes, replacement of Puppeteer E2D tests with Playwright or efforts to convert public components to TypeScript.
 * If subtasks of a related set of PRs are substantial, consider organizing as entries in a nested list.
-* Remove PRs that revert other PRs in the same release if the net change in code is zero. 
+* Remove PRs that revert other PRs in the same release if the net change in code is zero.
 * Remove all PRs that only update the mobile app. The only exception to this rule is if the mobile app pull request also updates functionality for the web.
 * If a subheader only has one PR listed, remove the subheader and move the PR to the next matching subheader with more than one item listed.
 
@@ -166,10 +166,10 @@ Here are some additional tips for preparing clear and concise changelogs:
 
 <div class="callout callout-info">
     <strong>Quick reference</strong>
-    <ul> 
+    <ul>
         <li>Ensure all PRs that need cherry-picking have the <code>Backport to Gutenberg RC</code> label.</li>
         <li>In your local clone of the Gutenberg repository, switch to the release branch: <code>git checkout release/X.Y</code></li>
-        <li>Cherry-pick all merged PRs using the automated script: </code>npm run other:cherry-pick "Backport to Gutenberg RC"</code></li> 
+        <li>Cherry-pick all merged PRs using the automated script: </code>npm run other:cherry-pick "Backport to Gutenberg RC"</code></li>
     </ul>
 </div>
 
@@ -187,7 +187,7 @@ The cherry-picking process can be automated with the `npm run other:cherry-pick 
 <div class="callout callout-warning">
 To cherry-pick PRs, you must clone (not fork) the Gutenberg repository and have write access. Only members of the <a href="https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams">Gutenberg development team</a> have the necessary permissions to perform this action.</div>
 
-Once you have cloned the Gutenberg repository to your local development environment, begin by switching to the release branch: 
+Once you have cloned the Gutenberg repository to your local development environment, begin by switching to the release branch:
 
 ```
 git checkout release/X.Y
@@ -204,7 +204,7 @@ Behind the scenes, the script will:
 * Cherry-pick all PRs with the label `Backport to Gutenberg RC`
 * Add them to the release milestone
 * `git push` all changes to the release branch
-* Add a comment to the PR indicating it’s been cherry-picked 
+* Add a comment to the PR indicating it’s been cherry-picked
 * Remove the label `Backport to Gutenberg RC` from the PR
 
 Here is a screenshot of the process:
@@ -229,14 +229,14 @@ If the cherry-picked fixes deserve another release candidate before the stable v
 
 <div class="callout callout-info">
     <strong>Quick reference</strong>
-    <ul> 
+    <ul>
         <li>In the release draft, press the “Publish release” button.</li>
         <li>If publishing a stable release, get approval from a member of the <a href="https://github.com/orgs/WordPress/teams/gutenberg-release">Gutenberg Release</a>, <a href="https://github.com/orgs/WordPress/teams/gutenberg-core">Gutenberg Core</a>, or the <a href="https://github.com/orgs/WordPress/teams/wordpress-core">WordPress Core</a> teams to upload the new plugin version to the WordPress.org plugin repository (SVN).</li>
-        <li>Once uploaded, confirm that the latest version can be downloaded and updated from the WordPress plugin dashboard.</li> 
+        <li>Once uploaded, confirm that the latest version can be downloaded and updated from the WordPress plugin dashboard.</li>
     </ul>
 </div>
 
-Only once you’re happy with the shape of the changelog in the release draft, press the “Publish release” button. 
+Only once you’re happy with the shape of the changelog in the release draft, press the “Publish release” button.
 
 Note that you do not need to change the checkboxes above the button. If you are publishing an RC, the “Set as a pre-release” will automatically be selected, and “Set as the latest release” will be selected if you are publishing the stable version.
 
@@ -259,7 +259,7 @@ Documenting the release is led by the release manager with the help of [Gutenber
 
 <div class="callout callout-info">
     <strong>Timeline</strong>
-    <ol> 
+    <ol>
         <li>Make a copy of the <a href="https://docs.google.com/document/d/1D-MTOCmL9eMlP9TDTXqlzuKVOg_ghCPm9_whHFViqMk/edit">Google Doc Template for release posts</a> – Wednesday to Friday</li>
         <li>Select the release highlights – Friday to Monday</li>
         <li>Request release assets (images, videos) from the Design team once highlights are finalized – Friday to Monday</li>
@@ -403,7 +403,7 @@ Behind the scenes, all steps are automated via `./bin/plugin/cli.js npm-latest` 
 10. Run the script `npm run publish:latest`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
 11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### WordPress releases
@@ -497,7 +497,7 @@ Behind the scenes, the rest of the process is automated with `./bin/plugin/cli.j
 5. Run the script `npm run publish:latest`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/main/libs/commands/publish#bump-from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
 6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### Development releases

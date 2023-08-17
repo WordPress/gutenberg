@@ -10,7 +10,7 @@
  *
  * @covers WP_Font_Family::has_font_faces
  */
-class Tests_FontsLibrary_WpFontFamily_HasFontFaces extends WP_UnitTestCase {
+class Tests_Fonts_WpFontFamily_HasFontFaces extends WP_UnitTestCase {
 
 	public function test_should_return_true_when_check_succeeds() {
 		$font_data = array(

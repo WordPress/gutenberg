@@ -8,16 +8,6 @@
 
 require_once __DIR__ . '/wp-font-face-testcase.php';
 
-/*
- * This code is only needed if the Font API is enabled.
- * @todo remove this code when Font Library is merged into Gutenberg.
- */
-if ( ! class_exists( 'WP_Font_Face' ) ) {
-	require_once __DIR__ . '/../../../lib/experimental/fonts/class-wp-font-face.php';
-	require_once __DIR__ . '/../../../lib/experimental/fonts/class-wp-font-face-resolver.php';
-	require_once __DIR__ . '/../../../lib/experimental/fonts/fonts.php';
-}
-
 /**
  * Test wp_print_font_faces().
  *

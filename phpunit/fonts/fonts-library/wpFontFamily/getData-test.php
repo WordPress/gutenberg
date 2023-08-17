@@ -10,7 +10,7 @@
  *
  * @covers WP_Font_Family::get_data
  */
-class Tests_FontsLibrary_WpFontsLibrary_GetData extends WP_UnitTestCase {
+class Tests_Fonts_WpFontsLibrary_GetData extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_should_get_data
