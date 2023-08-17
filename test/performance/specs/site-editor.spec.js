@@ -169,6 +169,10 @@ test.describe( 'Site Editor Performance', () => {
 
 		// Enter edit mode.
 		await editor.canvas.locator( 'body' ).click();
+		// Second click is needed for the legacy edit mode.
+		await editor.canvas
+			.getByRole( 'document', { name: /Block:( Post)? Content/ } )
+			.click();
 
 		// Append an empty paragraph.
 		// Since `editor.insertBlock( { name: 'core/paragraph' } )` is not
