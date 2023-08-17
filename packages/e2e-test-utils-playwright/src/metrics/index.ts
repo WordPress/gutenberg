@@ -133,6 +133,13 @@ export class Metrics {
 					// "provided" means no throttling.
 					// TODO: Make configurable.
 					throttlingMethod: 'provided',
+					// Default is "mobile".
+					// See https://github.com/GoogleChrome/lighthouse/blob/main/docs/emulation.md
+					// TODO: Make configurable.
+					formFactor: 'desktop',
+					screenEmulation: {
+						disabled: true,
+					},
 					// Only run certain audits to speed things up.
 					onlyAudits: Object.keys( audits ),
 				},
