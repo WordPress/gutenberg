@@ -181,7 +181,11 @@ function HeaderToolbar() {
 					) }
 				</div>
 			</NavigableToolbar>
-			<Slot name="__experimentalSelectedBlockTools" />
+			<Slot
+				className="selected-block-toolbar-wrapper"
+				name="__experimentalSelectedBlockTools"
+				bubblesVirtually
+			/>
 		</>
 	);
 }

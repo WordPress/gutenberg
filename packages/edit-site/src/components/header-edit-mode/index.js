@@ -301,6 +301,7 @@ export default function HeaderEditMode() {
 						</div>
 					</NavigableToolbar>
 					<Slot
+						className="selected-block-toolbar-wrapper"
 						name="__experimentalSelectedBlockTools"
 						bubblesVirtually
 					/>
