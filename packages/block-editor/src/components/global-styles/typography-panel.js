@@ -8,7 +8,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -357,17 +357,26 @@ export default function TypographyPanel( {
 	const textOrientation = decodeValue(
 		inheritedValue?.typography?.textOrientation
 	);
-	const setTextOrientation = ( newValue ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'typography', 'textOrientation' ],
-				newValue || undefined
-			)
-		);
-	};
+	const setTextOrientation = useCallback(
+		( newValue ) => {
+			onChange(
+				setImmutably(
+					value,
+					[ 'typography', 'textOrientation' ],
+					newValue || undefined
+				)
+			);
+		},
+		[ onChange, value ]
+	);
 	const hasTextOrientation = () => !! value?.typography?.textOrientation;
-	const resetTextOrientation = () => setTextOrientation( undefined );
+
+	// Reset text orientation when writing mode is reset.
+	useEffect( () => {
+		if ( writingMode === undefined ) {
+			setTextOrientation( undefined );
+		}
+	}, [ writingMode, setTextOrientation ] );
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -547,7 +556,7 @@ export default function TypographyPanel( {
 					}
 					label={ __( 'Text orientation' ) }
 					hasValue={ hasWritingMode && hasTextOrientation }
-					onDeselect={ resetWritingMode && resetTextOrientation }
+					onDeselect={ resetWritingMode }
 					isShownByDefault={ defaultControls.writingMode }
 					panelId={ panelId }
 				>
@@ -563,6 +572,7 @@ export default function TypographyPanel( {
 						}
 					/>
 					{ hasTextOrientationControl &&
+						hasWritingMode &&
 						( writingMode === 'vertical-lr' ||
 							writingMode === 'vertical-rl' ) && (
 							<TextOrientationControl
