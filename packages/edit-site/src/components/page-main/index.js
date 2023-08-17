@@ -18,7 +18,7 @@ export default function PageMain() {
 	const {
 		params: { path },
 	} = useLocation();
-console.log( 'path', path );
+
 	if ( path === '/wp_template/all' ) {
 		return <PageTemplates />;
 	} else if ( path === '/wp_template_part/all' ) {
