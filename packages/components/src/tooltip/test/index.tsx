@@ -74,9 +74,7 @@ describe( 'Tooltip', () => {
 
 		render( <Tooltip { ...props } /> );
 
-		const button = screen.getByRole( 'button', { name: /Button/i } );
-
-		await user.hover( button );
+		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
 
 		expect(
 			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
@@ -105,9 +103,7 @@ describe( 'Tooltip', () => {
 
 		render( <Tooltip { ...props } delay={ CUSTOM_DELAY } /> );
 
-		const button = screen.getByRole( 'button', { name: /Button/i } );
-
-		await user.hover( button );
+		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
 
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
@@ -216,9 +212,7 @@ describe( 'Tooltip', () => {
 
 		render( <Tooltip { ...props } shortcut="shortcut text" /> );
 
-		const button = screen.getByRole( 'button', { name: /Button/i } );
-
-		await user.hover( button );
+		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
 
 		expect( await screen.findByText( 'shortcut text' ) ).toBeVisible();
 
@@ -238,9 +232,7 @@ describe( 'Tooltip', () => {
 			/>
 		);
 
-		const button = screen.getByRole( 'button', { name: /Button/i } );
-
-		await user.hover( button );
+		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
 
 		await waitFor( () =>
 			expect( screen.getByText( '⇧⌘,' ) ).toBeVisible()
@@ -267,11 +259,11 @@ describe( 'Tooltip', () => {
 
 		expect( tooltip ).toBeInTheDocument();
 
-		const button = screen.getByRole( 'button', {
-			name: /Close/i,
-		} );
-
-		await user.hover( button );
+		await user.hover(
+			screen.getByRole( 'button', {
+				name: /Close/i,
+			} )
+		);
 
 		await waitFor( () => expect( tooltip ).toBeVisible() );
 
