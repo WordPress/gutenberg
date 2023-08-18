@@ -17,7 +17,7 @@ test.describe( 'WP Editor Meta Boxes', () => {
 	} );
 
 	test( 'Should save the changes', async ( { admin, editor, page } ) => {
-		await admin.createNewPost( { legacyCanvas: true } );
+		await admin.createNewPost();
 
 		// Add title to enable valid non-empty post save.
 		await editor.canvas.type(

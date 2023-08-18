@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.0 (2023-08-16)
+
 ### New Features
 
 -   Allow passing optional `afterLoad` callbacks to `store` calls. ([#53363](https://github.com/WordPress/gutenberg/pull/53363))
