@@ -74,7 +74,7 @@ function VariationsDropdown( {
 			label={ __( 'Transform to variation' ) }
 			text={ __( 'Transform to variation' ) }
 			popoverProps={ {
-				position: 'bottom center',
+				placement: 'bottom-end',
 				className: `${ className }__popover`,
 			} }
 			icon={ chevronDown }
