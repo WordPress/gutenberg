@@ -7,7 +7,14 @@ import {
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, media, navigation, page, styles, symbol } from '@wordpress/icons';
+import {
+	layout,
+	media,
+	navigation,
+	page,
+	styles,
+	symbol,
+} from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 

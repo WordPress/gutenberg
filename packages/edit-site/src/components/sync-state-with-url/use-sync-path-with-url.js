@@ -87,7 +87,10 @@ export default function useSyncPathWithURL() {
 					postId: navigatorParams?.postId,
 					path: undefined,
 				} );
-			} else if ( navigatorLocation.path === '/patterns' || navigatorLocation.path === '/media' ) {
+			} else if (
+				navigatorLocation.path === '/patterns' ||
+				navigatorLocation.path === '/media'
+			) {
 				updateUrlParams( {
 					postType: undefined,
 					postId: undefined,
