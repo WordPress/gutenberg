@@ -7,7 +7,7 @@
 	"parent": [ "core/query-pagination" ],
 	"description": "Displays a list of page numbers for pagination",
 	"textdomain": "default",
-	"usesContext": [ "queryId", "query" ],
+	"usesContext": [ "queryId", "query", "enhancedPagination" ],
 	"supports": {
 		"reusable": false,
 		"html": false,

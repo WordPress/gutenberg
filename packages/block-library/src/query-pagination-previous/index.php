@@ -15,8 +15,9 @@
  * @return string Returns the previous posts link for the query.
  */
 function render_block_core_query_pagination_previous( $attributes, $content, $block ) {
-	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
+	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
+	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$show_label         = isset( $block->context['showLabel'] ) ? (bool) $block->context['showLabel'] : true;
@@ -49,6 +50,22 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 			$label
 		);
 	}
+
+	if ( $enhanced_pagination ) {
+		$p = new WP_HTML_Tag_Processor( $content );
+		if ( $p->next_tag(
+			array(
+				'tag_name'   => 'a',
+				'class_name' => 'wp-block-query-pagination-previous',
+			)
+		) ) {
+			$p->set_attribute( 'data-wp-key', 'query-pagination-previous' );
+			$p->set_attribute( 'data-wp-on--click', 'actions.core.query.navigate' );
+			$p->set_attribute( 'data-wp-on--mouseenter', 'actions.core.query.prefetch' );
+			$content = $p->get_updated_html();
+		}
+	}
+
 	return $content;
 }
 
