@@ -189,6 +189,7 @@ export default function PageMedia() {
 	const { heading } = getMediaDetails( mediaType );
 	const [ tagsFilter, setTagsFilter ] = useState( [] );
 	const [ authorFilter, setAuthorFilter ] = useState( [] );
+	const [ sortBy, setSortBy ] = useState( [ 'name' ] );
 	return (
 		<Page
 			className="edit-site-media"
@@ -220,6 +221,7 @@ export default function PageMedia() {
 									value: 'architecture',
 								},
 							] }
+							multiple
 							onChange={ setTagsFilter }
 						/>
 						<FilterControl
@@ -236,19 +238,19 @@ export default function PageMedia() {
 								},
 								{ label: __( 'Rob' ), value: 'rob' },
 							] }
+							multiple
 							onChange={ setAuthorFilter }
 						/>
 						<Spacer />
-						<SelectControl
-							label={ __( 'Sort: Date' ) }
+						<FilterControl
+							label={ __( 'Sort' ) }
+							value={ sortBy }
 							options={ [
-								{ label: 'Big', value: '100%' },
-								{ label: 'Medium', value: '50%' },
-								{ label: 'Small', value: '25%' },
+								{ label: __( 'Name' ), value: 'name' },
+								{ label: __( 'Date' ), value: 'date' },
+								{ label: __( 'Author' ), value: 'author' },
 							] }
-							hideLabelFromVision
-							__nextHasNoMarginBottom
-							size="__unstable-large"
+							onChange={ setSortBy }
 						/>
 						<ToggleGroupControl
 							label={ __( 'Toggle view' ) }

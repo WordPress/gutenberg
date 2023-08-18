@@ -18,6 +18,7 @@ export default function FilterControl( {
 	label,
 	value = [],
 	options = [],
+	multiple = false,
 	onChange = noop,
 } ) {
 	const [ searchFilter, setSearchFilter ] = useState( '' );
@@ -27,7 +28,7 @@ export default function FilterControl( {
 			renderToggle={ ( { onToggle, isOpen } ) => (
 				<Button
 					variant="secondary"
-					text={ getToggleText( label, value ) }
+					text={ getToggleText( label, value, options ) }
 					icon={ chevronDown }
 					iconPosition="right"
 					isPressed={ isOpen }
@@ -55,14 +56,21 @@ export default function FilterControl( {
 								label={ option.label }
 								checked={ value.includes( option.value ) }
 								onChange={ ( checked ) => {
-									if ( checked ) {
-										onChange( [ ...value, option.value ] );
+									if ( multiple ) {
+										if ( checked ) {
+											onChange( [
+												...value,
+												option.value,
+											] );
+										} else {
+											onChange(
+												value.filter(
+													( v ) => v !== option.value
+												)
+											);
+										}
 									} else {
-										onChange(
-											value.filter(
-												( v ) => v !== option.value
-											)
-										);
+										onChange( [ option.value ] );
 									}
 								} }
 								__nextHasNoMarginBottom
@@ -85,7 +93,7 @@ export default function FilterControl( {
 	);
 }
 
-function getToggleText( label, value ) {
+function getToggleText( label, value, options ) {
 	if ( value.length > 1 ) {
 		return sprintf(
 			/* translators: %1$s: label, %2$d: number of selected items */
@@ -98,7 +106,7 @@ function getToggleText( label, value ) {
 			/* translators: %1$s: label, %2$s: selected item */
 			__( '%1$s: %2$s' ),
 			label,
-			value[ 0 ]
+			options.find( ( option ) => option.value === value[ 0 ] ).label
 		);
 	}
 	return label;
