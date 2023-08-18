@@ -26,14 +26,12 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	arrowRight,
-	arrowDown,
-	grid,
-	justifyLeft,
-	justifyCenter,
-	justifyRight,
-	justifySpaceBetween,
-} from '@wordpress/icons';
+	useEffect,
+	useContext,
+	createPortal,
+	useState,
+} from '@wordpress/element';
+import { arrowRight, arrowDown, grid } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -55,13 +53,6 @@ function hasLayoutBlockSupport( blockName ) {
 		hasBlockSupport( blockName, '__experimentalLayout' )
 	);
 }
-import {
-	alignTop,
-	alignCenter,
-	alignBottom,
-	spaceBetween,
-	alignStretch,
-} from '../components/block-vertical-alignment-control/icons';
 
 /**
  * Generates the utility classnames for the given block's layout attributes.
@@ -193,10 +184,6 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 		default: defaultBlockLayout = { type: 'default' },
 	} = blockSupportAndThemeSettings;
 
-	if ( ! allowEditing ) {
-		return null;
-	}
-
 	const usedLayout = layout || defaultBlockLayout || {};
 	const {
 		inherit = false,
@@ -204,8 +191,21 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 		contentSize = null,
 		orientation = 'horizontal',
 		flexWrap = 'nowrap',
+		justifyContent = 'left',
+		verticalAlignment = 'top',
 	} = usedLayout;
 	const { type: defaultBlockLayoutType } = defaultBlockLayout;
+
+	const [ matrixJustification, setMatrixJustification ] =
+		useState( justifyContent );
+
+	const [ matrixAlignment, setMatrixAlignment ] =
+		useState( verticalAlignment );
+
+	if ( ! allowEditing ) {
+		return null;
+	}
+
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow` or
 	 * `constrained` layouts and it should not be taken into account when other
@@ -248,61 +248,125 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 
 	const horizontalAlignmentOptions = [
 		{
-			value: 'left',
-			icon: justifyLeft,
-			label: __( 'Left' ),
-		},
-		{
-			value: 'center',
-			icon: justifyCenter,
-			label: __( 'Middle' ),
-		},
-		{
-			value: 'right',
-			icon: justifyRight,
-			label: __( 'Right' ),
+			key: 'fit',
+			value: 'fit',
+			name: __( 'Fit' ),
 		},
 	];
-
-	if ( type === 'flex' ) {
+	if ( orientation === 'vertical' ) {
 		horizontalAlignmentOptions.push( {
+			key: 'stretch',
+			value: 'stretch',
+			name: __( 'Stretch' ),
+		} );
+	} else {
+		horizontalAlignmentOptions.push( {
+			key: 'space-between',
 			value: 'space-between',
-			icon: justifySpaceBetween,
-			label: __( 'Space Between' ),
+			name: __( 'Space Between' ),
 		} );
 	}
+
+	const justifyControlValue = () => {
+		if (
+			justifyContent === 'stretch' ||
+			justifyContent === 'space-between'
+		) {
+			return horizontalAlignmentOptions.find(
+				( { _value } ) => _value?.key === justifyContent
+			);
+		}
+		return horizontalAlignmentOptions.find(
+			( { _value } ) => _value?.key === 'fit'
+		);
+	};
+
+	const onChangeJustify = ( { selectedItem } ) => {
+		const { key: newJustify } = selectedItem;
+		if ( newJustify === 'stretch' || newJustify === 'space-between' ) {
+			if (
+				justifyContent === 'left' ||
+				justifyContent === 'right' ||
+				justifyContent === 'center'
+			) {
+				setMatrixJustification( justifyContent );
+			}
+			setAttributes( {
+				layout: {
+					...layout,
+					justifyContent: newJustify,
+				},
+			} );
+		} else {
+			setAttributes( {
+				layout: {
+					...layout,
+					justifyContent: matrixJustification,
+				},
+			} );
+		}
+	};
 
 	const verticalAlignmentOptions = [
 		{
-			value: 'top',
-			icon: alignTop,
-			label: __( 'Top' ),
-		},
-		{
-			value: 'center',
-			icon: alignCenter,
-			label: __( 'Middle' ),
-		},
-		{
-			value: 'bottom',
-			icon: alignBottom,
-			label: __( 'Bottom' ),
+			key: 'fit',
+			value: 'fit',
+			name: __( 'Fit' ),
 		},
 	];
-
-	if ( orientation === 'horizontal' ) {
+	if ( orientation === 'vertical' ) {
 		verticalAlignmentOptions.push( {
-			value: 'stretch',
-			icon: alignStretch,
-			label: __( 'Stretch' ),
+			key: 'space-between',
+			value: 'space-between',
+			name: __( 'Space Between' ),
 		} );
 	} else {
 		verticalAlignmentOptions.push( {
-			value: 'space-between',
-			icon: spaceBetween,
-			label: __( 'Space Between' ),
+			key: 'stretch',
+			value: 'stretch',
+			name: __( 'Stretch' ),
 		} );
 	}
+
+	const itemsControlValue = () => {
+		if (
+			verticalAlignment === 'stretch' ||
+			verticalAlignment === 'space-between'
+		) {
+			return verticalAlignmentOptions.find(
+				( _value ) => _value?.key === verticalAlignment
+			);
+		}
+		return verticalAlignmentOptions.find(
+			( _value ) => _value?.key === 'fit'
+		);
+	};
+
+	const onChangeItems = ( { selectedItem } ) => {
+		const { key: newItems } = selectedItem;
+		if ( newItems === 'stretch' || newItems === 'space-between' ) {
+			if (
+				verticalAlignment === 'left' ||
+				verticalAlignment === 'right' ||
+				verticalAlignment === 'center'
+			) {
+				setMatrixAlignment( verticalAlignment );
+			}
+			setAttributes( {
+				layout: {
+					...layout,
+					verticalAlignment: newItems,
+				},
+			} );
+		} else {
+			setAttributes( {
+				layout: {
+					...layout,
+					verticalAlignment: matrixAlignment,
+				},
+			} );
+		}
+	};
 
 	const onChangeType = ( newType ) => {
 		if ( newType === 'stack' ) {
@@ -476,31 +540,53 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 						) }
 						<HStack spacing={ 2 } justify="stretch">
 							{ type === 'flex' && (
-								<FlexBlock>
-									<RangeControl
-										label={ __( 'Gap' ) }
-										onChange={ onChangeGap }
-										value={ style?.spacing?.blockGap }
-										min={ 0 }
-										max={ 100 }
-										withInputField={ true }
-									/>
-								</FlexBlock>
-							) }
-							{ type === 'flex' && (
-								<FlexBlock>
-									{
-										<AlignmentMatrixControl
-											label={ __(
-												'Change content position'
-											) }
-											value={ 'top' }
-											onChange={ onChangeMatrix }
+								<>
+									<FlexBlock>
+										{
+											<AlignmentMatrixControl
+												label={ __(
+													'Change content position'
+												) }
+												value={ `${ matrixAlignment } ${ matrixJustification }` }
+												onChange={ onChangeMatrix }
+											/>
+										}
+									</FlexBlock>
+									<FlexBlock>
+										<CustomSelectControl
+											label={ __( 'Justify' ) }
+											value={ justifyControlValue() }
+											options={
+												horizontalAlignmentOptions
+											}
+											onChange={ onChangeJustify }
+											__nextUnconstrainedWidth
+											__next36pxDefaultSize
 										/>
-									}
-								</FlexBlock>
+										<CustomSelectControl
+											label={ __( 'Items' ) }
+											value={ itemsControlValue() }
+											options={ verticalAlignmentOptions }
+											onChange={ onChangeItems }
+											__nextUnconstrainedWidth
+											__next36pxDefaultSize
+										/>
+									</FlexBlock>
+								</>
 							) }
 						</HStack>
+						{ type === 'flex' && (
+							<FlexBlock>
+								<RangeControl
+									label={ __( 'Gap' ) }
+									onChange={ onChangeGap }
+									value={ style?.spacing?.blockGap }
+									min={ 0 }
+									max={ 100 }
+									withInputField={ true }
+								/>
+							</FlexBlock>
+						) }
 						{ type === 'flex' && orientation === 'horizontal' && (
 							<ToggleGroupControl
 								__nextHasNoMarginBottom
