@@ -1,10 +1,8 @@
-
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import {
-	__experimentalItemGroup as ItemGroup,
-} from '@wordpress/components';
+import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { media, video, image, audio, pages } from '@wordpress/icons';
 
 /**
@@ -13,8 +11,6 @@ import { media, video, image, audio, pages } from '@wordpress/icons';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
-
-const EMPTY_ARRAY = [];
 
 function MediaItem( { icon, type, isActive, children } ) {
 	const linkInfo = useLink( {
@@ -36,9 +32,7 @@ export default function SidebarNavigationScreenMedia() {
 	return (
 		<SidebarNavigationScreen
 			title={ __( 'Media' ) }
-			description={ __(
-				"Browse and manage your site's media."
-			) }
+			description={ __( "Browse and manage your site's media." ) }
 			actions={ null }
 			content={
 				<ItemGroup>
@@ -54,7 +48,7 @@ export default function SidebarNavigationScreenMedia() {
 					<MediaItem icon={ audio } type="audio">
 						{ __( 'Audio' ) }
 					</MediaItem>
-					<MediaItem icon={ pages } type="document">
+					<MediaItem icon={ pages } type="application">
 						{ __( 'Documents' ) }
 					</MediaItem>
 				</ItemGroup>

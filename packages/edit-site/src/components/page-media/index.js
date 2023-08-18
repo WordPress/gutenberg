@@ -7,18 +7,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { getQueryArgs } from '@wordpress/url';
 import {
 	Button,
-	SearchControl,
 	__experimentalVStack as VStack,
 	DropdownMenu,
-	Flex,
-	FlexItem,
-	FlexBlock,
-	MenuGroup, MenuItem,
-	__experimentalInputControl as InputControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 
@@ -31,26 +24,52 @@ import Pagination from '../page-patterns/pagination';
 
 const EMPTY_ARRAY = [];
 
-// Getting headings, etc based on `mediaType` query type.
-function getMediaDetails() {}
+// Getting headings, etc. based on `mediaType` query type.
+function getMediaDetails( mediaType ) {
+	if ( 'document' === mediaType ) {
+		return {
+			heading: __( 'Documents' ),
+		};
+	}
+
+	if ( 'audio' === mediaType ) {
+		return {
+			heading: __( 'Audio' ),
+		};
+	}
+
+	if ( 'video' === mediaType ) {
+		return {
+			heading: __( 'Videos' ),
+		};
+	}
+
+	return {
+		heading: __( 'Images' ),
+	};
+}
 
 export default function PageMedia() {
 	const { mediaType } = getQueryArgs( window.location.href );
 	const { attachments } = useSelect(
 		( select ) => {
-			const _attachments = select( coreStore ).getEntityRecords(
-				'postType',
-				'attachment',
-				{
-					per_page: 50,
-					mime_type: mediaType,
-				}
-			);
+			const _attachments = select( coreStore ).getMediaItems( {
+				per_page: 50,
+				orderby: 'date',
+				order: 'desc',
+				// @todo `application` and `text` are valid media types,
+				// but we should maybe combine them into `documents`.
+				media_type: mediaType,
+			} );
 			return {
 				attachments: _attachments || EMPTY_ARRAY,
 			};
-		}, [] );
-console.log( '_attachments', _attachments );
+		},
+		[ mediaType ]
+	);
+
+	const { heading } = getMediaDetails( mediaType );
+
 	return (
 		<Page
 			className="edit-site-media"
@@ -59,17 +78,27 @@ console.log( '_attachments', _attachments );
 		>
 			<VStack spacing={ 3 }>
 				<HStack justify="space-between">
-					<Heading level={ 2 }>{ __( 'Images' ) }</Heading>
+					<Heading level={ 2 }>{ heading }</Heading>
 					<Button>Upload</Button>
 				</HStack>
 				<HStack justify="flex-start">
 					<DropdownMenu></DropdownMenu>
-					<ToggleGroupControl label="my label" value="vertical" isBlock>
-						<ToggleGroupControlOption value="horizontal" label="Horizontal" />
-						<ToggleGroupControlOption value="vertical" label="Vertical" />
+					<ToggleGroupControl
+						label="my label"
+						value="vertical"
+						isBlock
+					>
+						<ToggleGroupControlOption
+							value="horizontal"
+							label="Horizontal"
+						/>
+						<ToggleGroupControlOption
+							value="vertical"
+							label="Vertical"
+						/>
 					</ToggleGroupControl>
 
-					{/*<TableView /> or <GridView />*/}
+					{ /*<TableView /> or <GridView />*/ }
 				</HStack>
 				<HStack justify="flex-end">
 					<Pagination />
