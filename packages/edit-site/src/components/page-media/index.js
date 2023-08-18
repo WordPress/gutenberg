@@ -5,6 +5,7 @@ import {
 	useReactTable,
 	createColumnHelper,
 	getCoreRowModel,
+	getFilteredRowModel,
 } from '@tanstack/react-table';
 /**
  * WordPress dependencies
@@ -80,6 +81,7 @@ const columns = [
 		),
 	} ),
 	columnHelper.accessor( 'attachment_tags', {
+		id: 'tags',
 		header: () => __( 'Tags' ),
 		cell: ( info ) => (
 			<HStack>
@@ -97,6 +99,7 @@ const columns = [
 				) ) }
 			</HStack>
 		),
+		filterFn: 'arrIncludesAll',
 	} ),
 	columnHelper.accessor( 'post', {
 		header: () => __( 'Attached to' ),
@@ -200,6 +203,7 @@ export default function PageMedia() {
 		data: attachments,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
 		meta: {
 			tags,
 			dateFormatter,
@@ -207,12 +211,21 @@ export default function PageMedia() {
 		enableMultiRowSelection: true,
 		enableSorting: true,
 		enableHiding: true,
+		enableFilters: true,
 	} );
+	window.table = table;
 
-	const [ tagsFilter, setTagsFilter ] = useState( [] );
 	const [ authorFilter, setAuthorFilter ] = useState( [] );
 	const [ sortBy, setSortBy ] = useState( [ 'name' ] );
 	const [ currentView, setCurrentView ] = useState( 'table' );
+	const tagOptions = useMemo(
+		() =>
+			tags.map( ( tag ) => ( {
+				label: tag.name,
+				value: tag.id,
+			} ) ),
+		[ tags ]
+	);
 
 	return (
 		<Page
@@ -240,25 +253,14 @@ export default function PageMedia() {
 							/>
 							<FilterControl
 								label={ __( 'Tags' ) }
-								value={ tagsFilter }
-								options={ [
-									{
-										label: __( 'Abstract' ),
-										value: 'abstract',
-									},
-									{ label: __( 'New' ), value: 'new' },
-									{
-										label: __( 'Featured' ),
-										value: 'featured',
-									},
-									{ label: __( 'Nature' ), value: 'nature' },
-									{
-										label: __( 'Architecture' ),
-										value: 'architecture',
-									},
-								] }
+								value={ table
+									.getColumn( 'tags' )
+									.getFilterValue() }
+								options={ tagOptions }
 								multiple
-								onChange={ setTagsFilter }
+								onChange={
+									table.getColumn( 'tags' ).setFilterValue
+								}
 							/>
 							<FilterControl
 								label={ __( 'Author' ) }
