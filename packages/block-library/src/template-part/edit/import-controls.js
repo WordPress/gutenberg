@@ -147,7 +147,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 						options={ options }
 						onChange={ ( value ) => setSelectedSidebar( value ) }
 						disabled={ ! options.length }
-						__next36pxDefaultSize
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					/>
 				</FlexBlock>

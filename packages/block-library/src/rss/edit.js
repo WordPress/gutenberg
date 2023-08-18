@@ -69,7 +69,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					>
 						<HStack wrap>
 							<InputControl
-								__next36pxDefaultSize
+								__next40pxDefaultSize
 								placeholder={ __( 'Enter URL here…' ) }
 								value={ feedURL }
 								onChange={ ( value ) =>
