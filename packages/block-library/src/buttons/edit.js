@@ -43,19 +43,19 @@ function ButtonsEdit( { attributes, className } ) {
 			'has-custom-font-size': fontSize || style?.typography?.fontSize,
 		} ),
 	} );
-	const preferredStyle = useSelect( ( select ) => {
+	const { preferredStyle, hasButtonVariations } = useSelect( ( select ) => {
 		const preferredStyleVariations =
 			select( blockEditorStore ).getSettings()
 				.__experimentalPreferredStyleVariations;
-		return preferredStyleVariations?.value?.[ buttonBlockName ];
-	}, [] );
-
-	const hasButtonVariations = useSelect( ( select ) => {
 		const buttonVariations = select( blocksStore ).getBlockVariations(
 			buttonBlockName,
 			'inserter'
 		);
-		return buttonVariations.length > 0;
+		return {
+			preferredStyle:
+				preferredStyleVariations?.value?.[ buttonBlockName ],
+			hasButtonVariations: buttonVariations.length > 0,
+		};
 	}, [] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
