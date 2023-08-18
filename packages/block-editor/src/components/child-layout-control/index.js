@@ -73,7 +73,7 @@ export default function ChildLayoutControl( {
 		parentLayoutTypeToUse === 'flex' &&
 		orientation === 'vertical'
 	) {
-		widthOptions.pop().push( {
+		widthOptions.push( {
 			key: 'fit',
 			value: 'fit',
 			name: __( 'Fit' ),
@@ -209,7 +209,18 @@ export default function ChildLayoutControl( {
 		}
 	};
 
-	const onChangeHeight = () => {};
+	const onChangeHeight = ( newHeight ) => {
+		if ( parentLayoutTypeToUse === 'flex' && orientation === 'vertical' ) {
+			onChange( {
+				style: {
+					...value,
+					layout: {
+						selfStretch: newHeight.selectedItem.key,
+					},
+				},
+			} );
+		}
+	};
 
 	return (
 		<>
@@ -234,8 +245,13 @@ export default function ChildLayoutControl( {
 						size={ '__unstable-large' }
 						onChange={ ( _value ) => {
 							onChange( {
-								...childLayout,
-								flexSize: _value,
+								style: {
+									...value,
+									layout: {
+										...childLayout,
+										flexSize: _value,
+									},
+								},
 							} );
 						} }
 						value={ flexSize }
@@ -262,8 +278,13 @@ export default function ChildLayoutControl( {
 						size={ '__unstable-large' }
 						onChange={ ( _value ) => {
 							onChange( {
-								...childLayout,
-								flexSize: _value,
+								style: {
+									...value,
+									layout: {
+										...childLayout,
+										flexSize: _value,
+									},
+								},
 							} );
 						} }
 						value={ flexSize }
