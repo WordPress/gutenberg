@@ -864,8 +864,7 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { attributes } = props;
 		const { style: { layout = {} } = {} } = attributes;
-		const { selfStretch, flexSize } = layout;
-		// const hasChildLayout = selfStretch || flexSize;
+		const { selfStretch, flexSize, selfAlign } = layout;
 		const disableLayoutStyles = useSelect( ( select ) => {
 			const { getSettings } = select( blockEditorStore );
 			return !! getSettings().disableLayoutStyles;
@@ -885,6 +884,14 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 		} else if ( selfStretch === 'fill' ) {
 			css += `${ selector } {
 				flex-grow: 1;
+			}`;
+		} else if ( selfAlign === 'fill' ) {
+			css += `${ selector } {
+				align-self: stretch;
+			}`;
+		} else if ( selfAlign === 'fit' ) {
+			css += `${ selector } {
+				width: fit-content;
 			}`;
 		}
 

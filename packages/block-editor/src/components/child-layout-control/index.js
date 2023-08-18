@@ -31,13 +31,14 @@ export default function ChildLayoutControl( {
 		orientation = 'horizontal',
 		type: parentLayoutType,
 		default: { type: defaultParentLayoutType = 'default' } = {},
+		justifyContent = 'left',
 	} = parentLayout ?? {};
 
 	const parentLayoutTypeToUse = parentLayoutType ?? defaultParentLayoutType;
 
 	const { layout: childLayout = {} } = value;
 
-	const { selfStretch, flexSize } = childLayout;
+	const { selfStretch, selfAlign, flexSize } = childLayout;
 
 	useEffect( () => {
 		if ( selfStretch === 'fixed' && ! flexSize ) {
@@ -128,34 +129,29 @@ export default function ChildLayoutControl( {
 		} );
 	}
 
-	const selectedWidth = (
-		_selfStretch,
-		_align,
-		_parentLayoutTypeToUse,
-		_orientation
-	) => {
+	const selectedWidth = () => {
 		let selectedValue;
-		if ( _parentLayoutTypeToUse === 'constrained' ) {
+		if ( parentLayoutTypeToUse === 'constrained' ) {
 			// Replace "full" with "fill" for full width alignments.
-			const alignmentValue = _align === 'full' ? 'fill' : _align;
+			const alignmentValue = align === 'full' ? 'fill' : align;
 			selectedValue = alignmentValue || 'content';
 		} else if (
-			_parentLayoutTypeToUse === 'flex' &&
-			_orientation === 'vertical'
+			parentLayoutTypeToUse === 'flex' &&
+			orientation === 'vertical'
 		) {
-			selectedValue = 'fit';
+			const defaultSelfAlign =
+				justifyContent === 'stretch' ? 'fill' : 'fit';
+			selectedValue = selfAlign || defaultSelfAlign;
 		} else if (
-			_parentLayoutTypeToUse === 'flex' &&
-			_orientation === 'horizontal'
+			parentLayoutTypeToUse === 'flex' &&
+			orientation === 'horizontal'
 		) {
-			selectedValue = _selfStretch || 'fit';
+			selectedValue = selfStretch || 'fit';
 		} else {
 			selectedValue = 'fill';
 		}
 
-		return widthOptions.find(
-			( { _value } ) => _value?.key === selectedValue
-		);
+		return widthOptions.find( ( _value ) => _value?.key === selectedValue );
 	};
 
 	const selectedHeight = (
@@ -173,7 +169,7 @@ export default function ChildLayoutControl( {
 			selectedValue = 'fit';
 		}
 		return heightOptions.find(
-			( { _value } ) => _value?.key === selectedValue
+			( _value ) => _value?.key === selectedValue
 		);
 	};
 
@@ -206,6 +202,18 @@ export default function ChildLayoutControl( {
 					},
 				},
 			} );
+		} else if (
+			parentLayoutTypeToUse === 'flex' &&
+			orientation === 'vertical'
+		) {
+			onChange( {
+				style: {
+					...value,
+					layout: {
+						selfAlign: key,
+					},
+				},
+			} );
 		}
 	};
 
@@ -228,12 +236,7 @@ export default function ChildLayoutControl( {
 				<FlexBlock>
 					<CustomSelectControl
 						label={ __( 'Width' ) }
-						value={ selectedWidth(
-							selfStretch,
-							align,
-							parentLayoutTypeToUse,
-							orientation
-						) }
+						value={ selectedWidth() }
 						options={ widthOptions }
 						onChange={ onChangeWidth }
 						__nextUnconstrainedWidth
