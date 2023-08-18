@@ -228,9 +228,10 @@ export default function PageMedia() {
 					<VStack>
 						<HStack justify="flex-start">
 							<SearchControl
+								style={ { height: 40 } }
 								onChange={ () => {} }
 								placeholder={ __( 'Search' ) }
-								size="__unstable-large"
+								__nextHasNoMarginBottom
 							/>
 							<FilterControl
 								label={ __( 'Tags' ) }
