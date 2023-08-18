@@ -39,6 +39,7 @@ import Grid from './grid';
 // @todo abstract for common usage.
 import Pagination from '../page-patterns/pagination';
 import FilterControl from './filter-control';
+import { useLink } from '../routes/link';
 
 /**
  * @typedef {Object} Attachment
@@ -47,6 +48,21 @@ import FilterControl from './filter-control';
 
 /** @type {import('@tanstack/react-table').ColumnHelper<Attachment>} */
 const columnHelper = createColumnHelper();
+
+function GridItemButton( { item } ) {
+	const linkProps = useLink( {
+		postType: item.type,
+		postId: item.id,
+	} );
+	return (
+		<Button { ...linkProps }>
+			<HStack justify="flex-start">
+				{ getMediaThumbnail( item ) }
+				<h4>{ item.title.rendered }</h4>
+			</HStack>
+		</Button>
+	);
+}
 
 const columns = [
 	columnHelper.display( {
@@ -73,12 +89,7 @@ const columns = [
 	columnHelper.accessor( ( row ) => row.title.rendered, {
 		id: 'title',
 		header: () => __( 'Title' ),
-		cell: ( info ) => (
-			<HStack justify="flex-start">
-				{ getMediaThumbnail( info.row.original ) }
-				<h4>{ info.getValue() }</h4>
-			</HStack>
-		),
+		cell: ( info ) => <GridItemButton item={ info.row.original } />,
 	} ),
 	columnHelper.accessor( 'attachment_tags', {
 		id: 'tags',
