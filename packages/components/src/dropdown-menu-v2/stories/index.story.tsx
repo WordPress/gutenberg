@@ -46,7 +46,10 @@ const meta: Meta< typeof DropdownMenu > = {
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open', excludeDecorators: true } },
+		docs: {
+			canvas: { sourceState: 'shown' },
+			source: { excludeDecorators: true },
+		},
 	},
 	decorators: [
 		// Layout wrapper
