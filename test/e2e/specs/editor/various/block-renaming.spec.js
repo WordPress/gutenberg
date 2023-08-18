@@ -47,7 +47,7 @@ test.describe( 'Block Renaming', () => {
 			type: 'submit',
 		} );
 
-		await expect( saveButton ).toHaveAttribute( 'aria-disabled', 'true' );
+		await expect( saveButton ).toBeDisabled();
 
 		const nameInput = renameModal.getByLabel( 'Block name' );
 
@@ -55,7 +55,7 @@ test.describe( 'Block Renaming', () => {
 
 		await nameInput.fill( 'My new name' );
 
-		await expect( saveButton ).toHaveAttribute( 'aria-disabled', 'false' );
+		await expect( saveButton ).toBeEnabled();
 
 		await saveButton.click();
 
@@ -106,7 +106,7 @@ test.describe( 'Block Renaming', () => {
 			type: 'submit',
 		} );
 
-		await expect( saveButton ).toHaveAttribute( 'aria-disabled', 'true' );
+		await expect( saveButton ).toBeDisabled();
 
 		const nameInput = renameModal.getByLabel( 'Block name' );
 
@@ -123,7 +123,7 @@ test.describe( 'Block Renaming', () => {
 		// Expect value to automatically revert to original block name.
 		await expect( nameInput ).toHaveValue( 'Group' );
 
-		await expect( saveButton ).toHaveAttribute( 'aria-disabled', 'false' );
+		await expect( saveButton ).toBeEnabled();
 
 		await saveButton.click();
 
