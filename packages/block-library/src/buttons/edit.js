@@ -61,6 +61,7 @@ function ButtonsEdit( { attributes, className } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		defaultBlock: DEFAULT_BLOCK,
+		// This check should be handled by the `Inserter` internally to be consistent across all blocks that use it.
 		directInsert: ! hasButtonVariations,
 		template: [
 			[
