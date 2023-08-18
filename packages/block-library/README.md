@@ -132,7 +132,7 @@ The directory name is converted to lowercase, and any characters except for lett
 
 #### Example:
 
-For the PHP functions in the `packages/block-library/src/my-block/index.php` file, the correct prefixes would be:
+For the PHP functions declared in the `packages/block-library/src/my-block/index.php` file, the correct prefixes would be:
 
 -   `block_core_my_block`
 -   `render_block_core_my_block`
