@@ -237,13 +237,13 @@ function ListViewComponent(
 		BLOCK_LIST_ITEM_HEIGHT,
 		visibleBlockCount,
 		{
-			useWindowing: true,
 			// Ensure that the windowing logic is recalculated when the expanded state changes.
 			// This is necessary because expanding a collapsed block in a short list view can
 			// switch the list view to a tall list view with a scrollbar, and vice versa.
 			// When this happens, the windowing logic needs to be recalculated to ensure that
 			// the correct number of blocks are rendered, by rechecking for a scroll container.
-			watch: expandedState,
+			expandedState,
+			useWindowing: true,
 			windowOverscan: 40,
 		}
 	);
