@@ -32,6 +32,7 @@ export default function FilterControl( {
 					iconPosition="right"
 					isPressed={ isOpen }
 					onClick={ onToggle }
+					__next40pxDefaultSize
 				/>
 			) }
 			renderContent={ () => (
