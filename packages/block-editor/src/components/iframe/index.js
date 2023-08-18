@@ -10,8 +10,6 @@ import {
 	useState,
 	createPortal,
 	forwardRef,
-	useMemo,
-	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -30,6 +28,35 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { useCompatibilityStyles } from './use-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
+
+/**
+ * Normally, all iframes on the page use the exact same initial HTML, so we can
+ * cache creating the object URL once for all iframes (think patterns and
+ * previews). If the initial HTML changes, it will change for all iframes (which
+ * would also reload the iframe).
+ *
+ * The hope is that this this reduces memory usage and maybe also taps into some
+ * browser caching.
+ *
+ * @param {string} html The initial iframe HTML.
+ * @returns {string} The object URL for the iframe.
+ */
+function memoObjectURL( html ) {
+	if ( memoObjectURL.lastHTML === html ) {
+		return memoObjectURL.lastURL;
+	}
+
+	if ( memoObjectURL.lastURL ) {
+		URL.revokeObjectURL( memoObjectURL.lastURL );
+	}
+
+	const blob = new Blob( [ html ], { type: 'text/html' } );
+
+	memoObjectURL.lastHTML = html;
+	memoObjectURL.lastURL = URL.createObjectURL( blob );
+
+	return memoObjectURL.lastURL;
+}
 
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
@@ -191,7 +218,7 @@ function Iframe( {
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
-	const html = `<!doctype html>
+	const src = memoObjectURL( `<!doctype html>
 <html>
 	<head>
 		<script>window.frameElement._load()</script>
@@ -202,16 +229,7 @@ function Iframe( {
 	<body>
 		<script>document.currentScript.parentElement.remove()</script>
 	</body>
-</html>`;
-
-	const [ src, cleanup ] = useMemo( () => {
-		const _src = URL.createObjectURL(
-			new window.Blob( [ html ], { type: 'text/html' } )
-		);
-		return [ _src, () => URL.revokeObjectURL( _src ) ];
-	}, [ html ] );
-
-	useEffect( () => cleanup, [ cleanup ] );
+</html>` );
 
 	// We need to counter the margin created by scaling the iframe. If the scale
 	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
