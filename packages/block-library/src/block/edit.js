@@ -22,8 +22,22 @@ import {
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
 
-export default function ReusableBlockEdit( { attributes: { ref } } ) {
+export default function ReusableBlockEdit( {
+	attributes: { ref },
+	setAttributes,
+} ) {
+	const setDynamicContent = ( newDynamicContent ) => {
+		setAttributes( {
+			dynamicContent: newDynamicContent,
+		} );
+	};
+
+	useEffect( () => {
+		setAttributes( { setDynamicContent } );
+	}, [] );
+
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',

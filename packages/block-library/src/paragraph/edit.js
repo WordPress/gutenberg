@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -56,8 +57,13 @@ function ParagraphBlock( {
 	onRemove,
 	setAttributes,
 	clientId,
+	context: { dynamicContent, setDynamicContent },
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
+	const currentContent =
+		dynamicContent && dynamicContent[ attributes.metadata?.id ]
+			? dynamicContent[ attributes.metadata?.id ]
+			: content;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
@@ -76,7 +82,22 @@ function ParagraphBlock( {
 	} else {
 		helpText = __( 'Toggle to show a large initial letter.' );
 	}
+	const handleOnChange = ( newContent ) => {
+		if ( setDynamicContent ) {
+			const id = attributes.metadata?.id
+				? attributes.metadata?.id
+				: uuid();
+			if ( ! attributes.metadata?.id ) {
+				setAttributes( {
+					metadata: { ...attributes.metadata, id },
+				} );
+			}
+			setDynamicContent( { ...dynamicContent, [ id ]: newContent } );
+			return;
+		}
 
+		setAttributes( { content: newContent } );
+	};
 	return (
 		<>
 			<BlockControls group="block">
@@ -128,10 +149,8 @@ function ParagraphBlock( {
 				identifier="content"
 				tagName="p"
 				{ ...blockProps }
-				value={ content }
-				onChange={ ( newContent ) =>
-					setAttributes( { content: newContent } )
-				}
+				value={ currentContent }
+				onChange={ handleOnChange }
 				onSplit={ ( value, isOriginal ) => {
 					let newAttributes;
 
@@ -154,13 +173,13 @@ function ParagraphBlock( {
 				onReplace={ onReplace }
 				onRemove={ onRemove }
 				aria-label={
-					content
+					currentContent
 						? __( 'Paragraph block' )
 						: __(
 								'Empty block; start writing or type forward slash to choose a block'
 						  )
 				}
-				data-empty={ content ? false : true }
+				data-empty={ currentContent ? false : true }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
 				data-custom-placeholder={ placeholder ? true : undefined }
 				__unstableEmbedURLOnPaste

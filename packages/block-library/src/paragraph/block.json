@@ -7,7 +7,7 @@
 	"description": "Start with the basic building block of all narrative.",
 	"keywords": [ "text" ],
 	"textdomain": "default",
-	"usesContext": [ "postId" ],
+	"usesContext": [ "postId", "dynamicContent", "setDynamicContent" ],
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -32,6 +32,7 @@
 		}
 	},
 	"supports": {
+		"__experimentalMetadata": true,
 		"anchor": true,
 		"className": false,
 		"color": {
