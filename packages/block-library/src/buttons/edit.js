@@ -49,11 +49,12 @@ function ButtonsEdit( { attributes, className } ) {
 		const defaultButton = select( blocksStore ).getDefaultBlockVariation(
 			buttonBlockName
 		) || { attributes: {} };
+		const buttonClasses = classnames( defaultButton.attributes.className, {
+			[ `is-style-${ preferredStyle }` ]: !! preferredStyle,
+		} );
 		return {
 			...defaultButton.attributes,
-			className: classnames( defaultButton.attributes.className, {
-				[ `is-style-${ preferredStyle }` ]: !! preferredStyle,
-			} ),
+			className: buttonClasses === '' ? undefined : buttonClasses,
 		};
 	}, [] );
 
