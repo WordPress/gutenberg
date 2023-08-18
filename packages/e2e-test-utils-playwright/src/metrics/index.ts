@@ -140,6 +140,8 @@ export class Metrics {
 					screenEmulation: {
 						disabled: true,
 					},
+					// Speeds up the report.
+					disableFullPageScreenshot: true,
 					// Only run certain audits to speed things up.
 					onlyAudits: Object.keys( audits ),
 				},
