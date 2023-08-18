@@ -212,7 +212,7 @@ export default function PageMedia() {
 	const [ tagsFilter, setTagsFilter ] = useState( [] );
 	const [ authorFilter, setAuthorFilter ] = useState( [] );
 	const [ sortBy, setSortBy ] = useState( [ 'name' ] );
-	const [ currentView, setCurrentView ] = useState( 'grid' );
+	const [ currentView, setCurrentView ] = useState( 'table' );
 
 	return (
 		<Page
@@ -297,14 +297,14 @@ export default function PageMedia() {
 								onChange={ setCurrentView }
 							>
 								<ToggleGroupControlOptionIcon
-									value="grid"
-									label={ __( 'Grid' ) }
-									icon={ grid }
-								/>
-								<ToggleGroupControlOptionIcon
 									value="table"
 									label={ __( 'Table' ) }
 									icon={ list }
+								/>
+								<ToggleGroupControlOptionIcon
+									value="grid"
+									label={ __( 'Grid' ) }
+									icon={ grid }
 								/>
 							</ToggleGroupControl>
 						</HStack>
