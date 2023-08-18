@@ -12,6 +12,7 @@ import {
 	ToolbarButton,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	PanelBody,
 } from '@wordpress/components';
 import {
 	AlignmentControl,
@@ -145,6 +146,30 @@ function ParagraphBlock( {
 					</ToolsPanelItem>
 				</InspectorControls>
 			) }
+			{ dynamicContent && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Syncing' ) } initialOpen={ true }>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Sync' ) }
+							checked={
+								! dynamicContent[ attributes.metadata?.id ]
+							}
+							onChange={ () =>
+								setAttributes( {
+									metadata: {
+										...attributes.metadata,
+										id: undefined,
+									},
+								} )
+							}
+							help={ __(
+								'Toggle to sync original pattern content'
+							) }
+						/>
+					</PanelBody>
+				</InspectorControls>
+			) }
 			<RichText
 				identifier="content"
 				tagName="p"
@@ -157,6 +182,7 @@ function ParagraphBlock( {
 					if ( isOriginal || value ) {
 						newAttributes = {
 							...attributes,
+							metadata: { ...attributes.metadata, id: undefined },
 							content: value,
 						};
 					}
