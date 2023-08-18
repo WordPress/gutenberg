@@ -9,13 +9,15 @@ import {
 	Button,
 	SearchControl,
 	__experimentalVStack as VStack,
-	DropdownMenu,
 	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
+	SelectControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { grid, list } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -122,19 +124,34 @@ export default function PageMedia() {
 						] }
 						onChange={ setAuthorFilter }
 					/>
-					<DropdownMenu></DropdownMenu>
+					<Spacer />
+					<SelectControl
+						label={ __( 'Sort: Date' ) }
+						options={ [
+							{ label: 'Big', value: '100%' },
+							{ label: 'Medium', value: '50%' },
+							{ label: 'Small', value: '25%' },
+						] }
+						hideLabelFromVision
+						__nextHasNoMarginBottom
+						size="__unstable-large"
+					/>
 					<ToggleGroupControl
-						label="my label"
-						value="vertical"
-						isBlock
+						label={ __( 'Toggle view' ) }
+						hideLabelFromVision
+						value="table"
+						__nextHasNoMarginBottom
+						size="__unstable-large"
 					>
-						<ToggleGroupControlOption
-							value="horizontal"
-							label="Horizontal"
+						<ToggleGroupControlOptionIcon
+							value="grid"
+							label={ __( 'Grid' ) }
+							icon={ list }
 						/>
-						<ToggleGroupControlOption
-							value="vertical"
-							label="Vertical"
+						<ToggleGroupControlOptionIcon
+							value="table"
+							label={ __( 'Table' ) }
+							icon={ grid }
 						/>
 					</ToggleGroupControl>
 
