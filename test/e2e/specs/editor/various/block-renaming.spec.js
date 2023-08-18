@@ -32,6 +32,16 @@ test.describe( 'Block Renaming', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Rename' );
 
+		const renameMenuItem = page.getByRole( 'menuitem', {
+			name: 'Rename',
+			includeHidden: true, // the option is hidden behind modal but assertion is still valid.
+		} );
+
+		await expect( renameMenuItem ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
+
 		const renameModal = page.getByRole( 'dialog', {
 			name: 'Rename block',
 		} );
@@ -62,11 +72,12 @@ test.describe( 'Block Renaming', () => {
 		await expect( renameModal ).toBeHidden();
 
 		// Check that focus is transferred back to original "Rename" menu item.
-		await expect(
-			page.getByRole( 'menuitem', {
-				name: 'Rename',
-			} )
-		).toBeFocused();
+		await expect( renameMenuItem ).toBeFocused();
+
+		await expect( renameMenuItem ).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{

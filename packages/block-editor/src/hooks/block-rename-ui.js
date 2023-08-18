@@ -114,6 +114,8 @@ function BlockRenameControl( props ) {
 							onClick={ () => {
 								setRenamingBlock( true );
 							} }
+							aria-expanded={ renamingBlock }
+							aria-haspopup="dialog"
 						>
 							{ __( 'Rename' ) }
 						</MenuItem>
