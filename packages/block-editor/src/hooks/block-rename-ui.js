@@ -40,7 +40,6 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 		>
 			<p>{ __( 'Choose a custom name for this block.' ) }</p>
 			<form
-				className="sidebar-navigation__rename-modal-form"
 				onSubmit={ ( e ) => {
 					e.preventDefault();
 
