@@ -121,7 +121,7 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
 
 ### Naming convention for PHP functions
 
-All PHP function names within the subdirectories of the `packages/block-library/src/` directory should start with one of the following prefixes:
+All PHP function names declared within the subdirectories of the `packages/block-library/src/` directory should start with one of the following prefixes:
 
 -   `block_core_<directory_name>`
 -   `render_block_core_<directory_name>`
