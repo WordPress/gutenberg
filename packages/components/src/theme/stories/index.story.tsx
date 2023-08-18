@@ -20,7 +20,7 @@ const meta: ComponentMeta< typeof Theme > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
@@ -110,5 +110,5 @@ ColorScheme.argTypes = {
 	children: { table: { disable: true } },
 };
 ColorScheme.parameters = {
-	docs: { source: { state: 'closed' } },
+	docs: { canvas: { sourceState: 'hidden' } },
 };

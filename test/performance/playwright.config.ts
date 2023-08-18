@@ -15,12 +15,13 @@ process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
 const config = defineConfig( {
 	...baseConfig.default,
 	reporter: process.env.CI
-		? undefined // We're using another reporter in CI.
+		? './config/performance-reporter.ts'
 		: [ [ 'list' ], [ './config/performance-reporter.ts' ] ],
 	forbidOnly: !! process.env.CI,
 	fullyParallel: false,
 	retries: 0,
 	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 600_000, // Defaults to 10 minutes.
+	reportSlowTests: null,
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
