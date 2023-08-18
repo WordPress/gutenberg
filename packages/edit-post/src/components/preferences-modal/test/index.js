@@ -32,7 +32,7 @@ describe( 'EditPostPreferencesModal', () => {
 				screen.getByRole( 'dialog', { name: 'Preferences' } )
 			).toMatchSnapshot();
 		} );
-		it( 'small viewports', async () => {
+		it( 'small viewports', () => {
 			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => false );
 			render( <EditPostPreferencesModal /> );
