@@ -41,11 +41,11 @@ class WP_Font_Collection {
 	public function __construct( $id, $config ) {
 
 		if ( empty( $id ) ) {
-			throw new Exception( 'Font Collection data is missing the id.' );
+			throw new Exception( 'Font Collection is missing the id.' );
 		}
 
 		if ( empty( $config ) ) {
-			throw new Exception( 'Font Collection data is missing the config.' );
+			throw new Exception( 'Font Collection is missing the config.' );
 		}
 
 		$config['id'] = $id;
