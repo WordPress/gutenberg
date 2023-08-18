@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { media, video, image, audio, pages } from '@wordpress/icons';
+import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -29,6 +30,7 @@ function MediaItem( { icon, type, isActive, children } ) {
 }
 
 export default function SidebarNavigationScreenMedia() {
+	const { mediaType } = getQueryArgs( window.location.href );
 	return (
 		<SidebarNavigationScreen
 			title={ __( 'Media' ) }
@@ -36,19 +38,39 @@ export default function SidebarNavigationScreenMedia() {
 			actions={ null }
 			content={
 				<ItemGroup>
-					<MediaItem icon={ media } type="all">
+					<MediaItem
+						icon={ media }
+						type="all"
+						isActive={ mediaType === 'all' }
+					>
 						{ __( 'All media' ) }
 					</MediaItem>
-					<MediaItem icon={ image } type="image">
+					<MediaItem
+						icon={ image }
+						type="image"
+						isActive={ mediaType === 'image' }
+					>
 						{ __( 'Images' ) }
 					</MediaItem>
-					<MediaItem icon={ video } type="video">
+					<MediaItem
+						icon={ video }
+						type="video"
+						isActive={ mediaType === 'video' }
+					>
 						{ __( 'Videos' ) }
 					</MediaItem>
-					<MediaItem icon={ audio } type="audio">
+					<MediaItem
+						icon={ audio }
+						type="audio"
+						isActive={ mediaType === 'audio' }
+					>
 						{ __( 'Audio' ) }
 					</MediaItem>
-					<MediaItem icon={ pages } type="application">
+					<MediaItem
+						icon={ pages }
+						type="application"
+						isActive={ mediaType === 'application' }
+					>
 						{ __( 'Documents' ) }
 					</MediaItem>
 				</ItemGroup>
