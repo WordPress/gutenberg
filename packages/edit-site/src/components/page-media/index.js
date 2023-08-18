@@ -297,12 +297,12 @@ export default function PageMedia() {
 								<ToggleGroupControlOptionIcon
 									value="grid"
 									label={ __( 'Grid' ) }
-									icon={ list }
+									icon={ grid }
 								/>
 								<ToggleGroupControlOptionIcon
 									value="table"
 									label={ __( 'Table' ) }
-									icon={ grid }
+									icon={ list }
 								/>
 							</ToggleGroupControl>
 						</HStack>
