@@ -115,6 +115,7 @@ Settings related to layout.
 | ---       | ---    | ---    |---   |
 | contentSize | string |  |  |
 | wideSize | string |  |  |
+| allowEditing | boolean | true |  |
 
 ---
 

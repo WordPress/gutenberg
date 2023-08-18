@@ -5,7 +5,7 @@ import { otherBlocks } from '../src/initial-html';
 
 describe( 'Gutenberg Editor Rendering Other Blocks test', () => {
 	it( 'should be able to render blocks correctly', async () => {
-		await editorPage.setHtmlContent( otherBlocks );
+		await editorPage.initializeEditor( { initialData: otherBlocks } );
 
 		// Scroll to the last element.
 		const addBlockPlaceholder =

@@ -28,7 +28,9 @@ const createTemplatePartId = ( theme, slug ) =>
 	theme && slug ? theme + '//' + slug : null;
 
 const templatePartToPattern = ( templatePart ) => ( {
-	blocks: parse( templatePart.content.raw ),
+	blocks: parse( templatePart.content.raw, {
+		__unstableSkipMigrationLogs: true,
+	} ),
 	categories: [ templatePart.area ],
 	description: templatePart.description || '',
 	isCustom: templatePart.source === 'custom',
@@ -107,7 +109,9 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 			...pattern,
 			keywords: pattern.keywords || [],
 			type: 'pattern',
-			blocks: parse( pattern.content ),
+			blocks: parse( pattern.content, {
+				__unstableSkipMigrationLogs: true,
+			} ),
 		} ) );
 
 	if ( categoryId ) {
@@ -126,7 +130,9 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 };
 
 const reusableBlockToPattern = ( reusableBlock ) => ( {
-	blocks: parse( reusableBlock.content.raw ),
+	blocks: parse( reusableBlock.content.raw, {
+		__unstableSkipMigrationLogs: true,
+	} ),
 	categories: reusableBlock.wp_pattern,
 	id: reusableBlock.id,
 	name: reusableBlock.slug,

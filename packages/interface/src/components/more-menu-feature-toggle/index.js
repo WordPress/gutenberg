@@ -24,7 +24,7 @@ export default function MoreMenuFeatureToggle( {
 	const isActive = useSelect(
 		( select ) =>
 			select( interfaceStore ).isFeatureActive( scope, feature ),
-		[ feature ]
+		[ feature, scope ]
 	);
 	const { toggleFeature } = useDispatch( interfaceStore );
 	const speakMessage = () => {

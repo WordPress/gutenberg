@@ -58,7 +58,7 @@ export const CircleIndicatorWrapper = styled.div`
 `;
 
 export const CircleIndicator = styled.div`
-	background: ${ COLORS.ui.theme };
+	background: ${ COLORS.theme.accent };
 	border-radius: 50%;
 	box-sizing: border-box;
 	display: block;
@@ -71,6 +71,6 @@ export const CircleIndicator = styled.div`
 `;
 
 export const UnitText = styled( Text )`
-	color: ${ COLORS.ui.theme };
+	color: ${ COLORS.theme.accent };
 	margin-right: ${ space( 3 ) };
 `;

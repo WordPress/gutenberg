@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"__experimental": "fse",
 	"name": "core/post-comment",
-	"title": "Post Comment (deprecated)",
+	"title": "Comment (deprecated)",
 	"category": "theme",
 	"description": "This block is deprecated. Please use the Comments block instead.",
 	"textdomain": "default",

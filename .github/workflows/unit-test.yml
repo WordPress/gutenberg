@@ -28,7 +28,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['14']
+                node: ['16']
 
         steps:
             - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
