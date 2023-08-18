@@ -35,7 +35,11 @@ function gutenberg_init_font_library_routes() {
 
 add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );
 
-
+/**
+ * Registers the font collection filter for font library.
+ *
+ * @since 6.4.0
+ */
 function gutenberg_init_font_library() {
 	WP_Font_Library::register_filters();
 }

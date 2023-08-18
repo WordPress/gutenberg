@@ -29,6 +29,15 @@ class WP_Font_Collection {
 	 */
 	private $config;
 
+	/**
+	 * WP_Font_Collection constructor.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param string $id Font collection id.
+	 * @param array  $config Font collection config options.
+	 * @throws Exception If some of the required parameters are missing.
+	 */
 	public function __construct( $id, $config ) {
 
 		if ( empty( $id ) ) {
