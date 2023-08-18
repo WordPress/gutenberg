@@ -59,7 +59,7 @@ test.describe( 'Block Renaming', () => {
 
 		await saveButton.click();
 
-		await expect( renameModal ).not.toBeVisible();
+		await expect( renameModal ).toBeHidden();
 
 		// Check that focus is transferred back to original "Rename" menu item.
 		await expect(
