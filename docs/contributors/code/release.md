@@ -153,14 +153,15 @@ If you're worried that people won't be able to access the release candidate vers
 
 Here are some additional tips for preparing clear and concise changelogs:
 
-* Move all entries under the `Various` section to a more appropriate section.
-* Fix spelling errors or clarify wording. Phrasing should be easy to understand where the intended audience is those who use the plugin or are keeping up with ongoing development.
-* Create new groupings as applicable, and move pull requests between.
-* When multiple PRs relate to the same task (such as a follow-up pull request), try to combine them into a single entry. Good examples for this are PRs around removing Lodash for performance purposes, replacement of Puppeteer E2D tests with Playwright or efforts to convert public components to TypeScript.
-* If subtasks of a related set of PRs are substantial, consider organizing as entries in a nested list.
-* Remove PRs that revert other PRs in the same release if the net change in code is zero.
-* Remove all PRs that only update the mobile app. The only exception to this rule is if the mobile app pull request also updates functionality for the web.
-* If a subheader only has one PR listed, remove the subheader and move the PR to the next matching subheader with more than one item listed.
+-   Move all entries under the `Various` section to a more appropriate section.
+-   Fix spelling errors or clarify wording. Phrasing should be easy to understand where the intended audience is those who use the plugin or are keeping up with ongoing development.
+-   Create new groupings as applicable, and move pull requests between.
+-   When multiple PRs relate to the same task (such as a follow-up pull request), try to combine them into a single entry. Good examples for this are PRs around removing Lodash for performance purposes, replacement of Puppeteer E2D tests with Playwright or efforts to convert public components to TypeScript.
+-   If subtasks of a related set of PRs are substantial, consider organizing as entries in a nested list.
+-   Remove PRs that revert other PRs in the same release if the net change in code is zero.
+-   Remove all PRs that only update the mobile app. The only exception to this rule is if the mobile app pull request also updates functionality for the web.
+-   If a subheader only has one PR listed, remove the subheader and move the PR to the next matching subheader with more than one item listed.
+
 #### Creating release candidate patches (cherry-picking)
 
 <div class="callout callout-info">
@@ -200,11 +201,11 @@ npm run other:cherry-pick "Backport to Gutenberg RC"
 
 Behind the scenes, the script will:
 
-* Cherry-pick all PRs with the label `Backport to Gutenberg RC`
-* Add them to the release milestone
-* `git push` all changes to the release branch
-* Add a comment to the PR indicating it’s been cherry-picked
-* Remove the label `Backport to Gutenberg RC` from the PR
+-   Cherry-pick all PRs with the label `Backport to Gutenberg RC`
+-   Add them to the release milestone
+-   `git push` all changes to the release branch
+-   Add a comment to the PR indicating it’s been cherry-picked
+-   Remove the label `Backport to Gutenberg RC` from the PR
 
 Here is a screenshot of the process:
 
