@@ -232,7 +232,7 @@ export function HierarchicalTermSelector( { slug } ) {
 	const addTerm = ( term ) => {
 		return saveEntityRecord( 'taxonomy', slug, term, {
 			throwOnError: true,
-		  } );
+		} );
 	};
 
 	/**

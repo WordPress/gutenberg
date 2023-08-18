@@ -206,17 +206,18 @@ export function FlatTermSelector( { slug } ) {
 			newTermNames.map( ( termName ) =>
 				findOrCreateTerm( { name: termName } )
 			)
-		).then( ( newTerms ) => {
-			const newAvailableTerms = availableTerms.concat( newTerms );
-			return onUpdateTerms(
-				termNamesToIds( uniqueTerms, newAvailableTerms )
-			);
-		} ).catch( ( error ) => {
-			createErrorNotice( error.message, {
-			  type: 'snackbar',
+		)
+			.then( ( newTerms ) => {
+				const newAvailableTerms = availableTerms.concat( newTerms );
+				return onUpdateTerms(
+					termNamesToIds( uniqueTerms, newAvailableTerms )
+				);
+			} )
+			.catch( ( error ) => {
+				createErrorNotice( error.message, {
+					type: 'snackbar',
+				} );
 			} );
-			return;
-		} );
 	}
 
 	function appendTerm( newTerm ) {
