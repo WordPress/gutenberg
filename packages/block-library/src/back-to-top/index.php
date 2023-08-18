@@ -15,7 +15,7 @@ function render_block_core_back_to_top( $attributes ) {
 	$link_text          = isset( $attributes['text'] ) ? $attributes['text'] : __( 'Back to top' );
 	$wrapper_attributes = get_block_wrapper_attributes();
 
-	enqueue_block_core_back_to_top_classic_fallback();
+	block_core_back_to_top_classic_fallback();
 
 	return sprintf(
 		'<p %1$s><a href="#wp-back-to-top">%2$s</a></p>',
@@ -64,7 +64,7 @@ if ( wp_is_block_theme() ) {
  * Enqueue the fallback view.js file if the classic theme does not
  * use `wp_body_open()`.
  */
-function enqueue_block_core_back_to_top_classic_fallback() {
+function block_core_back_to_top_classic_fallback() {
 	if ( ! wp_is_block_theme() && 0 === did_action( 'wp_body_open' ) ) {
 		// If the Gutenberg plugin is active, use the script from the plugin.
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
