@@ -19,9 +19,10 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
+	Icon,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { grid, list } from '@wordpress/icons';
+import { grid, list, video, audio, page } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -49,7 +50,6 @@ const dateFormatter = new Intl.DateTimeFormat(
 		day: 'numeric',
 	}
 );
-
 const columns = [
 	columnHelper.display( {
 		id: 'select',
@@ -77,16 +77,7 @@ const columns = [
 		header: () => __( 'Title' ),
 		cell: ( info ) => (
 			<HStack justify="flex-start">
-				<img
-					height={ 100 }
-					width={ 100 }
-					style={ { borderRadius: '8px', flexShrink: 0 } }
-					src={
-						info.row.original.media_details.sizes.thumbnail
-							.source_url
-					}
-					alt={ info.row.original.alt_text }
-				/>
+				{ getMediaThumbnail( info.row.original ) }
 				<h4>{ info.getValue() }</h4>
 			</HStack>
 		),
@@ -134,29 +125,38 @@ const columns = [
 
 const EMPTY_ARRAY = [];
 
+const headingText = {
+	media: __( 'Media' ),
+	document: __( 'Documents' ),
+	audio: __( 'Audio' ),
+	video: __( 'Videos' ),
+	image: __( 'Images' ),
+};
+
 // Getting headings, etc. based on `mediaType` query type.
-function getMediaDetails( mediaType ) {
-	if ( 'document' === mediaType ) {
-		return {
-			heading: __( 'Documents' ),
-		};
+function getMediaThumbnail( attachment ) {
+	if ( 'image' === attachment?.media_type ) {
+		return (
+			<img
+				height={ 100 }
+				width={ 100 }
+				style={ { borderRadius: '8px', flexShrink: 0 } }
+				src={ attachment.media_details.sizes.thumbnail.source_url }
+				alt={ attachment.alt_text }
+			/>
+		);
 	}
 
-	if ( 'audio' === mediaType ) {
-		return {
-			heading: __( 'Audio' ),
-		};
+	if ( attachment?.mime_type.startsWith( 'audio' ) ) {
+		return <Icon icon={ audio } size={ 128 } />;
 	}
 
-	if ( 'video' === mediaType ) {
-		return {
-			heading: __( 'Videos' ),
-		};
+	if ( attachment?.mime_type.startsWith( 'video' ) ) {
+		return <Icon icon={ video } size={ 128 } />;
 	}
 
-	return {
-		heading: __( 'Images' ),
-	};
+	// Everything else is a file.
+	return <Icon icon={ page } size={ 128 } />;
 }
 
 export default function PageMedia() {
@@ -185,7 +185,6 @@ export default function PageMedia() {
 		[ mediaType ]
 	);
 
-	const { heading } = getMediaDetails( mediaType );
 	const [ tagsFilter, setTagsFilter ] = useState( [] );
 	const [ authorFilter, setAuthorFilter ] = useState( [] );
 	const [ sortBy, setSortBy ] = useState( [ 'name' ] );
@@ -197,7 +196,7 @@ export default function PageMedia() {
 		>
 			<VStack spacing={ 3 }>
 				<HStack justify="space-between">
-					<Heading level={ 2 }>{ heading }</Heading>
+					<Heading level={ 2 }>{ headingText[ mediaType ] }</Heading>
 					<Button variant="primary">{ __( 'Upload new' ) }</Button>
 				</HStack>
 				<VStack>
