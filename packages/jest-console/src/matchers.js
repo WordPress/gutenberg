@@ -25,14 +25,14 @@ const createErrorMessage = ( spyInfo ) => {
 		message +
 		'\n\n' +
 		`console.${ methodName }() should not be used unless explicitly expected\n` +
-		'See file://gutenberg/packages/jest-console/README.md for details.';
+		'See https://www.npmjs.com/package/@wordpress/jest-console for details.';
 };
 
 const createSpyInfo = ( spy, matcherName, methodName, expected ) => {
 	const calls = spy.mock.calls;
 
 	const pass = expected
-		? calls.some( ( objects ) => expect( objects ).toEqual( expected ) )
+		? JSON.stringify( calls ).includes( JSON.stringify( expected ) )
 		: calls.length > 0;
 
 	const message = createErrorMessage( {
@@ -45,7 +45,6 @@ const createSpyInfo = ( spy, matcherName, methodName, expected ) => {
 	} );
 
 	return {
-		calls,
 		pass,
 		message,
 	};
@@ -58,10 +57,7 @@ const createToHaveBeenCalledMatcher =
 
 		spy.assertionsNumber += 1;
 
-		return {
-			message: spyInfo.message,
-			pass: spyInfo.pass,
-		};
+		return spyInfo;
 	};
 
 const createToHaveBeenCalledWith = ( matcherName, methodName ) =>
@@ -71,10 +67,7 @@ const createToHaveBeenCalledWith = ( matcherName, methodName ) =>
 
 		spy.assertionsNumber += 1;
 
-		return {
-			message: spyInfo.message,
-			pass: spyInfo.pass,
-		};
+		return spyInfo;
 	};
 
 expect.extend(
