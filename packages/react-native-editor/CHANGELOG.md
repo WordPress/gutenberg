@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.102.0
 -   [*] Display custom color value in mobile Cover Block color picker [#51414]
 -   [**] Display outline around selected Social Link block [#51414]
 -   [**] Fixes font customization not getting updated on iOS [#53391]
