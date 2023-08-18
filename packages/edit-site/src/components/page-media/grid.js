@@ -11,7 +11,7 @@ export default function GridView( { items, ...props } ) {
 	return (
 		<ul role="listbox" className="edit-site-media__grid" { ...props }>
 			{ items.map( ( item ) => (
-				<GridItem key={ item.name } item={ item } />
+				<GridItem key={ item.slug } item={ item } />
 			) ) }
 		</ul>
 	);

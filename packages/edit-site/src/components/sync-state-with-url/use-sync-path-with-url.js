@@ -21,6 +21,7 @@ export function getPathFromURL( urlParams ) {
 			case 'wp_block':
 			case 'wp_template':
 			case 'wp_template_part':
+			case 'attachment':
 			case 'page':
 				path = `/${ encodeURIComponent(
 					urlParams.postType

@@ -162,14 +162,13 @@ export default function PageMedia() {
 	const { mediaType } = getQueryArgs( window.location.href );
 	const { attachments, tags, locale } = useSelect(
 		( select ) => {
-			const _mediaType = 'all' === mediaType ? undefined : mediaType;
 			const _attachments = select( coreStore ).getMediaItems( {
 				per_page: 50,
 				orderby: 'date',
 				order: 'desc',
 				// @todo `application` and `text` are valid media types,
 				// but we should maybe combine them into `documents`.
-				media_type: _mediaType,
+				media_type: mediaType,
 			} );
 			const _tags = select( coreStore ).getEntityRecords(
 				'taxonomy',

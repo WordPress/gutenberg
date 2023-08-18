@@ -38,11 +38,7 @@ export default function SidebarNavigationScreenMedia() {
 			actions={ null }
 			content={
 				<ItemGroup>
-					<MediaItem
-						icon={ media }
-						type="all"
-						isActive={ mediaType === 'all' }
-					>
+					<MediaItem icon={ media } isActive={ ! mediaType }>
 						{ __( 'All media' ) }
 					</MediaItem>
 					<MediaItem

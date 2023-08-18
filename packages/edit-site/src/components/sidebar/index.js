@@ -28,6 +28,7 @@ import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 import SidebarNavigationScreenMedia from '../sidebar-navigation-screen-media';
+import SidebarNavigationScreenMediaItem from '../sidebar-navigation-screen-media-item';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -71,6 +72,9 @@ function SidebarScreens() {
 			</NavigatorScreen>
 			<NavigatorScreen path="/media">
 				<SidebarNavigationScreenMedia />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(attachment)/:postId">
+				<SidebarNavigationScreenMediaItem />
 			</NavigatorScreen>
 		</>
 	);
