@@ -111,7 +111,8 @@ export const parameters = {
 				<Subtitle />
 				<Primary />
 				<Description />
-				<ArgsTable />
+				{ /* `story="^"` enables Controls for the primary props table */ }
+				<ArgsTable story="^" />
 				<Stories includePrimary={ false } />
 			</>
 		),
