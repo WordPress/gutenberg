@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import { createColumnHelper } from '@tanstack/react-table';
+import {
+	useReactTable,
+	getCoreRowModel,
+	createColumnHelper,
+} from '@tanstack/react-table';
 /**
  * WordPress dependencies
  */
@@ -103,6 +107,12 @@ export default function PageTemplates() {
 		}
 	);
 
+	const table = useReactTable( {
+		data: templates,
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+	} );
+
 	return (
 		<Page
 			title={ __( 'Templates' ) }
@@ -114,7 +124,7 @@ export default function PageTemplates() {
 				/>
 			}
 		>
-			{ templates && <Table data={ templates } columns={ columns } /> }
+			{ templates && <Table table={ table } /> }
 		</Page>
 	);
 }

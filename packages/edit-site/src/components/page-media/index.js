@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import { createColumnHelper } from '@tanstack/react-table';
+import {
+	useReactTable,
+	createColumnHelper,
+	getCoreRowModel,
+} from '@tanstack/react-table';
 /**
  * WordPress dependencies
  */
@@ -21,14 +25,16 @@ import {
 	__experimentalSpacer as Spacer,
 	Icon,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { grid, list, video, audio, page } from '@wordpress/icons';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
 import Table from '../table';
+import Grid from './grid';
 // @todo abstract for common usage.
 import Pagination from '../page-patterns/pagination';
 import FilterControl from './filter-control';
@@ -41,15 +47,6 @@ import FilterControl from './filter-control';
 /** @type {import('@tanstack/react-table').ColumnHelper<Attachment>} */
 const columnHelper = createColumnHelper();
 
-const dateFormatter = new Intl.DateTimeFormat(
-	// TODO: Other locales?
-	'en-US',
-	{
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	}
-);
 const columns = [
 	columnHelper.display( {
 		id: 'select',
@@ -117,7 +114,9 @@ const columns = [
 		header: () => __( 'Date' ),
 		cell: ( info ) => (
 			<time dateTime={ info.getValue() }>
-				{ dateFormatter.format( new Date( info.getValue() ) ) }
+				{ info.table.options.meta.dateFormatter.format(
+					new Date( info.getValue() )
+				) }
 			</time>
 		),
 	} ),
@@ -161,7 +160,7 @@ function getMediaThumbnail( attachment ) {
 
 export default function PageMedia() {
 	const { mediaType } = getQueryArgs( window.location.href );
-	const { attachments, tags } = useSelect(
+	const { attachments, tags, locale } = useSelect(
 		( select ) => {
 			const _mediaType = 'all' === mediaType ? undefined : mediaType;
 			const _attachments = select( coreStore ).getMediaItems( {
@@ -177,119 +176,152 @@ export default function PageMedia() {
 				'attachment_tag',
 				{ per_page: -1 }
 			);
+			const settings = select( blockEditorStore ).getSettings();
 			return {
 				attachments: _attachments || EMPTY_ARRAY,
 				tags: _tags || EMPTY_ARRAY,
+				locale: settings.locale,
 			};
 		},
 		[ mediaType ]
 	);
 
+	const dateFormatter = useMemo(
+		() =>
+			new Intl.DateTimeFormat( locale || 'en-US', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+			} ),
+		[ locale ]
+	);
+
+	const table = useReactTable( {
+		data: attachments,
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+		meta: {
+			tags,
+			dateFormatter,
+		},
+		enableMultiRowSelection: true,
+		enableSorting: true,
+		enableHiding: true,
+	} );
+
 	const [ tagsFilter, setTagsFilter ] = useState( [] );
 	const [ authorFilter, setAuthorFilter ] = useState( [] );
 	const [ sortBy, setSortBy ] = useState( [ 'name' ] );
+	const [ currentView, setCurrentView ] = useState( 'grid' );
+
 	return (
 		<Page
 			className="edit-site-media"
 			title={ __( 'Media' ) }
 			hideTitleFromUI
 		>
-			<VStack spacing={ 3 }>
-				<HStack justify="space-between">
-					<Heading level={ 2 }>{ headingText[ mediaType ] }</Heading>
-					<Button variant="primary">{ __( 'Upload new' ) }</Button>
-				</HStack>
-				<VStack>
-					<HStack justify="flex-start">
-						<SearchControl
-							onChange={ () => {} }
-							placeholder={ __( 'Search' ) }
-							size="__unstable-large"
-						/>
-						<FilterControl
-							label={ __( 'Tags' ) }
-							value={ tagsFilter }
-							options={ [
-								{ label: __( 'Abstract' ), value: 'abstract' },
-								{ label: __( 'New' ), value: 'new' },
-								{ label: __( 'Featured' ), value: 'featured' },
-								{ label: __( 'Nature' ), value: 'nature' },
-								{
-									label: __( 'Architecture' ),
-									value: 'architecture',
-								},
-							] }
-							multiple
-							onChange={ setTagsFilter }
-						/>
-						<FilterControl
-							label={ __( 'Author' ) }
-							value={ authorFilter }
-							options={ [
-								{ label: __( 'Saxon' ), value: 'saxon' },
-								{ label: __( 'Isabel' ), value: 'isabel' },
-								{ label: __( 'Ramon' ), value: 'ramon' },
-								{ label: __( 'Andy' ), value: 'andy' },
-								{
-									label: __( 'Kai' ),
-									value: 'kai',
-								},
-								{ label: __( 'Rob' ), value: 'rob' },
-							] }
-							multiple
-							onChange={ setAuthorFilter }
-						/>
-						<Spacer />
-						<FilterControl
-							label={ __( 'Sort' ) }
-							value={ sortBy }
-							options={ [
-								{ label: __( 'Name' ), value: 'name' },
-								{ label: __( 'Date' ), value: 'date' },
-								{ label: __( 'Author' ), value: 'author' },
-							] }
-							onChange={ setSortBy }
-						/>
-						<ToggleGroupControl
-							label={ __( 'Toggle view' ) }
-							hideLabelFromVision
-							value="table"
-							__nextHasNoMarginBottom
-							size="__unstable-large"
-						>
-							<ToggleGroupControlOptionIcon
-								value="grid"
-								label={ __( 'Grid' ) }
-								icon={ list }
-							/>
-							<ToggleGroupControlOptionIcon
-								value="table"
-								label={ __( 'Table' ) }
-								icon={ grid }
-							/>
-						</ToggleGroupControl>
+			<Spacer padding={ 3 }>
+				<VStack spacing={ 3 }>
+					<HStack justify="space-between">
+						<Heading level={ 2 }>
+							{ headingText[ mediaType ] }
+						</Heading>
+						<Button variant="primary">
+							{ __( 'Upload new' ) }
+						</Button>
 					</HStack>
+					<VStack>
+						<HStack justify="flex-start">
+							<SearchControl
+								style={ { height: 40 } }
+								onChange={ () => {} }
+								placeholder={ __( 'Search' ) }
+								__nextHasNoMarginBottom
+							/>
+							<FilterControl
+								label={ __( 'Tags' ) }
+								value={ tagsFilter }
+								options={ [
+									{
+										label: __( 'Abstract' ),
+										value: 'abstract',
+									},
+									{ label: __( 'New' ), value: 'new' },
+									{
+										label: __( 'Featured' ),
+										value: 'featured',
+									},
+									{ label: __( 'Nature' ), value: 'nature' },
+									{
+										label: __( 'Architecture' ),
+										value: 'architecture',
+									},
+								] }
+								multiple
+								onChange={ setTagsFilter }
+							/>
+							<FilterControl
+								label={ __( 'Author' ) }
+								value={ authorFilter }
+								options={ [
+									{ label: __( 'Saxon' ), value: 'saxon' },
+									{ label: __( 'Isabel' ), value: 'isabel' },
+									{ label: __( 'Ramon' ), value: 'ramon' },
+									{ label: __( 'Andy' ), value: 'andy' },
+									{
+										label: __( 'Kai' ),
+										value: 'kai',
+									},
+									{ label: __( 'Rob' ), value: 'rob' },
+								] }
+								multiple
+								onChange={ setAuthorFilter }
+							/>
+							<Spacer />
+							<FilterControl
+								label={ __( 'Sort' ) }
+								value={ sortBy }
+								options={ [
+									{ label: __( 'Name' ), value: 'name' },
+									{ label: __( 'Date' ), value: 'date' },
+									{ label: __( 'Author' ), value: 'author' },
+								] }
+								onChange={ setSortBy }
+							/>
+							<ToggleGroupControl
+								label={ __( 'Toggle view' ) }
+								hideLabelFromVision
+								value={ currentView }
+								__nextHasNoMarginBottom
+								size="__unstable-large"
+								onChange={ setCurrentView }
+							>
+								<ToggleGroupControlOptionIcon
+									value="grid"
+									label={ __( 'Grid' ) }
+									icon={ list }
+								/>
+								<ToggleGroupControlOptionIcon
+									value="table"
+									label={ __( 'Table' ) }
+									icon={ grid }
+								/>
+							</ToggleGroupControl>
+						</HStack>
 
-					{ attachments && (
-						<Table
-							data={ attachments }
-							columns={ columns }
-							tableOptions={ {
-								meta: {
-									tags,
-								},
-								enableMultiRowSelection: true,
-								enableSorting: true,
-								enableHiding: true,
-							} }
-						/>
-					) }
+						{ attachments && 'table' === currentView && (
+							<Table table={ table } />
+						) }
+						{ attachments && 'grid' === currentView && (
+							<Grid items={ attachments } />
+						) }
+					</VStack>
+
+					<HStack justify="flex-end">
+						<Pagination />
+					</HStack>
 				</VStack>
-
-				<HStack justify="flex-end">
-					<Pagination />
-				</HStack>
-			</VStack>
+			</Spacer>
 		</Page>
 	);
 }
