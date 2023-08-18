@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import { createColumnHelper } from '@tanstack/react-table';
+/**
  * WordPress dependencies
  */
 import {
@@ -21,7 +25,76 @@ import AddedBy from '../list/added-by';
 import TemplateActions from '../template-actions';
 import AddNewTemplate from '../add-new-template';
 
+/**
+ * @typedef {Object} RichContent
+ * @property {string}        rendered    The rendered content.
+ * @property {string}        raw         The raw content.
+ *
+ * @typedef {Object} Template
+ * @property {string}        id          The ID of the template.
+ * @property {'wp_template'} type        The type of the template.
+ * @property {RichContent}   title       The name of the template.
+ * @property {string}        description The description of the template.
+ * @property {string}        slug        The slug of the template.
+ */
+
+/** @type {import('@tanstack/react-table').ColumnHelper<Template>} */
+const columnHelper = createColumnHelper();
+
+const columns = [
+	columnHelper.accessor(
+		( row ) => decodeEntities( row.title?.rendered || row.slug ),
+		{
+			id: 'title',
+			header: __( 'Template' ),
+			cell: ( cell ) => {
+				const template = cell.row.original;
+				return (
+					<VStack>
+						<Heading as="h3" level={ 5 }>
+							<Link
+								params={ {
+									postId: template.id,
+									postType: template.type,
+									canvas: 'edit',
+								} }
+							>
+								{ cell.getValue() }
+							</Link>
+						</Heading>
+						{ template.description && (
+							<Text variant="muted">
+								{ decodeEntities( template.description ) }
+							</Text>
+						) }
+					</VStack>
+				);
+			},
+			maxWidth: 400,
+		}
+	),
+	// TODO: Ideally this should be a accessor column, but the data is only fetched asynchronously.
+	columnHelper.display( {
+		id: 'added-by',
+		header: __( 'Added by' ),
+		cell: ( { row: { original: template } } ) => (
+			<AddedBy postType={ template.type } postId={ template.id } />
+		),
+	} ),
+	columnHelper.display( {
+		id: 'actions',
+		header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
+		cell: ( { row: { original: template } } ) => (
+			<TemplateActions
+				postType={ template.type }
+				postId={ template.id }
+			/>
+		),
+	} ),
+];
+
 export default function PageTemplates() {
+	/** @type {{records: Template[] | null}} */
 	const { records: templates } = useEntityRecords(
 		'postType',
 		'wp_template',
@@ -29,50 +102,6 @@ export default function PageTemplates() {
 			per_page: -1,
 		}
 	);
-
-	const columns = [
-		{
-			header: __( 'Template' ),
-			cell: ( template ) => (
-				<VStack>
-					<Heading as="h3" level={ 5 }>
-						<Link
-							params={ {
-								postId: template.id,
-								postType: template.type,
-								canvas: 'edit',
-							} }
-						>
-							{ decodeEntities(
-								template.title?.rendered || template.slug
-							) }
-						</Link>
-					</Heading>
-					{ template.description && (
-						<Text variant="muted">
-							{ decodeEntities( template.description ) }
-						</Text>
-					) }
-				</VStack>
-			),
-			maxWidth: 400,
-		},
-		{
-			header: __( 'Added by' ),
-			cell: ( template ) => (
-				<AddedBy postType={ template.type } postId={ template.id } />
-			),
-		},
-		{
-			header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
-			cell: ( template ) => (
-				<TemplateActions
-					postType={ template.type }
-					postId={ template.id }
-				/>
-			),
-		},
-	];
 
 	return (
 		<Page

@@ -7,13 +7,23 @@ import { store as coreStore } from '@wordpress/core-data';
 import { getQueryArgs } from '@wordpress/url';
 import {
 	Button,
+	SearchControl,
 	__experimentalVStack as VStack,
 	DropdownMenu,
+	Flex,
+	FlexItem,
+	FlexBlock,
+	MenuGroup,
+	MenuItem,
+	__experimentalInputControl as InputControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalHeading as Heading,
+	__experimentalText as Text,
 	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,6 +31,7 @@ import {
 import Page from '../page';
 // @todo abstract for common usage.
 import Pagination from '../page-patterns/pagination';
+import FilterControl from './filter-control';
 
 const EMPTY_ARRAY = [];
 
@@ -69,7 +80,8 @@ export default function PageMedia() {
 	);
 
 	const { heading } = getMediaDetails( mediaType );
-
+	const [ tagsFilter, setTagsFilter ] = useState( [] );
+	const [ authorFilter, setAuthorFilter ] = useState( [] );
 	return (
 		<Page
 			className="edit-site-media"
@@ -82,6 +94,41 @@ export default function PageMedia() {
 					<Button>Upload</Button>
 				</HStack>
 				<HStack justify="flex-start">
+					<InputControl
+						placeholder={ __( 'Search' ) }
+						size="__unstable-large"
+					/>
+					<FilterControl
+						label={ __( 'Tags' ) }
+						value={ tagsFilter }
+						options={ [
+							{ label: __( 'Abstract' ), value: 'abstract' },
+							{ label: __( 'New' ), value: 'new' },
+							{ label: __( 'Featured' ), value: 'featured' },
+							{ label: __( 'Nature' ), value: 'nature' },
+							{
+								label: __( 'Architecture' ),
+								value: 'architecture',
+							},
+						] }
+						onChange={ setTagsFilter }
+					/>
+					<FilterControl
+						label={ __( 'Author' ) }
+						value={ authorFilter }
+						options={ [
+							{ label: __( 'Saxon' ), value: 'saxon' },
+							{ label: __( 'Isabel' ), value: 'isabel' },
+							{ label: __( 'Ramon' ), value: 'ramon' },
+							{ label: __( 'Andy' ), value: 'andy' },
+							{
+								label: __( 'Kai' ),
+								value: 'kai',
+							},
+							{ label: __( 'Rob' ), value: 'rob' },
+						] }
+						onChange={ setAuthorFilter }
+					/>
 					<DropdownMenu></DropdownMenu>
 					<ToggleGroupControl
 						label="my label"
