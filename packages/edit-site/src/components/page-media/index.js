@@ -19,7 +19,6 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	SelectControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { grid, list } from '@wordpress/icons';
