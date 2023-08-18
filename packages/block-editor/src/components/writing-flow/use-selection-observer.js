@@ -187,19 +187,27 @@ export default function useSelectionObserver() {
 				defaultView.removeEventListener( 'mouseup', onSelectionChange );
 			}
 
-			function resetListeners() {
+			function resetListeners( event ) {
 				removeListeners();
 				addListeners();
+
+				// Forbid focus within the writing flow wrapper when it is
+				// editable. The browser might focus a child element, for
+				// example in some cases when it has a tabindex. There might be
+				// other unknown cases, so we just forbid focus altogether.
+				if ( node.isContentEditable && node !== event.target ) {
+					node.focus();
+				}
 			}
 
 			addListeners();
 			// We must allow rich text to set selection first. This ensures that
 			// our `selectionchange` listener is always reset to be called after
 			// the rich text one.
-			node.addEventListener( 'focusin', resetListeners );
+			node.addEventListener( 'focusin', resetListeners, true );
 			return () => {
 				removeListeners();
-				node.removeEventListener( 'focusin', resetListeners );
+				node.removeEventListener( 'focusin', resetListeners, true );
 			};
 		},
 		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
