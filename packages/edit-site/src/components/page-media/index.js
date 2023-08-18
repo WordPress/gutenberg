@@ -195,102 +195,112 @@ export default function PageMedia() {
 			title={ __( 'Media' ) }
 			hideTitleFromUI
 		>
-			<VStack spacing={ 3 }>
-				<HStack justify="space-between">
-					<Heading level={ 2 }>{ heading }</Heading>
-					<Button variant="primary">{ __( 'Upload new' ) }</Button>
-				</HStack>
-				<VStack>
-					<HStack justify="flex-start">
-						<SearchControl
-							onChange={ () => {} }
-							placeholder={ __( 'Search' ) }
-							size="__unstable-large"
-						/>
-						<FilterControl
-							label={ __( 'Tags' ) }
-							value={ tagsFilter }
-							options={ [
-								{ label: __( 'Abstract' ), value: 'abstract' },
-								{ label: __( 'New' ), value: 'new' },
-								{ label: __( 'Featured' ), value: 'featured' },
-								{ label: __( 'Nature' ), value: 'nature' },
-								{
-									label: __( 'Architecture' ),
-									value: 'architecture',
-								},
-							] }
-							multiple
-							onChange={ setTagsFilter }
-						/>
-						<FilterControl
-							label={ __( 'Author' ) }
-							value={ authorFilter }
-							options={ [
-								{ label: __( 'Saxon' ), value: 'saxon' },
-								{ label: __( 'Isabel' ), value: 'isabel' },
-								{ label: __( 'Ramon' ), value: 'ramon' },
-								{ label: __( 'Andy' ), value: 'andy' },
-								{
-									label: __( 'Kai' ),
-									value: 'kai',
-								},
-								{ label: __( 'Rob' ), value: 'rob' },
-							] }
-							multiple
-							onChange={ setAuthorFilter }
-						/>
-						<Spacer />
-						<FilterControl
-							label={ __( 'Sort' ) }
-							value={ sortBy }
-							options={ [
-								{ label: __( 'Name' ), value: 'name' },
-								{ label: __( 'Date' ), value: 'date' },
-								{ label: __( 'Author' ), value: 'author' },
-							] }
-							onChange={ setSortBy }
-						/>
-						<ToggleGroupControl
-							label={ __( 'Toggle view' ) }
-							hideLabelFromVision
-							value="table"
-							__nextHasNoMarginBottom
-							size="__unstable-large"
-						>
-							<ToggleGroupControlOptionIcon
-								value="grid"
-								label={ __( 'Grid' ) }
-								icon={ list }
-							/>
-							<ToggleGroupControlOptionIcon
-								value="table"
-								label={ __( 'Table' ) }
-								icon={ grid }
-							/>
-						</ToggleGroupControl>
+			<Spacer padding={ 3 }>
+				<VStack spacing={ 3 }>
+					<HStack justify="space-between">
+						<Heading level={ 2 }>{ heading }</Heading>
+						<Button variant="primary">
+							{ __( 'Upload new' ) }
+						</Button>
 					</HStack>
+					<VStack>
+						<HStack justify="flex-start">
+							<SearchControl
+								onChange={ () => {} }
+								placeholder={ __( 'Search' ) }
+								size="__unstable-large"
+							/>
+							<FilterControl
+								label={ __( 'Tags' ) }
+								value={ tagsFilter }
+								options={ [
+									{
+										label: __( 'Abstract' ),
+										value: 'abstract',
+									},
+									{ label: __( 'New' ), value: 'new' },
+									{
+										label: __( 'Featured' ),
+										value: 'featured',
+									},
+									{ label: __( 'Nature' ), value: 'nature' },
+									{
+										label: __( 'Architecture' ),
+										value: 'architecture',
+									},
+								] }
+								multiple
+								onChange={ setTagsFilter }
+							/>
+							<FilterControl
+								label={ __( 'Author' ) }
+								value={ authorFilter }
+								options={ [
+									{ label: __( 'Saxon' ), value: 'saxon' },
+									{ label: __( 'Isabel' ), value: 'isabel' },
+									{ label: __( 'Ramon' ), value: 'ramon' },
+									{ label: __( 'Andy' ), value: 'andy' },
+									{
+										label: __( 'Kai' ),
+										value: 'kai',
+									},
+									{ label: __( 'Rob' ), value: 'rob' },
+								] }
+								multiple
+								onChange={ setAuthorFilter }
+							/>
+							<Spacer />
+							<FilterControl
+								label={ __( 'Sort' ) }
+								value={ sortBy }
+								options={ [
+									{ label: __( 'Name' ), value: 'name' },
+									{ label: __( 'Date' ), value: 'date' },
+									{ label: __( 'Author' ), value: 'author' },
+								] }
+								onChange={ setSortBy }
+							/>
+							<ToggleGroupControl
+								label={ __( 'Toggle view' ) }
+								hideLabelFromVision
+								value="table"
+								__nextHasNoMarginBottom
+								size="__unstable-large"
+							>
+								<ToggleGroupControlOptionIcon
+									value="grid"
+									label={ __( 'Grid' ) }
+									icon={ list }
+								/>
+								<ToggleGroupControlOptionIcon
+									value="table"
+									label={ __( 'Table' ) }
+									icon={ grid }
+								/>
+							</ToggleGroupControl>
+						</HStack>
 
-					{ attachments && (
-						<Table
-							data={ attachments }
-							columns={ columns }
-							tableOptions={ {
-								meta: {
-									tags,
-								},
-								enableMultiRowSelection: true,
-								enableSorting: true,
-								enableHiding: true,
-							} }
-						/>
-					) }
+						{ attachments && (
+							<Table
+								data={ attachments }
+								columns={ columns }
+								tableOptions={ {
+									meta: {
+										tags,
+									},
+									enableMultiRowSelection: true,
+									enableSorting: true,
+									enableHiding: true,
+								} }
+							/>
+						) }
+					</VStack>
+
+					<HStack justify="flex-end">
+						<Pagination />
+					</HStack>
 				</VStack>
-
-				<HStack justify="flex-end">
-					<Pagination />
-				</HStack>
-			</VStack>
+			</Spacer>
 		</Page>
 	);
 }
