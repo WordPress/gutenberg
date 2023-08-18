@@ -122,6 +122,7 @@ export class Metrics {
 			interactive: 'TTI',
 			'cumulative-layout-shift': 'CLS',
 			'experimental-interaction-to-next-paint': 'INP',
+			'server-response-time': 'TTFB',
 		};
 
 		const report = await lighthouse(
@@ -159,5 +160,162 @@ export class Metrics {
 		}
 
 		return result;
+	}
+
+	/**
+	 * CLS is only reported on visibility change.
+	 * FID requires an interaction.
+	 * INP requires an interaction AND a visibility change.
+	 */
+	async getWebVitals() {
+		const metricsDefinition = {
+			CLS: {
+				listen: 'onCLS',
+				global: 'webVitalsCLS',
+				get: () => window.webVitalsCLS,
+				results: [] as number[],
+			},
+			FCP: {
+				listen: 'onFCP',
+				global: 'webVitalsFCP',
+				get: () => window.webVitalsFCP,
+				results: [] as number[],
+			},
+			FID: {
+				listen: 'onFID',
+				global: 'webVitalsFID',
+				get: () => window.webVitalsFID,
+				results: [] as number[],
+			},
+			INP: {
+				listen: 'onINP',
+				global: 'webVitalsINP',
+				get: () => window.webVitalsINP,
+				results: [] as number[],
+			},
+			LCP: {
+				listen: 'onLCP',
+				global: 'webVitalsLCP',
+				get: () => window.webVitalsLCP,
+				results: [] as number[],
+			},
+			TTFB: {
+				listen: 'onTTFB',
+				global: 'webVitalsTTFB',
+				get: () => window.webVitalsTTFB,
+				results: [] as number[],
+			},
+		};
+
+		/*
+		 * Aggregate metrics are metrics which are calculated for every request as
+		 * a combination of other metrics.
+		 */
+		const aggregateMetricsDefinition = {
+			'LCP-TTFB': {
+				add: [ 'LCP' ],
+				subtract: [ 'TTFB' ],
+			},
+		};
+
+		let scriptTag = '';
+		Object.entries( metricsDefinition ).forEach( ( [ key, value ] ) => {
+			scriptTag += `webVitals.${
+				value.listen
+			}( ( { name, delta } ) => { window.${ value.global } = ${
+				key === 'CLS' ? 'delta * 1000' : 'delta'
+			}; } );`;
+		} );
+
+		await this.page.addScriptTag( {
+			url: 'https://unpkg.com/web-vitals@3/dist/web-vitals.iife.js',
+		} );
+
+		await this.page.addScriptTag( {
+			content: scriptTag,
+		} );
+
+		await Promise.all(
+			Object.values( metricsDefinition ).map( async ( value ) => {
+				// // Wait until global is populated.
+				// await this.page.waitForFunction(
+				// 	`window.${ value.global } !== undefined`
+				// );
+
+				/*
+				 * Do a random click, since only that triggers certain metrics
+				 * like LCP, as only a user interaction stops reporting new LCP
+				 * entries. See https://web.dev/lcp/.
+				 *
+				 * Click off screen to prevent clicking a link by accident and navigating away.
+				 */
+				await this.page.click( 'body', {
+					position: { x: 1, y: 1 },
+				} );
+				// Get the metric value from the global.
+				const metric = await this.page.evaluate< number, string >(
+					// @ts-ignore
+					( globalVarName ) => window[ globalVarName ] as number,
+					value.global
+				);
+				value.results.push( metric );
+			} )
+		);
+
+		const metrics: Record< string, number[] > = {};
+		Object.entries( metricsDefinition ).forEach( ( [ key, value ] ) => {
+			if ( value.results.length ) {
+				metrics[ key ] = value.results;
+			}
+		} );
+
+		Object.entries( aggregateMetricsDefinition ).forEach(
+			( [ key, value ] ) => {
+				// Bail if any of the necessary partial metrics are not provided.
+				const partialMetrics = [
+					...( value.add || [] ),
+					...( value.subtract || [] ),
+				];
+				if ( ! partialMetrics.length ) {
+					return;
+				}
+				for ( const metricKey of partialMetrics ) {
+					if ( ! metrics[ metricKey ] ) {
+						return;
+					}
+				}
+
+				// Initialize all values for the metric as 0.
+				metrics[ key ] = [] as number[];
+				const numResults = value.add
+					? metrics[ value.add[ 0 ] ].length
+					: metrics[ value.subtract[ 0 ] ].length;
+				for ( let n = 0; n < numResults; n++ ) {
+					metrics[ key ].push( 0.0 );
+				}
+
+				// Add and subtract all values.
+				if ( value.add ) {
+					value.add.forEach( ( metricKey ) => {
+						metrics[ metricKey ].forEach(
+							( metricValue, metricIndex ) => {
+								metrics[ key ][ metricIndex ] += metricValue;
+							}
+						);
+					} );
+				}
+				if ( value.subtract ) {
+					value.subtract.forEach( ( metricKey ) => {
+						metrics[ metricKey ].forEach(
+							( metricValue, metricIndex ) => {
+								metrics[ key ][ metricIndex ] -= metricValue;
+							}
+						);
+					} );
+				}
+			}
+		);
+
+		return metrics;
 	}
 }

@@ -154,16 +154,29 @@ async function runPerformanceTests( branches, options ) {
 	}
 
 	log( '    >> Installing dependencies and building packages' );
-	await runShellScript(
-		`bash -c "${ [
-			'source $HOME/.nvm/nvm.sh',
-			'nvm install',
-			'npm ci',
-			'npx playwright install chromium --with-deps',
-			'npm run build:packages',
-		].join( ' && ' ) }"`,
-		performanceTestDirectory
-	);
+	if (!!process.env.DO_NOT_INSTALL_BROWSERS) {
+		await runShellScript(
+			`bash -c "${ [
+				'source $HOME/.nvm/nvm.sh',
+				'nvm install',
+				'npm ci',
+				// 'npx playwright install chromium --with-deps',
+				'npm run build:packages',
+			].join( ' && ' ) }"`,
+			performanceTestDirectory
+		);
+	} else {
+		await runShellScript(
+			`bash -c "${[
+				'source $HOME/.nvm/nvm.sh',
+				'nvm install',
+				'npm ci',
+				'npx playwright install chromium --with-deps',
+				'npm run build:packages',
+			].join(' && ')}"`,
+			performanceTestDirectory
+		);
+	}
 	log( '    >> Creating the environment folders' );
 	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs' );
 

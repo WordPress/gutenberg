@@ -2,6 +2,14 @@ declare global {
 	interface Window {
 		// Silence the warning for `window.wp` in Playwright's evaluate functions.
 		wp: any;
+
+		// Globals added by the web-vitals library.
+		webVitalsCLS: number;
+		webVitalsFCP: number;
+		webVitalsINP: number;
+		webVitalsLCP: number;
+		webVitalsTTFB: number;
+		webVitalsFID: number;
 	}
 
 	// Experimental API that is subject to change.

@@ -38,6 +38,23 @@ test.describe( 'Front End Performance', () => {
 			const lcp = await metrics.getLargestContentfulPaint();
 			const ttfb = await metrics.getTimeToFirstByte();
 
+			console.log(
+				'\n',
+				'\n',
+				'ttfb',
+				ttfb,
+				'\n',
+				'lcp',
+				lcp,
+				'\n',
+				'lh',
+				await metrics.getLighthouseReport(),
+				'\n',
+				'web-vitals',
+				await metrics.getWebVitals(),
+				'\n'
+			);
+
 			// Ensure the numbers are valid.
 			expect( lcp ).toBeGreaterThan( 0 );
 			expect( ttfb ).toBeGreaterThan( 0 );
