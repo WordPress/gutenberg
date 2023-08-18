@@ -198,7 +198,7 @@ export default function PageMedia() {
 			<VStack spacing={ 3 }>
 				<HStack justify="space-between">
 					<Heading level={ 2 }>{ heading }</Heading>
-					<Button>Upload</Button>
+					<Button variant="primary">{ __( 'Upload new' ) }</Button>
 				</HStack>
 				<VStack>
 					<HStack justify="flex-start">
