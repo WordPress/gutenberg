@@ -370,22 +370,49 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 		if ( newType === 'stack' ) {
 			const { type: previousLayoutType } = usedLayout;
 			if ( previousLayoutType === 'flex' ) {
+				let justification = justifyContent;
+				let alignment = verticalAlignment;
+				if ( justifyContent === 'space-between' ) {
+					justification = 'left';
+				}
+				if ( verticalAlignment === 'stretch' ) {
+					alignment = 'top';
+				}
 				setAttributes( {
 					layout: {
 						...usedLayout,
 						type: 'flex',
 						orientation: 'vertical',
+						justifyContent: justification,
+						verticalAlignment: alignment,
 					},
 				} );
 			} else {
 				setAttributes( { layout: { type: 'default' } } );
 			}
-		} else {
+		} else if ( newType === 'flex' ) {
+			let justification = justifyContent;
+			let alignment = verticalAlignment;
+			if ( justifyContent === 'stretch' ) {
+				justification = 'left';
+			}
+			if ( verticalAlignment === 'space-between' ) {
+				alignment = 'center';
+			}
 			setAttributes( {
 				layout: {
 					...usedLayout,
 					type: newType,
 					orientation: 'horizontal',
+					justifyContent: justification,
+					verticalAlignment: alignment,
+				},
+			} );
+		} else {
+			setAttributes( {
+				layout: {
+					...usedLayout,
+					type: newType,
 				},
 			} );
 		}
