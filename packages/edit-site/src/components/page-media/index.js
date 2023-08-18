@@ -33,6 +33,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import Page from '../page';
 import Table from '../table';
+import Grid from './grid';
 // @todo abstract for common usage.
 import Pagination from '../page-patterns/pagination';
 import FilterControl from './filter-control';
@@ -211,6 +212,8 @@ export default function PageMedia() {
 	const [ tagsFilter, setTagsFilter ] = useState( [] );
 	const [ authorFilter, setAuthorFilter ] = useState( [] );
 	const [ sortBy, setSortBy ] = useState( [ 'name' ] );
+	const [ currentView, setCurrentView ] = useState( 'grid' );
+
 	return (
 		<Page
 			className="edit-site-media"
@@ -286,9 +289,10 @@ export default function PageMedia() {
 							<ToggleGroupControl
 								label={ __( 'Toggle view' ) }
 								hideLabelFromVision
-								value="table"
+								value={ currentView }
 								__nextHasNoMarginBottom
 								size="__unstable-large"
+								onChange={ setCurrentView }
 							>
 								<ToggleGroupControlOptionIcon
 									value="grid"
@@ -303,7 +307,12 @@ export default function PageMedia() {
 							</ToggleGroupControl>
 						</HStack>
 
-						{ attachments && <Table table={ table } /> }
+						{ attachments && 'table' === currentView && (
+							<Table table={ table } />
+						) }
+						{ attachments && 'grid' === currentView && (
+							<Grid items={ attachments } />
+						) }
 					</VStack>
 
 					<HStack justify="flex-end">
