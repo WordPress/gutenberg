@@ -108,6 +108,7 @@ export default function PageTemplateParts() {
 		data: templateParts,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
+		enableSorting: false,
 	} );
 
 	return (

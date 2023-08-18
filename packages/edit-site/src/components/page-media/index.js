@@ -6,6 +6,7 @@ import {
 	createColumnHelper,
 	getCoreRowModel,
 	getFilteredRowModel,
+	getSortedRowModel,
 } from '@tanstack/react-table';
 /**
  * WordPress dependencies
@@ -72,13 +73,14 @@ const columns = [
 	} ),
 	columnHelper.accessor( ( row ) => row.title.rendered, {
 		id: 'title',
-		header: () => __( 'Title' ),
+		header: __( 'Title' ),
 		cell: ( info ) => (
 			<HStack justify="flex-start">
 				{ getMediaThumbnail( info.row.original ) }
 				<h4>{ info.getValue() }</h4>
 			</HStack>
 		),
+		sortingFn: 'alphanumeric',
 	} ),
 	columnHelper.accessor( 'attachment_tags', {
 		id: 'tags',
@@ -112,6 +114,7 @@ const columns = [
 			const postTitle = record?.title?.rendered;
 			return postTitle ? <span>{ postTitle }</span> : null;
 		},
+		sortingFn: 'alphanumeric',
 	} ),
 	columnHelper.accessor( 'date_gmt', {
 		header: () => __( 'Date' ),
@@ -122,6 +125,7 @@ const columns = [
 				) }
 			</time>
 		),
+		sortingFn: 'datetime',
 	} ),
 ];
 
@@ -223,6 +227,7 @@ export default function PageMedia() {
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
+		getSortedRowModel: getSortedRowModel(),
 		meta: {
 			tags,
 			dateFormatter,

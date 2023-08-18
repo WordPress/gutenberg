@@ -111,6 +111,7 @@ export default function PageTemplates() {
 		data: templates,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
+		enableSorting: false,
 	} );
 
 	return (
