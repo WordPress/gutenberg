@@ -52,7 +52,7 @@ A block variation is defined by an object that can contain the following fields:
 
 Block variations can be declared during a block's registration by providing the `variations` key with a proper array of variation objects, as shown in the example above. See the [Block Registration API](/docs/reference-guides/block-api/block-registration.md) for more details.
 
-To create a variation for an exiting block, such as a Core block, use `wp.blocks.registerBlockVariation()`. This function accepts the name of the block and the object defining the variation.
+To create a variation for an existing block, such as a Core block, use `wp.blocks.registerBlockVariation()`. This function accepts the name of the block and the object defining the variation.
 
 ```js
 wp.blocks.registerBlockVariation( 
