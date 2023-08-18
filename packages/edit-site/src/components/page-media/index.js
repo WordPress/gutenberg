@@ -50,7 +50,7 @@ export default function PageMedia() {
 				attachments: _attachments || EMPTY_ARRAY,
 			};
 		}, [] );
-
+console.log( '_attachments', _attachments );
 	return (
 		<Page
 			className="edit-site-media"
