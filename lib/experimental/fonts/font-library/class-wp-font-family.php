@@ -5,7 +5,7 @@
  * This file contains the Font Family class definition.
  *
  * @package    WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  * @since      6.4.0
  */
 
@@ -14,7 +14,7 @@ if ( class_exists( 'WP_Font_Family' ) ) {
 }
 
 /**
- * Fonts Library class.
+ * Font Library class.
  *
  * @since 6.4.0
  */
@@ -135,7 +135,7 @@ class WP_Font_Family {
 	 */
 	private static function delete_asset( $src ) {
 		$filename  = basename( $src );
-		$file_path = path_join( WP_Fonts_Library::get_fonts_dir(), $filename );
+		$file_path = path_join( WP_Font_Library::get_fonts_dir(), $filename );
 
 		wp_delete_file( $file_path );
 
@@ -513,7 +513,7 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Creates a post for a font in the fonts library if it doesn't exist,
+	 * Creates a post for a font in the Font Library if it doesn't exist,
 	 * or updates it if it does.
 	 *
 	 * @since 6.4.0
@@ -541,9 +541,9 @@ class WP_Font_Family {
 	 * @return array|WP_Error An array of font family data on success, WP_Error otherwise.
 	 */
 	public function install( $files = null ) {
-		add_filter( 'upload_dir', array( 'WP_Fonts_Library', 'set_upload_dir' ) );
+		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
 		$were_assets_written = $this->download_or_move_font_faces( $files );
-		remove_filter( 'upload_dir', array( 'WP_Fonts_Library', 'set_upload_dir' ) );
+		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
 
 		if ( ! $were_assets_written ) {
 			return new WP_Error(

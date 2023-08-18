@@ -1,24 +1,24 @@
 <?php
 /**
- * Fonts Library class.
+ * Font Library class.
  *
- * This file contains the Fonts Library class definition.
+ * This file contains the Font Library class definition.
  *
  * @package    WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  * @since      6.4.0
  */
 
-if ( class_exists( 'WP_Fonts_Library' ) ) {
+if ( class_exists( 'WP_Font_Library' ) ) {
 	return;
 }
 
 /**
- * Fonts Library class.
+ * Font Library class.
  *
  * @since 6.4.0
  */
-class WP_Fonts_Library {
+class WP_Font_Library {
 
 	const ALLOWED_FONT_MIME_TYPES = array(
 		'otf'   => 'font/otf',

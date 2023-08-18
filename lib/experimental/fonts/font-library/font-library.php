@@ -1,11 +1,11 @@
 <?php
 /**
- * Fonts Library initialization.
+ * Font Library initialization.
  *
- * This file contains fonts library init calls.
+ * This file contains Font Library init calls.
  *
  * @package    WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  * @since      6.4.0
  */
 
@@ -19,7 +19,7 @@
  *
  * @since 6.4.0
  */
-function gutenberg_init_fonts_library() {
+function gutenberg_init_font_library() {
 	// @core-merge: This code will go into Core's `create_initial_post_types()`.
 	$args = array(
 		'public'       => true,
@@ -29,9 +29,9 @@ function gutenberg_init_fonts_library() {
 	register_post_type( 'wp_font_family', $args );
 
 	// @core-merge: This code will go into Core's `create_initial_rest_routes()`.
-	$fonts_library_controller = new WP_REST_Fonts_Library_Controller();
-	$fonts_library_controller->register_routes();
+	$font_library_controller = new WP_REST_Font_Library_Controller();
+	$font_library_controller->register_routes();
 }
 
-add_action( 'rest_api_init', 'gutenberg_init_fonts_library' );
+add_action( 'rest_api_init', 'gutenberg_init_font_library' );
 

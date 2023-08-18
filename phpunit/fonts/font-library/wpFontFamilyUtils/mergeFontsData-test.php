@@ -3,10 +3,10 @@
  * Test WP_Font_Family_Utils::merge_fonts_data().
  *
  * @package WordPress
- * @subpackage Fonts Library
+ * @subpackage Font Library
  *
  * @group fonts
- * @group fonts-library
+ * @group font-library
  *
  * @covers WP_Font_Family_Utils::merge_fonts_data
  */
