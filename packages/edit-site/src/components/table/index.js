@@ -4,8 +4,51 @@
 import { flexRender } from '@tanstack/react-table';
 
 /**
- * @param {Object}                                         props       The props.
- * @param {import('@tanstack/react-table').Table<unknown>} props.table The table created from `@tanstack/react-table`.
+ * WordPress dependencies
+ */
+import { Button, Icon } from '@wordpress/components';
+import { chevronUp, chevronDown } from '@wordpress/icons';
+
+/**
+ * @typedef {import('@tanstack/react-table').Header<unknown, unknown>} Header
+ * @typedef {import('@tanstack/react-table').Table<unknown>} Table
+ */
+
+/**
+ * @param {Object} props
+ * @param {Header} props.header
+ */
+function HeaderColumn( { header } ) {
+	if ( header.isPlaceholder ) return null;
+
+	const rendered = flexRender(
+		header.column.columnDef.header,
+		header.getContext()
+	);
+
+	if ( ! header.column.getCanSort() ) {
+		return rendered;
+	}
+
+	return (
+		<Button onClick={ header.column.getToggleSortingHandler() }>
+			{ rendered }
+			{ !! header.column.getIsSorted() && (
+				<Icon
+					icon={
+						header.column.getIsSorted() === 'asc'
+							? chevronUp
+							: chevronDown
+					}
+				/>
+			) }
+		</Button>
+	);
+}
+
+/**
+ * @param {Object} props
+ * @param {Table}  props.table
  */
 export default function Table( { table } ) {
 	return (
@@ -16,12 +59,7 @@ export default function Table( { table } ) {
 						<tr key={ headerGroup.id }>
 							{ headerGroup.headers.map( ( header ) => (
 								<th key={ header.id }>
-									{ header.isPlaceholder
-										? null
-										: flexRender(
-												header.column.columnDef.header,
-												header.getContext()
-										  ) }
+									<HeaderColumn header={ header } />
 								</th>
 							) ) }
 						</tr>
