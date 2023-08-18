@@ -10,18 +10,10 @@ import {
 	SearchControl,
 	__experimentalVStack as VStack,
 	DropdownMenu,
-	Flex,
-	FlexItem,
-	FlexBlock,
-	MenuGroup,
-	MenuItem,
-	__experimentalInputControl as InputControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
 	__experimentalHStack as HStack,
-	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -94,7 +86,8 @@ export default function PageMedia() {
 					<Button>Upload</Button>
 				</HStack>
 				<HStack justify="flex-start">
-					<InputControl
+					<SearchControl
+						onChange={ () => {} }
 						placeholder={ __( 'Search' ) }
 						size="__unstable-large"
 					/>
@@ -146,6 +139,11 @@ export default function PageMedia() {
 					</ToggleGroupControl>
 
 					{ /*<TableView /> or <GridView />*/ }
+					{ attachments.map( ( attachment ) => (
+						<p key={ attachment.id }>
+							{ attachment.title.raw } - { attachment.source_url }
+						</p>
+					) ) }
 				</HStack>
 				<HStack justify="flex-end">
 					<Pagination />
