@@ -126,6 +126,7 @@ const columns = [
 ];
 
 const EMPTY_ARRAY = [];
+const PAGE_SIZE = 20;
 
 const headingText = {
 	media: __( 'Media' ),
@@ -166,7 +167,7 @@ export default function PageMedia() {
 	const { attachments, tags, locale } = useSelect(
 		( select ) => {
 			const _attachments = select( coreStore ).getMediaItems( {
-				per_page: 50,
+				per_page: -1,
 				orderby: 'date',
 				order: 'desc',
 				// @todo `application` and `text` are valid media types,
@@ -187,6 +188,25 @@ export default function PageMedia() {
 		},
 		[ mediaType ]
 	);
+	const totalItems = attachments.length;
+	const numPages = Math.ceil( attachments.length / PAGE_SIZE );
+	const [ currentPage, setCurrentPage ] = useState( 1 );
+	const pageIndex = currentPage - 1;
+
+	const attachmentsOnPage = useMemo( () => {
+		return attachments.slice(
+			pageIndex * PAGE_SIZE,
+			pageIndex * PAGE_SIZE + PAGE_SIZE
+		);
+	}, [ pageIndex, attachments ] );
+
+	const changePage = ( newPage ) => {
+		// @todo Not working yet, we don't have a scroll container.
+		// const scrollContainer = document.querySelector( '.edit-site-media' );
+		// scrollContainer?.scrollTo( 0, 0 );
+
+		setCurrentPage( newPage );
+	};
 
 	const dateFormatter = useMemo(
 		() =>
@@ -199,7 +219,7 @@ export default function PageMedia() {
 	);
 
 	const table = useReactTable( {
-		data: attachments,
+		data: attachmentsOnPage,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
@@ -310,16 +330,23 @@ export default function PageMedia() {
 							</ToggleGroupControl>
 						</HStack>
 
-						{ attachments && 'table' === currentView && (
+						{ attachmentsOnPage && 'table' === currentView && (
 							<Table table={ table } />
 						) }
-						{ attachments && 'grid' === currentView && (
-							<Grid items={ attachments } />
+						{ attachmentsOnPage && 'grid' === currentView && (
+							<Grid items={ attachmentsOnPage } />
 						) }
 					</VStack>
 
 					<HStack justify="flex-end">
-						<Pagination />
+						{ numPages > 1 && (
+							<Pagination
+								currentPage={ currentPage }
+								numPages={ numPages }
+								changePage={ changePage }
+								totalItems={ totalItems }
+							/>
+						) }
 					</HStack>
 				</VStack>
 			</Spacer>
