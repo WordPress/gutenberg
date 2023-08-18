@@ -60,15 +60,16 @@ class WP_Font_Library {
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered succesfully and a WP_Error otherwise.
 	 */
 	public static function register_font_collection( $id, $config ) {
-		if ( ! array_key_exists( $id, self::$collections ) ) {
-			try {
+		if ( array_key_exists( $id, self::$collections ) ) {
+			return new WP_Error( 'font_collection_registration_error', 'Font collection already registered.' );
+		}
 
-				$new_collection           = new WP_Font_Collection( $id, $config );
-				self::$collections[ $id ] = $new_collection;
-				return $new_collection;
-			} catch ( Exception $e ) {
-				return new WP_Error( 'font_collection_error', $e->getMessage() );
-			}
+		try {
+			$new_collection           = new WP_Font_Collection( $id, $config );
+			self::$collections[ $id ] = $new_collection;
+			return $new_collection;
+		} catch ( Exception $e ) {
+			return new WP_Error( 'font_collection_error', $e->getMessage() );
 		}
 	}
 
