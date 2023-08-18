@@ -19,7 +19,7 @@
  *
  * @since 6.4.0
  */
-function gutenberg_init_font_library() {
+function gutenberg_init_font_library_routes() {
 	// @core-merge: This code will go into Core's `create_initial_post_types()`.
 	$args = array(
 		'public'       => true,
@@ -33,5 +33,11 @@ function gutenberg_init_font_library() {
 	$font_library_controller->register_routes();
 }
 
-add_action( 'rest_api_init', 'gutenberg_init_font_library' );
+add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );
 
+
+function gutenberg_init_font_library() {
+	WP_Font_Library::register_filters();
+}
+
+add_action( 'init', 'gutenberg_init_font_library' );

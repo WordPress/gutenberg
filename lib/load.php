@@ -164,6 +164,7 @@ if (
 	( defined( 'FONTS_LIBRARY_ENABLE' ) && FONTS_LIBRARY_ENABLE )
 ) {
 	// Loads the Font Library.
+	require __DIR__ . '/experimental/fonts/font-library/class-wp-font-collection.php';
 	require __DIR__ . '/experimental/fonts/font-library/class-wp-font-library.php';
 	require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family-utils.php';
 	require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family.php';

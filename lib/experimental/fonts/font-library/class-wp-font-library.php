@@ -28,6 +28,60 @@ class WP_Font_Library {
 	);
 
 	/**
+	 * Font collections.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @var array
+	 */
+	public static $collections = array();
+
+	/**
+	 * Register filter to extend the library with font collections.
+	 *
+	 * @since 6.4.0
+	 */
+	public static function register_filters() {
+		add_filter(
+			'register_font_collection',
+			array( 'WP_Font_Library', 'register_font_collection' ),
+			10,
+			2
+		);
+	}
+
+	/**
+	 * Register a new font collection.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @return WP_Font_Collection|WP_Error A font collection is it was registered succesfully and a WP_Error otherwise.
+	 */
+	public static function register_font_collection( $id, $config ) {
+		if ( ! array_key_exists( $id, self::$collections ) ) {
+			try {
+
+				$new_collection           = new WP_Font_Collection( $id, $config );
+				self::$collections[ $id ] = $new_collection;
+				return $new_collection;
+			} catch ( Exception $e ) {
+				return new WP_Error( 'font_collection_error', $e->getMessage() );
+			}
+		}
+	}
+
+	/**
+	 * Gets the font collections available.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @return array List of font collections.
+	 */
+	public static function get_font_collections() {
+		return self::$collections;
+	}
+
+	/**
 	 * Gets the upload directory for fonts.
 	 *
 	 * @since 6.4.0
