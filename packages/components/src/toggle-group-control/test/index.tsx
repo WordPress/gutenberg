@@ -17,6 +17,7 @@ import {
 	ToggleGroupControlOption,
 	ToggleGroupControlOptionIcon,
 } from '../index';
+import cleanupTooltip from '../../tooltip/test/utils';
 
 describe( 'ToggleGroupControl', () => {
 	const options = (
@@ -113,9 +114,7 @@ describe( 'ToggleGroupControl', () => {
 
 		await waitFor( () => expect( tooltip ).toBeVisible() );
 
-		await user.unhover( firstRadio );
-
-		expect( tooltip ).not.toBeVisible();
+		await cleanupTooltip( user );
 	} );
 
 	it( 'should not render tooltip', async () => {
