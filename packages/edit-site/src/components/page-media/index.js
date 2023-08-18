@@ -9,6 +9,7 @@ import {
 	Button,
 	SearchControl,
 	__experimentalVStack as VStack,
+	DropdownMenu,
 	Flex,
 	FlexItem,
 	FlexBlock,
@@ -74,13 +75,6 @@ export default function PageMedia() {
 					<Pagination />
 				</HStack>
 			</VStack>
-
-			{ attachments.map( ( attachment ) => (
-				<figure key={ attachment.id }>
-					<img src={ attachment.source_url } alt={ attachment.alt_text } />
-					<figcaption>{ attachment.title.raw }</figcaption>
-				</figure>
-			) ) }
 		</Page>
 	);
 }
