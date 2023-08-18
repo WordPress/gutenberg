@@ -13,14 +13,15 @@ import {
 } from '@wordpress/components';
 import { moreHorizontal } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { getMediaThumbnail } from './';
+
 function GridItem( { item } ) {
 	return (
 		<li className={ 'edit-site-media__item-container' }>
-			<img
-				src={ item.source_url }
-				alt={ item.title.rendered }
-				className={ 'edit-site-media__item' }
-			/>
+			{ getMediaThumbnail( item ) }
 			<HStack className="edit-site-media__footer" justify="space-between">
 				<HStack
 					alignment="center"

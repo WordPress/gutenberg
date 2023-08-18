@@ -133,7 +133,7 @@ const headingText = {
 };
 
 // Getting headings, etc. based on `mediaType` query type.
-function getMediaThumbnail( attachment ) {
+export function getMediaThumbnail( attachment ) {
 	if ( 'image' === attachment?.media_type ) {
 		return (
 			<img
