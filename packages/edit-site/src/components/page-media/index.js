@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import { createColumnHelper } from '@tanstack/react-table';
+import {
+	useReactTable,
+	createColumnHelper,
+	getCoreRowModel,
+} from '@tanstack/react-table';
 /**
  * WordPress dependencies
  */
@@ -20,8 +24,9 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { grid, list } from '@wordpress/icons';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -39,16 +44,6 @@ import FilterControl from './filter-control';
 
 /** @type {import('@tanstack/react-table').ColumnHelper<Attachment>} */
 const columnHelper = createColumnHelper();
-
-const dateFormatter = new Intl.DateTimeFormat(
-	// TODO: Other locales?
-	'en-US',
-	{
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	}
-);
 
 const columns = [
 	columnHelper.display( {
@@ -126,7 +121,9 @@ const columns = [
 		header: () => __( 'Date' ),
 		cell: ( info ) => (
 			<time dateTime={ info.getValue() }>
-				{ dateFormatter.format( new Date( info.getValue() ) ) }
+				{ info.table.options.meta.dateFormatter.format(
+					new Date( info.getValue() )
+				) }
 			</time>
 		),
 	} ),
@@ -161,7 +158,7 @@ function getMediaDetails( mediaType ) {
 
 export default function PageMedia() {
 	const { mediaType } = getQueryArgs( window.location.href );
-	const { attachments, tags } = useSelect(
+	const { attachments, tags, locale } = useSelect(
 		( select ) => {
 			const _mediaType = 'all' === mediaType ? undefined : mediaType;
 			const _attachments = select( coreStore ).getMediaItems( {
@@ -177,13 +174,38 @@ export default function PageMedia() {
 				'attachment_tag',
 				{ per_page: -1 }
 			);
+			const settings = select( blockEditorStore ).getSettings();
 			return {
 				attachments: _attachments || EMPTY_ARRAY,
 				tags: _tags || EMPTY_ARRAY,
+				locale: settings.locale,
 			};
 		},
 		[ mediaType ]
 	);
+
+	const dateFormatter = useMemo(
+		() =>
+			new Intl.DateTimeFormat( locale || 'en-US', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+			} ),
+		[ locale ]
+	);
+
+	const table = useReactTable( {
+		data: attachments,
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+		meta: {
+			tags,
+			dateFormatter,
+		},
+		enableMultiRowSelection: true,
+		enableSorting: true,
+		enableHiding: true,
+	} );
 
 	const { heading } = getMediaDetails( mediaType );
 	const [ tagsFilter, setTagsFilter ] = useState( [] );
@@ -280,20 +302,7 @@ export default function PageMedia() {
 							</ToggleGroupControl>
 						</HStack>
 
-						{ attachments && (
-							<Table
-								data={ attachments }
-								columns={ columns }
-								tableOptions={ {
-									meta: {
-										tags,
-									},
-									enableMultiRowSelection: true,
-									enableSorting: true,
-									enableHiding: true,
-								} }
-							/>
-						) }
+						{ attachments && <Table table={ table } /> }
 					</VStack>
 
 					<HStack justify="flex-end">

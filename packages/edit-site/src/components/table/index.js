@@ -1,20 +1,13 @@
 /**
  * External dependencies
  */
-import {
-	useReactTable,
-	flexRender,
-	getCoreRowModel,
-} from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
 
-export default function Table( { data, columns, tableOptions } ) {
-	const table = useReactTable( {
-		data,
-		columns,
-		getCoreRowModel: getCoreRowModel(),
-		...tableOptions,
-	} );
-
+/**
+ * @param {Object}                                         props       The props.
+ * @param {import('@tanstack/react-table').Table<unknown>} props.table The table created from `@tanstack/react-table`.
+ */
+export default function Table( { table } ) {
 	return (
 		<div className="edit-site-table-wrapper">
 			<table className="edit-site-table">
@@ -33,11 +26,6 @@ export default function Table( { data, columns, tableOptions } ) {
 							) ) }
 						</tr>
 					) ) }
-					{ /* <tr>
-						{ columns.map( ( column ) => (
-							<th key={ column.header }>{ column.header }</th>
-						) ) }
-					</tr> */ }
 				</thead>
 				<tbody>
 					{ table.getRowModel().rows.map( ( row ) => (
@@ -59,22 +47,6 @@ export default function Table( { data, columns, tableOptions } ) {
 							) ) }
 						</tr>
 					) ) }
-					{ /* { data.map( ( row, rowIndex ) => (
-						<tr key={ rowIndex }>
-							{ columns.map( ( column, columnIndex ) => (
-								<td
-									style={ {
-										maxWidth: column.maxWidth
-											? column.maxWidth
-											: undefined,
-									} }
-									key={ columnIndex }
-								>
-									{ column.cell( row ) }
-								</td>
-							) ) }
-						</tr>
-					) ) } */ }
 				</tbody>
 			</table>
 		</div>
