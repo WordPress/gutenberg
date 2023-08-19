@@ -9,6 +9,13 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { getBlockSupport } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Form to edit the child layout value.
@@ -19,6 +26,7 @@ import { useEffect } from '@wordpress/element';
  * @param {Object}   props.parentLayout The parent layout value.
  *
  * @param {string}   props.align
+ * @param {string}   props.clientId
  * @return {Element} child layout edit element.
  */
 export default function ChildLayoutControl( {
@@ -26,6 +34,7 @@ export default function ChildLayoutControl( {
 	onChange,
 	parentLayout,
 	align,
+	clientId,
 } ) {
 	const {
 		orientation = 'horizontal',
@@ -34,6 +43,17 @@ export default function ChildLayoutControl( {
 		justifyContent = 'left',
 		verticalAlignment = 'center',
 	} = parentLayout ?? {};
+
+	const blockName = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockName( clientId ) ?? 'core/block',
+		[ clientId ]
+	);
+	const blockSupportsAlign = getBlockSupport( blockName, 'align' );
+
+	const supportsWideAlign = blockSupportsAlign?.includes( 'wide' );
+
+	const supportsFullAlign = blockSupportsAlign?.includes( 'full' );
 
 	const parentLayoutTypeToUse = parentLayoutType ?? defaultParentLayoutType;
 
@@ -50,36 +70,44 @@ export default function ChildLayoutControl( {
 		}
 	}, [] );
 
-	const widthOptions = [
-		{
-			key: 'fill',
-			value: 'fill',
-			name: __( 'Fill' ),
-		},
-	];
+	const widthOptions = [];
 
 	if ( parentLayoutTypeToUse === 'constrained' ) {
-		widthOptions.push(
-			{
-				key: 'content',
-				value: 'content',
-				name: __( 'Content' ),
-			},
-			{
+		widthOptions.push( {
+			key: 'content',
+			value: 'content',
+			name: __( 'Content' ),
+		} );
+		if ( supportsFullAlign ) {
+			widthOptions.push( {
+				key: 'fill',
+				value: 'fill',
+				name: __( 'Fill' ),
+			} );
+		}
+		if ( supportsWideAlign ) {
+			widthOptions.push( {
 				key: 'wide',
 				value: 'wide',
 				name: __( 'Wide' ),
-			}
-		);
+			} );
+		}
 	} else if (
 		parentLayoutTypeToUse === 'flex' &&
 		orientation === 'vertical'
 	) {
-		widthOptions.push( {
-			key: 'fit',
-			value: 'fit',
-			name: __( 'Fit' ),
-		} );
+		widthOptions.push(
+			{
+				key: 'fit',
+				value: 'fit',
+				name: __( 'Fit' ),
+			},
+			{
+				key: 'fill',
+				value: 'fill',
+				name: __( 'Fill' ),
+			}
+		);
 	} else if (
 		parentLayoutTypeToUse === 'flex' &&
 		orientation === 'horizontal'
@@ -89,6 +117,11 @@ export default function ChildLayoutControl( {
 				key: 'fit',
 				value: 'fit',
 				name: __( 'Fit' ),
+			},
+			{
+				key: 'fill',
+				value: 'fill',
+				name: __( 'Fill' ),
 			},
 			{
 				key: 'fixed',
@@ -250,16 +283,22 @@ export default function ChildLayoutControl( {
 	return (
 		<>
 			<HStack style={ { alignItems: 'flex-end' } }>
-				<FlexBlock>
-					<CustomSelectControl
-						label={ __( 'Width' ) }
-						value={ selectedWidth() }
-						options={ widthOptions }
-						onChange={ onChangeWidth }
-						__nextUnconstrainedWidth
-						__next36pxDefaultSize
-					/>
-				</FlexBlock>
+				{ parentLayoutTypeToUse !== 'default' &&
+					( supportsFullAlign ||
+						supportsWideAlign ||
+						parentLayoutType !== 'constrained' ) && (
+						<FlexBlock>
+							<CustomSelectControl
+								label={ __( 'Width' ) }
+								value={ selectedWidth() }
+								options={ widthOptions }
+								onChange={ onChangeWidth }
+								__nextUnconstrainedWidth
+								__next36pxDefaultSize
+							/>
+						</FlexBlock>
+					) }
+
 				{ ( selfStretch === 'fixed' ||
 					selfStretch === 'fixedNoShrink' ) &&
 					orientation === 'horizontal' && (
@@ -283,16 +322,20 @@ export default function ChildLayoutControl( {
 					) }
 			</HStack>
 			<HStack style={ { alignItems: 'flex-end' } }>
-				<FlexBlock>
-					<CustomSelectControl
-						label={ __( 'Height' ) }
-						value={ selectedHeight() }
-						options={ heightOptions }
-						onChange={ onChangeHeight }
-						__nextUnconstrainedWidth
-						__next36pxDefaultSize
-					/>
-				</FlexBlock>
+				{ parentLayoutType !== 'default' &&
+					parentLayoutType !== 'constrained' && (
+						<FlexBlock>
+							<CustomSelectControl
+								label={ __( 'Height' ) }
+								value={ selectedHeight() }
+								options={ heightOptions }
+								onChange={ onChangeHeight }
+								__nextUnconstrainedWidth
+								__next36pxDefaultSize
+							/>
+						</FlexBlock>
+					) }
+
 				{ ( selfStretch === 'fixed' ||
 					selfStretch === 'fixedNoShrink' ) &&
 					orientation === 'vertical' && (

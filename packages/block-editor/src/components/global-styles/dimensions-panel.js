@@ -213,6 +213,7 @@ export default function DimensionsPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	onVisualize = () => {},
 	align = null,
+	clientId,
 	// Special case because the layout controls are not part of the dimensions panel
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
@@ -695,6 +696,7 @@ export default function DimensionsPanel( {
 						onChange={ setChildLayout }
 						parentLayout={ settings?.parentLayout }
 						align={ align }
+						clientId={ clientId }
 					/>
 				</VStack>
 			) }
