@@ -2,23 +2,17 @@
  * WordPress dependencies
  */
 import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { pencil } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import SidebarButton from '../sidebar-button';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import { store as editSiteStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
 export default function SidebarNavigationScreenMediaItem() {
 	const { params } = useNavigator();
-	const { postType, postId, mediaType } = params;
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { postId, mediaType } = params;
 	const { record } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -36,17 +30,10 @@ export default function SidebarNavigationScreenMediaItem() {
 
 	return (
 		<SidebarNavigationScreen
-			actions={
-				<SidebarButton
-					onClick={ () => setCanvasMode( 'edit' ) }
-					label={ __( 'Edit' ) }
-					icon={ pencil }
-				/>
-			}
 			backPath={ backPath }
 			content={
 				<div className="edit-site-sidebar-navigation-screen-media-item-content">
-					{ record?.title.rendered } { postType } - { postId }
+					{ record?.title.rendered } { postId }
 				</div>
 			}
 			footer={ __( 'Media Item Footer' ) }

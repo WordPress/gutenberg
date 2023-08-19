@@ -57,9 +57,8 @@ const columnHelper = createColumnHelper();
 
 function GridItemButton( { item } ) {
 	const linkProps = useLink( {
-		postType: item.type,
+		postType: 'attachment',
 		postId: item.id,
-		mediaType: getMediaTypeFromMimeType( item.mime_type ),
 	} );
 	return (
 		<Button { ...linkProps }>

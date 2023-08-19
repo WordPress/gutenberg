@@ -18,7 +18,6 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-
 export default function SidebarNavigationScreenNavigationItem() {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const {

@@ -14,7 +14,6 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export function getPathFromURL( urlParams ) {
 	let path = urlParams?.path ?? '/';
-
 	// Compute the navigator path based on the URL params.
 	if ( urlParams?.postType && urlParams?.postId ) {
 		switch ( urlParams.postType ) {
@@ -77,6 +76,7 @@ export default function useSyncPathWithURL() {
 				updateUrlParams( {
 					postType: navigatorParams?.postType,
 					postId: navigatorParams?.postId,
+					mediaType: undefined,
 					path: undefined,
 				} );
 			} else if (

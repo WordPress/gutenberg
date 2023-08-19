@@ -70,11 +70,11 @@ function SidebarScreens() {
 			<NavigatorScreen path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
 			</NavigatorScreen>
-			<NavigatorScreen path="/media">
-				<SidebarNavigationScreenMedia />
-			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(attachment)/:postId">
 				<SidebarNavigationScreenMediaItem />
+			</NavigatorScreen>
+			<NavigatorScreen path="/media">
+				<SidebarNavigationScreenMedia />
 			</NavigatorScreen>
 		</>
 	);
