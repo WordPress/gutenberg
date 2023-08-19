@@ -18,7 +18,7 @@ import { page } from '@wordpress/icons';
  */
 import Page from '../page';
 
-function getMediaPreview( mediaType, record ) {
+function MediaPreview( { mediaType, record } ) {
 	if ( mediaType === 'application' ) {
 		return (
 			<Tooltip
@@ -106,9 +106,12 @@ export default function PageMediaItem() {
 					spacing={ 3 }
 					className="edit-site-media-page-media-item"
 				>
-					{ mediaType &&
-						record &&
-						getMediaPreview( mediaType, record ) }
+					{ mediaType && record && (
+						<MediaPreview
+							mediaType={ mediaType }
+							record={ record }
+						/>
+					) }
 				</VStack>
 			</Spacer>
 		</Page>
