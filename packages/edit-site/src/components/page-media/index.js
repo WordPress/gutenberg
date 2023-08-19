@@ -25,12 +25,11 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	Icon,
 	FormFileUpload,
 	Button,
 } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
-import { grid, list, video, audio, page } from '@wordpress/icons';
+import { grid, list } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
@@ -46,6 +45,7 @@ import Grid from './grid';
 import Pagination from '../page-patterns/pagination';
 import FilterControl from './filter-control';
 import { useLink } from '../routes/link';
+import { getMediaItem } from './get-media';
 
 /**
  * @typedef {Object} Attachment
@@ -63,7 +63,7 @@ function GridItemButton( { item } ) {
 	return (
 		<Button { ...linkProps }>
 			<HStack justify="flex-start">
-				{ getMediaThumbnail( item ) }
+				{ getMediaItem( item ) }
 				<h4>{ item.title.rendered }</h4>
 			</HStack>
 		</Button>
@@ -97,7 +97,7 @@ const columns = [
 		header: () => __( 'Title' ),
 		cell: ( info ) =>
 			isBlobURL( info.row.original.url ) ? (
-				getMediaThumbnail( info.row.original )
+				getMediaItem( info.row.original )
 			) : (
 				<GridItemButton item={ info.row.original } />
 			),
@@ -160,64 +160,6 @@ const headingText = {
 	video: __( 'Videos' ),
 	image: __( 'Images' ),
 };
-
-export function getMediaTypeFromMimeType( mimeType ) {
-	// @todo this needs to be abstracted and the
-	//  media types formalized somewhere.
-	if ( mimeType.startsWith( 'image/' ) ) {
-		return 'image';
-	}
-
-	if ( mimeType.startsWith( 'video/' ) ) {
-		return 'video';
-	}
-
-	if ( mimeType.startsWith( 'audio/' ) ) {
-		return 'audio';
-	}
-
-	return 'application';
-}
-
-// Getting headings, etc. based on `mediaType` query type.
-export function getMediaThumbnail( attachment ) {
-	if ( isBlobURL( attachment.url ) ) {
-		return (
-			<img
-				height={ 100 }
-				width={ 100 }
-				style={ { borderRadius: '8px', flexShrink: 0 } }
-				src={ attachment.url }
-				alt=""
-			/>
-		);
-	}
-
-	const mediaType = getMediaTypeFromMimeType( attachment.mime_type );
-
-	if ( 'image' === mediaType ) {
-		return (
-			<img
-				height={ 100 }
-				width={ 100 }
-				style={ { borderRadius: '8px', flexShrink: 0 } }
-				src={ attachment.media_details.sizes.thumbnail.source_url }
-				alt={ attachment.alt_text }
-			/>
-		);
-	}
-
-	if ( 'audio' === mediaType ) {
-		return <Icon icon={ audio } size={ 128 } />;
-	}
-
-	if ( 'video' === mediaType ) {
-		return <Icon icon={ video } size={ 128 } />;
-	}
-
-	// Everything else is a file.
-	return <Icon icon={ page } size={ 128 } />;
-}
 
 export default function PageMedia() {
 	const { mediaType } = getQueryArgs( window.location.href );
