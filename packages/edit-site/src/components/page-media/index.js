@@ -183,6 +183,15 @@ const columns = [
 		},
 		sortingFn: 'alphanumeric',
 	} ),
+	columnHelper.accessor( 'author', {
+		header: () => __( 'Author' ),
+		cell: ( info ) => {
+			const users = info.table.options.meta.users;
+			if ( ! users ) return null;
+			return users.find( ( user ) => user.id === info.getValue() )?.name;
+		},
+		sortingFn: 'alphanumeric',
+	} ),
 	columnHelper.accessor( 'date_gmt', {
 		header: () => __( 'Date' ),
 		cell: ( info ) =>
@@ -268,7 +277,7 @@ export function getMediaThumbnail( attachment ) {
 
 export default function PageMedia() {
 	const { mediaType } = getQueryArgs( window.location.href );
-	const { persistedAttachments, tags, locale } = useSelect(
+	const { persistedAttachments, tags, locale, users } = useSelect(
 		( select ) => {
 			const _attachments = select( coreStore ).getMediaItems( {
 				per_page: -1,
@@ -288,6 +297,7 @@ export default function PageMedia() {
 				persistedAttachments: _attachments || EMPTY_ARRAY,
 				tags: _tags || EMPTY_ARRAY,
 				locale: settings.locale,
+				users: select( coreStore ).getUsers(),
 			};
 		},
 		[ mediaType ]
@@ -338,6 +348,7 @@ export default function PageMedia() {
 		meta: {
 			tags,
 			dateFormatter,
+			users,
 		},
 		enableMultiRowSelection: true,
 		enableSorting: true,
@@ -346,7 +357,6 @@ export default function PageMedia() {
 	} );
 	window.table = table;
 
-	const [ authorFilter, setAuthorFilter ] = useState( [] );
 	const [ sortBy, setSortBy ] = useState( [ 'name' ] );
 	const [ currentView, setCurrentView ] = useState( 'table' );
 	const tagOptions = useMemo(
@@ -427,23 +437,25 @@ export default function PageMedia() {
 									table.getColumn( 'tags' ).setFilterValue
 								}
 							/>
-							<FilterControl
-								label={ __( 'Author' ) }
-								value={ authorFilter }
-								options={ [
-									{ label: __( 'Saxon' ), value: 'saxon' },
-									{ label: __( 'Isabel' ), value: 'isabel' },
-									{ label: __( 'Ramon' ), value: 'ramon' },
-									{ label: __( 'Andy' ), value: 'andy' },
-									{
-										label: __( 'Kai' ),
-										value: 'kai',
-									},
-									{ label: __( 'Rob' ), value: 'rob' },
-								] }
-								multiple
-								onChange={ setAuthorFilter }
-							/>
+							{ users && (
+								<FilterControl
+									label={ __( 'Author' ) }
+									value={ table
+										.getColumn( 'author' )
+										.getFilterValue() }
+									options={
+										users.map( ( user ) => ( {
+											label: user.name,
+											value: user.id,
+										} ) ) ?? []
+									}
+									multiple
+									onChange={
+										table.getColumn( 'author' )
+											.setFilterValue
+									}
+								/>
+							) }
 							<Spacer />
 							<FilterControl
 								label={ __( 'Sort' ) }
