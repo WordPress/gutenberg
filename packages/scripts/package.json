@@ -38,6 +38,7 @@
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/dependency-extraction-webpack-plugin": "file:../dependency-extraction-webpack-plugin",
+		"@wordpress/e2e-test-utils-playwright": "file:../e2e-test-utils-playwright",
 		"@wordpress/eslint-plugin": "file:../eslint-plugin",
 		"@wordpress/jest-preset-default": "file:../jest-preset-default",
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
