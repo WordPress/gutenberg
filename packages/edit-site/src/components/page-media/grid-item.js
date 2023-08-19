@@ -1,17 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	Flex,
 } from '@wordpress/components';
-import { moreHorizontal } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -20,6 +15,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { getMediaItem } from './get-media';
 import { useLink } from '../routes/link';
 import { unlock } from '../../lock-unlock';
+import MediaActions from './media-actions';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -58,22 +54,10 @@ function GridItem( { item } ) {
 						</Heading>
 					</Flex>
 				</HStack>
-				<DropdownMenu
-					icon={ moreHorizontal }
-					label={ __( 'Actions' ) }
-					className="edit-site-media__dropdown"
-					popoverProps={ { placement: 'bottom-end' } }
-					toggleProps={ {
-						className: 'edit-site-patterns__button',
-						isSmall: true,
-					} }
-				>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							<MenuItem onClose={ onClose }>TODO</MenuItem>
-						</MenuGroup>
-					) }
-				</DropdownMenu>
+				<MediaActions
+					attachmentId={ item.id }
+					toggleProps={ { isSmall: true } }
+				/>
 			</HStack>
 		</li>
 	);
