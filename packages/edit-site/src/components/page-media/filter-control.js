@@ -53,6 +53,16 @@ export default function FilterControl( {
 							size="__unstable-large"
 							value={ searchFilter }
 							onChange={ setSearchFilter }
+							onKeyDown={ ( event ) => {
+								if ( event.key === 'Enter' ) {
+									event.preventDefault();
+									event.stopPropagation();
+									if ( onCreate ) {
+										onCreate( searchFilter );
+										onClose();
+									}
+								}
+							} }
 						/>
 					) }
 					{ options
@@ -94,6 +104,9 @@ export default function FilterControl( {
 								onClose();
 							} }
 						>
+							<kbd style={ { borderRadius: 4, marginRight: 4 } }>
+								{ __( 'Enter' ) }
+							</kbd>
 							{ sprintf(
 								/* translators: %s: search term */
 								__( 'Create "%s"' ),
