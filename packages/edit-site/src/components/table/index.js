@@ -70,6 +70,7 @@ export default function Table( { table } ) {
 						<tr
 							key={ row.id }
 							style={ {
+								// TODO: More generic way of dimming row.
 								opacity: row.original.id ? 1 : 0.5,
 							} }
 						>
