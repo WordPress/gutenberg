@@ -67,7 +67,12 @@ export default function Table( { table } ) {
 				</thead>
 				<tbody>
 					{ table.getRowModel().rows.map( ( row ) => (
-						<tr key={ row.id }>
+						<tr
+							key={ row.id }
+							style={ {
+								opacity: row.original.id ? 1 : 0.5,
+							} }
+						>
 							{ row.getVisibleCells().map( ( cell ) => (
 								<td
 									style={ {
