@@ -75,7 +75,9 @@ function GridItemButton( { item } ) {
 	} );
 	return (
 		<Button className="edit-site-media-item__name" { ...linkProps }>
-			{ getMediaItem( item ) }
+			<div className="edit-site-medi-item__image-wrapper">
+				{ getMediaItem( item ) }
+			</div>
 			<h4>{ item.title.rendered }</h4>
 		</Button>
 	);

@@ -93,11 +93,25 @@
 	padding: 0;
 }
 
+.edit-site-medi-item__image-wrapper {
+	width: 64px;
+}
+
 .edit-site-media-item__thumbnail {
 	display: block;
 	flex-shrink: 0;
-	height: 64px;
-	width: 64px;
+	width: 100%;
+	height: auto;
+	border-radius: $radius-block-ui;
+}
+
+.edit-site-media-item__icon {
+	width: 100%;
+	padding: $grid-unit-30 $grid-unit-10;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: $gray-100;
 	border-radius: $radius-block-ui;
 }
 
