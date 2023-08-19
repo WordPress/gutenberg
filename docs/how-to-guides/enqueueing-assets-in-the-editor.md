@@ -2,7 +2,7 @@
 
 This guide is designed to be the definitive reference for enqueueing assets (scripts and styles) in the Editor. The approaches outlined here represent the recommended practices but keep in mind that this resource will evolve as WordPress does. Updates are encouraged. 
 
-As of WordPress 6.3, the Post Editor is iframed if all registered blocks have a [`Block API version 3`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/) or higher. The Site Editor has always been iframed. This guide assumes you are looking to enqueue assets for the iframed Editor, but refer to the backward compatibility section below for additional considerations. 
+As of WordPress 6.3, the Post Editor is iframed if all registered blocks have a [`Block API version 3`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/) or higher and no traditional metaboxes are registered. The Site Editor has always been iframed. This guide assumes you are looking to enqueue assets for the iframed Editor, but refer to the backward compatibility section below for additional considerations. 
 
 For more information about why the Editor is iframed, please revisit the post [Blocks in an iframed (template) editor](https://make.wordpress.org/core/2021/06/29/blocks-in-an-iframed-template-editor/).
 
@@ -42,7 +42,7 @@ While not the recommended approach, it's important to note that `enqueue_block_e
 
 As of WordPress 6.3, all assets added through the [`enqueue_block_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_assets/) PHP action will also be enqueued in the iframed Editor. See [#48286](https://github.com/WordPress/gutenberg/pull/48286) for more details. 
 
-This is the primary method you should use to enqueue assets for user-generated content (blocks), and this hook fires both in the Editor and on the front end of your site. It should not be used to add assets intended for the Editor UI or to interact with Editor APIs. 
+This is the primary method you should use to enqueue assets for user-generated content (blocks), and this hook fires both in the Editor and on the front end of your site. It should not be used to add assets intended for the Editor UI or to interact with Editor APIs. See below for a note on backward compatibility.
 
 There are instances where you may only want to add assets in the Editor and not on the front end. You can achieve this by using an [`is_admin()`](https://developer.wordpress.org/reference/functions/is_admin/) check.
 
@@ -102,9 +102,9 @@ When building a block, `block.json` is the recommended way to enqueue all script
 
 ## Theme scripts and styles
 
-If you need to enqueue Editor JavaScript in a theme, you can use either `enqueue_block_assets` or `enqueue_block_editor_assets` as outlined above. Editor-specific stylesheets should almost always be added with [`add_editor_style()`](https://developer.wordpress.org/reference/functions/add_editor_style/). 
+If you need to enqueue Editor JavaScript in a theme, you can use either `enqueue_block_assets` or `enqueue_block_editor_assets` as outlined above. Editor-specific stylesheets should almost always be added with [`add_editor_style()`](https://developer.wordpress.org/reference/functions/add_editor_style/) or [`wp_enqueue_block_style()`](https://developer.wordpress.org/reference/functions/wp_enqueue_block_style/). 
 
-WordPress also includes a [`wp_enqueue_block_style()`](https://developer.wordpress.org/reference/functions/wp_enqueue_block_style/) function for loading per-block stylesheets in the Editor and on the front end. Coupled with `theme.json`, this is one of the best methods of styling blocks. See the WordPress Developer Blog article [Leveraging theme.json and per-block styles for more performant themes](https://developer.wordpress.org/news/2022/12/leveraging-theme-json-and-per-block-styles-for-more-performant-themes/) for more details.
+The `wp_enqueue_block_style()` function allows you to load per-block stylesheets in the Editor and on the front end. Coupled with `theme.json`, this is one of the best methods of styling blocks. See the WordPress Developer Blog article [Leveraging theme.json and per-block styles for more performant themes](https://developer.wordpress.org/news/2022/12/leveraging-theme-json-and-per-block-styles-for-more-performant-themes/) for more details.
 
 ## Backward compatibility and known issues
 
