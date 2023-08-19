@@ -11,7 +11,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { createInterpolateElement } from '@wordpress/element';
-import { download } from '@wordpress/icons';
+import { download, copy } from '@wordpress/icons';
+import { useCopyToClipboard } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -23,6 +24,21 @@ import {
 	SidebarNavigationScreenDetailsPanelLabel,
 	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
+
+function CopyButton( { text, onCopy = () => {}, children } ) {
+	const ref = useCopyToClipboard( text, onCopy );
+	return (
+		<Button
+			className="sidebar-navigation-screen-media-item__copy-button"
+			icon={ copy }
+			variant="secondary"
+			ref={ ref }
+			title={ text }
+		>
+			{ children }
+		</Button>
+	);
+}
 
 function getMediaDetails( record ) {
 	if ( ! record ) {
@@ -59,7 +75,7 @@ function getMediaDetails( record ) {
 	}
 
 	if ( record?.media_details ) {
-		const { width, height, filesize } = record.media_details;
+		const { width, height, filesize, file } = record.media_details;
 
 		if ( width && height ) {
 			details.push( {
@@ -72,6 +88,17 @@ function getMediaDetails( record ) {
 			details.push( {
 				label: __( 'File size' ),
 				value: `${ filesize / 1000 } kb`,
+			} );
+		}
+
+		if ( file ) {
+			details.push( {
+				label: __( 'Source' ),
+				value: (
+					<CopyButton text={ record?.source_url }>
+						{ __( 'Copy source url' ) }
+					</CopyButton>
+				),
 			} );
 		}
 	}

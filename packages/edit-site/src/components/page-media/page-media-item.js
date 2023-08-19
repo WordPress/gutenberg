@@ -8,7 +8,10 @@ import { getQueryArgs } from '@wordpress/url';
 import {
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
+	Icon,
+	Tooltip,
 } from '@wordpress/components';
+import { page } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -16,6 +19,20 @@ import {
 import Page from '../page';
 
 function getMediaPreview( mediaType, record ) {
+	if ( mediaType === 'application' ) {
+		return (
+			<Tooltip
+				text={ `${ record?.title.raw } - ${
+					record?.media_details?.filesize / 1000
+				} kb` }
+			>
+				<a href={ record?.source_url } target="_blank" rel="noreferrer">
+					<Icon icon={ page } size={ 128 } />
+				</a>
+			</Tooltip>
+		);
+	}
+
 	if ( mediaType === 'image' ) {
 		return <img src={ record?.source_url } alt={ record?.alt_text } />;
 	}
