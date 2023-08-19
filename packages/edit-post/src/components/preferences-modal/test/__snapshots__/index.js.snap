@@ -62,7 +62,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 
 <div
   aria-labelledby="components-modal-header-0"
-  class="components-modal__frame interface-preferences-modal"
+  class="components-modal__frame interface-preferences-modal interface-complementary-area"
   role="dialog"
   tabindex="-1"
 >
@@ -700,7 +700,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 
 <div
   aria-labelledby="components-modal-header-1"
-  class="components-modal__frame interface-preferences-modal"
+  class="components-modal__frame interface-preferences-modal interface-complementary-area"
   role="dialog"
   tabindex="-1"
 >

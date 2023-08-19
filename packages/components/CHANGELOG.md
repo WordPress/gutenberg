@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   `PreferencesModal`: Make heading and label colors consistent across the editor. ([#51246](https://github.com/WordPress/gutenberg/pull/51246)).
+
 ### Bug Fix
 
 -   `SandBox`: Fix the cleanup method in useEffect ([#53796](https://github.com/WordPress/gutenberg/pull/53796)).
