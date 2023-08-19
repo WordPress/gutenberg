@@ -9,7 +9,7 @@ import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { humanTimeDiff } from '@wordpress/date';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { createInterpolateElement } from '@wordpress/element';
 import { download } from '@wordpress/icons';
 
@@ -38,17 +38,21 @@ function getMediaDetails( record ) {
 		} );
 	}
 
-	if ( record?.modified ) {
+	if ( record?.date ) {
+		const formattedDate = dateI18n(
+			getSettings().formats.datetimeAbbreviated,
+			getDate( record?.date )
+		);
 		details.push( {
-			label: __( 'Last modified' ),
+			label: __( 'Uploaded' ),
 			value: createInterpolateElement(
 				sprintf(
 					/* translators: %s: is the relative time when the post was last modified. */
 					__( '<time>%s</time>' ),
-					humanTimeDiff( record.modified )
+					formattedDate
 				),
 				{
-					time: <time dateTime={ record.modified } />,
+					time: <time dateTime={ record.date } />,
 				}
 			),
 		} );
