@@ -193,7 +193,9 @@ export function getMediaThumbnail( attachment ) {
 		);
 	}
 
-	if ( 'image' === attachment?.media_type ) {
+	const mediaType = getMediaTypeFromMimeType( attachment.mime_type );
+
+	if ( 'image' === mediaType ) {
 		return (
 			<img
 				height={ 100 }
@@ -205,11 +207,11 @@ export function getMediaThumbnail( attachment ) {
 		);
 	}
 
-	if ( attachment?.mime_type.startsWith( 'audio' ) ) {
+	if ( 'audio' === mediaType ) {
 		return <Icon icon={ audio } size={ 128 } />;
 	}
 
-	if ( attachment?.mime_type.startsWith( 'video' ) ) {
+	if ( 'video' === mediaType ) {
 		return <Icon icon={ video } size={ 128 } />;
 	}
 
