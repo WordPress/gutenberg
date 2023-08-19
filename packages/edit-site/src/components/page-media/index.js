@@ -112,22 +112,26 @@ function TagsCellButton( { attachmentId, tagIds = [], tags } ) {
 		>
 			{ ( { onToggle } ) => (
 				<Button onClick={ onToggle }>
-					<HStack>
-						{ tagIds.map( ( tagId ) => (
-							<span
-								key={ tagId }
-								style={ {
-									background: '#ddd',
-									padding: '0.1em 0.5em',
-								} }
-							>
-								{
-									tags.find( ( tag ) => tag.id === tagId )
-										?.name
-								}
-							</span>
-						) ) }
-					</HStack>
+					{ tagIds.length ? (
+						<HStack>
+							{ tagIds.map( ( tagId ) => (
+								<span
+									key={ tagId }
+									style={ {
+										background: '#ddd',
+										padding: '0.1em 0.5em',
+									} }
+								>
+									{
+										tags.find( ( tag ) => tag.id === tagId )
+											?.name
+									}
+								</span>
+							) ) }
+						</HStack>
+					) : (
+						__( 'Add tag' )
+					) }
 				</Button>
 			) }
 		</FilterControl>
