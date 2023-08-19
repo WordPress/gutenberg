@@ -5,11 +5,18 @@ import { __experimentalUseNavigator as useNavigator } from '@wordpress/component
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import {
+	SidebarNavigationScreenDetailsPanel,
+	SidebarNavigationScreenDetailsPanelRow,
+	SidebarNavigationScreenDetailsPanelLabel,
+	SidebarNavigationScreenDetailsPanelValue,
+} from '../sidebar-navigation-screen-details-panel';
 
 export default function SidebarNavigationScreenMediaItem() {
 	const { params } = useNavigator();
@@ -31,11 +38,24 @@ export default function SidebarNavigationScreenMediaItem() {
 
 	return (
 		<SidebarNavigationScreen
+			title={ decodeEntities(
+				record?.title?.rendered || __( '(no title)' )
+			) }
 			backPath={ backPath }
 			content={
-				<div className="edit-site-sidebar-navigation-screen-media-item-content">
-					{ record?.title.raw }
-				</div>
+				<SidebarNavigationScreenDetailsPanel
+					spacing={ 5 }
+					title={ __( 'Details' ) }
+				>
+					<SidebarNavigationScreenDetailsPanelRow>
+						<SidebarNavigationScreenDetailsPanelLabel>
+							Something
+						</SidebarNavigationScreenDetailsPanelLabel>
+						<SidebarNavigationScreenDetailsPanelValue>
+							Yep
+						</SidebarNavigationScreenDetailsPanelValue>
+					</SidebarNavigationScreenDetailsPanelRow>
+				</SidebarNavigationScreenDetailsPanel>
 			}
 			footer={ __( 'Media Item Footer' ) }
 		/>
