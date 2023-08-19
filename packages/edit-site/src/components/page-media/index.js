@@ -70,6 +70,62 @@ function GridItemButton( { item } ) {
 	);
 }
 
+function TagsCellButton( { attachmentId, tagIds, tags } ) {
+	const { saveEntityRecord } = useDispatch( coreStore );
+	return (
+		<FilterControl
+			placeholder={ __( 'Select or create tags' ) }
+			value={ tagIds }
+			options={ tags.map( ( tag ) => ( {
+				value: tag.id,
+				label: tag.name,
+			} ) ) }
+			multiple
+			hideClear
+			onChange={ async ( newTagIds ) => {
+				await saveEntityRecord( 'root', 'media', {
+					id: attachmentId,
+					attachment_tags: newTagIds,
+				} );
+			} }
+			onCreate={ async ( input ) => {
+				const { id: newTagId } = await saveEntityRecord(
+					'taxonomy',
+					'attachment_tag',
+					{
+						name: input,
+					}
+				);
+				await saveEntityRecord( 'root', 'media', {
+					id: attachmentId,
+					attachment_tags: [ ...tagIds, newTagId ],
+				} );
+			} }
+		>
+			{ ( { onToggle } ) => (
+				<Button onClick={ onToggle }>
+					<HStack>
+						{ tagIds.map( ( tagId ) => (
+							<span
+								key={ tagId }
+								style={ {
+									background: '#ddd',
+									padding: '0.1em 0.5em',
+								} }
+							>
+								{
+									tags.find( ( tag ) => tag.id === tagId )
+										?.name
+								}
+							</span>
+						) ) }
+					</HStack>
+				</Button>
+			) }
+		</FilterControl>
+	);
+}
+
 const columns = [
 	columnHelper.display( {
 		id: 'select',
@@ -106,20 +162,11 @@ const columns = [
 		id: 'tags',
 		header: () => __( 'Tags' ),
 		cell: ( info ) => (
-			<HStack>
-				{ info.getValue()?.map( ( tagId ) => (
-					<span
-						key={ tagId }
-						style={ { background: '#ddd', padding: '0.1em 0.5em' } }
-					>
-						{
-							info.table.options.meta.tags.find(
-								( tag ) => tag.id === tagId
-							)?.name
-						}
-					</span>
-				) ) }
-			</HStack>
+			<TagsCellButton
+				attachmentId={ info.row.original.id }
+				tagIds={ info.getValue() }
+				tags={ info.table.options.meta.tags }
+			/>
 		),
 		filterFn: 'arrIncludesAll',
 	} ),
