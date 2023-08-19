@@ -54,3 +54,26 @@
 .edit-site-media__no-results {
 	color: $gray-600;
 }
+
+.edit-site-media__pagination {
+	padding: 0 $grid-unit-30 $grid-unit-40 $grid-unit-30;
+	position: sticky;
+	bottom: 0;
+
+	.components-button.is-tertiary {
+		width: $button-size-compact;
+		height: $button-size-compact;
+		color: $gray-700;
+		background-color: $gray-200;
+		justify-content: center;
+
+		&:disabled {
+			color: $gray-400;
+			background-color: $gray-100;
+		}
+
+		&:hover:not(:disabled) {
+			background-color: $gray-300;
+		}
+	}
+}

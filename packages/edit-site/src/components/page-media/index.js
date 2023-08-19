@@ -376,6 +376,7 @@ export default function PageMedia() {
 					<HStack justify="flex-end">
 						{ numPages > 1 && (
 							<Pagination
+								className={ 'edit-site-media__pagination' }
 								currentPage={ currentPage }
 								numPages={ numPages }
 								changePage={ changePage }

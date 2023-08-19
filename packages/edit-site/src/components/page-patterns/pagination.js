@@ -13,13 +13,14 @@ export default function Pagination( {
 	numPages,
 	changePage,
 	totalItems,
+	className = 'edit-site-patterns__grid-pagination',
 } ) {
 	return (
 		<HStack
 			expanded={ false }
 			spacing={ 3 }
 			justify="flex-start"
-			className="edit-site-patterns__grid-pagination"
+			className={ className }
 		>
 			<Text variant="muted">
 				{
