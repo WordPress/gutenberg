@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Added a new `test-playwright` ruleset using [`eslint-plugin-playwright`](https://www.npmjs.com/package/eslint-plugin-playwright).
+
 ## 15.0.0 (2023-08-16)
 
 ### Breaking Changes
@@ -15,7 +19,6 @@
 ### Enhancement
 
 -   Support Typescript 5 and 5.1 by updating both `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` to version `^5.62.0`. ([#52621](https://github.com/WordPress/gutenberg/pull/52621)).
--   Added a new `test-playwright` ruleset using [`eslint-plugin-playwright`](https://www.npmjs.com/package/eslint-plugin-playwright).
 
 ## 14.12.0 (2023-08-10)
 
