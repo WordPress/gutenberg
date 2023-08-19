@@ -254,6 +254,7 @@ export default function PageMedia() {
 	const table = useReactTable( {
 		data: attachmentsOnPage,
 		columns,
+		getRowId: ( row ) => row.id,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),

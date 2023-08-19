@@ -107,6 +107,7 @@ export default function PageTemplateParts() {
 	const table = useReactTable( {
 		data: templateParts,
 		columns,
+		getRowId: ( row ) => row.id,
 		getCoreRowModel: getCoreRowModel(),
 		enableSorting: false,
 	} );
