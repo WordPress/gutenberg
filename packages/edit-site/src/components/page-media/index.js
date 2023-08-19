@@ -70,6 +70,62 @@ function GridItemButton( { item } ) {
 	);
 }
 
+function TagsCellButton( { attachmentId, tagIds, tags } ) {
+	const { saveEntityRecord } = useDispatch( coreStore );
+	return (
+		<FilterControl
+			placeholder={ __( 'Select or create tags' ) }
+			value={ tagIds }
+			options={ tags.map( ( tag ) => ( {
+				value: tag.id,
+				label: tag.name,
+			} ) ) }
+			multiple
+			hideClear
+			onChange={ async ( newTagIds ) => {
+				await saveEntityRecord( 'root', 'media', {
+					id: attachmentId,
+					attachment_tags: newTagIds,
+				} );
+			} }
+			onCreate={ async ( input ) => {
+				const { id: newTagId } = await saveEntityRecord(
+					'taxonomy',
+					'attachment_tag',
+					{
+						name: input,
+					}
+				);
+				await saveEntityRecord( 'root', 'media', {
+					id: attachmentId,
+					attachment_tags: [ ...tagIds, newTagId ],
+				} );
+			} }
+		>
+			{ ( { onToggle } ) => (
+				<Button onClick={ onToggle }>
+					<HStack>
+						{ tagIds.map( ( tagId ) => (
+							<span
+								key={ tagId }
+								style={ {
+									background: '#ddd',
+									padding: '0.1em 0.5em',
+								} }
+							>
+								{
+									tags.find( ( tag ) => tag.id === tagId )
+										?.name
+								}
+							</span>
+						) ) }
+					</HStack>
+				</Button>
+			) }
+		</FilterControl>
+	);
+}
+
 const columns = [
 	columnHelper.display( {
 		id: 'select',
@@ -106,20 +162,11 @@ const columns = [
 		id: 'tags',
 		header: () => __( 'Tags' ),
 		cell: ( info ) => (
-			<HStack>
-				{ info.getValue()?.map( ( tagId ) => (
-					<span
-						key={ tagId }
-						style={ { background: '#ddd', padding: '0.1em 0.5em' } }
-					>
-						{
-							info.table.options.meta.tags.find(
-								( tag ) => tag.id === tagId
-							)?.name
-						}
-					</span>
-				) ) }
-			</HStack>
+			<TagsCellButton
+				attachmentId={ info.row.original.id }
+				tagIds={ info.getValue() }
+				tags={ info.table.options.meta.tags }
+			/>
 		),
 		filterFn: 'arrIncludesAll',
 	} ),
@@ -133,6 +180,15 @@ const columns = [
 			);
 			const postTitle = record?.title?.rendered;
 			return postTitle ? <span>{ postTitle }</span> : null;
+		},
+		sortingFn: 'alphanumeric',
+	} ),
+	columnHelper.accessor( 'author', {
+		header: () => __( 'Author' ),
+		cell: ( info ) => {
+			const users = info.table.options.meta.users;
+			if ( ! users ) return null;
+			return users.find( ( user ) => user.id === info.getValue() )?.name;
 		},
 		sortingFn: 'alphanumeric',
 	} ),
@@ -163,7 +219,7 @@ const headingText = {
 
 export default function PageMedia() {
 	const { mediaType } = getQueryArgs( window.location.href );
-	const { persistedAttachments, tags, locale } = useSelect(
+	const { persistedAttachments, tags, locale, users } = useSelect(
 		( select ) => {
 			const _attachments = select( coreStore ).getMediaItems( {
 				per_page: -1,
@@ -183,6 +239,7 @@ export default function PageMedia() {
 				persistedAttachments: _attachments || EMPTY_ARRAY,
 				tags: _tags || EMPTY_ARRAY,
 				locale: settings.locale,
+				users: select( coreStore ).getUsers(),
 			};
 		},
 		[ mediaType ]
@@ -222,6 +279,7 @@ export default function PageMedia() {
 			} ),
 		[ locale ]
 	);
+	const [ globalFilter, setGlobalFilter ] = useState( '' );
 
 	const table = useReactTable( {
 		data: attachmentsOnPage,
@@ -230,9 +288,13 @@ export default function PageMedia() {
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		state: {
+			globalFilter,
+		},
 		meta: {
 			tags,
 			dateFormatter,
+			users,
 		},
 		enableMultiRowSelection: true,
 		enableSorting: true,
@@ -241,7 +303,6 @@ export default function PageMedia() {
 	} );
 	window.table = table;
 
-	const [ authorFilter, setAuthorFilter ] = useState( [] );
 	const [ sortBy, setSortBy ] = useState( [ 'name' ] );
 	const [ currentView, setCurrentView ] = useState( 'table' );
 	const tagOptions = useMemo(
@@ -307,7 +368,8 @@ export default function PageMedia() {
 						<HStack justify="flex-start">
 							<SearchControl
 								style={ { height: 40 } }
-								onChange={ () => {} }
+								value={ globalFilter }
+								onChange={ setGlobalFilter }
 								placeholder={ __( 'Search' ) }
 								__nextHasNoMarginBottom
 							/>
@@ -322,23 +384,25 @@ export default function PageMedia() {
 									table.getColumn( 'tags' ).setFilterValue
 								}
 							/>
-							<FilterControl
-								label={ __( 'Author' ) }
-								value={ authorFilter }
-								options={ [
-									{ label: __( 'Saxon' ), value: 'saxon' },
-									{ label: __( 'Isabel' ), value: 'isabel' },
-									{ label: __( 'Ramon' ), value: 'ramon' },
-									{ label: __( 'Andy' ), value: 'andy' },
-									{
-										label: __( 'Kai' ),
-										value: 'kai',
-									},
-									{ label: __( 'Rob' ), value: 'rob' },
-								] }
-								multiple
-								onChange={ setAuthorFilter }
-							/>
+							{ users && (
+								<FilterControl
+									label={ __( 'Author' ) }
+									value={ table
+										.getColumn( 'author' )
+										.getFilterValue() }
+									options={
+										users.map( ( user ) => ( {
+											label: user.name,
+											value: user.id,
+										} ) ) ?? []
+									}
+									multiple
+									onChange={
+										table.getColumn( 'author' )
+											.setFilterValue
+									}
+								/>
+							) }
 							<Spacer />
 							<FilterControl
 								label={ __( 'Sort' ) }
