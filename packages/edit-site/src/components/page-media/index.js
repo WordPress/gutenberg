@@ -157,6 +157,7 @@ const columns = [
 			) : (
 				<GridItemButton item={ info.row.original } />
 			),
+		sortingFn: 'alphanumeric',
 	} ),
 	columnHelper.accessor( 'attachment_tags', {
 		id: 'tags',
