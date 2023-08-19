@@ -18,16 +18,16 @@ import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { getQueryArgs } from '@wordpress/url';
 import {
 	SearchControl,
-	CheckboxControl,
 	__experimentalVStack as VStack,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 	Icon,
 	FormFileUpload,
 	Button,
+	FlexBlock,
+	FlexItem,
 } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { grid, list, video, audio, page } from '@wordpress/icons';
@@ -61,11 +61,9 @@ function GridItemButton( { item } ) {
 		postId: item.id,
 	} );
 	return (
-		<Button { ...linkProps }>
-			<HStack justify="flex-start">
-				{ getMediaThumbnail( item ) }
-				<h4>{ item.title.rendered }</h4>
-			</HStack>
+		<Button className="edit-site-media-item__name" { ...linkProps }>
+			{ getMediaThumbnail( item ) }
+			<h4>{ item.title.rendered }</h4>
 		</Button>
 	);
 }
@@ -127,27 +125,27 @@ function TagsCellButton( { attachmentId, tagIds, tags } ) {
 }
 
 const columns = [
-	columnHelper.display( {
-		id: 'select',
-		header: ( { table } ) => (
-			<CheckboxControl
-				checked={ table.getIsAllPageRowsSelected() }
-				onChange={ ( value ) =>
-					table.toggleAllPageRowsSelected( !! value )
-				}
-				aria-label={ __( 'Select all' ) }
-			/>
-		),
-		cell: ( { row } ) => (
-			<CheckboxControl
-				checked={ row.getIsSelected() }
-				onChange={ ( value ) => row.toggleSelected( !! value ) }
-				aria-label={ __( 'Select row' ) }
-			/>
-		),
-		enableSorting: false,
-		enableHiding: false,
-	} ),
+	// columnHelper.display( {
+	// 	id: 'select',
+	// 	header: ( { table } ) => (
+	// 		<CheckboxControl
+	// 			checked={ table.getIsAllPageRowsSelected() }
+	// 			onChange={ ( value ) =>
+	// 				table.toggleAllPageRowsSelected( !! value )
+	// 			}
+	// 			aria-label={ __( 'Select all' ) }
+	// 		/>
+	// 	),
+	// 	cell: ( { row } ) => (
+	// 		<CheckboxControl
+	// 			checked={ row.getIsSelected() }
+	// 			onChange={ ( value ) => row.toggleSelected( !! value ) }
+	// 			aria-label={ __( 'Select row' ) }
+	// 		/>
+	// 	),
+	// 	enableSorting: false,
+	// 	enableHiding: false,
+	// } ),
 	columnHelper.accessor( ( row ) => row.title?.rendered, {
 		id: 'title',
 		header: () => __( 'Title' ),
@@ -231,11 +229,9 @@ export function getMediaThumbnail( attachment ) {
 	if ( isBlobURL( attachment.url ) ) {
 		return (
 			<img
-				height={ 100 }
-				width={ 100 }
-				style={ { borderRadius: '8px', flexShrink: 0 } }
 				src={ attachment.url }
 				alt=""
+				className="edit-site-media-item__thumbnail"
 			/>
 		);
 	}
@@ -245,9 +241,7 @@ export function getMediaThumbnail( attachment ) {
 	if ( 'image' === mediaType ) {
 		return (
 			<img
-				height={ 100 }
-				width={ 100 }
-				style={ { borderRadius: '8px', flexShrink: 0 } }
+				className="edit-site-media-item__thumbnail"
 				src={ attachment.media_details.sizes.thumbnail.source_url }
 				alt={ attachment.alt_text }
 			/>
@@ -339,7 +333,7 @@ export default function PageMedia() {
 			tags,
 			dateFormatter,
 		},
-		enableMultiRowSelection: true,
+		enableMultiRowSelection: false,
 		enableSorting: true,
 		enableHiding: true,
 		enableFilters: true,
@@ -389,62 +383,68 @@ export default function PageMedia() {
 	return (
 		<Page
 			className="edit-site-media"
-			title={ __( 'Media' ) }
-			hideTitleFromUI
+			title={ headingText[ mediaType ] || __( 'Media' ) }
+			actions={
+				<FormFileUpload
+					variant="primary"
+					multiple
+					onChange={ ( event ) => uploadFiles( event.target.files ) }
+				>
+					{ __( 'Upload new' ) }
+				</FormFileUpload>
+			}
 		>
-			<Spacer padding={ 3 }>
-				<VStack spacing={ 3 }>
-					<HStack justify="space-between">
-						<Heading level={ 2 }>
-							{ headingText[ mediaType ] }
-						</Heading>
-						<FormFileUpload
-							variant="primary"
-							multiple
-							onChange={ ( event ) =>
-								uploadFiles( event.target.files )
-							}
-						>
-							{ __( 'Upload new' ) }
-						</FormFileUpload>
-					</HStack>
-					<VStack>
-						<HStack justify="flex-start">
-							<SearchControl
-								style={ { height: 40 } }
-								onChange={ () => {} }
-								placeholder={ __( 'Search' ) }
-								__nextHasNoMarginBottom
-							/>
-							<FilterControl
-								label={ __( 'Tags' ) }
-								value={ table
-									.getColumn( 'tags' )
-									.getFilterValue() }
-								options={ tagOptions }
-								multiple
-								onChange={
-									table.getColumn( 'tags' ).setFilterValue
-								}
-							/>
-							<FilterControl
-								label={ __( 'Author' ) }
-								value={ authorFilter }
-								options={ [
-									{ label: __( 'Saxon' ), value: 'saxon' },
-									{ label: __( 'Isabel' ), value: 'isabel' },
-									{ label: __( 'Ramon' ), value: 'ramon' },
-									{ label: __( 'Andy' ), value: 'andy' },
-									{
-										label: __( 'Kai' ),
-										value: 'kai',
-									},
-									{ label: __( 'Rob' ), value: 'rob' },
-								] }
-								multiple
-								onChange={ setAuthorFilter }
-							/>
-							<Spacer />
+			<Spacer padding={ 7 }>
+				<VStack spacing={ 6 }>
+					<HStack alignment="left" spacing={ 5 }>
+						<SearchControl
+							style={ { height: 40 } }
+							onChange={ () => {} }
+							placeholder={ __( 'Search' ) }
+							__nextHasNoMarginBottom
+						/>
+						<FlexBlock>
+							<HStack alignment="left" spacing={ 3 }>
+								<FilterControl
+									label={ __( 'Tags' ) }
+									value={ table
+										.getColumn( 'tags' )
+										.getFilterValue() }
+									options={ tagOptions }
+									multiple
+									onChange={
+										table.getColumn( 'tags' ).setFilterValue
+									}
+								/>
+								<FilterControl
+									label={ __( 'Author' ) }
+									value={ authorFilter }
+									options={ [
+										{
+											label: __( 'Saxon' ),
+											value: 'saxon',
+										},
+										{
+											label: __( 'Isabel' ),
+											value: 'isabel',
+										},
+										{
+											label: __( 'Ramon' ),
+											value: 'ramon',
+										},
+										{ label: __( 'Andy' ), value: 'andy' },
+										{
+											label: __( 'Kai' ),
+											value: 'kai',
+										},
+										{ label: __( 'Rob' ), value: 'rob' },
+									] }
+									multiple
+									onChange={ setAuthorFilter }
+								/>
+							</HStack>
+						</FlexBlock>
+						<FlexItem>
 							<FilterControl
 								label={ __( 'Sort' ) }
 								value={ sortBy }
@@ -455,35 +455,33 @@ export default function PageMedia() {
 								] }
 								onChange={ setSortBy }
 							/>
-							<ToggleGroupControl
-								label={ __( 'Toggle view' ) }
-								hideLabelFromVision
-								value={ currentView }
-								__nextHasNoMarginBottom
-								size="__unstable-large"
-								onChange={ setCurrentView }
-							>
-								<ToggleGroupControlOptionIcon
-									value="table"
-									label={ __( 'Table' ) }
-									icon={ list }
-								/>
-								<ToggleGroupControlOptionIcon
-									value="grid"
-									label={ __( 'Grid' ) }
-									icon={ grid }
-								/>
-							</ToggleGroupControl>
-						</HStack>
-
-						{ attachmentsOnPage && 'table' === currentView && (
-							<Table table={ table } />
-						) }
-						{ attachmentsOnPage && 'grid' === currentView && (
-							<Grid items={ attachmentsOnPage } />
-						) }
-					</VStack>
-
+						</FlexItem>
+						<ToggleGroupControl
+							label={ __( 'Toggle view' ) }
+							hideLabelFromVision
+							value={ currentView }
+							__nextHasNoMarginBottom
+							size="__unstable-large"
+							onChange={ setCurrentView }
+						>
+							<ToggleGroupControlOptionIcon
+								value="table"
+								label={ __( 'Table' ) }
+								icon={ list }
+							/>
+							<ToggleGroupControlOptionIcon
+								value="grid"
+								label={ __( 'Grid' ) }
+								icon={ grid }
+							/>
+						</ToggleGroupControl>
+					</HStack>
+					{ attachmentsOnPage && 'table' === currentView && (
+						<Table table={ table } />
+					) }
+					{ attachmentsOnPage && 'grid' === currentView && (
+						<Grid items={ attachmentsOnPage } />
+					) }
 					<HStack justify="flex-end">
 						{ numPages > 1 && (
 							<Pagination

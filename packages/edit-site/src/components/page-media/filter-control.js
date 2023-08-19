@@ -35,7 +35,7 @@ export default function FilterControl( {
 					children( { onToggle, isOpen } )
 				) : (
 					<Button
-						variant="secondary"
+						variant="tertiary"
 						text={ getToggleText( label, value, options ) }
 						icon={ chevronDown }
 						iconPosition="right"

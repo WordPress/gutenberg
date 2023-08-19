@@ -1,6 +1,5 @@
 .edit-site-table-wrapper {
 	width: 100%;
-	padding: $grid-unit-40;
 }
 
 .edit-site-table {
@@ -35,4 +34,8 @@
 	tr {
 		border-bottom: 1px solid $gray-100;
 	}
+}
+
+.edit-site-table-header__button {
+	padding: 0;
 }
