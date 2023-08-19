@@ -1070,7 +1070,7 @@ export function canUserEditEntityRecord(
 	if ( ! entityConfig ) {
 		return false;
 	}
-	const resource = entityConfig.__unstable_rest_base;
+	const resource = entityConfig.__unstable_rest_base ?? entityConfig.name;
 
 	return canUser( state, 'update', resource, recordId );
 }
