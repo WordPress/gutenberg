@@ -78,7 +78,7 @@ function GridItemButton( { item } ) {
 	);
 }
 
-function TagsCellButton( { attachmentId, tagIds, tags } ) {
+function TagsCellButton( { attachmentId, tagIds = [], tags } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	return (
 		<FilterControl
