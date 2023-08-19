@@ -28,13 +28,14 @@ import {
 	FlexBlock,
 	FlexItem,
 } from '@wordpress/components';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useRef } from '@wordpress/element';
 import { grid, list } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -345,6 +346,8 @@ export default function PageMedia() {
 		} );
 	};
 
+	const pageRef = useRef();
+
 	return (
 		<Page
 			className="edit-site-media"
@@ -358,6 +361,7 @@ export default function PageMedia() {
 					{ __( 'Upload new' ) }
 				</FormFileUpload>
 			}
+			ref={ pageRef }
 		>
 			<Spacer padding={ 7 }>
 				<VStack spacing={ 6 }>
@@ -453,9 +457,12 @@ export default function PageMedia() {
 									table.getState().pagination.pageIndex + 1
 								}
 								numPages={ table.getPageCount() }
-								changePage={ ( page ) =>
-									table.setPageIndex( page - 1 )
-								}
+								changePage={ ( page ) => {
+									table.setPageIndex( page - 1 );
+									getScrollContainer(
+										pageRef.current
+									).scrollTop = 0;
+								} }
 								totalItems={
 									table.getFilteredRowModel().rows.length
 								}

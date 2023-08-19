@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { forwardRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { EditorSnackbars } from '@wordpress/editor';
 
@@ -14,19 +15,15 @@ import { EditorSnackbars } from '@wordpress/editor';
  */
 import Header from './header';
 
-export default function Page( {
-	title,
-	subTitle,
-	actions,
-	children,
-	className,
-	hideTitleFromUI = false,
-} ) {
+function Page(
+	{ title, subTitle, actions, children, className, hideTitleFromUI = false },
+	ref
+) {
 	const classes = classnames( 'edit-site-page', className );
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ title }>
-			<div className="edit-site-page-content">
+			<div className="edit-site-page-content" ref={ ref }>
 				{ ! hideTitleFromUI && title && (
 					<Header
 						title={ title }
@@ -40,3 +37,5 @@ export default function Page( {
 		</NavigableRegion>
 	);
 }
+
+export default forwardRef( Page );
