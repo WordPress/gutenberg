@@ -3,19 +3,7 @@
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
-		"development": {
-			"ssl": {
-				"cert": "packages/env/ssl/localhost.crt",
-				"key": "packages/env/ssl/localhost.key",
-				"port": 8993
-			}
-		},
 		"tests": {
-			"ssl": {
-				"cert": "packages/env/ssl/localhost.crt",
-				"key": "packages/env/ssl/localhost.key",
-				"port": 8994
-			},
 			"mappings": {
 				"wp-content/plugins/gutenberg": ".",
 				"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
