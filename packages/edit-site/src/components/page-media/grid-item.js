@@ -16,7 +16,7 @@ import { moreHorizontal } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { getMediaThumbnail } from './';
+import { getMediaItem } from './get-media';
 import { useLink } from '../routes/link';
 
 function GridItem( { item } ) {
@@ -27,7 +27,7 @@ function GridItem( { item } ) {
 	return (
 		<li className="edit-site-media__item-container">
 			<Button { ...linkProps } aria-label={ item.title.rendered }>
-				{ getMediaThumbnail( item ) }
+				{ getMediaItem( item, 'large' ) }
 				<HStack
 					className="edit-site-media__footer"
 					justify="space-between"

@@ -22,8 +22,13 @@
 		display: flex;
 		flex-direction: column;
 
-		.edit-site-media__item {
-			max-width: 100%;
+		.components-button {
+			height: auto;
+			display: block;
+
+			img {
+				max-width: 100%;
+			}
 		}
 
 		.edit-site-media__footer,

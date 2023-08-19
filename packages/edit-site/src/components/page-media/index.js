@@ -7,6 +7,7 @@ import {
 	getCoreRowModel,
 	getFilteredRowModel,
 	getSortedRowModel,
+	getPaginationRowModel,
 } from '@tanstack/react-table';
 
 /**
@@ -23,14 +24,13 @@ import {
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	Icon,
 	FormFileUpload,
 	Button,
 	FlexBlock,
 	FlexItem,
 } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
-import { grid, list, video, audio, page } from '@wordpress/icons';
+import { grid, list } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
@@ -46,6 +46,7 @@ import Grid from './grid';
 import Pagination from '../page-patterns/pagination';
 import FilterControl from './filter-control';
 import { useLink } from '../routes/link';
+import { getMediaItem } from './get-media';
 
 /**
  * @typedef {Object} Attachment
@@ -62,7 +63,7 @@ function GridItemButton( { item } ) {
 	} );
 	return (
 		<Button className="edit-site-media-item__name" { ...linkProps }>
-			{ getMediaThumbnail( item ) }
+			{ getMediaItem( item ) }
 			<h4>{ item.title.rendered }</h4>
 		</Button>
 	);
@@ -151,10 +152,11 @@ const columns = [
 		header: () => __( 'Title' ),
 		cell: ( info ) =>
 			isBlobURL( info.row.original.url ) ? (
-				getMediaThumbnail( info.row.original )
+				getMediaItem( info.row.original )
 			) : (
 				<GridItemButton item={ info.row.original } />
 			),
+		sortingFn: 'alphanumeric',
 	} ),
 	columnHelper.accessor( 'attachment_tags', {
 		id: 'tags',
@@ -181,6 +183,15 @@ const columns = [
 		},
 		sortingFn: 'alphanumeric',
 	} ),
+	columnHelper.accessor( 'author', {
+		header: () => __( 'Author' ),
+		cell: ( info ) => {
+			const users = info.table.options.meta.users;
+			if ( ! users ) return null;
+			return users.find( ( user ) => user.id === info.getValue() )?.name;
+		},
+		sortingFn: 'alphanumeric',
+	} ),
 	columnHelper.accessor( 'date_gmt', {
 		header: () => __( 'Date' ),
 		cell: ( info ) =>
@@ -196,7 +207,6 @@ const columns = [
 ];
 
 const EMPTY_ARRAY = [];
-const PAGE_SIZE = 20;
 
 const headingText = {
 	media: __( 'Media' ),
@@ -206,63 +216,9 @@ const headingText = {
 	image: __( 'Images' ),
 };
 
-export function getMediaTypeFromMimeType( mimeType ) {
-	// @todo this needs to be abstracted and the
-	//  media types formalized somewhere.
-	if ( mimeType.startsWith( 'image/' ) ) {
-		return 'image';
-	}
-
-	if ( mimeType.startsWith( 'video/' ) ) {
-		return 'video';
-	}
-
-	if ( mimeType.startsWith( 'audio/' ) ) {
-		return 'audio';
-	}
-
-	return 'application';
-}
-
-// Getting headings, etc. based on `mediaType` query type.
-export function getMediaThumbnail( attachment ) {
-	if ( isBlobURL( attachment.url ) ) {
-		return (
-			<img
-				src={ attachment.url }
-				alt=""
-				className="edit-site-media-item__thumbnail"
-			/>
-		);
-	}
-
-	const mediaType = getMediaTypeFromMimeType( attachment.mime_type );
-
-	if ( 'image' === mediaType ) {
-		return (
-			<img
-				className="edit-site-media-item__thumbnail"
-				src={ attachment.media_details.sizes.thumbnail.source_url }
-				alt={ attachment.alt_text }
-			/>
-		);
-	}
-
-	if ( 'audio' === mediaType ) {
-		return <Icon icon={ audio } size={ 128 } />;
-	}
-
-	if ( 'video' === mediaType ) {
-		return <Icon icon={ video } size={ 128 } />;
-	}
-
-	// Everything else is a file.
-	return <Icon icon={ page } size={ 128 } />;
-}
-
 export default function PageMedia() {
 	const { mediaType } = getQueryArgs( window.location.href );
-	const { persistedAttachments, tags, locale } = useSelect(
+	const { persistedAttachments, tags, locale, users } = useSelect(
 		( select ) => {
 			const _attachments = select( coreStore ).getMediaItems( {
 				per_page: -1,
@@ -282,6 +238,7 @@ export default function PageMedia() {
 				persistedAttachments: _attachments || EMPTY_ARRAY,
 				tags: _tags || EMPTY_ARRAY,
 				locale: settings.locale,
+				users: select( coreStore ).getUsers(),
 			};
 		},
 		[ mediaType ]
@@ -292,26 +249,6 @@ export default function PageMedia() {
 		[ persistedAttachments, transientAttachments ]
 	);
 
-	const totalItems = attachments.length;
-	const numPages = Math.ceil( attachments.length / PAGE_SIZE );
-	const [ currentPage, setCurrentPage ] = useState( 1 );
-	const pageIndex = currentPage - 1;
-
-	const attachmentsOnPage = useMemo( () => {
-		return attachments.slice(
-			pageIndex * PAGE_SIZE,
-			pageIndex * PAGE_SIZE + PAGE_SIZE
-		);
-	}, [ pageIndex, attachments ] );
-
-	const changePage = ( newPage ) => {
-		// @todo Not working yet, we don't have a scroll container.
-		// const scrollContainer = document.querySelector( '.edit-site-media' );
-		// scrollContainer?.scrollTo( 0, 0 );
-
-		setCurrentPage( newPage );
-	};
-
 	const dateFormatter = useMemo(
 		() =>
 			new Intl.DateTimeFormat( locale || 'en-US', {
@@ -321,17 +258,28 @@ export default function PageMedia() {
 			} ),
 		[ locale ]
 	);
+	const [ globalFilter, setGlobalFilter ] = useState( '' );
 
 	const table = useReactTable( {
-		data: attachmentsOnPage,
+		data: attachments,
 		columns,
 		getRowId: ( row ) => row.id,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		initialState: {
+			pagination: {
+				pageSize: 20,
+			},
+		},
+		state: {
+			globalFilter,
+		},
 		meta: {
 			tags,
 			dateFormatter,
+			users,
 		},
 		enableMultiRowSelection: false,
 		enableSorting: true,
@@ -340,7 +288,6 @@ export default function PageMedia() {
 	} );
 	window.table = table;
 
-	const [ authorFilter, setAuthorFilter ] = useState( [] );
 	const [ sortBy, setSortBy ] = useState( [ 'name' ] );
 	const [ currentView, setCurrentView ] = useState( 'table' );
 	const tagOptions = useMemo(
@@ -399,7 +346,8 @@ export default function PageMedia() {
 					<HStack alignment="left" spacing={ 5 }>
 						<SearchControl
 							style={ { height: 40 } }
-							onChange={ () => {} }
+							value={ globalFilter }
+							onChange={ setGlobalFilter }
 							placeholder={ __( 'Search' ) }
 							__nextHasNoMarginBottom
 						/>
@@ -416,32 +364,25 @@ export default function PageMedia() {
 										table.getColumn( 'tags' ).setFilterValue
 									}
 								/>
-								<FilterControl
-									label={ __( 'Author' ) }
-									value={ authorFilter }
-									options={ [
-										{
-											label: __( 'Saxon' ),
-											value: 'saxon',
-										},
-										{
-											label: __( 'Isabel' ),
-											value: 'isabel',
-										},
-										{
-											label: __( 'Ramon' ),
-											value: 'ramon',
-										},
-										{ label: __( 'Andy' ), value: 'andy' },
-										{
-											label: __( 'Kai' ),
-											value: 'kai',
-										},
-										{ label: __( 'Rob' ), value: 'rob' },
-									] }
-									multiple
-									onChange={ setAuthorFilter }
-								/>
+								{ users && (
+									<FilterControl
+										label={ __( 'Author' ) }
+										value={ table
+											.getColumn( 'author' )
+											.getFilterValue() }
+										options={
+											users.map( ( user ) => ( {
+												label: user.name,
+												value: user.id,
+											} ) ) ?? []
+										}
+										multiple
+										onChange={
+											table.getColumn( 'author' )
+												.setFilterValue
+										}
+									/>
+								) }
 							</HStack>
 						</FlexBlock>
 						<FlexItem>
@@ -476,20 +417,30 @@ export default function PageMedia() {
 							/>
 						</ToggleGroupControl>
 					</HStack>
-					{ attachmentsOnPage && 'table' === currentView && (
+					{ attachments && 'table' === currentView && (
 						<Table table={ table } />
 					) }
-					{ attachmentsOnPage && 'grid' === currentView && (
-						<Grid items={ attachmentsOnPage } />
+					{ attachments && 'grid' === currentView && (
+						<Grid
+							items={ table
+								.getRowModel()
+								.rows.map( ( row ) => row.original ) }
+						/>
 					) }
 					<HStack justify="flex-end">
-						{ numPages > 1 && (
+						{ table.getPageCount() > 1 && (
 							<Pagination
 								className={ 'edit-site-media__pagination' }
-								currentPage={ currentPage }
-								numPages={ numPages }
-								changePage={ changePage }
-								totalItems={ totalItems }
+								currentPage={
+									table.getState().pagination.pageIndex + 1
+								}
+								numPages={ table.getPageCount() }
+								changePage={ ( page ) =>
+									table.setPageIndex( page - 1 )
+								}
+								totalItems={
+									table.getFilteredRowModel().rows.length
+								}
 							/>
 						) }
 					</HStack>
