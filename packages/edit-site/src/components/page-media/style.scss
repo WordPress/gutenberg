@@ -22,9 +22,10 @@
 		display: flex;
 		flex-direction: column;
 
-		.components-button {
+		.edit-site-media__image-button {
 			height: auto;
 			display: block;
+			padding: 0;
 
 			img {
 				max-width: 100%;
