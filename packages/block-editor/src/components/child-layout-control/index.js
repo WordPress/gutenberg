@@ -32,6 +32,7 @@ export default function ChildLayoutControl( {
 		type: parentLayoutType,
 		default: { type: defaultParentLayoutType = 'default' } = {},
 		justifyContent = 'left',
+		verticalAlignment = 'center',
 	} = parentLayout ?? {};
 
 	const parentLayoutTypeToUse = parentLayoutType ?? defaultParentLayoutType;
@@ -154,17 +155,14 @@ export default function ChildLayoutControl( {
 		return widthOptions.find( ( _value ) => _value?.key === selectedValue );
 	};
 
-	const selectedHeight = (
-		_selfStretch,
-		_parentLayoutTypeToUse,
-		_orientation
-	) => {
+	const selectedHeight = () => {
 		let selectedValue;
-		if (
-			_parentLayoutTypeToUse === 'flex' &&
-			_orientation === 'vertical'
-		) {
-			selectedValue = _selfStretch || 'fit';
+		if ( parentLayoutTypeToUse === 'flex' && orientation === 'vertical' ) {
+			selectedValue = selfStretch || 'fit';
+		} else if ( parentLayoutTypeToUse === 'flex' ) {
+			const defaultSelfAlign =
+				verticalAlignment === 'stretch' ? 'fill' : 'fit';
+			selectedValue = selfAlign || defaultSelfAlign;
 		} else {
 			selectedValue = 'fit';
 		}
@@ -227,6 +225,15 @@ export default function ChildLayoutControl( {
 					},
 				},
 			} );
+		} else if ( parentLayoutTypeToUse === 'flex' ) {
+			onChange( {
+				style: {
+					...value,
+					layout: {
+						selfAlign: newHeight.selectedItem.key,
+					},
+				},
+			} );
 		}
 	};
 
@@ -265,11 +272,7 @@ export default function ChildLayoutControl( {
 				<FlexBlock>
 					<CustomSelectControl
 						label={ __( 'Height' ) }
-						value={ selectedHeight(
-							selfStretch,
-							parentLayoutTypeToUse,
-							orientation
-						) }
+						value={ selectedHeight() }
 						options={ heightOptions }
 						onChange={ onChangeHeight }
 						__nextUnconstrainedWidth

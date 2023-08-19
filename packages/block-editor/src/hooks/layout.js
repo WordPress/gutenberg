@@ -10,7 +10,6 @@ import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
 import {
 	CustomSelectControl,
 	FlexBlock,
@@ -25,12 +24,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	useEffect,
-	useContext,
-	createPortal,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { arrowRight, arrowDown, grid } from '@wordpress/icons';
 
 /**
@@ -40,6 +34,7 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import { useSettings } from '../components/use-settings';
 import { getLayoutType } from '../layouts';
+import { useLayout } from '../components/block-list/layout';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { useBlockSettings, useStyleOverride } from './utils';
@@ -161,11 +156,6 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 			themeSupportsLayout: getSettings().supportsLayout,
 		};
 	}, [] );
-	const blockEditingMode = useBlockEditingMode();
-
-	if ( blockEditingMode !== 'default' ) {
-		return null;
-	}
 
 	// Layout block support comes from the block's block.json.
 	const layoutBlockSupport = getBlockSupport(
@@ -199,6 +189,12 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 	const [ matrixJustification, setMatrixJustification ] = useState( 'left' );
 
 	const [ matrixAlignment, setMatrixAlignment ] = useState( 'center' );
+
+	const blockEditingMode = useBlockEditingMode();
+
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
 
 	if ( ! allowEditing ) {
 		return null;
@@ -862,6 +858,8 @@ export const withLayoutStyles = createHigherOrderComponent(
  */
 export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
+		const parentLayout = useLayout() || {};
+		const { orientation } = parentLayout;
 		const { attributes } = props;
 		const { style: { layout = {} } = {} } = attributes;
 		const { selfStretch, flexSize, selfAlign } = layout;
@@ -890,9 +888,15 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 				align-self: stretch;
 			}`;
 		} else if ( selfAlign === 'fit' ) {
-			css += `${ selector } {
-				width: fit-content;
-			}`;
+			if ( orientation === 'vertical' ) {
+				css += `${ selector } {
+					width: fit-content;
+				}`;
+			} else {
+				css += `${ selector } {
+					height: fit-content;
+				}`;
+			}
 		}
 
 		// Attach a `wp-container-content` id-based classname.
