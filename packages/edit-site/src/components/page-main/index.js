@@ -26,7 +26,7 @@ export default function PageMain() {
 		return <PageTemplateParts />;
 	} else if ( path === '/patterns' ) {
 		return <PagePatterns />;
-	} else if ( path === '/media' && ! postId ) {
+	} else if ( path && path.startsWith( '/media' ) && ! postId ) {
 		return <PageMedia />;
 	} else if ( postType === 'attachment' && !! postId ) {
 		return <PageMediaItem />;

@@ -15,7 +15,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
-import { getQueryArgs } from '@wordpress/url';
 import {
 	SearchControl,
 	CheckboxControl,
@@ -35,6 +34,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -46,6 +46,9 @@ import Grid from './grid';
 import Pagination from '../page-patterns/pagination';
 import FilterControl from './filter-control';
 import { useLink } from '../routes/link';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 /**
  * @typedef {Object} Attachment
@@ -56,8 +59,14 @@ import { useLink } from '../routes/link';
 const columnHelper = createColumnHelper();
 
 function GridItemButton( { item } ) {
+	const {
+		params: { path },
+	} = useLocation();
+
+	const mediaType = path.split( '/media/' )[ 1 ];
 	const linkProps = useLink( {
 		postType: 'attachment',
+		mediaType,
 		postId: item.id,
 	} );
 	return (
@@ -176,7 +185,9 @@ export function getMediaTypeFromMimeType( mimeType ) {
 		return 'audio';
 	}
 
-	return 'application';
+	if ( mimeType.startsWith( 'application/' ) ) {
+		return 'application';
+	}
 }
 
 // Getting headings, etc. based on `mediaType` query type.
@@ -220,16 +231,21 @@ export function getMediaThumbnail( attachment ) {
 }
 
 export default function PageMedia() {
-	const { mediaType } = getQueryArgs( window.location.href );
+	const {
+		params: { path },
+	} = useLocation();
+
+	const mediaType = path.split( '/media/' )[ 1 ];
 	const { persistedAttachments, tags, locale } = useSelect(
 		( select ) => {
+			const _mediaType = mediaType === 'all' ? undefined : mediaType;
 			const _attachments = select( coreStore ).getMediaItems( {
 				per_page: -1,
 				orderby: 'date',
 				order: 'desc',
 				// @todo `application` and `text` are valid media types,
 				// but we should maybe combine them into `documents`.
-				media_type: mediaType,
+				media_type: _mediaType,
 			} );
 			const _tags = select( coreStore ).getEntityRecords(
 				'taxonomy',

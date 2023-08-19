@@ -19,6 +19,7 @@ export default function getIsListPage(
 		path === '/wp_template/all' ||
 		path === '/wp_template_part/all' ||
 		path === '/media' ||
+		( path && path.startsWith( '/media' ) ) ||
 		( postType === 'attachment' && !! postId ) ||
 		( path === '/patterns' &&
 			// Don't treat "/patterns" without categoryType and categoryId as a

@@ -53,7 +53,7 @@ export default function SidebarNavigationScreenMain() {
 					<ItemGroup>
 						<NavigatorButton
 							as={ SidebarNavigationItem }
-							path="/media"
+							path="/media/all"
 							withChevron
 							icon={ media }
 						>

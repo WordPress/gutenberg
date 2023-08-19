@@ -12,16 +12,26 @@ import {
 	Flex,
 } from '@wordpress/components';
 import { moreHorizontal } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { getMediaThumbnail } from './';
 import { useLink } from '../routes/link';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 function GridItem( { item } ) {
+	const {
+		params: { path },
+	} = useLocation();
+
+	const mediaType = path.split( '/media/' )[ 1 ];
 	const linkProps = useLink( {
 		postType: 'attachment',
+		mediaType,
 		postId: item.id,
 	} );
 	return (

@@ -8,6 +8,7 @@ import { getQueryArgs } from '@wordpress/url';
 import {
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 
 /**
@@ -15,8 +16,36 @@ import {
  */
 import Page from '../page';
 
+function getMediaPreview( mediaType, record ) {
+	if ( mediaType === 'image' ) {
+		return <img src={ record?.source_url } alt={ record?.alt_text } />;
+	}
+
+	if ( mediaType === 'audio' ) {
+		return (
+			<audio
+				controls="controls"
+				src={ record?.source_url }
+				autoPlay={ false }
+				preload="true"
+			/>
+		);
+	}
+
+	if ( mediaType === 'video' ) {
+		return (
+			<video
+				controls="controls"
+				poster={ record?.poster }
+				preload="true"
+				src={ record?.source_url }
+			/>
+		);
+	}
+}
+
 export default function PageMediaItem() {
-	const { postId } = getQueryArgs( window.location.href );
+	const { postId, mediaType } = getQueryArgs( window.location.href );
 	const { record } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -34,7 +63,8 @@ export default function PageMediaItem() {
 		>
 			<Spacer padding={ 3 }>
 				<VStack spacing={ 3 }>
-					<h1>{ record?.title.rendered }</h1>
+					<Heading level={ 1 }>{ record?.title.raw }</Heading>
+					{ getMediaPreview( mediaType, record ) }
 				</VStack>
 			</Spacer>
 		</Page>

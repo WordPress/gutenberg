@@ -2,25 +2,29 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import {
+	__experimentalItemGroup as ItemGroup,
+	__experimentalUseNavigator as useNavigator,
+} from '@wordpress/components';
 import { media, video, image, audio, pages } from '@wordpress/icons';
-import { getQueryArgs } from '@wordpress/url';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import { useLink } from '../routes/link';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 function MediaItem( { icon, type, isActive, children } ) {
-	const linkInfo = useLink( {
-		path: '/media',
-		mediaType: type,
-	} );
+	const { goTo } = useNavigator();
 	return (
 		<SidebarNavigationItem
-			{ ...linkInfo }
+			onClick={ () =>
+				goTo( type ? `/media/${ type }` : '/media', { replace: true } )
+			}
 			icon={ icon }
 			aria-current={ isActive ? 'true' : undefined }
 		>
@@ -30,7 +34,9 @@ function MediaItem( { icon, type, isActive, children } ) {
 }
 
 export default function SidebarNavigationScreenMedia() {
-	const { mediaType } = getQueryArgs( window.location.href );
+	const {
+		params: { path },
+	} = useLocation();
 	return (
 		<SidebarNavigationScreen
 			title={ __( 'Media' ) }
@@ -38,34 +44,38 @@ export default function SidebarNavigationScreenMedia() {
 			actions={ null }
 			content={
 				<ItemGroup>
-					<MediaItem icon={ media } isActive={ ! mediaType }>
+					<MediaItem
+						type="all"
+						icon={ media }
+						isActive={ path === '/media/all' }
+					>
 						{ __( 'All media' ) }
 					</MediaItem>
 					<MediaItem
 						icon={ image }
 						type="image"
-						isActive={ mediaType === 'image' }
+						isActive={ path === '/media/image' }
 					>
 						{ __( 'Images' ) }
 					</MediaItem>
 					<MediaItem
 						icon={ video }
 						type="video"
-						isActive={ mediaType === 'video' }
+						isActive={ path === '/media/video' }
 					>
 						{ __( 'Videos' ) }
 					</MediaItem>
 					<MediaItem
 						icon={ audio }
 						type="audio"
-						isActive={ mediaType === 'audio' }
+						isActive={ path === '/media/audio' }
 					>
 						{ __( 'Audio' ) }
 					</MediaItem>
 					<MediaItem
 						icon={ pages }
 						type="application"
-						isActive={ mediaType === 'application' }
+						isActive={ path === '/media/application' }
 					>
 						{ __( 'Documents' ) }
 					</MediaItem>

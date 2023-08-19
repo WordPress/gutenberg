@@ -21,6 +21,12 @@ export function getPathFromURL( urlParams ) {
 			case 'wp_template':
 			case 'wp_template_part':
 			case 'attachment':
+				path = `/${ encodeURIComponent(
+					urlParams.postType
+				) }/${ encodeURIComponent(
+					urlParams.mediaType
+				) }/${ encodeURIComponent( urlParams.postId ) }`;
+				break;
 			case 'page':
 				path = `/${ encodeURIComponent(
 					urlParams.postType
@@ -72,11 +78,26 @@ export default function useSyncPathWithURL() {
 				history.push( updatedParams );
 			}
 
-			if ( navigatorParams?.postType && navigatorParams?.postId ) {
+			if (
+				! navigatorParams?.mediaType &&
+				navigatorParams?.postType &&
+				navigatorParams?.postId
+			) {
 				updateUrlParams( {
 					postType: navigatorParams?.postType,
 					postId: navigatorParams?.postId,
 					mediaType: undefined,
+					path: undefined,
+				} );
+			} else if (
+				navigatorParams?.mediaType &&
+				navigatorParams?.postType &&
+				navigatorParams?.postId
+			) {
+				updateUrlParams( {
+					postType: navigatorParams?.postType,
+					postId: navigatorParams?.postId,
+					mediaType: navigatorParams?.mediaType,
 					path: undefined,
 				} );
 			} else if (
