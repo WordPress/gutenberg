@@ -337,6 +337,7 @@ export default function PageMedia() {
 			} ),
 		[ locale ]
 	);
+	const [ globalFilter, setGlobalFilter ] = useState( '' );
 
 	const table = useReactTable( {
 		data: attachmentsOnPage,
@@ -345,6 +346,9 @@ export default function PageMedia() {
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		state: {
+			globalFilter,
+		},
 		meta: {
 			tags,
 			dateFormatter,
@@ -422,7 +426,8 @@ export default function PageMedia() {
 						<HStack justify="flex-start">
 							<SearchControl
 								style={ { height: 40 } }
-								onChange={ () => {} }
+								value={ globalFilter }
+								onChange={ setGlobalFilter }
 								placeholder={ __( 'Search' ) }
 								__nextHasNoMarginBottom
 							/>
