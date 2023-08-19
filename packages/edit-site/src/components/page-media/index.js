@@ -54,6 +54,7 @@ function GridItemButton( { item } ) {
 	const linkProps = useLink( {
 		postType: item.type,
 		postId: item.id,
+		mediaType: getMediaTypeFromMimeType( item.mime_type ),
 	} );
 	return (
 		<Button { ...linkProps }>
@@ -149,6 +150,24 @@ const headingText = {
 	video: __( 'Videos' ),
 	image: __( 'Images' ),
 };
+
+export function getMediaTypeFromMimeType( mimeType ) {
+	// @todo this needs to be abstracted and the
+	//  media types formalized somewhere.
+	if ( mimeType.startsWith( 'image/' ) ) {
+		return 'image';
+	}
+
+	if ( mimeType.startsWith( 'video/' ) ) {
+		return 'video';
+	}
+
+	if ( mimeType.startsWith( 'audio/' ) ) {
+		return 'audio';
+	}
+
+	return 'application';
+}
 
 // Getting headings, etc. based on `mediaType` query type.
 export function getMediaThumbnail( attachment ) {

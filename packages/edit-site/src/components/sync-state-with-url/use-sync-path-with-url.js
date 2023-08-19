@@ -104,6 +104,7 @@ export default function useSyncPathWithURL() {
 					postId: undefined,
 					categoryType: undefined,
 					categoryId: undefined,
+					mediaType: undefined,
 					path:
 						navigatorLocation.path === '/'
 							? undefined

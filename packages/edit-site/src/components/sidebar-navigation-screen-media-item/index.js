@@ -17,7 +17,7 @@ import { unlock } from '../../lock-unlock';
 
 export default function SidebarNavigationScreenMediaItem() {
 	const { params } = useNavigator();
-	const { postType, postId } = params;
+	const { postType, postId, mediaType } = params;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { record } = useSelect(
 		( select ) => {
@@ -32,7 +32,7 @@ export default function SidebarNavigationScreenMediaItem() {
 	// The absence of a media type in the query params for media
 	// indicates the user has arrived at the template part via the "media" main
 	// view and the back button should return them to that list page.
-	//const backPath = !! mediaType ? `/media/${ mediaType }` : '/media';
+	const backPath = !! mediaType ? `/media/${ mediaType }` : '/media';
 
 	return (
 		<SidebarNavigationScreen
@@ -43,7 +43,7 @@ export default function SidebarNavigationScreenMediaItem() {
 					icon={ pencil }
 				/>
 			}
-			//backPath={ backPath }
+			backPath={ backPath }
 			content={
 				<div className="edit-site-sidebar-navigation-screen-media-item-content">
 					{ record?.title.rendered } { postType } - { postId }

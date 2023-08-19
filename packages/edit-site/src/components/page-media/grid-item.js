@@ -18,11 +18,13 @@ import { moreHorizontal } from '@wordpress/icons';
  */
 import { getMediaThumbnail } from './';
 import { useLink } from '../routes/link';
+import { getMediaTypeFromMimeType } from '../page-media';
 
 function GridItem( { item } ) {
 	const linkProps = useLink( {
 		postType: item.type,
 		postId: item.id,
+		mediaType: getMediaTypeFromMimeType( item.mime_type ),
 	} );
 	return (
 		<li className="edit-site-media__item-container">
