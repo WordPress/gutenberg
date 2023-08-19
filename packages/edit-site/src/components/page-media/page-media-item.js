@@ -8,7 +8,6 @@ import { getQueryArgs } from '@wordpress/url';
 import {
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
-	__experimentalHeading as Heading,
 } from '@wordpress/components';
 
 /**
@@ -81,14 +80,15 @@ export default function PageMediaItem() {
 		: undefined;
 
 	return (
-		<Page
-			className="edit-site-media-page-media-item"
-			title={ __( 'Media item name here' ) }
-			hideTitleFromUI
-		>
-			<Spacer padding={ 3 }>
-				<VStack spacing={ 3 }>
-					<Heading level={ 1 }>{ record?.title.raw }</Heading>
+		<Page title={ __( 'Media item name here' ) } hideTitleFromUI>
+			<Spacer
+				padding={ 3 }
+				className="edit-site-media-page-media-item__spacer"
+			>
+				<VStack
+					spacing={ 3 }
+					className="edit-site-media-page-media-item"
+				>
 					{ mediaType &&
 						record &&
 						getMediaPreview( mediaType, record ) }

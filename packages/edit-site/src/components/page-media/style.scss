@@ -99,3 +99,9 @@
 	width: 64px;
 	border-radius: $radius-block-ui;
 }
+
+.edit-site-media-page-media-item__spacer,
+.edit-site-media-page-media-item {
+	align-items: center !important;
+	height: 100%;
+}
