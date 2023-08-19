@@ -8,15 +8,15 @@ import {
 	getFilteredRowModel,
 	getSortedRowModel,
 } from '@tanstack/react-table';
+
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { getQueryArgs } from '@wordpress/url';
 import {
-	Button,
 	SearchControl,
 	CheckboxControl,
 	__experimentalVStack as VStack,
@@ -26,10 +26,15 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 	Icon,
+	FormFileUpload,
+	Button,
 } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { grid, list, video, audio, page } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { uploadMedia } from '@wordpress/media-utils';
+import { store as noticesStore } from '@wordpress/notices';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -88,17 +93,22 @@ const columns = [
 		enableSorting: false,
 		enableHiding: false,
 	} ),
-	columnHelper.accessor( ( row ) => row.title.rendered, {
+	columnHelper.accessor( ( row ) => row.title?.rendered, {
 		id: 'title',
 		header: () => __( 'Title' ),
-		cell: ( info ) => <GridItemButton item={ info.row.original } />,
+		cell: ( info ) =>
+			isBlobURL( info.row.original.url ) ? (
+				getMediaThumbnail( info.row.original )
+			) : (
+				<GridItemButton item={ info.row.original } />
+			),
 	} ),
 	columnHelper.accessor( 'attachment_tags', {
 		id: 'tags',
 		header: () => __( 'Tags' ),
 		cell: ( info ) => (
 			<HStack>
-				{ info.getValue().map( ( tagId ) => (
+				{ info.getValue()?.map( ( tagId ) => (
 					<span
 						key={ tagId }
 						style={ { background: '#ddd', padding: '0.1em 0.5em' } }
@@ -129,13 +139,14 @@ const columns = [
 	} ),
 	columnHelper.accessor( 'date_gmt', {
 		header: () => __( 'Date' ),
-		cell: ( info ) => (
-			<time dateTime={ info.getValue() }>
-				{ info.table.options.meta.dateFormatter.format(
-					new Date( info.getValue() )
-				) }
-			</time>
-		),
+		cell: ( info ) =>
+			info.getValue() && (
+				<time dateTime={ info.getValue() }>
+					{ info.table.options.meta.dateFormatter.format(
+						new Date( info.getValue() )
+					) }
+				</time>
+			),
 		sortingFn: 'datetime',
 	} ),
 ];
@@ -171,6 +182,18 @@ export function getMediaTypeFromMimeType( mimeType ) {
 
 // Getting headings, etc. based on `mediaType` query type.
 export function getMediaThumbnail( attachment ) {
+	if ( isBlobURL( attachment.url ) ) {
+		return (
+			<img
+				height={ 100 }
+				width={ 100 }
+				style={ { borderRadius: '8px', flexShrink: 0 } }
+				src={ attachment.url }
+				alt=""
+			/>
+		);
+	}
+
 	if ( 'image' === attachment?.media_type ) {
 		return (
 			<img
@@ -197,7 +220,7 @@ export function getMediaThumbnail( attachment ) {
 
 export default function PageMedia() {
 	const { mediaType } = getQueryArgs( window.location.href );
-	const { attachments, tags, locale } = useSelect(
+	const { persistedAttachments, tags, locale } = useSelect(
 		( select ) => {
 			const _attachments = select( coreStore ).getMediaItems( {
 				per_page: -1,
@@ -214,13 +237,19 @@ export default function PageMedia() {
 			);
 			const settings = select( blockEditorStore ).getSettings();
 			return {
-				attachments: _attachments || EMPTY_ARRAY,
+				persistedAttachments: _attachments || EMPTY_ARRAY,
 				tags: _tags || EMPTY_ARRAY,
 				locale: settings.locale,
 			};
 		},
 		[ mediaType ]
 	);
+	const [ transientAttachments, setTransientAttachments ] = useState( [] );
+	const attachments = useMemo(
+		() => [ ...transientAttachments, ...persistedAttachments ],
+		[ persistedAttachments, transientAttachments ]
+	);
+
 	const totalItems = attachments.length;
 	const numPages = Math.ceil( attachments.length / PAGE_SIZE );
 	const [ currentPage, setCurrentPage ] = useState( 1 );
@@ -281,6 +310,34 @@ export default function PageMedia() {
 		[ tags ]
 	);
 
+	const { receiveEntityRecords } = useDispatch( coreStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const uploadFiles = async ( files ) => {
+		await uploadMedia( {
+			filesList: files,
+			onFileChange: ( newFiles ) => {
+				const newTransientAttachments = newFiles.filter( ( file ) =>
+					isBlobURL( file.url )
+				);
+				setTransientAttachments( newTransientAttachments );
+				const newMediaItems = newFiles.filter( ( file ) => !! file.id );
+				if ( newMediaItems.length ) {
+					receiveEntityRecords(
+						'root',
+						'media',
+						newMediaItems,
+						undefined,
+						true
+					);
+				}
+			},
+			onError: ( error ) => {
+				createErrorNotice( error.message, { type: 'snackbar' } );
+			},
+		} );
+	};
+
 	return (
 		<Page
 			className="edit-site-media"
@@ -293,9 +350,15 @@ export default function PageMedia() {
 						<Heading level={ 2 }>
 							{ headingText[ mediaType ] }
 						</Heading>
-						<Button variant="primary">
+						<FormFileUpload
+							variant="primary"
+							multiple
+							onChange={ ( event ) =>
+								uploadFiles( event.target.files )
+							}
+						>
 							{ __( 'Upload new' ) }
-						</Button>
+						</FormFileUpload>
 					</HStack>
 					<VStack>
 						<HStack justify="flex-start">
