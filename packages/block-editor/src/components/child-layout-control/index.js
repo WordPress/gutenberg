@@ -93,7 +93,12 @@ export default function ChildLayoutControl( {
 			{
 				key: 'fixed',
 				value: 'fixed',
-				name: __( 'Custom' ),
+				name: __( 'Max Width' ),
+			},
+			{
+				key: 'fixedNoShrink',
+				value: 'fixedNoShrink',
+				name: __( 'Fixed' ),
 			}
 		);
 	}
@@ -111,7 +116,12 @@ export default function ChildLayoutControl( {
 			{
 				key: 'fixed',
 				value: 'fixed',
-				name: __( 'Custom' ),
+				name: __( 'Max Height' ),
+			},
+			{
+				key: 'fixedNoShrink',
+				value: 'fixedNoShrink',
+				name: __( 'Fixed' ),
 			},
 			{
 				key: 'fill',
@@ -250,23 +260,27 @@ export default function ChildLayoutControl( {
 						__next36pxDefaultSize
 					/>
 				</FlexBlock>
-				<FlexBlock>
-					<UnitControl
-						size={ '__unstable-large' }
-						onChange={ ( _value ) => {
-							onChange( {
-								style: {
-									...value,
-									layout: {
-										...childLayout,
-										flexSize: _value,
-									},
-								},
-							} );
-						} }
-						value={ flexSize }
-					/>
-				</FlexBlock>
+				{ ( selfStretch === 'fixed' ||
+					selfStretch === 'fixedNoShrink' ) &&
+					orientation === 'horizontal' && (
+						<FlexBlock>
+							<UnitControl
+								size={ '__unstable-large' }
+								onChange={ ( _value ) => {
+									onChange( {
+										style: {
+											...value,
+											layout: {
+												...childLayout,
+												flexSize: _value,
+											},
+										},
+									} );
+								} }
+								value={ flexSize }
+							/>
+						</FlexBlock>
+					) }
 			</HStack>
 			<HStack style={ { alignItems: 'flex-end' } }>
 				<FlexBlock>
@@ -279,23 +293,27 @@ export default function ChildLayoutControl( {
 						__next36pxDefaultSize
 					/>
 				</FlexBlock>
-				<FlexBlock>
-					<UnitControl
-						size={ '__unstable-large' }
-						onChange={ ( _value ) => {
-							onChange( {
-								style: {
-									...value,
-									layout: {
-										...childLayout,
-										flexSize: _value,
-									},
-								},
-							} );
-						} }
-						value={ flexSize }
-					/>
-				</FlexBlock>
+				{ ( selfStretch === 'fixed' ||
+					selfStretch === 'fixedNoShrink' ) &&
+					orientation === 'vertical' && (
+						<FlexBlock>
+							<UnitControl
+								size={ '__unstable-large' }
+								onChange={ ( _value ) => {
+									onChange( {
+										style: {
+											...value,
+											layout: {
+												...childLayout,
+												flexSize: _value,
+											},
+										},
+									} );
+								} }
+								value={ flexSize }
+							/>
+						</FlexBlock>
+					) }
 			</HStack>
 		</>
 	);

@@ -879,6 +879,12 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 				flex-basis: ${ flexSize };
 				box-sizing: border-box;
 			}`;
+		} else if ( selfStretch === 'fixedNoShrink' && flexSize ) {
+			css += `${ selector } {
+				flex-basis: ${ flexSize };
+				flex-shrink: 0;
+				box-sizing: border-box;
+			}`;
 		} else if ( selfStretch === 'fill' ) {
 			css += `${ selector } {
 				flex-grow: 1;
