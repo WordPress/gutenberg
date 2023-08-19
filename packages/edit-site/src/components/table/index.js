@@ -31,7 +31,10 @@ function HeaderColumn( { header } ) {
 	}
 
 	return (
-		<Button onClick={ header.column.getToggleSortingHandler() }>
+		<Button
+			className="edit-site-table-header__button"
+			onClick={ header.column.getToggleSortingHandler() }
+		>
 			{ rendered }
 			{ !! header.column.getIsSorted() && (
 				<Icon

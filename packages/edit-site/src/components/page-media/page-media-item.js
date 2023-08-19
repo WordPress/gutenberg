@@ -44,8 +44,28 @@ function getMediaPreview( mediaType, record ) {
 	}
 }
 
+export function getMediaTypeFromMimeType( mimeType ) {
+	// @todo this needs to be abstracted and the
+	//  media types formalized somewhere.
+	if ( mimeType.startsWith( 'image/' ) ) {
+		return 'image';
+	}
+
+	if ( mimeType.startsWith( 'video/' ) ) {
+		return 'video';
+	}
+
+	if ( mimeType.startsWith( 'audio/' ) ) {
+		return 'audio';
+	}
+
+	if ( mimeType.startsWith( 'application/' ) ) {
+		return 'application';
+	}
+}
+
 export default function PageMediaItem() {
-	const { postId, mediaType } = getQueryArgs( window.location.href );
+	const { postId } = getQueryArgs( window.location.href );
 	const { record } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -55,6 +75,11 @@ export default function PageMediaItem() {
 		},
 		[ postId ]
 	);
+
+	const mediaType = record?.mime_type
+		? getMediaTypeFromMimeType( record.mime_type )
+		: undefined;
+
 	return (
 		<Page
 			className="edit-site-media-page-media-item"
@@ -64,7 +89,9 @@ export default function PageMediaItem() {
 			<Spacer padding={ 3 }>
 				<VStack spacing={ 3 }>
 					<Heading level={ 1 }>{ record?.title.raw }</Heading>
-					{ getMediaPreview( mediaType, record ) }
+					{ mediaType &&
+						record &&
+						getMediaPreview( mediaType, record ) }
 				</VStack>
 			</Spacer>
 		</Page>

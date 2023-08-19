@@ -22,8 +22,13 @@
 		display: flex;
 		flex-direction: column;
 
-		.edit-site-media__item {
-			max-width: 100%;
+		.components-button {
+			height: auto;
+			display: block;
+
+			img {
+				max-width: 100%;
+			}
 		}
 
 		.edit-site-media__footer,
@@ -76,4 +81,21 @@
 			background-color: $gray-300;
 		}
 	}
+}
+
+
+.edit-site-media-item__name {
+	display: inline-flex;
+	align-items: center;
+	height: auto;
+	gap: $grid-unit-20;
+	padding: 0;
+}
+
+.edit-site-media-item__thumbnail {
+	display: block;
+	flex-shrink: 0;
+	height: 64px;
+	width: 64px;
+	border-radius: $radius-block-ui;
 }

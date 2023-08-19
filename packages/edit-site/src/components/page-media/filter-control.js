@@ -16,34 +16,45 @@ const noop = () => {};
 
 export default function FilterControl( {
 	label,
+	placeholder,
 	value = [],
 	options = [],
 	multiple = false,
+	hideSearch = false,
+	hideClear = false,
 	onChange = noop,
+	onCreate,
+	children,
 } ) {
 	const [ searchFilter, setSearchFilter ] = useState( '' );
 	return (
 		<Dropdown
 			popoverProps={ { placement: 'bottom-start' } }
-			renderToggle={ ( { onToggle, isOpen } ) => (
-				<Button
-					variant="secondary"
-					text={ getToggleText( label, value, options ) }
-					icon={ chevronDown }
-					iconPosition="right"
-					isPressed={ isOpen }
-					onClick={ onToggle }
-					__next40pxDefaultSize
-				/>
-			) }
-			renderContent={ () => (
-				<VStack style={ { minWidth: 280 } }>
-					<InputControl
-						placeholder={ __( 'Search' ) }
-						size="__unstable-large"
-						value={ searchFilter }
-						onChange={ setSearchFilter }
+			renderToggle={ ( { onToggle, isOpen } ) =>
+				children ? (
+					children( { onToggle, isOpen } )
+				) : (
+					<Button
+						variant="tertiary"
+						text={ getToggleText( label, value, options ) }
+						icon={ chevronDown }
+						iconPosition="right"
+						isPressed={ isOpen }
+						onClick={ onToggle }
+						__next40pxDefaultSize
 					/>
+				)
+			}
+			renderContent={ ( { onClose } ) => (
+				<VStack style={ { minWidth: 280 } }>
+					{ ! hideSearch && (
+						<InputControl
+							placeholder={ placeholder ?? __( 'Search' ) }
+							size="__unstable-large"
+							value={ searchFilter }
+							onChange={ setSearchFilter }
+						/>
+					) }
 					{ options
 						.filter( ( option ) =>
 							option.label
@@ -76,17 +87,33 @@ export default function FilterControl( {
 								__nextHasNoMarginBottom
 							/>
 						) ) }
-					<Button
-						style={ {
-							width: '100%',
-							justifyContent: 'center',
-						} }
-						variant="tertiary"
-						onClick={ () => onChange( [] ) }
-						__next40pxDefaultSize
-					>
-						{ __( 'Clear' ) }
-					</Button>
+					{ !! onCreate && searchFilter !== '' && (
+						<Button
+							onClick={ () => {
+								onCreate( searchFilter );
+								onClose();
+							} }
+						>
+							{ sprintf(
+								/* translators: %s: search term */
+								__( 'Create "%s"' ),
+								searchFilter
+							) }
+						</Button>
+					) }
+					{ multiple && ! hideClear && (
+						<Button
+							style={ {
+								width: '100%',
+								justifyContent: 'center',
+							} }
+							variant="tertiary"
+							onClick={ () => onChange( [] ) }
+							__next40pxDefaultSize
+						>
+							{ __( 'Clear' ) }
+						</Button>
+					) }
 				</VStack>
 			) }
 		/>
@@ -106,7 +133,8 @@ function getToggleText( label, value, options ) {
 			/* translators: %1$s: label, %2$s: selected item */
 			__( '%1$s: %2$s' ),
 			label,
-			options.find( ( option ) => option.value === value[ 0 ] ).label
+			options.find( ( option ) => option.value === value[ 0 ] )?.label ??
+				value[ 0 ]
 		);
 	}
 	return label;
