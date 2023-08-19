@@ -7,6 +7,7 @@ import {
 	getCoreRowModel,
 	getFilteredRowModel,
 	getSortedRowModel,
+	getPaginationRowModel,
 } from '@tanstack/react-table';
 
 /**
@@ -208,7 +209,6 @@ const columns = [
 ];
 
 const EMPTY_ARRAY = [];
-const PAGE_SIZE = 20;
 
 const headingText = {
 	media: __( 'Media' ),
@@ -251,26 +251,6 @@ export default function PageMedia() {
 		[ persistedAttachments, transientAttachments ]
 	);
 
-	const totalItems = attachments.length;
-	const numPages = Math.ceil( attachments.length / PAGE_SIZE );
-	const [ currentPage, setCurrentPage ] = useState( 1 );
-	const pageIndex = currentPage - 1;
-
-	const attachmentsOnPage = useMemo( () => {
-		return attachments.slice(
-			pageIndex * PAGE_SIZE,
-			pageIndex * PAGE_SIZE + PAGE_SIZE
-		);
-	}, [ pageIndex, attachments ] );
-
-	const changePage = ( newPage ) => {
-		// @todo Not working yet, we don't have a scroll container.
-		// const scrollContainer = document.querySelector( '.edit-site-media' );
-		// scrollContainer?.scrollTo( 0, 0 );
-
-		setCurrentPage( newPage );
-	};
-
 	const dateFormatter = useMemo(
 		() =>
 			new Intl.DateTimeFormat( locale || 'en-US', {
@@ -283,12 +263,18 @@ export default function PageMedia() {
 	const [ globalFilter, setGlobalFilter ] = useState( '' );
 
 	const table = useReactTable( {
-		data: attachmentsOnPage,
+		data: attachments,
 		columns,
 		getRowId: ( row ) => row.id,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		initialState: {
+			pagination: {
+				pageSize: 20,
+			},
+		},
 		state: {
 			globalFilter,
 		},
@@ -436,22 +422,32 @@ export default function PageMedia() {
 							</ToggleGroupControl>
 						</HStack>
 
-						{ attachmentsOnPage && 'table' === currentView && (
+						{ attachments && 'table' === currentView && (
 							<Table table={ table } />
 						) }
-						{ attachmentsOnPage && 'grid' === currentView && (
-							<Grid items={ attachmentsOnPage } />
+						{ attachments && 'grid' === currentView && (
+							<Grid
+								items={ table
+									.getRowModel()
+									.rows.map( ( row ) => row.original ) }
+							/>
 						) }
 					</VStack>
 
 					<HStack justify="flex-end">
-						{ numPages > 1 && (
+						{ table.getPageCount() > 1 && (
 							<Pagination
 								className={ 'edit-site-media__pagination' }
-								currentPage={ currentPage }
-								numPages={ numPages }
-								changePage={ changePage }
-								totalItems={ totalItems }
+								currentPage={
+									table.getState().pagination.pageIndex + 1
+								}
+								numPages={ table.getPageCount() }
+								changePage={ ( page ) =>
+									table.setPageIndex( page - 1 )
+								}
+								totalItems={
+									table.getFilteredRowModel().rows.length
+								}
 							/>
 						) }
 					</HStack>

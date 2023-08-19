@@ -34,7 +34,10 @@ export function getMediaItem( attachment, size = 'thumb' ) {
 			/>
 		) : (
 			<img
-				src={ attachment.media_details.sizes.large.source_url }
+				src={
+					attachment.media_details.sizes.large?.source_url ??
+					attachment.media_details.sizes.full.source_url
+				}
 				alt={ attachment.alt_text }
 			/>
 		);
