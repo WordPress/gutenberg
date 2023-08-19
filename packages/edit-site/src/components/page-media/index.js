@@ -87,7 +87,7 @@ function TagsCellButton( { attachmentId, tagIds = [], tags } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	return (
 		<FilterControl
-			placeholder={ __( 'Select or create tags' ) }
+			placeholder={ __( 'Select or add tag' ) }
 			value={ tagIds }
 			options={ tags.map( ( tag ) => ( {
 				value: tag.id,
@@ -102,17 +102,19 @@ function TagsCellButton( { attachmentId, tagIds = [], tags } ) {
 				} );
 			} }
 			onCreate={ async ( input ) => {
-				const { id: newTagId } = await saveEntityRecord(
+				const newTag = await saveEntityRecord(
 					'taxonomy',
 					'attachment_tag',
 					{
 						name: input,
 					}
 				);
-				await saveEntityRecord( 'root', 'media', {
-					id: attachmentId,
-					attachment_tags: [ ...tagIds, newTagId ],
-				} );
+				if ( newTag ) {
+					await saveEntityRecord( 'root', 'media', {
+						id: attachmentId,
+						attachment_tags: [ ...tagIds, newTag.id ],
+					} );
+				}
 			} }
 		>
 			{ ( { onToggle } ) => (
