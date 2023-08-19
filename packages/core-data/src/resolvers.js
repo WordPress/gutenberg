@@ -410,7 +410,7 @@ export const canUserEditEntityRecord =
 			return;
 		}
 
-		const resource = entityConfig.__unstable_rest_base;
+		const resource = entityConfig.__unstable_rest_base ?? entityConfig.name;
 		await dispatch( canUser( 'update', resource, recordId ) );
 	};
 

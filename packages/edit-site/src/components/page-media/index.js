@@ -27,6 +27,7 @@ import {
 	Button,
 	FlexBlock,
 	FlexItem,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { useState, useMemo, useRef } from '@wordpress/element';
 import { grid, list } from '@wordpress/icons';
@@ -49,6 +50,7 @@ import FilterControl from './filter-control';
 import { useLink } from '../routes/link';
 import { getMediaItem } from './get-media';
 import { unlock } from '../../lock-unlock';
+import MediaActions from './media-actions';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -217,6 +219,15 @@ const columns = [
 				</time>
 			),
 		sortingFn: 'datetime',
+	} ),
+	columnHelper.display( {
+		id: 'actions',
+		header: () => <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
+		cell: ( { row: { original: attachment } } ) => (
+			<MediaActions attachmentId={ attachment.id } />
+		),
+		enableSorting: false,
+		enableHiding: false,
 	} ),
 ];
 
