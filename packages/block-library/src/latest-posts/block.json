@@ -70,12 +70,16 @@
 			"default": "thumbnail"
 		},
 		"featuredImageSizeWidth": {
-			"type": "number",
-			"default": null
+			"type": "string"
 		},
 		"featuredImageSizeHeight": {
-			"type": "number",
-			"default": null
+			"type": "string"
+		},
+		"featuredImageScale": {
+			"type": "string"
+		},
+		"featuredImageAspectRation": {
+			"type": "string"
 		},
 		"addLinkToFeaturedImage": {
 			"type": "boolean",
