@@ -92,6 +92,18 @@
 		},
 		"allowedBlocks": {
 			"type": "array"
+		},
+		"imageWidth": {
+			"type": "string"
+		},
+		"imageHeight": {
+			"type": "string"
+		},
+		"imageAspectRatio": {
+			"type": "string"
+		},
+		"imageScale": {
+			"type": "string"
 		}
 	},
 	"supports": {
