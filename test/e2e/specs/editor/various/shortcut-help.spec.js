@@ -15,7 +15,7 @@ test.describe( 'keyboard shortcut help modal', () => {
 			.locator( '.interface-more-menu-dropdown [aria-label="Options"]' )
 			.click();
 		await page
-			.locator( 'role=menuitem[name="Keyboard shortcuts ⌃⌥H"]' )
+			.locator( 'role=menuitem', { hasText: /^Keyboard shortcuts/i } )
 			.click();
 		const dialog = page.locator( 'role=dialog[name="Keyboard shortcuts"]' );
 		await expect( dialog ).toBeVisible();
