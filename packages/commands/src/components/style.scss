@@ -1,9 +1,15 @@
 // dirty hack to clean up modal
 .commands-command-menu {
-	width: 100%;
+	border-radius: $grid-unit-05;
+	width: calc(100% - #{$grid-unit-40});
+	margin: auto;
 	max-width: 420px;
 	position: relative;
-	top: 15%;
+	top: calc(15% + #{$header-height});
+
+	@include break-small() {
+		top: 15%;
+	}
 
 	.components-modal__content {
 		margin: 0;
@@ -66,9 +72,9 @@
 		cursor: pointer;
 		display: flex;
 		align-items: center;
-		padding: $grid-unit;
 		color: $gray-900;
 		font-size: $default-font-size;
+		min-height: $button-size-next-default-40px;
 
 		&[aria-selected="true"],
 		&:active {
@@ -87,6 +93,15 @@
 
 		svg {
 			fill: $gray-900;
+		}
+
+		> div {
+			padding: $grid-unit;
+			padding-left: $grid-unit-50; // Account for commands without icons.
+		}
+
+		> .has-icon {
+			padding-left: $grid-unit;
 		}
 	}
 

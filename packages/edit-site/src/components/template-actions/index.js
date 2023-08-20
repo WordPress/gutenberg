@@ -124,11 +124,7 @@ function DeleteMenuItem( { onRemove, isTemplate } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	return (
 		<>
-			<MenuItem
-				isDestructive
-				isTertiary
-				onClick={ () => setIsModalOpen( true ) }
-			>
+			<MenuItem isDestructive onClick={ () => setIsModalOpen( true ) }>
 				{ __( 'Delete' ) }
 			</MenuItem>
 			<ConfirmDialog

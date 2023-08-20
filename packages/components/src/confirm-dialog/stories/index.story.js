@@ -32,7 +32,7 @@ const meta = {
 		children: 'Would you like to privately publish the post now?',
 	},
 	parameters: {
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 
@@ -116,8 +116,8 @@ _default.parameters = {
 };
 
 // To customize button text, pass the `cancelButtonText` and/or `confirmButtonText` props.
-export const withCustomButtonLabels = Template.bind( {} );
-withCustomButtonLabels.args = {
+export const WithCustomButtonLabels = Template.bind( {} );
+WithCustomButtonLabels.args = {
 	cancelButtonText: 'No thanks',
 	confirmButtonText: 'Yes please!',
 };

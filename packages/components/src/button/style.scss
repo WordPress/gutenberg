@@ -186,7 +186,6 @@
 		// Only the default variant is styled differently from the non-destructive counterparts.
 		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
 			color: $alert-red;
-			box-shadow: inset 0 0 0 $border-width $alert-red;
 
 			&:hover:not(:disabled) {
 				color: darken($alert-red, 20%);

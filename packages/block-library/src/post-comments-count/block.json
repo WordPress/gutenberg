@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"__experimental": "fse",
 	"name": "core/post-comments-count",
-	"title": "Post Comments Count",
+	"title": "Comments Count",
 	"category": "theme",
 	"description": "Display a post's comments count.",
 	"textdomain": "default",

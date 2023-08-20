@@ -2,7 +2,11 @@
 	position: relative;
 	display: flex;
 	flex-flow: column;
-	overflow: hidden;
+	// In the iframed canvas this keeps extra scrollbars from appearing (when block toolbars overflow). In the
+	// legacy (non-iframed) canvas, overflow must not be hidden in order to maintain support for sticky positioning.
+	&:not(.has-inline-canvas) {
+		overflow: hidden;
+	}
 
 	// Gray preview overlay (desktop/tablet/mobile) is intentionally not set on an element with scrolling content like
 	// interface-interface-skeleton__content. This causes graphical glitches (flashes of the background color)

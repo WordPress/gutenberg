@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 9.10.0 (2023-08-16)
+
+### Enhancements
+
+-  Warn if the `useSelect` hook returns different values when called with the same state and parameters ([#53666](https://github.com/WordPress/gutenberg/pull/53666)).
+
 ## 9.9.0 (2023-08-10)
 
 ### Bug Fix

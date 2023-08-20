@@ -227,8 +227,8 @@ function KeyboardShortcuts() {
 		toggleFeature( 'distractionFree' );
 		createInfoNotice(
 			isFeatureActive( 'distractionFree' )
-				? __( 'Distraction free mode turned on.' )
-				: __( 'Distraction free mode turned off.' ),
+				? __( 'Distraction free on.' )
+				: __( 'Distraction free off.' ),
 			{
 				id: 'core/edit-post/distraction-free-mode/notice',
 				type: 'snackbar',

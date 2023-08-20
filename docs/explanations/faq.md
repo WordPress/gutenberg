@@ -221,7 +221,7 @@ This is the canonical list of keyboard shortcuts:
 		</tr>
 		<tr>
 			<td>Select text across multiple blocks.</td>
-			<td></td>
+			<td><kbd>Shift</kbd>+<kbd>Arrow (⇦, ⇧, ⇨, ⇩)</kbd></td>
 			<td><kbd>Shift</kbd>+<kbd>Arrow (⇦, ⇧, ⇨, ⇩)</kbd></td>
 		</tr>
 	</tbody>

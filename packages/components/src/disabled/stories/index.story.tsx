@@ -28,7 +28,7 @@ const meta: ComponentMeta< typeof Disabled > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 

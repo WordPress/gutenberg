@@ -29,15 +29,15 @@ const meta: ComponentMeta< typeof Navigation > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 
 export default meta;
 
 export const _default = DefaultStory.bind( {} );
-export const controlledState = ControlledStateStory.bind( {} );
-export const groups = GroupStory.bind( {} );
-export const search = SearchStory.bind( {} );
-export const moreExamples = MoreExamplesStory.bind( {} );
-export const hideIfEmpty = HideIfEmptyStory.bind( {} );
+export const ControlledState = ControlledStateStory.bind( {} );
+export const Groups = GroupStory.bind( {} );
+export const Search = SearchStory.bind( {} );
+export const MoreExamples = MoreExamplesStory.bind( {} );
+export const HideIfEmpty = HideIfEmptyStory.bind( {} );

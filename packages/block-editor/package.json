@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "12.7.0",
+	"version": "12.8.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,6 +39,7 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/commands": "file:../commands",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",

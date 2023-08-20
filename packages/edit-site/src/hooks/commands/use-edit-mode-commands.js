@@ -12,7 +12,6 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	cog,
 	code,
 	keyboard,
 } from '@wordpress/icons';
@@ -75,6 +74,37 @@ function usePageContentFocusCommands() {
 			icon: page,
 			callback: ( { close } ) => {
 				setHasPageContentFocus( true );
+				close();
+			},
+		} );
+	}
+
+	return { isLoading: false, commands };
+}
+
+function useEditorModeCommands() {
+	const { switchEditorMode } = useDispatch( editSiteStore );
+	const { canvasMode, editorMode } = useSelect(
+		( select ) => ( {
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+			editorMode: select( editSiteStore ).getEditorMode(),
+		} ),
+		[]
+	);
+
+	if ( canvasMode !== 'edit' || editorMode !== 'text' ) {
+		return { isLoading: false, commands: [] };
+	}
+
+	const commands = [];
+
+	if ( editorMode === 'text' ) {
+		commands.push( {
+			name: 'core/exit-code-editor',
+			label: __( 'Exit code editor' ),
+			icon: code,
+			callback: ( { close } ) => {
+				switchEditorMode( 'visual' );
 				close();
 			},
 		} );
@@ -225,7 +255,6 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'focusMode' );
 			close();
@@ -235,7 +264,6 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/toggle-distraction-free',
 		label: __( 'Toggle distraction free' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			setPreference( 'core/edit-site', 'fixedToolbar', false );
 			setIsInserterOpened( false );
@@ -244,8 +272,8 @@ function useEditUICommands() {
 			toggle( 'core/edit-site', 'distractionFree' );
 			createInfoNotice(
 				getPreference( 'core/edit-site', 'distractionFree' )
-					? __( 'Distraction free mode turned on.' )
-					: __( 'Distraction free mode turned off.' ),
+					? __( 'Distraction free on.' )
+					: __( 'Distraction free off.' ),
 				{
 					id: 'core/edit-site/distraction-free-mode/notice',
 					type: 'snackbar',
@@ -258,27 +286,27 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'fixedToolbar' );
 			close();
 		},
 	} );
 
-	commands.push( {
-		name: 'core/toggle-code-editor',
-		label: __( 'Toggle code editor' ),
-		icon: code,
-		callback: ( { close } ) => {
-			switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
-			close();
-		},
-	} );
+	if ( editorMode === 'visual' ) {
+		commands.push( {
+			name: 'core/toggle-code-editor',
+			label: __( 'Open code editor' ),
+			icon: code,
+			callback: ( { close } ) => {
+				switchEditorMode( 'text' );
+				close();
+			},
+		} );
+	}
 
 	commands.push( {
 		name: 'core/open-preferences',
-		label: __( 'Open editor preferences' ),
-		icon: cog,
+		label: __( 'Editor preferences' ),
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
 		},
@@ -286,7 +314,7 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/open-shortcut-help',
-		label: __( 'Open keyboard shortcuts' ),
+		label: __( 'Keyboard shortcuts' ),
 		icon: keyboard,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
@@ -298,10 +326,18 @@ function useEditUICommands() {
 		label: showBlockBreadcrumbs
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
 			close();
+			createInfoNotice(
+				showBlockBreadcrumbs
+					? __( 'Breadcrumbs hidden.' )
+					: __( 'Breadcrumbs visible.' ),
+				{
+					id: 'core/edit-site/toggle-breadcrumbs/notice',
+					type: 'snackbar',
+				}
+			);
 		},
 	} );
 
@@ -312,6 +348,12 @@ function useEditUICommands() {
 }
 
 export function useEditModeCommands() {
+	useCommandLoader( {
+		name: 'core/exit-code-editor',
+		hook: useEditorModeCommands,
+		context: 'site-editor-edit',
+	} );
+
 	useCommandLoader( {
 		name: 'core/edit-site/page-content-focus',
 		hook: usePageContentFocusCommands,
