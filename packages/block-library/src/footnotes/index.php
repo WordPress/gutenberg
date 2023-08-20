@@ -37,10 +37,12 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 	// The post meta contains malformed JSON. See
 	// https://core.trac.wordpress.org/ticket/59103.
 	if ( ! is_array( $footnotes ) ) {
-		// This will slash everything, including the keys value boundaries.
-		$footnotes = wp_slash( $raw_footnotes );
-		// So we need to unslash the keys, which are limited to "content" and
-		// "id".
+		// This will slash everything, including the key and value boundaries.
+		// Don't use wp_slash because it will also slash single quotes.
+		$footnotes = str_replace( '"', '\\"', $raw_footnotes );
+		// So we need to unslash the boundaries, which are limited to "content"
+		// and "id", and the order is fixed. We're alse dealing with a single
+		// line of JSON.
 		$footnotes = str_replace( '{\\"content\\":\\"', '{"content":"', $footnotes );
 		$footnotes = str_replace( '\\",\\"id\\":\\"', '","id":"', $footnotes );
 		$footnotes = str_replace( '\\"}', '"}', $footnotes );
