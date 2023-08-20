@@ -70,9 +70,13 @@
 .wp-block-media-text__media img,
 .wp-block-media-text__media video {
 	height: auto;
+	vertical-align: middle;
+}
+
+.wp-block-media-text__media img:not([width]),
+.wp-block-media-text__media video {
 	max-width: unset;
 	width: 100%;
-	vertical-align: middle;
 }
 
 .wp-block-media-text.is-image-fill .wp-block-media-text__media {
