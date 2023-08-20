@@ -26,7 +26,6 @@ import {
 	FormFileUpload,
 	Button,
 	FlexBlock,
-	FlexItem,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useState, useMemo, useRef } from '@wordpress/element';
@@ -52,7 +51,7 @@ import { getMediaItem } from './get-media';
 import { unlock } from '../../lock-unlock';
 import MediaActions from './media-actions';
 
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 /**
  * @typedef {Object} Attachment
@@ -75,7 +74,9 @@ function GridItemButton( { item } ) {
 	} );
 	return (
 		<Button className="edit-site-media-item__name" { ...linkProps }>
-			{ getMediaItem( item ) }
+			<div className="edit-site-medi-item__image-wrapper">
+				{ getMediaItem( item ) }
+			</div>
 			<h4>{ item.title.rendered }</h4>
 		</Button>
 	);
@@ -85,7 +86,7 @@ function TagsCellButton( { attachmentId, tagIds = [], tags } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	return (
 		<FilterControl
-			placeholder={ __( 'Select or create tags' ) }
+			placeholder={ __( 'Select or add tag' ) }
 			value={ tagIds }
 			options={ tags.map( ( tag ) => ( {
 				value: tag.id,
@@ -100,17 +101,19 @@ function TagsCellButton( { attachmentId, tagIds = [], tags } ) {
 				} );
 			} }
 			onCreate={ async ( input ) => {
-				const { id: newTagId } = await saveEntityRecord(
+				const newTag = await saveEntityRecord(
 					'taxonomy',
 					'attachment_tag',
 					{
 						name: input,
 					}
 				);
-				await saveEntityRecord( 'root', 'media', {
-					id: attachmentId,
-					attachment_tags: [ ...tagIds, newTagId ],
-				} );
+				if ( newTag ) {
+					await saveEntityRecord( 'root', 'media', {
+						id: attachmentId,
+						attachment_tags: [ ...tagIds, newTag.id ],
+					} );
+				}
 			} }
 		>
 			{ ( { onToggle } ) => (
@@ -232,6 +235,7 @@ const columns = [
 ];
 
 const EMPTY_ARRAY = [];
+const PAGE_SIZE = 20;
 
 const headingText = {
 	media: __( 'Media' ),
@@ -241,10 +245,19 @@ const headingText = {
 	image: __( 'Images' ),
 };
 
+const parseQueryParamFilter = ( filter ) =>
+	filter ? filter.split( ',' ).map( ( str ) => parseInt( str, 10 ) ) : [];
+
 export default function PageMedia() {
+	const { params } = useLocation();
 	const {
-		params: { path },
-	} = useLocation();
+		path,
+		tags: tagsFilter = '',
+		author: authorFilter = '',
+		p: pageIndex = 0,
+		view = 'table',
+	} = params;
+	const history = useHistory();
 
 	const mediaType = path.split( '/media/' )[ 1 ];
 	const { persistedAttachments, tags, locale, users } = useSelect(
@@ -288,6 +301,22 @@ export default function PageMedia() {
 			} ),
 		[ locale ]
 	);
+	/** @type {import('@tanstack/react-table').ColumnFiltersState} */
+	const columnFilters = useMemo(
+		() => [
+			{ id: 'tags', value: parseQueryParamFilter( tagsFilter ) },
+			{ id: 'author', value: parseQueryParamFilter( authorFilter ) },
+		],
+		[ tagsFilter, authorFilter ]
+	);
+	/** @type {import('@tanstack/react-table').PaginationState} */
+	const pagination = useMemo(
+		() => ( {
+			pageIndex: parseInt( pageIndex, 10 ),
+			pageSize: PAGE_SIZE,
+		} ),
+		[ pageIndex ]
+	);
 	const [ globalFilter, setGlobalFilter ] = useState( '' );
 
 	const table = useReactTable( {
@@ -298,13 +327,34 @@ export default function PageMedia() {
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		initialState: {
-			pagination: {
-				pageSize: 20,
-			},
-		},
 		state: {
+			pagination,
+			columnFilters,
 			globalFilter,
+		},
+		onColumnFiltersChange: ( columnFiltersStateUpdater ) => {
+			const columnFiltersState =
+				columnFiltersStateUpdater( columnFilters );
+			const newParams = { ...params, tags: undefined, author: undefined };
+			for ( const columnFilter of columnFiltersState ) {
+				if ( [ 'tags', 'author' ].includes( columnFilter.id ) ) {
+					newParams[ columnFilter.id ] =
+						columnFilter.value.join( ',' );
+				}
+			}
+			history.replace( newParams );
+		},
+		onPaginationChange: ( paginationStateUpdater ) => {
+			const paginationState = paginationStateUpdater( pagination );
+			if ( paginationState.pageIndex !== pagination.pageIndex ) {
+				history.push( {
+					...params,
+					p:
+						paginationState.pageIndex > 0
+							? paginationState.pageIndex
+							: undefined,
+				} );
+			}
 		},
 		meta: {
 			tags,
@@ -316,10 +366,7 @@ export default function PageMedia() {
 		enableHiding: true,
 		enableFilters: true,
 	} );
-	window.table = table;
 
-	const [ sortBy, setSortBy ] = useState( [ 'name' ] );
-	const [ currentView, setCurrentView ] = useState( 'table' );
 	const tagOptions = useMemo(
 		() =>
 			tags.map( ( tag ) => ( {
@@ -410,33 +457,27 @@ export default function PageMedia() {
 											} ) ) ?? []
 										}
 										multiple
-										onChange={
-											table.getColumn( 'author' )
-												.setFilterValue
-										}
+										onChange={ ( value ) => {
+											table
+												.getColumn( 'author' )
+												.setFilterValue( value );
+										} }
 									/>
 								) }
 							</HStack>
 						</FlexBlock>
-						<FlexItem>
-							<FilterControl
-								label={ __( 'Sort' ) }
-								value={ sortBy }
-								options={ [
-									{ label: __( 'Name' ), value: 'name' },
-									{ label: __( 'Date' ), value: 'date' },
-									{ label: __( 'Author' ), value: 'author' },
-								] }
-								onChange={ setSortBy }
-							/>
-						</FlexItem>
 						<ToggleGroupControl
 							label={ __( 'Toggle view' ) }
 							hideLabelFromVision
-							value={ currentView }
+							value={ view }
 							__nextHasNoMarginBottom
 							size="__unstable-large"
-							onChange={ setCurrentView }
+							onChange={ ( value ) => {
+								history.replace( {
+									...params,
+									view: value,
+								} );
+							} }
 						>
 							<ToggleGroupControlOptionIcon
 								value="table"
@@ -450,10 +491,10 @@ export default function PageMedia() {
 							/>
 						</ToggleGroupControl>
 					</HStack>
-					{ attachments && 'table' === currentView && (
+					{ attachments && 'table' === view && (
 						<Table table={ table } />
 					) }
-					{ attachments && 'grid' === currentView && (
+					{ attachments && 'grid' === view && (
 						<Grid
 							items={ table
 								.getRowModel()

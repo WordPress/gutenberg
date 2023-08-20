@@ -21,11 +21,12 @@ const { useLocation } = unlock( routerPrivateApis );
 
 function GridItem( { item } ) {
 	const {
-		params: { path },
+		params: { path, ...params },
 	} = useLocation();
 
 	const mediaType = path.split( '/media/' )[ 1 ];
 	const linkProps = useLink( {
+		...params,
 		postType: 'attachment',
 		mediaType,
 		postId: item.id,

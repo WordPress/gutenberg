@@ -10,9 +10,7 @@ export function getMediaItem( attachment, size = 'thumb' ) {
 	if ( isBlobURL( attachment.url ) ) {
 		return size === 'thumb' ? (
 			<img
-				height={ 100 }
-				width={ 100 }
-				style={ { borderRadius: '8px', flexShrink: 0 } }
+				className="edit-site-media-item__thumbnail"
 				src={ attachment.url }
 				alt=""
 			/>
@@ -27,14 +25,13 @@ export function getMediaItem( attachment, size = 'thumb' ) {
 		return size === 'thumb' &&
 			attachment.media_details?.sizes?.thumbnail?.source_url ? (
 			<img
-				height={ 100 }
-				width={ 100 }
-				style={ { borderRadius: '8px', flexShrink: 0 } }
+				className="edit-site-media-item__thumbnail"
 				src={ attachment.media_details.sizes.thumbnail.source_url }
 				alt={ attachment.alt_text }
 			/>
 		) : (
 			<img
+				className="edit-site-media-item__thumbnail"
 				src={
 					attachment.media_details?.sizes?.large?.source_url ??
 					attachment.source_url
@@ -45,15 +42,27 @@ export function getMediaItem( attachment, size = 'thumb' ) {
 	}
 
 	if ( 'audio' === mediaType ) {
-		return <Icon icon={ audio } size={ 128 } />;
+		return (
+			<div className="edit-site-media-item__icon">
+				<Icon icon={ audio } />
+			</div>
+		);
 	}
 
 	if ( 'video' === mediaType ) {
-		return <Icon icon={ video } size={ 128 } />;
+		return (
+			<div className="edit-site-media-item__icon">
+				<Icon icon={ video } />
+			</div>
+		);
 	}
 
 	// Everything else is a file.
-	return <Icon icon={ page } size={ 128 } />;
+	return (
+		<div className="edit-site-media-item__icon">
+			<Icon icon={ page } />
+		</div>
+	);
 }
 
 export function getMediaTypeFromMimeType( mimeType ) {
