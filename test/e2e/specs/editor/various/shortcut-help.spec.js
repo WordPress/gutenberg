@@ -11,18 +11,14 @@ test.describe( 'keyboard shortcut help modal', () => {
 	test( 'displays the shortcut help modal when opened using the menu item in the more menu', async ( {
 		page,
 	} ) => {
-		// Add a paragraph block.
 		await page
 			.locator( '.interface-more-menu-dropdown [aria-label="Options"]' )
 			.click();
 		await page
 			.locator( 'role=menuitem[name="Keyboard shortcuts ⌃⌥H"]' )
 			.click();
-		//await editor.clickBlockOptionsMenuItem('Keyboard shortcuts');
-		const shortcutHelpModalElements = await page.locator(
-			'role=dialog[name="Keyboard shortcuts"]'
-		);
-		await expect( shortcutHelpModalElements ).toHaveCount( 1 );
+		const dialog = page.locator( 'role=dialog[name="Keyboard shortcuts"]' );
+		await expect( dialog ).toBeVisible();
 	} );
 	test( 'closes the shortcut help modal when the close icon is clicked', async ( {
 		page,
@@ -34,44 +30,26 @@ test.describe( 'keyboard shortcut help modal', () => {
 			.locator( 'role=menuitem[name="Keyboard shortcuts ⌃⌥H"]' )
 			.click();
 		await page.locator( 'role=button[name="Close"]' ).click();
-		const shortcutHelpModalElements = await page.locator(
-			'role=dialog[name="Keyboard shortcuts"]'
-		);
-		await expect( shortcutHelpModalElements ).toHaveCount( 0 );
+		const dialog = page.locator( 'role=dialog[name="Keyboard shortcuts"]' );
+		await expect( dialog ).toBeHidden();
 	} );
 	test( 'displays the shortcut help modal when opened using the shortcut key (access+h)', async ( {
 		page,
 		pageUtils,
 	} ) => {
-		await page
-			.locator( '.interface-more-menu-dropdown [aria-label="Options"]' )
-			.click();
-		await page
-			.locator( 'role=menuitem[name="Keyboard shortcuts ⌃⌥H"]' )
-			.click();
-		await page.locator( 'role=button[name="Close"]' ).click();
-		await pageUtils.pressKeyWithModifier( 'access', 'h' );
-		const shortcutHelpModalElements = await page.locator(
-			'role=dialog[name="Keyboard shortcuts"]'
-		);
-		await expect( shortcutHelpModalElements ).toHaveCount( 1 );
+		await pageUtils.pressKeys( 'access+h' );
+		const dialog = page.locator( 'role=dialog[name="Keyboard shortcuts"]' );
+		await expect( dialog ).toBeVisible();
 	} );
 	test( 'closes the shortcut help modal when the shortcut key (access+h) is pressed again', async ( {
 		page,
 		pageUtils,
 	} ) => {
-		await page
-			.locator( '.interface-more-menu-dropdown [aria-label="Options"]' )
-			.click();
-		await page
-			.locator( 'role=menuitem[name="Keyboard shortcuts ⌃⌥H"]' )
-			.click();
-		await page.locator( 'role=button[name="Close"]' ).click();
-		await pageUtils.pressKeyWithModifier( 'access', 'h' );
-		await pageUtils.pressKeyWithModifier( 'access', 'h' );
-		const shortcutHelpModalElements = await page.locator(
-			'role=dialog[name="Keyboard shortcuts"]'
-		);
-		await expect( shortcutHelpModalElements ).toHaveCount( 0 );
+		await pageUtils.pressKeys( 'access+h' );
+		const dialog = page.locator( 'role=dialog[name="Keyboard shortcuts"]' );
+		await expect( dialog ).toBeVisible();
+
+		await pageUtils.pressKeys( 'access+h' );
+		await expect( dialog ).toBeHidden();
 	} );
 } );
