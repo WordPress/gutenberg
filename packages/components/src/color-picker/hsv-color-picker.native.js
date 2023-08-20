@@ -48,7 +48,10 @@ const HsvColorPicker = ( props ) => {
 	} = props;
 
 	return (
-		<View style={ [ styles[ 'hsv-container' ], containerStyle ] }>
+		<View
+			style={ [ styles[ 'hsv-container' ], containerStyle ] }
+			testID="hsv-color-picker"
+		>
 			<SaturationValuePicker
 				containerStyle={ satValPickerContainerStyle }
 				currentColor={ currentColor }

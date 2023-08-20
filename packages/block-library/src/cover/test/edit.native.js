@@ -558,7 +558,7 @@ describe( 'color settings', () => {
 		expect( screen.getByText( 'Select a color' ) ).toBeVisible();
 
 		// Tap color picker
-		const colorPicker = screen.getByTestId( 'color-picker' );
+		const colorPicker = screen.getByTestId( 'hsv-color-picker' );
 		fireEvent( colorPicker, 'onHuePickerPress', {
 			hue: 120,
 			saturation: 12,
