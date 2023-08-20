@@ -24,7 +24,8 @@ export function getMediaItem( attachment, size = 'thumb' ) {
 	const mediaType = getMediaTypeFromMimeType( attachment.mime_type );
 
 	if ( 'image' === mediaType ) {
-		return size === 'thumb' ? (
+		return size === 'thumb' &&
+			attachment.media_details?.sizes?.thumbnail?.source_url ? (
 			<img
 				height={ 100 }
 				width={ 100 }
@@ -35,8 +36,8 @@ export function getMediaItem( attachment, size = 'thumb' ) {
 		) : (
 			<img
 				src={
-					attachment.media_details.sizes.large?.source_url ??
-					attachment.media_details.sizes.full.source_url
+					attachment.media_details?.sizes?.large?.source_url ??
+					attachment.source_url
 				}
 				alt={ attachment.alt_text }
 			/>

@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	__experimentalUseNavigator as useNavigator,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -13,6 +10,7 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { createInterpolateElement } from '@wordpress/element';
 import { download, copy } from '@wordpress/icons';
 import { useCopyToClipboard } from '@wordpress/compose';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -24,6 +22,10 @@ import {
 	SidebarNavigationScreenDetailsPanelLabel,
 	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
+
 
 function CopyButton( { text, onCopy = () => {}, children } ) {
 	const ref = useCopyToClipboard( text, onCopy );
@@ -107,8 +109,7 @@ function getMediaDetails( record ) {
 }
 
 export default function SidebarNavigationScreenMediaItem() {
-	const { params } = useNavigator();
-	const { postId, mediaType } = params;
+	const { params: { postId, mediaType } } = useLocation();
 	const { record } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
