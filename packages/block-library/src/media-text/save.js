@@ -33,6 +33,10 @@ export default function save( { attributes } ) {
 		href,
 		linkTarget,
 		rel,
+		imageWidth,
+		imageHeight,
+		imageScale,
+		imageAspectRatio,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = ! rel ? undefined : rel;
@@ -47,6 +51,12 @@ export default function save( { attributes } ) {
 			src={ mediaUrl }
 			alt={ mediaAlt }
 			className={ imageClasses || null }
+			width={ imageWidth }
+			height={ imageHeight }
+			style={ {
+				objectFit: imageScale,
+				aspectRatio: imageAspectRatio,
+			} }
 		/>
 	);
 
