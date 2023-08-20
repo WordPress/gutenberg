@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
 import {
@@ -16,18 +16,20 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
-	__experimentalImageSizeControl as ImageSizeControl,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	ExternalLink,
 	FocalPointPicker,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
@@ -44,6 +46,22 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 	TEMPLATE,
 } from './constants';
+import { unlock } from '../lock-unlock';
+
+const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
+
+const scaleOptions = [
+	{
+		value: 'cover',
+		label: _x( 'Cover', 'Scale option for dimensions control' ),
+		help: __( 'Image covers the space evenly.' ),
+	},
+	{
+		value: 'contain',
+		label: _x( 'Contain', 'Scale option for dimensions control' ),
+		help: __( 'Image is contained without distortion.' ),
+	},
+];
 
 // this limits the resize to a safe zone to avoid making broken layouts
 const applyWidthConstraints = ( width ) =>
@@ -145,6 +163,10 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		rel,
 		verticalAlignment,
 		allowedBlocks,
+		imageWidth,
+		imageHeight,
+		imageScale,
+		imageAspectRatio,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
@@ -228,82 +250,167 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		} );
 	};
 
+	// TODO: Can allow more units after figuring out how they should interact
+	// with the ResizableBox and ImageEditor components. Calculations later on
+	// for those components are currently assuming px units.
+	const dimensionsUnitsOptions = useCustomUnits( {
+		availableUnits: [ 'px' ],
+	} );
+
 	const mediaTextGeneralSettings = (
-		<PanelBody title={ __( 'Settings' ) }>
-			<ToggleControl
-				__nextHasNoMarginBottom
+		<ToolsPanel label={ __( 'Settings' ) }>
+			<ToolsPanelItem
 				label={ __( 'Stack on mobile' ) }
-				checked={ isStackedOnMobile }
-				onChange={ () =>
-					setAttributes( {
-						isStackedOnMobile: ! isStackedOnMobile,
-					} )
+				isShownByDefault={ true }
+				hasValue={ () => isStackedOnMobile === true }
+				onDeselect={ () =>
+					setAttributes( { isStackedOnMobile: true } )
 				}
-			/>
-			{ mediaType === 'image' && (
+			>
 				<ToggleControl
 					__nextHasNoMarginBottom
-					label={ __( 'Crop image to fill entire column' ) }
-					checked={ imageFill }
+					label={ __( 'Stack on mobile' ) }
+					checked={ isStackedOnMobile }
 					onChange={ () =>
 						setAttributes( {
-							imageFill: ! imageFill,
+							isStackedOnMobile: ! isStackedOnMobile,
 						} )
 					}
 				/>
+			</ToolsPanelItem>
+			{ mediaType === 'image' && (
+				<ToolsPanelItem
+					label={ __( 'Crop image to fill entire column' ) }
+					isShownByDefault={ true }
+					hasValue={ () => imageFill === true }
+					onDeselect={ () =>
+						setAttributes( { imageFill: undefined } )
+					}
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Crop image to fill entire column' ) }
+						checked={ imageFill }
+						onChange={ () =>
+							setAttributes( {
+								imageFill: ! imageFill,
+							} )
+						}
+					/>
+				</ToolsPanelItem>
 			) }
 			{ imageFill && mediaUrl && mediaType === 'image' && (
-				<FocalPointPicker
-					__nextHasNoMarginBottom
+				<ToolsPanelItem
 					label={ __( 'Focal point picker' ) }
-					url={ mediaUrl }
-					value={ focalPoint }
-					onChange={ ( value ) =>
-						setAttributes( { focalPoint: value } )
+					isShownByDefault={ false }
+					hasValue={ () => focalPoint !== undefined }
+					onDeselect={ () =>
+						setAttributes( { focalPoint: undefined } )
 					}
-					onDragStart={ imperativeFocalPointPreview }
-					onDrag={ imperativeFocalPointPreview }
-				/>
+				>
+					<FocalPointPicker
+						__nextHasNoMarginBottom
+						label={ __( 'Focal point picker' ) }
+						url={ mediaUrl }
+						value={ focalPoint }
+						onChange={ ( value ) =>
+							setAttributes( { focalPoint: value } )
+						}
+						onDragStart={ imperativeFocalPointPreview }
+						onDrag={ imperativeFocalPointPreview }
+					/>
+				</ToolsPanelItem>
 			) }
 			{ mediaType === 'image' && (
-				<TextareaControl
-					__nextHasNoMarginBottom
+				<ToolsPanelItem
 					label={ __( 'Alternative text' ) }
-					value={ mediaAlt }
-					onChange={ onMediaAltChange }
-					help={
-						<>
-							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-								{ __( 'Describe the purpose of the image.' ) }
-							</ExternalLink>
-							<br />
-							{ __( 'Leave empty if decorative.' ) }
-						</>
+					isShownByDefault={ true }
+					hasValue={ () => !!! mediaAlt }
+					onDeselect={ () =>
+						setAttributes( { mediaAlt: undefined } )
 					}
-				/>
+				>
+					<TextareaControl
+						__nextHasNoMarginBottom
+						label={ __( 'Alternative text' ) }
+						value={ mediaAlt }
+						onChange={ onMediaAltChange }
+						help={
+							<>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</ExternalLink>
+								<br />
+								{ __( 'Leave empty if decorative.' ) }
+							</>
+						}
+					/>
+				</ToolsPanelItem>
 			) }
-			{ mediaType === 'image' && (
-				<ImageSizeControl
-					onChangeImage={ updateImage }
-					slug={ mediaSizeSlug }
-					imageSizeOptions={ imageSizeOptions }
-					isResizable={ false }
-					imageSizeHelp={ __(
-						'Select the size of the source image.'
-					) }
-				/>
+			{ mediaType === 'image' && ! imageFill && (
+				<>
+					<DimensionsTool
+						value={ {
+							width: imageWidth,
+							height: imageHeight,
+							scale: imageScale,
+							aspectRation: imageAspectRatio,
+						} }
+						onChange={ ( {
+							width: newWidth,
+							height: newHeight,
+							scale: newScale,
+							aspectRatio: newAspectRatio,
+						} ) => {
+							// Rebuilding the object forces setting `undefined`
+							// for values that are removed since setAttributes
+							// doesn't do anything with keys that aren't set.
+							setAttributes( {
+								// CSS includes `height: auto`, but we need
+								// `width: auto` to fix the aspect ratio when
+								// only height is set due to the width and
+								// height attributes set via the server.
+								imageWidth:
+									! newWidth && newHeight ? 'auto' : newWidth,
+								imageHeight: newHeight,
+								imageScale: newScale,
+								imageAspectRatio: newAspectRatio,
+							} );
+						} }
+						defaultScale="cover"
+						defaultAspectRatio="auto"
+						scaleOptions={ scaleOptions }
+						unitsOptions={ dimensionsUnitsOptions }
+					/>
+					<ResolutionTool
+						value={ mediaSizeSlug }
+						onChange={ updateImage }
+						options={ imageSizeOptions }
+					/>
+				</>
 			) }
 			{ mediaUrl && (
-				<RangeControl
-					__nextHasNoMarginBottom
+				<ToolsPanelItem
 					label={ __( 'Media width' ) }
-					value={ temporaryMediaWidth || mediaWidth }
-					onChange={ commitWidthChange }
-					min={ WIDTH_CONSTRAINT_PERCENTAGE }
-					max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
-				/>
+					isShownByDefault={ true }
+					hasValue={ () => mediaWidth > 0 }
+					onDeselect={ () =>
+						setAttributes( { mediaWidth: undefined } )
+					}
+				>
+					<RangeControl
+						__nextHasNoMarginBottom
+						label={ __( 'Media width' ) }
+						value={ temporaryMediaWidth || mediaWidth }
+						onChange={ commitWidthChange }
+						min={ WIDTH_CONSTRAINT_PERCENTAGE }
+						max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
+					/>
+				</ToolsPanelItem>
 			) }
-		</PanelBody>
+		</ToolsPanel>
 	);
 
 	const blockProps = useBlockProps( {
@@ -381,6 +488,10 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						mediaType,
 						mediaUrl,
 						mediaWidth,
+						imageWidth,
+						imageHeight,
+						imageScale,
+						imageAspectRatio,
 					} }
 				/>
 				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }
