@@ -12,7 +12,8 @@ test.describe( 'keyboard shortcut help modal', () => {
 		page,
 	} ) => {
 		await page
-			.locator( '.interface-more-menu-dropdown [aria-label="Options"]' )
+			.locator( 'role=region[name="Editor top bar"]' )
+			.locator( '[aria-label="Options"]' )
 			.click();
 		await page
 			.locator( 'role=menuitem', { hasText: /^Keyboard shortcuts/i } )
