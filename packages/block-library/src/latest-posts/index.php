@@ -83,25 +83,36 @@ function render_block_core_latest_posts( $attributes ) {
 		$list_items_markup .= '<li>';
 
 		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
-			$image_style = '';
+			$image_styles = [];
+			$image_attrs = [];
 			if ( isset( $attributes['featuredImageSizeWidth'] ) ) {
-				$image_style .= sprintf( 'max-width:%spx;', $attributes['featuredImageSizeWidth'] );
+				$image_attrs[] = 'width="' . esc_attr( $attributes['featuredImageSizeWidth'] ) . '"';
 			}
 			if ( isset( $attributes['featuredImageSizeHeight'] ) ) {
-				$image_style .= sprintf( 'max-height:%spx;', $attributes['featuredImageSizeHeight'] );
+				$image_attrs[] = 'height="' . esc_attr( $attributes['featuredImageSizeHeight'] ) . '"';
 			}
+			if ( isset( $attributes['featuredImageScale'] ) ) {
+				$image_styles[] = 'object-fit: ' . esc_attr( $attributes['featuredImageScale'] ) . ';';
+			}
+			if ( isset( $attributes['featuredImageAspectRation'] ) ) {
+				$image_styles[] = 'aspect-ratio: ' . esc_attr( $attributes['featuredImageAspectRation'] ) . ';';
+			}
+			$featured_image_classes = 'attachment-' . $attributes['featuredImageSizeSlug'] . ' size-' . $attributes['featuredImageSizeSlug'] . ' wp-post-image';
 
 			$image_classes = 'wp-block-latest-posts__featured-image';
 			if ( isset( $attributes['featuredImageAlign'] ) ) {
 				$image_classes .= ' align' . $attributes['featuredImageAlign'];
 			}
 
-			$featured_image = get_the_post_thumbnail(
-				$post,
-				$attributes['featuredImageSizeSlug'],
-				array(
-					'style' => esc_attr( $image_style ),
-				)
+			$featured_image_url = get_the_post_thumbnail_url( $post, $attributes['featuredImageSizeSlug'] );
+
+			$featured_image = sprintf(
+				'<img class="%1$s" src="%2$s" alt="%3$s" %4$s style="%5$s" decoding="async">',
+				esc_attr( $featured_image_classes ),
+				esc_attr( $featured_image_url ),
+				esc_attr( $title ),
+				implode( ' ', $image_attrs ),
+				implode( '', $image_styles)
 			);
 			if ( $attributes['addLinkToFeaturedImage'] ) {
 				$featured_image = sprintf(
