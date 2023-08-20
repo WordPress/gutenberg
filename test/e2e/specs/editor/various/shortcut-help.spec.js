@@ -8,7 +8,7 @@ test.describe( 'keyboard shortcut help modal', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'displays the shortcut help modal when opened using the menu item in the more menu', async ( {
+	test( 'opens from the options menu and closes with its close button', async ( {
 		page,
 	} ) => {
 		await page
@@ -19,29 +19,12 @@ test.describe( 'keyboard shortcut help modal', () => {
 			.click();
 		const dialog = page.locator( 'role=dialog[name="Keyboard shortcuts"]' );
 		await expect( dialog ).toBeVisible();
-	} );
-	test( 'closes the shortcut help modal when the close icon is clicked', async ( {
-		page,
-	} ) => {
-		await page
-			.locator( '.interface-more-menu-dropdown [aria-label="Options"]' )
-			.click();
-		await page
-			.locator( 'role=menuitem[name="Keyboard shortcuts ⌃⌥H"]' )
-			.click();
+
 		await page.locator( 'role=button[name="Close"]' ).click();
-		const dialog = page.locator( 'role=dialog[name="Keyboard shortcuts"]' );
 		await expect( dialog ).toBeHidden();
 	} );
-	test( 'displays the shortcut help modal when opened using the shortcut key (access+h)', async ( {
-		page,
-		pageUtils,
-	} ) => {
-		await pageUtils.pressKeys( 'access+h' );
-		const dialog = page.locator( 'role=dialog[name="Keyboard shortcuts"]' );
-		await expect( dialog ).toBeVisible();
-	} );
-	test( 'closes the shortcut help modal when the shortcut key (access+h) is pressed again', async ( {
+
+	test( 'toggles open/closed using the keyboard shortcut (access+h)', async ( {
 		page,
 		pageUtils,
 	} ) => {
