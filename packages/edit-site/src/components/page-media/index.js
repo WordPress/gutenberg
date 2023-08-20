@@ -235,6 +235,7 @@ const columns = [
 ];
 
 const EMPTY_ARRAY = [];
+const PAGE_SIZE = 20;
 
 const headingText = {
 	media: __( 'Media' ),
@@ -245,7 +246,7 @@ const headingText = {
 };
 
 const parseQueryParamFilter = ( filter ) =>
-	filter ? filter.split( ',' ).map( ( str ) => Number( str ) ) : [];
+	filter ? filter.split( ',' ).map( ( str ) => parseInt( str, 10 ) ) : [];
 
 export default function PageMedia() {
 	const { params } = useLocation();
@@ -253,6 +254,7 @@ export default function PageMedia() {
 		path,
 		tags: tagsFilter = '',
 		author: authorFilter = '',
+		p: pageIndex = 0,
 		view = 'table',
 	} = params;
 	const history = useHistory();
@@ -307,6 +309,14 @@ export default function PageMedia() {
 		],
 		[ tagsFilter, authorFilter ]
 	);
+	/** @type {import('@tanstack/react-table').PaginationState} */
+	const pagination = useMemo(
+		() => ( {
+			pageIndex: parseInt( pageIndex, 10 ),
+			pageSize: PAGE_SIZE,
+		} ),
+		[ pageIndex ]
+	);
 	const [ globalFilter, setGlobalFilter ] = useState( '' );
 
 	const table = useReactTable( {
@@ -317,12 +327,8 @@ export default function PageMedia() {
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		initialState: {
-			pagination: {
-				pageSize: 20,
-			},
-		},
 		state: {
+			pagination,
 			columnFilters,
 			globalFilter,
 		},
@@ -337,6 +343,18 @@ export default function PageMedia() {
 				}
 			}
 			history.replace( newParams );
+		},
+		onPaginationChange: ( paginationStateUpdater ) => {
+			const paginationState = paginationStateUpdater( pagination );
+			if ( paginationState.pageIndex !== pagination.pageIndex ) {
+				history.push( {
+					...params,
+					p:
+						paginationState.pageIndex > 0
+							? paginationState.pageIndex
+							: undefined,
+				} );
+			}
 		},
 		meta: {
 			tags,
