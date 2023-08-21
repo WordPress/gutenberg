@@ -214,7 +214,9 @@ describe( 'Tooltip', () => {
 
 		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
 
-		expect( await screen.findByText( 'shortcut text' ) ).toBeVisible();
+		await waitFor( () =>
+			expect( screen.getByText( 'shortcut text' ) ).toBeVisible()
+		);
 
 		await cleanupTooltip( user );
 	} );
