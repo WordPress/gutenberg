@@ -74,7 +74,7 @@ class WP_Font_Library {
 	}
 
 	/**
-	 * Gets the font collections available.
+	 * Gets all the font collections available.
 	 *
 	 * @since 6.4.0
 	 *
@@ -82,6 +82,21 @@ class WP_Font_Library {
 	 */
 	public static function get_font_collections() {
 		return self::$collections;
+	}
+
+	/**
+	 * Gets a font collection.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param string $id Font collection id.
+	 * @return array List of font collections.
+	 */
+	public static function get_font_collection( $id ) {
+		if ( array_key_exists( $id, self::$collections ) ) {
+			return self::$collections[ $id ];
+		}
+		return new WP_Error( 'font_collection_not_found', 'Font collection not found.' );
 	}
 
 	/**

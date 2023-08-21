@@ -103,15 +103,16 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 */
 	public function get_font_collection( $request ) {
 		$id = $request->get_param( 'id' );
-		if ( ! array_key_exists( $id, WP_Font_Library::get_font_collections() ) ) {
+		$collection = WP_Font_Library::get_font_collection( $id );
+
+		if ( is_wp_error( $collection ) ) {
 			return new WP_Error(
 				'font_collection_not_found',
 				__( 'Font collection not found.', 'gutenberg' ),
 				array( 'status' => 404 )
 			);
 		}
-
-		$collection = WP_Font_Library::get_font_collections()[ $id ];
+		
 		return new WP_REST_Response( $collection->get_data() );
 	}
 
