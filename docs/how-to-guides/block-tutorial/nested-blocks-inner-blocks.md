@@ -155,13 +155,15 @@ add_action( 'init', function() {
 } );
 ```
 
-## Child InnerBlocks: Parent and Ancestors
+## Using Hierarchical Context in InnerBlocks
 
-A common pattern for using InnerBlocks is to create a custom block that will be included only in the InnerBlocks.
+A common pattern for using InnerBlocks is to create a custom block that will be included _only_ in the InnerBlocks. This allows InnerBlocks to have a hierarchical context for nesting child blocks.
 
-An example of this is the Columns block, that creates a single parent block called `columns` and then creates an child block called `column`. The parent block is defined to only allow the child blocks. See [Column code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/column).
+### Defining Parent Block Context
 
-When defining a child block, use the `parent` block setting to define which block is the parent. This prevents the block showing in the inserter outside of the InnerBlock it is defined for.
+An example of this is the Column block, which is assigned the `parent` block setting. This allows the Column block to only be available in its parent Columns block context. Otherwise, the Column block will not be available as an option within the block inserter. See [Column code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/column).
+
+When defining a direct child block, use the `parent` block setting to define which block is the parent. This prevents the child block from showing in the inserter outside of the InnerBlock it is defined for.
 
 ```json
 {
@@ -172,7 +174,9 @@ When defining a child block, use the `parent` block setting to define which bloc
 }
 ```
 
-Another example is using the `ancestors` block setting to define a block that must be present as an ancestor, but it doesn't need to be the direct parent (like with `parent`). This prevents the block from showing in the inserter if the ancestor is not in the tree, but other blocks can be added in between, like a Columns or Group block. See [Comment Author Name code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/comment-author-name).
+## Defining Ancestor Block Context
+
+Another example is using the `ancestor` block setting. The Comment Author Name block utilizes the `ancestor` setting to assign the Comment Template block to allow it to be a descendant of the Comment Template block while refraining from explicitly assigning it a direct child hierarchy. This context allows the Comment Author Name block to be anywhere in the hierarchical tree, and not _just_ a direct child of the parent Comment Template block, while still limiting its availability within the block inserter to only be visible an an option to insert if the Comment Template block is available.
 
 ```json
 {
@@ -183,7 +187,7 @@ Another example is using the `ancestors` block setting to define a block that mu
 }
 ```
 
-## Using a react hook
+## Using a React Hook
 
 You can use a react hook called `useInnerBlocksProps` instead of the `InnerBlocks` component. This hook allows you to take more control over the markup of inner blocks areas.
 
