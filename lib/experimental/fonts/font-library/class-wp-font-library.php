@@ -34,7 +34,7 @@ class WP_Font_Library {
 	 *
 	 * @var array
 	 */
-	public static $collections = array();
+	private static $collections = array();
 
 	/**
 	 * Register filter to extend the library with font collections.
