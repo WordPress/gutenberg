@@ -13,17 +13,15 @@
 			"default": 2
 		}
 	},
-	"usesContext": [
-		"queryId",
-		"query"
-	],
+	"usesContext": [ "queryId", "query" ],
 	"supports": {
 		"reusable": false,
 		"html": false,
 		"color": {
 			"gradients": true,
 			"text": false,
-			"__experimentalDefaultControls": {				"background": true
+			"__experimentalDefaultControls": {
+				"background": true
 			}
 		},
 		"typography": {
