@@ -462,10 +462,9 @@ export function useGradientsPerOrigin( settings ) {
 	] );
 }
 
-export function __experimentalUseGlobalBehaviors( blockName, source = 'all' ) {
+export function __experimentalUseGlobalBehaviors( blockName ) {
 	const {
 		merged: mergedConfig,
-		base: baseConfig,
 		user: userConfig,
 		setUserConfig,
 	} = useContext( GlobalStylesContext );
@@ -473,23 +472,8 @@ export function __experimentalUseGlobalBehaviors( blockName, source = 'all' ) {
 		? `behaviors`
 		: `behaviors.blocks.${ blockName }`;
 
-	let rawResult, result;
-	switch ( source ) {
-		case 'all':
-			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
-			result = getValueFromVariable( mergedConfig, blockName, rawResult );
-			break;
-		case 'user':
-			rawResult = getValueFromObjectPath( userConfig, finalPath );
-			result = getValueFromVariable( mergedConfig, blockName, rawResult );
-			break;
-		case 'base':
-			rawResult = getValueFromObjectPath( baseConfig, finalPath );
-			result = getValueFromVariable( baseConfig, blockName, rawResult );
-			break;
-		default:
-			throw 'Unsupported source';
-	}
+	const rawResult = getValueFromObjectPath( userConfig, finalPath );
+	const result = getValueFromVariable( mergedConfig, blockName, rawResult );
 
 	const animation = result?.lightbox?.animation || 'zoom';
 

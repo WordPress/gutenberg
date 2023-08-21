@@ -67,7 +67,7 @@ const {
 	useHasEffectsPanel,
 	useHasFiltersPanel,
 	useGlobalStyle,
-	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
+	__experimentalUseGlobalBehaviors,
 	__experimentalBehaviorsPanel: StylesBehaviorsPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
@@ -93,8 +93,8 @@ function ScreenBlock( { name, variation } ) {
 	} );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
-	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
-	const { behavior } = useGlobalBehaviors( name, 'user' );
+	const { behavior, setBehavior, inheritedBehaviors } =
+		__experimentalUseGlobalBehaviors( name );
 
 	const blockType = getBlockType( name );
 	const blockVariations = useBlockVariations( name );
