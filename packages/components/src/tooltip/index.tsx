@@ -64,7 +64,8 @@ function Tooltip( props: TooltipProps ) {
 	return (
 		<>
 			<Ariakit.TooltipAnchor
-				onBlur={ () => tooltipStore.hide() }
+				onBlur={ tooltipStore.hide }
+				onClick={ tooltipStore.hide }
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
 			>
@@ -74,11 +75,6 @@ function Tooltip( props: TooltipProps ) {
 				<Ariakit.Tooltip
 					className="components-tooltip"
 					gutter={ 4 }
-					// 	hide tooltip when interacting with its anchor to match legacy tooltip
-					hideOnInteractOutside={ () => {
-						tooltipStore.setOpen( ( open ) => ! open );
-						return true;
-					} }
 					id={ describedById }
 					overflowPadding={ 0.5 }
 					store={ tooltipStore }
