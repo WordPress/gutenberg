@@ -10,7 +10,17 @@
 	"attributes": {
 		"ref": {
 			"type": "number"
+		},
+		"dynamicContent": {
+			"type": "object"
+		},
+		"setDynamicContent": {
+			"type": "function"
 		}
+	},
+	"providesContext": {
+		"dynamicContent": "dynamicContent",
+		"setDynamicContent": "setDynamicContent"
 	},
 	"supports": {
 		"customClassName": false,
