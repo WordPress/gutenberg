@@ -50,7 +50,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		$lightbox_settings = $block['attrs']['behaviors']['lightbox'];
 		// If the lightbox setting is not set in the block attributes, get it from the theme.json file.
 	} else {
-		$user_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
+		$user_data = WP_Theme_JSON_Resolver_Gutenberg::get_user_data()->get_data();
 
 		if ( isset( $user_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'] ) ) {
 			$lightbox_settings = $user_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
