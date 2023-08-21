@@ -10,7 +10,13 @@
 	"attributes": {
 		"ref": {
 			"type": "number"
+		},
+		"dynamicContent": {
+			"type": "object"
 		}
+	},
+	"providesContext": {
+		"dynamicContent": "dynamicContent"
 	},
 	"supports": {
 		"customClassName": false,
