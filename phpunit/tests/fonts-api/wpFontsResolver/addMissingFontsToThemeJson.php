@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../wp-fonts-testcase.php';
+require_once dirname( __DIR__ ) . '/base.php';
 
 /**
  * Test WP_Fonts_Resolver::add_missing_fonts_to_theme_json().

@@ -6,7 +6,7 @@
  * @subpackage Fonts API
  */
 
-require_once __DIR__ . '/fonts-bc-layer-testcase.php';
+require_once __DIR__ . '/base.php';
 
 /**
  * @group  fontsapi

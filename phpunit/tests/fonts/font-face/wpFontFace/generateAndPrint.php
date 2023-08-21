@@ -6,7 +6,7 @@
  * @subpackage Fonts
  */
 
-require_once __DIR__ . '/../wp-font-face-tests-dataset.php';
+require_once dirname( __DIR__ ) . '/base.php';
 
 /**
  * Test WP_Font_Face::generate_and_print().

@@ -6,7 +6,7 @@
  * @subpackage Fonts
  */
 
-require_once __DIR__ . '/wp-font-face-testcase.php';
+require_once __DIR__ . '/base.php';
 
 /**
  * Test wp_print_font_faces().

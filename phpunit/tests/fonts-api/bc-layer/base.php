@@ -6,7 +6,7 @@
  * @subpackage Fonts API
  */
 
-require_once __DIR__ . '/../wp-fonts-testcase.php';
+require_once dirname( __DIR__ ) . '/base.php';
 require_once __DIR__ . '/bc-layer-tests-dataset.php';
 
 /**
