@@ -66,17 +66,21 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 
 		const commands = useMemo( () => {
 			return ( records ?? [] ).map( ( record ) => {
+				const command = {
+					name: postType + '-' + record.id,
+					searchLabel: record.title?.rendered + ' ' + record.id,
+					label: record.title?.rendered
+						? record.title?.rendered
+						: __( '(no title)' ),
+					icon: icons[ postType ],
+				};
+
 				if (
 					postType === 'post' ||
 					( postType === 'page' && ! isBlockBasedTheme )
 				) {
 					return {
-						name: postType + '-' + record.id,
-						searchLabel: record.title?.rendered + ' ' + record.id,
-						label: record.title?.rendered
-							? record.title?.rendered
-							: __( '(no title)' ),
-						icon: icons[ postType ],
+						...command,
 						callback: ( { close } ) => {
 							const args = {
 								post: record.id,
@@ -102,12 +106,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					: {};
 
 				return {
-					name: postType + '-' + record.id,
-					searchLabel: record.title?.rendered + ' ' + record.id,
-					label: record.title?.rendered
-						? record.title?.rendered
-						: __( '(no title)' ),
-					icon: icons[ postType ],
+					...command,
 					callback: ( { close } ) => {
 						const args = {
 							postType,
