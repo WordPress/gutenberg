@@ -9,7 +9,14 @@ import * as getPort from 'get-port';
 /**
  * Internal dependencies
  */
-import { Admin, Editor, PageUtils, RequestUtils, Metrics } from './index';
+import {
+	Admin,
+	Editor,
+	PageUtils,
+	RequestUtils,
+	Metrics,
+	Lighthouse,
+} from './index';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
@@ -105,6 +112,7 @@ const test = base.extend<
 		pageUtils: PageUtils;
 		snapshotConfig: void;
 		metrics: Metrics;
+		lighthouse: Lighthouse;
 	},
 	{
 		requestUtils: RequestUtils;
@@ -143,7 +151,7 @@ const test = base.extend<
 		},
 		{ scope: 'worker', auto: true },
 	],
-	// Spins up a new browser for use by the Metrics fixture
+	// Spins up a new browser for use by the Lighthouse fixture
 	// so that Lighthouse can connect to the debugging port.
 	// As a worker-scoped fixture, this will only launch 1
 	// instance for the whole test worker, so multiple tests
@@ -161,8 +169,11 @@ const test = base.extend<
 		},
 		{ scope: 'worker' },
 	],
-	metrics: async ( { page, lighthousePort }, use ) => {
-		await use( new Metrics( page, lighthousePort ) );
+	lighthouse: async ( { page, lighthousePort }, use ) => {
+		await use( new Lighthouse( page, lighthousePort ) );
+	},
+	metrics: async ( { page }, use ) => {
+		await use( new Metrics( page ) );
 	},
 } );
 
