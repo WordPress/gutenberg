@@ -26,7 +26,7 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 	component: DropdownMenu,
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 	argTypes: {
 		icon: {

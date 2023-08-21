@@ -1,3 +1,6 @@
+// Run all tests with development tools enabled.
+global.SCRIPT_DEBUG = true;
+
 // These are necessary to load TinyMCE successfully.
 global.URL = window.URL;
 global.window.tinyMCEPreInit = {

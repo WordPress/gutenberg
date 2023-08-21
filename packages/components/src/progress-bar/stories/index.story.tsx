@@ -18,7 +18,7 @@ const meta: ComponentMeta< typeof ProgressBar > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;

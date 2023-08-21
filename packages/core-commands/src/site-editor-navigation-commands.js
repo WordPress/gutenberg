@@ -37,28 +37,22 @@ const icons = {
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
-		const supportsSearch = ! [ 'wp_template', 'wp_template_part' ].includes(
-			postType
-		);
+		const isBlockBasedTheme = useIsBlockBasedTheme();
 		const { records, isLoading } = useSelect(
 			( select ) => {
 				const { getEntityRecords } = select( coreStore );
-				const query = supportsSearch
-					? {
-							search: !! search ? search : undefined,
-							per_page: 10,
-							orderby: search ? 'relevance' : 'date',
-							status: [
-								'publish',
-								'future',
-								'draft',
-								'pending',
-								'private',
-							],
-					  }
-					: {
-							per_page: -1,
-					  };
+				const query = {
+					search: !! search ? search : undefined,
+					per_page: 10,
+					orderby: search ? 'relevance' : 'date',
+					status: [
+						'publish',
+						'future',
+						'draft',
+						'pending',
+						'private',
+					],
+				};
 				return {
 					records: getEntityRecords( 'postType', postType, query ),
 					isLoading: ! select( coreStore ).hasFinishedResolution(
@@ -67,37 +61,52 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					),
 				};
 			},
-			[ supportsSearch, search ]
+			[ search ]
 		);
 
-		/*
-		 * wp_template and wp_template_part endpoints do not support per_page or orderby parameters.
-		 * We need to sort the results based on the search query to avoid removing relevant
-		 * records below using .slice().
-		 */
-		const orderedRecords = useMemo( () => {
-			if ( supportsSearch ) {
-				return records ?? [];
-			}
-
-			return orderEntityRecordsBySearch( records, search ).slice( 0, 10 );
-		}, [ supportsSearch, records, search ] );
-
 		const commands = useMemo( () => {
-			return orderedRecords.map( ( record ) => {
-				const isSiteEditor = getPath( window.location.href )?.includes(
-					'site-editor.php'
-				);
-				const extraArgs = isSiteEditor
-					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
-					: {};
-				return {
+			return ( records ?? [] ).map( ( record ) => {
+				const command = {
 					name: postType + '-' + record.id,
 					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
 						? record.title?.rendered
 						: __( '(no title)' ),
 					icon: icons[ postType ],
+				};
+
+				if (
+					postType === 'post' ||
+					( postType === 'page' && ! isBlockBasedTheme )
+				) {
+					return {
+						...command,
+						callback: ( { close } ) => {
+							const args = {
+								post: record.id,
+								action: 'edit',
+							};
+							const targetUrl = addQueryArgs( 'post.php', args );
+							document.location = targetUrl;
+							close();
+						},
+					};
+				}
+
+				const isSiteEditor = getPath( window.location.href )?.includes(
+					'site-editor.php'
+				);
+				const extraArgs = isSiteEditor
+					? {
+							canvas: getQueryArg(
+								window.location.href,
+								'canvas'
+							),
+					  }
+					: {};
+
+				return {
+					...command,
 					callback: ( { close } ) => {
 						const args = {
 							postType,
@@ -117,7 +126,81 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					},
 				};
 			} );
-		}, [ orderedRecords, history ] );
+		}, [ records, isBlockBasedTheme, history ] );
+
+		return {
+			commands,
+			isLoading,
+		};
+	};
+
+const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
+	function useNavigationCommandLoader( { search } ) {
+		const history = useHistory();
+		const isBlockBasedTheme = useIsBlockBasedTheme();
+		const { records, isLoading } = useSelect( ( select ) => {
+			const { getEntityRecords } = select( coreStore );
+			const query = { per_page: -1 };
+			return {
+				records: getEntityRecords( 'postType', templateType, query ),
+				isLoading: ! select( coreStore ).hasFinishedResolution(
+					'getEntityRecords',
+					[ 'postType', templateType, query ]
+				),
+			};
+		}, [] );
+
+		/*
+		 * wp_template and wp_template_part endpoints do not support per_page or orderby parameters.
+		 * We need to sort the results based on the search query to avoid removing relevant
+		 * records below using .slice().
+		 */
+		const orderedRecords = useMemo( () => {
+			return orderEntityRecordsBySearch( records, search ).slice( 0, 10 );
+		}, [ records, search ] );
+
+		const commands = useMemo( () => {
+			if (
+				! isBlockBasedTheme &&
+				! templateType === 'wp_template_part'
+			) {
+				return [];
+			}
+			return orderedRecords.map( ( record ) => {
+				const isSiteEditor = getPath( window.location.href )?.includes(
+					'site-editor.php'
+				);
+				const extraArgs = isSiteEditor
+					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
+					: {};
+
+				return {
+					name: templateType + '-' + record.id,
+					searchLabel: record.title?.rendered + ' ' + record.id,
+					label: record.title?.rendered
+						? record.title?.rendered
+						: __( '(no title)' ),
+					icon: icons[ templateType ],
+					callback: ( { close } ) => {
+						const args = {
+							postType: templateType,
+							postId: record.id,
+							...extraArgs,
+						};
+						const targetUrl = addQueryArgs(
+							'site-editor.php',
+							args
+						);
+						if ( isSiteEditor ) {
+							history.push( args );
+						} else {
+							document.location = targetUrl;
+						}
+						close();
+					},
+				};
+			} );
+		}, [ isBlockBasedTheme, orderedRecords, history ] );
 
 		return {
 			commands,
@@ -130,9 +213,9 @@ const usePageNavigationCommandLoader =
 const usePostNavigationCommandLoader =
 	getNavigationCommandLoaderPerPostType( 'post' );
 const useTemplateNavigationCommandLoader =
-	getNavigationCommandLoaderPerPostType( 'wp_template' );
+	getNavigationCommandLoaderPerTemplate( 'wp_template' );
 const useTemplatePartNavigationCommandLoader =
-	getNavigationCommandLoaderPerPostType( 'wp_template_part' );
+	getNavigationCommandLoaderPerTemplate( 'wp_template_part' );
 
 function useSiteEditorBasicNavigationCommands() {
 	const history = useHistory();

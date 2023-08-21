@@ -27,7 +27,10 @@ const meta: ComponentMeta< typeof CircularOptionPicker > = {
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open', excludeDecorators: true } },
+		docs: {
+			canvas: { sourceState: 'shown' },
+			source: { excludeDecorators: true },
+		},
 	},
 	decorators: [
 		// Share current color state between main component, `actions` and `options`
