@@ -119,9 +119,12 @@ function GridItem( { categoryId, item, ...props } ) {
 		);
 	}
 
-	const itemIcon =
-		templatePartIcons[ categoryId ] ||
-		( item.syncStatus === SYNC_TYPES.full ? symbol : undefined );
+	let itemIcon;
+	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
+		itemIcon = templatePartIcons[ categoryId ];
+	} else {
+		itemIcon = item.syncStatus === SYNC_TYPES.full ? symbol : undefined;
+	}
 
 	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
 	const confirmPrompt = hasThemeFile
