@@ -3,12 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { QueryPaginationNumbersMidSizeControl } from './query-pagination-numbers-mid-size-control';
+import { PanelBody, RangeControl } from '@wordpress/components';
 
 const createPaginationItem = ( content, Tag = 'a', extraClass = '' ) => (
 	<Tag key={ content } className={ `page-numbers ${ extraClass }` }>
@@ -55,13 +50,20 @@ export default function QueryPaginationNumbersEdit( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					<QueryPaginationNumbersMidSizeControl
+					<RangeControl
+						label={ __( 'Number of links' ) }
+						help={ __(
+							'Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.'
+						) }
 						value={ midSize }
 						onChange={ ( value ) => {
 							setAttributes( {
 								midSize: parseInt( value, 10 ),
 							} );
 						} }
+						min={ 0 }
+						max={ 5 }
+						withInputField={ false }
 					/>
 				</PanelBody>
 			</InspectorControls>
