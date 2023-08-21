@@ -15,7 +15,7 @@
  * @return void
  */
 function gutenberg_register_taxonomy_patterns() {
-	$args   = array(
+	$args = array(
 		'public'            => true,
 		'hierarchical'      => false,
 		'labels'            => array(
