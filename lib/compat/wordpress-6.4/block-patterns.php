@@ -15,21 +15,20 @@
  * @return void
  */
 function gutenberg_register_taxonomy_patterns() {
-	$args = array(
-		array(
-			'public'            => false,
-			'hierarchical'      => false,
-			'labels'            => array(
-				'name'          => _x( 'Pattern Categories', 'taxonomy general name' ),
-				'singular_name' => _x( 'Pattern Category', 'taxonomy singular name' ),
-			),
-			'query_var'         => false,
-			'rewrite'           => false,
-			'show_ui'           => false,
-			'_builtin'          => true,
-			'show_in_nav_menus' => false,
-			'show_in_rest'      => true,
+	$args   = array(
+		'public'            => true,
+		'hierarchical'      => false,
+		'labels'            => array(
+			'name'          => _x( 'Pattern Categories', 'taxonomy general name' ),
+			'singular_name' => _x( 'Pattern Category', 'taxonomy singular name' ),
 		),
+		'query_var'         => false,
+		'rewrite'           => false,
+		'show_ui'           => true,
+		'_builtin'          => true,
+		'show_in_nav_menus' => false,
+		'show_in_rest'      => true,
+		'show_admin_column' => true,
 	);
 	register_taxonomy( 'wp_pattern_category', array( 'wp_block' ), $args );
 }

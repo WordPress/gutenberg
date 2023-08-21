@@ -25,6 +25,7 @@ export const SYNC_TYPES = {
  * Internal dependencies
  */
 import { store } from '../store';
+import CategorySelector from './category-selector';
 
 export default function CreatePatternModal( {
 	onSuccess,
@@ -34,6 +35,7 @@ export default function CreatePatternModal( {
 	className = 'patterns-menu-items__convert-modal',
 } ) {
 	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
+	const [ categories, setCategories ] = useState( [] );
 	const [ title, setTitle ] = useState( '' );
 	const { __experimentalCreatePattern: createPattern } = useDispatch( store );
 
@@ -44,7 +46,8 @@ export default function CreatePatternModal( {
 				const newPattern = await createPattern(
 					patternTitle,
 					sync,
-					clientIds
+					clientIds,
+					categories
 				);
 				onSuccess( {
 					pattern: newPattern,
@@ -58,8 +61,20 @@ export default function CreatePatternModal( {
 				onError();
 			}
 		},
-		[ createPattern, clientIds, onSuccess, createErrorNotice, onError ]
+		[
+			createPattern,
+			clientIds,
+			onSuccess,
+			createErrorNotice,
+			onError,
+			categories,
+		]
 	);
+
+	const handleCategorySelection = ( selectedCategories ) => {
+		setCategories( selectedCategories.map( ( cat ) => cat.id ) );
+	};
+
 	return (
 		<Modal
 			title={ __( 'Create pattern' ) }
@@ -84,7 +99,9 @@ export default function CreatePatternModal( {
 						onChange={ setTitle }
 						placeholder={ __( 'My pattern' ) }
 					/>
-
+					<CategorySelector
+						onCategorySelection={ handleCategorySelection }
+					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }
 						help={ __(
