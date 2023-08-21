@@ -37,20 +37,6 @@ class WP_Font_Library {
 	private static $collections = array();
 
 	/**
-	 * Register filter to extend the library with font collections.
-	 *
-	 * @since 6.4.0
-	 */
-	public static function register_filters() {
-		add_filter(
-			'wp_register_font_collection',
-			array( 'WP_Font_Library', 'register_font_collection' ),
-			10,
-			2
-		);
-	}
-
-	/**
 	 * Register a new font collection.
 	 *
 	 * @since 6.4.0

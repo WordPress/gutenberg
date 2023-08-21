@@ -102,7 +102,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_font_collection( $request ) {
-		$id = $request->get_param( 'id' );
+		$id         = $request->get_param( 'id' );
 		$collection = WP_Font_Library::get_font_collection( $id );
 
 		if ( is_wp_error( $collection ) ) {
@@ -112,7 +112,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 				array( 'status' => 404 )
 			);
 		}
-		
+
 		return new WP_REST_Response( $collection->get_data() );
 	}
 
