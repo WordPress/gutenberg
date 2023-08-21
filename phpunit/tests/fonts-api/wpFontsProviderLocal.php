@@ -155,7 +155,7 @@ CSS
 	 * `wp-content/themes/` directory to ensure consistency when running tests.
 	 */
 	private function set_up_theme() {
-		$this->theme_root                = realpath( DIR_TESTDATA . '/themedir1' );
+		$this->theme_root                = realpath( GUTENBERG_DIR_TESTDATA . '/themedir1' );
 		$this->orig_theme_dir            = $GLOBALS['wp_theme_directories'];
 		$GLOBALS['wp_theme_directories'] = array( $this->theme_root );
 
