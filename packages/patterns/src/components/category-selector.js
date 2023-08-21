@@ -115,6 +115,7 @@ export default function CategorySelector( { onCategorySelection } ) {
 	return (
 		<>
 			<FormTokenField
+				className="patterns-menu-items__convert-modal-categories"
 				value={ values }
 				suggestions={ suggestions }
 				onChange={ onChange }
