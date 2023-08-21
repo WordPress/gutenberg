@@ -25,7 +25,7 @@ test.describe( 'data-wp-key', () => {
 		await page
 			.getByTestId( 'first-item' )
 			.evaluate( ( n ) => ( ( n as any )._id = 123 ) );
-		await page.getByTestId( 'add' ).click();
+		await page.getByTestId( 'navigate' ).click();
 		const id = await page
 			.getByTestId( 'second-item' )
 			.evaluate( ( n ) => ( n as any )._id );
