@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { View, PanResponder } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -11,8 +13,6 @@ import React, { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import LinearGradient from 'react-native-linear-gradient';
-import { colord } from 'colord';
 import styles from './style.native.scss';
 
 export default class SaturationValuePicker extends Component {
