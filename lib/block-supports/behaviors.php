@@ -50,9 +50,10 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		$lightbox_settings = $block['attrs']['behaviors']['lightbox'];
 		// If the lightbox setting is not set in the block attributes, get it from the theme.json file.
 	} else {
-		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
-		if ( isset( $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'] ) ) {
-			$lightbox_settings = $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
+		$user_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
+
+		if ( isset( $user_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'] ) ) {
+			$lightbox_settings = $user_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
 		} else {
 			$lightbox_settings = null;
 		}

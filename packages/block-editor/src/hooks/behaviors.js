@@ -6,34 +6,19 @@ import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 
 function BehaviorsControl( {
-	blockName,
 	blockBehaviors,
 	onChangeBehavior,
 	onChangeAnimation,
 	disabled = false,
 } ) {
-	const { settings } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return {
-				settings:
-					getSettings()?.__experimentalFeatures?.blocks?.[ blockName ]
-						?.behaviors || {},
-			};
-		},
-		[ blockName ]
-	);
-
 	const defaultBehaviors = {
 		default: {
 			value: 'default',
@@ -44,23 +29,8 @@ function BehaviorsControl( {
 			label: __( 'No behaviors' ),
 		},
 	};
-	const behaviorsOptions = Object.entries( settings )
-		.filter(
-			( [ behaviorName, behaviorValue ] ) =>
-				hasBlockSupport( blockName, `behaviors.${ behaviorName }` ) &&
-				behaviorValue
-		) // Filter out behaviors that are disabled.
-		.map( ( [ behaviorName ] ) => ( {
-			value: behaviorName,
-			// Capitalize the first letter of the behavior name.
-			label: `${ behaviorName.charAt( 0 ).toUpperCase() }${ behaviorName
-				.slice( 1 )
-				.toLowerCase() }`,
-		} ) );
-	const options = [
-		...Object.values( defaultBehaviors ),
-		...behaviorsOptions,
-	];
+
+	const options = [ ...Object.values( defaultBehaviors ) ];
 
 	const { behaviors, behaviorsValue } = useMemo( () => {
 		const mergedBehaviors = {
@@ -79,11 +49,6 @@ function BehaviorsControl( {
 			behaviorsValue: value,
 		};
 	}, [ blockBehaviors ] );
-
-	// If every behavior is disabled, do not show the behaviors inspector control.
-	if ( behaviorsOptions.length === 0 ) {
-		return null;
-	}
 
 	const helpText = disabled
 		? __( 'The lightbox behavior is disabled for linked images.' )
