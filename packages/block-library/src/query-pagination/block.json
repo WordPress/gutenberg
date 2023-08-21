@@ -27,14 +27,16 @@
 		"reusable": false,
 		"html": false,
 		"color": {
-			"gradients": true,			"link": true,
+			"gradients": true,
+			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true,
 				"link": true
 			}
 		},
-		"layout": {			"allowSwitching": false,
+		"layout": {
+			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {
 				"type": "flex"

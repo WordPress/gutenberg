@@ -109,7 +109,8 @@
 								"name": "core/query-pagination-next",
 								"isValid": true,
 								"attributes": {},
-								"innerBlocks": []							}
+								"innerBlocks": []
+							}
 						]
 					},
 					{
