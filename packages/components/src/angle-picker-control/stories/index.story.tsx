@@ -25,7 +25,7 @@ const meta: ComponentMeta< typeof AnglePickerControl > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 

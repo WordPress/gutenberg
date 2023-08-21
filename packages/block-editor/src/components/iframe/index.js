@@ -194,6 +194,7 @@ function Iframe( {
 	const html = `<!doctype html>
 <html>
 	<head>
+		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
 		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
 		${ styles }

@@ -31,7 +31,7 @@ export default {
 		},
 		parameters: {
 			controls: { expanded: true },
-			docs: { source: { state: 'open' } },
+			docs: { canvas: { sourceState: 'shown' } },
 		},
 	},
 } as ComponentMeta< typeof DimensionControl >;

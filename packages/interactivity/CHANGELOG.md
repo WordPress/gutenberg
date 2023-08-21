@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.0 (2023-08-16)
+
 ### New Features
 
 -   Support region-based client-side navigation. ([#53733](https://github.com/WordPress/gutenberg/pull/53733))
