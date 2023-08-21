@@ -193,7 +193,7 @@ if (
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-web-fonts.php';
 } elseif ( ! class_exists( 'WP_Fonts' ) ) {
 	// Turns off Font Face hooks in Core.
-	// @since 6.4.0
+	// @since 6.4.0.
 	remove_action( 'wp_head', 'wp_print_font_faces', 50 );
 	remove_action( 'admin_print_styles', 'wp_print_font_faces', 50 );
 
