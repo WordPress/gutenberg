@@ -452,7 +452,6 @@ The `wp-init` can return a function. If it does, the returned function will run 
 
 #### `wp-key` 
 
-Here is the text for the `wp-key` directive description:
 
 The `wp-key` directive assigns a unique key to an element to help the Interactivity API identify it when iterating through arrays of elements. This becomes important if your array elements can move (e.g. due to sorting), get inserted, or get deleted. A well-chosen key value helps the Interactivity API infer what exactly has changed in the array, allowing it to make the correct updates to the DOM.
 
