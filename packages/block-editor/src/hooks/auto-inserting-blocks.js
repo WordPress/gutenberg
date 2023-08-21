@@ -40,45 +40,52 @@ function AutoInsertingBlocksControl( props ) {
 			const _rootClientId = getBlockRootClientId( props.clientId );
 
 			const _autoInsertedBlockClientIds =
-				autoInsertedBlocksForCurrentBlock.reduce( ( acc, block ) => {
-					const relativePosition =
-						block?.autoInsert?.[ props.blockName ];
-					let autoInsertedBlock;
-					if ( [ 'before', 'after' ].includes( relativePosition ) ) {
-						const siblings = getBlock( _rootClientId )?.innerBlocks;
+				autoInsertedBlocksForCurrentBlock.reduce(
+					( clientIds, block ) => {
+						const relativePosition =
+							block?.autoInsert?.[ props.blockName ];
+						let autoInsertedBlock;
+						if (
+							[ 'before', 'after' ].includes( relativePosition )
+						) {
+							const siblings =
+								getBlock( _rootClientId )?.innerBlocks;
 
-						// Any of the current block's siblings (with the right block type) qualifies
-						// as an auto-inserted block (inserted `before` or `after` the current one),
-						// as the block might've been auto-inserted and then moved around a bit by the user.
-						autoInsertedBlock = siblings.find(
-							( { name } ) => name === block.name
-						);
-					} else if (
-						[ 'first_child', 'last_child' ].includes(
-							relativePosition
-						)
-					) {
-						const { innerBlocks } = getBlock( props.clientId );
+							// Any of the current block's siblings (with the right block type) qualifies
+							// as an auto-inserted block (inserted `before` or `after` the current one),
+							// as the block might've been auto-inserted and then moved around a bit by the user.
+							autoInsertedBlock = siblings.find(
+								( { name } ) => name === block.name
+							);
+						} else if (
+							[ 'first_child', 'last_child' ].includes(
+								relativePosition
+							)
+						) {
+							const { innerBlocks } = getBlock( props.clientId );
 
-						// Any of the current block's child blocks (with the right block type) qualifies
-						// as an auto-inserted first or last child block, as the block might've been
-						// auto-inserted and then moved around a bit by the user.
-						autoInsertedBlock = innerBlocks.find(
-							( { name } ) => name === block.name
-						);
-					}
+							// Any of the current block's child blocks (with the right block type) qualifies
+							// as an auto-inserted first or last child block, as the block might've been
+							// auto-inserted and then moved around a bit by the user.
+							autoInsertedBlock = innerBlocks.find(
+								( { name } ) => name === block.name
+							);
+						}
 
-					if ( autoInsertedBlock ) {
-						acc[ block.name ] = autoInsertedBlock.clientId;
-					}
+						if ( autoInsertedBlock ) {
+							clientIds[ block.name ] =
+								autoInsertedBlock.clientId;
+						}
 
-					// TOOD: If no auto-inserted block was found in any of its designated locations,
-					// we want to check if it's present elsewhere in the block tree.
-					// If it is, we'd consider it manually inserted and would want to remove the
-					// corresponding toggle from the block inspector panel.
+						// TOOD: If no auto-inserted block was found in any of its designated locations,
+						// we want to check if it's present elsewhere in the block tree.
+						// If it is, we'd consider it manually inserted and would want to remove the
+						// corresponding toggle from the block inspector panel.
 
-					return acc;
-				}, {} );
+						return clientIds;
+					},
+					{}
+				);
 
 			return {
 				blockIndex: getBlockIndex( props.clientId ),
