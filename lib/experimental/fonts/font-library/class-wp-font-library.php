@@ -44,7 +44,7 @@ class WP_Font_Library {
 	public static function register_filters() {
 		add_filter(
 			'wp_register_font_collection',
-			array( 'WP_Font_Library', 'wp_register_font_collection' ),
+			array( 'WP_Font_Library', 'register_font_collection' ),
 			10,
 			2
 		);
