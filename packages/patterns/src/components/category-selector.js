@@ -9,33 +9,18 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 
-export const unescapeString = ( arg ) => {
+const unescapeString = ( arg ) => {
 	return decodeEntities( arg );
 };
-/**
- * Returns a term object with name unescaped.
- *
- * @param {Object} term The term object to unescape.
- *
- * @return {Object} Term object with name property unescaped.
- */
-export const unescapeTerm = ( term ) => {
+
+const unescapeTerm = ( term ) => {
 	return {
 		...term,
 		name: unescapeString( term.name ),
 	};
 };
-/**
- * Shared reference to an empty array for cases where it is important to avoid
- * returning a new array reference on every invocation.
- *
- * @type {Array<any>}
- */
-const EMPTY_ARRAY = [];
 
-/**
- * Module constants
- */
+const EMPTY_ARRAY = [];
 const MAX_TERMS_SUGGESTIONS = 20;
 const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
