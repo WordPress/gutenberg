@@ -70,7 +70,9 @@ const v4 = {
 	},
 	supports: {
 		anchor: true,
+		html: false,
 		__experimentalOnEnter: true,
+		__experimentalOnMerge: true,
 		typography: {
 			fontSize: true,
 			lineHeight: true,
@@ -87,6 +89,7 @@ const v4 = {
 		},
 		color: {
 			gradients: true,
+			heading: true,
 			link: true,
 			__experimentalDefaultControls: {
 				background: true,
