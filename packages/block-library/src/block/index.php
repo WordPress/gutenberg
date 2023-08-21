@@ -41,6 +41,21 @@ function render_block_core_block( $attributes ) {
 
 	$seen_refs[ $attributes['ref'] ] = true;
 
+	$filter_block_context = static function( $context ) use ( $attributes ) {
+		if ( isset( $attributes['dynamicContent'] ) && $attributes['dynamicContent'] ) {
+			$context['dynamicContent'] = $attributes['dynamicContent'];
+		}
+
+		return $context;
+	};
+
+	/**
+	 * We set the `dynamicContent` context through the `render_block_context`
+	 * filter so that it is available when a pattern's inner blocks are
+	 * rendering via do_blocks given it only receives the inner content.
+	 */
+	add_filter( 'render_block_context', $filter_block_context, 1 );
+
 	// Handle embeds for reusable blocks.
 	global $wp_embed;
 	$content = $wp_embed->run_shortcode( $reusable_block->post_content );
@@ -48,6 +63,9 @@ function render_block_core_block( $attributes ) {
 
 	$content = do_blocks( $content );
 	unset( $seen_refs[ $attributes['ref'] ] );
+
+	remove_filter( 'render_block_context', $filter_block_context, 1 );
+
 	return $content;
 }
 

@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
+import { useRegistry } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-import { PanelBody, TextControl } from '@wordpress/components';
+import { PanelBody, TextControl, SelectControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -55,7 +56,11 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 
 		// Check if the current block is a paragraph or image block.
 		// Currently, only these two blocks are supported.
-		if ( ! [ 'core/paragraph', 'core/image' ].includes( props.name ) ) {
+		if (
+			! [ 'core/paragraph', 'core/image', 'core/heading' ].includes(
+				props.name
+			)
+		) {
 			return <BlockEdit { ...props } />;
 		}
 
@@ -65,6 +70,41 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 		let attributeName;
 		if ( props.name === 'core/paragraph' ) attributeName = 'content';
 		if ( props.name === 'core/image' ) attributeName = 'url';
+		if ( props.name === 'core/heading' ) attributeName = 'content';
+
+		const connectionSource =
+			props.attributes?.connections?.attributes?.[ attributeName ]
+				?.source || '';
+		const connectionValue =
+			props.attributes?.connections?.attributes?.[ attributeName ]
+				?.value || '';
+
+		function updateConnections( source, value ) {
+			if ( value === '' ) {
+				props.setAttributes( {
+					connections: undefined,
+					placeholder: undefined,
+				} );
+			} else {
+				props.setAttributes( {
+					connections: {
+						attributes: {
+							// The attributeName will be either `content` or `url`.
+							[ attributeName ]: {
+								// Source will be variable, could be post_meta, user_meta, term_meta, etc.
+								// Could even be a custom source like a social media attribute.
+								source,
+								value,
+							},
+						},
+					},
+					placeholder: sprintf(
+						'This content will be replaced on the frontend by the value of "%s" custom field.',
+						value
+					),
+				} );
+			}
+		}
 
 		if ( hasCustomFieldsSupport && props.isSelected ) {
 			return (
@@ -76,42 +116,40 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 								title={ __( 'Connections' ) }
 								initialOpen={ true }
 							>
+								<SelectControl
+									label={ __( 'Source' ) }
+									value={ connectionSource }
+									options={ [
+										{
+											label: __( 'None' ),
+											value: '',
+										},
+										{
+											label: __( 'Meta fields' ),
+											value: 'meta_fields',
+										},
+										{
+											label: __( 'Pattern attributes' ),
+											value: 'pattern_attributes',
+										},
+									] }
+									onChange={ ( nextSource ) => {
+										updateConnections(
+											nextSource,
+											connectionValue
+										);
+									} }
+								/>
 								<TextControl
 									__nextHasNoMarginBottom
 									autoComplete="off"
 									label={ __( 'Custom field meta_key' ) }
-									value={
-										props.attributes?.connections
-											?.attributes?.[ attributeName ]
-											?.value || ''
-									}
+									value={ connectionValue }
 									onChange={ ( nextValue ) => {
-										if ( nextValue === '' ) {
-											props.setAttributes( {
-												connections: undefined,
-												[ attributeName ]: undefined,
-												placeholder: undefined,
-											} );
-										} else {
-											props.setAttributes( {
-												connections: {
-													attributes: {
-														// The attributeName will be either `content` or `url`.
-														[ attributeName ]: {
-															// Source will be variable, could be post_meta, user_meta, term_meta, etc.
-															// Could even be a custom source like a social media attribute.
-															source: 'meta_fields',
-															value: nextValue,
-														},
-													},
-												},
-												[ attributeName ]: undefined,
-												placeholder: sprintf(
-													'This content will be replaced on the frontend by the value of "%s" custom field.',
-													nextValue
-												),
-											} );
-										}
+										updateConnections(
+											connectionSource,
+											nextValue
+										);
 									} }
 								/>
 							</PanelBody>
@@ -125,6 +163,30 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 	};
 }, 'withCustomFieldsControls' );
 
+const createEditFunctionWithPatternSource = () =>
+	createHigherOrderComponent(
+		( BlockEdit ) =>
+			( { attributes, ...props } ) => {
+				const registry = useRegistry();
+				const sourceAttributes =
+					registry._selectAttributes?.( {
+						clientId: props.clientId,
+						name: props.name,
+						attributes,
+					} ) ?? attributes;
+
+				return (
+					<BlockEdit { ...props } attributes={ sourceAttributes } />
+				);
+			}
+	);
+
+function shimAttributeSource( settings ) {
+	settings.edit = createEditFunctionWithPatternSource()( settings.edit );
+
+	return settings;
+}
+
 if ( window.__experimentalConnections ) {
 	addFilter(
 		'blocks.registerBlockType',
@@ -135,5 +197,10 @@ if ( window.__experimentalConnections ) {
 		'editor.BlockEdit',
 		'core/editor/connections/with-inspector-controls',
 		withCustomFieldsControls
+	);
+	addFilter(
+		'blocks.registerBlockType',
+		'core/pattern/shimAttributeSource',
+		shimAttributeSource
 	);
 }
