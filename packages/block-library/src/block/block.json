@@ -8,6 +8,9 @@
 	"keywords": [ "reusable" ],
 	"textdomain": "default",
 	"attributes": {
+		"dynamicContent": {
+			"type": "object"
+		},
 		"ref": {
 			"type": "number"
 		}
