@@ -60,8 +60,8 @@ export default function usePatternCategories() {
 		// Update the category counts to reflect user registered patterns.
 		userPatterns.forEach( ( pattern ) => {
 			pattern.categories?.forEach( ( category ) => {
-				if ( categoryMap[ category.slug ] ) {
-					categoryMap[ category.slug ].count += 1;
+				if ( categoryMap[ category ] ) {
+					categoryMap[ category ].count += 1;
 				}
 			} );
 			// If the pattern has no categories, add it to uncategorized.
@@ -73,7 +73,12 @@ export default function usePatternCategories() {
 		// Filter categories so we only have those containing patterns.
 		[ ...defaultCategories, ...userPatternCategories ].forEach(
 			( category ) => {
-				if ( categoryMap[ category.name ].count ) {
+				if (
+					categoryMap[ category.name ].count &&
+					! categoriesWithCounts.find(
+						( cat ) => cat.name === category.name
+					)
+				) {
 					categoriesWithCounts.push( categoryMap[ category.name ] );
 				}
 			}

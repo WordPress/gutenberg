@@ -87,7 +87,7 @@ const selectTemplatePartsAsPatterns = (
 	return { patterns, isResolving };
 };
 
-const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
+const selectThemePatterns = ( select ) => {
 	const { getSettings } = unlock( select( editSiteStore ) );
 	const settings = getSettings();
 	const blockPatterns =
@@ -96,7 +96,7 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 
 	const restBlockPatterns = select( coreStore ).getBlockPatterns();
 
-	let patterns = [
+	const patterns = [
 		...( blockPatterns || [] ),
 		...( restBlockPatterns || [] ),
 	]
@@ -114,6 +114,14 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 			} ),
 		} ) );
 
+	return { patterns, isResolving: false };
+};
+const selectPatterns = ( select, { categoryId, search = '' } = {} ) => {
+	const { patterns: themePatterns } = selectThemePatterns( select );
+	const { patterns: userPatterns } = selectUserPatterns( select );
+
+	let patterns = [ ...( themePatterns || [] ), ...( userPatterns || [] ) ];
+
 	if ( categoryId ) {
 		patterns = searchItems( patterns, search, {
 			categoryId,
@@ -125,27 +133,26 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 			hasCategory: ( item ) => ! item.hasOwnProperty( 'categories' ),
 		} );
 	}
-
 	return { patterns, isResolving: false };
 };
 
-const reusableBlockToPattern = ( reusableBlock, categories ) => ( {
-	blocks: parse( reusableBlock.content.raw, {
+const patternBlockToPattern = ( patternBlock, categories ) => ( {
+	blocks: parse( patternBlock.content.raw, {
 		__unstableSkipMigrationLogs: true,
 	} ),
-	categories: reusableBlock.wp_pattern_category.map( ( patternCategoryId ) =>
+	categories: patternBlock.wp_pattern_category.map( ( patternCategoryId ) =>
 		categories
 			? categories.find(
 					( category ) => category.id === patternCategoryId
-			  )
+			  )?.slug
 			: patternCategoryId
 	),
-	id: reusableBlock.id,
-	name: reusableBlock.slug,
-	syncStatus: reusableBlock.wp_pattern_sync_status || SYNC_TYPES.full,
-	title: reusableBlock.title.raw,
-	type: reusableBlock.type,
-	reusableBlock,
+	id: patternBlock.id,
+	name: patternBlock.slug,
+	syncStatus: patternBlock.wp_pattern_sync_status || SYNC_TYPES.full,
+	title: patternBlock.title.raw,
+	type: 'userPattern',
+	patternBlock,
 } );
 
 const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
@@ -158,11 +165,13 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 		_fields: 'id,name,slug',
 		context: 'view',
 	} );
+
 	let patterns = records
 		? records.map( ( record ) =>
-				reusableBlockToPattern( record, categories )
+				patternBlockToPattern( record, categories )
 		  )
 		: EMPTY_PATTERN_LIST;
+
 	const isResolving = getIsResolving( 'getEntityRecords', [
 		'postType',
 		USER_PATTERNS,
@@ -198,7 +207,7 @@ export const usePatterns = (
 					search,
 				} );
 			} else if ( categoryType === PATTERNS ) {
-				return selectThemePatterns( select, { categoryId, search } );
+				return selectPatterns( select, { categoryId, search } );
 			} else if ( categoryType === USER_PATTERNS ) {
 				return selectUserPatterns( select, { search, syncStatus } );
 			}

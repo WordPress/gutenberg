@@ -4,16 +4,13 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
-	Flex,
-	Icon,
-	Tooltip,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { getTemplatePartIcon } from '@wordpress/editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
-import { file, starFilled, lockSmall } from '@wordpress/icons';
+import { file, starFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -64,23 +61,7 @@ function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 					<CategoryItem
 						key={ category.name }
 						count={ category.count }
-						label={
-							<Flex justify="left" align="center" gap={ 0 }>
-								{ category.label }
-								<Tooltip
-									position="top center"
-									text={ sprintf(
-										// translators: %s: The pattern category name.
-										'"%s" patterns cannot be edited.',
-										category.label
-									) }
-								>
-									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
-										<Icon icon={ lockSmall } size={ 24 } />
-									</span>
-								</Tooltip>
-							</Flex>
-						}
+						label={ category.label }
 						icon={ file }
 						id={ category.name }
 						type="pattern"
