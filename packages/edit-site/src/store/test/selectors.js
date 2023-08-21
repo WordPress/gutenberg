@@ -17,6 +17,7 @@ import {
 	__unstableGetPreference,
 	isPage,
 	hasPageContentFocus,
+	getPageContentFocusType,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -202,6 +203,43 @@ describe( 'selectors', () => {
 				hasPageContentFocus: true,
 			};
 			expect( hasPageContentFocus( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getPageContentFocusType', () => {
+		it( 'returns the current content focus type', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+				hasPageContentFocus: true,
+				pageContentFocusType: 'disableTemplate',
+			};
+			expect( getPageContentFocusType( state ) ).toBe(
+				'disableTemplate'
+			);
+		} );
+
+		it( 'returns null if the page does not have content focus', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+					context: { postType: 'page', postId: 123 },
+				},
+				hasPageContentFocus: false,
+			};
+			expect( getPageContentFocusType( state ) ).toBe( null );
+		} );
+
+		it( 'returns null if the edited post type is a template', () => {
+			const state = {
+				editedPost: {
+					postType: 'wp_template',
+				},
+				hasPageContentFocus: true,
+			};
+			expect( getPageContentFocusType( state ) ).toBe( null );
 		} );
 	} );
 } );
