@@ -5,7 +5,7 @@ const pkg = require( './package.json' );
 
 /**
  * Babel plugin which transforms `warning` function calls to wrap within a
- * condition that checks if `process.env.NODE_ENV !== 'production'`.
+ * condition that checks if `SCRIPT_DEBUG === true`.
  *
  * @param {import('@babel/core')} babel Current Babel object.
  *
@@ -16,34 +16,20 @@ function babelPlugin( { types: t } ) {
 
 	const typeofProcessExpression = t.binaryExpression(
 		'!==',
-		t.unaryExpression( 'typeof', t.identifier( 'process' ), false ),
+		t.unaryExpression( 'typeof', t.identifier( 'SCRIPT_DEBUG' ), false ),
 		t.stringLiteral( 'undefined' )
 	);
 
-	const processEnvExpression = t.memberExpression(
-		t.identifier( 'process' ),
-		t.identifier( 'env' ),
-		false
-	);
-
-	const nodeEnvCheckExpression = t.binaryExpression(
-		'!==',
-		t.memberExpression(
-			processEnvExpression,
-			t.identifier( 'NODE_ENV' ),
-			false
-		),
-		t.stringLiteral( 'production' )
+	const scriptDebugCheckExpression = t.binaryExpression(
+		'===',
+		t.identifier( 'SCRIPT_DEBUG' ),
+		t.booleanLiteral( true )
 	);
 
 	const logicalExpression = t.logicalExpression(
 		'&&',
-		t.logicalExpression(
-			'&&',
-			typeofProcessExpression,
-			processEnvExpression
-		),
-		nodeEnvCheckExpression
+		typeofProcessExpression,
+		scriptDebugCheckExpression
 	);
 
 	return {
@@ -80,7 +66,7 @@ function babelPlugin( { types: t } ) {
 					// Turns this code:
 					// warning(argument);
 					// into this:
-					// typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(argument) : void 0;
+					// typeof SCRIPT_DEBUG !== 'undefined' && SCRIPT_DEBUG === true ? warning(argument) : void 0;
 					node[ seen ] = true;
 					path.replaceWith(
 						t.ifStatement(
