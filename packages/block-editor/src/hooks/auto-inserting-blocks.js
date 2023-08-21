@@ -150,9 +150,9 @@ function AutoInsertingBlocksControl( props ) {
 									// TODO: Display block icon.
 									// <BlockIcon icon={ block.icon } />
 
-									const checked = Object.keys(
-										autoInsertedBlockClientIds
-									).includes( block.name );
+									const checked =
+										block.name in
+										autoInsertedBlockClientIds;
 
 									return (
 										<ToggleControl
