@@ -257,11 +257,10 @@ test( 'fires onChange when a new value is typed', () => {
 **Good**: using `user-event` to simulate user events.
 
 ```javascript
-
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-test('fires onChange when a new value is typed', async () => {
+test( 'fires onChange when a new value is typed', async () => {
 	const user = userEvent.setup();
 
 	const spyOnChange = jest.fn();
@@ -287,7 +286,7 @@ test('fires onChange when a new value is typed', async () => {
 	await user.selectOptions( select, [ 'optionValue' ] );
 
 	// ...
-})
+} );
 ```
 
 ### Integration testing for block UI
@@ -301,9 +300,7 @@ The advantage of this approach is that the bulk of a block editor's functionalit
 To set up a jest file for integration tests:
 
 ```js
-import {
-	initializeEditor
-} from 'test/integration/helpers/integration-test-editor';
+import { initializeEditor } from 'test/integration/helpers/integration-test-editor';
 
 async function setup( attributes ) {
 	const testBlock = { name: 'core/cover', attributes };
@@ -470,9 +467,7 @@ Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the d
 test( 'should render margin', () => {
 	const { container: spacer } = render( <Spacer /> );
 	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
-	expect( spacerWithMargin ).toMatchStyleDiffSnapshot(
-		spacer
-	);
+	expect( spacerWithMargin ).toMatchStyleDiffSnapshot( spacer );
 } );
 ```
 
@@ -516,7 +511,7 @@ There is an ongoing effort to add integration tests to the native mobile project
 
 Most existing End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
-There's an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. **It's recommended to write new e2e tests in Playwright whenever possible**. The sections below mostly apply to the old Jest + Puppeteer framework. See the dedicated [guide](/docs/contributors/code/e2e/README.md) if you're writing tests with Playwright.**
+There's an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. **It's recommended to write new e2e tests in Playwright whenever possible**. The sections below mostly apply to the old Jest + Puppeteer framework. See the dedicated [guide](/docs/contributors/code/e2e/README.md) if you're writing tests with Playwright.
 
 ### Using wp-env
 
