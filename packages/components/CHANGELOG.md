@@ -7,7 +7,7 @@
 -   `SandBox`: Fix the cleanup method in useEffect ([#53796](https://github.com/WordPress/gutenberg/pull/53796)).
 
 ### Internal
--   `SlotFill`: Refactor `<Slot bubblesVirtually />` ([#53272](https://github.com/WordPress/gutenberg/pull/53272))
+-   `SlotFill`: Do not render children when using `<Slot bubblesVirtually />`. ([#53272](https://github.com/WordPress/gutenberg/pull/53272))
 
 ### Enhancements
 
