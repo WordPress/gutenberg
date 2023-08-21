@@ -19,7 +19,7 @@ class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_UnitTestCase {
 			'data_json_file' => path_join( __DIR__, 'my-font-collection-data.json' ),
 		);
 
-		apply_filters( 'register_font_collection', 'my-font-collection', $my_font_collection_config );
+		apply_filters( 'wp_register_font_collection', 'my-font-collection', $my_font_collection_config );
 
 		$another_font_collection_config = array(
 			'name'           => 'Another Font Collection',
@@ -27,7 +27,7 @@ class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_UnitTestCase {
 			'data_json_file' => path_join( __DIR__, 'another-font-collection-data.json' ),
 		);
 
-		apply_filters( 'register_font_collection', 'another-font-collection', $another_font_collection_config );
+		apply_filters( 'wp_register_font_collection', 'another-font-collection', $another_font_collection_config );
 	}
 
 	public function test_should_get_font_collections() {
