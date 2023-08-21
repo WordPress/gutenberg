@@ -8,7 +8,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  */
 import { useContext, useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as blocksStore, hasBlockSupport } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -545,28 +545,4 @@ export function __experimentalUseGlobalBehaviors( blockName, source = 'all' ) {
 	if ( result?.lightbox.enabled ) behavior = 'lightbox';
 
 	return { behavior, inheritedBehaviors: result, setBehavior };
-}
-
-export function __experimentalUseHasBehaviorsPanel(
-	settings,
-	name,
-	{ blockSupportOnly = false } = {}
-) {
-	if ( ! settings?.behaviors ) {
-		return false;
-	}
-
-	// If every behavior is disabled on block supports, do not show the behaviors inspector control.
-	const hasSomeBlockSupport = Object.keys( settings?.behaviors ).some(
-		( key ) => hasBlockSupport( name, `behaviors.${ key }` )
-	);
-
-	if ( blockSupportOnly ) {
-		return hasSomeBlockSupport;
-	}
-
-	// If every behavior is disabled, do not show the behaviors inspector control.
-	return Object.values( settings?.behaviors ).some(
-		( value ) => value === true && hasSomeBlockSupport
-	);
 }

@@ -30,7 +30,6 @@ const {
 	cleanEmptyObject,
 	GlobalStylesContext,
 	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
-	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
 } = unlock( blockEditorPrivateApis );
 
 // Block Gap is a special case and isn't defined within the blocks
@@ -286,10 +285,6 @@ function PushChangesToGlobalStylesControl( {
 	attributes,
 	setAttributes,
 } ) {
-	const hasBehaviorsPanel = useHasBehaviorsPanel( attributes, name, {
-		blockSupportOnly: true,
-	} );
-
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 
@@ -301,8 +296,7 @@ function PushChangesToGlobalStylesControl( {
 
 	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
 
-	const userHasEditedBehaviors =
-		attributes.hasOwnProperty( 'behaviors' ) && hasBehaviorsPanel;
+	const userHasEditedBehaviors = attributes.hasOwnProperty( 'behaviors' );
 
 	const pushChanges = useCallback( () => {
 		if ( changes.length === 0 && ! userHasEditedBehaviors ) {

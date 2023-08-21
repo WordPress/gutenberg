@@ -1,6 +1,5 @@
 export {
 	__experimentalUseGlobalBehaviors,
-	__experimentalUseHasBehaviorsPanel,
 	useGlobalStylesReset,
 	useGlobalSetting,
 	useGlobalStyle,
