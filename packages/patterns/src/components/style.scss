@@ -1,3 +1,6 @@
 .patterns-menu-items__convert-modal {
 	z-index: z-index(".patterns-menu-items__convert-modal");
+	.patterns-menu-items__convert-modal-categories {
+		max-width: 300px;
+	}
 }
