@@ -126,7 +126,7 @@ add_filter( 'rest_themes_collection_params', 'gutenberg_themes_collection_params
 /**
  * Updates REST API response for the themes and adds the `is_block_theme` flag.
  *
- * @param WP_REST_Response $response The sidebar response object.
+ * @param WP_REST_Response $response The response object.
  * @param WP_Theme         $theme    Theme object used to create response.
  * @return WP_REST_Response $response Updated response object.
  */
