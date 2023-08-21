@@ -115,7 +115,8 @@
 										"array",
 										"string",
 										"integer",
-										"number"
+										"number",
+										"function"
 									]
 								},
 								{
