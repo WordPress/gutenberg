@@ -740,9 +740,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 	$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
 	$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
-	$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
-	$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
-	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
+	$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : esc_attr__( 'Close' );
+	$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . esc_attr__( 'Open menu' ) . '"' : ''; // Open button label.
+	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . esc_attr__( 'Close menu' ) . '"' : ''; // Close button label.
 
 	// Add Interactivity API directives to the markup if needed.
 	$nav_element_directives          = '';
@@ -791,8 +791,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			</div>',
 		esc_attr( $modal_unique_id ),
 		$inner_blocks_html,
-		esc_attr( $toggle_aria_label_open ),
-		esc_attr( $toggle_aria_label_close ),
+		$toggle_aria_label_open,
+		$toggle_aria_label_close,
 		esc_attr( implode( ' ', $responsive_container_classes ) ),
 		esc_attr( implode( ' ', $open_button_classes ) ),
 		esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
