@@ -36,7 +36,8 @@ function InserterLibrary(
 			return {
 				destinationRootClientId: _rootClientId,
 				prioritizePatterns:
-					getSettings().__experimentalPreferPatternsOnRoot,
+					getSettings().__experimentalPreferPatternsOnRoot &&
+					! _rootClientId,
 			};
 		},
 		[ clientId, rootClientId ]

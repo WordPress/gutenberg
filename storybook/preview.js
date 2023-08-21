@@ -6,7 +6,6 @@ import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithTheme } from './decorators/with-theme';
-import './style.scss';
 
 export const globalTypes = {
 	direction: {
@@ -31,7 +30,7 @@ export const globalTypes = {
 				{ value: 'default', title: 'Default' },
 				{ value: 'darkBg', title: 'Dark (background)' },
 				{ value: 'lightGrayBg', title: 'Light gray (background)' },
-				{ value: 'modern', title: 'Modern (accent)' },
+				{ value: 'classic', title: 'Classic (accent)' },
 			],
 		},
 	},
@@ -90,11 +89,6 @@ export const decorators = [
 export const parameters = {
 	controls: {
 		sort: 'requiredFirst',
-	},
-	knobs: {
-		// Knobs are deprecated, and new stories should use addon-controls.
-		// Will be enabled on a per-story basis until migration is complete.
-		disable: true,
 	},
 	options: {
 		storySort: {

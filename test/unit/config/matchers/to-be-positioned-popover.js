@@ -5,7 +5,7 @@
  * @param {HTMLElement} element Popover element.
  */
 function toBePositionedPopover( element ) {
-	const pass = element.style.top !== '' && element.style.left !== '';
+	const pass = element.classList.contains( 'is-positioned' );
 	return {
 		pass,
 		message: () => `Received element is ${ pass ? '' : 'not ' }positioned`,

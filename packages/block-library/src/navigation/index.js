@@ -20,6 +20,9 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {
+		attributes: {
+			overlayMenu: 'never',
+		},
 		innerBlocks: [
 			{
 				name: 'core/navigation-link',

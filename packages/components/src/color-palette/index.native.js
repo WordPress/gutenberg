@@ -11,12 +11,11 @@ import {
 	Platform,
 	Text,
 } from 'react-native';
-import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -64,13 +63,21 @@ function ColorPalette( {
 	const opacity = useRef( new Animated.Value( 1 ) ).current;
 
 	const defaultColors = [
-		...new Set( map( defaultSettings.colors, 'color' ) ),
+		...new Set(
+			( defaultSettings.colors ?? [] ).map( ( { color } ) => color )
+		),
 	];
 	const mergedColors = [
-		...new Set( map( defaultSettings.allColors, 'color' ) ),
+		...new Set(
+			( defaultSettings.allColors ?? [] ).map( ( { color } ) => color )
+		),
 	];
 	const defaultGradientColors = [
-		...new Set( map( defaultSettings.gradients, 'gradient' ) ),
+		...new Set(
+			( defaultSettings.gradients ?? [] ).map(
+				( { gradient } ) => gradient
+			)
+		),
 	];
 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
 
@@ -168,6 +175,22 @@ function ColorPalette( {
 		}
 	}
 
+	function getColorGradientName( value ) {
+		const fallbackName = sprintf(
+			/* translators: %s: the hex color value */
+			__( 'Unlabeled color. %s' ),
+			value
+		);
+		const foundColorName = isGradientSegment
+			? defaultSettings.gradients?.find(
+					( gradient ) => gradient.gradient === value
+			  )
+			: defaultSettings.allColors?.find(
+					( color ) => color.color === value
+			  );
+		return foundColorName ? foundColorName?.name : fallbackName;
+	}
+
 	function onColorPress( color ) {
 		deselectCustomGradient();
 		performAnimation( color );
@@ -244,6 +267,8 @@ function ColorPalette( {
 					const scaleValue = isSelected( color )
 						? scaleInterpolation
 						: 1;
+					const colorName = getColorGradientName( color );
+
 					return (
 						<View key={ `${ color }-${ isSelected( color ) }` }>
 							<TouchableWithoutFeedback
@@ -253,6 +278,7 @@ function ColorPalette( {
 									selected: isSelected( color ),
 								} }
 								accessibilityHint={ color }
+								accessibilityLabel={ colorName }
 								testID={ color }
 							>
 								<Animated.View

@@ -61,14 +61,12 @@ describe( 'DownloadableBlockListItem', () => {
 		);
 		const button = screen.getByRole( 'option' );
 		// Keeping it false to avoid focus loss and disable it using aria-disabled.
-		expect( button.disabled ).toBe( false );
+		expect( button ).toBeEnabled();
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	it( 'should try to install the block plugin', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		useSelect.mockImplementation( () => ( {
 			isInstalling: false,

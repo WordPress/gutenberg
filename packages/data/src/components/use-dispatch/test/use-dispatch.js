@@ -12,8 +12,6 @@ import createReduxStore from '../../../redux-store';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
 
-jest.useRealTimers();
-
 describe( 'useDispatch', () => {
 	const counterStore = {
 		reducer: ( state = 0, action ) => {

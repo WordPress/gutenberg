@@ -63,6 +63,35 @@ const flatColorPalettes = memize( ( colorsPalettes ) => [
 	...( colorsPalettes?.default || [] ),
 ] );
 
+const getSelectionColor = memize(
+	(
+		currentSelectionColor,
+		defaultSelectionColor,
+		baseGlobalStyles,
+		isBlockBasedTheme
+	) => {
+		let selectionColor = defaultSelectionColor;
+		if ( currentSelectionColor ) {
+			selectionColor = currentSelectionColor;
+		}
+
+		if ( isBlockBasedTheme ) {
+			const colordTextColor = colord( selectionColor );
+			const colordBackgroundColor = colord(
+				baseGlobalStyles?.color?.background
+			);
+			const isColordTextReadable = colordTextColor.isReadable(
+				colordBackgroundColor
+			);
+			if ( ! isColordTextReadable ) {
+				selectionColor = baseGlobalStyles?.color?.text;
+			}
+		}
+
+		return selectionColor;
+	}
+);
+
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
@@ -205,7 +234,7 @@ export class RichText extends Component {
 
 	valueToFormat( value ) {
 		// Remove the outer root tags.
-		return this.removeRootTagsProduceByAztec(
+		return this.removeRootTagsProducedByAztec(
 			toHTMLString( {
 				value,
 				multilineTag: this.multilineTag,
@@ -272,30 +301,27 @@ export class RichText extends Component {
 	 * Cleans up any root tags produced by aztec.
 	 * TODO: This should be removed on a later version when aztec doesn't return the top tag of the text being edited
 	 */
-	removeRootTagsProduceByAztec( html ) {
+	removeRootTagsProducedByAztec( html ) {
 		let result = this.removeRootTag( this.props.tagName, html );
-		// Temporary workaround for https://github.com/WordPress/gutenberg/pull/13763
-		if ( this.props.rootTagsToEliminate ) {
-			this.props.rootTagsToEliminate.forEach( ( element ) => {
-				result = this.removeRootTag( element, result );
-			} );
-		}
 
 		if ( this.props.tagsToEliminate ) {
 			this.props.tagsToEliminate.forEach( ( element ) => {
 				result = this.removeTag( element, result );
 			} );
 		}
+
 		return result;
 	}
 
 	removeRootTag( tag, html ) {
 		const openingTagRegexp = RegExp( '^<' + tag + '[^>]*>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
+
 		return html
 			.replace( openingTagRegexp, '' )
 			.replace( closingTagRegexp, '' );
 	}
+
 	removeTag( tag, html ) {
 		const openingTagRegexp = RegExp( '<' + tag + '>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>', 'gim' );
@@ -312,7 +338,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
+		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		// On iOS, onChange can be triggered after selection changes, even though there are no content changes.
@@ -327,7 +353,7 @@ export class RichText extends Component {
 	}
 
 	onTextUpdate( event ) {
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
+		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		let formattedContent = contentWithoutRootTag;
@@ -652,7 +678,7 @@ export class RichText extends Component {
 		const realEnd = Math.max( start, end );
 
 		// Check and dicsard stray event, where the text and selection is equal to the ones already cached.
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
+		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		if (
@@ -932,6 +958,11 @@ export class RichText extends Component {
 
 		let newFontSize = DEFAULT_FONT_SIZE;
 
+		// Disables line-height rendering for pre elements until we fix some issues with AztecAndroid.
+		if ( tagName === 'pre' && ! this.isIOS ) {
+			return undefined;
+		}
+
 		// For block-based themes, get the default editor font size.
 		if ( baseGlobalStyles?.typography?.fontSize && tagName === 'p' ) {
 			newFontSize = baseGlobalStyles?.typography?.fontSize;
@@ -968,6 +999,11 @@ export class RichText extends Component {
 			baseGlobalStyles?.elements?.[ tagName ]?.typography?.lineHeight;
 		let newLineHeight;
 
+		// Disables line-height rendering for pre elements until we fix some issues with AztecAndroid.
+		if ( tagName === 'pre' && ! this.isIOS ) {
+			return undefined;
+		}
+
 		if ( ! this.getIsBlockBasedTheme() ) {
 			return;
 		}
@@ -1000,6 +1036,11 @@ export class RichText extends Component {
 		// Check the final value is not over the minimum supported value.
 		if ( newLineHeight && newLineHeight < MIN_LINE_HEIGHT ) {
 			newLineHeight = MIN_LINE_HEIGHT;
+		}
+
+		// Until we parse CSS values correctly, avoid passing NaN values to Aztec
+		if ( isNaN( newLineHeight ) ) {
+			return undefined;
 		}
 
 		return newLineHeight;
@@ -1142,6 +1183,17 @@ export class RichText extends Component {
 			},
 		];
 
+		const defaultSelectionColor = getStylesFromColorScheme(
+			styles[ 'rich-text-selection' ],
+			styles[ 'rich-text-selection--dark' ]
+		).color;
+		const selectionColor = getSelectionColor(
+			this.props.selectionColor,
+			defaultSelectionColor,
+			baseGlobalStyles,
+			this.getIsBlockBasedTheme()
+		);
+
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;
 
@@ -1206,9 +1258,6 @@ export class RichText extends Component {
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
-					onCaretVerticalPositionChange={
-						this.props.onCaretVerticalPositionChange
-					}
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
 					color={
@@ -1229,7 +1278,7 @@ export class RichText extends Component {
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
 					minWidth={ minWidth }
 					id={ this.props.id }
-					selectionColor={ this.props.selectionColor }
+					selectionColor={ selectionColor }
 					disableAutocorrection={ this.props.disableAutocorrection }
 				/>
 				{ isSelected && (
@@ -1295,10 +1344,9 @@ export default compose( [
 			: settings?.colors;
 
 		return {
-			areMentionsSupported:
-				getSettings( 'capabilities' ).mentions === true,
-			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
-			...{ parentBlockStyles },
+			areMentionsSupported: settings?.capabilities?.mentions === true,
+			areXPostsSupported: settings?.capabilities?.xposts === true,
+			parentBlockStyles,
 			baseGlobalStyles,
 			colorPalette,
 		};

@@ -1,8 +1,8 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/post-author-biography",
-	"title": "Post Author Biography",
+	"title": "Author Biography",
 	"category": "theme",
 	"description": "The author biography.",
 	"textdomain": "default",

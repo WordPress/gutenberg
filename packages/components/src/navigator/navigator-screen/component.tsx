@@ -3,30 +3,31 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { motion, MotionProps } from 'framer-motion';
+import type { MotionProps } from 'framer-motion';
+// eslint-disable-next-line no-restricted-imports
+import { motion } from 'framer-motion';
 import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
 import {
-	useReducedMotion,
-	useMergeRefs,
-	usePrevious,
-} from '@wordpress/compose';
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useId,
+} from '@wordpress/element';
+import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect, useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
@@ -41,24 +42,33 @@ const animationExitDelay = 0;
 // as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
 type Props = Omit<
 	WordPressComponentProps< NavigatorScreenProps, 'div', false >,
-	keyof MotionProps
+	Exclude< keyof MotionProps, 'style' | 'children' >
 >;
 
 function UnconnectedNavigatorScreen(
 	props: Props,
 	forwardedRef: ForwardedRef< any >
 ) {
+	const screenId = useId();
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const { location } = useContext( NavigatorContext );
-	const isMatch = location.path === escapeAttribute( path );
+	const { location, match, addScreen, removeScreen } =
+		useContext( NavigatorContext );
+	const isMatch = match === screenId;
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
-	const previousLocation = usePrevious( location );
+	useEffect( () => {
+		const screen = {
+			id: screenId,
+			path: escapeAttribute( path ),
+		};
+		addScreen( screen );
+		return () => removeScreen( screen );
+	}, [ screenId, path, addScreen, removeScreen ] );
 
 	const cx = useCx();
 	const classes = useMemo(
@@ -89,11 +99,13 @@ function UnconnectedNavigatorScreen(
 		// - when the screen becomes visible
 		// - if the wrapper ref has been assigned
 		// - if focus hasn't already been restored for the current location
+		// - if the `skipFocus` option is not set to `true`. This is useful when we trigger the navigation outside of NavigatorScreen.
 		if (
 			isInitialLocation ||
 			! isMatch ||
 			! wrapperRef.current ||
-			locationRef.current.hasRestoredFocus
+			locationRef.current.hasRestoredFocus ||
+			location.skipFocus
 		) {
 			return;
 		}
@@ -110,9 +122,9 @@ function UnconnectedNavigatorScreen(
 
 		// When navigating back, if a selector is provided, use it to look for the
 		// target element (assumed to be a node inside the current NavigatorScreen)
-		if ( location.isBack && previousLocation?.focusTargetSelector ) {
+		if ( location.isBack && location?.focusTargetSelector ) {
 			elementToFocus = wrapperRef.current.querySelector(
-				previousLocation.focusTargetSelector
+				location.focusTargetSelector
 			);
 		}
 
@@ -131,7 +143,8 @@ function UnconnectedNavigatorScreen(
 		isInitialLocation,
 		isMatch,
 		location.isBack,
-		previousLocation?.focusTargetSelector,
+		location.focusTargetSelector,
+		location.skipFocus,
 	] );
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
@@ -161,13 +174,19 @@ function UnconnectedNavigatorScreen(
 		},
 		x: 0,
 	};
-	const initial = {
-		opacity: 0,
-		x:
-			( isRTL() && location.isBack ) || ( ! isRTL() && ! location.isBack )
-				? 50
-				: -50,
-	};
+	// Disable the initial animation if the screen is the very first screen to be
+	// rendered within the current `NavigatorProvider`.
+	const initial =
+		location.isInitial && ! location.isBack
+			? false
+			: {
+					opacity: 0,
+					x:
+						( isRTL() && location.isBack ) ||
+						( ! isRTL() && ! location.isBack )
+							? 50
+							: -50,
+			  };
 	const exit = {
 		delay: animationExitDelay,
 		opacity: 0,

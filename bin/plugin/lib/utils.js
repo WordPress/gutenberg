@@ -33,11 +33,13 @@ function runShellScript( script, cwd, env = {} ) {
 					NO_CHECKS: 'true',
 					PATH: process.env.PATH,
 					HOME: process.env.HOME,
+					USER: process.env.USER,
 					...env,
 				},
 			},
-			function ( error, _, stderr ) {
+			function ( error, stdout, stderr ) {
 				if ( error ) {
+					console.log( stdout ); // Sometimes the error message is thrown via stdout.
 					console.log( stderr );
 					reject( error );
 				} else {
@@ -119,10 +121,30 @@ function getRandomTemporaryPath() {
 	return path.join( os.tmpdir(), uuid() );
 }
 
+/**
+ * Scans the given directory and returns an array of file paths.
+ *
+ * @param {string} dir The path to the directory to scan.
+ *
+ * @return {string[]} An array of file paths.
+ */
+function getFilesFromDir( dir ) {
+	if ( ! fs.existsSync( dir ) ) {
+		console.log( 'Directory does not exist: ', dir );
+		return [];
+	}
+
+	return fs
+		.readdirSync( dir, { withFileTypes: true } )
+		.filter( ( dirent ) => dirent.isFile() )
+		.map( ( dirent ) => path.join( dir, dirent.name ) );
+}
+
 module.exports = {
 	askForConfirmation,
 	runStep,
 	readJSONFile,
 	runShellScript,
 	getRandomTemporaryPath,
+	getFilesFromDir,
 };

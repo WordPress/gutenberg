@@ -6,6 +6,7 @@ import {
 	initializeEditor,
 	fireEvent,
 	waitFor,
+	waitForModalVisible,
 	within,
 } from 'test/helpers';
 import { Platform } from 'react-native';
@@ -199,6 +200,10 @@ beforeEach( () => {
 		MOCK_EMBED_PHOTO_SUCCESS_RESPONSE,
 		MOCK_BAD_EMBED_PROVIDER_RESPONSE,
 	] );
+
+	// Intentionally suppress the expected console logs to reduce noise in the
+	// test output.
+	jest.spyOn( console, 'log' ).mockImplementation( () => {} );
 } );
 
 afterAll( () => {
@@ -238,7 +243,7 @@ describe( 'Embed block', () => {
 			const embedEditURLModal = editor.getByTestId(
 				'embed-edit-url-modal'
 			);
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			await waitForModalVisible( embedEditURLModal );
 
 			// Dismiss the edit URL modal.
 			fireEvent( embedEditURLModal, 'backdropPress' );
@@ -256,7 +261,7 @@ describe( 'Embed block', () => {
 			const embedEditURLModal = editor.getByTestId(
 				'embed-edit-url-modal'
 			);
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			await waitForModalVisible( embedEditURLModal );
 
 			// Set an URL.
 			const linkTextInput = editor.getByPlaceholderText( 'Add link' );
@@ -296,7 +301,7 @@ describe( 'Embed block', () => {
 			const embedEditURLModal = editor.getByTestId(
 				'embed-edit-url-modal'
 			);
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			await waitForModalVisible( embedEditURLModal );
 
 			// Get embed link with auto-pasted URL.
 			const autopastedLinkField = await editor.findByText( clipboardURL );
@@ -329,13 +334,13 @@ describe( 'Embed block', () => {
 			const editor = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
-			fireEvent.press( await editor.findByText( 'ADD LINK' ) );
+			fireEvent.press( await editor.findByText( 'Add link' ) );
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
 				'embed-edit-url-modal'
 			);
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			await waitForModalVisible( embedEditURLModal );
 
 			// Dismiss the edit URL modal.
 			fireEvent( embedEditURLModal, 'backdropPress' );
@@ -350,13 +355,13 @@ describe( 'Embed block', () => {
 			const editor = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
-			fireEvent.press( editor.getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'Add link' ) );
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
 				'embed-edit-url-modal'
 			);
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			await waitForModalVisible( embedEditURLModal );
 
 			// Set an URL.
 			const linkTextInput = editor.getByPlaceholderText( 'Add link' );
@@ -391,13 +396,13 @@ describe( 'Embed block', () => {
 			const editor = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
-			fireEvent.press( editor.getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'Add link' ) );
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
 				'embed-edit-url-modal'
 			);
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			await waitForModalVisible( embedEditURLModal );
 
 			// Get embed link.
 			const embedLink = await editor.findByText( clipboardURL );
@@ -438,7 +443,7 @@ describe( 'Embed block', () => {
 			const blockSettingsModal = editor.getByTestId(
 				'block-settings-modal'
 			);
-			await waitFor( () => blockSettingsModal.props.isVisible );
+			await waitForModalVisible( blockSettingsModal );
 
 			// Dismiss the Block Settings modal.
 			fireEvent( blockSettingsModal, 'backdropPress' );
@@ -462,7 +467,7 @@ describe( 'Embed block', () => {
 			const blockSettingsModal = editor.getByTestId(
 				'block-settings-modal'
 			);
-			await waitFor( () => blockSettingsModal.props.isVisible );
+			await waitForModalVisible( blockSettingsModal );
 
 			// Start editing link.
 			fireEvent.press(
@@ -507,7 +512,7 @@ describe( 'Embed block', () => {
 			const blockSettingsModal = editor.getByTestId(
 				'block-settings-modal'
 			);
-			await waitFor( () => blockSettingsModal.props.isVisible );
+			await waitForModalVisible( blockSettingsModal );
 
 			// Start editing link.
 			fireEvent.press(
@@ -581,7 +586,7 @@ describe( 'Embed block', () => {
 			const embedEditURLModal = editor.getByTestId(
 				'embed-edit-url-modal'
 			);
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			await waitForModalVisible( embedEditURLModal );
 
 			// Dismiss the edit URL modal.
 			fireEvent( embedEditURLModal, 'backdropPress' );
@@ -591,24 +596,22 @@ describe( 'Embed block', () => {
 			fireEvent.press( editor.block );
 
 			// Edit URL.
-			fireEvent.press( editor.getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'Add link' ) );
 
 			// Wait for edit URL modal to be visible.
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			await waitForModalVisible( embedEditURLModal );
 
 			// Dismiss the edit URL modal.
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			// Edit URL.
-			fireEvent.press( editor.getByText( 'ADD LINK' ) );
+			fireEvent.press( editor.getByText( 'Add link' ) );
 
 			// Wait for edit URL modal to be visible.
-			const isVisibleThirdTime = await waitFor(
-				() => embedEditURLModal.props.isVisible
-			);
+			await waitForModalVisible( embedEditURLModal );
 
-			expect( isVisibleThirdTime ).toBeTruthy();
+			expect( embedEditURLModal.props.isVisible ).toBe( true );
 		} );
 
 		// This test case covers the bug fixed in PR #35013.
@@ -622,7 +625,7 @@ describe( 'Embed block', () => {
 			const embedEditURLModal = editor.getByTestId(
 				'embed-edit-url-modal'
 			);
-			await waitFor( () => embedEditURLModal.props.isVisible );
+			await waitForModalVisible( embedEditURLModal );
 
 			// Set an bad URL.
 			let linkTextInput = editor.getByPlaceholderText( 'Add link' );
@@ -640,7 +643,7 @@ describe( 'Embed block', () => {
 			const blockSettingsModal = editor.getByTestId(
 				'block-settings-modal'
 			);
-			await waitFor( () => blockSettingsModal.props.isVisible );
+			await waitForModalVisible( blockSettingsModal );
 
 			// Start editing link.
 			fireEvent.press(
@@ -832,7 +835,7 @@ describe( 'Embed block', () => {
 
 			// Wait for no preview modal to be visible.
 			const noPreviewModal = getByTestId( 'embed-no-preview-modal' );
-			await waitFor( () => noPreviewModal.props.isVisible );
+			await waitForModalVisible( noPreviewModal );
 
 			// Preview post.
 			fireEvent.press( getByText( 'Preview post' ) );
@@ -854,13 +857,15 @@ describe( 'Embed block', () => {
 
 			// Wait for no preview modal to be visible.
 			const noPreviewModal = getByTestId( 'embed-no-preview-modal' );
-			await waitFor( () => noPreviewModal.props.isVisible );
+			await waitForModalVisible( noPreviewModal );
 
 			// Dismiss modal.
 			fireEvent.press( getByText( 'Dismiss' ) );
 
 			// Wait for no preview modal to be not visible.
-			await waitFor( () => ! noPreviewModal.props.isVisible );
+			await waitFor( () =>
+				expect( noPreviewModal.props.isVisible ).toBe( false )
+			);
 
 			expect( requestPreview ).not.toHaveBeenCalled();
 		} );
@@ -893,10 +898,14 @@ describe( 'Embed block', () => {
 			const embedHandlerPicker = editor.getByTestId(
 				'embed-handler-picker'
 			);
-			await waitFor( () => embedHandlerPicker.props.isVisible );
+			await waitForModalVisible( embedHandlerPicker );
 
 			// Select create embed option.
 			fireEvent.press( editor.getByText( 'Create embed' ) );
+			expect( console ).toHaveLoggedWith(
+				'Processed HTML piece:\n\n',
+				`<p>${ expectedURL }</p>`
+			);
 
 			// Get the created embed block.
 			const [ embedBlock ] = await editor.findAllByLabelText(
@@ -937,16 +946,18 @@ describe( 'Embed block', () => {
 			const embedHandlerPicker = editor.getByTestId(
 				'embed-handler-picker'
 			);
-			await waitFor( () => embedHandlerPicker.props.isVisible );
+			await waitForModalVisible( embedHandlerPicker );
 
 			// Select create link option.
 			fireEvent.press( editor.getByText( 'Create link' ) );
+			expect( console ).toHaveLoggedWith(
+				'Processed HTML piece:\n\n',
+				`<p>${ expectedURL }</p>`
+			);
 
 			// Get the link text.
-			const linkText = await waitFor( () =>
-				editor.getByDisplayValue(
-					`<p><a href="${ expectedURL }">${ expectedURL }</a></p>`
-				)
+			const linkText = await editor.findByDisplayValue(
+				`<p><a href="${ expectedURL }">${ expectedURL }</a></p>`
 			);
 
 			expect( linkText ).toBeDefined();
@@ -1041,11 +1052,10 @@ describe( 'Embed block', () => {
 	it( 'sets block caption', async () => {
 		const expectedCaption = 'Caption';
 
-		const { getByPlaceholderText, getByDisplayValue } =
-			await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+		const screen = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 		// Set a caption.
-		const captionField = getByPlaceholderText( 'Add caption' );
+		const captionField = screen.getByPlaceholderText( 'Add caption' );
 		fireEvent( captionField, 'focus' );
 		fireEvent( captionField, 'onChange', {
 			nativeEvent: {
@@ -1056,8 +1066,8 @@ describe( 'Embed block', () => {
 		} );
 
 		// Get current caption.
-		const caption = await waitFor( () =>
-			getByDisplayValue( `<p>${ expectedCaption }</p>` )
+		const caption = await screen.findByDisplayValue(
+			`<p>${ expectedCaption }</p>`
 		);
 
 		expect( caption ).toBeDefined();
@@ -1086,36 +1096,32 @@ describe( 'Embed block', () => {
 
 	describe( 'block settings', () => {
 		it( 'toggles resize for smaller devices media settings', async () => {
-			const { getByLabelText, getByText } =
-				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const screen = await initializeWithEmbedBlock(
+				RICH_TEXT_EMBED_HTML
+			);
 
 			// Open Block Settings.
-			fireEvent.press(
-				await waitFor( () => getByLabelText( 'Open Settings' ) )
-			);
+			fireEvent.press( await screen.findByLabelText( 'Open Settings' ) );
 
 			// Untoggle resize for smaller devices.
 			fireEvent.press(
-				await waitFor( () => getByText( /Resize for smaller devices/ ) )
+				await screen.findByText( /Resize for smaller devices/ )
 			);
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
 		it( 'does not show media settings panel if responsive is not supported', async () => {
-			const { getByLabelText, getByText } =
-				await initializeWithEmbedBlock( WP_EMBED_HTML );
+			const screen = await initializeWithEmbedBlock( WP_EMBED_HTML );
 
 			// Open Block Settings.
-			fireEvent.press(
-				await waitFor( () => getByLabelText( 'Open Settings' ) )
-			);
+			fireEvent.press( await screen.findByLabelText( 'Open Settings' ) );
 
 			// Wait for media settings panel.
 			let mediaSettingsPanel;
 			try {
-				mediaSettingsPanel = await waitFor( () =>
-					getByText( 'Media settings' )
+				mediaSettingsPanel = await screen.findByText(
+					'Media settings'
 				);
 			} catch ( e ) {
 				// NOOP.

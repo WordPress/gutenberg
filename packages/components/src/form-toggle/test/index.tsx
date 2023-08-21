@@ -79,9 +79,7 @@ describe( 'FormToggle', () => {
 
 	describe( 'Value', () => {
 		it( 'should flip the checked property when clicked', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChange = jest.fn();
 			render( <ControlledFormToggle onChange={ onChange } /> );

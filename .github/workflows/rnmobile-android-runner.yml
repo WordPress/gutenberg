@@ -18,32 +18,27 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                native-test-name: [gutenberg-editor-initial-html]
+                native-test-name: [gutenberg-editor-rendering]
                 api-level: [29]
 
         steps:
             - name: checkout
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
             - name: Use desired version of Java
-              uses: actions/setup-java@de1bb2b0c5634f0fc4438d7aa9944e68f9bf86cc # v3.6.0
+              uses: actions/setup-java@cd89f46ac9d01407894225f350157564c9c7cee2 # v3.12.0
               with:
-                  distribution: 'temurin'
-                  java-version: '11'
+                  distribution: 'corretto'
+                  java-version: '17'
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
-
-            - run: npm ci
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
             - name: Gradle cache
-              uses: gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef # v2.3.3
+              uses: gradle/gradle-build-action@a4cf152f482c7ca97ef56ead29bf08bcd953284c # v2.7.0
 
             - name: AVD cache
-              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
+              uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
               id: avd-cache
               with:
                   path: |
@@ -53,7 +48,7 @@ jobs:
 
             - name: Create AVD and generate snapshot for caching
               if: steps.avd-cache.outputs.cache-hit != 'true'
-              uses: reactivecircus/android-emulator-runner@50986b1464923454c95e261820bc626f38490ec0 # v2.27.0
+              uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
               with:
                   api-level: ${{ matrix.api-level }}
                   force-avd-creation: false
@@ -64,7 +59,7 @@ jobs:
                   script: echo "Generated AVD snapshot for caching."
 
             - name: Run tests
-              uses: reactivecircus/android-emulator-runner@50986b1464923454c95e261820bc626f38490ec0 # v2.27.0
+              uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
               with:
                   api-level: ${{ matrix.api-level }}
                   force-avd-creation: false
@@ -74,13 +69,13 @@ jobs:
                   profile: Nexus 6
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
-            - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+            - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               if: always()
               with:
                   name: android-screen-recordings
                   path: packages/react-native-editor/android-screen-recordings
 
-            - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+            - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               if: always()
               with:
                   name: appium-logs

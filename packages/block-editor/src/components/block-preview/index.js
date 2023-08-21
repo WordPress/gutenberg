@@ -9,22 +9,45 @@ import classnames from 'classnames';
 import { useDisabled, useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import BlockEditorProvider from '../provider';
+import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
 
 export function BlockPreview( {
 	blocks,
-	__experimentalPadding = 0,
 	viewportWidth = 1200,
+	minHeight,
+	additionalStyles = [],
+	// Deprecated props:
 	__experimentalMinHeight,
-	__experimentalStyles = [],
+	__experimentalPadding,
 } ) {
+	if ( __experimentalMinHeight ) {
+		minHeight = __experimentalMinHeight;
+		deprecated( 'The __experimentalMinHeight prop', {
+			since: '6.2',
+			version: '6.4',
+			alternative: 'minHeight',
+		} );
+	}
+	if ( __experimentalPadding ) {
+		additionalStyles = [
+			...additionalStyles,
+			{ css: `body { padding: ${ __experimentalPadding }px; }` },
+		];
+		deprecated( 'The __experimentalPadding prop of BlockPreview', {
+			since: '6.2',
+			version: '6.4',
+			alternative: 'additionalStyles',
+		} );
+	}
+
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
@@ -37,18 +60,22 @@ export function BlockPreview( {
 		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
 		[ blocks ]
 	);
+
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
 	}
+
 	return (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+		<ExperimentalBlockEditorProvider
+			value={ renderedBlocks }
+			settings={ settings }
+		>
 			<AutoHeightBlockPreview
 				viewportWidth={ viewportWidth }
-				__experimentalPadding={ __experimentalPadding }
-				__experimentalMinHeight={ __experimentalMinHeight }
-				__experimentalStyles={ __experimentalStyles }
+				minHeight={ minHeight }
+				additionalStyles={ additionalStyles }
 			/>
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 }
 
@@ -74,18 +101,13 @@ export default memo( BlockPreview );
  * returns. Optionally, you can also pass any other props through this hook, and
  * they will be merged and returned.
  *
- * @param {Object}    options                      Preview options.
- * @param {WPBlock[]} options.blocks               Block objects.
- * @param {Object}    options.props                Optional. Props to pass to the element. Must contain
- *                                                 the ref if one is defined.
- * @param {Object}    options.__experimentalLayout Layout settings to be used in the preview.
- *
+ * @param {Object}    options        Preview options.
+ * @param {WPBlock[]} options.blocks Block objects.
+ * @param {Object}    options.props  Optional. Props to pass to the element. Must contain
+ *                                   the ref if one is defined.
+ * @param {Object}    options.layout Layout settings to be used in the preview.
  */
-export function useBlockPreview( {
-	blocks,
-	props = {},
-	__experimentalLayout,
-} ) {
+export function useBlockPreview( { blocks, props = {}, layout } ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
@@ -102,12 +124,12 @@ export function useBlockPreview( {
 	);
 
 	const children = (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
-			<BlockListItems
-				renderAppender={ false }
-				__experimentalLayout={ __experimentalLayout }
-			/>
-		</BlockEditorProvider>
+		<ExperimentalBlockEditorProvider
+			value={ renderedBlocks }
+			settings={ settings }
+		>
+			<BlockListItems renderAppender={ false } layout={ layout } />
+		</ExperimentalBlockEditorProvider>
 	);
 
 	return {

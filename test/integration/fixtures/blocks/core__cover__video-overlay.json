@@ -11,7 +11,8 @@
 			"dimRatio": 10,
 			"customOverlayColor": "#3615d9",
 			"backgroundType": "video",
-			"isDark": true
+			"isDark": true,
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

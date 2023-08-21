@@ -44,7 +44,7 @@ function gutenberg_register_dimensions_support( $block_type ) {
  * @return array Block dimensions CSS classes and inline styles.
  */
 function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	if ( gutenberg_should_skip_block_supports_serialization( $block_type, 'dimensions' ) ) {
+	if ( wp_should_skip_block_supports_serialization( $block_type, 'dimensions' ) ) {
 		return array();
 	}
 
@@ -59,7 +59,7 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
 		return $attributes;
 	}
 
-	$skip_min_height                      = gutenberg_should_skip_block_supports_serialization( $block_type, 'dimensions', 'minHeight' );
+	$skip_min_height                      = wp_should_skip_block_supports_serialization( $block_type, 'dimensions', 'minHeight' );
 	$dimensions_block_styles              = array();
 	$dimensions_block_styles['minHeight'] = $has_min_height_support && ! $skip_min_height ? _wp_array_get( $block_styles, array( 'dimensions', 'minHeight' ), null ) : null;
 	$styles                               = gutenberg_style_engine_get_styles( array( 'dimensions' => $dimensions_block_styles ) );

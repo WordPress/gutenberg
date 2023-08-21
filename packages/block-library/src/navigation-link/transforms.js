@@ -40,6 +40,13 @@ const transforms = {
 				return createBlock( 'core/navigation-link' );
 			},
 		},
+		{
+			type: 'block',
+			blocks: [ 'core/page-list' ],
+			transform: () => {
+				return createBlock( 'core/navigation-link' );
+			},
+		},
 	],
 	to: [
 		{
@@ -89,6 +96,13 @@ const transforms = {
 					buttonUseIcon: true,
 					buttonPosition: 'button-inside',
 				} );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/page-list' ],
+			transform: () => {
+				return createBlock( 'core/page-list' );
 			},
 		},
 	],

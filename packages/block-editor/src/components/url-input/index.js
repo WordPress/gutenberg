@@ -7,6 +7,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
@@ -266,6 +267,7 @@ class URLInput extends Component {
 	}
 
 	onKeyDown( event ) {
+		this.props.onKeyDown?.( event );
 		const { showSuggestions, selectedSuggestion, suggestions, loading } =
 			this.state;
 
@@ -308,11 +310,10 @@ class URLInput extends Component {
 
 				// Submitting while loading should trigger onSubmit.
 				case ENTER: {
-					event.preventDefault();
 					if ( this.props.onSubmit ) {
+						event.preventDefault();
 						this.props.onSubmit( null, event );
 					}
-
 					break;
 				}
 			}
@@ -424,6 +425,8 @@ class URLInput extends Component {
 
 	renderControl() {
 		const {
+			/** Start opting into the new margin-free styles that will become the default in a future version. */
+			__nextHasNoMarginBottom = false,
 			label = null,
 			className,
 			isFullWidth,
@@ -431,6 +434,7 @@ class URLInput extends Component {
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
 			value = '',
+			hideLabelFromVision = false,
 		} = this.props;
 
 		const {
@@ -449,6 +453,7 @@ class URLInput extends Component {
 			className: classnames( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
 			} ),
+			hideLabelFromVision,
 		};
 
 		const inputProps = {
@@ -465,7 +470,7 @@ class URLInput extends Component {
 			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
 			'aria-autocomplete': 'list',
-			'aria-controls': suggestionsListboxId,
+			'aria-owns': suggestionsListboxId,
 			'aria-activedescendant':
 				selectedSuggestion !== null
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
@@ -477,8 +482,19 @@ class URLInput extends Component {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
+		if ( ! __nextHasNoMarginBottom ) {
+			deprecated( 'Bottom margin styles for wp.blockEditor.URLInput', {
+				since: '6.2',
+				version: '6.5',
+				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
+			} );
+		}
+
 		return (
-			<BaseControl { ...controlProps }>
+			<BaseControl
+				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+				{ ...controlProps }
+			>
 				<input { ...inputProps } />
 				{ loading && <Spinner /> }
 			</BaseControl>
@@ -517,7 +533,8 @@ class URLInput extends Component {
 				tabIndex: '-1',
 				id: `${ suggestionOptionIdPrefix }-${ index }`,
 				ref: this.bindSuggestionNode( index ),
-				'aria-selected': index === selectedSuggestion,
+				'aria-selected':
+					index === selectedSuggestion ? true : undefined,
 			};
 		};
 

@@ -327,6 +327,7 @@ function VideoEdit( {
 				{ showCaption &&
 					( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
+							identifier="caption"
 							tagName="figcaption"
 							className={ __experimentalGetElementClassName(
 								'caption'

@@ -9,7 +9,7 @@ import { getType } from 'mime';
  * Internal dependencies
  */
 import type { PageUtils } from './index';
-import type { Locator } from '@playwright/test';
+import type { ElementHandle, Locator } from '@playwright/test';
 
 type FileObject = {
 	name: string;
@@ -24,8 +24,8 @@ type Options = {
 /**
  * Simulate dragging files from outside the current page.
  *
- * @param  this
- * @param  files The files to be dragged.
+ * @param this
+ * @param files The files to be dragged.
  * @return The methods of the drag operation.
  */
 async function dragFiles(
@@ -100,9 +100,9 @@ async function dragFiles(
 		/**
 		 * Drag the files over an element (fires `dragenter` and `dragover` events).
 		 *
-		 * @param  selectorOrLocator A selector or a locator to search for an element.
-		 * @param  options           The optional options.
-		 * @param  options.position  A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+		 * @param selectorOrLocator A selector or a locator to search for an element.
+		 * @param options           The optional options.
+		 * @param options.position  A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
 		 */
 		dragOver: async (
 			selectorOrLocator: string | Locator,
@@ -141,21 +141,25 @@ async function dragFiles(
 
 		/**
 		 * Drop the files at the current position.
+		 *
+		 * @param locator
 		 */
-		drop: async () => {
-			const topMostElement = await this.page.evaluateHandle(
-				( { x, y } ) => {
-					return document.elementFromPoint( x, y );
-				},
-				position
-			);
-			const elementHandle = topMostElement.asElement();
+		drop: async ( locator: Locator | ElementHandle | null ) => {
+			if ( ! locator ) {
+				const topMostElement = await this.page.evaluateHandle(
+					( { x, y } ) => {
+						return document.elementFromPoint( x, y );
+					},
+					position
+				);
+				locator = topMostElement.asElement();
+			}
 
-			if ( ! elementHandle ) {
+			if ( ! locator ) {
 				throw new Error( 'Element not found.' );
 			}
 
-			await elementHandle.dispatchEvent( 'drop', { dataTransfer } );
+			await locator.dispatchEvent( 'drop', { dataTransfer } );
 
 			await cdpSession.detach();
 		},

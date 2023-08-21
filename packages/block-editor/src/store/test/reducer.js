@@ -32,6 +32,7 @@ import {
 	blockListSettings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
+	blockEditingModes,
 } from '../reducer';
 
 const noop = () => {};
@@ -2888,7 +2889,6 @@ describe( 'state', () => {
 					'core/embed': {
 						time: 123456,
 						count: 1,
-						insert: { name: 'core/embed' },
 					},
 				},
 			} );
@@ -2899,7 +2899,6 @@ describe( 'state', () => {
 						'core/embed': {
 							time: 123456,
 							count: 1,
-							insert: { name: 'core/embed' },
 						},
 					},
 				} ),
@@ -2925,12 +2924,10 @@ describe( 'state', () => {
 					'core/embed': {
 						time: 123457,
 						count: 2,
-						insert: { name: 'core/embed' },
 					},
 					'core/block/123': {
 						time: 123457,
 						count: 1,
-						insert: { name: 'core/block', ref: 123 },
 					},
 				},
 			} );
@@ -2993,17 +2990,14 @@ describe( 'state', () => {
 						[ orangeVariationName ]: {
 							time: 123456,
 							count: 1,
-							insert: { name: orangeVariationName },
 						},
 						[ appleVariationName ]: {
 							time: 123456,
 							count: 1,
-							insert: { name: appleVariationName },
 						},
 						[ blockWithVariations ]: {
 							time: 123456,
 							count: 2,
-							insert: { name: blockWithVariations },
 						},
 					} ),
 				} );
@@ -3255,7 +3249,7 @@ describe( 'state', () => {
 	} );
 
 	describe( 'lastBlockInserted', () => {
-		it( 'should return client id if last block inserted is called with action INSERT_BLOCKS', () => {
+		it( 'should contain client id if last block inserted is called with action INSERT_BLOCKS', () => {
 			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 
 			const action = {
@@ -3272,7 +3266,7 @@ describe( 'state', () => {
 
 			const state = lastBlockInserted( {}, action );
 
-			expect( state.clientId ).toBe( expectedClientId );
+			expect( state.clientIds ).toContain( expectedClientId );
 		} );
 
 		it( 'should return inserter_menu source if last block inserted is called with action INSERT_BLOCKS', () => {
@@ -3297,7 +3291,7 @@ describe( 'state', () => {
 
 		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and block list is empty', () => {
 			const expectedState = {
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 			};
 
 			const action = {
@@ -3313,6 +3307,55 @@ describe( 'state', () => {
 			expect( state ).toEqual( expectedState );
 		} );
 
+		it( 'should return client ids of blocks when called with REPLACE_BLOCKS', () => {
+			const clientIdOne = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+			const clientIdTwo = '9db792c6-a25a-495d-adbd-97d56a4c4189';
+
+			const action = {
+				blocks: [
+					{
+						clientId: clientIdOne,
+					},
+					{
+						clientId: clientIdTwo,
+					},
+				],
+				type: 'REPLACE_BLOCKS',
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state.clientIds ).toEqual( [ clientIdOne, clientIdTwo ] );
+		} );
+
+		it( 'should return client ids of the original blocks when inner blocks are replaced with REPLACE_INNER_BLOCKS', () => {
+			const initialBlocks = deepFreeze( [
+				'62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+				'9db792c6-a25a-495d-adbd-97d56a4c4189',
+			] );
+
+			const action = {
+				blocks: [
+					{
+						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					},
+					{
+						clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+					},
+				],
+				type: 'REPLACE_INNER_BLOCKS',
+			};
+
+			const state = lastBlockInserted(
+				{
+					clientIds: initialBlocks,
+				},
+				action
+			);
+
+			expect( state.clientIds ).toEqual( initialBlocks );
+		} );
+
 		it( 'should return empty state if last block inserted is called with action RESET_BLOCKS', () => {
 			const expectedState = {};
 
@@ -3323,6 +3366,53 @@ describe( 'state', () => {
 			const state = lastBlockInserted( expectedState, action );
 
 			expect( state ).toEqual( expectedState );
+		} );
+	} );
+
+	describe( 'blockEditingModes', () => {
+		it( 'should return an empty map by default', () => {
+			expect( blockEditingModes( undefined, {} ) ).toEqual( new Map() );
+		} );
+
+		it( 'should set the editing mode for a block', () => {
+			const state = new Map();
+			const newState = blockEditingModes( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'default',
+			} );
+			expect( newState ).toEqual(
+				new Map( [
+					[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
+				] )
+			);
+		} );
+
+		it( 'should clear the editing mode for a block', () => {
+			const state = new Map( [
+				[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
+			] );
+			const newState = blockEditingModes( state, {
+				type: 'UNSET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+			} );
+			expect( newState ).toEqual( new Map() );
+		} );
+
+		it( 'should clear editing modes when blocks are reset', () => {
+			const state = new Map( [
+				[ '', 'disabled' ],
+				[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
+			] );
+			const newState = blockEditingModes( state, {
+				type: 'RESET_BLOCKS',
+			} );
+			expect( newState ).toEqual(
+				new Map( [
+					// Root mode should be maintained.
+					[ '', 'disabled' ],
+				] )
+			);
 		} );
 	} );
 } );

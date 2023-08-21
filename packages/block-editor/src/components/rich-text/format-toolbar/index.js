@@ -16,14 +16,13 @@ import { chevronDown } from '@wordpress/icons';
 import { orderBy } from '../../../utils/sorting';
 
 const POPOVER_PROPS = {
-	position: 'bottom right',
-	variant: 'toolbar',
+	placement: 'bottom-start',
 };
 
 const FormatToolbar = () => {
 	return (
 		<>
-			{ [ 'bold', 'italic', 'link' ].map( ( format ) => (
+			{ [ 'bold', 'italic', 'link', 'unknown' ].map( ( format ) => (
 				<Slot
 					name={ `RichText.ToolbarControls.${ format }` }
 					key={ format }

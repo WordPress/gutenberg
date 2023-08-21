@@ -14,6 +14,7 @@ import {
 	useRef,
 	useState,
 	forwardRef,
+	useLayoutEffect,
 } from '@wordpress/element';
 import {
 	useInstanceId,
@@ -25,6 +26,7 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
+import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -64,6 +66,7 @@ function UnforwardedModal(
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
+		headerActions = null,
 		__experimentalHideHeader = false,
 	} = props;
 
@@ -76,8 +79,26 @@ function UnforwardedModal(
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOutsideProps = useFocusOutside( onRequestClose );
+	const contentRef = useRef< HTMLDivElement >( null );
+	const childrenContainerRef = useRef< HTMLDivElement >( null );
 
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
+	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
+
+	// Determines whether the Modal content is scrollable and updates the state.
+	const isContentScrollable = useCallback( () => {
+		if ( ! contentRef.current ) {
+			return;
+		}
+
+		const closestScrollContainer = getScrollContainer( contentRef.current );
+
+		if ( contentRef.current === closestScrollContainer ) {
+			setHasScrollableContent( true );
+		} else {
+			setHasScrollableContent( false );
+		}
+	}, [ contentRef ] );
 
 	useEffect( () => {
 		openModalCount++;
@@ -97,7 +118,34 @@ function UnforwardedModal(
 		};
 	}, [ bodyOpenClassName ] );
 
+	// Calls the isContentScrollable callback when the Modal children container resizes.
+	useLayoutEffect( () => {
+		if ( ! window.ResizeObserver || ! childrenContainerRef.current ) {
+			return;
+		}
+
+		const resizeObserver = new ResizeObserver( isContentScrollable );
+		resizeObserver.observe( childrenContainerRef.current );
+
+		isContentScrollable();
+
+		return () => {
+			resizeObserver.disconnect();
+		};
+	}, [ isContentScrollable, childrenContainerRef ] );
+
 	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
+		if (
+			// Ignore keydowns from IMEs
+			event.nativeEvent.isComposing ||
+			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+			// is `isComposing=false`, even though it's technically still part of the composition.
+			// These can only be detected by keyCode.
+			event.keyCode === 229
+		) {
+			return;
+		}
+
 		if (
 			shouldCloseOnEsc &&
 			event.code === 'Escape' &&
@@ -123,6 +171,34 @@ function UnforwardedModal(
 		[ hasScrolledContent ]
 	);
 
+	let pressTarget: EventTarget | null = null;
+	const overlayPressHandlers: {
+		onPointerDown: React.PointerEventHandler< HTMLDivElement >;
+		onPointerUp: React.PointerEventHandler< HTMLDivElement >;
+	} = {
+		onPointerDown: ( event ) => {
+			if ( event.isPrimary && event.target === event.currentTarget ) {
+				pressTarget = event.target;
+				// Avoids loss of focus yet also leaves `useFocusOutside`
+				// practically useless with its only potential trigger being
+				// programmatic focus movement. TODO opt for either removing
+				// the hook or enhancing it such that this isn't needed.
+				event.preventDefault();
+			}
+		},
+		// Closes the modal with two exceptions. 1. Opening the context menu on
+		// the overlay. 2. Pressing on the overlay then dragging the pointer
+		// over the modal and releasing. Due to the modal being a child of the
+		// overlay, such a gesture is a `click` on the overlay and cannot be
+		// excepted by a `click` handler. Thus the tactic of handling
+		// `pointerup` and comparing its target to that of the `pointerdown`.
+		onPointerUp: ( { target, button } ) => {
+			const isSameTarget = target === pressTarget;
+			pressTarget = null;
+			if ( button === 0 && isSameTarget ) onRequestClose();
+		},
+	};
+
 	return createPortal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
@@ -132,6 +208,7 @@ function UnforwardedModal(
 				overlayClassName
 			) }
 			onKeyDown={ handleEscapeKeyDown }
+			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
 		>
 			<StyleProvider document={ document }>
 				<div
@@ -161,10 +238,18 @@ function UnforwardedModal(
 					<div
 						className={ classnames( 'components-modal__content', {
 							'hide-header': __experimentalHideHeader,
+							'is-scrollable': hasScrollableContent,
 							'has-scrolled-content': hasScrolledContent,
 						} ) }
 						role="document"
 						onScroll={ onContentContainerScroll }
+						ref={ contentRef }
+						aria-label={
+							hasScrollableContent
+								? __( 'Scrollable section' )
+								: undefined
+						}
+						tabIndex={ hasScrollableContent ? 0 : undefined }
 					>
 						{ ! __experimentalHideHeader && (
 							<div className="components-modal__header">
@@ -186,19 +271,19 @@ function UnforwardedModal(
 										</h1>
 									) }
 								</div>
+								{ headerActions }
 								{ isDismissible && (
 									<Button
 										onClick={ onRequestClose }
 										icon={ close }
 										label={
-											closeButtonLabel ||
-											__( 'Close dialog' )
+											closeButtonLabel || __( 'Close' )
 										}
 									/>
 								) }
 							</div>
 						) }
-						{ children }
+						<div ref={ childrenContainerRef }>{ children }</div>
 					</div>
 				</div>
 			</StyleProvider>

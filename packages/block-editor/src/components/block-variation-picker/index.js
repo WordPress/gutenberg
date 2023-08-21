@@ -43,7 +43,11 @@ function BlockVariationPicker( {
 					<li key={ variation.name }>
 						<Button
 							variant="secondary"
-							icon={ variation.icon }
+							icon={
+								variation.icon && variation.icon.src
+									? variation.icon.src
+									: variation.icon
+							}
 							iconSize={ 48 }
 							onClick={ () => onSelect( variation ) }
 							className="block-editor-block-variation-picker__variation"

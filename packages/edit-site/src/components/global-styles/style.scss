@@ -1,6 +1,3 @@
-// Variables
-$block-preview-height: 150px;
-
 .edit-site-global-styles-preview {
 	display: flex;
 	align-items: center;
@@ -30,8 +27,8 @@ $block-preview-height: 150px;
 	max-width: 100%;
 }
 
-.edit-site-global-styles-screen-heading-color,
-.edit-site-global-styles-screen-typography {
+.edit-site-global-styles-screen-typography,
+.edit-site-global-styles-screen-css {
 	margin: $grid-unit-20;
 }
 
@@ -48,10 +45,10 @@ $block-preview-height: 150px;
 .edit-site-global-styles-screen-colors {
 	margin: $grid-unit-20;
 
-	.component-color-indicator {
-		// Show a diagonal line (crossed out) for empty swatches.
-		background: $white linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
-		flex-shrink: 0;
+	.color-block-support-panel {
+		padding-left: 0;
+		padding-right: 0;
+		border-top: none;
 	}
 }
 
@@ -62,6 +59,11 @@ $block-preview-height: 150px;
 .edit-site-block-types-search {
 	margin-bottom: $grid-unit-10;
 	padding: 0 $grid-unit-20;
+}
+
+.edit-site-global-styles-header {
+	// Need to override the too specific bottom margin for complementary areas.
+	margin-bottom: 0 !important;
 }
 
 .edit-site-global-styles-subtitle {
@@ -79,12 +81,6 @@ $block-preview-height: 150px;
 	padding: $grid-unit-20;
 	padding-bottom: 0;
 	margin: 0;
-}
-
-.edit-site-screen-text-color__control,
-.edit-site-screen-link-color__control,
-.edit-site-screen-button-color__control {
-	padding: $grid-unit-20;
 }
 
 .edit-site-global-styles-variations_item {
@@ -119,17 +115,78 @@ $block-preview-height: 150px;
 	flex-shrink: 0;
 }
 
-.edit-site-global-styles__color-label {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
 .edit-site-global-styles__block-preview-panel {
 	position: relative;
 	width: 100%;
-	height: $block-preview-height + 2 * $border-width;
 	overflow: auto;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;
+}
+
+.edit-site-global-styles-screen-css {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+
+	.components-v-stack {
+		flex: 1 1 auto;
+
+		.block-editor-global-styles-advanced-panel__custom-css-input {
+			flex: 1 1 auto;
+			display: flex;
+			flex-direction: column;
+
+			.components-base-control__field {
+				flex: 1 1 auto;
+				display: flex;
+				flex-direction: column;
+
+				.components-textarea-control__input {
+					flex: 1 1 auto;
+					// CSS input is always LTR regardless of language.
+					/*rtl:ignore*/
+					direction: ltr;
+				}
+			}
+		}
+	}
+}
+
+.edit-site-global-styles-screen-css-help-link {
+	display: block;
+	margin-top: $grid-unit-10;
+}
+.edit-site-global-styles-screen-variations {
+	margin-top: $grid-unit-20;
+	border-top: 1px solid $gray-300;
+
+	& > * {
+		margin: $grid-unit-30 $grid-unit-20;
+	}
+}
+
+.edit-site-global-styles-sidebar__navigator-screen {
+	display: flex;
+	flex-direction: column;
+}
+
+.edit-site-global-styles-screen-root.edit-site-global-styles-screen-root,
+.edit-site-global-styles-screen-style-variations.edit-site-global-styles-screen-style-variations {
+	background: unset;
+	color: inherit;
+}
+
+.edit-site-global-styles-sidebar__panel .block-editor-block-icon svg {
+	fill: currentColor;
+}
+
+[class][class].edit-site-global-styles-sidebar__revisions-count-badge {
+	align-items: center;
+	background: $gray-800;
+	border-radius: 2px;
+	color: $white;
+	display: inline-flex;
+	justify-content: center;
+	min-height: $icon-size;
+	min-width: $icon-size;
 }

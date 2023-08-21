@@ -5,12 +5,13 @@ import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useMemo, forwardRef } from '@wordpress/element';
+import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,7 +20,6 @@ import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
-import { Flex, FlexItem } from '../flex';
 import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
@@ -32,6 +32,12 @@ import type {
 	SinglePaletteProps,
 } from './types';
 import type { WordPressComponentProps } from '../ui/context';
+import type { DropdownProps } from '../dropdown/types';
+import {
+	extractColorNameFromCurrentValue,
+	isMultiplePaletteArray,
+	normalizeColorValue,
+} from './utils';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -100,6 +106,7 @@ function MultiplePalettes( {
 	onChange,
 	value,
 	actions,
+	headingLevel,
 }: MultiplePalettesProps ) {
 	if ( colors.length === 0 ) {
 		return null;
@@ -110,7 +117,9 @@ function MultiplePalettes( {
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading>{ name }</ColorHeading>
+						<ColorHeading level={ headingLevel }>
+							{ name }
+						</ColorHeading>
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }
@@ -134,7 +143,7 @@ export function CustomColorPickerDropdown( {
 	popoverProps: receivedPopoverProps,
 	...props
 }: CustomColorPickerDropdownProps ) {
-	const popoverProps = useMemo(
+	const popoverProps = useMemo< DropdownProps[ 'popoverProps' ] >(
 		() => ( {
 			shift: true,
 			...( isRenderedInSidebar
@@ -163,56 +172,6 @@ export function CustomColorPickerDropdown( {
 	);
 }
 
-export const extractColorNameFromCurrentValue = (
-	currentValue?: ColorPaletteProps[ 'value' ],
-	colors: ColorPaletteProps[ 'colors' ] = [],
-	showMultiplePalettes: ColorPaletteProps[ '__experimentalHasMultipleOrigins' ] = false
-) => {
-	if ( ! currentValue ) {
-		return '';
-	}
-
-	const currentValueIsCssVariable = /^var\(/.test( currentValue );
-	const normalizedCurrentValue = currentValueIsCssVariable
-		? currentValue
-		: colord( currentValue ).toHex();
-
-	// Normalize format of `colors` to simplify the following loop
-	type normalizedPaletteObject = { colors: ColorObject[] };
-	const colorPalettes: normalizedPaletteObject[] = showMultiplePalettes
-		? ( colors as PaletteObject[] )
-		: [ { colors: colors as ColorObject[] } ];
-	for ( const { colors: paletteColors } of colorPalettes ) {
-		for ( const { name: colorName, color: colorValue } of paletteColors ) {
-			const normalizedColorValue = currentValueIsCssVariable
-				? colorValue
-				: colord( colorValue ).toHex();
-
-			if ( normalizedCurrentValue === normalizedColorValue ) {
-				return colorName;
-			}
-		}
-	}
-
-	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
-	return __( 'Custom' );
-};
-
-export const showTransparentBackground = ( currentValue?: string ) => {
-	if ( typeof currentValue === 'undefined' ) {
-		return true;
-	}
-	return colord( currentValue ).alpha() === 0;
-};
-
-const areColorsMultiplePalette = (
-	colors: NonNullable< ColorPaletteProps[ 'colors' ] >
-): colors is PaletteObject[] => {
-	return colors.every( ( colorObj ) =>
-		Array.isArray( ( colorObj as PaletteObject ).colors )
-	);
-};
-
 function UnforwardedColorPalette(
 	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
@@ -224,61 +183,53 @@ function UnforwardedColorPalette(
 		enableAlpha = false,
 		onChange,
 		value,
-		__experimentalHasMultipleOrigins = false,
 		__experimentalIsRenderedInSidebar = false,
+		headingLevel = 2,
 		...otherProps
 	} = props;
+	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
+
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 
+	const customColorPaletteCallbackRef = useCallback(
+		( node: HTMLElement | null ) => {
+			setNormalizedColorValue( normalizeColorValue( value, node ) );
+		},
+		[ value ]
+	);
+
+	const hasMultipleColorOrigins = isMultiplePaletteArray( colors );
 	const buttonLabelName = useMemo(
 		() =>
 			extractColorNameFromCurrentValue(
 				value,
 				colors,
-				__experimentalHasMultipleOrigins
+				hasMultipleColorOrigins
 			),
-		[ value, colors, __experimentalHasMultipleOrigins ]
+		[ value, colors, hasMultipleColorOrigins ]
 	);
-
-	// Make sure that the `colors` array has a format (single/multiple) that is
-	// compatible with the `__experimentalHasMultipleOrigins` flag. This is true
-	// when __experimentalHasMultipleOrigins and areColorsMultiplePalette() are
-	// either both `true` or both `false`.
-	if (
-		colors.length > 0 &&
-		__experimentalHasMultipleOrigins !== areColorsMultiplePalette( colors )
-	) {
-		// eslint-disable-next-line no-console
-		console.warn(
-			'wp.components.ColorPalette: please specify a format for the `colors` prop that is compatible with the `__experimentalHasMultipleOrigins` prop.'
-		);
-		return null;
-	}
 
 	const renderCustomColorPicker = () => (
 		<DropdownContentWrapper paddingSize="none">
 			<ColorPicker
-				color={ value }
+				color={ normalizedColorValue }
 				onChange={ ( color ) => onChange( color ) }
 				enableAlpha={ enableAlpha }
 			/>
 		</DropdownContentWrapper>
 	);
+	const isHex = value?.startsWith( '#' );
 
-	const colordColor = colord( value ?? '' );
-
-	const valueWithoutLeadingHash = value?.startsWith( '#' )
-		? value.substring( 1 )
-		: value ?? '';
-
-	const customColorAccessibleLabel = !! valueWithoutLeadingHash
+	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
+	const displayValue = value?.replace( /^var\((.+)\)$/, '$1' );
+	const customColorAccessibleLabel = !! displayValue
 		? sprintf(
 				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
 				__(
 					'Custom color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
 				),
 				buttonLabelName,
-				valueWithoutLeadingHash
+				displayValue
 		  )
 		: __( 'Custom color picker.' );
 
@@ -292,6 +243,7 @@ function UnforwardedColorPalette(
 				{ __( 'Clear' ) }
 			</CircularOptionPicker.ButtonAction>
 		),
+		headingLevel,
 	};
 
 	return (
@@ -301,46 +253,52 @@ function UnforwardedColorPalette(
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Flex
-							as={ 'button' }
-							justify="space-between"
-							align="flex-start"
-							className="components-color-palette__custom-color"
-							aria-expanded={ isOpen }
-							aria-haspopup="true"
-							onClick={ onToggle }
-							aria-label={ customColorAccessibleLabel }
-							style={
-								showTransparentBackground( value )
-									? { color: '#000' }
-									: {
-											background: value,
-											color:
-												colordColor.contrast() >
-												colordColor.contrast( '#000' )
-													? '#fff'
-													: '#000',
-									  }
-							}
+						<VStack
+							className="components-color-palette__custom-color-wrapper"
+							spacing={ 0 }
 						>
-							<FlexItem
-								isBlock
-								as={ Truncate }
-								className="components-color-palette__custom-color-name"
+							<button
+								ref={ customColorPaletteCallbackRef }
+								className="components-color-palette__custom-color-button"
+								aria-expanded={ isOpen }
+								aria-haspopup="true"
+								onClick={ onToggle }
+								aria-label={ customColorAccessibleLabel }
+								style={ {
+									background: value,
+								} }
+							/>
+							<VStack
+								className="components-color-palette__custom-color-text-wrapper"
+								spacing={ 0.5 }
 							>
-								{ buttonLabelName }
-							</FlexItem>
-							<FlexItem
-								as="span"
-								className="components-color-palette__custom-color-value"
-							>
-								{ valueWithoutLeadingHash }
-							</FlexItem>
-						</Flex>
+								<Truncate className="components-color-palette__custom-color-name">
+									{ value
+										? buttonLabelName
+										: 'No color selected' }
+								</Truncate>
+								{ /*
+								This `Truncate` is always rendered, even if
+								there is no `displayValue`, to ensure the layout
+								does not shift
+								*/ }
+								<Truncate
+									className={ classnames(
+										'components-color-palette__custom-color-value',
+										{
+											'components-color-palette__custom-color-value--is-hex':
+												isHex,
+										}
+									) }
+								>
+									{ displayValue }
+								</Truncate>
+							</VStack>
+						</VStack>
 					) }
 				/>
 			) }
-			{ __experimentalHasMultipleOrigins ? (
+			{ hasMultipleColorOrigins ? (
 				<MultiplePalettes
 					{ ...paletteCommonProps }
 					colors={ colors as PaletteObject[] }

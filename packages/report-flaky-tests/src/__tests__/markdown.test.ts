@@ -12,7 +12,10 @@ import {
 	renderIssueBody,
 	parseFormattedTestResults,
 	parseIssueBody,
+	renderCommitComment,
+	isReportComment,
 } from '../markdown';
+import type { ReportedIssue } from '../types';
 
 jest.useFakeTimers( 'modern' ).setSystemTime( new Date( '2020-05-10' ) );
 
@@ -50,7 +53,7 @@ describe( 'formatTestResults', () => {
 		} );
 
 		expect( formatted ).toMatchInlineSnapshot(
-			`"<!-- __TEST_RESULT__ --><time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2282393879\\"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->"`
+			`"<!-- __TEST_RESULT__ --><time datetime="2020-05-10T00:00:00.000Z"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href="https://github.com/WordPress/gutenberg/actions/runs/2282393879"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->"`
 		);
 
 		expect( renderToDisplayText( formatted ) ).toMatchInlineSnapshot(
@@ -70,7 +73,7 @@ describe( 'formatTestResults', () => {
 		expect( formatted ).toMatchInlineSnapshot( `
 		"<!-- __TEST_RESULT__ --><details>
 		<summary>
-			<time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2282393879\\"><code>trunk</code></a>.
+			<time datetime="2020-05-10T00:00:00.000Z"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href="https://github.com/WordPress/gutenberg/actions/runs/2282393879"><code>trunk</code></a>.
 		</summary>
 
 		\`\`\`
@@ -98,7 +101,7 @@ describe( 'renderIssueBody', () => {
 		} );
 
 		expect( body ).toMatchInlineSnapshot( `
-		"<!-- __META_DATA__:{\\"failedTimes\\":5,\\"totalCommits\\":100} -->
+		"<!-- __META_DATA__:{"failedTimes":5,"totalCommits":100} -->
 		**Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
 
 		## Test title
@@ -223,6 +226,58 @@ describe( 'parseIssueBody', () => {
 				},
 			],
 		} );
+	} );
+} );
+
+describe( 'renderCommitComment', () => {
+	it( 'render the commit comment', () => {
+		const runURL = 'runURL';
+		const reportedIssues: ReportedIssue[] = [
+			{
+				testTitle: 'title1',
+				testPath: 'path1',
+				issueNumber: 1,
+				issueUrl: 'url1',
+			},
+			{
+				testTitle: 'title2',
+				testPath: 'path2',
+				issueNumber: 2,
+				issueUrl: 'url2',
+			},
+		];
+		const commitSHA = 'commitSHA';
+
+		const commentBody = renderCommitComment( {
+			reportedIssues,
+			runURL,
+			commitSHA,
+		} );
+
+		expect( commentBody ).toMatchInlineSnapshot( `
+		"<!-- flaky-tests-report-comment -->
+		**Flaky tests detected in commitSHA.**
+		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
+
+		🔍  Workflow run URL: runURL
+		📝  Reported issues:
+		- #1 in \`path1\`
+		- #2 in \`path2\`"
+	` );
+	} );
+} );
+
+describe( 'isReportComment', () => {
+	it( 'matches the report comment', () => {
+		const commentBody = renderCommitComment( {
+			reportedIssues: [],
+			runURL: '',
+			commitSHA: 'commitSHA',
+		} );
+
+		expect( isReportComment( commentBody ) ).toBe( true );
+
+		expect( isReportComment( 'random string' ) ).toBe( false );
 	} );
 } );
 

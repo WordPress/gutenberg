@@ -19,9 +19,7 @@ describe( 'FontSizePicker', () => {
 	] )(
 		'should call onChange( $expectedValue ) after user types 80 when value is $value',
 		async ( { value, expectedValue } ) => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onChange = jest.fn();
 			render(
 				<FontSizePicker
@@ -46,9 +44,7 @@ describe( 'FontSizePicker', () => {
 	] )(
 		'should call onChange( $expectedValue ) after user types 80 when first font size is $firstFontSize',
 		async ( { firstFontSize, expectedValue } ) => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onChange = jest.fn();
 			render(
 				<FontSizePicker
@@ -102,9 +98,7 @@ describe( 'FontSizePicker', () => {
 		];
 
 		it( 'displays a select control', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			render(
 				<FontSizePicker
 					__nextHasNoMarginBottom
@@ -160,9 +154,7 @@ describe( 'FontSizePicker', () => {
 		] )(
 			'calls onChange( $expectedArguments ) when $option is selected',
 			async ( { option, value, expectedArguments } ) => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 				const onChange = jest.fn();
 				render(
 					<FontSizePicker
@@ -222,9 +214,7 @@ describe( 'FontSizePicker', () => {
 		];
 
 		it( 'displays a select control', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			render(
 				<FontSizePicker
 					__nextHasNoMarginBottom
@@ -321,9 +311,7 @@ describe( 'FontSizePicker', () => {
 		] )(
 			'calls onChange( $expectedValue ) when $option is selected',
 			async ( { option, value, expectedArguments } ) => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 				const onChange = jest.fn();
 				render(
 					<FontSizePicker
@@ -419,9 +407,7 @@ describe( 'FontSizePicker', () => {
 		);
 
 		it( 'calls onChange when a font size is selected', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onChange = jest.fn();
 			render(
 				<FontSizePicker
@@ -521,9 +507,7 @@ describe( 'FontSizePicker', () => {
 		] )(
 			'calls onChange( $expectedArguments ) when $radio is selected',
 			async ( { radio, expectedArguments } ) => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 				const onChange = jest.fn();
 				render(
 					<FontSizePicker
@@ -578,9 +562,7 @@ describe( 'FontSizePicker', () => {
 
 	function commonSelectTests( fontSizes: FontSize[] ) {
 		it( 'shows custom input when Custom is selected', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onChange = jest.fn();
 			render(
 				<FontSizePicker
@@ -613,9 +595,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'allows custom values by default', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onChange = jest.fn();
 			render(
 				<FontSizePicker
@@ -646,9 +626,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'does not display a slider by default', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			render(
 				<FontSizePicker
 					__nextHasNoMarginBottom
@@ -664,9 +642,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'allows a slider to be used when withSlider is set', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onChange = jest.fn();
 			render(
 				<FontSizePicker
@@ -688,9 +664,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'allows reset by default', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onChange = jest.fn();
 			render(
 				<FontSizePicker
@@ -709,9 +683,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'does not allow reset when withReset is false', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			render(
 				<FontSizePicker
 					__nextHasNoMarginBottom
@@ -726,6 +698,29 @@ describe( 'FontSizePicker', () => {
 			expect(
 				screen.queryByRole( 'button', { name: 'Reset' } )
 			).not.toBeInTheDocument();
+		} );
+
+		it( 'applies custom units to custom font size control', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<FontSizePicker
+					__nextHasNoMarginBottom
+					fontSizes={ fontSizes }
+					value={ fontSizes[ 0 ].size }
+					units={ [ 'px', 'ch', 'ex' ] }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Set custom size' } )
+			);
+
+			const units = screen.getAllByRole( 'option' );
+			expect( units ).toHaveLength( 3 );
+			expect( units[ 0 ] ).toHaveAccessibleName( 'px' );
+			expect( units[ 1 ] ).toHaveAccessibleName( 'ch' );
+			expect( units[ 2 ] ).toHaveAccessibleName( 'ex' );
 		} );
 	}
 } );

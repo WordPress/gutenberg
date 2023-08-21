@@ -8,10 +8,10 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	settings,
-	homeTemplateId,
 	editedPost,
 	blockInserterPanel,
 	listViewPanel,
+	hasPageContentFocus,
 } from '../reducer';
 
 import { setIsInserterOpened, setIsListViewOpened } from '../actions';
@@ -46,17 +46,6 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'homeTemplateId()', () => {
-		it( 'should apply default state', () => {
-			expect( homeTemplateId( undefined, {} ) ).toEqual( undefined );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( homeTemplateId( state, {} ) ).toBe( state );
-		} );
-	} );
-
 	describe( 'editedPost()', () => {
 		it( 'should apply default state', () => {
 			expect( editedPost( undefined, {} ) ).toEqual( {} );
@@ -72,36 +61,17 @@ describe( 'state', () => {
 				editedPost(
 					{ id: 1, type: 'wp_template' },
 					{
-						type: 'SET_TEMPLATE',
-						templateId: 2,
+						type: 'SET_EDITED_POST',
+						postType: 'wp_template',
+						id: 2,
+						context: { templateSlug: 'slug' },
 					}
 				)
-			).toEqual( { id: 2, type: 'wp_template' } );
-		} );
-
-		it( 'should update when a page is set', () => {
-			expect(
-				editedPost(
-					{ id: 1, type: 'wp_template' },
-					{
-						type: 'SET_PAGE',
-						templateId: 2,
-						page: {},
-					}
-				)
-			).toEqual( { id: 2, type: 'wp_template', page: {} } );
-		} );
-
-		it( 'should update when a template part is set', () => {
-			expect(
-				editedPost(
-					{ id: 1, type: 'wp_template' },
-					{
-						type: 'SET_TEMPLATE_PART',
-						templatePartId: 2,
-					}
-				)
-			).toEqual( { id: 2, type: 'wp_template_part' } );
+			).toEqual( {
+				postType: 'wp_template',
+				id: 2,
+				context: { templateSlug: 'slug' },
+			} );
 		} );
 	} );
 
@@ -164,6 +134,49 @@ describe( 'state', () => {
 			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
 				true
 			);
+		} );
+	} );
+
+	describe( 'hasPageContentFocus()', () => {
+		it( 'defaults to false', () => {
+			expect( hasPageContentFocus( undefined, {} ) ).toBe( false );
+		} );
+
+		it( 'becomes false when editing a template', () => {
+			expect(
+				hasPageContentFocus( true, {
+					type: 'SET_EDITED_POST',
+					postType: 'wp_template',
+				} )
+			).toBe( false );
+		} );
+
+		it( 'becomes true when editing a page', () => {
+			expect(
+				hasPageContentFocus( false, {
+					type: 'SET_EDITED_POST',
+					postType: 'wp_template',
+					context: {
+						postType: 'page',
+						postId: 123,
+					},
+				} )
+			).toBe( true );
+		} );
+
+		it( 'can be set', () => {
+			expect(
+				hasPageContentFocus( false, {
+					type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+					hasPageContentFocus: true,
+				} )
+			).toBe( true );
+			expect(
+				hasPageContentFocus( true, {
+					type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+					hasPageContentFocus: false,
+				} )
+			).toBe( false );
 		} );
 	} );
 } );

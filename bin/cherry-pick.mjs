@@ -6,7 +6,7 @@ import readline from 'readline';
 
 import { spawnSync } from 'node:child_process';
 
-const LABEL = process.argv[ 2 ] || 'Backport to WP Minor Release';
+const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stderr?.toString()
@@ -114,12 +114,25 @@ async function fetchPRs() {
 	const { items } = await GitHubFetch(
 		`/search/issues?q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`
 	);
-	const PRs = items.map( ( { id, number, title } ) => ( {
+	const PRs = items.map( ( { id, number, title, pull_request, closed_at } ) => ( {
 		id,
 		number,
 		title,
-	} ) );
-	console.log( 'Found the following PRs to cherry-pick: ' );
+		closed_at,
+		pull_request,
+	} ) ).sort( ( a, b ) => {
+		/*
+		 * `closed_at` and `pull_request.merged_at` are _usually_ the same,
+		 * but let's prefer the latter if it's available.
+		 */
+		if ( a?.pull_request?.merged_at && b?.pull_request?.merged_at ) {
+			return new Date(  a?.pull_request?.merged_at ) - new Date( b?.pull_request?.merged_at );
+		}
+		return new Date( a.closed_at ) - new Date( b.closed_at );
+	} );
+
+
+	console.log( 'Found the following PRs to cherry-pick (sorted by closed date in ascending order): ' );
 	PRs.forEach( ( { number, title } ) =>
 		console.log( indent( `#${ number } – ${ title }` ) )
 	);

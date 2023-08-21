@@ -73,9 +73,7 @@ describe( 'Disabled', () => {
 	} );
 
 	it( 'should preserve input values when toggling the isDisabled prop', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const MaybeDisable = ( { isDisabled = true } ) => (
 			<Disabled isDisabled={ isDisabled }>

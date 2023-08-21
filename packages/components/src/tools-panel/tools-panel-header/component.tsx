@@ -19,7 +19,8 @@ import MenuItem from '../../menu-item';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
 import { ResetLabel } from '../styles';
 import type {
 	ToolsPanelControlsGroupProps,
@@ -111,7 +112,7 @@ const OptionalControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
-						icon={ isSelected && check }
+						icon={ isSelected ? check : null }
 						isSelected={ isSelected }
 						label={ itemLabel }
 						onClick={ () => {
@@ -156,6 +157,7 @@ const ToolsPanelHeader = (
 		dropdownMenuClassName,
 		hasMenuItems,
 		headingClassName,
+		headingLevel = 2,
 		label: labelText,
 		menuItems,
 		resetAll,
@@ -185,7 +187,7 @@ const ToolsPanelHeader = (
 
 	return (
 		<HStack { ...headerProps } ref={ forwardedRef }>
-			<Heading level={ 2 } className={ headingClassName }>
+			<Heading level={ headingLevel } className={ headingClassName }>
 				{ labelText }
 			</Heading>
 			{ hasMenuItems && (

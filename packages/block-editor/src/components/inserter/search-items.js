@@ -2,7 +2,6 @@
  * External dependencies
  */
 import removeAccents from 'remove-accents';
-import { find } from 'lodash';
 import { noCase } from 'change-case';
 
 // Default search helpers.
@@ -88,7 +87,7 @@ export const searchBlockItems = (
 
 	const config = {
 		getCategory: ( item ) =>
-			find( categories, { slug: item.category } )?.title,
+			categories.find( ( { slug } ) => slug === item.category )?.title,
 		getCollection: ( item ) =>
 			collections[ item.name.split( '/' )[ 0 ] ]?.title,
 	};

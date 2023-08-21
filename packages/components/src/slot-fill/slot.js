@@ -29,12 +29,11 @@ class SlotComponent extends Component {
 		super( ...arguments );
 
 		this.isUnmounted = false;
-		this.bindNode = this.bindNode.bind( this );
 	}
 
 	componentDidMount() {
 		const { registerSlot } = this.props;
-
+		this.isUnmounted = false;
 		registerSlot( this.props.name, this );
 	}
 
@@ -51,10 +50,6 @@ class SlotComponent extends Component {
 			unregisterSlot( prevProps.name );
 			registerSlot( name, this );
 		}
-	}
-
-	bindNode( node ) {
-		this.node = node;
 	}
 
 	forceUpdate() {

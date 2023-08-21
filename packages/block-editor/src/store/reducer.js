@@ -2,7 +2,6 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { omit, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -113,7 +112,10 @@ function getFlattenedClientIds( blocks ) {
  * @return {Array} Flattened block attributes object.
  */
 function getFlattenedBlocksWithoutAttributes( blocks ) {
-	return flattenBlocks( blocks, ( block ) => omit( block, 'attributes' ) );
+	return flattenBlocks( blocks, ( block ) => {
+		const { attributes, ...restBlock } = block;
+		return restBlock;
+	} );
 }
 
 /**
@@ -782,8 +784,8 @@ export const blocks = pipe(
 				}
 
 				// Do nothing if only attributes change.
-				const changes = omit( action.updates, 'attributes' );
-				if ( isEmpty( changes ) ) {
+				const { attributes, ...changes } = action.updates;
+				if ( Object.values( changes ).length === 0 ) {
 					return state;
 				}
 
@@ -1414,9 +1416,19 @@ export function selection( state = {}, action ) {
 			}
 	}
 
+	const selectionStart = selectionHelper( state.selectionStart, action );
+	const selectionEnd = selectionHelper( state.selectionEnd, action );
+
+	if (
+		selectionStart === state.selectionStart &&
+		selectionEnd === state.selectionEnd
+	) {
+		return state;
+	}
+
 	return {
-		selectionStart: selectionHelper( state.selectionStart, action ),
-		selectionEnd: selectionHelper( state.selectionEnd, action ),
+		selectionStart,
+		selectionEnd,
 	};
 }
 
@@ -1452,6 +1464,56 @@ export function isSelectionEnabled( state = true, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SELECTION':
 			return action.isSelectionEnabled;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the data needed to display a prompt when certain blocks
+ * are removed, or `false` if no such prompt is requested.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object|false} Data for removal prompt display, if any.
+ */
+function removalPromptData( state = false, action ) {
+	switch ( action.type ) {
+		case 'DISPLAY_BLOCK_REMOVAL_PROMPT':
+			const { clientIds, selectPrevious, blockNamesForPrompt } = action;
+			return {
+				clientIds,
+				selectPrevious,
+				blockNamesForPrompt,
+			};
+		case 'CLEAR_BLOCK_REMOVAL_PROMPT':
+			return false;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning any rules that a block editor may provide in order to
+ * prevent a user from accidentally removing certain blocks. These rules are
+ * then used to display a confirmation prompt to the user. For instance, in the
+ * Site Editor, the Query Loop block is important enough to warrant such
+ * confirmation.
+ *
+ * The data is a record whose keys are block types (e.g. 'core/query') and
+ * whose values are the explanation to be shown to users (e.g. 'Query Loop
+ * displays a list of posts or pages.').
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Record<string,string>} Updated state.
+ */
+function blockRemovalRules( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_REMOVAL_RULES':
+			return action.rules;
 	}
 
 	return state;
@@ -1569,6 +1631,12 @@ export function template( state = { isValid: true }, action ) {
 export function settings( state = SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'UPDATE_SETTINGS':
+			if ( action.reset ) {
+				return {
+					...SETTINGS_DEFAULTS,
+					...action.settings,
+				};
+			}
 			return {
 				...state,
 				...action.settings,
@@ -1592,18 +1660,17 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
 				const { attributes, name: blockName } = block;
+				let id = blockName;
+				// If a block variation match is found change the name to be the same with the
+				// one that is used for block variations in the Inserter (`getItemFromVariation`).
 				const match = select( blocksStore ).getActiveBlockVariation(
 					blockName,
 					attributes
 				);
-				// If a block variation match is found change the name to be the same with the
-				// one that is used for block variations in the Inserter (`getItemFromVariation`).
-				let id = match?.name
-					? `${ blockName }/${ match.name }`
-					: blockName;
-				const insert = { name: id };
+				if ( match?.name ) {
+					id += '/' + match.name;
+				}
 				if ( blockName === 'core/block' ) {
-					insert.ref = attributes.ref;
 					id += '/' + attributes.ref;
 				}
 
@@ -1616,7 +1683,6 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 							count: prevState.insertUsage[ id ]
 								? prevState.insertUsage[ id ].count + 1
 								: 1,
-							insert,
 						},
 					},
 				};
@@ -1641,13 +1707,18 @@ export const blockListSettings = ( state = {}, action ) => {
 		// should correct the state.
 		case 'REPLACE_BLOCKS':
 		case 'REMOVE_BLOCKS': {
-			return omit( state, action.clientIds );
+			return Object.fromEntries(
+				Object.entries( state ).filter(
+					( [ id ] ) => ! action.clientIds.includes( id )
+				)
+			);
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
 			const { clientId } = action;
 			if ( ! action.settings ) {
 				if ( state.hasOwnProperty( clientId ) ) {
-					return omit( state, clientId );
+					const { [ clientId ]: removedBlock, ...restBlocks } = state;
+					return restBlocks;
 				}
 
 				return state;
@@ -1744,45 +1815,6 @@ export function lastBlockAttributesChange( state = null, action ) {
 }
 
 /**
- * Reducer returning automatic change state.
- *
- * @param {?string} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function automaticChangeStatus( state, action ) {
-	switch ( action.type ) {
-		case 'MARK_AUTOMATIC_CHANGE':
-			return 'pending';
-		case 'MARK_AUTOMATIC_CHANGE_FINAL':
-			if ( state === 'pending' ) {
-				return 'final';
-			}
-
-			return;
-		case 'SELECTION_CHANGE':
-			// As long as the state is not final, ignore any selection changes.
-			if ( state !== 'final' ) {
-				return state;
-			}
-
-			return;
-		// Undoing an automatic change should still be possible after mouse
-		// move or after visibility change.
-		case 'SET_BLOCK_VISIBILITY':
-		case 'START_TYPING':
-		case 'STOP_TYPING':
-		case 'UPDATE_BLOCK_LIST_SETTINGS':
-			return state;
-	}
-
-	// TODO: This is a source of bug, as each time there's a change in timing,
-	// or a new action is added, this could break.
-	// Reset the state by default (for any action not handled).
-}
-
-/**
  * Reducer returning current highlighted block.
  *
  * @param {boolean} state  Current highlighted block.
@@ -1822,14 +1854,18 @@ export function highlightedBlock( state, action ) {
 export function lastBlockInserted( state = {}, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
+		case 'REPLACE_BLOCKS':
 			if ( ! action.blocks.length ) {
 				return state;
 			}
 
-			const clientId = action.blocks[ 0 ].clientId;
+			const clientIds = action.blocks.map( ( block ) => {
+				return block.clientId;
+			} );
+
 			const source = action.meta?.source;
 
-			return { clientId, source };
+			return { clientIds, source };
 		case 'RESET_BLOCKS':
 			return {};
 	}
@@ -1851,7 +1887,33 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 	return state;
 }
 
-export default combineReducers( {
+/**
+ * Reducer returning a map of block client IDs to block editing modes.
+ *
+ * @param {Map}    state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Map} Updated state.
+ */
+export function blockEditingModes( state = new Map(), action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_EDITING_MODE':
+			return new Map( state ).set( action.clientId, action.mode );
+		case 'UNSET_BLOCK_EDITING_MODE': {
+			const newState = new Map( state );
+			newState.delete( action.clientId );
+			return newState;
+		}
+		case 'RESET_BLOCKS': {
+			return state.has( '' )
+				? new Map().set( '', state.get( '' ) )
+				: state;
+		}
+	}
+	return state;
+}
+
+const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
 	isBlockInterfaceHidden,
@@ -1869,9 +1931,66 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	editorMode,
 	hasBlockMovingClientId,
-	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
+	blockEditingModes,
+	removalPromptData,
+	blockRemovalRules,
 } );
+
+function withAutomaticChangeReset( reducer ) {
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+
+		if ( ! state ) {
+			return nextState;
+		}
+
+		// Take over the last value without creating a new reference.
+		nextState.automaticChangeStatus = state.automaticChangeStatus;
+
+		if ( action.type === 'MARK_AUTOMATIC_CHANGE' ) {
+			return {
+				...nextState,
+				automaticChangeStatus: 'pending',
+			};
+		}
+
+		if (
+			action.type === 'MARK_AUTOMATIC_CHANGE_FINAL' &&
+			state.automaticChangeStatus === 'pending'
+		) {
+			return {
+				...nextState,
+				automaticChangeStatus: 'final',
+			};
+		}
+
+		// If there's a change that doesn't affect blocks or selection, maintain
+		// the current status.
+		if (
+			nextState.blocks === state.blocks &&
+			nextState.selection === state.selection
+		) {
+			return nextState;
+		}
+
+		// As long as the state is not final, ignore any selection changes.
+		if (
+			nextState.automaticChangeStatus !== 'final' &&
+			nextState.selection !== state.selection
+		) {
+			return nextState;
+		}
+
+		// Reset the status if blocks change or selection changes (when status is final).
+		return {
+			...nextState,
+			automaticChangeStatus: undefined,
+		};
+	};
+}
+
+export default withAutomaticChangeReset( combinedReducers );

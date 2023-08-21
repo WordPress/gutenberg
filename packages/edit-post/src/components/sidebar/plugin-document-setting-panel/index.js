@@ -1,14 +1,9 @@
 /**
- * Defines as extensibility slot for the Settings sidebar
- */
-
-/**
  * WordPress dependencies
  */
 import { createSlotFill, PanelBody } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import { withPluginContext } from '@wordpress/plugins';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { usePluginContext } from '@wordpress/plugins';
+import { useDispatch, useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
 
 /**
@@ -17,49 +12,17 @@ import warning from '@wordpress/warning';
 import { EnablePluginDocumentSettingPanelOption } from '../../preferences-modal/options';
 import { store as editPostStore } from '../../../store';
 
-export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
-
-const PluginDocumentSettingFill = ( {
-	isEnabled,
-	panelName,
-	opened,
-	onToggle,
-	className,
-	title,
-	icon,
-	children,
-} ) => {
-	return (
-		<>
-			<EnablePluginDocumentSettingPanelOption
-				label={ title }
-				panelName={ panelName }
-			/>
-			<Fill>
-				{ isEnabled && (
-					<PanelBody
-						className={ className }
-						title={ title }
-						icon={ icon }
-						opened={ opened }
-						onToggle={ onToggle }
-					>
-						{ children }
-					</PanelBody>
-				) }
-			</Fill>
-		</>
-	);
-};
+const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
 /**
  * Renders items below the Status & Availability panel in the Document Sidebar.
  *
  * @param {Object}                props                                 Component properties.
- * @param {string}                [props.name]                          The machine-friendly name for the panel.
+ * @param {string}                props.name                            Required. A machine-friendly name for the panel.
  * @param {string}                [props.className]                     An optional class name added to the row.
  * @param {string}                [props.title]                         The title of the panel
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {WPElement}             props.children                        Children to be rendered
  *
  * @example
  * ```js
@@ -75,6 +38,7 @@ const PluginDocumentSettingFill = ( {
  * 		{
  * 			className: 'my-document-setting-plugin',
  * 			title: 'My Panel',
+ * 			name: 'my-panel',
  * 		},
  * 		__( 'My Document Setting Panel' )
  * 	);
@@ -92,7 +56,7 @@ const PluginDocumentSettingFill = ( {
  * import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
  *
  * const MyDocumentSettingTest = () => (
- * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
+ * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel" name="my-panel">
  *			<p>My Document Setting Panel</p>
  *		</PluginDocumentSettingPanel>
  *	);
@@ -102,30 +66,55 @@ const PluginDocumentSettingFill = ( {
  *
  * @return {WPComponent} The component to be rendered.
  */
-const PluginDocumentSettingPanel = compose(
-	withPluginContext( ( context, ownProps ) => {
-		if ( undefined === ownProps.name ) {
-			warning( 'PluginDocumentSettingPanel requires a name property.' );
-		}
-		return {
-			panelName: `${ context.name }/${ ownProps.name }`,
-		};
-	} ),
-	withSelect( ( select, { panelName } ) => {
-		return {
-			opened: select( editPostStore ).isEditorPanelOpened( panelName ),
-			isEnabled:
-				select( editPostStore ).isEditorPanelEnabled( panelName ),
-		};
-	} ),
-	withDispatch( ( dispatch, { panelName } ) => ( {
-		onToggle() {
-			return dispatch( editPostStore ).toggleEditorPanelOpened(
-				panelName
-			);
+const PluginDocumentSettingPanel = ( {
+	name,
+	className,
+	title,
+	icon,
+	children,
+} ) => {
+	const { name: pluginName } = usePluginContext();
+	const panelName = `${ pluginName }/${ name }`;
+	const { opened, isEnabled } = useSelect(
+		( select ) => {
+			const { isEditorPanelOpened, isEditorPanelEnabled } =
+				select( editPostStore );
+
+			return {
+				opened: isEditorPanelOpened( panelName ),
+				isEnabled: isEditorPanelEnabled( panelName ),
+			};
 		},
-	} ) )
-)( PluginDocumentSettingFill );
+		[ panelName ]
+	);
+	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+
+	if ( undefined === name ) {
+		warning( 'PluginDocumentSettingPanel requires a name property.' );
+	}
+
+	return (
+		<>
+			<EnablePluginDocumentSettingPanelOption
+				label={ title }
+				panelName={ panelName }
+			/>
+			<Fill>
+				{ isEnabled && (
+					<PanelBody
+						className={ className }
+						title={ title }
+						icon={ icon }
+						opened={ opened }
+						onToggle={ () => toggleEditorPanelOpened( panelName ) }
+					>
+						{ children }
+					</PanelBody>
+				) }
+			</Fill>
+		</>
+	);
+};
 
 PluginDocumentSettingPanel.Slot = Slot;
 

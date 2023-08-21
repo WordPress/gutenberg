@@ -8,10 +8,13 @@ import { render } from '@testing-library/react';
  */
 import { AutosaveMonitor } from '../';
 
+jest.useFakeTimers();
+jest.spyOn( global, 'clearTimeout' );
+jest.spyOn( global, 'setTimeout' );
+
 describe( 'AutosaveMonitor', () => {
 	let setAutosaveTimerSpy;
 	beforeEach( () => {
-		jest.useFakeTimers( 'legacy' );
 		setAutosaveTimerSpy = jest.spyOn(
 			AutosaveMonitor.prototype,
 			'setAutosaveTimer'
@@ -19,9 +22,6 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
-
 		setAutosaveTimerSpy.mockClear();
 	} );
 
@@ -174,7 +174,10 @@ describe( 'AutosaveMonitor', () => {
 
 		jest.runOnlyPendingTimers();
 
-		expect( setTimeout ).lastCalledWith( expect.any( Function ), 5000 );
+		expect( setTimeout ).toHaveBeenLastCalledWith(
+			expect.any( Function ),
+			5000
+		);
 	} );
 
 	it( 'should schedule itself in 1000 ms if the post is not autosaveable at a time', () => {
@@ -186,6 +189,9 @@ describe( 'AutosaveMonitor', () => {
 
 		jest.runOnlyPendingTimers();
 
-		expect( setTimeout ).lastCalledWith( expect.any( Function ), 1000 );
+		expect( setTimeout ).toHaveBeenLastCalledWith(
+			expect.any( Function ),
+			1000
+		);
 	} );
 } );

@@ -8,7 +8,7 @@
 /**
  * Registers the block pattern categories.
  */
-function gutenberg_register_core_block_patterns_and_categories() {
+function gutenberg_register_core_block_patterns_categories() {
 	register_block_pattern_category(
 		'banner',
 		array(
@@ -27,27 +27,6 @@ function gutenberg_register_core_block_patterns_and_categories() {
 		array(
 			'label'       => _x( 'Columns', 'Block pattern category', 'gutenberg' ),
 			'description' => __( 'Multi-column patterns with more complex layouts.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
-		'footer',
-		array(
-			'label'       => _x( 'Footers', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'A variety of footer designs displaying information and site navigation.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
-		'gallery',
-		array(
-			'label'       => _x( 'Gallery', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Patterns containing mostly images or other media.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
-		'header',
-		array(
-			'label'       => _x( 'Headers', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'A variety of header designs displaying your site title and navigation.', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
@@ -71,53 +50,95 @@ function gutenberg_register_core_block_patterns_and_categories() {
 			'description' => __( 'A set of high quality curated patterns.', 'gutenberg' ),
 		)
 	);
-}
-add_action( 'init', 'gutenberg_register_core_block_patterns_and_categories' );
 
-/**
- * Registers Gutenberg-bundled patterns, with a focus on headers and footers
- * for site editing.
- *
- * @since 6.2.0
- * @access private
- */
-function gutenberg_register_core_block_patterns() {
-	if ( ! get_theme_support( 'core-block-patterns' ) ) {
-		return;
-	}
-
-	$core_block_patterns = array(
-		'centered-footer',
-		'centered-footer-with-social-links',
-		'centered-header',
-		'centered-logo-in-navigation',
-		'footer-with-background-color-and-three-columns',
-		'footer-with-credit-line-and-navigation',
-		'footer-with-large-font-size',
-		'footer-with-navigation-and-credit-line',
-		'footer-with-search-site-title-and-credit-line',
-		'footer-with-site-title-and-credit-line',
-		'header-with-large-font-size',
-		'left-aligned-footer',
-		'right-aligned-footer',
-		'simple-header',
-		'simple-header-inside-image',
-		'simple-header-with-background-color',
-		'simple-header-with-image',
-		'simple-header-with-tagline',
-		'simple-header-with-tagline-2',
-		'site-title-and-menu-button',
-		'site-title-and-vertical-navigation',
+	// Register new core block pattern categories.
+	register_block_pattern_category(
+		'call-to-action',
+		array(
+			'label'       => _x( 'Call to Action', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Sections whose purpose is to trigger a specific action.', 'gutenberg' ),
+		)
 	);
-
-	foreach ( $core_block_patterns as $core_block_pattern ) {
-		register_block_pattern(
-			'core/' . $core_block_pattern,
-			require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
-		);
-	}
+	register_block_pattern_category(
+		'team',
+		array(
+			'label'       => _x( 'Team', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'A variety of designs to display your team members.', 'gutenberg' ),
+		)
+	);
+	register_block_pattern_category(
+		'testimonials',
+		array(
+			'label'       => _x( 'Testimonials', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Share reviews and feedback about your brand/business.', 'gutenberg' ),
+		)
+	);
+	register_block_pattern_category(
+		'services',
+		array(
+			'label'       => _x( 'Services', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Briefly describe what your business does and how you can help.', 'gutenberg' ),
+		)
+	);
+	register_block_pattern_category(
+		'contact',
+		array(
+			'label'       => _x( 'Contact', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Display your contact information.', 'gutenberg' ),
+		)
+	);
+	register_block_pattern_category(
+		'about',
+		array(
+			'label'       => _x( 'About', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Introduce yourself.', 'gutenberg' ),
+		)
+	);
+	register_block_pattern_category(
+		'portfolio',
+		array(
+			'label'       => _x( 'Portfolio', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Showcase your latest work.', 'gutenberg' ),
+		)
+	);
+	register_block_pattern_category(
+		'gallery',
+		array(
+			'label'       => _x( 'Gallery', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Different layouts for displaying images.', 'gutenberg' ),
+		)
+	);
+	register_block_pattern_category(
+		'media',
+		array(
+			'label'       => _x( 'Media', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Different layouts containing video or audio.', 'gutenberg' ),
+		)
+	);
+	register_block_pattern_category(
+		'posts',
+		array(
+			'label'       => _x( 'Posts', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Display your latest posts in lists, grids or other layouts.', 'gutenberg' ),
+		)
+	);
+	// Site building pattern categories.
+	register_block_pattern_category(
+		'footer',
+		array(
+			'label'       => _x( 'Footers', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'A variety of footer designs displaying information and site navigation.', 'gutenberg' ),
+		)
+	);
+	register_block_pattern_category(
+		'header',
+		array(
+			'label'       => _x( 'Headers', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'A variety of header designs displaying your site title and navigation.', 'gutenberg' ),
+		)
+	);
 }
-add_action( 'init', 'gutenberg_register_core_block_patterns' );
+add_action( 'init', 'gutenberg_register_core_block_patterns_categories' );
 
 /**
  * Register any patterns that the active theme may provide under its
@@ -159,6 +180,7 @@ function gutenberg_register_theme_block_patterns() {
 		'blockTypes'    => 'Block Types',
 		'postTypes'     => 'Post Types',
 		'inserter'      => 'Inserter',
+		'templateTypes' => 'Template Types',
 	);
 
 	/*
@@ -228,7 +250,7 @@ function gutenberg_register_theme_block_patterns() {
 					}
 
 					// For properties of type array, parse data as comma-separated.
-					foreach ( array( 'categories', 'keywords', 'blockTypes', 'postTypes' ) as $property ) {
+					foreach ( array( 'categories', 'keywords', 'blockTypes', 'postTypes', 'templateTypes' ) as $property ) {
 						if ( ! empty( $pattern_data[ $property ] ) ) {
 							$pattern_data[ $property ] = array_filter(
 								preg_split(
@@ -288,3 +310,24 @@ function gutenberg_register_theme_block_patterns() {
 }
 remove_action( 'init', '_register_theme_block_patterns' );
 add_action( 'init', 'gutenberg_register_theme_block_patterns' );
+
+/**
+ * Normalize the pattern from the API (snake_case) to the format expected by `register_block_pattern` (camelCase).
+ *
+ * @since 6.2.0
+ *
+ * @param array $pattern Pattern as returned from the Pattern Directory API.
+ */
+function gutenberg_normalize_remote_pattern( $pattern ) {
+	if ( isset( $pattern['block_types'] ) ) {
+		$pattern['blockTypes'] = $pattern['block_types'];
+		unset( $pattern['block_types'] );
+	}
+
+	if ( isset( $pattern['viewport_width'] ) ) {
+		$pattern['viewportWidth'] = $pattern['viewport_width'];
+		unset( $pattern['viewport_width'] );
+	}
+
+	return (array) $pattern;
+}

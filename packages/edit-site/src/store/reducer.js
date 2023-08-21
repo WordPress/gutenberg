@@ -51,35 +51,17 @@ export function settings( state = {}, action ) {
  */
 export function editedPost( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_TEMPLATE':
-		case 'SET_PAGE':
+		case 'SET_EDITED_POST':
 			return {
-				type: 'wp_template',
-				id: action.templateId,
-				page: action.page,
+				postType: action.postType,
+				id: action.id,
+				context: action.context,
 			};
-		case 'SET_TEMPLATE_PART':
+		case 'SET_EDITED_POST_CONTEXT':
 			return {
-				type: 'wp_template_part',
-				id: action.templatePartId,
+				...state,
+				context: action.context,
 			};
-	}
-
-	return state;
-}
-
-/**
- * Reducer for information about the site's homepage.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function homeTemplateId( state, action ) {
-	switch ( action.type ) {
-		case 'SET_HOME_TEMPLATE':
-			return action.homeTemplateId;
 	}
 
 	return state;
@@ -149,10 +131,47 @@ export function saveViewPanel( state = false, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
-function canvasMode( state = 'view', action ) {
+function canvasMode( state = 'init', action ) {
 	switch ( action.type ) {
 		case 'SET_CANVAS_MODE':
 			return action.mode;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer used to track the site editor canvas container view.
+ * Default is `undefined`, denoting the default, visual block editor.
+ * This could be, for example, `'style-book'` (the style book).
+ *
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
+ */
+function editorCanvasContainerView( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'SET_EDITOR_CANVAS_CONTAINER_VIEW':
+			return action.view;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer used to track whether the editor allows only page content to be
+ * edited.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function hasPageContentFocus( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_EDITED_POST':
+			return !! action.context?.postId;
+		case 'SET_HAS_PAGE_CONTENT_FOCUS':
+			return action.hasPageContentFocus;
 	}
 
 	return state;
@@ -162,9 +181,10 @@ export default combineReducers( {
 	deviceType,
 	settings,
 	editedPost,
-	homeTemplateId,
 	blockInserterPanel,
 	listViewPanel,
 	saveViewPanel,
 	canvasMode,
+	editorCanvasContainerView,
+	hasPageContentFocus,
 } );

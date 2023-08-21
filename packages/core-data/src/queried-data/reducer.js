@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map, omit, mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -74,6 +69,29 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 }
 
 /**
+ * Helper function to filter out entities with certain IDs.
+ * Entities are keyed by their ID.
+ *
+ * @param {Object} entities Entity objects, keyed by entity ID.
+ * @param {Array}  ids      Entity IDs to filter out.
+ *
+ * @return {Object} Filtered entities.
+ */
+function removeEntitiesById( entities, ids ) {
+	return Object.fromEntries(
+		Object.entries( entities ).filter(
+			( [ id ] ) =>
+				! ids.some( ( itemId ) => {
+					if ( Number.isInteger( itemId ) ) {
+						return itemId === +id;
+					}
+					return itemId === id;
+				} )
+		)
+	);
+}
+
+/**
  * Reducer tracking items state, keyed by ID. Items are assumed to be normal,
  * where identifiers are common across all queries.
  *
@@ -103,8 +121,11 @@ export function items( state = {}, action ) {
 			};
 		}
 		case 'REMOVE_ITEMS':
-			return mapValues( state, ( contextState ) =>
-				omit( contextState, action.itemIds )
+			return Object.fromEntries(
+				Object.entries( state ).map( ( [ itemId, contextState ] ) => [
+					itemId,
+					removeEntitiesById( contextState, action.itemIds ),
+				] )
 			);
 	}
 	return state;
@@ -156,8 +177,11 @@ export function itemIsComplete( state = {}, action ) {
 			};
 		}
 		case 'REMOVE_ITEMS':
-			return mapValues( state, ( contextState ) =>
-				omit( contextState, action.itemIds )
+			return Object.fromEntries(
+				Object.entries( state ).map( ( [ itemId, contextState ] ) => [
+					itemId,
+					removeEntitiesById( contextState, action.itemIds ),
+				] )
 			);
 	}
 
@@ -207,7 +231,7 @@ const receiveQueries = compose( [
 
 	return getMergedItemIds(
 		state || [],
-		map( action.items, key ),
+		action.items.map( ( item ) => item[ key ] ),
 		page,
 		perPage
 	);
@@ -231,13 +255,23 @@ const queries = ( state = {}, action ) => {
 				return result;
 			}, {} );
 
-			return mapValues( state, ( contextQueries ) => {
-				return mapValues( contextQueries, ( queryItems ) => {
-					return queryItems.filter( ( queryId ) => {
-						return ! removedItems[ queryId ];
-					} );
-				} );
-			} );
+			return Object.fromEntries(
+				Object.entries( state ).map(
+					( [ queryGroup, contextQueries ] ) => [
+						queryGroup,
+						Object.fromEntries(
+							Object.entries( contextQueries ).map(
+								( [ query, queryItems ] ) => [
+									query,
+									queryItems.filter(
+										( queryId ) => ! removedItems[ queryId ]
+									),
+								]
+							)
+						),
+					]
+				)
+			);
 		default:
 			return state;
 	}

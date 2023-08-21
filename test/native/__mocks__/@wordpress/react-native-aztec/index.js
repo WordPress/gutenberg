@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TextInput } from 'react-native';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,9 +14,8 @@ const AztecInputState = jest.requireActual( '@wordpress/react-native-aztec' )
 const AztecKeyCodes = jest.requireActual( '@wordpress/react-native-aztec' )
 	.default.KeyCodes;
 
-const UNSUPPORTED_PROPS = [ 'style' ];
-
 const RCTAztecView = ( { accessibilityLabel, text, ...rest }, ref ) => {
+	const { style, ...supportedProps } = rest;
 	const inputRef = useRef();
 
 	useImperativeHandle( ref, () => ( {
@@ -40,7 +38,7 @@ const RCTAztecView = ( { accessibilityLabel, text, ...rest }, ref ) => {
 
 	return (
 		<TextInput
-			{ ...omit( rest, UNSUPPORTED_PROPS ) }
+			{ ...supportedProps }
 			accessibilityLabel={
 				accessibilityLabel || `Text input. ${ text.text || 'Empty' }`
 			}

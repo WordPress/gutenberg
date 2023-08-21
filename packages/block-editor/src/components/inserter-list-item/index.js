@@ -49,7 +49,9 @@ function InserterListItem( {
 		];
 	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
 
-	const isSynced = isReusableBlock( item ) || isTemplatePart( item );
+	const isSynced =
+		( isReusableBlock( item ) && item.syncStatus !== 'unsynced' ) ||
+		isTemplatePart( item );
 
 	return (
 		<InserterDraggableBlocks
@@ -107,12 +109,6 @@ function InserterListItem( {
 								onHover( null );
 							}
 						} }
-						onFocus={ () => {
-							if ( isDragging.current ) {
-								return;
-							}
-							onHover( item );
-						} }
 						onMouseEnter={ () => {
 							if ( isDragging.current ) {
 								return;
@@ -120,7 +116,6 @@ function InserterListItem( {
 							onHover( item );
 						} }
 						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
 						{ ...props }
 					>
 						<span

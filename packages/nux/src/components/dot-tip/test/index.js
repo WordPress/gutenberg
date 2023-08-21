@@ -12,6 +12,14 @@ import { DotTip } from '..';
 const noop = () => {};
 
 describe( 'DotTip', () => {
+	beforeEach( () => {
+		jest.useFakeTimers();
+	} );
+
+	afterEach( () => {
+		jest.useRealTimers();
+	} );
+
 	it( 'should not render anything if invisible', async () => {
 		render(
 			<DotTip>

@@ -35,6 +35,7 @@ function restoreOnAttributes( attributes, isEditableTree ) {
  *
  * @param {Object}  $1                        Named parameters.
  * @param {string}  $1.type                   The format type.
+ * @param {string}  $1.tagName                The tag name.
  * @param {Object}  $1.attributes             The format attributes.
  * @param {Object}  $1.unregisteredAttributes The unregistered format
  *                                            attributes.
@@ -48,6 +49,7 @@ function restoreOnAttributes( attributes, isEditableTree ) {
  */
 function fromFormat( {
 	type,
+	tagName,
 	attributes,
 	unregisteredAttributes,
 	object,
@@ -58,7 +60,7 @@ function fromFormat( {
 
 	let elementAttributes = {};
 
-	if ( boundaryClass ) {
+	if ( boundaryClass && isEditableTree ) {
 		elementAttributes[ 'data-rich-text-format-boundary' ] = 'true';
 	}
 
@@ -99,8 +101,14 @@ function fromFormat( {
 		}
 	}
 
+	// When a format is declared as non editable, make it non editable in the
+	// editor.
+	if ( isEditableTree && formatType.contentEditable === false ) {
+		elementAttributes.contenteditable = 'false';
+	}
+
 	return {
-		type: formatType.tagName,
+		type: tagName || formatType.tagName,
 		object: formatType.object,
 		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
 	};
@@ -241,7 +249,8 @@ export function toTree( {
 					return;
 				}
 
-				const { type, attributes, unregisteredAttributes } = format;
+				const { type, tagName, attributes, unregisteredAttributes } =
+					format;
 
 				const boundaryClass =
 					isEditableTree &&
@@ -253,6 +262,7 @@ export function toTree( {
 					parent,
 					fromFormat( {
 						type,
+						tagName,
 						attributes,
 						unregisteredAttributes,
 						boundaryClass,
@@ -287,7 +297,12 @@ export function toTree( {
 		}
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( ! isEditableTree && replacements[ i ]?.type === 'script' ) {
+			const replacement = replacements[ i ];
+			if ( ! replacement ) continue;
+			const { type, attributes, innerHTML } = replacement;
+			const formatType = getFormatType( type );
+
+			if ( ! isEditableTree && type === 'script' ) {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {
@@ -297,14 +312,30 @@ export function toTree( {
 				);
 				append( pointer, {
 					html: decodeURIComponent(
-						replacements[ i ].attributes[ 'data-rich-text-script' ]
+						attributes[ 'data-rich-text-script' ]
 					),
 				} );
+			} else if ( formatType?.contentEditable === false ) {
+				// For non editable formats, render the stored inner HTML.
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						...replacement,
+						isEditableTree,
+						boundaryClass: start === i && end === i + 1,
+					} )
+				);
+
+				if ( innerHTML ) {
+					append( pointer, {
+						html: innerHTML,
+					} );
+				}
 			} else {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {
-						...replacements[ i ],
+						...replacement,
 						object: true,
 						isEditableTree,
 					} )
@@ -347,9 +378,7 @@ export function toTree( {
 					attributes: {
 						'data-rich-text-placeholder': placeholder,
 						// Necessary to prevent the placeholder from catching
-						// selection. The placeholder is also not editable after
-						// all.
-						contenteditable: 'false',
+						// selection and being editable.
 						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
 					},
 				} );

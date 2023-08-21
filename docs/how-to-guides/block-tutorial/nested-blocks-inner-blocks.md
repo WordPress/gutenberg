@@ -157,7 +157,7 @@ add_action( 'init', function() {
 
 ## Child InnerBlocks: Parent and Ancestors
 
-A common pattern for using InnerBlocks is to create a custom block that will be included only in the InnerBlocks. 
+A common pattern for using InnerBlocks is to create a custom block that will be included only in the InnerBlocks.
 
 An example of this is the Columns block, that creates a single parent block called `columns` and then creates an child block called `column`. The parent block is defined to only allow the child blocks. See [Column code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/column).
 
@@ -181,4 +181,218 @@ Another example is using the `ancestors` block setting to define a block that mu
 	"ancestor": [ "core/comment-template" ],
 	// ...
 }
+```
+
+## Using a react hook
+
+You can use a react hook called `useInnerBlocksProps` instead of the `InnerBlocks` component. This hook allows you to take more control over the markup of inner blocks areas.
+
+The `useInnerBlocksProps` is exported from the `@wordpress/block-editor` package same as the `InnerBlocks` component itself and supports everything the component does. It also works like the `useBlockProps` hook.
+
+Here is the basic `useInnerBlocksProps` hook usage.
+
+{% codetabs %}
+{% JSX %}
+
+```js
+import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+
+registerBlockType( 'gutenberg-examples/example-06', {
+	// ...
+
+	edit: () => {
+		const blockProps = useBlockProps();
+		const innerBlocksProps = useInnerBlocksProps();
+
+		return (
+			<div { ...blockProps }>
+				<div {...innerBlocksProps} />
+			</div>
+		);
+	},
+
+	save: () => {
+		const blockProps = useBlockProps.save();
+		const innerBlocksProps = useInnerBlocksProps.save();
+
+		return (
+			<div { ...blockProps }>
+				<div {...innerBlocksProps} />
+			</div>
+		);
+	},
+} );
+```
+
+{% Plain %}
+
+```js
+( function ( blocks, element, blockEditor ) {
+	var el = element.createElement;
+	var InnerBlocks = blockEditor.InnerBlocks;
+	var useBlockProps = blockEditor.useBlockProps;
+	var useInnerBlocksProps = blockEditor.useInnerBlocksProps;
+
+	blocks.registerBlockType( 'gutenberg-examples/example-06', {
+		title: 'Example: Inner Blocks',
+		category: 'design',
+
+		edit: function () {
+			var blockProps = useBlockProps();
+			var innerBlocksProps = useInnerBlocksProps();
+
+			return el( 'div', blockProps, el( 'div', innerBlocksProps ) );
+		},
+
+		save: function () {
+			var blockProps = useBlockProps.save();
+			var innerBlocksProps = useInnerBlocksProps.save();
+
+			return el( 'div', blockProps, el( 'div', innerBlocksProps ) );
+		},
+	} );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+```
+
+{% end %}
+
+This hook can also pass objects returned from the `useBlockProps` hook to the `useInnerBlocksProps` hook. This reduces the number of elements we need to create.
+
+{% codetabs %}
+{% JSX %}
+
+```js
+import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+
+registerBlockType( 'gutenberg-examples/example-06', {
+	// ...
+
+	edit: () => {
+		const blockProps = useBlockProps();
+		const innerBlocksProps = useInnerBlocksProps( blockProps );
+
+		return (
+			<div {...innerBlocksProps} />
+		);
+	},
+
+	save: () => {
+		const blockProps = useBlockProps.save();
+		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+
+		return (
+			<div {...innerBlocksProps} />
+		);
+	},
+} );
+```
+
+{% Plain %}
+
+```js
+( function ( blocks, element, blockEditor ) {
+	var el = element.createElement;
+	var InnerBlocks = blockEditor.InnerBlocks;
+	var useBlockProps = blockEditor.useBlockProps;
+	var useInnerBlocksProps = blockEditor.useInnerBlocksProps;
+
+	blocks.registerBlockType( 'gutenberg-examples/example-06', {
+		// ...
+
+		edit: function () {
+			var blockProps = useBlockProps();
+			var innerBlocksProps = useInnerBlocksProps();
+
+			return el( 'div', innerBlocksProps );
+		},
+
+		save: function () {
+			var blockProps = useBlockProps.save();
+			var innerBlocksProps = useInnerBlocksProps.save();
+
+			return el( 'div', innerBlocksProps );
+		},
+	} );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+```
+
+{% end %}
+
+The above code will render to the following markup in the editor:
+
+```html
+<div>
+	<!-- Inner Blocks get inserted here -->
+</div>
+```
+
+Another benefit to using the hook approach is using the returned value, which is just an object, and deconstruct to get the react children from the object. This property contains the actual child inner blocks thus we can place elements on the same level as our inner blocks.
+
+{% codetabs %}
+{% JSX %}
+
+```js
+import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+
+registerBlockType( 'gutenberg-examples/example-06', {
+	// ...
+
+	edit: () => {
+		const blockProps = useBlockProps();
+		const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps );
+
+		return (
+			<div {...innerBlocksProps}>
+    			{ children }
+				<!-- Insert any arbitrary html here at the same level as the children -->
+			</div>
+		);
+	},
+
+	// ...
+} );
+```
+
+{% Plain %}
+
+```js
+( function ( blocks, element, blockEditor ) {
+	var el = element.createElement;
+	var InnerBlocks = blockEditor.InnerBlocks;
+	var useBlockProps = blockEditor.useBlockProps;
+	var useInnerBlocksProps = blockEditor.useInnerBlocksProps;
+
+    blocks.registerBlockType( 'gutenberg-examples/example-06', {
+		// ...
+
+		edit: function () {
+			var blockProps = useBlockProps();
+			var { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps );
+
+			return el(
+                'div',
+                innerBlocksProps,
+                children,
+                el(
+            	    'div',
+                    {},
+    	            '<!-- Insert any arbitrary html here at the same level as the children -->',
+	            )
+            );
+		},
+		// ...
+	} );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+```
+
+{% end %}
+
+```html
+<div>
+	<!-- Inner Blocks get inserted here -->
+	<!-- The custom html gets rendered on the same level -->
+</div>
 ```

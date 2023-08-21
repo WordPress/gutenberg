@@ -33,9 +33,9 @@ import { HStack } from '../../h-stack';
 import { Spacer } from '../../spacer';
 import type { InputChangeCallback } from '../../input-control/types';
 import type { InputState } from '../../input-control/reducer/state';
+import type { InputAction } from '../../input-control/reducer/actions';
 import {
 	COMMIT,
-	InputAction,
 	PRESS_DOWN,
 	PRESS_UP,
 } from '../../input-control/reducer/actions';
@@ -51,7 +51,7 @@ function from12hTo24h( hours: number, isPm: boolean ) {
  * given width. For example, the hours and minutes inputs are padded to 2 so
  * that '4' appears as '04'.
  *
- * @param  pad How many digits the value should be.
+ * @param pad How many digits the value should be.
  */
 function buildPadInputStateReducer( pad: number ) {
 	return ( state: InputState, action: InputAction ) => {

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +15,6 @@ import {
 	ToolbarButton,
 	Tooltip,
 	ToolbarGroup,
-	KeyboardShortcuts,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
@@ -30,24 +28,22 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import {
 	placeCaretAtHorizontalEdge,
 	__unstableStripHTML as stripHTML,
 } from '@wordpress/dom';
+import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
-import {
-	store as coreStore,
-	useResourcePermissions,
-} from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { name } from './block.json';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
+import { getColors } from '../navigation/edit/utils';
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -99,61 +95,6 @@ const useIsDraggingWithin = ( elementRef ) => {
 
 	return isDraggingWithin;
 };
-
-/**
- * Determine the colors for a menu.
- *
- * Order of priority is:
- * 1: Overlay custom colors (if submenu)
- * 2: Overlay theme colors (if submenu)
- * 3: Custom colors
- * 4: Theme colors
- * 5: Global styles
- *
- * @param {Object}  context
- * @param {boolean} isSubMenu
- */
-function getColors( context, isSubMenu ) {
-	const {
-		textColor,
-		customTextColor,
-		backgroundColor,
-		customBackgroundColor,
-		overlayTextColor,
-		customOverlayTextColor,
-		overlayBackgroundColor,
-		customOverlayBackgroundColor,
-		style,
-	} = context;
-
-	const colors = {};
-
-	if ( isSubMenu && !! customOverlayTextColor ) {
-		colors.customTextColor = customOverlayTextColor;
-	} else if ( isSubMenu && !! overlayTextColor ) {
-		colors.textColor = overlayTextColor;
-	} else if ( !! customTextColor ) {
-		colors.customTextColor = customTextColor;
-	} else if ( !! textColor ) {
-		colors.textColor = textColor;
-	} else if ( !! style?.color?.text ) {
-		colors.customTextColor = style.color.text;
-	}
-
-	if ( isSubMenu && !! customOverlayBackgroundColor ) {
-		colors.customBackgroundColor = customOverlayBackgroundColor;
-	} else if ( isSubMenu && !! overlayBackgroundColor ) {
-		colors.backgroundColor = overlayBackgroundColor;
-	} else if ( !! customBackgroundColor ) {
-		colors.customBackgroundColor = customBackgroundColor;
-	} else if ( !! backgroundColor ) {
-		colors.backgroundColor = backgroundColor;
-	} else if ( !! style?.color?.background ) {
-		colors.customTextColor = style.color.background;
-	}
-
-	return colors;
-}
 
 const useIsInvalidLink = ( kind, type, id ) => {
 	const isPostType =
@@ -239,8 +180,9 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
 
-	const pagesPermissions = useResourcePermissions( 'pages' );
-	const postsPermissions = useResourcePermissions( 'posts' );
+	// Change the label using inspector causes rich text to change focus on firefox.
+	// This is a workaround to keep the focus on the label field when label filed is focused we don't render the rich text.
+	const [ isLabelFieldFocused, setIsLabelFieldFocused ] = useState( false );
 
 	const {
 		innerBlocks,
@@ -263,7 +205,7 @@ export default function NavigationLinkEdit( {
 				innerBlocks: getBlocks( clientId ),
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, [
-						name,
+						'core/navigation-link',
 						'core/navigation-submenu',
 					] ).length >= maxNestingLevel,
 				isTopLevelLink:
@@ -278,15 +220,6 @@ export default function NavigationLinkEdit( {
 		},
 		[ clientId ]
 	);
-
-	useEffect( () => {
-		// This side-effect should not create an undo level as those should
-		// only be created via user interactions. Mark this change as
-		// not persistent to avoid undo level creation.
-		// See https://github.com/WordPress/gutenberg/issues/34564.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isTopLevelLink } );
-	}, [ isTopLevelLink ] );
 
 	/**
 	 * Transform to submenu block.
@@ -315,6 +248,9 @@ export default function NavigationLinkEdit( {
 	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
 		if ( hasChildren ) {
+			// This side-effect should not create an undo level as those should
+			// only be created via user interactions.
+			__unstableMarkNextChangeAsNotPersistent();
 			transformToSubmenu();
 		}
 	}, [ hasChildren ] );
@@ -366,23 +302,21 @@ export default function NavigationLinkEdit( {
 	 */
 	function removeLink() {
 		// Reset all attributes that comprise the link.
+		// It is critical that all attributes are reset
+		// to their default values otherwise this may
+		// in advertently trigger side effects because
+		// the values will have "changed".
 		setAttributes( {
-			url: '',
-			label: '',
-			id: '',
-			kind: '',
-			type: '',
+			url: undefined,
+			label: undefined,
+			id: undefined,
+			kind: undefined,
+			type: undefined,
+			opensInNewTab: false,
 		} );
 
 		// Close the link editing UI.
 		setIsLinkOpen( false );
-	}
-
-	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
-		userCanCreate = pagesPermissions.canCreate;
-	} else if ( type === 'post' ) {
-		userCanCreate = postsPermissions.canCreate;
 	}
 
 	const {
@@ -395,7 +329,7 @@ export default function NavigationLinkEdit( {
 	function onKeyDown( event ) {
 		if (
 			isKeyboardEvent.primary( event, 'k' ) ||
-			( ! url && event.keyCode === ENTER )
+			( ( ! url || isDraft || isInvalid ) && event.keyCode === ENTER )
 		) {
 			setIsLinkOpen( true );
 		}
@@ -424,16 +358,24 @@ export default function NavigationLinkEdit( {
 	const ALLOWED_BLOCKS = [
 		'core/navigation-link',
 		'core/navigation-submenu',
+		'core/page-list',
 	];
 	const DEFAULT_BLOCK = {
 		name: 'core/navigation-link',
 	};
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: true,
-		renderAppender: false,
-	} );
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			...blockProps,
+			className: 'remove-outline', // Remove the outline from the inner blocks container.
+		},
+		{
+			allowedBlocks: ALLOWED_BLOCKS,
+			defaultBlock: DEFAULT_BLOCK,
+			directInsert: true,
+			renderAppender: false,
+		}
+	);
 
 	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => setIsLinkOpen( true );
@@ -454,7 +396,7 @@ export default function NavigationLinkEdit( {
 			: __( 'This item is missing a link' );
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
@@ -476,24 +418,33 @@ export default function NavigationLinkEdit( {
 			</BlockControls>
 			{ /* Warning, this duplicated in packages/block-library/src/navigation-submenu/edit.js */ }
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ label ? stripHTML( label ) : '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
 						} }
 						label={ __( 'Label' ) }
 						autoComplete="off"
+						onFocus={ () => setIsLabelFieldFocused( true ) }
+						onBlur={ () => setIsLabelFieldFocused( false ) }
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
-							setAttributes( { url: urlValue } );
+							updateAttributes(
+								{ url: urlValue },
+								setAttributes,
+								attributes
+							);
 						} }
 						label={ __( 'URL' ) }
 						autoComplete="off"
 					/>
 					<TextareaControl
+						__nextHasNoMarginBottom
 						value={ description || '' }
 						onChange={ ( descriptionValue ) => {
 							setAttributes( { description: descriptionValue } );
@@ -504,20 +455,28 @@ export default function NavigationLinkEdit( {
 						) }
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
 						} }
-						label={ __( 'Link title' ) }
+						label={ __( 'Title attribute' ) }
 						autoComplete="off"
+						help={ __(
+							'Additional information to help clarify the purpose of the link.'
+						) }
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
 						} }
-						label={ __( 'Link rel' ) }
+						label={ __( 'Rel attribute' ) }
 						autoComplete="off"
+						help={ __(
+							'The relationship of the linked URL as space-separated link types.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -538,60 +497,57 @@ export default function NavigationLinkEdit( {
 						</div>
 					) : (
 						<>
-							{ ! isInvalid && ! isDraft && (
-								<>
-									<RichText
-										ref={ ref }
-										identifier="label"
-										className="wp-block-navigation-item__label"
-										value={ label }
-										onChange={ ( labelValue ) =>
-											setAttributes( {
-												label: labelValue,
-											} )
-										}
-										onMerge={ mergeBlocks }
-										onReplace={ onReplace }
-										__unstableOnSplitAtEnd={ () =>
-											insertBlocksAfter(
-												createBlock(
-													'core/navigation-link'
-												)
-											)
-										}
-										aria-label={ __(
-											'Navigation link text'
-										) }
-										placeholder={ itemLabelPlaceholder }
-										withoutInteractiveFormatting
-										allowedFormats={ [
-											'core/bold',
-											'core/italic',
-											'core/image',
-											'core/strikethrough',
-										] }
-										onClick={ () => {
-											if ( ! url ) {
-												setIsLinkOpen( true );
+							{ ! isInvalid &&
+								! isDraft &&
+								! isLabelFieldFocused && (
+									<>
+										<RichText
+											ref={ ref }
+											identifier="label"
+											className="wp-block-navigation-item__label"
+											value={ label }
+											onChange={ ( labelValue ) =>
+												setAttributes( {
+													label: labelValue,
+												} )
 											}
-										} }
-									/>
-									{ description && (
-										<span className="wp-block-navigation-item__description">
-											{ description }
-										</span>
-									) }
-								</>
-							) }
-							{ ( isInvalid || isDraft ) && (
+											onMerge={ mergeBlocks }
+											onReplace={ onReplace }
+											__unstableOnSplitAtEnd={ () =>
+												insertBlocksAfter(
+													createBlock(
+														'core/navigation-link'
+													)
+												)
+											}
+											aria-label={ __(
+												'Navigation link text'
+											) }
+											placeholder={ itemLabelPlaceholder }
+											withoutInteractiveFormatting
+											allowedFormats={ [
+												'core/bold',
+												'core/italic',
+												'core/image',
+												'core/strikethrough',
+											] }
+											onClick={ () => {
+												if ( ! url ) {
+													setIsLinkOpen( true );
+												}
+											} }
+										/>
+										{ description && (
+											<span className="wp-block-navigation-item__description">
+												{ description }
+											</span>
+										) }
+									</>
+								) }
+							{ ( isInvalid ||
+								isDraft ||
+								isLabelFieldFocused ) && (
 								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
-									<KeyboardShortcuts
-										shortcuts={ {
-											enter: () =>
-												isSelected &&
-												setIsLinkOpen( true ),
-										} }
-									/>
 									<Tooltip
 										position="top center"
 										text={ tooltipText }
@@ -608,9 +564,13 @@ export default function NavigationLinkEdit( {
 													// Unescape is used here to "recover" the escaped characters
 													// so they display without encoding.
 													// See `updateAttributes` for more details.
-													`${ unescape(
+													`${ decodeEntities(
 														label
-													) } ${ placeholderText }`.trim()
+													) } ${
+														isInvalid || isDraft
+															? placeholderText
+															: ''
+													}`.trim()
 												}
 											</span>
 											<span className="wp-block-navigation-link__missing_text-tooltip">
@@ -624,12 +584,10 @@ export default function NavigationLinkEdit( {
 					) }
 					{ isLinkOpen && (
 						<LinkUI
-							className="wp-block-navigation-link__inline-link-input"
 							clientId={ clientId }
 							link={ attributes }
 							onClose={ () => setIsLinkOpen( false ) }
 							anchor={ popoverAnchor }
-							hasCreateSuggestion={ userCanCreate }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {
 								updateAttributes(
@@ -643,6 +601,6 @@ export default function NavigationLinkEdit( {
 				</a>
 				<div { ...innerBlocksProps } />
 			</div>
-		</Fragment>
+		</>
 	);
 }

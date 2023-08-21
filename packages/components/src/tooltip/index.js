@@ -1,6 +1,11 @@
 // @ts-nocheck
 
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -66,6 +71,8 @@ const addPopoverToGrandchildren = ( {
 	position,
 	shortcut,
 	text,
+	className,
+	...props
 } ) =>
 	concatChildren(
 		grandchildren,
@@ -73,12 +80,13 @@ const addPopoverToGrandchildren = ( {
 			<Popover
 				focusOnMount={ false }
 				position={ position }
-				className="components-tooltip"
+				className={ classNames( 'components-tooltip', className ) }
 				aria-hidden="true"
 				animate={ false }
 				offset={ offset }
 				anchor={ anchor }
 				shift
+				{ ...props }
 			>
 				{ text }
 				<Shortcut
@@ -113,6 +121,7 @@ function Tooltip( props ) {
 		text,
 		shortcut,
 		delay = TOOLTIP_DELAY,
+		...popoverProps
 	} = props;
 	/**
 	 * Whether a mouse is currently pressed, used in determining whether
@@ -270,6 +279,7 @@ function Tooltip( props ) {
 	const childrenWithPopover = addPopoverToGrandchildren( {
 		grandchildren,
 		...popoverData,
+		...popoverProps,
 	} );
 
 	return getElementWithPopover( {

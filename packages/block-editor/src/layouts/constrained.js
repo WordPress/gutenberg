@@ -25,6 +25,7 @@ import useSetting from '../components/use-setting';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 export default {
 	name: 'constrained',
@@ -32,8 +33,10 @@ export default {
 	inspectorControls: function DefaultLayoutInspectorControls( {
 		layout,
 		onChange,
+		layoutBlockSupport = {},
 	} ) {
 		const { wideSize, contentSize, justifyContent = 'center' } = layout;
+		const { allowJustification = true } = layoutBlockSupport;
 		const onJustificationChange = ( value ) => {
 			onChange( {
 				...layout,
@@ -71,6 +74,7 @@ export default {
 				<div className="block-editor-hooks__layout-controls">
 					<div className="block-editor-hooks__layout-controls-unit">
 						<UnitControl
+							className="block-editor-hooks__layout-controls-unit-input"
 							label={ __( 'Content' ) }
 							labelPosition="top"
 							__unstableInputWidth="80px"
@@ -91,6 +95,7 @@ export default {
 					</div>
 					<div className="block-editor-hooks__layout-controls-unit">
 						<UnitControl
+							className="block-editor-hooks__layout-controls-unit-input"
 							label={ __( 'Wide' ) }
 							labelPosition="top"
 							__unstableInputWidth="80px"
@@ -115,22 +120,27 @@ export default {
 						'Customize the width for all elements that are assigned to the center or wide columns.'
 					) }
 				</p>
-				<ToggleGroupControl
-					label={ __( 'Justification' ) }
-					value={ justifyContent }
-					onChange={ onJustificationChange }
-				>
-					{ justificationOptions.map( ( { value, icon, label } ) => {
-						return (
-							<ToggleGroupControlOptionIcon
-								key={ value }
-								value={ value }
-								icon={ icon }
-								label={ label }
-							/>
-						);
-					} ) }
-				</ToggleGroupControl>
+				{ allowJustification && (
+					<ToggleGroupControl
+						__nextHasNoMarginBottom
+						label={ __( 'Justification' ) }
+						value={ justifyContent }
+						onChange={ onJustificationChange }
+					>
+						{ justificationOptions.map(
+							( { value, icon, label } ) => {
+								return (
+									<ToggleGroupControlOptionIcon
+										key={ value }
+										value={ value }
+										icon={ icon }
+										label={ label }
+									/>
+								);
+							}
+						) }
+					</ToggleGroupControl>
+				) }
 			</>
 		);
 	},
@@ -143,7 +153,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const { contentSize, wideSize, justifyContent } = layout;
 		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );

@@ -2,18 +2,22 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import { ItemSubmenuIcon } from '../navigation-link/icons';
+import {
+	getColors,
+	getNavigationChildBlockProps,
+} from '../navigation/edit/utils';
 
 function useFrontPageId() {
 	return useSelect( ( select ) => {
@@ -31,9 +35,20 @@ function useFrontPageId() {
 }
 
 export default function PageListItemEdit( { context, attributes } ) {
-	const { id, label, link, hasChildren } = attributes;
+	const { id, label, link, hasChildren, title } = attributes;
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
+
+	const innerBlocksColors = getColors( context, true );
+
+	const navigationChildBlockProps =
+		getNavigationChildBlockProps( innerBlocksColors );
+	const blockProps = useBlockProps( navigationChildBlockProps, {
+		className: 'wp-block-pages-list__item',
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
+
 	return (
 		<li
 			key={ id }
@@ -52,7 +67,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 						className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
 						aria-expanded="false"
 					>
-						{ label }
+						{ decodeEntities( label ) }
 					</button>
 					<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
 						<ItemSubmenuIcon />
@@ -65,7 +80,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 					} ) }
 					href={ link }
 				>
-					{ label }
+					{ decodeEntities( title ) }
 				</a>
 			) }
 			{ hasChildren && (
@@ -79,14 +94,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 								<ItemSubmenuIcon />
 							</button>
 						) }
-					<ul
-						className={ classnames( 'submenu-container', {
-							'wp-block-navigation__submenu-container':
-								isNavigationChild,
-						} ) }
-					>
-						<InnerBlocks />
-					</ul>
+					<ul { ...innerBlocksProps }></ul>
 				</>
 			) }
 		</li>

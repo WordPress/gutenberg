@@ -7,11 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	getBlockSupport,
-	getBlockType,
 	store as blocksStore,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
@@ -23,13 +22,16 @@ import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
 import useInnerBlockTemplateSync from './use-inner-block-template-sync';
-import getBlockContext from './get-block-context';
+import useBlockContext from './use-block-context';
 import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
+import useSetting from '../use-setting';
+
+const EMPTY_OBJECT = {};
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -43,6 +45,9 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
+		defaultBlock,
+		directInsert,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		template,
@@ -54,18 +59,21 @@ function UncontrolledInnerBlocks( props ) {
 		renderAppender,
 		orientation,
 		placeholder,
-		__experimentalLayout,
+		layout,
 	} = props;
 
 	useNestedSettingsUpdate(
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
+		defaultBlock,
+		directInsert,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		templateLock,
 		captureToolbars,
 		orientation,
-		__experimentalLayout
+		layout
 	);
 
 	useInnerBlockTemplateSync(
@@ -75,32 +83,36 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const { context, name } = useSelect(
+	const context = useBlockContext( clientId );
+	const name = useSelect(
 		( select ) => {
-			const block = select( blockEditorStore ).getBlock( clientId );
-
-			// This check is here to avoid the Redux zombie bug where a child subscription
-			// is called before a parent, causing potential JS errors when the child has been removed.
-			if ( ! block ) {
-				return {};
-			}
-
-			const blockType = getBlockType( block.name );
-
-			if ( ! blockType || ! blockType.providesContext ) {
-				return {};
-			}
-
-			return {
-				context: getBlockContext( block.attributes, blockType ),
-				name: block.name,
-			};
+			return select( blockEditorStore ).getBlock( clientId )?.name;
 		},
 		[ clientId ]
 	);
 
-	const { allowSizingOnChildren = false } =
-		getBlockSupport( name, '__experimentalLayout' ) || {};
+	const defaultLayoutBlockSupport =
+		getBlockSupport( name, 'layout' ) ||
+		getBlockSupport( name, '__experimentalLayout' ) ||
+		EMPTY_OBJECT;
+
+	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
+
+	const defaultLayout = useSetting( 'layout' ) || EMPTY_OBJECT;
+
+	const usedLayout = layout || defaultLayoutBlockSupport;
+
+	const memoedLayout = useMemo(
+		() => ( {
+			// Default layout will know about any content/wide size defined by the theme.
+			...defaultLayout,
+			...usedLayout,
+			...( allowSizingOnChildren && {
+				allowSizingOnChildren: true,
+			} ),
+		} ),
+		[ defaultLayout, usedLayout, allowSizingOnChildren ]
+	);
 
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
@@ -110,10 +122,7 @@ function UncontrolledInnerBlocks( props ) {
 				rootClientId={ clientId }
 				renderAppender={ renderAppender }
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				__experimentalLayout={ {
-					...__experimentalLayout,
-					allowSizingOnChildren,
-				} }
+				layout={ memoedLayout }
 				wrapperRef={ wrapperRef }
 				placeholder={ placeholder }
 			/>
@@ -162,8 +171,11 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
 export function useInnerBlocksProps( props = {}, options = {} ) {
 	const { __unstableDisableLayoutClassNames, __unstableDisableDropZone } =
 		options;
-	const { clientId, __unstableLayoutClassNames: layoutClassNames = '' } =
-		useBlockEditContext();
+	const {
+		clientId,
+		layout = null,
+		__unstableLayoutClassNames: layoutClassNames = '',
+	} = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
 		( select ) => {
@@ -209,6 +221,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	const innerBlocksProps = {
 		__experimentalCaptureToolbars,
+		layout,
 		...options,
 	};
 	const InnerBlocks =

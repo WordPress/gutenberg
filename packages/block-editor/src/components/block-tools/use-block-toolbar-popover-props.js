@@ -3,13 +3,20 @@
  */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
+import { getScrollContainer } from '@wordpress/dom';
+import {
+	useCallback,
+	useLayoutEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { hasStickyOrFixedPositionValue } from '../../hooks/position';
 
 const COMMON_PROPS = {
 	placement: 'top-start',
@@ -40,28 +47,50 @@ const RESTRICTED_HEIGHT_PROPS = {
  *
  * @param {Element} contentElement       The DOM element that represents the editor content or canvas.
  * @param {Element} selectedBlockElement The outer DOM element of the first selected block.
+ * @param {Element} scrollContainer      The scrollable container for the contentElement.
  * @param {number}  toolbarHeight        The height of the toolbar in pixels.
+ * @param {boolean} isSticky             Whether or not the selected block is sticky or fixed.
  *
  * @return {Object} The popover props used to determine the position of the toolbar.
  */
-function getProps( contentElement, selectedBlockElement, toolbarHeight ) {
+function getProps(
+	contentElement,
+	selectedBlockElement,
+	scrollContainer,
+	toolbarHeight,
+	isSticky
+) {
 	if ( ! contentElement || ! selectedBlockElement ) {
 		return DEFAULT_PROPS;
 	}
 
+	// Get how far the content area has been scrolled.
+	const scrollTop = scrollContainer?.scrollTop || 0;
+
 	const blockRect = selectedBlockElement.getBoundingClientRect();
 	const contentRect = contentElement.getBoundingClientRect();
+
+	// Get the vertical position of top of the visible content area.
+	const topOfContentElementInViewport = scrollTop + contentRect.top;
 
 	// The document element's clientHeight represents the viewport height.
 	const viewportHeight =
 		contentElement.ownerDocument.documentElement.clientHeight;
 
-	const hasSpaceForToolbarAbove =
-		blockRect.top - contentRect.top > toolbarHeight;
+	// The restricted height area is calculated as the sum of the
+	// vertical position of the visible content area, plus the height
+	// of the block toolbar.
+	const restrictedTopArea = topOfContentElementInViewport + toolbarHeight;
+	const hasSpaceForToolbarAbove = blockRect.top > restrictedTopArea;
+
 	const isBlockTallerThanViewport =
 		blockRect.height > viewportHeight - toolbarHeight;
 
-	if ( hasSpaceForToolbarAbove || isBlockTallerThanViewport ) {
+	// Sticky blocks are treated as if they will never have enough space for the toolbar above.
+	if (
+		! isSticky &&
+		( hasSpaceForToolbarAbove || isBlockTallerThanViewport )
+	) {
 		return DEFAULT_PROPS;
 	}
 
@@ -83,12 +112,33 @@ export default function useBlockToolbarPopoverProps( {
 } ) {
 	const selectedBlockElement = useBlockElement( clientId );
 	const [ toolbarHeight, setToolbarHeight ] = useState( 0 );
-	const [ props, setProps ] = useState( () =>
-		getProps( contentElement, selectedBlockElement, toolbarHeight )
-	);
-	const blockIndex = useSelect(
-		( select ) => select( blockEditorStore ).getBlockIndex( clientId ),
+	const { blockIndex, isSticky } = useSelect(
+		( select ) => {
+			const { getBlockIndex, getBlockAttributes } =
+				select( blockEditorStore );
+			return {
+				blockIndex: getBlockIndex( clientId ),
+				isSticky: hasStickyOrFixedPositionValue(
+					getBlockAttributes( clientId )
+				),
+			};
+		},
 		[ clientId ]
+	);
+	const scrollContainer = useMemo( () => {
+		if ( ! contentElement ) {
+			return;
+		}
+		return getScrollContainer( contentElement );
+	}, [ contentElement ] );
+	const [ props, setProps ] = useState( () =>
+		getProps(
+			contentElement,
+			selectedBlockElement,
+			scrollContainer,
+			toolbarHeight,
+			isSticky
+		)
 	);
 
 	const popoverRef = useRefEffect( ( popoverNode ) => {
@@ -98,9 +148,15 @@ export default function useBlockToolbarPopoverProps( {
 	const updateProps = useCallback(
 		() =>
 			setProps(
-				getProps( contentElement, selectedBlockElement, toolbarHeight )
+				getProps(
+					contentElement,
+					selectedBlockElement,
+					scrollContainer,
+					toolbarHeight,
+					isSticky
+				)
 			),
-		[ contentElement, selectedBlockElement, toolbarHeight ]
+		[ contentElement, selectedBlockElement, scrollContainer, toolbarHeight ]
 	);
 
 	// Update props when the block is moved. This also ensures the props are

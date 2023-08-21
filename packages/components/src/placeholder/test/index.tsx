@@ -34,7 +34,7 @@ const testIcon = (
 
 const Placeholder = (
 	props: Omit<
-		WordPressComponentProps< PlaceholderProps< unknown >, 'div', false >,
+		WordPressComponentProps< PlaceholderProps, 'div', false >,
 		'ref'
 	>
 ) => <BasePlaceholder data-testid="placeholder" { ...props } />;
@@ -59,6 +59,7 @@ describe( 'Placeholder', () => {
 
 			// Test for empty label. When the label is empty, the only way to
 			// query the div is with `querySelector`.
+			// eslint-disable-next-line testing-library/no-node-access
 			const label = placeholder.querySelector(
 				'.components-placeholder__label'
 			);
@@ -67,6 +68,7 @@ describe( 'Placeholder', () => {
 
 			// Test for non existent instructions. When the instructions is
 			// empty, the only way to query the div is with `querySelector`.
+			// eslint-disable-next-line testing-library/no-node-access
 			const placeholderInstructions = placeholder.querySelector(
 				'.components-placeholder__instructions'
 			);
@@ -84,6 +86,7 @@ describe( 'Placeholder', () => {
 
 			const placeholder = getPlaceholder();
 			const icon = within( placeholder ).getByTestId( 'icon' );
+			// eslint-disable-next-line testing-library/no-node-access
 			expect( icon.parentNode ).toHaveClass(
 				'components-placeholder__label'
 			);

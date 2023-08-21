@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	showBlockToolbar,
 	clickBlockToolbarButton,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
@@ -24,8 +25,8 @@ describe( 'RichText', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await insertBlock( 'Heading' );
-		await page.waitForSelector( '[aria-label="Change heading level"]' );
-		await page.click( '[aria-label="Change heading level"]' );
+		await page.waitForSelector( '[aria-label="Change level"]' );
+		await page.click( '[aria-label="Change level"]' );
 		await page.click( '[aria-label="Heading 3"]' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -74,7 +75,7 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'b' );
 
-		const count = await page.evaluate(
+		const count = await canvas().evaluate(
 			() =>
 				document.querySelectorAll( '*[data-rich-text-format-boundary]' )
 					.length
@@ -173,7 +174,7 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '3' );
 
-		await page.evaluate( () => {
+		await canvas().evaluate( () => {
 			let called;
 			const { body } = document;
 			const config = {
@@ -233,7 +234,7 @@ describe( 'RichText', () => {
 
 		await page.keyboard.type( '4' );
 
-		await page.evaluate( () => {
+		await canvas().evaluate( () => {
 			// The selection change event should be called once. If there's only
 			// one item in `window.unsubscribes`, it means that only one
 			// function is present to disconnect the `mutationObserver`.
@@ -274,7 +275,7 @@ describe( 'RichText', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Wait for rich text editor to load.
-		await page.waitForSelector( '.block-editor-rich-text__editable' );
+		await canvas().waitForSelector( '.block-editor-rich-text__editable' );
 
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '12' );
@@ -305,7 +306,7 @@ describe( 'RichText', () => {
 		await page.keyboard.type( '1' );
 		// Simulate moving focus to a different app, then moving focus back,
 		// without selection being changed.
-		await page.evaluate( () => {
+		await canvas().evaluate( () => {
 			const activeElement = document.activeElement;
 			activeElement.blur();
 			activeElement.focus();
@@ -408,12 +409,16 @@ describe( 'RichText', () => {
 		await button.evaluate( ( element ) => element.scrollIntoView() );
 		await button.click();
 
-		// Tab to the "Text" tab.
+		// Wait for the popover with "Text" tab to appear.
+		await page.waitForXPath(
+			'//button[@role="tab"][@aria-selected="true"][text()="Text"]'
+		);
+		// Initial focus is on the "Text" tab.
+		// Tab to the "Custom color picker".
 		await page.keyboard.press( 'Tab' );
 		// Tab to black.
 		await page.keyboard.press( 'Tab' );
 		// Select color other than black.
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
@@ -511,11 +516,15 @@ describe( 'RichText', () => {
 		// text in the DOM directly, setting selection in the right place, and
 		// firing `compositionend`.
 		// See https://github.com/puppeteer/puppeteer/issues/4981.
-		await page.evaluate( () => {
+		await canvas().evaluate( async () => {
 			document.activeElement.textContent = '`a`';
 			const selection = window.getSelection();
+			// The `selectionchange` and `compositionend` events should run in separate event
+			// loop ticks to process all data store updates in time. Native events would be
+			// scheduled the same way.
 			selection.selectAllChildren( document.activeElement );
 			selection.collapseToEnd();
+			await new Promise( ( r ) => setTimeout( r, 0 ) );
 			document.activeElement.dispatchEvent(
 				new CompositionEvent( 'compositionend' )
 			);
@@ -545,6 +554,17 @@ describe( 'RichText', () => {
 		await page.keyboard.type( '-' );
 
 		// Expect: <strong>1</strong>-<em>2</em>
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'should copy/paste heading', async () => {
+		await insertBlock( 'Heading' );
+		await page.keyboard.type( 'Heading' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'v' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

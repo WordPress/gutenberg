@@ -3,15 +3,13 @@
  */
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
-const mkdirp = require( 'mkdirp' ).sync;
+const mkdirp = require( 'mkdirp' ).mkdirp.sync;
 const path = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
 
 const fixturesPath = path.join( __dirname, 'fixtures' );
 const configFixtures = fs.readdirSync( fixturesPath ).sort();
-
-jest.useRealTimers();
 
 describe( 'DependencyExtractionWebpackPlugin', () => {
 	afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );

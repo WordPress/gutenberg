@@ -13,6 +13,7 @@ module.exports = function ( api ) {
 				'../../node_modules/@babel/plugin-proposal-async-generator-functions'
 			),
 			'@babel/plugin-transform-runtime',
+			'@babel/plugin-transform-named-capturing-groups-regex',
 			[
 				'react-native-platform-specific-extensions',
 				{

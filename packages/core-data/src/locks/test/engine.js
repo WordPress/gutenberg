@@ -3,8 +3,6 @@
  */
 import createLocks from '../engine';
 
-jest.useRealTimers();
-
 // We correctly await all promises with expect calls, but the rule doesn't detect that.
 /* eslint-disable jest/valid-expect-in-promise */
 

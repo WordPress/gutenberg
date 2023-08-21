@@ -8,19 +8,25 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	showBlockToolbar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 async function getActiveLabel() {
 	return await page.evaluate( () => {
+		const { activeElement } =
+			document.activeElement.contentDocument ?? document;
 		return (
-			document.activeElement.getAttribute( 'aria-label' ) ||
-			document.activeElement.innerHTML
+			activeElement.getAttribute( 'aria-label' ) ||
+			activeElement.innerHTML
 		);
 	} );
 }
 
 const navigateToContentEditorTop = async () => {
 	// Use 'Ctrl+`' to return to the top of the editor.
+	await pressKeyWithModifier( 'ctrl', '`' );
+	await pressKeyWithModifier( 'ctrl', '`' );
+	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
 };
@@ -31,11 +37,19 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
 	await expect(
-		await page.evaluate( () => document.activeElement.innerHTML )
+		await page.evaluate( () => {
+			const { activeElement } =
+				document.activeElement.contentDocument ?? document;
+			return activeElement.innerHTML;
+		} )
 	).toBe( paragraphText );
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Open document settings' );
+
+	// Need to shift+tab here to end back in the block. If not, we'll be in the next region and it will only require 4 region jumps instead of 5.
+	await pressKeyWithModifier( 'shift', 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
 };
 
 const tabThroughBlockToolbar = async () => {
@@ -49,7 +63,7 @@ const tabThroughBlockToolbar = async () => {
 	await expect( await getActiveLabel() ).toBe( 'Move down' );
 
 	await page.keyboard.press( 'ArrowRight' );
-	await expect( await getActiveLabel() ).toBe( 'Align' );
+	await expect( await getActiveLabel() ).toBe( 'Align text' );
 
 	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Bold' );
@@ -106,16 +120,12 @@ describe( 'Order of block keyboard navigation', () => {
 		}
 
 		// Clear the selected block.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const paragraph = await canvas().$( '[data-type="core/paragraph"]' );
 		const box = await paragraph.boundingBox();
 		await page.mouse.click( box.x - 1, box.y );
 
 		await page.keyboard.press( 'Tab' );
-		await expect(
-			await page.evaluate( () => {
-				return document.activeElement.getAttribute( 'aria-label' );
-			} )
-		).toBe( 'Add title' );
+		await expect( await getActiveLabel() ).toBe( 'Add title' );
 
 		await page.keyboard.press( 'Tab' );
 		await expect( await getActiveLabel() ).toBe(
@@ -141,7 +151,7 @@ describe( 'Order of block keyboard navigation', () => {
 		}
 
 		// Clear the selected block.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const paragraph = await canvas().$( '[data-type="core/paragraph"]' );
 		const box = await paragraph.boundingBox();
 		await page.mouse.click( box.x - 1, box.y );
 
@@ -169,11 +179,7 @@ describe( 'Order of block keyboard navigation', () => {
 		);
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect(
-			await page.evaluate( () => {
-				return document.activeElement.getAttribute( 'aria-label' );
-			} )
-		).toBe( 'Add title' );
+		await expect( await getActiveLabel() ).toBe( 'Add title' );
 	} );
 
 	it( 'should navigate correctly with multi selection', async () => {
@@ -210,7 +216,7 @@ describe( 'Order of block keyboard navigation', () => {
 		await insertBlock( 'Image' );
 
 		// Make sure the upload button has focus.
-		const uploadButton = await page.waitForXPath(
+		const uploadButton = await canvas().waitForXPath(
 			'//button[contains( text(), "Upload" ) ]'
 		);
 		await expect( uploadButton ).toHaveFocus();
@@ -224,7 +230,7 @@ describe( 'Order of block keyboard navigation', () => {
 		// Insert a group block.
 		await insertBlock( 'Group' );
 		// Select the default, selected Group layout from the variation picker.
-		await page.click(
+		await canvas().click(
 			'button[aria-label="Group: Gather blocks in a container."]'
 		);
 		// If active label matches, that means focus did not change from group block wrapper.

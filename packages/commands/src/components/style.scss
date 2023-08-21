@@ -1,0 +1,147 @@
+// dirty hack to clean up modal
+.commands-command-menu {
+	border-radius: $grid-unit-05;
+	width: calc(100% - #{$grid-unit-40});
+	margin: auto;
+	max-width: 420px;
+	position: relative;
+	top: calc(15% + #{$header-height});
+
+	@include break-small() {
+		top: 15%;
+	}
+
+	.components-modal__content {
+		margin: 0;
+		padding: 0;
+	}
+}
+
+.commands-command-menu__overlay {
+	display: block;
+	align-items: start;
+}
+
+.commands-command-menu__header {
+	display: flex;
+	align-items: center;
+	padding-left: $grid-unit-20;
+
+	.components-button {
+		height: $grid-unit-70;
+		width: $grid-unit-70;
+		border: 1px solid $gray-600;
+		border-right: 0;
+		justify-content: center;
+		border-radius: $radius-block-ui 0 0 $radius-block-ui;
+
+		& + [cmdk-input] {
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+	}
+}
+
+.commands-command-menu__container {
+	// the style here is a hack to force safari to repaint to avoid a style glitch
+	will-change: transform;
+
+	[cmdk-input] {
+		border: none;
+		width: 100%;
+		padding: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-10;
+		outline: none;
+		color: $gray-900;
+		margin: 0;
+		font-size: 16px;
+		line-height: 28px;
+		border-radius: 0;
+
+		&::placeholder {
+			color: $gray-700;
+		}
+
+		&:focus {
+			box-shadow: none;
+			outline: none;
+		}
+	}
+
+	[cmdk-item] {
+		border-radius: $radius-block-ui;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		color: $gray-900;
+		font-size: $default-font-size;
+		min-height: $button-size-next-default-40px;
+
+		&[aria-selected="true"],
+		&:active {
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			color: var(--wp-admin-theme-color);
+
+			svg {
+				fill: var(--wp-admin-theme-color);
+			}
+		}
+
+		&[aria-disabled="true"] {
+			color: $gray-600;
+			cursor: not-allowed;
+		}
+
+		svg {
+			fill: $gray-900;
+		}
+
+		> div {
+			padding: $grid-unit;
+			padding-left: $grid-unit-50; // Account for commands without icons.
+		}
+
+		> .has-icon {
+			padding-left: $grid-unit;
+		}
+	}
+
+	[cmdk-root] > [cmdk-list] {
+		max-height: 368px; // Specific to not have commands overflow oddly.
+		overflow: auto;
+
+		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
+			padding: 0 $grid-unit $grid-unit;
+		}
+	}
+
+	[cmdk-empty] {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		white-space: pre-wrap;
+		color: $gray-900;
+		padding: $grid-unit-10 0 $grid-unit-40;
+	}
+
+	[cmdk-loading] {
+		padding: $grid-unit-20;
+	}
+
+	[cmdk-list-sizer] {
+		position: relative;
+	}
+}
+
+.commands-command-menu__item span {
+	// Ensure commands do not run off the edge (great for post titles).
+	display: inline-block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.commands-command-menu__item mark {
+	color: inherit;
+	background: unset;
+	font-weight: 600;
+}

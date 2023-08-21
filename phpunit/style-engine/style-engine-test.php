@@ -188,6 +188,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'fontStyle'      => 'italic',
 						'fontWeight'     => '800',
 						'lineHeight'     => '1.3',
+						'textColumns'    => '2',
 						'textDecoration' => 'underline',
 						'textTransform'  => 'uppercase',
 						'letterSpacing'  => '2',
@@ -195,13 +196,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
+					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;column-count:2;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
 					'declarations' => array(
 						'font-size'       => 'clamp(2em, 2vw, 4em)',
 						'font-family'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
 						'font-style'      => 'italic',
 						'font-weight'     => '800',
 						'line-height'     => '1.3',
+						'column-count'    => '2',
 						'text-decoration' => 'underline',
 						'text-transform'  => 'uppercase',
 						'letter-spacing'  => '2',
@@ -630,6 +632,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that incoming styles are deduped and merged.
 	 *
+	 * @ticket 58811
+	 *
 	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
 	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
 	 */
@@ -672,6 +676,32 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 
-		$this->assertSame( '.gandalf{color:white;height:190px;border-style:dotted;padding:10px;margin-bottom:100px;}.dumbledore,.rincewind{color:grey;height:90px;border-style:dotted;}', $compiled_stylesheet );
+		$this->assertSame( '.gandalf{color:white;height:190px;border-style:dotted;padding:10px;margin-bottom:100px;}.dumbledore{color:grey;height:90px;border-style:dotted;}.rincewind{color:grey;height:90px;border-style:dotted;}', $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests returning a generated stylesheet from a set of duotone rules.
+	 *
+	 * This is testing this fix: https://github.com/WordPress/gutenberg/pull/49004
+	 *
+	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
+	 */
+	public function test_should_return_stylesheet_from_duotone_css_rules() {
+		$css_rules = array(
+			array(
+				'selector'     => '.wp-duotone-ffffff-000000-1',
+				'declarations' => array(
+					// !important is needed because these styles
+					// render before global styles,
+					// and they should be overriding the duotone
+					// filters set by global styles.
+					'filter' => "url('#wp-duotone-ffffff-000000-1') !important",
+				),
+			),
+		);
+
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+		$this->assertSame( ".wp-duotone-ffffff-000000-1{filter:url('#wp-duotone-ffffff-000000-1') !important;}", $compiled_stylesheet );
 	}
 }

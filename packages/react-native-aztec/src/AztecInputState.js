@@ -6,8 +6,10 @@ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInpu
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 const focusChangeListeners = [];
+const caretChangeListeners = [];
 
 let currentFocusedElement = null;
+let currentCaretData = null;
 
 /**
  * Adds a listener that will be called in the following cases:
@@ -48,6 +50,37 @@ const notifyListeners = ( { isFocused } ) => {
 };
 
 /**
+ * Adds a listener that will be called when the caret's Y position
+ * changes for the focused Aztec view.
+ *
+ * @param {Function} listener
+ */
+export const addCaretChangeListener = ( listener ) => {
+	caretChangeListeners.push( listener );
+};
+
+/**
+ * Removes a listener from the caret change listeners list.
+ *
+ * @param {Function} listener
+ */
+export const removeCaretChangeListener = ( listener ) => {
+	const itemIndex = caretChangeListeners.indexOf( listener );
+	if ( itemIndex !== -1 ) {
+		caretChangeListeners.splice( itemIndex, 1 );
+	}
+};
+
+/**
+ * Notifies listeners about caret changes in focused Aztec view.
+ */
+const notifyCaretChangeListeners = () => {
+	caretChangeListeners.forEach( ( listener ) => {
+		listener( getCurrentCaretData() );
+	} );
+};
+
+/**
  * Determines if any Aztec view is focused.
  *
  * @return {boolean} True if focused.
@@ -84,6 +117,15 @@ export const notifyInputChange = () => {
 };
 
 /**
+ * Sets the current focused element ref held within TextInputState.
+ *
+ * @param {RefObject} element Element to be set as the focused element.
+ */
+export const focusInput = ( element ) => {
+	TextInputState.focusInput( element );
+};
+
+/**
  * Focuses the specified element.
  *
  * @param {RefObject} element Element to be focused.
@@ -100,6 +142,7 @@ export const focus = ( element ) => {
  */
 export const blur = ( element ) => {
 	TextInputState.blurTextInput( element );
+	setCurrentCaretData( null );
 	notifyInputChange();
 };
 
@@ -110,4 +153,25 @@ export const blurCurrentFocusedElement = () => {
 	if ( isFocused() ) {
 		blur( getCurrentFocusedElement() );
 	}
+};
+
+/**
+ * Sets the current focused element caret's data.
+ *
+ * @param {Object} caret Caret's data.
+ */
+export const setCurrentCaretData = ( caret ) => {
+	if ( isFocused() && caret ) {
+		currentCaretData = caret;
+		notifyCaretChangeListeners();
+	}
+};
+
+/**
+ * Get the current focused element caret's data.
+ *
+ * @return {Object} Current caret's data.
+ */
+export const getCurrentCaretData = () => {
+	return currentCaretData;
 };
