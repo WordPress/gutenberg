@@ -132,9 +132,8 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				continue;
 			}
 
-			// If the source value is not "meta_fields", skip it because the only supported
-			// connection source is meta (custom fields) for now.
-			if ( 'meta_fields' !== $attribute_value['source'] ) {
+			// Skip if the source value is not "meta_fields" or "pattern_attributes".
+			if ( 'meta_fields' !== $attribute_value['source'] && 'pattern_attributes' !== $attribute_value['source'] ) {
 				continue;
 			}
 
@@ -153,6 +152,10 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				$block_instance,
 				$attribute_value['value']
 			);
+
+			if ( false === $custom_value ) {
+				continue;
+			}
 
 			$tags  = new WP_HTML_Tag_Processor( $block_content );
 			$found = $tags->next_tag(
@@ -181,5 +184,6 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 
 		return $block_content;
 	}
+
 	add_filter( 'render_block', 'gutenberg_render_block_connections', 10, 3 );
 }
