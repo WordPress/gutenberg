@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Support keys using `data-wp-key`. ([#53844](https://github.com/WordPress/gutenberg/pull/53844))
 -   Support region-based client-side navigation. ([#53733](https://github.com/WordPress/gutenberg/pull/53733))
 -   Allow passing optional `afterLoad` callbacks to `store` calls. ([#53363](https://github.com/WordPress/gutenberg/pull/53363))
 
