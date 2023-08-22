@@ -15,11 +15,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	store as coreStore,
-	useEntityRecord,
-	useEntityRecords,
-} from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import {
 	SearchControl,
 	__experimentalVStack as VStack,
@@ -184,7 +180,7 @@ const columns = [
 	// 	enableSorting: false,
 	// 	enableHiding: false,
 	// } ),
-	columnHelper.accessor( ( row ) => row.title?.rendered, {
+	columnHelper.accessor( ( row ) => row.title?.rendered ?? '', {
 		id: 'title',
 		header: () => __( 'Title' ),
 		cell: ( info ) =>
@@ -194,6 +190,7 @@ const columns = [
 				<GridItemButton item={ info.row.original } />
 			),
 		sortingFn: 'alphanumeric',
+		enableGlobalFilter: true,
 	} ),
 	columnHelper.accessor(
 		// Return a string so that the global filter can match against it.
@@ -217,22 +214,17 @@ const columns = [
 					)
 				);
 			},
+			enableGlobalFilter: true,
 		}
 	),
-	columnHelper.accessor( 'post', {
+	columnHelper.accessor( ( row ) => row.post?.title?.rendered ?? '', {
+		id: 'post',
 		header: () => __( 'Attached to' ),
-		cell: function AttachedToCell( info ) {
-			const { record } = useEntityRecord(
-				'postType',
-				'post',
-				info.getValue()
-			);
-			const postTitle = record?.title?.rendered;
-			return postTitle ? <span>{ postTitle }</span> : null;
-		},
+		cell: ( info ) => info.getValue(),
 		sortingFn: 'alphanumeric',
+		enableGlobalFilter: true,
 	} ),
-	columnHelper.accessor( ( row ) => row.author?.name, {
+	columnHelper.accessor( ( row ) => row.author?.name ?? '', {
 		id: 'author',
 		header: () => __( 'Author' ),
 		cell: ( info ) => info.getValue(),
@@ -245,6 +237,7 @@ const columns = [
 				)
 			);
 		},
+		enableGlobalFilter: true,
 	} ),
 	columnHelper.accessor( 'formattedDate', {
 		header: () => __( 'Date' ),
@@ -298,7 +291,13 @@ export default function PageMedia() {
 	const { persistedAttachments, tags, locale, users } = useSelect(
 		( select ) => {
 			const _mediaType = mediaType === 'all' ? undefined : mediaType;
-			const _attachments = select( coreStore ).getMediaItems( {
+			const {
+				getMediaItems,
+				getEntityRecord,
+				getEntityRecords,
+				getUsers,
+			} = select( coreStore );
+			const _attachments = getMediaItems( {
 				per_page: -1,
 				orderby: 'date',
 				order: 'desc',
@@ -306,17 +305,26 @@ export default function PageMedia() {
 				// but we should maybe combine them into `documents`.
 				media_type: _mediaType,
 			} );
-			const _tags = select( coreStore ).getEntityRecords(
-				'taxonomy',
-				'attachment_tag',
-				{ per_page: -1 }
-			);
+			const _tags = getEntityRecords( 'taxonomy', 'attachment_tag', {
+				per_page: -1,
+			} );
 			const settings = select( blockEditorStore ).getSettings();
 			return {
-				persistedAttachments: _attachments || EMPTY_ARRAY,
+				persistedAttachments: _attachments
+					? _attachments.map( ( attachment ) => ( {
+							...attachment,
+							post:
+								attachment.post &&
+								getEntityRecord(
+									'postType',
+									'post',
+									attachment.post
+								),
+					  } ) )
+					: EMPTY_ARRAY,
 				tags: _tags || EMPTY_ARRAY,
 				locale: settings.locale,
-				users: select( coreStore ).getUsers(),
+				users: getUsers(),
 			};
 		},
 		[ mediaType ]
