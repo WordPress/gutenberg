@@ -115,8 +115,8 @@ class WP_Fonts extends WP_Dependencies {
 	 *     @type string $provider_id => array {
 	 *         An associate array of provider's class name and fonts.
 	 *
-	 *         @type string $class   Fully qualified name of the provider's class.
-	 *         @type string[] $fonts An array of enqueued font handles for this provider.
+	 *         @type string $class_name Fully qualified name of the provider's class.
+	 *         @type string[] $fonts    An array of enqueued font handles for this provider.
 	 *     }
 	 * }
 	 */
@@ -130,16 +130,16 @@ class WP_Fonts extends WP_Dependencies {
 	 * @since X.X.X
 	 *
 	 * @param string $provider_id The provider's unique ID.
-	 * @param string $class       The provider class name.
+	 * @param string $class_name       The provider class name.
 	 * @return bool True if successfully registered, else false.
 	 */
-	public function register_provider( $provider_id, $class ) {
-		if ( empty( $provider_id ) || empty( $class ) || ! class_exists( $class ) ) {
+	public function register_provider( $provider_id, $class_name ) {
+		if ( empty( $provider_id ) || empty( $class_name ) || ! class_exists( $class_name ) ) {
 			return false;
 		}
 
 		$this->providers[ $provider_id ] = array(
-			'class' => $class,
+			'class' => $class_name,
 			'fonts' => array(),
 		);
 		return true;

@@ -6,16 +6,18 @@
  * @subpackage Interactivity API
  */
 
+// phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
+
 class Helper_Class {
 	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	function process_foo_test( $tags, $context ) {
+	public function process_foo_test( $tags, $context ) {
 	}
 
-	function increment( $store ) {
+	public function increment( $store ) {
 		return $store['state']['count'] + $store['context']['count'];
 	}
 
-	static function static_increment( $store ) {
+	public static function static_increment( $store ) {
 		return $store['state']['count'] + $store['context']['count'];
 	}
 }
@@ -40,7 +42,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 					->method( 'process_foo_test' )
 					->with(
 						$this->callback(
-							function( $p ) {
+							function ( $p ) {
 								return 'DIV' === $p->get_tag() && (
 									// Either this is a closing tag...
 									$p->is_tag_closer() ||
@@ -129,7 +131,7 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 
 	public function test_evaluate_function_should_execute_anonymous_functions() {
 		$context = new WP_Directive_Context( array( 'count' => 2 ) );
-		$helper  = new Helper_Class;
+		$helper  = new Helper_Class();
 
 		wp_store(
 			array(
@@ -137,7 +139,7 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 					'count' => 3,
 				),
 				'selectors' => array(
-					'anonymous_function'           => function( $store ) {
+					'anonymous_function'           => function ( $store ) {
 						return $store['state']['count'] + $store['context']['count'];
 					},
 					// Other types of callables should not be executed.
