@@ -412,7 +412,7 @@ const UnforwardedPopover = (
 	}, [ referenceOwnerDocument, update ] );
 
 	const mergedFloatingRef = useMergeRefs( [
-		refs.floating,
+		refs.setFloating,
 		dialogRef,
 		forwardedRef,
 	] );
