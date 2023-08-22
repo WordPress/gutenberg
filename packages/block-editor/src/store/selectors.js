@@ -2293,7 +2293,8 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 function getUnsyncedPatterns( state ) {
 	const reusableBlocks =
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
-
+	const userPatternCategories =
+		state?.settings?.__experimentalUserPatternCategories ?? EMPTY_ARRAY;
 	return reusableBlocks
 		.filter(
 			( reusableBlock ) =>
@@ -2303,7 +2304,12 @@ function getUnsyncedPatterns( state ) {
 			return {
 				name: `core/block/${ reusableBlock.id }`,
 				title: reusableBlock.title.raw,
-				categories: reusableBlock.wp_pattern_category,
+				categories: reusableBlock.wp_pattern_category.map(
+					( cat ) =>
+						userPatternCategories.find(
+							( userCat ) => cat === userCat.id
+						)?.slug
+				),
 				content: reusableBlock.content.raw,
 			};
 		} );
