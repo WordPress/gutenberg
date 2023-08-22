@@ -59,4 +59,14 @@ export function unmodalize() {
 	if ( ! hiddenElements ) return;
 
 	for ( const element of hiddenElements ) element.removeAttribute( 'inert' );
+
+	// Hacks around a Chromium bug where it fails to restore a region to the
+	// accessibility tree after an ancestor had the `inert` attribute removed.
+	// The bug seems like a variation of this: https://crbug.com/1354313
+	// This workaround doesn't have to be a custom property. It also seems to
+	// not have to be done each time `showApp` is invoked but it's inexpensive
+	// and ensures some other code didn't remove it.
+	document
+		.querySelectorAll< HTMLElement >( '[role=region]' )
+		.forEach( ( region ) => region.style.setProperty( '--∞', '8' ) );
 }
