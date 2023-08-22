@@ -63,7 +63,7 @@ export async function visitSiteEditor(
 		.first()
 		.waitFor();
 
-	// TODO: Ideally the content underneath the progress bar should be marked inert until it's ready.
+	// TODO: Ideally the content underneath the canvas loader should be marked inert until it's ready.
 	await this.page
 		.locator( '.edit-site-canvas-loader' )
 		// Bigger timeout is needed for larger entities, for example the large
