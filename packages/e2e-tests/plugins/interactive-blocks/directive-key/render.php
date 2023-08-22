@@ -4,6 +4,7 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
+
 ?>
 
 <div data-wp-interactive data-wp-navigation-id="some-id">
