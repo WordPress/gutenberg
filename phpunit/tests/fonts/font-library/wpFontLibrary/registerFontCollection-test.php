@@ -17,7 +17,7 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 		$config     = array(
 			'name'           => 'My Collection',
 			'description'    => 'My Collection Description',
-			'data_file_json' => 'my-collection-data.json',
+			'data_json_file' => 'my-collection-data.json',
 		);
 		$collection = WP_Font_Library::register_font_collection( $id, $config );
 		$this->assertInstanceOf( 'WP_Font_Collection', $collection );
@@ -27,7 +27,7 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 		$config     = array(
 			'name'           => 'My Collection',
 			'description'    => 'My Collection Description',
-			'data_file_json' => 'my-collection-data.json',
+			'data_json_file' => 'my-collection-data.json',
 		);
 		$collection = WP_Font_Library::register_font_collection( '', $config );
 		$this->assertInstanceOf( 'WP_Error', $collection );
@@ -50,12 +50,12 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 		$config1 = array(
 			'name'           => 'My Collection 1',
 			'description'    => 'My Collection 1 Description',
-			'data_file_json' => 'my-collection-1-data.json',
+			'data_json_file' => 'my-collection-1-data.json',
 		);
 		$config2 = array(
 			'name'           => 'My Collection 2',
 			'description'    => 'My Collection 2 Description',
-			'data_file_json' => 'my-collection-2-data.json',
+			'data_json_file' => 'my-collection-2-data.json',
 		);
 
 		// Register first collection.
