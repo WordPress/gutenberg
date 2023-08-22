@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import Button from '../../button';
 import NoticeList from '../list';
 import type { NoticeListProps } from '../types';
 
-const meta: ComponentMeta< typeof Notice > = {
+const meta: Meta< typeof Notice > = {
 	title: 'Components/Notice',
 	component: Notice,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -29,7 +29,7 @@ const meta: ComponentMeta< typeof Notice > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Notice > = ( props ) => {
+const Template: StoryFn< typeof Notice > = ( props ) => {
 	return <Notice { ...props } />;
 };
 
@@ -83,9 +83,7 @@ WithActions.args = {
 	],
 };
 
-export const NoticeListSubcomponent: ComponentStory<
-	typeof NoticeList
-> = () => {
+export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
 	const exampleNotices = [
 		{
 			id: 'second-notice',

@@ -619,7 +619,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 	3. Rewrite the `meta` story object, and export it as default. In particular, make sure you add the following settings under the `parameters` key:
 
 		```tsx
-		const meta: ComponentMeta< typeof MyComponent > = {
+		const meta: Meta< typeof MyComponent > = {
 			parameters: {
 				controls: { expanded: true },
 				docs: { canvas: { sourceState: 'shown' } },

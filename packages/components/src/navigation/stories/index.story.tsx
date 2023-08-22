@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta } from '@storybook/react';
+import type { Meta } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -19,7 +19,7 @@ import { MoreExamplesStory } from './utils/more-examples';
 import { HideIfEmptyStory } from './utils/hide-if-empty';
 import './style.css';
 
-const meta: ComponentMeta< typeof Navigation > = {
+const meta: Meta< typeof Navigation > = {
 	title: 'Components (Experimental)/Navigation',
 	component: Navigation,
 	subcomponents: {

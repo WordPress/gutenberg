@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
@@ -20,7 +20,7 @@ const CircularOptionPickerStoryContext = createContext< {
 	setCurrentColor?: ( v: string | undefined ) => void;
 } >( {} );
 
-const meta: ComponentMeta< typeof CircularOptionPicker > = {
+const meta: Meta< typeof CircularOptionPicker > = {
 	title: 'Components/CircularOptionPicker',
 	component: CircularOptionPicker,
 	subcomponents: {
@@ -107,7 +107,7 @@ const DefaultActions = () => {
 	);
 };
 
-const Template: ComponentStory< typeof CircularOptionPicker > = ( props ) => (
+const Template: StoryFn< typeof CircularOptionPicker > = ( props ) => (
 	<CircularOptionPicker { ...props } />
 );
 

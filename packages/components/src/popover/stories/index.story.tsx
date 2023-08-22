@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 	'overlay',
 ];
 
-const meta: ComponentMeta< typeof Popover > = {
+const meta: Meta< typeof Popover > = {
 	title: 'Components/Popover',
 	component: Popover,
 	argTypes: {
@@ -81,7 +81,7 @@ const PopoverWithAnchor = ( args: PopoverProps ) => {
 	);
 };
 
-const Template: ComponentStory< typeof Popover > = ( args ) => {
+const Template: StoryFn< typeof Popover > = ( args ) => {
 	const [ isVisible, setIsVisible ] = useState( false );
 	const toggleVisible = () => {
 		setIsVisible( ( state ) => ! state );
@@ -116,7 +116,7 @@ const Template: ComponentStory< typeof Popover > = ( args ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Popover > = Template.bind( {} );
+export const Default: StoryFn< typeof Popover > = Template.bind( {} );
 Default.args = {
 	children: (
 		<div style={ { width: '280px', whiteSpace: 'normal' } }>
@@ -128,7 +128,7 @@ Default.args = {
 	),
 };
 
-export const Unstyled: ComponentStory< typeof Popover > = Template.bind( {} );
+export const Unstyled: StoryFn< typeof Popover > = Template.bind( {} );
 Unstyled.args = {
 	children: (
 		<div style={ { width: '280px', whiteSpace: 'normal' } }>
@@ -141,7 +141,7 @@ Unstyled.args = {
 	variant: 'unstyled',
 };
 
-export const AllPlacements: ComponentStory< typeof Popover > = ( {
+export const AllPlacements: StoryFn< typeof Popover > = ( {
 	children,
 	...args
 } ) => (
@@ -194,7 +194,7 @@ AllPlacements.args = {
 	flip: false,
 };
 
-export const DynamicHeight: ComponentStory< typeof Popover > = ( {
+export const DynamicHeight: StoryFn< typeof Popover > = ( {
 	children,
 	...args
 } ) => {
@@ -246,9 +246,7 @@ DynamicHeight.args = {
 	children: 'Content with dynamic height',
 };
 
-export const WithSlotOutsideIframe: ComponentStory< typeof Popover > = (
-	args
-) => {
+export const WithSlotOutsideIframe: StoryFn< typeof Popover > = ( args ) => {
 	return <PopoverInsideIframeRenderedInExternalSlot { ...args } />;
 };
 WithSlotOutsideIframe.args = {

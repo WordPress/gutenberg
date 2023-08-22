@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import AlignmentMatrixControl from '..';
 import { HStack } from '../../h-stack';
 import type { AlignmentMatrixControlProps } from '../types';
 
-const meta: ComponentMeta< typeof AlignmentMatrixControl > = {
+const meta: Meta< typeof AlignmentMatrixControl > = {
 	title: 'Components (Experimental)/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
 	subcomponents: {
@@ -34,7 +34,7 @@ const meta: ComponentMeta< typeof AlignmentMatrixControl > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof AlignmentMatrixControl > = ( {
+const Template: StoryFn< typeof AlignmentMatrixControl > = ( {
 	defaultValue,
 	onChange,
 	...props

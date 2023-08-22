@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ import { Text } from '../../text';
 import { Heading } from '../../heading';
 import Button from '../../button';
 
-const meta: ComponentMeta< typeof Card > = {
+const meta: Meta< typeof Card > = {
 	component: Card,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
@@ -41,9 +41,7 @@ const meta: ComponentMeta< typeof Card > = {
 
 export default meta;
 
-const Template: ComponentStory< typeof Card > = ( args ) => (
-	<Card { ...args } />
-);
+const Template: StoryFn< typeof Card > = ( args ) => <Card { ...args } />;
 
 export const Default = Template.bind( {} );
 Default.args = {
