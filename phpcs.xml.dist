@@ -18,7 +18,6 @@
 			<property name="allowUnusedParametersBeforeUsed" value="true"/>
 		</properties>
 	</rule>
-	<rule ref="WordPress.CodeAnalysis.EmptyStatement"/>
 
 	<rule ref="PEAR.Functions.FunctionCallSignature">
 		<properties>
