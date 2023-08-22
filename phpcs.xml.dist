@@ -47,6 +47,7 @@
 	<!-- Exclude generated files -->
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
 	<exclude-pattern>node_modules/*</exclude-pattern>
+	<exclude-pattern>build/*</exclude-pattern>
 
 	<!-- Exclude third party libraries -->
 	<exclude-pattern>./vendor/*</exclude-pattern>
