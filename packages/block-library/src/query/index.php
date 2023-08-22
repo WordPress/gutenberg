@@ -43,6 +43,11 @@ function render_block_core_query( $attributes, $content, $block ) {
 					style="position:absolute;clip:rect(0,0,0,0);"
 					aria-live="polite"
 					data-wp-text="context.core.query.message"
+				></div>
+				<div
+					class="wp-block-query__enhanced-pagination-animation"
+					data-wp-class--start-animation="selectors.core.query.startAnimation"
+					data-wp-class--finish-animation="selectors.core.query.finishAnimation"
 				></div>',
 				$last_div_position,
 				0

@@ -19,6 +19,16 @@ const isValidEvent = ( event ) =>
 	! event.defaultPrevented;
 
 store( {
+	selectors: {
+		core: {
+			query: {
+				startAnimation: ( { context } ) =>
+					context.core.query.animation === 'start',
+				finishAnimation: ( { context } ) =>
+					context.core.query.animation === 'finish',
+			},
+		},
+	},
 	actions: {
 		core: {
 			query: {
@@ -33,6 +43,7 @@ store( {
 						const timeout = setTimeout( () => {
 							context.core.query.message =
 								state.core.query.loadingText;
+							context.core.query.animation = 'start';
 						}, 300 );
 
 						await navigate( ref.href );
@@ -49,6 +60,8 @@ store( {
 							state.core.query.loadedText
 								? '\u00A0'
 								: '' );
+
+						context.core.query.animation = 'finish';
 
 						// Focus the first anchor of the Query block.
 						document

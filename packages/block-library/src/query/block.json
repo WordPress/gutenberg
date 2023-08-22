@@ -52,5 +52,6 @@
 		"layout": true
 	},
 	"editorStyle": "wp-block-query-editor",
+	"style": "wp-block-query",
 	"viewScript": "file:./view.min.js"
 }
