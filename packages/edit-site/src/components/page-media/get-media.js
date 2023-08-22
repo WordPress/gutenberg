@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
-import { video, audio, page } from '@wordpress/icons';
+import { audio, page } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
 
 // Getting headings, etc. based on `mediaType` query type.
@@ -52,7 +52,11 @@ export function getMediaItem( attachment, size = 'thumb' ) {
 	if ( 'video' === mediaType ) {
 		return (
 			<div className="edit-site-media-item__icon">
-				<Icon icon={ video } />
+				<video
+					poster={ attachment?.poster }
+					preload="true"
+					src={ attachment?.source_url }
+				/>
 			</div>
 		);
 	}
