@@ -477,7 +477,7 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	if ( typeof state === 'boolean' ) {
+	if ( typeof state.blockInserterPanel === 'boolean' ) {
 		return EMPTY_INSERTION_POINT;
 	}
 

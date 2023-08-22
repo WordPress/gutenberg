@@ -13,7 +13,7 @@ import { useStylesPreviewColors } from '../global-styles/hooks';
 const { ProgressBar, Theme } = unlock( componentsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
-export default function CanvasSpinner( { id } ) {
+export default function CanvasLoader( { id } ) {
 	const [ fallbackIndicatorColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { highlightedColors } = useStylesPreviewColors();
@@ -21,7 +21,7 @@ export default function CanvasSpinner( { id } ) {
 		highlightedColors[ 0 ]?.color ?? fallbackIndicatorColor;
 
 	return (
-		<div className="edit-site-canvas-spinner">
+		<div className="edit-site-canvas-loader">
 			<Theme accent={ indicatorColor } background={ backgroundColor }>
 				<ProgressBar id={ id } />
 			</Theme>

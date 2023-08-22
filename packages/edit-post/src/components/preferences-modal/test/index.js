@@ -24,16 +24,20 @@ describe( 'EditPostPreferencesModal', () => {
 			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => true );
 			render( <EditPostPreferencesModal /> );
+			await screen.findByRole( 'tab', {
+				name: 'General',
+				selected: true,
+			} );
 			expect(
-				await screen.findByRole( 'dialog', { name: 'Preferences' } )
+				screen.getByRole( 'dialog', { name: 'Preferences' } )
 			).toMatchSnapshot();
 		} );
-		it( 'small viewports', async () => {
+		it( 'small viewports', () => {
 			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => false );
 			render( <EditPostPreferencesModal /> );
 			expect(
-				await screen.findByRole( 'dialog', { name: 'Preferences' } )
+				screen.getByRole( 'dialog', { name: 'Preferences' } )
 			).toMatchSnapshot();
 		} );
 	} );
