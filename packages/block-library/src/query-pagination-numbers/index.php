@@ -34,7 +34,7 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 		if ( null !== $mid_size ) {
 			$paginate_args['mid_size'] = $mid_size;
 		}
-		$content       = paginate_links( $paginate_args );
+		$content = paginate_links( $paginate_args );
 	} else {
 		$block_query = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
 		// `paginate_links` works with the global $wp_query, so we have to
