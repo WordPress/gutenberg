@@ -10,7 +10,6 @@ import {
 	BlockSelectionClearer,
 	BlockInspector,
 	CopyHandler,
-	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
@@ -118,11 +117,7 @@ export default function SidebarBlockEditor( {
 						<EditorStyles styles={ settings.defaultEditorStyles } />
 						<BlockSelectionClearer>
 							<WritingFlow className="editor-styles-wrapper">
-								<ObserveTyping>
-									<BlockList
-										renderAppender={ BlockAppender }
-									/>
-								</ObserveTyping>
+								<BlockList renderAppender={ BlockAppender } />
 							</WritingFlow>
 						</BlockSelectionClearer>
 					</BlockTools>
