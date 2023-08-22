@@ -1,3 +1,13 @@
+// .edit-site-media__table {
+// 	& table {
+// 		table-layout: fixed;
+
+// 		& tr > :is(td, th):first-child {
+// 			width: 50%;
+// 		}
+// 	}
+// }
+
 .edit-site-media__grid {
 	display: grid;
 	grid-template-columns: 1fr;

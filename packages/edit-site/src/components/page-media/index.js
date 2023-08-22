@@ -183,14 +183,18 @@ const columns = [
 	columnHelper.accessor( ( row ) => row.title?.rendered ?? '', {
 		id: 'title',
 		header: () => __( 'Title' ),
-		cell: ( info ) =>
-			isBlobURL( info.row.original.url ) ? (
-				getMediaItem( info.row.original )
-			) : (
-				<GridItemButton item={ info.row.original } />
-			),
+		cell: ( info ) => (
+			<div>
+				{ isBlobURL( info.row.original.url ) ? (
+					getMediaItem( info.row.original )
+				) : (
+					<GridItemButton item={ info.row.original } />
+				) }
+			</div>
+		),
 		sortingFn: 'alphanumeric',
 		enableGlobalFilter: true,
+		width: '50%',
 	} ),
 	columnHelper.accessor(
 		// Return a string so that the global filter can match against it.
@@ -559,7 +563,10 @@ export default function PageMedia() {
 						</ToggleGroupControl>
 					</HStack>
 					{ attachments && 'table' === view && (
-						<Table table={ table } />
+						<Table
+							table={ table }
+							className="edit-site-media__table"
+						/>
 					) }
 					{ attachments && 'grid' === view && (
 						<Grid

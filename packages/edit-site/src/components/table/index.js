@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { flexRender } from '@tanstack/react-table';
+import cx from 'classnames';
 
 /**
  * WordPress dependencies
@@ -51,17 +52,31 @@ function HeaderColumn( { header } ) {
 
 /**
  * @param {Object} props
+ * @param {string} props.className
  * @param {Table}  props.table
  */
-export default function Table( { table } ) {
+export default function Table( { table, className, ...props } ) {
 	return (
-		<div className="edit-site-table-wrapper">
+		<div
+			className={ cx( 'edit-site-table-wrapper', className ) }
+			{ ...props }
+		>
 			<table className="edit-site-table">
 				<thead>
 					{ table.getHeaderGroups().map( ( headerGroup ) => (
 						<tr key={ headerGroup.id }>
 							{ headerGroup.headers.map( ( header ) => (
-								<th key={ header.id }>
+								<th
+									style={ {
+										width:
+											header.column.columnDef.width ||
+											undefined,
+										maxWidth:
+											header.column.columnDef.maxWidth ||
+											undefined,
+									} }
+									key={ header.id }
+								>
 									<HeaderColumn header={ header } />
 								</th>
 							) ) }
@@ -80,6 +95,9 @@ export default function Table( { table } ) {
 							{ row.getVisibleCells().map( ( cell ) => (
 								<td
 									style={ {
+										width:
+											cell.column.columnDef.width ||
+											undefined,
 										maxWidth:
 											cell.column.columnDef.maxWidth ||
 											undefined,
