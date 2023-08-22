@@ -51,6 +51,13 @@ function MediaEditor( { record } ) {
 	const history = useHistory();
 	const { params: urlParams } = useLocation();
 
+	const defaultSize = ( { imageSize, visibleArea } ) => {
+		return {
+			width: ( visibleArea || imageSize ).width,
+			height: ( visibleArea || imageSize ).height,
+		};
+	};
+
 	if ( ! isEditingImage ) {
 		return (
 			<>
@@ -191,6 +198,7 @@ function MediaEditor( { record } ) {
 					grid: true,
 				} }
 				src={ image?.source_url || image?.url }
+				defaultSize={ defaultSize }
 			/>
 		</>
 	);
