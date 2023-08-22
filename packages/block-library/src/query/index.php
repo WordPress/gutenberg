@@ -12,6 +12,7 @@
  *
  * @param array  $attributes Block attributes.
  * @param string $content    Block default content.
+ * @param string $block      Block instance.
  *
  * @return string Returns the modified output of the query block.
  */
@@ -25,10 +26,41 @@ function render_block_core_query( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-interactive', true );
 			$p->set_attribute( 'data-wp-navigation-id', 'query-' . $attributes['queryId'] );
+			$p->set_attribute(
+				'data-wp-context',
+				json_encode( array( 'core' => array( 'query' => (object) array() ) ) )
+			);
 			$content = $p->get_updated_html();
 
 			// Make the block as interactive.
 			$block->block_type->supports['interactivity'] = true;
+
+			// Add a div to announce messages using `aria-live`.
+			$last_div_position = strripos( $content, '</div>' );
+			$content           = substr_replace(
+				$content,
+				'<div
+					style="position:absolute;clip:rect(0,0,0,0);"
+					aria-live="polite"
+					data-wp-text="context.core.query.message"
+				></div>',
+				$last_div_position,
+				0
+			);
+
+			// Use state to send translated strings.
+			wp_store(
+				array(
+					'state' => array(
+						'core' => array(
+							'query' => array(
+								'loadingText' => __( 'Loading page, please wait.' ),
+								'loadedText'  => __( 'The new page has been loaded. You can continue navigating.' ),
+							),
+						),
+					),
+				)
+			);
 		}
 	}
 
