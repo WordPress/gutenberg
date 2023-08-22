@@ -119,7 +119,7 @@ function Root( { className, ...settings } ) {
 			<IntersectionObserver.Provider value={ intersectionObserver }>
 				<div { ...innerBlocksProps } />
 				{ /* Ensure element and layout styles are always at the end of the document */ }
-				<div hidden ref={ setElement } />
+				<div ref={ setElement } />
 			</IntersectionObserver.Provider>
 		</elementContext.Provider>
 	);
