@@ -243,7 +243,7 @@
  *
  * @since 6.2.0
  */
-class Gutenberg_HTML_Tag_Processor_6_3 {
+class Gutenberg_HTML_Tag_Processor_6_4 {
 	/**
 	 * The maximum number of bookmarks allowed to exist at
 	 * any given time.
@@ -961,7 +961,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 
 			if ( '/' === $this->html[ $at + 1 ] ) {
 				$this->is_closing_tag = true;
-				++$at;
+				$at++;
 			} else {
 				$this->is_closing_tag = false;
 			}
@@ -1030,7 +1030,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 					 *
 					 * See https://html.spec.whatwg.org/#parse-error-incorrectly-closed-comment
 					 */
-					--$closer_at; // Pre-increment inside condition below reduces risk of accidental infinite looping.
+					$closer_at--; // Pre-increment inside condition below reduces risk of accidental infinite looping.
 					while ( ++$closer_at < strlen( $html ) ) {
 						$closer_at = strpos( $html, '--', $closer_at );
 						if ( false === $closer_at ) {
@@ -1111,7 +1111,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			 * See https://html.spec.whatwg.org/#parse-error-missing-end-tag-name
 			 */
 			if ( '>' === $html[ $at + 1 ] ) {
-				++$at;
+				$at++;
 				continue;
 			}
 
@@ -2327,9 +2327,11 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			 * See https://html.spec.whatwg.org/#attributes-3
 			 * See https://html.spec.whatwg.org/#space-separated-tokens
 			 */
-			do {
-				$class_at = strpos( $this->html, $this->sought_class_name, $class_at );
-
+			while (
+				// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+				false !== ( $class_at = strpos( $this->html, $this->sought_class_name, $class_at ) ) &&
+				$class_at < $class_end
+			) {
 				/*
 				 * Verify this class starts at a boundary.
 				 */
@@ -2355,7 +2357,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 				}
 
 				return true;
-			} while ( false !== $class_at && $class_at < $class_end );
+			}
 
 			return false;
 		}
