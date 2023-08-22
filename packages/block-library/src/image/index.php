@@ -54,6 +54,11 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$should_load_view_script = true;
 	}
 
+	// If at least one block in the page has the lightbox, mark the block type as interactive.
+	if ( $should_load_view_script ) {
+		$block->block_type->supports['interactivity'] = true;
+	}
+
 	$view_js_file = 'wp-block-image-view';
 	if ( ! wp_script_is( $view_js_file ) ) {
 		$script_handles = $block->block_type->view_script_handles;

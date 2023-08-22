@@ -11,9 +11,11 @@ import { Slot, Fill, Provider as SlotFillProvider } from '../';
 export default {
 	title: 'Components/SlotFill',
 	component: Slot,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { Fill, SlotFillProvider },
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 
