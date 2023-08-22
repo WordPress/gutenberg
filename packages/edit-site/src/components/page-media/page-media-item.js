@@ -46,7 +46,6 @@ function MediaEditor( { record } ) {
 	const { receiveEntityRecords } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const cropperRef = useRef( null );
-	const [ flipValue, setFlipValue ] = useState( [ false, false ] );
 	const [ image, setImage ] = useState( record );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const history = useHistory();
@@ -74,7 +73,6 @@ function MediaEditor( { record } ) {
 			cropperRef.current.flipImage( horizontal, vertical, {
 				transitions: true,
 			} );
-			setFlipValue( [ horizontal, vertical ] );
 		}
 	};
 
@@ -97,7 +95,6 @@ function MediaEditor( { record } ) {
 	const reset = () => {
 		if ( cropperRef.current ) {
 			cropperRef.current.reset();
-			setFlipValue( [ false, false ] );
 		}
 	};
 
@@ -148,13 +145,13 @@ function MediaEditor( { record } ) {
 					icon={ flipVertical }
 					variant="secondary"
 					label={ __( 'Flip vertical' ) }
-					onClick={ () => flip( flipValue[ 0 ], ! flipValue[ 1 ] ) }
+					onClick={ () => flip( false, true ) }
 				/>
 				<Button
 					icon={ flipHorizontal }
 					variant="secondary"
 					label={ __( 'Flip horizontal' ) }
-					onClick={ () => flip( ! flipValue[ 0 ], flipValue[ 1 ] ) }
+					onClick={ () => flip( true, false ) }
 				/>
 				<Button
 					icon={ lineSolid }
