@@ -12,7 +12,7 @@ import GoogleFonts from './google-fonts';
 import LocalFonts from './local-fonts';
 import { MODAL_TABS } from './constants';
 
-function FontsLibraryModal( {
+function FontLibraryModal( {
 	onRequestClose,
 	initialTabName = 'installed-fonts',
 } ) {
@@ -21,7 +21,7 @@ function FontsLibraryModal( {
 			title={ __( 'Fonts' ) }
 			onRequestClose={ onRequestClose }
 			isFullScreen={ true }
-			className="fonts-library-modal"
+			className="font-library-modal"
 		>
 			<TabPanel
 				className="font-library-modal__tab-panel"
@@ -44,4 +44,4 @@ function FontsLibraryModal( {
 	);
 }
 
-export default FontsLibraryModal;
+export default FontLibraryModal;

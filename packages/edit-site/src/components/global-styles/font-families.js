@@ -17,8 +17,8 @@ import { useContext } from '@wordpress/element';
  */
 import FontLibraryProvider, {
 	FontLibraryContext,
-} from './fonts-library-modal/context';
-import FontsLibraryModal from './fonts-library-modal';
+} from './font-library-modal/context';
+import FontLibraryModal from './font-library-modal';
 import FontFamilyItem from './font-family-item';
 import Subtitle from './subtitle';
 
@@ -29,7 +29,7 @@ function FontFamilies() {
 	return (
 		<>
 			{ !! modalTabOepn && (
-				<FontsLibraryModal
+				<FontLibraryModal
 					onRequestClose={ () => toggleModal() }
 					initialTabName={ modalTabOepn }
 				/>

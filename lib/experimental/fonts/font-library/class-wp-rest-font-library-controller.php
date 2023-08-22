@@ -79,7 +79,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'google_fonts' ),
-					'permission_callback' => array( $this, 'update_fonts_library_permissions_check' ),
+					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
 				),
 			)
 		);
