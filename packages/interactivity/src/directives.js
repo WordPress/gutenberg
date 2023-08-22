@@ -14,18 +14,16 @@ import { directive } from './hooks';
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
 
-const mergeDeepSignals = ( target, source ) => {
+const mergeDeepSignals = ( target, source, overwrite ) => {
 	for ( const k in source ) {
-		if ( typeof peek( target, k ) === 'undefined' ) {
-			target[ `$${ k }` ] = source[ `$${ k }` ];
-		} else if (
-			isObject( peek( target, k ) ) &&
-			isObject( peek( source, k ) )
-		) {
+		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
 			mergeDeepSignals(
 				target[ `$${ k }` ].peek(),
-				source[ `$${ k }` ].peek()
+				source[ `$${ k }` ].peek(),
+				overwrite
 			);
+		} else if ( overwrite || typeof peek( target, k ) === 'undefined' ) {
+			target[ `$${ k }` ] = source[ `$${ k }` ];
 		}
 	}
 };
@@ -46,9 +44,9 @@ export default () => {
 			const currentValue = useRef( deepSignal( {} ) );
 			currentValue.current = useMemo( () => {
 				const newValue = deepSignal( newContext );
-				mergeDeepSignals( newValue, currentValue.current );
 				mergeDeepSignals( newValue, inheritedValue );
-				return newValue;
+				mergeDeepSignals( currentValue.current, newValue, true );
+				return currentValue.current;
 			}, [ newContext, inheritedValue ] );
 
 			return (
