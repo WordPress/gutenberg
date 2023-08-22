@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Search Control - Prevent calling TextInput's methods when undefined [#53745]
 
 ## 1.102.0
 -   [*] Display custom color value in mobile Cover Block color picker [#51414]
