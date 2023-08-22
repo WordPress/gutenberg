@@ -1,4 +1,16 @@
 /**
+ * External dependencies
+ */
+import {
+	ArgsTable,
+	Description,
+	Primary,
+	Stories,
+	Subtitle,
+	Title,
+} from '@storybook/blocks';
+
+/**
  * Internal dependencies
  */
 import { WithGlobalCSS } from './decorators/with-global-css';
@@ -89,6 +101,21 @@ export const decorators = [
 export const parameters = {
 	controls: {
 		sort: 'requiredFirst',
+	},
+	docs: {
+		// Flips the order of the description and the primary component story
+		// so the component is always visible before the fold.
+		page: () => (
+			<>
+				<Title />
+				<Subtitle />
+				<Primary />
+				<Description />
+				{ /* `story="^"` enables Controls for the primary props table */ }
+				<ArgsTable story="^" />
+				<Stories includePrimary={ false } />
+			</>
+		),
 	},
 	options: {
 		storySort: {

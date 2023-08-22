@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useState, useEffect } from '@wordpress/element';
 import DateTimePicker from '../date-time';
 import { daysFromNow, isWeekend } from './utils';
 
-const meta: ComponentMeta< typeof DateTimePicker > = {
+const meta: Meta< typeof DateTimePicker > = {
 	title: 'Components/DateTimePicker',
 	component: DateTimePicker,
 	argTypes: {
@@ -28,7 +28,7 @@ const meta: ComponentMeta< typeof DateTimePicker > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof DateTimePicker > = ( {
+const Template: StoryFn< typeof DateTimePicker > = ( {
 	currentDate,
 	onChange,
 	...args
@@ -49,12 +49,9 @@ const Template: ComponentStory< typeof DateTimePicker > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof DateTimePicker > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof DateTimePicker > = Template.bind( {} );
 
-export const WithEvents: ComponentStory< typeof DateTimePicker > =
-	Template.bind( {} );
+export const WithEvents: StoryFn< typeof DateTimePicker > = Template.bind( {} );
 WithEvents.args = {
 	currentDate: new Date(),
 	events: [
@@ -65,8 +62,9 @@ WithEvents.args = {
 	],
 };
 
-export const WithInvalidDates: ComponentStory< typeof DateTimePicker > =
-	Template.bind( {} );
+export const WithInvalidDates: StoryFn< typeof DateTimePicker > = Template.bind(
+	{}
+);
 WithInvalidDates.args = {
 	currentDate: new Date(),
 	isInvalidDate: isWeekend,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -16,9 +16,11 @@ import InputControl from '../../input-control';
  */
 import { wordpress } from '@wordpress/icons';
 
-const meta: ComponentMeta< typeof Panel > = {
+const meta: Meta< typeof Panel > = {
 	title: 'Components/Panel',
 	component: Panel,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { PanelRow, PanelBody },
 	argTypes: {
 		children: { control: { type: null } },
 	},
@@ -29,11 +31,9 @@ const meta: ComponentMeta< typeof Panel > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Panel > = ( props ) => (
-	<Panel { ...props } />
-);
+const Template: StoryFn< typeof Panel > = ( props ) => <Panel { ...props } />;
 
-export const Default: ComponentStory< typeof Panel > = Template.bind( {} );
+export const Default: StoryFn< typeof Panel > = Template.bind( {} );
 Default.args = {
 	header: 'My panel',
 	children: (
@@ -68,7 +68,7 @@ Default.args = {
  * `PanelRow` is a generic container for rows within a `PanelBody`.
  * It is a flex container with a top margin for spacing.
  */
-export const _PanelRow: ComponentStory< typeof Panel > = Template.bind( {} );
+export const _PanelRow: StoryFn< typeof Panel > = Template.bind( {} );
 _PanelRow.args = {
 	children: (
 		<PanelBody title="My Profile">
@@ -85,9 +85,7 @@ _PanelRow.args = {
 	),
 };
 
-export const DisabledSection: ComponentStory< typeof Panel > = Template.bind(
-	{}
-);
+export const DisabledSection: StoryFn< typeof Panel > = Template.bind( {} );
 DisabledSection.args = {
 	...Default.args,
 	children: (
@@ -99,7 +97,7 @@ DisabledSection.args = {
 	),
 };
 
-export const WithIcon: ComponentStory< typeof Panel > = Template.bind( {} );
+export const WithIcon: StoryFn< typeof Panel > = Template.bind( {} );
 WithIcon.args = {
 	...Default.args,
 	children: (

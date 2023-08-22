@@ -87,7 +87,7 @@ jobs:
               uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               with:
                   name: performance-results
-                  path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results.json
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
 
             - name: Publish performance results
               if: github.event_name == 'push'

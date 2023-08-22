@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import SnackbarList from '../list';
 
-const meta: ComponentMeta< typeof SnackbarList > = {
+const meta: Meta< typeof SnackbarList > = {
 	title: 'Components/SnackbarList',
 	component: SnackbarList,
 	argTypes: {
@@ -32,7 +32,7 @@ const meta: ComponentMeta< typeof SnackbarList > = {
 };
 export default meta;
 
-export const Default: ComponentStory< typeof SnackbarList > = ( {
+export const Default: StoryFn< typeof SnackbarList > = ( {
 	children,
 	notices: noticesProp,
 	...props

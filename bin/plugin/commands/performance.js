@@ -14,11 +14,13 @@ const {
 	readJSONFile,
 	askForConfirmation,
 	getRandomTemporaryPath,
+	getFilesFromDir,
 } = require( '../lib/utils' );
 const config = require( '../config' );
 
 const ARTIFACTS_PATH =
 	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
+const RESULTS_FILE_SUFFIX = '.performance-results.json';
 
 /**
  * @typedef WPPerformanceCommandOptions
@@ -27,62 +29,6 @@ const ARTIFACTS_PATH =
  * @property {number=}  rounds      Run each test suite this many times for each branch.
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
- */
-
-/**
- * @typedef WPRawPerformanceResults
- *
- * @property {number[]} timeToFirstByte        Represents the time since the browser started the request until it received a response.
- * @property {number[]} largestContentfulPaint Represents the time when the main content of the page has likely loaded.
- * @property {number[]} lcpMinusTtfb           Represents the difference between LCP and TTFB.
- * @property {number[]} serverResponse         Represents the time the server takes to respond.
- * @property {number[]} firstPaint             Represents the time when the user agent first rendered after navigation.
- * @property {number[]} domContentLoaded       Represents the time immediately after the document's DOMContentLoaded event completes.
- * @property {number[]} loaded                 Represents the time when the load event of the current document is completed.
- * @property {number[]} firstContentfulPaint   Represents the time when the browser first renders any text or media.
- * @property {number[]} firstBlock             Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number[]} type                   Average type time.
- * @property {number[]} typeContainer          Average type time within a container.
- * @property {number[]} focus                  Average block selection time.
- * @property {number[]} inserterOpen           Average time to open global inserter.
- * @property {number[]} inserterSearch         Average time to search the inserter.
- * @property {number[]} inserterHover          Average time to move mouse between two block item in the inserter.
- * @property {number[]} listViewOpen           Average time to open listView
- */
-
-/**
- * @typedef WPPerformanceResults
- *
- * @property {number=} timeToFirstByte        Represents the time since the browser started the request until it received a response.
- * @property {number=} largestContentfulPaint Represents the time when the main content of the page has likely loaded.
- * @property {number=} lcpMinusTtfb           Represents the difference between LCP and TTFB.
- * @property {number=} serverResponse         Represents the time the server takes to respond.
- * @property {number=} firstPaint             Represents the time when the user agent first rendered after navigation.
- * @property {number=} domContentLoaded       Represents the time immediately after the document's DOMContentLoaded event completes.
- * @property {number=} loaded                 Represents the time when the load event of the current document is completed.
- * @property {number=} firstContentfulPaint   Represents the time when the browser first renders any text or media.
- * @property {number=} firstBlock             Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number=} type                   Average type time.
- * @property {number=} minType                Minimum type time.
- * @property {number=} maxType                Maximum type time.
- * @property {number=} typeContainer          Average type time within a container.
- * @property {number=} minTypeContainer       Minimum type time within a container.
- * @property {number=} maxTypeContainer       Maximum type time within a container.
- * @property {number=} focus                  Average block selection time.
- * @property {number=} minFocus               Min block selection time.
- * @property {number=} maxFocus               Max block selection time.
- * @property {number=} inserterOpen           Average time to open global inserter.
- * @property {number=} minInserterOpen        Min time to open global inserter.
- * @property {number=} maxInserterOpen        Max time to open global inserter.
- * @property {number=} inserterSearch         Average time to open global inserter.
- * @property {number=} minInserterSearch      Min time to open global inserter.
- * @property {number=} maxInserterSearch      Max time to open global inserter.
- * @property {number=} inserterHover          Average time to move mouse between two block item in the inserter.
- * @property {number=} minInserterHover       Min time to move mouse between two block item in the inserter.
- * @property {number=} maxInserterHover       Max time to move mouse between two block item in the inserter.
- * @property {number=} listViewOpen           Average time to open list view.
- * @property {number=} minListViewOpen        Min time to open list view.
- * @property {number=} maxListViewOpen        Max time to open list view.
  */
 
 /**
@@ -97,92 +43,22 @@ function sanitizeBranchName( branch ) {
 }
 
 /**
- * Computes the average number from an array numbers.
- *
- * @param {number[]} array
- *
- * @return {number} Average.
- */
-function average( array ) {
-	return array.reduce( ( a, b ) => a + b, 0 ) / array.length;
-}
-
-/**
  * Computes the median number from an array numbers.
  *
  * @param {number[]} array
  *
- * @return {number} Median.
+ * @return {number|undefined} Median value or undefined if array empty.
  */
 function median( array ) {
-	const mid = Math.floor( array.length / 2 ),
-		numbers = [ ...array ].sort( ( a, b ) => a - b );
-	return array.length % 2 !== 0
-		? numbers[ mid ]
-		: ( numbers[ mid - 1 ] + numbers[ mid ] ) / 2;
-}
+	if ( ! array || ! array.length ) return undefined;
 
-/**
- * Rounds and format a time passed in milliseconds.
- *
- * @param {number} number
- *
- * @return {number} Formatted time.
- */
-function formatTime( number ) {
-	const factor = Math.pow( 10, 2 );
-	return Math.round( number * factor ) / factor;
-}
+	const numbers = [ ...array ].sort( ( a, b ) => a - b );
+	const middleIndex = Math.floor( numbers.length / 2 );
 
-/**
- * Curate the raw performance results.
- *
- * @param {string}                  testSuite
- * @param {WPRawPerformanceResults} results
- *
- * @return {WPPerformanceResults} Curated Performance results.
- */
-function curateResults( testSuite, results ) {
-	if (
-		testSuite === 'front-end-classic-theme' ||
-		testSuite === 'front-end-block-theme'
-	) {
-		return {
-			timeToFirstByte: median( results.timeToFirstByte ),
-			largestContentfulPaint: median( results.largestContentfulPaint ),
-			lcpMinusTtfb: median( results.lcpMinusTtfb ),
-		};
+	if ( numbers.length % 2 === 0 ) {
+		return ( numbers[ middleIndex - 1 ] + numbers[ middleIndex ] ) / 2;
 	}
-
-	return {
-		serverResponse: average( results.serverResponse ),
-		firstPaint: average( results.firstPaint ),
-		domContentLoaded: average( results.domContentLoaded ),
-		loaded: average( results.loaded ),
-		firstContentfulPaint: average( results.firstContentfulPaint ),
-		firstBlock: average( results.firstBlock ),
-		type: average( results.type ),
-		minType: Math.min( ...results.type ),
-		maxType: Math.max( ...results.type ),
-		typeContainer: average( results.typeContainer ),
-		minTypeContainer: Math.min( ...results.typeContainer ),
-		maxTypeContainer: Math.max( ...results.typeContainer ),
-		focus: average( results.focus ),
-		minFocus: Math.min( ...results.focus ),
-		maxFocus: Math.max( ...results.focus ),
-		inserterOpen: average( results.inserterOpen ),
-		minInserterOpen: Math.min( ...results.inserterOpen ),
-		maxInserterOpen: Math.max( ...results.inserterOpen ),
-		inserterSearch: average( results.inserterSearch ),
-		minInserterSearch: Math.min( ...results.inserterSearch ),
-		maxInserterSearch: Math.max( ...results.inserterSearch ),
-		inserterHover: average( results.inserterHover ),
-		minInserterHover: Math.min( ...results.inserterHover ),
-		maxInserterHover: Math.max( ...results.inserterHover ),
-		listViewOpen: average( results.listViewOpen ),
-		minListViewOpen: Math.min( ...results.listViewOpen ),
-		maxListViewOpen: Math.max( ...results.listViewOpen ),
-	};
+	return numbers[ middleIndex ];
 }
 
 /**
@@ -190,26 +66,17 @@ function curateResults( testSuite, results ) {
  *
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
- * @param {string} runKey                   Unique identifier for the test run, e.g. `branch-name_post-editor_run-3`.
- *
- * @return {Promise<WPPerformanceResults>} Performance results for the branch.
+ * @param {string} runKey                   Unique identifier for the test run.
  */
 async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
-	const resultsFilename = `${ runKey }.performance-results.json`;
-
 	await runShellScript(
 		`npm run test:performance -- ${ testSuite }`,
 		performanceTestDirectory,
 		{
 			...process.env,
 			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
-			RESULTS_FILENAME: resultsFilename,
+			RESULTS_ID: runKey,
 		}
-	);
-
-	return curateResults(
-		testSuite,
-		await readJSONFile( path.join( ARTIFACTS_PATH, resultsFilename ) )
 	);
 }
 
@@ -239,7 +106,10 @@ async function runPerformanceTests( branches, options ) {
 		await askForConfirmation( 'Ready to go? ' );
 	}
 
-	// 1- Preparing the tests directory.
+	/*
+	 * 1- Preparing the tests directory.
+	 */
+
 	log( '\n>> Preparing the tests directories' );
 	log( '    >> Cloning the repository' );
 
@@ -285,13 +155,22 @@ async function runPerformanceTests( branches, options ) {
 
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && node ./bin/packages/build.js"',
+		`bash -c "${ [
+			'source $HOME/.nvm/nvm.sh',
+			'nvm install',
+			'npm ci',
+			'npx playwright install chromium --with-deps',
+			'npm run build:packages',
+		].join( ' && ' ) }"`,
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
 	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs' );
 
-	// 2- Preparing the environment directories per branch.
+	/*
+	 * 2- Preparing the environment directories per branch.
+	 */
+
 	log( '\n>> Preparing an environment directory per branch' );
 	const branchDirectories = {};
 	for ( const branch of branches ) {
@@ -404,7 +283,7 @@ async function runPerformanceTests( branches, options ) {
 		}
 	}
 
-	// 3- Printing the used folders.
+	// Printing the used folders.
 	log(
 		'\n>> Perf Tests Directory : ' +
 			formats.success( performanceTestDirectory )
@@ -415,34 +294,28 @@ async function runPerformanceTests( branches, options ) {
 		log( `>> Environment Directory (${ branch }) : ${ envPath }` );
 	}
 
-	// 4- Running the tests.
+	/*
+	 * 3- Running the tests.
+	 */
+
 	log( '\n>> Running the tests' );
 
-	const testSuites = [
-		'post-editor',
-		'site-editor',
-		'front-end-classic-theme',
-		'front-end-block-theme',
-	];
+	const testSuites = getFilesFromDir(
+		path.join( performanceTestDirectory, 'test/performance/specs' )
+	).map( ( file ) => path.basename( file, '.spec.js' ) );
 
-	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
-	const results = {};
 	const wpEnvPath = path.join(
 		performanceTestDirectory,
 		'node_modules/.bin/wp-env'
 	);
 
 	for ( const testSuite of testSuites ) {
-		results[ testSuite ] = {};
-		/** @type {Array<Record<string, WPPerformanceResults>>} */
-		const rawResults = [];
-		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
-			const roundInfo = `round ${ i + 1 } of ${ TEST_ROUNDS }`;
+		for ( let i = 1; i <= TEST_ROUNDS; i++ ) {
+			const roundInfo = `round ${ i } of ${ TEST_ROUNDS }`;
 			log( `    >> Suite: ${ testSuite } (${ roundInfo })` );
-			rawResults[ i ] = {};
 			for ( const branch of branches ) {
 				const sanitizedBranch = sanitizeBranchName( branch );
-				const runKey = `${ testSuite }_${ sanitizedBranch }_run-${ i }`;
+				const runKey = `${ testSuite }_${ sanitizedBranch }_round-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
 				log( `        >> Branch: ${ branch }` );
@@ -452,7 +325,7 @@ async function runPerformanceTests( branches, options ) {
 					environmentDirectory
 				);
 				log( '            >> Running the test.' );
-				rawResults[ i ][ branch ] = await runTestSuite(
+				await runTestSuite(
 					testSuite,
 					performanceTestDirectory,
 					runKey
@@ -464,53 +337,60 @@ async function runPerformanceTests( branches, options ) {
 				);
 			}
 		}
-
-		// Computing medians.
-		for ( const branch of branches ) {
-			/**
-			 * @type {string[]}
-			 */
-			let dataPointsForTestSuite = [];
-			if ( rawResults.length > 0 ) {
-				dataPointsForTestSuite = Object.keys(
-					rawResults[ 0 ][ branch ]
-				);
-			}
-
-			const resultsByDataPoint = {};
-			dataPointsForTestSuite.forEach( ( dataPoint ) => {
-				// @ts-ignore
-				resultsByDataPoint[ dataPoint ] = rawResults.map(
-					// @ts-ignore
-					( r ) => r[ branch ][ dataPoint ]
-				);
-			} );
-			// @ts-ignore
-			const medians = Object.fromEntries(
-				Object.entries( resultsByDataPoint ).map(
-					( [ dataPoint, dataPointResults ] ) => [
-						dataPoint,
-						median( dataPointResults ),
-					]
-				)
-			);
-
-			// Format results as times.
-			// @ts-ignore
-			results[ testSuite ][ branch ] = Object.fromEntries(
-				Object.entries( medians ).map(
-					( [ dataPoint, dataPointMedian ] ) => [
-						dataPoint,
-						formatTime( dataPointMedian ),
-					]
-				)
-			);
-		}
 	}
 
-	// 5- Formatting the results.
-	log( '\n>> 🎉 Results.\n' );
+	/*
+	 * 4- Formatting and saving the results.
+	 */
 
+	// Load curated results from each round.
+	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>
+		file.endsWith( RESULTS_FILE_SUFFIX )
+	);
+	/** @type {Record<string,Record<string, Record<string, number>>>} */
+	const results = {};
+
+	// Calculate medians from all rounds.
+	for ( const testSuite of testSuites ) {
+		results[ testSuite ] = {};
+
+		for ( const branch of branches ) {
+			const sanitizedBranch = sanitizeBranchName( branch );
+			const resultsRounds = resultFiles
+				.filter( ( file ) =>
+					file.includes(
+						`${ testSuite }_${ sanitizedBranch }_round-`
+					)
+				)
+				.map( ( file ) => readJSONFile( file ) );
+
+			const metrics = Object.keys( resultsRounds[ 0 ] );
+			results[ testSuite ][ branch ] = {};
+
+			for ( const metric of metrics ) {
+				const values = resultsRounds
+					.map( ( round ) => round[ metric ] )
+					.filter( ( value ) => typeof value === 'number' );
+
+				const value = median( values );
+				if ( value !== undefined ) {
+					results[ testSuite ][ branch ][ metric ] = value;
+				}
+			}
+		}
+
+		// Save calculated results to file.
+		fs.writeFileSync(
+			path.join( ARTIFACTS_PATH, testSuite + RESULTS_FILE_SUFFIX ),
+			JSON.stringify( results[ testSuite ], null, 2 )
+		);
+	}
+
+	/*
+	 * 5- Displaying the results.
+	 */
+
+	log( '\n>> 🎉 Results.\n' );
 	log(
 		'\nPlease note that client side metrics EXCLUDE the server response time.\n'
 	);
@@ -518,31 +398,20 @@ async function runPerformanceTests( branches, options ) {
 	for ( const testSuite of testSuites ) {
 		log( `\n>> ${ testSuite }\n` );
 
+		// Invert the results so we can display them in a table.
 		/** @type {Record<string, Record<string, string>>} */
 		const invertedResult = {};
-		Object.entries( results[ testSuite ] ).reduce(
-			( acc, [ key, val ] ) => {
-				for ( const entry of Object.keys( val ) ) {
-					// @ts-ignore
-					if ( ! acc[ entry ] && isFinite( val[ entry ] ) )
-						acc[ entry ] = {};
-					// @ts-ignore
-					if ( isFinite( val[ entry ] ) ) {
-						// @ts-ignore
-						acc[ entry ][ key ] = val[ entry ] + ' ms';
-					}
-				}
-				return acc;
-			},
-			invertedResult
-		);
-		console.table( invertedResult );
+		for ( const [ branch, metrics ] of Object.entries(
+			results[ testSuite ]
+		) ) {
+			for ( const [ metric, value ] of Object.entries( metrics ) ) {
+				invertedResult[ metric ] = invertedResult[ metric ] || {};
+				invertedResult[ metric ][ branch ] = `${ value } ms`;
+			}
+		}
 
-		const resultsFilename = testSuite + '.performance-results.json';
-		fs.writeFileSync(
-			path.join( ARTIFACTS_PATH, resultsFilename ),
-			JSON.stringify( results[ testSuite ], null, 2 )
-		);
+		// Print the results.
+		console.table( invertedResult );
 	}
 }
 

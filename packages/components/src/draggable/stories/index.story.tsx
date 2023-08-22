@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { DragEvent } from 'react';
 
 /**
@@ -16,7 +16,7 @@ import { Icon, more } from '@wordpress/icons';
  */
 import Draggable from '..';
 
-const meta: ComponentMeta< typeof Draggable > = {
+const meta: Meta< typeof Draggable > = {
 	component: Draggable,
 	title: 'Components/Draggable',
 	argTypes: {
@@ -31,7 +31,7 @@ const meta: ComponentMeta< typeof Draggable > = {
 };
 export default meta;
 
-const DefaultTemplate: ComponentStory< typeof Draggable > = ( args ) => {
+const DefaultTemplate: StoryFn< typeof Draggable > = ( args ) => {
 	const [ isDragging, setDragging ] = useState( false );
 	const instanceId = useInstanceId( DefaultTemplate );
 
@@ -100,9 +100,7 @@ const DefaultTemplate: ComponentStory< typeof Draggable > = ( args ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Draggable > = DefaultTemplate.bind(
-	{}
-);
+export const Default: StoryFn< typeof Draggable > = DefaultTemplate.bind( {} );
 Default.args = {};
 
 /**
@@ -112,7 +110,7 @@ Default.args = {};
  * For example, when the element's parent sets a `z-index` value that would cause the dragged
  * element to be rendered behind other elements.
  */
-export const AppendElementToOwnerDocument: ComponentStory< typeof Draggable > =
+export const AppendElementToOwnerDocument: StoryFn< typeof Draggable > =
 	DefaultTemplate.bind( {} );
 AppendElementToOwnerDocument.args = {
 	appendToOwnerDocument: true,
