@@ -20,6 +20,8 @@ import Button from '../../button';
 
 const meta: ComponentMeta< typeof Card > = {
 	component: Card,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
 	title: 'Components/Card',
 	argTypes: {
 		as: {
