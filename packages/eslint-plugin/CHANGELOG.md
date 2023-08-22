@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.0.0 (2023-08-16)
+
 ### Breaking Changes
 
 -   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring ^39.6.9 to requiring ^46.4.6 ([#53629](https://github.com/WordPress/gutenberg/pull/53629)):

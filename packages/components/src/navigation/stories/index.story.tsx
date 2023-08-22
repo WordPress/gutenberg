@@ -43,7 +43,7 @@ const meta: ComponentMeta< typeof Navigation > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 

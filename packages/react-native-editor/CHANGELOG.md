@@ -10,8 +10,14 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.102.0
 -   [*] Display custom color value in mobile Cover Block color picker [#51414]
--   [**] Display outline around selected Social Link block [#51414]
+-   [**] Display outline around selected Social Link block [#53377]
+-   [**] Fixes font customization not getting updated on iOS [#53391]
+
+## 1.101.1
+-  [**] Fix the dynamic height when opening/closing navigation screens within the bottom sheet. [https://github.com/WordPress/gutenberg/pull/53608]
 
 ## 1.101.0
 -   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]

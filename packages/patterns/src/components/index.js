@@ -12,12 +12,11 @@ import PatternsManageButton from './patterns-manage-button';
 export default function PatternsMenuItems( { rootClientId } ) {
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { onClose, selectedClientIds } ) => (
+			{ ( { selectedClientIds } ) => (
 				<>
 					<PatternConvertButton
 						clientIds={ selectedClientIds }
 						rootClientId={ rootClientId }
-						onClose={ onClose }
 					/>
 					{ selectedClientIds.length === 1 && (
 						<PatternsManageButton

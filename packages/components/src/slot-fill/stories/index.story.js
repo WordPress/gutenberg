@@ -15,7 +15,7 @@ export default {
 	subcomponents: { Fill, SlotFillProvider },
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 

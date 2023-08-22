@@ -35,7 +35,7 @@ const meta: ComponentMeta< typeof Card > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 
