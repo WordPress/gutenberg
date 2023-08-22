@@ -180,4 +180,13 @@ test.describe( 'data-wp-context', () => {
 		await page.getByTestId( 'navigate' ).click();
 		await expect( element ).toHaveText( 'some new text' );
 	} );
+
+	test( 'should maintain the same context reference on async actions', async ( {
+		page,
+	} ) => {
+		const element = page.getByTestId( 'navigation new text' );
+		await expect( element ).toHaveText( '' );
+		await page.getByTestId( 'async navigate' ).click();
+		await expect( element ).toHaveText( 'changed from async action' );
+	} );
 } );
