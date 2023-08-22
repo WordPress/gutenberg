@@ -12,6 +12,7 @@
 			<button data-testid="toggle text" data-wp-on--click="actions.toggleText">Toggle Text</button>
 			<button data-testid="add new text" data-wp-on--click="actions.addNewText">Add new text</button>
 			<button data-testid="navigate" data-wp-on--click="actions.navigate">Navigate</button>
+			<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
 		</div>`;
 
 	store( {
@@ -41,6 +42,13 @@
 					force: true,
 					html,
 				} );
+			},
+			asyncNavigate: async ({ context }) => {
+				await navigate( window.location, {
+					force: true,
+					html,
+				} );
+				context.newText = 'changed from async action';
 			}
 		},
 	} );
