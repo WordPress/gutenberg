@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Merge new server-side rendered context on client-side navigation. ([#53853](https://github.com/WordPress/gutenberg/pull/53853))
+
 ## 2.1.0 (2023-08-16)
 
 ### New Features

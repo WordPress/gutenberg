@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useContext, useMemo, useEffect } from 'preact/hooks';
+import { useContext, useMemo, useEffect, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
@@ -36,20 +36,24 @@ export default () => {
 		'context',
 		( {
 			directives: {
-				context: { default: context },
+				context: { default: newContext },
 			},
 			props: { children },
-			context: inherited,
+			context: inheritedContext,
 		} ) => {
-			const { Provider } = inherited;
-			const inheritedValue = useContext( inherited );
-			const value = useMemo( () => {
-				const localValue = deepSignal( context );
-				mergeDeepSignals( localValue, inheritedValue );
-				return localValue;
-			}, [ context, inheritedValue ] );
+			const { Provider } = inheritedContext;
+			const inheritedValue = useContext( inheritedContext );
+			const currentValue = useRef( deepSignal( {} ) );
+			currentValue.current = useMemo( () => {
+				const newValue = deepSignal( newContext );
+				mergeDeepSignals( newValue, currentValue.current );
+				mergeDeepSignals( newValue, inheritedValue );
+				return newValue;
+			}, [ newContext, inheritedValue ] );
 
-			return <Provider value={ value }>{ children }</Provider>;
+			return (
+				<Provider value={ currentValue.current }>{ children }</Provider>
+			);
 		},
 		{ priority: 5 }
 	);
