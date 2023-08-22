@@ -15,7 +15,11 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	useEntityRecord,
+	useEntityRecords,
+} from '@wordpress/core-data';
 import {
 	SearchControl,
 	__experimentalVStack as VStack,
@@ -55,7 +59,14 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 /**
  * @typedef {Object} Attachment
- * @property {{raw: string, rendered: string}} title The name of the attachment.
+ * @property {number}                          [id]            The ID of the attachment.
+ * @property {{raw: string, rendered: string}} [title]         The title of the attachment.
+ * @property {{id: number, name: string}[]}    attachment_tags The tags of the attachment.
+ * @property {{id: number, name: string}}      [author]        The author of the attachment.
+ * @property {number}                          [post]          The post the attachment is attached to.
+ * @property {string}                          [date_gmt]      The date the attachment was created.
+ * @property {string}                          [formattedDate] The formatted date the attachment was created.
+ * @property {string}                          [url]           The URL of the attachment.
  */
 
 /** @type {import('@tanstack/react-table').ColumnHelper<Attachment>} */
@@ -82,16 +93,26 @@ function GridItemButton( { item } ) {
 	);
 }
 
-function TagsCellButton( { attachmentId, tagIds = [], tags } ) {
+function TagsCellButton( { attachmentId, tags = [] } ) {
+	const { records: allTags } = useEntityRecords(
+		'taxonomy',
+		'attachment_tag',
+		{
+			per_page: -1,
+		}
+	);
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const tagIds = tags.map( ( tag ) => tag.id );
 	return (
 		<FilterControl
 			placeholder={ __( 'Select or add tag' ) }
 			value={ tagIds }
-			options={ tags.map( ( tag ) => ( {
-				value: tag.id,
-				label: tag.name,
-			} ) ) }
+			options={
+				allTags?.map( ( tag ) => ( {
+					value: tag.id,
+					label: tag.name,
+				} ) ) ?? []
+			}
 			multiple
 			hideClear
 			onChange={ async ( newTagIds ) => {
@@ -118,20 +139,17 @@ function TagsCellButton( { attachmentId, tagIds = [], tags } ) {
 		>
 			{ ( { onToggle } ) => (
 				<Button onClick={ onToggle }>
-					{ tagIds.length ? (
+					{ tags.length ? (
 						<HStack>
-							{ tagIds.map( ( tagId ) => (
+							{ tags.map( ( tag ) => (
 								<span
-									key={ tagId }
+									key={ tag.id }
 									style={ {
 										background: '#ddd',
 										padding: '0.1em 0.5em',
 									} }
 								>
-									{
-										tags.find( ( tag ) => tag.id === tagId )
-											?.name
-									}
+									{ tag.name }
 								</span>
 							) ) }
 						</HStack>
@@ -177,18 +195,30 @@ const columns = [
 			),
 		sortingFn: 'alphanumeric',
 	} ),
-	columnHelper.accessor( 'attachment_tags', {
-		id: 'tags',
-		header: () => __( 'Tags' ),
-		cell: ( info ) => (
-			<TagsCellButton
-				attachmentId={ info.row.original.id }
-				tagIds={ info.getValue() }
-				tags={ info.table.options.meta.tags }
-			/>
-		),
-		filterFn: 'arrIncludesAll',
-	} ),
+	columnHelper.accessor(
+		// Return a string so that the global filter can match against it.
+		( row ) => row.attachment_tags.map( ( tag ) => tag.name ).join( ' ' ),
+		{
+			id: 'tags',
+			header: () => __( 'Tags' ),
+			cell: ( info ) => (
+				<TagsCellButton
+					attachmentId={ info.row.original.id }
+					tags={ info.row.original.attachment_tags }
+				/>
+			),
+			filterFn: ( row, _columnId, filterValue ) => {
+				return (
+					! filterValue.length ||
+					filterValue.some( ( tagId ) =>
+						row.original.attachment_tags.some(
+							( tag ) => tag.id === tagId
+						)
+					)
+				);
+			},
+		}
+	),
 	columnHelper.accessor( 'post', {
 		header: () => __( 'Attached to' ),
 		cell: function AttachedToCell( info ) {
@@ -202,26 +232,31 @@ const columns = [
 		},
 		sortingFn: 'alphanumeric',
 	} ),
-	columnHelper.accessor( 'author', {
+	columnHelper.accessor( ( row ) => row.author?.name, {
+		id: 'author',
 		header: () => __( 'Author' ),
-		cell: ( info ) => {
-			const users = info.table.options.meta.users;
-			if ( ! users ) return null;
-			return users.find( ( user ) => user.id === info.getValue() )?.name;
-		},
+		cell: ( info ) => info.getValue(),
 		sortingFn: 'alphanumeric',
+		filterFn: ( row, _columnId, filterValue ) => {
+			return (
+				! filterValue.length ||
+				filterValue.some(
+					( authorId ) => row.original.author?.id === authorId
+				)
+			);
+		},
 	} ),
-	columnHelper.accessor( 'date_gmt', {
+	columnHelper.accessor( 'formattedDate', {
 		header: () => __( 'Date' ),
 		cell: ( info ) =>
 			info.getValue() && (
-				<time dateTime={ info.getValue() }>
-					{ info.table.options.meta.dateFormatter.format(
-						new Date( info.getValue() )
-					) }
+				<time dateTime={ info.row.original.date_gmt }>
+					{ info.getValue() }
 				</time>
 			),
-		sortingFn: 'datetime',
+		sortingFn: ( rowA, rowB ) =>
+			new Date( rowA.original.date_gmt ) -
+			new Date( rowB.original.date_gmt ),
 	} ),
 	columnHelper.display( {
 		id: 'actions',
@@ -286,12 +321,6 @@ export default function PageMedia() {
 		},
 		[ mediaType ]
 	);
-	const [ transientAttachments, setTransientAttachments ] = useState( [] );
-	const attachments = useMemo(
-		() => [ ...transientAttachments, ...persistedAttachments ],
-		[ persistedAttachments, transientAttachments ]
-	);
-
 	const dateFormatter = useMemo(
 		() =>
 			new Intl.DateTimeFormat( locale || 'en-US', {
@@ -301,6 +330,34 @@ export default function PageMedia() {
 			} ),
 		[ locale ]
 	);
+	const [ transientAttachments, setTransientAttachments ] = useState( [] );
+	const attachments = useMemo(
+		() => [
+			...transientAttachments,
+			...persistedAttachments.map( ( attachment ) => ( {
+				...attachment,
+				attachment_tags: attachment.attachment_tags
+					.map( ( tagId ) =>
+						tags.find( ( tag ) => tagId === tag.id )
+					)
+					.filter( ( tag ) => !! tag ),
+				author: users?.find(
+					( user ) => user.id === attachment.author
+				),
+				formattedDate: dateFormatter.format(
+					new Date( attachment.date_gmt )
+				),
+			} ) ),
+		],
+		[
+			dateFormatter,
+			persistedAttachments,
+			tags,
+			transientAttachments,
+			users,
+		]
+	);
+
 	/** @type {import('@tanstack/react-table').ColumnFiltersState} */
 	const columnFilters = useMemo(
 		() => [
@@ -356,11 +413,6 @@ export default function PageMedia() {
 				} );
 			}
 		},
-		meta: {
-			tags,
-			dateFormatter,
-			users,
-		},
 		enableMultiRowSelection: false,
 		enableSorting: true,
 		enableHiding: true,
@@ -386,7 +438,14 @@ export default function PageMedia() {
 				const newTransientAttachments = newFiles.filter( ( file ) =>
 					isBlobURL( file.url )
 				);
-				setTransientAttachments( newTransientAttachments );
+				setTransientAttachments(
+					newTransientAttachments.map( ( attachment ) => ( {
+						...attachment,
+						attachment_tags: [],
+						post: null,
+						author: null,
+					} ) )
+				);
 				const newMediaItems = newFiles.filter( ( file ) => !! file.id );
 				if ( newMediaItems.length ) {
 					receiveEntityRecords(
