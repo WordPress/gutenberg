@@ -78,7 +78,7 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 			)
 		) ) {
 			if ( ! $this->is_tag_closer() ) {
-				$depth++;
+				++$depth;
 				continue;
 			}
 
@@ -86,7 +86,7 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 				return true;
 			}
 
-			$depth--;
+			--$depth;
 		}
 
 		return false;

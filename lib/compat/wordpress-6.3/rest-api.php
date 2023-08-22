@@ -70,7 +70,7 @@ if ( ! function_exists( 'add_modified_wp_template_schema' ) ) {
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'get_callback' => function( $object ) {
+				'get_callback' => function ( $object ) {
 					if ( ! empty( $object['wp_id'] ) ) {
 						$post = get_post( $object['wp_id'] );
 						if ( $post && isset( $post->post_modified ) ) {
