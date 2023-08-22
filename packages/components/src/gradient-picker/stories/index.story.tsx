@@ -17,7 +17,7 @@ const meta: ComponentMeta< typeof GradientPicker > = {
 	component: GradientPicker,
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 		actions: { argTypesRegex: '^on.*' },
 	},
 	argTypes: {

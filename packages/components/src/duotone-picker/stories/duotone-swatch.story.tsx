@@ -13,7 +13,7 @@ const meta: ComponentMeta< typeof DuotoneSwatch > = {
 	component: DuotoneSwatch,
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
