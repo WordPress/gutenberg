@@ -420,6 +420,8 @@ export default function DimensionsPanel( {
 				layout: {
 					selfStretch: undefined,
 					flexSize: undefined,
+					height: undefined,
+					width: undefined,
 				},
 			},
 		} );
@@ -435,6 +437,8 @@ export default function DimensionsPanel( {
 				wideSize: undefined,
 				selfStretch: undefined,
 				flexSize: undefined,
+				height: undefined,
+				width: undefined,
 			} ),
 			spacing: {
 				...previousValue?.spacing,
@@ -519,6 +523,46 @@ export default function DimensionsPanel( {
 							<Icon icon={ stretchWide } />
 						</View>
 					</HStack>
+				</ToolsPanelItem>
+			) }
+
+			{ showChildLayoutControl && (
+				<VStack
+					as={ ToolsPanelItem }
+					spacing={ 2 }
+					hasValue={ hasChildLayoutValue }
+					label={ childLayoutOrientationLabel }
+					onDeselect={ resetChildLayoutValue }
+					isShownByDefault={
+						defaultControls.childLayout ??
+						DEFAULT_CONTROLS.childLayout
+					}
+					panelId={ panelId }
+				>
+					<ChildLayoutControl
+						value={ inheritedValue }
+						onChange={ setChildLayout }
+						parentLayout={ settings?.parentLayout }
+						align={ align }
+						clientId={ clientId }
+					/>
+				</VStack>
+			) }
+			{ showMinHeightControl && (
+				<ToolsPanelItem
+					hasValue={ hasMinHeightValue }
+					label={ __( 'Min. height' ) }
+					onDeselect={ resetMinHeightValue }
+					isShownByDefault={
+						defaultControls.minHeight ?? DEFAULT_CONTROLS.minHeight
+					}
+					panelId={ panelId }
+				>
+					<HeightControl
+						label={ __( 'Min. height' ) }
+						value={ minHeightValue }
+						onChange={ setMinHeightValue }
+					/>
 				</ToolsPanelItem>
 			) }
 			{ showPaddingControl && (

@@ -59,7 +59,20 @@ export default function ChildLayoutControl( {
 
 	const { layout: childLayout = {} } = value;
 
-	const { selfStretch, selfAlign, flexSize } = childLayout;
+	const { selfStretch, selfAlign, flexSize, height, width } = childLayout;
+
+	const isConstrained =
+		parentLayoutTypeToUse === 'constrained' ||
+		parentLayoutTypeToUse === 'default';
+
+	const widthProp =
+		isConstrained || orientation === 'vertical'
+			? 'selfAlign'
+			: 'selfStretch';
+	const heightProp =
+		isConstrained || orientation === 'vertical'
+			? 'selfStretch'
+			: 'selfAlign';
 
 	useEffect( () => {
 		if ( selfStretch === 'fixed' && ! flexSize ) {
@@ -73,11 +86,23 @@ export default function ChildLayoutControl( {
 	const widthOptions = [];
 
 	if ( parentLayoutTypeToUse === 'constrained' ) {
-		widthOptions.push( {
-			key: 'content',
-			value: 'content',
-			name: __( 'Content' ),
-		} );
+		widthOptions.push(
+			{
+				key: 'content',
+				value: 'content',
+				name: __( 'Content' ),
+			},
+			{
+				key: 'fixedNoShrink',
+				value: 'fixedNoShrink',
+				name: __( 'Fixed' ),
+			},
+			{
+				key: 'fit',
+				value: 'fit',
+				name: __( 'Fit' ),
+			}
+		);
 		if ( supportsFullAlign ) {
 			widthOptions.push( {
 				key: 'fill',
@@ -93,8 +118,8 @@ export default function ChildLayoutControl( {
 			} );
 		}
 	} else if (
-		parentLayoutTypeToUse === 'flex' &&
-		orientation === 'vertical'
+		parentLayoutTypeToUse === 'default' ||
+		( parentLayoutTypeToUse === 'flex' && orientation === 'vertical' )
 	) {
 		widthOptions.push(
 			{
@@ -106,6 +131,11 @@ export default function ChildLayoutControl( {
 				key: 'fill',
 				value: 'fill',
 				name: __( 'Fill' ),
+			},
+			{
+				key: 'fixedNoShrink',
+				value: 'fixedNoShrink',
+				name: __( 'Fixed' ),
 			}
 		);
 	} else if (
@@ -144,7 +174,7 @@ export default function ChildLayoutControl( {
 		},
 	];
 
-	if ( parentLayoutTypeToUse === 'flex' && orientation === 'vertical' ) {
+	if ( parentLayoutTypeToUse === 'flex' ) {
 		heightOptions.push(
 			{
 				key: 'fixed',
@@ -162,23 +192,29 @@ export default function ChildLayoutControl( {
 				name: __( 'Fill' ),
 			}
 		);
-	} else if (
-		parentLayoutTypeToUse === 'flex' &&
-		orientation === 'horizontal'
-	) {
+	} else {
 		heightOptions.push( {
-			key: 'fill',
-			value: 'fill',
-			name: __( 'Fill' ),
+			key: 'fixedNoShrink',
+			value: 'fixedNoShrink',
+			name: __( 'Fixed' ),
 		} );
 	}
 
 	const selectedWidth = () => {
 		let selectedValue;
-		if ( parentLayoutTypeToUse === 'constrained' ) {
+		if ( isConstrained ) {
 			// Replace "full" with "fill" for full width alignments.
-			const alignmentValue = align === 'full' ? 'fill' : align;
-			selectedValue = alignmentValue || 'content';
+			if ( align === 'full' ) {
+				selectedValue = 'fill';
+			} else if ( align === 'wide' ) {
+				selectedValue = 'wide';
+			} else if ( selfAlign === 'fixedNoShrink' ) {
+				selectedValue = 'fixedNoShrink';
+			} else if ( selfAlign === 'fit' ) {
+				selectedValue = 'fit';
+			} else {
+				selectedValue = 'content';
+			}
 		} else if (
 			parentLayoutTypeToUse === 'flex' &&
 			orientation === 'vertical'
@@ -200,12 +236,15 @@ export default function ChildLayoutControl( {
 
 	const selectedHeight = () => {
 		let selectedValue;
-		if ( parentLayoutTypeToUse === 'flex' && orientation === 'vertical' ) {
-			selectedValue = selfStretch || 'fit';
+		if (
+			isConstrained ||
+			( parentLayoutTypeToUse === 'flex' && orientation === 'vertical' )
+		) {
+			selectedValue = childLayout[ heightProp ] || 'fit';
 		} else if ( parentLayoutTypeToUse === 'flex' ) {
 			const defaultSelfAlign =
 				verticalAlignment === 'stretch' ? 'fill' : 'fit';
-			selectedValue = selfAlign || defaultSelfAlign;
+			selectedValue = childLayout[ heightProp ] || defaultSelfAlign;
 		} else {
 			selectedValue = 'fit';
 		}
@@ -217,41 +256,56 @@ export default function ChildLayoutControl( {
 	const onChangeWidth = ( newWidth ) => {
 		const { selectedItem } = newWidth;
 		const { key } = selectedItem;
-		if ( parentLayoutTypeToUse === 'constrained' ) {
+		if ( isConstrained ) {
 			if ( key === 'fill' ) {
 				onChange( {
 					align: 'full',
+					style: {
+						...value,
+						layout: {
+							[ widthProp ]: key,
+						},
+					},
 				} );
 			} else if ( key === 'wide' ) {
 				onChange( {
 					align: 'wide',
+					style: {
+						...value,
+						layout: {
+							[ widthProp ]: key,
+						},
+					},
+				} );
+			} else if ( key === 'fixedNoShrink' ) {
+				onChange( {
+					align: null,
+					style: {
+						...value,
+						layout: {
+							...childLayout,
+							[ widthProp ]: key,
+						},
+					},
 				} );
 			} else {
 				onChange( {
 					align: null,
+					style: {
+						...value,
+						layout: {
+							[ widthProp ]: key,
+						},
+					},
 				} );
 			}
-		} else if (
-			parentLayoutTypeToUse === 'flex' &&
-			orientation === 'horizontal'
-		) {
+		} else if ( parentLayoutTypeToUse === 'flex' ) {
 			onChange( {
 				style: {
 					...value,
 					layout: {
-						selfStretch: key,
-					},
-				},
-			} );
-		} else if (
-			parentLayoutTypeToUse === 'flex' &&
-			orientation === 'vertical'
-		) {
-			onChange( {
-				style: {
-					...value,
-					layout: {
-						selfAlign: key,
+						...childLayout,
+						[ widthProp ]: key,
 					},
 				},
 			} );
@@ -259,104 +313,84 @@ export default function ChildLayoutControl( {
 	};
 
 	const onChangeHeight = ( newHeight ) => {
-		if ( parentLayoutTypeToUse === 'flex' && orientation === 'vertical' ) {
-			onChange( {
-				style: {
-					...value,
-					layout: {
-						selfStretch: newHeight.selectedItem.key,
-					},
+		onChange( {
+			style: {
+				...value,
+				layout: {
+					...childLayout,
+					[ heightProp ]: newHeight.selectedItem.key,
 				},
-			} );
-		} else if ( parentLayoutTypeToUse === 'flex' ) {
-			onChange( {
-				style: {
-					...value,
-					layout: {
-						selfAlign: newHeight.selectedItem.key,
-					},
-				},
-			} );
-		}
+			},
+		} );
 	};
 
 	return (
 		<>
 			<HStack style={ { alignItems: 'flex-end' } }>
-				{ parentLayoutTypeToUse !== 'default' &&
-					( supportsFullAlign ||
-						supportsWideAlign ||
-						parentLayoutType !== 'constrained' ) && (
-						<FlexBlock>
-							<CustomSelectControl
-								label={ __( 'Width' ) }
-								value={ selectedWidth() }
-								options={ widthOptions }
-								onChange={ onChangeWidth }
-								__nextUnconstrainedWidth
-								__next36pxDefaultSize
-							/>
-						</FlexBlock>
-					) }
+				<FlexBlock>
+					<CustomSelectControl
+						label={ __( 'Width' ) }
+						value={ selectedWidth() }
+						options={ widthOptions }
+						onChange={ onChangeWidth }
+						__nextUnconstrainedWidth
+						__next36pxDefaultSize
+					/>
+				</FlexBlock>
 
-				{ ( selfStretch === 'fixed' ||
-					selfStretch === 'fixedNoShrink' ) &&
-					orientation === 'horizontal' && (
-						<FlexBlock>
-							<UnitControl
-								size={ '__unstable-large' }
-								onChange={ ( _value ) => {
-									onChange( {
-										style: {
-											...value,
-											layout: {
-												...childLayout,
-												flexSize: _value,
-											},
+				{ ( childLayout[ widthProp ] === 'fixed' ||
+					childLayout[ widthProp ] === 'fixedNoShrink' ) && (
+					<FlexBlock>
+						<UnitControl
+							size={ '__unstable-large' }
+							onChange={ ( _value ) => {
+								onChange( {
+									style: {
+										...value,
+										layout: {
+											...childLayout,
+											width: _value,
 										},
-									} );
-								} }
-								value={ flexSize }
-							/>
-						</FlexBlock>
-					) }
+									},
+								} );
+							} }
+							value={ width }
+						/>
+					</FlexBlock>
+				) }
 			</HStack>
 			<HStack style={ { alignItems: 'flex-end' } }>
-				{ parentLayoutType !== 'default' &&
-					parentLayoutType !== 'constrained' && (
-						<FlexBlock>
-							<CustomSelectControl
-								label={ __( 'Height' ) }
-								value={ selectedHeight() }
-								options={ heightOptions }
-								onChange={ onChangeHeight }
-								__nextUnconstrainedWidth
-								__next36pxDefaultSize
-							/>
-						</FlexBlock>
-					) }
+				<FlexBlock>
+					<CustomSelectControl
+						label={ __( 'Height' ) }
+						value={ selectedHeight() }
+						options={ heightOptions }
+						onChange={ onChangeHeight }
+						__nextUnconstrainedWidth
+						__next36pxDefaultSize
+					/>
+				</FlexBlock>
 
-				{ ( selfStretch === 'fixed' ||
-					selfStretch === 'fixedNoShrink' ) &&
-					orientation === 'vertical' && (
-						<FlexBlock>
-							<UnitControl
-								size={ '__unstable-large' }
-								onChange={ ( _value ) => {
-									onChange( {
-										style: {
-											...value,
-											layout: {
-												...childLayout,
-												flexSize: _value,
-											},
+				{ ( childLayout[ heightProp ] === 'fixed' ||
+					childLayout[ heightProp ] === 'fixedNoShrink' ) && (
+					<FlexBlock>
+						<UnitControl
+							size={ '__unstable-large' }
+							onChange={ ( _value ) => {
+								onChange( {
+									style: {
+										...value,
+										layout: {
+											...childLayout,
+											height: _value,
 										},
-									} );
-								} }
-								value={ flexSize }
-							/>
-						</FlexBlock>
-					) }
+									},
+								} );
+							} }
+							value={ height }
+						/>
+					</FlexBlock>
+				) }
 			</HStack>
 		</>
 	);

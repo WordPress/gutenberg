@@ -25,7 +25,14 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import { arrowRight, arrowDown, grid } from '@wordpress/icons';
+import {
+	arrowRight,
+	arrowDown,
+	grid,
+	justifyLeft,
+	justifyCenter,
+	justifyRight,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -240,25 +247,54 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 		} );
 	}
 
-	const horizontalAlignmentOptions = [
-		{
-			key: 'fit',
-			value: 'fit',
-			name: __( 'Fit' ),
-		},
-	];
-	if ( orientation === 'vertical' ) {
-		horizontalAlignmentOptions.push( {
-			key: 'stretch',
-			value: 'stretch',
-			name: __( 'Stretch' ),
-		} );
+	const horizontalAlignmentOptions = [];
+	if ( type === 'constrained' ) {
+		horizontalAlignmentOptions.push(
+			{
+				key: 'left',
+				value: 'left',
+				icon: justifyLeft,
+				name: __( 'Left' ),
+			},
+			{
+				key: 'center',
+				value: 'center',
+				icon: justifyCenter,
+				name: __( 'Center' ),
+			},
+			{
+				key: 'right',
+				value: 'right',
+				icon: justifyRight,
+				name: __( 'Right' ),
+			}
+		);
+	} else if ( orientation === 'vertical' ) {
+		horizontalAlignmentOptions.push(
+			{
+				key: 'fit',
+				value: 'fit',
+				name: __( 'Fit' ),
+			},
+			{
+				key: 'stretch',
+				value: 'stretch',
+				name: __( 'Stretch' ),
+			}
+		);
 	} else {
-		horizontalAlignmentOptions.push( {
-			key: 'space-between',
-			value: 'space-between',
-			name: __( 'Space Between' ),
-		} );
+		horizontalAlignmentOptions.push(
+			{
+				key: 'fit',
+				value: 'fit',
+				name: __( 'Fit' ),
+			},
+			{
+				key: 'space-between',
+				value: 'space-between',
+				name: __( 'Space Between' ),
+			}
+		);
 	}
 
 	const justifyControlValue = () => {
@@ -636,18 +672,16 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 								</>
 							) }
 						</HStack>
-						{ type === 'flex' && (
-							<FlexBlock>
-								<RangeControl
-									label={ __( 'Gap' ) }
-									onChange={ onChangeGap }
-									value={ style?.spacing?.blockGap }
-									min={ 0 }
-									max={ 100 }
-									withInputField={ true }
-								/>
-							</FlexBlock>
-						) }
+						<FlexBlock>
+							<RangeControl
+								label={ __( 'Gap' ) }
+								onChange={ onChangeGap }
+								value={ style?.spacing?.blockGap }
+								min={ 0 }
+								max={ 100 }
+								withInputField={ true }
+							/>
+						</FlexBlock>
 						{ type === 'flex' && orientation === 'horizontal' && (
 							<ToggleGroupControl
 								__nextHasNoMarginBottom
@@ -862,7 +896,7 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 		const { orientation } = parentLayout;
 		const { attributes } = props;
 		const { style: { layout = {} } = {} } = attributes;
-		const { selfStretch, flexSize, selfAlign } = layout;
+		const { width, height } = layout;
 		const disableLayoutStyles = useSelect( ( select ) => {
 			const { getSettings } = select( blockEditorStore );
 			return !! getSettings().disableLayoutStyles;
@@ -872,35 +906,106 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 		const id = useInstanceId( BlockListBlock );
 		const selector = `.wp-container-content-${ id }`;
 
-		let css = '';
+		const widthProp =
+			orientation === 'horizontal' ? 'selfStretch' : 'selfAlign';
+		const heightProp =
+			orientation === 'horizontal' ? 'selfAlign' : 'selfStretch';
 
-		if ( selfStretch === 'fixed' && flexSize ) {
-			css += `${ selector } {
-				flex-basis: ${ flexSize };
-				box-sizing: border-box;
-			}`;
-		} else if ( selfStretch === 'fixedNoShrink' && flexSize ) {
-			css += `${ selector } {
-				flex-basis: ${ flexSize };
-				flex-shrink: 0;
-				box-sizing: border-box;
-			}`;
-		} else if ( selfStretch === 'fill' ) {
-			css += `${ selector } {
-				flex-grow: 1;
-			}`;
-		} else if ( selfAlign === 'fill' ) {
-			css += `${ selector } {
-				align-self: stretch;
-			}`;
-		} else if ( selfAlign === 'fit' ) {
-			if ( orientation === 'vertical' ) {
+		let css = `${ selector } {
+			box-sizing: border-box;}`;
+		if ( orientation === 'horizontal' ) {
+			// set width
+			if ( layout[ widthProp ] === 'fixed' && width ) {
+				css += `${ selector } {
+					max-width: ${ width };
+					flex-grow: 0;
+					flex-shrink: 1;
+					flex-basis: ${ width };
+					
+				}`;
+			} else if ( layout[ widthProp ] === 'fixedNoShrink' && width ) {
+				css += `${ selector } {
+					width: ${ width };
+					flex-shrink: 0;
+					flex-grow: 0;
+					flex-basis: auto;
+				}`;
+			} else if ( layout[ widthProp ] === 'fill' ) {
+				css += `${ selector } {
+					flex-grow: 1;
+					flex-shrink: 1;
+					flex-basis: 100%;
+				}`;
+			} else if ( layout[ widthProp ] === 'fit' ) {
+				css += `${ selector } {
+					flex-grow: 0;
+					flex-shrink: 0;
+					flex-basis: auto;
+					width: fit-content;
+				}`;
+			}
+
+			// set height
+			if ( layout[ heightProp ] === 'fill' ) {
+				css += `${ selector } {
+					align-self: stretch;
+				}`;
+			} else if ( layout[ heightProp ] === 'fit' ) {
+				css += `${ selector } {
+						height: fit-content;
+					}`;
+			} else if ( layout[ heightProp ] === 'fixedNoShrink' ) {
+				css += `${ selector } {
+						height: ${ height };
+					}`;
+			}
+		} else {
+			// set width
+			if ( layout[ widthProp ] === 'fixed' && width ) {
+				css += `${ selector } {
+					max-width: ${ width };
+				}`;
+			} else if ( layout[ widthProp ] === 'fixedNoShrink' && width ) {
+				css += `${ selector } {
+					width: ${ width };
+				}`;
+			} else if ( layout[ widthProp ] === 'fill' ) {
+				css += `${ selector } {
+					align-self: stretch;
+				}`;
+			} else if ( layout[ widthProp ] === 'fit' ) {
 				css += `${ selector } {
 					width: fit-content;
 				}`;
-			} else {
+			}
+
+			// set height
+			if ( layout[ heightProp ] === 'fixed' && height ) {
 				css += `${ selector } {
-					height: fit-content;
+					max-height: ${ height };
+					flex-grow: 0;
+					flex-shrink: 1;
+					flex-basis: ${ height };
+				}`;
+			} else if ( layout[ heightProp ] === 'fixedNoShrink' && height ) {
+				css += `${ selector } {
+					height: ${ height };
+					flex-shrink: 0;
+					flex-grow: 0;
+					flex-basis: auto;
+				}`;
+			} else if ( layout[ heightProp ] === 'fill' ) {
+				css += `${ selector } {
+					flex-grow: 1;
+					flex-shrink: 1;
+					flex-basis: 100%;
+				}`;
+			} else if ( layout[ heightProp ] === 'fit' ) {
+				css += `${ selector } {
+					flex-grow: 0;
+					flex-shrink: 0;
+					flex-basis: auto;
+					height: auto;
 				}`;
 			}
 		}
