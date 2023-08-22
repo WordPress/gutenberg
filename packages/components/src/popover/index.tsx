@@ -3,7 +3,6 @@
  */
 import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
 import classnames from 'classnames';
-import type { Middleware } from '@floating-ui/react-dom';
 import {
 	useFloating,
 	flip as flipMiddleware,
@@ -263,36 +262,31 @@ const UnforwardedPopover = (
 	const middleware = [
 		...( placementProp === 'overlay' ? overlayMiddlewares() : [] ),
 		offsetMiddleware( offsetProp ),
-		computedFlipProp ? flipMiddleware() : undefined,
-		computedResizeProp
-			? size( {
-					apply( sizeProps ) {
-						const { firstElementChild } =
-							refs.floating.current ?? {};
+		computedFlipProp && flipMiddleware(),
+		computedResizeProp &&
+			size( {
+				apply( sizeProps ) {
+					const { firstElementChild } = refs.floating.current ?? {};
 
-						// Only HTMLElement instances have the `style` property.
-						if ( ! ( firstElementChild instanceof HTMLElement ) )
-							return;
+					// Only HTMLElement instances have the `style` property.
+					if ( ! ( firstElementChild instanceof HTMLElement ) )
+						return;
 
-						// Reduce the height of the popover to the available space.
-						Object.assign( firstElementChild.style, {
-							maxHeight: `${ sizeProps.availableHeight }px`,
-							overflow: 'auto',
-						} );
-					},
-			  } )
-			: undefined,
-		shift
-			? shiftMiddleware( {
-					crossAxis: true,
-					limiter: limitShift(),
-					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
-			  } )
-			: undefined,
+					// Reduce the height of the popover to the available space.
+					Object.assign( firstElementChild.style, {
+						maxHeight: `${ sizeProps.availableHeight }px`,
+						overflow: 'auto',
+					} );
+				},
+			} ),
+		shift &&
+			shiftMiddleware( {
+				crossAxis: true,
+				limiter: limitShift(),
+				padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+			} ),
 		arrow( { element: arrowRef } ),
-	].filter(
-		( m: Middleware | undefined ): m is Middleware => m !== undefined
-	);
+	];
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
 
