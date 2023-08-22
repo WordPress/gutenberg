@@ -58,11 +58,11 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 			'data_file_json' => 'my-collection-2-data.json',
 		);
 
-		// Register first collection
+		// Register first collection.
 		$collection1 = WP_Font_Library::register_font_collection( $id1, $config1 );
 		$this->assertInstanceOf( 'WP_Font_Collection', $collection1, 'A collection should be registered.' );
 
-		// Try to register a second collection with same id
+		// Try to register a second collection with same id.
 		$collection2 = WP_Font_Library::register_font_collection( $id1, $config2 );
 		$this->assertInstanceOf( 'WP_Error', $collection2, 'Second collection with the same id should fail.' );
 	}
