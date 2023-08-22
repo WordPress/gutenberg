@@ -48,6 +48,10 @@ class WP_Font_Collection {
 			throw new Exception( 'Font Collection is missing the config.' );
 		}
 
+		if ( empty( $config['data_json_file'] ) ) {
+			throw new Exception( 'Font Collection is missing the data_json_file.' );
+		}
+
 		$config['id'] = $id;
 		$this->config = $config;
 	}

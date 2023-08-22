@@ -88,6 +88,15 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 				'Font Collection is missing the config.',
 			),
 
+			'missing data_json_file'          => array(
+				'my-collection',
+				array(
+					'name'        => 'My Collection',
+					'description' => 'My collection description',
+				),
+				'Font Collection is missing the data_json_file.',
+			),
+
 		);
 	}
 }
