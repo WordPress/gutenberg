@@ -20,7 +20,7 @@ const meta: ComponentMeta< typeof ScrollLock > = {
 	title: 'Components/ScrollLock',
 	parameters: {
 		controls: { hideNoControlsWarning: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
