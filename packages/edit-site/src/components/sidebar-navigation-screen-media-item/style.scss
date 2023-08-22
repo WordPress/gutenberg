@@ -7,3 +7,11 @@
 	box-shadow: none !important;
 	padding: 0 !important;
 }
+
+.sidebar-navigation-screen-media-item__tag {
+	background: rgb(221, 221, 221);
+	padding: 0.1em 0.5em;
+	margin: 0.1em 0.1em 0;
+	color: $black;
+	display: inline-block;
+}

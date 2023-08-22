@@ -25,7 +25,8 @@ import {
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
-
+const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
 
 function CopyButton( { text, onCopy = () => {}, children } ) {
 	const ref = useCopyToClipboard( text, onCopy );
@@ -41,8 +42,7 @@ function CopyButton( { text, onCopy = () => {}, children } ) {
 		</Button>
 	);
 }
-
-function getMediaDetails( record ) {
+function getMediaDetails( record, imageTags ) {
 	if ( ! record ) {
 		return [];
 	}
@@ -77,7 +77,7 @@ function getMediaDetails( record ) {
 	}
 
 	if ( record?.media_details ) {
-		const { width, height, filesize, file } = record.media_details;
+		const { width, height, filesize } = record.media_details;
 
 		if ( width && height ) {
 			details.push( {
@@ -92,33 +92,63 @@ function getMediaDetails( record ) {
 				value: `${ filesize / 1000 } kb`,
 			} );
 		}
-
-		if ( file ) {
-			details.push( {
-				label: __( 'Source' ),
-				value: (
-					<CopyButton text={ record?.source_url }>
-						{ __( 'Copy source url' ) }
-					</CopyButton>
-				),
-			} );
-		}
+	}
+	if ( imageTags && imageTags.length ) {
+		details.push( {
+			label: __( 'Tags' ),
+			value: (
+				<>
+					{ imageTags.map( ( tag ) => (
+						<div
+							key={ tag?.name }
+							className="sidebar-navigation-screen-media-item__tag"
+						>
+							{ tag?.name }
+						</div>
+					) ) }
+				</>
+			),
+		} );
 	}
 
+	if ( record?.source_url ) {
+		details.push( {
+			label: __( 'Source' ),
+			value: (
+				<CopyButton text={ record?.source_url }>
+					{ __( 'Copy source url' ) }
+				</CopyButton>
+			),
+		} );
+	}
 	return details;
 }
 
 export default function SidebarNavigationScreenMediaItem() {
-	const { params: { postId, mediaType } } = useLocation();
-	const { record } = useSelect(
+	const {
+		params: { postId, mediaType },
+	} = useLocation();
+	const { record, tags } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
+			const _tags = select( coreStore ).getEntityRecords(
+				'taxonomy',
+				'attachment_tag',
+				{ per_page: -1 }
+			);
 			return {
-				record: getMedia( postId ),
+				record: getMedia( postId ) || EMPTY_OBJECT,
+				tags: _tags || EMPTY_ARRAY,
 			};
 		},
 		[ postId ]
 	);
+
+	const imageTags = record?.attachment_tags?.length
+		? record?.attachment_tags.map( ( tagId ) =>
+				tags.find( ( tag ) => tag.id === tagId )
+		  )
+		: [];
 
 	// The absence of a media type in the query params for media
 	// indicates the user has arrived at the template part via the "media" main
@@ -136,16 +166,20 @@ export default function SidebarNavigationScreenMediaItem() {
 					spacing={ 5 }
 					title={ __( 'Details' ) }
 				>
-					{ getMediaDetails( record ).map( ( { label, value } ) => (
-						<SidebarNavigationScreenDetailsPanelRow key={ label }>
-							<SidebarNavigationScreenDetailsPanelLabel>
-								{ label }
-							</SidebarNavigationScreenDetailsPanelLabel>
-							<SidebarNavigationScreenDetailsPanelValue>
-								{ value }
-							</SidebarNavigationScreenDetailsPanelValue>
-						</SidebarNavigationScreenDetailsPanelRow>
-					) ) }
+					{ getMediaDetails( record, imageTags ).map(
+						( { label, value } ) => (
+							<SidebarNavigationScreenDetailsPanelRow
+								key={ label }
+							>
+								<SidebarNavigationScreenDetailsPanelLabel>
+									{ label }
+								</SidebarNavigationScreenDetailsPanelLabel>
+								<SidebarNavigationScreenDetailsPanelValue>
+									{ value }
+								</SidebarNavigationScreenDetailsPanelValue>
+							</SidebarNavigationScreenDetailsPanelRow>
+						)
+					) }
 				</SidebarNavigationScreenDetailsPanel>
 			}
 			footer={
