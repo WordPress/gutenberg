@@ -13,12 +13,20 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { View } from '../../view';
 import SlotFillContext from './slot-fill-context';
 
-function Slot(
-	{ name, fillProps = {}, as: Component = 'div', ...props },
-	forwardedRef
-) {
+function Slot( props, forwardedRef ) {
+	const {
+		name,
+		fillProps = {},
+		as,
+		// `children` is not allowed. However, if it is passed,
+		// it will be displayed as is, so remove `children`.
+		children,
+		...restProps
+	} = props;
+
 	const { registerSlot, unregisterSlot, ...registry } =
 		useContext( SlotFillContext );
 	const ref = useRef();
@@ -41,7 +49,11 @@ function Slot(
 	} );
 
 	return (
-		<Component ref={ useMergeRefs( [ forwardedRef, ref ] ) } { ...props } />
+		<View
+			as={ as }
+			ref={ useMergeRefs( [ forwardedRef, ref ] ) }
+			{ ...restProps }
+		/>
 	);
 }
 
