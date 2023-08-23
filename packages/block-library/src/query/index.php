@@ -37,7 +37,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 			$content           = substr_replace(
 				$content,
 				'<div
-					style="position:absolute;clip:rect(0,0,0,0);"
+					style="position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;border:0;"
 					aria-live="polite"
 					data-wp-text="context.core.query.message"
 				></div>
