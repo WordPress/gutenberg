@@ -45,6 +45,7 @@ function render_block_core_comments( $attributes, $content, $block ) {
 				// Add the necessary directives.
 				$p->set_attribute( 'data-wp-interactive', true );
 				$p->set_attribute( 'data-wp-navigation-id', 'comments-' . ++$id );
+				$p->set_attribute( 'data-wp-slot-provider', true );
 				$p->set_attribute(
 					'data-wp-context',
 					wp_json_encode( array( 'core' => array( 'comments' => (object) array() ) ) )

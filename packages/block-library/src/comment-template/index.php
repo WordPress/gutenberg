@@ -84,7 +84,7 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 			}
 		}
 
-		$comment_directives = $enhanced_submission ? ' data-wp-key="comment-' . $comment->comment_ID . '"' : '';
+		$comment_directives = $enhanced_submission ? ' data-wp-key="comment-' . $comment->comment_ID . '" data-wp-slot--below="comment-' . $comment->comment_ID . '"' : '';
 
 		$content .= sprintf(
 			'<li id="comment-%1$s" %2$s%3$s>%4$s</li>',

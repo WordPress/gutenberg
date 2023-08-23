@@ -7,6 +7,7 @@ store( {
 	state: {
 		core: {
 			comments: {
+				replyTo: '',
 				error: '',
 			},
 		},
@@ -106,6 +107,15 @@ store( {
 							response.url || window.location
 						);
 					}
+				},
+				changeReplyTo: ( { state, ref, event } ) => {
+					event.preventDefault();
+
+					const commentId = ref.dataset.commentid;
+					state.core.comments.replyTo = `comment-${ commentId }`;
+
+					// eslint-disable-next-line no-console
+					console.log( commentId );
 				},
 			},
 		},

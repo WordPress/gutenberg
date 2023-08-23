@@ -29,7 +29,12 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 		$classes[] = 'has-link-color';
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class'        => implode( ' ', $classes ),
+			'data-wp-fill' => 'state.core.comments.replyTo'
+		)
+	);
 
 	add_filter( 'comment_form_defaults', 'post_comments_form_block_form_defaults' );
 
