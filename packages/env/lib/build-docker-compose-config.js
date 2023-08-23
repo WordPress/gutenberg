@@ -54,7 +54,7 @@ function getMounts(
 			? `user-home:/home/${ hostUsername }`
 			: `tests-user-home:/home/${ hostUsername }`;
 
-	const sslMount = workDirectoryPath + `/ssl:/home/${ hostUsername }/ssl`
+	const sslMount = workDirectoryPath + `/ssl:/home/${ hostUsername }/ssl`;
 
 	const corePHPUnitMount = `${ path.join(
 		workDirectoryPath,
@@ -176,11 +176,23 @@ module.exports = function buildDockerComposeConfig( config ) {
 	];
 
 	// Set the default SSL ports based on the config values.
-	if ( config.env.development.ssl !== undefined && config.env.development.ssl.cert && config.env.development.ssl.port ) {
-		developmentPorts.push( `\${WP_ENV_PORT:-${ config.env.development.ssl.port }}:443` );
+	if (
+		config.env.development.ssl !== undefined &&
+		config.env.development.ssl.cert &&
+		config.env.development.ssl.port
+	) {
+		developmentPorts.push(
+			`\${WP_ENV_PORT:-${ config.env.development.ssl.port }}:443`
+		);
 	}
-	if ( config.env.tests.ssl !== undefined && config.env.tests.ssl.cert && config.env.tests.ssl.port ) {
-		testsPorts.push( `\${WP_ENV_TESTS_PORT:-${ config.env.tests.ssl.port }}:443` );
+	if (
+		config.env.tests.ssl !== undefined &&
+		config.env.tests.ssl.cert &&
+		config.env.tests.ssl.port
+	) {
+		testsPorts.push(
+			`\${WP_ENV_TESTS_PORT:-${ config.env.tests.ssl.port }}:443`
+		);
 	}
 
 	return {

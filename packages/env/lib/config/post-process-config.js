@@ -131,8 +131,12 @@ function appendPortToWPConfigs( config ) {
 			let port = config.env[ env ].port;
 			if ( config.env[ env ].ssl ) {
 				port = config.env[ env ].ssl.port;
-				if ( config.env[ env ].config[ option ].startsWith( 'http://' ) ) {
-					config.env[ env ].config[ option ] = 'https://' + config.env[ env ].config[ option ].substring( 7 );
+				if (
+					config.env[ env ].config[ option ].startsWith( 'http://' )
+				) {
+					config.env[ env ].config[ option ] =
+						'https://' +
+						config.env[ env ].config[ option ].substring( 7 );
 				}
 			}
 			config.env[ env ].config[ option ] = addOrReplacePort(

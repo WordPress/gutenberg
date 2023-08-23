@@ -4,7 +4,13 @@
  */
 const path = require( 'path' );
 const { writeFile, mkdir } = require( 'fs' ).promises;
-const { mkdirSync, existsSync, copyFileSync, accessSync, constants } = require( 'fs' );
+const {
+	mkdirSync,
+	existsSync,
+	copyFileSync,
+	accessSync,
+	constants,
+} = require( 'fs' );
 const yaml = require( 'js-yaml' );
 
 /**
@@ -209,7 +215,11 @@ RUN apt-get -qy install sudo
 RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Enable SSL support
-${ enableSSL( config.env[ env ].ssl.cert, config.env[ env ].ssl.key, config.workDirectoryPath ) }`;
+${ enableSSL(
+	config.env[ env ].ssl.cert,
+	config.env[ env ].ssl.key,
+	config.workDirectoryPath
+) }`;
 			break;
 		}
 		case 'cli': {
@@ -309,14 +319,13 @@ RUN echo 'xdebug.client_host="host.docker.internal"' >> /usr/local/etc/php/php.i
 
 /**
  * Enable SSL support.
- * 
- * @param {string} certPath Path of the certificate file on the host.
- * @param {string} keyPath Path of the key file on the host.
+ *
+ * @param {string} certPath          Path of the certificate file on the host.
+ * @param {string} keyPath           Path of the key file on the host.
  * @param {string} workDirectoryPath Path to the work directory located in ~/.wp-env.
- * @returns {string} Dockerfile content to enable SSL support
+ * @return {string} Dockerfile content to enable SSL support
  */
 function enableSSL( certPath, keyPath, workDirectoryPath ) {
-
 	if ( typeof certPath !== 'string' && typeof keyPath !== 'string' ) {
 		return '';
 	}
@@ -326,8 +335,6 @@ function enableSSL( certPath, keyPath, workDirectoryPath ) {
 
 	const certName = path.basename( certPath );
 	const keyName = path.basename( keyPath );
-	const certFile = workDirectoryPath + '/' + certName;
-	const keyFile = workDirectoryPath + '/' + keyName;
 
 	return `
 RUN sed -i "s\/\\\/etc\\\/ssl\\\/certs\\\/ssl-cert-snakeoil.pem\/\\\/home\\\/$HOST_USERNAME\\\/ssl\\\/${ certName }\/" /etc/apache2/sites-available/default-ssl.conf
@@ -339,23 +346,22 @@ RUN a2ensite default-ssl
 
 /**
  * Try to copy the SSL certificates to the work directory.
- * @param {string} certPath Path of the certificate file on the host.
- * @param {string} keyPath Path of the key file on the host.
+ * @param {string} certPath          Path of the certificate file on the host.
+ * @param {string} keyPath           Path of the key file on the host.
  * @param {string} workDirectoryPath Path to the work directory located in ~/.wp-env.
  */
 function copySSLCertificates( certPath, keyPath, workDirectoryPath ) {
-
 	// Check that paths exist and is readable.
-	accessSync( certPath, constants.F_OK | constants.R_OK, error => {
-		if ( error ) throw new Error( `File does not exist or is not readable: "${ certPath }"` );
+	accessSync( certPath, constants.F_OK, ( error ) => {
+		if ( error ) throw new Error( `File does not exist: "${ certPath }"` );
 	} );
-	accessSync( keyPath, constants.F_OK | constants.R_OK, error => {
-		if ( error ) throw new Error( `File does not exist or is not readable: "${ keyPath }"` );
+	accessSync( keyPath, constants.F_OK, ( error ) => {
+		if ( error ) throw new Error( `File does not exist: "${ keyPath }"` );
 	} );
 
 	const sslDir = workDirectoryPath + '/ssl';
 
-	if ( !existsSync( sslDir ) ) {
+	if ( ! existsSync( sslDir ) ) {
 		mkdirSync( sslDir );
 	}
 

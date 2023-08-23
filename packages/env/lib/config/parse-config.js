@@ -92,7 +92,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 		cert: null,
 		key: null,
 		port: 8883,
-		testsPort: 8884
+		testsPort: 8884,
 	},
 	mappings: {},
 	config: {
@@ -469,16 +469,28 @@ async function parseEnvironmentConfig(
 	if ( config.ssl !== undefined ) {
 		parsedConfig.ssl = config.ssl;
 		if ( config.ssl.port !== undefined ) {
-			checkPort( configFile, `${ environmentPrefix }ssl.port`, config.ssl.port );
+			checkPort(
+				configFile,
+				`${ environmentPrefix }ssl.port`,
+				config.ssl.port
+			);
 			parsedConfig.ssl.port = config.ssl.port;
 		}
 		if ( config.ssl.key !== undefined && config.ssl.key !== null ) {
-			checkString( configFile, `${ environmentPrefix }ssl.key`, config.ssl.key );
+			checkString(
+				configFile,
+				`${ environmentPrefix }ssl.key`,
+				config.ssl.key
+			);
 			parsedConfig.ssl.key = config.ssl.key;
 		}
 		parsedConfig.ssl.key = config.ssl.key;
 		if ( config.ssl.cert !== undefined && config.ssl.cert !== null ) {
-			checkString( configFile, `${ environmentPrefix }ssl.cert`, config.ssl.cert );
+			checkString(
+				configFile,
+				`${ environmentPrefix }ssl.cert`,
+				config.ssl.cert
+			);
 			parsedConfig.ssl.cert = config.ssl.cert;
 		}
 	}
