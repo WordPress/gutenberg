@@ -15,13 +15,21 @@ store( {
 		core: {
 			comments: {
 				submit: async ( { event, state, ref } ) => {
-					let res;
+					let response;
+					const existingComments = new Set();
+					const comments = ref.closest( '.wp-block-comments' );
+					comments
+						.querySelectorAll( 'li[id^="comment-"]' )
+						.forEach( ( comment ) =>
+							existingComments.add( comment.id )
+						);
+
 					try {
 						event.preventDefault();
 
 						state.core.comments.error = '';
 
-						res = await window.fetch( ref.action, {
+						response = await window.fetch( ref.action, {
 							method: 'POST',
 							body: new window.FormData( ref ),
 						} );
@@ -33,9 +41,9 @@ store( {
 						window.HTMLFormElement.prototype.submit.bind( ref )();
 					}
 					try {
-						const html = await res.text();
+						const html = await response.text();
 
-						if ( res.status !== 200 ) {
+						if ( response.status !== 200 ) {
 							const dom = new window.DOMParser().parseFromString(
 								html,
 								'text/html'
@@ -45,11 +53,33 @@ store( {
 									'.wp-die-message'
 								).innerText;
 						} else {
-							navigate( res.url, {
+							await navigate( response.url, {
 								html,
 								replace: true,
 								force: true,
 							} );
+
+							let newComment;
+							comments
+								.querySelectorAll( 'li[id^="comment-"]' )
+								.forEach( ( comment ) => {
+									if ( ! existingComments.has( comment.id ) )
+										newComment = comment;
+								} );
+
+							// Scroll the new comment into view.
+							newComment.scrollIntoView( {
+								block: 'start',
+							} );
+
+							// Add hash to the URL.
+							window.history.replaceState(
+								{},
+								'',
+								window.location.pathname +
+									window.location.search +
+									`#${ newComment.id }`
+							);
 
 							ref.reset();
 						}
@@ -57,7 +87,9 @@ store( {
 						// If something happens at this point, the form has been submitted
 						// but we were not able to show it in the screen, so we can just
 						// refresh the page.
-						window.location.assign( res.url || window.location );
+						window.location.assign(
+							response.url || window.location
+						);
 					}
 				},
 			},
