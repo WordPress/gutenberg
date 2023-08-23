@@ -46,32 +46,38 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	// of the 'Reply' link that the user clicked by Core's `comment-reply.js` script.
 	$form = str_replace( 'class="comment-respond"', $wrapper_attributes, $form );
 
-	$p = new WP_HTML_Tag_Processor( $form );
+	$enhanced_submission = $block->context['enhancedSubmission'];
 
-	if ( $p->next_tag( array( 'class' => 'comment-respond' ) ) ) {
-		$p->set_attribute( 'data-wp-interactive', true );
-
+	if ( $enhanced_submission ) {
+		$p = new WP_HTML_Tag_Processor( $form );
 		if ( $p->next_tag(
 			array(
 				'tag_name' => 'FORM',
 				'id'       => 'commentform',
 			)
 		) ) {
+			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-on--submit', 'actions.core.comments.submit' );
 
-			// TODO: Replace with snackbar.
-			$form = str_replace(
-				'</form>',
+			// Mark the block as interactive.
+			$block->block_type->supports['interactivity'] = true;
+
+			// Add a div to show error messages below the form.
+			$form              = $p->get_updated_html();
+			$last_div_position = strripos( $form, '</form>' );
+			$form              = substr_replace(
+				$form,
 				'<div style="color: red;" data-wp-text="state.core.comments.error"></div></form>',
-				$p->get_updated_html()
+				$last_div_position,
+				0
 			);
 
 			return $form;
 		}
 	}
 
-	// If something fails, enqueue the regular comment-reply script and return
-	// the HTML without the directives.
+	// If something fails or there is no enhanced submission, enqueue the regular
+	// comment-reply script and return the HTML without the directives.
 	wp_enqueue_script( 'comment-reply' );
 	return $form;
 }

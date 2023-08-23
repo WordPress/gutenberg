@@ -14,6 +14,10 @@
 		"legacy": {
 			"type": "boolean",
 			"default": false
+		},
+		"enhancedSubmission": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
@@ -48,5 +52,8 @@
 		}
 	},
 	"editorStyle": "wp-block-comments-editor",
-	"usesContext": [ "postId", "postType" ]
+	"usesContext": [ "postId", "postType" ],
+	"providesContext": {
+		"enhancedSubmission": "enhancedSubmission"
+	}
 }
