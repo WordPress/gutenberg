@@ -9,6 +9,7 @@ store( {
 			comments: {
 				replyTo: '',
 				error: '',
+				text: '',
 			},
 		},
 	},
@@ -116,6 +117,9 @@ store( {
 
 					// eslint-disable-next-line no-console
 					console.log( commentId );
+				},
+				updateText: ( { state, event } ) => {
+					state.core.comments.text = event.target.value;
 				},
 			},
 		},

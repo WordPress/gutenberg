@@ -64,6 +64,11 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-on--submit', 'actions.core.comments.submit' );
 
+			if ( $p->next_tag( 'textarea') ) {
+				$p->set_attribute( 'data-wp-bind--value', 'state.core.comments.text' );
+				$p->set_attribute( 'data-wp-on--change', 'actions.core.comments.updateText' );
+			}
+
 			while ( $p->next_tag( 'input' ) ) {
 				if ( $p->get_attribute( 'type' ) === 'submit' ) {
 					// Add the necessary directives.
