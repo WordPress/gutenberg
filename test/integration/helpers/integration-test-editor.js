@@ -17,7 +17,7 @@ import {
 	WritingFlow,
 	ObserveTyping,
 } from '@wordpress/block-editor';
-import { Popover, SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import '@wordpress/format-library';
@@ -86,8 +86,6 @@ export function Editor( { testBlocks, settings = {} } ) {
 							</ObserveTyping>
 						</WritingFlow>
 					</BlockTools>
-
-					<Popover.Slot />
 				</BlockEditorProvider>
 			</SlotFillProvider>
 		</ShortcutProvider>

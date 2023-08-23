@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { SlotFillProvider, Popover } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/components';
 import { UnsavedChangesWarning } from '@wordpress/editor';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
@@ -38,7 +38,6 @@ export default function App() {
 		<ShortcutProvider style={ { height: '100%' } }>
 			<SlotFillProvider>
 				<GlobalStylesProvider>
-					<Popover.Slot />
 					<UnsavedChangesWarning />
 					<RouterProvider>
 						<Layout />

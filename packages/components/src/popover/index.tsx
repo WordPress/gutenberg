@@ -30,6 +30,7 @@ import {
 	useMemo,
 	useState,
 	useCallback,
+	createPortal,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -138,6 +139,19 @@ const AnimatedWrapper = forwardRef(
 );
 
 const slotNameContext = createContext< string | undefined >( undefined );
+
+const getPopoverFallbackContainer = () => {
+	let container = document.body.querySelector(
+		'.components-popover__fallback-container'
+	);
+	if ( ! container ) {
+		container = document.createElement( 'div' );
+		container.className = 'components-popover__fallback-container';
+		document.body.append( container );
+	}
+
+	return container;
+};
 
 const UnforwardedPopover = (
 	props: Omit<
@@ -552,11 +566,14 @@ const UnforwardedPopover = (
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	}
 
-	if ( anchorRef || anchorRect || anchor ) {
-		return content;
-	}
-
-	return <span ref={ anchorRefFallback }>{ content }</span>;
+	return createPortal(
+		anchorRef || anchorRect || anchor ? (
+			content
+		) : (
+			<span ref={ anchorRefFallback }>{ content }</span>
+		),
+		getPopoverFallbackContainer()
+	);
 };
 
 /**

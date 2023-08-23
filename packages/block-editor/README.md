@@ -42,7 +42,6 @@ function MyEditorComponent() {
 						</ObserveTyping>
 					</WritingFlow>
 				</BlockTools>
-				<Popover.Slot />
 			</SlotFillProvider>
 		</BlockEditorProvider>
 	);
