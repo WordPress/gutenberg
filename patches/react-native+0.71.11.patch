@@ -1,0 +1,26 @@
+diff --git a/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.js b/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.js
+index 364fc52..20bcf58 100755
+--- a/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.js
++++ b/node_modules/react-native/Libraries/Components/Touchable/TouchableWithoutFeedback.js
+@@ -156,10 +156,10 @@ class TouchableWithoutFeedback extends React.Component<Props, State> {
+       accessibilityState:
+         this.props.disabled != null
+           ? {
+-              ..._accessibilityState,
++              ...this.props.accessibilityState?.disabled,
+               disabled: this.props.disabled,
+             }
+-          : _accessibilityState,
++          : this.props.accessibilityState?.disabled,
+       focusable:
+         this.props.focusable !== false && this.props.onPress !== undefined,
+ 
+@@ -202,7 +202,7 @@ function createPressabilityConfig({
+   return {
+     cancelable: !props.rejectResponderTermination,
+     disabled:
+-      props.disabled !== null ? props.disabled : accessibilityStateDisabled,
++      props.disabled !== null ? props.disabled : props.accessibilityState?.disable,
+     hitSlop: props.hitSlop,
+     delayLongPress: props.delayLongPress,
+     delayPressIn: props.delayPressIn,
