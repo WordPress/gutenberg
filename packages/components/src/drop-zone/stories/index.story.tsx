@@ -1,24 +1,24 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * Internal dependencies
  */
 import DropZone from '..';
 
-const meta: ComponentMeta< typeof DropZone > = {
+const meta: Meta< typeof DropZone > = {
 	component: DropZone,
 	title: 'Components/DropZone',
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof DropZone > = ( props ) => {
+const Template: StoryFn< typeof DropZone > = ( props ) => {
 	return (
 		<div style={ { background: 'lightgray', padding: 16 } }>
 			Drop something here

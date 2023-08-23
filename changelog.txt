@@ -229,7 +229,7 @@
 
 ### Experiments
 
-- Fonts Library: Backend. ([52704](https://github.com/WordPress/gutenberg/pull/52704))
+- Font Library: Backend. ([52704](https://github.com/WordPress/gutenberg/pull/52704))
 
 #### Block API
 - /add custom connections inspector control. ([53241](https://github.com/WordPress/gutenberg/pull/53241))

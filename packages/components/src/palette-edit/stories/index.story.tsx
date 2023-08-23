@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,18 +14,18 @@ import { useState } from '@wordpress/element';
 import PaletteEdit from '..';
 import type { Color, Gradient } from '../types';
 
-const meta: ComponentMeta< typeof PaletteEdit > = {
+const meta: Meta< typeof PaletteEdit > = {
 	title: 'Components/PaletteEdit',
 	component: PaletteEdit,
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: Story< typeof PaletteEdit > = ( args ) => {
+const Template: StoryFn< typeof PaletteEdit > = ( args ) => {
 	const { colors, gradients, onChange, ...props } = args;
 	const [ value, setValue ] = useState( gradients || colors );
 

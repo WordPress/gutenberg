@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * Internal dependencies
  */
@@ -31,12 +31,12 @@ export default {
 		},
 		parameters: {
 			controls: { expanded: true },
-			docs: { source: { state: 'open' } },
+			docs: { canvas: { sourceState: 'shown' } },
 		},
 	},
-} as ComponentMeta< typeof DimensionControl >;
+} as Meta< typeof DimensionControl >;
 
-const Template: ComponentStory< typeof DimensionControl > = ( args ) => (
+const Template: StoryFn< typeof DimensionControl > = ( args ) => (
 	<DimensionControl { ...args } />
 );
 

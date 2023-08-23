@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	Button,
 	__experimentalHStack as HStack,
@@ -55,13 +56,15 @@ function ListViewBlockSelectButton(
 	} );
 	const { isLocked } = useBlockLock( clientId );
 	const {
+		canInsertBlockType,
 		getSelectedBlockClientIds,
 		getPreviousBlockClientId,
 		getBlockRootClientId,
 		getBlockOrder,
+		getBlocksByClientId,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
-	const { removeBlocks } = useDispatch( blockEditorStore );
+	const { duplicateBlocks, removeBlocks } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
@@ -83,10 +86,35 @@ function ListViewBlockSelectButton(
 		onDragStart?.( event );
 	};
 
+	// Determine which blocks to update:
+	// If the current (focused) block is part of the block selection, use the whole selection.
+	// If the focused block is not part of the block selection, only update the focused block.
+	function getBlocksToUpdate() {
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const isUpdatingSelectedBlocks =
+			selectedBlockClientIds.includes( clientId );
+		const firstBlockClientId = isUpdatingSelectedBlocks
+			? selectedBlockClientIds[ 0 ]
+			: clientId;
+		const firstBlockRootClientId =
+			getBlockRootClientId( firstBlockClientId );
+
+		const blocksToUpdate = isUpdatingSelectedBlocks
+			? selectedBlockClientIds
+			: [ clientId ];
+
+		return {
+			blocksToUpdate,
+			firstBlockClientId,
+			firstBlockRootClientId,
+			selectedBlockClientIds,
+		};
+	}
+
 	/**
 	 * @param {KeyboardEvent} event
 	 */
-	function onKeyDownHandler( event ) {
+	async function onKeyDownHandler( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
 		} else if (
@@ -94,18 +122,12 @@ function ListViewBlockSelectButton(
 			event.keyCode === DELETE ||
 			isMatch( 'core/block-editor/remove', event )
 		) {
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const isDeletingSelectedBlocks =
-				selectedBlockClientIds.includes( clientId );
-			const firstBlockClientId = isDeletingSelectedBlocks
-				? selectedBlockClientIds[ 0 ]
-				: clientId;
-			const firstBlockRootClientId =
-				getBlockRootClientId( firstBlockClientId );
-
-			const blocksToDelete = isDeletingSelectedBlocks
-				? selectedBlockClientIds
-				: [ clientId ];
+			const {
+				blocksToUpdate: blocksToDelete,
+				firstBlockClientId,
+				firstBlockRootClientId,
+				selectedBlockClientIds,
+			} = getBlocksToUpdate();
 
 			// Don't update the selection if the blocks cannot be deleted.
 			if ( ! canRemoveBlocks( blocksToDelete, firstBlockRootClientId ) ) {
@@ -131,6 +153,36 @@ function ListViewBlockSelectButton(
 			}
 
 			updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
+		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+
+			const { blocksToUpdate, firstBlockRootClientId } =
+				getBlocksToUpdate();
+
+			const canDuplicate = getBlocksByClientId( blocksToUpdate ).every(
+				( block ) => {
+					return (
+						!! block &&
+						hasBlockSupport( block.name, 'multiple', true ) &&
+						canInsertBlockType( block.name, firstBlockRootClientId )
+					);
+				}
+			);
+
+			if ( canDuplicate ) {
+				const updatedBlocks = await duplicateBlocks(
+					blocksToUpdate,
+					false
+				);
+
+				if ( updatedBlocks?.length ) {
+					// If blocks have been duplicated, focus the first duplicated block.
+					updateFocusAndSelection( updatedBlocks[ 0 ], false );
+				}
+			}
 		}
 	}
 
@@ -194,7 +246,7 @@ function ListViewBlockSelectButton(
 							{ images.map( ( image, index ) => (
 								<span
 									className="block-editor-list-view-block-select-button__image"
-									key={ `img-${ image.url }` }
+									key={ image.clientId }
 									style={ {
 										backgroundImage: `url(${ image.url })`,
 										zIndex: images.length - index, // Ensure the first image is on top, and subsequent images are behind.
