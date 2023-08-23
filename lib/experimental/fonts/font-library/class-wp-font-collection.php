@@ -5,7 +5,7 @@
  * This file contains the Font Collection class definition.
  *
  * @package    WordPress
- * @subpackage Font Collection
+ * @subpackage Font Library
  * @since      6.4.0
  */
 
