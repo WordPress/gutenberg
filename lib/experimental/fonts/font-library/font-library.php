@@ -35,18 +35,4 @@ function gutenberg_init_font_library_routes() {
 
 add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );
 
-/**
- * Registers the font collection filter for font library.
- *
- * @since 6.4.0
- */
-function gutenberg_add_register_font_collection_filter() {
-	add_filter(
-		'wp_register_font_collection',
-		array( 'WP_Font_Library', 'register_font_collection' ),
-		10,
-		2
-	);
-}
-
-add_action( 'init', 'gutenberg_add_register_font_collection_filter' );
+add_filter( 'wp_register_font_collection', array( 'WP_Font_Library', 'register_font_collection' ), 10, 2 );
