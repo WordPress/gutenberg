@@ -39,3 +39,10 @@
 .block-editor-hooks__toggle-control.block-editor-hooks__toggle-control {
 	margin-bottom: $grid-unit-20;
 }
+
+.components-tab-panel__tab-content .component-alignment-matrix-control {
+	border: 1px solid $gray-600;
+	width: 120px;
+	height: 120px;
+	grid-template-rows: repeat(3, calc(120px / 3));
+}

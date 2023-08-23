@@ -29,6 +29,7 @@ import { store as blockEditorStore } from '../../store';
  * @param {string}   props.clientId
  * @return {Element} child layout edit element.
  */
+
 export default function ChildLayoutControl( {
 	value = {},
 	onChange,
@@ -63,7 +64,8 @@ export default function ChildLayoutControl( {
 
 	const isConstrained =
 		parentLayoutTypeToUse === 'constrained' ||
-		parentLayoutTypeToUse === 'default';
+		parentLayoutTypeToUse === 'default' ||
+		parentLayoutTypeToUse === undefined;
 
 	const widthProp =
 		isConstrained || orientation === 'vertical'
@@ -342,7 +344,7 @@ export default function ChildLayoutControl( {
 					childLayout[ widthProp ] === 'fixedNoShrink' ) && (
 					<FlexBlock>
 						<UnitControl
-							size={ '__unstable-large' }
+							__next36pxDefaultSize
 							onChange={ ( _value ) => {
 								onChange( {
 									style: {
@@ -375,7 +377,7 @@ export default function ChildLayoutControl( {
 					childLayout[ heightProp ] === 'fixedNoShrink' ) && (
 					<FlexBlock>
 						<UnitControl
-							size={ '__unstable-large' }
+							__next36pxDefaultSize
 							onChange={ ( _value ) => {
 								onChange( {
 									style: {
