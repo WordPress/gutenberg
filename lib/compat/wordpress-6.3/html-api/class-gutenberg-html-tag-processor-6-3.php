@@ -2282,11 +2282,8 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			 * See https://html.spec.whatwg.org/#attributes-3
 			 * See https://html.spec.whatwg.org/#space-separated-tokens
 			 */
-			while ( true ) {
+			do {
 				$class_at = strpos( $this->html, $this->sought_class_name, $class_at );
-				if ( false === $class_at || $class_at >= $class_end ) {
-					break;
-				}
 
 				/*
 				 * Verify this class starts at a boundary.
@@ -2313,7 +2310,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 				}
 
 				return true;
-			}
+			} while ( false !== $class_at && $class_at < $class_end );
 
 			return false;
 		}
