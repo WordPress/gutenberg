@@ -86,9 +86,7 @@ function LocalFonts() {
 				acc[ item.fontFamily ] = {
 					name: item.fontFamily,
 					fontFamily: item.fontFamily,
-					slug:
-						'wp-font-lib-' +
-						item.fontFamily.replace( /\s+/g, '-' ).toLowerCase(),
+					slug: item.fontFamily.replace( /\s+/g, '-' ).toLowerCase(),
 					fontFace: [],
 				};
 			}
