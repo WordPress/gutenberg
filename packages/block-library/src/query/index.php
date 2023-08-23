@@ -17,9 +17,6 @@
  * @return string Returns the modified output of the query block.
  */
 function render_block_core_query( $attributes, $content, $block ) {
-	$should_load_view_script = $attributes['enhancedPagination'];
-	$view_js_file            = 'wp-block-query-view';
-
 	if ( $attributes['enhancedPagination'] ) {
 		$p = new WP_HTML_Tag_Processor( $content );
 		if ( $p->next_tag() ) {
@@ -69,16 +66,29 @@ function render_block_core_query( $attributes, $content, $block ) {
 		}
 	}
 
-	if ( ! wp_script_is( $view_js_file ) ) {
+	$view_asset = 'wp-block-query-view';
+	if ( ! wp_script_is( $view_asset ) ) {
 		$script_handles = $block->block_type->view_script_handles;
-
 		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		if ( ! $attributes['enhancedPagination'] && in_array( $view_asset, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
 		}
 		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+		if ( $attributes['enhancedPagination'] && ! in_array( $view_asset, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_asset ) );
+		}
+	}
+
+	$style_asset = 'wp-block-query';
+	if ( ! wp_style_is( $style_asset ) ) {
+		$style_handles = $block->block_type->style_handles;
+		// If the styles are not needed, and they are still in the `style_handles`, remove them.
+		if ( ! $attributes['enhancedPagination'] && in_array( $style_asset, $style_handles, true ) ) {
+			$block->block_type->style_handles = array_diff( $style_handles, array( $style_asset ) );
+		}
+		// If the styles are needed, but they were previously removed, add them again.
+		if ( $attributes['enhancedPagination'] && ! in_array( $style_asset, $style_handles, true ) ) {
+			$block->block_type->style_handles = array_merge( $style_handles, array( $style_asset ) );
 		}
 	}
 
