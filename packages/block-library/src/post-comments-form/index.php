@@ -76,6 +76,19 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 		}
 	}
 
+	$view_asset = 'wp-block-post-comments-form-view';
+	if ( ! wp_script_is( $view_asset ) ) {
+		$script_handles = $block->block_type->view_script_handles;
+		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+		if ( ! $enhanced_submission && in_array( $view_asset, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+		}
+		// If the script is needed, but it was previously removed, add it again.
+		if ( $enhanced_submission && ! in_array( $view_asset, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_asset ) );
+		}
+	}
+
 	// If something fails or there is no enhanced submission, enqueue the regular
 	// comment-reply script and return the HTML without the directives.
 	wp_enqueue_script( 'comment-reply' );
