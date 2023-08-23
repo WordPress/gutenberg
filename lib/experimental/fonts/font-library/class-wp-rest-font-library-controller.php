@@ -106,11 +106,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 		$collection = WP_Font_Library::get_font_collection( $id );
 
 		if ( is_wp_error( $collection ) ) {
-			return new WP_Error(
-				'font_collection_not_found',
-				__( 'Font collection not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
+			return $collection;
 		}
 
 		return new WP_REST_Response( $collection->get_data() );
