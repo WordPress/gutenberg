@@ -30,7 +30,7 @@ class WP_Font_Face_Resolver {
 	 * @return array Returns the font-families, each with their font-face variations.
 	 */
 	public static function get_fonts_from_theme_json() {
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
+		$settings = gutenberg_get_global_settings();
 
 		// Bail out early if there are no font settings.
 		if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
