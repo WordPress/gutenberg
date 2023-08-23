@@ -64,6 +64,7 @@
 	</rule>
 	<rule ref="Squiz.Commenting.FileComment.Missing">
 		<exclude-pattern>phpunit/*</exclude-pattern>
+		<exclude-pattern>test/gutenberg-test-themes/*</exclude-pattern>
 		<exclude-pattern>**/*.min.asset.php</exclude-pattern>
 	</rule>
 	<rule ref="Squiz.Commenting.ClassComment.Missing">

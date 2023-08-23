@@ -1,1 +1,1 @@
-<?php // phpcs:disable
+<?php
