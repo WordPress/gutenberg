@@ -113,6 +113,11 @@
 		<exclude-pattern>/phpunit/*</exclude-pattern>
 	</rule>
 
+	<!-- Ignore empty files in tests/gutenberg-test-themes -->
+	<rule ref="Internal.NoCodeFound">
+		<exclude-pattern>./test/gutenberg-test-themes/*</exclude-pattern>
+	</rule>
+
 	<!-- Exclude PHPUnit tests from file and class name sniffs (for Core parity). -->
 	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
 		<exclude-pattern>/phpunit/*</exclude-pattern>
