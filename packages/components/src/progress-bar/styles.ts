@@ -56,7 +56,7 @@ export const Indicator = styled.div< {
 			  } )
 			: css( {
 					width: `${ value }%`,
-					transition: 'width 0.2s ease-in-out',
+					transition: 'width 0.4s ease-in-out',
 			  } ) };
 `;
 
