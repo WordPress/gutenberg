@@ -13,11 +13,6 @@ export const MODAL_TABS = [
 		className: 'installed-fonts',
 	},
 	{
-		name: 'google-fonts',
-		title: __( 'Google Fonts' ),
-		className: 'google-fonts',
-	},
-	{
 		name: 'local-fonts',
 		title: __( 'Upload' ),
 		className: 'local-fonts',
@@ -27,15 +22,6 @@ export const MODAL_TABS = [
 export const DEMO_TEXT = __(
 	'Incredible as it may seem, I believe that the Aleph of Garay Street was a false Aleph'
 );
-
-// Google Fonts API categories mappping to fallback system fonts
-export const GOOGLE_FONT_FALLBACKS = {
-	display: 'system-ui',
-	'sans-serif': 'sans-serif',
-	serif: 'serif',
-	handwriting: 'cursive',
-	monospace: 'monospace',
-};
 
 export const DEFAULT_DEMO_CONFIG = {
 	text: '',

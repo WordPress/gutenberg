@@ -23,7 +23,7 @@ import PreviewContols from './preview-controls';
 import { FontLibraryContext } from './context';
 
 function LocalFonts() {
-	const { installFonts } = useContext( FontLibraryContext );
+	const { installFonts, refreshLibrary } = useContext( FontLibraryContext );
 	const [ selectedFiles, setSelectedFiles ] = useState( [] );
 	const [ fontFacesLoaded, setFontFacesLoaded ] = useState( [] );
 	const [ isInstalling, setIsInstalling ] = useState( false );

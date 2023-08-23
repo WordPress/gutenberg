@@ -18,7 +18,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	fetchGoogleFonts,
 	fetchInstallFonts,
 	fetchUninstallFonts,
 } from './resolvers';
@@ -116,11 +115,6 @@ function FontLibraryProvider( { children } ) {
 		setModalTabOepn( tabName || null );
 	};
 
-	// Google Fonts
-	const [ googleFonts, setGoogleFonts ] = useState( null );
-	const [ googleFontsCategories, setGoogleFontsCategories ] =
-		useState( null );
-
 	// Demo
 	const [ loadedFontUrls ] = useState( new Set() );
 	const [ demoConfig, setDemoConfig ] = useState( DEFAULT_DEMO_CONFIG );
@@ -152,13 +146,6 @@ function FontLibraryProvider( { children } ) {
 	} );
 	const themeUrl =
 		site?.url + '/wp-content/themes/' + currentTheme?.stylesheet;
-
-	useEffect( () => {
-		fetchGoogleFonts().then( ( { fontFamilies, categories } ) => {
-			setGoogleFonts( fontFamilies );
-			setGoogleFontsCategories( [ 'all', ...categories ] );
-		} );
-	}, [] );
 
 	const getAvailableFontsOutline = ( fontFamilies ) => {
 		const outline = fontFamilies.reduce( ( acc, font ) => {
@@ -298,7 +285,6 @@ function FontLibraryProvider( { children } ) {
 				];
 			}
 		}
-		console.log( 'source', newCustomFonts );
 		setFontFamilies( {
 			...fontFamilies,
 			[ source ]: newCustomFonts,
@@ -357,8 +343,6 @@ function FontLibraryProvider( { children } ) {
 				baseCustomFonts,
 				isFontActivated,
 				getFontFacesActivated,
-				googleFonts,
-				googleFontsCategories,
 				loadFontFaceAsset,
 				installFonts,
 				uninstallFonts,
