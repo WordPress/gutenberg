@@ -36,29 +36,20 @@ class WP_Font_Collection {
 	 *
 	 * @param string $id     Font collection id.
 	 * @param array  $config Font collection config options.
-	 * @throws WP_Error When passed an invalid argument.
+	 * @throws Exception If the required parameters are missing.
 	 */
 	public function __construct( $id, $config ) {
 
 		if ( empty( $id ) && is_string( $id ) ) {
-			return new WP_Error(
-				'font_collection_id_required',
-				__( 'Font Collection ID is required as a non-empty string.', 'gutenberg' )
-			);
+			throw new Exception( 'Font Collection ID is required as a non-empty string.' );
 		}
 
 		if ( empty( $config ) ) {
-			return new WP_Error(
-				'font_collection_config_required',
-				__( 'Font Collection config options is required as a non-empty array.', 'gutenberg' )
-			);
+			throw new Exception( 'Font Collection config options is required as a non-empty array.' );
 		}
 
 		if ( empty( $config['data_json_file'] ) && is_string( $config['data_json_file'] ) ) {
-			return new WP_Error(
-				'font_collection_data_json_file_required',
-				__( 'Font Collection config "data_json_file" option is required as a non-empty string.', 'gutenberg' )
-			);
+			throw new Exception( 'Font Collection config "data_json_file" option is required as a non-empty string.' );
 		}
 
 		$config['id'] = $id;
