@@ -57,28 +57,35 @@ function gutenberg_render_block_pattern_data( $block_content, $block, $block_ins
 	$pattern_attributes = _wp_array_get( $block_type->supports, array( '__experimentalPattern' ), false );
 
 	foreach ( $pattern_attributes as $pattern_attribute => $pattern_attribute_type ) {
+		// Some attributes might not need to be used in the markup but are
+		// linked to other attributes e.g. Image block's url and id attributes.
+		// TODO: Update the markup to alter the classname etc if required for image's and IDs etc.
+		if ( 'ignore' === $pattern_attribute_type ) {
+			continue;
+		}
+
 		$pattern_attribute_value = _wp_array_get( $dynamic_content, array( $pattern_attribute ), false );
 
 		if ( ! $pattern_attribute_value ) {
 			continue;
 		}
 
+		$tags  = new WP_HTML_Tag_Processor( $block_content );
+		$found = $tags->next_tag(
+			array(
+				// TODO: Improve the retrieval via selector, see block connections work.
+				'tag_name' => $block_type->attributes[ $pattern_attribute ]['selector'],
+			)
+		);
+
+		if ( ! $found ) {
+			continue;
+		};
+
 		// Only inner html content and DOM attributes are currently processed.
 
 		// Process content.
 		if ( 'content' === $pattern_attribute_type ) {
-			$tags  = new WP_HTML_Tag_Processor( $block_content );
-			$found = $tags->next_tag(
-				array(
-					// TODO: Improve the retrieval via selector, see block connections work.
-					'tag_name' => $block_type->attributes[ $pattern_attribute ]['selector'],
-				)
-			);
-
-			if ( ! $found ) {
-				continue;
-			};
-
 			$tag_name     = $tags->get_tag();
 			$markup       = "<$tag_name>$pattern_attribute_value</$tag_name>";
 			$updated_tags = new WP_HTML_Tag_Processor( $markup );
@@ -91,12 +98,11 @@ function gutenberg_render_block_pattern_data( $block_content, $block, $block_ins
 			}
 
 			$block_content = $updated_tags->get_updated_html();
-			continue;
 		}
 
-		// TODO: Process DOM attribute.
 		if ( 'attr' === $pattern_attribute_type ) {
-
+			$tags->set_attribute( $block_type->attributes[ $pattern_attribute ]['attribute'], $pattern_attribute_value );
+			$block_content = $tags->get_updated_html();
 		}
 	}
 
