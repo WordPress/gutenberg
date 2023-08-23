@@ -4,9 +4,10 @@
  *
  * @package Gutenberg
  * @subpackage Interactivity API
+ *
+ * @phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
  */
 
-// phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
 
 class Helper_Class {
 	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
