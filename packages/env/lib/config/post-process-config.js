@@ -59,7 +59,17 @@ function mergeRootToEnvironments( config ) {
 		config.env.tests.port = config.testsPort;
 		delete config.testsPort;
 	}
-	if ( config.ssl !== undefined ) {
+	if ( config.lifecycleScripts !== undefined ) {
+		removedRootOptions.lifecycleScripts = config.lifecycleScripts;
+		delete config.lifecycleScripts;
+	}
+
+	// Check if ssl is set and if it is, move it to the environment configs.
+	if (
+		config.ssl !== undefined &&
+		config.ssl.cert &&
+		config.ssl.key
+	) {
 		removedRootOptions.ssl = {};
 		config.env.development.ssl = {};
 		config.env.tests.ssl = {};
@@ -81,7 +91,7 @@ function mergeRootToEnvironments( config ) {
 			config.env.tests.ssl.port = config.ssl.testsPort;
 			delete config.ssl.testsPort;
 		}
-		if ( config.ssl.cert !== undefined ) {
+		if ( config.ssl.cert ) {
 			if (
 				config.env.development.ssl !== undefined &&
 				config.env.development.ssl.cert === undefined
@@ -97,7 +107,7 @@ function mergeRootToEnvironments( config ) {
 			removedRootOptions.ssl.cert = config.ssl.cert;
 			delete config.ssl.cert;
 		}
-		if ( config.ssl.key !== undefined ) {
+		if ( config.ssl.key ) {
 			if (
 				config.env.development.ssl !== undefined &&
 				config.env.development.ssl.key === undefined
@@ -114,10 +124,13 @@ function mergeRootToEnvironments( config ) {
 			delete config.ssl.key;
 		}
 		delete config.ssl;
-	}
-	if ( config.lifecycleScripts !== undefined ) {
-		removedRootOptions.lifecycleScripts = config.lifecycleScripts;
-		delete config.lifecycleScripts;
+	} else if (
+		config.ssl !== undefined &&
+		config.ssl.cert === undefined &&
+		config.ssl.key === undefined
+	) {
+		removedRootOptions.ssl = config.ssl;
+		delete config.ssl;
 	}
 
 	// Merge the root config and the environment configs together so that
@@ -167,7 +180,11 @@ function appendPortToWPConfigs( config ) {
 			}
 
 			let port = config.env[ env ].port;
-			if ( config.env[ env ].ssl ) {
+			if (
+				config.env[ env ].ssl && 
+				config.env[ env ].ssl.cert &&
+				config.env[ env ].ssl.key
+				) {
 				port = config.env[ env ].ssl.port;
 				if (
 					config.env[ env ].config[ option ].startsWith( 'http://' )
@@ -210,7 +227,7 @@ function validatePortUniqueness( config ) {
 		}
 		if (
 			config.env[ env ].ssl !== undefined &&
-			config.env[ env ].ssl.port === undefined
+			! config.env[ env ].ssl.port
 		) {
 			throw new ValidationError(
 				`The "${ env }" environment has an invalid SSL port.`
@@ -219,7 +236,12 @@ function validatePortUniqueness( config ) {
 
 		environmentPorts[ env ] = config.env[ env ].port;
 
-		if ( config.env[ env ].ssl !== undefined ) {
+		if (
+			config.env[ env ].ssl !== undefined &&
+			config.env[ env ].ssl.port && 
+			config.env[ env ].ssl.cert &&
+			config.env[ env ].ssl.key
+		) {
 			environmentSSLPorts[ env ] = config.env[ env ].ssl.port;
 		}
 	}
@@ -247,6 +269,7 @@ function validatePortUniqueness( config ) {
 			}
 
 			if ( environmentSSLPorts[ env ] === environmentSSLPorts[ check ] ) {
+				console.log(config);
 				throw new ValidationError(
 					`The "${ env }" and "${ check }" environments may not have the same SSL port.`
 				);

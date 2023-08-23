@@ -474,7 +474,7 @@ async function parseEnvironmentConfig(
 			);
 			parsedConfig.ssl.port = config.ssl.port;
 		}
-		if ( config.ssl.key !== undefined && config.ssl.key !== null ) {
+		if ( config.ssl.key ) {
 			checkString(
 				configFile,
 				`${ environmentPrefix }ssl.key`,
@@ -483,7 +483,7 @@ async function parseEnvironmentConfig(
 			parsedConfig.ssl.key = config.ssl.key;
 		}
 		parsedConfig.ssl.key = config.ssl.key;
-		if ( config.ssl.cert !== undefined && config.ssl.cert !== null ) {
+		if ( config.ssl.cert ) {
 			checkString(
 				configFile,
 				`${ environmentPrefix }ssl.cert`,
