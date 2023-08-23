@@ -50,13 +50,13 @@ class WP_Font_Library {
 			return new WP_Error( 'font_collection_registration_error', 'Font collection already registered.' );
 		}
 
-		try {
-			$new_collection           = new WP_Font_Collection( $id, $config );
-			self::$collections[ $id ] = $new_collection;
+		$new_collection = new WP_Font_Collection( $id, $config );
+		if ( is_wp_error( $new_collection ) ) {
 			return $new_collection;
-		} catch ( Exception $e ) {
-			return new WP_Error( 'font_collection_error', $e->getMessage() );
 		}
+
+		self::$collections[ $id ] = $new_collection;
+		return $new_collection;
 	}
 
 	/**
