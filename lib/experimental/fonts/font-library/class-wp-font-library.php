@@ -46,7 +46,7 @@ class WP_Font_Library {
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered succesfully and a WP_Error otherwise.
 	 */
 	public static function register_font_collection( $id, $config ) {
-		if ( array_key_exists( $id, self::$collections ) ) {
+		if ( isset( self::$collections[ $id ] ) ) {
 			return new WP_Error( 'font_collection_registration_error', 'Font collection already registered.' );
 		}
 
