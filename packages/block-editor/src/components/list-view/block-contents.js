@@ -79,6 +79,7 @@ const ListViewBlockContents = forwardRef(
 					/>
 				) }
 				<BlockDraggable
+					appendToOwnerDocument
 					clientIds={ draggableClientIds }
 					__experimentalDragComponent={ null }
 					elementId={ `list-view-${ listViewInstanceId }-block-${ clientId }` }

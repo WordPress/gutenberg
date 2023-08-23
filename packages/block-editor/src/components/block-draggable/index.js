@@ -14,6 +14,7 @@ import useScrollWhenDragging from './use-scroll-when-dragging';
 import { store as blockEditorStore } from '../../store';
 
 const BlockDraggable = ( {
+	appendToOwnerDocument,
 	children,
 	clientIds,
 	cloneClassname,
@@ -75,6 +76,7 @@ const BlockDraggable = ( {
 
 	return (
 		<Draggable
+			appendToOwnerDocument={ appendToOwnerDocument }
 			cloneClassname={ cloneClassname }
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
