@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import 'preact/debug';
+/**
  * Internal dependencies
  */
 import registerDirectives from './directives';
