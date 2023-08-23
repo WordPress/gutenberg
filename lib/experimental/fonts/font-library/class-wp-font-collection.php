@@ -34,7 +34,7 @@ class WP_Font_Collection {
 	 *
 	 * @since 6.4.0
 	 *
-	 * @param string $id Font collection id.
+	 * @param string $id     Font collection id.
 	 * @param array  $config Font collection config options.
 	 * @throws Exception If the required parameters are missing.
 	 */
@@ -61,7 +61,7 @@ class WP_Font_Collection {
 	 *
 	 * @since 6.4.0
 	 *
-	 * @return array An array contaning the font collection config.
+	 * @return array An array containing the font collection config.
 	 */
 	public function get_config() {
 		return $this->config;
@@ -72,7 +72,8 @@ class WP_Font_Collection {
 	 *
 	 * @since 6.4.0
 	 *
-	 * @return array An array contaning the list of font families in theme.json format
+	 * @return array|WP_Error An array containing the list of font families in theme.json format on success,
+	 *                        else an instance of WP_Error on failure.
 	 */
 	public function get_data() {
 		if ( ! empty( $this->config['data_json_file'] ) ) {
