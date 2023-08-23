@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { ComponentProps } from 'react';
 
 /**
@@ -17,7 +17,7 @@ import Popover from '../../popover';
 import { BorderBoxControl } from '../';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 
-const meta: ComponentMeta< typeof BorderBoxControl > = {
+const meta: Meta< typeof BorderBoxControl > = {
 	title: 'Components (Experimental)/BorderBoxControl',
 	component: BorderBoxControl,
 	argTypes: {
@@ -41,7 +41,7 @@ const colors = [
 	{ name: 'Yellow 40', color: '#bd8600' },
 ];
 
-const Template: ComponentStory< typeof BorderBoxControl > = ( props ) => {
+const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 	const { onChange, ...otherProps } = props;
 	const [ borders, setBorders ] = useState< ( typeof props )[ 'value' ] >();
 
