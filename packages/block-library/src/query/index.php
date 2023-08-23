@@ -25,11 +25,11 @@ function render_block_core_query( $attributes, $content, $block ) {
 			$p->set_attribute( 'data-wp-navigation-id', 'query-' . $attributes['queryId'] );
 			$p->set_attribute(
 				'data-wp-context',
-				json_encode( array( 'core' => array( 'query' => (object) array() ) ) )
+				wp_json_encode( array( 'core' => array( 'query' => (object) array() ) ) )
 			);
 			$content = $p->get_updated_html();
 
-			// Make the block as interactive.
+			// Mark the block as interactive.
 			$block->block_type->supports['interactivity'] = true;
 
 			// Add a div to announce messages using `aria-live`.
