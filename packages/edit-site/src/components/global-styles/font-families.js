@@ -41,7 +41,7 @@ function FontFamilies() {
 					<HStack justify="flex-end">
 						<Tooltip text={ __( 'Add fonts' ) }>
 							<Button
-								onClick={ () => toggleModal( 'google-fonts' ) }
+								onClick={ () => toggleModal( 'local-fonts' ) }
 								aria-label={ __( 'Add fonts' ) }
 								icon={ plus }
 								isSmall
