@@ -105,11 +105,11 @@ function LocalFonts() {
 		// Adds the fontFamilies to the formData
 		formData.append( 'fontFamilies', JSON.stringify( fontFamilies ) );
 
-		// Sends the formData to the server
-		const save = await installFonts( formData );
+		await installFonts( formData );
 		setIsInstalling( ( pevIsInstalling ) => ! pevIsInstalling );
 		setSelectedFiles( [] );
 		setFontFacesLoaded( [] );
+		refreshLibrary();
 	};
 
 	const Footer = () => {
