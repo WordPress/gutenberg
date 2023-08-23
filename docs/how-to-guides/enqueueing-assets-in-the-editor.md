@@ -13,7 +13,8 @@ Do you want to add styling or JavaScript to the user-generated content (blocks) 
 
 There are different hooks to use depending on the answers to these questions, and if you are building a block or a theme, there are additional approaches to consider. Refer to the designated sections below. 
 
-## Editor scripts and styles
+## Scenarios for enqueing assets
+### Editor scripts and styles
 
 Whenever you need to enqueue assets for the Editor itself (i.e. not the user-generated content), you should use the [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) and [`wp_enqueue_style`](https://developer.wordpress.org/reference/functions/wp_enqueue_style/) functions. 
 
@@ -38,7 +39,7 @@ add_action( 'enqueue_block_editor_assets, 'example_enqueue_editor_assets' );
 
 While not the recommended approach, it's important to note that `enqueue_block_editor_assets` can be used to style Editor content for backward compatibility. See below for more details.
 
-## Editor content scripts and styles
+### Editor content scripts and styles
 
 As of WordPress 6.3, all assets added through the [`enqueue_block_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_assets/) PHP action will also be enqueued in the iframed Editor. See [#48286](https://github.com/WordPress/gutenberg/pull/48286) for more details. 
 
@@ -96,11 +97,11 @@ These styles are inlined in the `body` of the iframed Editor and prefixed by `.e
 
 Beginning in WordPress 6.3, you can also use this method of modifying Editor settings to change styles dynamically with JavaScript. See [#52767](https://github.com/WordPress/gutenberg/pull/52767#top) for more details.
 
-## Block scripts and styles
+### Block scripts and styles
 
 When building a block, `block.json` is the recommended way to enqueue all scripts and styles that are specifically required for the block itself. You are able to enqueue assets for the Editor, the front end, or both. See the [Block Metadata](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/) article for more details. 
 
-## Theme scripts and styles
+### Theme scripts and styles
 
 If you need to enqueue Editor JavaScript in a theme, you can use either `enqueue_block_assets` or `enqueue_block_editor_assets` as outlined above. Editor-specific stylesheets should almost always be added with [`add_editor_style()`](https://developer.wordpress.org/reference/functions/add_editor_style/) or [`wp_enqueue_block_style()`](https://developer.wordpress.org/reference/functions/wp_enqueue_block_style/). 
 
