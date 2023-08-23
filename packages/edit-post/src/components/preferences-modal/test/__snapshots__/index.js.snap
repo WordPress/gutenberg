@@ -130,6 +130,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
             data-command=""
             id="tab-panel-0-blocks"
             role="tab"
+            tabindex="-1"
             type="button"
           >
             Blocks
@@ -141,6 +142,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
             data-command=""
             id="tab-panel-0-panels"
             role="tab"
+            tabindex="-1"
             type="button"
           >
             Panels
