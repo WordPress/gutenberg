@@ -26,7 +26,7 @@ describe( 'invalid blocks', () => {
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Focus on the textarea and enter an invalid paragraph
-		await canvas().click(
+		await canvas().$(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea'
 		);
 		await page.keyboard.type( '<p>invalid paragraph' );
