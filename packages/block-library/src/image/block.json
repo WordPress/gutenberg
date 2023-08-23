@@ -110,6 +110,10 @@
 				"radius": true,
 				"width": true
 			}
+		},
+		"__experimentalPattern": {
+			"url": "attr",
+			"id": "ignore"
 		}
 	},
 	"selectors": {
