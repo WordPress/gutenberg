@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useContext, useMemo, useEffect } from 'preact/hooks';
+import { useContext, useMemo, useEffect, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
@@ -14,18 +14,16 @@ import { directive } from './hooks';
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
 
-const mergeDeepSignals = ( target, source ) => {
+const mergeDeepSignals = ( target, source, overwrite ) => {
 	for ( const k in source ) {
-		if ( typeof peek( target, k ) === 'undefined' ) {
-			target[ `$${ k }` ] = source[ `$${ k }` ];
-		} else if (
-			isObject( peek( target, k ) ) &&
-			isObject( peek( source, k ) )
-		) {
+		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
 			mergeDeepSignals(
 				target[ `$${ k }` ].peek(),
-				source[ `$${ k }` ].peek()
+				source[ `$${ k }` ].peek(),
+				overwrite
 			);
+		} else if ( overwrite || typeof peek( target, k ) === 'undefined' ) {
+			target[ `$${ k }` ] = source[ `$${ k }` ];
 		}
 	}
 };
@@ -36,20 +34,24 @@ export default () => {
 		'context',
 		( {
 			directives: {
-				context: { default: context },
+				context: { default: newContext },
 			},
 			props: { children },
-			context: inherited,
+			context: inheritedContext,
 		} ) => {
-			const { Provider } = inherited;
-			const inheritedValue = useContext( inherited );
-			const value = useMemo( () => {
-				const localValue = deepSignal( context );
-				mergeDeepSignals( localValue, inheritedValue );
-				return localValue;
-			}, [ context, inheritedValue ] );
+			const { Provider } = inheritedContext;
+			const inheritedValue = useContext( inheritedContext );
+			const currentValue = useRef( deepSignal( {} ) );
+			currentValue.current = useMemo( () => {
+				const newValue = deepSignal( newContext );
+				mergeDeepSignals( newValue, inheritedValue );
+				mergeDeepSignals( currentValue.current, newValue, true );
+				return currentValue.current;
+			}, [ newContext, inheritedValue ] );
 
-			return <Provider value={ value }>{ children }</Provider>;
+			return (
+				<Provider value={ currentValue.current }>{ children }</Provider>
+			);
 		},
 		{ priority: 5 }
 	);
