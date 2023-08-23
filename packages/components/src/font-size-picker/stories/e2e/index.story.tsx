@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory } from '@storybook/react';
+import type { StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ export default {
 	component: FontSizePicker,
 };
 
-const FontSizePickerWithState: ComponentStory< typeof FontSizePicker > = ( {
+const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
 	value,
 	...props
 } ) => {
@@ -32,7 +32,7 @@ const FontSizePickerWithState: ComponentStory< typeof FontSizePicker > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof FontSizePicker > =
+export const Default: StoryFn< typeof FontSizePicker > =
 	FontSizePickerWithState.bind( {} );
 Default.args = {
 	fontSizes: [

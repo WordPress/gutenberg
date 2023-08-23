@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
-const meta: ComponentMeta< typeof BaseControl > = {
+const meta: Meta< typeof BaseControl > = {
 	title: 'Components/BaseControl',
 	component: BaseControl,
 	argTypes: {
@@ -19,14 +19,12 @@ const meta: ComponentMeta< typeof BaseControl > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const BaseControlWithTextarea: ComponentStory< typeof BaseControl > = (
-	props
-) => {
+const BaseControlWithTextarea: StoryFn< typeof BaseControl > = ( props ) => {
 	const { baseControlProps, controlProps } = useBaseControlProps( props );
 
 	return (
@@ -36,7 +34,7 @@ const BaseControlWithTextarea: ComponentStory< typeof BaseControl > = (
 	);
 };
 
-export const Default: ComponentStory< typeof BaseControl > =
+export const Default: StoryFn< typeof BaseControl > =
 	BaseControlWithTextarea.bind( {} );
 Default.args = {
 	__nextHasNoMarginBottom: true,
@@ -56,9 +54,7 @@ WithHelpText.args = {
  * e.g., a button, but we want an additional visual label for that section equivalent to the labels `BaseControl` would
  * otherwise use if the `label` prop was passed.
  */
-export const WithVisualLabel: ComponentStory< typeof BaseControl > = (
-	props
-) => {
+export const WithVisualLabel: StoryFn< typeof BaseControl > = ( props ) => {
 	// @ts-expect-error - Unclear how to fix, see also https://github.com/WordPress/gutenberg/pull/39468#discussion_r827150516
 	BaseControl.VisualLabel.displayName = 'BaseControl.VisualLabel';
 
