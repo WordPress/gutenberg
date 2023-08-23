@@ -159,7 +159,7 @@ describe( 'BorderControl', () => {
 			await openPopover();
 
 			const customColorPicker = getButton( /Custom color picker/ );
-			const colorSwatchButtons = screen.getAllByRole( 'button', {
+			const colorSwatchButtons = screen.getAllByRole( 'option', {
 				name: /^Color:/,
 			} );
 			const styleLabel = screen.getByText( 'Style' );
