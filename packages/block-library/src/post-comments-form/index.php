@@ -59,6 +59,37 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-on--submit', 'actions.core.comments.submit' );
 
+			while ( $p->next_tag( 'input' ) ) {
+				if ( $p->get_attribute( 'type' ) === 'submit' ) {
+					// Add the necessary directives.
+					$p->set_attribute( 'data-wp-bind--value', 'selectors.core.comments.submitText' );
+					$p->set_attribute( 'data-wp-bind--disabled', 'context.core.comments.isSubmitting' );
+
+					// Add translated strings to the state.
+					$submit_text = $p->get_attribute( 'value' );
+					wp_store(
+						array(
+							'state'     => array(
+								'core' => array(
+									'comments' => array(
+										'submitText'  => $submit_text,
+										'loadingText' => __( 'Submitting…' ),
+									),
+								),
+							),
+							'selectors' => array(
+								'core' => array(
+									'comments' => array(
+										'submitText' => $submit_text,
+									),
+								),
+							),
+						)
+					);
+					break;
+				}
+			}
+
 			// Mark the block as interactive.
 			$block->block_type->supports['interactivity'] = true;
 

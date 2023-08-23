@@ -11,10 +11,20 @@ store( {
 			},
 		},
 	},
+	selectors: {
+		core: {
+			comments: {
+				submitText: ( { context, state } ) =>
+					context.core.comments.isSubmitting
+						? state.core.comments.loadingText
+						: state.core.comments.submitText,
+			},
+		},
+	},
 	actions: {
 		core: {
 			comments: {
-				submit: async ( { event, state, ref } ) => {
+				submit: async ( { event, context, state, ref } ) => {
 					let response;
 					const existingComments = new Set();
 					const comments = ref.closest( '.wp-block-comments' );
@@ -28,7 +38,9 @@ store( {
 						event.preventDefault();
 
 						state.core.comments.error = '';
+						context.core.comments.isSubmitting = true;
 
+						await new Promise( ( r ) => setTimeout( r, 1400 ) );
 						response = await window.fetch( ref.action, {
 							method: 'POST',
 							body: new window.FormData( ref ),
@@ -40,6 +52,7 @@ store( {
 						// `<input name="submit"> element.
 						window.HTMLFormElement.prototype.submit.bind( ref )();
 					}
+
 					try {
 						const html = await response.text();
 
@@ -83,6 +96,8 @@ store( {
 
 							ref.reset();
 						}
+
+						context.core.comments.isSubmitting = false;
 					} catch ( e ) {
 						// If something happens at this point, the form has been submitted
 						// but we were not able to show it in the screen, so we can just
