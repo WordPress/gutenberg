@@ -5,27 +5,27 @@ import { Component } from 'preact';
 
 export class SlotContent {
 	apply( slot, content, fireChange ) {
-		const { slots } = this.context;
-		if ( slot ) {
-			slots.named[ slot ] = content;
+		const { named, onChange } = this.context;
+		if ( named ) {
+			named[ slot ] = content;
 			if ( fireChange ) {
-				for ( let i = 0; i < slots.onChange.length; i++ ) {
-					slots.onChange[ i ]();
+				for ( let i = 0; i < onChange.length; i++ ) {
+					onChange[ i ]();
 				}
 			}
 		}
 	}
 
 	componentWillMount() {
-		this.apply( this.props.slot, this.props.children[ 0 ], true );
+		this.apply( this.props.slot, this.props.children, true );
 	}
 
 	componentWillReceiveProps( { slot, children } ) {
 		if ( slot !== this.props.slot ) {
 			this.apply( this.props.slot, null, false );
-			this.apply( slot, children[ 0 ], true );
-		} else if ( children[ 0 ] !== this.props.children[ 0 ] ) {
-			this.apply( slot, children[ 0 ], true );
+			this.apply( slot, children, true );
+		} else if ( children !== this.props.children ) {
+			this.apply( slot, children, true );
 		}
 	}
 
@@ -34,22 +34,17 @@ export class SlotContent {
 	}
 
 	render( props ) {
-		return props.slot ? null : props.children[ 0 ];
+		return props.slot ? null : props.children;
 	}
 }
 
 export class SlotProvider {
 	getChildContext() {
-		return {
-			slots: {
-				named: {},
-				onChange: [],
-			},
-		};
+		return { named: {}, onChange: [] };
 	}
 
 	render( props ) {
-		return props.children[ 0 ];
+		return props.children;
 	}
 }
 
@@ -62,22 +57,22 @@ export class Slot extends Component {
 	}
 
 	componentDidMount() {
-		this.context.slots.onChange.push( this.__update.bind( this ) );
+		this.context.onChange.push( this.__update.bind( this ) );
 	}
 
 	componentWillUnmount() {
-		this.context.slots.onChange.push( this.__update.bind( this ) );
+		this.context.onChange.push( this.__update.bind( this ) );
 	}
 
 	render( props, state ) {
-		const child = props.children && props.children[ 0 ];
+		const child = props.children;
 		return typeof child === 'function'
 			? child( state.content )
 			: state.content || child;
 	}
 
 	__update() {
-		const content = this.context.slots.named[ this.props.name ];
+		const content = this.context.named[ this.props.name ];
 		if ( content !== this.state.content ) {
 			this.setState( { content } );
 		}

@@ -323,7 +323,7 @@ export default () => {
 		} ) => {
 			const contextValue = useContext( context );
 			const slot = evaluate( fill, { context: contextValue } );
-			return <SlotContent slot={ slot }>{ [ children ] }</SlotContent>;
+			return <SlotContent slot={ slot }>{ children }</SlotContent>;
 		},
 		{ priority: 4 }
 	);
@@ -332,7 +332,7 @@ export default () => {
 	directive(
 		'slot-provider',
 		( { props: { children } } ) => (
-			<SlotProvider>{ [ children ] }</SlotProvider>
+			<SlotProvider>{ children }</SlotProvider>
 		),
 		{ priority: 4 }
 	);
