@@ -23,6 +23,12 @@ const DEFAULT_CONFIG = {
 	port: 8888,
 	testsPort: 8889,
 	phpVersion: null,
+	ssl: {
+		cert: null,
+		key: null,
+		port: 8883,
+		testsPort: 8884,
+	},
 	coreSource: {
 		type: 'git',
 		url: 'https://github.com/WordPress/WordPress.git',
