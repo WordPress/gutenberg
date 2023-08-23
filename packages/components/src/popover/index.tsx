@@ -181,6 +181,7 @@ const UnforwardedPopover = (
 		flip = true,
 		resize = true,
 		shift = false,
+		inline = false,
 		variant,
 
 		// Deprecated props
@@ -562,18 +563,26 @@ const UnforwardedPopover = (
 		</AnimatedWrapper>
 	);
 
-	if ( slot.ref ) {
+	const shouldRenderWithinSlot = slot.ref && ! inline;
+	const hasAnchor = anchorRef || anchorRect || anchor;
+
+	if ( shouldRenderWithinSlot ) {
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	}
 
-	return createPortal(
-		anchorRef || anchorRect || anchor ? (
-			content
-		) : (
-			<span ref={ anchorRefFallback }>{ content }</span>
-		),
-		getPopoverFallbackContainer()
-	);
+	if ( ! hasAnchor ) {
+		content = <span ref={ anchorRefFallback }>{ content }</span>;
+	}
+
+	if ( shouldRenderWithinSlot ) {
+		return content;
+	}
+
+	if ( inline ) {
+		return content;
+	}
+
+	return createPortal( content, getPopoverFallbackContainer() );
 };
 
 /**
