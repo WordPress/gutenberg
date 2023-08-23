@@ -60,8 +60,12 @@ function mergeRootToEnvironments( config ) {
 		delete config.testsPort;
 	}
 	if ( config.ssl !== undefined ) {
+		removedRootOptions.ssl = {};
+		config.env.development.ssl = {};
+		config.env.tests.ssl = {};
 		if (
 			config.ssl.port !== undefined &&
+			config.env.development.ssl !== undefined &&
 			config.env.development.ssl.port === undefined
 		) {
 			removedRootOptions.ssl.port = config.ssl.port;
@@ -70,12 +74,46 @@ function mergeRootToEnvironments( config ) {
 		}
 		if (
 			config.ssl.testsPort !== undefined &&
+			config.env.tests.ssl !== undefined &&
 			config.env.tests.ssl.port === undefined
 		) {
 			removedRootOptions.ssl.testsPort = config.ssl.testsPort;
 			config.env.tests.ssl.port = config.ssl.testsPort;
 			delete config.ssl.testsPort;
 		}
+		if ( config.ssl.cert !== undefined ) {
+			if (
+				config.env.development.ssl !== undefined &&
+				config.env.development.ssl.cert === undefined
+			) {
+				config.env.development.ssl.cert = config.ssl.cert;
+			}
+			if (
+				config.env.tests.ssl !== undefined &&
+				config.env.tests.ssl.cert === undefined
+			) {
+				config.env.tests.ssl.cert = config.ssl.cert;
+			}
+			removedRootOptions.ssl.cert = config.ssl.cert;
+			delete config.ssl.cert;
+		}
+		if ( config.ssl.key !== undefined ) {
+			if (
+				config.env.development.ssl !== undefined &&
+				config.env.development.ssl.key === undefined
+			) {
+				config.env.development.ssl.key = config.ssl.key;
+			}
+			if (
+				config.env.tests.ssl !== undefined &&
+				config.env.tests.ssl.key === undefined
+			) {
+				config.env.tests.ssl.key = config.ssl.key;
+			}
+			removedRootOptions.ssl.key = config.ssl.key;
+			delete config.ssl.key;
+		}
+		delete config.ssl;
 	}
 	if ( config.lifecycleScripts !== undefined ) {
 		removedRootOptions.lifecycleScripts = config.lifecycleScripts;

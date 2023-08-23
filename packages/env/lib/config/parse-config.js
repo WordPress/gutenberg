@@ -36,7 +36,7 @@ const mergeConfigs = require( './merge-configs' );
  * @typedef WPRootConfigOptions
  * @property {number}                               port                          The port to use in the development environment.
  * @property {number}                               testsPort                     The port to use in the tests environment.
- * @property {Object}         						ssl              			  The ssl certificate, key, and port numbers.
+ * @property {Object.<string, string|number|null>}  ssl                           The ssl certificate, key, and port numbers.
  * @property {Object.<string, string|null>}         lifecycleScripts              The scripts to run at certain points in the command lifecycle.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
@@ -52,10 +52,19 @@ const mergeConfigs = require( './merge-configs' );
  * @property {WPSource[]}                pluginSources Plugins to load in the environment.
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
  * @property {number}                    port          The port to use.
- * @property {Object}         			 ssl           The ssl certificate, key, and port number.
+ * @property {WPSSLConfig}               ssl           The ssl certificate, key, and port number.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
  * @property {string|null}               phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ */
+
+/**
+ * The SSL configuration options.
+ *
+ * @typedef WPSSLConfig
+ * @property {string} cert The path to the SSL certificate.
+ * @property {string} key  The path to the SSL key.
+ * @property {number} port The port to use for SSL.
  */
 
 /**
@@ -241,19 +250,8 @@ async function getDefaultConfig(
 			afterDestroy: null,
 		},
 		env: {
-			development: {
-				ssl: {
-					/* cert: DEFAULT_ENVIRONMENT_CONFIG.ssl.cert,
-					key: DEFAULT_ENVIRONMENT_CONFIG.ssl.key, */
-					port: DEFAULT_ENVIRONMENT_CONFIG.ssl.port,
-				},
-			},
+			development: {},
 			tests: {
-				ssl: {
-					/* cert: DEFAULT_ENVIRONMENT_CONFIG.ssl.cert,
-					key: DEFAULT_ENVIRONMENT_CONFIG.ssl.key, */
-					port: DEFAULT_ENVIRONMENT_CONFIG.ssl.testsPort,
-				},
 				config: {
 					WP_DEBUG: false,
 					SCRIPT_DEBUG: false,
@@ -301,12 +299,12 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.port = overrides.testsPort;
 	}
 
-	if ( overrides.ssl.port ) {
+	if ( overrides.ssl && overrides.ssl.port ) {
 		overrideConfig.ssl.port = overrides.ssl.port;
 		overrideConfig.env.development.ssl.port = overrides.ssl.port;
 	}
 
-	if ( overrides.ssl.testsPort ) {
+	if ( overrides.ssl && overrides.ssl.testsPort ) {
 		overrideConfig.ssl.testsPort = overrides.ssl.testsPort;
 		overrideConfig.env.tests.ssl.port = overrides.ssl.testsPort;
 	}
