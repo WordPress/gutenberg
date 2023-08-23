@@ -299,7 +299,6 @@ class TableRecord {
 	}
 }
 const gzipDecode = GzipDecode.inflate || undefined;
-console.log( "gzipDecode", gzipDecode );
 let nativeGzipDecode = undefined;
 // if ( ! gzipDecode ) {
 // 	import( 'zlib' ).then( ( zlib ) => {
