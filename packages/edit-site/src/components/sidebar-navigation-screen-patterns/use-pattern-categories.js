@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import useDefaultPatternCategories from './use-default-pattern-categories';
 import useThemePatterns from './use-theme-patterns';
 import usePatterns from '../page-patterns/use-patterns';
-import { USER_PATTERNS } from '../page-patterns/utils';
+import { USER_PATTERNS, ALL_PATTERNS_CATEGORY } from '../page-patterns/utils';
 
 export default function usePatternCategories() {
 	const defaultCategories = useDefaultPatternCategories();
@@ -77,8 +77,16 @@ export default function usePatternCategories() {
 				}
 			}
 		);
-
-		return categoriesWithCounts;
+		const sorttedCategories = categoriesWithCounts.sort( ( a, b ) =>
+			a.label.localeCompare( b.label )
+		);
+		sorttedCategories.unshift( {
+			name: ALL_PATTERNS_CATEGORY,
+			label: __( 'All Patterns' ),
+			description: __( 'A list of all patterns from all sources' ),
+			count: themePatterns.length + userPatterns.length,
+		} );
+		return sorttedCategories;
 	}, [
 		defaultCategories,
 		themePatterns,
