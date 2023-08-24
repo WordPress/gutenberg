@@ -79,35 +79,23 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 
 	if ( 'hidden' === type ) {
 		return (
-			<div { ...blockProps }>
+			<>
 				{ controls }
-				<span className={ 'is-input-hidden' }>
-					<RichText
-						tagName="span"
-						className="wp-block-form-input__label-content"
-						value={ name }
-						onChange={ ( newValue ) =>
-							setAttributes( { name: newValue } )
-						}
-						aria-label={ __( 'Input name' ) }
-						placeholder={ __( 'Type the name for this input' ) }
-					/>
-					<input
-						type="text"
-						className={ classNames(
-							className,
-							'wp-block-form-input__input',
-							colorProps.className,
-							borderProps.className
-						) }
-						aria-label={ __( 'Value' ) }
-						value={ value }
-						onChange={ ( event ) =>
-							setAttributes( { value: event.target.value } )
-						}
-					/>
-				</span>
-			</div>
+				<input
+					type="hidden"
+					className={ classNames(
+						className,
+						'wp-block-form-input__input',
+						colorProps.className,
+						borderProps.className
+					) }
+					aria-label={ __( 'Value' ) }
+					value={ value }
+					onChange={ ( event ) =>
+						setAttributes( { value: event.target.value } )
+					}
+				/>
+			</>
 		);
 	}
 
