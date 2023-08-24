@@ -14,6 +14,7 @@ const {
 	hasFileArgInCLI,
 	hasProjectFile,
 	hasPackageProp,
+	searchConfig,
 } = require( '../utils' );
 
 const args = getArgsFromCLI();
@@ -23,12 +24,7 @@ const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.{css,pcss,scss}' ];
 // See: https://stylelint.io/user-guide/configuration
 const hasLintConfig =
 	hasArgInCLI( '--config' ) ||
-	hasProjectFile( '.stylelintrc.js' ) ||
-	hasProjectFile( '.stylelintrc.json' ) ||
-	hasProjectFile( '.stylelintrc.yaml' ) ||
-	hasProjectFile( '.stylelintrc.yml' ) ||
-	hasProjectFile( 'stylelint.config.js' ) ||
-	hasProjectFile( '.stylelintrc' ) ||
+	searchConfig( 'stylelint' ) ||
 	hasPackageProp( 'stylelint' );
 
 const defaultConfigArgs = ! hasLintConfig

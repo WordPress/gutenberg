@@ -14,6 +14,7 @@ const {
 	hasFileArgInCLI,
 	hasPackageProp,
 	hasProjectFile,
+	searchConfig,
 } = require( '../utils' );
 
 const args = getArgsFromCLI();
@@ -24,12 +25,7 @@ const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '.' ];
 const hasLintConfig =
 	hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--config' ) ||
-	hasProjectFile( '.eslintrc.js' ) ||
-	hasProjectFile( '.eslintrc.json' ) ||
-	hasProjectFile( '.eslintrc.yaml' ) ||
-	hasProjectFile( '.eslintrc.yml' ) ||
-	hasProjectFile( 'eslintrc.config.js' ) ||
-	hasProjectFile( '.eslintrc' ) ||
+	searchConfig( 'eslint' ) ||
 	hasPackageProp( 'eslintConfig' );
 
 // When a configuration is not provided by the project, use from the default
