@@ -31,6 +31,53 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenber
 		}
 	}
 
+	/**
+	 * Creates an HTML tag processor based off the block's content and selector
+	 * for the pattern sourced attribute.
+	 *
+	 * @param string $block_content
+	 * @param string $selector
+	 *
+	 * @return void
+	 */
+	function gutenberg_create_pattern_content_processor( $block_content, $selector ) {
+		if ( ! $selector ) {
+			return false;
+		}
+
+		$tags             = new WP_HTML_Tag_Processor( $block_content );
+		$is_selector_list = strpos( $selector, ',' ) !== false;
+
+		if ( ! $is_selector_list ) {
+			// TODO: The retrieval via selector could do with some work.
+			$found = $tags->next_tag( array( 'tag_name' => $selector ) );
+
+			return $found ? $tags : false;
+		}
+
+		$found     = false;
+		$selectors = explode( ',', $selector );
+
+		foreach ( $selectors as $tag_selector ) {
+			// TODO: The retrieval via selector could do with some work.
+			$found = $tags->next_tag( array( 'tag_name' => $tag_selector ) );
+
+			if ( $found ) {
+				break;
+			}
+
+			// TODO: Revisit whether a bookmark can be used here. The need for
+			// the bookmark to be on a found tag meant that you already needed
+			// to have searched and found a tag which made the rest of this
+			// search awkward. Perhaps we could wrap the block in a div and
+			// create the processor from that content, bookmarking that outer
+			// div if the current approach isn't performant.
+			$tags = new WP_HTML_Tag_Processor( $block_content );
+		}
+
+		return $found ? $tags : false;
+	}
+
 	function gutenberg_render_block_pattern_data( $block_content, $block, $block_instance ) {
 		$block_type = $block_instance->block_type;
 
@@ -72,17 +119,17 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenber
 				continue;
 			}
 
-			$tags  = new WP_HTML_Tag_Processor( $block_content );
-			$found = $tags->next_tag(
-				array(
-					// TODO: Improve the retrieval via selector, see block connections work.
-					'tag_name' => $block_type->attributes[ $pattern_attribute ]['selector'],
-				)
-			);
+			$selector = _wp_array_get( $block_type->attributes, array( $pattern_attribute, 'selector' ), null );
 
-			if ( ! $found ) {
+			if ( ! $selector ) {
 				continue;
-			};
+			}
+
+			$tags = gutenberg_create_pattern_content_processor( $block_content, $selector );
+
+			if ( ! $tags ) {
+				continue;
+			}
 
 			// Only inner html content and DOM attributes are currently processed.
 

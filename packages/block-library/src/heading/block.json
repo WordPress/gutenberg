@@ -63,7 +63,10 @@
 			}
 		},
 		"__unstablePasteTextInline": true,
-		"__experimentalSlashInserter": true
+		"__experimentalSlashInserter": true,
+		"__experimentalPattern": {
+			"content": "content"
+		}
 	},
 	"editorStyle": "wp-block-heading-editor",
 	"style": "wp-block-heading"
