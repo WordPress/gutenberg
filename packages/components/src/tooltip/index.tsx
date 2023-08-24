@@ -88,11 +88,6 @@ function Tooltip( props: TooltipProps ) {
 							shortcut={ shortcut }
 						/>
 					) }
-					<Ariakit.TooltipArrow
-						// 	 TODO: Remove when floating-ui/core is updated above 1.0.1
-						//  Required workaround, related to github.com/WordPress/gutenberg/pull/48402
-						size={ 0.0001 }
-					/>
 				</Ariakit.Tooltip>
 			) }
 		</>
