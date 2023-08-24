@@ -42,8 +42,14 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 *
 	 * @since 6.4.0
 	 *
-	 * @param array $config Font collection config options.
-	 * @return WP_Font_Collection|WP_Error A font collection is it was registered succesfully and a WP_Error otherwise.
+	 * @param string[] $config {
+	 *     Font collection associative array of configuration options.
+	 *
+	 *     @type string $id             The font collection's unique ID.
+	 *     @type string $data_json_file The font collection's data JSON file.
+	 * }
+	 * @return WP_Font_Collection|WP_Error A font collection is it was registered
+	 *                                     successfully, else WP_Error.
 	 */
 	function wp_register_font_collection( $config ) {
 		return WP_Font_Library::register_font_collection( $config );
