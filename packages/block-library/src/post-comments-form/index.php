@@ -115,7 +115,8 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			// Mark the block as interactive.
 			$block->block_type->supports['interactivity'] = true;
 
-			// Add a div to show error messages below the form.
+			// Add a div to show error messages below the form and another div to
+			// announce the spoken notices.
 			$form              = $p->get_updated_html();
 			$last_div_position = strripos( $form, '</form>' );
 			$form              = substr_replace(
