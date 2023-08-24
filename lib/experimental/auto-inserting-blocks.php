@@ -5,6 +5,15 @@
  * @package gutenberg
  */
 
+ class AutoInsertTracker {
+	static private $has_inserted = [];
+	public static function block_has_been_inserted( $block ) {
+		return isset( self::$has_inserted[ $block['blockName'] ] );
+	}
+	public static function set_block_has_been_inserted( $block ) {
+		self::$has_inserted[ $block['blockName'] ] = true;
+	}
+ }
 /**
  * Return a function that auto-inserts a block next to a given "anchor" block.
  *
@@ -19,10 +28,14 @@
  * @param string $relative_position The position relative to the given block.
  *                                  Can be 'before', 'after', 'first_child', or 'last_child'.
  * @param string $anchor_block_type The auto-inserted block will be inserted next to instances of this block type.
+ * @param bool	 $allow_multiple    Whether the anchor block allows multiple instances.
  * @return callable A function that accepts a block's content and returns the content with the inserted block.
  */
-function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anchor_block_type ) {
-	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block_type ) {
+function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anchor_block_type, $allow_multiple ) {
+	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block_type, $allow_multiple ) {
+		if ( AutoInsertTracker::block_has_been_inserted($inserted_block) && ! $allow_multiple ) {
+			return $block;
+		}
 		if ( $anchor_block_type === $block['blockName'] ) {
 			if ( 'first_child' === $relative_position ) {
 				array_unshift( $block['innerBlocks'], $inserted_block );
@@ -30,12 +43,14 @@ function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anch
 				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
 				// location) to that array.
 				array_unshift( $block['innerContent'], null );
+				AutoInsertTracker::set_block_has_been_inserted($inserted_block);
 			} elseif ( 'last_child' === $relative_position ) {
 				array_push( $block['innerBlocks'], $inserted_block );
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
 				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
 				// location) to that array.
 				array_push( $block['innerContent'], null );
+				AutoInsertTracker::set_block_has_been_inserted($inserted_block);
 			}
 			return $block;
 		}
@@ -59,6 +74,7 @@ function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anch
 			// when rendering blocks, we also need to insert a value (`null`, to mark a block
 			// location) into that array.
 			array_splice( $block['innerContent'], $chunk_index, 0, array( null ) );
+			AutoInsertTracker::set_block_has_been_inserted($inserted_block);
 		}
 		return $block;
 	};
@@ -76,6 +92,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 		return $settings;
 	}
 	$auto_insert = $metadata['__experimentalAutoInsert'];
+	$allow_multiple = $metadata['supports']['multiple'];
 
 	/**
 	 * Map the camelCased position string from block.json to the snake_cased block type position
@@ -108,7 +125,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 
 		$mapped_position = $property_mappings[ $position ];
 
-		gutenberg_register_auto_inserted_block( $inserted_block_name, $mapped_position, $anchor_block_name );
+		gutenberg_register_auto_inserted_block( $inserted_block_name, $mapped_position, $anchor_block_name, $allow_multiple );
 
 		$settings['auto_insert'][ $anchor_block_name ] = $mapped_position;
 	}
@@ -132,9 +149,10 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_bl
  * @param string $position        The desired position of the auto-inserted block, relative to its anchor block.
  *                                Can be 'before', 'after', 'first_child', or 'last_child'.
  * @param string $anchor_block    The name of the block to insert the auto-inserted block next to.
+ * @param bool  $allow_multiple  Whether the anchor block allows multiple instances.
  * @return void
  */
-function gutenberg_register_auto_inserted_block( $inserted_block, $position, $anchor_block ) {
+function gutenberg_register_auto_inserted_block( $inserted_block, $position, $anchor_block, $allow_multiple ) {
 		$inserted_block = array(
 			'blockName'    => $inserted_block,
 			'attrs'        => array(),
@@ -143,7 +161,7 @@ function gutenberg_register_auto_inserted_block( $inserted_block, $position, $an
 			'innerBlocks'  => array(),
 		);
 
-		$inserter = gutenberg_auto_insert_block( $inserted_block, $position, $anchor_block );
+		$inserter = gutenberg_auto_insert_block( $inserted_block, $position, $anchor_block, $allow_multiple );
 		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
 }
 
