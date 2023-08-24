@@ -286,7 +286,6 @@ function Editor( { settings } ) {
 					<Sidebar />
 					<BlockEditor settings={ settings } />
 				</div>
-				<Popover.Slot />
 			</DropZoneProvider>
 		</SlotFillProvider>
 	);
@@ -303,8 +302,6 @@ Let's examine these in more detail:
 -   `<Notices>` – Provides a "snack bar" Notice that will be rendered if any messages are dispatched to the `core/notices` store
 -   `<Header>` – Renders the static title "Standalone Block Editor" at the top of the editor UI
 -   `<BlockEditor>` – The custom block editor component
--   `<Popover.Slot />` – Renders a slot into which `<Popover>`s can be rendered
-    using the Slot/Fill mechanic
 
 ### Keyboard navigation
 

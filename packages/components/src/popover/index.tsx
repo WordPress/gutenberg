@@ -30,6 +30,7 @@ import {
 	useMemo,
 	useState,
 	useCallback,
+	createPortal,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -139,6 +140,19 @@ const AnimatedWrapper = forwardRef(
 
 const slotNameContext = createContext< string | undefined >( undefined );
 
+const getPopoverFallbackContainer = () => {
+	let container = document.body.querySelector(
+		'.components-popover__fallback-container'
+	);
+	if ( ! container ) {
+		container = document.createElement( 'div' );
+		container.className = 'components-popover__fallback-container';
+		document.body.append( container );
+	}
+
+	return container;
+};
+
 const UnforwardedPopover = (
 	props: Omit<
 		WordPressComponentProps< PopoverProps, 'div', false >,
@@ -167,6 +181,7 @@ const UnforwardedPopover = (
 		flip = true,
 		resize = true,
 		shift = false,
+		inline = false,
 		variant,
 
 		// Deprecated props
@@ -548,15 +563,26 @@ const UnforwardedPopover = (
 		</AnimatedWrapper>
 	);
 
-	if ( slot.ref ) {
+	const shouldRenderWithinSlot = slot.ref && ! inline;
+	const hasAnchor = anchorRef || anchorRect || anchor;
+
+	if ( shouldRenderWithinSlot ) {
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	}
 
-	if ( anchorRef || anchorRect || anchor ) {
+	if ( ! hasAnchor ) {
+		content = <span ref={ anchorRefFallback }>{ content }</span>;
+	}
+
+	if ( shouldRenderWithinSlot ) {
 		return content;
 	}
 
-	return <span ref={ anchorRefFallback }>{ content }</span>;
+	if ( inline ) {
+		return content;
+	}
+
+	return createPortal( content, getPopoverFallbackContainer() );
 };
 
 /**
