@@ -121,7 +121,7 @@ describe( 'Popover', () => {
 				);
 
 				await waitFor( () =>
-					// We want to explictely check that it's within the container.
+					// We want to explicitly check if it's within the container.
 					// eslint-disable-next-line testing-library/prefer-screen-queries
 					expect( getByText( container, 'Hello' ) ).toBeVisible()
 				);
