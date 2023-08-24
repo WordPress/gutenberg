@@ -20,6 +20,9 @@ store( {
 					context.core.comments.isSubmitting
 						? state.core.comments.loadingText
 						: state.core.comments.submitText,
+				displayCancelReply: ( { context } ) => {
+					return context.core.comments.formSlot ? undefined : 'none';
+				},
 			},
 		},
 	},
@@ -121,15 +124,25 @@ store( {
 				},
 				changeReplyTo: ( { context, ref, event } ) => {
 					event.preventDefault();
-
-					const commentId = ref.dataset.commentid;
-					context.core.comments.replyTo = `comment-${ commentId }`;
-
-					// eslint-disable-next-line no-console
-					console.log( commentId );
+					const { commentid, replyto } = ref.dataset;
+					context.core.comments.replyTitle = replyto;
+					context.core.comments.formSlot = `comment-${ commentid }`;
+					context.core.comments.fields.comment_parent = commentid;
 				},
-				updateText: ( { context, event } ) => {
-					context.core.comments.text = event.target.value;
+				cancelReply: ( { context } ) => {
+					context.core.comments.formSlot = undefined;
+					context.core.comments.fields.comment_parent = 0;
+				},
+				updateField: ( { context, event } ) => {
+					const { name, value } = event.target;
+					context.core.comments.fields[ name ] = value;
+				},
+				updateReplyTitle: ( { context, ref } ) => {
+					if ( context.core.comments.fields.comment_parent !== 0 ) {
+						ref.firstChild.replaceWith(
+							context.core.comments.replyTitle
+						);
+					}
 				},
 			},
 		},

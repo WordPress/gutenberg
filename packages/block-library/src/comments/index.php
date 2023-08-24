@@ -48,7 +48,17 @@ function render_block_core_comments( $attributes, $content, $block ) {
 				$p->set_attribute( 'data-wp-slot-provider', true );
 				$p->set_attribute(
 					'data-wp-context',
-					wp_json_encode( array( 'core' => array( 'comments' => (object) array() ) ) )
+					wp_json_encode(
+						array(
+							'core' => array(
+								'comments' => (object) array(
+									'fields' => (object) array(
+										'comment_parent' => 0
+									)
+								)
+							)
+						)
+					)
 				);
 				$output = $p->get_updated_html();
 

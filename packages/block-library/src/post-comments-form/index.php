@@ -32,7 +32,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class'        => implode( ' ', $classes ),
-			'data-wp-fill' => 'context.core.comments.replyTo',
+			'data-wp-fill' => 'context.core.comments.formSlot',
 		)
 	);
 
@@ -57,7 +57,12 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	if ( $enhanced_submission ) {
 		$p = new WP_HTML_Tag_Processor( $form );
 
-		// Try to find the form element. This is not optinal, if it fails, we don't
+		// Move to the first tag and add a bookmark. This is supposed to be OK considering
+		// that the first element is not the form element.
+		$p->next_tag();
+		$p->set_bookmark( 'first-tag' );
+
+		// Try to find the form element. This is not optional; if it fails, we don't
 		// enhance the submission.
 		if ( $p->next_tag(
 			array(
@@ -68,20 +73,34 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-on--submit', 'actions.core.comments.submit' );
 
-			// Try to find the different input fields and save their values on the
-			// context so it can be restored when the form is moved around. This is
-			// optional.
-			//
-			// TODO: Use `input[name="..."]` to find them, and add the rest of inputs.
-			if ( $p->next_tag( 'textarea' ) ) {
-				$p->set_attribute( 'data-wp-bind--value', 'context.core.comments.text' );
-				$p->set_attribute( 'data-wp-on--change', 'actions.core.comments.updateText' );
-			}
+			while( $p->next_tag() ) {
+				$tag  = $p->get_tag();
+				$name = $p->get_attribute( 'name' );
+				$type = $p->get_attribute( 'type' );
 
-			// Try to find the submit button and add directives to change its value
-			// on submission. This is optinal.
-			while ( $p->next_tag( 'input' ) ) {
-				if ( $p->get_attribute( 'type' ) === 'submit' ) {
+				// Try to find the different input fields and save their values on the
+				// context so it can be restored when the form is moved around. This is
+				// optional.
+				if ( 'TEXTAREA' === $tag && 'comment' === $name ) {
+					$p->set_attribute( 'data-wp-bind--value', 'context.core.comments.fields.' . $name );
+					$p->set_attribute( 'data-wp-on--change', 'actions.core.comments.updateField' );
+				}
+
+				if (
+					'INPUT' === $tag &&
+					in_array( $name, array( 'author', 'email', 'url' ), true )
+				) {
+					$p->set_attribute( 'data-wp-bind--value', 'context.core.comments.fields.' . $name );
+					$p->set_attribute( 'data-wp-on--input', 'actions.core.comments.updateField' );
+				}
+
+				if ( 'INPUT' === $tag && 'comment_parent' === $name ) {
+					$p->set_attribute( 'data-wp-bind--value', 'context.core.comments.fields.' . $name );
+				}
+
+				// Try to find the submit button and add directives to change its value
+				// on submission. This is optional.
+				if ( 'INPUT' === $tag && 'submit' === $type ) {
 					// Add the necessary directives.
 					$p->set_attribute( 'data-wp-bind--value', 'selectors.core.comments.submitText' );
 					$p->set_attribute( 'data-wp-bind--disabled', 'context.core.comments.isSubmitting' );
@@ -107,6 +126,19 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 							),
 						)
 					);
+				}
+			}
+
+			// Start again to add directives to the reply title elements.
+			$p->seek( 'first-tag' );
+			if ( $p->next_tag( array( 'class_name' => 'comment-reply-title' ) ) ) {
+				$p->set_attribute( 'data-wp-effect', 'actions.core.comments.updateReplyTitle' );
+			}
+
+			while ( $p->next_tag( array( 'tag_name' => 'a' ) ) ) {
+				if ( 'cancel-comment-reply-link' === $p->get_attribute( 'id' ) ) {
+					$p->set_attribute( 'data-wp-style--display', 'selectors.core.comments.displayCancelReply' );
+					$p->set_attribute( 'data-wp-on--click', 'actions.core.comments.cancelReply' );
 					break;
 				}
 			}
@@ -131,7 +163,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			$last_div_position = strripos( $enhanced_form, '</form>' );
 			$enhanced_form     = substr_replace(
 				$enhanced_form,
-				'<div 
+				'<div
 					class="wp-block-post-comments-form__error"
 					data-wp-style--display="selectors.core.comments.showError"
 					data-wp-effect="effects.core.comments.scrollToError"
@@ -139,7 +171,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
 						<path d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-6h-2v6zm0-8h2V7h-2v2z"></path>
 					</svg>
-					<span 
+					<span
 						data-wp-text="state.core.comments.error"
 						aria-live="polite"
 					></span>
