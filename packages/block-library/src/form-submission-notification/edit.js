@@ -52,6 +52,12 @@ const Edit = ( { attributes, clientId } ) => {
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
-	return <div { ...innerBlocksProps } />;
+	return (
+		<div
+			{ ...innerBlocksProps }
+			data-message-success={ __( 'Submission success notification' ) }
+			data-message-error={ __( 'Submission error notification' ) }
+		/>
+	);
 };
 export default Edit;
