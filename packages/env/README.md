@@ -183,7 +183,7 @@ Out of the box `wp-env` includes the [WordPress' PHPUnit test files](https://dev
 
 While we do provide a default `wp-tests-config.php` file within the environment, there may be cases where you want to use your own. WordPress provides a `WP_TESTS_CONFIG_FILE_PATH` constant that you can use to change the `wp-config.php` file used for testing. Set this to a desired path in your `bootstrap.php` file and the file you've chosen will be used instead of the one included in the environment.
 
-## Using `composer`, `phpunit`, and `wp-cli` tools.
+## Using `composer`, `phpunit`, and `wp-cli` tools
 
 For ease of use, Composer, PHPUnit, and wp-cli are available for in the environment. To run these executables, use `wp-env run <env> <tool> <command>`. For example, `wp-env run cli composer install`, or `wp-env run tests-cli phpunit`. You can also access various shells like `wp-env run cli bash` or `wp-env run cli wp shell`.
 
@@ -261,6 +261,41 @@ Here is a summary:
 3. Configure the IDE debugger to use port `9003` and the correct source files in wp-env.
 4. Launch the debugger and put a breakpoint on any line of PHP code.
 5. Refresh the URL wp-env is running at and the breakpoint should trigger.
+
+## HTTPS/TLS/SSL Support
+
+In order to easily add a certificate for HTTPS, configuration options have been added to pass a TLS certificate and key, as well as the ability to define their separate ports, which default to `8883` for development and `8884` for test. This way, you can use whatever tool you like to create a TLS certificate and use it in your environments.
+
+By using `.wp-env.override.json`, you can define a personal TLS certificate without disrupting a projects `.wp-env.json` configuration.
+
+This can be defined as root settings, as shown here, which will get moved to the development and tests environments when parsed.
+
+```json
+{
+	"ssl": {
+		"cert": "\etc\ssl\certs\localhost.crt",
+		"key": "\etc\ssl\certs\localhost.key",
+		"port": 8883,
+		"testsPort": 8884,
+	}
+}
+```
+
+Or it can be defined per environment:
+
+```json
+{
+	"env": {
+		"development": {
+			"ssl": {
+				"cert": "\etc\ssl\certs\localhost.crt",
+				"key": "\etc\ssl\certs\localhost.key",
+				"port": 8883,
+			}
+		}
+	}
+}
+```
 
 ## Command reference
 
@@ -487,6 +522,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"themes"`     | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
 | `"port"`       | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
 | `"testsPort"`  | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                         |
+| `"ssl"`        | `Object`       | `{ "cert": null, "key": null, "port": 8883, "testsPort": 8884 }` | Defines options for SSL/TLS/HTTPS support. Providing a path for `cert` and `key` will enable HTTPS.    |
 | `"config"`     | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`   | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
 
