@@ -104,16 +104,7 @@ function BlockRenameControl( props ) {
 					__nextHasNoMarginBottom
 					label={ __( 'Custom block name' ) }
 					value={ blockAttributes?.metadata?.name || '' }
-					onChange={ ( newName ) => {
-						onChange( {
-							// Include existing metadata (if present) to avoid overwriting existing.
-							metadata: {
-								...( blockAttributes?.metadata &&
-									blockAttributes?.metadata ),
-								name: newName,
-							},
-						} );
-					} }
+					onChange={ onChange }
 				/>
 			</InspectorControls>
 			<BlockSettingsMenuControls>
@@ -161,14 +152,7 @@ function BlockRenameControl( props ) {
 							newName = undefined;
 						}
 
-						onChange( {
-							// Include existing metadata (if present) to avoid overwriting existing.
-							metadata: {
-								...( blockAttributes?.metadata &&
-									blockAttributes?.metadata ),
-								name: newName,
-							},
-						} );
+						onChange( newName );
 					} }
 				/>
 			) }
@@ -197,7 +181,15 @@ export const withBlockRenameControl = createHigherOrderComponent(
 						<BlockRenameControl
 							clientId={ clientId }
 							blockAttributes={ attributes }
-							onChange={ setAttributes }
+							onChange={ ( newName ) => {
+								setAttributes( {
+									metadata: {
+										...( attributes?.metadata &&
+											attributes?.metadata ),
+										name: newName,
+									},
+								} );
+							} }
 						/>
 					</>
 				) }
