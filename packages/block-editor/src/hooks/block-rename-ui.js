@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
@@ -38,13 +38,23 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 
 	const autoSelectInputText = ( event ) => event.target.select();
 
+	const dialogDescription = useInstanceId(
+		RenameModal,
+		`block-editor-rename-modal__description`
+	);
+
 	return (
 		<Modal
 			title={ __( 'Rename block' ) }
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-rename-modal"
+			aria={ {
+				describedby: dialogDescription,
+			} }
 		>
-			<p>{ __( 'Choose a custom name for this block.' ) }</p>
+			<p id={ dialogDescription }>
+				{ __( 'Choose a custom name for this block.' ) }
+			</p>
 			<form
 				onSubmit={ ( e ) => {
 					e.preventDefault();
