@@ -31,7 +31,7 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 		);
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( 'Font Collection config ID is required as a non-empty string.' );
-		$collection = WP_Font_Library::register_font_collection( $config );
+		WP_Font_Library::register_font_collection( $config );
 	}
 
 	public function test_should_return_error_if_name_is_missing() {
@@ -42,14 +42,14 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 		);
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( 'Font Collection config name is required as a non-empty string.' );
-		$collection = WP_Font_Library::register_font_collection( $config );
+		WP_Font_Library::register_font_collection( $config );
 	}
 
 	public function test_should_return_error_if_config_is_empty() {
 		$config = array();
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( 'Font Collection config options is required as a non-empty array.' );
-		$collection = WP_Font_Library::register_font_collection( $config );
+		WP_Font_Library::register_font_collection( $config );
 	}
 
 	public function test_should_return_error_if_id_is_repeated() {
