@@ -305,7 +305,7 @@ class AztecView extends Component {
 		}
 
 		return (
-			<Pressable onPress={ this._onPress }>
+			<Pressable accessible={ false } onPress={ this._onPress }>
 				<RCTAztecView
 					{ ...otherProps }
 					style={ style }

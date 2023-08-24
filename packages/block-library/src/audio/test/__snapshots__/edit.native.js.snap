@@ -151,7 +151,7 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
               "text": undefined,
             }
           }
-          accessible={true}
+          accessible={false}
           collapsable={false}
           focusable={true}
           onBlur={[Function]}
@@ -391,7 +391,7 @@ exports[`Audio block renders audio file without crashing 1`] = `
               "text": undefined,
             }
           }
-          accessible={true}
+          accessible={false}
           collapsable={false}
           focusable={true}
           onBlur={[Function]}
