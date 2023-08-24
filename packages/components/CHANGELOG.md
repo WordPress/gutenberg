@@ -6,6 +6,10 @@
 
 -   `SandBox`: Fix the cleanup method in useEffect ([#53796](https://github.com/WordPress/gutenberg/pull/53796)).
 
+### Internal
+
+-   `Shortcut`: Add Storybook stories ([#53627](https://github.com/WordPress/gutenberg/pull/53627)).
+
 ## 25.6.0 (2023-08-16)
 
 ### Enhancements
@@ -30,7 +34,6 @@
 -   `ControlGroup`, `FormGroup`, `ControlLabel`, `Spinner`: Remove unused `ui/` components from the codebase ([#52953](https://github.com/WordPress/gutenberg/pull/52953)).
 -   `MenuItem`: Convert to TypeScript ([#53132](https://github.com/WordPress/gutenberg/pull/53132)).
 -   `MenuGroup`: Add Storybook stories ([#53090](https://github.com/WordPress/gutenberg/pull/53090)).
--   `Shortcut`: Add Storybook stories ([#53627](https://github.com/WordPress/gutenberg/pull/53627)).
 -   Components: Remove unnecessary utils ([#53679](https://github.com/WordPress/gutenberg/pull/53679)).
 
 ## 25.5.0 (2023-08-10)
