@@ -10,14 +10,15 @@ import { v4 as uuid } from 'uuid';
  */
 import { getBlockSupport, getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useRegistry } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useDispatch, useRegistry } from '@wordpress/data';
+import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
+import { store as blockEditorStore } from '../store';
 
 export const PATTERN_SUPPORT_KEY = '__experimentalPattern';
 
@@ -28,11 +29,11 @@ function hasPatternSupport( blockType ) {
 // TODO: Extract this to a custom source file?
 function useSource( {
 	name,
-	context: { dynamicContent, setDynamicContent },
+	context: { dynamicContent, patternId },
 	attributes,
 	setAttributes,
 } ) {
-	// 🪄🪄🪄 This is one of the places that the magic is supposed to happen 🪄🪄🪄
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockType = getBlockType( name );
 	const patternSupport = blockType.supports?.[ PATTERN_SUPPORT_KEY ];
 	// Generate unique id to link the block instance with the data in the
@@ -97,7 +98,7 @@ function useSource( {
 				: nextAttributes;
 
 			// Update the parent pattern instance's dynamic content attribute.
-			if ( updatedDynamicContent.length && setDynamicContent ) {
+			if ( updatedDynamicContent.length ) {
 				// If we are setting dynamic content on the parent pattern,
 				// ensure the block's id is saved in its metadata.
 				if ( ! attributes.metadata?.id ) {
@@ -107,7 +108,9 @@ function useSource( {
 					};
 				}
 
-				setDynamicContent( nextDynamicContent );
+				updateBlockAttributes( patternId, {
+					dynamicContent: nextDynamicContent,
+				} );
 			}
 
 			setAttributes( updatedAttributes );
@@ -115,9 +118,10 @@ function useSource( {
 		[
 			attributes.metadata?.id,
 			dynamicContent,
+			patternId,
 			patternSupport,
 			setAttributes,
-			setDynamicContent,
+			updateBlockAttributes,
 		]
 	);
 
@@ -141,7 +145,7 @@ function extendUsesContext( settings ) {
 	}
 
 	if ( ! Array.isArray( settings.usesContext ) ) {
-		settings.usesContext = [ 'dynamicContent', 'setDynamicContent' ];
+		settings.usesContext = [ 'dynamicContent', 'patternId' ];
 		return settings;
 	}
 
@@ -149,8 +153,8 @@ function extendUsesContext( settings ) {
 		settings.usesContext.push( 'dynamicContent' );
 	}
 
-	if ( ! settings.usesContext.includes( 'setDynamicContent' ) ) {
-		settings.usesContext.push( 'setDynamicContent' );
+	if ( ! settings.usesContext.includes( 'patternId' ) ) {
+		settings.usesContext.push( 'patternId' );
 	}
 
 	return settings;
@@ -169,7 +173,7 @@ const createEditFunctionWithPatternSource = () =>
 	createHigherOrderComponent(
 		( BlockEdit ) =>
 			( { name, attributes, setAttributes, context, ...props } ) => {
-				if ( ! context.setDynamicContent ) {
+				if ( ! context.patternId ) {
 					return (
 						<BlockEdit
 							name={ name }

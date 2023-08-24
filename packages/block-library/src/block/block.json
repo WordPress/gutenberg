@@ -8,11 +8,11 @@
 	"keywords": [ "reusable" ],
 	"textdomain": "default",
 	"attributes": {
-		"ref": {
-			"type": "number"
-		},
 		"dynamicContent": {
 			"type": "object"
+		},
+		"ref": {
+			"type": "number"
 		}
 	},
 	"providesContext": {

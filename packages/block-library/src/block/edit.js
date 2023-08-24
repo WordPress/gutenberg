@@ -24,6 +24,7 @@ import {
 	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
 	InspectorControls,
+	store as blockEditorStore,
 	useBlockProps,
 	Warning,
 	privateApis as blockEditorPrivateApis,
