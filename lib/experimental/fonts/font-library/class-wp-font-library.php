@@ -41,7 +41,6 @@ class WP_Font_Library {
 	 *
 	 * @since 6.4.0
 	 *
-	 * @param string $id Font collection id.
 	 * @param array  $config Font collection config options.
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered succesfully and a WP_Error otherwise.
 	 */
@@ -72,7 +71,6 @@ class WP_Font_Library {
 	 *
 	 * @since 6.4.0
 	 *
-	 * @param string $id Font collection id.
 	 * @return array List of font collections.
 	 */
 	public static function get_font_collection( $id ) {
