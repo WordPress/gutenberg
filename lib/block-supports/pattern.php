@@ -21,11 +21,11 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenber
 				$block_type->uses_context = array();
 			}
 
-			if ( ! in_array( 'patternId', $block_type->uses_context ) ) {
+			if ( ! in_array( 'patternId', $block_type->uses_context, true ) ) {
 				$block_type->uses_context[] = 'patternId';
 			}
 
-			if ( ! in_array( 'dynamicContent', $block_type->uses_context ) ) {
+			if ( ! in_array( 'dynamicContent', $block_type->uses_context, true ) ) {
 				$block_type->uses_context[] = 'dynamicContent';
 			}
 		}
@@ -35,10 +35,10 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenber
 	 * Creates an HTML tag processor based off the block's content and selector
 	 * for the pattern sourced attribute.
 	 *
-	 * @param string $block_content
-	 * @param string $selector
+	 * @param string $block_content Block markup.
+	 * @param string $selector      Attribute's CSS selector.
 	 *
-	 * @return void
+	 * @return WP_HTML_Tag_Processor HTML tag processor having matched on attribute's selector.
 	 */
 	function gutenberg_create_pattern_content_processor( $block_content, $selector ) {
 		if ( ! $selector ) {
@@ -52,7 +52,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenber
 			// TODO: The retrieval via selector could do with some work.
 			$found = $tags->next_tag( array( 'tag_name' => $selector ) );
 
-			return $found ? $tags : false;
+			return $found ? $tags : null;
 		}
 
 		$found     = false;
@@ -75,9 +75,19 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenber
 			$tags = new WP_HTML_Tag_Processor( $block_content );
 		}
 
-		return $found ? $tags : false;
+		return $found ? $tags : null;
 	}
 
+	/**
+	 * Renders pattern data into the final block markup for block's within
+	 * partially synced patterns.
+	 *
+	 * @param string   $block_content  Block Content.
+	 * @param array    $block          Block attributes.
+	 * @param WP_Block $block_instance The block instance.
+	 *
+	 * @return string
+	 */
 	function gutenberg_render_block_pattern_data( $block_content, $block, $block_instance ) {
 		$block_type = $block_instance->block_type;
 
