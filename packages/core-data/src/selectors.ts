@@ -1293,6 +1293,7 @@ export function getUserPatternCategories(
 				( userCategory: UserPatternCategory ) => ( {
 					...userCategory,
 					label: userCategory.name,
+					name: userCategory.slug,
 				} )
 			) || [],
 		patternCatogoriesMap,
