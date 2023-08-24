@@ -62,7 +62,7 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 -	**Name:** core/buttons
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Calendar
 
@@ -173,7 +173,7 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Category:** design
 -	**Parent:** core/comments
 -	**Supports:** align, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Comments
 
@@ -212,7 +212,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 -	**Category:** theme
 -	**Parent:** core/comments-pagination
 -	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Comments Previous Page
 
@@ -276,7 +276,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 -	**Name:** core/footnotes
 -	**Category:** text
 -	**Supports:** color (background, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~multiple~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Classic
 
@@ -452,7 +452,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Category:** design
 -	**Parent:** core/post-content
 -	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Page List
 
@@ -564,7 +564,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 -	**Name:** core/post-content
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), dimensions (minHeight), layout, typography (fontSize, lineHeight), ~~html~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Date
 
@@ -675,7 +675,7 @@ Contains the block elements used to render content when no query results are fou
 -	**Category:** theme
 -	**Parent:** core/query
 -	**Supports:** align, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Pagination
 
@@ -705,7 +705,7 @@ Displays a list of page numbers for pagination ([Source](https://github.com/Word
 -	**Category:** theme
 -	**Parent:** core/query-pagination
 -	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Previous Page
 
