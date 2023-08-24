@@ -9,7 +9,7 @@ test.describe( 'Block Renaming', () => {
 	} );
 
 	test.describe( 'Dialog renaming', () => {
-		test.only( 'allows renaming of blocks that support the feature via dialog-based UI', async ( {
+		test( 'allows renaming of blocks that support the feature via dialog-based UI', async ( {
 			editor,
 			page,
 			pageUtils,
@@ -62,7 +62,7 @@ test.describe( 'Block Renaming', () => {
 
 			const nameInput = renameModal.getByLabel( 'Block name' );
 
-			await expect( nameInput ).toHaveValue( 'Group' );
+			await expect( nameInput ).toHaveAttribute( 'placeholder', 'Group' );
 
 			await nameInput.fill( 'My new name' );
 
