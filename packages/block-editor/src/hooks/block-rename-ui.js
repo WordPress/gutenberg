@@ -3,7 +3,7 @@
  */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	MenuItem,
@@ -14,6 +14,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -43,6 +44,24 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 		`block-editor-rename-modal__description`
 	);
 
+	const handleSubmit = () => {
+		// Must be assertive to immediately announce change.
+		speak(
+			sprintf(
+				/* translators: %1$s: type of update (either reset of changed). %2$s: new name/label for the block */
+				__( 'Block name %1$s to: "%2$s".' ),
+				nameIsOriginal ? __( 'reset' ) : __( 'changed' ),
+				editedBlockName
+			),
+			'assertive'
+		);
+
+		onSave( editedBlockName );
+
+		// Immediate close avoids ability to hit save multiple times.
+		onClose();
+	};
+
 	return (
 		<Modal
 			title={ __( 'Rename block' ) }
@@ -63,10 +82,7 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 						return;
 					}
 
-					onSave( editedBlockName );
-
-					// Immediate close avoids ability to hit save multiple times.
-					onClose();
+					handleSubmit();
 				} }
 			>
 				<VStack spacing="3">
