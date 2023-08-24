@@ -45,7 +45,7 @@ function render_block_core_form( $attributes, $content ) {
 /**
  * Additional data to add to the view.js script for this block.
  */
-function gutenberg_block_core_form_view_script() {
+function block_core_form_view_script() {
 	wp_localize_script(
 		'wp-block-form-view',
 		'wpBlockFormSettings',
@@ -56,7 +56,7 @@ function gutenberg_block_core_form_view_script() {
 		)
 	);
 }
-add_action( 'wp_enqueue_scripts', 'gutenberg_block_core_form_view_script' );
+add_action( 'wp_enqueue_scripts', 'block_core_form_view_script' );
 
 /**
  * Adds extra settings to the block editor, for the forms block.
@@ -65,7 +65,7 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_block_core_form_view_script' );
  *
  * @return array The block editor settings with extra settings added.
  */
-function gutenberg_block_core_form_editor_settings( $settings ) {
+function block_core_form_editor_settings( $settings ) {
 	$settings['formOptions'] = array(
 		'availableMethods' => array(
 			'email'  => array(
@@ -80,7 +80,7 @@ function gutenberg_block_core_form_editor_settings( $settings ) {
 	);
 	return $settings;
 }
-add_filter( 'block_editor_settings_all', 'gutenberg_block_core_form_editor_settings' );
+add_filter( 'block_editor_settings_all', 'block_core_form_editor_settings' );
 
 /**
  * Adds extra fields to the form.
@@ -93,20 +93,20 @@ add_filter( 'block_editor_settings_all', 'gutenberg_block_core_form_editor_setti
  *
  * @return string The extra fields.
  */
-function gutenberg_block_core_form_extra_fields_comment_form( $extra_fields, $attributes ) {
+function block_core_form_extra_fields_comment_form( $extra_fields, $attributes ) {
 	if ( ! empty( $attributes['action'] ) && str_ends_with( $attributes['action'], '/wp-comments-post.php' ) ) {
 		$extra_fields .= '<input type="hidden" name="comment_post_ID" value="' . get_the_ID() . '" id="comment_post_ID">';
 	}
 	return $extra_fields;
 }
-add_filter( 'render_block_core_form_extra_fields', 'gutenberg_block_core_form_extra_fields_comment_form', 10, 2 );
+add_filter( 'render_block_core_form_extra_fields', 'block_core_form_extra_fields_comment_form', 10, 2 );
 
 /**
  * Sends an email if the form is a contact form.
  *
  * @return void
  */
-function gutenberg_block_core_form_send_email() {
+function block_core_form_send_email() {
 	check_ajax_referer( 'wp-block-form' );
 
 	// Get the POST data.
@@ -141,15 +141,15 @@ function gutenberg_block_core_form_send_email() {
 	}
 	wp_send_json_success( $result );
 }
-add_action( 'wp_ajax_wp_block_form_email_submit', 'gutenberg_block_core_form_send_email' );
-add_action( 'wp_ajax_nopriv_wp_block_form_email_submit', 'gutenberg_block_core_form_send_email' );
+add_action( 'wp_ajax_wp_block_form_email_submit', 'block_core_form_send_email' );
+add_action( 'wp_ajax_nopriv_wp_block_form_email_submit', 'block_core_form_send_email' );
 
 /**
  * Send the data export/remove request if the form is a privacy-request form.
  *
  * @return void
  */
-function gutenberg_block_core_form_privacy_form() {
+function block_core_form_privacy_form() {
 	// Get the POST data.
 	$params = wp_unslash( $_POST );
 
@@ -219,7 +219,7 @@ function gutenberg_block_core_form_privacy_form() {
 	// Add filter to show the core/form-submission-notification block.
 	add_filter( 'show_form_submission_notification_block', $show_notification, 10, 2 );
 }
-add_action( 'wp', 'gutenberg_block_core_form_privacy_form' );
+add_action( 'wp', 'block_core_form_privacy_form' );
 
 /**
  * Registers the `core/form` block on server.
