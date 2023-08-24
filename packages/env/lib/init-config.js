@@ -197,6 +197,21 @@ function installDependencies( service, env, config ) {
 	// At times we may need to evaluate the environment. This is because the
 	// WordPress image uses Ubuntu while the CLI image uses Alpine.
 
+	// Determine support for SSL
+	let SSLSupport = '';
+	if (
+		config.env[ env ].ssl &&
+		config.env[ env ].ssl.cert &&
+		config.env[ env ].ssl.key
+	) {
+		SSLSupport = '# Enable SSL support\n';
+		SSLSupport += enableSSL(
+			config.env[ env ].ssl.cert,
+			config.env[ env ].ssl.key,
+			config.workDirectoryPath
+		);
+	}
+
 	// Start with some environment-specific dependency installations.
 	switch ( service ) {
 		case 'wordpress': {
@@ -214,12 +229,7 @@ RUN apt-get -qy install git
 RUN apt-get -qy install sudo
 RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Enable SSL support
-${ enableSSL(
-	config.env[ env ].ssl.cert,
-	config.env[ env ].ssl.key,
-	config.workDirectoryPath
-) }`;
+${ SSLSupport }`;
 			break;
 		}
 		case 'cli': {

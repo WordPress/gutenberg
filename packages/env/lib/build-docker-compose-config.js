@@ -55,8 +55,8 @@ function getMounts(
 			: `tests-user-home:/home/${ hostUsername }`;
 
 	const sslMount = [];
-	if (config.ssl !== undefined && config.ssl.cert) {
-		sslMount.push(workDirectoryPath + `/ssl:/home/${ hostUsername }/ssl`);
+	if ( config.ssl !== undefined && config.ssl.cert ) {
+		sslMount.push( workDirectoryPath + `/ssl:/home/${ hostUsername }/ssl` );
 	}
 
 	const corePHPUnitMount = `${ path.join(

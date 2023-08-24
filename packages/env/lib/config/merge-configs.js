@@ -53,6 +53,10 @@ function mergeConfig( config, toMerge ) {
 				);
 				break;
 			}
+			case 'ssl': {
+				config.ssl = Object.assign( config.ssl, toMerge.ssl );
+				break;
+			}
 
 			// Environment-specific config options are recursively merged.
 			case 'env': {
