@@ -15,12 +15,11 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_should_get_data
 	 *
-	 * @param string $id Font collection id.
 	 * @param array  $config Font collection config options.
 	 * @param array  $expected_data Expected data.
 	 */
-	public function test_should_get_data( $id, $config, $expected_data ) {
-		$collection = new WP_Font_Collection( $id, $config );
+	public function test_should_get_data( $config, $expected_data ) {
+		$collection = new WP_Font_Collection( $config );
 		$this->assertSame( $expected_data, $collection->get_data() );
 	}
 
@@ -35,16 +34,16 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 
 		return array(
 			'with a data_json_file' => array(
-				'id'            => 'my-collection',
 				'config'        => array(
+					'id'             => 'my-collection',
 					'name'           => 'My Collection',
 					'description'    => 'My collection description',
 					'data_json_file' => $mock_file,
 				),
 				'expected_data' => array(
+					'id'          => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
-					'id'          => 'my-collection',
 					'data'        => '{"this is mock data":true}',
 				),
 			),
