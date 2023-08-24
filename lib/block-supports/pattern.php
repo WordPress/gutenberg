@@ -8,8 +8,8 @@
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenberg_experiments ) ) {
 	/**
-	 * Adds the pattern `dynamicContent` and `setDynamicContent` items to the
-	 * block's `usesContext` configuration.
+	 * Adds `patternId` and `dynamicContent` items to the block's `usesContext`
+	 * configuration.
 	 *
 	 * @param WP_Block_Type $block_type Block type.
 	 */
@@ -21,12 +21,12 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenber
 				$block_type->uses_context = array();
 			}
 
-			if ( ! in_array( 'dynamicContent', $block_type->uses_context ) ) {
-				$block_type->uses_context[] = 'dynamicContent';
+			if ( ! in_array( 'patternId', $block_type->uses_context ) ) {
+				$block_type->uses_context[] = 'patternId';
 			}
 
-			if ( ! in_array( 'setDynamicContent', $block_type->uses_context ) ) {
-				$block_type->uses_context[] = 'setDynamicContent';
+			if ( ! in_array( 'dynamicContent', $block_type->uses_context ) ) {
+				$block_type->uses_context[] = 'dynamicContent';
 			}
 		}
 	}

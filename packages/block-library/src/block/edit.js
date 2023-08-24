@@ -19,18 +19,29 @@ import {
 	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
 	InspectorControls,
+	store as blockEditorStore,
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 
 export default function ReusableBlockEdit( {
 	attributes: { ref },
+	clientId,
 	setAttributes,
 } ) {
-	const setDynamicContent = ( dynamicContent ) =>
-		setAttributes( { dynamicContent } );
-	useEffect( () => setAttributes( { setDynamicContent } ), [] );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	// To leverage updateBlockAttributes in the pattern block support we need
+	// an ID, otherwise we'd need to pass a setter down through context.
+	// The `clientId` is a prop and so can't be passed directly through block
+	// context. Instead, we set this on a dedicated block attribute.
+	useEffect( () => {
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { patternId: clientId } );
+	}, [] );
 
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(

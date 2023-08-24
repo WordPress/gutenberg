@@ -8,19 +8,19 @@
 	"keywords": [ "reusable" ],
 	"textdomain": "default",
 	"attributes": {
-		"ref": {
-			"type": "number"
-		},
 		"dynamicContent": {
 			"type": "object"
 		},
-		"setDynamicContent": {
-			"type": "function"
+		"patternId": {
+			"type": "string"
+		},
+		"ref": {
+			"type": "number"
 		}
 	},
 	"providesContext": {
 		"dynamicContent": "dynamicContent",
-		"setDynamicContent": "setDynamicContent"
+		"patternId": "patternId"
 	},
 	"supports": {
 		"customClassName": false,
