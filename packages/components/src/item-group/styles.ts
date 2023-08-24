@@ -42,6 +42,7 @@ export const unstyledButton = ( as: 'a' | 'button' ) => {
 			// Windows high contrast mode.
 			outline: 2px solid transparent;
 			outline-offset: 0;
+			border-radius: 2px;
 		}
 	`;
 };
