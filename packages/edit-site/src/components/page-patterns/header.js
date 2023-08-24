@@ -6,7 +6,6 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 
@@ -14,12 +13,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
-import {
-	USER_PATTERN_CATEGORY,
-	USER_PATTERNS,
-	TEMPLATE_PARTS,
-	PATTERNS,
-} from './utils';
+import { TEMPLATE_PARTS, PATTERNS } from './utils';
 
 export default function PatternsHeader( {
 	categoryId,
@@ -35,10 +29,7 @@ export default function PatternsHeader( {
 	);
 
 	let title, description;
-	if ( categoryId === USER_PATTERN_CATEGORY && type === USER_PATTERNS ) {
-		title = __( 'My Patterns' );
-		description = '';
-	} else if ( type === TEMPLATE_PARTS ) {
+	if ( type === TEMPLATE_PARTS ) {
 		const templatePartArea = templatePartAreas.find(
 			( area ) => area.area === categoryId
 		);
