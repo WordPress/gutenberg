@@ -250,13 +250,13 @@ const useActionsCommands = () => {
 		},
 		{
 			name: 'add-after',
-			label: __( 'Add After' ),
+			label: __( 'Add after' ),
 			callback: onAddAfter,
 			icon: add,
 		},
 		{
 			name: 'add-before',
-			label: __( 'Add Before' ),
+			label: __( 'Add before' ),
 			callback: onAddBefore,
 			icon: add,
 		},
