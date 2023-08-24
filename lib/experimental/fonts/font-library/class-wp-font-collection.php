@@ -34,7 +34,7 @@ class WP_Font_Collection {
 	 *
 	 * @since 6.4.0
 	 *
-	 * @param array  $config Font collection config options.
+	 * @param array $config Font collection config options.
 	 * @throws Exception If the required parameters are missing.
 	 */
 	public function __construct( $config ) {
