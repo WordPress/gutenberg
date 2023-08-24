@@ -43,11 +43,11 @@ class WP_Font_Collection {
 			throw new Exception( 'Font Collection config options is required as a non-empty array.' );
 		}
 
-		if ( empty( $config[ 'id' ] ) || !is_string( $config[ 'id' ] ) ) {
+		if ( empty( $config['id'] ) || ! is_string( $config['id'] ) ) {
 			throw new Exception( 'Font Collection config ID is required as a non-empty string.' );
 		}
 
-		if ( empty( $config['data_json_file'] ) || !is_string( $config['data_json_file'] ) ) {
+		if ( empty( $config['data_json_file'] ) || ! is_string( $config['data_json_file'] ) ) {
 			throw new Exception( 'Font Collection config "data_json_file" option is required as a non-empty string.' );
 		}
 
