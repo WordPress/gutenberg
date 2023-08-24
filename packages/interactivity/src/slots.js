@@ -1,80 +1,27 @@
 /**
  * External dependencies
  */
-import { Component } from 'preact';
+import { createContext } from 'preact';
+import { useContext, useEffect } from 'preact/hooks';
 
-export class SlotContent {
-	apply( slot, content, fireChange ) {
-		const { named, onChange } = this.context;
-		if ( named ) {
-			named[ slot ] = content;
-			if ( fireChange ) {
-				for ( let i = 0; i < onChange.length; i++ ) {
-					onChange[ i ]();
-				}
-			}
-		}
-	}
+const slotsContext = createContext();
 
-	componentWillMount() {
-		this.apply( this.props.slot, this.props.children, true );
-	}
+export const SlotContent = ( { slot, children } ) => {
+	const slots = useContext( slotsContext );
 
-	componentWillReceiveProps( { slot, children } ) {
-		if ( slot !== this.props.slot ) {
-			this.apply( this.props.slot, null, false );
-			this.apply( slot, children, true );
-		} else if ( children !== this.props.children ) {
-			this.apply( slot, children, true );
-		}
-	}
+	useEffect( () => {
+		slots[ slot ] = children;
+		return () => {
+			slots[ slot ] = null;
+		};
+	}, [ slots, slot, children ] );
 
-	componentWillUnmount() {
-		this.apply( this.props.slot, null, true );
-	}
+	return !! slot ? null : children;
+};
 
-	render( props ) {
-		return props.slot ? null : props.children;
-	}
-}
+export const SlotProvider = slotsContext.Provider;
 
-export class SlotProvider {
-	getChildContext() {
-		return { named: {}, onChange: [] };
-	}
-
-	render( props ) {
-		return props.children;
-	}
-}
-
-export class Slot extends Component {
-	state = {};
-
-	constructor( props, context ) {
-		super( props, context );
-		this.__update();
-	}
-
-	componentDidMount() {
-		this.context.onChange.push( this.__update.bind( this ) );
-	}
-
-	componentWillUnmount() {
-		this.context.onChange.push( this.__update.bind( this ) );
-	}
-
-	render( props, state ) {
-		const child = props.children;
-		return typeof child === 'function'
-			? child( state.content )
-			: state.content || child;
-	}
-
-	__update() {
-		const content = this.context.named[ this.props.name ];
-		if ( content !== this.state.content ) {
-			this.setState( { content } );
-		}
-	}
-}
+export const Slot = ( { name, children } ) => {
+	const slots = useContext( slotsContext );
+	return slots[ name ] || children;
+};

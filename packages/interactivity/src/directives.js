@@ -331,9 +331,10 @@ export default () => {
 	// data-wp-slot-provider
 	directive(
 		'slot-provider',
-		( { props: { children } } ) => (
-			<SlotProvider>{ children }</SlotProvider>
-		),
+		( { props: { children } } ) => {
+			const slots = useMemo( () => deepSignal( {} ), [] );
+			return <SlotProvider value={ slots }>{ children }</SlotProvider>;
+		},
 		{ priority: 4 }
 	);
 };
