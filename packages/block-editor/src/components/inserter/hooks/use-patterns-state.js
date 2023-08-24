@@ -29,21 +29,16 @@ const CUSTOM_CATEGORY = {
 const usePatternsState = ( onInsert, rootClientId ) => {
 	const { patternCategories, patterns, userPatternCategories } = useSelect(
 		( select ) => {
+			const { __experimentalGetAllowedPatterns, getSettings } =
+				select( blockEditorStore );
 			const {
-				__experimentalGetAllowedPatterns,
 				__experimentalUserPatternCategories,
-				getSettings,
-			} = select( blockEditorStore );
+				__experimentalBlockPatternCategories,
+			} = getSettings();
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
-				userPatternCategories:
-					__experimentalUserPatternCategories().map( ( cat ) => ( {
-						...cat,
-						label: cat.name,
-						name: cat.slug,
-					} ) ),
-				patternCategories:
-					getSettings().__experimentalBlockPatternCategories,
+				userPatternCategories: __experimentalUserPatternCategories,
+				patternCategories: __experimentalBlockPatternCategories,
 			};
 		},
 		[ rootClientId ]
