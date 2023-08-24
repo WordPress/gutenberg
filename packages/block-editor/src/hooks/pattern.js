@@ -209,14 +209,16 @@ function shimAttributeSource( settings ) {
 	return settings;
 }
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/pattern/shimAttributeSource',
-	shimAttributeSource
-);
+if ( window.__experimentalPatterns ) {
+	addFilter(
+		'blocks.registerBlockType',
+		'core/pattern/shimAttributeSource',
+		shimAttributeSource
+	);
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/pattern/extendUsesContext',
-	extendUsesContext
-);
+	addFilter(
+		'blocks.registerBlockType',
+		'core/pattern/extendUsesContext',
+		extendUsesContext
+	);
+}

@@ -27,6 +27,10 @@ function gutenberg_enable_experiments() {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalConnections = true', 'before' );
 	}
 
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalPatterns = true', 'before' );
+	}
+
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
 	}
