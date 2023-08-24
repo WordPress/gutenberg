@@ -9,7 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import { useState, useEffect } from '@wordpress/element';
 import {
-	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 	BlockList,
 	BlockTools,
@@ -78,7 +77,6 @@ export function Editor( { testBlocks, settings = {} } ) {
 				>
 					<BlockInspector />
 					<BlockTools>
-						<BlockEditorKeyboardShortcuts.Register />
 						<WritingFlow>
 							<BlockList />
 						</WritingFlow>

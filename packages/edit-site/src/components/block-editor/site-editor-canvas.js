@@ -11,7 +11,6 @@ import {
 	BlockList,
 	BlockTools,
 	__unstableUseClipboardHandler as useClipboardHandler,
-	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
@@ -116,7 +115,6 @@ export default function SiteEditorCanvas() {
 								}
 							} }
 						>
-							<BlockEditorKeyboardShortcuts.Register />
 							<BackButton />
 							<ResizableEditor
 								enableResizing={ enableResizing }

@@ -11,7 +11,6 @@ import {
 } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
-	BlockEditorKeyboardShortcuts,
 	CopyHandler,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -100,7 +99,6 @@ export default function WidgetAreasBlockEditorProvider( {
 
 	return (
 		<ShortcutProvider>
-			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
 				<ExperimentalBlockEditorProvider
