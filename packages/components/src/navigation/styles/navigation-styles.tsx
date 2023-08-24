@@ -155,7 +155,7 @@ export const ItemBaseUI = styled.li`
 	}
 
 	&.is-active {
-		background-color: ${ COLORS.theme.accent };
+		background-color: var( --wp-components-color-accent-solid );
 		color: ${ COLORS.white };
 
 		> button,

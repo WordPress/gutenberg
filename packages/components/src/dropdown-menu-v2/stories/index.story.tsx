@@ -150,66 +150,63 @@ const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
 	</SlotFillProvider>
 );
 export const Default = Template.bind( {} );
+
+export const DropdownDemo = () => (
+	<>
+		<DropdownMenuGroup>
+			<DropdownMenuItem>Menu item</DropdownMenuItem>
+			<DropdownMenuItem>Menu item with prefix</DropdownMenuItem>
+			<DropdownMenuItem suffix={ <span>⌥⌘T</span> }>
+				Menu item with suffix
+			</DropdownMenuItem>
+			<DropdownMenuItem disabled>Disabled menu item</DropdownMenuItem>
+			<DropdownSubMenu
+				trigger={
+					<DropdownSubMenuTrigger>Submenu</DropdownSubMenuTrigger>
+				}
+			>
+				<DropdownMenuItem suffix={ <span>⌘+S</span> }>
+					Submenu item with suffix
+				</DropdownMenuItem>
+				<DropdownMenuItem>
+					<div
+						style={ {
+							display: 'inline-flex',
+							flexDirection: 'column',
+						} }
+					>
+						Submenu item
+						<ItemHelpText>With additional custom text</ItemHelpText>
+					</div>
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownSubMenu
+					trigger={
+						<DropdownSubMenuTrigger>
+							Second level submenu
+						</DropdownSubMenuTrigger>
+					}
+				>
+					<DropdownMenuItem>Submenu item</DropdownMenuItem>
+					<DropdownMenuItem>Submenu item</DropdownMenuItem>
+				</DropdownSubMenu>
+			</DropdownSubMenu>
+		</DropdownMenuGroup>
+
+		<DropdownMenuSeparator />
+
+		<CheckboxItemsGroup />
+
+		<DropdownMenuSeparator />
+
+		<RadioItemsGroup />
+	</>
+);
+
 Default.args = {
 	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
 	sideOffset: 12,
-	children: (
-		<>
-			<DropdownMenuGroup>
-				<DropdownMenuItem>Menu item</DropdownMenuItem>
-				<DropdownMenuItem
-					prefix={ <Icon icon={ wordpress } size={ 24 } /> }
-				>
-					Menu item with prefix
-				</DropdownMenuItem>
-				<DropdownMenuItem suffix={ <span>⌥⌘T</span> }>
-					Menu item with suffix
-				</DropdownMenuItem>
-				<DropdownMenuItem disabled>Disabled menu item</DropdownMenuItem>
-				<DropdownSubMenu
-					trigger={
-						<DropdownSubMenuTrigger>Submenu</DropdownSubMenuTrigger>
-					}
-				>
-					<DropdownMenuItem suffix={ <span>⌘+S</span> }>
-						Submenu item with suffix
-					</DropdownMenuItem>
-					<DropdownMenuItem>
-						<div
-							style={ {
-								display: 'inline-flex',
-								flexDirection: 'column',
-							} }
-						>
-							Submenu item
-							<ItemHelpText>
-								With additional custom text
-							</ItemHelpText>
-						</div>
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
-					<DropdownSubMenu
-						trigger={
-							<DropdownSubMenuTrigger>
-								Second level submenu
-							</DropdownSubMenuTrigger>
-						}
-					>
-						<DropdownMenuItem>Submenu item</DropdownMenuItem>
-						<DropdownMenuItem>Submenu item</DropdownMenuItem>
-					</DropdownSubMenu>
-				</DropdownSubMenu>
-			</DropdownMenuGroup>
-
-			<DropdownMenuSeparator />
-
-			<CheckboxItemsGroup />
-
-			<DropdownMenuSeparator />
-
-			<RadioItemsGroup />
-		</>
-	),
+	children: <DropdownDemo />,
 };
 
 const toolbarVariantContextValue = {

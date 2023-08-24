@@ -59,9 +59,7 @@ export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
 	`;
 };
 
-export const borderControlDropdown = (
-	size?: 'default' | '__unstable-large'
-) => css`
+export const borderControlDropdown = ( size?: 'default' | '__unstable-large' ) => css`
 	background: #fff;
 
 	&& > button {
@@ -79,7 +77,7 @@ export const borderControlDropdown = (
 			{ borderRadius: `2px 0 0 2px` },
 			{ borderRadius: `0 2px 2px 0` }
 		)() }
-		border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
+		border: ${ CONFIG.borderWidth } solid var( --wp-components-color-gray-component-border );
 
 		&:focus,
 		&:hover:not( :disabled ) {

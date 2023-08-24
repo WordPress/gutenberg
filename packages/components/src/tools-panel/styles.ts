@@ -157,14 +157,14 @@ export const ResetLabel = styled.span`
 `;
 
 export const DefaultControlsItem = css`
-	color: ${ COLORS.gray[ 900 ] };
+	color: var( --wp-components-color-gray-contrast );
 
 	&&[aria-disabled='true'] {
-		color: ${ COLORS.gray[ 700 ] };
+		color: var( --wp-components-color-gray-text );
 		opacity: 1;
 
 		&:hover {
-			color: ${ COLORS.gray[ 700 ] };
+			color: var( --wp-components-color-gray-text );
 		}
 
 		${ ResetLabel } {

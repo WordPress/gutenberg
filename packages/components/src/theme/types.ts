@@ -14,6 +14,7 @@ export type ThemeInputValues = {
 	 * `var(--my-custom-property)`) are _not_ supported values for this property.
 	 */
 	accent?: string;
+	isDark?: boolean;
 	/**
 	 * The background color.
 	 *

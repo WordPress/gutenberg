@@ -14,15 +14,17 @@ export const inputStyleNeutral = css`
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: ${ CONFIG.radiusBlockUi };
-	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border } };
+	border: ${
+		CONFIG.borderWidth
+	} solid var( --wp-components-color-gray-component-border ) };
 	${ reduceMotion( 'transition' ) }
 `;
 
 export const inputStyleFocus = css`
-	border-color: ${ COLORS.theme.accent };
+	border-color: var( --wp-components-color-accent-solid );
 	box-shadow: 0 0 0
 		calc( ${ CONFIG.borderWidthFocus } - ${ CONFIG.borderWidth } )
-		${ COLORS.theme.accent };
+		var( --wp-components-color-accent-solid );
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;

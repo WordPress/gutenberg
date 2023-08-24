@@ -35,7 +35,7 @@ export const Container = styled.div`
 
 export const Side = styled.div`
 	box-sizing: border-box;
-	background: ${ COLORS.theme.accent };
+	background: var( --wp-components-color-accent-solid );
 	filter: brightness( 1 );
 	opacity: 0;
 	position: absolute;

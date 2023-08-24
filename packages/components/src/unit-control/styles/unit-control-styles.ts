@@ -54,7 +54,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			height: 24px;
 			margin-inline-end: ${ space( 2 ) };
 			padding: ${ space( 1 ) };
-			color: ${ COLORS.theme.accent };
+			color: var( --wp-components-color-accent-solid );
 			font-size: 13px;
 			line-height: 1;
 			text-align-last: center;
@@ -73,7 +73,7 @@ export const UnitLabel = styled.div< SelectProps >`
 
 		${ baseUnitLabelStyles };
 
-		color: ${ COLORS.gray[ 900 ] };
+		color: var( --wp-components-color-gray-contrast );
 	}
 `;
 

@@ -11,7 +11,7 @@ import type { SurfaceVariant, SurfaceProps } from './types';
 
 export const Surface = css`
 	background-color: ${ CONFIG.surfaceColor };
-	color: ${ COLORS.gray[ 900 ] };
+	color: var( --wp-components-color-gray-contrast );
 	position: relative;
 `;
 

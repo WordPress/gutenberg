@@ -30,7 +30,7 @@ export const TooltipWrapper = styled.div`
 `;
 
 export const Tooltip = styled.div`
-	background: ${ COLORS.gray[ 900 ] };
+	background: var( --wp-components-color-gray-contrast );
 	border-radius: 2px;
 	box-sizing: border-box;
 	font-family: ${ font( 'default.fontFamily' ) };

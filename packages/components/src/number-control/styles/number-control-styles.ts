@@ -36,7 +36,7 @@ export const Input = styled( InputControl )`
 
 export const SpinButton = styled( Button )`
 	&&&&& {
-		color: ${ COLORS.theme.accent };
+		color: var( --wp-components-color-accent-solid );
 	}
 `;
 

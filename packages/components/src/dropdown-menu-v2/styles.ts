@@ -25,8 +25,9 @@ const ITEM_PADDING_INLINE_START = space( 2 );
 const ITEM_PADDING_INLINE_END = space( 2.5 );
 
 // TODO: should bring this into the config, and make themeable
-const DEFAULT_BORDER_COLOR = COLORS.ui.borderDisabled;
-const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
+const DEFAULT_BORDER_COLOR = 'var( --wp-components-color-gray-border )';
+const TOOLBAR_VARIANT_BORDER_COLOR =
+	'var( --wp-components-color-gray-components-border )';
 const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
@@ -65,8 +66,9 @@ const slideLeftAndFade = keyframes( {
 const baseContent = (
 	variant: DropdownMenuInternalContext[ 'variant' ]
 ) => css`
+	z-index: 10;
 	min-width: 220px;
-	background-color: ${ COLORS.ui.background };
+	background-color: var( --wp-components-color-gray-background );
 	border-radius: ${ CONFIG.radiusBlockUi };
 	padding: ${ CONTENT_WRAPPER_PADDING };
 	box-shadow: ${ variant === 'toolbar'
@@ -163,7 +165,7 @@ const baseItem = css`
 	font-family: inherit;
 	font-weight: normal;
 	line-height: 20px;
-	color: ${ COLORS.gray[ 900 ] };
+	color: var( --wp-components-color-gray-contrast );
 	border-radius: ${ CONFIG.radiusBlockUi };
 	display: flex;
 	align-items: center;
@@ -186,7 +188,9 @@ const baseItem = css`
 	/* Hover and Focus styles */
 	&[data-highlighted] {
 		/* TODO: reconcile with global focus styles */
-		background-color: ${ COLORS.gray[ '100' ] };
+		background-color: var(
+			--wp-components-color-gray-component-background-hover
+		);
 
 		/* Only visible in Windows High Contrast mode */
 		outline: 2px solid transparent;
@@ -225,7 +229,7 @@ export const SubTrigger = styled( DropdownMenu.SubTrigger )`
 	${ baseItem }
 
 	&[data-state='open'] {
-		background-color: ${ COLORS.gray[ '100' ] };
+		background-color: var( --wp-components-color-gray-background-subtle );
 	}
 `;
 
@@ -238,7 +242,7 @@ export const Label = styled( DropdownMenu.Label )`
 	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
 		${ ITEM_PREFIX_WIDTH };
 	/* TODO: color doesn't match available UI variables */
-	color: ${ COLORS.gray[ 700 ] };
+	color: var( --wp-components-color-gray-text );
 
 	/* TODO: font size doesn't match available ones via "font" utils */
 	font-size: 11px;

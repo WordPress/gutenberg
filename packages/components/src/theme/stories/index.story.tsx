@@ -7,7 +7,20 @@ import type { Meta, StoryFn } from '@storybook/react';
  * Internal dependencies
  */
 import Theme from '../index';
-import Button from '../../button';
+import {
+	Button,
+	__experimentalInputControl as InputControl,
+	__experimentalText as Text,
+	__experimentalHeading as Heading,
+	__experimentalVStack as VStack,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	ToggleControl,
+} from '../..';
+import Popover from '../../popover';
+import { DropdownDemo } from '../../dropdown-menu-v2/stories/index.story';
+import { DropdownMenu } from '../../dropdown-menu-v2';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 import { generateThemeVariables, checkContrasts } from '../color-algorithms';
 import { HStack } from '../../h-stack';
 
@@ -47,6 +60,93 @@ export const Nested: StoryFn< typeof Theme > = ( args ) => (
 );
 Nested.args = {
 	accent: 'blue',
+};
+
+// Demo
+export const Demo: StoryFn< typeof Theme > = ( args ) => {
+	console.log( 'dark:', args.isDark );
+	return (
+		<Theme accent={ args.accent } isDark={ args.isDark }>
+			<VStack
+				alignment="topLeft"
+				spacing={ 5 }
+				style={ {
+					padding: 32,
+					minHeight: '100vh',
+					backgroundColor:
+						'var(--wp-components-color-gray-background)',
+				} }
+			>
+				<Heading>My first heading</Heading>
+				<Text>
+					Lorem Ipsum is simply dummy text of the printing and
+					typesetting industry. Lorem Ipsum has been the industry's
+					standard dummy text ever since the 1500s, when an unknown
+					printer took a galley of type and scrambled it to make a
+					type specimen book.
+				</Text>
+				<Heading as="h2" level={ 3 }>
+					Two
+				</Heading>
+				<Text>
+					Lorem Ipsum is simply dummy text of the printing and
+					typesetting industry.
+				</Text>
+
+				<InputControl
+					label="Input"
+					value={ 'Input' }
+					help="This is some help text"
+					onChange={ ( value ) => console.log( value ) }
+				/>
+				<HStack alignment="left">
+					<SlotFillProvider>
+						<DropdownMenu
+							align="start"
+							side="bottom"
+							sideOffset={ 8 }
+							trigger={
+								<Button
+									variant="primary"
+									__next40pxDefaultSize
+									label="Open menu"
+								>
+									Open menu
+								</Button>
+							}
+						>
+							<DropdownDemo />
+						</DropdownMenu>
+						{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+						<Popover.Slot />
+					</SlotFillProvider>
+					<Button __next40pxDefaultSize variant="secondary">
+						Secondary
+					</Button>
+				</HStack>
+				<ToggleControl
+					checked
+					label="This is a toggle"
+					onChange={ () => console.log( 'yay' ) }
+				/>
+				<ToggleGroupControl
+					__nextHasNoMarginBottom
+					isBlock
+					label="Label"
+					onChange={ () => {} }
+				>
+					<ToggleGroupControlOption label="Left" value="left" />
+					<ToggleGroupControlOption label="Center" value="center" />
+					<ToggleGroupControlOption label="Right" value="right" />
+					<ToggleGroupControlOption label="Justify" value="justify" />
+				</ToggleGroupControl>
+			</VStack>
+		</Theme>
+	);
+};
+Nested.args = {
+	isDark: false,
+	accent: '#3858E9',
 };
 
 /**

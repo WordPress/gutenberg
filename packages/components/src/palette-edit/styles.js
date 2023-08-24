@@ -58,7 +58,7 @@ export const PaletteItem = styled( View )`
 		border-top-color: transparent;
 	}
 	&.is-selected {
-		border-color: ${ COLORS.theme.accent };
+		border-color: var( --wp-components-color-accent-solid );
 	}
 `;
 
@@ -69,7 +69,7 @@ export const NameContainer = styled.div`
 	white-space: nowrap;
 	overflow: hidden;
 	${ PaletteItem }:hover & {
-		color: ${ COLORS.theme.accent };
+		color: var( --wp-components-color-accent-solid );
 	}
 `;
 
@@ -103,7 +103,7 @@ export const PaletteEditStyles = styled( View )`
 
 export const DoneButton = styled( Button )`
 	&& {
-		color: ${ COLORS.theme.accent };
+		color: var( --wp-components-color-accent-solid );
 	}
 `;
 

@@ -184,7 +184,7 @@ const thumbColor = ( { disabled }: ThumbProps ) =>
 				background-color: ${ COLORS.gray[ 400 ] };
 		  `
 		: css`
-				background-color: ${ COLORS.theme.accent };
+				background-color: var( --wp-components-color-accent-solid );
 		  `;
 
 export const ThumbWrapper = styled.span`
@@ -215,7 +215,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 				&::before {
 					content: ' ';
 					position: absolute;
-					background-color: ${ COLORS.theme.accent };
+					background-color: var( --wp-components-color-accent-solid );
 					opacity: 0.4;
 					border-radius: 50%;
 					height: ${ thumbSize + 8 }px;

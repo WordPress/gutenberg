@@ -48,8 +48,8 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: $components-color-accent;
-		color: $components-color-accent-inverted;
+		background: var(--wp-components-color-accent-solid-hover);
+		color: var(--wp-components-color-accent-background);
 		text-decoration: none;
 		text-shadow: none;
 
@@ -57,7 +57,7 @@
 		outline: 1px solid transparent;
 
 		&:hover:not(:disabled) {
-			background: $components-color-accent-darker-10;
+			background: var(--wp-components-color-accent-solid-hover);
 			color: $components-color-accent-inverted;
 		}
 
@@ -125,7 +125,7 @@
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
-			color: $gray-600;
+			color: var(--wp-components-color-gray-text);
 			background: transparent;
 			transform: none;
 			opacity: 1;
@@ -139,14 +139,13 @@
 	 */
 
 	&.is-secondary {
-		box-shadow: inset 0 0 0 $border-width $components-color-accent;
+		background-color: var(--wp-components-color-gray-component-background);
 		outline: 1px solid transparent; // Shown in high contrast mode.
 		white-space: nowrap;
-		color: $components-color-accent;
-		background: transparent;
+		color: var(--wp-components-color-gray-contrast);
 
 		&:hover:not(:disabled) {
-			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
+			background: var(--wp-components-color-gray-component-background-hover);
 		}
 	}
 

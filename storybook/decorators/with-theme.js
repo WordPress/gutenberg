@@ -10,14 +10,16 @@ import { css } from '@emotion/react';
 import Theme from '../../packages/components/src/theme';
 
 const themes = {
-	default: {},
+	default: {
+		accent: '#3858E9',
+		isDark: false,
+	},
 	darkBg: {
-		accent: '#f7c849',
-		background: '#1e1e1e',
+		accent: '#3858E9',
+		isDark: true,
 	},
 	lightGrayBg: {
 		accent: '#3858e9',
-		background: '#f0f0f0',
 	},
 	classic: {
 		accent: '#007cba',

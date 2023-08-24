@@ -16,7 +16,7 @@ const CONTROL_PROPS = {
 	controlBackgroundColor: COLORS.white,
 	controlBorderRadius: '2px',
 	controlBoxShadow: 'transparent',
-	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.theme.accent }`,
+	controlBoxShadowFocus: `0 0 0 0.5px var(--wp-components-color-accent-solid)`,
 	controlDestructiveBorderColor: COLORS.alert.red,
 	controlHeight: CONTROL_HEIGHT,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,

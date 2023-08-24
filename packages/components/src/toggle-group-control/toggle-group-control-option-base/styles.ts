@@ -38,7 +38,7 @@ export const buttonView = ( {
 	background: transparent;
 	border: none;
 	border-radius: ${ CONFIG.controlBorderRadius };
-	color: ${ COLORS.gray[ 700 ] };
+	color: var( --wp-components-color-gray-text );
 	fill: currentColor;
 	cursor: pointer;
 	display: flex;
@@ -79,11 +79,12 @@ const pressed = css`
 `;
 
 const deselectable = css`
-	color: ${ COLORS.gray[ 900 ] };
+	color: var( --wp-components-color-gray-contrast );
 
 	&:focus {
 		box-shadow: inset 0 0 0 1px ${ COLORS.white },
-			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.theme.accent };
+			0 0 0 ${ CONFIG.borderWidthFocus }
+				var( --wp-components-color-accent-solid );
 		outline: 2px solid transparent;
 	}
 `;
@@ -92,6 +93,7 @@ export const ButtonContentView = styled.div`
 	display: flex;
 	font-size: ${ CONFIG.fontSize };
 	line-height: 1;
+	color: var( --wp-components-color-gray-text );
 `;
 
 const isIconStyles = ( {
@@ -103,7 +105,7 @@ const isIconStyles = ( {
 	};
 
 	return css`
-		color: ${ COLORS.gray[ 900 ] };
+		color: var( --wp-components-color-gray-contrast );
 		width: ${ iconButtonSizes[ size ] };
 		padding-left: 0;
 		padding-right: 0;

@@ -64,7 +64,7 @@ export const StyledHelp = styled.p`
 	margin-bottom: 0;
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
-	color: ${ COLORS.gray[ 700 ] };
+	color: var( --wp-components-color-gray-text );
 
 	${ deprecatedMarginHelp }
 `;

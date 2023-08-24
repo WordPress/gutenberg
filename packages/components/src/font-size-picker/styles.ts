@@ -34,7 +34,7 @@ export const HeaderLabel = styled( BaseControl.VisualLabel )`
 `;
 
 export const HeaderHint = styled.span`
-	color: ${ COLORS.gray[ 700 ] };
+	color: var( --wp-components-color-gray-text );
 `;
 
 export const Controls = styled.div< {

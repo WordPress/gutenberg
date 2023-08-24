@@ -17,7 +17,7 @@ export const ToggleGroupControl = ( {
 }: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
-	background: ${ COLORS.ui.background };
+	background: var( --wp-components-color-gray-background-subtle );
 	border: 1px solid transparent;
 	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
@@ -33,14 +33,16 @@ export const ToggleGroupControl = ( {
 
 const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 	const enclosingBorder = css`
-		border-color: ${ COLORS.ui.border };
+		border-color: var( --wp-components-color-gray-component-border );
 	`;
 
 	return css`
 		${ isBlock && enclosingBorder }
 
 		&:hover {
-			border-color: ${ COLORS.ui.borderHover };
+			border-color: var(
+				--wp-components-color-gray-component-border-hover
+			);
 		}
 
 		&:focus-within {
@@ -73,7 +75,7 @@ export const block = css`
 `;
 
 export const BackdropView = styled.div`
-	background: ${ COLORS.gray[ 900 ] };
+	background: var( --wp-components-color-gray-component-background-active );
 	border-radius: ${ CONFIG.controlBorderRadius };
 	left: 0;
 	position: absolute;

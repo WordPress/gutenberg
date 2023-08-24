@@ -144,7 +144,7 @@ export const Select = styled.select< SelectProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.gray[ 900 ] };
+		color: var( --wp-components-color-gray-contrast );
 		display: block;
 		font-family: inherit;
 		margin: 0;

@@ -24,7 +24,7 @@ export const StyledSpinner = styled.svg`
 	display: inline-block;
 	margin: 5px 11px 0;
 	position: relative;
-	color: ${ COLORS.theme.accent };
+	color: var( --wp-components-color-accent-solid );
 	overflow: visible;
 	opacity: 1;
 	background-color: transparent;

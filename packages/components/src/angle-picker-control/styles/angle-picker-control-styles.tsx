@@ -34,7 +34,8 @@ export const Root = styled( Flex )`
 
 export const CircleRoot = styled.div`
 	border-radius: 50%;
-	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
+	border: ${ CONFIG.borderWidth } solid
+		var( --wp-components-color-gray-component-border );
 	box-sizing: border-box;
 	cursor: grab;
 	height: ${ CIRCLE_SIZE }px;
@@ -58,7 +59,7 @@ export const CircleIndicatorWrapper = styled.div`
 `;
 
 export const CircleIndicator = styled.div`
-	background: ${ COLORS.theme.accent };
+	background: var( --wp-components-color-accent-solid );
 	border-radius: 50%;
 	box-sizing: border-box;
 	display: block;
@@ -71,6 +72,6 @@ export const CircleIndicator = styled.div`
 `;
 
 export const UnitText = styled( Text )`
-	color: ${ COLORS.theme.accent };
+	color: var( --wp-components-color-accent-solid );
 	margin-right: ${ space( 3 ) };
 `;

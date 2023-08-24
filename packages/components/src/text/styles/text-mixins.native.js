@@ -81,7 +81,7 @@ const sectionHeading = `
 	font-size: 11px;
 	line-height: 1.4;
 	text-transform: uppercase;
-	color: ${ COLORS.gray[ 700 ] }
+	color: var(--wp-components-color-gray-text)
 `;
 
 /**

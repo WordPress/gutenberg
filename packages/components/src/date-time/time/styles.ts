@@ -62,8 +62,10 @@ export const HoursInput = styled( NumberControl )`
 `;
 
 export const TimeSeparator = styled.span`
-	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 700 ] };
-	border-bottom: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 700 ] };
+	border-top: ${ CONFIG.borderWidth } solid
+		var( --wp-components-color-gray-text );
+	border-bottom: ${ CONFIG.borderWidth } solid
+		var( --wp-components-color-gray-text );
 	line-height: calc(
 		${ CONFIG.controlHeight } - ${ CONFIG.borderWidth } * 2
 	);

@@ -38,7 +38,7 @@ export const Calendar = styled.div`
 `;
 
 export const DayOfWeek = styled.div`
-	color: ${ COLORS.gray[ 700 ] };
+	color: var( --wp-components-color-gray-text );
 	font-size: ${ CONFIG.fontSize };
 	line-height: ${ CONFIG.fontLineHeightBase };
 
@@ -90,7 +90,7 @@ export const DayButton = styled( Button, {
 		${ ( props ) =>
 			props.isSelected &&
 			`
-			background: ${ COLORS.theme.accent };
+			background: var(--wp-components-color-accent-solid);
 			color: ${ COLORS.white };
 			` }
 

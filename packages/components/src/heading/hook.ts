@@ -31,7 +31,7 @@ export function useHeading(
 	}
 
 	const textProps = useText( {
-		color: COLORS.gray[ 900 ],
+		color: 'var(--wp-components-color-gray-contrast)',
 		size: getHeadingFontSize( level ),
 		isBlock: true,
 		weight: CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],

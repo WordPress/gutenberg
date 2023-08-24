@@ -13,7 +13,7 @@ $toggle-border-width: 1px;
 		box-sizing: border-box;
 		vertical-align: top;
 		background-color: $white;
-		border: $toggle-border-width solid $gray-900;
+		border: $toggle-border-width solid var(--wp-components-color-gray-contrast);
 		width: $toggle-width;
 		height: $toggle-height;
 		border-radius: $toggle-height * 0.5;
@@ -32,19 +32,19 @@ $toggle-border-width: 1px;
 		border-radius: 50%;
 		transition: 0.1s transform ease;
 		@include reduce-motion("transition");
-		background-color: $gray-900;
-		border: 5px solid $gray-900; // Has explicit border to act as a fill in Windows High Contrast Mode.
+		background-color: var(--wp-components-color-gray-contrast);
+		border: 5px solid var(--wp-components-color-gray-contrast); // Has explicit border to act as a fill in Windows High Contrast Mode.
 	}
 
 	// Checked state.
 	&.is-checked .components-form-toggle__track {
-		background-color: $components-color-accent;
-		border: $toggle-border-width solid $components-color-accent;
+		background-color: var(--wp-components-color-accent-solid);
+		border: $toggle-border-width solid var(--wp-components-color-accent-solid);
 		border: #{ $toggle-height * 0.5 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
 	}
 
 	.components-form-toggle__input:focus + .components-form-toggle__track {
-		@include button-style-outset__focus($components-color-accent);
+		@include button-style-outset__focus(var(--wp-components-color-accent-solid));
 	}
 
 	&.is-checked {

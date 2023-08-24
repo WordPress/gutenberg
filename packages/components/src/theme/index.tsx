@@ -9,7 +9,7 @@ import { useMemo } from '@wordpress/element';
 import type { ThemeProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 import { colorVariables, Wrapper } from './styles';
-import { generateThemeVariables } from './color-algorithms';
+import { generateColors } from './colors';
 import { useCx } from '../utils';
 
 /**
@@ -34,7 +34,7 @@ import { useCx } from '../utils';
  */
 function Theme( {
 	accent,
-	background,
+	isDark,
 	className,
 	...props
 }: WordPressComponentProps< ThemeProps, 'div', true > ) {
@@ -42,12 +42,10 @@ function Theme( {
 	const classes = useMemo(
 		() =>
 			cx(
-				...colorVariables(
-					generateThemeVariables( { accent, background } )
-				),
+				...colorVariables( generateColors( accent, { isDark } ) ),
 				className
 			),
-		[ accent, background, className, cx ]
+		[ accent, isDark, className, cx ]
 	);
 
 	return <Wrapper className={ classes } { ...props } />;
