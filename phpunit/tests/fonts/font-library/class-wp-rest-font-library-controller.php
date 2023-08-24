@@ -33,13 +33,13 @@ class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
 		file_put_contents( $mock_file, '{"this is mock data":true}' );
 
 		// Add a font collection.
-		$config = array (
+		$config = array(
 			'id'             => 'my-font-collection',
 			'name'           => 'My Font Collection',
 			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
 			'data_json_file' => $mock_file,
 		);
-		wp_register_font_collection ( $config );
+		wp_register_font_collection( $config );
 	}
 
 	/**
@@ -63,9 +63,9 @@ class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_font_collections() {
 		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections' );
 		$response = rest_get_server()->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
 		$this->assertCount( 1, $data, 'The response data is not an array with one element.' );
 		$this->assertArrayHasKey( 'my-font-collection', $data, 'The response data does not have the key of the registered font collection id.' );
@@ -76,9 +76,9 @@ class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_font_collection() {
 		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections/my-font-collection' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections/my-font-collection' );
 		$response = rest_get_server()->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
 		$this->assertArrayHasKey( 'data', $data, 'The response data does not have the key with the file data.' );
 	}
