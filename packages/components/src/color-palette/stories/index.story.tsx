@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { CSSProperties } from 'react';
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import ColorPalette from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 
-const meta: ComponentMeta< typeof ColorPalette > = {
+const meta: Meta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
 	component: ColorPalette,
 	argTypes: {
@@ -26,15 +26,12 @@ const meta: ComponentMeta< typeof ColorPalette > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof ColorPalette > = ( {
-	onChange,
-	...args
-} ) => {
+const Template: StoryFn< typeof ColorPalette > = ( { onChange, ...args } ) => {
 	const [ color, setColor ] = useState< string | undefined >();
 
 	return (
@@ -84,7 +81,7 @@ MultipleOrigins.args = {
 	],
 };
 
-export const CSSVariables: ComponentStory< typeof ColorPalette > = ( args ) => {
+export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
 	return (
 		<div
 			style={

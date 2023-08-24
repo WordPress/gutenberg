@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import styled from '@emotion/styled';
 
 /**
@@ -39,6 +39,26 @@ import { ContextSystemProvider } from '../../ui/context';
 const meta: Meta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2',
 	component: DropdownMenu,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuItem,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownSubMenu,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownSubMenuTrigger,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuSeparator,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuCheckboxItem,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuGroup,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuLabel,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuRadioGroup,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuRadioItem,
+	},
 	argTypes: {
 		children: { control: { type: null } },
 		trigger: { control: { type: null } },
@@ -46,7 +66,10 @@ const meta: Meta< typeof DropdownMenu > = {
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open', excludeDecorators: true } },
+		docs: {
+			canvas: { sourceState: 'shown' },
+			source: { excludeDecorators: true },
+		},
 	},
 	decorators: [
 		// Layout wrapper
@@ -119,7 +142,7 @@ const RadioItemsGroup = () => {
 	);
 };
 
-const Template: Story< typeof DropdownMenu > = ( props ) => (
+const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<SlotFillProvider>
 		<DropdownMenu { ...props } />
 		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
@@ -194,7 +217,7 @@ const toolbarVariantContextValue = {
 		variant: 'toolbar',
 	},
 };
-export const ToolbarVariant: Story< typeof DropdownMenu > = ( props ) => (
+export const ToolbarVariant: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<ContextSystemProvider value={ toolbarVariantContextValue }>
 		<DropdownMenu { ...props } />
 	</ContextSystemProvider>

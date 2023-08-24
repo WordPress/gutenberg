@@ -12,6 +12,7 @@ import RadioGroup from '../';
 export default {
 	title: 'Components (Deprecated)/RadioGroup',
 	component: RadioGroup,
+	subcomponents: { Radio },
 	parameters: {
 		docs: {
 			description: {

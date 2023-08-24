@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -15,18 +15,18 @@ import TabPanel from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 
-const meta: ComponentMeta< typeof TabPanel > = {
+const meta: Meta< typeof TabPanel > = {
 	title: 'Components/TabPanel',
 	component: TabPanel,
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof TabPanel > = ( props ) => {
+const Template: StoryFn< typeof TabPanel > = ( props ) => {
 	return <TabPanel { ...props } />;
 };
 
@@ -65,7 +65,7 @@ DisabledTab.args = {
 	],
 };
 
-const SlotFillTemplate: ComponentStory< typeof TabPanel > = ( props ) => {
+const SlotFillTemplate: StoryFn< typeof TabPanel > = ( props ) => {
 	return (
 		<SlotFillProvider>
 			<TabPanel { ...props } />

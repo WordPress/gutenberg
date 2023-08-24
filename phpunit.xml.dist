@@ -9,11 +9,12 @@
 	>
 	<php>
 		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
-		<const name="FONTS_LIBRARY_ENABLE" value="true"/>
+		<const name="FONT_LIBRARY_ENABLE" value="true"/>
 	</php>
 	<testsuites>
 		<testsuite name="default">
 			<directory suffix="-test.php">./phpunit/</directory>
+			<directory suffix=".php">./phpunit/tests/</directory>
 		</testsuite>
 	</testsuites>
 	<groups>
