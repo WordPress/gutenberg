@@ -44,6 +44,7 @@ export interface State {
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
+	userPatternCategories: Array< UserPatternCategory >;
 }
 
 type EntityRecordKey = string | number;
@@ -91,6 +92,19 @@ interface UndoState {
 interface UserState {
 	queries: Record< string, EntityRecordKey[] >;
 	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
+}
+
+interface UserPatternCategory {
+	id: number;
+	name: string;
+	label: string;
+	slug: string;
+	description: string;
+}
+
+export interface UserPatternCategories {
+	patternCategories: Array< UserPatternCategory >;
+	patternCatogoriesMap: Map< number, UserPatternCategory >;
 }
 
 type Optional< T > = T | undefined;
@@ -1255,6 +1269,34 @@ export function getBlockPatterns( state: State ): Array< any > {
  */
 export function getBlockPatternCategories( state: State ): Array< any > {
 	return state.blockPatternCategories;
+}
+
+/**
+ * Retrieve the registered user pattern categories.
+ *
+ * @param state Data state.
+ *
+ * @return User patterns category array and map keyed by id.
+ */
+
+export function getUserPatternCategories(
+	state: State
+): UserPatternCategories {
+	const patternCatogoriesMap = new Map< number, UserPatternCategory >();
+	state.userPatternCategories?.forEach(
+		( userCategory: UserPatternCategory ) =>
+			patternCatogoriesMap.set( userCategory.id, userCategory )
+	);
+	return {
+		patternCategories:
+			state.userPatternCategories?.map(
+				( userCategory: UserPatternCategory ) => ( {
+					...userCategory,
+					label: userCategory.name,
+				} )
+			) || [],
+		patternCatogoriesMap,
+	};
 }
 
 /**
