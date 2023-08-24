@@ -167,7 +167,7 @@ function BlockRenameControl( props ) {
 
 			{ renamingBlock && (
 				<RenameModal
-					blockName={ customName || blockInformation?.title || '' }
+					blockName={ customName || '' }
 					originalBlockName={ blockInformation?.title }
 					onClose={ () => setRenamingBlock( false ) }
 					onSave={ ( newName ) => {
