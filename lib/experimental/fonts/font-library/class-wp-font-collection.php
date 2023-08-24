@@ -38,7 +38,7 @@ class WP_Font_Collection {
 	 * @throws Exception If the required parameters are missing.
 	 */
 	public function __construct( $config ) {
-		if ( empty( $config ) ) {
+		if ( empty( $config ) || ! is_array( $config ) ) {
 			throw new Exception( 'Font Collection config options is required as a non-empty array.' );
 		}
 
