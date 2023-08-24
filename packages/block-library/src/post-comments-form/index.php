@@ -32,7 +32,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class'        => implode( ' ', $classes ),
-			'data-wp-fill' => 'context.core.comments.replyTo'
+			'data-wp-fill' => 'context.core.comments.replyTo',
 		)
 	);
 
@@ -64,10 +64,22 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-on--submit', 'actions.core.comments.submit' );
 
-			if ( $p->next_tag( 'textarea') ) {
+			if ( $p->next_tag( 'textarea' ) ) {
 				$p->set_attribute( 'data-wp-bind--value', 'context.core.comments.text' );
 				$p->set_attribute( 'data-wp-on--change', 'actions.core.comments.updateText' );
 			}
+
+			wp_store(
+				array(
+					'state' => array(
+						'core' => array(
+							'comments' => array(
+								'submittedNotice' => __( 'Comment submitted. You can continue navigating.' ),
+							),
+						),
+					),
+				)
+			);
 
 			while ( $p->next_tag( 'input' ) ) {
 				if ( $p->get_attribute( 'type' ) === 'submit' ) {
@@ -108,7 +120,25 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			$last_div_position = strripos( $form, '</form>' );
 			$form              = substr_replace(
 				$form,
-				'<div style="color: red;" data-wp-text="state.core.comments.error"></div></form>',
+				'<div 
+					class="wp-block-post-comments-form__error"
+					data-wp-style--display="selectors.core.comments.showError"
+					data-wp-effect="effects.core.comments.scrollToError"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+						<path d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-6h-2v6zm0-8h2V7h-2v2z"></path>
+					</svg>
+					<span 
+						data-wp-text="state.core.comments.error"
+						aria-live="polite"
+					></span>
+				</div>
+				<div
+					style="position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;border:0;"
+					aria-live="polite"
+					data-wp-text="context.core.comments.notice"
+				></div>
+				</form>',
 				$last_div_position,
 				0
 			);

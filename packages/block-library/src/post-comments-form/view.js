@@ -14,6 +14,8 @@ store( {
 	selectors: {
 		core: {
 			comments: {
+				showError: ( { state } ) =>
+					state.core.comments.error ? 'flex' : 'none',
 				submitText: ( { context, state } ) =>
 					context.core.comments.isSubmitting
 						? state.core.comments.loadingText
@@ -40,7 +42,6 @@ store( {
 						state.core.comments.error = '';
 						context.core.comments.isSubmitting = true;
 
-						await new Promise( ( r ) => setTimeout( r, 1400 ) );
 						response = await window.fetch( ref.action, {
 							method: 'POST',
 							body: new window.FormData( ref ),
@@ -81,9 +82,17 @@ store( {
 								} );
 
 							// Scroll the new comment into view.
-							newComment.scrollIntoView( {
-								block: 'start',
-							} );
+							newComment.querySelector( 'a[href]' ).focus();
+
+							// Announce that the comment has been submitted. If the notice is
+							// the same, we use a no-break space similar to the trick used by
+							// the @wordpress/a11y package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
+							context.core.comments.notice =
+								state.core.comments.submittedNotice +
+								( context.core.comments.notice ===
+								state.core.comments.submittedNotice
+									? '\u00A0'
+									: '' );
 
 							// Add hash to the URL.
 							window.history.replaceState(
@@ -118,6 +127,18 @@ store( {
 				},
 				updateText: ( { context, event } ) => {
 					context.core.comments.text = event.target.value;
+				},
+			},
+		},
+	},
+	effects: {
+		core: {
+			comments: {
+				scrollToError: ( st ) => {
+					// Scroll to the error when it's shown.
+					if ( st.state.core.comments.error ) {
+						st.ref.scrollIntoView();
+					}
 				},
 			},
 		},
