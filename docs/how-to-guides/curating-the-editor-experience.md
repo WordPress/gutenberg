@@ -403,6 +403,8 @@ To fully remove patterns bundled with WordPress core from being accessed in the 
 
 `remove_theme_support( 'core-block-patterns' );`
 
+When core patterns are disabled, you can can still register specific patterns from the Pattern Directory with the top level "patterns" key in theme.json.
+
 ## Utilizing patterns
 
 **Prioritize starter patterns for any post type**
