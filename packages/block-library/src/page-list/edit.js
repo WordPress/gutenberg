@@ -72,11 +72,10 @@ function BlockContent( {
 
 	if ( pages.length === 0 ) {
 		return (
-			<div { ...blockProps }>
-				<Notice status={ 'info' } isDismissible={ false }>
-					{ __( 'Page List: Cannot retrieve Pages.' ) }
-				</Notice>
-			</div>
+			<span
+				className="rich-text"
+				data-rich-text-placeholder="You have no pages yet."
+			></span>
 		);
 	}
 
