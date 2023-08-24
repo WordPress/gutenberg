@@ -15,8 +15,8 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_should_get_data
 	 *
-	 * @param array  $config Font collection config options.
-	 * @param array  $expected_data Expected data.
+	 * @param array $config Font collection config options.
+	 * @param array $expected_data Expected data.
 	 */
 	public function test_should_get_data( $config, $expected_data ) {
 		$collection = new WP_Font_Collection( $config );

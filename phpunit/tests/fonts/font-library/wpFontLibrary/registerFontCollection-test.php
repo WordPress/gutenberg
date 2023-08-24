@@ -24,7 +24,7 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 	}
 
 	public function test_should_return_error_if_id_is_missing() {
-		$config     = array(
+		$config = array(
 			'name'           => 'My Collection',
 			'description'    => 'My Collection Description',
 			'data_json_file' => 'my-collection-data.json',
@@ -35,8 +35,8 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 	}
 
 	public function test_should_return_error_if_name_is_missing() {
-		$config     = array(
-			'id'  => 'my-collection',
+		$config = array(
+			'id'             => 'my-collection',
 			'description'    => 'My Collection Description',
 			'data_json_file' => 'my-collection-data.json',
 		);

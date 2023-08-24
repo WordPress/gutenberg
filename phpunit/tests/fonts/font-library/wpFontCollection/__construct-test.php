@@ -80,7 +80,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 
 			'missing data_json_file'          => array(
 				array(
-					'id'		  => 'my-collection',
+					'id'          => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
