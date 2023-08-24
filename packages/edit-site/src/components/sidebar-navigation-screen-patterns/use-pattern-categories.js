@@ -19,16 +19,10 @@ export default function usePatternCategories() {
 		label: __( 'Uncategorized' ),
 	} );
 	const themePatterns = useThemePatterns();
-	const { patterns: userPatterns, categories: userCategories } =
+	const { patterns: userPatterns, categories: userPatternCategories } =
 		usePatterns( USER_PATTERNS );
 
 	const patternCategories = useMemo( () => {
-		const userPatternCategories = userCategories
-			? userCategories.map( ( cat ) => ( {
-					name: cat.slug,
-					label: cat.name,
-			  } ) )
-			: [];
 		const categoryMap = {};
 		const categoriesWithCounts = [];
 
@@ -85,7 +79,12 @@ export default function usePatternCategories() {
 		);
 
 		return categoriesWithCounts;
-	}, [ defaultCategories, themePatterns, userCategories, userPatterns ] );
+	}, [
+		defaultCategories,
+		themePatterns,
+		userPatternCategories,
+		userPatterns,
+	] );
 
 	return { patternCategories, hasPatterns: !! patternCategories.length };
 }
