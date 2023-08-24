@@ -93,7 +93,7 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 function BlockRenameControl( props ) {
 	const [ renamingBlock, setRenamingBlock ] = useState( false );
 
-	const { clientId, blockAttributes, onChange } = props;
+	const { clientId, customName, onChange } = props;
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 
@@ -103,7 +103,7 @@ function BlockRenameControl( props ) {
 				<TextControl
 					__nextHasNoMarginBottom
 					label={ __( 'Custom block name' ) }
-					value={ blockAttributes?.metadata?.name || '' }
+					value={ customName || '' }
 					onChange={ onChange }
 				/>
 			</InspectorControls>
@@ -137,11 +137,7 @@ function BlockRenameControl( props ) {
 
 			{ renamingBlock && (
 				<RenameModal
-					blockName={
-						blockAttributes?.metadata?.name ||
-						blockInformation?.title ||
-						''
-					}
+					blockName={ customName || blockInformation?.title || '' }
 					originalBlockName={ blockInformation?.title }
 					onClose={ () => setRenamingBlock( false ) }
 					onSave={ ( newName ) => {
@@ -180,7 +176,7 @@ export const withBlockRenameControl = createHigherOrderComponent(
 					<>
 						<BlockRenameControl
 							clientId={ clientId }
-							blockAttributes={ attributes }
+							customName={ attributes?.metadata?.name }
 							onChange={ ( newName ) => {
 								setAttributes( {
 									metadata: {
