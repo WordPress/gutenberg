@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -10,9 +10,11 @@ import InputControl from '..';
 import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
 import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
 
-const meta: ComponentMeta< typeof InputControl > = {
+const meta: Meta< typeof InputControl > = {
 	title: 'Components (Experimental)/InputControl',
 	component: InputControl,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
 	argTypes: {
 		__unstableInputWidth: { control: { type: 'text' } },
 		__unstableStateReducer: { control: { type: null } },
@@ -29,7 +31,7 @@ const meta: ComponentMeta< typeof InputControl > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof InputControl > = ( args ) => (
+const Template: StoryFn< typeof InputControl > = ( args ) => (
 	<InputControl { ...args } />
 );
 

@@ -30,7 +30,7 @@ const HR = ( {
 	);
 
 	const renderText = ( key ) => (
-		<View key={ key }>
+		<View key={ key } style={ styles.textContainer }>
 			<Text style={ [ styles.text, textStyle ] }>{ text }</Text>
 		</View>
 	);

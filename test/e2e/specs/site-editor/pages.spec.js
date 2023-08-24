@@ -93,7 +93,7 @@ test.describe( 'Pages', () => {
 				name: 'Block: Content',
 			} )
 		).toContainText(
-			'This is the Post Content block, it will display all the blocks in any single post or page.'
+			'This is the Content block, it will display all the blocks in any single post or page.'
 		);
 		await expect(
 			page.locator(

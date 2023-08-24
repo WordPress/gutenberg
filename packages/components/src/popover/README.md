@@ -6,7 +6,7 @@ The behavior of the popover when it exceeds the viewport's edges can be controll
 
 ## Usage
 
-Render a Popover within the parent to which it should anchor.
+Render a Popover adjacent to its container.
 
 If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
 
@@ -60,7 +60,7 @@ const MyPopover = () => {
 };
 ```
 
-If you want Popover elements to render to a specific location on the page to allow style cascade to take effect, you must render a `Popover.Slot` further up the element tree:
+By default Popovers render at the end of the body of your document. If you want Popover elements to render to a specific location on the page, you must render a `Popover.Slot` further up the element tree:
 
 ```jsx
 import { render } from '@wordpress/element';

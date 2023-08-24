@@ -4,7 +4,7 @@
 import {
 	requireNativeComponent,
 	UIManager,
-	TouchableWithoutFeedback,
+	Pressable,
 	Platform,
 } from 'react-native';
 
@@ -305,7 +305,7 @@ class AztecView extends Component {
 		}
 
 		return (
-			<TouchableWithoutFeedback onPress={ this._onPress }>
+			<Pressable accessible={ false } onPress={ this._onPress }>
 				<RCTAztecView
 					{ ...otherProps }
 					style={ style }
@@ -322,7 +322,7 @@ class AztecView extends Component {
 					onBlur={ this._onBlur }
 					ref={ this.aztecViewRef }
 				/>
-			</TouchableWithoutFeedback>
+			</Pressable>
 		);
 	}
 }
