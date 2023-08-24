@@ -71,6 +71,7 @@ class WP_Font_Library {
 	 *
 	 * @since 6.4.0
 	 *
+	 * @param string $id Font collection id.
 	 * @return array List of font collections.
 	 */
 	public static function get_font_collection( $id ) {
