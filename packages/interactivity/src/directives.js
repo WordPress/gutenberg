@@ -8,7 +8,7 @@ import { Fragment } from 'preact';
 /**
  * Internal dependencies
  */
-import { Slot, SlotContent, SlotProvider } from './slots';
+import { Slot, Fill, SlotProvider } from './slots';
 import { createPortal } from './portals';
 import { useSignalEffect } from './utils';
 import { directive } from './hooks';
@@ -323,7 +323,7 @@ export default () => {
 		} ) => {
 			const contextValue = useContext( context );
 			const slot = evaluate( fill, { context: contextValue } );
-			return <SlotContent slot={ slot }>{ children }</SlotContent>;
+			return <Fill slot={ slot }>{ children }</Fill>;
 		},
 		{ priority: 4 }
 	);
