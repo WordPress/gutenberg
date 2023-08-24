@@ -35,6 +35,16 @@ function gutenberg_init_font_library_routes() {
 
 add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );
 
-function wp_register_font_collection ( $config ) {
-	return WP_Font_Library::register_font_collection( $config );
+/*
+ * Registers a new Font Collection in the Font Library.
+ *
+ * @since 6.4.0
+ *
+ * @param array $config Font collection config options.
+ * @return WP_Font_Collection|WP_Error A font collection is it was registered succesfully and a WP_Error otherwise.
+ */
+if ( ! function_exists( 'wp_register_font_collection' ) ) {
+	function wp_register_font_collection( $config ) {
+		return WP_Font_Library::register_font_collection( $config );
+	}
 }
