@@ -16,35 +16,31 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 		$property = new ReflectionProperty( WP_Font_Collection::class, 'config' );
 		$property->setAccessible( true );
 
-		$id              = 'my-collection';
 		$config          = array(
+			'id'             => 'my-collection',
 			'name'           => 'My Collection',
 			'description'    => 'My collection description',
 			'data_json_file' => 'my-collection-data.json',
 		);
-		$font_collection = new WP_Font_Collection( $id, $config );
+		$font_collection = new WP_Font_Collection( $config );
 
 		$actual = $property->getValue( $font_collection );
 		$property->setAccessible( false );
 
-		$expected       = $config;
-		$expected['id'] = $id;
-
-		$this->assertSame( $expected, $actual );
+		$this->assertSame( $config, $actual );
 	}
 
 	/**
 	 * @dataProvider data_should_throw_exception
 	 *
-	 * @param mixed  $id Id of the font collection.
 	 * @param mixed  $config Config of the font collection.
 	 * @param string $expected_exception_message Expected exception message.
 	 */
-	public function test_should_throw_exception( $id, $config, $expected_exception_message ) {
+	public function test_should_throw_exception( $config, $expected_exception_message ) {
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( $expected_exception_message );
 
-		new WP_Font_Collection( $id, $config );
+		new WP_Font_Collection( $config );
 	}
 
 	/**
@@ -55,46 +51,41 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	public function data_should_throw_exception() {
 		return array(
 			'no id'                           => array(
-				'',
 				array(
 					'name'           => 'My Collection',
 					'description'    => 'My collection description',
 					'data_json_file' => 'my-collection-data.json',
 				),
-				'Font Collection is missing the id.',
+				'Font Collection config ID is required as a non-empty string.',
 			),
 
 			'no config'                       => array(
-				'my-collection',
 				'',
-				'Font Collection is missing the config.',
+				'Font Collection config options is required as a non-empty array.',
 			),
 
 			'empty array'                     => array(
-				'my-collection',
 				array(),
-				'Font Collection is missing the config.',
+				'Font Collection config options is required as a non-empty array.',
 			),
 
 			'boolean instead of config array' => array(
-				'my-collection',
 				false,
-				'Font Collection is missing the config.',
+				'Font Collection config options is required as a non-empty array.',
 			),
 
 			'null instead of config array'    => array(
-				'my-collection',
 				null,
-				'Font Collection is missing the config.',
+				'Font Collection config options is required as a non-empty array.',
 			),
 
 			'missing data_json_file'          => array(
-				'my-collection',
 				array(
+					'id'		  => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
-				'Font Collection is missing the data_json_file.',
+				'Font Collection config "data_json_file" option is required as a non-empty string.',
 			),
 
 		);
