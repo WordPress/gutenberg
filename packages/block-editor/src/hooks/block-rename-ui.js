@@ -21,6 +21,7 @@ import { useState } from '@wordpress/element';
 import {
 	BlockSettingsMenuControls,
 	useBlockDisplayInformation,
+	InspectorControls,
 } from '../components';
 
 const emptyString = ( testString ) => testString?.trim()?.length === 0;
@@ -98,6 +99,23 @@ function BlockRenameControl( props ) {
 
 	return (
 		<>
+			<InspectorControls group="advanced">
+				<TextControl
+					__nextHasNoMarginBottom
+					label={ __( 'Custom block name' ) }
+					value={ blockAttributes?.metadata?.name || '' }
+					onChange={ ( newName ) => {
+						onChange( {
+							// Include existing metadata (if present) to avoid overwriting existing.
+							metadata: {
+								...( blockAttributes?.metadata &&
+									blockAttributes?.metadata ),
+								name: newName,
+							},
+						} );
+					} }
+				/>
+			</InspectorControls>
 			<BlockSettingsMenuControls>
 				{ ( { selectedClientIds } ) => {
 					// Only enabled for single selections.
@@ -175,11 +193,13 @@ export const withBlockRenameControl = createHigherOrderComponent(
 		return (
 			<>
 				{ supportsBlockNaming && (
-					<BlockRenameControl
-						clientId={ clientId }
-						blockAttributes={ attributes }
-						onChange={ setAttributes }
-					/>
+					<>
+						<BlockRenameControl
+							clientId={ clientId }
+							blockAttributes={ attributes }
+							onChange={ setAttributes }
+						/>
+					</>
 				) }
 
 				<BlockEdit key="edit" { ...props } />
