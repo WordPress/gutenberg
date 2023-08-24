@@ -161,19 +161,25 @@ function FontLibraryProvider( { children } ) {
 		return outline;
 	};
 
-	const activatedFontsOutline = useMemo( () => {
-		return getAvailableFontsOutline( [].concat( themeFonts, customFonts ) );
-	}, [ customFonts ] );
-
-	const isFontActivated = ( slug, style, weight ) => {
-		if ( ! style && ! weight ) {
-			return !! activatedFontsOutline[ slug ];
+	const getActivatedFontsOutline = ( source ) => {
+		switch ( source ) {
+			case 'theme':
+				return getAvailableFontsOutline( themeFonts );
+			case 'custom':
+			default:
+				return getAvailableFontsOutline( customFonts );
 		}
-		return !! activatedFontsOutline[ slug ]?.includes( style + weight );
 	};
 
-	const getFontFacesActivated = ( slug ) => {
-		return activatedFontsOutline[ slug ] || [];
+	const isFontActivated = ( slug, style, weight, source ) => {
+		if ( ! style && ! weight ) {
+			return !! getActivatedFontsOutline( source )[ slug ];
+		}
+		return !! getActivatedFontsOutline( source )[ slug ]?.includes( style + weight );
+	};
+
+	const getFontFacesActivated = ( slug, source ) => {
+		return getActivatedFontsOutline( source )[ slug ] || [];
 	};
 
 	async function installFonts( fonts ) {
@@ -210,11 +216,9 @@ function FontLibraryProvider( { children } ) {
 	}
 
 	const toggleActivateFont = ( font, face ) => {
-		const source = font.source || 'custom';
-
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
-		const initialCustomFonts = fontFamilies[ source ] || [];
+		const initialCustomFonts = fontFamilies[ font.source ] || [];
 
 		const activatedFont = initialCustomFonts.find(
 			( f ) => f.slug === font.slug
@@ -287,7 +291,7 @@ function FontLibraryProvider( { children } ) {
 		}
 		setFontFamilies( {
 			...fontFamilies,
-			[ source ]: newCustomFonts,
+			[ font.source ]: newCustomFonts,
 		} );
 	};
 

@@ -50,7 +50,7 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 		setIsConfirmOpen( false );
 	};
 
-	const isActive = isFontActivated( font.slug );
+	const isActive = isFontActivated( font.slug, font.source );
 
 	return (
 		<>

@@ -14,7 +14,7 @@ function LibraryFontCard( { font, ...props } ) {
 	const { getFontFacesActivated } = useContext( FontLibraryContext );
 
 	const variantsInstalled = font.fontFace?.length || 1;
-	const variantsActive = getFontFacesActivated( font.slug ).length;
+	const variantsActive = getFontFacesActivated( font.slug, font.source ).length;
 	const variantsText = __(
 		`${ variantsActive }/${ variantsInstalled } variants active`
 	);
