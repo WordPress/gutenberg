@@ -355,6 +355,11 @@
 
 		&.is-selected td {
 			background: $white;
+
+			.block-editor-list-view-block-select-button,
+			.components-button.has-icon {
+				color: inherit;
+			}
 		}
 	}
 
