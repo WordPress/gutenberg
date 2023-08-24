@@ -140,13 +140,14 @@ const AnimatedWrapper = forwardRef(
 
 const slotNameContext = createContext< string | undefined >( undefined );
 
+const fallbackContainerClassname = 'components-popover__fallback-container';
 const getPopoverFallbackContainer = () => {
 	let container = document.body.querySelector(
-		'.components-popover__fallback-container'
+		'.' + fallbackContainerClassname
 	);
 	if ( ! container ) {
 		container = document.createElement( 'div' );
-		container.className = 'components-popover__fallback-container';
+		container.className = fallbackContainerClassname;
 		document.body.append( container );
 	}
 
@@ -574,11 +575,7 @@ const UnforwardedPopover = (
 		content = <span ref={ anchorRefFallback }>{ content }</span>;
 	}
 
-	if ( shouldRenderWithinSlot ) {
-		return content;
-	}
-
-	if ( inline ) {
+	if ( shouldRenderWithinSlot || inline ) {
 		return content;
 	}
 

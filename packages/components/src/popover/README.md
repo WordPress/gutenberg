@@ -6,7 +6,7 @@ The behavior of the popover when it exceeds the viewport's edges can be controll
 
 ## Usage
 
-Render a Popover adjacent to which its container.
+Render a Popover adjacent to its container.
 
 If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
 
