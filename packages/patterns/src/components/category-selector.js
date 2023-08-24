@@ -77,13 +77,15 @@ export default function CategorySelector( { onCategorySelection } ) {
 	}
 
 	function onChange( termNames ) {
-		const uniqueTerms = termNames.reduce( ( acc, name ) => {
+		const uniqueTerms = termNames.reduce( ( terms, newTerm ) => {
 			if (
-				! acc.some( ( n ) => n.toLowerCase() === name.toLowerCase() )
+				! terms.some(
+					( term ) => term.toLowerCase() === newTerm.toLowerCase()
+				)
 			) {
-				acc.push( name );
+				terms.push( newTerm );
 			}
-			return acc;
+			return terms;
 		}, [] );
 
 		setValues( uniqueTerms );
