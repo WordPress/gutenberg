@@ -15,7 +15,6 @@ import {
 	BlockTools,
 	BlockInspector,
 	WritingFlow,
-	ObserveTyping,
 } from '@wordpress/block-editor';
 import { SlotFillProvider } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
@@ -81,9 +80,7 @@ export function Editor( { testBlocks, settings = {} } ) {
 					<BlockTools>
 						<BlockEditorKeyboardShortcuts.Register />
 						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
+							<BlockList />
 						</WritingFlow>
 					</BlockTools>
 				</BlockEditorProvider>

@@ -20,7 +20,6 @@ import {
 	BlockList,
 	BlockTools,
 	WritingFlow,
-	ObserveTyping,
 } from '@wordpress/block-editor';
 import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -37,9 +36,7 @@ function MyEditorComponent() {
 			<SlotFillProvider>
 				<BlockTools>
 					<WritingFlow>
-						<ObserveTyping>
-							<BlockList />
-						</ObserveTyping>
+						<BlockList />
 					</WritingFlow>
 				</BlockTools>
 			</SlotFillProvider>

@@ -38,6 +38,7 @@ import {
 	BlockEditContextProvider,
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
+import { useTypingObserver } from '../observe-typing';
 
 const elementContext = createContext();
 
@@ -104,6 +105,7 @@ function Root( { className, ...settings } ) {
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
 				setElement,
+				useTypingObserver(),
 			] ),
 			className: classnames( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,

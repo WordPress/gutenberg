@@ -339,9 +339,7 @@ return (
 			<div className="editor-styles-wrapper">
 				<BlockEditorKeyboardShortcuts />
 				<WritingFlow>
-					<ObserveTyping>
-						<BlockList className="getdavesbe-block-editor__block-list" />
-					</ObserveTyping>
+					<BlockList className="getdavesbe-block-editor__block-list" />
 				</WritingFlow>
 			</div>
 		</BlockEditorProvider>
@@ -436,10 +434,7 @@ Jumping back to your custom `<BlockEditor>` component, it is also worth noting t
 	<BlockEditorKeyboardShortcuts /> /* 1. */
 	<WritingFlow>
 		/* 2. */
-		<ObserveTyping>
-			/* 3. */
-			<BlockList className="getdavesbe-block-editor__block-list" />
-		</ObserveTyping>
+		<BlockList className="getdavesbe-block-editor__block-list" />
 	</WritingFlow>
 </div>
 ```
@@ -448,7 +443,6 @@ These provide other important elements of functionality for the editor instance.
 
 1. [`<BlockEditorKeyboardShortcuts />`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/keyboard-shortcuts/index.js) – Enables and usage of keyboard shortcuts within the editor
 2. [`<WritingFlow>`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/writing-flow/index.js) – Handles selection, focus management, and navigation across blocks
-3. [`<ObserveTyping>`](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/observe-typing)- Used to manage the editor's internal `isTyping` flag
 
 ## Reviewing the sidebar
 
