@@ -52,9 +52,13 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	$form = str_replace( 'class="comment-respond"', $wrapper_attributes, $form );
 
 	$enhanced_submission = $block->context['enhancedSubmission'];
+	$enhanced_form       = false;
 
 	if ( $enhanced_submission ) {
 		$p = new WP_HTML_Tag_Processor( $form );
+
+		// Try to find the form element. This is not optinal, if it fails, we don't
+		// enhance the submission.
 		if ( $p->next_tag(
 			array(
 				'tag_name' => 'FORM',
@@ -64,23 +68,18 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-on--submit', 'actions.core.comments.submit' );
 
+			// Try to find the different input fields and save their values on the
+			// context so it can be restored when the form is moved around. This is
+			// optional.
+			//
+			// TODO: Use `input[name="..."]` to find them, and add the rest of inputs.
 			if ( $p->next_tag( 'textarea' ) ) {
 				$p->set_attribute( 'data-wp-bind--value', 'context.core.comments.text' );
 				$p->set_attribute( 'data-wp-on--change', 'actions.core.comments.updateText' );
 			}
 
-			wp_store(
-				array(
-					'state' => array(
-						'core' => array(
-							'comments' => array(
-								'submittedNotice' => __( 'Comment submitted. You can continue navigating.' ),
-							),
-						),
-					),
-				)
-			);
-
+			// Try to find the submit button and add directives to change its value
+			// on submission. This is optinal.
 			while ( $p->next_tag( 'input' ) ) {
 				if ( $p->get_attribute( 'type' ) === 'submit' ) {
 					// Add the necessary directives.
@@ -117,10 +116,21 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 
 			// Add a div to show error messages below the form and another div to
 			// announce the spoken notices.
-			$form              = $p->get_updated_html();
-			$last_div_position = strripos( $form, '</form>' );
-			$form              = substr_replace(
-				$form,
+			wp_store(
+				array(
+					'state' => array(
+						'core' => array(
+							'comments' => array(
+								'submittedNotice' => __( 'Comment submitted. You can continue navigating.' ),
+							),
+						),
+					),
+				)
+			);
+			$enhanced_form     = $p->get_updated_html();
+			$last_div_position = strripos( $enhanced_form, '</form>' );
+			$enhanced_form     = substr_replace(
+				$enhanced_form,
 				'<div 
 					class="wp-block-post-comments-form__error"
 					data-wp-style--display="selectors.core.comments.showError"
@@ -143,8 +153,6 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 				$last_div_position,
 				0
 			);
-
-			return $form;
 		}
 	}
 
@@ -161,7 +169,11 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 		}
 	}
 
-	// If something fails or there is no enhanced submission, enqueue the regular
+	if ( $enhanced_form ) {
+		return $enhanced_form;
+	}
+
+	// If something failed or there is no enhanced submission, enqueue the regular
 	// comment-reply script and return the HTML without the directives.
 	wp_enqueue_script( 'comment-reply' );
 	return $form;
