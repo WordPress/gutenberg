@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { ProgressBar } from '..';
 
-const meta: ComponentMeta< typeof ProgressBar > = {
+const meta: Meta< typeof ProgressBar > = {
 	component: ProgressBar,
 	title: 'Components (Experimental)/ProgressBar',
 	argTypes: {
@@ -23,11 +23,9 @@ const meta: ComponentMeta< typeof ProgressBar > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof ProgressBar > = ( { ...args } ) => {
+const Template: StoryFn< typeof ProgressBar > = ( { ...args } ) => {
 	return <ProgressBar { ...args } />;
 };
 
-export const Default: ComponentStory< typeof ProgressBar > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof ProgressBar > = Template.bind( {} );
 Default.args = {};

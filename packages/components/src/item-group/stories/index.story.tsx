@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -11,8 +11,10 @@ import { Item } from '../item/component';
 
 type ItemProps = React.ComponentPropsWithoutRef< typeof Item >;
 
-const meta: ComponentMeta< typeof ItemGroup > = {
+const meta: Meta< typeof ItemGroup > = {
 	component: ItemGroup,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { Item },
 	title: 'Components (Experimental)/ItemGroup',
 	argTypes: {
 		as: { control: { type: null } },
@@ -29,11 +31,11 @@ const mapPropsToItem = ( props: ItemProps, index: number ) => (
 	<Item { ...props } key={ index } />
 );
 
-const Template: ComponentStory< typeof ItemGroup > = ( props ) => (
+const Template: StoryFn< typeof ItemGroup > = ( props ) => (
 	<ItemGroup { ...props } />
 );
 
-export const Default: ComponentStory< typeof ItemGroup > = Template.bind( {} );
+export const Default: StoryFn< typeof ItemGroup > = Template.bind( {} );
 Default.args = {
 	children: (
 		[
@@ -61,8 +63,9 @@ Default.args = {
 	 ).map( mapPropsToItem ),
 };
 
-export const NonClickableItems: ComponentStory< typeof ItemGroup > =
-	Template.bind( {} );
+export const NonClickableItems: StoryFn< typeof ItemGroup > = Template.bind(
+	{}
+);
 NonClickableItems.args = {
 	children: (
 		[
@@ -78,9 +81,7 @@ NonClickableItems.args = {
 	 ).map( mapPropsToItem ),
 };
 
-export const CustomItemSize: ComponentStory< typeof ItemGroup > = Template.bind(
-	{}
-);
+export const CustomItemSize: StoryFn< typeof ItemGroup > = Template.bind( {} );
 CustomItemSize.args = {
 	children: (
 		[
@@ -97,9 +98,7 @@ CustomItemSize.args = {
 	 ).map( mapPropsToItem ),
 };
 
-export const WithBorder: ComponentStory< typeof ItemGroup > = Template.bind(
-	{}
-);
+export const WithBorder: StoryFn< typeof ItemGroup > = Template.bind( {} );
 WithBorder.args = {
 	...Default.args,
 	isBordered: true,

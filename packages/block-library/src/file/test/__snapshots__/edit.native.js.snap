@@ -64,7 +64,7 @@ exports[`File block renders file error state without crashing 1`] = `
           ]
         }
       >
-        <RCTAztecView
+        <View
           accessibilityState={
             {
               "busy": undefined,
@@ -74,59 +74,73 @@ exports[`File block renders file error state without crashing 1`] = `
               "selected": undefined,
             }
           }
-          accessible={true}
-          activeFormats={[]}
-          blockType={
+          accessibilityValue={
             {
-              "tag": "p",
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
-          deleteEnter={true}
-          disableEditingMenu={false}
+          accessible={false}
+          collapsable={false}
           focusable={true}
-          fontFamily="serif"
-          fontSize={16}
-          isMultiline={false}
-          maxImagesWidth={200}
-          onBackspace={[Function]}
           onBlur={[Function]}
-          onChange={[Function]}
           onClick={[Function]}
-          onContentSizeChange={[Function]}
-          onEnter={[Function]}
           onFocus={[Function]}
-          onHTMLContentWithCursor={[Function]}
-          onKeyDown={[Function]}
-          onPaste={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
           onResponderTerminate={[Function]}
           onResponderTerminationRequest={[Function]}
-          onSelectionChange={[Function]}
           onStartShouldSetResponder={[Function]}
-          placeholder="File name"
-          placeholderTextColor="gray"
-          selectionColor="black"
-          style={
-            {
-              "backgroundColor": undefined,
-              "maxWidth": undefined,
-              "minHeight": 0,
+        >
+          <RCTAztecView
+            activeFormats={[]}
+            blockType={
+              {
+                "tag": "p",
+              }
             }
-          }
-          text={
-            {
-              "eventCount": undefined,
-              "linkTextColor": undefined,
-              "selection": null,
-              "tag": "p",
-              "text": "<p>File name</p>",
+            deleteEnter={true}
+            disableEditingMenu={false}
+            fontFamily="serif"
+            fontSize={16}
+            isMultiline={false}
+            maxImagesWidth={200}
+            onBackspace={[Function]}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onContentSizeChange={[Function]}
+            onEnter={[Function]}
+            onFocus={[Function]}
+            onHTMLContentWithCursor={[Function]}
+            onKeyDown={[Function]}
+            onPaste={[Function]}
+            onSelectionChange={[Function]}
+            placeholder="File name"
+            placeholderTextColor="gray"
+            selectionColor="black"
+            style={
+              {
+                "backgroundColor": undefined,
+                "maxWidth": undefined,
+                "minHeight": 0,
+              }
             }
-          }
-          textAlign="left"
-          triggerKeyCodes={[]}
-        />
+            text={
+              {
+                "eventCount": undefined,
+                "linkTextColor": undefined,
+                "selection": null,
+                "tag": "p",
+                "text": "<p>File name</p>",
+              }
+            }
+            textAlign="left"
+            triggerKeyCodes={[]}
+          />
+        </View>
       </View>
       <View>
         <Svg
@@ -179,7 +193,7 @@ exports[`File block renders file error state without crashing 1`] = `
           ]
         }
       >
-        <RCTAztecView
+        <View
           accessibilityState={
             {
               "busy": undefined,
@@ -189,62 +203,76 @@ exports[`File block renders file error state without crashing 1`] = `
               "selected": undefined,
             }
           }
-          accessible={true}
-          activeFormats={[]}
-          blockType={
+          accessibilityValue={
             {
-              "tag": "p",
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
-          color="white"
-          deleteEnter={true}
-          disableEditingMenu={false}
+          accessible={false}
+          collapsable={false}
           focusable={true}
-          fontFamily="serif"
-          fontSize={16}
-          isMultiline={false}
-          maxImagesWidth={200}
-          minWidth={40}
-          onBackspace={[Function]}
           onBlur={[Function]}
-          onChange={[Function]}
           onClick={[Function]}
-          onContentSizeChange={[Function]}
-          onEnter={[Function]}
           onFocus={[Function]}
-          onHTMLContentWithCursor={[Function]}
-          onKeyDown={[Function]}
-          onPaste={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
           onResponderTerminate={[Function]}
           onResponderTerminationRequest={[Function]}
-          onSelectionChange={[Function]}
           onStartShouldSetResponder={[Function]}
-          placeholder=""
-          placeholderTextColor="white"
-          selectionColor="white"
-          style={
-            {
-              "backgroundColor": undefined,
-              "color": "white",
-              "maxWidth": 80,
-              "minHeight": 0,
+        >
+          <RCTAztecView
+            activeFormats={[]}
+            blockType={
+              {
+                "tag": "p",
+              }
             }
-          }
-          text={
-            {
-              "eventCount": undefined,
-              "linkTextColor": undefined,
-              "selection": null,
-              "tag": "p",
-              "text": "<p>Download</p>",
+            color="white"
+            deleteEnter={true}
+            disableEditingMenu={false}
+            fontFamily="serif"
+            fontSize={16}
+            isMultiline={false}
+            maxImagesWidth={200}
+            minWidth={40}
+            onBackspace={[Function]}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onContentSizeChange={[Function]}
+            onEnter={[Function]}
+            onFocus={[Function]}
+            onHTMLContentWithCursor={[Function]}
+            onKeyDown={[Function]}
+            onPaste={[Function]}
+            onSelectionChange={[Function]}
+            placeholder=""
+            placeholderTextColor="white"
+            selectionColor="white"
+            style={
+              {
+                "backgroundColor": undefined,
+                "color": "white",
+                "maxWidth": 80,
+                "minHeight": 0,
+              }
             }
-          }
-          textAlign="center"
-          triggerKeyCodes={[]}
-        />
+            text={
+              {
+                "eventCount": undefined,
+                "linkTextColor": undefined,
+                "selection": null,
+                "tag": "p",
+                "text": "<p>Download</p>",
+              }
+            }
+            textAlign="center"
+            triggerKeyCodes={[]}
+          />
+        </View>
       </View>
     </View>
   </View>
@@ -315,7 +343,7 @@ exports[`File block renders file without crashing 1`] = `
           ]
         }
       >
-        <RCTAztecView
+        <View
           accessibilityState={
             {
               "busy": undefined,
@@ -325,59 +353,73 @@ exports[`File block renders file without crashing 1`] = `
               "selected": undefined,
             }
           }
-          accessible={true}
-          activeFormats={[]}
-          blockType={
+          accessibilityValue={
             {
-              "tag": "p",
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
-          deleteEnter={true}
-          disableEditingMenu={false}
+          accessible={false}
+          collapsable={false}
           focusable={true}
-          fontFamily="serif"
-          fontSize={16}
-          isMultiline={false}
-          maxImagesWidth={200}
-          onBackspace={[Function]}
           onBlur={[Function]}
-          onChange={[Function]}
           onClick={[Function]}
-          onContentSizeChange={[Function]}
-          onEnter={[Function]}
           onFocus={[Function]}
-          onHTMLContentWithCursor={[Function]}
-          onKeyDown={[Function]}
-          onPaste={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
           onResponderTerminate={[Function]}
           onResponderTerminationRequest={[Function]}
-          onSelectionChange={[Function]}
           onStartShouldSetResponder={[Function]}
-          placeholder="File name"
-          placeholderTextColor="gray"
-          selectionColor="black"
-          style={
-            {
-              "backgroundColor": undefined,
-              "maxWidth": undefined,
-              "minHeight": 0,
+        >
+          <RCTAztecView
+            activeFormats={[]}
+            blockType={
+              {
+                "tag": "p",
+              }
             }
-          }
-          text={
-            {
-              "eventCount": undefined,
-              "linkTextColor": undefined,
-              "selection": null,
-              "tag": "p",
-              "text": "<p>File name</p>",
+            deleteEnter={true}
+            disableEditingMenu={false}
+            fontFamily="serif"
+            fontSize={16}
+            isMultiline={false}
+            maxImagesWidth={200}
+            onBackspace={[Function]}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onContentSizeChange={[Function]}
+            onEnter={[Function]}
+            onFocus={[Function]}
+            onHTMLContentWithCursor={[Function]}
+            onKeyDown={[Function]}
+            onPaste={[Function]}
+            onSelectionChange={[Function]}
+            placeholder="File name"
+            placeholderTextColor="gray"
+            selectionColor="black"
+            style={
+              {
+                "backgroundColor": undefined,
+                "maxWidth": undefined,
+                "minHeight": 0,
+              }
             }
-          }
-          textAlign="left"
-          triggerKeyCodes={[]}
-        />
+            text={
+              {
+                "eventCount": undefined,
+                "linkTextColor": undefined,
+                "selection": null,
+                "tag": "p",
+                "text": "<p>File name</p>",
+              }
+            }
+            textAlign="left"
+            triggerKeyCodes={[]}
+          />
+        </View>
       </View>
     </View>
     <View
@@ -404,7 +446,7 @@ exports[`File block renders file without crashing 1`] = `
           ]
         }
       >
-        <RCTAztecView
+        <View
           accessibilityState={
             {
               "busy": undefined,
@@ -414,62 +456,76 @@ exports[`File block renders file without crashing 1`] = `
               "selected": undefined,
             }
           }
-          accessible={true}
-          activeFormats={[]}
-          blockType={
+          accessibilityValue={
             {
-              "tag": "p",
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
             }
           }
-          color="white"
-          deleteEnter={true}
-          disableEditingMenu={false}
+          accessible={false}
+          collapsable={false}
           focusable={true}
-          fontFamily="serif"
-          fontSize={16}
-          isMultiline={false}
-          maxImagesWidth={200}
-          minWidth={40}
-          onBackspace={[Function]}
           onBlur={[Function]}
-          onChange={[Function]}
           onClick={[Function]}
-          onContentSizeChange={[Function]}
-          onEnter={[Function]}
           onFocus={[Function]}
-          onHTMLContentWithCursor={[Function]}
-          onKeyDown={[Function]}
-          onPaste={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
           onResponderTerminate={[Function]}
           onResponderTerminationRequest={[Function]}
-          onSelectionChange={[Function]}
           onStartShouldSetResponder={[Function]}
-          placeholder=""
-          placeholderTextColor="white"
-          selectionColor="white"
-          style={
-            {
-              "backgroundColor": undefined,
-              "color": "white",
-              "maxWidth": 80,
-              "minHeight": 0,
+        >
+          <RCTAztecView
+            activeFormats={[]}
+            blockType={
+              {
+                "tag": "p",
+              }
             }
-          }
-          text={
-            {
-              "eventCount": undefined,
-              "linkTextColor": undefined,
-              "selection": null,
-              "tag": "p",
-              "text": "<p>Download</p>",
+            color="white"
+            deleteEnter={true}
+            disableEditingMenu={false}
+            fontFamily="serif"
+            fontSize={16}
+            isMultiline={false}
+            maxImagesWidth={200}
+            minWidth={40}
+            onBackspace={[Function]}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onContentSizeChange={[Function]}
+            onEnter={[Function]}
+            onFocus={[Function]}
+            onHTMLContentWithCursor={[Function]}
+            onKeyDown={[Function]}
+            onPaste={[Function]}
+            onSelectionChange={[Function]}
+            placeholder=""
+            placeholderTextColor="white"
+            selectionColor="white"
+            style={
+              {
+                "backgroundColor": undefined,
+                "color": "white",
+                "maxWidth": 80,
+                "minHeight": 0,
+              }
             }
-          }
-          textAlign="center"
-          triggerKeyCodes={[]}
-        />
+            text={
+              {
+                "eventCount": undefined,
+                "linkTextColor": undefined,
+                "selection": null,
+                "tag": "p",
+                "text": "<p>Download</p>",
+              }
+            }
+            textAlign="center"
+            triggerKeyCodes={[]}
+          />
+        </View>
       </View>
     </View>
   </View>

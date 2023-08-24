@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { TabbableContainer } from '..';
 
-const meta: ComponentMeta< typeof TabbableContainer > = {
+const meta: Meta< typeof TabbableContainer > = {
 	title: 'Components/TabbableContainer',
 	component: TabbableContainer,
 	argTypes: {
@@ -24,7 +24,7 @@ const meta: ComponentMeta< typeof TabbableContainer > = {
 };
 export default meta;
 
-export const Default: ComponentStory< typeof TabbableContainer > = ( args ) => {
+export const Default: StoryFn< typeof TabbableContainer > = ( args ) => {
 	return (
 		<>
 			<button>Before tabbable container</button>

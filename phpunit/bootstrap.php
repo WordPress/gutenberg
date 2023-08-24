@@ -21,6 +21,8 @@ if ( ! defined( 'LOCAL_SCRIPT_DEBUG' ) ) {
 if ( ! defined( 'LOCAL_WP_ENVIRONMENT_TYPE' ) ) {
 	define( 'LOCAL_WP_ENVIRONMENT_TYPE', 'local' );
 }
+define( 'GUTENBERG_DIR_TESTDATA', __DIR__ . '/data/' );
+define( 'GUTENBERG_DIR_TESTFIXTURES', __DIR__ . '/fixtures/' );
 
 // Pretend that these are Core unit tests. This is needed so that
 // wp_theme_has_theme_json() does not cache its return value between each test.
