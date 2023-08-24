@@ -35,4 +35,6 @@ function gutenberg_init_font_library_routes() {
 
 add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );
 
-add_filter( 'wp_register_font_collection', array( 'WP_Font_Library', 'register_font_collection' ), 10, 2 );
+function wp_register_font_collection ( $config ) {
+	return WP_Font_Library::register_font_collection( $config );
+}

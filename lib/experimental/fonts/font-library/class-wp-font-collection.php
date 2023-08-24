@@ -38,21 +38,19 @@ class WP_Font_Collection {
 	 * @param array  $config Font collection config options.
 	 * @throws Exception If the required parameters are missing.
 	 */
-	public function __construct( $id, $config ) {
-
-		if ( empty( $id ) && is_string( $id ) ) {
-			throw new Exception( 'Font Collection ID is required as a non-empty string.' );
-		}
-
+	public function __construct( $config ) {
 		if ( empty( $config ) ) {
 			throw new Exception( 'Font Collection config options is required as a non-empty array.' );
 		}
 
-		if ( empty( $config['data_json_file'] ) && is_string( $config['data_json_file'] ) ) {
+		if ( empty( $config[ 'id' ] ) || !is_string( $config[ 'id' ] ) ) {
+			throw new Exception( 'Font Collection config ID is required as a non-empty string.' );
+		}
+
+		if ( empty( $config['data_json_file'] ) || !is_string( $config['data_json_file'] ) ) {
 			throw new Exception( 'Font Collection config "data_json_file" option is required as a non-empty string.' );
 		}
 
-		$config['id'] = $id;
 		$this->config = $config;
 	}
 
