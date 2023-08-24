@@ -46,6 +46,10 @@ class WP_Font_Collection {
 			throw new Exception( 'Font Collection config ID is required as a non-empty string.' );
 		}
 
+		if ( empty( $config['name'] ) || ! is_string( $config['name'] ) ) {
+			throw new Exception( 'Font Collection config name is required as a non-empty string.' );
+		}
+
 		if ( empty( $config['data_json_file'] ) || ! is_string( $config['data_json_file'] ) ) {
 			throw new Exception( 'Font Collection config "data_json_file" option is required as a non-empty string.' );
 		}

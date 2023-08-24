@@ -39,7 +39,6 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	public function test_should_throw_exception( $config, $expected_exception_message ) {
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( $expected_exception_message );
-
 		new WP_Font_Collection( $config );
 	}
 

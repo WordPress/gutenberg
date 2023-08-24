@@ -14,20 +14,22 @@ class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_UnitTestCase {
 
 	public static function set_up_before_class() {
 		$my_font_collection_config = array(
+			'id'             => 'my-font-collection',
 			'name'           => 'My Font Collection',
 			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
 			'data_json_file' => path_join( __DIR__, 'my-font-collection-data.json' ),
 		);
 
-		apply_filters( 'wp_register_font_collection', 'my-font-collection', $my_font_collection_config );
+		wp_register_font_collection( $my_font_collection_config );
 
 		$another_font_collection_config = array(
+			'id'             => 'another-font-collection',
 			'name'           => 'Another Font Collection',
 			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
 			'data_json_file' => path_join( __DIR__, 'another-font-collection-data.json' ),
 		);
 
-		apply_filters( 'wp_register_font_collection', 'another-font-collection', $another_font_collection_config );
+		wp_register_font_collection( $another_font_collection_config );
 	}
 
 	public function test_should_get_font_collections() {
