@@ -31,7 +31,6 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
-import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useInnerBlocksProps } from '../inner-blocks';
@@ -124,7 +123,6 @@ function Root( { className, ...settings } ) {
 }
 
 export default function BlockList( settings ) {
-	usePreParsePatterns();
 	return (
 		<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
 			<Root { ...settings } />
