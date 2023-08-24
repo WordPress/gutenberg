@@ -84,6 +84,16 @@ class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::get_font_collection
+	 */
+	public function test_get_non_existing_font_collection() {
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections/non-existing-collection-id' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 404, $response->get_status() );
+	}
+
+	/**
 	 * @covers ::uninstall_fonts
 	 */
 	public function test_uninstall_non_existing_fonts() {

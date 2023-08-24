@@ -106,6 +106,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 		$collection = WP_Font_Library::get_font_collection( $id );
 
 		if ( is_wp_error( $collection ) ) {
+			$collection->add_data( array( 'status' => 404 ) );
 			return $collection;
 		}
 
