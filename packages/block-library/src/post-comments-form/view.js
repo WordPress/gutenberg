@@ -7,9 +7,7 @@ store( {
 	state: {
 		core: {
 			comments: {
-				replyTo: '',
 				error: '',
-				text: '',
 			},
 		},
 	},
@@ -109,17 +107,17 @@ store( {
 						);
 					}
 				},
-				changeReplyTo: ( { state, ref, event } ) => {
+				changeReplyTo: ( { context, ref, event } ) => {
 					event.preventDefault();
 
 					const commentId = ref.dataset.commentid;
-					state.core.comments.replyTo = `comment-${ commentId }`;
+					context.core.comments.replyTo = `comment-${ commentId }`;
 
 					// eslint-disable-next-line no-console
 					console.log( commentId );
 				},
-				updateText: ( { state, event } ) => {
-					state.core.comments.text = event.target.value;
+				updateText: ( { context, event } ) => {
+					context.core.comments.text = event.target.value;
 				},
 			},
 		},

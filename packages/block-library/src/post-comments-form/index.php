@@ -32,7 +32,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class'        => implode( ' ', $classes ),
-			'data-wp-fill' => 'state.core.comments.replyTo'
+			'data-wp-fill' => 'context.core.comments.replyTo'
 		)
 	);
 
@@ -65,7 +65,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			$p->set_attribute( 'data-wp-on--submit', 'actions.core.comments.submit' );
 
 			if ( $p->next_tag( 'textarea') ) {
-				$p->set_attribute( 'data-wp-bind--value', 'state.core.comments.text' );
+				$p->set_attribute( 'data-wp-bind--value', 'context.core.comments.text' );
 				$p->set_attribute( 'data-wp-on--change', 'actions.core.comments.updateText' );
 			}
 
