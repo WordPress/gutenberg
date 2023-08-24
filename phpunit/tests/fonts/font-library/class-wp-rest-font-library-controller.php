@@ -45,6 +45,29 @@ class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::get_font_collections
+	 */
+	public function test_get_font_collections() {
+		$config = array (
+			'id'             => 'my-font-collection',
+			'name'           => 'My Font Collection',
+			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
+			'data_json_file' => 'my-font-collection-data.json',
+		);
+		wp_register_font_collection ( $config );
+
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections' );
+		$response = rest_get_server()->dispatch( $request );
+		$data = $response->get_data();
+
+		echo ( print_r( $data, true ) );
+		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
+		$this->assertCount( 1, $data, 'The response data is not an array with one element.' );
+		$this->assertArrayHasKey( 'my-font-collection', $data, 'The response data does not have the key of the registered font collection id.' );
+	}
+
+	/**
 	 * @covers ::uninstall_fonts
 	 */
 	public function test_uninstall_non_existing_fonts() {
@@ -67,7 +90,6 @@ class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
 		$response->get_data();
 		$this->assertSame( 500, $response->get_status(), 'The response status is not 500.' );
 	}
-
 
 	/**
 	 * @covers ::install_fonts
