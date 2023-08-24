@@ -56,12 +56,15 @@ store( {
 
 					try {
 						const html = await response.text();
+						const dom = new window.DOMParser().parseFromString(
+							html,
+							'text/html'
+						);
 
-						if ( response.status !== 200 ) {
-							const dom = new window.DOMParser().parseFromString(
-								html,
-								'text/html'
-							);
+						if (
+							response.status !== 200 ||
+							dom.body.id === 'error-page'
+						) {
 							state.core.comments.error =
 								dom.querySelector(
 									'.wp-die-message'
