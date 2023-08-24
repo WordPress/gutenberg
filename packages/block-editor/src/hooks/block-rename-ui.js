@@ -30,8 +30,11 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
 
 	const nameHasChanged = editedBlockName !== blockName;
+	const nameIsOriginal = editedBlockName === originalBlockName;
 
-	const isNameValid = nameHasChanged && ! emptyString( editedBlockName );
+	const isNameValid =
+		( nameHasChanged || nameIsOriginal ) &&
+		! emptyString( editedBlockName );
 
 	const autoSelectInputText = ( event ) => event.target.select();
 
@@ -58,11 +61,12 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 			>
 				<VStack spacing="3">
 					<TextControl
+						required
 						__nextHasNoMarginBottom
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
 						hideLabelFromVision={ true }
-						placeholder={ __( 'Block name' ) }
+						placeholder={ originalBlockName }
 						onChange={ setEditedBlockName }
 						onBlur={ () => {
 							if ( emptyString( editedBlockName ) ) {
