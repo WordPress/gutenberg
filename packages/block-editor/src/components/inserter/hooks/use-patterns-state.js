@@ -27,13 +27,21 @@ const CUSTOM_CATEGORY = {
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
 const usePatternsState = ( onInsert, rootClientId ) => {
-	const { patternCategories, patterns } = useSelect(
+	const { patternCategories, patterns, userPatternCategories } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } =
-				select( blockEditorStore );
-
+			const {
+				__experimentalGetAllowedPatterns,
+				__experimentalUserPatternCategories,
+				getSettings,
+			} = select( blockEditorStore );
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
+				userPatternCategories:
+					__experimentalUserPatternCategories().map( ( cat ) => ( {
+						...cat,
+						label: cat.name,
+						name: cat.slug,
+					} ) ),
 				patternCategories:
 					getSettings().__experimentalBlockPatternCategories,
 			};
@@ -68,7 +76,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 		[ createSuccessNotice, onInsert ]
 	);
 
-	return [ patterns, allCategories, onClickPattern ];
+	return { patterns, allCategories, userPatternCategories, onClickPattern };
 };
 
 export default usePatternsState;

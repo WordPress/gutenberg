@@ -2303,11 +2303,18 @@ function getUnsyncedPatterns( state ) {
 			return {
 				name: `core/block/${ reusableBlock.id }`,
 				title: reusableBlock.title.raw,
-				categories: [ 'custom' ],
+				categories: reusableBlock.wp_pattern_category,
 				content: reusableBlock.content.raw,
 			};
 		} );
 }
+
+export const __experimentalUserPatternCategories = createSelector(
+	( state ) => {
+		return state?.settings?.__experimentalUserPatternCategories;
+	},
+	( state ) => [ state.settings.__experimentalUserPatternCategories ]
+);
 
 export const __experimentalGetParsedPattern = createSelector(
 	( state, patternName ) => {

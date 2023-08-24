@@ -81,7 +81,7 @@ function InserterSearchResults( {
 		blockTypeCollections,
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
-	const [ patterns, , onSelectBlockPattern ] = usePatternsState(
+	const { patterns, onSelectBlockPattern } = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);

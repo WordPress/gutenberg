@@ -48,7 +48,7 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
 	} );
-	const [ allPatterns, , onSelectBlockPattern ] = usePatternsState(
+	const { patterns: allPatterns, onSelectBlockPattern } = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);

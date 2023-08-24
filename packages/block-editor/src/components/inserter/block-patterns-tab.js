@@ -45,11 +45,11 @@ const patternCategoriesOrder = [
 ];
 
 function usePatternsCategories( rootClientId ) {
-	const [ allPatterns, allCategories ] = usePatternsState(
-		undefined,
-		rootClientId
-	);
-
+	const {
+		patterns: allPatterns,
+		allCategories,
+		userPatternCategories,
+	} = usePatternsState( undefined, rootClientId );
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
 			if ( ! pattern.categories || ! pattern.categories.length ) {
@@ -141,7 +141,7 @@ export function BlockPatternsCategoryPanel( {
 	category,
 	showTitlesAsTooltip,
 } ) {
-	const [ allPatterns, , onClick ] = usePatternsState(
+	const { patterns: allPatterns, onClick } = usePatternsState(
 		onInsert,
 		rootClientId
 	);
