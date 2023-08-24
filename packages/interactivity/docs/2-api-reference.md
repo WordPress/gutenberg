@@ -508,7 +508,7 @@ Defines data available to the HTML nodes of the page. It is important to differe
 store( {
   state: {
     someText: "Hello Universe!"
-  }
+  },
   actions: {
     someAction: ({ state, context }) => {
       state.someText // Access or modify global state - "Hello Universe!"

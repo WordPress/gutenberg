@@ -11,7 +11,6 @@ import {
 	BlockList,
 	BlockTools,
 	__unstableUseClipboardHandler as useClipboardHandler,
-	__unstableUseTypingObserver as useTypingObserver,
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -78,11 +77,7 @@ export default function SiteEditorCanvas() {
 		! isMobileViewport;
 
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [
-		contentRef,
-		useClipboardHandler(),
-		useTypingObserver(),
-	] );
+	const mergedRefs = useMergeRefs( [ contentRef, useClipboardHandler() ] );
 
 	const isTemplateTypeNavigation = templateType === 'wp_navigation';
 

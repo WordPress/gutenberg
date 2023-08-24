@@ -13,8 +13,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import ColorPalette from '..';
-import Popover from '../../popover';
-import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: Meta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
@@ -35,18 +33,14 @@ const Template: StoryFn< typeof ColorPalette > = ( { onChange, ...args } ) => {
 	const [ color, setColor ] = useState< string | undefined >();
 
 	return (
-		<SlotFillProvider>
-			<ColorPalette
-				{ ...args }
-				value={ color }
-				onChange={ ( newColor ) => {
-					setColor( newColor );
-					onChange?.( newColor );
-				} }
-			/>
-			{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
-			<Popover.Slot />
-		</SlotFillProvider>
+		<ColorPalette
+			{ ...args }
+			value={ color }
+			onChange={ ( newColor ) => {
+				setColor( newColor );
+				onChange?.( newColor );
+			} }
+		/>
 	);
 };
 
