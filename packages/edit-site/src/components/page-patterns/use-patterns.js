@@ -154,7 +154,7 @@ const patternBlockToPattern = ( patternBlock, categories ) => ( {
 	name: patternBlock.slug,
 	syncStatus: patternBlock.wp_pattern_sync_status || SYNC_TYPES.full,
 	title: patternBlock.title.raw,
-	type: 'wp_block',
+	type: USER_PATTERNS,
 	patternBlock,
 } );
 
