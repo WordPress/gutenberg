@@ -141,6 +141,7 @@ store( {
 					// Scroll to the error when it's shown.
 					if ( st.state.core.comments.error ) {
 						st.ref.scrollIntoView( {
+							behavior: 'smooth',
 							block: 'end',
 						} );
 					}
