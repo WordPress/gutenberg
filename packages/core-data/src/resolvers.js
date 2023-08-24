@@ -619,6 +619,23 @@ export const getBlockPatternCategories =
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
 	};
 
+export const getUserPatternCategories =
+	() =>
+	async ( { dispatch, resolveSelect } ) => {
+		const patternCategories = await resolveSelect.getEntityRecords(
+			'taxonomy',
+			'wp_pattern_category',
+			{
+				per_page: -1,
+				_fields: 'id,name,description,slug',
+			}
+		);
+		dispatch( {
+			type: 'RECEIVE_USER_PATTERN_CATEGORIES',
+			patternCategories,
+		} );
+	};
+
 export const getNavigationFallbackId =
 	() =>
 	async ( { dispatch, select } ) => {
