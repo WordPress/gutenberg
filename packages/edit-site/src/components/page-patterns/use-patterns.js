@@ -143,10 +143,8 @@ const patternBlockToPattern = ( patternBlock, categories ) => ( {
 	...( patternBlock.wp_pattern_category.length > 0 && {
 		categories: patternBlock.wp_pattern_category.map(
 			( patternCategoryId ) =>
-				categories
-					? categories.find(
-							( category ) => category.id === patternCategoryId
-					  )?.slug
+				categories && categories.get( patternCategoryId )
+					? categories.get( patternCategoryId ).slug
 					: patternCategoryId
 		),
 	} ),
@@ -159,19 +157,16 @@ const patternBlockToPattern = ( patternBlock, categories ) => ( {
 } );
 
 const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
-	const { getEntityRecords, getIsResolving } = select( coreStore );
+	const { getEntityRecords, getIsResolving, getUserPatternCategories } =
+		select( coreStore );
 
 	const query = { per_page: -1 };
 	const records = getEntityRecords( 'postType', USER_PATTERNS, query );
-	const categories = getEntityRecords( 'taxonomy', 'wp_pattern_category', {
-		per_page: -1,
-		_fields: 'id,name,slug',
-		context: 'view',
-	} );
+	const categories = getUserPatternCategories();
 
 	let patterns = records
 		? records.map( ( record ) =>
-				patternBlockToPattern( record, categories )
+				patternBlockToPattern( record, categories.patternCatogoriesMap )
 		  )
 		: EMPTY_PATTERN_LIST;
 
@@ -194,7 +189,7 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 		hasCategory: () => true,
 	} );
 
-	return { patterns, isResolving, categories };
+	return { patterns, isResolving, categories: categories.patternCategories };
 };
 
 export const usePatterns = (
