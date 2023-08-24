@@ -1240,7 +1240,6 @@ export class RichText extends Component {
 					placeholderTextColor={
 						style?.placeholderColor ||
 						this.props.placeholderTextColor ||
-						( baseGlobalStyles && baseGlobalStyles?.color?.text ) ||
 						defaultPlaceholderTextColor
 					}
 					deleteEnter={ this.props.deleteEnter }

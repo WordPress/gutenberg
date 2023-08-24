@@ -135,7 +135,6 @@ class PostTitle extends Component {
 			...style,
 			...( globalStyles?.text && {
 				color: globalStyles.text,
-				placeholderColor: globalStyles.text,
 			} ),
 		};
 
