@@ -32,6 +32,8 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 
 	const isNameValid = nameHasChanged && ! emptyString( editedBlockName );
 
+	const autoSelectInputText = ( event ) => event.target.select();
+
 	return (
 		<Modal
 			title={ __( 'Rename block' ) }
@@ -66,6 +68,7 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 								setEditedBlockName( originalBlockName );
 							}
 						} }
+						onFocus={ autoSelectInputText }
 					/>
 					<HStack justify="right">
 						<Button variant="tertiary" onClick={ onClose }>
