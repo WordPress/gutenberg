@@ -27,9 +27,6 @@ export type FormFileUploadProps = {
 	icon?: ComponentProps< typeof Icon >[ 'icon' ];
 	/**
 	 * Whether to allow multiple selection of files or not.
-	 *
-	 * This property will also accept a string with the value `add` to allow multiple
-	 * selection of files without the need to use the `Shift` or `Ctrl`/`Cmd` keys.
 	 */
 	multiple?: InputHTMLAttributes< HTMLInputElement >[ 'multiple' ];
 	/**
