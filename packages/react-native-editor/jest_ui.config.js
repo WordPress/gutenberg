@@ -9,7 +9,6 @@ if ( process.env.TEST_RN_PLATFORM ) {
 }
 
 module.exports = {
-	verbose: true,
 	rootDir: './',
 	haste: {
 		defaultPlatform: rnPlatform,
@@ -23,4 +22,8 @@ module.exports = {
 	testMatch: [ '**/__device-tests__/**/*.test.[jt]s?(x)' ],
 	testRunner: 'jest-jasmine2',
 	reporters: [ 'default', 'jest-junit' ],
+	watchPlugins: [
+		'jest-watch-typeahead/filename',
+		'jest-watch-typeahead/testname',
+	],
 };

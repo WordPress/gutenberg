@@ -14,12 +14,38 @@ This guide focuses on just the block, see the [Create a Block tutorial](/docs/ge
 
 Static blocks are implemented in JavaScript, so a basic level of JavaScript is helpful, see the [Getting Started with JavaScript](/docs/how-to-guides/javascript/README.md) for a refresher.
 
-Blocks are added to WordPress using plugins, so you will need:
+Blocks are added to WordPress using plugins, so you will need a WordPress development environment - see the [setup guide](/docs/getting-started/devenv/README.md).
 
--   WordPress development environment, see [setup guide](/docs/getting-started/devenv/README.md)
--   JavaScript build tools (node/npm) if using JSX example
+This tutorial demonstrates the creation of a block in two ways, using JSX and using plain JavaScript. JSX requires a build step, so if you choose to follow the JSX path you will need JavaScript build tools (node/npm). See Step 0 below for details on getting set up.
 
 ## Step-by-step guide
+
+### Step 0: Set up your project
+
+_**Note:** this step is only needed if you are going to use the JSX examples in the following steps. If you intend to work with the plain JavaScript examples these will run without a build step so you can proceed straight to 'Step 1: Configure block.json' below._
+
+Before starting with the JSX examples you will need to set up your project. In your project directory run:
+
+```bash
+npm init
+```
+
+This will create a `package.json` file.
+
+You will then need to add `@wordpress/scripts` as a development dependency to `package.json`. You can do this with:
+
+```bash
+npm install @wordpress/scripts --save-dev
+```
+
+Next, add the following two lines to the `scripts` property in `package.json`:
+
+```json
+"start": "wp-scripts start",
+"build": "wp-scripts build"
+```
+
+You're all set!
 
 ### Step 1: Configure block.json
 

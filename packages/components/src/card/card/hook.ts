@@ -7,7 +7,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { useContextSystem } from '../../ui/context';
 import { useSurface } from '../../surface';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';

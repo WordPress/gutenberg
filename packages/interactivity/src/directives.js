@@ -55,13 +55,8 @@ export default () => {
 	);
 
 	// data-wp-body
-	directive( 'body', ( { props: { children }, context: inherited } ) => {
-		const { Provider } = inherited;
-		const inheritedValue = useContext( inherited );
-		return createPortal(
-			<Provider value={ inheritedValue }>{ children }</Provider>,
-			document.body
-		);
+	directive( 'body', ( { props: { children } } ) => {
+		return createPortal( children, document.body );
 	} );
 
 	// data-wp-effect--[name]
@@ -241,26 +236,6 @@ export default () => {
 						}
 					}, [] );
 				} );
-		}
-	);
-
-	// data-wp-show
-	directive(
-		'show',
-		( {
-			directives: {
-				show: { default: show },
-			},
-			element,
-			evaluate,
-			context,
-		} ) => {
-			const contextValue = useContext( context );
-
-			if ( ! evaluate( show, { context: contextValue } ) )
-				element.props.children = (
-					<template>{ element.props.children }</template>
-				);
 		}
 	);
 

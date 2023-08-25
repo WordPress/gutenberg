@@ -11,6 +11,13 @@ import {
 
 setupCoreBlocks();
 
+beforeEach( () => {
+	// Intentionally suppress the expected console errors and warnings to reduce
+	// noise in the test output.
+	jest.spyOn( console, 'error' ).mockImplementation( () => {} );
+	jest.spyOn( console, 'warn' ).mockImplementation( () => {} );
+} );
+
 describe( 'Block invalid warning', () => {
 	it( 'shows invalid placeholder', async () => {
 		// Arrange
@@ -19,6 +26,10 @@ describe( 'Block invalid warning', () => {
             <div styless="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
             <!-- /wp:spacer -->`,
 		} );
+		expect( console ).toHaveErrored();
+		expect( console ).toHaveWarnedWith(
+			'Encountered unexpected attribute `styless`.'
+		);
 
 		// Assert
 		const warningElement = screen.getByText( /Problem displaying block./ );
@@ -32,7 +43,10 @@ describe( 'Block invalid warning', () => {
             <div styless="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
             <!-- /wp:spacer -->`,
 		} );
-
+		expect( console ).toHaveErrored();
+		expect( console ).toHaveWarnedWith(
+			'Encountered unexpected attribute `styless`.'
+		);
 		// Act
 		fireEvent.press( screen.getByText( /Problem displaying block./ ) );
 		const spacerBlock = getBlock( screen, 'Spacer' );

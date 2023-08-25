@@ -115,6 +115,8 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
             aria-controls="tab-panel-0-general-view"
             aria-selected="true"
             class="components-button components-tab-panel__tabs-item is-active"
+            data-active-item=""
+            data-command=""
             id="tab-panel-0-general"
             role="tab"
             type="button"
@@ -125,9 +127,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
             aria-controls="tab-panel-0-blocks-view"
             aria-selected="false"
             class="components-button components-tab-panel__tabs-item"
+            data-command=""
             id="tab-panel-0-blocks"
             role="tab"
-            tabindex="-1"
             type="button"
           >
             Blocks
@@ -136,9 +138,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
             aria-controls="tab-panel-0-panels-view"
             aria-selected="false"
             class="components-button components-tab-panel__tabs-item"
+            data-command=""
             id="tab-panel-0-panels"
             role="tab"
-            tabindex="-1"
             type="button"
           >
             Panels
@@ -149,6 +151,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
           class="components-tab-panel__tab-content"
           id="tab-panel-0-general-view"
           role="tabpanel"
+          tabindex="0"
         >
           <fieldset
             class="interface-preferences-modal__section"

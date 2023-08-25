@@ -7,6 +7,7 @@ import testData, { slashInserter, shortText } from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for Block insertion', () => {
 	it( 'should be able to insert multi-paragraph text, and text to another paragraph block in between', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
 		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
@@ -38,19 +39,12 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		expect( html.toLowerCase() ).toBe(
 			testData.blockInsertionHtml.toLowerCase()
 		);
-
-		for ( let i = 4; i > 0; i-- ) {
-			paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-				blockNames.paragraph
-			);
-			await paragraphBlockElement.click();
-			await editorPage.removeBlock();
-		}
 	} );
 
 	it( 'should be able to insert block at the beginning of post from the title', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
-		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
@@ -79,20 +73,12 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		expect( html.toLowerCase() ).toBe(
 			testData.blockInsertionHtmlFromTitle.toLowerCase()
 		);
-
-		// Remove blocks
-		for ( let i = 4; i > 0; i-- ) {
-			paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-				blockNames.paragraph
-			);
-			await paragraphBlockElement.click();
-			await editorPage.removeBlock();
-		}
 	} );
 } );
 
 describe( 'Gutenberg Editor Slash Inserter tests', () => {
 	it( 'should show the menu after typing /', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
@@ -104,10 +90,10 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		);
 
 		expect( await editorPage.assertSlashInserterPresent() ).toBe( true );
-		await editorPage.removeBlock();
 	} );
 
 	it( 'should hide the menu after deleting the / character', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
@@ -138,11 +124,10 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 
 		// Check if the slash inserter UI no longer exists.
 		expect( await editorPage.assertSlashInserterPresent() ).toBe( false );
-
-		await editorPage.removeBlock();
 	} );
 
 	it( 'should add an Image block after tying /image and tapping on the Image block button', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
@@ -170,12 +155,10 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 
 		// Slash inserter UI should not be present after adding a block.
 		expect( await editorPage.assertSlashInserterPresent() ).toBe( false );
-
-		// Remove image block.
-		await editorPage.removeBlock();
 	} );
 
 	it( 'should insert an embed image block with "/img" + enter', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
@@ -189,7 +172,5 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		expect(
 			await editorPage.hasBlockAtPosition( 1, blockNames.embed )
 		).toBe( true );
-
-		await editorPage.removeBlock();
 	} );
 } );

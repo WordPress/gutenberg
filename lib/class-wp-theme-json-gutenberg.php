@@ -346,6 +346,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added `dimensions.minHeight`, 'shadow.presets', 'shadow.defaultPresets',
 	 *              `position.fixed` and `position.sticky`.
 	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
+	 * @since 6.4.0 Added `layout.allowEditing`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -379,8 +380,9 @@ class WP_Theme_JSON_Gutenberg {
 			'minHeight' => null,
 		),
 		'layout'                        => array(
-			'contentSize' => null,
-			'wideSize'    => null,
+			'contentSize'  => null,
+			'wideSize'     => null,
+			'allowEditing' => null,
 		),
 		'position'                      => array(
 			'fixed'  => null,
@@ -1315,7 +1317,7 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
-					$class_name    = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), false ) );
+					$class_name    = _wp_array_get( $layout_definition, array( 'className' ), false );
 					$spacing_rules = _wp_array_get( $layout_definition, array( 'spacingStyles' ), array() );
 
 					if (
@@ -1372,7 +1374,7 @@ class WP_Theme_JSON_Gutenberg {
 		) {
 			$valid_display_modes = array( 'block', 'flex', 'grid' );
 			foreach ( $layout_definitions as $layout_definition ) {
-				$class_name       = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), false ) );
+				$class_name       = _wp_array_get( $layout_definition, array( 'className' ), false );
 				$base_style_rules = _wp_array_get( $layout_definition, array( 'baseStyles' ), array() );
 
 				if (
@@ -1567,6 +1569,10 @@ class WP_Theme_JSON_Gutenberg {
 
 		$stylesheet = '';
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+			if ( empty( $preset_metadata['classes'] ) ) {
+				continue;
+			}
+
 			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
 			foreach ( $preset_metadata['classes'] as $class => $property ) {
 				foreach ( $slugs as $slug ) {
@@ -1766,6 +1772,10 @@ class WP_Theme_JSON_Gutenberg {
 	protected static function compute_preset_vars( $settings, $origins ) {
 		$declarations = array();
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+			if ( empty( $preset_metadata['css_vars'] ) ) {
+				continue;
+			}
+
 			$values_by_slug = static::get_settings_values_by_slug( $settings, $preset_metadata, $origins );
 			foreach ( $values_by_slug as $slug => $value ) {
 				$declarations[] = array(
@@ -2502,7 +2512,7 @@ class WP_Theme_JSON_Gutenberg {
 			// The above rule is negated for alignfull children of nested containers.
 			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }';
 			// Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
-			$css .= '.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+			$css .= '.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 			// The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
 			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }';
 		}
@@ -2897,6 +2907,20 @@ class WP_Theme_JSON_Gutenberg {
 
 			if ( ! empty( $output ) ) {
 				_wp_array_set( $sanitized, $metadata['path'], $output );
+			}
+
+			if ( isset( $metadata['variations'] ) ) {
+				foreach ( $metadata['variations'] as $variation ) {
+					$variation_input = _wp_array_get( $theme_json, $variation['path'], array() );
+					if ( empty( $variation_input ) ) {
+						continue;
+					}
+
+					$variation_output = static::remove_insecure_styles( $variation_input );
+					if ( ! empty( $variation_output ) ) {
+						_wp_array_set( $sanitized, $variation['path'], $variation_output );
+					}
+				}
 			}
 		}
 

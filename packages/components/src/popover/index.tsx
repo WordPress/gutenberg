@@ -3,6 +3,7 @@
  */
 import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
 import classnames from 'classnames';
+import type { Middleware, MiddlewareArguments } from '@floating-ui/react-dom';
 import {
 	useFloating,
 	flip as flipMiddleware,
@@ -11,16 +12,11 @@ import {
 	arrow,
 	offset as offsetMiddleware,
 	size,
-	Middleware,
-	MiddlewareArguments,
 } from '@floating-ui/react-dom';
 // eslint-disable-next-line no-restricted-imports
-import {
-	motion,
-	useReducedMotion,
-	HTMLMotionProps,
-	MotionProps,
-} from 'framer-motion';
+import type { HTMLMotionProps, MotionProps } from 'framer-motion';
+// eslint-disable-next-line no-restricted-imports
+import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -34,6 +30,7 @@ import {
 	useMemo,
 	useState,
 	useCallback,
+	createPortal,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -143,6 +140,20 @@ const AnimatedWrapper = forwardRef(
 
 const slotNameContext = createContext< string | undefined >( undefined );
 
+const fallbackContainerClassname = 'components-popover__fallback-container';
+const getPopoverFallbackContainer = () => {
+	let container = document.body.querySelector(
+		'.' + fallbackContainerClassname
+	);
+	if ( ! container ) {
+		container = document.createElement( 'div' );
+		container.className = fallbackContainerClassname;
+		document.body.append( container );
+	}
+
+	return container;
+};
+
 const UnforwardedPopover = (
 	props: Omit<
 		WordPressComponentProps< PopoverProps, 'div', false >,
@@ -171,6 +182,7 @@ const UnforwardedPopover = (
 		flip = true,
 		resize = true,
 		shift = false,
+		inline = false,
 		variant,
 
 		// Deprecated props
@@ -552,15 +564,22 @@ const UnforwardedPopover = (
 		</AnimatedWrapper>
 	);
 
-	if ( slot.ref ) {
+	const shouldRenderWithinSlot = slot.ref && ! inline;
+	const hasAnchor = anchorRef || anchorRect || anchor;
+
+	if ( shouldRenderWithinSlot ) {
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	}
 
-	if ( anchorRef || anchorRect || anchor ) {
+	if ( ! hasAnchor ) {
+		content = <span ref={ anchorRefFallback }>{ content }</span>;
+	}
+
+	if ( shouldRenderWithinSlot || inline ) {
 		return content;
 	}
 
-	return <span ref={ anchorRefFallback }>{ content }</span>;
+	return createPortal( content, getPopoverFallbackContainer() );
 };
 
 /**

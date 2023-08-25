@@ -20,11 +20,8 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect, useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
@@ -271,7 +268,6 @@ function UnconnectedNavigatorProvider(
  * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
  * `useNavigator` hook).
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalNavigatorProvider as NavigatorProvider,

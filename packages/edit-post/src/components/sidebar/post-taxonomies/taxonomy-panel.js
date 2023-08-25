@@ -1,22 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
 import { PanelBody } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
 
-function TaxonomyPanel( {
-	isEnabled,
-	taxonomy,
-	isOpened,
-	onTogglePanel,
-	children,
-} ) {
+function TaxonomyPanel( { taxonomy, children } ) {
+	const slug = taxonomy?.slug;
+	const panelName = slug ? `taxonomy-panel-${ slug }` : '';
+	const { isEnabled, isOpened } = useSelect(
+		( select ) => {
+			const { isEditorPanelEnabled, isEditorPanelOpened } =
+				select( editPostStore );
+			return {
+				isEnabled: slug ? isEditorPanelEnabled( panelName ) : false,
+				isOpened: slug ? isEditorPanelOpened( panelName ) : false,
+			};
+		},
+		[ panelName, slug ]
+	);
+	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+
 	if ( ! isEnabled ) {
 		return null;
 	}
@@ -30,32 +38,11 @@ function TaxonomyPanel( {
 		<PanelBody
 			title={ taxonomyMenuName }
 			opened={ isOpened }
-			onToggle={ onTogglePanel }
+			onToggle={ () => toggleEditorPanelOpened( panelName ) }
 		>
 			{ children }
 		</PanelBody>
 	);
 }
 
-export default compose(
-	withSelect( ( select, ownProps ) => {
-		const slug = ownProps.taxonomy?.slug;
-		const panelName = slug ? `taxonomy-panel-${ slug }` : '';
-		return {
-			panelName,
-			isEnabled: slug
-				? select( editPostStore ).isEditorPanelEnabled( panelName )
-				: false,
-			isOpened: slug
-				? select( editPostStore ).isEditorPanelOpened( panelName )
-				: false,
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => ( {
-		onTogglePanel: () => {
-			dispatch( editPostStore ).toggleEditorPanelOpened(
-				ownProps.panelName
-			);
-		},
-	} ) )
-)( TaxonomyPanel );
+export default TaxonomyPanel;
