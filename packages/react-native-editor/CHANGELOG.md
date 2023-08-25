@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.101.2
+-  [**] Fix Voice Over and assistive keyboards [#53895]
+
 ## 1.101.1
 -  [**] Fix the dynamic height when opening/closing navigation screens within the bottom sheet. [https://github.com/WordPress/gutenberg/pull/53608]
 
