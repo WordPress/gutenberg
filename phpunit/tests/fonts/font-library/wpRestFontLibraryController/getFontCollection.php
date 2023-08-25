@@ -28,7 +28,7 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
 			'data_json_file' => $mock_file,
 		);
-		$hola   = wp_register_font_collection( $config );
+		wp_register_font_collection( $config );
 	}
 
 	public function test_get_font_collection() {

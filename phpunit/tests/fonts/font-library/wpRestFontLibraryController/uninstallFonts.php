@@ -54,7 +54,7 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
 		$font_families_json = json_encode( $mock_families );
 		$install_request->set_param( 'fontFamilies', $font_families_json );
-		$response = rest_get_server()->dispatch( $install_request );
+		rest_get_server()->dispatch( $install_request );
 	}
 
 	public function test_uninstall() {
