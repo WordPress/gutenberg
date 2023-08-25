@@ -1,29 +1,25 @@
 .edit-site-page {
-	color: $gray-800;
-	background: $white;
+	color: var(--wp-components-color-gray-text);
+	background: var(--wp-components-color-gray-background-alt);
+	border-left: 1px solid var(--wp-components-color-gray-border);
 	flex-grow: 1;
 	overflow: hidden;
 	margin: 0;
-	margin-top: $header-height;
-	@include break-medium() {
-		border-radius: 8px;
-		margin: $grid-unit-30 $grid-unit-30 $grid-unit-30 0;
-	}
 }
 
 .edit-site-page-header {
 	padding: 0 $grid-unit-40;
 	min-height: $header-height;
-	border-bottom: 1px solid $gray-100;
-	background: $white;
+	border-bottom: 1px solid var(--wp-components-color-gray-border);
+	background: var(--wp-components-color-gray-background-alt);
 	position: sticky;
 	top: 0;
 	z-index: z-index(".edit-site-page-header");
 	.components-text {
-		color: $gray-800;
+		color: var(--wp-components-color-gray-text);
 	}
 	.components-heading {
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 	}
 	.edit-site-page-header__sub-title {
 		margin-top: $grid-unit-10;

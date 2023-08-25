@@ -19,6 +19,7 @@ export const colorVariables = ( colors: ColorPalette ) => {
 	};
 
 	const ALIAS_MAP: { [ key: string ]: string } = {
+		'0': 'background-alt', // TODO: needs a better name
 		'1': 'background',
 		'2': 'background-subtle',
 		'3': 'component-background',

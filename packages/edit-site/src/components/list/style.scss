@@ -150,7 +150,7 @@
 	justify-content: center;
 	width: $grid-unit-40;
 	height: $grid-unit-40;
-	background: $gray-800;
+	background: var(--wp-components-color-gray-solid);
 	border-radius: 100%;
 
 	svg {
@@ -184,5 +184,5 @@
 
 .edit-site-list-added-by__customized-info {
 	display: block;
-	color: $gray-700;
+	color: var(--wp-components-color-gray-text);
 }

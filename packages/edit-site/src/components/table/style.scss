@@ -11,12 +11,17 @@
 	position: relative;
 	a {
 		text-decoration: none;
+		color: var(--wp-components-color-gray-contrast);
+
+		&:hover {
+			color: var(--wp-components-color-gray-contrast);
+		}
 	}
 	th {
 		text-align: left;
 		font-weight: normal;
 		padding: 0 $grid-unit-20 $grid-unit-20;
-		color: $gray-700;
+		color: var(--wp-components-color-gray-text);
 	}
 	td {
 		padding: $grid-unit-20;
@@ -33,6 +38,6 @@
 		}
 	}
 	tr {
-		border-bottom: 1px solid $gray-100;
+		border-bottom: 1px solid var(--wp-components-color-gray-border);
 	}
 }
