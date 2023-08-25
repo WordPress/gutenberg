@@ -46,9 +46,9 @@ The icon to render. Supported values are: Dashicons (specified as strings), func
 
 ### multiple
 
-Whether to allow multiple selection of files or not. This property will also accept a string with the value `add` to allow multiple selection of files without the need to use the `Shift` or `Ctrl`/`Cmd` keys.
+Whether to allow multiple selection of files or not.
 
--   Type: `Boolean|String`
+-   Type: `Boolean`
 -   Required: No
 -   Default: `false`
 
