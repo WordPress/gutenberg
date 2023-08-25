@@ -30,6 +30,7 @@ abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 
 		$uploads_dir       = wp_upload_dir();
 		static::$fonts_dir = $uploads_dir['basedir'] . '/fonts/';
+		wp_mkdir_p( static::$fonts_dir );
 	}
 
 	public function set_up() {
