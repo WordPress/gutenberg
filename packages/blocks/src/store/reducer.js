@@ -166,7 +166,7 @@ export function unprocessedBlockTypes( state = {}, action ) {
 		case 'ADD_UNPROCESSED_BLOCK_TYPE':
 			return {
 				...state,
-				[ action.blockType.name ]: action.blockType,
+				[ action.name ]: action.blockType,
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
