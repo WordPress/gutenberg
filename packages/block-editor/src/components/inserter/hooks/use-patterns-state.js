@@ -41,7 +41,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 
 	const allCategories = useMemo( () => {
 		const categories = [ ...patternCategories ];
-		userPatternCategories.forEach( ( userCategory ) => {
+		userPatternCategories?.forEach( ( userCategory ) => {
 			if (
 				! categories.find(
 					( existingCategory ) =>
