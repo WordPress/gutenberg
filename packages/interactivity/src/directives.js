@@ -312,21 +312,38 @@ export default () => {
 		'slot',
 		( {
 			directives: {
-				slot: { default: slot, above, below },
+				slot: { default: slot },
 			},
 			props: { children },
+			element,
 		} ) => {
-			return (
-				<>
-					{ above && <Slot name={ above } /> }
-					{ slot ? (
-						<Slot name={ slot }>{ children }</Slot>
-					) : (
-						children
-					) }
-					{ below && <Slot name={ below } /> }
-				</>
-			);
+			const name = typeof slot === 'string' ? slot : slot.name;
+			const position = slot.position || 'children';
+
+			if ( position === 'before' ) {
+				return (
+					<>
+						<Slot name={ name } />
+						{ children }
+					</>
+				);
+			}
+			if ( position === 'after' ) {
+				return (
+					<>
+						{ children }
+						<Slot name={ name } />
+					</>
+				);
+			}
+			if ( position === 'replace' ) {
+				return <Slot name={ name }>{ children }</Slot>;
+			}
+			if ( position === 'children' ) {
+				element.props.children = (
+					<Slot name={ name }>{ element.props.children }</Slot>
+				);
+			}
 		},
 		{ priority: 4 }
 	);
