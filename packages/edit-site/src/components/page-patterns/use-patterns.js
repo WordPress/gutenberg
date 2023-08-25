@@ -166,7 +166,7 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 
 	let patterns = records
 		? records.map( ( record ) =>
-				patternBlockToPattern( record, categories.patternCatogoriesMap )
+				patternBlockToPattern( record, categories.patternCategoriesMap )
 		  )
 		: EMPTY_PATTERN_LIST;
 

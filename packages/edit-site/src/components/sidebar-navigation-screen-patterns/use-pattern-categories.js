@@ -77,16 +77,16 @@ export default function usePatternCategories() {
 				}
 			}
 		);
-		const sorttedCategories = categoriesWithCounts.sort( ( a, b ) =>
+		const sortedCategories = categoriesWithCounts.sort( ( a, b ) =>
 			a.label.localeCompare( b.label )
 		);
-		sorttedCategories.unshift( {
+		sortedCategories.unshift( {
 			name: ALL_PATTERNS_CATEGORY,
 			label: __( 'All Patterns' ),
 			description: __( 'A list of all patterns from all sources' ),
 			count: themePatterns.length + userPatterns.length,
 		} );
-		return sorttedCategories;
+		return sortedCategories;
 	}, [
 		defaultCategories,
 		themePatterns,
