@@ -3,6 +3,7 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -44,10 +45,10 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		useBlockSync( props );
 
 		return (
-			<>
+			<SlotFillProvider>
 				<KeyboardShortcuts.Register />
 				<BlockRefsProvider>{ children }</BlockRefsProvider>
-			</>
+			</SlotFillProvider>
 		);
 	}
 );

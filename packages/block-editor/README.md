@@ -21,7 +21,6 @@ import {
 	BlockTools,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent() {
@@ -33,13 +32,11 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<SlotFillProvider>
-				<BlockTools>
-					<WritingFlow>
-						<BlockList />
-					</WritingFlow>
-				</BlockTools>
-			</SlotFillProvider>
+			<BlockTools>
+				<WritingFlow>
+					<BlockList />
+				</WritingFlow>
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }
