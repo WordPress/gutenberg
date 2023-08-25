@@ -27,11 +27,11 @@ function getPatternMeta( item ) {
 		return { wp_pattern_sync_status: SYNC_TYPES.unsynced };
 	}
 
-	const syncStatus = item.reusableBlock.wp_pattern_sync_status;
+	const syncStatus = item.patternBlock.wp_pattern_sync_status;
 	const isUnsynced = syncStatus === SYNC_TYPES.unsynced;
 
 	return {
-		...item.reusableBlock.meta,
+		...item.patternBlock.meta,
 		wp_pattern_sync_status: isUnsynced ? syncStatus : undefined,
 	};
 }
@@ -122,7 +122,7 @@ export default function DuplicateMenuItem( {
 					throwOnError: true,
 				}
 			);
-			return newTerm.id;
+			return newTerm;
 		} catch ( error ) {
 			if ( error.code !== 'term_exists' ) {
 				throw error;
@@ -150,7 +150,7 @@ export default function DuplicateMenuItem( {
 				{
 					content: isThemePattern
 						? item.content
-						: item.reusableBlock.content,
+						: item.patternBlock.content,
 					meta: getPatternMeta( item ),
 					status: 'publish',
 					title,
