@@ -1,134 +1,27 @@
 <?php
 /**
- * Tests for WP_REST_Font_Library_Controller class
+ * Test WP_REST_Font_Library_Controller::install_fonts().
  *
- * @package    Gutenberg
+ * @package WordPress
  * @subpackage Font Library
+ *
+ * @group fonts
+ * @group font-library
+ *
+ * @covers WP_REST_Font_Library_Controller::install_fonts
  */
 
-/**
- * @coversDefaultClass WP_REST_Font_Library_Controller
- */
-class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
-	/**
-	 * @var int
-	 */
-	protected static $admin_id;
+class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_Library_Controller_UnitTestCase {
 
 	/**
-	 * Creates fake data before our tests run.
 	 *
-	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
-	 */
-	public static function wpSetupBeforeClass( $factory ) {
-		// Create a user with administrator role.
-		self::$admin_id = $factory->user->create(
-			array(
-				'role' => 'administrator',
-			)
-		);
-
-		// Mock font collection data file.
-		$mock_file = wp_tempnam( 'my-collection-data-' );
-		file_put_contents( $mock_file, '{"this is mock data":true}' );
-
-		// Add a font collection.
-		$config = array(
-			'id'             => 'my-font-collection',
-			'name'           => 'My Font Collection',
-			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
-			'data_json_file' => $mock_file,
-		);
-		wp_register_font_collection( $config );
-	}
-
-	/**
-	 * @covers ::register_routes
-	 */
-	public function test_register_routes() {
-		$routes = rest_get_server()->get_routes();
-		$this->assertArrayHasKey( '/wp/v2/fonts', $routes, 'Rest server has not the fonts path intialized.' );
-		$this->assertCount( 2, $routes['/wp/v2/fonts'], 'Rest server has not the 2 fonts paths initialized.' );
-		$this->assertCount( 1, $routes['/wp/v2/fonts/collections'], 'Rest server has not the collections path initialized.' );
-		$this->assertCount( 1, $routes['/wp/v2/fonts/collections/(?P<id>[\/\w-]+)'], 'Rest server has not the collection path initialized.' );
-
-		$this->assertArrayHasKey( 'POST', $routes['/wp/v2/fonts'][0]['methods'], 'Rest server has not the POST method for fonts intialized.' );
-		$this->assertArrayHasKey( 'DELETE', $routes['/wp/v2/fonts'][1]['methods'], 'Rest server has not the DELETE method for fonts intialized.' );
-		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/fonts/collections'][0]['methods'], 'Rest server has not the GET method for collections intialized.' );
-		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/fonts/collections/(?P<id>[\/\w-]+)'][0]['methods'], 'Rest server has not the GET method for collection intialized.' );
-	}
-
-	/**
-	 * @covers ::get_font_collections
-	 */
-	public function test_get_font_collections() {
-		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
-		$this->assertCount( 1, $data, 'The response data is not an array with one element.' );
-		$this->assertArrayHasKey( 'my-font-collection', $data, 'The response data does not have the key of the registered font collection id.' );
-	}
-
-	/**
-	 * @covers ::get_font_collection
-	 */
-	public function test_get_font_collection() {
-		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections/my-font-collection' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
-		$this->assertArrayHasKey( 'data', $data, 'The response data does not have the key with the file data.' );
-	}
-
-	/**
-	 * @covers ::get_font_collection
-	 */
-	public function test_get_non_existing_font_collection() {
-		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections/non-existing-collection-id' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertSame( 404, $response->get_status() );
-	}
-
-	/**
-	 * @covers ::uninstall_fonts
-	 */
-	public function test_uninstall_non_existing_fonts() {
-		wp_set_current_user( self::$admin_id );
-		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );
-
-		$non_existing_font_data = array(
-			array(
-				'slug' => 'non-existing-font',
-				'name' => 'Non existing font',
-			),
-			array(
-				'slug' => 'another-not-installed-font',
-				'name' => 'Another not installed font',
-			),
-		);
-
-		$uninstall_request->set_param( 'fontFamilies', $non_existing_font_data );
-		$response = rest_get_server()->dispatch( $uninstall_request );
-		$response->get_data();
-		$this->assertSame( 500, $response->get_status(), 'The response status is not 500.' );
-	}
-
-	/**
-	 * @covers ::install_fonts
-	 * @covers ::uninstall_fonts
-	 *
-	 * @dataProvider data_install_and_uninstall_fonts
+	 * @dataProvider data_install_fonts
 	 *
 	 * @param array $font_families     Font families to install in theme.json format.
 	 * @param array $files             Font files to install.
 	 * @param array $expected_response Expected response data.
 	 */
-	public function test_install_and_uninstall_fonts( $font_families, $files, $expected_response ) {
-		wp_set_current_user( self::$admin_id );
+	public function test_install_fonts( $font_families, $files, $expected_response ) {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
 		$font_families_json = json_encode( $font_families );
 		$install_request->set_param( 'fontFamilies', $font_families_json );
@@ -158,16 +51,12 @@ class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
 			$this->assertEquals( $expected_font, $installed_font, 'The endpoint answer is not as expected.' );
 		}
 
-		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );
-		$uninstall_request->set_param( 'fontFamilies', $font_families );
-		$response = rest_get_server()->dispatch( $uninstall_request );
-		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
 	}
 
 	/**
-	 * Data provider for test_install_and_uninstall_fonts
+	 * Data provider for test_install_fonts
 	 */
-	public function data_install_and_uninstall_fonts() {
+	public function data_install_fonts() {
 
 		$temp_file_path1 = wp_tempnam( 'Piazzola1-' );
 		file_put_contents( $temp_file_path1, 'Mocking file content' );
@@ -397,16 +286,12 @@ class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
 	/**
 	 * Tests failure when fonfaces has improper inputs
 	 *
-	 * @covers ::install_fonts
-	 *
 	 * @dataProvider data_install_with_improper_inputs
 	 *
 	 * @param array $font_families Font families to install in theme.json format.
 	 * @param array $files         Font files to install.
 	 */
 	public function test_install_with_improper_inputs( $font_families, $files = array() ) {
-		wp_set_current_user( self::$admin_id );
-
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
 		$font_families_json = json_encode( $font_families );
 		$install_request->set_param( 'fontFamilies', $font_families_json );
@@ -530,4 +415,6 @@ class WP_REST_Font_Library_Controller_Test extends WP_UnitTestCase {
 			),
 		);
 	}
+
 }
+
