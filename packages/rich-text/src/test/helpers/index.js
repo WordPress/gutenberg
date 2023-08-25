@@ -551,8 +551,8 @@ export const spec = [
 			endOffset: 0,
 			endContainer: element.querySelector( 'ul > li' ),
 		} ),
-		startPath: [ 0, 2, 0, 0, 0 ],
-		endPath: [ 0, 2, 0, 0, 0 ],
+		startPath: [ 0, 1, 0, 0, 0 ],
+		endPath: [ 0, 1, 0, 0, 0 ],
 		record: {
 			start: 1,
 			end: 1,
