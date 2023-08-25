@@ -17,12 +17,17 @@ export default function useTabNav() {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
-	const lastFocus = useRef();
+
 	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
 		useSelect( blockEditorStore );
-	const { setNavigationMode } = useDispatch( blockEditorStore );
+	const { setNavigationMode, setLastFocus } = useDispatch( blockEditorStore );
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
+		[]
+	);
+
+	const lastFocus = useSelect(
+		( select ) => select( blockEditorStore ).getLastFocus(),
 		[]
 	);
 
@@ -158,7 +163,7 @@ export default function useTabNav() {
 		}
 
 		function onFocusOut( event ) {
-			lastFocus.current = event.target;
+			setLastFocus( { ...lastFocus, current: event.target } );
 
 			const { ownerDocument } = node;
 
