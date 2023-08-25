@@ -32,7 +32,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
 				userPatternCategories:
-					__experimentalUserPatternCategories.patternCategories,
+					__experimentalUserPatternCategories?.patternCategories,
 				patternCategories: __experimentalBlockPatternCategories,
 			};
 		},
