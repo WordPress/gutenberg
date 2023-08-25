@@ -9,7 +9,8 @@
 	};
 
 	const allowedBlocksWhenSingleEmptyChild = [ 'core/image', 'core/list' ];
-	const allowedBlocksWhenMultipleChildren = [ 'core/gallery', 'core/video' ];
+	const allowedBlocksWhenTwoChildren = [ 'core/gallery', 'core/video' ];
+    const allowedBlocksWhenTreeOrMoreChildren = [ 'core/gallery', 'core/video', 'core/list'  ];
 
 	registerBlockType( 'test/allowed-blocks-dynamic', {
 		apiVersion: 3,
@@ -25,7 +26,12 @@
 				},
 				[ props.clientId ]
 			);
-
+            let allowedBlocks = allowedBlocksWhenSingleEmptyChild;
+            if ( props.numberOfChildren === 2 ) {
+                allowedBlocks = allowedBlocksWhenTwoChildren;
+            } else if( props.numberOfChildren > 2 ){
+                allowedBlocks = allowedBlocksWhenTreeOrMoreChildren;
+            }
 			return el(
 				'div',
 				{
@@ -33,10 +39,7 @@
 					'data-number-of-children': numberOfChildren,
 				},
 				el( InnerBlocks, {
-					allowedBlocks:
-						numberOfChildren < 2
-							? allowedBlocksWhenSingleEmptyChild
-							: allowedBlocksWhenMultipleChildren,
+					allowedBlocks,
 				} )
 			);
 		},
