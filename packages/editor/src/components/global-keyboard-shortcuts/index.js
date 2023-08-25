@@ -48,7 +48,7 @@ export default function EditorKeyboardShortcuts() {
 		savePost();
 	} );
 
-	useShortcut( 'core/block-editor/focus-editor', ( event ) => {
+	useShortcut( 'core/editor/focus-editor', ( event ) => {
 		event.preventDefault();
 		const lastFocus = getLastFocus();
 		// Only move focus if the selected block is a match with the last focused block
