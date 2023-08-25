@@ -160,16 +160,18 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
 
+	$post = $is_post_type && $navigation_link_has_id ? get_post( $attributes['id'] ) : null;
+
 	// Don't render the block's subtree if it is a draft or if the ID does not exist.
-	if ( $is_post_type && $navigation_link_has_id ) {
-		$post = get_post( $attributes['id'] );
-		if ( ! $post || 'publish' !== $post->post_status ) {
-			return '';
-		}
+	if ( ! $post || 'publish' !== $post->post_status ) {
+		return '';
 	}
 
+	$dynamic_url   = $post ? get_permalink( $post ) : $attributes['url'];
+	$dynamic_label = $post ? $post->post_title : $attributes['label'];
+
 	// Don't render the block's subtree if it has no label.
-	if ( empty( $attributes['label'] ) ) {
+	if ( empty( $dynamic_label ) ) {
 		return '';
 	}
 
@@ -195,8 +197,8 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		'<a class="wp-block-navigation-item__content" ';
 
 	// Start appending HTML attributes to anchor tag.
-	if ( isset( $attributes['url'] ) ) {
-		$html .= ' href="' . esc_url( block_core_navigation_link_maybe_urldecode( $attributes['url'] ) ) . '"';
+	if ( isset( $dynamic_url ) ) {
+		$html .= ' href="' . esc_url( block_core_navigation_link_maybe_urldecode( $dynamic_url ) ) . '"';
 	}
 
 	if ( $is_active ) {
@@ -224,8 +226,8 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		// Wrap title with span to isolate it from submenu icon.
 		'<span class="wp-block-navigation-item__label">';
 
-	if ( isset( $attributes['label'] ) ) {
-		$html .= wp_kses_post( $attributes['label'] );
+	if ( isset( $dynamic_label ) ) {
+		$html .= wp_kses_post( $dynamic_label );
 	}
 
 	$html .= '</span>';

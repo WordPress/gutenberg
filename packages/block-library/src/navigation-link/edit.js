@@ -35,7 +35,7 @@ import {
 } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -180,6 +180,8 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
 
+	const { record: navPostRecord } = useEntityRecord( 'postType', type, id );
+
 	// Change the label using inspector causes rich text to change focus on firefox.
 	// This is a workaround to keep the focus on the label field when label filed is focused we don't render the rich text.
 	const [ isLabelFieldFocused, setIsLabelFieldFocused ] = useState( false );
@@ -281,6 +283,24 @@ export default function NavigationLinkEdit( {
 			}
 		}
 	}, [ url ] );
+
+	useEffect( () => {
+		// Only updates attributes if:
+		// - there is an ID (and it has changed).
+		// - there is a navPostRecord.
+		if ( id && navPostRecord ) {
+			// Conditionall update attributes to avoid
+			// unnecessary re-renders.
+			setAttributes( {
+				...( label !== navPostRecord?.title.rendered && {
+					label: navPostRecord?.title.rendered,
+				} ),
+				...( url !== navPostRecord?.link && {
+					url: navPostRecord?.link,
+				} ),
+			} );
+		}
+	}, [ id, navPostRecord ] );
 
 	/**
 	 * Focus the Link label text and select it.
