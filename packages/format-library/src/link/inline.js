@@ -35,8 +35,7 @@ const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
 	{
 		id: 'nofollow',
-		title: __( 'No follow' ),
-		help: createInterpolateElement(
+		title: createInterpolateElement(
 			__(
 				'Search engines should ignore this link (mark as <code>nofollow</code>)'
 			),
