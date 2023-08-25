@@ -36,7 +36,7 @@ module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 		testsPort: getPortFromEnvironmentVariable( 'WP_ENV_TESTS_PORT' ),
 		ssl: {
 			port: getPortFromEnvironmentVariable( 'WP_ENV_SSL_PORT' ),
-			testPort: getPortFromEnvironmentVariable( 'WP_ENV_SSL_TESTS_PORT' ),
+			testsPort: getPortFromEnvironmentVariable( 'WP_ENV_SSL_TESTS_PORT' ),
 		},
 		lifecycleScripts: getLifecycleScriptOverrides(),
 	};

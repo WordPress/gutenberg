@@ -526,7 +526,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"config"`     | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`   | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
 
-_Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
+_Note: the port number environment variables (`WP_ENV_PORT`, `WP_ENV_TESTS_PORT`, `WP_ENV_SSL_PORT`, `WP_ENV_SSL_TESTS_PORT`) take precedent over the .wp-env.json values._
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 

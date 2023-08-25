@@ -79,10 +79,8 @@ function mergeRootToEnvironments( config ) {
 		// Move the ssl options to the environment configs.
 		if ( config.ssl.port !== undefined ) {
 			if (
-				config.env.development.ssl !== undefined &&
-				config.env.development.ssl.port === undefined
+				config.env.development.ssl !== undefined
 			) {
-				config.env.development.ssl = {};
 				config.env.development.ssl.cert = config.ssl.cert;
 				config.env.development.ssl.key = config.ssl.key;
 				config.env.development.ssl.port = config.ssl.port;
@@ -91,10 +89,8 @@ function mergeRootToEnvironments( config ) {
 		}
 		if ( config.ssl.testsPort !== undefined ) {
 			if (
-				config.env.tests.ssl !== undefined &&
-				config.env.tests.ssl.port === undefined
+				config.env.tests.ssl !== undefined
 			) {
-				config.env.tests.ssl = {};
 				config.env.tests.ssl.cert = config.ssl.cert;
 				config.env.tests.ssl.key = config.ssl.key;
 				config.env.tests.ssl.port = config.ssl.testsPort;
@@ -105,9 +101,7 @@ function mergeRootToEnvironments( config ) {
 		removedRootOptions.ssl.key = config.ssl.key;
 		delete config.ssl;
 	} else if (
-		config.ssl !== undefined &&
-		config.ssl.cert === undefined &&
-		config.ssl.key === undefined
+		config.ssl !== undefined && Object.keys( config.ssl ).length === 0
 	) {
 		removedRootOptions.ssl = config.ssl;
 		delete config.ssl;

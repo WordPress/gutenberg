@@ -299,14 +299,19 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.port = overrides.testsPort;
 	}
 
-	if ( overrides.ssl && overrides.ssl.port ) {
-		overrideConfig.ssl.port = overrides.ssl.port;
-		overrideConfig.env.development.ssl.port = overrides.ssl.port;
-	}
+	if ( overrides.ssl ) {
+		overrideConfig.ssl = {};
+		overrideConfig.env.development.ssl = {};
+		overrideConfig.env.tests.ssl = {};
 
-	if ( overrides.ssl && overrides.ssl.testsPort ) {
-		overrideConfig.ssl.testsPort = overrides.ssl.testsPort;
-		overrideConfig.env.tests.ssl.port = overrides.ssl.testsPort;
+		if ( overrides.ssl.port ) {
+			overrideConfig.ssl.port = overrides.ssl.port;
+			overrideConfig.env.development.ssl.port = overrides.ssl.port;
+		}
+		if ( overrides.ssl.testsPort ) {
+			overrideConfig.ssl.testsPort = overrides.ssl.testsPort;
+			overrideConfig.env.tests.ssl.port = overrides.ssl.testsPort;
+		}
 	}
 
 	if ( overrides.coreSource ) {
