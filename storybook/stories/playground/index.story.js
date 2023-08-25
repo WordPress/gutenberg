@@ -3,7 +3,6 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 import {
-	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 	BlockList,
 	BlockTools,
@@ -50,7 +49,6 @@ function App() {
 						<div className="playground__content">
 							<BlockTools>
 								<div className="editor-styles-wrapper">
-									<BlockEditorKeyboardShortcuts.Register />
 									<WritingFlow>
 										<BlockList />
 									</WritingFlow>

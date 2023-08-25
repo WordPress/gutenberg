@@ -11,7 +11,6 @@ import {
 	BlockInspector,
 	CopyHandler,
 	WritingFlow,
-	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
@@ -94,7 +93,6 @@ export default function SidebarBlockEditor( {
 
 	return (
 		<>
-			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
