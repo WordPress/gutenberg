@@ -372,6 +372,18 @@ export const withBlockControls = createHigherOrderComponent(
 	'withToolbarControls'
 );
 
+// Defines which element types are supported, including their hover styles or
+// any other elements that have been included under a single element type
+// e.g. heading and h1-h6.
+const elementTypes = [
+	{ elementType: 'button' },
+	{ elementType: 'link', pseudo: [ ':hover' ] },
+	{
+		elementType: 'heading',
+		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
+	},
+];
+
 /**
  * Override the default block element to include elements styles.
  *
@@ -383,116 +395,85 @@ const withElementsStyles = createHigherOrderComponent(
 		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 			BlockListBlock
 		) }`;
+
+		// The .editor-styles-wrapper selector is required on elements styles. As it is
+		// added to all other editor styles, not providing it causes reset and global
+		// styles to override element styles because of higher specificity.
 		const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }`;
-
-		const skipLinkColorSerialization = shouldSkipSerialization(
-			props.name,
-			COLOR_SUPPORT_KEY,
-			'link'
-		);
-
-		const skipHeadingColorSerialization = shouldSkipSerialization(
-			props.name,
-			COLOR_SUPPORT_KEY,
-			'heading'
-		);
-
-		const skipButtonColorSerialization = shouldSkipSerialization(
-			props.name,
-			COLOR_SUPPORT_KEY,
-			'button'
-		);
+		const blockElementStyles = props.attributes.style?.elements;
 
 		const styles = useMemo( () => {
-			// The .editor-styles-wrapper selector is required on elements styles. As it is
-			// added to all other editor styles, not providing it causes reset and global
-			// styles to override element styles because of higher specificity.
-			const elements = [
-				{
-					styles: ! skipLinkColorSerialization
-						? props.attributes.style?.elements?.link
-						: undefined,
-					selector: `${ baseElementSelector } ${ ELEMENTS.link }`,
-				},
-				{
-					styles: ! skipLinkColorSerialization
-						? props.attributes.style?.elements?.link?.[ ':hover' ]
-						: undefined,
-					selector: `${ baseElementSelector } ${ ELEMENTS.link }:hover`,
-				},
-				{
-					styles: ! skipHeadingColorSerialization
-						? props.attributes.style?.elements?.heading
-						: undefined,
-					selector: scopeSelector(
-						baseElementSelector,
-						ELEMENTS.heading
-					),
-				},
-				{
-					styles: ! skipHeadingColorSerialization
-						? props.attributes.style?.elements?.h1
-						: undefined,
-					selector: scopeSelector( baseElementSelector, ELEMENTS.h1 ),
-				},
-				{
-					styles: ! skipHeadingColorSerialization
-						? props.attributes.style?.elements?.h2
-						: undefined,
-					selector: scopeSelector( baseElementSelector, ELEMENTS.h2 ),
-				},
-				{
-					styles: ! skipHeadingColorSerialization
-						? props.attributes.style?.elements?.h3
-						: undefined,
-					selector: scopeSelector( baseElementSelector, ELEMENTS.h3 ),
-				},
-				{
-					styles: ! skipHeadingColorSerialization
-						? props.attributes.style?.elements?.h4
-						: undefined,
-					selector: scopeSelector( baseElementSelector, ELEMENTS.h4 ),
-				},
-				{
-					styles: ! skipHeadingColorSerialization
-						? props.attributes.style?.elements?.h5
-						: undefined,
-					selector: scopeSelector( baseElementSelector, ELEMENTS.h5 ),
-				},
-				{
-					styles: ! skipHeadingColorSerialization
-						? props.attributes.style?.elements?.h6
-						: undefined,
-					selector: scopeSelector( baseElementSelector, ELEMENTS.h6 ),
-				},
-				//TODO: Refactor this to a helper that can more concisely flesh out the rest of the heading elements.
-				{
-					styles: ! skipButtonColorSerialization
-						? props.attributes.style?.elements?.button
-						: undefined,
-					selector: scopeSelector(
-						baseElementSelector,
-						ELEMENTS.button
-					),
-				},
-			];
-			const elementCssRules = [];
-			for ( const { styles: elementStyles, selector } of elements ) {
-				if ( elementStyles ) {
-					const cssRule = compileCSS( elementStyles, {
-						selector,
-					} );
-					elementCssRules.push( cssRule );
-				}
+			if ( ! blockElementStyles ) {
+				return;
 			}
-			return elementCssRules.length > 0
-				? elementCssRules.join( '' )
+
+			const elementCSSRules = [];
+
+			elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
+				const skipSerialization = shouldSkipSerialization(
+					props.name,
+					COLOR_SUPPORT_KEY,
+					elementType
+				);
+
+				if ( skipSerialization ) {
+					return;
+				}
+
+				const elementStyles = blockElementStyles?.[ elementType ];
+
+				// Process primary element type styles.
+				if ( elementStyles ) {
+					const selector = scopeSelector(
+						baseElementSelector,
+						ELEMENTS[ elementType ]
+					);
+
+					elementCSSRules.push(
+						compileCSS( elementStyles, { selector } )
+					);
+
+					// Process any interactive states for the element type.
+					if ( pseudo ) {
+						pseudo.forEach( ( pseudoSelector ) => {
+							if ( elementStyles[ pseudoSelector ] ) {
+								elementCSSRules.push(
+									compileCSS(
+										elementStyles[ pseudoSelector ],
+										{
+											selector: scopeSelector(
+												baseElementSelector,
+												`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
+											),
+										}
+									)
+								);
+							}
+						} );
+					}
+				}
+
+				// Process related elements e.g. h1-h6 for headings
+				if ( elements ) {
+					elements.forEach( ( element ) => {
+						if ( blockElementStyles[ element ] ) {
+							elementCSSRules.push(
+								compileCSS( blockElementStyles[ element ], {
+									selector: scopeSelector(
+										baseElementSelector,
+										ELEMENTS[ element ]
+									),
+								} )
+							);
+						}
+					} );
+				}
+			} );
+
+			return elementCSSRules.length > 0
+				? elementCSSRules.join( '' )
 				: undefined;
-		}, [
-			props.attributes.style?.elements,
-			baseElementSelector,
-			skipLinkColorSerialization,
-		] );
+		}, [ baseElementSelector, blockElementStyles, props.name ] );
 
 		const element = useContext( BlockList.__unstableElementContext );
 
