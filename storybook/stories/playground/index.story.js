@@ -9,7 +9,6 @@ import {
 	BlockInspector,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { SlotFillProvider } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import '@wordpress/format-library';
@@ -37,26 +36,24 @@ function App() {
 	return (
 		<div className="playground">
 			<ShortcutProvider>
-				<SlotFillProvider>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ updateBlocks }
-						onChange={ updateBlocks }
-					>
-						<div className="playground__sidebar">
-							<BlockInspector />
-						</div>
-						<div className="playground__content">
-							<BlockTools>
-								<div className="editor-styles-wrapper">
-									<WritingFlow>
-										<BlockList />
-									</WritingFlow>
-								</div>
-							</BlockTools>
-						</div>
-					</BlockEditorProvider>
-				</SlotFillProvider>
+				<BlockEditorProvider
+					value={ blocks }
+					onInput={ updateBlocks }
+					onChange={ updateBlocks }
+				>
+					<div className="playground__sidebar">
+						<BlockInspector />
+					</div>
+					<div className="playground__content">
+						<BlockTools>
+							<div className="editor-styles-wrapper">
+								<WritingFlow>
+									<BlockList />
+								</WritingFlow>
+							</div>
+						</BlockTools>
+					</div>
+				</BlockEditorProvider>
 			</ShortcutProvider>
 		</div>
 	);
