@@ -594,3 +594,94 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 // Enqueue stored styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
+
+
+/**
+ * Updates the registered inline script `wp-date` required for moment.js localization.
+ * Changes to the inline script output should be synced with Core in the file
+ * src/wp-includes/script-loader.php in `wp_default_packages_inline_scripts()`.
+ *
+ * @since 6.4.0
+ *
+ * @global WP_Locale $wp_locale WordPress date and time locale object.
+ *
+ * @param WP_Scripts $scripts WP_Scripts object.
+ */
+function gutenberg_update_wp_date_settings( $scripts ) {
+	global $wp_locale;
+
+	$script = $scripts->query( 'wp-date', 'registered' );
+
+	if ( $script ) {
+		// Calculate the timezone abbr (EDT, PST) if possible.
+		$timezone_string = get_option( 'timezone_string', 'UTC' );
+		$timezone_abbr   = '';
+
+		if ( ! empty( $timezone_string ) ) {
+			$timezone_date = new DateTime( 'now', new DateTimeZone( $timezone_string ) );
+			$timezone_abbr = $timezone_date->format( 'T' );
+		}
+		$scripts->registered['wp-date']->extra['after'] = array(
+			false,
+			sprintf(
+				'wp.date.setSettings( %s );',
+				wp_json_encode(
+					array(
+						'l10n'     => array(
+							'locale'        => get_user_locale(),
+							'months'        => array_values( $wp_locale->month ),
+							'monthsShort'   => array_values( $wp_locale->month_abbrev ),
+							'weekdays'      => array_values( $wp_locale->weekday ),
+							'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
+							'meridiem'      => (object) $wp_locale->meridiem,
+							'relative'      => array(
+								/* translators: %s: Duration. */
+								'future' => __( '%s from now' ),
+								/* translators: %s: Duration. */
+								'past'   => __( '%s ago'),
+								's' => __( 'a second' ),
+								/* translators: %s: Duration in seconds. */
+								'ss' => __( '%d seconds' ),
+								'm'  => __( 'a minute' ),
+								/* translators: %s: Duration in minutes. */
+								'mm' => __( '%d minutes' ),
+								'h'  => __( 'an hour' ),
+								/* translators: %s: Duration in hours. */
+								'hh' => __( '%d hours' ),
+								'd'  => __( 'a day' ),
+								/* translators: %s: Duration in days. */
+								'dd' => __( '%d days' ),
+								'M'  => __( 'a month' ),
+								/* translators: %s: Duration in months. */
+								'MM' => __( '%d months' ),
+								'y'  => __( 'a year' ),
+								/* translators: %s: Duration in years. */
+								'yy' => __( '%d years' ),
+
+							),
+							'startOfWeek'   => (int) get_option( 'start_of_week', 0 ),
+						),
+						'formats'  => array(
+							/* translators: Time format, see https://www.php.net/manual/datetime.format.php */
+							'time'                => get_option( 'time_format', __( 'g:i a', 'gutenberg' ) ),
+							/* translators: Date format, see https://www.php.net/manual/datetime.format.php */
+							'date'                => get_option( 'date_format', __( 'F j, Y', 'gutenberg' ) ),
+							/* translators: Date/Time format, see https://www.php.net/manual/datetime.format.php */
+							'datetime'            => __( 'F j, Y g:i a' ),
+							/* translators: Abbreviated date/time format, see https://www.php.net/manual/datetime.format.php */
+							'datetimeAbbreviated' => __( 'M j, Y g:i a' ),
+						),
+						'timezone' => array(
+							'offset' => (float) get_option( 'gmt_offset', 0 ),
+							'string' => $timezone_string,
+							'abbr'   => $timezone_abbr,
+						),
+					)
+				)
+			)
+		);
+	}
+}
+
+add_action( 'wp_default_scripts', 'gutenberg_update_wp_date_settings' );
+
