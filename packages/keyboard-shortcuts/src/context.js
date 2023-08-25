@@ -3,4 +3,11 @@
  */
 import { createContext } from '@wordpress/element';
 
-export const context = createContext();
+const globalShortcuts = { current: new Set() };
+document.body.addEventListener( 'keydown', ( event ) => {
+	for ( const keyboardShortcut of globalShortcuts.current ) {
+		keyboardShortcut( event );
+	}
+} );
+
+export const context = createContext( globalShortcuts );

@@ -15,7 +15,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -98,21 +97,19 @@ export default function WidgetAreasBlockEditorProvider( {
 	);
 
 	return (
-		<ShortcutProvider>
+		<SlotFillProvider>
 			<KeyboardShortcuts.Register />
-			<SlotFillProvider>
-				<ExperimentalBlockEditorProvider
-					value={ blocks }
-					onInput={ onInput }
-					onChange={ onChange }
-					settings={ settings }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<CopyHandler>{ children }</CopyHandler>
-					<PatternsMenuItems rootClientId={ widgetAreaId } />
-				</ExperimentalBlockEditorProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+			<ExperimentalBlockEditorProvider
+				value={ blocks }
+				onInput={ onInput }
+				onChange={ onChange }
+				settings={ settings }
+				useSubRegistry={ false }
+				{ ...props }
+			>
+				<CopyHandler>{ children }</CopyHandler>
+				<PatternsMenuItems rootClientId={ widgetAreaId } />
+			</ExperimentalBlockEditorProvider>
+		</SlotFillProvider>
 	);
 }

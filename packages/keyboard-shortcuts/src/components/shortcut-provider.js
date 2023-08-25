@@ -12,6 +12,8 @@ const { Provider } = context;
 
 /**
  * Handles callbacks added to context by `useShortcut`.
+ * Adding a provider allows to register contextual shortcuts
+ * that are only active when a certain part of the UI is focused.
  *
  * @param {Object} props Props to pass to `div`.
  *
