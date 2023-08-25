@@ -159,6 +159,18 @@ function KeyboardShortcutsRegister() {
 				character: '\\',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/edit-site/focus-editor',
+			category: 'global',
+			description: __(
+				'Navigate to the last focused element in the editor.'
+			),
+			keyCombination: {
+				modifier: 'alt',
+				character: 'F9',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;
