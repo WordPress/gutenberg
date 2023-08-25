@@ -1,7 +1,7 @@
 .edit-site-layout {
 	height: 100%;
-	background: $gray-900;
-	color: $gray-400;
+	background: var(--wp-components-color-gray-background-subtle);
+	color: var(--wp-components-color-gray-text);
 	display: flex;
 	flex-direction: column;
 }

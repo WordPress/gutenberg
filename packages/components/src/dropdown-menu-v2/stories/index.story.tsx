@@ -28,12 +28,11 @@ import { Provider as SlotFillProvider } from '../../slot-fill';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { menu, wordpress } from '@wordpress/icons';
+import { menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Icon from '../../icon';
 import { ContextSystemProvider } from '../../ui/context';
 
 const meta: Meta< typeof DropdownMenu > = {

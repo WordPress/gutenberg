@@ -8,7 +8,6 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { Flex } from '../../flex';
-import { COLORS } from '../../utils';
 import { space } from '../../ui/utils/space';
 import { Text } from '../../text';
 import CONFIG from '../../utils/config-values';

@@ -15,6 +15,7 @@ export type ThemeInputValues = {
 	 */
 	accent?: string;
 	isDark?: boolean;
+	fun?: number;
 	/**
 	 * The background color.
 	 *

@@ -18,7 +18,7 @@
 	// Use the entire viewport on smaller screens.
 	margin: $grid-unit-50 0 0 0;
 	width: 100%;
-	background: $white;
+	background: var(--wp-components-color-gray-background);
 	box-shadow: $shadow-modal;
 	border-radius: $grid-unit-05 $grid-unit-05 0 0;
 	overflow: hidden;

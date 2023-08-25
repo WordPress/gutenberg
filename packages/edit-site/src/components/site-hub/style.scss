@@ -28,7 +28,7 @@
 			opacity: 1;
 		}
 		svg {
-			fill: $gray-200;
+			fill: var(--wp-components-color-gray-text);
 		}
 	}
 	&:hover {
@@ -46,7 +46,7 @@
 	height: $header-height;
 	width: $header-height;
 	flex-shrink: 0;
-	background: $gray-900;
+	background: var(--wp-components-color-gray-background-subtle);
 
 	&.has-transparent-background {
 		background: transparent;
@@ -67,13 +67,13 @@
 .edit-site-site-hub__site-title {
 	margin-left: $grid-unit-05;
 	flex-grow: 1;
-	color: $gray-200;
+	color: var(--wp-components-color-gray-text);
 }
 
 .edit-site-site-hub_toggle-command-center {
-	color: $gray-200;
+	color: var(--wp-components-color-gray-text);
 
 	&:hover {
-		color: $gray-100;
+		color: var(--wp-components-color-gray-contrast);
 	}
 }

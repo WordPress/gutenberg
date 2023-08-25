@@ -35,7 +35,10 @@ export function generateThemeVariables(
 
 function validateInputs( inputs: ThemeInputValues ) {
 	for ( const [ key, value ] of Object.entries( inputs ) ) {
-		if ( typeof value !== 'undefined' && ! colord( value ).isValid() ) {
+		if (
+			typeof value !== 'undefined' &&
+			! colord( <string>value ).isValid()
+		) {
 			warning(
 				`wp.components.Theme: "${ value }" is not a valid color value for the '${ key }' prop.`
 			);

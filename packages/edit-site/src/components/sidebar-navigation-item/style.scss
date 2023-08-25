@@ -1,5 +1,5 @@
 .edit-site-sidebar-navigation-item.components-item {
-	color: $gray-600;
+	color: var(--wp-components-color-gray-text);
 	// 6px right padding to align with + button
 	padding: $grid-unit-10 6px $grid-unit-10 $grid-unit-20;
 	border: none;
@@ -9,21 +9,21 @@
 	&:hover,
 	&:focus,
 	&[aria-current] {
-		color: $gray-200;
-		background: $gray-800;
+		color: var(--wp-components-color-gray-contrast);
+		background: var(--wp-components-color-gray-component-background-hover);
 
 		.edit-site-sidebar-navigation-item__drilldown-indicator {
-			fill: $gray-200;
+			fill: var(--wp-components-color-gray-text);
 		}
 	}
 
 	&[aria-current] {
-		background: var(--wp-admin-theme-color);
-		color: $white;
+		background: var(--wp-components-color-gray-component-background-active);
+		color: var(--wp-components-color-gray-background-contrast);
 	}
 
 	.edit-site-sidebar-navigation-item__drilldown-indicator {
-		fill: $gray-600;
+		fill: var(--wp-components-color-gray-text);
 	}
 
 	&.with-suffix {

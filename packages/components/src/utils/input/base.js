@@ -7,7 +7,6 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { reduceMotion } from '../reduce-motion';
-import { COLORS } from '../colors-values';
 import { CONFIG } from '../';
 
 export const inputStyleNeutral = css`

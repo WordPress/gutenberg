@@ -25,6 +25,7 @@
 	position: absolute;
 	z-index: 0;
 	inset: 0;
+	box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.03), 0 2px 5px 0 rgba(0, 0, 0, 0.03), 0 10px 10px 0 rgba(0, 0, 0, 0.03), 0 22px 13px 0 rgba(0, 0, 0, 0.02), 0 40px 16px 0 rgba(0, 0, 0, 0), 0 62px 17px 0 rgba(0, 0, 0, 0);
 }
 
 .edit-site-resizable-frame__handle {

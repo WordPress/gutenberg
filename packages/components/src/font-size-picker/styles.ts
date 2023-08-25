@@ -10,7 +10,6 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import { HStack } from '../h-stack';
 import { space } from '../ui/utils/space';
-import { COLORS } from '../utils';
 
 export const Container = styled.fieldset`
 	border: 0;

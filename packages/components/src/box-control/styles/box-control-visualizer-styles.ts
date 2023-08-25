@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS, rtl } from '../../utils';
+import { rtl } from '../../utils';
 
 const containerPositionStyles = ( {
 	isPositionAbsolute,

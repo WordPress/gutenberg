@@ -11,6 +11,7 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 	__unstableUseNavigateRegions as useNavigateRegions,
+	__experimentalTheme as Theme,
 } from '@wordpress/components';
 import {
 	useReducedMotion,
@@ -167,7 +168,10 @@ export default function Layout() {
 	}
 
 	return (
-		<>
+		// #3858E9 WordPress
+		// #089E09 Jetpack
+		// #7f54b3 Woo
+		<Theme accent="#7f54b3" fun={ 0.4 } style={ { height: '100%' } }>
 			<CommandMenu />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
@@ -353,7 +357,7 @@ export default function Layout() {
 													defaultSize={ {
 														width:
 															canvasSize.width -
-															24 /* $canvas-padding */,
+															16 /* $canvas-padding */,
 														height: canvasSize.height,
 													} }
 													isOversized={
@@ -383,6 +387,6 @@ export default function Layout() {
 					) }
 				</div>
 			</div>
-		</>
+		</Theme>
 	);
 }

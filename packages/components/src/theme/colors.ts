@@ -62,7 +62,7 @@ interface PaletteParams {
 	darkColorLightnessValues: number[];
 	darkGrayLightnessValues: number[];
 	saturationFinetune: number[] | false;
-	grayscaleSaturation: number;
+	fun: number;
 	spreadOutMinMaxValues: boolean;
 	colorKeys: string[];
 	returnFullPalette: boolean;
@@ -97,12 +97,12 @@ const defaultPaletteParams: PaletteParams = {
 		0.1, 0.13, 0.19, 0.22, 0.25, 0.31, 0.39, 0.54, 0.57, 0.64, 0.8, 0.93,
 	],
 	darkGrayLightnessValues: [
-		0.09, 0.11, 0.16, 0.19, 0.22, 0.25, 0.29, 0.38, 0.43, 0.55, 0.69, 0.93,
+		0.09, 0.11, 0.16, 0.19, 0.22, 0.18, 0.29, 0.38, 0.43, 0.55, 0.69, 0.93,
 	],
 	saturationFinetune: [
 		0.95, 0.95, 0.95, 0.97, 0.97, 0.97, 0.97, 0.97, 0.9, 0.8, 0.7, 0.6,
 	],
-	grayscaleSaturation: 0.2,
+	fun: 0.4,
 	spreadOutMinMaxValues: true,
 	returnFullPalette: true,
 	isDark: false,
@@ -174,7 +174,7 @@ export const generateColors = (
 	const grayScaleBaseColor = {
 		mode: params.colorSpace,
 		h: correctColorSpaceHSLColor.h ? correctColorSpaceHSLColor.h : 0,
-		s: params.grayscaleSaturation,
+		s: params.fun,
 		l: 0.5,
 	};
 

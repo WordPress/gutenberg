@@ -8,7 +8,6 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import InputControl from '../../input-control';
-import { COLORS } from '../../utils';
 import Button from '../../button';
 import { space } from '../../ui/utils/space';
 

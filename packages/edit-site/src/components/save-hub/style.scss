@@ -1,6 +1,6 @@
 .edit-site-save-hub {
-	color: $gray-600;
-	border-top: 1px solid $gray-800;
+	color: var(--wp-components-color-gray-text);
+	border-top: 1px solid var(--wp-components-color-gray-border);
 	flex-shrink: 0;
 	margin: 0;
 	padding: $grid-unit-20 + $grid-unit-05 $canvas-padding;

@@ -33,8 +33,9 @@ import { useCx } from '../utils';
  * ```
  */
 function Theme( {
-	accent,
+	accent = '#3858E9',
 	isDark,
+	fun = 0.2,
 	className,
 	...props
 }: WordPressComponentProps< ThemeProps, 'div', true > ) {
@@ -42,7 +43,7 @@ function Theme( {
 	const classes = useMemo(
 		() =>
 			cx(
-				...colorVariables( generateColors( accent, { isDark } ) ),
+				...colorVariables( generateColors( accent, { isDark, fun } ) ),
 				className
 			),
 		[ accent, isDark, className, cx ]

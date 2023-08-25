@@ -186,6 +186,7 @@ export {
 export { View as __experimentalView } from './view';
 export { VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
+export { default as __experimentalTheme } from './theme';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {
 	createSlotFill,

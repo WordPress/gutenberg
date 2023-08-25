@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { baseLabelTypography, boxSizingReset, font, COLORS } from '../../utils';
+import { baseLabelTypography, boxSizingReset, font } from '../../utils';
 import { space } from '../../ui/utils/space';
 
 export const Wrapper = styled.div`

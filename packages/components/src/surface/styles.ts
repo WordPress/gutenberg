@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS } from '../utils';
+import { CONFIG } from '../utils';
 import type { SurfaceVariant, SurfaceProps } from './types';
 
 export const Surface = css`

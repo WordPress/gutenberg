@@ -16,7 +16,7 @@
 	box-sizing: border-box;
 	padding: 6px 12px;
 	border-radius: $radius-block-ui;
-	color: $components-color-foreground;
+	color: var(--wp-components-color-gray-contrast);
 
 	&.is-next-40px-default-size {
 		height: $button-size-next-default-40px;
@@ -49,7 +49,7 @@
 	&.is-primary {
 		white-space: nowrap;
 		background: var(--wp-components-color-accent-solid);
-		color: var(--wp-components-color-accent-background);
+		color: $white;
 		text-decoration: none;
 		text-shadow: none;
 
@@ -227,7 +227,7 @@
 	}
 
 	&:not(:disabled, [aria-disabled="true"]):active {
-		color: $components-color-foreground;
+		color: var(--wp-components-color-gray-contrast);
 	}
 
 	&:disabled,
@@ -308,8 +308,8 @@
 
 	// Toggled style.
 	&.is-pressed {
-		color: $components-color-foreground-inverted;
-		background: $components-color-foreground;
+		color: var(--wp-components-color-gray-contrast)-inverted;
+		background: var(--wp-components-color-gray-contrast);
 
 		&:focus:not(:disabled) {
 			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
@@ -319,8 +319,8 @@
 		}
 
 		&:hover:not(:disabled) {
-			color: $components-color-foreground-inverted;
-			background: $components-color-foreground;
+			color: var(--wp-components-color-gray-contrast)-inverted;
+			background: var(--wp-components-color-gray-contrast);
 		}
 	}
 

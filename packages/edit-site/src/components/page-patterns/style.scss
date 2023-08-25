@@ -1,5 +1,5 @@
 .edit-site-patterns {
-	border-left: 1px solid $gray-800;
+	border-left: 1px solid var(--wp-components-color-gray-border);
 	background: none;
 	margin: $header-height 0 0;
 	border-radius: 0;
@@ -14,11 +14,11 @@
 	}
 
 	.components-text {
-		color: $gray-600;
+		color: var(--wp-components-color-gray-text);
 	}
 
 	.components-heading {
-		color: $gray-200;
+		color: var(--wp-components-color-gray-contrast);
 	}
 
 	@include break-medium {
@@ -35,22 +35,20 @@
 	.edit-site-patterns__search {
 		input[type="search"] {
 			height: $button-size-next-default-40px;
-			background: $gray-800;
-			color: $gray-200;
+			background: var(--wp-components-color-gray-component-background);
+			color: var(--wp-components-color-gray-contrast);
 
 			&:focus {
-				background: $gray-800;
+				background: var(--wp-components-color-gray-component-background);
 			}
 		}
 
 		svg {
-			fill: $gray-600;
+			fill: var(--wp-components-color-gray-text);
 		}
 	}
 
 	.edit-site-patterns__sync-status-filter {
-		background: $gray-800;
-		border: none;
 		height: $button-size-next-default-40px;
 		min-width: max-content;
 		width: 100%;
@@ -60,17 +58,10 @@
 			width: 300px;
 		}
 	}
-	.edit-site-patterns__sync-status-filter-option:not([aria-checked="true"]) {
-		color: $gray-600;
-	}
-	.edit-site-patterns__sync-status-filter-option:active {
-		background: $gray-700;
-		color: $gray-100;
-	}
 
 	.edit-site-patterns__grid-pagination {
-		border-top: 1px solid $gray-800;
-		background: $gray-900;
+		border-top: 1px solid var(--wp-components-color-gray-border);
+		background: var(--wp-components-color-gray-background);
 		padding: $grid-unit-30 $grid-unit-40;
 		position: sticky;
 		bottom: 0;
@@ -79,12 +70,12 @@
 		.components-button.is-tertiary {
 			width: $button-size-compact;
 			height: $button-size-compact;
-			color: $gray-100;
-			background-color: $gray-800;
+			color: var(--wp-components-color-gray-contrast);
+			background-color: var(--wp-components-color-gray-components-background);
 			justify-content: center;
 
 			&:disabled {
-				color: $gray-600;
+				color: var(--wp-components-color-gray-text);
 				background: none;
 			}
 
@@ -98,7 +89,7 @@
 .edit-site-patterns__header {
 	position: sticky;
 	top: 0;
-	background: $gray-900;
+	background: var(--wp-components-color-gray-background);
 	padding: $grid-unit-40 $grid-unit-40 $grid-unit-20;
 	z-index: z-index(".edit-site-patterns__header");
 }
@@ -153,14 +144,14 @@
 				cursor: default;
 			}
 			&.is-inactive:focus {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $gray-800;
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-gray-component-background);
 				opacity: 0.8;
 			}
 		}
 
 		.edit-site-patterns__footer,
 		.edit-site-patterns__button {
-			color: $gray-600;
+			color: var(--wp-components-color-gray-text);
 		}
 
 		.edit-site-patterns__dropdown {
@@ -169,8 +160,8 @@
 
 		&.is-placeholder .edit-site-patterns__preview {
 			min-height: $grid-unit-80;
-			color: $gray-600;
-			border: 1px dashed $gray-800;
+			color: var(--wp-components-color-gray-text);
+			border: 1px dashed var(--wp-components-color-gray-component-background);
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -192,11 +183,11 @@
 }
 
 .edit-site-patterns__pattern-title {
-	color: $gray-200;
+	color: var(--wp-components-color-gray-contrast);
 
 	.is-link {
 		text-decoration: none;
-		color: $gray-200;
+		color: var(--wp-components-color-gray-contrast);
 
 		&:hover,
 		&:focus {
@@ -220,5 +211,5 @@
 }
 
 .edit-site-patterns__no-results {
-	color: $gray-600;
+	color: var(--wp-components-color-gray-text);
 }

@@ -5,7 +5,7 @@ import type { WordPressComponentProps } from '../ui/context';
 import { useContextSystem } from '../ui/context';
 import { useText } from '../text';
 import { getHeadingFontSize } from '../ui/utils/font-size';
-import { CONFIG, COLORS } from '../utils';
+import { CONFIG } from '../utils';
 import type { HeadingProps } from './types';
 
 export function useHeading(
