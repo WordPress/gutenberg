@@ -608,9 +608,7 @@ add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
  * @param WP_Scripts $scripts WP_Scripts object.
  */
 function gutenberg_update_wp_date_settings( $scripts ) {
-	$script = $scripts->query( 'wp-date', 'registered' );
-
-	if ( $script ) {
+	if ( $scripts->query( 'wp-date', 'registered' ) ) {
 		global $wp_locale;
 		// Calculate the timezone abbr (EDT, PST) if possible.
 		$timezone_string = get_option( 'timezone_string', 'UTC' );
