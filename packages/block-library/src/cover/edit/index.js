@@ -151,8 +151,9 @@ function CoverEdit( {
 	const setMedia = attributesFromMedia( setAttributes, dimRatio );
 
 	const onSelectMedia = async ( newMedia ) => {
+		const newUrl = newMedia?.type === 'image' ? newMedia.url : undefined;
 		const isDarkSetting = await getCoverIsDark(
-			newMedia.url,
+			newUrl,
 			dimRatio,
 			overlayColor.color
 		);

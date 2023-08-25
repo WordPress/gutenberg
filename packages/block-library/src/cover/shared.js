@@ -167,26 +167,31 @@ export async function getCoverIsDark( url, dimRatio = 50, overlayColor ) {
 		.toRgb();
 
 	if ( url ) {
-		const imgCrossOrigin = applyFilters(
-			'media.crossOrigin',
-			undefined,
-			url
-		);
-		const {
-			value: [ r, g, b, a ],
-		} = await retrieveFastAverageColor().getColorAsync( url, {
-			// Previously the default color was white, but that changed
-			// in v6.0.0 so it has to be manually set now.
-			defaultColor: [ 255, 255, 255, 255 ],
-			// Errors that come up don't reject the promise, so error
-			// logging has to be silenced with this option.
-			silent: process.env.NODE_ENV === 'production',
-			crossOrigin: imgCrossOrigin,
-		} );
-		// FAC uses 0-255 for alpha, but colord expects 0-1.
-		const media = { r, g, b, a: a / 255 };
-		const composite = compositeSourceOver( overlay, media );
-		return colord( composite ).isDark();
+		try {
+			const imgCrossOrigin = applyFilters(
+				'media.crossOrigin',
+				undefined,
+				url
+			);
+			const {
+				value: [ r, g, b, a ],
+			} = await retrieveFastAverageColor().getColorAsync( url, {
+				// Previously the default color was white, but that changed
+				// in v6.0.0 so it has to be manually set now.
+				defaultColor: [ 255, 255, 255, 255 ],
+				// Errors that come up don't reject the promise, so error
+				// logging has to be silenced with this option.
+				silent: process.env.NODE_ENV === 'production',
+				crossOrigin: imgCrossOrigin,
+			} );
+			// FAC uses 0-255 for alpha, but colord expects 0-1.
+			const media = { r, g, b, a: a / 255 };
+			const composite = compositeSourceOver( overlay, media );
+			return colord( composite ).isDark();
+		} catch ( error ) {
+			// If there's an error, just assume the image is dark.
+			return true;
+		}
 	}
 
 	// Assume a white background because it isn't easy to get the actual
