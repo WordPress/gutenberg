@@ -41,6 +41,13 @@ export interface Style {
 	dimensions?: {
 		minHeight?: CSSProperties[ 'minHeight' ];
 	};
+	media?: {
+		backgroundImage: {
+			url?: CSSProperties[ 'backgroundImage' ];
+			source?: string;
+		};
+		backgroundSize?: CSSProperties[ 'backgroundSize' ];
+	};
 	spacing?: {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;
 		padding?: CSSProperties[ 'padding' ] | Box< 'padding' >;

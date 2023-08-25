@@ -384,6 +384,9 @@ class WP_Theme_JSON_Gutenberg {
 			'wideSize'     => null,
 			'allowEditing' => null,
 		),
+		'media'                         => array(
+			'backgroundImage' => null,
+		),
 		'position'                      => array(
 			'fixed'  => null,
 			'sticky' => null,
@@ -578,6 +581,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'color', 'button' ),
 		array( 'color', 'caption' ),
 		array( 'dimensions', 'minHeight' ),
+		array( 'media', 'backgroundImage' ),
 		// BEGIN EXPERIMENTAL.
 		// Allow `position.fixed` to be opted-in by default.
 		// Sticky position support was backported to WordPress 6.2 in https://core.trac.wordpress.org/ticket/57618.

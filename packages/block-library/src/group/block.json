@@ -63,6 +63,9 @@
 				"width": true
 			}
 		},
+		"media": {
+			"backgroundImage": true
+		},
 		"position": {
 			"sticky": true
 		},

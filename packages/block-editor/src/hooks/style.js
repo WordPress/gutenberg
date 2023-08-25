@@ -20,6 +20,7 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
  * Internal dependencies
  */
 import BlockList from '../components/block-list';
+import { MEDIA_SUPPORT_KEY, MediaPanel } from './media';
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -42,6 +43,7 @@ const styleSupportKeys = [
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	DIMENSIONS_SUPPORT_KEY,
+	MEDIA_SUPPORT_KEY, // TODO: Is this really a style support?
 	SPACING_SUPPORT_KEY,
 ];
 
@@ -128,6 +130,7 @@ const skipSerializationPathsEdit = {
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
 	[ `${ SPACING_SUPPORT_KEY }` ]: [ 'spacing.blockGap' ],
+	[ `${ MEDIA_SUPPORT_KEY }` ]: [ MEDIA_SUPPORT_KEY ],
 };
 
 /**
@@ -359,6 +362,7 @@ export const withBlockControls = createHigherOrderComponent(
 			<>
 				{ shouldDisplayControls && blockEditingMode === 'default' && (
 					<>
+						<MediaPanel { ...props } />
 						<ColorEdit { ...props } />
 						<TypographyPanel { ...props } />
 						<BorderPanel { ...props } />

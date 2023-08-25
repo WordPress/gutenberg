@@ -12,6 +12,7 @@ const InspectorControlsDimensions = createSlotFill(
 	'InspectorControlsDimensions'
 );
 const InspectorControlsPosition = createSlotFill( 'InspectorControlsPosition' );
+const InspectorControlsMedia = createSlotFill( 'InspectorControlsMedia' );
 const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
 );
@@ -23,13 +24,14 @@ const groups = {
 	advanced: InspectorControlsAdvanced,
 	border: InspectorControlsBorder,
 	color: InspectorControlsColor,
-	filter: InspectorControlsFilter,
 	dimensions: InspectorControlsDimensions,
+	filter: InspectorControlsFilter,
 	list: InspectorControlsListView,
+	media: InspectorControlsMedia,
+	position: InspectorControlsPosition,
 	settings: InspectorControlsDefault, // Alias for default.
 	styles: InspectorControlsStyles,
 	typography: InspectorControlsTypography,
-	position: InspectorControlsPosition,
 };
 
 export default groups;
