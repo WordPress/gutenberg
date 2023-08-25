@@ -11,13 +11,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import {
-	TEMPLATE_PARTS,
-	PATTERNS,
-	SYNC_TYPES,
-	USER_PATTERNS,
-	USER_PATTERN_CATEGORY,
-} from './utils';
+import { TEMPLATE_PARTS, PATTERNS, SYNC_TYPES, USER_PATTERNS } from './utils';
 import {
 	useExistingTemplateParts,
 	getUniqueTemplatePartTitle,
@@ -149,7 +143,7 @@ export default function DuplicateMenuItem( {
 				__( '%s (Copy)' ),
 				item.title
 			);
-			const patternCategoryId = await findOrCreateTerm( categoryId );
+			const patternCategory = await findOrCreateTerm( categoryId );
 			const result = await saveEntityRecord(
 				'postType',
 				'wp_block',
@@ -160,7 +154,7 @@ export default function DuplicateMenuItem( {
 					meta: getPatternMeta( item ),
 					status: 'publish',
 					title,
-					wp_pattern_category: [ patternCategoryId ],
+					wp_pattern_category: [ patternCategory.id ],
 				},
 				{ throwOnError: true }
 			);
@@ -178,8 +172,8 @@ export default function DuplicateMenuItem( {
 			);
 
 			history.push( {
-				categoryType: USER_PATTERNS,
-				categoryId: USER_PATTERN_CATEGORY,
+				categoryType: PATTERNS,
+				categoryId,
 				postType: USER_PATTERNS,
 				postId: result?.id,
 			} );
