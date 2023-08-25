@@ -32,10 +32,7 @@ import { link as settings } from './index';
 import useLinkInstanceKey from './use-link-instance-key';
 
 const LINK_SETTINGS = [
-	{
-		id: 'opensInNewTab',
-		title: __( 'Open in new tab' ),
-	},
+	...LinkControl.DEFAULT_LINK_SETTINGS,
 	{
 		id: 'noFollow',
 		title: __( 'No follow' ),
