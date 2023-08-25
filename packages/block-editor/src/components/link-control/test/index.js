@@ -1789,6 +1789,7 @@ describe( 'Addition Settings UI', () => {
 
 		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 		expect( mockOnChange ).toHaveBeenCalledWith( {
+			...selectedLink,
 			opensInNewTab: true,
 		} );
 	} );
