@@ -42,8 +42,12 @@ function KeyboardShortcutsEditMode() {
 		useDispatch( interfaceStore );
 
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockName,
+		getLastFocus,
+		getSelectedBlockClientId,
+		getBlockAttributes,
+	} = useSelect( blockEditorStore );
 
 	const { get: getPreference } = useSelect( preferencesStore );
 	const { set: setPreference, toggle } = useDispatch( preferencesStore );
@@ -144,6 +148,19 @@ function KeyboardShortcutsEditMode() {
 				type: 'snackbar',
 			}
 		);
+	} );
+
+	useShortcut( 'core/edit-site/focus-editor', ( event ) => {
+		event.preventDefault();
+		const lastFocus = getLastFocus();
+		// Only move focus if the selected block is a match with the last focused block
+		if (
+			getSelectedBlockClientId() &&
+			lastFocus?.current &&
+			lastFocus?.current.id.includes( getSelectedBlockClientId() )
+		) {
+			lastFocus.current.focus();
+		}
 	} );
 
 	return null;
