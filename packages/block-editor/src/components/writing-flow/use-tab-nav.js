@@ -15,15 +15,20 @@ import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 
 export default function useTabNav() {
 	const container = useRef();
-	const lastFocus = useRef();
 	const lastBlock = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
+
 	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
 		useSelect( blockEditorStore );
-	const { setNavigationMode } = useDispatch( blockEditorStore );
+	const { setNavigationMode, setLastFocus } = useDispatch( blockEditorStore );
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
+		[]
+	);
+
+	const lastFocus = useSelect(
+		( select ) => select( blockEditorStore ).getLastFocus(),
 		[]
 	);
 
@@ -184,7 +189,7 @@ export default function useTabNav() {
 
 		function onFocusOut( event ) {
 			// Capture the last element with focus.
-			lastFocus.current = event.target;
+			setLastFocus( { ...lastFocus, current: event.target } );
 			// Capture the last known block before focus leaves writing flow.
 			lastBlock.current = event.target.closest( '[data-block]' );
 
