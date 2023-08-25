@@ -70,7 +70,7 @@ function bubbleEvents( doc ) {
 		}
 	}
 
-	const eventTypes = [ 'dragover', 'mousemove' ];
+	const eventTypes = [ 'dragover', 'mousemove', 'keydown' ];
 
 	for ( const name of eventTypes ) {
 		doc.addEventListener( name, bubbleEvent );
