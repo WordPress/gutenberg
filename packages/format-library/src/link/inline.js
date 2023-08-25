@@ -36,11 +36,10 @@ const LINK_SETTINGS = [
 	{
 		id: 'nofollow',
 		title: createInterpolateElement(
-			__(
-				'Search engines should ignore this link (mark as <code>nofollow</code>)'
-			),
+			__( 'Mark as <code>nofollow</code>' ),
 			{ code: <code /> }
 		),
+		help: __( 'Search engines should ignore this link.' ),
 	},
 ];
 
