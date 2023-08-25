@@ -55,7 +55,7 @@ function EditorKeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: 'core/block-editor/focus-editor',
+			name: 'core/editor/focus-editor',
 			category: 'global',
 			description: __(
 				'Navigate to the last focused element in the editor.'
