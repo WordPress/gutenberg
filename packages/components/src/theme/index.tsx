@@ -18,7 +18,6 @@ import { useCx } from '../utils';
  * Multiple `Theme` components can be nested in order to override specific theme variables.
  *
  *
- * @example
  * ```jsx
  * const Example = () => {
  *   return (
