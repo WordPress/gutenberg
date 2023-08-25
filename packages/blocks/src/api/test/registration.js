@@ -5,7 +5,7 @@
  */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
 import { logged } from '@wordpress/deprecated';
-import { select } from '@wordpress/data';
+import { select, dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -33,6 +33,7 @@ import {
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
 import { omit } from '../utils';
 import { store as blocksStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
@@ -48,19 +49,14 @@ describe( 'blocks', () => {
 		title: 'block title',
 	};
 
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../store' );
-	} );
-
 	afterEach( () => {
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
+		const registeredNames = Object.keys(
+			unlock( select( blocksStore ) ).getUnprocessedBlockTypes()
+		);
+		dispatch( blocksStore ).removeBlockTypes( registeredNames );
 		setFreeformContentHandlerName( undefined );
 		setUnregisteredTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
-		unstable__bootstrapServerSideBlockDefinitions( {} );
 
 		// Reset deprecation logging to ensure we properly track warnings.
 		for ( const key in logged ) {
@@ -918,6 +914,34 @@ describe( 'blocks', () => {
 				expect( block.description ).toBe( newDescription );
 				expect( console ).toHaveWarnedWith(
 					'Declaring non-string block descriptions is deprecated since version 6.2.'
+				);
+			} );
+
+			it( 're-applies block filters', () => {
+				// register block
+				registerBlockType( 'test/block', defaultBlockSettings );
+
+				// register a filter after registering a block
+				addFilter(
+					'blocks.registerBlockType',
+					'core/blocks/reapply',
+					( settings ) => ( {
+						...settings,
+						title: settings.title + ' filtered',
+					} )
+				);
+
+				// check that block type has unfiltered values
+				expect( getBlockType( 'test/block' ).title ).toBe(
+					'block title'
+				);
+
+				// reapply the block filters
+				dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+
+				// check that block type has filtered values
+				expect( getBlockType( 'test/block' ).title ).toBe(
+					'block title filtered'
 				);
 			} );
 		} );
