@@ -387,6 +387,7 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 							hideLabelFromVision={ ! showTextControl }
+							isDisabled={ value?.id }
 						/>
 					</div>
 					{ errorMessage && (

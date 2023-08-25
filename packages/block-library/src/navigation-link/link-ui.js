@@ -158,7 +158,7 @@ export function LinkUI( props ) {
 		};
 	}
 
-	const { label, url, opensInNewTab, type, kind } = props.link;
+	const { label, url, opensInNewTab, type, kind, id } = props.link;
 
 	let userCanCreate = false;
 	if ( ! type || type === 'page' ) {
@@ -174,8 +174,9 @@ export function LinkUI( props ) {
 			url,
 			opensInNewTab,
 			title: label && stripHTML( label ),
+			id,
 		} ),
-		[ label, opensInNewTab, url ]
+		[ label, opensInNewTab, url, id ]
 	);
 
 	return (
