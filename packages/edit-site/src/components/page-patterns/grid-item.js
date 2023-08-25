@@ -248,11 +248,7 @@ function GridItem( { categoryId, item, ...props } ) {
 								categoryId={ categoryId }
 								item={ item }
 								onClose={ onClose }
-								label={
-									isNonUserPattern
-										? __( 'Copy to My patterns' )
-										: __( 'Duplicate' )
-								}
+								label={ __( 'Duplicate' ) }
 							/>
 							{ isCustomPattern && (
 								<MenuItem

@@ -24,6 +24,7 @@ import {
 	getCleanTemplatePartSlug,
 } from '../../utils/template-part-create';
 import { unlock } from '../../lock-unlock';
+import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -53,6 +54,7 @@ export default function DuplicateMenuItem( {
 
 	const history = useHistory();
 	const existingTemplateParts = useExistingTemplateParts();
+	const { patternCategories } = usePatternCategories();
 
 	async function createTemplatePart() {
 		try {
@@ -111,6 +113,34 @@ export default function DuplicateMenuItem( {
 		}
 	}
 
+	async function findOrCreateTerm( term ) {
+		const category = patternCategories.find( ( cat ) => cat.name === term );
+		try {
+			const newTerm = await saveEntityRecord(
+				'taxonomy',
+				'wp_pattern_category',
+				{
+					name: category.label,
+					slug: category.name,
+					description: category.description,
+				},
+				{
+					throwOnError: true,
+				}
+			);
+			return newTerm.id;
+		} catch ( error ) {
+			if ( error.code !== 'term_exists' ) {
+				throw error;
+			}
+
+			return {
+				id: error.data.term_id,
+				name: term.name,
+			};
+		}
+	}
+
 	async function createPattern() {
 		try {
 			const isThemePattern = item.type === PATTERNS;
@@ -119,7 +149,7 @@ export default function DuplicateMenuItem( {
 				__( '%s (Copy)' ),
 				item.title
 			);
-
+			const patternCategoryId = await findOrCreateTerm( categoryId );
 			const result = await saveEntityRecord(
 				'postType',
 				'wp_block',
@@ -130,6 +160,7 @@ export default function DuplicateMenuItem( {
 					meta: getPatternMeta( item ),
 					status: 'publish',
 					title,
+					wp_pattern_category: [ patternCategoryId ],
 				},
 				{ throwOnError: true }
 			);
