@@ -60,6 +60,7 @@ function InlineLinkUI( {
 		type: activeAttributes.type,
 		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
+		noFollow: activeAttributes.rel?.includes( 'nofollow' ),
 		title: richTextText,
 	};
 
@@ -77,7 +78,6 @@ function InlineLinkUI( {
 		const didToggleSetting =
 			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
 			nextValue.url === undefined;
-
 		// Merge the next value with the current link value.
 		nextValue = {
 			...linkValue,
@@ -93,6 +93,7 @@ function InlineLinkUI( {
 					? String( nextValue.id )
 					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
+			noFollow: nextValue.noFollow,
 		} );
 
 		const newText = nextValue.title || newUrl;
