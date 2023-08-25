@@ -34,9 +34,14 @@ import useLinkInstanceKey from './use-link-instance-key';
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
 	{
-		id: 'noFollow',
+		id: 'nofollow',
 		title: __( 'No follow' ),
-		help: __( 'Search engines should ignore this link' ),
+		help: createInterpolateElement(
+			__(
+				'Search engines should ignore this link (mark as <code>nofollow</code>)'
+			),
+			{ code: <code /> }
+		),
 	},
 ];
 
@@ -69,7 +74,7 @@ function InlineLinkUI( {
 		type: activeAttributes.type,
 		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
-		noFollow: activeAttributes.rel?.includes( 'nofollow' ),
+		nofollow: activeAttributes.rel?.includes( 'nofollow' ),
 		title: richTextText,
 	};
 
@@ -102,7 +107,7 @@ function InlineLinkUI( {
 					? String( nextValue.id )
 					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
-			noFollow: nextValue.noFollow,
+			nofollow: nextValue.nofollow,
 		} );
 
 		const newText = nextValue.title || newUrl;
