@@ -32,5 +32,8 @@
 				"fontSize": true
 			}
 		}
+	},
+	"__experimentalAutoInsert": {
+		"core/navigation": "after"
 	}
 }
