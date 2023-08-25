@@ -1,4 +1,5 @@
 import { Okhsl, converter, formatHex } from 'culori';
+import { colord } from 'colord';
 
 const OKHSL_CONVERTER = converter( 'okhsl' );
 
@@ -101,7 +102,7 @@ const defaultPaletteParams: PaletteParams = {
 	saturationFinetune: [
 		0.95, 0.95, 0.95, 0.97, 0.97, 0.97, 0.97, 0.97, 0.9, 0.8, 0.7, 0.6,
 	],
-	grayscaleSaturation: 0.08,
+	grayscaleSaturation: 0.2,
 	spreadOutMinMaxValues: true,
 	returnFullPalette: true,
 	isDark: false,
@@ -183,6 +184,14 @@ export const generateColors = (
 		input: hexColorIn,
 		main: hueName( rawHSLspaceHues[ 0 ] ),
 	} as ColorMetadata;
+
+	// use accent colour if there is enough contrast
+	if ( colord( output.gray[ '1' ] ).isReadable( hexColorIn ) ) {
+		output[ output.metadata.main ][ '9' ] = <string>hexColorIn;
+		output[ output.metadata.main ][ '10' ] = colord( <string>hexColorIn )
+			.darken( 0.1 )
+			.toHex();
+	}
 
 	if ( rawHSLspaceHues.length > 1 ) {
 		output.metadata.analogous30 = [
