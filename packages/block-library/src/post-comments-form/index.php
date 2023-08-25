@@ -73,7 +73,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-on--submit', 'actions.core.comments.submit' );
 
-			while( $p->next_tag() ) {
+			while ( $p->next_tag() ) {
 				$tag  = $p->get_tag();
 				$name = $p->get_attribute( 'name' );
 				$type = $p->get_attribute( 'type' );

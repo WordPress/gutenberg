@@ -68,7 +68,7 @@ function render_block_core_comment_reply_link( $attributes, $content, $block ) {
 			'class_name' => 'comment-reply-link',
 		)
 	) ) {
-		$p->set_attribute('data-wp-on--click', 'actions.core.comments.changeReplyTo' );
+		$p->set_attribute( 'data-wp-on--click', 'actions.core.comments.changeReplyTo' );
 	}
 	$comment_reply_link = $p->get_updated_html();
 

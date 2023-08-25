@@ -53,10 +53,10 @@ function render_block_core_comments( $attributes, $content, $block ) {
 							'core' => array(
 								'comments' => (object) array(
 									'fields' => (object) array(
-										'comment_parent' => 0
-									)
-								)
-							)
+										'comment_parent' => 0,
+									),
+								),
+							),
 						)
 					)
 				);
