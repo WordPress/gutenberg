@@ -23,6 +23,7 @@ import {
 	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
 } from './dropdown-menu-v2';
 import { ComponentsContext } from './ui/context/context-system-provider';
+import Theme from './theme';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -47,4 +48,5 @@ lock( privateApis, {
 	DropdownSubMenuV2,
 	DropdownSubMenuTriggerV2,
 	ProgressBar,
+	Theme,
 } );

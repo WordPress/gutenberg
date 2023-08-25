@@ -3,10 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import {
-	BlockControls,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { BlockControls, useBlockEditingMode } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { ToolbarButton } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
@@ -20,7 +17,6 @@ import { useLink } from '../components/routes/link';
 import { unlock } from '../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
-const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 function NavigationMenuEdit( { attributes } ) {
 	const { ref } = attributes;

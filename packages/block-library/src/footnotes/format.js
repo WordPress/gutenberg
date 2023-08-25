@@ -20,7 +20,6 @@ import { createBlock, store as blocksStore } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { name } from './block.json';
 import { unlock } from '../lock-unlock';
 
 const { usesContextKey } = unlock( privateApis );
@@ -37,6 +36,7 @@ export const format = {
 	attributes: {
 		'data-fn': 'data-fn',
 	},
+	interactive: true,
 	contentEditable: false,
 	[ usesContextKey ]: [ 'postType' ],
 	edit: function Edit( {
@@ -52,9 +52,11 @@ export const format = {
 			getBlockRootClientId,
 			getBlockName,
 			getBlockParentsByBlockName,
-		} = useSelect( blockEditorStore );
-		const footnotesBlockType = useSelect( ( select ) =>
-			select( blocksStore ).getBlockType( name )
+		} = registry.select( blockEditorStore );
+		const hasFootnotesBlockType = useSelect(
+			( select ) =>
+				!! select( blocksStore ).getBlockType( 'core/footnotes' ),
+			[]
 		);
 		/*
 		 * This useSelect exists because we need to use its return value
@@ -75,7 +77,7 @@ export const format = {
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
 
-		if ( ! footnotesBlockType ) {
+		if ( ! hasFootnotesBlockType ) {
 			return null;
 		}
 
@@ -135,7 +137,7 @@ export const format = {
 					const queue = [ ...blocks ];
 					while ( queue.length ) {
 						const block = queue.shift();
-						if ( block.name === name ) {
+						if ( block.name === 'core/footnotes' ) {
 							fnBlock = block;
 							break;
 						}
@@ -156,7 +158,7 @@ export const format = {
 						rootClientId = getBlockRootClientId( rootClientId );
 					}
 
-					fnBlock = createBlock( name );
+					fnBlock = createBlock( 'core/footnotes' );
 
 					insertBlock( fnBlock, undefined, rootClientId );
 				}

@@ -20,11 +20,11 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const reusableBlockNameInputSelector =
-	'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
+	'.patterns-menu-items__convert-modal .components-text-control__input';
 const reusableBlockInspectorNameInputSelector =
 	'.block-editor-block-inspector .components-text-control__input';
 const syncToggleSelectorChecked =
-	'.reusable-blocks-menu-items__convert-modal .components-form-toggle.is-checked';
+	'.patterns-menu-items__convert-modal .components-form-toggle.is-checked';
 
 const saveAll = async () => {
 	const publishButtonSelector =
@@ -196,7 +196,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert block to a reusable block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create pattern/reusable block' );
+		await clickMenuItem( 'Create pattern' );
 
 		// Set title.
 		const nameInput = await page.waitForSelector(
@@ -382,7 +382,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert to reusable.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Create pattern/reusable block' );
+		await clickMenuItem( 'Create pattern' );
 		const nameInput = await page.waitForSelector(
 			reusableBlockNameInputSelector
 		);

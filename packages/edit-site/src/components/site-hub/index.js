@@ -76,7 +76,7 @@ const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 					event.preventDefault();
 					if ( canvasMode === 'edit' ) {
 						clearSelectedBlock();
-						setPreviewDeviceType( 'desktop' );
+						setPreviewDeviceType( 'Desktop' );
 						setCanvasMode( 'view' );
 					}
 				},

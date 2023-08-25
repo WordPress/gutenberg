@@ -16,10 +16,8 @@ import deprecated from '@wordpress/deprecated';
 import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
 import type { ToolbarProps } from './types';
-import {
-	WordPressComponentProps,
-	ContextSystemProvider,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { ContextSystemProvider } from '../../ui/context';
 
 const CONTEXT_SYSTEM_VALUE = {
 	DropdownMenu: {

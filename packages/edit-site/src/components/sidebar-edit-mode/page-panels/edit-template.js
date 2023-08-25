@@ -8,6 +8,7 @@ import { BlockContextProvider, BlockPreview } from '@wordpress/block-editor';
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editSiteStore } from '../../../store';
 
 export default function EditTemplate() {
-	const { context, hasResolved, title, blocks } = useSelect( ( select ) => {
+	const { context, hasResolved, template } = useSelect( ( select ) => {
 		const { getEditedPostContext, getEditedPostType, getEditedPostId } =
 			select( editSiteStore );
 		const { getEditedEntityRecord, hasFinishedResolution } =
@@ -26,15 +27,13 @@ export default function EditTemplate() {
 			getEditedPostType(),
 			getEditedPostId(),
 		];
-		const template = getEditedEntityRecord( ...queryArgs );
 		return {
 			context: _context,
 			hasResolved: hasFinishedResolution(
 				'getEditedEntityRecord',
 				queryArgs
 			),
-			title: template?.title,
-			blocks: template?.blocks,
+			template: getEditedEntityRecord( ...queryArgs ),
 		};
 	}, [] );
 
@@ -45,13 +44,22 @@ export default function EditTemplate() {
 		[ context ]
 	);
 
+	const blocks = useMemo(
+		() =>
+			template.blocks ??
+			( template.content && typeof template.content !== 'function'
+				? parse( template.content )
+				: [] ),
+		[ template.blocks, template.content ]
+	);
+
 	if ( ! hasResolved ) {
 		return null;
 	}
 
 	return (
 		<VStack>
-			<div>{ decodeEntities( title ) }</div>
+			<div>{ decodeEntities( template.title ) }</div>
 			<div className="edit-site-page-panels__edit-template-preview">
 				<BlockContextProvider value={ blockContext }>
 					<BlockPreview viewportWidth={ 1024 } blocks={ blocks } />

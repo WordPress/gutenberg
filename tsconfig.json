@@ -42,6 +42,7 @@
 		{ "path": "packages/report-flaky-tests" },
 		{ "path": "packages/rich-text" },
 		{ "path": "packages/style-engine" },
+		{ "path": "packages/sync" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },
 		{ "path": "packages/warning" },

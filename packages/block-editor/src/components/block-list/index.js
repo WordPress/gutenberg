@@ -31,7 +31,6 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
-import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useInnerBlocksProps } from '../inner-blocks';
@@ -39,6 +38,7 @@ import {
 	BlockEditContextProvider,
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
+import { useTypingObserver } from '../observe-typing';
 
 const elementContext = createContext();
 
@@ -105,6 +105,7 @@ function Root( { className, ...settings } ) {
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
 				setElement,
+				useTypingObserver(),
 			] ),
 			className: classnames( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
@@ -124,7 +125,6 @@ function Root( { className, ...settings } ) {
 }
 
 export default function BlockList( settings ) {
-	usePreParsePatterns();
 	return (
 		<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
 			<Root { ...settings } />
