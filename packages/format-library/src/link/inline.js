@@ -31,6 +31,18 @@ import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 import useLinkInstanceKey from './use-link-instance-key';
 
+const LINK_SETTINGS = [
+	{
+		id: 'opensInNewTab',
+		title: __( 'Open in new tab' ),
+	},
+	{
+		id: 'noFollow',
+		title: __( 'No follow' ),
+		help: __( 'Search engines should ignore this link' ),
+	},
+];
+
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
@@ -248,6 +260,7 @@ function InlineLinkUI( {
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
+				settings={ LINK_SETTINGS }
 			/>
 		</Popover>
 	);

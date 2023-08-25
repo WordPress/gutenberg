@@ -24,8 +24,4 @@ export const DEFAULT_LINK_SETTINGS = [
 		id: 'opensInNewTab',
 		title: __( 'Open in new tab' ),
 	},
-	{
-		id: 'noFollow',
-		title: __( 'No follow' ),
-	},
 ];
