@@ -21,8 +21,6 @@ import {
 	DropdownSubMenuTrigger,
 } from '..';
 import Button from '../../button';
-import Popover from '../../popover';
-import { Provider as SlotFillProvider } from '../../slot-fill';
 
 /**
  * WordPress dependencies
@@ -143,11 +141,7 @@ const RadioItemsGroup = () => {
 };
 
 const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
-	<SlotFillProvider>
-		<DropdownMenu { ...props } />
-		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
-		<Popover.Slot />
-	</SlotFillProvider>
+	<DropdownMenu { ...props } />
 );
 export const Default = Template.bind( {} );
 Default.args = {

@@ -25,7 +25,7 @@ const isSerializedStyles = ( o: any ): o is SerializedStyles =>
  * `cx` normally knows how to handle. It also hooks into the Emotion
  * Cache, allowing `css` calls to work inside iframes.
  *
- * @example
+ * ```jsx
  * import { css } from '@emotion/react';
  *
  * const styles = css`
@@ -39,6 +39,7 @@ const isSerializedStyles = ( o: any ): o is SerializedStyles =>
  *
  * 	return <span className={classes} {...props} />;
  * }
+ * ```
  */
 export const useCx = () => {
 	const cache = useEmotionCache();

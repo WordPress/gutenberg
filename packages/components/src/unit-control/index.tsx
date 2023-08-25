@@ -223,7 +223,6 @@ function UnforwardedUnitControl(
  * `UnitControl` allows the user to set a numeric quantity as well as a unit (e.g. `px`).
  *
  *
- * @example
  * ```jsx
  * import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';

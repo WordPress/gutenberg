@@ -23,7 +23,7 @@ import {
 	BlockBreadcrumb,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { Button, ScrollLock, Popover } from '@wordpress/components';
+import { Button, ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -357,7 +357,6 @@ function Layout() {
 			<WelcomeGuide />
 			<PostSyncStatusModal />
 			<StartPageOptions />
-			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />
 		</>
 	);

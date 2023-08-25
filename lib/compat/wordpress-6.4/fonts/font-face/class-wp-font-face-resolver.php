@@ -4,7 +4,7 @@
  *
  * @package    WordPress
  * @subpackage Fonts
- * @since      X.X.X
+ * @since      6.4.0
  */
 
 if ( class_exists( 'WP_Font_Face_Resolver' ) ) {
@@ -25,12 +25,12 @@ class WP_Font_Face_Resolver {
 	/**
 	 * Gets fonts defined in theme.json.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @return array Returns the font-families, each with their font-face variations.
 	 */
 	public static function get_fonts_from_theme_json() {
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
+		$settings = gutenberg_get_global_settings();
 
 		// Bail out early if there are no font settings.
 		if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
@@ -43,7 +43,7 @@ class WP_Font_Face_Resolver {
 	/**
 	 * Parse theme.json settings to extract font definitions with variations grouped by font-family.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $settings Font settings to parse.
 	 * @return array Returns an array of fonts, grouped by font-family.
@@ -81,7 +81,7 @@ class WP_Font_Face_Resolver {
 	/**
 	 * Converts font-face properties from theme.json format.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array  $font_face_definition The font-face definitions to convert.
 	 * @param string $font_family_property The value to store in the font-face font-family property.
@@ -115,7 +115,7 @@ class WP_Font_Face_Resolver {
 	 * replaced with the URI to the font file's location in the theme. When a "src"
 	 * beings with this placeholder, it is replaced, converting the src into a URI.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $src An array of font file sources to process.
 	 * @return array An array of font file src URI(s).
@@ -139,7 +139,7 @@ class WP_Font_Face_Resolver {
 	/**
 	 * Converts all first dimension keys into kebab-case.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $data The array to process.
 	 * @return array Data with first dimension keys converted into kebab-case.

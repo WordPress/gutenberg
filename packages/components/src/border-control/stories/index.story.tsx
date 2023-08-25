@@ -13,8 +13,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { BorderControl } from '..';
-import { Provider as SlotFillProvider } from '../../slot-fill';
-import Popover from '../../popover';
 import type { Border } from '../types';
 
 const meta: Meta< typeof BorderControl > = {
@@ -83,15 +81,11 @@ const Template: StoryFn< typeof BorderControl > = ( {
 	};
 
 	return (
-		<SlotFillProvider>
-			<BorderControl
-				onChange={ onChangeMerged }
-				value={ border }
-				{ ...props }
-			/>
-			{ /* @ts-expect-error Ignore until Popover.Slot is converted to TS */ }
-			<Popover.Slot />
-		</SlotFillProvider>
+		<BorderControl
+			onChange={ onChangeMerged }
+			value={ border }
+			{ ...props }
+		/>
 	);
 };
 

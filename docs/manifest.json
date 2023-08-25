@@ -216,6 +216,12 @@
 		"parent": "how-to-guides"
 	},
 	{
+		"title": "Enqueueing assets in the Editor",
+		"slug": "enqueueing-assets-in-the-editor",
+		"markdown_source": "../docs/how-to-guides/enqueueing-assets-in-the-editor.md",
+		"parent": "how-to-guides"
+	},
+	{
 		"title": "Feature Flags",
 		"slug": "feature-flags",
 		"markdown_source": "../docs/how-to-guides/feature-flags.md",

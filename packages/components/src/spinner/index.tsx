@@ -50,7 +50,6 @@ export function UnforwardedSpinner(
 /**
  * `Spinner` is a component used to notify users that their action is being processed.
  *
- * @example
  * ```js
  *   import { Spinner } from '@wordpress/components';
  *

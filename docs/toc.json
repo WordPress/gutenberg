@@ -104,6 +104,7 @@
 				]
 			},
 			{ "docs/how-to-guides/curating-the-editor-experience.md": [] },
+			{ "docs/how-to-guides/enqueueing-assets-in-the-editor.md": [] },
 			{ "docs/how-to-guides/feature-flags.md": [] },
 			{ "docs/how-to-guides/format-api.md": [] },
 			{

@@ -29,7 +29,6 @@ function UnconnectedItem(
  * `Item` is used in combination with `ItemGroup` to display a list of items
  * grouped and styled together.
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalItemGroup as ItemGroup,

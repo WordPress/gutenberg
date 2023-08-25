@@ -27,7 +27,6 @@ function getSelectOptions(
 /**
  * TreeSelect component is used to generate select input fields.
  *
- * @example
  * ```jsx
  * import { TreeSelect } from '@wordpress/components';
  * import { useState } from '@wordpress/element';

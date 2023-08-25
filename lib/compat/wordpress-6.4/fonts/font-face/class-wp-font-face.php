@@ -4,7 +4,7 @@
  *
  * @package    WordPress
  * @subpackage Fonts
- * @since      X.X.X
+ * @since      6.4.0
  */
 
 if ( class_exists( 'WP_Font_Face' ) ) {
@@ -14,14 +14,14 @@ if ( class_exists( 'WP_Font_Face' ) ) {
 /**
  * Font Face generates and prints `@font-face` styles for given fonts.
  *
- * @since X.X.X
+ * @since 6.4.0
  */
 class WP_Font_Face {
 
 	/**
 	 * The font-face property defaults.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @var string[]
 	 */
@@ -35,7 +35,7 @@ class WP_Font_Face {
 	/**
 	 * Valid font-face property names.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @var string[]
 	 */
@@ -59,7 +59,7 @@ class WP_Font_Face {
 	/**
 	 * Valid font-display values.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @var string[]
 	 */
@@ -70,7 +70,7 @@ class WP_Font_Face {
 	 * where the key is the attribute name and the
 	 * value is its value.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @var string[]
 	 */
@@ -79,13 +79,13 @@ class WP_Font_Face {
 	/**
 	 * Creates and initializes an instance of WP_Font_Face.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 */
 	public function __construct() {
 		/**
 		 * Filters the font-face property defaults.
 		 *
-		 * @since X.X.X
+		 * @since 6.4.0
 		 *
 		 * @param array $defaults {
 		 *     An array of required font-face properties and defaults.
@@ -111,7 +111,7 @@ class WP_Font_Face {
 	/**
 	 * Generates and prints the `@font-face` styles for the given fonts.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $fonts The fonts to generate and print @font-face styles.
 	 */
@@ -132,7 +132,7 @@ class WP_Font_Face {
 	/**
 	 * Validates each of the font-face properties.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $fonts The fonts to valid.
 	 * @return array Prepared font-faces organized by provider and font-family.
@@ -158,7 +158,7 @@ class WP_Font_Face {
 	/**
 	 * Validates each font-face property.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $font_face Font face properties to validate.
 	 * @return false|array Validated font-face on success. Else, false.
@@ -212,7 +212,7 @@ class WP_Font_Face {
 	/**
 	 * Gets the `<style>` element for wrapping the `@font-face` CSS.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @return string The style element.
 	 */
@@ -225,7 +225,7 @@ class WP_Font_Face {
 	/**
 	 * Gets the defined <style> element's attributes.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @return string A string of attribute=value when defined, else, empty string.
 	 */
@@ -244,7 +244,7 @@ class WP_Font_Face {
 	 *    1. Orchestrates an optimized `src` (with format) for browser support.
 	 *    2. Generates the `@font-face` for all its fonts.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $font_faces The font-faces to generate @font-face CSS styles.
 	 * @return string The `@font-face` CSS styles.
@@ -267,7 +267,7 @@ class WP_Font_Face {
 	/**
 	 * Orders `src` items to optimize for browser support.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $font_face Font face to process.
 	 * @return array Font-face with ordered src items.
@@ -340,7 +340,7 @@ class WP_Font_Face {
 	/**
 	 * Builds the font-family's CSS.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $font_face Font face to process.
 	 * @return string This font-family's CSS.
@@ -380,7 +380,7 @@ class WP_Font_Face {
 	/**
 	 * Compiles the `src` into valid CSS.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $value Value to process.
 	 * @return string The CSS.
@@ -401,7 +401,7 @@ class WP_Font_Face {
 	/**
 	 * Compiles the font variation settings.
 	 *
-	 * @since X.X.X
+	 * @since 6.4.0
 	 *
 	 * @param array $font_variation_settings Array of font variation settings.
 	 * @return string The CSS.
