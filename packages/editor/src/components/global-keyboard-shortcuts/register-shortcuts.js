@@ -53,6 +53,18 @@ function EditorKeyboardShortcutsRegister() {
 						},
 				  ],
 		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/focus-editor',
+			category: 'global',
+			description: __(
+				'Navigate to the last focused element in the editor.'
+			),
+			keyCombination: {
+				modifier: 'alt',
+				character: 'F9',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return <BlockEditorKeyboardShortcuts.Register />;
