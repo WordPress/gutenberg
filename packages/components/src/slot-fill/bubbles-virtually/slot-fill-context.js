@@ -22,6 +22,8 @@ const SlotFillContext = createContext( {
 	unregisterSlot: () => {},
 	registerFill: () => {},
 	unregisterFill: () => {},
+
+	// This helps the provider know if it's using the default context value or not.
 	isDefault: true,
 } );
 
