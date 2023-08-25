@@ -33,7 +33,6 @@ const noop = () => {};
 // Preferred order of pattern categories. Any other categories should
 // be at the bottom without any re-ordering.
 const patternCategoriesOrder = [
-	'custom',
 	'featured',
 	'posts',
 	'text',
@@ -45,11 +44,11 @@ const patternCategoriesOrder = [
 ];
 
 function usePatternsCategories( rootClientId ) {
-	const {
-		patterns: allPatterns,
-		allCategories,
-		userPatternCategories,
-	} = usePatternsState( undefined, rootClientId );
+	const { patterns: allPatterns, allCategories } = usePatternsState(
+		undefined,
+		rootClientId
+	);
+
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
 			if ( ! pattern.categories || ! pattern.categories.length ) {
@@ -71,10 +70,10 @@ function usePatternsCategories( rootClientId ) {
 					pattern.categories?.includes( category.name )
 				)
 			)
-			.sort( ( { name: aName }, { name: bName } ) => {
+			.sort( ( { label: aLabel }, { label: bLabel } ) => {
 				// Sort categories according to `patternCategoriesOrder`.
-				let aIndex = patternCategoriesOrder.indexOf( aName );
-				let bIndex = patternCategoriesOrder.indexOf( bName );
+				let aIndex = patternCategoriesOrder.indexOf( aLabel );
+				let bIndex = patternCategoriesOrder.indexOf( bLabel );
 				// All other categories should come after that.
 				if ( aIndex < 0 ) aIndex = patternCategoriesOrder.length;
 				if ( bIndex < 0 ) bIndex = patternCategoriesOrder.length;
@@ -141,7 +140,7 @@ export function BlockPatternsCategoryPanel( {
 	category,
 	showTitlesAsTooltip,
 } ) {
-	const { patterns: allPatterns, onClick } = usePatternsState(
+	const { patterns: allPatterns, onClickPattern } = usePatternsState(
 		onInsert,
 		rootClientId
 	);
@@ -187,7 +186,7 @@ export function BlockPatternsCategoryPanel( {
 			<BlockPatternList
 				shownPatterns={ categoryPatternsList }
 				blockPatterns={ currentCategoryPatterns }
-				onClickPattern={ onClick }
+				onClickPattern={ onClickPattern }
 				onHover={ onHover }
 				label={ category.label }
 				orientation="vertical"

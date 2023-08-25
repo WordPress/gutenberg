@@ -48,7 +48,7 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
 	} );
-	const { patterns: allPatterns, onSelectBlockPattern } = usePatternsState(
+	const { patterns: allPatterns, onClickPattern } = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);
@@ -116,7 +116,7 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 					<BlockPatternsList
 						shownPatterns={ currentShownPatterns }
 						blockPatterns={ filteredBlockPatterns }
-						onClickPattern={ onSelectBlockPattern }
+						onClickPattern={ onClickPattern }
 						isDraggable={ false }
 					/>
 				) }

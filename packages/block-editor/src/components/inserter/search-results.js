@@ -81,7 +81,7 @@ function InserterSearchResults( {
 		blockTypeCollections,
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
-	const { patterns, onSelectBlockPattern } = usePatternsState(
+	const { patterns, onClickPattern } = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);
@@ -189,7 +189,7 @@ function InserterSearchResults( {
 				<BlockPatternsList
 					shownPatterns={ currentShownPatterns }
 					blockPatterns={ filteredBlockPatterns }
-					onClickPattern={ onSelectBlockPattern }
+					onClickPattern={ onClickPattern }
 					onHover={ onHoverPattern }
 					isDraggable={ isDraggable }
 				/>

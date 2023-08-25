@@ -12,12 +12,6 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { store as blockEditorStore } from '../../../store';
 
-const CUSTOM_CATEGORY = {
-	name: 'custom',
-	label: __( 'My patterns' ),
-	description: __( 'Custom patterns added by site users.' ),
-};
-
 /**
  * Retrieves the block patterns inserter state.
  *
@@ -37,17 +31,28 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 			} = getSettings();
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
-				userPatternCategories: __experimentalUserPatternCategories,
+				userPatternCategories:
+					__experimentalUserPatternCategories.patternCategories,
 				patternCategories: __experimentalBlockPatternCategories,
 			};
 		},
 		[ rootClientId ]
 	);
 
-	const allCategories = useMemo(
-		() => [ ...patternCategories, CUSTOM_CATEGORY ],
-		[ patternCategories ]
-	);
+	const allCategories = useMemo( () => {
+		const categories = [ ...patternCategories ];
+		userPatternCategories.forEach( ( userCategory ) => {
+			if (
+				! categories.find(
+					( existingCategory ) =>
+						existingCategory.name === userCategory.name
+				)
+			) {
+				categories.push( userCategory );
+			}
+		} );
+		return categories;
+	}, [ patternCategories, userPatternCategories ] );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback(
@@ -71,7 +76,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 		[ createSuccessNotice, onInsert ]
 	);
 
-	return { patterns, allCategories, userPatternCategories, onClickPattern };
+	return { patterns, allCategories, onClickPattern };
 };
 
 export default usePatternsState;

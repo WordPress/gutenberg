@@ -2293,7 +2293,7 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 function getUnsyncedPatterns( state ) {
 	const reusableBlocks =
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
-	const { userPatternCategoriesMap: categories } =
+	const { patternCatogoriesMap: categories } =
 		state?.settings?.__experimentalUserPatternCategories ?? {};
 	return reusableBlocks
 		.filter(
@@ -2341,6 +2341,7 @@ export const __experimentalGetParsedPattern = createSelector(
 	},
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
+		state.settings.__experimentalUserPatternCategories,
 		state.settings.__experimentalReusableBlocks,
 	]
 );
@@ -2364,6 +2365,7 @@ const getAllAllowedPatterns = createSelector(
 	},
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
+		state.settings.__experimentalUserPatternCategories,
 		state.settings.__experimentalReusableBlocks,
 		state.settings.allowedBlockTypes,
 	]
@@ -2392,6 +2394,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId ) => [
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
+		state.settings.__experimentalUserPatternCategories,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.blockListSettings[ rootClientId ],
