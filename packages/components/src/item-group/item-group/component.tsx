@@ -44,7 +44,6 @@ function UnconnectedItemGroup(
 /**
  * `ItemGroup` displays a list of `Item`s grouped and styled together.
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalItemGroup as ItemGroup,

@@ -14,7 +14,13 @@ import {
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useMemo, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useRef,
+	useMemo,
+	useEffect,
+	useCallback,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Gridicons } from '@wordpress/components';
 import {
@@ -120,23 +126,44 @@ function SearchControl( {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ isActive, isDark ] );
 
+	const clearInput = useCallback( () => {
+		onChange( '' );
+	}, [ onChange ] );
+
+	const onPress = useCallback( () => {
+		setIsActive( true );
+		inputRef.current?.focus();
+	}, [] );
+
+	const onFocus = useCallback( () => {
+		setIsActive( true );
+	}, [] );
+
+	const onCancel = useCallback( () => {
+		clearTimeout( onCancelTimer.current );
+		onCancelTimer.current = setTimeout( () => {
+			inputRef.current?.blur();
+			clearInput();
+			setIsActive( false );
+		}, 0 );
+	}, [ clearInput ] );
+
+	const onKeyboardDidHide = useCallback( () => {
+		if ( ! isIOS ) {
+			onCancel();
+		}
+	}, [ isIOS, onCancel ] );
+
 	useEffect( () => {
 		const keyboardHideSubscription = Keyboard.addListener(
 			'keyboardDidHide',
-			() => {
-				if ( ! isIOS ) {
-					onCancel();
-				}
-			}
+			onKeyboardDidHide
 		);
 		return () => {
 			clearTimeout( onCancelTimer.current );
 			keyboardHideSubscription.remove();
 		};
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
+	}, [ onKeyboardDidHide ] );
 
 	const {
 		'search-control__container': containerStyle,
@@ -152,18 +179,6 @@ function SearchControl( {
 		'search-control__icon': iconStyle,
 		'search-control__right-icon': rightIconStyle,
 	} = currentStyles;
-
-	function clearInput() {
-		onChange( '' );
-	}
-
-	function onCancel() {
-		onCancelTimer.current = setTimeout( () => {
-			inputRef.current.blur();
-			clearInput();
-			setIsActive( false );
-		}, 0 );
-	}
 
 	function renderLeftButton() {
 		const button =
@@ -234,10 +249,7 @@ function SearchControl( {
 	return (
 		<TouchableOpacity
 			style={ containerStyle }
-			onPress={ () => {
-				setIsActive( true );
-				inputRef.current.focus();
-			} }
+			onPress={ onPress }
 			activeOpacity={ 1 }
 		>
 			<View style={ innerContainerStyle }>
@@ -248,7 +260,7 @@ function SearchControl( {
 						style={ formInputStyle }
 						placeholderTextColor={ placeholderStyle?.color }
 						onChangeText={ onChange }
-						onFocus={ () => setIsActive( true ) }
+						onFocus={ onFocus }
 						value={ value }
 						placeholder={ placeholder }
 					/>
