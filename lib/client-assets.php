@@ -636,34 +636,33 @@ function gutenberg_update_wp_date_settings( $scripts ) {
 							'meridiem'      => (object) $wp_locale->meridiem,
 							'relative'      => array(
 								/* translators: %s: Duration. */
-								'future' => __( '%s from now' ),
+								'future' => __( '%s from now', 'default' ),
 								/* translators: %s: Duration. */
-								'past'   => __( '%s ago'),
+								'past'   => __( '%s ago', 'default' ),
 								/* translators: One second from or to a particular datetime, e.g., "a second ago" or "a second from now". */
-								's' => __( 'a second' ),
+								's'      => __( 'a second', 'default' ),
 								/* translators: %s: Duration in seconds from or to a particular datetime, e.g., "4 seconds ago" or "4 seconds from now". */
-								'ss' => __( '%d seconds' ),
+								'ss'     => __( '%d seconds', 'default' ),
 								/* translators: One minute from or to a particular datetime, e.g., "4 seconds ago" or "in 4 seconds from now". */
-								'm'  => __( 'a minute' ),
+								'm'      => __( 'a minute', 'default' ),
 								/* translators: %s: Duration in minutes from or to a particular datetime, e.g., "4 minutes ago" or "4 minutes from now". */
-								'mm' => __( '%d minutes' ),
+								'mm'     => __( '%d minutes', 'default' ),
 								/* translators: %s: One hour from or to a particular datetime, e.g., "an hour ago" or "an hour from now". */
-								'h'  => __( 'an hour' ),
+								'h'      => __( 'an hour', 'default' ),
 								/* translators: %s: Duration in hours from or to a particular datetime, e.g., "4 hours ago" or "4 hours from now". */
-								'hh' => __( '%d hours' ),
+								'hh'     => __( '%d hours', 'default' ),
 								/* translators: %s: One day from or to a particular datetime, e.g., "a day ago" or "a day from now". */
-								'd'  => __( 'a day' ),
+								'd'      => __( 'a day', 'default' ),
 								/* translators: %s: Duration in days from or to a particular datetime, e.g., "4 days ago" or "4 days from now". */
-								'dd' => __( '%d days' ),
+								'dd'     => __( '%d days', 'default' ),
 								/* translators: %s: One month from or to a particular datetime, e.g., "a month ago" or "a month from now". */
-								'M'  => __( 'a month' ),
+								'M'      => __( 'a month', 'default' ),
 								/* translators: %s: Duration in months from or to a particular datetime, e.g., "4 months ago" or "4 months from now". */
-								'MM' => __( '%d months' ),
+								'MM'     => __( '%d months', 'default' ),
 								/* translators: %s: One year from or to a particular datetime, e.g., "a year ago" or "a year from now". */
-								'y'  => __( 'a year' ),
+								'y'      => __( 'a year', 'default' ),
 								/* translators: %s: Duration in years from or to a particular datetime, e.g., "4 years ago" or "4 years from now". */
-								'yy' => __( '%d years' ),
-
+								'yy'     => __( '%d years', 'default' ),
 							),
 							'startOfWeek'   => (int) get_option( 'start_of_week', 0 ),
 						),
@@ -673,9 +672,9 @@ function gutenberg_update_wp_date_settings( $scripts ) {
 							/* translators: Date format, see https://www.php.net/manual/datetime.format.php */
 							'date'                => get_option( 'date_format', __( 'F j, Y', 'gutenberg' ) ),
 							/* translators: Date/Time format, see https://www.php.net/manual/datetime.format.php */
-							'datetime'            => __( 'F j, Y g:i a' ),
+							'datetime'            => __( 'F j, Y g:i a', 'default' ),
 							/* translators: Abbreviated date/time format, see https://www.php.net/manual/datetime.format.php */
-							'datetimeAbbreviated' => __( 'M j, Y g:i a' ),
+							'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
 						),
 						'timezone' => array(
 							'offset' => (float) get_option( 'gmt_offset', 0 ),
