@@ -22,7 +22,7 @@ const SlotFillContext = createContext( {
 	unregisterSlot: () => {},
 	registerFill: () => {},
 	unregisterFill: () => {},
-	isDefault: false,
+	isDefault: true,
 } );
 
 export default SlotFillContext;
