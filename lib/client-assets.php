@@ -683,7 +683,7 @@ function gutenberg_update_wp_date_settings( $scripts ) {
 						),
 					)
 				)
-			)
+			),
 		);
 	}
 }
