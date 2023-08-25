@@ -33,6 +33,7 @@ export default function CategorySelector( { onCategorySelection } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
+	const { invalidateResolution } = useDispatch( coreStore );
 
 	const { searchResults } = useSelect(
 		( select ) => {
@@ -63,6 +64,7 @@ export default function CategorySelector( { onCategorySelection } ) {
 			const newTerm = await saveEntityRecord( 'taxonomy', slug, term, {
 				throwOnError: true,
 			} );
+			invalidateResolution( 'getUserPatternCategories' );
 			return unescapeTerm( newTerm );
 		} catch ( error ) {
 			if ( error.code !== 'term_exists' ) {
