@@ -16,14 +16,14 @@
 		flex-wrap: wrap;
 		gap: 1.25em;
 
-		> li {
+		> * {
 			margin: 0;
 			width: 100%;
 		}
 
 		@include break-small {
 			@for $i from 2 through 6 {
-				&.is-flex-container.columns-#{ $i } > li {
+				&.is-flex-container.columns-#{ $i } > * {
 					width: calc((100% / #{ $i }) - 1.25em + (1.25em / #{ $i }));
 				}
 			}

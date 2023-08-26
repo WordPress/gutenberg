@@ -48,6 +48,7 @@
 						"name": "core/post-template",
 						"isValid": true,
 						"attributes": {
+							"tagName": "ul",
 							"layout": {
 								"type": "default"
 							}

@@ -610,7 +610,7 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Category:** theme
 -	**Parent:** core/query
 -	**Supports:** align (full, wide), color (background, gradients, link, text), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
+-	**Attributes:** tagName
 
 ## Post Terms
 
