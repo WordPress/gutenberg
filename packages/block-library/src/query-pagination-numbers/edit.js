@@ -33,7 +33,7 @@ const previewPaginationNumbers = ( midSize ) => {
 	paginationItems.push( createPaginationItem( '...', 'span', 'dots' ) );
 
 	// Last pagination item.
-	paginationItems.push( createPaginationItem( midSize * 2 + 2 ) );
+	paginationItems.push( createPaginationItem( midSize * 2 + 3 ) );
 
 	return <>{ paginationItems }</>;
 };
