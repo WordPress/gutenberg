@@ -253,6 +253,12 @@ module.exports = function cli() {
 		() => {},
 		withSpinner( env.installPath )
 	);
+	yargs.command(
+		'init',
+		'Generates a .wp-env.json file.',
+		() => {},
+		withSpinner( env.init )
+	);
 
 	return yargs;
 };

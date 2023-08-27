@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Added command `wp-env init` to generate a `.wp-env.json` file.
+
 ## 8.6.0 (2023-08-16)
 
 ## 8.5.0 (2023-08-10)

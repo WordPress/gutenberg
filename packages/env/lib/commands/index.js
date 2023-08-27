@@ -9,6 +9,7 @@ const run = require( './run' );
 const destroy = require( './destroy' );
 const logs = require( './logs' );
 const installPath = require( './install-path' );
+const init = require( './init' );
 
 module.exports = {
 	start,
@@ -18,4 +19,5 @@ module.exports = {
 	destroy,
 	logs,
 	installPath,
+	init,
 };
