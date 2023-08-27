@@ -280,5 +280,6 @@ export const useBlockCommands = () => {
 	useCommandLoader( {
 		name: 'core/block-editor/blockActions',
 		hook: useActionsCommands,
+		context: 'block-selection-edit',
 	} );
 };
