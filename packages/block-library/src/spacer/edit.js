@@ -217,7 +217,9 @@ const SpacerEdit = ( {
 					isSelected={ isSelected }
 					isResizing={ isResizing }
 					setIsResizing={ setIsResizing }
-				/>
+				>
+					<br />
+				</ResizableSpacer>
 			);
 		}
 
@@ -242,7 +244,9 @@ const SpacerEdit = ( {
 					isSelected={ isSelected }
 					isResizing={ isResizing }
 					setIsResizing={ setIsResizing }
-				/>
+				>
+					<br />
+				</ResizableSpacer>
 			</>
 		);
 	};
