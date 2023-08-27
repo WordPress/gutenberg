@@ -22,6 +22,7 @@ import {
 	useBlockCommands,
 	BlockBreadcrumb,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button, ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -36,6 +37,12 @@ import {
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
+
+import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+
+const { useCommands } = unlock( coreCommandsPrivateApis );
+const { useCommandContext } = unlock( commandsPrivateApis );
 
 /**
  * Internal dependencies
@@ -124,7 +131,9 @@ function useEditorStyles() {
 }
 
 function Layout() {
+	useCommands();
 	useBlockCommands();
+
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isLargeViewport = useViewportMatch( 'large' );
@@ -184,8 +193,16 @@ function Layout() {
 			),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
+			hasBlockSelected:
+				select( blockEditorStore ).getBlockSelectionStart(),
 		};
 	}, [] );
+
+	// Set the right context for the command palette
+	const commandContext = hasBlockSelected
+		? 'block-selection-edit'
+		: 'post-editor-edit';
+	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();
 
