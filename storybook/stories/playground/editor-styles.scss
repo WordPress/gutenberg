@@ -2,7 +2,7 @@
 	font-family: $default-font;
 	font-size: $editor-font-size;
 	line-height: $editor-line-height;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 
 	p {
 		font-size: inherit;

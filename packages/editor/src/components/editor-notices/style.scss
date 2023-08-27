@@ -5,7 +5,7 @@
 	left: 0;
 	top: 0;
 	right: 0;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 
 	.components-notice {
 		box-sizing: border-box;

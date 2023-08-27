@@ -1,9 +1,9 @@
 $arrow-triangle-base-size: 14px;
 
 $shadow-popover-border-default: 0 0 0 $border-width $gray-400;
-$shadow-popover-border-default-alternate: 0 0 0 $border-width $gray-900;
+$shadow-popover-border-default-alternate: 0 0 0 $border-width var(--wp-components-color-gray-contrast);
 $shadow-popover-border-top-only: 0 #{-$border-width} 0 0 $gray-400;
-$shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+$shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 var(--wp-components-color-gray-contrast);
 
 .components-popover {
 	z-index: z-index(".components-popover");
@@ -130,6 +130,6 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	stroke: $gray-400;
 
 	.is-alternate & {
-		stroke: $gray-900;
+		stroke: var(--wp-components-color-gray-contrast);
 	}
 }

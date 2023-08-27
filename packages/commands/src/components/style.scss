@@ -51,7 +51,7 @@
 		width: 100%;
 		padding: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-10;
 		outline: none;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		margin: 0;
 		font-size: 16px;
 		line-height: 28px;
@@ -72,7 +72,7 @@
 		cursor: pointer;
 		display: flex;
 		align-items: center;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		font-size: $default-font-size;
 		min-height: $button-size-next-default-40px;
 
@@ -92,7 +92,7 @@
 		}
 
 		svg {
-			fill: $gray-900;
+			fill: var(--wp-components-color-gray-contrast);
 		}
 
 		> div {
@@ -119,7 +119,7 @@
 		align-items: center;
 		justify-content: center;
 		white-space: pre-wrap;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		padding: $grid-unit-10 0 $grid-unit-40;
 	}
 

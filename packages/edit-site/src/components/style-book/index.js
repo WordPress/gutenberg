@@ -69,11 +69,11 @@ const STYLE_BOOK_IFRAME_STYLES = `
 	}
 
 	.edit-site-style-book__example.is-selected {
-		box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		box-shadow: 0 0 0 1px var(--wp-components-color-accent-solid, var(--wp-admin-theme-color, #007cba));
 	}
 
 	.edit-site-style-book__example:focus:not(:disabled) {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent-solid, var(--wp-admin-theme-color, #007cba));
 		outline: 3px solid transparent;
 	}
 

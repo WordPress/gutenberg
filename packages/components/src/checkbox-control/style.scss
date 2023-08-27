@@ -4,7 +4,7 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 .components-checkbox-control__input[type="checkbox"] {
 	@include checkbox-control;
 	background: $white;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	clear: none;
 	cursor: pointer;
 	display: inline-block;

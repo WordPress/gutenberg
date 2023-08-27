@@ -126,7 +126,7 @@
 	}
 
 	& > div {
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 	}
 
 	@include break-medium {
@@ -228,7 +228,7 @@
 	left: auto;
 	right: 0;
 	width: $sidebar-width;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	background: $white;
 
 	&:focus,

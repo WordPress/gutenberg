@@ -26,6 +26,6 @@
 // Force the appender to always have "light mode" styling as it appears in a
 // light colored placeholder.
 .is-dark-theme .wp-block-widget-group__placeholder .block-editor-button-block-appender {
-	box-shadow: inset 0 0 0 $border-width $gray-900;
-	color: $gray-900;
+	box-shadow: inset 0 0 0 $border-width var(--wp-components-color-gray-contrast);
+	color: var(--wp-components-color-gray-contrast);
 }

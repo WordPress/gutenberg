@@ -240,7 +240,7 @@
 
 @mixin checkbox-control {
 	@include input-control;
-	border: $border-width solid $gray-900;
+	border: $border-width solid var(--wp-components-color-gray-contrast);
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-block-ui;
@@ -301,7 +301,7 @@
 
 @mixin radio-control {
 	@include input-control;
-	border: $border-width solid $gray-900;
+	border: $border-width solid var(--wp-components-color-gray-contrast);
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-round;
@@ -360,10 +360,10 @@
 // The editor input reset with increased specificity to avoid theme styles bleeding in.
 @mixin editor-input-reset() {
 	font-family: $editor-html-font !important;
-	color: $gray-900 !important;
+	color: var(--wp-components-color-gray-contrast) !important;
 	background: $white !important;
 	padding: $grid-unit-15 !important;
-	border: $border-width solid $gray-900 !important;
+	border: $border-width solid var(--wp-components-color-gray-contrast) !important;
 	box-shadow: none !important;
 	border-radius: $radius-block-ui !important;
 

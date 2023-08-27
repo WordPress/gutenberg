@@ -43,7 +43,7 @@ $blue-30: #5198d9;
 $gray: #87a6bc;
 $gray-light: lighten($gray, 33%); //#f3f6f8
 $gray-dark: darken($gray, 38%); //#2e4453
-$gray-900: #1a1a1a;
+var(--wp-components-color-gray-contrast): #1a1a1a;
 $gray-700: #757575;
 
 // $gray-text: ideal for standard, non placeholder text

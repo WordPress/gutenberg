@@ -35,7 +35,7 @@
 	gap: $grid-unit-10;
 
 	button.components-button.block-editor-block-styles__item {
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		box-shadow: inset 0 0 0 1px $gray-400;
 		display: inline-block;
 		width: calc(50% - #{$grid-unit-05});
@@ -47,7 +47,7 @@
 
 		&.is-active,
 		&.is-active:hover {
-			background-color: $gray-900;
+			background-color: var(--wp-components-color-gray-contrast);
 			box-shadow: none;
 		}
 

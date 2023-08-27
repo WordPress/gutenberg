@@ -5,6 +5,6 @@
 // such as the .interface-interface-skeleton__sidebar section.
 // Let's assume that this is the CSS environment we will be in when wp-components appear in a WP context.
 body {
-	color: $gray-900 !important;
+	color: var(--wp-components-color-gray-contrast) !important;
 	background: $white !important;
 }

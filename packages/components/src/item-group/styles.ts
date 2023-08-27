@@ -36,7 +36,7 @@ export const unstyledButton = ( as: 'a' | 'button' ) => {
 		&:focus-visible {
 			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
 				var(
-					--wp-components-color-accent,
+					--wp-components-color-accent-solid,
 					var(
 						--wp-admin-theme-color,
 						var( --wp-components-color-accent-solid )

@@ -49,7 +49,7 @@
 	align-items: flex-start;
 	margin: 0 0 0 -1px;
 	padding: 2px 5px 2px 1px;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	text-align: left;
 	border-radius: $radius-block-ui;
 
@@ -67,7 +67,7 @@
 
 .document-outline__level {
 	background: $gray-300;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	border-radius: 3px;
 	font-size: $default-font-size;
 	padding: 1px 6px;

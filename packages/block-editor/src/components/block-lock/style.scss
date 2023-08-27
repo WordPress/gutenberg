@@ -30,7 +30,7 @@
 	.block-editor-block-lock-modal__lock-icon {
 		flex-shrink: 0;
 		margin-right: $grid-unit-15;
-		fill: $gray-900;
+		fill: var(--wp-components-color-gray-contrast);
 	}
 
 	&:hover {
@@ -61,7 +61,7 @@
 
 .show-icon-labels {
 	.block-editor-block-toolbar__block-controls .block-editor-block-lock-toolbar {
-		border-left: 1px solid $gray-900;
+		border-left: 1px solid var(--wp-components-color-gray-contrast);
 		margin-left: $grid-unit-15 * 0.5 !important;
 		margin-right: -$grid-unit-15 * 0.5;
 	}

@@ -20,7 +20,7 @@
 .edit-site-style-book__tab-panel {
 	.components-tab-panel__tabs {
 		background: $white;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 	}
 
 	.components-tab-panel__tab-content {

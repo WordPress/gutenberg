@@ -107,7 +107,7 @@
 	padding: $grid-unit-20;
 
 	strong {
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 	}
 
 	.components-panel__body {

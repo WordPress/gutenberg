@@ -44,7 +44,7 @@
 
 	.block-editor-inserter__toggle.components-button.has-icon {
 		// Basic look
-		background: $gray-900;
+		background: var(--wp-components-color-gray-contrast);
 		border-radius: $radius-block-ui;
 		color: $white;
 		padding: 0;
@@ -115,7 +115,7 @@
 		padding: 0 !important;
 
 		// Basic look
-		background: $gray-900;
+		background: var(--wp-components-color-gray-contrast);
 		color: $white;
 
 		&:hover {

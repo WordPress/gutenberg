@@ -22,7 +22,7 @@
 		white-space: pre-wrap;
 		font-family: $editor-html-font;
 		font-size: $text-editor-font-size;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 	}
 
 	> *:first-child {
@@ -52,7 +52,7 @@
 	code {
 		padding: 2px;
 		border-radius: 2px;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		background: $gray-100;
 		font-family: $editor-html-font;
 		font-size: 14px;
@@ -249,7 +249,7 @@ div[data-type="core/freeform"] {
 	}
 
 	&.is-selected::before {
-		border-color: $gray-900;
+		border-color: var(--wp-components-color-gray-contrast);
 	}
 
 	.block-editor-block-contextual-toolbar + div {
@@ -273,7 +273,7 @@ div[data-type="core/freeform"] {
 	.mce-btn.mce-active:hover button,
 	.mce-btn.mce-active i,
 	.mce-btn.mce-active:hover i {
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 	}
 
 	// Prevent toolbar clipping on heading style in RTL languages
@@ -310,7 +310,7 @@ div[data-type="core/freeform"] {
 	// would also show when a parent block is selected.
 	div[data-type="core/freeform"].is-selected & {
 		display: block;
-		border-color: $gray-900;
+		border-color: var(--wp-components-color-gray-contrast);
 	}
 
 	// Remove the box shadow to mimic other Gutenberg UI.
@@ -338,7 +338,7 @@ div[data-type="core/freeform"] {
 	}
 
 	div.mce-toolbar-grp {
-		border-bottom: 1px solid $gray-900;
+		border-bottom: 1px solid var(--wp-components-color-gray-contrast);
 	}
 
 	// Overwrite inline styles.

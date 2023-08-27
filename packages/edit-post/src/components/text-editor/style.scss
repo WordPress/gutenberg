@@ -66,7 +66,7 @@
 		line-height: $button-size;
 		margin: 0 auto 0 0;
 		font-size: $default-font-size;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 	}
 
 	.components-button svg {

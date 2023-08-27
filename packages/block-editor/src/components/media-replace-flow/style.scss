@@ -15,7 +15,7 @@
 	padding: $grid-unit-20;
 
 	&.has-siblings {
-		border-top: $border-width solid $gray-900;
+		border-top: $border-width solid var(--wp-components-color-gray-contrast);
 		margin-top: $grid-unit-10;
 	}
 

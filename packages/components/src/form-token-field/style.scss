@@ -27,7 +27,7 @@
 		min-width: 50px;
 		background: inherit;
 		border: 0;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		box-shadow: none;
 
 		// Resolves Zooming on iOS devices
@@ -51,7 +51,7 @@
 .components-form-token-field__token {
 	font-size: $default-font-size;
 	display: flex;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	max-width: 100%;
 
 	&.is-success {
@@ -109,7 +109,7 @@
 
 		&.is-validating {
 			.components-form-token-field__token-text {
-				color: $gray-900;
+				color: var(--wp-components-color-gray-contrast);
 			}
 		}
 	}
@@ -144,12 +144,12 @@
 	cursor: pointer;
 	border-radius: 0 2px 2px 0;
 	padding: 0 2px;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	line-height: 10px;
 	overflow: initial;
 
 	&:hover {
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 	}
 }
 

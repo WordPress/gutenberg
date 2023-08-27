@@ -23,7 +23,7 @@
 	height: 100%;
 	display: block;
 	overflow: hidden;
-	background-color: $gray-900;
+	background-color: var(--wp-components-color-gray-contrast);
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
 

@@ -6,7 +6,7 @@
 	padding: 1em;
 
 	// Block UI appearance.
-	border: $border-width solid $gray-900;
+	border: $border-width solid var(--wp-components-color-gray-contrast);
 	border-radius: $radius-block-ui;
 	background-color: $white;
 
@@ -14,7 +14,7 @@
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		margin: 0;
 	}
 

@@ -1,7 +1,7 @@
 .components-font-appearance-control {
 	ul {
 		li {
-			color: $gray-900;
+			color: var(--wp-components-color-gray-contrast);
 			text-transform: capitalize;
 		}
 	}

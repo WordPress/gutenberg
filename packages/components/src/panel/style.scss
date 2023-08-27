@@ -1,6 +1,6 @@
 .components-panel {
-	background: $white;
-	border: $border-width solid $gray-200;
+	background: var(--wp-components-color-gray-background-alt);
+	border: $border-width solid var(--wp-components-color-gray-border);
 
 	> .components-panel__header:first-child,
 	> .components-panel__body:first-child {
@@ -18,8 +18,8 @@
 }
 
 .components-panel__body {
-	border-top: $border-width solid $gray-200;
-	border-bottom: $border-width solid $gray-200;
+	border-top: $border-width solid var(--wp-components-color-gray-border);
+	border-bottom: $border-width solid var(--wp-components-color-gray-border);
 
 	h3 {
 		margin: 0 0 0.5em;
@@ -35,7 +35,7 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 $grid-unit-20;
-	border-bottom: $border-width solid $gray-300;
+	border-bottom: $border-width solid var(--wp-components-color-gray-border);
 
 	// This helps ensure the correct panel height, including the border, avoiding subpixel rounding issues.
 	box-sizing: content-box;
@@ -83,7 +83,7 @@
 	width: 100%;
 	font-weight: 500;
 	text-align: left;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	border: none;
 	box-shadow: none;
 	transition: 0.1s background ease-in-out;
@@ -100,7 +100,7 @@
 		right: $grid-unit-20;
 		top: 50%;
 		transform: translateY(-50%);
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		fill: currentColor;
 		transition: 0.1s color ease-in-out;
 		@include reduce-motion("transition");

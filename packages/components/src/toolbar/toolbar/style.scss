@@ -1,6 +1,6 @@
 .components-accessible-toolbar {
 	display: inline-flex;
-	border: $border-width solid $gray-900;
+	border: $border-width solid var(--wp-components-color-gray-contrast);
 	border-radius: $radius-block-ui;
 	flex-shrink: 0;
 
@@ -62,7 +62,7 @@
 			}
 
 			&::before {
-				background: $gray-900;
+				background: var(--wp-components-color-gray-contrast);
 			}
 		}
 

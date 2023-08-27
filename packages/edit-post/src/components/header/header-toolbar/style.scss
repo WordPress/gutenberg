@@ -45,7 +45,7 @@
 		padding: 6px;
 
 		&.is-pressed {
-			background: $gray-900;
+			background: var(--wp-components-color-gray-contrast);
 		}
 
 		&:focus:not(:disabled) {

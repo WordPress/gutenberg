@@ -1,11 +1,11 @@
 .components-snackbar {
 	font-family: $default-font;
 	font-size: $default-font-size;
-	background: rgba($black, 0.85); // Emulates #1e1e1e closely.
+	background: var(--wp-components-color-gray-contrast); // Emulates #1e1e1e closely.
 	backdrop-filter: blur($grid-unit-20) saturate(180%);
 	border-radius: $radius-block-ui;
 	box-shadow: $shadow-popover;
-	color: $white;
+	color: var(--wp-components-color-gray-background);
 	padding: $grid-unit-15 ($grid-unit-05 * 5);
 	width: 100%;
 	max-width: 600px;

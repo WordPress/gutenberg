@@ -3,13 +3,13 @@ $header-toolbar-min-width: 335px;
 .edit-site-header-edit-mode {
 	height: $header-height;
 	align-items: center;
-	background-color: $white;
-	color: $gray-900;
+	background-color: var(--wp-components-color-gray-background-alt);
+	color: var(--wp-components-color-gray-contrast);
 	display: flex;
 	box-sizing: border-box;
 	width: 100%;
 	justify-content: space-between;
-	border-bottom: $border-width solid $gray-200;
+	border-bottom: $border-width solid var(--wp-components-color-gray-border);
 	padding-left: $header-height;
 
 	.edit-site-header-edit-mode__start {
@@ -112,7 +112,7 @@ $header-toolbar-min-width: 335px;
 		padding: 6px;
 
 		&.is-pressed {
-			background: $gray-900;
+			background: var(--wp-components-color-gray-contrast);
 		}
 
 		&:focus:not(:disabled) {

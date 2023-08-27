@@ -43,7 +43,7 @@
 
 		&:not(:hover),
 		&[aria-checked="true"] {
-			color: $gray-900;
+			color: var(--wp-components-color-gray-contrast);
 			cursor: auto;
 
 			.edit-site-create-template-part-modal__option-label div {

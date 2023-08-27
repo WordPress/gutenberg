@@ -18,7 +18,7 @@
 	align-items: top;
 	background: $gray-100;
 	border-radius: $radius-block-ui;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	display: flex;
 	flex-direction: row;
 	margin: $grid-unit-20;

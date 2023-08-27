@@ -6,7 +6,7 @@
 	h2,
 	h3 {
 		font-size: $default-font-size;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		margin-bottom: 1.5em;
 	}
 

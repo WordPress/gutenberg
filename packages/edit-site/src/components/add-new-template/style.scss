@@ -176,7 +176,7 @@
 		outline: 1px solid transparent;
 
 		span:first-child {
-			color: $gray-900;
+			color: var(--wp-components-color-gray-contrast);
 		}
 
 		span {

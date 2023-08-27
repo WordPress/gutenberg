@@ -113,7 +113,7 @@
 		font-size: 16px;
 		font-weight: 600;
 		text-align: left;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		border-top: none;
 		border-bottom: $border-width solid $gray-300;
 

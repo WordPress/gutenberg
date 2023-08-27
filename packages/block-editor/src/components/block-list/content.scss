@@ -393,7 +393,7 @@
 	border: none;
 	outline: none;
 	border-radius: 2px;
-	box-shadow: inset 0 0 0 $border-width $gray-900;
+	box-shadow: inset 0 0 0 $border-width var(--wp-components-color-gray-contrast);
 	resize: none;
 	overflow: hidden;
 	font-family: $editor-html-font;

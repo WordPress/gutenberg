@@ -288,7 +288,7 @@
 	}
 
 	.block-editor-inserter__toggle {
-		background: $gray-900;
+		background: var(--wp-components-color-gray-contrast);
 		color: $white;
 		height: $grid-unit-30;
 		margin: 6px 6px 6px 1px;

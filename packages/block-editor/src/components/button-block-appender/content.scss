@@ -5,8 +5,8 @@
 	justify-content: center;
 	width: 100%;
 	height: auto;
-	color: $gray-900;
-	box-shadow: inset 0 0 0 $border-width $gray-900;
+	color: var(--wp-components-color-gray-contrast);
+	box-shadow: inset 0 0 0 $border-width var(--wp-components-color-gray-contrast);
 
 	// Needs specificity to override button styles.
 	&.components-button.components-button {

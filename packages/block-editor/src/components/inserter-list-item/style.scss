@@ -36,7 +36,7 @@
 	flex-direction: column;
 	width: 100%;
 	font-size: $default-font-size;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	padding: $grid-unit-10;
 	align-items: stretch;
 	justify-content: center;
@@ -86,7 +86,7 @@
 
 		&.is-active {
 			color: $white;
-			background: $gray-900;
+			background: var(--wp-components-color-gray-contrast);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
@@ -98,7 +98,7 @@
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
 	border-radius: $radius-block-ui;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 

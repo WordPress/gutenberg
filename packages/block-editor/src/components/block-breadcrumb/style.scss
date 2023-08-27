@@ -57,7 +57,7 @@
 
 .block-editor-block-breadcrumb__button.components-button,
 .block-editor-block-breadcrumb__current {
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	padding: 0 $grid-unit-10;
 	font-size: inherit;
 }

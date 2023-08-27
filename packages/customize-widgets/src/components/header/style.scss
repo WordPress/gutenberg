@@ -42,7 +42,7 @@
 		}
 
 		&.is-pressed {
-			background: $gray-900;
+			background: var(--wp-components-color-gray-contrast);
 		}
 	}
 

@@ -37,7 +37,7 @@
 		transform: translate(-50%, -50%);
 	}
 	&.is-selected::before {
-		background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		background: var(--wp-components-color-accent-solid, var(--wp-admin-theme-color, #007cba));
 	}
 }
 
@@ -58,7 +58,7 @@
 
 .is-selected {
 	.edit-site-global-styles-screen-revisions__revision-button {
-		color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		color: var(--wp-components-color-accent-solid, var(--wp-admin-theme-color, #007cba));
 		opacity: 1;
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 	}

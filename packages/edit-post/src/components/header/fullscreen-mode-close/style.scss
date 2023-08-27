@@ -11,7 +11,7 @@
 		align-items: center;
 		align-self: stretch;
 		border: none;
-		background: $gray-900;
+		background: var(--wp-components-color-gray-contrast);
 		color: $white;
 		border-radius: 0;
 		height: $header-height + $border-width;
@@ -38,7 +38,7 @@
 			bottom: 9px + $border-width; // Height of toolbar in edit-post (not edit-site) is 61px tall.
 			left: 9px;
 			border-radius: $radius-block-ui + $border-width + $border-width;
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-gray-contrast);
 		}
 
 		// Hover color.

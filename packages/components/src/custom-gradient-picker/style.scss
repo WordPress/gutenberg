@@ -60,7 +60,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		background: $white;
 		padding: 2px;
 
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 
 		svg {
 			height: 100%;

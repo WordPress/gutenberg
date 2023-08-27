@@ -93,7 +93,7 @@
 	}
 
 	&.is-active .edit-site-global-styles-variations_item-preview {
-		border: $gray-900 $border-width solid;
+		border: var(--wp-components-color-gray-contrast) $border-width solid;
 	}
 
 	&:hover .edit-site-global-styles-variations_item-preview {

@@ -64,7 +64,7 @@
 
 	&:hover {
 		background: $gray-300;
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 	}
 }
 

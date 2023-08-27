@@ -1,11 +1,11 @@
 .block-editor-block-parent-selector {
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	border-radius: $radius-block-ui;
 
 	.block-editor-block-parent-selector__button {
 		width: $grid-unit-60;
 		height: $grid-unit-60;
-		border: $border-width solid $gray-900;
+		border: $border-width solid var(--wp-components-color-gray-border);
 		border-radius: $radius-block-ui;
 	}
 }

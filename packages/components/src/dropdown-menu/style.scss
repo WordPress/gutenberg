@@ -35,8 +35,8 @@
 			.dashicon {
 				// Block UI appearance.
 				color: $white;
-				background: $gray-900;
-				box-shadow: 0 0 0 $border-width $gray-900;
+				background: var(--wp-components-color-gray-contrast);
+				box-shadow: 0 0 0 $border-width var(--wp-components-color-gray-contrast);
 				border-radius: $border-width;
 			}
 		}
@@ -78,7 +78,7 @@
 		padding: $grid-unit-10;
 
 		.is-alternate & {
-			border-color: $gray-900;
+			border-color: var(--wp-components-color-gray-contrast);
 		}
 	}
 }

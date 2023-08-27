@@ -63,7 +63,7 @@
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		color: $gray-900;
+		color: var(--wp-components-color-gray-contrast);
 		background-color: transparent;
 	}
 

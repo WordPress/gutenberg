@@ -60,7 +60,7 @@ body.js.site-editor-php {
 }
 
 body.js.site-editor-php {
-	background: $gray-900;
+	background: var(--wp-components-color-gray-contrast);
 }
 
 .edit-site,
@@ -99,7 +99,7 @@ body.js.site-editor-php {
 	}
 
 	.interface-interface-skeleton__content {
-		background-color: $gray-900;
+		background-color: var(--wp-components-color-gray-contrast);
 	}
 }
 

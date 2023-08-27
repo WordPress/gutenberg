@@ -58,7 +58,7 @@
 }
 
 .block-directory-downloadable-block-list-item__details {
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 }
 
 .block-directory-downloadable-block-list-item__title {

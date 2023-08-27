@@ -139,7 +139,7 @@ figure.wp-block-gallery {
 	@include reduce-motion("transition");
 	border-radius: $radius-block-ui;
 	background: $white;
-	border: $border-width solid $gray-900;
+	border: $border-width solid var(--wp-components-color-gray-contrast);
 
 	&:hover {
 		box-shadow: $shadow-popover;

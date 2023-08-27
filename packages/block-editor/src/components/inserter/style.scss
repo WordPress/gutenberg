@@ -52,7 +52,7 @@ $block-inserter-tabs-height: 44px;
 			}
 
 			&.components-button {
-				border: $border-width solid $gray-900;
+				border: $border-width solid var(--wp-components-color-gray-contrast);
 			}
 		}
 	}
@@ -316,7 +316,7 @@ $block-inserter-tabs-height: 44px;
 	.block-editor-block-preview__container {
 		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
 		&:hover {
-			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+			box-shadow: 0 0 0 2px var(--wp-components-color-gray-contrast), 0 15px 25px rgb(0 0 0 / 7%);
 		}
 	}
 }
@@ -401,7 +401,7 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__quick-inserter-expand.components-button {
 	display: block;
-	background: $gray-900;
+	background: var(--wp-components-color-gray-contrast);
 	color: $white;
 	width: 100%;
 	height: ($button-size + $grid-unit-10);
@@ -561,7 +561,7 @@ $block-inserter-tabs-height: 44px;
 	.block-editor-block-preview__container {
 		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
 		&:hover {
-			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+			box-shadow: 0 0 0 2px var(--wp-components-color-gray-contrast), 0 15px 25px rgb(0 0 0 / 7%);
 		}
 	}
 }
@@ -615,7 +615,7 @@ $block-inserter-tabs-height: 44px;
 
 		&.is-hovered {
 			.block-editor-inserter__media-list__item-preview {
-				box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+				box-shadow: 0 0 0 2px var(--wp-components-color-gray-contrast), 0 15px 25px rgb(0 0 0 / 7%);
 			}
 
 			.block-editor-inserter__media-list__item-preview-options > button {
@@ -720,7 +720,7 @@ $block-inserter-tabs-height: 44px;
 	align-items: top;
 	background: $gray-100;
 	border-radius: $radius-block-ui;
-	color: $gray-900;
+	color: var(--wp-components-color-gray-contrast);
 	display: flex;
 	flex-direction: row;
 	max-width: 380px;
