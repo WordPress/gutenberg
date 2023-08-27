@@ -605,7 +605,7 @@ An example implementation of the `render.php` file defined with `render` could l
 
 ```php
 <div <?php echo get_block_wrapper_attributes(); ?>>
-	<?php echo $content; ?>
+	<?php echo esc_html( $attributes['label'] ); ?>
 </div>
 ```
 
