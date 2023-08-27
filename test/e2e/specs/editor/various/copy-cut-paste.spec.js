@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Copy/cut/paste', () => {
+test.describe( 'Copy/cut/paste (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -19,14 +19,46 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+c' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Copy - collapsed selection',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '2',
+				},
+			},
+		] );
 
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Copy - collapsed selection',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '2',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Copy - collapsed selection',
+				},
+			},
+		] );
 	} );
 
-	test( 'should cut and paste individual blocks with collapsed selection', async ( {
+	test( 'should cut and paste individual blocks with collapsed selection (-firefox)', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -44,12 +76,32 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+x' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '2',
+				},
+			},
+		] );
 
 		await pageUtils.pressKeys( 'Tab' );
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '2',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Cut - collapsed selection',
+				},
+			},
+		] );
 	} );
 
 	test( 'should copy blocks when non textual elements are focused  (image, spacer)', async ( {
@@ -60,7 +112,11 @@ test.describe( 'Copy/cut/paste', () => {
 		await editor.insertBlock( { name: 'core/spacer' } );
 		// At this point the spacer wrapper should be focused.
 		await pageUtils.pressKeys( 'primary+c' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/spacer',
+			},
+		] );
 
 		// The block appender is only visible when there's no selection.
 		await page.evaluate( () => {
@@ -68,7 +124,14 @@ test.describe( 'Copy/cut/paste', () => {
 		} );
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/spacer',
+			},
+			{
+				name: 'core/spacer',
+			},
+		] );
 	} );
 
 	test( 'should cut and paste individual non textual blocks', async ( {
@@ -87,7 +150,14 @@ test.describe( 'Copy/cut/paste', () => {
 		} );
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+			},
+			{
+				name: 'core/spacer',
+			},
+		] );
 	} );
 
 	test( 'should respect inline copy when text is selected', async ( {
@@ -106,14 +176,46 @@ test.describe( 'Copy/cut/paste', () => {
 
 		await pageUtils.pressKeys( 'primary+c' );
 		await page.keyboard.press( 'ArrowRight' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First block',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second block',
+				},
+			},
+		] );
 
 		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First block',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'ck',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second block',
+				},
+			},
+		] );
 	} );
 
-	test( 'should respect inline copy in places like input fields and textareas', async ( {
+	test( 'should respect inline copy in places like input fields and textareas (-webkit, -firefox)', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -126,12 +228,32 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+c' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/shortcode',
+				attributes: {
+					text: '[my-shortcode]',
+				},
+			},
+		] );
 
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Pasted: ' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/shortcode',
+				attributes: {
+					text: '[my-shortcode]',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Pasted: e]',
+				},
+			},
+		] );
 	} );
 
 	test( 'should handle paste events once', async ( {
@@ -139,8 +261,7 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// Add group block with paragraph.
-		await editor.insertBlock( {
+		const buttonsBlocks = {
 			name: 'core/buttons',
 			innerBlocks: [
 				{
@@ -148,7 +269,9 @@ test.describe( 'Copy/cut/paste', () => {
 					attributes: { text: 'Click' },
 				},
 			],
-		} );
+		};
+		// Add group block with paragraph.
+		await editor.insertBlock( buttonsBlocks );
 		// Cut group.
 		await pageUtils.pressKeys( 'primary+x' );
 		expect( await editor.getEditedPostContent() ).toBe( '' );
@@ -185,7 +308,12 @@ test.describe( 'Copy/cut/paste', () => {
 		);
 
 		expect( blocksUpdated.length ).toEqual( 1 );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+			},
+			buttonsBlocks,
+		] );
 	} );
 
 	test( 'can copy group onto non textual element (image, spacer)', async ( {
@@ -193,8 +321,7 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// Add group block with paragraph.
-		await editor.insertBlock( {
+		const buttonsBlocks = {
 			name: 'core/buttons',
 			innerBlocks: [
 				{
@@ -202,7 +329,9 @@ test.describe( 'Copy/cut/paste', () => {
 					attributes: { text: 'Click' },
 				},
 			],
-		} );
+		};
+		// Add group block with paragraph.
+		await editor.insertBlock( buttonsBlocks );
 		// Cut group.
 		await pageUtils.pressKeys( 'primary+x' );
 		expect( await editor.getEditedPostContent() ).toBe( '' );
@@ -239,7 +368,12 @@ test.describe( 'Copy/cut/paste', () => {
 		);
 
 		expect( blocksUpdated.length ).toEqual( 1 );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+			},
+			buttonsBlocks,
+		] );
 	} );
 
 	test( 'should copy only partial selection of text blocks', async ( {
@@ -251,7 +385,20 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'B block' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'A block',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'B block',
+				},
+			},
+		] );
 		// Partial select from both blocks.
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
@@ -266,7 +413,32 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'block',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'B ',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'A block',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'B block',
+				},
+			},
+		] );
 	} );
 
 	test( 'should copy/paste partial selection with other blocks in-between', async ( {
@@ -279,7 +451,23 @@ test.describe( 'Copy/cut/paste', () => {
 		await editor.insertBlock( { name: 'core/spacer' } );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'B block' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'A block',
+				},
+			},
+			{
+				name: 'core/spacer',
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'B block',
+				},
+			},
+		] );
 		// Partial select from outer blocks.
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
@@ -294,7 +482,38 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'block',
+				},
+			},
+			{
+				name: 'core/spacer',
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'B ',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'A block',
+				},
+			},
+			{
+				name: 'core/spacer',
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'B block',
+				},
+			},
+		] );
 	} );
 
 	test( 'should cut partial selection of text blocks', async ( {
@@ -306,7 +525,20 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'B block' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'A block',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'B block',
+				},
+			},
+		] );
 		// Partial select from both blocks.
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
@@ -321,7 +553,26 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'block',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'B ',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'A block',
+				},
+			},
+		] );
 	} );
 
 	test( 'should cut/paste partial selection with other blocks in-between', async ( {
@@ -334,7 +585,23 @@ test.describe( 'Copy/cut/paste', () => {
 		await editor.insertBlock( { name: 'core/spacer' } );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'B block' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'A block',
+				},
+			},
+			{
+				name: 'core/spacer',
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'B block',
+				},
+			},
+		] );
 		// Partial select from outer blocks.
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
@@ -349,7 +616,29 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'block',
+				},
+			},
+			{
+				name: 'core/spacer',
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'B ',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'A block',
+				},
+			},
+		] );
 	} );
 
 	test( 'should cut partial selection and merge like a normal `delete` - not forward ', async ( {
@@ -361,7 +650,20 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.type( 'Heading' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Paragraph' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'Heading',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Paragraph',
+				},
+			},
+		] );
 		// Partial select from outer blocks.
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
@@ -376,7 +678,26 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'ading',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Paragra',
+				},
+			},
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'Heph',
+				},
+			},
+		] );
 	} );
 
 	test( 'should paste plain text in plain text context when cross block selection is copied ', async ( {
@@ -388,7 +709,20 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.type( 'Heading' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Paragraph' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'Heading',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Paragraph',
+				},
+			},
+		] );
 		// Partial select from outer blocks.
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
@@ -402,7 +736,26 @@ test.describe( 'Copy/cut/paste', () => {
 		// Create a new code block to paste there.
 		await editor.insertBlock( { name: 'core/code' } );
 		await pageUtils.pressKeys( 'primary+v' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'Heading',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Paragraph',
+				},
+			},
+			{
+				name: 'core/code',
+				attributes: {
+					content: 'ading\n\nParagra',
+				},
+			},
+		] );
 	} );
 
 	test( 'should paste single line in post title', async ( {
@@ -423,7 +776,7 @@ test.describe( 'Copy/cut/paste', () => {
 			await editor.canvas.evaluate(
 				() => document.activeElement.innerHTML
 			)
-		).toMatchSnapshot();
+		).toBe( 'Hello World' );
 	} );
 
 	test( 'should paste single line in post title with existing content', async ( {
@@ -458,6 +811,18 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+v' );
 		// Ensure the selection is correct.
 		await page.keyboard.type( 'y' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content: 'xy',
+						},
+					},
+				],
+			},
+		] );
 	} );
 } );
