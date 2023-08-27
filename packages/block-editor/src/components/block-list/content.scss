@@ -85,7 +85,6 @@
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
 	&.is-navigate-mode .block-editor-block-list__block.is-selected,
-	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected,
 	.block-editor-block-list__block:not([contenteditable]):focus {
 		outline: none;
 
@@ -113,8 +112,6 @@
 
 	// Moving blocks using keyboard (Ellipsis > Move).
 	& .is-block-moving-mode.block-editor-block-list__block.is-selected {
-		box-shadow: none;
-		outline: none;
 
 		&::after {
 			content: "";
@@ -130,6 +127,8 @@
 			top: -$default-block-margin * 0.5;
 			border-radius: $radius-block-ui;
 			border-top: 4px solid $gray-400;
+			bottom: auto;
+			box-shadow: none;
 		}
 	}
 
