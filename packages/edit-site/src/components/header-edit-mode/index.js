@@ -19,7 +19,13 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus, external, chevronUpDown } from '@wordpress/icons';
+import {
+	desktop,
+	listView,
+	plus,
+	external,
+	chevronUpDown,
+} from '@wordpress/icons';
 import {
 	__unstableMotion as motion,
 	Button,
@@ -313,13 +319,13 @@ export default function HeaderEditMode() {
 					variants={ toolbarVariants }
 					transition={ toolbarTransition }
 				>
-					{ ! isFocusMode && hasDefaultEditorCanvasView && (
-						<div
-							className={ classnames(
-								'edit-site-header-edit-mode__preview-options',
-								{ 'is-zoomed-out': isZoomedOutView }
-							) }
-						>
+					<div
+						className={ classnames(
+							'edit-site-header-edit-mode__preview-options',
+							{ 'is-zoomed-out': isZoomedOutView }
+						) }
+					>
+						{ ! isFocusMode && hasDefaultEditorCanvasView ? (
 							<PreviewOptions
 								deviceType={ deviceType }
 								setDeviceType={ setPreviewDeviceType }
@@ -344,8 +350,15 @@ export default function HeaderEditMode() {
 									</MenuGroup>
 								) }
 							</PreviewOptions>
-						</div>
-					) }
+						) : (
+							<Button
+								label={ __( 'View' ) }
+								icon={ desktop }
+								disabled
+								__experimentalIsFocusable
+							/>
+						) }
+					</div>
 					<SaveButton />
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />
