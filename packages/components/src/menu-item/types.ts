@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { ButtonAsButtonProps } from '../button/types';
 
-export type MenuItemProps = ButtonAsButtonProps & {
+export type MenuItemProps = Pick< ButtonAsButtonProps, 'isDestructive' > & {
 	/**
 	 * A CSS `class` to give to the container element.
 	 */
@@ -33,7 +33,8 @@ export type MenuItemProps = ButtonAsButtonProps & {
 	 */
 	iconPosition?: ButtonAsButtonProps[ 'iconPosition' ];
 	/**
-	 * Whether or not the menu item is currently selected.
+	 * Whether or not the menu item is currently selected, `isSelected` is only taken into
+	 * account when the `role` prop is either `"menuitemcheckbox"` or `"menuitemradio"`.
 	 */
 	isSelected?: boolean;
 	/**
