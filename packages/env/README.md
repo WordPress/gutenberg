@@ -473,6 +473,10 @@ $ wp-env install-path
 /home/user/.wp-env/63263e6506becb7b8613b02d42280a49
 ```
 
+### `wp-env init`
+
+Generates a .wp-env.json file into the current directory.
+
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.

@@ -9,7 +9,7 @@ const { existsSync } = require( 'fs' );
 const inquirer = require( 'inquirer' );
 
 /**
- * Generates a .wp-env.json file.
+ * Generates a .wp-env.json file into the current directory.
  * @param {Object} options
  * @param {Object} options.spinner A CLI spinner which indicates progress.
  */
