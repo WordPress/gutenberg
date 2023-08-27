@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The bundled `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` dependencies has been updated from requiring ^5.62.0 to requiring ^6.4.1 ([#XXX](https://github.com/WordPress/gutenberg/pull/XXX)):
+    -   Removes the deprecated `@typescript-eslint/no-duplicate-imports` rule in favor of `import/no-duplicates`.
+
+### Enhancement
+
+-   The bundled `eslint-plugin-jest` dependency has been updated from requiring `^27.2.1` to requiring `^27.2.3` ([#XXX](https://github.com/WordPress/gutenberg/pull/XXX)).
+
 ## 15.0.0 (2023-08-16)
 
 ### Breaking Changes
