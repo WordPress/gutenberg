@@ -180,7 +180,8 @@ export default function VisualEditor( { styles } ) {
 	const desktopCanvasStyles = {
 		height: '100%',
 		width: '100%',
-		margin: 0,
+		marginLeft: 'auto',
+		marginRight: 'auto',
 		display: 'flex',
 		flexFlow: 'column',
 		// Default background color so that grey
