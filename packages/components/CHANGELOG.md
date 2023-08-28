@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## Enhancement
+### Enhancement
 
 -   `FormTokenField`: Add `__experimentalAddOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#53976](https://github.com/WordPress/gutenberg/pull/53976)).
 
