@@ -247,7 +247,6 @@ export default () => {
 									result === null || result === undefined
 										? ''
 										: result;
-								// labelled break is 1b smaller here than a return statement (sorry)
 								return;
 							} catch ( err ) {}
 						}
