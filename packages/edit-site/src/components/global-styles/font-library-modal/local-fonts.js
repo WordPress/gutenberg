@@ -19,7 +19,6 @@ import { useState, useContext } from '@wordpress/element';
 import TabLayout from './tab-layout';
 import { ALLOWED_FILE_EXTENSIONS } from './constants';
 import LocalFontVariant from './local-font-variant';
-import PreviewContols from './preview-controls';
 import { FontLibraryContext } from './context';
 
 function LocalFonts() {
@@ -161,7 +160,6 @@ function LocalFonts() {
 
 			{ selectedFiles.length > 0 && (
 				<>
-					{ /* <PreviewContols /> */ }
 					<Spacer margin={ 8 } />
 
 					<VStack spacing={ 4 }>
