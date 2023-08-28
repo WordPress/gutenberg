@@ -573,7 +573,7 @@ const UnforwardedPopover = (
 		content = createPortal( content, getPopoverFallbackContainer() );
 	}
 
-	if ( ! hasAnchor ) {
+	if ( hasAnchor ) {
 		return content;
 	}
 
