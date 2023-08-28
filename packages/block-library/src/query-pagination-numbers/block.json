@@ -7,6 +7,12 @@
 	"parent": [ "core/query-pagination" ],
 	"description": "Displays a list of page numbers for pagination",
 	"textdomain": "default",
+	"attributes": {
+		"midSize": {
+			"type": "number",
+			"default": 2
+		}
+	},
 	"usesContext": [ "queryId", "query" ],
 	"supports": {
 		"reusable": false,
