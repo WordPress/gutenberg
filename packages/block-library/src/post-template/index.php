@@ -50,6 +50,12 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
 	if ( $use_global_query ) {
 		global $wp_query;
+
+		/*
+		 * If already in the main query loop, duplicate the query instance to not tamper with the main instance.
+		 * Since this is a nested query, it should start at the beginning, therefore rewind posts.
+		 * Otherwise, the main query loop has not started yet and this block is responsible for doing so.
+		 */
 		if ( in_the_loop() ) {
 			$query = clone $wp_query;
 			$query->rewind_posts();
