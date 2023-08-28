@@ -2293,7 +2293,7 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 function getUnsyncedPatterns( state ) {
 	const reusableBlocks =
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
-	const { patternCatogoriesMap: categories } =
+	const { patternCategoriesMap: categories } =
 		state?.settings?.__experimentalUserPatternCategories ?? {};
 	return reusableBlocks
 		.filter(
