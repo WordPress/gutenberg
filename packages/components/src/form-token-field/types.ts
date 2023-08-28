@@ -182,6 +182,12 @@ export interface FormTokenFieldProps
 	 * @default false
 	 */
 	__nextHasNoMarginBottom?: boolean;
+	/**
+	 * If true add any incompleteTokenValue as a new token.
+	 *
+	 * @default false
+	 */
+	__experimentalAddOnBlur?: boolean;
 }
 
 /**
