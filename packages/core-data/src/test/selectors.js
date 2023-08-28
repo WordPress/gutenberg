@@ -838,20 +838,20 @@ describe( 'getCurrentUser', () => {
 
 describe( 'getReferenceByDistinctEdits', () => {
 	it( 'should return referentially equal values across empty states', () => {
-		const state = { undo: [] };
+		const state = { undo: { list: [] } };
 		expect( getReferenceByDistinctEdits( state ) ).toBe(
 			getReferenceByDistinctEdits( state )
 		);
 
-		const beforeState = { undo: [] };
-		const afterState = { undo: [] };
+		const beforeState = { undo: { list: [] } };
+		const afterState = { undo: { list: [] } };
 		expect( getReferenceByDistinctEdits( beforeState ) ).toBe(
 			getReferenceByDistinctEdits( afterState )
 		);
 	} );
 
 	it( 'should return referentially equal values across unchanging non-empty state', () => {
-		const undoStates = [ {} ];
+		const undoStates = { list: [ {} ] };
 		const state = { undo: undoStates };
 		expect( getReferenceByDistinctEdits( state ) ).toBe(
 			getReferenceByDistinctEdits( state )
@@ -866,9 +866,9 @@ describe( 'getReferenceByDistinctEdits', () => {
 
 	describe( 'when adding edits', () => {
 		it( 'should return referentially different values across changing states', () => {
-			const beforeState = { undo: [ {} ] };
+			const beforeState = { undo: { list: [ {} ] } };
 			beforeState.undo.offset = 0;
-			const afterState = { undo: [ {}, {} ] };
+			const afterState = { undo: { list: [ {}, {} ] } };
 			afterState.undo.offset = 1;
 			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe(
 				getReferenceByDistinctEdits( afterState )
@@ -878,9 +878,9 @@ describe( 'getReferenceByDistinctEdits', () => {
 
 	describe( 'when using undo', () => {
 		it( 'should return referentially different values across changing states', () => {
-			const beforeState = { undo: [ {}, {} ] };
+			const beforeState = { undo: { list: [ {}, {} ] } };
 			beforeState.undo.offset = 1;
-			const afterState = { undo: [ {}, {} ] };
+			const afterState = { undo: { list: [ {}, {} ] } };
 			afterState.undo.offset = 0;
 			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe(
 				getReferenceByDistinctEdits( afterState )

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { camelCase } from 'change-case';
-import { get } from 'lodash';
 import { Dimensions } from 'react-native';
 
 /**
@@ -191,6 +190,22 @@ export function getBlockTypography(
 	return typographyStyles;
 }
 
+/**
+ * Return a value from a certain path of the object.
+ * Path is specified as an array of properties, like: [ 'parent', 'child' ].
+ *
+ * @param {Object} object Input object.
+ * @param {Array}  path   Path to the object property.
+ * @return {*} Value of the object property at the specified path.
+ */
+const getValueFromObjectPath = ( object, path ) => {
+	let value = object;
+	path.forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
+
 export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
 	const variables = [ 'preset', 'custom', 'var', 'fontSize' ];
@@ -231,11 +246,11 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 						customValuesData
 					)
 				) {
-					return get( customValuesData, path );
+					return getValueFromObjectPath( customValuesData, path );
 				}
 
 				// Check for camelcase properties.
-				return get( customValuesData, [
+				return getValueFromObjectPath( customValuesData, [
 					...path.slice( 0, path.length - 1 ),
 					camelCase( path[ path.length - 1 ] ),
 				] );

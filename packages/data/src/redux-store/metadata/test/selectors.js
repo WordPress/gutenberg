@@ -324,3 +324,35 @@ describe( 'getResolutionError', () => {
 		).toBeFalsy();
 	} );
 } );
+
+describe( 'hasResolvingSelectors', () => {
+	let registry;
+	beforeEach( () => {
+		registry = createRegistry();
+		registry.registerStore( 'testStore', testStore );
+	} );
+
+	it( 'returns false if no requests have started', () => {
+		const { hasResolvingSelectors } = registry.select( 'testStore' );
+		const result = hasResolvingSelectors();
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'returns false if all requests have finished', () => {
+		registry.dispatch( 'testStore' ).startResolution( 'getFoo', [] );
+		registry.dispatch( 'testStore' ).finishResolution( 'getFoo', [] );
+		const { hasResolvingSelectors } = registry.select( 'testStore' );
+		const result = hasResolvingSelectors();
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'returns true if has started but not finished', () => {
+		registry.dispatch( 'testStore' ).startResolution( 'getFoo', [] );
+		const { hasResolvingSelectors } = registry.select( 'testStore' );
+		const result = hasResolvingSelectors();
+
+		expect( result ).toBe( true );
+	} );
+} );

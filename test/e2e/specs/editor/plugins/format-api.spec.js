@@ -21,7 +21,7 @@ test.describe( 'Using Format API', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'First paragraph' );
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await editor.clickBlockToolbarButton( 'More' );

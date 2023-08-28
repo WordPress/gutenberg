@@ -6,7 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Inner blocks templates', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin(
-			'gutenberg-test-inner-blocks-templates'
+			'gutenberg-test-innerblocks-templates'
 		);
 	} );
 
@@ -16,7 +16,7 @@ test.describe( 'Inner blocks templates', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
-			'gutenberg-test-inner-blocks-templates'
+			'gutenberg-test-innerblocks-templates'
 		);
 	} );
 
@@ -28,9 +28,11 @@ test.describe( 'Inner blocks templates', () => {
 			name: 'test/test-inner-blocks-async-template',
 		} );
 
-		const blockWithTemplateContent = page.locator(
-			'role=document[name="Block: Test Inner Blocks Async Template"i] >> text=OneTwo'
-		);
+		const blockWithTemplateContent = page
+			.frameLocator( '[name=editor-canvas]' )
+			.locator(
+				'role=document[name="Block: Test Inner Blocks Async Template"i] >> text=OneTwo'
+			);
 
 		// The block template content appears asynchronously, so wait for it.
 		await expect( blockWithTemplateContent ).toBeVisible();

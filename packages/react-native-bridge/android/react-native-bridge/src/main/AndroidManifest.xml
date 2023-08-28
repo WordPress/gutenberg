@@ -1,6 +1,9 @@
-
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.wordpress.mobile.ReactNativeGutenbergBridge">
+<!--
+    IMPORTANT: Any updates to the package name should be reflected in
+    the `namespace` property of the `build.gradle` file.
+    File reference: `react-native-bridge/android/react-native-bridge/build.gradle`
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.wordpress.mobile.ReactNativeGutenbergBridge">
 
     <queries>
         <intent>
@@ -19,6 +22,9 @@
     <application>
         <activity
             android:name=".GutenbergWebViewActivity"
+            android:theme="@style/Base.GutenbergWebView" />
+        <activity
+            android:name=".GutenbergEmbedWebViewActivity"
             android:theme="@style/Base.GutenbergWebView" />
     </application>
 

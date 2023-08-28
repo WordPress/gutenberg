@@ -112,3 +112,11 @@ export type DropdownProps = {
 	 */
 	position?: PopoverProps[ 'position' ];
 };
+
+export type DropdownInternalContext = {
+	/**
+	 * This variant can be used to change the appearance of the component in
+	 * specific contexts, ie. when rendered inside the `Toolbar` component.
+	 */
+	variant?: 'toolbar';
+};

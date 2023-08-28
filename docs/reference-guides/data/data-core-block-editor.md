@@ -209,6 +209,35 @@ _Returns_
 
 -   `number`: Number of blocks in the post.
 
+### getBlockEditingMode
+
+Returns the block editing mode for a given block.
+
+The mode can be one of three options:
+
+-   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be selected.
+-   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the toolbar, the block movers, block settings.
+-   `'default'`: Allows editing the block as normal.
+
+Blocks can set a mode using the `useBlockEditingMode` hook.
+
+The mode is inherited by all of the block's inner blocks, unless they have their own mode.
+
+A template lock can also set a mode. If the template lock is `'contentOnly'`, the block's mode is overridden to `'contentOnly'` if the block has a content role attribute, or `'disabled'` otherwise.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
+
+_Returns_
+
+-   `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
+
 ### getBlockHierarchyRootClientId
 
 Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -461,6 +490,29 @@ _Parameters_
 _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
+
+### getDirectInsertBlock
+
+Returns the block to be directly inserted by the block appender.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `?WPDirectInsertBlock`: The block type to be directly inserted.
+
+_Type Definition_
+
+-   _WPDirectInsertBlock_ `Object`
+
+_Properties_
+
+-   _name_ `string`: The type of block.
+-   _attributes_ `?Object`: Attributes to pass to the newly created block.
+-   _attributesToCopy_ `?Array<string>`: Attributes to be copied from adjecent blocks when inserted.
 
 ### getDraggedBlockClientIds
 
@@ -1190,6 +1242,8 @@ _Parameters_
 
 Action that inserts a single block, optionally at a specific index respective a root block list.
 
+Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if a templateLock is active on the block list.
+
 _Parameters_
 
 -   _block_ `Object`: Block object to insert.
@@ -1205,6 +1259,8 @@ _Returns_
 ### insertBlocks
 
 Action that inserts an array of blocks, optionally at a specific index respective a root block list.
+
+Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if a templateLock is active on the block list.
 
 _Parameters_
 
@@ -1291,6 +1347,108 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### registerInserterMediaCategory
+
+Registers a new inserter media category. Once registered, the media category is available in the inserter's media tab.
+
+The following interfaces are used:
+
+_Type Definition_
+
+-   _InserterMediaRequest_ `Object`: Interface for inserter media requests.
+
+_Properties_
+
+-   _per_page_ `number`: How many items to fetch per page.
+-   _search_ `string`: The search term to use for filtering the results.
+
+_Type Definition_
+
+-   _InserterMediaItem_ `Object`: Interface for inserter media responses. Any media resource should map their response to this interface, in order to create the core WordPress media blocks (image, video, audio).
+
+_Properties_
+
+-   _title_ `string`: The title of the media item.
+-   _url_ \`string: The source url of the media item.
+-   _previewUrl_ `[string]`: The preview source url of the media item to display in the media list.
+-   _id_ `[number]`: The WordPress id of the media item.
+-   _sourceId_ `[number|string]`: The id of the media item from external source.
+-   _alt_ `[string]`: The alt text of the media item.
+-   _caption_ `[string]`: The caption of the media item.
+
+_Usage_
+
+```js
+wp.data.dispatch( 'core/block-editor' ).registerInserterMediaCategory( {
+	name: 'openverse',
+	labels: {
+		name: 'Openverse',
+		search_items: 'Search Openverse',
+	},
+	mediaType: 'image',
+	async fetch( query = {} ) {
+		const defaultArgs = {
+			mature: false,
+			excluded_source: 'flickr,inaturalist,wikimedia',
+			license: 'pdm,cc0',
+		};
+		const finalQuery = { ...query, ...defaultArgs };
+		// Sometimes you might need to map the supported request params according to `InserterMediaRequest`.
+		// interface. In this example the `search` query param is named `q`.
+		const mapFromInserterMediaRequest = {
+			per_page: 'page_size',
+			search: 'q',
+		};
+		const url = new URL( 'https://api.openverse.engineering/v1/images/' );
+		Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
+			const queryKey = mapFromInserterMediaRequest[ key ] || key;
+			url.searchParams.set( queryKey, value );
+		} );
+		const response = await window.fetch( url, {
+			headers: {
+				'User-Agent': 'WordPress/inserter-media-fetch',
+			},
+		} );
+		const jsonResponse = await response.json();
+		const results = jsonResponse.results;
+		return results.map( ( result ) => ( {
+			...result,
+			// If your response result includes an `id` prop that you want to access later, it should
+			// be mapped to `InserterMediaItem`'s `sourceId` prop. This can be useful if you provide
+			// a report URL getter.
+			// Additionally you should always clear the `id` value of your response results because
+			// it is used to identify WordPress media items.
+			sourceId: result.id,
+			id: undefined,
+			caption: result.caption,
+			previewUrl: result.thumbnail,
+		} ) );
+	},
+	getReportUrl: ( { sourceId } ) =>
+		`https://wordpress.org/openverse/image/${ sourceId }/report/`,
+	isExternalResource: true,
+} );
+```
+
+_Parameters_
+
+-   _category_ `InserterMediaCategory`: The inserter media category to register.
+
+_Type Definition_
+
+-   _InserterMediaCategory_ `Object`: Interface for inserter media category.
+
+_Properties_
+
+-   _name_ `string`: The name of the media category, that should be unique among all media categories.
+-   _labels_ `Object`: Labels for the media category.
+-   _labels.name_ `string`: General name of the media category. It's used in the inserter media items list.
+-   _labels.search_items_ `[string]`: Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
+-   _mediaType_ `('image'|'audio'|'video')`: The media type of the media category.
+-   _fetch_ `(InserterMediaRequest) => Promise<InserterMediaItem[]>`: The function to fetch media items for the category.
+-   _getReportUrl_ `[(InserterMediaItem) => string]`: If the media category supports reporting media items, this function should return the report url for the media item. It accepts the `InserterMediaItem` as an argument.
+-   _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when the user
 
 ### removeBlock
 
@@ -1424,6 +1582,23 @@ _Parameters_
 
 -   _clientId_ `string`: Block client ID.
 -   _fallbackToParent_ `boolean`: If true, select the first parent if there is no previous block.
+
+### setBlockEditingMode
+
+Sets the block editing mode for a given block.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
+-   _mode_ `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### setBlockMovingClientId
 
@@ -1577,6 +1752,22 @@ Action that enables or disables block selection.
 _Parameters_
 
 -   _isSelectionEnabled_ `[boolean]`: Whether block selection should be enabled.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### unsetBlockEditingMode
+
+Clears the block editing mode for a given block.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
 
 _Returns_
 

@@ -37,7 +37,7 @@ test.describe( 'Block deletion', () => {
 
 		// Remove the current paragraph via the Block Toolbar options menu.
 		await editor.showBlockToolbar();
-		await editor.canvas
+		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
@@ -84,7 +84,7 @@ test.describe( 'Block deletion', () => {
 
 		// Remove the current paragraph via the Block Toolbar options menu.
 		await editor.showBlockToolbar();
-		await editor.canvas
+		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
@@ -313,7 +313,7 @@ test.describe( 'Block deletion', () => {
 
 		// Remove that paragraph via its options menu.
 		await editor.showBlockToolbar();
-		await editor.canvas
+		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();

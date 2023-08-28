@@ -2,12 +2,12 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { get } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { getBlockType } from './selectors';
+import { getValueFromObjectPath } from './utils';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
 
 const ROOT_BLOCK_SUPPORTS = [
@@ -106,15 +106,7 @@ export const getSupportedStyles = createSelector(
 
 		// Check for blockGap support.
 		// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
-		// Also, only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
-		if (
-			blockType?.supports?.spacing?.blockGap &&
-			blockType?.supports?.spacing?.__experimentalSkipSerialization !==
-				true &&
-			! blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
-				( spacingType ) => spacingType === 'blockGap'
-			)
-		) {
+		if ( blockType?.supports?.spacing?.blockGap ) {
 			supportKeys.push( 'blockGap' );
 		}
 
@@ -135,7 +127,7 @@ export const getSupportedStyles = createSelector(
 				if (
 					STYLE_PROPERTY[ styleName ].support[ 0 ] in
 						blockType.supports &&
-					get(
+					getValueFromObjectPath(
 						blockType.supports,
 						STYLE_PROPERTY[ styleName ].support
 					) !== false
@@ -146,7 +138,7 @@ export const getSupportedStyles = createSelector(
 			}
 
 			if (
-				get(
+				getValueFromObjectPath(
 					blockType.supports,
 					STYLE_PROPERTY[ styleName ].support,
 					false

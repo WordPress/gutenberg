@@ -135,8 +135,9 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 		...( Platform.isNative && {
 			marginVertical: NATIVE_MARGIN_SPACING,
 			marginHorizontal: NATIVE_MARGIN_SPACING,
-			useCompactList: true,
+			renderAppender: false,
 		} ),
+		__experimentalCaptureToolbars: true,
 	} );
 	useMigrateOnLoad( attributes, clientId );
 	const { ordered, type, reversed, start } = attributes;
@@ -177,10 +178,12 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 			{ controls }
 			{ ordered && (
 				<OrderedListSettings
-					setAttributes={ setAttributes }
-					ordered={ ordered }
-					reversed={ reversed }
-					start={ start }
+					{ ...{
+						setAttributes,
+						reversed,
+						start,
+						type,
+					} }
 				/>
 			) }
 		</>

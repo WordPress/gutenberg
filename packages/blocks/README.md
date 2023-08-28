@@ -5,7 +5,7 @@
 For more context, refer to [_What Are Little Blocks Made Of?_](https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of/) from the [Make WordPress Design](https://make.wordpress.org/design/) blog.
 
 <div class="callout callout-alert">
-[Learn how to create your first block](https://developer.wordpress.org/block-editor/getting-started/create-block/) for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all you need to know to get started with creating blocks.
+<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">Learn how to create your first block</a> for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all you need to know to get started with creating blocks.
 </div>
 
 ## Installation
@@ -458,6 +458,7 @@ _Parameters_
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
 -   _options.tagName_ `[Array]`: The tag into which content will be inserted.
 -   _options.preserveWhiteSpace_ `[boolean]`: Whether or not to preserve consequent white space.
+-   _options.disableFilters_ `[boolean]`: Whether or not to filter non semantic content.
 
 _Returns_
 

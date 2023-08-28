@@ -3,7 +3,9 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { motion, MotionProps } from 'framer-motion';
+import type { MotionProps } from 'framer-motion';
+// eslint-disable-next-line no-restricted-imports
+import { motion } from 'framer-motion';
 import { css } from '@emotion/react';
 
 /**
@@ -24,11 +26,8 @@ import { escapeAttribute } from '@wordpress/escape-html';
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect, useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
@@ -43,7 +42,7 @@ const animationExitDelay = 0;
 // as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
 type Props = Omit<
 	WordPressComponentProps< NavigatorScreenProps, 'div', false >,
-	Exclude< keyof MotionProps, 'style' >
+	Exclude< keyof MotionProps, 'style' | 'children' >
 >;
 
 function UnconnectedNavigatorScreen(

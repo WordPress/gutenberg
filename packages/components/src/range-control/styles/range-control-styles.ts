@@ -18,6 +18,7 @@ import type {
 	TooltipProps,
 	TrackProps,
 	WrapperProps,
+	RangeControlProps,
 } from '../types';
 
 const rangeHeightValue = 30;
@@ -26,15 +27,24 @@ const rangeHeight = () =>
 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
 const thumbSize = 12;
 
-export const Root = styled.div`
+const deprecatedHeight = ( {
+	__next40pxDefaultSize,
+}: Pick< RangeControlProps, '__next40pxDefaultSize' > ) =>
+	! __next40pxDefaultSize && css( { minHeight: rangeHeightValue } );
+
+type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' >;
+export const Root = styled.div< RootProps >`
 	-webkit-tap-highlight-color: transparent;
-	align-items: flex-start;
+	align-items: center;
 	display: flex;
 	justify-content: flex-start;
 	padding: 0;
 	position: relative;
 	touch-action: none;
 	width: 100%;
+	min-height: 40px;
+	/* TODO: remove after removing the __next40pxDefaultSize prop */
+	${ deprecatedHeight };
 `;
 
 const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
@@ -174,7 +184,7 @@ const thumbColor = ( { disabled }: ThumbProps ) =>
 				background-color: ${ COLORS.gray[ 400 ] };
 		  `
 		: css`
-				background-color: ${ COLORS.ui.theme };
+				background-color: ${ COLORS.theme.accent };
 		  `;
 
 export const ThumbWrapper = styled.span`
@@ -205,7 +215,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 				&::before {
 					content: ' ';
 					position: absolute;
-					background-color: ${ COLORS.ui.theme };
+					background-color: ${ COLORS.theme.accent };
 					opacity: 0.4;
 					border-radius: 50%;
 					height: ${ thumbSize + 8 }px;
@@ -296,7 +306,6 @@ export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;
 	margin-top: 0;
-	width: ${ space( 16 ) } !important;
 
 	input[type='number']& {
 		${ rangeHeight };

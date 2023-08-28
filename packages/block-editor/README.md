@@ -20,9 +20,7 @@ import {
 	BlockList,
 	BlockTools,
 	WritingFlow,
-	ObserveTyping,
 } from '@wordpress/block-editor';
-import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent() {
@@ -34,16 +32,11 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<SlotFillProvider>
-				<BlockTools>
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList />
-						</ObserveTyping>
-					</WritingFlow>
-				</BlockTools>
-				<Popover.Slot />
-			</SlotFillProvider>
+			<BlockTools>
+				<WritingFlow>
+					<BlockList />
+				</WritingFlow>
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }
@@ -398,7 +391,7 @@ _Returns_
 
 Computes a fluid font-size value that uses clamp(). A minimum and maximum font size OR a single font size can be specified.
 
-If a single font size is specified, it is scaled up and down by minimumFontSizeFactor and maximumFontSizeFactor to arrive at the minimum and maximum sizes.
+If a single font size is specified, it is scaled up and down using a logarithmic scale.
 
 _Usage_
 
@@ -417,18 +410,30 @@ const fontSize = getComputedFluidTypographyValue( {
 _Parameters_
 
 -   _args_ `Object`:
--   _args.minimumViewPortWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
--   _args.maximumViewPortWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+-   _args.minimumViewportWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+-   _args.maximumViewportWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
 -   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
 -   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
 -   _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
--   _args.minimumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive minimumFontSize. Optional.
 -   _args.minimumFontSizeLimit_ `?string`: The smallest a calculated font size may be. Optional.
 
 _Returns_
 
 -   `string|null`: A font-size value using clamp().
+
+### getCustomValueFromPreset
+
+Converts a spacing preset into a custom value.
+
+_Parameters_
+
+-   _value_ `string`: Value to convert
+-   _spacingSizes_ `Array`: Array of the current spacing preset objects
+
+_Returns_
+
+-   `string`: Mapping of the spacing preset to its equivalent custom value.
 
 ### getFontSize
 
@@ -527,11 +532,23 @@ Provides the CSS class names and inline styles for a block's typography support 
 _Parameters_
 
 -   _attributes_ `Object`: Block attributes.
--   _fluidTypographySettings_ `Object|boolean`: If boolean, whether the function should try to convert font sizes to fluid values, otherwise an object containing theme fluid typography settings.
+-   _settings_ `Object|boolean`: Merged theme.json settings
 
 _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
+
+### HeadingLevelDropdown
+
+Dropdown for selecting a heading level (1 through 6) or paragraph (0).
+
+_Parameters_
+
+-   _props_ `WPHeadingLevelDropdownProps`: Component props.
+
+_Returns_
+
+-   `WPComponent`: The toolbar.
 
 ### HeightControl
 
@@ -656,6 +673,10 @@ _Related_
 
 Private @wordpress/block-editor APIs.
 
+### ReusableBlocksRenameHint
+
+Undocumented declaration.
+
 ### RichText
 
 _Related_
@@ -687,6 +708,7 @@ _Properties_
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `boolean|Array`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
+-   _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
@@ -735,7 +757,7 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 
 _Parameters_
 
--   _styles_ `Array`: CSS rules.
+-   _styles_ `Object|Array`: CSS rules.
 -   _wrapperClassName_ `string`: Wrapper Class Name.
 
 _Returns_
@@ -764,6 +786,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+### useBlockCommands
+
+Undocumented declaration.
+
 ### useBlockDisplayInformation
 
 Hook used to try to find a matching block variation and return the appropriate information for display reasons. In order to to try to find a match we need to things: 1. Block's client id to extract it's current attributes. 2. A block variation should have set `isActive` prop to a proper function.
@@ -786,9 +812,68 @@ _Returns_
 
 -   `Object`: Block edit context
 
+### useBlockEditingMode
+
+Allows a block to restrict the user interface that is displayed for editing that block and its inner blocks.
+
+_Usage_
+
+```js
+function MyBlock( { attributes, setAttributes } ) {
+	useBlockEditingMode( 'disabled' );
+	return <div { ...useBlockProps() }></div>;
+}
+```
+
+`mode` can be one of three options:
+
+-   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
+    selected.
+-   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
+    toolbar, the block movers, block settings.
+-   `'default'`: Allows editing the block as normal.
+
+The mode is inherited by all of the block's inner blocks, unless they have
+their own mode.
+
+If called outside of a block context, the mode is applied to all blocks.
+
+_Parameters_
+
+-   _mode_ `?BlockEditingMode`: The editing mode to apply. If undefined, the current editing mode is not changed.
+
+_Returns_
+
+-   `BlockEditingMode`: The current editing mode.
+
 ### useBlockProps
 
 This hook is used to lightly mark an element as a block element. The element should be the outermost element of a block. Call this hook and pass the returned props to the element to mark as a block. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
+
+Use of this hook on the outermost element of a block is required if using API >= v2.
+
+_Usage_
+
+```js
+import { useBlockProps } from '@wordpress/block-editor';
+
+export default function Edit() {
+
+  const blockProps = useBlockProps(
+    className: 'my-custom-class',
+    style: {
+      color: '#222222',
+      backgroundColor: '#eeeeee'
+    }
+  )
+
+  return (
+    <div { ...blockProps }>
+
+    </div>
+  )
+}
+```
 
 _Parameters_
 

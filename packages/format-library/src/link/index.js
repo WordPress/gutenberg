@@ -60,9 +60,11 @@ function Edit( {
 		}
 	}
 
-	function stopAddingLink() {
+	function stopAddingLink( returnFocus = true ) {
 		setAddingLink( false );
-		onFocus();
+		if ( returnFocus ) {
+			onFocus();
+		}
 	}
 
 	function onRemoveFormat() {
@@ -87,6 +89,8 @@ function Edit( {
 					isActive={ isActive }
 					shortcutType="primaryShift"
 					shortcutCharacter="k"
+					aria-haspopup="true"
+					aria-expanded={ addingLink || isActive }
 				/>
 			) }
 			{ ! isActive && (
@@ -98,6 +102,8 @@ function Edit( {
 					isActive={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="k"
+					aria-haspopup="true"
+					aria-expanded={ addingLink || isActive }
 				/>
 			) }
 			{ ( addingLink || isActive ) && (

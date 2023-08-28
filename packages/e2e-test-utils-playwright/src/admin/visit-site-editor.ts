@@ -43,7 +43,15 @@ export async function visitSiteEditor(
 
 			window.wp.data
 				.dispatch( 'core/preferences' )
-				.toggle( 'core/edit-site', 'welcomeGuideStyles', false );
+				.set( 'core/edit-site', 'welcomeGuideStyles', false );
+
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'welcomeGuidePage', false );
+
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'welcomeGuideTemplate', false );
 		} );
 	}
 
@@ -54,4 +62,12 @@ export async function visitSiteEditor(
 		.locator( 'body > *' )
 		.first()
 		.waitFor();
+
+	// TODO: Ideally the content underneath the canvas loader should be marked inert until it's ready.
+	await this.page
+		.locator( '.edit-site-canvas-loader' )
+		// Bigger timeout is needed for larger entities, for example the large
+		// post html fixture that we load for performance tests, which often
+		// doesn't make it under the default 10 seconds.
+		.waitFor( { state: 'hidden', timeout: 60_000 } );
 }

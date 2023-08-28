@@ -6,11 +6,12 @@
 	width: 230px;
 }
 
+.block-editor-global-styles-filters-panel__dropdown,
 .block-editor-global-styles-effects-panel__shadow-dropdown {
 	display: block;
 	padding: 0;
 
-	> button {
+	button {
 		width: 100%;
 		padding: $grid-unit-10;
 
@@ -39,4 +40,21 @@
 
 	height: 24px;
 	width: 24px;
+}
+
+.block-editor-global-styles-advanced-panel__custom-css-input textarea {
+	font-family: $editor_html_font;
+	// CSS input is always LTR regardless of language.
+	/*rtl:ignore*/
+	direction: ltr;
+}
+
+.block-editor-global-styles-advanced-panel__custom-css-validation-wrapper {
+	position: absolute;
+	bottom: $grid-unit-20;
+	right: $grid-unit * 3;
+}
+
+.block-editor-global-styles-advanced-panel__custom-css-validation-icon {
+	fill: $alert-red;
 }

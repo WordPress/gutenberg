@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Fixed invalid XML namespace on `alignJustify`, `customLink`, `mapMarker`, `postContent` and `title` ([#53955](https://github.com/WordPress/gutenberg/pull/53955)).
+
+## 9.31.0 (2023-08-16)
+
+## 9.30.0 (2023-08-10)
+
+## 9.29.0 (2023-07-20)
+
+## 9.28.0 (2023-07-05)
+
+## 9.27.0 (2023-06-23)
+
+## 9.26.0 (2023-06-07)
+
+## 9.25.0 (2023-05-24)
+
+### New Features
+
+-   Add new `HeadingLevel` icons. ([#50856](https://github.com/WordPress/gutenberg/pull/50856))
+
+## 9.24.0 (2023-05-10)
+
+## 9.23.0 (2023-04-26)
+
 ## 9.22.0 (2023-04-12)
 
 ### New features

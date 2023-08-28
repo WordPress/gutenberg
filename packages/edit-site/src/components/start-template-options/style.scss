@@ -1,47 +1,44 @@
-.edit-site-start-template-options__modal.components-modal__frame {
-	// To keep modal dimensions consistent as subsections are navigated, width
-	// and height are used instead of max-(width/height).
-	@include break-small() {
-		width: calc(100% - #{ $grid-unit-20 * 2 });
-		height: auto;
+$actions-height: 92px;
+
+.edit-site-start-template-options__modal {
+	.edit-site-start-template-options__modal__actions {
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		height: $actions-height;
+		background-color: $white;
+		margin-left: - $grid-unit-40;
+		margin-right: - $grid-unit-40;
+		padding-left: $grid-unit-40;
+		padding-right: $grid-unit-40;
+		border-top: 1px solid $gray-300;
+		z-index: z-index(".edit-site-start-template-options__modal__actions");
 	}
-	@include break-medium() {
-		width: 95%;
-	}
-	@include break-large() {
-		max-height: 95%;
+
+	.block-editor-block-patterns-list {
+		// Since the actions container is positioned absolutely,
+		// this padding bottom ensures that the content wrapper will properly
+		// detect overflowing content and start showing scrollbars at the right
+		// moment. Without this padding, the content would render under the actions
+		// bar without causing the wrapper to show a scrollbar.
+		padding-bottom: $actions-height;
 	}
 }
 
 .edit-site-start-template-options__modal-content .block-editor-block-patterns-list {
-	display: flex;
-	flex-wrap: wrap;
-	gap: $grid-unit-30;
-	width: 100%;
-	margin-top: $grid-unit-05;
+	column-count: 2;
+	column-gap: $grid-unit-30;
+
+	@include break-medium() {
+		column-count: 3;
+	}
+
+	@include break-wide() {
+		column-count: 4;
+	}
 
 	.block-editor-block-patterns-list__list-item {
 		break-inside: avoid-column;
-		margin-bottom: 0;
-		aspect-ratio: 3/4;
-		width: calc(50% - #{ $grid-unit-30 * 1 } / 2);
-
-		@include break-medium() {
-			width: calc(33.333% - #{ $grid-unit-30 * 2 } / 3);
-		}
-
-		@include break-wide() {
-			width: calc(25% - #{ $grid-unit-30 * 3 } / 4);
-		}
-
-		.block-editor-block-preview__container {
-			height: 100%;
-		}
-
-		.block-editor-block-preview__content {
-			width: 100%;
-			position: absolute;
-		}
 
 		.block-editor-block-patterns-list__item-title {
 			display: none;
@@ -53,25 +50,6 @@
 		// default hover and focus styles.
 		&:not(:focus):not(:hover) .block-editor-block-preview__container {
 			box-shadow: 0 0 0 1px $gray-300;
-		}
-	}
-
-	// The start blank pattern is the last and we are selecting it.
-	.block-editor-block-patterns-list__list-item:nth-last-child(2) {
-		.block-editor-block-preview__container {
-			position: absolute;
-			padding: 0;
-			background: #f0f0f0;
-			&::after {
-				width: 100%;
-				top: 50%;
-				margin-top: -1em;
-				content: var(--wp-edit-site-start-template-options-start-blank);
-				text-align: center;
-			}
-		}
-		iframe {
-			display: none;
 		}
 	}
 }

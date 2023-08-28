@@ -80,11 +80,7 @@
 			{
 				"docs/how-to-guides/platform/README.md": [
 					{
-						"docs/how-to-guides/platform/custom-block-editor/README.md": [
-							{
-								"docs/how-to-guides/platform/custom-block-editor/tutorial.md": []
-							}
-						]
+						"docs/how-to-guides/platform/custom-block-editor.md": []
 					}
 				]
 			},
@@ -108,6 +104,7 @@
 				]
 			},
 			{ "docs/how-to-guides/curating-the-editor-experience.md": [] },
+			{ "docs/how-to-guides/enqueueing-assets-in-the-editor.md": [] },
 			{ "docs/how-to-guides/feature-flags.md": [] },
 			{ "docs/how-to-guides/format-api.md": [] },
 			{
@@ -284,6 +281,7 @@
 						"docs/reference-guides/data/data-core-keyboard-shortcuts.md": []
 					},
 					{ "docs/reference-guides/data/data-core-notices.md": [] },
+					{ "docs/reference-guides/data/data-core-nux.md": [] },
 					{
 						"docs/reference-guides/data/data-core-preferences.md": []
 					},
@@ -302,6 +300,7 @@
 				"docs/explanations/architecture/README.md": [
 					{ "docs/explanations/architecture/key-concepts.md": [] },
 					{ "docs/explanations/architecture/data-flow.md": [] },
+					{ "docs/explanations/architecture/entities.md": [] },
 					{ "docs/explanations/architecture/modularity.md": [] },
 					{ "docs/explanations/architecture/performance.md": [] },
 					{
@@ -350,7 +349,6 @@
 							}
 						]
 					},
-					{ "docs/contributors/code/grammar.md": [] },
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
 					{
@@ -399,8 +397,7 @@
 			{ "docs/contributors/accessibility-testing.md": [] },
 			{ "docs/contributors/repository-management.md": [] },
 			{ "docs/contributors/folder-structure.md": [] },
-			{ "docs/contributors/versions-in-wordpress.md": [] },
-			{ "docs/contributors/roadmap.md": [] }
+			{ "docs/contributors/versions-in-wordpress.md": [] }
 		]
 	}
 ]

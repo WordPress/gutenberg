@@ -4,17 +4,13 @@
 import { SVG, Path } from '@wordpress/primitives';
 
 const details = (
-	<SVG
-		width="24"
-		height="24"
-		viewBox="0 0 24 24"
-		xmlns="http://www.w3.org/2000/svg"
-	>
+	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 		<Path
-			d="M4 10L8 8L4 6V10ZM12 17V15.5H4V17H12ZM4 11.5H20V13H4V11.5ZM20 7.25L10 7.25V8.75L20 8.75V7.25Z"
+			d="M4 16h10v1.5H4V16Zm0-4.5h16V13H4v-1.5ZM10 7h10v1.5H10V7Z"
 			fillRule="evenodd"
 			clipRule="evenodd"
 		/>
+		<Path d="m4 5.25 4 2.5-4 2.5v-5Z" />
 	</SVG>
 );
 

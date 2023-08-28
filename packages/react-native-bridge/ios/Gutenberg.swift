@@ -123,6 +123,10 @@ public class Gutenberg: UIResponder {
         sendEvent(.featuredImageIdNativeUpdated, body: ["featuredImageId": mediaId])
     }
 
+    public func postHasBeenJustSaved() {
+        sendEvent(.postHasBeenJustSaved)
+    }
+
     public func replace(block: Block) {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
     }
@@ -196,6 +200,14 @@ public class Gutenberg: UIResponder {
 
     public func showEditorHelp() {
         bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)
+    }
+    
+    public func onUndoPressed() {
+        bridgeModule.sendEventIfNeeded(.onUndoPressed, body: nil)
+    }
+    
+    public func onRedoPressed() {
+        bridgeModule.sendEventIfNeeded(.onRedoPressed, body: nil)
     }
 
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {

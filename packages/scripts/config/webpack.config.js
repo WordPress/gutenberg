@@ -4,6 +4,7 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const { DefinePlugin } = require( 'webpack' );
 const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const { basename, dirname, resolve } = require( 'path' );
@@ -38,8 +39,27 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-// Get paths of the `render` props included in `block.json` files
-const renderPaths = getRenderPropPaths();
+/**
+ * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
+ * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
+ * changes in `block.json` files are picked up in watch mode.
+ */
+class RenderPathsPlugin {
+	/**
+	 * Paths with the `render` props included in `block.json` files.
+	 *
+	 * @type {string[]}
+	 */
+	static renderPaths;
+
+	apply( compiler ) {
+		const pluginName = this.constructor.name;
+
+		compiler.hooks.thisCompilation.tap( pluginName, () => {
+			this.constructor.renderPaths = getRenderPropPaths();
+		} );
+	}
+}
 
 const cssLoaders = [
 	{
@@ -224,6 +244,10 @@ const config = {
 		],
 	},
 	plugins: [
+		new DefinePlugin( {
+			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
+			SCRIPT_DEBUG: ! isProduction,
+		} ),
 		// During rebuilds, all webpack assets that are not used anymore will be
 		// removed automatically. There is an exception added in watch mode for
 		// fonts and images. It is a known limitations:
@@ -234,6 +258,7 @@ const config = {
 			// multiple configurations returned in the webpack config.
 			cleanStaleWebpackAssets: false,
 		} ),
+		new RenderPathsPlugin(),
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
@@ -277,7 +302,7 @@ const config = {
 					filter: ( filepath ) => {
 						return (
 							process.env.WP_COPY_PHP_FILES_TO_DIST ||
-							renderPaths.includes( filepath )
+							RenderPathsPlugin.renderPaths.includes( filepath )
 						);
 					},
 				},

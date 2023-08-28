@@ -47,7 +47,7 @@ export function createRegistrySelector( registrySelector ) {
 
 	/**
 	 * Flag indicating that the selector is a registry selector that needs the correct registry
-	 * reference to be assigned to `selecto.registry` to make it work correctly.
+	 * reference to be assigned to `selector.registry` to make it work correctly.
 	 * be mapped as a registry selector.
 	 *
 	 * @type {boolean}

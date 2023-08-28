@@ -13,7 +13,8 @@ import {
  * Internal dependencies
  */
 import * as styles from '../styles';
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type {
 	ToolsPanelItem,

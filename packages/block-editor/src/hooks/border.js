@@ -377,18 +377,20 @@ export const withBorderColorPaletteStyles = createHigherOrderComponent(
 			borderBottomColor: borderBottomColor || borderColorValue,
 			borderLeftColor: borderLeftColor || borderColorValue,
 		};
+		const cleanedExtraStyles = cleanEmptyObject( extraStyles ) || {};
 
 		let wrapperProps = props.wrapperProps;
 		wrapperProps = {
 			...props.wrapperProps,
 			style: {
 				...props.wrapperProps?.style,
-				...extraStyles,
+				...cleanedExtraStyles,
 			},
 		};
 
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	}
+	},
+	'withBorderColorPaletteStyles'
 );
 
 addFilter(

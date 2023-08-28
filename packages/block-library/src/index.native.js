@@ -88,6 +88,7 @@ export const coreBlocks = [
 	column,
 	cover,
 	embed,
+	group,
 	file,
 	html,
 	mediaText,
@@ -121,7 +122,6 @@ export const coreBlocks = [
  * Function to register a block variations e.g. social icons different types.
  *
  * @param {Object} block The block which variations will be registered.
- *
  */
 const registerBlockVariations = ( block ) => {
 	const { metadata, settings, name } = block;

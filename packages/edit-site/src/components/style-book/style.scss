@@ -1,19 +1,20 @@
 .edit-site-style-book {
-	background: $white; // Fallback color, overridden by JavaScript.
-	border-radius: $radius-block-ui;
-	bottom: 0;
-	left: 0;
-	overflow: hidden;
-	position: absolute;
-	right: 0;
-	top: 0;
-	transition: all 0.3s; // Match .block-editor-iframe__body transition.
+	// Ensure the style book fills the available vertical space.
+	// This is useful when the style book is used to fill a frame.
+	height: 100%;
+	&.is-button {
+		border-radius: $radius-block-ui * 4;
+	}
 }
 
-.edit-site-style-book__close-button {
-	position: absolute;
-	right: $grid-unit-10;
-	top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
+.edit-site-style-book__iframe {
+	&.is-button {
+		border-radius: $radius-block-ui * 4;
+	}
+	&.is-focused {
+		outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
+		outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
+	}
 }
 
 .edit-site-style-book__tab-panel {

@@ -5,7 +5,7 @@
 import { insert } from './insert';
 import { create } from './create';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Remove content from a Rich Text value between the given `startIndex` and

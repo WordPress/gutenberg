@@ -53,7 +53,7 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request.
+-   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request. For valid query parameters see the [Users page](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and see the arguments for [List Users](https://developer.wordpress.org/rest-api/reference/users/#list-users) and [Retrieve a User](https://developer.wordpress.org/rest-api/reference/users/#retrieve-a-user).
 
 _Returns_
 
@@ -125,6 +125,18 @@ _Parameters_
 _Returns_
 
 -   `any`: The current theme.
+
+### getCurrentThemeGlobalStylesRevisions
+
+Returns the revisions of the current global styles theme.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< object > | null`: The current global styles.
 
 ### getCurrentUser
 
@@ -234,7 +246,7 @@ _Parameters_
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _key_ `EntityRecordKey`: Record's key
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
 
 _Returns_
 
@@ -281,7 +293,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
@@ -334,6 +346,8 @@ _Returns_
 
 ### getRedoEdit
 
+> **Deprecated** since 6.3
+
 Returns the next edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
@@ -376,6 +390,8 @@ _Returns_
 -   `any`: Index data.
 
 ### getUndoEdit
+
+> **Deprecated** since 6.3
 
 Returns the previous edit from the current undo offset for the entity records edits history, if any.
 
@@ -424,7 +440,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
@@ -602,6 +618,18 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### receiveNavigationFallbackId
+
+Returns an action object signalling that the fallback Navigation Menu id has been received.
+
+_Parameters_
+
+-   _fallbackId_ `integer`: the id of the fallback Navigation Menu
 
 _Returns_
 
