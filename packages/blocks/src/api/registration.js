@@ -135,9 +135,9 @@ function isObject( object ) {
  */
 // eslint-disable-next-line camelcase
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
-	const { addBootstrappedBlock } = unlock( dispatch( blocksStore ) );
+	const { addBootstrappedBlockType } = unlock( dispatch( blocksStore ) );
 	for ( const [ name, blockType ] of Object.entries( definitions ) ) {
-		addBootstrappedBlock( name, blockType );
+		addBootstrappedBlockType( name, blockType );
 	}
 }
 
@@ -243,11 +243,11 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		? getBlockSettingsFromMetadata( blockNameOrMetadata )
 		: getBlockSettingsFromMetadata( settings );
 
-	const { addBootstrappedBlock, addUnprocessedBlock } = unlock(
+	const { addBootstrappedBlockType, addUnprocessedBlockType } = unlock(
 		dispatch( blocksStore )
 	);
-	addBootstrappedBlock( name, metadata );
-	addUnprocessedBlock( name, settings );
+	addBootstrappedBlockType( name, metadata );
+	addUnprocessedBlockType( name, settings );
 
 	return select( blocksStore ).getBlockType( name );
 }
