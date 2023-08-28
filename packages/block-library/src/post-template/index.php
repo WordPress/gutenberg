@@ -50,7 +50,12 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
 	if ( $use_global_query ) {
 		global $wp_query;
-		$query = $wp_query;
+		if ( in_the_loop() ) {
+			$query = clone $wp_query;
+			$query->rewind_posts();
+		} else {
+			$query = $wp_query;
+		}
 	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
 		$query      = new WP_Query( $query_args );
