@@ -68,33 +68,32 @@ function AutoInsertingBlocksControl( props ) {
 					( clientIds, block ) => {
 						const relativePosition =
 							block?.autoInsert?.[ props.blockName ];
-						let autoInsertedBlock;
-						if (
-							[ 'before', 'after' ].includes( relativePosition )
-						) {
-							const siblings =
-								getBlock( _rootClientId )?.innerBlocks;
+						let candidates;
 
-							// Any of the current block's siblings (with the right block type) qualifies
-							// as an auto-inserted block (inserted `before` or `after` the current one),
-							// as the block might've been auto-inserted and then moved around a bit by the user.
-							autoInsertedBlock = siblings.find(
-								( { name } ) => name === block.name
-							);
-						} else if (
-							[ 'first_child', 'last_child' ].includes(
-								relativePosition
-							)
-						) {
-							const { innerBlocks } = getBlock( props.clientId );
+						switch ( relativePosition ) {
+							case 'before':
+							case 'after':
+								// Any of the current block's siblings (with the right block type) qualifies
+								// as an auto-inserted block (inserted `before` or `after` the current one),
+								// as the block might've been auto-inserted and then moved around a bit by the user.
+								candidates =
+									getBlock( _rootClientId )?.innerBlocks;
+								break;
 
-							// Any of the current block's child blocks (with the right block type) qualifies
-							// as an auto-inserted first or last child block, as the block might've been
-							// auto-inserted and then moved around a bit by the user.
-							autoInsertedBlock = innerBlocks.find(
-								( { name } ) => name === block.name
-							);
+							case 'first_child':
+							case 'last_child':
+								// Any of the current block's child blocks (with the right block type) qualifies
+								// as an auto-inserted first or last child block, as the block might've been
+								// auto-inserted and then moved around a bit by the user.
+								candidates = getBlock(
+									props.clientId
+								).innerBlocks;
+								break;
 						}
+
+						const autoInsertedBlock = candidates?.find(
+							( { name } ) => name === block.name
+						);
 
 						if ( autoInsertedBlock ) {
 							clientIds[ block.name ] =
