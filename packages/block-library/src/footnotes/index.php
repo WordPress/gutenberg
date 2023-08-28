@@ -311,7 +311,7 @@ add_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference', 10
  * @param string $meta_type Type of object metadata is for. Accepts 'post', 'comment', 'term', 'user',
  *                          or any other object type with an associated meta table.
  */
-function _wp_footnotes_get_post_metadata( $value, $object_id, $meta_key, $single, $meta_type ) {
+function block_core_footnotes_get_post_metadata( $value, $object_id, $meta_key, $single, $meta_type ) {
 	if ( 'footnotes' !== $meta_key ) {
 		return $value;
 	}
@@ -358,5 +358,5 @@ function _wp_footnotes_get_post_metadata( $value, $object_id, $meta_key, $single
 	return $value;
 }
 
-add_filter( 'get_post_metadata', '_wp_footnotes_get_post_metadata', 10, 5 );
+add_filter( 'get_post_metadata', 'block_core_footnotes_get_post_metadata', 10, 5 );
 
