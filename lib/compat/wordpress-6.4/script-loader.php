@@ -42,41 +42,41 @@ function gutenberg_update_wp_date_settings( $scripts ) {
 							'meridiem'      => (object) $wp_locale->meridiem,
 							'relative'      => array(
 								/* translators: %s: Duration. */
-								'future' => __( '%s from now', 'default' ),
+								'future' => __( '%s from now', 'gutenberg' ),
 								/* translators: %s: Duration. */
-								'past'   => __( '%s ago', 'default' ),
+								'past'   => __( '%s ago', 'gutenberg' ),
 								/* translators: One second from or to a particular datetime, e.g., "a second ago" or "a second from now". */
-								's'      => __( 'a second', 'default' ),
+								's'      => __( 'a second', 'gutenberg' ),
 								/* translators: %s: Duration in seconds from or to a particular datetime, e.g., "4 seconds ago" or "4 seconds from now". */
-								'ss'     => __( '%d seconds', 'default' ),
+								'ss'     => __( '%d seconds', 'gutenberg' ),
 								/* translators: One minute from or to a particular datetime, e.g., "a minute ago" or "a minute from now". */
-								'm'      => __( 'a minute', 'default' ),
+								'm'      => __( 'a minute', 'gutenberg' ),
 								/* translators: %s: Duration in minutes from or to a particular datetime, e.g., "4 minutes ago" or "4 minutes from now". */
-								'mm'     => __( '%d minutes', 'default' ),
+								'mm'     => __( '%d minutes', 'gutenberg' ),
 								/* translators: %s: One hour from or to a particular datetime, e.g., "an hour ago" or "an hour from now". */
-								'h'      => __( 'an hour', 'default' ),
+								'h'      => __( 'an hour', 'gutenberg' ),
 								/* translators: %s: Duration in hours from or to a particular datetime, e.g., "4 hours ago" or "4 hours from now". */
-								'hh'     => __( '%d hours', 'default' ),
+								'hh'     => __( '%d hours', 'gutenberg' ),
 								/* translators: %s: One day from or to a particular datetime, e.g., "a day ago" or "a day from now". */
-								'd'      => __( 'a day', 'default' ),
+								'd'      => __( 'a day', 'gutenberg' ),
 								/* translators: %s: Duration in days from or to a particular datetime, e.g., "4 days ago" or "4 days from now". */
-								'dd'     => __( '%d days', 'default' ),
+								'dd'     => __( '%d days', 'gutenberg' ),
 								/* translators: %s: One month from or to a particular datetime, e.g., "a month ago" or "a month from now". */
-								'M'      => __( 'a month', 'default' ),
+								'M'      => __( 'a month', 'gutenberg' ),
 								/* translators: %s: Duration in months from or to a particular datetime, e.g., "4 months ago" or "4 months from now". */
-								'MM'     => __( '%d months', 'default' ),
+								'MM'     => __( '%d months', 'gutenberg' ),
 								/* translators: %s: One year from or to a particular datetime, e.g., "a year ago" or "a year from now". */
-								'y'      => __( 'a year', 'default' ),
+								'y'      => __( 'a year', 'gutenberg' ),
 								/* translators: %s: Duration in years from or to a particular datetime, e.g., "4 years ago" or "4 years from now". */
-								'yy'     => __( '%d years', 'default' ),
+								'yy'     => __( '%d years', 'gutenberg' ),
 							),
 							'startOfWeek'   => (int) get_option( 'start_of_week', 0 ),
 						),
 						'formats'  => array(
 							/* translators: Time format, see https://www.php.net/manual/datetime.format.php */
-							'time'                => get_option( 'time_format', __( 'g:i a', 'gutenberg' ) ),
+							'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
 							/* translators: Date format, see https://www.php.net/manual/datetime.format.php */
-							'date'                => get_option( 'date_format', __( 'F j, Y', 'gutenberg' ) ),
+							'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
 							/* translators: Date/Time format, see https://www.php.net/manual/datetime.format.php */
 							'datetime'            => __( 'F j, Y g:i a', 'default' ),
 							/* translators: Abbreviated date/time format, see https://www.php.net/manual/datetime.format.php */
