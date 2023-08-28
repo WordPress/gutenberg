@@ -159,19 +159,6 @@ function ListViewComponent(
 		isMounted.current = true;
 	}, [] );
 
-	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
-	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
-	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
-	const [ fixedListWindow ] = useFixedWindowList(
-		elementRef,
-		BLOCK_LIST_ITEM_HEIGHT,
-		visibleBlockCount,
-		{
-			useWindowing: true,
-			windowOverscan: 40,
-		}
-	);
-
 	const expand = useCallback(
 		( clientId ) => {
 			if ( ! clientId ) {
@@ -240,6 +227,25 @@ function ListViewComponent(
 			insertedBlock,
 			setInsertedBlock,
 		]
+	);
+
+	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
+	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
+	const [ fixedListWindow ] = useFixedWindowList(
+		elementRef,
+		BLOCK_LIST_ITEM_HEIGHT,
+		visibleBlockCount,
+		{
+			// Ensure that the windowing logic is recalculated when the expanded state changes.
+			// This is necessary because expanding a collapsed block in a short list view can
+			// switch the list view to a tall list view with a scrollbar, and vice versa.
+			// When this happens, the windowing logic needs to be recalculated to ensure that
+			// the correct number of blocks are rendered, by rechecking for a scroll container.
+			expandedState,
+			useWindowing: true,
+			windowOverscan: 40,
+		}
 	);
 
 	// If there are no blocks to show and we're not showing the appender, do not render the list view.

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import ButtonGroup from '..';
 import Button from '../../button';
 
-const meta: ComponentMeta< typeof ButtonGroup > = {
+const meta: Meta< typeof ButtonGroup > = {
 	title: 'Components/ButtonGroup',
 	component: ButtonGroup,
 	argTypes: {
@@ -22,7 +22,7 @@ const meta: ComponentMeta< typeof ButtonGroup > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof ButtonGroup > = ( args ) => {
+const Template: StoryFn< typeof ButtonGroup > = ( args ) => {
 	const style = { margin: '0 4px' };
 	return (
 		<ButtonGroup { ...args }>
@@ -36,6 +36,4 @@ const Template: ComponentStory< typeof ButtonGroup > = ( args ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof ButtonGroup > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof ButtonGroup > = Template.bind( {} );
