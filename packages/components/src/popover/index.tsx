@@ -569,17 +569,16 @@ const UnforwardedPopover = (
 
 	if ( shouldRenderWithinSlot ) {
 		content = <Fill name={ slotName }>{ content }</Fill>;
+	} else if ( ! inline ) {
+		content = createPortal( content, getPopoverFallbackContainer() );
 	}
 
-	if ( ! hasAnchor ) {
-		content = <span ref={ anchorRefFallback }>{ content }</span>;
-	}
-
-	if ( shouldRenderWithinSlot || inline ) {
-		return content;
-	}
-
-	return createPortal( content, getPopoverFallbackContainer() );
+	return (
+		<>
+			{ ! hasAnchor && <span ref={ anchorRefFallback } /> }
+			{ content }
+		</>
+	);
 };
 
 /**
