@@ -65,7 +65,7 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 				) }
 			</ConfirmDialog>
 
-			<Spacer margin={ 8 } />
+			<Spacer margin={ 4 } />
 
 			<VStack spacing={ 0 }>
 				<Spacer margin={ 8 } />
