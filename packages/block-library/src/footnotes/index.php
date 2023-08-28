@@ -299,3 +299,64 @@ function _wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
 }
 
 add_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference', 10, 2 );
+
+/**
+ * Short-circuits the return value of the footnotes post meta field.
+ *
+ * @param mixed  $value     The value to return, either a single metadata value or an array
+ *                          of values depending on the value of `$single`. Default null.
+ * @param int    $object_id ID of the object metadata is for.
+ * @param string $meta_key  Metadata key.
+ * @param bool   $single    Whether to return only the first value of the specified `$meta_key`.
+ * @param string $meta_type Type of object metadata is for. Accepts 'post', 'comment', 'term', 'user',
+ *                          or any other object type with an associated meta table.
+ */
+function _wp_footnotes_get_post_metadata( $value, $object_id, $meta_key, $single, $meta_type ) {
+	if ( 'footnotes' !== $meta_key ) {
+		return $value;
+	}
+
+	/*
+	 * Because the filter does not pass the current value,
+	 * we need to get it ourselves via the same method as `get_metadata_raw()`
+	 * to avoid recursion.
+	 */
+	$meta_cache = wp_cache_get( $object_id, $meta_type . '_meta' );
+	if ( isset( $meta_cache['footnotes'][0] ) ) {
+		$raw_footnotes = maybe_unserialize( $meta_cache['footnotes'][0] );
+		$footnotes     = json_decode( $raw_footnotes, true );
+
+		/*
+		 * This is the same transformation as render_block_core_footnotes()
+		 * above. Duplicating here to avoid creating a new function.
+		 * The post meta contains malformed JSON. See
+		 * https://core.trac.wordpress.org/ticket/59103.
+		 */
+		if ( ! is_array( $footnotes ) ) {
+			/*
+			 * This will slash everything, including the key and value boundaries.
+			 * Don't use wp_slash because it will also slash single quotes.
+			 */
+			$footnotes = str_replace( '"', '\\"', $raw_footnotes );
+
+			/*
+			 * So we need to unslash the boundaries, which are limited to "content"
+			 * and "id", and the order is fixed. We're alse dealing with a single
+			 * line of JSON.
+			 */
+			$footnotes = str_replace( '{\\"content\\":\\"', '{"content":"', $footnotes );
+			$footnotes = str_replace( '\\",\\"id\\":\\"', '","id":"', $footnotes );
+			$footnotes = str_replace( '\\"}', '"}', $footnotes );
+			// Test if the transformation worked.
+			$footnotes_json = json_decode( $footnotes, true );
+			if ( ! is_array( $footnotes_json ) || count( $footnotes_json ) === 0 ) {
+				return '';
+			}
+			return array( $footnotes );
+		}
+	}
+	return $value;
+}
+
+add_filter( 'get_post_metadata', '_wp_footnotes_get_post_metadata', 10, 5 );
+
