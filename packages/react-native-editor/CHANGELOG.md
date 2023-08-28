@@ -15,9 +15,12 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Improve horizontal rule styles to avoid invisible lines [#53883]
 -   [*] Fix horizontal rule style extensions [#53917]
 
+## 1.102.1
+- [**] Fix Voice Over and assistive keyboards [#53895]
+
 ## 1.102.0
 -   [*] Display custom color value in mobile Cover Block color picker [#51414]
--   [**] Display outline around selected Social Link block [#51414]
+-   [**] Display outline around selected Social Link block [#53377]
 -   [**] Fixes font customization not getting updated on iOS [#53391]
 
 ## 1.101.2
