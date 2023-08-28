@@ -2294,19 +2294,16 @@ function getUnsyncedPatterns( state ) {
 	const reusableBlocks =
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 
-	return reusableBlocks
-		.filter(
-			( reusableBlock ) =>
-				reusableBlock.wp_pattern_sync_status === 'unsynced'
-		)
-		.map( ( reusableBlock ) => {
-			return {
-				name: `core/block/${ reusableBlock.id }`,
-				title: reusableBlock.title.raw,
-				categories: [ 'custom' ],
-				content: reusableBlock.content.raw,
-			};
-		} );
+	return reusableBlocks.map( ( reusableBlock ) => {
+		return {
+			id: reusableBlock.id,
+			name: `core/block/${ reusableBlock.id }`,
+			title: reusableBlock.title.raw,
+			categories: [ 'custom' ],
+			content: reusableBlock.content.raw,
+			syncStatus: reusableBlock.wp_pattern_sync_status,
+		};
+	} );
 }
 
 export const __experimentalGetParsedPattern = createSelector(

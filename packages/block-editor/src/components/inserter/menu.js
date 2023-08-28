@@ -27,7 +27,6 @@ import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs, {
 	BlockPatternsCategoryDialog,
 } from './block-patterns-tab';
-import ReusableBlocksTab from './reusable-blocks-tab';
 import { MediaTab, MediaCategoryDialog, useMediaCategories } from './media-tab';
 import InserterSearchResults from './search-results';
 import useDebouncedInput from './hooks/use-debounced-input';
@@ -174,17 +173,6 @@ function InserterMenu(
 		]
 	);
 
-	const reusableBlocksTab = useMemo(
-		() => (
-			<ReusableBlocksTab
-				rootClientId={ destinationRootClientId }
-				onInsert={ onInsert }
-				onHover={ onHover }
-			/>
-		),
-		[ destinationRootClientId, onInsert, onHover ]
-	);
-
 	const mediaTab = useMemo(
 		() => (
 			<MediaTab
@@ -208,13 +196,11 @@ function InserterMenu(
 				return blocksTab;
 			} else if ( tab.name === 'patterns' ) {
 				return patternsTab;
-			} else if ( tab.name === 'reusable' ) {
-				return reusableBlocksTab;
 			} else if ( tab.name === 'media' ) {
 				return mediaTab;
 			}
 		},
-		[ blocksTab, patternsTab, reusableBlocksTab, mediaTab ]
+		[ blocksTab, patternsTab, mediaTab ]
 	);
 
 	const searchRef = useRef();
