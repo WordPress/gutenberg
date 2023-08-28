@@ -61,4 +61,8 @@ class WP_Font_Library {
 
 		return $defaults;
 	}
+
+	public static function set_allowed_mime_types( $mime_types ) {
+		return array_merge( $mime_types, self::ALLOWED_FONT_MIME_TYPES );
+	}
 }
