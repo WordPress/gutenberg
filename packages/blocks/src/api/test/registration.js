@@ -863,7 +863,7 @@ describe( 'blocks', () => {
 				);
 
 				// reapply the block filters
-				dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+				dispatch( blocksStore ).reapplyBlockTypeFilters();
 
 				// check that block type has filtered values
 				expect( getBlockType( 'test/block' ).title ).toBe(

@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import { processBlockType } from './process-block-type';
@@ -39,9 +44,8 @@ export function addBlockTypes( blockTypes ) {
  *   7. Filter G.
  * In this scenario some filters would not get applied for all blocks because they are registered too late.
  */
-export const __experimentalReapplyBlockTypeFilters =
-	() =>
-	( { dispatch, select } ) => {
+export function reapplyBlockTypeFilters() {
+	return ( { dispatch, select } ) => {
 		const processedBlockTypes = [];
 		for ( const [ name, settings ] of Object.entries(
 			select.getUnprocessedBlockTypes()
@@ -58,6 +62,19 @@ export const __experimentalReapplyBlockTypeFilters =
 
 		dispatch.addBlockTypes( processedBlockTypes );
 	};
+}
+
+export function __experimentalReapplyBlockFilters() {
+	deprecated(
+		'wp.data.dispatch( "core/blocks" ).__experimentalReapplyBlockFilters',
+		{
+			since: '6.4',
+			alternative: 'reapplyBlockFilters',
+		}
+	);
+
+	return reapplyBlockTypeFilters();
+}
 
 /**
  * Returns an action object used to remove a registered block type.
