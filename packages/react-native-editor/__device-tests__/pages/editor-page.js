@@ -1024,6 +1024,7 @@ const blockNames = {
 	paragraph: 'Paragraph',
 	search: 'Search',
 	separator: 'Separator',
+	socialIcons: 'Social Icons',
 	spacer: 'Spacer',
 	verse: 'Verse',
 	shortcode: 'Shortcode',
