@@ -43,7 +43,7 @@ const styleSupportKeys = [
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	DIMENSIONS_SUPPORT_KEY,
-	MEDIA_SUPPORT_KEY, // TODO: Is this really a style support?
+	MEDIA_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 ];
 
@@ -129,8 +129,7 @@ const skipSerializationPathsEdit = {
  */
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
-	[ `${ SPACING_SUPPORT_KEY }` ]: [ 'spacing.blockGap' ],
-	[ `${ MEDIA_SUPPORT_KEY }` ]: [ MEDIA_SUPPORT_KEY ],
+	[ `${ MEDIA_SUPPORT_KEY }` ]: [ MEDIA_SUPPORT_KEY ], // Skip serialization of media support in save mode.
 };
 
 /**
@@ -299,6 +298,20 @@ export function addSaveProps(
 				const feature = renamedFeatures[ featureName ] || featureName;
 				style = omitStyle( style, [ [ ...path, feature ] ] );
 			} );
+		} else if (
+			!! skipSerialization &&
+			typeof skipSerialization === 'object'
+		) {
+			Object.entries( skipSerialization ).forEach(
+				( [ featureName, value ] ) => {
+					const feature =
+						renamedFeatures[ featureName ] || featureName;
+					// Allow a truthy value to skip serialization of the feature.
+					if ( !! value ) {
+						style = omitStyle( style, [ [ ...path, feature ] ] );
+					}
+				}
+			);
 		}
 	} );
 

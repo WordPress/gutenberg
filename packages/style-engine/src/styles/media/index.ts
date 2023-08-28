@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import type { GeneratedCSSRule, Style, StyleOptions } from '../../types';
+import { safeDecodeURI } from '../utils';
 
 const backgroundImage = {
 	name: 'backgroundImage',
@@ -19,7 +20,10 @@ const backgroundImage = {
 			styleRules.push( {
 				selector: options.selector,
 				key: 'backgroundImage',
-				value: `url( '${ _backgroundImage.url }' )`,
+				// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
+				value: `url( '${ encodeURI(
+					safeDecodeURI( _backgroundImage.url )
+				) }' )`,
 			} );
 		}
 
