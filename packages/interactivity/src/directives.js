@@ -255,7 +255,8 @@ export default () => {
 						// present, so we can't remove it.
 						// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
 						if (
-							( result !== null || result !== undefined ) &&
+							result !== null &&
+							result !== undefined &&
 							( result !== false || attribute[ 4 ] === '-' )
 						) {
 							el.setAttribute( attribute, result );
