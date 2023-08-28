@@ -33,174 +33,6 @@ export const BACKGROUND_IMAGE_SUPPORT_KEY = '__experimentalBackgroundImage';
 export const MEDIA_SUPPORT_KEY = 'media';
 export const IMAGE_BACKGROUND_TYPE = 'image';
 
-const InspectorImagePreview = ( { url: imgUrl } ) => {
-	const imgLabel = getFilename( imgUrl );
-	return (
-		<ItemGroup as="span">
-			<HStack justify="flex-start" as="span">
-				<img src={ imgUrl } alt="" />
-				<FlexItem as="span">
-					<Truncate
-						numberOfLines={ 1 }
-						className="block-editor-hooks__media__inspector-media-replace-title"
-					>
-						{ imgLabel }
-					</Truncate>
-				</FlexItem>
-			</HStack>
-		</ItemGroup>
-	);
-};
-
-export function MediaPanel( props ) {
-	const { attributes, clientId, setAttributes } = props;
-
-	const { id, url } = attributes.style?.media?.backgroundImage || {};
-
-	const { mediaUpload } = useSelect( ( select ) => {
-		return {
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
-		};
-	} );
-
-	const { createErrorNotice } = useDispatch( noticesStore );
-	const onUploadError = ( message ) => {
-		createErrorNotice( message, { type: 'snackbar' } );
-	};
-
-	const onSelectMedia = ( media ) => {
-		if ( ! media || ! media.url ) {
-			const newStyle = {
-				...attributes.style,
-				media: {
-					...attributes.style?.media,
-					backgroundImage: undefined,
-				},
-			};
-
-			const newAttributes = {
-				style: cleanEmptyObject( newStyle ),
-			};
-
-			setAttributes( newAttributes );
-			return;
-		}
-
-		if ( isBlobURL( media.url ) ) {
-			// TODO: Might need to revoke the blob URL.
-			return;
-		}
-
-		// For media selections originated from a file upload.
-		if ( media.media_type && media.media_type !== IMAGE_BACKGROUND_TYPE ) {
-			return;
-		}
-
-		const newStyle = {
-			...attributes.style,
-			media: {
-				...attributes.style?.media,
-				backgroundImage: {
-					url: media.url,
-					id: media.id,
-					source: 'file',
-				},
-			},
-		};
-
-		const newAttributes = {
-			style: cleanEmptyObject( newStyle ),
-		};
-
-		setAttributes( newAttributes );
-	};
-
-	const onFilesDrop = ( filesList ) => {
-		mediaUpload( {
-			allowedTypes: [ 'image' ],
-			filesList,
-			onFileChange( [ image ] ) {
-				if ( isBlobURL( image?.url ) ) {
-					return;
-				}
-				onSelectMedia( image );
-			},
-			onError: onUploadError,
-		} );
-	};
-
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			style: {
-				...previousValue.style,
-				media: undefined,
-			},
-		};
-	}, [] );
-
-	const isBackgroundImageSupported =
-		useSetting( 'media.backgroundImage' ) &&
-		hasMediaSupport( props.name, 'backgroundImage' );
-
-	const isDisabled = [ ! isBackgroundImageSupported ].every( Boolean );
-
-	if ( isDisabled ) {
-		return null;
-	}
-
-	return (
-		<InspectorControls group="media">
-			{ isBackgroundImageSupported && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ () => hasBackgroundImageValue( props ) }
-					label={ __( 'Background image' ) }
-					onDeselect={ () => resetBackgroundImage( props ) }
-					isShownByDefault={ true }
-					resetAllFilter={ resetAllFilter }
-					panelId={ clientId }
-				>
-					<div className="block-editor-hooks__media__inspector-media-replace-container">
-						{ !! url && (
-							<MediaReplaceFlow
-								mediaId={ id }
-								mediaURL={ url }
-								allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-								accept="image/*"
-								onSelect={ onSelectMedia }
-								name={ <InspectorImagePreview url={ url } /> }
-								variant="secondary"
-							/>
-						) }
-						{ ! url && (
-							<MediaUploadCheck>
-								<MediaUpload
-									onSelect={ onSelectMedia }
-									allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-									render={ ( { open } ) => (
-										<div className="block-editor-hooks__media____inspector-upload-container">
-											<Button
-												onClick={ open }
-												variant="secondary"
-											>
-												{ __( 'Add media' ) }
-											</Button>
-											<DropZone
-												onFilesDrop={ onFilesDrop }
-											/>
-										</div>
-									) }
-								/>
-							</MediaUploadCheck>
-						) }
-					</div>
-				</ToolsPanelItem>
-			) }
-		</InspectorControls>
-	);
-}
-
 /**
  * Checks if there is a current value in the background image block support
  * attributes.
@@ -258,4 +90,183 @@ export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
 			},
 		} ),
 	} );
+}
+
+function InspectorImagePreview( { url: imgUrl } ) {
+	const imgLabel = getFilename( imgUrl );
+	return (
+		<ItemGroup as="span">
+			<HStack justify="flex-start" as="span">
+				<img src={ imgUrl } alt="" />
+				<FlexItem as="span">
+					<Truncate
+						numberOfLines={ 1 }
+						className="block-editor-hooks__media__inspector-media-replace-title"
+					>
+						{ imgLabel }
+					</Truncate>
+				</FlexItem>
+			</HStack>
+		</ItemGroup>
+	);
+}
+
+function BackgroundImagePanelItem( props ) {
+	const { attributes, clientId, setAttributes } = props;
+
+	const { id, url } = attributes.style?.media?.backgroundImage || {};
+
+	const { mediaUpload } = useSelect( ( select ) => {
+		return {
+			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
+		};
+	} );
+
+	const { createErrorNotice } = useDispatch( noticesStore );
+	const onUploadError = ( message ) => {
+		createErrorNotice( message, { type: 'snackbar' } );
+	};
+
+	const onSelectMedia = ( media ) => {
+		if ( ! media || ! media.url ) {
+			const newStyle = {
+				...attributes.style,
+				media: {
+					...attributes.style?.media,
+					backgroundImage: undefined,
+				},
+			};
+
+			const newAttributes = {
+				style: cleanEmptyObject( newStyle ),
+			};
+
+			setAttributes( newAttributes );
+			return;
+		}
+
+		if ( isBlobURL( media.url ) ) {
+			// TODO: Might need to revoke the blob URL.
+			return;
+		}
+
+		// For media selections originated from a file upload.
+		if (
+			( media.media_type &&
+				media.media_type !== IMAGE_BACKGROUND_TYPE ) ||
+			( media.type && media.type !== IMAGE_BACKGROUND_TYPE )
+		) {
+			onUploadError(
+				__( 'Only images can be used as a background image.' )
+			);
+			return;
+		}
+
+		const newStyle = {
+			...attributes.style,
+			media: {
+				...attributes.style?.media,
+				backgroundImage: {
+					url: media.url,
+					id: media.id,
+					source: 'file',
+				},
+			},
+		};
+
+		const newAttributes = {
+			style: cleanEmptyObject( newStyle ),
+		};
+
+		setAttributes( newAttributes );
+	};
+
+	const onFilesDrop = ( filesList ) => {
+		mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList,
+			onFileChange( [ image ] ) {
+				if ( isBlobURL( image?.url ) ) {
+					return;
+				}
+				onSelectMedia( image );
+			},
+			onError: onUploadError,
+		} );
+	};
+
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
+			style: {
+				...previousValue.style,
+				media: undefined,
+			},
+		};
+	}, [] );
+
+	return (
+		<ToolsPanelItem
+			className="single-column"
+			hasValue={ () => hasBackgroundImageValue( props ) }
+			label={ __( 'Background image' ) }
+			onDeselect={ () => resetBackgroundImage( props ) }
+			isShownByDefault={ true }
+			resetAllFilter={ resetAllFilter }
+			panelId={ clientId }
+		>
+			<div className="block-editor-hooks__media__inspector-media-replace-container">
+				{ !! url && (
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ url }
+						allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
+						accept="image/*"
+						onSelect={ onSelectMedia }
+						name={ <InspectorImagePreview url={ url } /> }
+						variant="secondary"
+					/>
+				) }
+				{ ! url && (
+					<MediaUploadCheck>
+						<MediaUpload
+							onSelect={ onSelectMedia }
+							allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
+							render={ ( { open } ) => (
+								<div className="block-editor-hooks__media____inspector-upload-container">
+									<Button
+										onClick={ open }
+										variant="secondary"
+									>
+										{ __( 'Add background image' ) }
+									</Button>
+									<DropZone onFilesDrop={ onFilesDrop } />
+								</div>
+							) }
+						/>
+					</MediaUploadCheck>
+				) }
+			</div>
+		</ToolsPanelItem>
+	);
+}
+
+export function MediaPanel( props ) {
+	const isBackgroundImageSupported =
+		useSetting( 'media.backgroundImage' ) &&
+		hasMediaSupport( props.name, 'backgroundImage' );
+
+	const isDisabled = [ ! isBackgroundImageSupported ].every( Boolean );
+
+	if ( isDisabled ) {
+		return null;
+	}
+
+	return (
+		<InspectorControls group="media">
+			{ isBackgroundImageSupported && (
+				<BackgroundImagePanelItem { ...props } />
+			) }
+		</InspectorControls>
+	);
 }
