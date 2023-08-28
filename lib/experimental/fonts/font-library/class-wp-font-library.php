@@ -19,12 +19,18 @@ if ( class_exists( 'WP_Font_Library' ) ) {
  * @since 6.4.0
  */
 class WP_Font_Library {
-
+	/*
+	* As of PHP 8.1.12, which includes libmagic/file update to version 5.42,
+	* the expected mime type for WOFF files is 'font/woff'.
+	*
+	* See https://github.com/php/php-src/issues/8805.
+	*/
 	const ALLOWED_FONT_MIME_TYPES = array(
 		'otf'   => 'font/otf',
-		'ttf'   => 'font/ttf',
-		'woff'  => 'font/woff',
-		'woff2' => 'font/woff2',
+		'ttf'   => 'font/sfnt',
+		// 'ttf'   => PHP_VERSION_ID >= 80112 ? 'font/ttf' : 'application/x-font-ttf',
+		'woff'  => PHP_VERSION_ID >= 80112 ? 'font/woff' : 'application/font-woff',
+		'woff2' => PHP_VERSION_ID >= 80112 ? 'font/woff2' : 'application/font-woff2',
 	);
 
 	/**
@@ -117,5 +123,17 @@ class WP_Font_Library {
 		$defaults['url']     = $defaults['baseurl'] . '/fonts';
 
 		return $defaults;
+	}
+
+	/**
+	 * Sets the allowed mime types for fonts.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param array $mime_types List of allowed mime types.
+	 * @return array Modified upload directory.
+	 */
+	public static function set_allowed_mime_types( $mime_types ) {
+		return array_merge( $mime_types, self::ALLOWED_FONT_MIME_TYPES );
 	}
 }
