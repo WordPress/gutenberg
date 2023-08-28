@@ -49,7 +49,7 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 		setIsConfirmOpen( false );
 	};
 
-	const isActive = isFontActivated( font.slug, font.source );
+	const isActive = isFontActivated( font.slug, null, null, font.source );
 
 	return (
 		<>
@@ -80,11 +80,14 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 
 			<Spacer margin={ 8 } />
 
-			{ ! isActive && !! canBeRemoved && (
-				<Button variant="link" onClick={ handleUninstallClick }>
-					{ __( 'Delete permanently' ) }
-				</Button>
-			) }
+			<Button
+				isDestructive
+				disabled={ !canBeRemoved || isActive }
+				variant="link"
+				onClick={ handleUninstallClick }
+			>
+				{ __( 'Delete permanently' ) }
+			</Button>
 		</>
 	);
 }
