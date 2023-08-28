@@ -9,7 +9,6 @@ import { useContext, useEffect, useState, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { FontLibraryContext } from './context';
-import { DEMO_TEXT } from './constants';
 
 function FontFaceDemo( { fontFace, text, style = {} } ) {
 	const ref = useRef( null );
@@ -51,7 +50,7 @@ function FontFaceDemo( { fontFace, text, style = {} } ) {
 
 	return (
 		<Text style={ demoStyle } ref={ ref }>
-			{ demoConfig.text || text || DEMO_TEXT }
+			{ demoConfig.text || text }
 		</Text>
 	);
 }

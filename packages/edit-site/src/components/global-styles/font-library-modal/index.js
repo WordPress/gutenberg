@@ -21,7 +21,7 @@ function FontLibraryModal( {
 			onRequestClose={ onRequestClose }
 			isFullScreen={ true }
 			className="font-library-modal"
-			style={ { width: '70vw' } }
+			style={ { width: '65vw' } }
 		>
 			<TabPanel
 				className="font-library-modal__tab-panel"

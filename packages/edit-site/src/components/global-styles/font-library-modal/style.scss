@@ -53,6 +53,12 @@
     }
 }
 
+.font-library-modal__library-font-variant {
+    border: 1px solid #e5e5e5;
+    padding: 1rem;
+    margin-top: -1px; /* To collapse the margin with the previous element */
+}
+
 .font-library-modal__font-variant {
     border-bottom: 1px solid #e5e5e5;
     padding-bottom: 1rem;

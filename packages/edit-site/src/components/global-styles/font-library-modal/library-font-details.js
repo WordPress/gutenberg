@@ -67,7 +67,7 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 
 			<Spacer margin={ 8 } />
 
-			<VStack spacing={ 4 }>
+			<VStack spacing={ 0 }>
 				<Spacer margin={ 8 } />
 				{ fontFaces.map( ( face, i ) => (
 					<LibraryFontVariant
