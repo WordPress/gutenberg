@@ -16,17 +16,41 @@ import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
 function AutoInsertingBlocksControl( props ) {
-	const autoInsertedBlocksForCurrentBlock = useSelect(
-		( select ) => {
-			const { getBlockTypes } = select( blocksStore );
-			return getBlockTypes()?.filter(
-				( block ) =>
-					block.autoInsert &&
-					Object.keys( block.autoInsert ).includes( props.blockName )
-			);
-		},
-		[ props.blockName ]
-	);
+	const { autoInsertedBlocksForCurrentBlock, groupedAutoInsertedBlocks } =
+		useSelect(
+			( select ) => {
+				const { getBlockTypes } = select( blocksStore );
+				const _autoInsertedBlocksForCurrentBlock =
+					getBlockTypes()?.filter(
+						( block ) =>
+							block.autoInsert &&
+							Object.keys( block.autoInsert ).includes(
+								props.blockName
+							)
+					);
+
+				// Group by block namespace (i.e. prefix before the slash).
+				const _groupedAutoInsertedBlocks =
+					_autoInsertedBlocksForCurrentBlock?.reduce(
+						( groups, block ) => {
+							const [ prefix ] = block.name.split( '/' );
+							if ( ! groups[ prefix ] ) {
+								groups[ prefix ] = [];
+							}
+							groups[ prefix ].push( block );
+							return groups;
+						},
+						{}
+					);
+
+				return {
+					autoInsertedBlocksForCurrentBlock:
+						_autoInsertedBlocksForCurrentBlock,
+					groupedAutoInsertedBlocks: _groupedAutoInsertedBlocks,
+				};
+			},
+			[ props.blockName ]
+		);
 
 	const {
 		autoInsertedBlockClientIds,
@@ -103,19 +127,6 @@ function AutoInsertingBlocksControl( props ) {
 	if ( ! autoInsertedBlocksForCurrentBlock.length ) {
 		return null;
 	}
-
-	// Group by block namespace (i.e. prefix before the slash).
-	const groupedAutoInsertedBlocks = autoInsertedBlocksForCurrentBlock.reduce(
-		( groups, block ) => {
-			const [ prefix ] = block.name.split( '/' );
-			if ( ! groups[ prefix ] ) {
-				groups[ prefix ] = [];
-			}
-			groups[ prefix ].push( block );
-			return groups;
-		},
-		{}
-	);
 
 	const insertBlockIntoDesignatedLocation = ( block, relativePosition ) => {
 		if ( [ 'before', 'after' ].includes( relativePosition ) ) {
