@@ -108,31 +108,41 @@ export default function DuplicateMenuItem( {
 	}
 
 	async function findOrCreateTerm( term ) {
-		const category = patternCategories.find( ( cat ) => cat.name === term );
 		try {
 			const newTerm = await saveEntityRecord(
 				'taxonomy',
 				'wp_pattern_category',
 				{
-					name: category.label,
-					slug: category.name,
-					description: category.description,
+					name: term.label,
+					slug: term.name,
+					description: term.description,
 				},
 				{
 					throwOnError: true,
 				}
 			);
-			return newTerm;
+			return newTerm.id;
 		} catch ( error ) {
 			if ( error.code !== 'term_exists' ) {
 				throw error;
 			}
 
-			return {
-				id: error.data.term_id,
-				name: term.name,
-			};
+			return error.data.term_id;
 		}
+	}
+
+	async function getCategories( categories ) {
+		const terms = categories.map( ( category ) => {
+			const fullCategory = patternCategories.find(
+				( cat ) => cat.name === category
+			);
+			if ( fullCategory.id ) {
+				return fullCategory.id;
+			}
+			return findOrCreateTerm( fullCategory );
+		} );
+
+		return Promise.all( terms );
 	}
 
 	async function createPattern() {
@@ -143,7 +153,8 @@ export default function DuplicateMenuItem( {
 				__( '%s (Copy)' ),
 				item.title
 			);
-			const patternCategory = await findOrCreateTerm( categoryId );
+			const categories = await getCategories( item.categories );
+
 			const result = await saveEntityRecord(
 				'postType',
 				'wp_block',
@@ -154,7 +165,7 @@ export default function DuplicateMenuItem( {
 					meta: getPatternMeta( item ),
 					status: 'publish',
 					title,
-					wp_pattern_category: [ patternCategory.id ],
+					wp_pattern_category: categories,
 				},
 				{ throwOnError: true }
 			);
