@@ -42,7 +42,7 @@ export default function DuplicateMenuItem( {
 	label = __( 'Duplicate' ),
 	onClose,
 } ) {
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
@@ -121,6 +121,7 @@ export default function DuplicateMenuItem( {
 					throwOnError: true,
 				}
 			);
+			invalidateResolution( 'getUserPatternCategories' );
 			return newTerm.id;
 		} catch ( error ) {
 			if ( error.code !== 'term_exists' ) {
