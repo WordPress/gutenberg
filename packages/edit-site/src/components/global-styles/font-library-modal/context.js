@@ -117,23 +117,7 @@ function FontLibraryProvider( { children } ) {
 
 	// Demo
 	const [ loadedFontUrls ] = useState( new Set() );
-	const [ demoConfig, setDemoConfig ] = useState( DEFAULT_DEMO_CONFIG );
-	const updateDemoConfig = ( key, value ) => {
-		setDemoConfig( {
-			...demoConfig,
-			[ key ]: value,
-		} );
-	};
-	const setDefaultDemoConfig = ( key ) => {
-		if ( key ) {
-			setDemoConfig( {
-				...demoConfig,
-				[ key ]: DEFAULT_DEMO_CONFIG[ key ],
-			} );
-		} else {
-			setDemoConfig( DEFAULT_DEMO_CONFIG );
-		}
-	};
+	const [ demoConfig ] = useState( DEFAULT_DEMO_CONFIG );
 
 	// Theme data
 	const { site, currentTheme } = useSelect( ( select ) => {
@@ -337,8 +321,6 @@ function FontLibraryProvider( { children } ) {
 		<FontLibraryContext.Provider
 			value={ {
 				demoConfig,
-				updateDemoConfig,
-				setDefaultDemoConfig,
 				libraryFontSelected,
 				handleSetLibraryFontSelected,
 				themeFonts,

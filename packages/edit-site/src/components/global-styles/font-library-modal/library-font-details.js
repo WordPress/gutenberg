@@ -16,7 +16,6 @@ import {
  */
 import { FontLibraryContext } from './context';
 import LibraryFontVariant from './library-font-variant';
-import PreviewControls from './preview-controls';
 
 function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 	const { uninstallFonts, isFontActivated } =
@@ -66,7 +65,6 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 				) }
 			</ConfirmDialog>
 
-			{ /* <PreviewControls /> */ }
 			<Spacer margin={ 8 } />
 
 			<VStack spacing={ 4 }>
