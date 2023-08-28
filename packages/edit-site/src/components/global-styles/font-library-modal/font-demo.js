@@ -22,6 +22,7 @@ function FontFaceDemo( { fontFace, text, style = {} } ) {
 		fontWeight,
 		fontStyle,
 		fontFamily,
+		flexShrink: 0,
 		fontSize: `${ demoConfig.fontSize }px`,
 		opacity: isAssetLoaded ? '1' : '0',
 		transition: 'opacity 0.3s ease-in-out',

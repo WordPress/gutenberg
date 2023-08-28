@@ -3,12 +3,9 @@
  */
 import { __, _n } from '@wordpress/i18n';
 import {
-	Card,
-	CardBody,
 	__experimentalText as Text,
-	__experimentalHeading as Heading,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 
 /**
@@ -44,31 +41,26 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 			style={ style }
 			className="font-library-modal__font-card"
 		>
-			<Card>
-				<CardBody>
-					<VStack spacing={ 4 }>
-						<HStack justify="space-between">
-							<VStack spacing={ 1 }>
-								<Text className="font-library-modal__font-card__name">
-									{ font.name }
-								</Text>
-								<Text className="font-library-modal__font-card__count">
-									{ variantsText ||
-										variantsCount +
-											' ' +
-											_n(
-												'variant',
-												'variants',
-												variantsCount
-											) }
-								</Text>
-							</VStack>
-							{ !! actionHandler && actionHandler }
-						</HStack>
-						<FontDemo fontFace={ displayFontFace } />
-					</VStack>
-				</CardBody>
-			</Card>
+			<Flex justify="space-between" wrap={false}>
+				<FontDemo fontFace={ displayFontFace } text={ font.name } />
+				<Flex justify='flex-end'>
+					<FlexItem>
+						<Text className="font-library-modal__font-card__count">
+							{ variantsText ||
+								variantsCount +
+									' ' +
+									_n(
+										'variant',
+										'variants',
+										variantsCount
+									) }
+						</Text>
+					</FlexItem>
+					<FlexItem>
+						{ !! actionHandler && actionHandler }
+					</FlexItem>
+				</Flex>
+			</Flex>
 		</div>
 	);
 }

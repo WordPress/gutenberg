@@ -56,7 +56,7 @@ function InstalledFonts() {
 				<>
 					{ baseCustomFonts.length > 0 && (
 						<>
-							<Spacer margin={ 4 } />
+							<Spacer margin={ 2 } />
 							<FontsGrid>
 								{ baseCustomFonts.map( ( font ) => (
 									<LibraryFontCard
@@ -73,7 +73,7 @@ function InstalledFonts() {
 
 					{ baseThemeFonts.length > 0 && (
 						<>
-							<Spacer margin={ 10 } />
+							<Spacer margin={ 8 } />
 							<FontsGrid title={ __( 'Theme Fonts' ) }>
 								{ baseThemeFonts.map( ( font ) => (
 									<LibraryFontCard

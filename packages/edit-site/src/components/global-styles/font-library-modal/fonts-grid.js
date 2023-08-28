@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
+	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 
@@ -30,11 +31,14 @@ function FontsGrid( { title, children, pageSize = 32 } ) {
 
 	return (
 		<div className="font-library-modal__fonts-grid">
-			<VStack spacing={ 4 }>
+			<VStack spacing={ 0 }>
 				{ title && (
-					<Text className="font-library-modal__fonts-grid__subtitle">
-						{ title }
-					</Text>
+					<>
+						<Text className="font-library-modal__fonts-grid__subtitle">
+							{ title }
+						</Text>
+						<Spacer margin={ 2 } />
+					</>
 				) }
 				<div className="font-library-modal__fonts-grid__main">
 					{ items.map( ( child, i ) => {

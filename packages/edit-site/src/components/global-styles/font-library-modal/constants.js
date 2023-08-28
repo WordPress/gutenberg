@@ -25,7 +25,7 @@ export const DEMO_TEXT = __(
 
 export const DEFAULT_DEMO_CONFIG = {
 	text: '',
-	fontSize: 24,
+	fontSize: 18,
 };
 
 export const ALLOWED_FILE_EXTENSIONS = [ 'otf', 'ttf', 'woff', 'woff2' ];
