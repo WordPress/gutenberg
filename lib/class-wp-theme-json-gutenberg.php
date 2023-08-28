@@ -331,7 +331,6 @@ class WP_Theme_JSON_Gutenberg {
 		'templateParts',
 		'title',
 		'version',
-		'behaviors',
 	);
 
 	/**
@@ -416,7 +415,6 @@ class WP_Theme_JSON_Gutenberg {
 			'textTransform'  => null,
 			'writingMode'    => null,
 		),
-		'behaviors'                     => null,
 	);
 
 	/**
