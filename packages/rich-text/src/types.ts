@@ -26,6 +26,6 @@ export type RichTextValue = {
 	text: string;
 	formats: Array< RichTextFormatList >;
 	replacements: Array< RichTextFormat >;
-	start: number | undefined;
-	end: number | undefined;
+	start: number;
+	end: number;
 };
