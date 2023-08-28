@@ -224,6 +224,10 @@ export default () => {
 					useEffect( () => {
 						const el = element.ref.current;
 
+						// We set the value directly to the corresponding
+						// HTMLElement instance property excluding the following
+						// special cases.
+						// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
 						if (
 							attribute !== 'width' &&
 							attribute !== 'height' &&
