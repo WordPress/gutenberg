@@ -154,7 +154,9 @@ function BackgroundImagePanelItem( props ) {
 		if (
 			( media.media_type &&
 				media.media_type !== IMAGE_BACKGROUND_TYPE ) ||
-			( media.type && media.type !== IMAGE_BACKGROUND_TYPE )
+			( ! media.media_type &&
+				media.type &&
+				media.type !== IMAGE_BACKGROUND_TYPE )
 		) {
 			onUploadError(
 				__( 'Only images can be used as a background image.' )
