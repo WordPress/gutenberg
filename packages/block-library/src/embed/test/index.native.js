@@ -241,7 +241,7 @@ describe( 'Embed block', () => {
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
-				'embed-edit-url-modal'
+				'link-settings-navigation'
 			);
 			await waitForModalVisible( embedEditURLModal );
 
@@ -259,7 +259,7 @@ describe( 'Embed block', () => {
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
-				'embed-edit-url-modal'
+				'link-settings-navigation'
 			);
 			await waitForModalVisible( embedEditURLModal );
 
@@ -299,7 +299,7 @@ describe( 'Embed block', () => {
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
-				'embed-edit-url-modal'
+				'link-settings-navigation'
 			);
 			await waitForModalVisible( embedEditURLModal );
 
@@ -338,7 +338,7 @@ describe( 'Embed block', () => {
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
-				'embed-edit-url-modal'
+				'link-settings-navigation'
 			);
 			await waitForModalVisible( embedEditURLModal );
 
@@ -359,7 +359,7 @@ describe( 'Embed block', () => {
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
-				'embed-edit-url-modal'
+				'link-settings-navigation'
 			);
 			await waitForModalVisible( embedEditURLModal );
 
@@ -400,7 +400,7 @@ describe( 'Embed block', () => {
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
-				'embed-edit-url-modal'
+				'link-settings-navigation'
 			);
 			await waitForModalVisible( embedEditURLModal );
 
@@ -584,7 +584,7 @@ describe( 'Embed block', () => {
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
-				'embed-edit-url-modal'
+				'link-settings-navigation'
 			);
 			await waitForModalVisible( embedEditURLModal );
 
@@ -623,7 +623,7 @@ describe( 'Embed block', () => {
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = editor.getByTestId(
-				'embed-edit-url-modal'
+				'link-settings-navigation'
 			);
 			await waitForModalVisible( embedEditURLModal );
 
@@ -804,7 +804,7 @@ describe( 'Embed block', () => {
 
 			// Dismiss the edit URL modal.
 			const embedEditURLModal = editor.getByTestId(
-				'embed-edit-url-modal'
+				'link-settings-navigation'
 			);
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
