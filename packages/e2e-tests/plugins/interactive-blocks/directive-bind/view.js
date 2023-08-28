@@ -18,6 +18,16 @@
 				state.show = ! state.show;
 				state.width += foo.bar;
 			},
+			toggleDisabled: ( { context } ) => {
+				const prevDisabled = ( 'prevDisabled' in context )
+					? context.prevDisabled
+					// Any string works here; we just want to toggle the value
+					// to ensure Preact renders the same we are hydrating.
+					: 'disabled';
+
+				context.prevDisabled = context.disabled;
+				context.disabled = prevDisabled;
+			}
 		},
 	} );
 } )( window );
