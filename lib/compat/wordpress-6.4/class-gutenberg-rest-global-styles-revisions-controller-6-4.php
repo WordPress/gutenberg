@@ -19,7 +19,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_4 extends Gutenberg_RE
 	 * Prepares the revision for the REST response.
 	 *
 	 * @since 6.3.0
-	 * @since 6.4.0 Added `behaviors` field to the response.
 	 *
 	 * @param WP_Post         $post    Post revision object.
 	 * @param WP_REST_Request $request Request object.
@@ -36,16 +35,13 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_4 extends Gutenberg_RE
 		$fields = $this->get_fields_for_response( $request );
 		$data   = array();
 
-		if ( ! empty( $global_styles_config['styles'] ) || ! empty( $global_styles_config['settings'] ) || ! empty( $global_styles_config['behaviors'] ) ) {
+		if ( ! empty( $global_styles_config['styles'] ) || ! empty( $global_styles_config['settings'] ) ) {
 			$global_styles_config = ( new WP_Theme_JSON_Gutenberg( $global_styles_config, 'custom' ) )->get_raw_data();
 			if ( rest_is_field_included( 'settings', $fields ) ) {
 				$data['settings'] = ! empty( $global_styles_config['settings'] ) ? $global_styles_config['settings'] : new stdClass();
 			}
 			if ( rest_is_field_included( 'styles', $fields ) ) {
 				$data['styles'] = ! empty( $global_styles_config['styles'] ) ? $global_styles_config['styles'] : new stdClass();
-			}
-			if ( rest_is_field_included( 'behaviors', $fields ) ) {
-				$data['behaviors'] = ! empty( $global_styles_config['behaviors'] ) ? $global_styles_config['behaviors'] : new stdClass();
 			}
 		}
 
@@ -88,7 +84,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_4 extends Gutenberg_RE
 	 * Retrieves the revision's schema, conforming to JSON Schema.
 	 *
 	 * @since 6.3.0
-	 * @since 6.4.0 Added `behaviors` field to the schema properties.
 	 *
 	 * @return array Item schema data.
 	 */
@@ -156,11 +151,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_4 extends Gutenberg_RE
 				),
 				'settings'     => array(
 					'description' => __( 'Global settings.', 'gutenberg' ),
-					'type'        => array( 'object' ),
-					'context'     => array( 'view', 'edit' ),
-				),
-				'behaviors'    => array(
-					'description' => __( 'Global behaviors.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),

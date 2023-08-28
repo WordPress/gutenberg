@@ -31,16 +31,6 @@ export default function ( { onChange, value, behaviors } ) {
 		...behaviorsOptions,
 	];
 
-	const animations = [
-		{
-			value: 'zoom',
-			label: __( 'Zoom' ),
-		},
-		{
-			value: 'fade',
-			label: __( 'Fade' ),
-		},
-	];
 	return (
 		<div style={ { marginTop: '2rem' } }>
 			<SelectControl
@@ -52,20 +42,6 @@ export default function ( { onChange, value, behaviors } ) {
 				hideCancelButton={ true }
 				size="__unstable-large"
 			/>
-			{ value === 'lightbox' && (
-				<SelectControl
-					label={ __( 'Animation' ) }
-					value={
-						behaviors?.lightbox.animation
-							? behaviors?.lightbox.animation
-							: ''
-					}
-					options={ animations }
-					onChange={ onChange }
-					hideCancelButton={ false }
-					size="__unstable-large"
-				/>
-			) }
 		</div>
 	);
 }

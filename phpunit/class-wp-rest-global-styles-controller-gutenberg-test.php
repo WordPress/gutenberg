@@ -130,7 +130,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 				),
 				'settings'  => new stdClass(),
 				'styles'    => new stdClass(),
-				'behaviors' => new stdClass(),
 			),
 			$data
 		);

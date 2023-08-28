@@ -272,12 +272,12 @@ function ScreenBlock( { name, variation } ) {
 						onChange={ setStyle }
 						inheritedValue={ inheritedStyle }
 					/>
-					<StylesBehaviorsPanel
+					{ /* <StylesBehaviorsPanel
 						value={ behavior }
 						onChange={ setBehavior }
 						behaviors={ inheritedBehaviors }
 						blockName={ name }
-					></StylesBehaviorsPanel>
+					></StylesBehaviorsPanel> */ }
 				</PanelBody>
 			) }
 		</>

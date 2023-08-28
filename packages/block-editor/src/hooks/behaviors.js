@@ -164,8 +164,10 @@ export const withBehaviors = createHigherOrderComponent( ( BlockEdit ) => {
 	};
 }, 'withBehaviors' );
 
-addFilter(
-	'editor.BlockEdit',
-	'core/behaviors/with-inspector-control',
-	withBehaviors
-);
+// TODO: Remove this whole file once the image block is updated to use the
+// lightbox directly
+// addFilter(
+// 	'editor.BlockEdit',
+// 	'core/behaviors/with-inspector-control',
+// 	withBehaviors
+// );
