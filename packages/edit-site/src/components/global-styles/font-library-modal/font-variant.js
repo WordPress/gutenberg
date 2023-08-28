@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalText as Text,
-	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	CheckboxControl,

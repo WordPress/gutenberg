@@ -7,7 +7,6 @@ import {
 	Button,
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 

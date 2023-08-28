@@ -5,7 +5,6 @@ import {
 	createContext,
 	useState,
 	useEffect,
-	useMemo,
 } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
