@@ -309,7 +309,12 @@ export function applyDefaultAttributes( blockTypeOrName, attributes = {} ) {
 
 	const blockAttributes = Object.fromEntries(
 		Object.entries( blockType.attributes ?? {} ).map(
-			( [ key, schema ] ) => [ key, attributes[ key ] ?? schema.default ]
+			( [ key, schema ] ) => [
+				key,
+				attributes[ key ] === undefined
+					? schema.default
+					: attributes[ key ],
+			]
 		)
 	);
 
