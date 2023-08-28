@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { CSSProperties } from 'react';
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,10 +13,8 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import ColorPalette from '..';
-import Popover from '../../popover';
-import { Provider as SlotFillProvider } from '../../slot-fill';
 
-const meta: ComponentMeta< typeof ColorPalette > = {
+const meta: Meta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
 	component: ColorPalette,
 	argTypes: {
@@ -26,30 +24,23 @@ const meta: ComponentMeta< typeof ColorPalette > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof ColorPalette > = ( {
-	onChange,
-	...args
-} ) => {
+const Template: StoryFn< typeof ColorPalette > = ( { onChange, ...args } ) => {
 	const [ color, setColor ] = useState< string | undefined >();
 
 	return (
-		<SlotFillProvider>
-			<ColorPalette
-				{ ...args }
-				value={ color }
-				onChange={ ( newColor ) => {
-					setColor( newColor );
-					onChange?.( newColor );
-				} }
-			/>
-			{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
-			<Popover.Slot />
-		</SlotFillProvider>
+		<ColorPalette
+			{ ...args }
+			value={ color }
+			onChange={ ( newColor ) => {
+				setColor( newColor );
+				onChange?.( newColor );
+			} }
+		/>
 	);
 };
 
@@ -84,7 +75,7 @@ MultipleOrigins.args = {
 	],
 };
 
-export const CSSVariables: ComponentStory< typeof ColorPalette > = ( args ) => {
+export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
 	return (
 		<div
 			style={

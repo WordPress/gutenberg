@@ -22,6 +22,7 @@ DOM elements are connected to data stored in the state & context through directi
     - [`wp-on`](#wp-on) ![](https://img.shields.io/badge/EVENT_HANDLERS-afd2e3.svg)
     - [`wp-effect`](#wp-effect) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
     - [`wp-init`](#wp-init) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
+    - [`wp-key`](#wp-key) ![](https://img.shields.io/badge/TEMPLATING-afd2e3.svg)
   - [Values of directives are references to store properties](#values-of-directives-are-references-to-store-properties)
 - [The store](#the-store)
   - [Elements of the store](#elements-of-the-store)
@@ -449,6 +450,31 @@ store( {
 
 The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM.
 
+#### `wp-key` 
+
+
+The `wp-key` directive assigns a unique key to an element to help the Interactivity API identify it when iterating through arrays of elements. This becomes important if your array elements can move (e.g. due to sorting), get inserted, or get deleted. A well-chosen key value helps the Interactivity API infer what exactly has changed in the array, allowing it to make the correct updates to the DOM.
+
+The key should be a string that uniquely identifies the element among its siblings. Typically it is used on repeated elements like list items. For example:
+
+```html
+<ul>
+  <li data-wp-key="unique-id-1">Item 1</li> 
+  <li data-wp-key="unique-id-2">Item 2</li>
+</ul>  
+```
+
+But it can also be used on other elements:
+
+```html
+<div>
+  <a data-wp-key="previous-page" ...>Previous page</a> 
+  <a data-wp-key="next-page" ...>Next page</a>
+</div>  
+```
+
+When the list is re-rendered, the Interactivity API will match elements by their keys to determine if an item was added/removed/reordered. Elements without keys might be recreated unnecessarily.
+
 ### Values of directives are references to store properties
 
 The value assigned to a directive is a string pointing to a specific state, selector, action, or effect. *Using a Namespace is highly recommended* to define these elements of the store. 
@@ -508,7 +534,7 @@ Defines data available to the HTML nodes of the page. It is important to differe
 store( {
   state: {
     someText: "Hello Universe!"
-  }
+  },
   actions: {
     someAction: ({ state, context }) => {
       state.someText // Access or modify global state - "Hello Universe!"

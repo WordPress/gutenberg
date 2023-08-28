@@ -278,17 +278,14 @@ With these components available, you can define the `<Editor>` component.
 
 function Editor( { settings } ) {
 	return (
-		<SlotFillProvider>
-			<DropZoneProvider>
-				<div className="getdavesbe-block-editor-layout">
-					<Notices />
-					<Header />
-					<Sidebar />
-					<BlockEditor settings={ settings } />
-				</div>
-				<Popover.Slot />
-			</DropZoneProvider>
-		</SlotFillProvider>
+		<DropZoneProvider>
+			<div className="getdavesbe-block-editor-layout">
+				<Notices />
+				<Header />
+				<Sidebar />
+				<BlockEditor settings={ settings } />
+			</div>
+		</DropZoneProvider>
 	);
 }
 ```
@@ -297,14 +294,10 @@ In this process, the core of the editor's layout is being scaffolded, along with
 
 Let's examine these in more detail:
 
--   `<SlotFillProvider>` – Enables the use of the ["Slot/Fill"
-    pattern](/docs/reference-guides/slotfills/README.md) through the component tree
 -   `<DropZoneProvider>` – Enables the use of [dropzones for drag and drop functionality](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/components/src/drop-zone)
 -   `<Notices>` – Provides a "snack bar" Notice that will be rendered if any messages are dispatched to the `core/notices` store
 -   `<Header>` – Renders the static title "Standalone Block Editor" at the top of the editor UI
 -   `<BlockEditor>` – The custom block editor component
--   `<Popover.Slot />` – Renders a slot into which `<Popover>`s can be rendered
-    using the Slot/Fill mechanic
 
 ### Keyboard navigation
 
@@ -342,9 +335,7 @@ return (
 			<div className="editor-styles-wrapper">
 				<BlockEditorKeyboardShortcuts />
 				<WritingFlow>
-					<ObserveTyping>
-						<BlockList className="getdavesbe-block-editor__block-list" />
-					</ObserveTyping>
+					<BlockList className="getdavesbe-block-editor__block-list" />
 				</WritingFlow>
 			</div>
 		</BlockEditorProvider>
@@ -439,10 +430,7 @@ Jumping back to your custom `<BlockEditor>` component, it is also worth noting t
 	<BlockEditorKeyboardShortcuts /> /* 1. */
 	<WritingFlow>
 		/* 2. */
-		<ObserveTyping>
-			/* 3. */
-			<BlockList className="getdavesbe-block-editor__block-list" />
-		</ObserveTyping>
+		<BlockList className="getdavesbe-block-editor__block-list" />
 	</WritingFlow>
 </div>
 ```
@@ -451,7 +439,6 @@ These provide other important elements of functionality for the editor instance.
 
 1. [`<BlockEditorKeyboardShortcuts />`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/keyboard-shortcuts/index.js) – Enables and usage of keyboard shortcuts within the editor
 2. [`<WritingFlow>`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/writing-flow/index.js) – Handles selection, focus management, and navigation across blocks
-3. [`<ObserveTyping>`](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/observe-typing)- Used to manage the editor's internal `isTyping` flag
 
 ## Reviewing the sidebar
 

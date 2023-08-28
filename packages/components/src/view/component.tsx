@@ -14,7 +14,6 @@ import type { ViewProps } from './types';
  * `View` is a core component that renders everything in the library.
  * It is the principle component in the entire library.
  *
- * @example
  * ```jsx
  * import { View } from `@wordpress/components`;
  *

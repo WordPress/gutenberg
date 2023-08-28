@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Support keys using `data-wp-key`. ([#53844](https://github.com/WordPress/gutenberg/pull/53844))
+-   Merge new server-side rendered context on client-side navigation. ([#53853](https://github.com/WordPress/gutenberg/pull/53853))
+-   Support region-based client-side navigation. ([#53733](https://github.com/WordPress/gutenberg/pull/53733))
+
 ## 2.1.0 (2023-08-16)
 
 ### New Features

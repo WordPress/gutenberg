@@ -216,6 +216,7 @@ export default function HeaderEditMode() {
 									showIconLabels ? shortLabel : longLabel
 								}
 								showTooltip={ ! showIconLabels }
+								aria-expanded={ isInserterOpen }
 							/>
 						) }
 						{ isLargeViewport && (
@@ -265,6 +266,7 @@ export default function HeaderEditMode() {
 												? 'tertiary'
 												: undefined
 										}
+										aria-expanded={ isListViewOpen }
 									/>
 								) }
 								{ isZoomedOutViewExperimentEnabled &&
