@@ -1111,6 +1111,23 @@ export const mergeBlocks =
 			return;
 		}
 
+		// If previous block is empty, remove previous block and update selection.
+		const blockAHasEmptyContent = blockA?.attributes.content === '';
+		if ( blockAHasEmptyContent && blockB?.attributes.content ) {
+			dispatch.removeBlock( clientIdA );
+
+			if ( canRestoreTextSelection ) {
+				dispatch.selectionChange(
+					blockB.clientId,
+					attributeKey,
+					offset,
+					offset
+				);
+			}
+
+			return;
+		}
+
 		// Calling the merge to update the attributes and remove the block to be merged.
 		const updatedAttributes = blockAType.merge(
 			cloneA.attributes,
@@ -1148,18 +1165,20 @@ export const mergeBlocks =
 			);
 		}
 
+		const replacementBlocks = [
+			{
+				...blockA,
+				attributes: {
+					...blockA.attributes,
+					...updatedAttributes,
+				},
+			},
+			...blocksWithTheSameType.slice( 1 ),
+		];
+
 		dispatch.replaceBlocks(
 			[ blockA.clientId, blockB.clientId ],
-			[
-				{
-					...blockA,
-					attributes: {
-						...blockA.attributes,
-						...updatedAttributes,
-					},
-				},
-				...blocksWithTheSameType.slice( 1 ),
-			],
+			replacementBlocks,
 			0 // If we don't pass the `indexToSelect` it will default to the last block.
 		);
 	};

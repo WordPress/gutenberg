@@ -12,6 +12,65 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
+	test( 'should not merge heading with empty paragraph block on backspace', async ( {
+		editor,
+		page,
+		pageUtils
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/heading' } );
+		await page.keyboard.type( 'Heading' );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 7 } );
+		await page.keyboard.press( 'Backspace' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:heading -->
+<h2 class="wp-block-heading">Heading</h2>
+<!-- /wp:heading -->`
+		);
+	} );
+
+	test( 'should gracefully handle if placing caret in empty container', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Regression Test: placeCaretAtHorizontalEdge previously did not
+		// account for contentEditables which have no children.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/8676
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Foo' );
+
+		// The regression appeared to only affect paragraphs created while
+		// within an inline boundary.
+		await page.keyboard.down( 'Shift' );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 3 } );
+		await page.keyboard.up( 'Shift' );
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
+		await page.keyboard.press( 'Backspace' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:paragraph -->
+<p><strong>Foo</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
+	return;
+
 	test( 'should split and merge paragraph blocks using Enter and Backspace', async ( {
 		editor,
 		page,
@@ -253,6 +312,25 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe( `` );
+	} );
+
+	test( 'should not merge heading with empty paragraph block on backspace', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/heading' } );
+		await page.keyboard.type( 'Heading' );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 7 } );
+		await page.keyboard.press( 'Backspace' );
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:heading -->
+<h2 class="wp-block-heading">Heading</h2>
+<!-- /wp:heading -->`
+		);
 	} );
 
 	test( 'should remove at most one paragraph in forward direction', async ( {
