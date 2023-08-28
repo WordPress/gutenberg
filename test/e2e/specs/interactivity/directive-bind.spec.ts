@@ -37,12 +37,12 @@ test.describe( 'data-wp-bind', () => {
 
 	test( 'add missing checked at hydration', async ( { page } ) => {
 		const el = page.getByTestId( 'add missing checked at hydration' );
-		await expect( el ).toHaveAttribute( 'checked', '' );
+		await expect( el ).toBeChecked();
 	} );
 
 	test( 'remove existing checked at hydration', async ( { page } ) => {
 		const el = page.getByTestId( 'remove existing checked at hydration' );
-		await expect( el ).not.toHaveAttribute( 'checked', '' );
+		await expect( el ).not.toBeChecked();
 	} );
 
 	test( 'update existing checked', async ( { page } ) => {
@@ -94,63 +94,129 @@ test.describe( 'data-wp-bind', () => {
 		await expect( el ).toHaveAttribute( 'data-some-value', 'true' );
 	} );
 
-	// `width`:    using the red-dot image (default value comes from image)
-	// `tabIndex`: can be a div (default value is -1)
-	// `hidden`:   can be a div (values are treated as boolean)
-	// `value`:    a text input (can be any string)
-	// `aria-disabled`: an input field
-	// `data-disabled`: the same input field
-
 	test.describe( 'attribute hydration', () => {
-		const cases = [
-			{ type: 'false', attrValues: [ null, 'false' ] },
-			{ type: 'true', attrValues: [ '', 'true' ] },
-			{ type: 'string "false"', attrValues: [ '', 'false' ] },
-			{ type: 'string "true"', attrValues: [ '', 'true' ] },
-			{ type: 'null', attrValues: [ null, null ] },
-			{ type: 'undefined', attrValues: [ null, null ] },
-			{ type: 'empty string', attrValues: [ null, '' ] },
-			{ type: 'any string', attrValues: [ '', 'any' ] },
+		const matrix = [
+			{
+				testid: 'image',
+				name: 'width',
+				values: {
+					false: [ null, 5 ],
+					true: [ 'true', 5 ],
+					null: [ null, 5 ],
+					undef: [ null, 5 ],
+					emptyString: [ '', 5 ],
+					anyString: [ 'any', 5 ],
+					number: [ '10', 10 ],
+				},
+			},
+			{
+				testid: 'input',
+				name: 'name',
+				values: {
+					false: [ 'false', 'false' ],
+					true: [ 'true', 'true' ],
+					null: [ '', '' ],
+					undef: [ '', '' ],
+					emptyString: [ '', '' ],
+					anyString: [ 'any', 'any' ],
+					number: [ '10', '10' ],
+				},
+			},
+			{
+				testid: 'input',
+				name: 'value',
+				values: {
+					false: [ null, 'false' ],
+					true: [ null, 'true' ],
+					null: [ null, '' ],
+					undef: [ null, '' ],
+					emptyString: [ null, '' ],
+					anyString: [ null, 'any' ],
+					number: [ null, '10' ],
+				},
+			},
+			{
+				testid: 'input',
+				name: 'disabled',
+				values: {
+					false: [ null, false ],
+					true: [ '', true ],
+					null: [ null, false ],
+					undef: [ null, false ],
+					emptyString: [ null, false ],
+					anyString: [ '', true ],
+					number: [ '', true ],
+				},
+			},
+			{
+				testid: 'input',
+				name: 'aria-disabled',
+				values: {
+					false: [ 'false', undefined ],
+					true: [ 'true', undefined ],
+					null: [ null, undefined ],
+					undef: [ null, undefined ],
+					emptyString: [ '', undefined ],
+					anyString: [ 'any', undefined ],
+					number: [ '10', undefined ],
+				},
+			},
 		];
 
-		for ( const {
-			type,
-			attrValues: [ regularValue, ariaDataValue ],
-		} of cases ) {
-			test( `works for ${ type } values correctly`, async ( {
+		for ( const { testid, name, values } of matrix ) {
+			test( `${ name } is correctly hydrated for different values`, async ( {
 				page,
 			} ) => {
-				const el = page.getByTestId( `hydrating ${ type }` );
-				const input = el.getByTestId( 'input' );
-				const toggle = el.getByTestId( 'toggle-prop' );
+				for ( const type in values ) {
+					const [ attrValue, propValue ] = ( values as any )[ type ];
 
-				const initialValues = {
-					ariaDisabled: await input.getAttribute( 'aria-disabled' ),
-					dataDisabled: await input.getAttribute( 'data-disabled' ),
-					disabled: await input.getAttribute( 'disabled' ),
-				};
+					const container = page.getByTestId( `hydrating ${ type }` );
+					const el = container.getByTestId( testid );
+					const toggle = container.getByTestId( 'toggle value' );
 
-				expect( initialValues.disabled ).toBe( regularValue );
-				expect( initialValues.ariaDisabled ).toBe( ariaDataValue );
-				expect( initialValues.dataDisabled ).toBe( ariaDataValue );
+					const hydratedAttr = await el.getAttribute( name );
+					const hydratedProp = await el.evaluate(
+						( node, propName ) => ( node as any )[ propName ],
+						name
+					);
+					expect( [ type, hydratedAttr ] ).toEqual( [
+						type,
+						attrValue,
+					] );
+					expect( [ type, hydratedProp ] ).toEqual( [
+						type,
+						propValue,
+					] );
 
-				// Here we check that the hydrated values match the rendered
-				// values.
-				await toggle.click( { clickCount: 2, delay: 50 } );
+					// Only check the rendered value if the new value is not
+					// `undefined` and the attibute is neither `value` nor
+					// `disabled` because Preact doesn't update the attribute
+					// for those cases.
+					// See https://github.com/preactjs/preact/blob/099c38c6ef92055428afbc116d18a6b9e0c2ea2c/src/diff/index.js#L471-L494
+					if (
+						type === 'undef' &&
+						( name === 'value' || name === 'undefined' )
+					) {
+						return;
+					}
 
-				const finalValues = {
-					ariaDisabled: await input.getAttribute( 'aria-disabled' ),
-					dataDisabled: await input.getAttribute( 'data-disabled' ),
-					disabled: await input.getAttribute( 'disabled' ),
-				};
+					await toggle.click( { clickCount: 2, delay: 50 } );
 
-				expect( initialValues.disabled ).toBe( finalValues.disabled );
-				expect( initialValues.ariaDisabled ).toBe(
-					finalValues.ariaDisabled
-				);
-				expect( initialValues.dataDisabled ).toBe(
-					finalValues.dataDisabled
-				);
+					// Values should be the same as before.
+					const renderedAttr = await el.getAttribute( name );
+					const renderedProp = await el.evaluate(
+						( node, propName ) => ( node as any )[ propName ],
+						name
+					);
+					expect( [ type, renderedAttr ] ).toEqual( [
+						type,
+						attrValue,
+					] );
+					expect( [ type, renderedProp ] ).toEqual( [
+						type,
+						propValue,
+					] );
+				}
 			} );
 		}
 	} );

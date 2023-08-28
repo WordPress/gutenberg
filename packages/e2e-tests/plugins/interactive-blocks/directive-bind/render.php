@@ -59,14 +59,13 @@
 
 	<?php
 		$hydration_cases = array(
-			'false'          => '{ "disabled": false }',
-			'true'           => '{ "disabled": true }',
-			'string "false"' => '{ "disabled": "false" }',
-			'string "true"'  => '{ "disabled": "true" }',
-			'null'           => '{ "disabled": null }',
-			'undefined'      => '{ "other": "other" }',
-			'empty string'   => '{ "disabled": "" }',
-			'any string'     => '{ "disabled": "any" }',
+			'false'       => '{ "value": false }',
+			'true'        => '{ "value": true }',
+			'null'        => '{ "value": null }',
+			'undef'       => '{ "__any": "any" }',
+			'emptyString' => '{ "value": "" }',
+			'anyString'   => '{ "value": "any" }',
+			'number'      => '{ "value": 10 }'
 		);
 	?>
 
@@ -75,16 +74,25 @@
 		data-testid='hydrating <?php echo $type; ?>'
 		data-wp-context='<?php echo $context; ?>'
 	>
+		<img
+			alt="Red dot"
+			data-testid="image"
+			data-wp-bind--width="context.value"
+			src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
+			AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
+			9TXL0Y4OHwAAAABJRU5ErkJggg=="
+		>
 		<input
 			type="text"
 			data-testid="input"
-			data-wp-bind--disabled="context.disabled"
-			data-wp-bind--aria-disabled="context.disabled"
-			data-wp-bind--data-disabled="context.disabled"
+			data-wp-bind--name="context.value"
+			data-wp-bind--value="context.value"
+			data-wp-bind--disabled="context.value"
+			data-wp-bind--aria-disabled="context.value"
 		>
 		<button
-			data-testid="toggle-prop"
-			data-wp-on--click="actions.toggleDisabled"
+			data-testid="toggle value"
+			data-wp-on--click="actions.toggleValue"
 		>Toggle</button>
 	</div>
 	<?php endforeach; ?>

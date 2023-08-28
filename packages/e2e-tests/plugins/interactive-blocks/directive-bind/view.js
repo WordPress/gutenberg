@@ -18,15 +18,16 @@
 				state.show = ! state.show;
 				state.width += foo.bar;
 			},
-			toggleDisabled: ( { context } ) => {
-				const prevDisabled = ( 'prevDisabled' in context )
-					? context.prevDisabled
+			toggleValue: ( { context } ) => {
+				const previousValue = ( 'previousValue' in context )
+					? context.previousValue
 					// Any string works here; we just want to toggle the value
-					// to ensure Preact renders the same we are hydrating.
-					: 'disabled';
+					// to ensure Preact renders the same we are hydrating in the
+					// first place.
+					: 'tacocat';
 
-				context.prevDisabled = context.disabled;
-				context.disabled = prevDisabled;
+				context.previousValue = context.value;
+				context.value = previousValue;
 			}
 		},
 	} );
