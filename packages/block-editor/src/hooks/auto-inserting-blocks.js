@@ -128,23 +128,27 @@ function AutoInsertingBlocksControl( props ) {
 	}
 
 	const insertBlockIntoDesignatedLocation = ( block, relativePosition ) => {
-		if ( [ 'before', 'after' ].includes( relativePosition ) ) {
-			insertBlock(
-				block,
-				relativePosition === 'after' ? blockIndex + 1 : blockIndex,
-				rootClientId, // Insert as a child of the current block's parent
-				false
-			);
-		} else if (
-			[ 'first_child', 'last_child' ].includes( relativePosition )
-		) {
-			insertBlock(
-				block,
-				// TODO: It'd be great if insertBlock() would accept negative indices for insertion.
-				relativePosition === 'first_child' ? 0 : innerBlocksLength,
-				props.clientId, // Insert as a child of the current block.
-				false
-			);
+		switch ( relativePosition ) {
+			case 'before':
+			case 'after':
+				insertBlock(
+					block,
+					relativePosition === 'after' ? blockIndex + 1 : blockIndex,
+					rootClientId, // Insert as a child of the current block's parent
+					false
+				);
+				break;
+
+			case 'first_child':
+			case 'last_child':
+				insertBlock(
+					block,
+					// TODO: It'd be great if insertBlock() would accept negative indices for insertion.
+					relativePosition === 'first_child' ? 0 : innerBlocksLength,
+					props.clientId, // Insert as a child of the current block.
+					false
+				);
+				break;
 		}
 	};
 
