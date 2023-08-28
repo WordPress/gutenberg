@@ -12,39 +12,43 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import withFocusOutside from '../';
+import withFocusOutside from '..';
 
-let onFocusOutside;
-
-describe( 'withFocusOutside', () => {
-	let origHasFocus;
-
-	const EnhancedComponent = withFocusOutside(
-		class extends Component {
-			handleFocusOutside() {
-				this.props.onFocusOutside();
-			}
-
-			render() {
-				return (
-					<div>
-						<input type="text" />
-						<input type="button" />
-					</div>
-				);
-			}
+const EnhancedComponent = withFocusOutside(
+	class extends Component< TestComponentProps > {
+		handleFocusOutside() {
+			this.props.onFocusOutside( new FocusEvent( 'blur' ) );
 		}
-	);
 
-	class TestComponent extends Component {
 		render() {
-			return <EnhancedComponent { ...this.props } />;
+			return (
+				<div>
+					<input type="text" />
+					<input type="button" />
+				</div>
+			);
 		}
 	}
+);
+
+interface TestComponentProps {
+	onFocusOutside: ( event: FocusEvent ) => void;
+}
+
+const TestComponent: React.FC< TestComponentProps > = ( {
+	onFocusOutside,
+} ) => {
+	return <EnhancedComponent onFocusOutside={ onFocusOutside } />;
+};
+
+let onFocusOutside: () => void;
+
+describe( 'withFocusOutside', () => {
+	let origHasFocus: typeof document.hasFocus;
 
 	beforeEach( () => {
 		// Mock document.hasFocus() to always be true for testing
-		// note: we overide this for some tests.
+		// note: we override this for some tests.
 		origHasFocus = document.hasFocus;
 		document.hasFocus = () => true;
 

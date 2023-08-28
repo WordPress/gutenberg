@@ -82,7 +82,7 @@ type UseFocusOutsideReturn = {
  * wrapping element element to capture when focus moves outside that element.
  */
 export default function useFocusOutside(
-	onFocusOutside: ( event: FocusEvent ) => void
+	onFocusOutside: ( ( event: FocusEvent ) => void ) | undefined
 ): UseFocusOutsideReturn {
 	const currentOnFocusOutside = useRef( onFocusOutside );
 	useEffect( () => {
