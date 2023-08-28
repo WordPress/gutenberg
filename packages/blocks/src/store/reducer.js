@@ -66,33 +66,6 @@ function bootstrappedBlockTypes( state = {}, action ) {
 			// Don't overwrite if already set. It covers the case when metadata
 			// was initialized from the server.
 			if ( serverDefinition ) {
-				// We still need to polyfill `apiVersion` for WordPress version
-				// lower than 5.7. If it isn't present in the definition shared
-				// from the server, we try to fallback to the definition passed.
-				// @see https://github.com/WordPress/gutenberg/pull/29279
-				if (
-					serverDefinition.apiVersion === undefined &&
-					blockType.apiVersion
-				) {
-					newDefinition = {
-						...serverDefinition,
-						...newDefinition,
-						apiVersion: blockType.apiVersion,
-					};
-				}
-				// The `ancestor` prop is not included in the definitions shared
-				// from the server yet, so it needs to be polyfilled as well.
-				// @see https://github.com/WordPress/gutenberg/pull/39894
-				if (
-					serverDefinition.ancestor === undefined &&
-					blockType.ancestor
-				) {
-					newDefinition = {
-						...serverDefinition,
-						...newDefinition,
-						ancestor: blockType.ancestor,
-					};
-				}
 				// The `selectors` prop is not yet included in the server provided
 				// definitions and needs to be polyfilled. This can be removed when the
 				// minimum supported WordPress is >= 6.3.
@@ -102,7 +75,6 @@ function bootstrappedBlockTypes( state = {}, action ) {
 				) {
 					newDefinition = {
 						...serverDefinition,
-						...newDefinition,
 						selectors: blockType.selectors,
 					};
 				}
