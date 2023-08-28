@@ -6,7 +6,9 @@ import { processBlockType } from './process-block-type';
 /** @typedef {import('../api/registration').WPBlockType} WPBlockType */
 
 /**
- * Add block type metadata to the store.
+ * Add bootstrapped block type metadata to the store. These metadata usually come from
+ * the `block.json` file and are either statically boostrapped from the server, or
+ * passed as the `metadata` parameter to the `registerBlockType` function.
  *
  * @param {string}      name      Block name.
  * @param {WPBlockType} blockType Block type metadata.
@@ -20,7 +22,8 @@ export function addBootstrappedBlock( name, blockType ) {
 }
 
 /**
- * Add unprocessed block type settings to the store.
+ * Add unprocessed block type settings to the store. These data are passed as the
+ * `settings` parameter to the client-side `registerBlockType` function.
  *
  * @param {string}      name      Block name.
  * @param {WPBlockType} blockType Unprocessed block type settings.
