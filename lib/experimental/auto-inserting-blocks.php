@@ -68,7 +68,7 @@ function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anch
  * Add auto-insertion information to a block type's controller.
  *
  * @param array  $inserted_block_type The type of block to insert.
- * @param string $relative_position   The position relative to the anchor block.
+ * @param string $position            The position relative to the anchor block.
  *                                    Can be 'before', 'after', 'first_child', or 'last_child'.
  * @param string $anchor_block_type   The auto-inserted block will be inserted next to instances of this block type.
  * @return callable A filter for the `rest_prepare_block_type` hook that adds an `auto_insert` field to the network response.
