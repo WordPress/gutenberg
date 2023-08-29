@@ -61,7 +61,7 @@ function render_block_core_comment_reply_link( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
-	if ( $block->context['enhancedSubmission'] ) {
+	if ( isset( $block->context['enhancedSubmission'] ) && $block->context['enhancedSubmission'] ) {
 		$p = new WP_HTML_Tag_Processor( $comment_reply_link );
 		if ( $p->next_tag(
 			array(
