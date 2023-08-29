@@ -131,23 +131,6 @@ const useActionsCommands = () => {
 		useSelect( blocksStore );
 
 	const blocks = getBlocksByClientId( clientIds );
-	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-
-	const canDuplicate = blocks.every( ( block ) => {
-		return (
-			!! block &&
-			hasBlockSupport( block.name, 'multiple', true ) &&
-			canInsertBlockType( block.name, rootClientId )
-		);
-	} );
-
-	const canInsertDefaultBlock = canInsertBlockType(
-		getDefaultBlockName(),
-		rootClientId
-	);
-
-	const canMove = canMoveBlocks( clientIds, rootClientId );
-	const canRemove = canRemoveBlocks( clientIds, rootClientId );
 
 	const {
 		removeBlocks,
@@ -160,42 +143,6 @@ const useActionsCommands = () => {
 		selectBlock,
 	} = useDispatch( blockEditorStore );
 
-	const onDuplicate = () => {
-		if ( ! canDuplicate ) {
-			return;
-		}
-		return duplicateBlocks( clientIds, true );
-	};
-	const onRemove = () => {
-		if ( ! canRemove ) {
-			return;
-		}
-		return removeBlocks( clientIds, true );
-	};
-	const onAddBefore = () => {
-		if ( ! canInsertDefaultBlock ) {
-			return;
-		}
-		const clientId = Array.isArray( clientIds ) ? clientIds[ 0 ] : clientId;
-		insertBeforeBlock( clientId );
-	};
-	const onAddAfter = () => {
-		if ( ! canInsertDefaultBlock ) {
-			return;
-		}
-		const clientId = Array.isArray( clientIds )
-			? clientIds[ clientIds.length - 1 ]
-			: clientId;
-		insertAfterBlock( clientId );
-	};
-	const onMoveTo = () => {
-		if ( ! canMove ) {
-			return;
-		}
-		setNavigationMode( true );
-		selectBlock( clientIds[ 0 ] );
-		setBlockMovingClientId( clientIds[ 0 ] );
-	};
 	const onGroup = () => {
 		if ( ! blocks.length ) {
 			return;
@@ -229,6 +176,21 @@ const useActionsCommands = () => {
 		return { isLoading: false, commands: [] };
 	}
 
+	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+	const canInsertDefaultBlock = canInsertBlockType(
+		getDefaultBlockName(),
+		rootClientId
+	);
+	const canDuplicate = blocks.every( ( block ) => {
+		return (
+			!! block &&
+			hasBlockSupport( block.name, 'multiple', true ) &&
+			canInsertBlockType( block.name, rootClientId )
+		);
+	} );
+	const canRemove = canRemoveBlocks( clientIds, rootClientId );
+	const canMove = canMoveBlocks( clientIds, rootClientId );
+
 	const commands = [
 		{
 			name: 'ungroup',
@@ -242,49 +204,73 @@ const useActionsCommands = () => {
 			callback: onGroup,
 			icon: group,
 		},
-		{
-			name: 'move-to',
-			label: __( 'Move to' ),
-			callback: onMoveTo,
-			icon: move,
-		},
-		{
-			name: 'add-after',
-			label: __( 'Add after' ),
-			callback: onAddAfter,
-			icon: add,
-		},
-		{
-			name: 'add-before',
-			label: __( 'Add before' ),
-			callback: onAddBefore,
-			icon: add,
-		},
-		{
+	];
+	if ( canInsertDefaultBlock ) {
+		commands.push(
+			{
+				name: 'add-after',
+				label: __( 'Add after' ),
+				callback: () => {
+					const clientId = Array.isArray( clientIds )
+						? clientIds[ clientIds.length - 1 ]
+						: clientId;
+					insertAfterBlock( clientId );
+				},
+				icon: add,
+			},
+			{
+				name: 'add-before',
+				label: __( 'Add before' ),
+				callback: () => {
+					const clientId = Array.isArray( clientIds )
+						? clientIds[ 0 ]
+						: clientId;
+					insertBeforeBlock( clientId );
+				},
+				icon: add,
+			}
+		);
+	}
+	if ( canRemove ) {
+		commands.push( {
 			name: 'remove',
 			label: __( 'Remove' ),
-			callback: onRemove,
+			callback: () => removeBlocks( clientIds, true ),
 			icon: remove,
-		},
-		{
+		} );
+	}
+	if ( canDuplicate ) {
+		commands.push( {
 			name: 'duplicate',
 			label: __( 'Duplicate' ),
-			callback: onDuplicate,
+			callback: () => duplicateBlocks( clientIds, true ),
 			icon: copy,
-		},
-	].map( ( { name, label, callback, icon } ) => {
-		return {
-			name: 'core/block-editor/action-' + name,
-			label,
-			icon,
+		} );
+	}
+	if ( canMove ) {
+		commands.push( {
+			name: 'move-to',
+			label: __( 'Move to' ),
+			callback: () => {
+				setNavigationMode( true );
+				selectBlock( clientIds[ 0 ] );
+				setBlockMovingClientId( clientIds[ 0 ] );
+			},
+			icon: move,
+		} );
+	}
+
+	return {
+		isLoading: false,
+		commands: commands.map( ( command ) => ( {
+			...command,
+			name: 'core/block-editor/action-' + command.name,
 			callback: ( { close } ) => {
-				callback();
+				command.callback();
 				close();
 			},
-		};
-	} );
-
-	return { isLoading: false, commands };
+		} ) ),
+	};
 };
 
 export const useBlockCommands = () => {
