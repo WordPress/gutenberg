@@ -3,7 +3,8 @@
  */
 import { createContext, useState, useEffect } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useSelect, useEntityRecords } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { useEntityRecords } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
