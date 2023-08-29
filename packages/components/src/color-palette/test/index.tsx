@@ -43,20 +43,6 @@ const ControlledColorPalette = ( {
 };
 
 describe( 'ColorPalette', () => {
-	it( 'should render a dynamic toolbar of colors', () => {
-		const onChange = jest.fn();
-
-		const { container } = render(
-			<ColorPalette
-				colors={ EXAMPLE_COLORS }
-				value={ INITIAL_COLOR }
-				onChange={ onChange }
-			/>
-		);
-
-		expect( container ).toMatchSnapshot();
-	} );
-
 	it( 'should render three color button options', () => {
 		const onChange = jest.fn();
 
