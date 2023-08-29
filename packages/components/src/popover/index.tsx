@@ -330,6 +330,7 @@ const UnforwardedPopover = (
 		middleware,
 		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
 			autoUpdate( referenceParam, floatingParam, updateParam, {
+				layoutShift: false,
 				animationFrame: true,
 			} ),
 	} );
