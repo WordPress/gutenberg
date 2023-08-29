@@ -90,7 +90,7 @@ interface UserPatternCategory {
 
 export interface UserPatternCategories {
 	patternCategories: Array< UserPatternCategory >;
-	patternCatogoriesMap: Map< number, UserPatternCategory >;
+	patternCategoriesMap: Map< number, UserPatternCategory >;
 }
 
 type Optional< T > = T | undefined;
@@ -1247,10 +1247,10 @@ export function getBlockPatternCategories( state: State ): Array< any > {
 export function getUserPatternCategories(
 	state: State
 ): UserPatternCategories {
-	const patternCatogoriesMap = new Map< number, UserPatternCategory >();
+	const patternCategoriesMap = new Map< number, UserPatternCategory >();
 	state.userPatternCategories?.forEach(
 		( userCategory: UserPatternCategory ) =>
-			patternCatogoriesMap.set( userCategory.id, userCategory )
+			patternCategoriesMap.set( userCategory.id, userCategory )
 	);
 	return {
 		patternCategories:
@@ -1261,7 +1261,7 @@ export function getUserPatternCategories(
 					name: userCategory.slug,
 				} )
 			) || [],
-		patternCatogoriesMap,
+		patternCategoriesMap,
 	};
 }
 
