@@ -338,8 +338,8 @@ function gutenberg_register_auto_insert_rest_field() {
 				'description'       => __( 'Block types that may be automatically inserted near this block and the associated relative position where they are inserted.', 'gutenberg' ),
 				'patternProperties' => array(
 					'^[a-zA-Z0-9-]+/[a-zA-Z0-9-]+$' => array(
-						'type'    => 'string',
-						'enum'    => array( 'before', 'after', 'first_child', 'last_child' )
+						'type' => 'string',
+						'enum' => array( 'before', 'after', 'first_child', 'last_child' ),
 					),
 				),
 			),
