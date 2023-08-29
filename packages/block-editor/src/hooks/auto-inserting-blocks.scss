@@ -1,4 +1,8 @@
 .auto-inserting-blocks-panel {
+	/**
+	 * Since we're displaying the block icon alongside the block name,
+	 * we need to right-align the toggle.
+	 */
 	.components-toggle-control .components-h-stack {
 		flex-direction: row-reverse;
 	}
