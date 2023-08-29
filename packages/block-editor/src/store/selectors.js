@@ -2298,6 +2298,7 @@ function getUserPatterns( state ) {
 	return userPatterns.map( ( userPattern ) => {
 		return {
 			name: `core/block/${ userPattern.id }`,
+			id: userPattern.id,
 			title: userPattern.title.raw,
 			categories: userPattern.wp_pattern_category.map( ( catId ) =>
 				categories && categories.get( catId )
