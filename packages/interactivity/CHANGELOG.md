@@ -9,6 +9,10 @@
 -   Support region-based client-side navigation. ([#53733](https://github.com/WordPress/gutenberg/pull/53733))
 -   Improve `data-wp-bind` hydration to match Preact's logic. ([#54003](https://github.com/WordPress/gutenberg/pull/54003))
 
+### New Features
+
+-   Add new directives that implement the Slot and Fill pattern: `data-wp-slot-provider`, `data-wp-slot` and `data-wp-fill`. ([#53958](https://github.com/WordPress/gutenberg/pull/53958))
+
 ## 2.1.0 (2023-08-16)
 
 ### New Features

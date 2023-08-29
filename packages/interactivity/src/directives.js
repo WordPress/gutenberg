@@ -10,6 +10,7 @@ import { deepSignal, peek } from 'deepsignal';
 import { createPortal } from './portals';
 import { useSignalEffect } from './utils';
 import { directive } from './hooks';
+import { SlotProvider, Slot, Fill } from './slots';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
@@ -304,5 +305,73 @@ export default () => {
 				context: contextValue,
 			} );
 		}
+	);
+
+	// data-wp-slot
+	directive(
+		'slot',
+		( {
+			directives: {
+				slot: { default: slot },
+			},
+			props: { children },
+			element,
+		} ) => {
+			const name = typeof slot === 'string' ? slot : slot.name;
+			const position = slot.position || 'children';
+
+			if ( position === 'before' ) {
+				return (
+					<>
+						<Slot name={ name } />
+						{ children }
+					</>
+				);
+			}
+			if ( position === 'after' ) {
+				return (
+					<>
+						{ children }
+						<Slot name={ name } />
+					</>
+				);
+			}
+			if ( position === 'replace' ) {
+				return <Slot name={ name }>{ children }</Slot>;
+			}
+			if ( position === 'children' ) {
+				element.props.children = (
+					<Slot name={ name }>{ element.props.children }</Slot>
+				);
+			}
+		},
+		{ priority: 4 }
+	);
+
+	// data-wp-fill
+	directive(
+		'fill',
+		( {
+			directives: {
+				fill: { default: fill },
+			},
+			props: { children },
+			evaluate,
+			context,
+		} ) => {
+			const contextValue = useContext( context );
+			const slot = evaluate( fill, { context: contextValue } );
+			return <Fill slot={ slot }>{ children }</Fill>;
+		},
+		{ priority: 4 }
+	);
+
+	// data-wp-slot-provider
+	directive(
+		'slot-provider',
+		( { props: { children } } ) => (
+			<SlotProvider>{ children }</SlotProvider>
+		),
+		{ priority: 4 }
 	);
 };
