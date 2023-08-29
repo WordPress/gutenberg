@@ -417,7 +417,7 @@ describe( 'RichText', () => {
 		// Tab to the "Custom color picker".
 		await page.keyboard.press( 'Tab' );
 		// Move to black.
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Tab' );
 		// Select color other than black.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );

@@ -261,7 +261,7 @@ test.describe( 'Buttons', () => {
 			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
-		await page.click( 'role=button[name="Gradient: Purple to yellow"i]' );
+		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
