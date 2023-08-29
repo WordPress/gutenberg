@@ -20,7 +20,7 @@
 
 ### Experimental
 
--   `DropdownMenu` v2: Fix submenu chevron direction in RTL languages ([#](https://github.com/WordPress/gutenberg/pull/).
+-   `DropdownMenu` v2: Fix submenu chevron direction in RTL languages ([#54036](https://github.com/WordPress/gutenberg/pull/54036).
 
 ## 25.6.0 (2023-08-16)
 
