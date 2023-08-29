@@ -95,7 +95,43 @@ test.describe( 'data-wp-bind', () => {
 	} );
 
 	test.describe( 'attribute hydration', () => {
-		const matrix = [
+		/**
+		 * Data structure to define a hydration test case.
+		 */
+		type MatrixEntry = {
+			/**
+			 * Test ID of the element (the `data-testid` attr).
+			 */
+			testid: string;
+			/**
+			 *  Name of the attribute being hydrated.
+			 */
+			name: string;
+			/**
+			 * Array of different values to test.
+			 */
+			values: Record<
+				/**
+				 * The type of value we are hydrating. E.g., false is `false`,
+				 * undef is `undefined`, emptyString is `''`, etc.
+				 */
+				string,
+				[
+					/**
+					 * Value that the attribute should contain after hydration.
+					 * If the attribute is missing, this value is `null`.
+					 */
+					attributeValue: any,
+					/**
+					 * Value that the HTMLElement instance property should
+					 * contain after hydration.
+					 */
+					entityPropValue: any
+				]
+			>;
+		};
+
+		const matrix: MatrixEntry[] = [
 			{
 				testid: 'image',
 				name: 'width',
@@ -168,7 +204,7 @@ test.describe( 'data-wp-bind', () => {
 				page,
 			} ) => {
 				for ( const type in values ) {
-					const [ attrValue, propValue ] = ( values as any )[ type ];
+					const [ attrValue, propValue ] = values[ type ];
 
 					const container = page.getByTestId( `hydrating ${ type }` );
 					const el = container.getByTestId( testid );
