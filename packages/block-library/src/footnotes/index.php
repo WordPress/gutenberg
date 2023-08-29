@@ -34,28 +34,12 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 
 	$footnotes = json_decode( $raw_footnotes, true );
 
-	// The post meta contains malformed JSON. See
-	// https://core.trac.wordpress.org/ticket/59103.
-	if ( ! is_array( $footnotes ) ) {
-		// This will slash everything, including the key and value boundaries.
-		// Don't use wp_slash because it will also slash single quotes.
-		$footnotes = str_replace( '"', '\\"', $raw_footnotes );
-		// So we need to unslash the boundaries, which are limited to "content"
-		// and "id", and the order is fixed. We're alse dealing with a single
-		// line of JSON.
-		$footnotes = str_replace( '{\\"content\\":\\"', '{"content":"', $footnotes );
-		$footnotes = str_replace( '\\",\\"id\\":\\"', '","id":"', $footnotes );
-		$footnotes = str_replace( '\\"}', '"}', $footnotes );
-		$footnotes = json_decode( $footnotes, true );
-	}
-
 	if ( ! is_array( $footnotes ) || count( $footnotes ) === 0 ) {
 		return '';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
-
-	$block_content = '';
+	$block_content      = '';
 
 	foreach ( $footnotes as $footnote ) {
 		$block_content .= sprintf(
@@ -347,8 +331,10 @@ function block_core_footnotes_get_post_metadata( $value, $object_id, $meta_key, 
 			$footnotes = str_replace( '{\\"content\\":\\"', '{"content":"', $footnotes );
 			$footnotes = str_replace( '\\",\\"id\\":\\"', '","id":"', $footnotes );
 			$footnotes = str_replace( '\\"}', '"}', $footnotes );
-			// Test if the transformation worked.
+
+			// Tests if the transformation worked.
 			$footnotes_json = json_decode( $footnotes, true );
+
 			if ( ! is_array( $footnotes_json ) || count( $footnotes_json ) === 0 ) {
 				return '';
 			}
