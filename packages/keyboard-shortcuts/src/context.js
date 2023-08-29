@@ -11,18 +11,16 @@ const globalListener = ( event ) => {
 };
 
 export const context = createContext( {
-	current: {
-		add: ( shortcut ) => {
-			if ( globalShortcuts.size === 0 ) {
-				document.addEventListener( 'keydown', globalListener );
-			}
-			globalShortcuts.add( shortcut );
-		},
-		delete: ( shortcut ) => {
-			globalShortcuts.delete( shortcut );
-			if ( globalShortcuts.size === 0 ) {
-				document.removeEventListener( 'keydown', globalListener );
-			}
-		},
+	add: ( shortcut ) => {
+		if ( globalShortcuts.size === 0 ) {
+			document.addEventListener( 'keydown', globalListener );
+		}
+		globalShortcuts.add( shortcut );
+	},
+	delete: ( shortcut ) => {
+		globalShortcuts.delete( shortcut );
+		if ( globalShortcuts.size === 0 ) {
+			document.removeEventListener( 'keydown', globalListener );
+		}
 	},
 } );
