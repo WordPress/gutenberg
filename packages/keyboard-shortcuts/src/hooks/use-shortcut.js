@@ -28,7 +28,7 @@ export default function useShortcut(
 
 	useEffect( () => {
 		callbackRef.current = callback;
-	} );
+	}, [ callback ] );
 
 	useEffect( () => {
 		if ( isDisabled ) {
