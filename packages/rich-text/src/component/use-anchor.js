@@ -20,8 +20,22 @@ import { useState, useLayoutEffect } from '@wordpress/element';
 function getFormatElement( range, editableContentElement, tagName, className ) {
 	let element = range.startContainer;
 
-	// If the caret is right before the element, select the next element.
-	element = element.nextElementSibling || element;
+	// One issues with format boundaries is that the caret can be right before
+	// the element while we make it look to be inside the element. So if the
+	// startContainer is a text node and the caret is at the end of the text,
+	// we should use the next sibling and the deepest first child so we can
+	// select the correct format element. Do not use nextElementSibling, it must
+	// otherwise you may be matching an element further away.
+	if (
+		element.nodeType === element.TEXT_NODE &&
+		range.startOffset === element.length
+	) {
+		element = element.nextSibling;
+
+		while ( element.firstChild ) {
+			element = element.firstChild;
+		}
+	}
 
 	if ( element.nodeType !== element.ELEMENT_NODE ) {
 		element = element.parentElement;
