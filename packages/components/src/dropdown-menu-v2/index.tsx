@@ -13,12 +13,7 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-import {
-	check,
-	chevronRightSmall,
-	chevronLeftSmall,
-	lineSolid,
-} from '@wordpress/icons';
+import { check, chevronRightSmall, lineSolid } from '@wordpress/icons';
 import { SVG, Circle } from '@wordpress/primitives';
 
 /**
@@ -134,7 +129,7 @@ export const DropdownSubMenuTrigger = ( {
 	prefix,
 	suffix = (
 		<DropdownMenuStyled.SubmenuRtlChevronIcon
-			icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
+			icon={ chevronRightSmall }
 			size={ 24 }
 		/>
 	),
