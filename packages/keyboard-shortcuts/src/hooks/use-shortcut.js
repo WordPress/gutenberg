@@ -17,11 +17,18 @@ import { context } from '../context';
  * @param {Object}   options            Shortcut options.
  * @param {boolean}  options.isDisabled Whether to disable to shortut.
  */
-export default function useShortcut( name, callback, { isDisabled } = {} ) {
+export default function useShortcut(
+	name,
+	callback,
+	{ isDisabled = false } = {}
+) {
 	const shortcuts = useContext( context );
 	const isMatch = useShortcutEventMatch();
 	const callbackRef = useRef();
-	callbackRef.current = callback;
+
+	useEffect( () => {
+		callbackRef.current = callback;
+	} );
 
 	useEffect( () => {
 		if ( isDisabled ) {

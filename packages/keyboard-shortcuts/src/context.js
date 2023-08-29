@@ -18,7 +18,7 @@ export const context = createContext( {
 			}
 			globalShortcuts.add( shortcut );
 		},
-		remove: ( shortcut ) => {
+		delete: ( shortcut ) => {
 			globalShortcuts.delete( shortcut );
 			if ( globalShortcuts.size === 0 ) {
 				document.removeEventListener( 'keydown', globalListener );
