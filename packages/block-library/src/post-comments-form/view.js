@@ -119,9 +119,11 @@ store( {
 
 							// Reset form fields and position.
 							context.core.comments.formSlot = undefined;
-							context.core.comments.fields = {
-								comment_parent: 0,
-							};
+							const { fields } = context.core.comments;
+							for ( const key in fields ) {
+								fields[ key ] =
+									key !== 'comment_parent' ? '' : 0;
+							}
 						}
 
 						context.core.comments.isSubmitting = false;
