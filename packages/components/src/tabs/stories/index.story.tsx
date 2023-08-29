@@ -7,6 +7,7 @@ import type { Meta, StoryFn } from '@storybook/react';
  * WordPress dependencies
  */
 import { wordpress, more, link } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -292,4 +293,80 @@ Monolithic.args = {
 			tab: { icon: wordpress },
 		},
 	],
+};
+
+const ControlledModeTemplate: StoryFn< typeof Tabs > = ( props ) => {
+	const [ selectedTabId, setSelectedTabId ] = useState<
+		string | undefined | null
+	>( props.selectedTabId );
+
+	return (
+		<>
+			{ /* Ignore reason: `children` and `tabs` props are mutually
+		exclusive. When we ambiguously pass `props` here in Storybook, TS
+		doesn't know what to expect, so it errors.
+		@ts-expect-error */ }
+			<Tabs
+				{ ...props }
+				selectedTabId={ selectedTabId }
+				onSelect={ ( selectedId ) => {
+					setSelectedTabId( selectedId );
+					props.onSelect?.( selectedId );
+				} }
+			>
+				<Tabs.TabList>
+					<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' }>
+						Tab 1
+					</Tabs.Tab>
+
+					<Tabs.Tab id={ 'tab2' } title={ 'Tab 2' }>
+						Tab 2
+					</Tabs.Tab>
+
+					<Tabs.Tab id={ 'tab3' } title={ 'Tab 3' }>
+						Tab 3
+					</Tabs.Tab>
+				</Tabs.TabList>
+				<Tabs.TabPanel id={ 'tab1' }>
+					<p>Selected tab: Tab 1</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel id={ 'tab2' }>
+					<p>Selected tab: Tab 2</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel id={ 'tab3' }>
+					<p>Selected tab: Tab 3</p>
+				</Tabs.TabPanel>
+			</Tabs>
+			{
+				<div style={ { marginTop: '200px' } }>
+					<p>Select a tab:</p>
+					<DropdownMenu
+						controls={ [
+							{
+								onClick: () => setSelectedTabId( 'tab1' ),
+								title: 'Tab 1',
+								isActive: selectedTabId === 'tab1',
+							},
+							{
+								onClick: () => setSelectedTabId( 'tab2' ),
+								title: 'Tab 2',
+								isActive: selectedTabId === 'tab2',
+							},
+							{
+								onClick: () => setSelectedTabId( 'tab3' ),
+								title: 'Tab 3',
+								isActive: selectedTabId === 'tab3',
+							},
+						] }
+						label="Choose a tab. The power is yours."
+					/>
+				</div>
+			}
+		</>
+	);
+};
+
+export const ControlledMode = ControlledModeTemplate.bind( {} );
+ControlledMode.args = {
+	selectedTabId: 'tab3',
 };

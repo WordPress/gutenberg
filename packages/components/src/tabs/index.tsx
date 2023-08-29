@@ -80,16 +80,28 @@ function Tabs( {
 	orientation = 'horizontal',
 	onSelect,
 	children,
+	selectedTabId,
 }: TabsProps ) {
 	const instanceId = useInstanceId( Tabs, 'tabs' );
 	const store = Ariakit.useTabStore( {
 		selectOnMove,
 		orientation,
 		defaultSelectedId: initialTabId && `${ instanceId }-${ initialTabId }`,
-		setSelectedId: onSelect,
+		setSelectedId: ( selectedId ) => {
+			const strippedDownId =
+				typeof selectedId === 'string'
+					? selectedId.replace( `${ instanceId }-`, '' )
+					: selectedId;
+			onSelect?.( strippedDownId );
+		},
+		selectedId: selectedTabId && `${ instanceId }-${ selectedTabId }`,
 	} );
 
+	const isControlled = selectedTabId !== undefined;
+
 	const { items, selectedId } = store.useState();
+	const { setSelectedId } = store;
+
 	const selectedTab = items.find( ( item ) => item.id === selectedId );
 	const firstEnabledTab = items.find( ( item ) => {
 		// Ariakit internally refers to disabled tabs as `dimmed`.
@@ -98,6 +110,10 @@ function Tabs( {
 
 	// Handle selecting the initial tab.
 	useLayoutEffect( () => {
+		if ( isControlled ) {
+			return;
+		}
+
 		const initialTab = items.find(
 			( item ) => item.id === `${ instanceId }-${ initialTabId }`
 		);
@@ -114,18 +130,19 @@ function Tabs( {
 		// fall back to the initial tab or the first enabled tab.
 		if ( ! items.find( ( item ) => item.id === selectedId ) ) {
 			if ( initialTab && ! initialTab.dimmed ) {
-				store.setSelectedId( initialTab?.id );
+				setSelectedId( initialTab?.id );
 			} else {
-				store.setSelectedId( firstEnabledTab?.id );
+				setSelectedId( firstEnabledTab?.id );
 			}
 		}
 	}, [
 		firstEnabledTab?.id,
 		initialTabId,
 		instanceId,
-		store,
+		isControlled,
 		items,
 		selectedId,
+		setSelectedId,
 	] );
 
 	// Handle the currently selected tab becoming disabled.
@@ -133,18 +150,20 @@ function Tabs( {
 		if ( ! selectedTab?.dimmed ) {
 			return;
 		}
-		// If the currently selected tab becomes disabled, select the first enabled tab.
-		// (if there is one).
-		if ( firstEnabledTab ) {
-			store.setSelectedId( firstEnabledTab?.id );
+
+		// In controlled mode, we trust that disabling tabs is done
+		// intentionally, and don't select a new tab automatically.
+		if ( isControlled ) {
+			setSelectedId( null );
+			return;
 		}
-	}, [
-		items,
-		store,
-		selectedTab?.id,
-		selectedTab?.dimmed,
-		firstEnabledTab,
-	] );
+
+		// If the currently selected tab becomes disabled, select the first
+		// enabled tab (if there is one).
+		if ( firstEnabledTab ) {
+			setSelectedId( firstEnabledTab?.id );
+		}
+	}, [ firstEnabledTab, isControlled, selectedTab?.dimmed, setSelectedId ] );
 
 	return (
 		<TabsContext.Provider value={ { store, instanceId, activeClass } }>

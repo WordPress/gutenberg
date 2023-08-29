@@ -107,6 +107,9 @@ export type TabsProps =
 		 * If this prop is not set, the first tab will be selected by default.
 		 * The id provided will be internally prefixed with the
 		 * `TabsContextProps.instanceId`.
+		 *
+		 * Note: this prop will be overridden by the `selectedTabId` prop if it is
+		 * provided. (Controlled Mode)
 		 */
 		initialTabId?: string;
 		/**
@@ -122,6 +125,15 @@ export type TabsProps =
 		 * @default `horizontal`
 		 */
 		orientation?: 'horizontal' | 'vertical';
+		/**
+		 * The Id of the tab to display. This id is prepended with the `Tabs`
+		 * instanceId internally.
+		 *
+		 * This prop puts the component into controlled mode. A value of
+		 * `undefined` returns the component to uncontrolled mode. A value of
+		 * `null` will result in no tab being selected.
+		 */
+		selectedTabId?: string | null;
 	};
 
 export type TabListProps = {
