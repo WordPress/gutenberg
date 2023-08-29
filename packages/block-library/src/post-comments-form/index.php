@@ -153,7 +153,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 					'state' => array(
 						'core' => array(
 							'comments' => array(
-								'submittedNotice' => __( 'Comment submitted. You can continue navigating.' ),
+								'submittedNotice' => __( 'Comment submitted.' ),
 							),
 						),
 					),
