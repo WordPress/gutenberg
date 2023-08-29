@@ -3,6 +3,14 @@
  */
 import { store, navigate } from '@wordpress/interactivity';
 
+const focusableSelectors = [
+	'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
+	'select:not([disabled]):not([aria-hidden])',
+	'textarea:not([disabled]):not([aria-hidden])',
+	'[contenteditable]',
+	'[tabindex]:not([tabindex^="-"])',
+];
+
 store( {
 	state: {
 		core: {
@@ -133,7 +141,8 @@ store( {
 					context.core.comments.formSlot = `comment-${ commentid }`;
 					context.core.comments.fields.comment_parent = commentid;
 				},
-				cancelReply: ( { context } ) => {
+				cancelReply: ( { context, event } ) => {
+					event.preventDefault();
 					context.core.comments.formSlot = undefined;
 					context.core.comments.fields.comment_parent = 0;
 				},
@@ -162,6 +171,15 @@ store( {
 							block: 'end',
 						} );
 					}
+				},
+				scrollOnReply: ( { context, ref } ) => {
+					const { formSlot } = context.core.comments;
+
+					// Focus on the first field in the comment form.
+					if ( formSlot )
+						ref.querySelector( 'form' )
+							.querySelector( focusableSelectors )
+							.focus();
 				},
 			},
 		},

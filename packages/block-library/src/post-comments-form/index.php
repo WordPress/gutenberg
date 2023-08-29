@@ -31,8 +31,9 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	}
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class'        => implode( ' ', $classes ),
-			'data-wp-fill' => 'context.core.comments.formSlot',
+			'class'          => implode( ' ', $classes ),
+			'data-wp-fill'   => 'context.core.comments.formSlot',
+			'data-wp-effect' => 'effects.core.comments.scrollOnReply',
 		)
 	);
 
