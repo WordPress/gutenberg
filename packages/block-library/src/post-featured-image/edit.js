@@ -28,6 +28,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -59,6 +60,7 @@ export default function PostFeaturedImageEdit( {
 		sizeSlug,
 		rel,
 		linkTarget,
+		align,
 	} = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
@@ -66,6 +68,17 @@ export default function PostFeaturedImageEdit( {
 		'featured_media',
 		postId
 	);
+
+	useEffect( () => {
+		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( align )
+			? { width: undefined, height: undefined }
+			: {};
+		setAttributes( {
+			...extraUpdatedAttributes,
+		} );
+	}, [ align ] );
+
+	const isWideAligned = [ 'wide', 'full' ].includes( align );
 
 	const { media, postType } = useSelect(
 		( select ) => {
@@ -133,12 +146,14 @@ export default function PostFeaturedImageEdit( {
 
 	const controls = (
 		<>
-			<DimensionControls
-				clientId={ clientId }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				imageSizeOptions={ imageSizeOptions }
-			/>
+			{ ! isWideAligned && (
+				<DimensionControls
+					clientId={ clientId }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					imageSizeOptions={ imageSizeOptions }
+				/>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
