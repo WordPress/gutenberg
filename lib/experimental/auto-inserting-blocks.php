@@ -343,7 +343,7 @@ function gutenberg_register_auto_insert_rest_field() {
 					),
 				),
 			),
-		),
+		)
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_auto_insert_rest_field' );
