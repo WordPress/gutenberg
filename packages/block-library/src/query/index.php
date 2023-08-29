@@ -57,7 +57,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 						'core' => array(
 							'query' => array(
 								'loadingText' => __( 'Loading page, please wait.' ),
-								'loadedText'  => __( 'The new page has been loaded. You can continue navigating.' ),
+								'loadedText'  => __( 'Page Loaded.' ),
 							),
 						),
 					),
