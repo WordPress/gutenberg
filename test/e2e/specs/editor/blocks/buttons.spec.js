@@ -196,11 +196,11 @@ test.describe( 'Buttons', () => {
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Color Text styles"i]'
 		);
-		await page.click( 'role=button[name="Color: Cyan bluish gray"i]' );
+		await page.click( 'role=option[name="Color: Cyan bluish gray"i]' );
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
 		);
-		await page.click( 'role=button[name="Color: Vivid red"i]' );
+		await page.click( 'role=option[name="Color: Vivid red"i]' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();

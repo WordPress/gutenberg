@@ -132,7 +132,7 @@ test.describe( 'List View', () => {
 		// make the inner blocks appear.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Cover' } )
-			.getByRole( 'button', { name: /Color: /i } )
+			.getByRole( 'option', { name: /Color: /i } )
 			.first()
 			.click();
 
