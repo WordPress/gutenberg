@@ -416,10 +416,10 @@ describe( 'RichText', () => {
 		// Initial focus is on the "Text" tab.
 		// Tab to the "Custom color picker".
 		await page.keyboard.press( 'Tab' );
-		// Tab to black.
-		await page.keyboard.press( 'Tab' );
+		// Move to black.
+		await page.keyboard.press( 'ArrowRight' );
 		// Select color other than black.
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
