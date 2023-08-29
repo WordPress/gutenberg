@@ -30,11 +30,11 @@ function AutoInsertingBlocksControl( props ) {
 				const _groupedAutoInsertedBlocks =
 					_autoInsertedBlocksForCurrentBlock?.reduce(
 						( groups, block ) => {
-							const [ prefix ] = block.name.split( '/' );
-							if ( ! groups[ prefix ] ) {
-								groups[ prefix ] = [];
+							const [ namespace ] = block.name.split( '/' );
+							if ( ! groups[ namespace ] ) {
+								groups[ namespace ] = [];
 							}
-							groups[ prefix ].push( block );
+							groups[ namespace ].push( block );
 							return groups;
 						},
 						{}
