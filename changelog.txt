@@ -1,5 +1,26 @@
 == Changelog ==
 
+= 16.5.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+- Pass entire link value on toggle of setting on Link Preview. ([53949](https://github.com/WordPress/gutenberg/pull/53949))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@getdave
+
+
 = 16.5.0 =
 
 
