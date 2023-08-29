@@ -63,7 +63,7 @@ export default function CommentsInspectorControls( {
 					<ToggleControl
 						label={ __( 'Enhanced form submission' ) }
 						help={ __(
-							"Don't refresh the page when submitting a new comment."
+							'Submitted comments are added without refreshing the page.'
 						) }
 						checked={ !! enhancedSubmission }
 						onChange={ ( value ) =>
