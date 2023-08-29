@@ -411,8 +411,6 @@ const UnforwardedPopover = (
 		defaultView.addEventListener( 'resize', update );
 		scrollContainer?.addEventListener( 'scroll', update );
 
-		update();
-
 		return () => {
 			defaultView.removeEventListener( 'resize', update );
 			scrollContainer?.removeEventListener( 'scroll', update );
