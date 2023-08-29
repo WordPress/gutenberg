@@ -33,7 +33,7 @@ function someBlock( blocks, predicate, getBlocks ) {
 				? getBlocks( block.clientId )
 				: block.innerBlocks;
 
-		return someBlock( innerBlocks, predicate );
+		return someBlock( innerBlocks, predicate, getBlocks );
 	} );
 }
 
