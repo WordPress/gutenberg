@@ -51,46 +51,45 @@ function gutenberg_render_media_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	// TODO: should we get the style engine to handle `backgroundImage`?
-
-	$styles = array();
-
 	$background_image_source = _wp_array_get( $block_attributes, array( 'style', 'media', 'backgroundImage', 'source' ), null );
 	$background_image_url    = _wp_array_get( $block_attributes, array( 'style', 'media', 'backgroundImage', 'url' ), null );
-	$background_size         = _wp_array_get( $block_attributes, array( 'style', 'media', 'backgroundSize' ), null );
+	$background_size         = _wp_array_get( $block_attributes, array( 'style', 'media', 'backgroundSize' ), 'cover' );
 
-	if ( empty( $background_size ) ) {
-		$background_size = 'cover';
-	}
+	$media_block_styles = array();
 
 	if (
 		'file' === $background_image_source &&
 		$background_image_url
 	) {
-		$styles[] = sprintf( "background-image: url('%s')", esc_url( $background_image_url ) );
+		// Set file based background URL.
+		// TODO: In a follow-up, similar logic could be added to inject a featured image url.
+		$media_block_styles['backgroundImage']['url'] = $background_image_url;
+		// Only output the background size when an image url is set.
+		$media_block_styles['backgroundSize'] = $background_size;
 	}
 
-	// TODO: Yeah, for this to work reliably, it'd be better to run it through the style engine, I think.
-	$styles[] = "background-size: $background_size";
+	$styles = gutenberg_style_engine_get_styles( array( 'media' => $media_block_styles ) );
 
-	$inline_style = safecss_filter_attr( implode( '; ', $styles ) );
+	if ( ! empty( $styles['css'] ) ) {
+		// Inject media styles to the first element, presuming it's the wrapper, if it exists.
+		$tags = new WP_HTML_Tag_Processor( $block_content );
 
-	// Inject media styles to the first element, presuming it's the wrapper, if it exists.
-	$tags = new WP_HTML_Tag_Processor( $block_content );
-	if ( $tags->next_tag() ) {
-		$existing_style = $tags->get_attribute( 'style' );
+		if ( $tags->next_tag() ) {
+			$existing_style = $tags->get_attribute( 'style' );
+			$updated_style  = '';
 
-		$updated_style = '';
+			if ( ! empty( $existing_style ) && ! str_ends_with( $existing_style, ';' ) ) {
+				$updated_style = $existing_style . '; ';
+			}
 
-		if ( ! empty( $existing_style ) && ! str_ends_with( $existing_style, ';' ) ) {
-			$updated_style = $existing_style . '; ';
+			$updated_style .= $styles['css'];
+			$tags->set_attribute( 'style', $updated_style );
 		}
 
-		$updated_style .= $inline_style;
-		$tags->set_attribute( 'style', $updated_style );
+		return $tags->get_updated_html();
 	}
 
-	return $tags->get_updated_html();
+	return $block_content;
 }
 
 // Register the block support.

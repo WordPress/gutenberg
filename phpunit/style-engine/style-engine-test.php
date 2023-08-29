@@ -493,6 +493,25 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 			),
+
+			'inline_background_image_url_with_background_size' => array(
+				'block_styles'    => array(
+					'media' => array(
+						'backgroundImage' => array(
+							'url' => 'http://example.com/image.jpg',
+						),
+						'backgroundSize'  => 'cover',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => "background-image:url('http://example.com/image.jpg');background-size:cover;",
+					'declarations' => array(
+						'background-image' => "url('http://example.com/image.jpg')",
+						'background-size'  => 'cover',
+					),
+				),
+			),
 		);
 	}
 
