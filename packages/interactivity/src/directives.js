@@ -222,19 +222,46 @@ export default () => {
 					// on the hydration, so we have to do it manually. It doesn't need
 					// deps because it only needs to do it the first time.
 					useEffect( () => {
+						const el = element.ref.current;
+
+						// We set the value directly to the corresponding
+						// HTMLElement instance property excluding the following
+						// special cases.
+						// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
+						if (
+							attribute !== 'width' &&
+							attribute !== 'height' &&
+							attribute !== 'href' &&
+							attribute !== 'list' &&
+							attribute !== 'form' &&
+							// Default value in browsers is `-1` and an empty string is
+							// cast to `0` instead
+							attribute !== 'tabIndex' &&
+							attribute !== 'download' &&
+							attribute !== 'rowSpan' &&
+							attribute !== 'colSpan' &&
+							attribute in el
+						) {
+							try {
+								el[ attribute ] =
+									result === null || result === undefined
+										? ''
+										: result;
+								return;
+							} catch ( err ) {}
+						}
 						// aria- and data- attributes have no boolean representation.
 						// A `false` value is different from the attribute not being
 						// present, so we can't remove it.
 						// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
-						if ( result === false && attribute[ 4 ] !== '-' ) {
-							element.ref.current.removeAttribute( attribute );
+						if (
+							result !== null &&
+							result !== undefined &&
+							( result !== false || attribute[ 4 ] === '-' )
+						) {
+							el.setAttribute( attribute, result );
 						} else {
-							element.ref.current.setAttribute(
-								attribute,
-								result === true && attribute[ 4 ] !== '-'
-									? ''
-									: result
-							);
+							el.removeAttribute( attribute );
 						}
 					}, [] );
 				} );
