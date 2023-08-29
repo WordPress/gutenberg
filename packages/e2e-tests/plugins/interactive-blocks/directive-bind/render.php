@@ -58,18 +58,18 @@
 	</p>
 
 	<?php
-		$hydration_cases = array(
-			'false'       => '{ "value": false }',
-			'true'        => '{ "value": true }',
-			'null'        => '{ "value": null }',
-			'undef'       => '{ "__any": "any" }',
-			'emptyString' => '{ "value": "" }',
-			'anyString'   => '{ "value": "any" }',
-			'number'      => '{ "value": 10 }'
-		);
+	$hydration_cases = array(
+		'false'       => '{ "value": false }',
+		'true'        => '{ "value": true }',
+		'null'        => '{ "value": null }',
+		'undef'       => '{ "__any": "any" }',
+		'emptyString' => '{ "value": "" }',
+		'anyString'   => '{ "value": "any" }',
+		'number'      => '{ "value": 10 }',
+	);
 	?>
 
-	<?php foreach( $hydration_cases as $type => $context ): ?>
+	<?php foreach ( $hydration_cases as $type => $context ) : ?>
 	<div
 		data-testid='hydrating <?php echo $type; ?>'
 		data-wp-context='<?php echo $context; ?>'
