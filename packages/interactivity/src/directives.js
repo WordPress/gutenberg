@@ -3,7 +3,6 @@
  */
 import { useContext, useMemo, useEffect, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
-import { Fragment } from 'preact';
 
 /**
  * Internal dependencies
