@@ -21,19 +21,26 @@ import AddedBy from '../list/added-by';
 import TemplateActions from '../template-actions';
 import AddNewTemplate from '../add-new-template';
 
-export default function PageTemplates() {
-	const { records: templates } = useEntityRecords(
-		'postType',
-		'wp_template',
-		{
-			per_page: -1,
-		}
-	);
+/**
+ * @typedef {Object} RichContent
+ * @property {string}        rendered    The rendered content.
+ * @property {string}        raw         The raw content.
+ *
+ * @typedef {Object} Template
+ * @property {string}        id          The ID of the template.
+ * @property {'wp_template'} type        The type of the template.
+ * @property {RichContent}   title       The name of the template.
+ * @property {string}        description The description of the template.
+ * @property {string}        slug        The slug of the template.
+ */
 
-	const columns = [
-		{
-			header: __( 'Template' ),
-			cell: ( template ) => (
+const columns = [
+	{
+		accessor: ( row ) => decodeEntities( row.title?.rendered || row.slug ),
+		id: 'title',
+		header: __( 'Template' ),
+		cell: ( { value, row: template } ) => {
+			return (
 				<VStack>
 					<Heading as="h3" level={ 5 }>
 						<Link
@@ -43,9 +50,7 @@ export default function PageTemplates() {
 								canvas: 'edit',
 							} }
 						>
-							{ decodeEntities(
-								template.title?.rendered || template.slug
-							) }
+							{ value }
 						</Link>
 					</Heading>
 					{ template.description && (
@@ -54,25 +59,38 @@ export default function PageTemplates() {
 						</Text>
 					) }
 				</VStack>
-			),
-			maxWidth: 400,
+			);
 		},
+		maxWidth: 400,
+	},
+	{
+		id: 'added-by',
+		header: __( 'Added by' ),
+		cell: ( { row: template } ) => (
+			<AddedBy postType={ template.type } postId={ template.id } />
+		),
+	},
+	{
+		id: 'actions',
+		header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
+		cell: ( { row: template } ) => (
+			<TemplateActions
+				postType={ template.type }
+				postId={ template.id }
+			/>
+		),
+	},
+];
+
+export default function PageTemplates() {
+	/** @type {{records: Template[] | null}} */
+	const { records: templates } = useEntityRecords(
+		'postType',
+		'wp_template',
 		{
-			header: __( 'Added by' ),
-			cell: ( template ) => (
-				<AddedBy postType={ template.type } postId={ template.id } />
-			),
-		},
-		{
-			header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
-			cell: ( template ) => (
-				<TemplateActions
-					postType={ template.type }
-					postId={ template.id }
-				/>
-			),
-		},
-	];
+			per_page: -1,
+		}
+	);
 
 	return (
 		<Page
@@ -85,7 +103,14 @@ export default function PageTemplates() {
 				/>
 			}
 		>
-			{ templates && <Table data={ templates } columns={ columns } /> }
+			{ templates && (
+				<Table
+					data={ templates }
+					columns={ columns }
+					rowId="id"
+					enableSorting={ false }
+				/>
+			) }
 		</Page>
 	);
 }
