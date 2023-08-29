@@ -18,6 +18,7 @@ import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
+import { allPatternsCategory } from '../block-patterns-tab';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
@@ -63,17 +64,20 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 
 	const filteredBlockPatterns = useMemo( () => {
 		if ( ! filterValue ) {
-			return allPatterns.filter( ( pattern ) =>
-				selectedCategory === 'uncategorized'
+			return allPatterns.filter( ( pattern ) => {
+				if ( selectedCategory === allPatternsCategory.name ) {
+					return true;
+				}
+				return selectedCategory === 'uncategorized'
 					? ! pattern.categories?.length ||
-					  pattern.categories.every(
-							( category ) =>
-								! registeredPatternCategories.includes(
-									category
-								)
-					  )
-					: pattern.categories?.includes( selectedCategory )
-			);
+							pattern.categories.every(
+								( category ) =>
+									! registeredPatternCategories.includes(
+										category
+									)
+							)
+					: pattern.categories?.includes( selectedCategory );
+			} );
 		}
 		return searchItems( allPatterns, filterValue );
 	}, [
@@ -99,7 +103,8 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 
 	const {
 		totalItems,
-		categoryPatternsList,
+		categoryPatterns,
+		categoryPatternsAsyncList,
 		numPages,
 		changePage,
 		currentPage,
@@ -121,8 +126,8 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 				{ ! hasItems && <InserterNoResults /> }
 				{ hasItems && (
 					<BlockPatternsList
-						shownPatterns={ categoryPatternsList }
-						blockPatterns={ filteredBlockPatterns }
+						shownPatterns={ categoryPatternsAsyncList }
+						blockPatterns={ categoryPatterns }
 						onClickPattern={ onClickPattern }
 						isDraggable={ false }
 					/>

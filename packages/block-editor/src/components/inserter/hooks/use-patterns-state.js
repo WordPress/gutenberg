@@ -58,7 +58,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 	const onClickPattern = useCallback(
 		( pattern, blocks ) => {
 			const patternBlocks =
-				pattern.syncStatus !== 'unsynced'
+				pattern.id && pattern.syncStatus !== 'unsynced'
 					? [ createBlock( 'core/block', { ref: pattern.id } ) ]
 					: blocks;
 			onInsert(

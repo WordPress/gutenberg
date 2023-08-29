@@ -16,6 +16,8 @@ import {
 	__experimentalHStack as HStack,
 	FlexBlock,
 	Button,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
@@ -44,6 +46,20 @@ const patternCategoriesOrder = [
 	'header',
 	'footer',
 ];
+
+export const allPatternsCategory = {
+	name: 'allPatterns',
+	label: __( 'All patterns' ),
+};
+export const SYNC_TYPES = {
+	full: 'fully',
+	unsynced: 'unsynced',
+};
+const SYNC_FILTERS = {
+	all: __( 'All' ),
+	[ SYNC_TYPES.full ]: __( 'My synced' ),
+	[ SYNC_TYPES.unsynced ]: __( 'My standard' ),
+};
 
 function usePatternsCategories( rootClientId ) {
 	const { patterns: allPatterns, allCategories } = usePatternsState(
@@ -93,6 +109,12 @@ function usePatternsCategories( rootClientId ) {
 			categories.push( {
 				name: 'uncategorized',
 				label: _x( 'Uncategorized' ),
+			} );
+		}
+		if ( allPatterns.length > 0 ) {
+			categories.unshift( {
+				name: allPatternsCategory.name,
+				label: allPatternsCategory.label,
 			} );
 		}
 
@@ -146,11 +168,18 @@ export function BlockPatternsCategoryPanel( {
 		onInsert,
 		rootClientId
 	);
-
+	const [ syncFilter, setSyncFilter ] = useState( 'all' );
+	const updateSyncFilter = ( value ) => {
+		//setCurrentPage( 1 );
+		setSyncFilter( value );
+	};
 	const availableCategories = usePatternsCategories( rootClientId );
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
+				if ( category.name === allPatternsCategory.name ) {
+					return true;
+				}
 				if ( category.name !== 'uncategorized' ) {
 					return pattern.categories?.includes( category.name );
 				}
@@ -172,7 +201,8 @@ export function BlockPatternsCategoryPanel( {
 
 	const {
 		totalItems,
-		categoryPatternsList,
+		categoryPatterns,
+		categoryPatternsAsyncList,
 		numPages,
 		changePage,
 		currentPage,
@@ -194,9 +224,31 @@ export function BlockPatternsCategoryPanel( {
 				{ category.label }
 			</div>
 			<p>{ category.description }</p>
+			{ category.name === allPatternsCategory.name && (
+				<ToggleGroupControl
+					className="edit-site-patterns__sync-status-filter"
+					hideLabelFromVision
+					label={ __( 'Filter by sync status' ) }
+					value={ syncFilter }
+					isBlock
+					onChange={ ( value ) => updateSyncFilter( value ) }
+					__nextHasNoMarginBottom
+				>
+					{ Object.entries( SYNC_FILTERS ).map(
+						( [ key, label ] ) => (
+							<ToggleGroupControlOption
+								className="edit-site-patterns__sync-status-filter-option"
+								key={ key }
+								value={ key }
+								label={ label }
+							/>
+						)
+					) }
+				</ToggleGroupControl>
+			) }
 			<BlockPatternList
-				shownPatterns={ categoryPatternsList }
-				blockPatterns={ currentCategoryPatterns }
+				shownPatterns={ categoryPatternsAsyncList }
+				blockPatterns={ categoryPatterns }
 				onClickPattern={ onClickPattern }
 				onHover={ onHover }
 				label={ category.label }
