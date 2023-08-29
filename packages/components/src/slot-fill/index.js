@@ -2,7 +2,7 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,6 +13,7 @@ import BubblesVirtuallyFill from './bubbles-virtually/fill';
 import BubblesVirtuallySlot from './bubbles-virtually/slot';
 import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
 import SlotFillProvider from './provider';
+import SlotFillContext from './bubbles-virtually/slot-fill-context';
 export { default as useSlot } from './bubbles-virtually/use-slot';
 export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
 
@@ -35,6 +36,10 @@ export const Slot = forwardRef( ( { bubblesVirtually, ...props }, ref ) => {
 } );
 
 export function Provider( { children, ...props } ) {
+	const parent = useContext( SlotFillContext );
+	if ( ! parent.isDefault ) {
+		return children;
+	}
 	return (
 		<SlotFillProvider { ...props }>
 			<BubblesVirtuallySlotFillProvider>

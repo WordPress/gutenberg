@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import { DuotonePicker } from '..';
 import type { DuotonePickerProps } from '../types';
 
-const meta: ComponentMeta< typeof DuotonePicker > = {
+const meta: Meta< typeof DuotonePicker > = {
 	title: 'Components/DuotonePicker',
 	component: DuotonePicker,
 	argTypes: {
@@ -48,10 +48,7 @@ const COLOR_PALETTE = [
 	{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
 ];
 
-const Template: ComponentStory< typeof DuotonePicker > = ( {
-	onChange,
-	...args
-} ) => {
+const Template: StoryFn< typeof DuotonePicker > = ( { onChange, ...args } ) => {
 	const [ value, setValue ] = useState< DuotonePickerProps[ 'value' ] >();
 
 	return (

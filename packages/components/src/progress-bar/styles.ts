@@ -54,7 +54,10 @@ export const Indicator = styled.div< {
 					animationName: animateProgressBar,
 					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
 			  } )
-			: css( { width: `${ value }%` } ) };
+			: css( {
+					width: `${ value }%`,
+					transition: 'width 0.4s ease-in-out',
+			  } ) };
 `;
 
 export const ProgressElement = styled.progress`

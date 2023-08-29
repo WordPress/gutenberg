@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * Internal dependencies
  */
@@ -21,7 +21,7 @@ import {
 	trash,
 } from '@wordpress/icons';
 
-const meta: ComponentMeta< typeof DropdownMenu > = {
+const meta: Meta< typeof DropdownMenu > = {
 	title: 'Components/DropdownMenu',
 	component: DropdownMenu,
 	parameters: {
@@ -38,7 +38,7 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 };
 export default meta;
 
-const Template: Story< typeof DropdownMenu > = ( props ) => (
+const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<div style={ { height: 150 } }>
 		<DropdownMenu { ...props } />
 	</div>

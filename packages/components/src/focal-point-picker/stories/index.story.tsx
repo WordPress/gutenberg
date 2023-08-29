@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
  */
 import FocalPointPicker from '..';
 
-const meta: ComponentMeta< typeof FocalPointPicker > = {
+const meta: Meta< typeof FocalPointPicker > = {
 	title: 'Components/FocalPointPicker',
 	component: FocalPointPicker,
 	argTypes: {
@@ -27,7 +27,7 @@ const meta: ComponentMeta< typeof FocalPointPicker > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof FocalPointPicker > = ( {
+const Template: StoryFn< typeof FocalPointPicker > = ( {
 	onChange,
 	...props
 } ) => {

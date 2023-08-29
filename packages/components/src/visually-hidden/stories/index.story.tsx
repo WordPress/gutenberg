@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { VisuallyHidden } from '..';
 
-const meta: ComponentMeta< typeof VisuallyHidden > = {
+const meta: Meta< typeof VisuallyHidden > = {
 	component: VisuallyHidden,
 	title: 'Components/VisuallyHidden',
 	argTypes: {
@@ -24,7 +24,7 @@ const meta: ComponentMeta< typeof VisuallyHidden > = {
 };
 export default meta;
 
-export const Default: ComponentStory< typeof VisuallyHidden > = ( args ) => (
+export const Default: StoryFn< typeof VisuallyHidden > = ( args ) => (
 	<>
 		<VisuallyHidden as="span" { ...args }>
 			This should not show.
@@ -39,7 +39,7 @@ export const Default: ComponentStory< typeof VisuallyHidden > = ( args ) => (
 	</>
 );
 
-export const WithForwardedProps: ComponentStory< typeof VisuallyHidden > = (
+export const WithForwardedProps: StoryFn< typeof VisuallyHidden > = (
 	args
 ) => (
 	<>
@@ -52,9 +52,9 @@ export const WithForwardedProps: ComponentStory< typeof VisuallyHidden > = (
 	</>
 );
 
-export const WithAdditionalClassNames: ComponentStory<
-	typeof VisuallyHidden
-> = ( args ) => (
+export const WithAdditionalClassNames: StoryFn< typeof VisuallyHidden > = (
+	args
+) => (
 	<>
 		Additional class names passed to VisuallyHidden extend the component
 		class name.{ ' ' }
