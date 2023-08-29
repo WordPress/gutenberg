@@ -3,13 +3,26 @@
  */
 import { createContext } from '@wordpress/element';
 
-const globalShortcuts = { current: new Set() };
-document.addEventListener( 'DOMContentLoaded', () => {
-	document.body.addEventListener( 'keydown', ( event ) => {
-		for ( const keyboardShortcut of globalShortcuts.current ) {
-			keyboardShortcut( event );
-		}
-	} );
-} );
+const globalShortcuts = new Set();
+const globalListener = ( event ) => {
+	for ( const keyboardShortcut of globalShortcuts ) {
+		keyboardShortcut( event );
+	}
+};
 
-export const context = createContext( globalShortcuts );
+export const context = createContext( {
+	current: {
+		add: ( shortcut ) => {
+			if ( globalShortcuts.size === 0 ) {
+				document.addEventListener( 'keydown', globalListener );
+			}
+			globalShortcuts.add( shortcut );
+		},
+		remove: ( shortcut ) => {
+			globalShortcuts.delete( shortcut );
+			if ( globalShortcuts.size === 0 ) {
+				document.removeEventListener( 'keydown', globalListener );
+			}
+		},
+	},
+} );
