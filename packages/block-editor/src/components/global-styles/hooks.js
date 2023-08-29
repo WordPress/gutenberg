@@ -19,11 +19,10 @@ import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
 
-const EMPTY_CONFIG = { settings: {}, styles: {}, behaviors: {} };
+const EMPTY_CONFIG = { settings: {}, styles: {} };
 
 const VALID_SETTINGS = [
 	'appearanceTools',
-	'behaviors',
 	'useRootPaddingAwareAlignments',
 	'border.color',
 	'border.radius',
@@ -460,73 +459,4 @@ export function useGradientsPerOrigin( settings ) {
 		defaultGradients,
 		shouldDisplayDefaultGradients,
 	] );
-}
-
-export function __experimentalUseGlobalBehaviors( blockName ) {
-	const {
-		merged: mergedConfig,
-		user: userConfig,
-		setUserConfig,
-	} = useContext( GlobalStylesContext );
-	const finalPath = ! blockName
-		? `behaviors`
-		: `behaviors.blocks.${ blockName }`;
-
-	const rawResult = getValueFromObjectPath( userConfig, finalPath );
-	const result = getValueFromVariable( mergedConfig, blockName, rawResult );
-
-	const animation = result?.lightbox?.animation || 'zoom';
-
-	const setBehavior = ( newValue ) => {
-		let newBehavior;
-		// The user saves with Apply Globally option.
-		if ( typeof newValue === 'object' ) {
-			newBehavior = newValue;
-		} else {
-			switch ( newValue ) {
-				case 'lightbox':
-					newBehavior = {
-						lightbox: {
-							enabled: true,
-							animation,
-						},
-					};
-					break;
-				case 'fade':
-					newBehavior = {
-						lightbox: {
-							enabled: true,
-							animation: 'fade',
-						},
-					};
-					break;
-				case 'zoom':
-					newBehavior = {
-						lightbox: {
-							enabled: true,
-							animation: 'zoom',
-						},
-					};
-					break;
-				case '':
-					newBehavior = {
-						lightbox: {
-							enabled: false,
-							animation,
-						},
-					};
-					break;
-				default:
-					break;
-			}
-		}
-		setUserConfig( ( currentConfig ) =>
-			setImmutably( currentConfig, finalPath.split( '.' ), newBehavior )
-		);
-	};
-	let behavior = '';
-	if ( result === undefined ) behavior = 'default';
-	if ( result?.lightbox.enabled ) behavior = 'lightbox';
-
-	return { behavior, inheritedBehaviors: result, setBehavior };
 }

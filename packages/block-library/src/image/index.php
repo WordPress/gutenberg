@@ -33,7 +33,9 @@ function render_block_core_image( $attributes, $content, $block ) {
 
 	$should_load_view_script = false;
 	$link_destination        = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
+
 	// Get the lightbox setting from the block attributes.
+	// TODO: This must be changed to use the new Lightbox UI.
 	if ( isset( $attributes['behaviors']['lightbox'] ) ) {
 		$lightbox_settings = $attributes['behaviors']['lightbox'];
 	}
@@ -74,6 +76,8 @@ function render_block_core_image( $attributes, $content, $block ) {
 function gutenberg_render_lightbox( $block_content, $block ) {
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 	// Get the lightbox setting from the block attributes.
+
+	// TODO: This must be changed to use the new Lightbox UI.
 	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
 		$lightbox_settings = $block['attrs']['behaviors']['lightbox'];
 	}
@@ -102,11 +106,8 @@ function gutenberg_render_lightbox( $block_content, $block ) {
 	}
 	$content = $processor->get_updated_html();
 
-	// If we don't set a default, it won't work if Lightbox is set to enabled by default.
+	// Currently, the only supported animation is 'zoom'.
 	$lightbox_animation = 'zoom';
-	if ( isset( $lightbox_settings['animation'] ) && '' !== $lightbox_settings['animation'] ) {
-		$lightbox_animation = $lightbox_settings['animation'];
-	}
 
 	// We want to store the src in the context so we can set it dynamically when the lightbox is opened.
 	$z = new WP_HTML_Tag_Processor( $content );
@@ -254,6 +255,8 @@ HTML;
 	return str_replace( '</figure>', $lightbox_html . '</figure>', $body_content );
 }
 
+// TODO: We should not be adding a separate filter but rather move the
+// the lightbox rendering to the `render_block_core_image` function.
 
 // Use priority 15 to run this hook after other hooks/plugins.
 // They could use the `render_block_{$this->name}` filter to modify the markup.

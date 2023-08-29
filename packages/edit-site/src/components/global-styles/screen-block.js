@@ -67,8 +67,6 @@ const {
 	useHasEffectsPanel,
 	useHasFiltersPanel,
 	useGlobalStyle,
-	__experimentalUseGlobalBehaviors,
-	__experimentalBehaviorsPanel: StylesBehaviorsPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
@@ -93,9 +91,6 @@ function ScreenBlock( { name, variation } ) {
 	} );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
-	const { behavior, setBehavior, inheritedBehaviors } =
-		__experimentalUseGlobalBehaviors( name );
-
 	const blockType = getBlockType( name );
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
@@ -272,12 +267,6 @@ function ScreenBlock( { name, variation } ) {
 						onChange={ setStyle }
 						inheritedValue={ inheritedStyle }
 					/>
-					{ /* <StylesBehaviorsPanel
-						value={ behavior }
-						onChange={ setBehavior }
-						behaviors={ inheritedBehaviors }
-						blockName={ name }
-					></StylesBehaviorsPanel> */ }
 				</PanelBody>
 			) }
 		</>
