@@ -14,6 +14,7 @@ import {
 	blockDefault,
 	code,
 	keyboard,
+	listView,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -198,21 +199,27 @@ function useEditUICommands() {
 		setIsListViewOpened,
 		switchEditorMode,
 	} = useDispatch( editSiteStore );
-	const { canvasMode, editorMode, activeSidebar, showBlockBreadcrumbs } =
-		useSelect(
-			( select ) => ( {
-				canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-				editorMode: select( editSiteStore ).getEditorMode(),
-				activeSidebar: select(
-					interfaceStore
-				).getActiveComplementaryArea( editSiteStore.name ),
-				showBlockBreadcrumbs: select( preferencesStore ).get(
-					'core/edit-site',
-					'showBlockBreadcrumbs'
-				),
-			} ),
-			[]
-		);
+	const {
+		canvasMode,
+		editorMode,
+		activeSidebar,
+		showBlockBreadcrumbs,
+		isListViewOpen,
+	} = useSelect( ( select ) => {
+		const { isListViewOpened, getEditorMode } = select( editSiteStore );
+		return {
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+			editorMode: getEditorMode(),
+			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
+				editSiteStore.name
+			),
+			showBlockBreadcrumbs: select( preferencesStore ).get(
+				'core/edit-site',
+				'showBlockBreadcrumbs'
+			),
+			isListViewOpen: isListViewOpened(),
+		};
+	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
 	const { get: getPreference } = useSelect( preferencesStore );
 	const { set: setPreference, toggle } = useDispatch( preferencesStore );
@@ -338,6 +345,16 @@ function useEditUICommands() {
 					type: 'snackbar',
 				}
 			);
+		},
+	} );
+
+	commands.push( {
+		name: 'core/toggle-list-view',
+		label: __( 'Toggle list view' ),
+		icon: listView,
+		callback: ( { close } ) => {
+			setIsListViewOpened( ! isListViewOpen );
+			close();
 		},
 	} );
 

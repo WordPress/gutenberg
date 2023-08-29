@@ -56,4 +56,44 @@
 	>
 		Some Text
 	</p>
+
+	<?php
+	$hydration_cases = array(
+		'false'       => '{ "value": false }',
+		'true'        => '{ "value": true }',
+		'null'        => '{ "value": null }',
+		'undef'       => '{ "__any": "any" }',
+		'emptyString' => '{ "value": "" }',
+		'anyString'   => '{ "value": "any" }',
+		'number'      => '{ "value": 10 }',
+	);
+	?>
+
+	<?php foreach ( $hydration_cases as $type => $context ) : ?>
+	<div
+		data-testid='hydrating <?php echo $type; ?>'
+		data-wp-context='<?php echo $context; ?>'
+	>
+		<img
+			alt="Red dot"
+			data-testid="image"
+			data-wp-bind--width="context.value"
+			src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
+			AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
+			9TXL0Y4OHwAAAABJRU5ErkJggg=="
+		>
+		<input
+			type="text"
+			data-testid="input"
+			data-wp-bind--name="context.value"
+			data-wp-bind--value="context.value"
+			data-wp-bind--disabled="context.value"
+			data-wp-bind--aria-disabled="context.value"
+		>
+		<button
+			data-testid="toggle value"
+			data-wp-on--click="actions.toggleValue"
+		>Toggle</button>
+	</div>
+	<?php endforeach; ?>
 </div>
