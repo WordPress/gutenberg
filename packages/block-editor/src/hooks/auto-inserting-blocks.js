@@ -22,11 +22,8 @@ function AutoInsertingBlocksControl( props ) {
 				const { getBlockTypes } = select( blocksStore );
 				const _autoInsertedBlocksForCurrentBlock =
 					getBlockTypes()?.filter(
-						( block ) =>
-							block.autoInsert &&
-							Object.keys( block.autoInsert ).includes(
-								props.blockName
-							)
+						( { autoInsert } ) =>
+							autoInsert && props.blockName in autoInsert
 					);
 
 				// Group by block namespace (i.e. prefix before the slash).
