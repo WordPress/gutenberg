@@ -15,9 +15,10 @@
  * @return string Returns the pagination numbers for the Query.
  */
 function render_block_core_query_pagination_numbers( $attributes, $content, $block ) {
-	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
-	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
+	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
+	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
+	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$max_page            = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$content            = '';
@@ -84,9 +85,24 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 		wp_reset_postdata(); // Restore original Post Data.
 		$wp_query = $prev_wp_query;
 	}
+
 	if ( empty( $content ) ) {
 		return '';
 	}
+
+	if ( $enhanced_pagination ) {
+		$p = new WP_HTML_Tag_Processor( $content );
+		while ( $p->next_tag(
+			array(
+				'tag_name'   => 'a',
+				'class_name' => 'page-numbers',
+			)
+		) ) {
+			$p->set_attribute( 'data-wp-on--click', 'actions.core.query.navigate' );
+		}
+		$content = $p->get_updated_html();
+	}
+
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
