@@ -17,7 +17,7 @@ class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_UnitTestCase {
 			'id'             => 'my-font-collection',
 			'name'           => 'My Font Collection',
 			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
-			'data_json_file' => path_join( __DIR__, 'my-font-collection-data.json' ),
+			'src' => path_join( __DIR__, 'my-font-collection-data.json' ),
 		);
 
 		wp_register_font_collection( $my_font_collection_config );
@@ -26,7 +26,7 @@ class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_UnitTestCase {
 			'id'             => 'another-font-collection',
 			'name'           => 'Another Font Collection',
 			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
-			'data_json_file' => path_join( __DIR__, 'another-font-collection-data.json' ),
+			'src' => path_join( __DIR__, 'another-font-collection-data.json' ),
 		);
 
 		wp_register_font_collection( $another_font_collection_config );

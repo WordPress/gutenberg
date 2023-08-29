@@ -20,7 +20,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 			'id'             => 'my-collection',
 			'name'           => 'My Collection',
 			'description'    => 'My collection description',
-			'data_json_file' => 'my-collection-data.json',
+			'src' => 'my-collection-data.json',
 		);
 		$font_collection = new WP_Font_Collection( $config );
 
@@ -53,7 +53,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 				array(
 					'name'           => 'My Collection',
 					'description'    => 'My collection description',
-					'data_json_file' => 'my-collection-data.json',
+					'src' => 'my-collection-data.json',
 				),
 				'Font Collection config ID is required as a non-empty string.',
 			),
@@ -78,13 +78,13 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 				'Font Collection config options is required as a non-empty array.',
 			),
 
-			'missing data_json_file'          => array(
+			'missing src'          => array(
 				array(
 					'id'          => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
-				'Font Collection config "data_json_file" option is required as a non-empty string.',
+				'Font Collection config "src" option is required as a non-empty string.',
 			),
 
 		);

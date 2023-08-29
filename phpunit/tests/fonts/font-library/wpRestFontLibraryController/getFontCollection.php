@@ -26,7 +26,7 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 			'id'             => 'one-collection',
 			'name'           => 'One Font Collection',
 			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
-			'data_json_file' => $mock_file,
+			'src' => $mock_file,
 		);
 		wp_register_font_collection( $config );
 	}
