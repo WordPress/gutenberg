@@ -54,6 +54,7 @@ export default function PreviewOptions( {
 			menuProps={ menuProps }
 			icon={ deviceIcons[ deviceType.toLowerCase() ] }
 			label={ label || __( 'Preview' ) }
+			disableOpenOnArrowDown={ ! isEnabled }
 		>
 			{ ( renderProps ) => (
 				<>
