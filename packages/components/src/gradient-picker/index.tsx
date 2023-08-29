@@ -115,14 +115,35 @@ function MultipleOrigin( {
 }
 
 function Component( props: PickerProps< any > ) {
-	const { actions, headingLevel, ...otherProps } = props;
+	const {
+		actions,
+		headingLevel,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
+		...otherProps
+	} = props;
 	const options = isMultipleOriginArray( props.gradients ) ? (
 		<MultipleOrigin headingLevel={ headingLevel } { ...otherProps } />
 	) : (
 		<SingleOrigin { ...otherProps } />
 	);
 
-	return <CircularOptionPicker actions={ actions } options={ options } />;
+	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
+	if ( ariaLabel ) {
+		ariaProps = { 'aria-label': ariaLabel as string };
+	} else if ( ariaLabelledby ) {
+		ariaProps = { 'aria-labelledby': ariaLabelledby as string };
+	} else {
+		ariaProps = { 'aria-label': __( 'Custom gradient picker.' ) };
+	}
+
+	return (
+		<CircularOptionPicker
+			{ ...ariaProps }
+			actions={ actions }
+			options={ options }
+		/>
+	);
 }
 
 /**

@@ -186,6 +186,8 @@ function UnforwardedColorPalette(
 		value,
 		__experimentalIsRenderedInSidebar = false,
 		headingLevel = 2,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
 		...otherProps
 	} = props;
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
@@ -246,6 +248,15 @@ function UnforwardedColorPalette(
 		</CircularOptionPicker.ButtonAction>
 	);
 
+	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
+	if ( ariaLabel ) {
+		ariaProps = { 'aria-label': ariaLabel as string };
+	} else if ( ariaLabelledby ) {
+		ariaProps = { 'aria-labelledby': ariaLabelledby as string };
+	} else {
+		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
+	}
+
 	return (
 		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
 			{ ! disableCustomColors && (
@@ -299,6 +310,7 @@ function UnforwardedColorPalette(
 				/>
 			) }
 			<CircularOptionPicker
+				{ ...ariaProps }
 				actions={ actions }
 				options={
 					hasMultipleColorOrigins ? (

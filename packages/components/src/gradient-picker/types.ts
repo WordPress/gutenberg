@@ -42,6 +42,18 @@ type GradientPickerBaseProps = {
 	 * @default 2
 	 */
 	headingLevel?: HeadingSize;
+	/**
+	 * A label to identify the purpose of the control.
+	 *
+	 * @todo Either this or `aria-labelledby` should be required
+	 */
+	'aria-label'?: string;
+	/**
+	 * An ID of an element to provide a label for the control.
+	 *
+	 * @todo Either this or `aria-label` should be required
+	 */
+	'aria-labelledby'?: string;
 };
 
 export type GradientPickerComponentProps = GradientPickerBaseProps & {

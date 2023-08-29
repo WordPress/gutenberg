@@ -17,6 +17,10 @@ import type { WordPressComponentProps } from '../ui/context';
 
 export type CircularOptionPickerProps = {
 	/**
+	 * An ID to apply to the component.
+	 */
+	id?: string;
+	/**
 	 * A CSS class to apply to the wrapper element.
 	 */
 	className?: string;
@@ -42,7 +46,14 @@ export type CircularOptionPickerProps = {
 	 * @default true
 	 */
 	loop?: boolean;
-};
+} & (
+	| {
+			'aria-label': string;
+	  }
+	| {
+			'aria-labelledby': string;
+	  }
+ );
 
 export type DropdownLinkActionProps = {
 	buttonProps?: Omit<

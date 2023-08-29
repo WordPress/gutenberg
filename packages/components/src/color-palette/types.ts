@@ -88,4 +88,16 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
+	/**
+	 * A label to identify the purpose of the control.
+	 *
+	 * @todo Either this or `aria-labelledby` should be required
+	 */
+	'aria-label'?: string;
+	/**
+	 * An ID of an element to provide a label for the control.
+	 *
+	 * @todo Either this or `aria-label` should be required
+	 */
+	'aria-labelledby'?: string;
 };

@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { createContext, useContext } from '@wordpress/element';
+import { createContext, useContext, useEffect } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
 import { isRTL } from '@wordpress/i18n';
 
@@ -46,6 +46,19 @@ export function Option( {
 	} = compositeState as any;
 	const id = useInstanceId( Option, baseId );
 
+	useEffect( () => {
+		// If we call `setCurrentId` here, it doesn't update for other
+		// Option renders in the same pass. So we have to store our own
+		// map to make sure that we only set the first selected option.
+		// We still need to check `currentId` because the control will
+		// update this as the user moves around, and that state should
+		// be maintained as the group gains and loses focus.
+		if ( isSelected && ! currentId && ! hasSelectedOption.get( baseId ) ) {
+			hasSelectedOption.set( baseId, true );
+			setCurrentId( id );
+		}
+	} );
+
 	const optionControl = (
 		<CompositeItem
 			as={ Button }
@@ -62,17 +75,6 @@ export function Option( {
 			aria-selected={ !! isSelected }
 		/>
 	);
-
-	// If we call `setCurrentId` here, it doesn't update for other
-	// Option renders in the same pass. So we have to store our own
-	// map to make sure that we only set the first selected option.
-	// We still need to check `currentId` because the control will
-	// update this as the user moves around, and that state should
-	// be maintained as the group gains and loses focus.
-	if ( isSelected && ! currentId && ! hasSelectedOption.get( baseId ) ) {
-		hasSelectedOption.set( baseId, true );
-		setCurrentId( id );
-	}
 
 	return (
 		<div
@@ -101,10 +103,14 @@ export function OptionGroup( {
 	options,
 	...additionalProps
 }: OptionGroupProps ) {
+	const { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby } =
+		additionalProps as any;
+	const role = ariaLabel || ariaLabelledby ? 'group' : undefined;
+
 	return (
 		<div
 			{ ...additionalProps }
-			role="group"
+			role={ role }
 			className={ classnames(
 				'components-circular-option-picker__option-group',
 				'components-circular-option-picker__swatches',
@@ -210,12 +216,22 @@ export function ButtonAction( {
  */
 
 function CircularOptionPicker( props: CircularOptionPickerProps ) {
-	const { actions, className, options, children, loop = true } = props;
+	const {
+		actions,
+		className,
+		id: idProp,
+		options,
+		children,
+		loop = true,
+		...additionalProps
+	} = props;
+	const id = useInstanceId( CircularOptionPicker, 'option-picker', idProp );
 	const rtl = isRTL();
-	const compositeState = useCompositeState( { loop, rtl } );
+	const compositeState = useCompositeState( { baseId: id, loop, rtl } );
 
 	return (
 		<Composite
+			{ ...additionalProps }
 			{ ...compositeState }
 			role={ 'listbox' }
 			className={ classnames(

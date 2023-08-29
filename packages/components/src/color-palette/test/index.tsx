@@ -69,7 +69,7 @@ describe( 'ColorPalette', () => {
 		);
 
 		expect(
-			screen.getAllByRole( 'button', { name: /^Color:/ } )
+			screen.getAllByRole( 'option', { name: /^Color:/ } )
 		).toHaveLength( 3 );
 	} );
 
@@ -86,7 +86,7 @@ describe( 'ColorPalette', () => {
 		);
 
 		await user.click(
-			screen.getByRole( 'button', { name: /^Color:/, pressed: true } )
+			screen.getByRole( 'option', { name: /^Color:/, selected: true } )
 		);
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
@@ -108,9 +108,9 @@ describe( 'ColorPalette', () => {
 		// Click the first unpressed button
 		// (i.e. a button representing a color that is not the current color)
 		await user.click(
-			screen.getAllByRole( 'button', {
+			screen.getAllByRole( 'option', {
 				name: /^Color:/,
-				pressed: false,
+				selected: false,
 			} )[ 0 ]
 		);
 
@@ -231,9 +231,9 @@ describe( 'ColorPalette', () => {
 
 		// Click the first unpressed button
 		await user.click(
-			screen.getAllByRole( 'button', {
+			screen.getAllByRole( 'option', {
 				name: /^Color:/,
-				pressed: false,
+				selected: false,
 			} )[ 0 ]
 		);
 

@@ -39,6 +39,18 @@ export type DuotonePickerProps = {
 	 * Callback which is called when the duotone colors change.
 	 */
 	onChange: ( value: DuotonePickerProps[ 'value' ] | undefined ) => void;
+	/**
+	 * A label to identify the purpose of the control.
+	 *
+	 * @todo Either this or `aria-labelledby` should be required
+	 */
+	'aria-label'?: string;
+	/**
+	 * An ID of an element to provide a label for the control.
+	 *
+	 * @todo Either this or `aria-label` should be required
+	 */
+	'aria-labelledby'?: string;
 };
 
 type Color = {
