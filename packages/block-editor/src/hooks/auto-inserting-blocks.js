@@ -19,6 +19,24 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { BlockIcon, InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
+function someBlock( blocks, predicate, getBlocks ) {
+	return blocks.some( ( block ) => {
+		const result = predicate( block );
+		if ( result ) {
+			return result;
+		}
+
+		// A Template Part block's innerBlocks array always shows up as empty,
+		// so we have to manually load its inner blocks via getBlocks().
+		const innerBlocks =
+			block.name === 'core/template-part'
+				? getBlocks( block.clientId )
+				: block.innerBlocks;
+
+		return someBlock( innerBlocks, predicate );
+	} );
+}
+
 function AutoInsertingBlocksControl( props ) {
 	const { autoInsertedBlocksForCurrentBlock, groupedAutoInsertedBlocks } =
 		useSelect(
@@ -60,8 +78,9 @@ function AutoInsertingBlocksControl( props ) {
 		innerBlocksLength,
 	} = useSelect(
 		( select ) => {
-			const { getBlock, getBlockIndex, getBlockRootClientId } =
+			const { getBlock, getBlockIndex, getBlockRootClientId, getBlocks } =
 				select( blockEditorStore );
+
 			const _rootClientId = getBlockRootClientId( props.clientId );
 
 			const _autoInsertedBlockClientIds =
@@ -99,12 +118,18 @@ function AutoInsertingBlocksControl( props ) {
 						if ( autoInsertedBlock ) {
 							clientIds[ block.name ] =
 								autoInsertedBlock.clientId;
+						} else {
+							// If no auto-inserted block was found in any of its designated locations,
+							// we check if it's present elsewhere in the block tree.
+							// If it is, we consider it manually inserted and remove the corresponding
+							// toggle from the block inspector panel.
+							const blockIsPresentElsewhereInTree = someBlock(
+								getBlocks(),
+								( { name } ) => name === block.name,
+								getBlocks
+							);
+							// TODO: Remove the toggle from the block inspector panel.
 						}
-
-						// TOOD: If no auto-inserted block was found in any of its designated locations,
-						// we want to check if it's present elsewhere in the block tree.
-						// If it is, we'd consider it manually inserted and would want to remove the
-						// corresponding toggle from the block inspector panel.
 
 						return clientIds;
 					},
