@@ -38,9 +38,9 @@ export default function useMediaQuery( query ) {
 					return () => {};
 				}
 
-				mediaQueryList.addEventListener( 'change', onStoreChange );
+				mediaQueryList.addEventListener?.( 'change', onStoreChange );
 				return () => {
-					mediaQueryList.removeEventListener(
+					mediaQueryList.removeEventListener?.(
 						'change',
 						onStoreChange
 					);
