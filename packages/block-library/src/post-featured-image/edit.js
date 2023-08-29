@@ -140,7 +140,10 @@ export default function PostFeaturedImageEdit( {
 		} ) );
 
 	const blockProps = useBlockProps( {
-		style: { width, height, aspectRatio },
+		style: {
+			width,
+			maxWidth: !! width && '100%',
+		},
 	} );
 	const borderProps = useBorderProps( attributes );
 
@@ -264,8 +267,9 @@ export default function PostFeaturedImageEdit( {
 	const label = __( 'Add a featured image' );
 	const imageStyles = {
 		...borderProps.style,
-		height: aspectRatio ? '100%' : height,
-		width: !! aspectRatio && '100%',
+		aspectRatio,
+		height,
+		width,
 		objectFit: !! ( height || aspectRatio ) && scale,
 	};
 

@@ -40,8 +40,14 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 
 	// Aspect ratio with a height set needs to override the default width/height.
 	if ( ! empty( $attributes['aspectRatio'] ) ) {
-		$extra_styles .= 'width:100%;height:100%;';
-	} elseif ( ! empty( $attributes['height'] ) ) {
+		$extra_styles .= esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ). ';';
+	}
+
+	if ( ! empty( $attributes['width'] ) ) {
+		$extra_styles .= "width:{$attributes['width']};";
+	}
+
+	if ( ! empty( $attributes['height'] ) ) {
 		$extra_styles .= "height:{$attributes['height']};";
 	}
 
@@ -105,19 +111,13 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = $featured_image . $overlay_markup;
 	}
 
-	$aspect_ratio = ! empty( $attributes['aspectRatio'] )
-		? esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';'
-		: '';
 	$width        = ! empty( $attributes['width'] )
 		? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';'
 		: '';
-	$height       = ! empty( $attributes['height'] )
-		? esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';'
-		: '';
-	if ( ! $height && ! $width && ! $aspect_ratio ) {
+	if ( ! $width ) {
 		$wrapper_attributes = get_block_wrapper_attributes();
 	} else {
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => $aspect_ratio . $width . $height ) );
+		$wrapper_attributes = get_block_wrapper_attributes(array( 'style' => $width ));
 	}
 	return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
 }
