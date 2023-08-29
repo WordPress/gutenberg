@@ -33,6 +33,7 @@ export default function PreviewOptions( {
 	const toggleProps = {
 		className: 'block-editor-post-preview__button-toggle',
 		disabled: ! isEnabled,
+		__experimentalIsFocusable: ! isEnabled,
 		children: viewLabel,
 	};
 	const menuProps = {

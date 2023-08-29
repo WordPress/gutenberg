@@ -19,13 +19,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import {
-	desktop,
-	listView,
-	plus,
-	external,
-	chevronUpDown,
-} from '@wordpress/icons';
+import { listView, plus, external, chevronUpDown } from '@wordpress/icons';
 import {
 	__unstableMotion as motion,
 	Button,
@@ -325,39 +319,33 @@ export default function HeaderEditMode() {
 							{ 'is-zoomed-out': isZoomedOutView }
 						) }
 					>
-						{ ! isFocusMode && hasDefaultEditorCanvasView ? (
-							<PreviewOptions
-								deviceType={ deviceType }
-								setDeviceType={ setPreviewDeviceType }
-								label={ __( 'View' ) }
-							>
-								{ ( { onClose } ) => (
-									<MenuGroup>
-										<MenuItem
-											href={ homeUrl }
-											target="_blank"
-											icon={ external }
-											onClick={ onClose }
-										>
-											{ __( 'View site' ) }
-											<VisuallyHidden as="span">
-												{
-													/* translators: accessibility text */
-													__( '(opens in a new tab)' )
-												}
-											</VisuallyHidden>
-										</MenuItem>
-									</MenuGroup>
-								) }
-							</PreviewOptions>
-						) : (
-							<Button
-								label={ __( 'View' ) }
-								icon={ desktop }
-								disabled
-								__experimentalIsFocusable
-							/>
-						) }
+						<PreviewOptions
+							deviceType={ deviceType }
+							setDeviceType={ setPreviewDeviceType }
+							label={ __( 'View' ) }
+							isEnabled={
+								! isFocusMode && hasDefaultEditorCanvasView
+							}
+						>
+							{ ( { onClose } ) => (
+								<MenuGroup>
+									<MenuItem
+										href={ homeUrl }
+										target="_blank"
+										icon={ external }
+										onClick={ onClose }
+									>
+										{ __( 'View site' ) }
+										<VisuallyHidden as="span">
+											{
+												/* translators: accessibility text */
+												__( '(opens in a new tab)' )
+											}
+										</VisuallyHidden>
+									</MenuItem>
+								</MenuGroup>
+							) }
+						</PreviewOptions>
 					</div>
 					<SaveButton />
 					{ ! isDistractionFree && (
