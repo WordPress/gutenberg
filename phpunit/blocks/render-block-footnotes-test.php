@@ -64,10 +64,10 @@ class Blocks_RenderFootnotes_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::block_core_footnotes_get_post_metadata
 	 */
-	public function test_rendering_footnotes_block_with_quotations() {
+	public function test_rendering_footnotes_block_with_double_quotations() {
 		$post_args = array(
-			'ID'             => self::$post->ID,
-			'meta_input'     => array(
+			'ID'         => self::$post->ID,
+			'meta_input' => array(
 				'footnotes' => '[{\"content\":\"Because I said "so"!!!\",\"id\":\"b100\"}]',
 			),
 		);
@@ -85,6 +85,31 @@ class Blocks_RenderFootnotes_Test extends WP_UnitTestCase {
 		 */
 		$rendered = gutenberg_render_block_core_footnotes( array(), '', $block );
 		$expected = '<ol class="wp-block-footnotes"><li id="b100">Because I said "so"!!! <a href="#b100-link">↩︎</a></li></ol>';
+
+		$this->assertSame(
+			$expected,
+			$rendered
+		);
+	}
+
+	/**
+	 * @covers ::block_core_footnotes_get_post_metadata
+	 */
+	public function test_rendering_footnotes_block_with_single_quotations() {
+		$post_args = array(
+			'ID'         => self::$post->ID,
+			'meta_input' => array(
+				'footnotes' => "[{\"content\":\"And the bee said: \"I didn't know\"\",\"id\":\"b200\"}]",
+			),
+		);
+
+		wp_update_post( $post_args, true, false );
+
+		$updated_post             = get_post( self::$post->ID );
+		$block                    = new WP_Block( parse_blocks( $updated_post->post_content )[1] );
+		$block->context['postId'] = self::$post->ID;
+		$rendered                 = gutenberg_render_block_core_footnotes( array(), '', $block );
+		$expected                 = '<ol class="wp-block-footnotes"><li id="b200">And the bee said: "I didn\'t know" <a href="#b200-link">↩︎</a></li></ol>';
 
 		$this->assertSame(
 			$expected,
