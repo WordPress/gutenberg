@@ -103,7 +103,9 @@ function AutoInsertingBlocksControl( props ) {
 								( { name } ) => name === block.name,
 								getBlocks
 							);
-							// TODO: Remove the toggle from the block inspector panel.
+							if ( blockIsPresentElsewhereInTree ) {
+								clientIds[ block.name ] = false;
+							}
 						}
 
 						return clientIds;
@@ -124,12 +126,18 @@ function AutoInsertingBlocksControl( props ) {
 
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
 
-	if ( ! autoInsertedBlocksForCurrentBlock.length ) {
+	// Remove toggle if block isn't present in the designated location but elsewhere in the block tree.
+	const autoInsertedBlocksForCurrentBlockIfNotPresentElsewhere =
+		autoInsertedBlocksForCurrentBlock?.filter(
+			( block ) => autoInsertedBlockClientIds?.[ block.name ] !== false
+		);
+
+	if ( ! autoInsertedBlocksForCurrentBlockIfNotPresentElsewhere.length ) {
 		return null;
 	}
 
 	// Group by block namespace (i.e. prefix before the slash).
-	const groupedAutoInsertedBlocks = autoInsertedBlocksForCurrentBlock?.reduce(
+	const groupedAutoInsertedBlocks = autoInsertedBlocksForCurrentBlock.reduce(
 		( groups, block ) => {
 			const [ namespace ] = block.name.split( '/' );
 			if ( ! groups[ namespace ] ) {
