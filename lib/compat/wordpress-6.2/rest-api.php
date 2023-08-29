@@ -68,6 +68,7 @@ function gutenberg_pattern_directory_collection_params_6_2( $query_params ) {
 			'include_slugs',
 			'title',
 			'favorite_count',
+			'menu_order',
 		),
 	);
 
