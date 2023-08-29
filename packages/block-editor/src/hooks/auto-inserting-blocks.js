@@ -151,7 +151,11 @@ function AutoInsertingBlocksControl( props ) {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Plugins' ) } initialOpen={ true }>
+			<PanelBody
+				className="auto-inserting-blocks-panel"
+				title={ __( 'Plugins' ) }
+				initialOpen={ true }
+			>
 				{ Object.keys( groupedAutoInsertedBlocks ).map( ( vendor ) => {
 					return (
 						<Fragment key={ vendor }>
