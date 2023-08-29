@@ -3,7 +3,6 @@
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 
-
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name ) {
 		font.name = font.fontFamily || font.slug;
@@ -23,8 +22,9 @@ export function isUrlEncoded( url ) {
 
 export function getFontFaceVariantName( face ) {
 	const weightName = FONT_WEIGHTS[ face.fontWeight ] || face.fontWeight;
-	let styleName = face.fontStyle  === "normal"
-		? ""
-		: FONT_STYLES[ face.fontStyle ] || face.fontStyle;
+	const styleName =
+		face.fontStyle === 'normal'
+			? ''
+			: FONT_STYLES[ face.fontStyle ] || face.fontStyle;
 	return `${ weightName } ${ styleName }`;
 }

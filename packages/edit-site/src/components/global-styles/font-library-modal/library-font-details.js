@@ -81,7 +81,7 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 
 			<Button
 				isDestructive
-				disabled={ !canBeRemoved || isActive }
+				disabled={ ! canBeRemoved || isActive }
 				variant="link"
 				onClick={ handleUninstallClick }
 			>

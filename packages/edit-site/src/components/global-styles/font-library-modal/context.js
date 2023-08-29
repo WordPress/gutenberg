@@ -1,14 +1,9 @@
 /**
  * WordPress dependencies
  */
-import {
-	createContext,
-	useState,
-	useEffect,
-} from '@wordpress/element';
+import { createContext, useState, useEffect } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect, useEntityRecords } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -16,10 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	fetchInstallFonts,
-	fetchUninstallFonts,
-} from './resolvers';
+import { fetchInstallFonts, fetchUninstallFonts } from './resolvers';
 import { DEFAULT_DEMO_CONFIG } from './constants';
 import { unlock } from '../../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
@@ -120,10 +112,9 @@ function FontLibraryProvider( { children } ) {
 
 	// Theme data
 	const { site, currentTheme } = useSelect( ( select ) => {
-		const site = select( 'core' ).getSite();
 		const currentTheme = select( 'core' ).getCurrentTheme();
 		return {
-			site,
+			site: select( 'core' ).getSite(),
 			currentTheme,
 		};
 	} );
@@ -158,7 +149,9 @@ function FontLibraryProvider( { children } ) {
 		if ( ! style && ! weight ) {
 			return !! getActivatedFontsOutline( source )[ slug ];
 		}
-		return !! getActivatedFontsOutline( source )[ slug ]?.includes( style + weight );
+		return !! getActivatedFontsOutline( source )[ slug ]?.includes(
+			style + weight
+		);
 	};
 
 	const getFontFacesActivated = ( slug, source ) => {

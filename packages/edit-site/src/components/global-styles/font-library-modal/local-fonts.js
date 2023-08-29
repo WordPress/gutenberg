@@ -80,23 +80,28 @@ function LocalFonts() {
 		const formData = new FormData();
 
 		// Creates the fontFamilies array that will be sent to the server
-		const fontFamiliesObject = fontFaces.reduce( ( acc, { file, ...item }, i ) => {
-			if ( ! acc[ item.fontFamily ] ) {
-				acc[ item.fontFamily ] = {
-					name: item.fontFamily,
-					fontFamily: item.fontFamily,
-					slug: item.fontFamily.replace( /\s+/g, '-' ).toLowerCase(),
-					fontFace: [],
-				};
-			}
-			// Add the files to the formData
-			formData.append( `files${ i }`, file, file.name );
-			// Add the posted file id to the fontFace object
-			// This is needed to associate the fontFace with the file on the server
-			const face = { ...item, uploadedFile: `files${ i }` };
-			acc[ item.fontFamily ].fontFace.push( face );
-			return acc;
-		}, {} );
+		const fontFamiliesObject = fontFaces.reduce(
+			( acc, { file, ...item }, i ) => {
+				if ( ! acc[ item.fontFamily ] ) {
+					acc[ item.fontFamily ] = {
+						name: item.fontFamily,
+						fontFamily: item.fontFamily,
+						slug: item.fontFamily
+							.replace( /\s+/g, '-' )
+							.toLowerCase(),
+						fontFace: [],
+					};
+				}
+				// Add the files to the formData
+				formData.append( `files${ i }`, file, file.name );
+				// Add the posted file id to the fontFace object
+				// This is needed to associate the fontFace with the file on the server
+				const face = { ...item, uploadedFile: `files${ i }` };
+				acc[ item.fontFamily ].fontFace.push( face );
+				return acc;
+			},
+			{}
+		);
 		const fontFamilies = Object.values( fontFamiliesObject );
 
 		// Adds the fontFamilies to the formData

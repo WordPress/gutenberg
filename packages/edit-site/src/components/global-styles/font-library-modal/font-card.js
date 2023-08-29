@@ -41,24 +41,18 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 			style={ style }
 			className="font-library-modal__font-card"
 		>
-			<Flex justify="space-between" wrap={false}>
+			<Flex justify="space-between" wrap={ false }>
 				<FontDemo fontFace={ displayFontFace } text={ font.name } />
-				<Flex justify='flex-end'>
+				<Flex justify="flex-end">
 					<FlexItem>
 						<Text className="font-library-modal__font-card__count">
 							{ variantsText ||
 								variantsCount +
 									' ' +
-									_n(
-										'variant',
-										'variants',
-										variantsCount
-									) }
+									_n( 'variant', 'variants', variantsCount ) }
 						</Text>
 					</FlexItem>
-					<FlexItem>
-						{ !! actionHandler && actionHandler }
-					</FlexItem>
+					<FlexItem>{ !! actionHandler && actionHandler }</FlexItem>
 				</Flex>
 			</Flex>
 		</div>
