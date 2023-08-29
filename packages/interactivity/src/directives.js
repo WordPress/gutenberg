@@ -7,7 +7,6 @@ import { deepSignal, peek } from 'deepsignal';
 /**
  * Internal dependencies
  */
-import { Slot, Fill, SlotProvider } from './slots';
 import { createPortal } from './portals';
 import { useSignalEffect } from './utils';
 import { directive } from './hooks';
