@@ -373,12 +373,20 @@ export function updateSettings( settings ) {
  * @param {boolean} isOpen If true, opens the list view. If false, closes it.
  *                         It does not toggle the state, but sets it directly.
  */
-export function setIsListViewOpened( isOpen ) {
-	return {
-		type: 'SET_IS_LIST_VIEW_OPENED',
-		isOpen,
+export const setIsListViewOpened =
+	( isOpen ) =>
+	( { dispatch, registry } ) => {
+		const dfmMode = registry
+			.select( preferencesStore )
+			.get( 'core/edit-site', 'distractionFree' );
+		if ( dfmMode && isOpen ) {
+			dispatch.toggleDistractionFree();
+		}
+		dispatch( {
+			type: 'SET_IS_LIST_VIEW_OPENED',
+			isOpen,
+		} );
 	};
-}
 
 /**
  * Sets whether the save view panel should be open.
@@ -533,7 +541,13 @@ export const revertTemplate =
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { registry } ) => {
+	( { dispatch, registry } ) => {
+		const dfmMode = registry
+			.select( preferencesStore )
+			.get( 'core/edit-site', 'distractionFree' );
+		if ( dfmMode ) {
+			dispatch.toggleDistractionFree();
+		}
 		registry
 			.dispatch( interfaceStore )
 			.enableComplementaryArea( editSiteStoreName, name );
@@ -552,7 +566,7 @@ export const closeGeneralSidebar =
 
 export const switchEditorMode =
 	( mode ) =>
-	( { registry } ) => {
+	( { dispatch, registry } ) => {
 		registry
 			.dispatch( 'core/preferences' )
 			.set( 'core/edit-site', 'editorMode', mode );
@@ -565,6 +579,12 @@ export const switchEditorMode =
 		if ( mode === 'visual' ) {
 			speak( __( 'Visual editor selected' ), 'assertive' );
 		} else if ( mode === 'text' ) {
+			const dfmMode = registry
+				.select( preferencesStore )
+				.get( 'core/edit-site', 'distractionFree' );
+			if ( dfmMode ) {
+				dispatch.toggleDistractionFree();
+			}
 			speak( __( 'Code editor selected' ), 'assertive' );
 		}
 	};
@@ -585,5 +605,44 @@ export const setHasPageContentFocus =
 		dispatch( {
 			type: 'SET_HAS_PAGE_CONTENT_FOCUS',
 			hasPageContentFocus,
+		} );
+	};
+
+/**
+ * Action that toggles distraction free mode.
+ * DFM expects there are no sidebars, as due to the
+ * z-index values set, you can't close sidebars.
+ */
+export const toggleDistractionFree =
+	() =>
+	( { dispatch, registry } ) => {
+		const dfmMode = registry
+			.select( preferencesStore )
+			.get( 'core/edit-site', 'distractionFree' );
+		if ( ! dfmMode ) {
+			registry.batch( () => {
+				registry
+					.dispatch( preferencesStore )
+					.set( 'core/edit-site', 'fixedToolbar', false );
+				dispatch.setIsInserterOpened( false );
+				dispatch.setIsListViewOpened( false );
+				dispatch.closeGeneralSidebar();
+			} );
+		}
+		registry.batch( () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core/edit-site', 'distractionFree', ! dfmMode );
+			registry
+				.dispatch( noticesStore )
+				.createInfoNotice(
+					dfmMode
+						? __( 'Distraction free off.' )
+						: __( 'Distraction free on.' ),
+					{
+						id: 'core/edit-site/distraction-free-mode/notice',
+						type: 'snackbar',
+					}
+				);
 		} );
 	};

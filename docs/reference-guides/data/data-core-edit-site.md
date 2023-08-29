@@ -408,6 +408,10 @@ _Returns_
 
 Undocumented declaration.
 
+### toggleDistractionFree
+
+Action that toggles distraction free mode. DFM expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
+
 ### toggleFeature
 
 Dispatches an action that toggles a feature flag.
