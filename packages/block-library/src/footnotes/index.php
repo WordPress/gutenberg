@@ -311,8 +311,6 @@ function block_core_footnotes_get_post_metadata( $value, $object_id, $meta_key, 
 		$footnotes     = json_decode( $raw_footnotes, true );
 
 		/*
-		 * This is the same transformation as render_block_core_footnotes()
-		 * above. Duplicating here to avoid creating a new function.
 		 * The post meta contains malformed JSON. See
 		 * https://core.trac.wordpress.org/ticket/59103.
 		 */
