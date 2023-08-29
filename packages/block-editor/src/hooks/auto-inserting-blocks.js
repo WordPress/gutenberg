@@ -12,7 +12,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { InspectorControls } from '../components';
+import { BlockIcon, InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
 function AutoInsertingBlocksControl( props ) {
@@ -169,7 +169,14 @@ function AutoInsertingBlocksControl( props ) {
 										<ToggleControl
 											checked={ checked }
 											key={ block.title }
-											label={ block.title }
+											label={
+												<>
+													<BlockIcon
+														icon={ block.icon }
+													/>
+													{ block.title }
+												</>
+											}
 											onChange={ () => {
 												if ( ! checked ) {
 													// Create and insert block.
