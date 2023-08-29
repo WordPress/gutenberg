@@ -71,6 +71,7 @@ export default function BlockTools( {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
+				event.stopPropagation();
 				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 				moveBlocksUp( clientIds, rootClientId );
 			}
@@ -78,6 +79,7 @@ export default function BlockTools( {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
+				event.stopPropagation();
 				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 				moveBlocksDown( clientIds, rootClientId );
 			}
@@ -85,30 +87,35 @@ export default function BlockTools( {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
+				event.stopPropagation();
 				duplicateBlocks( clientIds );
 			}
 		} else if ( isMatch( 'core/block-editor/remove', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
+				event.stopPropagation();
 				removeBlocks( clientIds );
 			}
 		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
+				event.stopPropagation();
 				insertAfterBlock( clientIds[ clientIds.length - 1 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
+				event.stopPropagation();
 				insertBeforeBlock( clientIds[ 0 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
+				event.stopPropagation();
 
 				// If there is more than one block selected, select the first
 				// block so that focus is directed back to the beginning of the selection.
