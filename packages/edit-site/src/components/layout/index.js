@@ -171,7 +171,14 @@ export default function Layout() {
 		// #3858E9 WordPress
 		// #089E09 Jetpack
 		// #7f54b3 Woo
-		<Theme accent="#7f54b3" fun={ 0.4 } style={ { height: '100%' } }>
+		// #2271b1 "Default"
+		// #52accc "Blue"
+		// #59524c "Coffee"
+		// #523f6d "Ectoplasm"
+		// #363b3f "Midnight"
+		// #9ebaa0 "Ocean"
+		// #cf4944 "Sunrise"
+		<Theme accent="#3858E9" fun={ 0.2 } isDark style={ { height: '100%' } }>
 			<CommandMenu />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
