@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory } from '@storybook/react';
+import type { StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -29,7 +29,7 @@ const searchItems = [
 	{ item: 'waldo', title: 'Waldo' },
 ];
 
-export const SearchStory: ComponentStory< typeof Navigation > = ( {
+export const SearchStory: StoryFn< typeof Navigation > = ( {
 	className,
 	...props
 } ) => {

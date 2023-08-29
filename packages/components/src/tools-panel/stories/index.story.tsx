@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import styled from '@emotion/styled';
 
 /**
@@ -25,9 +25,11 @@ import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
-const meta: ComponentMeta< typeof ToolsPanel > = {
+const meta: Meta< typeof ToolsPanel > = {
 	title: 'Components (Experimental)/ToolsPanel',
 	component: ToolsPanel,
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { ToolsPanelItem },
 	argTypes: {
 		as: { control: { type: null } },
 		children: { control: { type: null } },
@@ -44,7 +46,7 @@ const meta: ComponentMeta< typeof ToolsPanel > = {
 };
 export default meta;
 
-export const Default: ComponentStory< typeof ToolsPanel > = ( {
+export const Default: StoryFn< typeof ToolsPanel > = ( {
 	resetAll: resetAllProp,
 	...props
 } ) => {
@@ -136,7 +138,7 @@ Default.args = {
 	label: 'Tools Panel (default example)',
 };
 
-export const WithNonToolsPanelItems: ComponentStory< typeof ToolsPanel > = ( {
+export const WithNonToolsPanelItems: StoryFn< typeof ToolsPanel > = ( {
 	resetAll: resetAllProp,
 	...props
 } ) => {
@@ -191,9 +193,10 @@ WithNonToolsPanelItems.args = {
 	label: 'ToolsPanel (with non-menu items)',
 };
 
-export const WithOptionalItemsPlusIcon: ComponentStory<
-	typeof ToolsPanel
-> = ( { resetAll: resetAllProp, ...props } ) => {
+export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
+	resetAll: resetAllProp,
+	...props
+} ) => {
 	const [
 		isFirstToolsPanelItemShownByDefault,
 		setIsFirstToolsPanelItemShownByDefault,
@@ -294,7 +297,7 @@ WithOptionalItemsPlusIcon.args = {
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 
-export const WithSlotFillItems: ComponentStory< typeof ToolsPanel > = ( {
+export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 	resetAll: resetAllProp,
 	panelId,
 	...props
@@ -392,9 +395,11 @@ WithSlotFillItems.args = {
 	panelId: 'unique-tools-panel-id',
 };
 
-export const WithConditionalDefaultControl: ComponentStory<
-	typeof ToolsPanel
-> = ( { resetAll: resetAllProp, panelId, ...props } ) => {
+export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
+	resetAll: resetAllProp,
+	panelId,
+	...props
+} ) => {
 	const [ attributes, setAttributes ] = useState< {
 		height?: string;
 		scale?: React.ReactText;
@@ -488,7 +493,7 @@ WithConditionalDefaultControl.args = {
 	panelId: 'unique-tools-panel-id',
 };
 
-export const WithConditionallyRenderedControl: ComponentStory<
+export const WithConditionallyRenderedControl: StoryFn<
 	typeof ToolsPanel
 > = ( { resetAll: resetAllProp, panelId, ...props } ) => {
 	const [ attributes, setAttributes ] = useState< {

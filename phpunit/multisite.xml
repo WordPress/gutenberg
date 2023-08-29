@@ -15,6 +15,7 @@
 	<testsuites>
 		<testsuite name="default">
 			<directory suffix="-test.php">./</directory>
+			<directory suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
 	<groups>

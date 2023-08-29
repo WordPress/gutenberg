@@ -180,6 +180,17 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 				serverSideBlockDefinitions[ blockName ].selectors =
 					definitions[ blockName ].selectors;
 			}
+
+			if (
+				serverSideBlockDefinitions[ blockName ]
+					.__experimentalAutoInsert === undefined &&
+				definitions[ blockName ].__experimentalAutoInsert
+			) {
+				serverSideBlockDefinitions[
+					blockName
+				].__experimentalAutoInsert =
+					definitions[ blockName ].__experimentalAutoInsert;
+			}
 			continue;
 		}
 
@@ -219,6 +230,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'styles',
 		'example',
 		'variations',
+		'__experimentalAutoInsert',
 	];
 
 	const settings = Object.fromEntries(

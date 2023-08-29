@@ -103,7 +103,7 @@ function Placeholder( { layoutClassNames } ) {
 		<div { ...blockProps }>
 			<p>
 				{ __(
-					'This is the Post Content block, it will display all the blocks in any single post or page.'
+					'This is the Content block, it will display all the blocks in any single post or page.'
 				) }
 			</p>
 			<p>
@@ -113,7 +113,7 @@ function Placeholder( { layoutClassNames } ) {
 			</p>
 			<p>
 				{ __(
-					'If there are any Custom Post Types registered at your site, the Post Content block can display the contents of those entries as well.'
+					'If there are any Custom Post Types registered at your site, the Content block can display the contents of those entries as well.'
 				) }
 			</p>
 		</div>
