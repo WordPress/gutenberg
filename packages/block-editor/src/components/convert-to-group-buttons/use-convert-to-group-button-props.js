@@ -46,10 +46,11 @@ export default function useConvertToGroupButtonProps( selectedClientIds ) {
 				: getSelectedBlockClientIds();
 			const blocksSelection = getBlocksByClientId( clientIds );
 			const [ firstSelectedBlock ] = blocksSelection;
-			const _isUngroupable = isUngroupable();
+			const _isUngroupable =
+				clientIds.length === 1 && isUngroupable( clientIds[ 0 ] );
 			return {
 				clientIds,
-				isGroupable: isGroupable(),
+				isGroupable: isGroupable( clientIds ),
 				isUngroupable: _isUngroupable,
 				blocksSelection,
 				groupingBlockName: getGroupingBlockName(),
