@@ -335,7 +335,7 @@ function gutenberg_register_auto_insert_rest_field() {
 		'auto_insert',
 		array(
 			'schema' => array(
-				'description' => __( 'Block types that are automatically inserted next to this block, and their positions relative to it.', 'default' ),
+				'description' => __( 'Block types that may be automatically inserted near this block and the associated relative position where they are inserted.', 'default' ),
 				'type'        => 'object',
 			),
 		)
