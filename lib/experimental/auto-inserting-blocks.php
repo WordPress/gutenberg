@@ -339,7 +339,7 @@ function gutenberg_register_auto_insert_rest_field() {
 				'patternProperties' => array(
 					'^[a-zA-Z0-9-]+/[a-zA-Z0-9-]+$' => array(
 						'type'    => 'string',
-						'pattern' => '^before|after|first_child|last_child$',
+						'enum'    => array( 'before', 'after', 'first_child', 'last_child' )
 					),
 				),
 			),
