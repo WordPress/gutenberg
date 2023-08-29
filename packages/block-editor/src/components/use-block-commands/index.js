@@ -229,39 +229,54 @@ const useActionsCommands = () => {
 		return { isLoading: false, commands: [] };
 	}
 
-	const icons = {
-		ungroup,
-		group,
-		move,
-		add,
-		remove,
-		duplicate: copy,
-	};
-
 	const commands = [
-		onUngroup,
-		onGroup,
-		onMoveTo,
-		onAddAfter,
-		onAddBefore,
-		onRemove,
-		onDuplicate,
-	].map( ( callback ) => {
-		const action = callback.name
-			.replace( 'on', '' )
-			.replace( /([a-z])([A-Z])/g, '$1 $2' );
-
+		{
+			name: 'ungroup',
+			label: __( 'Ungroup' ),
+			callback: onUngroup,
+			icon: ungroup,
+		},
+		{
+			name: 'Group',
+			label: __( 'Group' ),
+			callback: onGroup,
+			icon: group,
+		},
+		{
+			name: 'move-to',
+			label: __( 'Move to' ),
+			callback: onMoveTo,
+			icon: move,
+		},
+		{
+			name: 'add-after',
+			label: __( 'Add after' ),
+			callback: onAddAfter,
+			icon: add,
+		},
+		{
+			name: 'add-before',
+			label: __( 'Add before' ),
+			callback: onAddBefore,
+			icon: add,
+		},
+		{
+			name: 'remove',
+			label: __( 'Remove' ),
+			callback: onRemove,
+			icon: remove,
+		},
+		{
+			name: 'duplicate',
+			label: __( 'Duplicate' ),
+			callback: onDuplicate,
+			icon: copy,
+		},
+	].map( ( { name, label, callback, icon } ) => {
 		return {
-			name: 'core/block-editor/action-' + callback.name,
-			// translators: %s: type of the command.
-			label: action,
-			icon: icons[
-				callback.name
-					.replace( 'on', '' )
-					.match( /[A-Z]{1}[a-z]*/ )
-					.toString()
-					.toLowerCase()
-			],
+			name: 'core/block-editor/action-' + name,
+			label,
+			icon,
 			callback: ( { close } ) => {
 				callback();
 				close();

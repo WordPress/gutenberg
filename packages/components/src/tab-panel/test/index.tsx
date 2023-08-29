@@ -13,8 +13,6 @@ import { wordpress, category, media } from '@wordpress/icons';
  * Internal dependencies
  */
 import TabPanel from '..';
-import Popover from '../../popover';
-import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const TABS = [
 	{
@@ -107,17 +105,10 @@ describe.each( [
 			];
 
 			render(
-				// In order for the tooltip to display properly, there needs to be
-				// `Popover.Slot` in which the `Popover` renders outside of the
-				// `TabPanel` component, otherwise the tooltip renders inline.
-				<SlotFillProvider>
-					<Component
-						tabs={ TABS_WITH_ICON }
-						children={ panelRenderFunction }
-					/>
-					{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
-					<Popover.Slot />
-				</SlotFillProvider>
+				<Component
+					tabs={ TABS_WITH_ICON }
+					children={ panelRenderFunction }
+				/>
 			);
 
 			const allTabs = screen.getAllByRole( 'tab' );
@@ -152,18 +143,11 @@ describe.each( [
 			];
 
 			render(
-				// In order for the tooltip to display properly, there needs to be
-				// `Popover.Slot` in which the `Popover` renders outside of the
-				// `TabPanel` component, otherwise the tooltip renders inline.
-				<SlotFillProvider>
-					<Component
-						tabs={ TABS_WITH_ICON }
-						children={ panelRenderFunction }
-						onSelect={ mockOnSelect }
-					/>
-					{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
-					<Popover.Slot />
-				</SlotFillProvider>
+				<Component
+					tabs={ TABS_WITH_ICON }
+					children={ panelRenderFunction }
+					onSelect={ mockOnSelect }
+				/>
 			);
 
 			expect( await getSelectedTab() ).not.toHaveTextContent( 'Alpha' );

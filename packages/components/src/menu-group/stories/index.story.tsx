@@ -13,9 +13,9 @@ import MenuItemsChoice from '../../menu-items-choice';
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
-const meta: ComponentMeta< typeof MenuGroup > = {
+const meta: Meta< typeof MenuGroup > = {
 	title: 'Components/MenuGroup',
 	component: MenuGroup,
 	argTypes: {
@@ -28,7 +28,7 @@ const meta: ComponentMeta< typeof MenuGroup > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof MenuGroup > = ( args ) => {
+const Template: StoryFn< typeof MenuGroup > = ( args ) => {
 	return (
 		<MenuGroup { ...args }>
 			<MenuItem>Menu Item 1</MenuItem>
@@ -37,9 +37,9 @@ const Template: ComponentStory< typeof MenuGroup > = ( args ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof MenuGroup > = Template.bind( {} );
+export const Default: StoryFn< typeof MenuGroup > = Template.bind( {} );
 
-const MultiGroupsTemplate: ComponentStory< typeof MenuGroup > = ( args ) => {
+const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
 	const [ mode, setMode ] = useState( 'visual' );
 	const choices = [
 		{
