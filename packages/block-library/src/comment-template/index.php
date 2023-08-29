@@ -20,7 +20,7 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 	global $comment_depth;
 	$thread_comments       = get_option( 'thread_comments' );
 	$thread_comments_depth = get_option( 'thread_comments_depth' );
-	$enhanced_submission   = $block->context['enhancedSubmission'];
+	$enhanced_submission   = isset( $block->context['enhancedSubmission'] ) && $block->context['enhancedSubmission'];
 
 	if ( empty( $comment_depth ) ) {
 		$comment_depth = 1;
