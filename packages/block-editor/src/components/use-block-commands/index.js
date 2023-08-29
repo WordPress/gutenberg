@@ -271,7 +271,6 @@ const useActionsCommands = () => {
 			icon: group,
 		} );
 	}
-
 	return {
 		isLoading: false,
 		commands: commands.map( ( command ) => ( {
