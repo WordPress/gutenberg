@@ -2295,16 +2295,17 @@ function getUserPatterns( state ) {
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 	const { patternCategoriesMap: categories } =
 		state?.settings?.__experimentalUserPatternCategories ?? {};
-	return userPatterns.map( ( reusableBlock ) => {
+	return userPatterns.map( ( userPattern ) => {
 		return {
-			name: `core/block/${ reusableBlock.id }`,
-			title: reusableBlock.title.raw,
-			categories: reusableBlock.wp_pattern_category.map( ( catId ) =>
+			name: `core/block/${ userPattern.id }`,
+			title: userPattern.title.raw,
+			categories: userPattern.wp_pattern_category.map( ( catId ) =>
 				categories && categories.get( catId )
 					? categories.get( catId ).slug
 					: catId
 			),
-			content: reusableBlock.content.raw,
+			content: userPattern.content.raw,
+			syncStatus: userPattern.wp_pattern_sync_status,
 		};
 	} );
 }
