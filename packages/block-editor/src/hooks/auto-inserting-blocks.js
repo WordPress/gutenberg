@@ -38,38 +38,13 @@ function someBlock( blocks, predicate, getBlocks ) {
 }
 
 function AutoInsertingBlocksControl( props ) {
-	const { autoInsertedBlocksForCurrentBlock, groupedAutoInsertedBlocks } =
-		useSelect(
-			( select ) => {
-				const { getBlockTypes } = select( blocksStore );
-				const _autoInsertedBlocksForCurrentBlock =
-					getBlockTypes()?.filter(
-						( { autoInsert } ) =>
-							autoInsert && props.blockName in autoInsert
-					);
+	const blockTypes = useSelect( ( select ) =>
+		select( blocksStore ).getBlockTypes()
+	);
 
-				// Group by block namespace (i.e. prefix before the slash).
-				const _groupedAutoInsertedBlocks =
-					_autoInsertedBlocksForCurrentBlock?.reduce(
-						( groups, block ) => {
-							const [ namespace ] = block.name.split( '/' );
-							if ( ! groups[ namespace ] ) {
-								groups[ namespace ] = [];
-							}
-							groups[ namespace ].push( block );
-							return groups;
-						},
-						{}
-					);
-
-				return {
-					autoInsertedBlocksForCurrentBlock:
-						_autoInsertedBlocksForCurrentBlock,
-					groupedAutoInsertedBlocks: _groupedAutoInsertedBlocks,
-				};
-			},
-			[ props.blockName ]
-		);
+	const autoInsertedBlocksForCurrentBlock = blockTypes?.filter(
+		( { autoInsert } ) => autoInsert && props.blockName in autoInsert
+	);
 
 	const {
 		autoInsertedBlockClientIds,
@@ -152,6 +127,19 @@ function AutoInsertingBlocksControl( props ) {
 	if ( ! autoInsertedBlocksForCurrentBlock.length ) {
 		return null;
 	}
+
+	// Group by block namespace (i.e. prefix before the slash).
+	const groupedAutoInsertedBlocks = autoInsertedBlocksForCurrentBlock?.reduce(
+		( groups, block ) => {
+			const [ namespace ] = block.name.split( '/' );
+			if ( ! groups[ namespace ] ) {
+				groups[ namespace ] = [];
+			}
+			groups[ namespace ].push( block );
+			return groups;
+		},
+		{}
+	);
 
 	const insertBlockIntoDesignatedLocation = ( block, relativePosition ) => {
 		switch ( relativePosition ) {
