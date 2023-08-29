@@ -11,6 +11,7 @@ import { Slot, Fill, SlotProvider } from './slots';
 import { createPortal } from './portals';
 import { useSignalEffect } from './utils';
 import { directive } from './hooks';
+import { SlotProvider, Slot, Fill } from './slots';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
