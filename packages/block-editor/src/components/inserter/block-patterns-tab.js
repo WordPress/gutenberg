@@ -9,7 +9,7 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { _x, __, isRTL } from '@wordpress/i18n';
-import { useAsyncList, useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -28,6 +28,7 @@ import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
 import BlockPatternsPaging from '../block-patterns-paging';
+import usePatternsPaging from './hooks/use-patterns-paging';
 
 const noop = () => {};
 
@@ -169,10 +170,20 @@ export function BlockPatternsCategoryPanel( {
 		[ allPatterns, availableCategories, category.name ]
 	);
 
-	const categoryPatternsList = useAsyncList( currentCategoryPatterns );
-
 	// Hide block pattern preview on unmount.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => () => onHover( null ), [] );
+
+	const {
+		totalItems,
+		categoryPatternsList,
+		numPages,
+		changePage,
+		currentPage,
+	} = usePatternsPaging(
+		currentCategoryPatterns,
+		'.block-editor-inserter__patterns-category-dialog'
+	);
 
 	if ( ! currentCategoryPatterns.length ) {
 		return null;
@@ -195,12 +206,14 @@ export function BlockPatternsCategoryPanel( {
 				isDraggable
 				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
-			<BlockPatternsPaging
-				currentPage={ 1 }
-				numPages={ 2 }
-				changePage={ () => {} }
-				totalItems={ 40 }
-			/>
+			{ numPages > 1 && (
+				<BlockPatternsPaging
+					currentPage={ currentPage }
+					numPages={ numPages }
+					changePage={ changePage }
+					totalItems={ totalItems }
+				/>
+			) }
 		</div>
 	);
 }

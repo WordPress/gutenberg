@@ -18,7 +18,6 @@ import { Icon, symbolFilled } from '@wordpress/icons';
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
-import BlockPatternsSyncFilter from '../block-patterns-sync-filter';
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
@@ -141,10 +140,8 @@ function BlockPatternList( {
 	orientation,
 	label = __( 'Block Patterns' ),
 	showTitlesAsTooltip,
-	category,
 } ) {
 	const composite = useCompositeState( { orientation } );
-	const [ syncFilter, setSyncFilter ] = useState( 'all' );
 	return (
 		<Composite
 			{ ...composite }
@@ -152,12 +149,6 @@ function BlockPatternList( {
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
 		>
-			{ category === 'custom' && (
-				<BlockPatternsSyncFilter
-					syncFilter={ syncFilter }
-					setSyncFilter={ setSyncFilter }
-				/>
-			) }
 			{ blockPatterns.map( ( pattern ) => {
 				const isShown = shownPatterns.includes( pattern );
 				return isShown ? (

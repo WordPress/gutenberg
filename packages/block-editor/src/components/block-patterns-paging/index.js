@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 	Button,
@@ -15,12 +16,7 @@ export default function Pagination( {
 	totalItems,
 } ) {
 	return (
-		<HStack
-			expanded={ false }
-			spacing={ 3 }
-			justify="flex-start"
-			className="block-editor-patterns__grid-pagination"
-		>
+		<VStack>
 			<Text variant="muted">
 				{
 					// translators: %s: Total number of patterns.
@@ -31,50 +27,57 @@ export default function Pagination( {
 					)
 				}
 			</Text>
-			<HStack expanded={ false } spacing={ 1 }>
-				<Button
-					variant="tertiary"
-					onClick={ () => changePage( 1 ) }
-					disabled={ currentPage === 1 }
-					aria-label={ __( 'First page' ) }
-				>
-					«
-				</Button>
-				<Button
-					variant="tertiary"
-					onClick={ () => changePage( currentPage - 1 ) }
-					disabled={ currentPage === 1 }
-					aria-label={ __( 'Previous page' ) }
-				>
-					‹
-				</Button>
+			<HStack
+				expanded={ false }
+				spacing={ 3 }
+				justify="flex-start"
+				className="block-editor-patterns__grid-pagination"
+			>
+				<HStack expanded={ false } spacing={ 1 }>
+					<Button
+						variant="tertiary"
+						onClick={ () => changePage( 1 ) }
+						disabled={ currentPage === 1 }
+						aria-label={ __( 'First page' ) }
+					>
+						«
+					</Button>
+					<Button
+						variant="tertiary"
+						onClick={ () => changePage( currentPage - 1 ) }
+						disabled={ currentPage === 1 }
+						aria-label={ __( 'Previous page' ) }
+					>
+						‹
+					</Button>
+				</HStack>
+				<Text variant="muted">
+					{ sprintf(
+						// translators: %1$s: Current page number, %2$s: Total number of pages.
+						_x( '%1$s of %2$s', 'paging' ),
+						currentPage,
+						numPages
+					) }
+				</Text>
+				<HStack expanded={ false } spacing={ 1 }>
+					<Button
+						variant="tertiary"
+						onClick={ () => changePage( currentPage + 1 ) }
+						disabled={ currentPage === numPages }
+						aria-label={ __( 'Next page' ) }
+					>
+						›
+					</Button>
+					<Button
+						variant="tertiary"
+						onClick={ () => changePage( numPages ) }
+						disabled={ currentPage === numPages }
+						aria-label={ __( 'Last page' ) }
+					>
+						»
+					</Button>
+				</HStack>
 			</HStack>
-			<Text variant="muted">
-				{ sprintf(
-					// translators: %1$s: Current page number, %2$s: Total number of pages.
-					_x( '%1$s of %2$s', 'paging' ),
-					currentPage,
-					numPages
-				) }
-			</Text>
-			<HStack expanded={ false } spacing={ 1 }>
-				<Button
-					variant="tertiary"
-					onClick={ () => changePage( currentPage + 1 ) }
-					disabled={ currentPage === numPages }
-					aria-label={ __( 'Next page' ) }
-				>
-					›
-				</Button>
-				<Button
-					variant="tertiary"
-					onClick={ () => changePage( numPages ) }
-					disabled={ currentPage === numPages }
-					aria-label={ __( 'Last page' ) }
-				>
-					»
-				</Button>
-			</HStack>
-		</HStack>
+		</VStack>
 	);
 }
