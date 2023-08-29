@@ -12,6 +12,7 @@ import {
 	getBlock,
 	dismissModal,
 	waitForModalVisible,
+	openBlockActionsMenu,
 } from 'test/helpers';
 
 /**
@@ -462,5 +463,33 @@ describe( 'Columns block', () => {
 				expect( getEditorHtml() ).toMatchSnapshot();
 			}
 		);
+	} );
+
+	it( 'transforms a nested Columns block into a Group block', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: `<!-- wp:group {"layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"><!-- wp:columns -->
+			<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+			<div class="wp-block-column" style="flex-basis:100%"><!-- wp:paragraph -->
+			<p></p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:column --></div>
+			<!-- /wp:columns --></div>
+			<!-- /wp:group -->`,
+		} );
+
+		// Get Columns block
+		const columnsBlock = await getBlock( screen, 'Columns' );
+		fireEvent.press( columnsBlock );
+
+		// Open block actions menu
+		await openBlockActionsMenu( screen );
+
+		// Tap on the Transform block button
+		fireEvent.press( screen.getByLabelText( /Transform block…/ ) );
+
+		// Tap on the Group transform button
+		fireEvent.press( screen.getByLabelText( 'Group' ) );
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
