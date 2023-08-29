@@ -1,5 +1,5 @@
 /**
- * Stores the type of a rich rext format, such as core/bold.
+ * Stores the type of a rich text format, such as core/bold.
  */
 export type RichTextFormat = {
 	type:
