@@ -194,20 +194,44 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
  * @return {WPBlock | undefined} Fully parsed block.
  */
 export function parseRawBlock( rawBlock, options ) {
-	let normalizedBlock = normalizeRawBlock( rawBlock, options );
+	let normalizedRawBlock = { ...rawBlock };
+
+	// If the grammar parsing don't produce any block name, use the freeform block.
+	const fallbackBlockName = getFreeformContentHandlerName();
+
+	if ( ! normalizeRawBlock.blockName ) {
+		normalizeRawBlock.blockName = fallbackBlockName;
+	}
+
+	if ( ! normalizeRawBlock.attrs ) {
+		normalizeRawBlock.attrs = {};
+	}
+
+	// Fallback content may be upgraded from classic content expecting implicit
+	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
+	// meaning there are no negative consequences to repeated autop calls.
+	if (
+		normalizedRawBlock.blockName === fallbackBlockName &&
+		fallbackBlockName === 'core/freeform' &&
+		! options?.__unstableSkipAutop
+	) {
+		normalizeRawBlock.innerHTML = autop( normalizedRawBlock.innerHTML );
+	}
+
+	normalizeRawBlock.innerHTML = normalizeRawBlock.innerHTML.trim();
 
 	// During the lifecycle of the project, we renamed some old blocks
 	// and transformed others to new blocks. To avoid breaking existing content,
 	// we added this function to properly parse the old content.
-	normalizedBlock = convertLegacyBlocks( normalizedBlock );
+	normalizedRawBlock = convertLegacyBlocks( normalizedRawBlock );
 
 	// Try finding the type for known block name.
-	let blockType = getBlockType( normalizedBlock.blockName );
+	let blockType = getBlockType( normalizedRawBlock.blockName );
 
 	// If not blockType is found for the specified name, fallback to the "unregistedBlockType".
 	if ( ! blockType ) {
-		normalizedBlock = createMissingBlockType( normalizedBlock );
-		blockType = getBlockType( normalizedBlock.blockName );
+		normalizedRawBlock = createMissingBlockType( normalizedRawBlock );
+		blockType = getBlockType( normalizedRawBlock.blockName );
 	}
 
 	// If it's an empty freeform block or there's no blockType (no missing block handler)
@@ -216,29 +240,32 @@ export function parseRawBlock( rawBlock, options ) {
 	// TODO: I'm unsure about the unregisteredFallbackBlock check,
 	// it might ignore some dynamic unregistered third party blocks wrongly.
 	const isFallbackBlock =
-		normalizedBlock.blockName === getFreeformContentHandlerName() ||
-		normalizedBlock.blockName === getUnregisteredTypeHandlerName();
-	if ( ! blockType || ( ! normalizedBlock.innerHTML && isFallbackBlock ) ) {
+		normalizedRawBlock.blockName === getFreeformContentHandlerName() ||
+		normalizedRawBlock.blockName === getUnregisteredTypeHandlerName();
+	if (
+		! blockType ||
+		( ! normalizedRawBlock.innerHTML && isFallbackBlock )
+	) {
 		return;
 	}
 
 	// Parse inner blocks recursively.
-	const parsedInnerBlocks = normalizedBlock.innerBlocks
+	const parsedInnerBlocks = normalizedRawBlock.innerBlocks
 		.map( ( innerBlock ) => parseRawBlock( innerBlock, options ) )
 		// See https://github.com/WordPress/gutenberg/pull/17164.
 		.filter( ( innerBlock ) => !! innerBlock );
 
 	// Get the fully parsed block.
 	const parsedBlock = createBlock(
-		normalizedBlock.blockName,
+		normalizedRawBlock.blockName,
 		getBlockAttributes(
 			blockType,
-			normalizedBlock.innerHTML,
-			normalizedBlock.attrs
+			normalizedRawBlock.innerHTML,
+			normalizedRawBlock.attrs
 		),
 		parsedInnerBlocks
 	);
-	parsedBlock.originalContent = normalizedBlock.innerHTML;
+	parsedBlock.originalContent = normalizedRawBlock.innerHTML;
 
 	const validatedBlock = applyBlockValidation( parsedBlock, blockType );
 	const { validationIssues } = validatedBlock;
@@ -249,7 +276,7 @@ export function parseRawBlock( rawBlock, options ) {
 	// if the output is deemed valid.
 	const updatedBlock = applyBlockDeprecatedVersions(
 		validatedBlock,
-		normalizedBlock,
+		normalizedRawBlock,
 		blockType
 	);
 

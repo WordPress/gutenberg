@@ -125,3 +125,5 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 
 	return block;
 }
+
+function migrateBlock( rawBlock, blockType ) {}
