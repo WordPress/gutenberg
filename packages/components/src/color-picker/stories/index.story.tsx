@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import { ColorPicker } from '../component';
 
-const meta: ComponentMeta< typeof ColorPicker > = {
+const meta: Meta< typeof ColorPicker > = {
 	component: ColorPicker,
 	title: 'Components/ColorPicker',
 	argTypes: {
@@ -25,12 +25,12 @@ const meta: ComponentMeta< typeof ColorPicker > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: Story< typeof ColorPicker > = ( { onChange, ...props } ) => {
+const Template: StoryFn< typeof ColorPicker > = ( { onChange, ...props } ) => {
 	const [ color, setColor ] = useState< string | undefined >();
 
 	return (

@@ -128,4 +128,59 @@
 			</property>
 		</properties>
 	</rule>
+
+	<rule ref="Gutenberg.NamingConventions.ValidBlockLibraryFunctionName">
+		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="block_core_"/>
+				<element value="render_block_core_"/>
+				<element value="register_block_core_"/>
+			</property>
+			<!--
+				The following list of functions is final and must not be extended.
+				It includes functions that cannot be renamed due to backward compatibility concerns.
+			-->
+			<property name="allowed_functions" type="array">
+				<element value="_delete_custom_logo_on_remove_site_logo"/>
+				<element value="_delete_site_logo_on_remove_custom_logo"/>
+				<element value="_delete_site_logo_on_remove_custom_logo_on_setup_theme"/>
+				<element value="_delete_site_logo_on_remove_theme_mods"/>
+				<element value="_override_custom_logo_theme_mod"/>
+				<element value="_sync_custom_logo_to_site_logo"/>
+				<element value="_wp_rest_api_autosave_meta"/>
+				<element value="_wp_rest_api_force_autosave_difference"/>
+				<element value="apply_block_core_search_border_style"/>
+				<element value="apply_block_core_search_border_styles"/>
+				<element value="build_dropdown_script_block_core_categories"/>
+				<element value="build_template_part_block_area_variations"/>
+				<element value="build_template_part_block_instance_variations"/>
+				<element value="build_template_part_block_variations"/>
+				<element value="build_variation_for_navigation_link"/>
+				<element value="classnames_for_block_core_search"/>
+				<element value="comments_block_form_defaults"/>
+				<element value="enqueue_legacy_post_comments_block_styles"/>
+				<element value="get_block_core_avatar_border_attributes"/>
+				<element value="get_block_core_post_featured_image_border_attributes"/>
+				<element value="get_block_core_post_featured_image_overlay_element_markup"/>
+				<element value="get_border_color_classes_for_block_core_search"/>
+				<element value="get_color_classes_for_block_core_search"/>
+				<element value="get_typography_classes_for_block_core_search"/>
+				<element value="get_typography_styles_for_block_core_search"/>
+				<element value="gutenberg_block_core_file_update_interactive_view_script"/>
+				<element value="gutenberg_block_core_navigation_update_interactive_view_script"/>
+				<element value="post_comments_form_block_form_defaults"/>
+				<element value="register_block_core_site_icon_setting"/>
+				<element value="register_legacy_post_comments_block"/>
+				<element value="styles_for_block_core_search"/>
+				<element value="wp_add_footnotes_revisions_to_post_meta"/>
+				<element value="wp_add_footnotes_to_revision"/>
+				<element value="wp_get_footnotes_from_revision"/>
+				<element value="wp_keep_footnotes_revision_id"/>
+				<element value="wp_latest_comments_draft_or_post_title"/>
+				<element value="wp_restore_footnotes_from_revision"/>
+				<element value="wp_save_footnotes_meta"/>
+			</property>
+		</properties>
+	</rule>
 </ruleset>

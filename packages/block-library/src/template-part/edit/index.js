@@ -34,7 +34,6 @@ export default function TemplatePartEdit( {
 	attributes,
 	setAttributes,
 	clientId,
-	isSelected,
 } ) {
 	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = createTemplatePartId( theme, slug );
@@ -91,10 +90,7 @@ export default function TemplatePartEdit( {
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
 
-	// The `isSelected` check ensures the `BlockSettingsMenuControls` fill
-	// doesn't render multiple times. The block controls has similar internal check.
 	const canReplace =
-		isSelected &&
 		isEntityAvailable &&
 		hasReplacements &&
 		( area === 'header' || area === 'footer' );
@@ -156,25 +152,42 @@ export default function TemplatePartEdit( {
 				) }
 				{ canReplace && (
 					<BlockSettingsMenuControls>
-						{ () => (
-							<MenuItem
-								onClick={ () => {
-									setIsTemplatePartSelectionOpen( true );
-								} }
-							>
-								{ createInterpolateElement(
-									__( 'Replace <BlockTitle />' ),
-									{
-										BlockTitle: (
-											<BlockTitle
-												clientId={ clientId }
-												maximumLength={ 25 }
-											/>
-										),
+						{ ( { selectedClientIds } ) => {
+							// Only enable for single selection that matches the current block.
+							// Ensures menu item doesn't render multiple times.
+							if (
+								! (
+									selectedClientIds.length === 1 &&
+									clientId === selectedClientIds[ 0 ]
+								)
+							) {
+								return null;
+							}
+
+							return (
+								<MenuItem
+									onClick={ () => {
+										setIsTemplatePartSelectionOpen( true );
+									} }
+									aria-expanded={
+										isTemplatePartSelectionOpen
 									}
-								) }
-							</MenuItem>
-						) }
+									aria-haspopup="dialog"
+								>
+									{ createInterpolateElement(
+										__( 'Replace <BlockTitle />' ),
+										{
+											BlockTitle: (
+												<BlockTitle
+													clientId={ clientId }
+													maximumLength={ 25 }
+												/>
+											),
+										}
+									) }
+								</MenuItem>
+							);
+						} }
 					</BlockSettingsMenuControls>
 				) }
 				{ isEntityAvailable && (

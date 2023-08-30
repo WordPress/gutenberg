@@ -12,14 +12,13 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const {
-	readFile,
-	deleteFile,
-	saveResultsFile,
-	getTraceFilePath,
 	getTypingEventDurations,
 	getLoadingDurations,
 	loadBlocksFromHtml,
 } = require( '../utils' );
+
+// See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
+const BROWSER_IDLE_WAIT = 1000;
 
 const results = {
 	serverResponse: [],
@@ -46,19 +45,32 @@ test.describe( 'Site Editor Performance', () => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		saveResultsFile( __filename, results );
+	test.afterAll( async ( { requestUtils }, testInfo ) => {
+		await testInfo.attach( 'results', {
+			body: JSON.stringify( results, null, 2 ),
+			contentType: 'application/json',
+		} );
 
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Loading', async ( { browser, page, admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		// Start a new page.
 		await admin.createNewPost( { postType: 'page' } );
 
-		// Turn the large post HTML into blocks and insert.
+		// Disable auto-save to avoid impacting the metrics.
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+				autosaveInterval: 100000000000,
+				localAutosaveInterval: 100000000000,
+			} );
+		} );
+	} );
+
+	test( 'Loading', async ( { browser, page, admin } ) => {
+		// Load the large post fixture.
 		await loadBlocksFromHtml(
 			page,
 			path.join( process.env.ASSETS_PATH, 'large-post.html' )
@@ -84,20 +96,22 @@ test.describe( 'Site Editor Performance', () => {
 		} );
 
 		// Get the URL that we will be testing against.
-		const targetUrl = page.url();
+		const draftURL = page.url();
 
 		// Start the measurements.
-		let i = 3;
-		while ( i-- ) {
+		const samples = 10;
+		const throwaway = 1;
+		const rounds = samples + throwaway;
+		for ( let i = 0; i < rounds; i++ ) {
 			// Open a fresh page in a new context to prevent caching.
 			const testPage = await browser.newPage();
 
 			// Go to the test page URL.
-			await testPage.goto( targetUrl );
+			await testPage.goto( draftURL );
 
 			// Wait for the canvas to appear.
 			await testPage
-				.locator( '.edit-site-canvas-spinner' )
+				.locator( '.edit-site-canvas-loader' )
 				.waitFor( { state: 'hidden', timeout: 60_000 } );
 
 			// Wait for the first block.
@@ -107,31 +121,22 @@ test.describe( 'Site Editor Performance', () => {
 				.first()
 				.waitFor( { timeout: 60_000 } );
 
-			// Save results.
-			const {
-				serverResponse,
-				firstPaint,
-				domContentLoaded,
-				loaded,
-				firstContentfulPaint,
-				firstBlock,
-			} = await getLoadingDurations( testPage );
-			results.serverResponse.push( serverResponse );
-			results.firstPaint.push( firstPaint );
-			results.domContentLoaded.push( domContentLoaded );
-			results.loaded.push( loaded );
-			results.firstContentfulPaint.push( firstContentfulPaint );
-			results.firstBlock.push( firstBlock );
+			// Save the results.
+			if ( i >= throwaway ) {
+				const loadingDurations = await getLoadingDurations( testPage );
+				Object.entries( loadingDurations ).forEach(
+					( [ metric, duration ] ) => {
+						results[ metric ].push( duration );
+					}
+				);
+			}
 
 			await testPage.close();
 		}
 	} );
 
-	test( 'Typing', async ( { browser, page, pageUtils, admin } ) => {
-		// Start a new page.
-		await admin.createNewPost( { postType: 'page' } );
-
-		// Turn the large post HTML into blocks and insert.
+	test( 'Typing', async ( { browser, page, admin, editor } ) => {
+		// Load the large post fixture.
 		await loadBlocksFromHtml(
 			page,
 			path.join( process.env.ASSETS_PATH, 'large-post.html' )
@@ -148,9 +153,7 @@ test.describe( 'Site Editor Performance', () => {
 		).toBeDisabled();
 
 		// Get the ID of the saved page.
-		testPageId = await page.evaluate( () =>
-			new URL( document.location ).searchParams.get( 'post' )
-		);
+		testPageId = new URL( page.url() ).searchParams.get( 'post' );
 
 		// Open the test page in Site Editor.
 		await admin.visitSiteEditor( {
@@ -159,48 +162,57 @@ test.describe( 'Site Editor Performance', () => {
 		} );
 
 		// Wait for the first paragraph to be ready.
-		const canvas = page.frameLocator( 'iframe[name="editor-canvas"]' );
-		const firstParagraph = canvas
+		const firstParagraph = editor.canvas
 			.getByText( 'Lorem ipsum dolor sit amet' )
 			.first();
 		await firstParagraph.waitFor( { timeout: 60_000 } );
 
 		// Enter edit mode.
-		await canvas.locator( 'body' ).click();
-
-		// Insert a new paragraph right under the first one.
-		await canvas
-			.getByRole( 'document', { name: 'Block: Content' } )
+		await editor.canvas.locator( 'body' ).click();
+		// Second click is needed for the legacy edit mode.
+		await editor.canvas
+			.getByRole( 'document', { name: /Block:( Post)? Content/ } )
 			.click();
-		await firstParagraph.click();
-		await pageUtils.pressKeys( 'primary+a' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'Enter' );
+
+		// Append an empty paragraph.
+		// Since `editor.insertBlock( { name: 'core/paragraph' } )` is not
+		// working in page edit mode, we need to _manually_ insert a new
+		// paragraph.
+		await editor.canvas
+			.getByText( 'Quamquam tu hanc copiosiorem etiam soles dicere.' )
+			.last()
+			.click(); // Enters edit mode for the last post's element, which is a list item.
+
+		await page.keyboard.press( 'Enter' ); // Creates a new list item.
+		await page.keyboard.press( 'Enter' ); // Exits the list and creates a new paragraph.
 
 		// Start tracing.
-		const traceFilePath = getTraceFilePath();
 		await browser.startTracing( page, {
-			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
 
-		// Type "x" 200 times.
-		const typingSequence = new Array( 200 ).fill( 'x' ).join( '' );
-		await page.keyboard.type( typingSequence );
+		// The first character typed triggers a longer time (isTyping change).
+		// It can impact the stability of the metric, so we exclude it. It
+		// probably deserves a dedicated metric itself, though.
+		const samples = 10;
+		const throwaway = 1;
+		const rounds = samples + throwaway;
+
+		// Type the testing sequence into the empty paragraph.
+		await page.keyboard.type( 'x'.repeat( rounds ), {
+			delay: BROWSER_IDLE_WAIT,
+		} );
 
 		// Stop tracing and save results.
-		await browser.stopTracing();
-		const traceResults = JSON.parse( readFile( traceFilePath ) );
+		const traceBuffer = await browser.stopTracing();
+		const traceResults = JSON.parse( traceBuffer.toString() );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
-		for ( let i = 0; i < keyDownEvents.length; i++ ) {
+		for ( let i = throwaway; i < rounds; i++ ) {
 			results.type.push(
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);
 		}
-
-		// Delete the original trace file.
-		deleteFile( traceFilePath );
 	} );
 } );

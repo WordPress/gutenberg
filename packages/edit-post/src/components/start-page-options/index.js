@@ -19,7 +19,7 @@ import { store as editPostStore } from '../../store';
 
 function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
-	// and it has no postTypes declares and the current post type is page or if
+	// and it has no postTypes declared and the current post type is page or if
 	// the current post type is part of the postTypes declared.
 	const { blockPatternsWithPostContentBlockType, postType } = useSelect(
 		( select ) => {
@@ -47,8 +47,7 @@ function useStartPatterns() {
 	}, [ postType, blockPatternsWithPostContentBlockType ] );
 }
 
-function PatternSelection( { onChoosePattern } ) {
-	const blockPatterns = useStartPatterns();
+function PatternSelection( { blockPatterns, onChoosePattern } ) {
 	const shownBlockPatterns = useAsyncList( blockPatterns );
 	const { resetEditorBlocks } = useDispatch( editorStore );
 	return (
@@ -63,70 +62,55 @@ function PatternSelection( { onChoosePattern } ) {
 	);
 }
 
-const START_PAGE_MODAL_STATES = {
-	INITIAL: 'INITIAL',
-	PATTERN: 'PATTERN',
-	CLOSED: 'CLOSED',
-};
-
-export default function StartPageOptions() {
-	const [ modalState, setModalState ] = useState(
-		START_PAGE_MODAL_STATES.INITIAL
-	);
-	const blockPatterns = useStartPatterns();
-	const hasStartPattern = blockPatterns.length > 0;
-	const shouldOpenModel = useSelect(
-		( select ) => {
-			if (
-				! hasStartPattern ||
-				modalState !== START_PAGE_MODAL_STATES.INITIAL
-			) {
-				return false;
-			}
-			const { getEditedPostContent, isEditedPostSaveable } =
-				select( editorStore );
-			const { isEditingTemplate, isFeatureActive } =
-				select( editPostStore );
-			return (
-				! isEditedPostSaveable() &&
-				'' === getEditedPostContent() &&
-				! isEditingTemplate() &&
-				! isFeatureActive( 'welcomeGuide' )
-			);
-		},
-		[ modalState, hasStartPattern ]
-	);
+function StartPageOptionsModal() {
+	const [ modalState, setModalState ] = useState( 'initial' );
+	const startPatterns = useStartPatterns();
+	const hasStartPattern = startPatterns.length > 0;
+	const shouldOpenModal = hasStartPattern && modalState === 'initial';
 
 	useEffect( () => {
-		if ( shouldOpenModel ) {
-			setModalState( START_PAGE_MODAL_STATES.PATTERN );
+		if ( shouldOpenModal ) {
+			setModalState( 'open' );
 		}
-	}, [ shouldOpenModel ] );
+	}, [ shouldOpenModal ] );
 
-	if (
-		modalState === START_PAGE_MODAL_STATES.INITIAL ||
-		modalState === START_PAGE_MODAL_STATES.CLOSED
-	) {
+	if ( modalState !== 'open' ) {
 		return null;
 	}
+
 	return (
 		<Modal
 			className="edit-post-start-page-options__modal"
 			title={ __( 'Choose a pattern' ) }
-			isFullScreen={ true }
-			onRequestClose={ () => {
-				setModalState( START_PAGE_MODAL_STATES.CLOSED );
-			} }
+			isFullScreen
+			onRequestClose={ () => setModalState( 'closed' ) }
 		>
 			<div className="edit-post-start-page-options__modal-content">
-				{ modalState === START_PAGE_MODAL_STATES.PATTERN && (
-					<PatternSelection
-						onChoosePattern={ () => {
-							setModalState( START_PAGE_MODAL_STATES.CLOSED );
-						} }
-					/>
-				) }
+				<PatternSelection
+					blockPatterns={ startPatterns }
+					onChoosePattern={ () => setModalState( 'closed' ) }
+				/>
 			</div>
 		</Modal>
 	);
+}
+
+export default function StartPageOptions() {
+	const shouldEnableModal = useSelect( ( select ) => {
+		const { getEditedPostContent, isEditedPostSaveable } =
+			select( editorStore );
+		const { isEditingTemplate, isFeatureActive } = select( editPostStore );
+		return (
+			! isEditedPostSaveable() &&
+			'' === getEditedPostContent() &&
+			! isEditingTemplate() &&
+			! isFeatureActive( 'welcomeGuide' )
+		);
+	}, [] );
+
+	if ( ! shouldEnableModal ) {
+		return null;
+	}
+
+	return <StartPageOptionsModal />;
 }

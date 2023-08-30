@@ -119,4 +119,23 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
     }
     ```
 
+### Naming convention for PHP functions
+
+All PHP function names declared within the subdirectories of the `packages/block-library/src/` directory should start with one of the following prefixes:
+
+-   `block_core_<directory_name>`
+-   `render_block_core_<directory_name>`
+-   `register_block_core_<directory_name>`
+
+In this context, `<directory_name>` represents the name of the directory where the corresponding `.php` file is located.
+The directory name is converted to lowercase, and any characters except for letters and digits are replaced with underscores.
+
+#### Example:
+
+For the PHP functions declared in the `packages/block-library/src/my-block/index.php` file, the correct prefixes would be:
+
+-   `block_core_my_block`
+-   `render_block_core_my_block`
+-   `register_block_core_my_block`
+
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
