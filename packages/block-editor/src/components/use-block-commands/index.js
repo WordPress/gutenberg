@@ -126,6 +126,7 @@ const useActionsCommands = () => {
 		getBlocksByClientId,
 		canMoveBlocks,
 		canRemoveBlocks,
+		getBlockCount,
 	} = useSelect( blockEditorStore );
 	const { getDefaultBlockName, getGroupingBlockName } =
 		useSelect( blocksStore );
@@ -189,7 +190,9 @@ const useActionsCommands = () => {
 		);
 	} );
 	const canRemove = canRemoveBlocks( clientIds, rootClientId );
-	const canMove = canMoveBlocks( clientIds, rootClientId );
+	const canMove =
+		canMoveBlocks( clientIds, rootClientId ) &&
+		getBlockCount( rootClientId ) !== 1;
 
 	const commands = [
 		{
