@@ -74,8 +74,8 @@ function render_block_core_image( $attributes, $content, $block ) {
  */
 function block_core_image_render_lightbox( $block_content, $block ) {
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
-	// Get the lightbox setting from the block attributes.
 
+	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['lightbox'] ) ) {
 		$lightbox_settings = $block['attrs']['lightbox'];
 	}
