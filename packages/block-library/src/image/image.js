@@ -7,6 +7,7 @@ import {
 	ResizableBox,
 	Spinner,
 	TextareaControl,
+	ToggleControl,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -113,6 +114,7 @@ export default function Image( {
 		scale,
 		linkTarget,
 		sizeSlug,
+		lightbox,
 	} = attributes;
 
 	// The only supported unit is px, so we can parseInt to strip the px here.
@@ -451,6 +453,7 @@ export default function Image( {
 							height: undefined,
 							scale: undefined,
 							aspectRatio: undefined,
+							lightbox: undefined,
 						} )
 					}
 				>
@@ -519,6 +522,22 @@ export default function Image( {
 						onChange={ updateImage }
 						options={ imageSizeOptions }
 					/>
+					<ToolsPanelItem
+						hasValue={ () => lightbox !== undefined }
+						label={ __( 'Expand on Click' ) }
+						onDeselect={ () => {
+							setAttributes( { lightbox: undefined } );
+						} }
+						isShownByDefault={ true }
+					>
+						<ToggleControl
+							label={ __( 'Expand on Click' ) }
+							checked={ lightbox ? true : false }
+							onChange={ ( newValue ) => {
+								setAttributes( { lightbox: newValue } );
+							} }
+						/>
+					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">

@@ -36,8 +36,17 @@ function render_block_core_image( $attributes, $content, $block ) {
 
 	// Get the lightbox setting from the block attributes.
 	// TODO: This must be changed to use the new Lightbox UI.
-	if ( isset( $attributes['behaviors']['lightbox'] ) ) {
-		$lightbox_settings = $attributes['behaviors']['lightbox'];
+	if ( isset( $attributes['lightbox'] ) ) {
+		$lightbox_settings = $attributes['lightbox'];
+	} else {
+		// THIS IS NOT WORKING YET AND IS PROBABLY INCORRECT
+		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
+		$user_data = WP_Theme_JSON_Resolver_Gutenberg::get_user_data()->get_data();
+		if ( isset( $user_data['settings']['lightbox'] ) ) {
+			$lightbox_settings = $theme_data['settings']['lightbox'];
+		} else {
+			$lightbox_settings = null;
+		}
 	}
 
 	// If the lightbox is enabled, the image is not linked, and the Interactivity API is enabled, load the view script.
