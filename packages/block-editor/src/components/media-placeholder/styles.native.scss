@@ -30,7 +30,7 @@
 
 .emptyStateDescription {
 	text-align: center;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	font-size: 16;
 	font-weight: 400;
 }
@@ -62,7 +62,7 @@
 
 .appender {
 	height: auto;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	border: $border-width solid $light-gray-500;
 	border-radius: 4px;
 }
@@ -73,7 +73,7 @@
 }
 
 .addMediaButton {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	background-color: $toolbar-button;
 	border-radius: $button-size-small * 0.5;
 	overflow: hidden;

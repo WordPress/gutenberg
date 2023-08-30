@@ -141,7 +141,7 @@ $cell-disable-opacity: 0.38;
 }
 
 .cellTextDark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .cellValueRTL {
@@ -193,7 +193,7 @@ $cell-disable-opacity: 0.38;
 
 .textInputIOSDark {
 	border-color: $gray-70;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .textInputContainer {
@@ -212,7 +212,7 @@ $cell-disable-opacity: 0.38;
 
 .textInputDark {
 	border-color: $gray-70;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 // Navigation Header
@@ -294,7 +294,7 @@ $cell-disable-opacity: 0.38;
 }
 
 .placeholderColorDisabledDark {
-	color: rgba($white, $cell-disable-opacity);
+	color: rgba(var(--wp-components-color-gray-background-alt), $cell-disable-opacity);
 }
 
 .applyButton {

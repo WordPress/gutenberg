@@ -63,12 +63,12 @@ export const item = css`
 `;
 
 export const bordered = css`
-	border: 1px solid ${ CONFIG.surfaceBorderColor };
+	border: 1px solid var( --wp-components-color-gray-border );
 `;
 
 export const separated = css`
 	> *:not( marquee ) > * {
-		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
+		border-bottom: 1px solid var( --wp-components-color-gray-border );
 	}
 
 	> *:last-of-type > *:not( :focus ) {

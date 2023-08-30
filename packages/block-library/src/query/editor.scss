@@ -35,7 +35,7 @@
 	}
 
 	.block-library-query-pattern__selection-search {
-		background: $white;
+		background: var(--wp-components-color-gray-background-alt);
 		position: sticky;
 		top: 0;
 		padding: $grid-unit-20 0;

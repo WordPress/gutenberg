@@ -21,7 +21,7 @@
 	}
 
 	&:focus {
-		box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		box-shadow: inset 0 0 0 1px var(--wp-components-color-gray-background-alt), 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 	}
 
 	&.components-snackbar-explicit-dismiss {
@@ -46,7 +46,7 @@
 
 .components-snackbar__action.components-button {
 	margin-left: $grid-unit-40;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	height: auto;
 	flex-shrink: 0;
 	line-height: $default-line-height;
@@ -57,14 +57,14 @@
 		background-color: transparent;
 
 		&:focus {
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 			box-shadow: none;
-			outline: 1px dotted $white;
+			outline: 1px dotted var(--wp-components-color-gray-background-alt);
 		}
 
 		&:hover {
 			text-decoration: none;
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 		}
 	}
 }

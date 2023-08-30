@@ -48,7 +48,7 @@
 			max-height: 100%;
 			overflow: auto;
 			padding: 3em 0.77em 0.7em;
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 			text-align: center;
 			font-size: 0.8em;
 			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);

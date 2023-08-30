@@ -14,7 +14,7 @@
 }
 
 .customize-widgets-layout__inserter-panel {
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 }
 
 .customize-widgets-layout__inserter-panel-header {
@@ -35,6 +35,6 @@
 .block-editor-inserter__quick-inserter {
 	.block-editor-inserter__panel-content {
 		// To fix quick inserter doesn't have background.
-		background: $white;
+		background: var(--wp-components-color-gray-background-alt);
 	}
 }

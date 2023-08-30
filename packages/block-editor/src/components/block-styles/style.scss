@@ -53,7 +53,7 @@
 
 		&.is-active .block-editor-block-styles__item-text,
 		&.is-active:hover .block-editor-block-styles__item-text {
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 		}
 
 		&:focus,

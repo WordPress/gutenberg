@@ -1,6 +1,6 @@
 .entities-saved-states__panel-header {
 	box-sizing: border-box;
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	padding-left: $grid-unit-10;
 	padding-right: $grid-unit-10;
 	height: $header-height;

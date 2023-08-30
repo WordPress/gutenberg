@@ -36,7 +36,7 @@
 }
 
 .unsupported-icon-dark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	fill: currentColor;
 }
 
@@ -46,6 +46,6 @@
 }
 
 .warning-icon-dark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	fill: currentColor;
 }

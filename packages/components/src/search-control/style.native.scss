@@ -28,7 +28,7 @@
 }
 
 .search-control__form-input--dark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .search-control__form-input-placeholder {
@@ -46,7 +46,7 @@
 }
 
 .search-control__icon--dark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .search-control__input-button {

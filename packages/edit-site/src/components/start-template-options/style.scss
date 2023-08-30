@@ -6,7 +6,7 @@ $actions-height: 92px;
 		bottom: 0;
 		width: 100%;
 		height: $actions-height;
-		background-color: $white;
+		background-color: var(--wp-components-color-gray-background-alt);
 		margin-left: - $grid-unit-40;
 		margin-right: - $grid-unit-40;
 		padding-left: $grid-unit-40;

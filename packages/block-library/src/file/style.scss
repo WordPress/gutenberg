@@ -42,7 +42,7 @@
 		&:focus,
 		&:active {
 			box-shadow: none;
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 			opacity: 0.85;
 			text-decoration: none;
 		}

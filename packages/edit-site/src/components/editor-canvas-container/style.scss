@@ -1,5 +1,5 @@
 .edit-site-editor-canvas-container {
-	background: $white; // Fallback color, overridden by JavaScript.
+	background: var(--wp-components-color-gray-background-alt); // Fallback color, overridden by JavaScript.
 	border-radius: $radius-block-ui;
 	bottom: 0;
 	left: 0;
@@ -15,5 +15,5 @@
 	right: $grid-unit-10;
 	top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
 	z-index: 1;
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 }

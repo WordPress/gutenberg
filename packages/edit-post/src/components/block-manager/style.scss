@@ -12,9 +12,9 @@
 	border: 1px solid $gray-300;
 	border-width: 1px 0;
 	// Cover up horizontal areas off the sides of the box rectangle
-	box-shadow: -$grid-unit-40 0 0 0 $white, $grid-unit-40 0 0 0 $white;
+	box-shadow: -$grid-unit-40 0 0 0 var(--wp-components-color-gray-background-alt), $grid-unit-40 0 0 0 var(--wp-components-color-gray-background-alt);
 	padding: $grid-unit-10;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	text-align: center;
 	position: sticky;
 	// When sticking, tuck the top border beneath the modal header border
@@ -38,7 +38,7 @@
 	position: sticky;
 	top: - $grid-unit-05; // Offsets the top padding on the modal content container
 	padding: $grid-unit-20 0;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	z-index: z-index(".edit-post-block-manager__category-title");
 
 	.components-checkbox-control__label {

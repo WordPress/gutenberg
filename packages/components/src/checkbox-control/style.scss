@@ -3,7 +3,7 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 
 .components-checkbox-control__input[type="checkbox"] {
 	@include checkbox-control;
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	color: var(--wp-components-color-gray-contrast);
 	clear: none;
 	cursor: pointer;
@@ -62,7 +62,7 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 
 svg.components-checkbox-control__checked,
 svg.components-checkbox-control__indeterminate {
-	fill: $white;
+	fill: var(--wp-components-color-gray-background-alt);
 	cursor: pointer;
 	position: absolute;
 	left: 0;

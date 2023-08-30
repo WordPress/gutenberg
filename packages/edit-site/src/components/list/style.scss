@@ -34,7 +34,7 @@
 .edit-site {
 	.edit-site-list {
 		flex-grow: 1;
-		background: $white;
+		background: var(--wp-components-color-gray-background-alt);
 		border-radius: $radius-block-ui * 4;
 		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
 
@@ -47,7 +47,7 @@
 		}
 
 		.interface-interface-skeleton__content {
-			background: $white;
+			background: var(--wp-components-color-gray-background-alt);
 			padding: $grid-unit-20;
 			align-items: center;
 
@@ -154,7 +154,7 @@
 	border-radius: 100%;
 
 	svg {
-		fill: $white;
+		fill: var(--wp-components-color-gray-background-alt);
 	}
 }
 

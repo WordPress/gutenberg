@@ -29,7 +29,7 @@
 }
 
 .wp-block-list-item__list-item--default--dark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .wp-block-list-item__list-item-ordered--default {

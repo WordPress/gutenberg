@@ -86,7 +86,7 @@
 	position: absolute;
 	top: $grid-unit-10;
 	left: $grid-unit-10;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 
 	&:active:not([aria-disabled="true"]),
 	&:focus:not([aria-disabled="true"]),

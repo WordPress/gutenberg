@@ -184,7 +184,7 @@
 	align-items: center;
 	background: $gray-800;
 	border-radius: 2px;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	display: inline-flex;
 	justify-content: center;
 	min-height: $icon-size;

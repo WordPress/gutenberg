@@ -29,7 +29,7 @@
 	justify-content: center;
 	z-index: z-index(".components-drop-zone__content");
 	text-align: center;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .components-drop-zone__content-icon,

@@ -55,7 +55,7 @@ $media-to-text: 12px;
 }
 
 .iconPlaceholderDark {
-	fill: $white;
+	fill: var(--wp-components-color-gray-background-alt);
 }
 
 .iconRetry {
@@ -124,7 +124,7 @@ $media-to-text: 12px;
 }
 
 .uploadFailedTextVideoDark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 // Inner blocks STACK

@@ -177,7 +177,7 @@
 
 	&.is-selected {
 		background: $components-color-accent;
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 	}
 }
 

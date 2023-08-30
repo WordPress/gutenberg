@@ -64,7 +64,7 @@
 		// Basic look
 		background: var(--wp-components-color-gray-contrast);
 		border-radius: $radius-block-ui;
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 		padding: 0;
 
 		// Special dimensions for this button.
@@ -72,7 +72,7 @@
 		height: $button-size-small;
 
 		&:hover {
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 			background: var(--wp-admin-theme-color);
 		}
 	}
@@ -134,7 +134,7 @@
 		left: 100%;
 		width: $grid-unit-60;
 		height: 100%;
-		background: linear-gradient(to right, $white, transparent);
+		background: linear-gradient(to right, var(--wp-components-color-gray-background-alt), transparent);
 	}
 
 	// on desktop and tablet viewports the toolbar is fixed
@@ -407,14 +407,14 @@
 
 	.block-editor-block-icon {
 		font-size: $default-font-size;
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 		height: $block-toolbar-height;
 	}
 
 	// The button here has a special style to appear as a toolbar.
 	.components-button {
 		min-width: $button-size;
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 		height: $block-toolbar-height;
 
 		// When button is focused, it receives a box-shadow instead of the border.
@@ -424,12 +424,12 @@
 		}
 
 		&:active {
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 		}
 
 		// Make sure the button has no hover style when it's disabled.
 		&[aria-disabled="true"]:hover {
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 		}
 
 		display: flex;

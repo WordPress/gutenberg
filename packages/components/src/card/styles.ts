@@ -79,7 +79,7 @@ export const borderRadius = css`
 `;
 
 export const borderColor = css`
-	border-color: ${ CONFIG.colorDivider };
+	border-color: var( --wp-components-color-gray-border );
 `;
 
 export const boxShadowless = css`

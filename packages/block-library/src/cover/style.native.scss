@@ -5,7 +5,7 @@
 }
 
 .iconDark {
-	fill: $white;
+	fill: var(--wp-components-color-gray-background-alt);
 }
 
 .backgroundContainer {
@@ -46,7 +46,7 @@
 }
 
 .defaultColor {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .defaultColorLightMode {
@@ -115,7 +115,7 @@
 }
 
 .selectImageIcon {
-	fill: $white;
+	fill: var(--wp-components-color-gray-background-alt);
 	position: absolute;
 	top: 7px;
 	left: 7px;
@@ -173,7 +173,7 @@
 
 .focalPointHint {
 	box-shadow: 0 0 0.5px rgba(0, 0, 0, 0.5);
-	fill: $white;
+	fill: var(--wp-components-color-gray-background-alt);
 	left: 50%;
 	margin: -16px 0 0 -16px;
 	opacity: 0.8;

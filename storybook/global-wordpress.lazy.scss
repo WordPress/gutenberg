@@ -6,5 +6,5 @@
 // Let's assume that this is the CSS environment we will be in when wp-components appear in a WP context.
 body {
 	color: var(--wp-components-color-gray-contrast) !important;
-	background: $white !important;
+	background: var(--wp-components-color-gray-background-alt) !important;
 }

@@ -94,7 +94,7 @@
 		border: $border-width solid $gray-700;
 
 		&:checked {
-			background: $white;
+			background: var(--wp-components-color-gray-background-alt);
 			border-color: $gray-700;
 		}
 

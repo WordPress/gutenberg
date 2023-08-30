@@ -49,7 +49,7 @@
 	&.is-primary {
 		white-space: nowrap;
 		background: var(--wp-components-color-accent-solid);
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 		text-decoration: none;
 		text-shadow: none;
 

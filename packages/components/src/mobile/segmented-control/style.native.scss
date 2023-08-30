@@ -23,7 +23,7 @@ $border-radius-ios: 7px;
 
 .selected {
 	position: absolute;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 }
 
 .selectedDark {

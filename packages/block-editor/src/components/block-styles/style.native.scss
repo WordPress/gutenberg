@@ -25,7 +25,7 @@ $image-height: 64px;
 }
 
 .labelDark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .labelSelected {
@@ -44,7 +44,7 @@ $image-height: 64px;
 }
 
 .innerOutline {
-	border-color: $white;
+	border-color: var(--wp-components-color-gray-background-alt);
 	border-width: $border-width * 2;
 	position: absolute;
 	top: $border-width;

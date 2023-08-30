@@ -46,7 +46,7 @@
 		// Basic look
 		background: var(--wp-components-color-gray-contrast);
 		border-radius: $radius-block-ui;
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 		padding: 0;
 
 		// Special dimensions for this button.
@@ -54,7 +54,7 @@
 		height: $button-size-small;
 
 		&:hover {
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 			background: var(--wp-admin-theme-color);
 		}
 	}
@@ -116,10 +116,10 @@
 
 		// Basic look
 		background: var(--wp-components-color-gray-contrast);
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 
 		&:hover {
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 			background: var(--wp-admin-theme-color);
 		}
 	}

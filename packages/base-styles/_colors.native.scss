@@ -14,10 +14,10 @@ $dark-opacity-600: rgba(#000913, 0.75);
 
 
 // Light opacities, for use with dark themes.
-$light-opacity-700: rgba($white, 0.85);
-$light-opacity-200: rgba($white, 0.6);
-$light-opacity-light-100: rgba($white, 0.1);
-$light-opacity-light-700: rgba($white, 0.4);
+$light-opacity-700: rgba(var(--wp-components-color-gray-background-alt), 0.85);
+$light-opacity-200: rgba(var(--wp-components-color-gray-background-alt), 0.6);
+$light-opacity-light-100: rgba(var(--wp-components-color-gray-background-alt), 0.1);
+$light-opacity-light-700: rgba(var(--wp-components-color-gray-background-alt), 0.4);
 
 
 // Alert colors.
@@ -102,16 +102,16 @@ $dark-ultra-dim: #ffffff14; //rgba(255, 255, 255, 0.08);
 $dark-dim: #ffffff1f; //rgba(255, 255, 255, 0.12)
 
 // Design Token colors
-$app-background: $white;
+$app-background: var(--wp-components-color-gray-background-alt);
 $app-background-dark: $black;
 $app-background-dark-alt: $background-dark-elevated;
 $app-safe-area-background-dark: #141414;
 
-$modal-background: $white;
+$modal-background: var(--wp-components-color-gray-background-alt);
 $modal-background-dark: $background-dark-elevated;
 
 $sub-heading: $gray-text-min;
-$sub-heading-dark: $white;
+$sub-heading-dark: var(--wp-components-color-gray-background-alt);
 /**
  * Deprecated colors.
  * Please avoid using these.

@@ -25,7 +25,7 @@
 }
 
 .edit-site-sidebar-navigation-screen-template__template-area-button {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	display: flex;
 	align-items: center;
 	width: 100%;
@@ -34,7 +34,7 @@
 	&:hover,
 	&:focus {
 		background: $gray-800;
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 	}
 }
 

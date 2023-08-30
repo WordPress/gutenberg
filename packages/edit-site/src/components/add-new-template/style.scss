@@ -23,7 +23,7 @@
 
 	.components-search-control {
 		input[type="search"].components-search-control__input {
-			background: $white;
+			background: var(--wp-components-color-gray-background-alt);
 			border: 1px solid $gray-300;
 
 			&:focus {
@@ -112,7 +112,7 @@
 	background-color: transparent;
 
 	&.is-full-screen {
-		background-color: $white;
+		background-color: var(--wp-components-color-gray-background-alt);
 		box-shadow: 0 0 0 transparent;
 		min-width: 100%;
 		min-height: 100%;

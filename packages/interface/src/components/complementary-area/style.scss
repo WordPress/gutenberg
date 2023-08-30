@@ -1,5 +1,5 @@
 .interface-complementary-area {
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	color: var(--wp-components-color-gray-contrast);
 
 	@include break-small() {
@@ -52,7 +52,7 @@
 
 	hr {
 		border-top: none;
-		border-bottom: 1px solid $gray-100;
+		border-bottom: 1px solid var(--wp-components-color-gray-border);
 		margin: 1.5em 0;
 	}
 

@@ -35,6 +35,6 @@
 
 .edit-template-welcome-guide {
 	.components-button svg {
-		fill: $white;
+		fill: var(--wp-components-color-gray-background-alt);
 	}
 }

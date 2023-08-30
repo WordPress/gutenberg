@@ -31,7 +31,7 @@
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
 		border-radius: 2px;
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 		padding: 0;
 		min-width: $grid-unit-30;
 		height: $grid-unit-30;

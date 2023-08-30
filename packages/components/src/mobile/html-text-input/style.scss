@@ -1,6 +1,6 @@
 $padding: 8;
 $htmlFont: $default-monospace-font;
-$textColorDark: $white;
+$textColorDark: var(--wp-components-color-gray-background-alt);
 
 .keyboardAvoidingView {
 	position: absolute;

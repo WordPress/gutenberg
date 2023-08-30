@@ -3,7 +3,7 @@
 	margin: $block-edge-to-content;
 	margin-left: $block-selected-child-margin;
 	margin-right: $block-selected-child-margin;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	border: $border-width dashed $gray;
 	border-radius: 4px;
 }

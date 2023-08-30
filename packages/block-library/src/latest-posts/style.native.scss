@@ -24,7 +24,7 @@
 }
 
 .latestPostBlockIconDark {
-	fill: $white;
+	fill: var(--wp-components-color-gray-background-alt);
 }
 
 .latestPostBlockMessage {
@@ -35,7 +35,7 @@
 }
 
 .latestPostBlockMessageDark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .latestPostBlockSubtitle {

@@ -19,7 +19,7 @@
 
 .inactiveIcon {
 	background-color: $light-quaternary;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .inactiveIconDark {

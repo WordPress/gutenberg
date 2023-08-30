@@ -78,7 +78,7 @@
 
 .embed__action {
 	text-align: center;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	font-size: 16;
 	font-weight: 400;
 }
@@ -161,7 +161,7 @@
 }
 
 .embed-no-preview__sheet-title--dark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .embed-no-preview__sheet-description {

@@ -15,7 +15,7 @@
 .edit-site-editor__toggle-save-panel {
 	box-sizing: border-box;
 	width: $sidebar-width;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	border: 1px dotted $gray-300;
 	padding: $grid-unit-30;
 	display: flex;

@@ -135,7 +135,7 @@
 			overflow: hidden;
 
 			&:focus {
-				box-shadow: inset 0 0 0 0 $white, 0 0 0 2px var(--wp-admin-theme-color);
+				box-shadow: inset 0 0 0 0 var(--wp-components-color-gray-background-alt), 0 0 0 2px var(--wp-admin-theme-color);
 				// Windows High Contrast mode will show this outline, but not the box-shadow.
 				outline: 2px solid transparent;
 			}
@@ -191,14 +191,14 @@
 
 		&:hover,
 		&:focus {
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 		}
 	}
 
 	.edit-site-patterns__pattern-icon {
 		border-radius: $grid-unit-05;
 		background: var(--wp-block-synced-color);
-		fill: $white;
+		fill: var(--wp-components-color-gray-background-alt);
 	}
 
 	.edit-site-patterns__pattern-lock-icon {

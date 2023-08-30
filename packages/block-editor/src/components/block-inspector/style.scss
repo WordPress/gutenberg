@@ -44,7 +44,7 @@
 .block-editor-block-inspector__no-block-tools {
 	display: block;
 	font-size: $default-font-size;
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	padding: ($grid-unit-20 * 2) $grid-unit-20;
 	text-align: center;
 }

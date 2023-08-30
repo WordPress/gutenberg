@@ -239,12 +239,12 @@ video.wp-block-cover__video-background {
 section.wp-block-cover-image h2,
 .wp-block-cover-image-text,
 .wp-block-cover-text {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	a,
 	a:hover,
 	a:focus,
 	a:active {
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 	}
 }
 
@@ -292,7 +292,7 @@ section.wp-block-cover-image > h2,
 
 :where(.wp-block-cover:not(.has-text-color)),
 :where(.wp-block-cover-image:not(.has-text-color)) {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 :where(.wp-block-cover.is-light:not(.has-text-color)),

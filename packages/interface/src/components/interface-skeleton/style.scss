@@ -105,7 +105,7 @@ html.interface-interface-skeleton__html-container {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	color: var(--wp-components-color-gray-contrast);
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
@@ -153,7 +153,7 @@ html.interface-interface-skeleton__html-container {
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	z-index: z-index(".interface-interface-skeleton__footer");
 
 	// On Mobile the footer is hidden
@@ -165,7 +165,7 @@ html.interface-interface-skeleton__html-container {
 	.block-editor-block-breadcrumb {
 		z-index: z-index(".edit-post-layout__footer");
 		display: flex;
-		background: $white;
+		background: var(--wp-components-color-gray-background-alt);
 		height: $button-size-small;
 		align-items: center;
 		font-size: $default-font-size;
@@ -181,7 +181,7 @@ html.interface-interface-skeleton__html-container {
 	left: auto;
 	right: 0;
 	color: var(--wp-components-color-gray-contrast);
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	width: 100vw;
 
 	@include break-medium() {

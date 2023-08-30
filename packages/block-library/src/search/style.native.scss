@@ -42,7 +42,7 @@
 }
 
 .icon {
-	fill: $white;
+	fill: var(--wp-components-color-gray-background-alt);
 	background-color: transparent;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .richTextButton {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	font-size: $editor-font-size;
 	font-weight: 400;
 	background-color: transparent;

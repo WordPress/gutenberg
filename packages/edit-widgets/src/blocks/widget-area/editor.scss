@@ -14,7 +14,7 @@ $panel-title-height: 48px;
 		// we still want the title to be interactive.
 		position: relative;
 		z-index: 1;
-		background: $white;
+		background: var(--wp-components-color-gray-background-alt);
 		// z-index should be enough to create a new stacking context,
 		// unfortunately, Safari needs this to stop it from flickering while dragging.
 		// The reason behind that is still unknown, probably a bug in the browser.
@@ -22,7 +22,7 @@ $panel-title-height: 48px;
 
 		// Remove default hover background in panel title. See #25752.
 		&:hover {
-			background: $white;
+			background: var(--wp-components-color-gray-background-alt);
 		}
 	}
 

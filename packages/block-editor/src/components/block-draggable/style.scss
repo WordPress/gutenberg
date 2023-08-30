@@ -9,7 +9,7 @@
 	background-color: var(--wp-components-color-gray-contrast);
 	border-radius: $radius-block-ui;
 	box-shadow: 0 6px 8px rgba($black, 0.3);
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	cursor: grabbing;
 	display: inline-flex;
 	height: $block-toolbar-height;

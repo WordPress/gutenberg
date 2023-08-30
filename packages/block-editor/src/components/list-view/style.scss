@@ -54,30 +54,30 @@
 
 		&:focus::after {
 			box-shadow:
-				inset 0 0 0 1px $white,
+				inset 0 0 0 1px var(--wp-components-color-gray-background-alt),
 				0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 		}
 	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 	}
 	&.is-selected .block-editor-list-view-block-contents:focus {
 		&::after {
 			box-shadow:
-				inset 0 0 0 1px $white,
+				inset 0 0 0 1px var(--wp-components-color-gray-background-alt),
 				0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 	}
 	&.is-selected.is-synced .block-editor-list-view-block-contents:focus {
 		&::after {
 			box-shadow:
-				inset 0 0 0 1px $white,
+				inset 0 0 0 1px var(--wp-components-color-gray-background-alt),
 				0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 		}
 	}
 	&.is-selected .block-editor-list-view-block__menu:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-gray-background-alt);
 	}
 
 	// Border radius for corners of the selected item.
@@ -289,13 +289,13 @@
 
 	.block-editor-inserter__toggle {
 		background: var(--wp-components-color-gray-contrast);
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 		height: $grid-unit-30;
 		margin: 6px 6px 6px 1px;
 		min-width: $grid-unit-30;
 
 		&:active {
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 		}
 	}
 
@@ -351,7 +351,7 @@
 		border-radius: $radius-block-ui;
 
 		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-block-ui $white;
+			box-shadow: 0 0 0 $radius-block-ui var(--wp-components-color-gray-background-alt);
 		}
 
 		&:not(:first-child) {

@@ -46,7 +46,7 @@ figure.wp-block-gallery.has-nested-images {
 		figcaption {
 			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
 			bottom: 0;
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 			font-size: $default-font-size;
 			left: 0;
 			margin-bottom: 0;

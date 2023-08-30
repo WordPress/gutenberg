@@ -2,7 +2,7 @@
 	display: flex;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	border-left: 4px solid $components-color-accent;
 	margin: 5px 15px 2px;
 	padding: 8px 12px;

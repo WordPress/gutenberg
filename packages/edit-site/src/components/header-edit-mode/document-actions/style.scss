@@ -8,7 +8,7 @@
 	// subsequently truncate child text, we set an explicit min-width.
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
-	background: $gray-100;
+	background: var(--wp-components-color-gray-background-subtle);
 	border-radius: $grid-unit-05;
 	width: min(100%, 450px);
 
@@ -18,15 +18,15 @@
 	}
 
 	&:hover {
-		background-color: $gray-200;
+		background-color: var(--wp-components-color-gray-component-background);
 	}
 
 	.components-button {
 		border-radius: $grid-unit-05;
 
 		&:hover {
-			color: var(--wp-block-synced-color);
-			background: $gray-200;
+			color: var(--wp-components-color-accent-solid);
+			background: var(--wp-components-color-gray-component-background);
 		}
 	}
 
@@ -36,9 +36,9 @@
 
 	&.is-synced-entity {
 		.edit-site-document-actions__title {
-			color: var(--wp-block-synced-color);
+			color: var(--wp-components-color-accent-solid);
 			h1 {
-				color: var(--wp-block-synced-color);
+				color: var(--wp-components-color-accent-solid);
 			}
 		}
 	}
@@ -46,7 +46,7 @@
 
 .edit-site-document-actions__command {
 	flex-grow: 1;
-	color: var(--wp-block-synced-color);
+	color: var(--wp-components-color-accent-solid);
 	overflow: hidden;
 }
 
@@ -60,7 +60,7 @@
 	}
 
 	&:hover {
-		color: var(--wp-block-synced-color);
+		color: var(--wp-components-color-accent-solid);
 	}
 
 	.block-editor-block-icon {

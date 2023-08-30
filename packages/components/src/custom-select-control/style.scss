@@ -22,7 +22,7 @@
 
 	// Block UI appearance.
 	border: $border-width solid var(--wp-components-color-gray-contrast);
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	border-radius: $radius-block-ui;
 	outline: none;
 	transition: none;

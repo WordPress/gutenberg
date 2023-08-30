@@ -1,5 +1,5 @@
 .components-panel__header.interface-complementary-area-header__small {
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	padding-right: $grid-unit-05;
 
 	.interface-complementary-area-header__small-title {
@@ -15,7 +15,7 @@
 }
 
 .interface-complementary-area-header {
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	padding-right: $grid-unit-05;
 
 	.components-button.has-icon {

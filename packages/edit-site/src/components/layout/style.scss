@@ -164,7 +164,7 @@
 
 .edit-site-layout__view-mode-toggle.components-button {
 	position: relative;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	border-radius: 0;
 	height: $header-height;
 	width: $header-height;
@@ -182,7 +182,7 @@
 
 	&:hover,
 	&:active {
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 	}
 
 	&:focus {
@@ -206,7 +206,7 @@
 	// Lightened spot color focus.
 	&:focus::before {
 		box-shadow:
-			inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1),
+			inset 0 0 0 var(--wp-admin-border-width-focus) rgba(var(--wp-components-color-gray-background-alt), 0.1),
 			inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 
@@ -229,7 +229,7 @@
 	right: 0;
 	width: $sidebar-width;
 	color: var(--wp-components-color-gray-contrast);
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 
 	&:focus,
 	&:focus-within {

@@ -57,7 +57,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		min-width: $grid-unit-20;
 		border-radius: 50%;
 
-		background: $white;
+		background: var(--wp-components-color-gray-background-alt);
 		padding: 2px;
 
 		color: var(--wp-components-color-gray-contrast);
@@ -76,14 +76,14 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		padding: 0;
 
 		// Shadow and stroke.
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white, 0 0 $border-width-focus-fallback 0 rgba($black, 0.25);
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-gray-background-alt), 0 0 $border-width-focus-fallback 0 rgba($black, 0.25);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
 
 		&:focus,
 		&.is-active {
-			box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus) * 2) $white, 0 0 $border-width-focus-fallback 0 rgba($black, 0.25);
+			box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus) * 2) var(--wp-components-color-gray-background-alt), 0 0 $border-width-focus-fallback 0 rgba($black, 0.25);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: $border-width-tab solid transparent;
@@ -118,7 +118,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 	button {
 		&.is-pressed {
 			> svg {
-				background: $white;
+				background: var(--wp-components-color-gray-background-alt);
 				border: 1px solid $gray-600;
 				border-radius: 2px;
 			}

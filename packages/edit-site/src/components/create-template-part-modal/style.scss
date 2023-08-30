@@ -33,7 +33,7 @@
 			}
 
 			&:focus {
-				border-bottom: $border-width solid $white;
+				border-bottom: $border-width solid var(--wp-components-color-gray-background-alt);
 			}
 
 			&:last-of-type {

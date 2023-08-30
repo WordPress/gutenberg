@@ -20,7 +20,7 @@ $tooltipArrowOffset: -($tooltipArrowSize - 1);
 }
 
 .text {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	padding: 12px 16px;
 }
 

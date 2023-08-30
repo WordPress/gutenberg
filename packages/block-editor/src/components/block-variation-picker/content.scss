@@ -62,7 +62,7 @@
 		width: auto;
 
 		&.is-secondary {
-			background-color: $white;
+			background-color: var(--wp-components-color-gray-background-alt);
 		}
 	}
 

@@ -35,7 +35,7 @@ export const ToolsPanel = ( columns: number ) => css`
 	${ toolsPanelGrid.columns( columns ) }
 	${ toolsPanelGrid.spacing }
 
-	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
+	border-top: ${ CONFIG.borderWidth } solid var(--wp-components-color-gray-border);
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
 `;

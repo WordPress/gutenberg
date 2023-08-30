@@ -1,7 +1,7 @@
 .edit-post-text-editor {
 	position: relative;
 	width: 100%;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	flex-grow: 1;
 
 	// Post title.
@@ -51,7 +51,7 @@
 	left: 0;
 	right: 0;
 	display: flex;
-	background: rgba($white, 0.8);
+	background: rgba(var(--wp-components-color-gray-background-alt), 0.8);
 	padding: $grid-unit-05 $grid-unit-15;
 
 	@include break-small() {

@@ -85,7 +85,7 @@
 		}
 
 		&.is-active {
-			color: $white;
+			color: var(--wp-components-color-gray-background-alt);
 			background: var(--wp-components-color-gray-contrast);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.

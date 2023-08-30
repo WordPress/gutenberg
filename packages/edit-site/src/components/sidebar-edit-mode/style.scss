@@ -103,7 +103,7 @@
 .edit-site-sidebar-fixed-bottom-slot {
 	position: sticky;
 	bottom: 0;
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	display: flex;
 	padding: $grid-unit-20;
 	border-top: $border-width solid $gray-300;

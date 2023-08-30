@@ -1,6 +1,6 @@
 .edit-post-header {
 	height: $header-height;
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;

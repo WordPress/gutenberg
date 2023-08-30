@@ -20,7 +20,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 var(--wp-compon
 }
 
 .components-popover__content {
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	box-shadow: $shadow-popover-border-default, $shadow-popover;
 	border-radius: $radius-block-ui;
 	box-sizing: border-box;
@@ -52,7 +52,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 var(--wp-compon
 
 .components-popover__header {
 	align-items: center;
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	display: flex;
 	height: $panel-header-height;
 	justify-content: space-between;
@@ -87,7 +87,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 var(--wp-compon
 		left: 1px;
 		height: 2px;
 		right: 1px;
-		background-color: $white;
+		background-color: var(--wp-components-color-gray-background-alt);
 	}
 
 	// Position and rotate the arrow depending on the popover's placement.
@@ -120,7 +120,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 var(--wp-compon
 
 .components-popover__triangle-bg {
 	// Fill color is the same as the .components-popover__content's background
-	fill: $white;
+	fill: var(--wp-components-color-gray-background-alt);
 }
 
 .components-popover__triangle-border {

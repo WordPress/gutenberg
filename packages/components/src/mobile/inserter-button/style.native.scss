@@ -17,7 +17,7 @@
 }
 
 .modalIconWrapperDark {
-	background-color: rgba($white, 0.07);
+	background-color: rgba(var(--wp-components-color-gray-background-alt), 0.07);
 }
 
 .newIndicator {
@@ -48,7 +48,7 @@
 }
 
 .modalItemLabelDark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .clipboardBlock {

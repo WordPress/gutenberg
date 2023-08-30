@@ -1,7 +1,7 @@
 .components-toolbar-group {
 	min-height: $block-toolbar-height;
 	border-right: $border-width solid var(--wp-components-color-gray-contrast);
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	display: inline-flex;
 	flex-shrink: 0;
 	flex-wrap: wrap;
@@ -41,7 +41,7 @@
 	min-height: $block-toolbar-height;
 	margin: 0;
 	border: $border-width solid var(--wp-components-color-gray-contrast);
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	display: inline-flex;
 	flex-shrink: 0;
 	flex-wrap: wrap;

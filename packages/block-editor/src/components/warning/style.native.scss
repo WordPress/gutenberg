@@ -33,7 +33,7 @@
 }
 
 .titleDark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .message {
@@ -43,5 +43,5 @@
 }
 
 .messageDark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }

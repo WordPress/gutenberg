@@ -15,7 +15,7 @@
 }
 
 .appenderLight {
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	border: $border-width solid $light-gray-500;
 }
 
@@ -25,7 +25,7 @@
 }
 
 .addBlockButton {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	background-color: $gray;
 	border-radius: $button-size-small * 0.5;
 	overflow: hidden;

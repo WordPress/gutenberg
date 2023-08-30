@@ -96,7 +96,7 @@
 	// Colors need to work in both dark themes, and dark dropdown colors.
 	// This customization would be nice to retire in a refactor of the canvas appender button.
 	.block-editor-button-block-appender {
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 		background: var(--wp-components-color-gray-contrast);
 		padding: 0;
 		width: $button-size-small;
@@ -199,7 +199,7 @@ $color-control-label-height: 20px;
 // See https://github.com/WordPress/gutenberg/issues/37572.
 .wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
 	background-color: var(--wp-components-color-gray-contrast);
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 
 	// This needs specificity to override an inherited padding.
 	// That source padding in turn has high specificity to protect
@@ -324,7 +324,7 @@ $color-control-label-height: 20px;
 
 .wp-block-navigation-placeholder__controls {
 	border-radius: $radius-block-ui;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	box-shadow: inset 0 0 0 $border-width var(--wp-components-color-gray-contrast);
 	display: none;
 	position: relative;
@@ -583,7 +583,7 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	&.open {
 		box-shadow: inset 0 0 0 $border-width $gray-200;
 		outline: 1px solid transparent; // Box shadow is removed in high contrast mode, a transparent outline is made opaque.
-		background-color: $white;
+		background-color: var(--wp-components-color-gray-background-alt);
 	}
 }
 

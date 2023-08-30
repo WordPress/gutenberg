@@ -7,11 +7,11 @@
 }
 
 .inserter-menu__add-block-button--dark {
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 }
 
 .inserter-menu__add-block-button-icon {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .inserter-menu__add-block-button-icon--dark {
@@ -19,7 +19,7 @@
 }
 
 .inserter-menu__add-block-button-text {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	font-weight: 500;
 	align-self: center;
 	text-transform: capitalize;

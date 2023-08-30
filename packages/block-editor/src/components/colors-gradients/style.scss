@@ -58,7 +58,7 @@ $swatch-gap: 12px;
 
 .block-editor-panel-color-gradient-settings__color-indicator {
 	// Show a diagonal line (crossed out) for empty swatches.
-	background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+	background: linear-gradient(-45deg, transparent 48%, var(--wp-components-color-gray-border) 48%, var(--wp-components-color-gray-border) 52%, transparent 52%);
 }
 
 /**
@@ -73,15 +73,15 @@ $swatch-gap: 12px;
 	max-width: 100%;
 
 	// Border styles.
-	border-left: 1px solid $gray-300;
-	border-right: 1px solid $gray-300;
-	border-bottom: 1px solid $gray-300;
+	border-left: 1px solid var(--wp-components-color-gray-border);
+	border-right: 1px solid var(--wp-components-color-gray-border);
+	border-bottom: 1px solid var(--wp-components-color-gray-border);
 
 	&.first {
 		margin-top: $grid-unit-30;
 		border-top-left-radius: $radius-block-ui;
 		border-top-right-radius: $radius-block-ui;
-		border-top: 1px solid $gray-300;
+		border-top: 1px solid var(--wp-components-color-gray-border);
 	}
 
 	&.last {

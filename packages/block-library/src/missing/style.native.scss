@@ -56,7 +56,7 @@
 }
 
 .infoTextDark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .infoTitle {
@@ -68,7 +68,7 @@
 }
 
 .infoTitleDark {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .infoDescription {

@@ -34,7 +34,7 @@ $block-spacing: 4px;
 	border-width: $border-width;
 	margin: 2 * $grid-unit-20;
 	background-color: $button-fallback-bg;
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .clearLinkButton {
@@ -42,7 +42,7 @@ $block-spacing: 4px;
 }
 
 .placeholderTextColor {
-	color: rgba($color: $white, $alpha: 0.43);
+	color: rgba($color: var(--wp-components-color-gray-background-alt), $alpha: 0.43);
 }
 
 .placeholder {

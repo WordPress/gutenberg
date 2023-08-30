@@ -23,6 +23,6 @@
 	}
 
 	&:not(:disabled).is-pressed[data-subscript]::after {
-		color: $white;
+		color: var(--wp-components-color-gray-background-alt);
 	}
 }

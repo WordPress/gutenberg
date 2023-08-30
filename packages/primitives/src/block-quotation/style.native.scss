@@ -13,7 +13,7 @@
 
 .wpBlockQuoteDark {
 	@extend %wpBlockQuote-shared;
-	border-left-color: $white;
+	border-left-color: var(--wp-components-color-gray-background-alt);
 }
 
 .wpBlockQuoteCitation {

@@ -22,7 +22,7 @@
 	background: rgba($black, 0.1);
 
 	.is-dark-theme & {
-		background: rgba($white, 0.15);
+		background: rgba(var(--wp-components-color-gray-background-alt), 0.15);
 	}
 }
 

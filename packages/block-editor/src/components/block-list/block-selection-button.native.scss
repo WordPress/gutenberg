@@ -8,13 +8,13 @@
 }
 
 .selectionButtonTitle {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	margin-left: 4;
 	flex-shrink: 1;
 }
 
 .icon {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 }
 
 .button {

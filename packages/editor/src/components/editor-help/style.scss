@@ -114,7 +114,7 @@
 }
 
 .helpDetailBadgeText {
-	color: $white;
+	color: var(--wp-components-color-gray-background-alt);
 	font-weight: 500;
 	font-size: 12px;
 }

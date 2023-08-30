@@ -230,7 +230,7 @@
 		bottom: 0;
 		left: 0;
 		border-radius: $radius-block-ui;
-		background-color: rgba($white, 0.4);
+		background-color: rgba(var(--wp-components-color-gray-background-alt), 0.4);
 	}
 
 	// Avoid conflict with the multi-selection highlight color.
@@ -427,7 +427,7 @@
 }
 
 .block-editor-iframe__body {
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	transition: all 0.3s;
 	transform-origin: top center;
 }

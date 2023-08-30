@@ -12,7 +12,7 @@ $toggle-border-width: 1px;
 		display: inline-block;
 		box-sizing: border-box;
 		vertical-align: top;
-		background-color: $white;
+		background-color: var(--wp-components-color-gray-background-alt);
 		border: $toggle-border-width solid var(--wp-components-color-gray-contrast);
 		width: $toggle-width;
 		height: $toggle-height;
@@ -49,7 +49,7 @@ $toggle-border-width: 1px;
 
 	&.is-checked {
 		.components-form-toggle__thumb {
-			background-color: $white;
+			background-color: var(--wp-components-color-gray-background-alt);
 			border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
 			transform: translateX($toggle-width - ($toggle-border-width * 4) - ($toggle-height - ($toggle-border-width * 4)));
 		}

@@ -2,7 +2,7 @@
 	&:not([hidden]) {
 		display: flow-root;
 	}
-	background: $white;
+	background: var(--wp-components-color-gray-background-alt);
 	border-radius: $radius-block-ui;
 	border: 1px solid var(--wp-components-color-gray-contrast);
 	padding: $grid-unit-15 - 1px; // Subtract the border width.

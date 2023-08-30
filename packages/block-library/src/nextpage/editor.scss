@@ -19,7 +19,7 @@
 		font-family: $default-font;
 		color: $gray-700;
 		border-radius: 4px;
-		background: $white;
+		background: var(--wp-components-color-gray-background-alt);
 		padding: 6px 8px;
 		height: $button-size-small;
 	}

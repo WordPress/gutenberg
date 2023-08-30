@@ -71,7 +71,7 @@
 	right: 0;
 	box-sizing: border-box;
 	width: $sidebar-width;
-	background-color: $white;
+	background-color: var(--wp-components-color-gray-background-alt);
 	border: 1px dotted $gray-300;
 	height: auto !important; // Need to override the default sidebar positionnings
 	padding: $grid-unit-30;
