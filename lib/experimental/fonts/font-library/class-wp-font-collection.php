@@ -81,7 +81,6 @@ class WP_Font_Collection {
 		// If the src is a URL, fetch the data from the URL.
 		if ( wp_http_validate_url( $this->config['src'] ) ) {
 			$response = wp_remote_get( $this->config['src'] );
-			// error_log( print_r($response) );
 			if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
 				return new WP_Error( 'font_collection_read_error', __( 'Error fetching the Font Collection data from a URL.', 'gutenberg' ) );
 			}
