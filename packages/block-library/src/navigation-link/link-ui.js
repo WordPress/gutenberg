@@ -180,6 +180,7 @@ export function LinkUI( props ) {
 
 	return (
 		<Popover
+			role="dialog"
 			placement="bottom"
 			onClose={ props.onClose }
 			anchor={ props.anchor }
