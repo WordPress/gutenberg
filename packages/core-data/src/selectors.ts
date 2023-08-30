@@ -21,6 +21,7 @@ import {
 	isRawAttribute,
 	setNestedValue,
 	isNumericID,
+	parseEntityName,
 } from './utils';
 import type * as ET from './entity-types';
 import type { UndoManager } from '@wordpress/undo-manager';
@@ -70,6 +71,7 @@ interface EntityState< EntityRecord extends ET.EntityRecord > {
 	>;
 	deleting: Record< string, Partial< { pending: boolean; error: Error } > >;
 	queriedData: QueriedData;
+	revisions: QueriedData;
 }
 
 interface EntityConfig {
@@ -341,6 +343,7 @@ export const getEntityRecord = createSelector(
 		if ( ! queriedState ) {
 			return undefined;
 		}
+
 		const context = query?.context ?? 'default';
 
 		if ( query === undefined ) {
@@ -1373,3 +1376,101 @@ export function getDefaultTemplateId(
 ): string {
 	return state.defaultTemplates[ JSON.stringify( query ) ];
 }
+
+/**
+ * Returns an Entity's revisions.
+ *
+ * @param state    State tree
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param parentId Record's key whose revisions you wish to fetch.
+ * @param query    Optional query. If requesting specific
+ *                 fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+ *
+ * @return Record.
+ */
+export const getEntityRevisions = (
+	state: State,
+	kind: string,
+	name: string,
+	parentId: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+) => {
+	const queriedStateRevisions =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions[ parentId ];
+
+	if ( ! queriedStateRevisions ) {
+		return null;
+	}
+
+	return getQueriedItems( queriedStateRevisions, query );
+};
+
+/**
+ * Returns a specific Entity revision.
+ *
+ * @param state    State tree
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param parentId Record's key whose revisions you wish to fetch.
+ * @param key      The Revision's key.
+ * @param query    Optional query. If requesting specific
+ *                 fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+ *
+ * @return Record.
+ */
+export const getEntityRevision = createSelector(
+	(
+		state: State,
+		kind: string,
+		name: string,
+		parentId: EntityRecordKey,
+		key: EntityRecordKey,
+		query?: GetRecordsHttpQuery
+	) => {
+		const queriedRevisionsState =
+			state.entities.records?.[ kind ]?.[ name ]?.revisions[ parentId ];
+
+		if ( ! queriedRevisionsState ) {
+			return undefined;
+		}
+
+		const context = query?.context ?? 'default';
+
+		if ( query === undefined ) {
+			// If expecting a complete item, validate that completeness.
+			if ( ! queriedRevisionsState.itemIsComplete[ context ]?.[ key ] ) {
+				return undefined;
+			}
+
+			return queriedRevisionsState.items[ context ][ key ];
+		}
+
+		const item = queriedRevisionsState.items[ context ]?.[ key ];
+
+		if ( item && query._fields ) {
+			const filteredItem = {};
+			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+			for ( let f = 0; f < fields.length; f++ ) {
+				const field = fields[ f ].split( '.' );
+				let value = item;
+				field.forEach( ( fieldName ) => {
+					value = value?.[ fieldName ];
+				} );
+				setNestedValue( filteredItem, field, value );
+			}
+			return filteredItem;
+		}
+
+		return item;
+	},
+	( state: State, kind, name, parentId, key, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			state.entities.records?.[ kind ]?.[ name ]?.revisions[ parentId ]
+				?.items[ key ],
+			state.entities.records?.[ kind ]?.[ name ]?.revisions[ parentId ]
+				?.itemIsComplete[ context ]?.[ key ],
+		];
+	}
+);

@@ -207,6 +207,14 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'globalStylesVariations', // Should be different than name.
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
+		getRevisionsUrl: ( parentId, revisionId ) =>
+			`/wp/v2/global-styles/${ parentId }/revisions${
+				revisionId ? '/' + revisionId : ''
+			}`,
+		revisionURLParams: { context: 'view' },
+		supports: {
+			revisions: true,
+		},
 	},
 	{
 		label: __( 'Themes' ),
@@ -276,8 +284,9 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
+	// @TODO 'edit' context required to get supports collection.
 	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=view',
+		path: '/wp/v2/types?context=edit',
 	} );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
@@ -295,6 +304,7 @@ async function loadPostTypeEntities() {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
+			supports: postType?.supports,
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
 				record?.title?.rendered ||
@@ -328,6 +338,15 @@ async function loadPostTypeEntities() {
 			syncObjectType: 'postType/' + postType.name,
 			getSyncObjectId: ( id ) => id,
 			supportsPagination: true,
+			getRevisionsUrl: ( parentId, revisionId ) =>
+				postType?.supports?.revisions
+					? `/${ namespace }/${
+							postType.rest_base
+					  }/${ parentId }/revisions${
+							revisionId ? '/' + revisionId : ''
+					  }`
+					: undefined,
+			revisionURLParams: { context: 'view' },
 		};
 	} );
 }

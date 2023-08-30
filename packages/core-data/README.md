@@ -123,7 +123,7 @@ The package provides general methods to interact with the entities (`getEntityRe
 
 ```js
 // Get the record collection for the user entity.
-wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
+wp.data.select( 'core' ).getEntityRecords( 'root', 'user' );
 
 // Get a single record for the user entity.
 wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
@@ -138,7 +138,7 @@ In addition to the general utilities (`getEntityRecords`, `getEntityRecord`, etc
 
 ```js
 // Collection
-wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
+wp.data.select( 'core' ).getEntityRecords( 'root', 'user' );
 wp.data.select( 'core' ).getUsers();
 
 // Single record
@@ -648,6 +648,39 @@ _Parameters_
 _Returns_
 
 -   `number | null`: number | null.
+
+### getEntityRevision
+
+Returns a specific Entity revision.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _parentId_ `EntityRecordKey`: Record's key whose revisions you wish to fetch.
+-   _key_ `EntityRecordKey`: The Revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+
+_Returns_
+
+-   Record.
+
+### getEntityRevisions
+
+Returns an Entity's revisions.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _parentId_ `EntityRecordKey`: Record's key whose revisions you wish to fetch.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+
+_Returns_
+
+-   Record.
 
 ### getLastEntityDeleteError
 
