@@ -110,9 +110,9 @@ class WP_Font_Library {
 	 * @return array Modified upload directory.
 	 */
 	public static function set_upload_dir( $defaults ) {
-		$defaults['subdir']  = '/fonts';
-		$defaults['path']    = $defaults['basedir'] . $defaults['subdir'];
-		$defaults['url']     = $defaults['baseurl'] . $defaults['subdir'];
+		$defaults['subdir'] = '/fonts';
+		$defaults['path']   = $defaults['basedir'] . $defaults['subdir'];
+		$defaults['url']    = $defaults['baseurl'] . $defaults['subdir'];
 
 		return $defaults;
 	}
