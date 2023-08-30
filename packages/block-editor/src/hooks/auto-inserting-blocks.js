@@ -19,24 +19,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { BlockIcon, InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
-function someBlock( blocks, predicate, getBlocks ) {
-	return blocks.some( ( block ) => {
-		const result = predicate( block );
-		if ( result ) {
-			return result;
-		}
-
-		// A Template Part block's innerBlocks array always shows up as empty,
-		// so we have to manually load its inner blocks via getBlocks().
-		const innerBlocks =
-			block.name === 'core/template-part'
-				? getBlocks( block.clientId )
-				: block.innerBlocks;
-
-		return someBlock( innerBlocks, predicate, getBlocks );
-	} );
-}
-
 function AutoInsertingBlocksControl( props ) {
 	const blockTypes = useSelect( ( select ) =>
 		select( blocksStore ).getBlockTypes()
@@ -53,8 +35,12 @@ function AutoInsertingBlocksControl( props ) {
 		innerBlocksLength,
 	} = useSelect(
 		( select ) => {
-			const { getBlock, getBlockIndex, getBlockRootClientId, getBlocks } =
-				select( blockEditorStore );
+			const {
+				getBlock,
+				getBlockIndex,
+				getBlockRootClientId,
+				getGlobalBlockCount,
+			} = select( blockEditorStore );
 
 			const _rootClientId = getBlockRootClientId( props.clientId );
 
@@ -93,19 +79,11 @@ function AutoInsertingBlocksControl( props ) {
 						if ( autoInsertedBlock ) {
 							clientIds[ block.name ] =
 								autoInsertedBlock.clientId;
-						} else {
+						} else if ( getGlobalBlockCount( block.name ) > 0 ) {
 							// If no auto-inserted block was found in any of its designated locations,
-							// we check if it's present elsewhere in the block tree.
-							// If it is, we consider it manually inserted and remove the corresponding
-							// toggle from the block inspector panel.
-							const blockIsPresentElsewhereInTree = someBlock(
-								getBlocks(),
-								( { name } ) => name === block.name,
-								getBlocks
-							);
-							if ( blockIsPresentElsewhereInTree ) {
-								clientIds[ block.name ] = false;
-							}
+							// but it exists elsewhere in the block tree, we consider it manually inserted.
+							// In this case, we remove the corresponding toggle from the block inspector panel.
+							clientIds[ block.name ] = false;
 						}
 
 						return clientIds;
