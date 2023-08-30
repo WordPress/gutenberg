@@ -105,7 +105,7 @@ export type ToggleGroupControlProps = Pick<
 	/**
 	 * Callback when a segment is selected.
 	 */
-	onChange?: ( value: string | number | undefined ) => void;
+	onChange?: (value: string | number | undefined) => void;
 	/**
 	 * The selected value.
 	 */
@@ -126,10 +126,10 @@ export type ToggleGroupControlProps = Pick<
 export type ToggleGroupControlContextProps = {
 	isDeselectable?: boolean;
 	baseId: string;
-	isBlock: ToggleGroupControlProps[ 'isBlock' ];
-	size: ToggleGroupControlProps[ 'size' ];
-	value: ToggleGroupControlProps[ 'value' ];
-	setValue: ( newValue: string | number | undefined ) => void;
+	isBlock: ToggleGroupControlProps['isBlock'];
+	size: ToggleGroupControlProps['size'];
+	value: ToggleGroupControlProps['value'];
+	setValue: (newValue: string | number | undefined) => void;
 };
 
 export type ToggleGroupControlMainControlProps = Pick<
