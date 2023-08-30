@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
+import {
+	Button,
+	Spinner,
+	Notice,
+	TextControl,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -15,6 +21,7 @@ import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn } from '@wordpress/icons';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -338,20 +345,41 @@ function LinkControl( {
 	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
 	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 
+	const dialogTitleId = useInstanceId(
+		LinkControl,
+		`block-editor-link-control___title`
+	);
+	const dialogDescritionId = useInstanceId(
+		LinkControl,
+		`block-editor-link-control___description`
+	);
+
 	return (
 		<div
 			tabIndex={ -1 }
 			ref={ wrapperNode }
 			className="block-editor-link-control"
+			aria-labelledby={ dialogTitleId }
+			aria-describedby={ dialogDescritionId }
 		>
+			<VisuallyHidden>
+				<h2 id={ dialogTitleId }>Link</h2>
+			</VisuallyHidden>
+
 			{ isCreatingPage && (
 				<div className="block-editor-link-control__loading">
-					<Spinner /> { __( 'Creating' ) }…
+					<Spinner />
+					{ __( 'Creating' ) }…
 				</div>
 			) }
 
 			{ isEditing && (
 				<>
+					<VisuallyHidden>
+						<p id={ dialogDescritionId }>
+							{ __( 'Editing the link.' ) }
+						</p>
+					</VisuallyHidden>
 					<div
 						className={ classnames( {
 							'block-editor-link-control__search-input-wrapper': true,
@@ -415,36 +443,44 @@ function LinkControl( {
 			) }
 
 			{ value && ! isEditingLink && ! isCreatingPage && (
-				<LinkPreview
-					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
-					value={ value }
-					onEditClick={ () => setIsEditingLink( true ) }
-					hasRichPreviews={ hasRichPreviews }
-					hasUnlinkControl={ shownUnlinkControl }
-					additionalControls={ () => {
-						// Expose the "Opens in new tab" settings in the preview
-						// as it is the most common setting to change.
-						if (
-							settings?.find(
-								( setting ) => setting.id === 'opensInNewTab'
-							)
-						) {
-							return (
-								<LinkSettings
-									value={ internalControlValue }
-									settings={ settings?.filter(
-										( { id } ) => id === 'opensInNewTab'
-									) }
-									onChange={ onChange }
-								/>
-							);
-						}
-					} }
-					onRemove={ () => {
-						onRemove();
-						setIsEditingLink( true );
-					} }
-				/>
+				<>
+					<VisuallyHidden>
+						<p id={ dialogDescritionId }>
+							{ __( 'Previewing the currently selected link.' ) }
+						</p>
+					</VisuallyHidden>
+					<LinkPreview
+						key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
+						value={ value }
+						onEditClick={ () => setIsEditingLink( true ) }
+						hasRichPreviews={ hasRichPreviews }
+						hasUnlinkControl={ shownUnlinkControl }
+						additionalControls={ () => {
+							// Expose the "Opens in new tab" settings in the preview
+							// as it is the most common setting to change.
+							if (
+								settings?.find(
+									( setting ) =>
+										setting.id === 'opensInNewTab'
+								)
+							) {
+								return (
+									<LinkSettings
+										value={ internalControlValue }
+										settings={ settings?.filter(
+											( { id } ) => id === 'opensInNewTab'
+										) }
+										onChange={ onChange }
+									/>
+								);
+							}
+						} }
+						onRemove={ () => {
+							onRemove();
+							setIsEditingLink( true );
+						} }
+					/>
+				</>
 			) }
 
 			{ showSettings && (
