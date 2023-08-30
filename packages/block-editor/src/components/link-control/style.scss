@@ -412,6 +412,16 @@ $preview-image-height: 140px;
 	padding-right: $grid-unit-20;
 }
 
+.block-editor-link-control__search-item-details {
+	margin-block-start: 0;
+	margin-block-end: 0;
+
+	dd {
+		margin-inline-start: 0;
+		margin-block-end: 0;
+	}
+}
+
 .block-editor-link-control__setting {
 	margin-bottom: 0;
 	flex: 1;

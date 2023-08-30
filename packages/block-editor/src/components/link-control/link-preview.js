@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	ExternalLink,
+	VisuallyHidden,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
@@ -20,7 +21,6 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
  * Internal dependencies
  */
 import { ViewerSlot } from './viewer-slot';
-
 import useRichUrlData from './use-rich-url-data';
 
 export default function LinkPreview( {
@@ -84,28 +84,43 @@ export default function LinkPreview( {
 					>
 						{ icon }
 					</span>
-					<span className="block-editor-link-control__search-item-details">
+					<dl className="block-editor-link-control__search-item-details">
 						{ ! isEmptyURL ? (
 							<>
-								<ExternalLink
-									className="block-editor-link-control__search-item-title"
-									href={ value.url }
-								>
-									{ displayTitle }
-								</ExternalLink>
+								<VisuallyHidden>
+									<dt>Link title</dt>
+								</VisuallyHidden>
+								<dd>
+									<ExternalLink
+										className="block-editor-link-control__search-item-title"
+										href={ value.url }
+									>
+										{ displayTitle }
+									</ExternalLink>
+								</dd>
 
 								{ value?.url && displayTitle !== displayURL && (
-									<span className="block-editor-link-control__search-item-info">
-										{ displayURL }
-									</span>
+									<>
+										<VisuallyHidden>
+											<dt>Link URL</dt>
+										</VisuallyHidden>
+										<dd className="block-editor-link-control__search-item-info">
+											{ displayURL }
+										</dd>
+									</>
 								) }
 							</>
 						) : (
-							<span className="block-editor-link-control__search-item-error-notice">
-								{ __( 'Link is empty' ) }
-							</span>
+							<>
+								<VisuallyHidden>
+									<dt>Link value</dt>
+								</VisuallyHidden>
+								<dd className="block-editor-link-control__search-item-error-notice">
+									{ __( 'Link is empty' ) }
+								</dd>
+							</>
 						) }
-					</span>
+					</dl>
 				</span>
 
 				<Button
