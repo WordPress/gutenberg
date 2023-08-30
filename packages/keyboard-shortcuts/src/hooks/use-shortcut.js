@@ -16,11 +16,12 @@ import { context } from '../context';
  * @param {Function} callback           Shortcut callback.
  * @param {Object}   options            Shortcut options.
  * @param {boolean}  options.isDisabled Whether to disable to shortut.
+ * @param {Object}   options.scope      Optional scope reference.
  */
 export default function useShortcut(
 	name,
 	callback,
-	{ isDisabled = false } = {}
+	{ isDisabled = false, scope } = {}
 ) {
 	const shortcuts = useContext( context );
 	const isMatch = useShortcutEventMatch();
@@ -41,9 +42,10 @@ export default function useShortcut(
 			}
 		}
 
-		shortcuts.add( _callback );
+		const scopeElement = scope?.current;
+		shortcuts.add( _callback, scopeElement );
 		return () => {
-			shortcuts.delete( _callback );
+			shortcuts.delete( _callback, scopeElement );
 		};
 	}, [ name, isDisabled, shortcuts ] );
 }

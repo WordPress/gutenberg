@@ -53,6 +53,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		popoverProps,
 		toggleProps,
 		menuProps,
+		menuRef,
 		disableOpenOnArrowDown = false,
 		text,
 		noIcons,
@@ -162,7 +163,11 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 				);
 
 				return (
-					<NavigableMenu { ...mergedMenuProps } role="menu">
+					<NavigableMenu
+						ref={ menuRef }
+						{ ...mergedMenuProps }
+						role="menu"
+					>
 						{ isFunction( children ) ? children( props ) : null }
 						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
 							controlSet.map( ( control, indexOfControl ) => (

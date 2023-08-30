@@ -104,6 +104,12 @@ export type DropdownMenuProps = {
 	 * e.g.: the orientation of the menu set with `orientation` prop.
 	 */
 	menuProps?: Omit< Partial< NavigableMenuProps >, 'children' >;
+
+	/**
+	 * Reference to the dropdown menu's root element.
+	 */
+	menuRef?: React.Ref< HTMLDivElement >;
+
 	/**
 	 * In some contexts, the arrow down key used to open the dropdown menu might
 	 * need to be disabled—for example when that key is used to perform another

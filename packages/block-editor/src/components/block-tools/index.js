@@ -4,7 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
-import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
 
 /**
@@ -45,12 +45,12 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
+	const scope = useRef( null );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { hasFixedToolbar, isZoomOutMode, isTyping } = useSelect(
 		selector,
 		[]
 	);
-	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const {
@@ -64,81 +64,89 @@ export default function BlockTools( {
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
 
-	function onKeyDown( event ) {
-		if ( event.defaultPrevented ) return;
-
-		if ( isMatch( 'core/block-editor/move-up', event ) ) {
+	useShortcut(
+		'core/block-editor/move-up',
+		( event ) => {
+			if ( event.defaultPrevented ) return;
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
-				event.stopPropagation();
 				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 				moveBlocksUp( clientIds, rootClientId );
 			}
-		} else if ( isMatch( 'core/block-editor/move-down', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				event.stopPropagation();
-				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-				moveBlocksDown( clientIds, rootClientId );
-			}
-		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				event.stopPropagation();
-				duplicateBlocks( clientIds );
-			}
-		} else if ( isMatch( 'core/block-editor/remove', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				event.stopPropagation();
-				removeBlocks( clientIds );
-			}
-		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				event.stopPropagation();
-				insertAfterBlock( clientIds[ clientIds.length - 1 ] );
-			}
-		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				event.stopPropagation();
-				insertBeforeBlock( clientIds[ 0 ] );
-			}
-		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				event.stopPropagation();
+		},
+		{ scope }
+	);
 
-				// If there is more than one block selected, select the first
-				// block so that focus is directed back to the beginning of the selection.
-				// In effect, to the user this feels like deselecting the multi-selection.
-				if ( clientIds.length > 1 ) {
-					selectBlock( clientIds[ 0 ] );
-				} else {
-					clearSelectedBlock();
-				}
-				event.target.ownerDocument.defaultView
-					.getSelection()
-					.removeAllRanges();
-				__unstableContentRef?.current.focus();
-			}
+	useShortcut( 'core/block-editor/move-down', ( event ) => {
+		if ( event.defaultPrevented ) return;
+		const clientIds = getSelectedBlockClientIds();
+		if ( clientIds.length ) {
+			event.preventDefault();
+			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+			moveBlocksDown( clientIds, rootClientId );
 		}
-	}
+	} );
+
+	useShortcut( 'core/block-editor/duplicate', ( event ) => {
+		if ( event.defaultPrevented ) return;
+		const clientIds = getSelectedBlockClientIds();
+		if ( clientIds.length ) {
+			event.preventDefault();
+			duplicateBlocks( clientIds );
+		}
+	} );
+
+	useShortcut( 'core/block-editor/remove', ( event ) => {
+		const clientIds = getSelectedBlockClientIds();
+		if ( clientIds.length ) {
+			event.preventDefault();
+			removeBlocks( clientIds );
+		}
+	} );
+
+	useShortcut( 'core/block-editor/insert-after', ( event ) => {
+		const clientIds = getSelectedBlockClientIds();
+		if ( clientIds.length ) {
+			event.preventDefault();
+			insertAfterBlock( clientIds[ clientIds.length - 1 ] );
+		}
+	} );
+
+	useShortcut( 'core/block-editor/insert-before', ( event ) => {
+		const clientIds = getSelectedBlockClientIds();
+		if ( clientIds.length ) {
+			event.preventDefault();
+			insertBeforeBlock( clientIds[ 0 ] );
+		}
+	} );
+
+	useShortcut( 'core/block-editor/unselect', ( event ) => {
+		const clientIds = getSelectedBlockClientIds();
+		if ( clientIds.length ) {
+			event.preventDefault();
+
+			// If there is more than one block selected, select the first
+			// block so that focus is directed back to the beginning of the selection.
+			// In effect, to the user this feels like deselecting the multi-selection.
+			if ( clientIds.length > 1 ) {
+				selectBlock( clientIds[ 0 ] );
+			} else {
+				clearSelectedBlock();
+			}
+			event.target.ownerDocument.defaultView
+				.getSelection()
+				.removeAllRanges();
+			__unstableContentRef?.current.focus();
+		}
+	} );
 
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div { ...props } onKeyDown={ onKeyDown }>
+		<div ref={ scope } { ...props }>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
 				{ ! isTyping && (
 					<InsertionPoint

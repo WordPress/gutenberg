@@ -3,8 +3,9 @@
  */
 import { isEntirelySelected } from '@wordpress/dom';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useRefEffect } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,14 +16,10 @@ export default function useSelectAll() {
 	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
-	const isMatch = useShortcutEventMatch();
-
-	return useRefEffect( ( node ) => {
-		function onKeyDown( event ) {
-			if ( ! isMatch( 'core/block-editor/select-all', event ) ) {
-				return;
-			}
-
+	const scope = useRef();
+	useShortcut(
+		'core/block-editor/select-all',
+		( event ) => {
 			const selectedClientIds = getSelectedBlockClientIds();
 
 			if (
@@ -42,7 +39,7 @@ export default function useSelectAll() {
 			// level. See: https://github.com/WordPress/gutenberg/pull/31859/
 			if ( selectedClientIds.length === blockClientIds.length ) {
 				if ( rootClientId ) {
-					node.ownerDocument.defaultView
+					scope.current.ownerDocument.defaultView
 						.getSelection()
 						.removeAllRanges();
 					selectBlock( rootClientId );
@@ -54,12 +51,11 @@ export default function useSelectAll() {
 				blockClientIds[ 0 ],
 				blockClientIds[ blockClientIds.length - 1 ]
 			);
-		}
+		},
+		{ scope }
+	);
 
-		node.addEventListener( 'keydown', onKeyDown );
-
-		return () => {
-			node.removeEventListener( 'keydown', onKeyDown );
-		};
+	return useRefEffect( ( node ) => {
+		scope.ref = node;
 	}, [] );
 }

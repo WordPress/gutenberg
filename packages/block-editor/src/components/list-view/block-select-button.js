@@ -13,12 +13,13 @@ import {
 	__experimentalTruncate as Truncate,
 	Tooltip,
 } from '@wordpress/components';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { __, sprintf } from '@wordpress/i18n';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -49,6 +50,7 @@ function ListViewBlockSelectButton(
 	},
 	ref
 ) {
+	const scope = useRef();
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
@@ -65,7 +67,6 @@ function ListViewBlockSelectButton(
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
 	const { duplicateBlocks, removeBlocks } = useDispatch( blockEditorStore );
-	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
@@ -111,49 +112,44 @@ function ListViewBlockSelectButton(
 		};
 	}
 
-	/**
-	 * @param {KeyboardEvent} event
-	 */
-	async function onKeyDownHandler( event ) {
-		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
-			onClick( event );
-		} else if (
-			event.keyCode === BACKSPACE ||
-			event.keyCode === DELETE ||
-			isMatch( 'core/block-editor/remove', event )
-		) {
-			const {
-				blocksToUpdate: blocksToDelete,
-				firstBlockClientId,
-				firstBlockRootClientId,
-				selectedBlockClientIds,
-			} = getBlocksToUpdate();
+	function onRemoveBlock() {
+		const {
+			blocksToUpdate: blocksToDelete,
+			firstBlockClientId,
+			firstBlockRootClientId,
+			selectedBlockClientIds,
+		} = getBlocksToUpdate();
 
-			// Don't update the selection if the blocks cannot be deleted.
-			if ( ! canRemoveBlocks( blocksToDelete, firstBlockRootClientId ) ) {
-				return;
-			}
+		// Don't update the selection if the blocks cannot be deleted.
+		if ( ! canRemoveBlocks( blocksToDelete, firstBlockRootClientId ) ) {
+			return;
+		}
 
-			let blockToFocus =
-				getPreviousBlockClientId( firstBlockClientId ) ??
-				// If the previous block is not found (when the first block is deleted),
-				// fallback to focus the parent block.
-				firstBlockRootClientId;
+		let blockToFocus =
+			getPreviousBlockClientId( firstBlockClientId ) ??
+			// If the previous block is not found (when the first block is deleted),
+			// fallback to focus the parent block.
+			firstBlockRootClientId;
 
-			removeBlocks( blocksToDelete, false );
+		removeBlocks( blocksToDelete, false );
 
-			// Update the selection if the original selection has been removed.
-			const shouldUpdateSelection =
-				selectedBlockClientIds.length > 0 &&
-				getSelectedBlockClientIds().length === 0;
+		// Update the selection if the original selection has been removed.
+		const shouldUpdateSelection =
+			selectedBlockClientIds.length > 0 &&
+			getSelectedBlockClientIds().length === 0;
 
-			// If there's no previous block nor parent block, focus the first block.
-			if ( ! blockToFocus ) {
-				blockToFocus = getBlockOrder()[ 0 ];
-			}
+		// If there's no previous block nor parent block, focus the first block.
+		if ( ! blockToFocus ) {
+			blockToFocus = getBlockOrder()[ 0 ];
+		}
 
-			updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
-		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
+		updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
+	}
+
+	useShortcut( 'core/block-editor/remove', onRemoveBlock, { scope } );
+	useShortcut(
+		'core/block-editor/duplicate',
+		async ( event ) => {
 			if ( event.defaultPrevented ) {
 				return;
 			}
@@ -183,8 +179,21 @@ function ListViewBlockSelectButton(
 					updateFocusAndSelection( updatedBlocks[ 0 ], false );
 				}
 			}
+		},
+		{ scope }
+	);
+
+	async function onKeyDownHandler( event ) {
+		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
+			onClick( event );
+		} else if ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) {
+			onRemoveBlock();
 		}
 	}
+
+	const scopeRef = useRefEffect( ( node ) => {
+		scope.current = node;
+	}, [] );
 
 	return (
 		<>
@@ -195,7 +204,7 @@ function ListViewBlockSelectButton(
 				) }
 				onClick={ onClick }
 				onKeyDown={ onKeyDownHandler }
-				ref={ ref }
+				ref={ useMergeRefs( [ ref, scopeRef ] ) }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
 				onDragStart={ onDragStartHandler }

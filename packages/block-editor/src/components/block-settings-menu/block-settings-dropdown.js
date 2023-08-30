@@ -18,7 +18,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	store as keyboardShortcutsStore,
-	__unstableUseShortcutEventMatch,
+	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
@@ -49,10 +49,49 @@ function CopyMenuItem( { blocks, onCopy, label } ) {
 export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
-	children,
-	__unstableDisplayLocation,
 	...props
 } ) {
+	return (
+		<BlockActions
+			clientIds={ clientIds }
+			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
+		>
+			{ ( blocksActionsProps ) => (
+				<BlockSettingsDropdownMenu
+					clientIds={ clientIds }
+					__experimentalSelectBlock={ __experimentalSelectBlock }
+					{ ...blocksActionsProps }
+					{ ...props }
+				/>
+			) }
+		</BlockActions>
+	);
+}
+
+function BlockSettingsDropdownMenu( {
+	clientIds,
+	__experimentalSelectBlock,
+	children,
+	__unstableDisplayLocation,
+
+	// The following props are injected by BlockActions
+	canCopyStyles,
+	canDuplicate,
+	canInsertDefaultBlock,
+	canMove,
+	canRemove,
+	onDuplicate,
+	onInsertAfter,
+	onInsertBefore,
+	onRemove,
+	onCopy,
+	onPasteStyles,
+	onMoveTo,
+	blocks,
+
+	...props
+} ) {
+	const scope = useRef();
 	const blockClientIds = Array.isArray( clientIds )
 		? clientIds
 		: [ clientIds ];
@@ -117,7 +156,6 @@ export function BlockSettingsDropdown( {
 			),
 		};
 	}, [] );
-	const isMatch = __unstableUseShortcutEventMatch();
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
@@ -158,6 +196,50 @@ export function BlockSettingsDropdown( {
 		getSelectedBlockClientIds,
 	] );
 
+	useShortcut(
+		'core/block-editor/remove',
+		( event ) => {
+			if ( event.defaultPrevented || ! canRemove ) return;
+
+			event.preventDefault();
+			updateSelectionAfterRemove( onRemove() );
+		},
+		{ scope }
+	);
+
+	useShortcut(
+		'core/block-editor/duplicate',
+		( event ) => {
+			if ( event.defaultPrevented || ! canDuplicate ) return;
+
+			event.preventDefault();
+			updateSelectionAfterDuplicate( onDuplicate() );
+		},
+		{ scope }
+	);
+
+	useShortcut(
+		'core/block-editor/insert-after',
+		( event ) => {
+			if ( event.defaultPrevented || ! canInsertDefaultBlock ) return;
+
+			event.preventDefault();
+			onInsertAfter();
+		},
+		{ scope }
+	);
+
+	useShortcut(
+		'core/block-editor/insert-after',
+		( event ) => {
+			if ( event.defaultPrevented || ! canInsertDefaultBlock ) return;
+
+			event.preventDefault();
+			onInsertBefore();
+		},
+		{ scope }
+	);
+
 	const removeBlockLabel =
 		count === 1 ? __( 'Delete' ) : __( 'Delete blocks' );
 
@@ -175,203 +257,120 @@ export function BlockSettingsDropdown( {
 		selectedBlockClientIds?.includes( firstParentClientId );
 
 	return (
-		<BlockActions
-			clientIds={ clientIds }
-			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
+		<DropdownMenu
+			icon={ moreVertical }
+			label={ __( 'Options' ) }
+			className="block-editor-block-settings-menu"
+			popoverProps={ POPOVER_PROPS }
+			noIcons
+			menuRef={ scope }
+			{ ...props }
 		>
-			{ ( {
-				canCopyStyles,
-				canDuplicate,
-				canInsertDefaultBlock,
-				canMove,
-				canRemove,
-				onDuplicate,
-				onInsertAfter,
-				onInsertBefore,
-				onRemove,
-				onCopy,
-				onPasteStyles,
-				onMoveTo,
-				blocks,
-			} ) => (
-				<DropdownMenu
-					icon={ moreVertical }
-					label={ __( 'Options' ) }
-					className="block-editor-block-settings-menu"
-					popoverProps={ POPOVER_PROPS }
-					noIcons
-					menuProps={ {
-						/**
-						 * @param {KeyboardEvent} event
-						 */
-						onKeyDown( event ) {
-							if ( event.defaultPrevented ) return;
-
-							if (
-								isMatch( 'core/block-editor/remove', event ) &&
-								canRemove
-							) {
-								event.preventDefault();
-								updateSelectionAfterRemove( onRemove() );
-							} else if (
-								isMatch(
-									'core/block-editor/duplicate',
-									event
-								) &&
-								canDuplicate
-							) {
-								event.preventDefault();
-								updateSelectionAfterDuplicate( onDuplicate() );
-							} else if (
-								isMatch(
-									'core/block-editor/insert-after',
-									event
-								) &&
-								canInsertDefaultBlock
-							) {
-								event.preventDefault();
-								onInsertAfter();
-							} else if (
-								isMatch(
-									'core/block-editor/insert-before',
-									event
-								) &&
-								canInsertDefaultBlock
-							) {
-								event.preventDefault();
-								onInsertBefore();
-							}
-						},
-					} }
-					{ ...props }
-				>
-					{ ( { onClose } ) => (
-						<>
-							<MenuGroup>
-								<__unstableBlockSettingsMenuFirstItem.Slot
-									fillProps={ { onClose } }
-								/>
-								{ ! parentBlockIsSelected &&
-									!! firstParentClientId && (
-										<MenuItem
-											{ ...showParentOutlineGestures }
-											ref={ selectParentButtonRef }
-											icon={
-												<BlockIcon
-													icon={
-														parentBlockType.icon
-													}
-												/>
-											}
-											onClick={ () =>
-												selectBlock(
-													firstParentClientId
-												)
-											}
-										>
-											{ sprintf(
-												/* translators: %s: Name of the block's parent. */
-												__(
-													'Select parent block (%s)'
-												),
-												parentBlockType.title
-											) }
-										</MenuItem>
-									) }
-								{ count === 1 && (
-									<BlockHTMLConvertButton
-										clientId={ firstBlockClientId }
-									/>
-								) }
-								<CopyMenuItem
-									blocks={ blocks }
-									onCopy={ onCopy }
-								/>
-								{ canDuplicate && (
-									<MenuItem
-										onClick={ pipe(
-											onClose,
-											onDuplicate,
-											updateSelectionAfterDuplicate
-										) }
-										shortcut={ shortcuts.duplicate }
-									>
-										{ __( 'Duplicate' ) }
-									</MenuItem>
-								) }
-								{ canInsertDefaultBlock && (
-									<>
-										<MenuItem
-											onClick={ pipe(
-												onClose,
-												onInsertBefore
-											) }
-											shortcut={ shortcuts.insertBefore }
-										>
-											{ __( 'Add before' ) }
-										</MenuItem>
-										<MenuItem
-											onClick={ pipe(
-												onClose,
-												onInsertAfter
-											) }
-											shortcut={ shortcuts.insertAfter }
-										>
-											{ __( 'Add after' ) }
-										</MenuItem>
-									</>
-								) }
-							</MenuGroup>
-							{ canCopyStyles && (
-								<MenuGroup>
-									<CopyMenuItem
-										blocks={ blocks }
-										onCopy={ onCopy }
-										label={ __( 'Copy styles' ) }
-									/>
-									<MenuItem onClick={ onPasteStyles }>
-										{ __( 'Paste styles' ) }
-									</MenuItem>
-								</MenuGroup>
-							) }
-							<BlockSettingsMenuControls.Slot
-								fillProps={ {
-									onClose,
-									canMove,
-									onMoveTo,
-									onlyBlock,
-									count,
-									firstBlockClientId,
-								} }
-								clientIds={ clientIds }
-								__unstableDisplayLocation={
-									__unstableDisplayLocation
+			{ ( { onClose } ) => (
+				<>
+					<MenuGroup>
+						<__unstableBlockSettingsMenuFirstItem.Slot
+							fillProps={ { onClose } }
+						/>
+						{ ! parentBlockIsSelected && !! firstParentClientId && (
+							<MenuItem
+								{ ...showParentOutlineGestures }
+								ref={ selectParentButtonRef }
+								icon={
+									<BlockIcon icon={ parentBlockType.icon } />
 								}
+								onClick={ () =>
+									selectBlock( firstParentClientId )
+								}
+							>
+								{ sprintf(
+									/* translators: %s: Name of the block's parent. */
+									__( 'Select parent block (%s)' ),
+									parentBlockType.title
+								) }
+							</MenuItem>
+						) }
+						{ count === 1 && (
+							<BlockHTMLConvertButton
+								clientId={ firstBlockClientId }
 							/>
-							{ typeof children === 'function'
-								? children( { onClose } )
-								: Children.map( ( child ) =>
-										cloneElement( child, { onClose } )
-								  ) }
-							{ canRemove && (
-								<MenuGroup>
-									<MenuItem
-										onClick={ pipe(
-											onClose,
-											onRemove,
-											updateSelectionAfterRemove
-										) }
-										shortcut={ shortcuts.remove }
-									>
-										{ removeBlockLabel }
-									</MenuItem>
-								</MenuGroup>
-							) }
-						</>
+						) }
+						<CopyMenuItem blocks={ blocks } onCopy={ onCopy } />
+						{ canDuplicate && (
+							<MenuItem
+								onClick={ pipe(
+									onClose,
+									onDuplicate,
+									updateSelectionAfterDuplicate
+								) }
+								shortcut={ shortcuts.duplicate }
+							>
+								{ __( 'Duplicate' ) }
+							</MenuItem>
+						) }
+						{ canInsertDefaultBlock && (
+							<>
+								<MenuItem
+									onClick={ pipe( onClose, onInsertBefore ) }
+									shortcut={ shortcuts.insertBefore }
+								>
+									{ __( 'Add before' ) }
+								</MenuItem>
+								<MenuItem
+									onClick={ pipe( onClose, onInsertAfter ) }
+									shortcut={ shortcuts.insertAfter }
+								>
+									{ __( 'Add after' ) }
+								</MenuItem>
+							</>
+						) }
+					</MenuGroup>
+					{ canCopyStyles && (
+						<MenuGroup>
+							<CopyMenuItem
+								blocks={ blocks }
+								onCopy={ onCopy }
+								label={ __( 'Copy styles' ) }
+							/>
+							<MenuItem onClick={ onPasteStyles }>
+								{ __( 'Paste styles' ) }
+							</MenuItem>
+						</MenuGroup>
 					) }
-				</DropdownMenu>
+					<BlockSettingsMenuControls.Slot
+						fillProps={ {
+							onClose,
+							canMove,
+							onMoveTo,
+							onlyBlock,
+							count,
+							firstBlockClientId,
+						} }
+						clientIds={ clientIds }
+						__unstableDisplayLocation={ __unstableDisplayLocation }
+					/>
+					{ typeof children === 'function'
+						? children( { onClose } )
+						: Children.map( ( child ) =>
+								cloneElement( child, { onClose } )
+						  ) }
+					{ canRemove && (
+						<MenuGroup>
+							<MenuItem
+								onClick={ pipe(
+									onClose,
+									onRemove,
+									updateSelectionAfterRemove
+								) }
+								shortcut={ shortcuts.remove }
+							>
+								{ removeBlockLabel }
+							</MenuItem>
+						</MenuGroup>
+					) }
+				</>
 			) }
-		</BlockActions>
+		</DropdownMenu>
 	);
 }
 
