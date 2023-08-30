@@ -10,6 +10,7 @@ import {
 	post,
 	page,
 	layout,
+	symbol,
 	symbolFilled,
 	styles,
 	navigation,
@@ -224,7 +225,25 @@ function useSiteEditorBasicNavigationCommands() {
 	const isTemplatesAccessible = useIsTemplatesAccessible();
 	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {
-		const result = [];
+		const result = [
+			{
+				name: 'core/edit-site/open-patterns',
+				label: __( 'Patterns' ),
+				icon: symbol,
+				callback: ( { close } ) => {
+					const args = {
+						path: '/patterns',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
+				},
+			},
+		];
 
 		if ( ! isTemplatesAccessible || ! isBlockBasedTheme ) {
 			return result;
