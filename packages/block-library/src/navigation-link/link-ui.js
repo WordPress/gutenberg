@@ -4,6 +4,7 @@
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { Popover, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import {
 	__experimentalLinkControl as LinkControl,
 	BlockIcon,
@@ -138,6 +139,14 @@ export function LinkUI( props ) {
 			title: pageTitle,
 			status: 'draft',
 		} );
+
+		speak(
+			sprintf(
+				/* translators: %s: title of the page that has been created. */
+				__( 'Draft Page "%s" created.' ),
+				pageTitle
+			)
+		);
 
 		return {
 			id: page.id,

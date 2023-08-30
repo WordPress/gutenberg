@@ -220,6 +220,14 @@ function InlineLinkUI( {
 			status: 'draft',
 		} );
 
+		speak(
+			sprintf(
+				/* translators: %s: title of the page that has been created. */
+				__( 'Draft Page "%s" created.' ),
+				pageTitle
+			)
+		);
+
 		return {
 			id: page.id,
 			type: page.type,
