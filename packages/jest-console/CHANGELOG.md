@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancement
+
+- Improved error messages and codes printed on the console ([#53743](https://github.com/WordPress/gutenberg/pull/53743)).
+
+## 7.11.0 (2023-08-16)
+
 ## 7.10.0 (2023-08-10)
 
 ## 7.9.0 (2023-07-20)
