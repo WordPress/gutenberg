@@ -376,10 +376,10 @@ export function updateSettings( settings ) {
 export const setIsListViewOpened =
 	( isOpen ) =>
 	( { dispatch, registry } ) => {
-		const dfmMode = registry
+		const distractionFreeMode = registry
 			.select( preferencesStore )
 			.get( 'core/edit-site', 'distractionFree' );
-		if ( dfmMode && isOpen ) {
+		if ( distractionFreeMode && isOpen ) {
 			dispatch.toggleDistractionFree();
 		}
 		dispatch( {
@@ -542,10 +542,10 @@ export const revertTemplate =
 export const openGeneralSidebar =
 	( name ) =>
 	( { dispatch, registry } ) => {
-		const dfmMode = registry
+		const distractionFreeMode = registry
 			.select( preferencesStore )
 			.get( 'core/edit-site', 'distractionFree' );
-		if ( dfmMode ) {
+		if ( distractionFreeMode ) {
 			dispatch.toggleDistractionFree();
 		}
 		registry
@@ -579,10 +579,10 @@ export const switchEditorMode =
 		if ( mode === 'visual' ) {
 			speak( __( 'Visual editor selected' ), 'assertive' );
 		} else if ( mode === 'text' ) {
-			const dfmMode = registry
+			const distractionFreeMode = registry
 				.select( preferencesStore )
 				.get( 'core/edit-site', 'distractionFree' );
-			if ( dfmMode ) {
+			if ( distractionFreeMode ) {
 				dispatch.toggleDistractionFree();
 			}
 			speak( __( 'Code editor selected' ), 'assertive' );
@@ -616,10 +616,10 @@ export const setHasPageContentFocus =
 export const toggleDistractionFree =
 	() =>
 	( { dispatch, registry } ) => {
-		const dfmMode = registry
+		const distractionFreeMode = registry
 			.select( preferencesStore )
 			.get( 'core/edit-site', 'distractionFree' );
-		if ( ! dfmMode ) {
+		if ( ! distractionFreeMode ) {
 			registry.batch( () => {
 				registry
 					.dispatch( preferencesStore )
@@ -632,11 +632,15 @@ export const toggleDistractionFree =
 		registry.batch( () => {
 			registry
 				.dispatch( preferencesStore )
-				.set( 'core/edit-site', 'distractionFree', ! dfmMode );
+				.set(
+					'core/edit-site',
+					'distractionFree',
+					! distractionFreeMode
+				);
 			registry
 				.dispatch( noticesStore )
 				.createInfoNotice(
-					dfmMode
+					distractionFreeMode
 						? __( 'Distraction free off.' )
 						: __( 'Distraction free on.' ),
 					{
