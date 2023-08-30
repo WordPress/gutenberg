@@ -352,6 +352,9 @@ class WP_Theme_JSON_Gutenberg {
 	const VALID_SETTINGS = array(
 		'appearanceTools'               => null,
 		'useRootPaddingAwareAlignments' => null,
+		'background'                    => array(
+			'backgroundImage' => null,
+		),
 		'border'                        => array(
 			'color'  => null,
 			'radius' => null,
@@ -383,9 +386,6 @@ class WP_Theme_JSON_Gutenberg {
 			'contentSize'  => null,
 			'wideSize'     => null,
 			'allowEditing' => null,
-		),
-		'media'                         => array(
-			'backgroundImage' => null,
 		),
 		'position'                      => array(
 			'fixed'  => null,
@@ -572,6 +572,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
+		array( 'background', 'backgroundImage' ),
 		array( 'border', 'color' ),
 		array( 'border', 'radius' ),
 		array( 'border', 'style' ),
@@ -581,7 +582,6 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'color', 'button' ),
 		array( 'color', 'caption' ),
 		array( 'dimensions', 'minHeight' ),
-		array( 'media', 'backgroundImage' ),
 		// BEGIN EXPERIMENTAL.
 		// Allow `position.fixed` to be opted-in by default.
 		// Sticky position support was backported to WordPress 6.2 in https://core.trac.wordpress.org/ticket/57618.

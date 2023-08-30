@@ -4,7 +4,7 @@
 import border from './border';
 import color from './color';
 import dimensions from './dimensions';
-import media from './media';
+import background from './background';
 import shadow from './shadow';
 import outline from './outline';
 import spacing from './spacing';
@@ -18,5 +18,5 @@ export const styleDefinitions = [
 	...spacing,
 	...typography,
 	...shadow,
-	...media,
+	...background,
 ];

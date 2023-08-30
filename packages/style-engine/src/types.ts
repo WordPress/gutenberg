@@ -21,6 +21,13 @@ export interface BorderIndividualStyles< T extends BoxEdge > {
 }
 
 export interface Style {
+	background?: {
+		backgroundImage: {
+			url?: CSSProperties[ 'backgroundImage' ];
+			source?: string;
+		};
+		backgroundSize?: CSSProperties[ 'backgroundSize' ];
+	};
 	border?: {
 		color?: CSSProperties[ 'borderColor' ];
 		radius?:
@@ -40,13 +47,6 @@ export interface Style {
 	};
 	dimensions?: {
 		minHeight?: CSSProperties[ 'minHeight' ];
-	};
-	media?: {
-		backgroundImage: {
-			url?: CSSProperties[ 'backgroundImage' ];
-			source?: string;
-		};
-		backgroundSize?: CSSProperties[ 'backgroundSize' ];
 	};
 	spacing?: {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;

@@ -29,8 +29,7 @@ import useSetting from '../components/use-setting';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 
-export const BACKGROUND_IMAGE_SUPPORT_KEY = '__experimentalBackgroundImage';
-export const MEDIA_SUPPORT_KEY = 'media';
+export const BACKGROUND_SUPPORT_KEY = 'background';
 export const IMAGE_BACKGROUND_TYPE = 'image';
 
 /**
@@ -42,26 +41,26 @@ export const IMAGE_BACKGROUND_TYPE = 'image';
  */
 export function hasBackgroundImageValue( props ) {
 	const hasValue =
-		!! props.attributes.style?.media?.backgroundImage?.id ||
-		!! props.attributes.style?.media?.backgroundImage?.url;
+		!! props.attributes.style?.background?.backgroundImage?.id ||
+		!! props.attributes.style?.background?.backgroundImage?.url;
 
 	return hasValue;
 }
 
 /**
- * Determine whether there is block support for background image.
+ * Determine whether there is block support for background.
  *
  * @param {string} blockName Block name.
  * @param {string} feature   Background image feature to check for.
  *
  * @return {boolean} Whether there is support.
  */
-export function hasMediaSupport( blockName, feature = 'any' ) {
+export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	if ( Platform.OS !== 'web' ) {
 		return false;
 	}
 
-	const support = getBlockSupport( blockName, MEDIA_SUPPORT_KEY );
+	const support = getBlockSupport( blockName, BACKGROUND_SUPPORT_KEY );
 
 	if ( support === true ) {
 		return true;
@@ -71,8 +70,8 @@ export function hasMediaSupport( blockName, feature = 'any' ) {
 }
 
 /**
- * Resets the position block support attributes. This can be used when disabling
- * the position support controls for a block via a `ToolsPanel`.
+ * Resets the background image block support attributes. This can be used when disabling
+ * the background image controls for a block via a `ToolsPanel`.
  *
  * @param {Object} props               Block props.
  * @param {Object} props.attributes    Block's attributes.
@@ -84,8 +83,8 @@ export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
 	setAttributes( {
 		style: cleanEmptyObject( {
 			...style,
-			media: {
-				...style?.media,
+			background: {
+				...style?.background,
 				backgroundImage: undefined,
 			},
 		} ),
@@ -101,7 +100,7 @@ function InspectorImagePreview( { url: imgUrl } ) {
 				<FlexItem as="span">
 					<Truncate
 						numberOfLines={ 1 }
-						className="block-editor-hooks__media__inspector-media-replace-title"
+						className="block-editor-hooks__background__inspector-media-replace-title"
 					>
 						{ imgLabel }
 					</Truncate>
@@ -114,7 +113,7 @@ function InspectorImagePreview( { url: imgUrl } ) {
 function BackgroundImagePanelItem( props ) {
 	const { attributes, clientId, setAttributes } = props;
 
-	const { id, url } = attributes.style?.media?.backgroundImage || {};
+	const { id, url } = attributes.style?.background?.backgroundImage || {};
 
 	const { mediaUpload } = useSelect( ( select ) => {
 		return {
@@ -131,8 +130,8 @@ function BackgroundImagePanelItem( props ) {
 		if ( ! media || ! media.url ) {
 			const newStyle = {
 				...attributes.style,
-				media: {
-					...attributes.style?.media,
+				background: {
+					...attributes.style?.background,
 					backgroundImage: undefined,
 				},
 			};
@@ -166,8 +165,8 @@ function BackgroundImagePanelItem( props ) {
 
 		const newStyle = {
 			...attributes.style,
-			media: {
-				...attributes.style?.media,
+			background: {
+				...attributes.style?.background,
 				backgroundImage: {
 					url: media.url,
 					id: media.id,
@@ -202,7 +201,7 @@ function BackgroundImagePanelItem( props ) {
 			...previousValue,
 			style: {
 				...previousValue.style,
-				media: undefined,
+				background: undefined,
 			},
 		};
 	}, [] );
@@ -217,7 +216,7 @@ function BackgroundImagePanelItem( props ) {
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
 		>
-			<div className="block-editor-hooks__media__inspector-media-replace-container">
+			<div className="block-editor-hooks__background__inspector-media-replace-container">
 				{ !! url && (
 					<MediaReplaceFlow
 						mediaId={ id }
@@ -235,7 +234,7 @@ function BackgroundImagePanelItem( props ) {
 							onSelect={ onSelectMedia }
 							allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
 							render={ ( { open } ) => (
-								<div className="block-editor-hooks__media____inspector-upload-container">
+								<div className="block-editor-hooks__background____inspector-upload-container">
 									<Button
 										onClick={ open }
 										variant="secondary"
@@ -253,10 +252,10 @@ function BackgroundImagePanelItem( props ) {
 	);
 }
 
-export function MediaPanel( props ) {
+export function BackgroundPanel( props ) {
 	const isBackgroundImageSupported =
-		useSetting( 'media.backgroundImage' ) &&
-		hasMediaSupport( props.name, 'backgroundImage' );
+		useSetting( 'background.backgroundImage' ) &&
+		hasBackgroundSupport( props.name, 'backgroundImage' );
 
 	const isDisabled = [ ! isBackgroundImageSupported ].every( Boolean );
 
@@ -265,7 +264,7 @@ export function MediaPanel( props ) {
 	}
 
 	return (
-		<InspectorControls group="media">
+		<InspectorControls group="background">
 			{ isBackgroundImageSupported && (
 				<BackgroundImagePanelItem { ...props } />
 			) }

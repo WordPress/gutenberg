@@ -301,8 +301,8 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					/>
 					<InspectorControls.Slot group="styles" />
 					<InspectorControls.Slot
-						group="media"
-						label={ __( 'Media' ) }
+						group="background"
+						label={ __( 'Background' ) }
 					/>
 					<PositionControls />
 					<div>

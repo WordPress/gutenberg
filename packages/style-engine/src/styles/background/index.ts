@@ -7,8 +7,8 @@ import { safeDecodeURI } from '../utils';
 const backgroundImage = {
 	name: 'backgroundImage',
 	generate: ( style: Style, options: StyleOptions ) => {
-		const _backgroundImage = style?.media?.backgroundImage;
-		const _backgroundSize = style?.media?.backgroundSize;
+		const _backgroundImage = style?.background?.backgroundImage;
+		const _backgroundSize = style?.background?.backgroundSize;
 
 		const styleRules: GeneratedCSSRule[] = [];
 

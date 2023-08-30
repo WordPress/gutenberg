@@ -496,7 +496,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 			'inline_background_image_url_with_background_size' => array(
 				'block_styles'    => array(
-					'media' => array(
+					'background' => array(
 						'backgroundImage' => array(
 							'url' => 'http://example.com/image.jpg',
 						),

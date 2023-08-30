@@ -41,6 +41,21 @@ final class WP_Style_Engine {
 	 * @var array
 	 */
 	const BLOCK_STYLE_DEFINITIONS_METADATA = array(
+		'background' => array(
+			'backgroundImage' => array(
+				'property_keys' => array(
+					'default' => 'background-image',
+				),
+				'value_func'    => array( self::class, 'get_url_or_value_css_declaration' ),
+				'path'          => array( 'background', 'backgroundImage' ),
+			),
+			'backgroundSize'  => array(
+				'property_keys' => array(
+					'default' => 'background-size',
+				),
+				'path'          => array( 'background', 'backgroundSize' ),
+			),
+		),
 		'color'      => array(
 			'text'       => array(
 				'property_keys' => array(
@@ -164,21 +179,6 @@ final class WP_Style_Engine {
 				'css_vars'      => array(
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
-			),
-		),
-		'media'      => array(
-			'backgroundImage' => array(
-				'property_keys' => array(
-					'default' => 'background-image',
-				),
-				'value_func'    => array( self::class, 'get_url_or_value_css_declaration' ),
-				'path'          => array( 'media', 'backgroundImage' ),
-			),
-			'backgroundSize'  => array(
-				'property_keys' => array(
-					'default' => 'background-size',
-				),
-				'path'          => array( 'media', 'backgroundSize' ),
 			),
 		),
 		'spacing'    => array(
