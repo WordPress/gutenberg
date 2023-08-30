@@ -239,14 +239,15 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
-	const metadata = isObject( blockNameOrMetadata )
-		? getBlockSettingsFromMetadata( blockNameOrMetadata )
-		: getBlockSettingsFromMetadata( settings );
-
 	const { addBootstrappedBlockType, addUnprocessedBlockType } = unlock(
 		dispatch( blocksStore )
 	);
-	addBootstrappedBlockType( name, metadata );
+
+	if ( isObject( blockNameOrMetadata ) ) {
+		const metadata = getBlockSettingsFromMetadata( blockNameOrMetadata );
+		addBootstrappedBlockType( name, metadata );
+	}
+
 	addUnprocessedBlockType( name, settings );
 
 	return select( blocksStore ).getBlockType( name );
