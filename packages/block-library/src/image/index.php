@@ -73,7 +73,7 @@ function render_block_core_image( $attributes, $content, $block ) {
  * @param  array  $block         Block object.
  * @return string                Filtered block content.
  */
-function gutenberg_render_lightbox( $block_content, $block ) {
+function block_core_image_render_lightbox( $block_content, $block ) {
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 	// Get the lightbox setting from the block attributes.
 
@@ -260,7 +260,7 @@ HTML;
 
 // Use priority 15 to run this hook after other hooks/plugins.
 // They could use the `render_block_{$this->name}` filter to modify the markup.
-add_filter( 'render_block_core/image', 'gutenberg_render_lightbox', 15, 2 );
+add_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15, 2 );
 
 	/**
 	 * Registers the `core/image` block on server.
