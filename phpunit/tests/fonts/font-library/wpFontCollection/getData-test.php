@@ -35,10 +35,10 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 		return array(
 			'with a src' => array(
 				'config'        => array(
-					'id'             => 'my-collection',
-					'name'           => 'My Collection',
-					'description'    => 'My collection description',
-					'src' => $mock_file,
+					'id'          => 'my-collection',
+					'name'        => 'My Collection',
+					'description' => 'My collection description',
+					'src'         => $mock_file,
 				),
 				'expected_data' => array(
 					'id'          => 'my-collection',
