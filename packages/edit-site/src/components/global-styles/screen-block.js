@@ -66,6 +66,7 @@ const {
 	useHasColorPanel,
 	useHasEffectsPanel,
 	useHasFiltersPanel,
+	useHasImageSettingsPanel,
 	useGlobalStyle,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
@@ -73,6 +74,7 @@ const {
 	DimensionsPanel: StylesDimensionsPanel,
 	EffectsPanel: StylesEffectsPanel,
 	FiltersPanel: StylesFiltersPanel,
+	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
 } = unlock( blockEditorPrivateApis );
 
@@ -99,6 +101,7 @@ function ScreenBlock( { name, variation } ) {
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
+	const hasImageSettingsPanel = useHasImageSettingsPanel( name );
 	const hasVariationsPanel = !! blockVariations?.length && ! variation;
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -143,6 +146,14 @@ function ScreenBlock( { name, variation } ) {
 				layout: newStyle.layout,
 			} );
 		}
+	};
+	const onChangeLightbox = ( newSetting ) => {
+		setSettings( {
+			...rawSettings,
+			lightbox: {
+				enabled: newSetting,
+			},
+		} );
 	};
 	const onChangeBorders = ( newStyle ) => {
 		if ( ! newStyle?.border ) {
@@ -251,6 +262,14 @@ function ScreenBlock( { name, variation } ) {
 					includeLayoutControls
 				/>
 			) }
+			{ hasImageSettingsPanel && (
+				<ImageSettingsPanel
+					name={ name }
+					onChange={ onChangeLightbox }
+					settings={ settings }
+				/>
+			) }
+
 			{ canEditCSS && (
 				<PanelBody title={ __( 'Advanced' ) } initialOpen={ false }>
 					<p>
