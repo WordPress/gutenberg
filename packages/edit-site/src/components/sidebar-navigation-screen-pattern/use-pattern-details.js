@@ -46,11 +46,18 @@ export default function usePatternDetails( postType, postId ) {
 	let description = getDescription();
 
 	if ( ! description && addedBy.text ) {
-		description = sprintf(
-			// translators: %s: pattern title e.g: "Header".
-			__( 'This is the %s pattern.' ),
-			getTitle()
-		);
+		description =
+			postType === 'wp_block'
+				? sprintf(
+						// translators: %s: pattern title e.g: "Header".
+						__( 'This is the %s pattern.' ),
+						getTitle()
+				  )
+				: sprintf(
+						// translators: %s: template part title e.g: "Header".
+						__( 'This is the %s template part.' ),
+						getTitle()
+				  );
 	}
 
 	if ( ! description && postType === 'wp_block' && record?.title ) {
