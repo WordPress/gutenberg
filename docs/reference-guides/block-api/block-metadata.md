@@ -609,7 +609,7 @@ An example implementation of the `render.php` file defined with `render` could l
 </div>
 ```
 
-_Note: This file loads for every instance of the block type when rendering a single page. Accounting for that is essential when declaring functions or classes in the file. The simplest way to avoid the risk of errors is to consume that shared logic from another file._
+_Note: This file loads for every instance of the block type when rendering the page HTML on the server. Accounting for that is essential when declaring functions or classes in the file. The simplest way to avoid the risk of errors is to consume that shared logic from another file._
 
 ## Assets
 
