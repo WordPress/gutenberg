@@ -6,4 +6,11 @@
 	.components-toggle-control .components-h-stack {
 		flex-direction: row-reverse;
 	}
+
+	/**
+	 * Un-reverse the flex direction for the toggle's label.
+	 */
+	.components-toggle-control .components-h-stack .components-h-stack {
+		flex-direction: row;
+	}
 }

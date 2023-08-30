@@ -4,7 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
 import { Fragment } from '@wordpress/element';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -174,12 +178,12 @@ function AutoInsertingBlocksControl( props ) {
 											checked={ checked }
 											key={ block.title }
 											label={
-												<>
+												<HStack justify="flex-start">
 													<BlockIcon
 														icon={ block.icon }
 													/>
-													{ block.title }
-												</>
+													<span>{ block.title }</span>
+												</HStack>
 											}
 											onChange={ () => {
 												if ( ! checked ) {
