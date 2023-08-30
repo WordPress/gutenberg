@@ -68,7 +68,7 @@ test.describe( 'RichText', () => {
 		] );
 	} );
 
-	test( 'should apply multiple formats when selection is collapse', async ( {
+	test( 'should apply multiple formats when selection is collapsed', async ( {
 		page,
 		editor,
 		pageUtils,
