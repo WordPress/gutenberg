@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
-import { Fragment } from '@wordpress/element';
+import { Fragment, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	PanelBody,
@@ -19,30 +19,27 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { BlockIcon, InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
-const emptyObject = {};
+const EMPTY_OBJECT = {};
 
 function AutoInsertingBlocksControl( props ) {
-	const blockTypes = useSelect( ( select ) =>
-		select( blocksStore ).getBlockTypes()
+	const blockTypes = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
 	);
 
-	const autoInsertedBlocksForCurrentBlock = blockTypes?.filter(
-		( { autoInsert } ) => autoInsert && props.blockName in autoInsert
+	const autoInsertedBlocksForCurrentBlock = useMemo(
+		() =>
+			blockTypes?.filter(
+				( { autoInsert } ) =>
+					autoInsert && props.blockName in autoInsert
+			),
+		[ blockTypes, props.blockName ]
 	);
 
-	const {
-		autoInsertedBlockClientIds,
-		blockIndex,
-		rootClientId,
-		innerBlocksLength,
-	} = useSelect(
+	const autoInsertedBlockClientIds = useSelect(
 		( select ) => {
-			const {
-				getBlock,
-				getBlockIndex,
-				getBlockRootClientId,
-				getGlobalBlockCount,
-			} = select( blockEditorStore );
+			const { getBlock, getGlobalBlockCount, getBlockRootClientId } =
+				select( blockEditorStore );
 
 			const _rootClientId = getBlockRootClientId( props.clientId );
 
@@ -96,18 +93,33 @@ function AutoInsertingBlocksControl( props ) {
 
 						return clientIds;
 					},
-					emptyObject // Retain reference equality across renders if there are no auto-inserted blocks.
+					{}
 				);
+
+			if ( Object.values( _autoInsertedBlockClientIds ).length > 0 ) {
+				return _autoInsertedBlockClientIds;
+			}
+
+			return EMPTY_OBJECT;
+		},
+		[ autoInsertedBlocksForCurrentBlock, props.blockName, props.clientId ]
+	);
+
+	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
+		( select ) => {
+			const { getBlock, getBlockIndex, getBlockRootClientId } =
+				select( blockEditorStore );
+
+			const _rootClientId = getBlockRootClientId( props.clientId );
 
 			return {
 				blockIndex: getBlockIndex( props.clientId ),
 				innerBlocksLength: getBlock( props.clientId )?.innerBlocks
 					?.length,
 				rootClientId: _rootClientId,
-				autoInsertedBlockClientIds: _autoInsertedBlockClientIds,
 			};
 		},
-		[ autoInsertedBlocksForCurrentBlock, props.blockName, props.clientId ]
+		[ props.clientId ]
 	);
 
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
