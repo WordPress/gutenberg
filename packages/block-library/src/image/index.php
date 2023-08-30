@@ -35,9 +35,8 @@ function render_block_core_image( $attributes, $content, $block ) {
 	$link_destination        = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 
 	// Get the lightbox setting from the block attributes.
-	// TODO: This must be changed to use the new Lightbox UI.
-	if ( isset( $attributes['behaviors']['lightbox'] ) ) {
-		$lightbox_settings = $attributes['behaviors']['lightbox'];
+	if ( isset( $attributes['lightbox'] ) ) {
+		$lightbox_settings = $attributes['lightbox'];
 	}
 
 	// If the lightbox is enabled, the image is not linked, and the Interactivity API is enabled, load the view script.
@@ -77,9 +76,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 	// Get the lightbox setting from the block attributes.
 
-	// TODO: This must be changed to use the new Lightbox UI.
-	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
-		$lightbox_settings = $block['attrs']['behaviors']['lightbox'];
+	if ( isset( $block['attrs']['lightbox'] ) ) {
+		$lightbox_settings = $block['attrs']['lightbox'];
 	}
 
 	if ( ! isset( $lightbox_settings ) || 'none' !== $link_destination ) {
