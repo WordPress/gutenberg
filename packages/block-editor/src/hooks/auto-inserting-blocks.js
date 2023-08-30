@@ -19,6 +19,8 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { BlockIcon, InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
+const emptyObject = {};
+
 function AutoInsertingBlocksControl( props ) {
 	const blockTypes = useSelect( ( select ) =>
 		select( blocksStore ).getBlockTypes()
@@ -77,18 +79,24 @@ function AutoInsertingBlocksControl( props ) {
 						);
 
 						if ( autoInsertedBlock ) {
-							clientIds[ block.name ] =
-								autoInsertedBlock.clientId;
+							clientIds = {
+								...clientIds,
+								[ block.name ]: autoInsertedBlock.clientId,
+							};
 						} else if ( getGlobalBlockCount( block.name ) > 0 ) {
 							// If no auto-inserted block was found in any of its designated locations,
 							// but it exists elsewhere in the block tree, we consider it manually inserted.
-							// In this case, we remove the corresponding toggle from the block inspector panel.
-							clientIds[ block.name ] = false;
+							// In this case, we take note and will remove the corresponding toggle from the
+							// block inspector panel.
+							clientIds = {
+								...clientIds,
+								[ block.name ]: false,
+							};
 						}
 
 						return clientIds;
 					},
-					{}
+					emptyObject // Retain reference equality across renders if there are no auto-inserted blocks.
 				);
 
 			return {
