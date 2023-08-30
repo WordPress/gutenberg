@@ -35,12 +35,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 		editor,
 		insertingBlocksUtils,
-	}, testInfo ) => {
-		testInfo.fixme(
-			testInfo.project.name === 'firefox',
-			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
-		);
-
+	} ) => {
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
 		await editor.insertBlock( {
@@ -171,12 +166,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 		editor,
 		insertingBlocksUtils,
-	}, testInfo ) => {
-		testInfo.fixme(
-			testInfo.project.name === 'firefox',
-			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
-		);
-
+	} ) => {
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
 		await editor.insertBlock( {
