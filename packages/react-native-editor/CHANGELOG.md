@@ -15,6 +15,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Improve horizontal rule styles to avoid invisible lines [#53883]
 -   [*] Fix horizontal rule style extensions [#53917]
 -   [*] Add block outline to all Social Link blocks when selected [#54011]
+-   [*] Columns block - Fix transforming into a Group block crash [#54035]
 
 ## 1.102.1
 - [**] Fix Voice Over and assistive keyboards [#53895]
