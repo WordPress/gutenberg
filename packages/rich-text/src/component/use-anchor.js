@@ -28,7 +28,8 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 	// otherwise you may be matching an element further away.
 	if (
 		element.nodeType === element.TEXT_NODE &&
-		range.startOffset === element.length
+		range.startOffset === element.length &&
+		element.nextSibling
 	) {
 		element = element.nextSibling;
 
