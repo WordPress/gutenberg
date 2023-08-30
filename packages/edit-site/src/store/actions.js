@@ -376,10 +376,10 @@ export function updateSettings( settings ) {
 export const setIsListViewOpened =
 	( isOpen ) =>
 	( { dispatch, registry } ) => {
-		const distractionFreeMode = registry
+		const isDistractionFree = registry
 			.select( preferencesStore )
 			.get( 'core/edit-site', 'distractionFree' );
-		if ( distractionFreeMode && isOpen ) {
+		if ( isDistractionFree && isOpen ) {
 			dispatch.toggleDistractionFree();
 		}
 		dispatch( {
@@ -542,10 +542,10 @@ export const revertTemplate =
 export const openGeneralSidebar =
 	( name ) =>
 	( { dispatch, registry } ) => {
-		const distractionFreeMode = registry
+		const isDistractionFree = registry
 			.select( preferencesStore )
 			.get( 'core/edit-site', 'distractionFree' );
-		if ( distractionFreeMode ) {
+		if ( isDistractionFree ) {
 			dispatch.toggleDistractionFree();
 		}
 		registry
@@ -579,10 +579,10 @@ export const switchEditorMode =
 		if ( mode === 'visual' ) {
 			speak( __( 'Visual editor selected' ), 'assertive' );
 		} else if ( mode === 'text' ) {
-			const distractionFreeMode = registry
+			const isDistractionFree = registry
 				.select( preferencesStore )
 				.get( 'core/edit-site', 'distractionFree' );
-			if ( distractionFreeMode ) {
+			if ( isDistractionFree ) {
 				dispatch.toggleDistractionFree();
 			}
 			speak( __( 'Code editor selected' ), 'assertive' );
@@ -609,17 +609,17 @@ export const setHasPageContentFocus =
 	};
 
 /**
- * Action that toggles distraction free mode.
- * DFM expects there are no sidebars, as due to the
+ * Action that toggles Distraction free mode.
+ * Distraction free mode expects there are no sidebars, as due to the
  * z-index values set, you can't close sidebars.
  */
 export const toggleDistractionFree =
 	() =>
 	( { dispatch, registry } ) => {
-		const distractionFreeMode = registry
+		const isDistractionFree = registry
 			.select( preferencesStore )
 			.get( 'core/edit-site', 'distractionFree' );
-		if ( ! distractionFreeMode ) {
+		if ( ! isDistractionFree ) {
 			registry.batch( () => {
 				registry
 					.dispatch( preferencesStore )
@@ -635,12 +635,12 @@ export const toggleDistractionFree =
 				.set(
 					'core/edit-site',
 					'distractionFree',
-					! distractionFreeMode
+					! isDistractionFree
 				);
 			registry
 				.dispatch( noticesStore )
 				.createInfoNotice(
-					distractionFreeMode
+					isDistractionFree
 						? __( 'Distraction free off.' )
 						: __( 'Distraction free on.' ),
 					{

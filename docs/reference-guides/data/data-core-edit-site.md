@@ -410,7 +410,7 @@ Undocumented declaration.
 
 ### toggleDistractionFree
 
-Action that toggles distraction free mode. DFM expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
 ### toggleFeature
 
