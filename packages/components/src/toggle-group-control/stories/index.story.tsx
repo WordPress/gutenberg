@@ -36,7 +36,6 @@ const meta: Meta< typeof ToggleGroupControl > = {
 		help: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
 		value: { control: { type: null } },
-		defaultValue: { control: { type: null } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -62,7 +61,7 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 					onChange?.( ...changeArgs );
 				} }
 				value={ value }
-			/>{ ' ' }
+			/>
 			<Button onClick={ () => setValue( undefined ) } variant="tertiary">
 				Reset
 			</Button>
@@ -152,9 +151,7 @@ Deselectable.args = {
 };
 
 // TODO: remove before merging
-export const DoubleToggles: StoryFn<
-	typeof ToggleGroupControl
-> = () => {
+export const DoubleToggles: StoryFn< typeof ToggleGroupControl > = () => {
 	const aligns = [ 'Left', 'Center', 'Right' ];
 	const quantities = [ 'One', 'Two', 'Three', 'Four' ];
 
@@ -251,9 +248,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 	);
 };
 
-export const RenderViaSlot: StoryFn<
-	typeof ToggleGroupControl
-> = () => {
+export const RenderViaSlot: StoryFn< typeof ToggleGroupControl > = () => {
 	const [ alignState, setAlignState ] = useState< string | undefined >();
 	const aligns = [ 'Left', 'Center', 'Right' ];
 

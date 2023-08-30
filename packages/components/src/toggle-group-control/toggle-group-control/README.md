@@ -20,7 +20,7 @@ import {
 
 function Example() {
 	return (
-		<ToggleGroupControl label="my label" defaultValue={ orientation } isBlock>
+		<ToggleGroupControl label="my label" value={ orientation } isBlock>
 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
 			<ToggleGroupControlOption value="vertical" label="Vertical" />
 		</ToggleGroupControl>
@@ -76,12 +76,6 @@ Callback when a segment is selected.
 
 -   Required: No
 -   Default: `() => {}`
-
-### `defaultValue`: `string | number`
-
-The initial value to be used when in uncontrolled mode.
-
--   Required: No
 
 ### `value`: `string | number`
 

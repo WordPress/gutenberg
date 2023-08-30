@@ -17,7 +17,7 @@ import { forwardRef, useMemo } from '@wordpress/element';
 import { View } from '../../view';
 import type { WordPressComponentProps } from '../../ui/context';
 import ToggleGroupControlContext from '../context';
-import { useAdjustUndefinedValue } from './utils';
+import { useComputeControlledOrUncontrolledValue } from './utils';
 import type {
 	ToggleGroupControlMainControlProps,
 	ToggleGroupControlContextProps,
@@ -31,7 +31,6 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		onChange: onChangeProp,
 		size,
 		value: valueProp,
-		defaultValue: defaultValueProp,
 		id: idProp,
 		...otherProps
 	}: WordPressComponentProps<
@@ -47,22 +46,24 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 	).toString();
 	const baseId = idProp || generatedId;
 
-	// Use a heuristic to understand if an `undefined` value should be intended as
-	// "no value" for controlled mode, or that the component is being used in
-	// an uncontrolled way.
-	const adjustedValueProp = useAdjustUndefinedValue( valueProp );
+	// Use a heuristic to understand if the component is being used in controlled
+	// or uncontrolled mode, and consequently:
+	// - when controlled, convert `undefined` values to `''` (ie. "no value")
+	// - use the `value` prop as the `defaultValue` when uncontrolled
+	const { value, defaultValue } =
+		useComputeControlledOrUncontrolledValue( valueProp );
 
 	// `useRadioStore`'s `setValue` prop can be called with `null`, while
 	// the component's `onChange` prop only expects `undefined`
 	const wrappedOnChangeProp = onChangeProp
-		? ( value: string | number | null ) => {
-				onChangeProp( value ?? undefined );
+		? ( v: string | number | null ) => {
+				onChangeProp( v ?? undefined );
 		  }
 		: undefined;
 
 	const radio = useRadioStore( {
-		defaultValue: defaultValueProp,
-		value: adjustedValueProp,
+		defaultValue,
+		value,
 		setValue: wrappedOnChangeProp,
 	} );
 

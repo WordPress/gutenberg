@@ -111,10 +111,6 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	value?: string | number;
 	/**
-	 * The initial value to be used when in uncontrolled mode.
-	 */
-	defaultValue?: string | number;
-	/**
 	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
 	 * `ToggleGroupControlOptionIcon` components.
 	 */
@@ -144,5 +140,4 @@ export type ToggleGroupControlMainControlProps = Pick<
 	| 'size'
 	| 'onChange'
 	| 'value'
-	| 'defaultValue'
 >;

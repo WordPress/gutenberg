@@ -26,11 +26,11 @@ function getWrappingPopoverElement( element: HTMLElement ) {
 }
 
 const ControlledToggleGroupControl = ( {
-	defaultValue,
+	value: valueProp,
 	onChange,
 	...props
 }: ToggleGroupControlProps ) => {
-	const [ value, setValue ] = useState( defaultValue );
+	const [ value, setValue ] = useState( valueProp );
 
 	return (
 		<>
@@ -88,7 +88,7 @@ describe.each( [
 		it( 'with icons', () => {
 			const { container } = render(
 				<Component
-					defaultValue="uppercase"
+					value="uppercase"
 					label="Test Toggle Group Control"
 				>
 					<ToggleGroupControlOptionIcon
@@ -113,7 +113,7 @@ describe.each( [
 
 		render(
 			<Component
-				defaultValue="jack"
+				value="jack"
 				onChange={ mockOnChange }
 				label="Test Toggle Group Control"
 			>
@@ -212,7 +212,7 @@ describe.each( [
 
 				render(
 					<Component
-						defaultValue="rigas"
+						value="rigas"
 						label="Test"
 						onChange={ mockOnChange }
 					>
@@ -232,7 +232,7 @@ describe.each( [
 				const user = userEvent.setup();
 
 				render(
-					<Component defaultValue="rigas" label="Test">
+					<Component value="rigas" label="Test">
 						{ options }
 					</Component>
 				);
@@ -262,7 +262,7 @@ describe.each( [
 
 				render(
 					<Component
-						defaultValue="rigas"
+						value="rigas"
 						label="Test"
 						onChange={ mockOnChange }
 						isDeselectable
@@ -294,7 +294,7 @@ describe.each( [
 				const user = userEvent.setup();
 
 				render(
-					<Component isDeselectable defaultValue="rigas" label="Test">
+					<Component isDeselectable value="rigas" label="Test">
 						{ options }
 					</Component>
 				);

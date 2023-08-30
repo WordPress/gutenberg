@@ -1,12 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { usePrevious } from '@wordpress/compose';
 import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { ToggleGroupControlProps } from '../types';
+
+type ValueProp = ToggleGroupControlProps[ 'value' ];
 
 /**
  * Used to determine, via an internal heuristics, whether an `undefined` value
@@ -15,21 +18,33 @@ import type { ToggleGroupControlProps } from '../types';
  *
  * @param valueProp The received `value`
  */
-export function useAdjustUndefinedValue(
-	valueProp: ToggleGroupControlProps[ 'value' ]
-): ToggleGroupControlProps[ 'value' ] {
-	const hasEverBeenUsedInControlledMode = useRef(
-		typeof valueProp !== 'undefined'
-	);
+export function useComputeControlledOrUncontrolledValue(
+	valueProp: ValueProp
+): { value: ValueProp; defaultValue: ValueProp } {
+	const hasEverBeenUsedInControlledMode = useRef( false );
+	const previousValueProp = usePrevious( valueProp );
 
 	useEffect( () => {
 		if ( ! hasEverBeenUsedInControlledMode.current ) {
+			// Assume the component is being used in controlled mode if:
+			// - the `value` prop is not `undefined`
+			// - the `value` prop was not previously `undefined` and was given a new value
 			hasEverBeenUsedInControlledMode.current =
-				typeof valueProp !== 'undefined';
+				valueProp !== undefined &&
+				previousValueProp !== undefined &&
+				valueProp !== previousValueProp;
 		}
-	}, [ valueProp ] );
+	}, [ valueProp, previousValueProp ] );
 
-	return valueProp === undefined && hasEverBeenUsedInControlledMode.current
-		? ''
-		: valueProp;
+	let value, defaultValue;
+
+	if ( hasEverBeenUsedInControlledMode.current ) {
+		// When in controlled mode, use `''` instead of `undefined`
+		value = valueProp ?? '';
+	} else {
+		// When in uncontrolled mode, the `value` should be intended as the initial value
+		defaultValue = valueProp;
+	}
+
+	return { value, defaultValue };
 }
