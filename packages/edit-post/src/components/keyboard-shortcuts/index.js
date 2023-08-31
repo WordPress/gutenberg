@@ -225,8 +225,9 @@ function KeyboardShortcuts() {
 	} );
 
 	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
-	useShortcut( 'core/edit-post/toggle-list-view', () => {
+	useShortcut( 'core/edit-post/toggle-list-view', ( event ) => {
 		if ( ! isListViewOpened() ) {
+			event.preventDefault();
 			setIsListViewOpened( true );
 		}
 	} );
