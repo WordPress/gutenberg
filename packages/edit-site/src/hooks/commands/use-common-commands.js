@@ -10,7 +10,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -31,16 +30,7 @@ function useGlobalStylesOpenStylesCommands() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
-	const { set } = useDispatch( preferencesStore );
-	const { createInfoNotice } = useDispatch( noticesStore );
-
 	const history = useHistory();
-	const isDistractionFree = useSelect( ( select ) => {
-		return select( preferencesStore ).get(
-			editSiteStore.name,
-			'distractionFree'
-		);
-	}, [] );
 
 	const isBlockBasedTheme = useSelect( ( select ) => {
 		return select( coreStore ).getCurrentTheme().is_block_theme;
@@ -66,15 +56,6 @@ function useGlobalStylesOpenStylesCommands() {
 					if ( isEditorPage && getCanvasMode() !== 'edit' ) {
 						setCanvasMode( 'edit' );
 					}
-					if ( isDistractionFree ) {
-						set( editSiteStore.name, 'distractionFree', false );
-						createInfoNotice(
-							__( 'Distraction free mode turned off.' ),
-							{
-								type: 'snackbar',
-							}
-						);
-					}
 					openGeneralSidebar( 'edit-site/global-styles' );
 				},
 				icon: styles,
@@ -85,11 +66,8 @@ function useGlobalStylesOpenStylesCommands() {
 		openGeneralSidebar,
 		setCanvasMode,
 		isEditorPage,
-		createInfoNotice,
 		getCanvasMode,
-		isDistractionFree,
 		isBlockBasedTheme,
-		set,
 	] );
 
 	return {

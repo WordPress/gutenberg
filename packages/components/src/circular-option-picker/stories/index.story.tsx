@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
@@ -9,16 +9,28 @@ import { useState, createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { default as CircularOptionPicker } from '..';
+import {
+	ButtonAction,
+	default as CircularOptionPicker,
+	DropdownLinkAction,
+} from '..';
 
 const CircularOptionPickerStoryContext = createContext< {
 	currentColor?: string;
 	setCurrentColor?: ( v: string | undefined ) => void;
 } >( {} );
 
-const meta: ComponentMeta< typeof CircularOptionPicker > = {
+const meta: Meta< typeof CircularOptionPicker > = {
 	title: 'Components/CircularOptionPicker',
 	component: CircularOptionPicker,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'CircularOptionPicker.Option': Option,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'CircularOptionPicker.ButtonAction': ButtonAction,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'CircularOptionPicker.DropdownLinkAction': DropdownLinkAction,
+	},
 	argTypes: {
 		actions: { control: { type: null } },
 		options: { control: { type: null } },
@@ -95,7 +107,7 @@ const DefaultActions = () => {
 	);
 };
 
-const Template: ComponentStory< typeof CircularOptionPicker > = ( props ) => (
+const Template: StoryFn< typeof CircularOptionPicker > = ( props ) => (
 	<CircularOptionPicker { ...props } />
 );
 

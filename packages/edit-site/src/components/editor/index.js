@@ -40,7 +40,7 @@ import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import useTitle from '../routes/use-title';
-import CanvasSpinner from '../canvas-spinner';
+import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
@@ -180,7 +180,7 @@ export default function Editor( { isLoading } ) {
 	useTitle( hasLoadedPost && title );
 
 	const loadingProgressId = useInstanceId(
-		CanvasSpinner,
+		CanvasLoader,
 		'edit-site-editor__loading-progress'
 	);
 
@@ -193,7 +193,7 @@ export default function Editor( { isLoading } ) {
 
 	return (
 		<>
-			{ isLoading ? <CanvasSpinner id={ loadingProgressId } /> : null }
+			{ isLoading ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			<EntityProvider kind="root" type="site">
 				<EntityProvider

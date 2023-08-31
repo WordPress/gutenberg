@@ -401,17 +401,17 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__setting {
-	margin-bottom: $grid-unit-20;
+	margin-bottom: 0;
 	flex: 1;
 	padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-30;
+
+	.components-base-control__field {
+		display: flex; // don't allow label to wrap under checkbox.
+	}
 
 	// Cancel left margin inherited from WP Admin Forms CSS.
 	input {
 		margin-left: 0;
-	}
-
-	&.block-editor-link-control__setting:last-child {
-		margin-bottom: 0;
 	}
 
 	.is-preview & {

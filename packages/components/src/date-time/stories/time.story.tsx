@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState, useEffect } from '@wordpress/element';
  */
 import TimePicker from '../time';
 
-const meta: ComponentMeta< typeof TimePicker > = {
+const meta: Meta< typeof TimePicker > = {
 	title: 'Components/TimePicker',
 	component: TimePicker,
 	argTypes: {
@@ -27,7 +27,7 @@ const meta: ComponentMeta< typeof TimePicker > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof TimePicker > = ( {
+const Template: StoryFn< typeof TimePicker > = ( {
 	currentTime,
 	onChange,
 	...args
@@ -48,4 +48,4 @@ const Template: ComponentStory< typeof TimePicker > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof TimePicker > = Template.bind( {} );
+export const Default: StoryFn< typeof TimePicker > = Template.bind( {} );
