@@ -11,7 +11,6 @@ import {
 	BlockList,
 	BlockTools,
 	__unstableUseClipboardHandler as useClipboardHandler,
-	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
@@ -28,7 +27,7 @@ import EditorCanvas from './editor-canvas';
 import EditorCanvasContainer from '../editor-canvas-container';
 import useSiteEditorSettings from './use-site-editor-settings';
 import { store as editSiteStore } from '../../store';
-import { FOCUSABLE_ENTITIES } from './constants';
+import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import PageContentFocusManager from '../page-content-focus-manager';
 
@@ -116,7 +115,6 @@ export default function SiteEditorCanvas() {
 								}
 							} }
 						>
-							<BlockEditorKeyboardShortcuts.Register />
 							<BackButton />
 							<ResizableEditor
 								enableResizing={ enableResizing }

@@ -278,16 +278,14 @@ With these components available, you can define the `<Editor>` component.
 
 function Editor( { settings } ) {
 	return (
-		<SlotFillProvider>
-			<DropZoneProvider>
-				<div className="getdavesbe-block-editor-layout">
-					<Notices />
-					<Header />
-					<Sidebar />
-					<BlockEditor settings={ settings } />
-				</div>
-			</DropZoneProvider>
-		</SlotFillProvider>
+		<DropZoneProvider>
+			<div className="getdavesbe-block-editor-layout">
+				<Notices />
+				<Header />
+				<Sidebar />
+				<BlockEditor settings={ settings } />
+			</div>
+		</DropZoneProvider>
 	);
 }
 ```
@@ -296,8 +294,6 @@ In this process, the core of the editor's layout is being scaffolded, along with
 
 Let's examine these in more detail:
 
--   `<SlotFillProvider>` – Enables the use of the ["Slot/Fill"
-    pattern](/docs/reference-guides/slotfills/README.md) through the component tree
 -   `<DropZoneProvider>` – Enables the use of [dropzones for drag and drop functionality](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/components/src/drop-zone)
 -   `<Notices>` – Provides a "snack bar" Notice that will be rendered if any messages are dispatched to the `core/notices` store
 -   `<Header>` – Renders the static title "Standalone Block Editor" at the top of the editor UI

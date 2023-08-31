@@ -422,11 +422,7 @@ function LinkControl( {
 									settings={ settings?.filter(
 										( { id } ) => id === 'opensInNewTab'
 									) }
-									onChange={ ( { opensInNewTab } ) => {
-										onChange( {
-											opensInNewTab,
-										} );
-									} }
+									onChange={ onChange }
 								/>
 							);
 						}
@@ -479,5 +475,6 @@ function LinkControl( {
 }
 
 LinkControl.ViewerFill = ViewerFill;
+LinkControl.DEFAULT_LINK_SETTINGS = DEFAULT_LINK_SETTINGS;
 
 export default LinkControl;

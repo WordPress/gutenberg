@@ -9,14 +9,12 @@ import userEvent from '@testing-library/user-event';
  */
 import { useState, useEffect } from '@wordpress/element';
 import {
-	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 	BlockList,
 	BlockTools,
 	BlockInspector,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { SlotFillProvider } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import '@wordpress/format-library';
@@ -69,22 +67,19 @@ export function Editor( { testBlocks, settings = {} } ) {
 
 	return (
 		<ShortcutProvider>
-			<SlotFillProvider>
-				<BlockEditorProvider
-					value={ currentBlocks }
-					onInput={ updateBlocks }
-					onChange={ updateBlocks }
-					settings={ settings }
-				>
-					<BlockInspector />
-					<BlockTools>
-						<BlockEditorKeyboardShortcuts.Register />
-						<WritingFlow>
-							<BlockList />
-						</WritingFlow>
-					</BlockTools>
-				</BlockEditorProvider>
-			</SlotFillProvider>
+			<BlockEditorProvider
+				value={ currentBlocks }
+				onInput={ updateBlocks }
+				onChange={ updateBlocks }
+				settings={ settings }
+			>
+				<BlockInspector />
+				<BlockTools>
+					<WritingFlow>
+						<BlockList />
+					</WritingFlow>
+				</BlockTools>
+			</BlockEditorProvider>
 		</ShortcutProvider>
 	);
 }

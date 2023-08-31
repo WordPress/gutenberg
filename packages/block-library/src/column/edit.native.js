@@ -111,10 +111,10 @@ function ColumnEdit( {
 	};
 
 	const renderAppender = useCallback( () => {
-		const { width: columnWidth } = contentStyle[ clientId ];
-		const isFullWidth = columnWidth === screenWidth;
-
 		if ( isSelected ) {
+			const { width: columnWidth } = contentStyle[ clientId ] || {};
+			const isFullWidth = columnWidth === screenWidth;
+
 			return (
 				<View
 					style={ [
@@ -133,7 +133,7 @@ function ColumnEdit( {
 			);
 		}
 		return null;
-	}, [ contentStyle[ clientId ], screenWidth, isSelected, hasChildren ] );
+	}, [ contentStyle, clientId, screenWidth, isSelected, hasChildren ] );
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (

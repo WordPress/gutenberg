@@ -6,6 +6,8 @@
 
 -   Added support for `test-playwright` script ([#53108](https://github.com/WordPress/gutenberg/pull/53108)).
 
+## 26.12.0 (2023-08-31)
+
 ## 26.11.0 (2023-08-16)
 
 ### Enhancement
