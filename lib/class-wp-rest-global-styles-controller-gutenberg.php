@@ -523,23 +523,23 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			'title'      => $this->post_type,
 			'type'       => 'object',
 			'properties' => array(
-				'id'        => array(
+				'id'       => array(
 					'description' => __( 'ID of global styles config.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'styles'    => array(
+				'styles'   => array(
 					'description' => __( 'Global styles.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
-				'settings'  => array(
+				'settings' => array(
 					'description' => __( 'Global settings.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
-				'title'     => array(
+				'title'    => array(
 					'description' => __( 'Title of the global styles variation.', 'gutenberg' ),
 					'type'        => array( 'object', 'string' ),
 					'default'     => '',

@@ -35,18 +35,12 @@ function render_block_core_image( $attributes, $content, $block ) {
 	$link_destination        = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 
 	// Get the lightbox setting from the block attributes.
-	// TODO: This must be changed to use the new Lightbox UI.
-	if ( isset( $attributes['lightbox'] ) ) {
-		$lightbox_settings = $attributes['lightbox'];
+	if ( isset( $block['attrs']['lightbox'] ) ) {
+		$lightbox_settings = $block['attrs']['lightbox'];
+		// If the lightbox setting is not set in the block attributes, get it from
+		// the global settings.
 	} else {
-		// THIS IS NOT WORKING YET AND IS PROBABLY INCORRECT
-		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
-		$user_data = WP_Theme_JSON_Resolver_Gutenberg::get_user_data()->get_data();
-		if ( isset( $user_data['settings']['lightbox'] ) ) {
-			$lightbox_settings = $theme_data['settings']['lightbox'];
-		} else {
-			$lightbox_settings = null;
-		}
+		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
 	}
 
 	// If the lightbox is enabled, the image is not linked, and the Interactivity API is enabled, load the view script.
@@ -82,13 +76,12 @@ function render_block_core_image( $attributes, $content, $block ) {
  * @param  array  $block         Block object.
  * @return string                Filtered block content.
  */
-function gutenberg_render_lightbox( $block_content, $block ) {
+function block_core_image_render_lightbox( $block_content, $block ) {
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
-	// Get the lightbox setting from the block attributes.
 
-	// TODO: This must be changed to use the new Lightbox UI.
-	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
-		$lightbox_settings = $block['attrs']['behaviors']['lightbox'];
+	// Get the lightbox setting from the block attributes.
+	if ( isset( $block['attrs']['lightbox'] ) ) {
+		$lightbox_settings = $block['attrs']['lightbox'];
 	}
 
 	if ( ! isset( $lightbox_settings ) || 'none' !== $link_destination ) {
@@ -269,7 +262,7 @@ HTML;
 
 // Use priority 15 to run this hook after other hooks/plugins.
 // They could use the `render_block_{$this->name}` filter to modify the markup.
-add_filter( 'render_block_core/image', 'gutenberg_render_lightbox', 15, 2 );
+add_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15, 2 );
 
 	/**
 	 * Registers the `core/image` block on server.
