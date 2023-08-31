@@ -532,9 +532,11 @@ export default function Image( {
 					>
 						<ToggleControl
 							label={ __( 'Expand on Click' ) }
-							checked={ lightbox ? true : false }
+							checked={ lightbox?.enabled }
 							onChange={ ( newValue ) => {
-								setAttributes( { lightbox: newValue } );
+								setAttributes( {
+									lightbox: { enabled: newValue },
+								} );
 							} }
 						/>
 					</ToolsPanelItem>

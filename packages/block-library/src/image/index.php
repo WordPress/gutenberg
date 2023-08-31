@@ -35,12 +35,12 @@ function render_block_core_image( $attributes, $content, $block ) {
 	$link_destination        = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 
 	// Get the lightbox setting from the block attributes.
-	if ( isset( $block['attrs']['lightbox'] ) ) {
-		$lightbox_settings = $block['attrs']['lightbox'];
+	if ( isset( $attributes['lightbox'] ) ) {
+		$lightbox_settings = $attributes['lightbox'];
 		// If the lightbox setting is not set in the block attributes, get it from
 		// the global settings.
 	} else {
-		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
+		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
 	}
 
 	// If the lightbox is enabled, the image is not linked, and the Interactivity API is enabled, load the view script.
@@ -82,6 +82,11 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['lightbox'] ) ) {
 		$lightbox_settings = $block['attrs']['lightbox'];
+		// If the lightbox setting is not set in the block attributes, get it from
+		// the global settings.
+
+	} else {
+		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
 	}
 
 	if ( ! isset( $lightbox_settings ) || 'none' !== $link_destination ) {
