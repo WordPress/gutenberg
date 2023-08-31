@@ -39,14 +39,6 @@ function FontFamilies() {
 				<HStack justify="space-between">
 					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 					<HStack justify="flex-end">
-						<Tooltip text={ __( 'Add fonts' ) }>
-							<Button
-								onClick={ () => toggleModal( 'local-fonts' ) }
-								aria-label={ __( 'Add fonts' ) }
-								icon={ plus }
-								isSmall
-							/>
-						</Tooltip>
 						<Tooltip text={ __( 'Manage fonts' ) }>
 							<Button
 								onClick={ () =>
@@ -54,6 +46,14 @@ function FontFamilies() {
 								}
 								aria-label={ __( 'Manage fonts' ) }
 								icon={ typography }
+								isSmall
+							/>
+						</Tooltip>
+						<Tooltip text={ __( 'Add fonts' ) }>
+							<Button
+								onClick={ () => toggleModal( 'local-fonts' ) }
+								aria-label={ __( 'Add fonts' ) }
+								icon={ plus }
 								isSmall
 							/>
 						</Tooltip>
