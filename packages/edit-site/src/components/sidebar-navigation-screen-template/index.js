@@ -48,11 +48,7 @@ function useTemplateDetails( postType, postId ) {
 			<HomeTemplateDetails />
 		) : null;
 
-	const footer = !! record?.modified ? (
-		<SidebarNavigationScreenDetailsFooter
-			lastModifiedDateTime={ record.modified }
-		/>
-	) : null;
+	const footer = <SidebarNavigationScreenDetailsFooter record={ record } />;
 
 	const description = (
 		<>

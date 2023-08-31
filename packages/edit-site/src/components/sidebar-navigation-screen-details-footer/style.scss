@@ -1,5 +1,15 @@
 .edit-site-sidebar-navigation-screen-details-footer {
-	padding-top: $grid-unit-10;
-	padding-bottom: $grid-unit-10;
-	padding-left: $grid-unit-20;
+	.edit-site-sidebar-navigation-screen-details-footer__button {
+		width: 100%;
+		border-radius: $radius-block-ui;
+
+		&:hover,
+		&:focus {
+			background-color: $gray-800;
+		}
+	}
+	.edit-site-sidebar-navigation-screen-details-footer__icon {
+		margin-left: auto;
+		fill: $white;
+	}
 }

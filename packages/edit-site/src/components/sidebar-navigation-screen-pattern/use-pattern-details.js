@@ -61,11 +61,7 @@ export default function usePatternDetails( postType, postId ) {
 		);
 	}
 
-	const footer = !! record?.modified ? (
-		<SidebarNavigationScreenDetailsFooter
-			lastModifiedDateTime={ record.modified }
-		/>
-	) : null;
+	const footer = <SidebarNavigationScreenDetailsFooter record={ record } />;
 
 	const details = [];
 
