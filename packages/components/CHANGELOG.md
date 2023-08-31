@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+### Breaking changes
+
+-   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889), [#53982](https://github.com/WordPress/gutenberg/pull/53982)).
+
 ### Enhancements
 
--   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889)).
 -   `ProgressBar`: Add transition to determinate indicator ([#53877](https://github.com/WordPress/gutenberg/pull/53877)).
 -   Prevent nested `SlotFillProvider` from rendering ([#53940](https://github.com/WordPress/gutenberg/pull/53940)).
 

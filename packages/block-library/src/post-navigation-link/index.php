@@ -28,13 +28,16 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= " has-text-align-{$attributes['textAlign']}";
 	}
-
-	$writing_mode = _wp_array_get( $attributes, array( 'style', 'typography', 'writingMode' ), null );
-	if ( isset( $writing_mode ) ) {
-		$classes .= ' has-writing-mode';
-		$classes .= ' is-{$writing_mode}';
+	$styles = '';
+	if ( isset( $attributes['style']['typography']['writingMode'] ) ) {
+		$styles = "writing-mode:{$attributes['style']['typography']['writingMode']};";
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => $classes,
+			'style' => $styles,
+		)
+	);
 	// Set default values.
 	$format = '%link';
 	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
