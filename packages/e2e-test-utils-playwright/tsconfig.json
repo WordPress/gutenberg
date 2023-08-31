@@ -5,7 +5,6 @@
 		"composite": false,
 		"module": "CommonJS",
 		"moduleResolution": "node16",
-		"skipLibCheck": true,
 		"types": [ "node" ],
 		"rootDir": "src",
 		"noEmit": false,
