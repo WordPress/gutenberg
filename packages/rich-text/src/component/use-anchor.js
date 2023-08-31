@@ -20,12 +20,10 @@ import { useState, useLayoutEffect } from '@wordpress/element';
 function getFormatElement( range, editableContentElement, tagName, className ) {
 	let element = range.startContainer;
 
-	// One issues with format boundaries is that the caret can be right before
-	// the element while we make it look to be inside the element. So if the
-	// startContainer is a text node and the caret is at the end of the text,
-	// we should use the next sibling and the deepest first child so we can
-	// select the correct format element. Do not use nextElementSibling, it must
-	// otherwise you may be matching an element further away.
+	// Even if the active format is defined, the actualy DOM range's start
+	// container may be outside of the format's DOM element:
+	// `a‸<strong>b</strong>` (DOM) while visually it's `a<strong>‸b</strong>`.
+	// So at a given selection index, start with the deepest format DOM element.
 	if (
 		element.nodeType === element.TEXT_NODE &&
 		range.startOffset === element.length &&
