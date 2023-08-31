@@ -322,6 +322,8 @@ function URLInput( props ) {
 		>
 			<PanelBody>
 				<TextControl
+					// eslint-disable-next-line jsx-a11y/no-autofocus
+					autoFocus
 					label={ __( 'Insert from URL' ) }
 					onChange={ props.onChange }
 					placeholder={ __( 'Type a URL' ) }
