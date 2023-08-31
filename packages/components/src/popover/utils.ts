@@ -3,7 +3,11 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type { MotionProps } from 'framer-motion';
-import type { ReferenceType, VirtualElement } from '@floating-ui/react-dom';
+import type {
+	Placement,
+	ReferenceType,
+	VirtualElement,
+} from '@floating-ui/react-dom';
 
 /**
  * Internal dependencies
@@ -16,7 +20,7 @@ import type {
 
 const POSITION_TO_PLACEMENT: Record<
 	NonNullable< PopoverProps[ 'position' ] >,
-	NonNullable< PopoverProps[ 'placement' ] >
+	Placement
 > = {
 	bottom: 'bottom',
 	top: 'top',
@@ -79,8 +83,7 @@ const POSITION_TO_PLACEMENT: Record<
  */
 export const positionToPlacement = (
 	position: NonNullable< PopoverProps[ 'position' ] >
-): NonNullable< PopoverProps[ 'placement' ] > =>
-	POSITION_TO_PLACEMENT[ position ] ?? 'bottom';
+) => POSITION_TO_PLACEMENT[ position ] ?? 'bottom';
 
 /**
  * @typedef AnimationOrigin
