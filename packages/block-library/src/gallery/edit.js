@@ -91,6 +91,7 @@ function GalleryEdit( props ) {
 		isSelected,
 		insertBlocksAfter,
 		isContentLocked,
+		onFocus,
 	} = props;
 
 	const { columns, imageCrop, linkTarget, linkTo, sizeSlug, caption } =
@@ -498,6 +499,7 @@ function GalleryEdit( props ) {
 			value: hasImageIds ? images : {},
 			autoOpenMediaUpload:
 				! hasImages && isSelected && wasBlockJustInserted,
+			onFocus,
 		},
 	} );
 	const mediaPlaceholder = (

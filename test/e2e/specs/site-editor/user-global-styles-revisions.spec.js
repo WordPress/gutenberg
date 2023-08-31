@@ -26,7 +26,7 @@ test.describe( 'Global styles revisions', () => {
 		await admin.visitSiteEditor();
 	} );
 
-	test( 'should display revisions UI when there is more than 1 revision', async ( {
+	test( 'should display revisions UI when there is 1 revision', async ( {
 		page,
 		editor,
 		userGlobalStylesRevisions,
@@ -43,19 +43,6 @@ test.describe( 'Global styles revisions', () => {
 			.getByRole( 'button', { name: 'Color Background styles' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Color: Black' } )
-			.click( { force: true } );
-
-		await editor.saveSiteEditorEntities();
-
-		/*
-		 * Change a style and save it again.
-		 * We need more than 2 revisions to show the UI.
-		 */
-		await page
-			.getByRole( 'button', { name: 'Color Background styles' } )
-			.click();
-		await page
 			.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
 			.click( { force: true } );
 
@@ -68,8 +55,9 @@ test.describe( 'Global styles revisions', () => {
 			name: /^Changes saved by /,
 		} );
 
+		// There should be 2 revisions not including the reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(
-			currentRevisions.length + 2
+			currentRevisions.length + 1
 		);
 	} );
 
@@ -115,6 +103,25 @@ test.describe( 'Global styles revisions', () => {
 			.getByRole( 'button', { name: 'Cancel' } )
 			.click();
 		await editor.saveSiteEditorEntities();
+	} );
+
+	test( 'should have a reset to defaults button', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.click( 'body' );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await userGlobalStylesRevisions.openRevisions();
+		const lastRevisionButton = page
+			.getByLabel( 'Global styles revisions' )
+			.getByRole( 'button' )
+			.last();
+		await expect( lastRevisionButton ).toContainText( 'Default styles' );
+		await lastRevisionButton.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Reset to defaults' } )
+		).toBeVisible();
 	} );
 } );
 

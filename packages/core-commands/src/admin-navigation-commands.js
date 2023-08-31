@@ -10,14 +10,15 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import { useIsSiteEditorAccessible } from './hooks';
+import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
 export function useAdminNavigationCommands() {
 	const history = useHistory();
-	const isSiteEditorAccessible = useIsSiteEditorAccessible();
+	const isTemplatesAccessible = useIsTemplatesAccessible();
+	const isBlockBasedTheme = useIsBlockBasedTheme();
 
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
@@ -43,9 +44,7 @@ export function useAdminNavigationCommands() {
 		name: 'core/manage-reusable-blocks',
 		label: __( 'Open patterns' ),
 		callback: ( { close } ) => {
-			if ( ! isSiteEditorAccessible ) {
-				document.location.href = 'edit.php?post_type=wp_block';
-			} else {
+			if ( isTemplatesAccessible && isBlockBasedTheme ) {
 				const args = {
 					path: '/patterns',
 				};
@@ -55,6 +54,8 @@ export function useAdminNavigationCommands() {
 					document.location = addQueryArgs( 'site-editor.php', args );
 				}
 				close();
+			} else {
+				document.location.href = 'edit.php?post_type=wp_block';
 			}
 		},
 		icon: isSiteEditor ? symbol : external,

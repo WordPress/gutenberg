@@ -22,10 +22,9 @@ import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/
 export const postType = `wp_navigation`;
 
 export default function SidebarNavigationScreenNavigationMenu() {
-	const { params } = useNavigator();
-
-	// See https://github.com/WordPress/gutenberg/pull/52120.
-	const postId = Number( params?.postId );
+	const {
+		params: { postId },
+	} = useNavigator();
 
 	const { record: navigationMenu, isResolving } = useEntityRecord(
 		'postType',

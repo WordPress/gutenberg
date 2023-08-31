@@ -59,6 +59,7 @@ const options = {
 	headerShown: false,
 	gestureEnabled: false,
 	cardStyleInterpolator: fadeConfig,
+	keyboardHandlingEnabled: false,
 };
 
 const HEIGHT_ANIMATION_DURATION = 300;

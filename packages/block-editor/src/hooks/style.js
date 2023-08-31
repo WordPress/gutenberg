@@ -44,8 +44,8 @@ const styleSupportKeys = [
 	SPACING_SUPPORT_KEY,
 ];
 
-const hasStyleSupport = ( blockType ) =>
-	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
+const hasStyleSupport = ( nameOrType ) =>
+	styleSupportKeys.some( ( key ) => hasBlockSupport( nameOrType, key ) );
 
 /**
  * Returns the inline styles to add depending on the style object
@@ -347,6 +347,10 @@ export function addEditProps( settings ) {
  */
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		if ( ! hasStyleSupport( props.name ) ) {
+			return <BlockEdit key="edit" { ...props } />;
+		}
+
 		const shouldDisplayControls = useDisplayBlockControls();
 		const blockEditingMode = useBlockEditingMode();
 
@@ -360,7 +364,7 @@ export const withBlockControls = createHigherOrderComponent(
 						<DimensionsPanel { ...props } />
 					</>
 				) }
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},

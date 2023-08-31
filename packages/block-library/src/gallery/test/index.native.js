@@ -159,9 +159,7 @@ describe( 'Gallery block', () => {
 		/* eslint-enable jest/no-conditional-expect */
 	} );
 
-	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
-	// is addressed.
-	it.skip( 'block remains selected after dismissing the media options picker', async () => {
+	it( 'block remains selected after dismissing the media options picker', async () => {
 		// Initialize with an empty gallery
 		const { getByLabelText, getByText, getByTestId } =
 			await initializeEditor( {

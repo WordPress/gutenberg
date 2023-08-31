@@ -47,6 +47,14 @@ export const addBlock = async (
 	// microtasks are executed.
 	await withFakeTimers( async () => {
 		fireEvent.press( blockButton );
+
+		// On iOS the action for inserting a block is delayed (https://bit.ly/3AVALqH).
+		// Hence, we need to wait for the different steps until the the block is inserted.
+		if ( Platform.isIOS ) {
+			await AccessibilityInfo.isScreenReaderEnabled();
+			act( () => jest.runOnlyPendingTimers() );
+		}
+
 		// Run all timers, in case any performs a state updates.
 		// Column block example: https://t.ly/NjTs
 		act( () => jest.runOnlyPendingTimers() );
@@ -54,13 +62,4 @@ export const addBlock = async (
 		// Inner blocks example: https://t.ly/b95nA
 		await act( async () => {} );
 	} );
-
-	// On iOS the action for inserting a block is delayed (https://bit.ly/3AVALqH).
-	// Hence, we need to wait for the different steps until the the block is inserted.
-	if ( Platform.isIOS ) {
-		await withFakeTimers( async () => {
-			await AccessibilityInfo.isScreenReaderEnabled();
-			act( () => jest.runOnlyPendingTimers() );
-		} );
-	}
 };

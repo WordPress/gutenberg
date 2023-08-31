@@ -72,4 +72,15 @@
 			Toggle context falseValue
 		</button>
 	</div>
+
+	<div
+		data-wp-class--block__element--modifier="state.trueValue"
+		data-testid="can use BEM notation classes"
+	></div>
+
+	<div
+		data-wp-class--main-bg----color="state.trueValue"
+		data-testid="can use classes with several dashes"
+	></div>
+
 </div>

@@ -885,40 +885,41 @@ test.describe( 'Image - interactivity', () => {
 
 				await expect( lightbox ).toBeVisible();
 
-				const document = page.getByRole( 'document' );
-				const lightboxStyleCheck = await document.evaluate( ( doc ) => {
-					// We don't have access to the getPropertyValue() method
-					// on the CSSStyleDeclaration returned form getComputedStyle()
-					// in the Playwright outer context, so we need to evaluate it here
-					// in the browser context here.
-					const documentStyles = window.getComputedStyle( doc );
-					const lightboxStyleVars = [
-						'--lightbox-scale-width',
-						'--lightbox-scale-height',
-						'--lightbox-image-max-width',
-						'--lightbox-image-max-height',
-						'--lightbox-initial-left-position',
-						'--lightbox-initial-top-position',
-					];
-					const lightboxStyleErrors = [];
-					lightboxStyleVars.forEach( ( styleVar ) => {
-						if ( ! documentStyles.getPropertyValue( styleVar ) ) {
-							lightboxStyleErrors.push( styleVar );
-						}
-					} );
-
-					return lightboxStyleErrors.length > 0
-						? lightboxStyleErrors
-						: true;
+				// Use page.evaluate to get the content of the style tag
+				const styleTagContent = await page.evaluate( () => {
+					const styleTag = document.querySelector(
+						'style#wp-lightbox-styles'
+					);
+					return styleTag ? styleTag.textContent : '';
 				} );
-				expect( lightboxStyleCheck ).toBe( true );
+
+				// Define the keys you want to check for
+				const keysToCheck = [
+					'--wp--lightbox-initial-top-position',
+					'--wp--lightbox-initial-left-position',
+					'--wp--lightbox-container-width',
+					'--wp--lightbox-container-height',
+					'--wp--lightbox-image-width',
+					'--wp--lightbox-image-height',
+					'--wp--lightbox-scale',
+				];
+
+				// Check if all the keys are present in the style tag's content
+				const keysPresent = keysToCheck.every( ( key ) =>
+					styleTagContent.includes( key )
+				);
+
+				expect( keysPresent ).toBe( true );
 
 				const closeButton = lightbox.getByRole( 'button', {
 					name: 'Close',
 				} );
 				await closeButton.click();
 
-				await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+				await expect( responsiveImage ).toHaveAttribute(
+					'src',
+					contentImageCurrentSrc
+				);
 				await expect( enlargedImage ).toHaveAttribute(
 					'src',
 					imageUploadedSrc
@@ -1013,7 +1014,10 @@ test.describe( 'Image - interactivity', () => {
 				} );
 				await closeButton.click();
 
-				await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+				await expect( responsiveImage ).toHaveAttribute(
+					'src',
+					contentImageCurrentSrc
+				);
 				await expect( enlargedImage ).toHaveAttribute(
 					'src',
 					imageUploadedSrc
@@ -1362,7 +1366,7 @@ test.describe( 'Image - interactivity', () => {
 
 		await page.getByRole( 'button', { name: 'Close' } ).click();
 
-		await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+		await expect( responsiveImage ).toHaveAttribute( 'src', imgUrl );
 		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
 	} );
 } );

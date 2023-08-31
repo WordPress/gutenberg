@@ -8,23 +8,6 @@ This feature is still experimental. “Experimental” means this is an early im
 
 Multiple `Theme` components can be nested in order to override specific theme variables.
 
-## Usage
-
-```jsx
-import { __experimentalTheme as Theme } from '@wordpress/components';
-
-const Example = () => {
-	return (
-		<Theme accent="red">
-			<Button variant="primary">I'm red</Button>
-			<Theme accent="blue" background="black">
-				<Button variant="primary">I'm blue</Button>
-			</Theme>
-		</Theme>
-	);
-};
-```
-
 ## Props
 
 ### `accent`: `string`

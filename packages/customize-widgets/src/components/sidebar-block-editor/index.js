@@ -10,9 +10,7 @@ import {
 	BlockSelectionClearer,
 	BlockInspector,
 	CopyHandler,
-	ObserveTyping,
 	WritingFlow,
-	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
@@ -95,7 +93,6 @@ export default function SidebarBlockEditor( {
 
 	return (
 		<>
-			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
@@ -118,11 +115,7 @@ export default function SidebarBlockEditor( {
 						<EditorStyles styles={ settings.defaultEditorStyles } />
 						<BlockSelectionClearer>
 							<WritingFlow className="editor-styles-wrapper">
-								<ObserveTyping>
-									<BlockList
-										renderAppender={ BlockAppender }
-									/>
-								</ObserveTyping>
+								<BlockList renderAppender={ BlockAppender } />
 							</WritingFlow>
 						</BlockSelectionClearer>
 					</BlockTools>

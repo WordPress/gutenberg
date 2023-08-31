@@ -16,7 +16,6 @@ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInpu
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
-import '@wordpress/jest-console';
 
 /**
  * Internal dependencies

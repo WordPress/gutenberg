@@ -5,7 +5,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	code,
-	cog,
 	drawerLeft,
 	drawerRight,
 	blockDefault,
@@ -59,6 +58,7 @@ export default function useCommonCommands() {
 	const { toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
 	const { __unstableSaveForPreview } = useDispatch( editorStore );
+	const { getCurrentPostId } = useSelect( editorStore );
 
 	useCommand( {
 		name: 'core/open-settings-sidebar',
@@ -91,7 +91,6 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-distraction-free',
 		label: __( 'Toggle distraction free' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'distractionFree' );
 			close();
@@ -101,7 +100,6 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'focusMode' );
 			close();
@@ -131,7 +129,6 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'fixedToolbar' );
 			close();
@@ -150,8 +147,7 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/open-preferences',
-		label: __( 'Open editor preferences' ),
-		icon: cog,
+		label: __( 'Editor preferences' ),
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
 		},
@@ -159,7 +155,7 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/open-shortcut-help',
-		label: __( 'Open keyboard shortcuts' ),
+		label: __( 'Keyboard shortcuts' ),
 		icon: keyboard,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
@@ -171,14 +167,13 @@ export default function useCommonCommands() {
 		label: showBlockBreadcrumbs
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
 			close();
 			createInfoNotice(
 				showBlockBreadcrumbs
-					? __( 'Breadcrumbs off.' )
-					: __( 'Breadcrumbs on.' ),
+					? __( 'Breadcrumbs hidden.' )
+					: __( 'Breadcrumbs visible.' ),
 				{
 					id: 'core/edit-post/toggle-breadcrumbs/notice',
 					type: 'snackbar',
@@ -214,8 +209,9 @@ export default function useCommonCommands() {
 		icon: external,
 		callback: async ( { close } ) => {
 			close();
-			const link = await __unstableSaveForPreview( {} );
-			window.open( link, '_blank' );
+			const postId = getCurrentPostId();
+			const link = await __unstableSaveForPreview();
+			window.open( link, `wp-preview-${ postId }` );
 		},
 	} );
 }

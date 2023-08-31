@@ -20,10 +20,14 @@ jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => jest.fn() );
 
 describe( 'EditPostPreferencesModal', () => {
 	describe( 'should match snapshot when the modal is active', () => {
-		it( 'large viewports', () => {
+		it( 'large viewports', async () => {
 			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => true );
 			render( <EditPostPreferencesModal /> );
+			await screen.findByRole( 'tab', {
+				name: 'General',
+				selected: true,
+			} );
 			expect(
 				screen.getByRole( 'dialog', { name: 'Preferences' } )
 			).toMatchSnapshot();

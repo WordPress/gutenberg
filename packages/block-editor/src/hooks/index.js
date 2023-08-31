@@ -21,6 +21,8 @@ import './content-lock-ui';
 import './metadata';
 import './metadata-name';
 import './behaviors';
+import './custom-fields';
+import './auto-inserting-blocks';
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';

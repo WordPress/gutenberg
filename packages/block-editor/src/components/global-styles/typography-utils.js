@@ -7,7 +7,10 @@
 /**
  * Internal dependencies
  */
-import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
+import {
+	getComputedFluidTypographyValue,
+	getTypographyValueAndUnit,
+} from '../font-sizes/fluid-utils';
 
 /**
  * @typedef {Object} FluidPreset
@@ -68,6 +71,7 @@ export function getTypographyFontSizeValue( preset, typographyOptions ) {
 		fontSize: defaultSize,
 		minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
 		maximumViewportWidth: fluidTypographySettings?.maxViewportWidth,
+		minimumViewportWidth: fluidTypographySettings?.minViewportWidth,
 	} );
 
 	if ( !! fluidFontSizeValue ) {
@@ -98,11 +102,16 @@ function isFluidTypographyEnabled( typographySettings ) {
 export function getFluidTypographyOptionsFromSettings( settings ) {
 	const typographySettings = settings?.typography;
 	const layoutSettings = settings?.layout;
-	return isFluidTypographyEnabled( typographySettings ) &&
+	const defaultMaxViewportWidth = getTypographyValueAndUnit(
 		layoutSettings?.wideSize
+	)
+		? layoutSettings?.wideSize
+		: null;
+	return isFluidTypographyEnabled( typographySettings ) &&
+		defaultMaxViewportWidth
 		? {
 				fluid: {
-					maxViewportWidth: layoutSettings.wideSize,
+					maxViewportWidth: defaultMaxViewportWidth,
 					...typographySettings.fluid,
 				},
 		  }

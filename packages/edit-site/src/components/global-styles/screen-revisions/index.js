@@ -79,9 +79,9 @@ function ScreenRevisions() {
 
 	const selectRevision = ( revision ) => {
 		setGlobalStylesRevision( {
-			styles: revision?.styles,
-			settings: revision?.settings,
-			behaviors: revision?.behaviors,
+			styles: revision?.styles || {},
+			settings: revision?.settings || {},
+			behaviors: revision?.behaviors || {},
 			id: revision?.id,
 		} );
 		setSelectedRevisionId( revision?.id );
@@ -137,7 +137,9 @@ function ScreenRevisions() {
 										}
 									} }
 								>
-									{ __( 'Apply' ) }
+									{ globalStylesRevision?.id === 'parent'
+										? __( 'Reset to defaults' )
+										: __( 'Apply' ) }
 								</Button>
 							</SidebarFixedBottom>
 						) }
