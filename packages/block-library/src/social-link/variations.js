@@ -308,6 +308,7 @@ const variations = [
 	{
 		name: 'x',
 		attributes: { service: 'x' },
+		keywords: [ 'Twitter' ],
 		title: 'X',
 		icon: XIcon,
 	},
