@@ -18,8 +18,6 @@ import { positionToPlacement } from '../popover/utils';
 
 /**
  * Time over anchor to wait before showing tooltip
- *
- * @type {number}
  */
 export const TOOLTIP_DELAY = 700;
 
@@ -42,22 +40,15 @@ function Tooltip( props: TooltipProps ) {
 
 	const DEFAULT_PLACEMENT = 'bottom';
 
-	// Compute tooltip's placement:
-	// - compute it from the legacy `position` prop (if defined)
-	// - otherwise, fallback to the DEFAULT_PLACEMENT.
-	let computedPlacement;
-
-	if ( position !== undefined ) {
-		computedPlacement = positionToPlacement( position );
-	} else {
-		computedPlacement = DEFAULT_PLACEMENT;
-	}
-
 	const tooltipStore = Ariakit.useTooltipStore( {
-		// TODO: can remove the ignore once position has been fully deprecated
-		// Type error due to 'overlay' type from positionToPlacement
-		// @ts-ignore
-		placement: computedPlacement,
+		//@ts-ignore
+		placement:
+			// Compute tooltip's placement:
+			// - compute it from the legacy `position` prop (if defined)
+			// - otherwise, fallback to the DEFAULT_PLACEMENT.
+			position === undefined
+				? DEFAULT_PLACEMENT
+				: positionToPlacement( position ),
 		timeout: delay,
 	} );
 
