@@ -39,7 +39,6 @@ const LINK_SETTINGS = [
 			__( 'Mark as <code>nofollow</code>' ),
 			{ code: <code /> }
 		),
-		help: __( 'Ask search engines to ignore this link.' ),
 	},
 ];
 
