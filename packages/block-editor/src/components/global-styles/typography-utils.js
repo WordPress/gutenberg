@@ -110,7 +110,7 @@ export function getFluidTypographyOptionsFromSettings( settings ) {
 		defaultMaxViewportWidth
 		? {
 				fluid: {
-					maxViewportWidth: defaultMaxViewportWidth,
+					maxViewPortWidth: defaultMaxViewportWidth,
 					...typographySettings.fluid,
 				},
 		  }
