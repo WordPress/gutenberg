@@ -64,6 +64,7 @@ function bubbleEvents( doc ) {
 
 		// This stopPropagation call ensures React doesn't create a syncthetic event to bubble this event
 		// which would result in two React events being bubbled throught the iframe.
+		event.stopPropagation();
 		const newEvent = new Constructor( event.type, init );
 		const cancelled = ! frameElement.dispatchEvent( newEvent );
 
