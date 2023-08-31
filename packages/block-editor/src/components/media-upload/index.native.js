@@ -3,14 +3,17 @@
  */
 import { Platform } from 'react-native';
 
-import prompt from 'react-native-prompt-android';
-
 /**
  * WordPress dependencies
  */
 import { Component, React } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Picker } from '@wordpress/components';
+import {
+	BottomSheet,
+	PanelBody,
+	Picker,
+	TextControl,
+} from '@wordpress/components';
 import {
 	getOtherMediaOptions,
 	requestMediaPicker,
@@ -51,6 +54,8 @@ export class MediaUpload extends Component {
 		this.onPickerSelect = this.onPickerSelect.bind( this );
 		this.getAllSources = this.getAllSources.bind( this );
 		this.state = {
+			url: '',
+			showURLInput: false,
 			otherMediaOptions: [],
 		};
 	}
@@ -203,31 +208,10 @@ export class MediaUpload extends Component {
 	}
 
 	onPickerSelect( value ) {
-		const {
-			allowedTypes = [],
-			onSelect,
-			onSelectURL,
-			multiple = false,
-		} = this.props;
+		const { allowedTypes = [], onSelect, multiple = false } = this.props;
 
 		if ( value === URL_MEDIA_SOURCE ) {
-			prompt(
-				__( 'Type a URL' ), // title
-				undefined, // message
-				[
-					{
-						text: __( 'Cancel' ),
-						style: 'cancel',
-					},
-					{
-						text: __( 'Apply' ),
-						onPress: onSelectURL,
-					},
-				], // Buttons.
-				'plain-text', // type
-				undefined, // defaultValue
-				'url' // keyboardType
-			);
+			this.setState( { showURLInput: true } );
 			return;
 		}
 
@@ -305,11 +289,47 @@ export class MediaUpload extends Component {
 			/>
 		);
 
-		return this.props.render( {
-			open: this.onPickerPresent,
-			getMediaOptions,
-		} );
+		return (
+			<>
+				<URLInput
+					isVisible={ this.state.showURLInput }
+					onClose={ () => {
+						if ( this.state.url !== '' ) {
+							this.props.onSelectURL( this.state.url );
+						}
+						this.setState( { showURLInput: false, url: '' } );
+					} }
+					onChange={ ( url ) => {
+						this.setState( { url } );
+					} }
+					value={ this.state.url }
+				/>
+				{ this.props.render( {
+					open: this.onPickerPresent,
+					getMediaOptions,
+				} ) }
+			</>
+		);
 	}
+}
+
+function URLInput( props ) {
+	return (
+		<BottomSheet
+			hideHeader
+			isVisible={ props.isVisible }
+			onClose={ props.onClose }
+		>
+			<PanelBody>
+				<TextControl
+					label={ __( 'Insert from URL' ) }
+					onChange={ props.onChange }
+					placeholder={ __( 'Type a URL' ) }
+					value={ props.value }
+				/>
+			</PanelBody>
+		</BottomSheet>
+	);
 }
 
 export default compose( [
