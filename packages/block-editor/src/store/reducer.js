@@ -1913,6 +1913,14 @@ export function blockEditingModes( state = new Map(), action ) {
 	return state;
 }
 
+export function openedBlockSettingsMenu( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_OPENED_BLOCK_SETTINGS_MENU':
+			return action.clientId || null;
+	}
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -1938,6 +1946,7 @@ const combinedReducers = combineReducers( {
 	blockEditingModes,
 	removalPromptData,
 	blockRemovalRules,
+	openedBlockSettingsMenu,
 } );
 
 function withAutomaticChangeReset( reducer ) {
