@@ -73,7 +73,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import im.shimo.react.prompt.RNPromptPackage;
 import okhttp3.OkHttpClient;
 
 
@@ -618,7 +617,6 @@ public class WPAndroidGlueCode {
                         return mReactInstanceManager;
                     }
                 },
-                new RNPromptPackage(),
                 new RNCWebViewPackage(),
                 new ClipboardPackage(),
                 new FastImageViewPackage(),
