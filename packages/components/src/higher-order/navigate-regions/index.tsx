@@ -98,14 +98,12 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 					return isKeyboardEvent[ modifier ]( event, character );
 				} )
 			) {
-				event.stopPropagation();
 				focusRegion( -1 );
 			} else if (
 				shortcuts.next.some( ( { modifier, character } ) => {
 					return isKeyboardEvent[ modifier ]( event, character );
 				} )
 			) {
-				event.stopPropagation();
 				focusRegion( 1 );
 			}
 		},
