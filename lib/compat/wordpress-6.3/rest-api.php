@@ -106,3 +106,32 @@ function gutenberg_register_rest_navigation_fallbacks() {
 	$editor_settings->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_navigation_fallbacks' );
+
+/**
+ * Add extra collection params to themes requests.
+ *
+ * @param array $query_params JSON Schema-formatted collection parameters.
+ * @return array Updated parameters.
+ */
+function gutenberg_themes_collection_params_6_3( $query_params ) {
+	$query_params['is_block_theme'] = array(
+		'description' => __( 'Whether the theme is a block-based theme.' ),
+		'type'        => 'boolean',
+		'readonly'    => true,
+	);
+	return $query_params;
+}
+add_filter( 'rest_themes_collection_params', 'gutenberg_themes_collection_params_6_3' );
+
+/**
+ * Updates REST API response for the themes and adds the `is_block_theme` flag.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Theme         $theme    Theme object used to create response.
+ * @return WP_REST_Response $response Updated response object.
+ */
+function gutenberg_modify_rest_themes_response( $response, $theme ) {
+	$response->data['is_block_theme'] = $theme->is_block_theme();
+	return $response;
+}
+add_filter( 'rest_prepare_theme', 'gutenberg_modify_rest_themes_response', 10, 2 );

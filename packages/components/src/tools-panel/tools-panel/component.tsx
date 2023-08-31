@@ -48,7 +48,6 @@ const UnconnectedToolsPanel = (
  * by a header. The header includes a dropdown menu which is automatically
  * generated from the panel's inner `ToolsPanelItems`.
  *
- * @example
  * ```jsx
  * import { __ } from '@wordpress/i18n';
  * import {

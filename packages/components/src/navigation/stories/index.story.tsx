@@ -1,12 +1,16 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta } from '@storybook/react';
+import type { Meta } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { Navigation } from '..';
+import { NavigationBackButton } from '../back-button';
+import { NavigationGroup } from '../group';
+import { NavigationItem } from '../item';
+import { NavigationMenu } from '../menu';
 import { DefaultStory } from './utils/default';
 import { GroupStory } from './utils/group';
 import { ControlledStateStory } from './utils/controlled-state';
@@ -15,9 +19,19 @@ import { MoreExamplesStory } from './utils/more-examples';
 import { HideIfEmptyStory } from './utils/hide-if-empty';
 import './style.css';
 
-const meta: ComponentMeta< typeof Navigation > = {
+const meta: Meta< typeof Navigation > = {
 	title: 'Components (Experimental)/Navigation',
 	component: Navigation,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		NavigationBackButton,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		NavigationGroup,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		NavigationItem,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		NavigationMenu,
+	},
 	argTypes: {
 		activeItem: { control: { type: null } },
 		activeMenu: { control: { type: null } },
@@ -29,7 +43,7 @@ const meta: ComponentMeta< typeof Navigation > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 

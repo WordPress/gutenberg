@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,19 +9,21 @@ import type { ComponentMeta, Story } from '@storybook/react';
 import { Animate } from '..';
 import Notice from '../../notice';
 
-const meta: ComponentMeta< typeof Animate > = {
+const meta: Meta< typeof Animate > = {
 	title: 'Components/Animate',
 	component: Animate,
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: Story< typeof Animate > = ( props ) => <Animate { ...props } />;
+const Template: StoryFn< typeof Animate > = ( props ) => (
+	<Animate { ...props } />
+);
 
-export const Default: Story< typeof Animate > = Template.bind( {} );
+export const Default = Template.bind( {} );
 Default.args = {
 	children: ( { className } ) => (
 		<Notice className={ className } status="success">
@@ -30,7 +32,7 @@ Default.args = {
 	),
 };
 
-export const AppearTopLeft: Story< typeof Animate > = Template.bind( {} );
+export const AppearTopLeft = Template.bind( {} );
 AppearTopLeft.args = {
 	type: 'appear',
 	options: { origin: 'top left' },
@@ -40,7 +42,7 @@ AppearTopLeft.args = {
 		</Notice>
 	),
 };
-export const AppearTopRight: Story< typeof Animate > = Template.bind( {} );
+export const AppearTopRight = Template.bind( {} );
 AppearTopRight.args = {
 	type: 'appear',
 	options: { origin: 'top right' },
@@ -50,7 +52,7 @@ AppearTopRight.args = {
 		</Notice>
 	),
 };
-export const AppearBottomLeft: Story< typeof Animate > = Template.bind( {} );
+export const AppearBottomLeft = Template.bind( {} );
 AppearBottomLeft.args = {
 	type: 'appear',
 	options: { origin: 'bottom left' },
@@ -60,7 +62,7 @@ AppearBottomLeft.args = {
 		</Notice>
 	),
 };
-export const AppearBottomRight: Story< typeof Animate > = Template.bind( {} );
+export const AppearBottomRight = Template.bind( {} );
 AppearBottomRight.args = {
 	type: 'appear',
 	options: { origin: 'bottom right' },
@@ -71,7 +73,7 @@ AppearBottomRight.args = {
 	),
 };
 
-export const Loading: Story< typeof Animate > = Template.bind( {} );
+export const Loading = Template.bind( {} );
 Loading.args = {
 	type: 'loading',
 	children: ( { className } ) => (
@@ -81,7 +83,7 @@ Loading.args = {
 	),
 };
 
-export const SlideIn: Story< typeof Animate > = Template.bind( {} );
+export const SlideIn = Template.bind( {} );
 SlideIn.args = {
 	type: 'slide-in',
 	options: { origin: 'left' },

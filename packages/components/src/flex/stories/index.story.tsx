@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,9 +9,11 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Flex, FlexItem, FlexBlock } from '../';
 import { View } from '../../view';
 
-const meta: ComponentMeta< typeof Flex > = {
+const meta: Meta< typeof Flex > = {
 	component: Flex,
 	title: 'Components/Flex',
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { FlexBlock, FlexItem },
 	argTypes: {
 		align: { control: { type: 'text' } },
 		as: { control: { type: 'text' } },
@@ -29,7 +31,7 @@ const meta: ComponentMeta< typeof Flex > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
@@ -38,7 +40,7 @@ const GrayBox = ( { children }: { children: string } ) => (
 	<View style={ { backgroundColor: '#eee', padding: 10 } }>{ children }</View>
 );
 
-export const Default: ComponentStory< typeof Flex > = ( { ...args } ) => {
+export const Default: StoryFn< typeof Flex > = ( { ...args } ) => {
 	return (
 		<Flex { ...args }>
 			<FlexItem>
@@ -55,9 +57,7 @@ export const Default: ComponentStory< typeof Flex > = ( { ...args } ) => {
 };
 Default.args = {};
 
-export const ResponsiveDirection: ComponentStory< typeof Flex > = ( {
-	...args
-} ) => {
+export const ResponsiveDirection: StoryFn< typeof Flex > = ( { ...args } ) => {
 	return (
 		<Flex { ...args }>
 			<FlexItem>

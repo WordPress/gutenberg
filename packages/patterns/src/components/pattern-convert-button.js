@@ -101,7 +101,12 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 	};
 	return (
 		<>
-			<MenuItem icon={ symbol } onClick={ () => setIsModalOpen( true ) }>
+			<MenuItem
+				icon={ symbol }
+				onClick={ () => setIsModalOpen( true ) }
+				aria-expanded={ isModalOpen }
+				aria-haspopup="dialog"
+			>
 				{ __( 'Create pattern' ) }
 			</MenuItem>
 			{ isModalOpen && (

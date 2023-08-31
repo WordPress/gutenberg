@@ -20,9 +20,7 @@ import {
 	BlockList,
 	BlockTools,
 	WritingFlow,
-	ObserveTyping,
 } from '@wordpress/block-editor';
-import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent() {
@@ -34,16 +32,11 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<SlotFillProvider>
-				<BlockTools>
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList />
-						</ObserveTyping>
-					</WritingFlow>
-				</BlockTools>
-				<Popover.Slot />
-			</SlotFillProvider>
+			<BlockTools>
+				<WritingFlow>
+					<BlockList />
+				</WritingFlow>
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }
@@ -856,6 +849,31 @@ _Returns_
 ### useBlockProps
 
 This hook is used to lightly mark an element as a block element. The element should be the outermost element of a block. Call this hook and pass the returned props to the element to mark as a block. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
+
+Use of this hook on the outermost element of a block is required if using API >= v2.
+
+_Usage_
+
+```js
+import { useBlockProps } from '@wordpress/block-editor';
+
+export default function Edit() {
+
+  const blockProps = useBlockProps(
+    className: 'my-custom-class',
+    style: {
+      color: '#222222',
+      backgroundColor: '#eeeeee'
+    }
+  )
+
+  return (
+    <div { ...blockProps }>
+
+    </div>
+  )
+}
+```
 
 _Parameters_
 

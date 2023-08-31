@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import ResponsiveWrapper from '..';
 
-const meta: ComponentMeta< typeof ResponsiveWrapper > = {
+const meta: Meta< typeof ResponsiveWrapper > = {
 	component: ResponsiveWrapper,
 	title: 'Components/ResponsiveWrapper',
 	argTypes: {
@@ -16,12 +16,12 @@ const meta: ComponentMeta< typeof ResponsiveWrapper > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof ResponsiveWrapper > = ( args ) => (
+const Template: StoryFn< typeof ResponsiveWrapper > = ( args ) => (
 	<ResponsiveWrapper { ...args } />
 );
 
@@ -46,8 +46,7 @@ Default.args = {
  * `<ResponsiveWrapper />`. In this case, the SVG simply keeps scaling up to fill
  * its container, unless the `height` and `width` attributes are specified.
  */
-export const WithSVG: ComponentStory< typeof ResponsiveWrapper > =
-	Template.bind( {} );
+export const WithSVG: StoryFn< typeof ResponsiveWrapper > = Template.bind( {} );
 WithSVG.args = {
 	children: (
 		<svg

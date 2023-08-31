@@ -17,7 +17,7 @@ const config = defineConfig( {
 	forbidOnly: !! process.env.CI,
 	workers: 1,
 	retries: process.env.CI ? 2 : 0,
-	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 100_000, // Defaults to 100 seconds.
+	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 200_000, // Defaults to 200 seconds.
 	// Don't report slow test "files", as we will be running our tests in serial.
 	reportSlowTests: null,
 	testDir: fileURLToPath( new URL( './specs', 'file:' + __filename ).href ),

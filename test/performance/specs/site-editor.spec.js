@@ -111,7 +111,7 @@ test.describe( 'Site Editor Performance', () => {
 
 			// Wait for the canvas to appear.
 			await testPage
-				.locator( '.edit-site-canvas-spinner' )
+				.locator( '.edit-site-canvas-loader' )
 				.waitFor( { state: 'hidden', timeout: 60_000 } );
 
 			// Wait for the first block.
@@ -169,6 +169,10 @@ test.describe( 'Site Editor Performance', () => {
 
 		// Enter edit mode.
 		await editor.canvas.locator( 'body' ).click();
+		// Second click is needed for the legacy edit mode.
+		await editor.canvas
+			.getByRole( 'document', { name: /Block:( Post)? Content/ } )
+			.click();
 
 		// Append an empty paragraph.
 		// Since `editor.insertBlock( { name: 'core/paragraph' } )` is not

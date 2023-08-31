@@ -24,7 +24,7 @@ export default {
 		text: { control: 'text' },
 	},
 	parameters: {
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 

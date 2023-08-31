@@ -1,11 +1,6 @@
 /* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
 
 /**
- * External dependencies
- */
-import { camelCase } from 'change-case';
-
-/**
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
@@ -15,8 +10,8 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import i18nBlockSchema from './i18n-block.json';
-import { BLOCK_ICON_DEFAULT } from './constants';
 import { store as blocksStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 /**
  * An icon type definition. One of a Dashicon slug, an element,
@@ -129,8 +124,6 @@ import { store as blocksStore } from '../store';
  *                                              then no preview is shown.
  */
 
-const serverSideBlockDefinitions = {};
-
 function isObject( object ) {
 	return object !== null && typeof object === 'object';
 }
@@ -142,54 +135,9 @@ function isObject( object ) {
  */
 // eslint-disable-next-line camelcase
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
-	for ( const blockName of Object.keys( definitions ) ) {
-		// Don't overwrite if already set. It covers the case when metadata
-		// was initialized from the server.
-		if ( serverSideBlockDefinitions[ blockName ] ) {
-			// We still need to polyfill `apiVersion` for WordPress version
-			// lower than 5.7. If it isn't present in the definition shared
-			// from the server, we try to fallback to the definition passed.
-			// @see https://github.com/WordPress/gutenberg/pull/29279
-			if (
-				serverSideBlockDefinitions[ blockName ].apiVersion ===
-					undefined &&
-				definitions[ blockName ].apiVersion
-			) {
-				serverSideBlockDefinitions[ blockName ].apiVersion =
-					definitions[ blockName ].apiVersion;
-			}
-			// The `ancestor` prop is not included in the definitions shared
-			// from the server yet, so it needs to be polyfilled as well.
-			// @see https://github.com/WordPress/gutenberg/pull/39894
-			if (
-				serverSideBlockDefinitions[ blockName ].ancestor ===
-					undefined &&
-				definitions[ blockName ].ancestor
-			) {
-				serverSideBlockDefinitions[ blockName ].ancestor =
-					definitions[ blockName ].ancestor;
-			}
-			// The `selectors` prop is not yet included in the server provided
-			// definitions. Polyfill it as well. This can be removed when the
-			// minimum supported WordPress is >= 6.3.
-			if (
-				serverSideBlockDefinitions[ blockName ].selectors ===
-					undefined &&
-				definitions[ blockName ].selectors
-			) {
-				serverSideBlockDefinitions[ blockName ].selectors =
-					definitions[ blockName ].selectors;
-			}
-			continue;
-		}
-
-		serverSideBlockDefinitions[ blockName ] = Object.fromEntries(
-			Object.entries( definitions[ blockName ] )
-				.filter(
-					( [ , value ] ) => value !== null && value !== undefined
-				)
-				.map( ( [ key, value ] ) => [ camelCase( key ), value ] )
-		);
+	const { addBootstrappedBlockType } = unlock( dispatch( blocksStore ) );
+	for ( const [ name, blockType ] of Object.entries( definitions ) ) {
+		addBootstrappedBlockType( name, blockType );
 	}
 }
 
@@ -219,6 +167,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'styles',
 		'example',
 		'variations',
+		'__experimentalAutoInsert',
 	];
 
 	const settings = Object.fromEntries(
@@ -290,29 +239,16 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
+	const { addBootstrappedBlockType, addUnprocessedBlockType } = unlock(
+		dispatch( blocksStore )
+	);
+
 	if ( isObject( blockNameOrMetadata ) ) {
-		unstable__bootstrapServerSideBlockDefinitions( {
-			[ name ]: getBlockSettingsFromMetadata( blockNameOrMetadata ),
-		} );
+		const metadata = getBlockSettingsFromMetadata( blockNameOrMetadata );
+		addBootstrappedBlockType( name, metadata );
 	}
 
-	const blockType = {
-		name,
-		icon: BLOCK_ICON_DEFAULT,
-		keywords: [],
-		attributes: {},
-		providesContext: {},
-		usesContext: [],
-		selectors: {},
-		supports: {},
-		styles: [],
-		variations: [],
-		save: () => null,
-		...serverSideBlockDefinitions?.[ name ],
-		...settings,
-	};
-
-	dispatch( blocksStore ).__experimentalRegisterBlockType( blockType );
+	addUnprocessedBlockType( name, settings );
 
 	return select( blocksStore ).getBlockType( name );
 }

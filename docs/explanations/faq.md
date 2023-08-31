@@ -367,19 +367,6 @@ The main extension point we want to emphasize is creating new blocks. Blocks are
 
 Indeed. There are multiple ways in which custom post types can leverage Gutenberg. The plan is to allow them to specify the blocks they support, as well as defining a default block for the post type. It's not currently the case, but if a post type disables the content field, the “advanced” section at the bottom would fill the page.
 
-## Does Gutenberg support columns?
-
-Yes, a columns block is available in Gutenberg.
-
-## Does Gutenberg support nested blocks?
-
-Yes, it is supported. You can have multiple levels of nesting – blocks within blocks within blocks. See the [Nested Block Tutorial](/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md) for more information.
-
-## Does drag and drop work for rearranging blocks?
-
-Yes, you can drag and drop blocks to rearrange their order.
-
-
 ## Can themes _style_ blocks?
 
 Yes. Blocks can provide their own styles, which themes can add to or override, or they can provide no styles at all and rely fully on what the theme provides.
@@ -417,7 +404,7 @@ Gutenberg works in modern browsers.
 
 The [list of supported browsers can be found in the Make WordPress handbook](https://make.wordpress.org/core/handbook/best-practices/browser-support/). The term “modern browsers” generally refers to the _current and previous two versions_ of each major browser.
 
-Since WordPress 5.8, Gutenberg no longer supports any version of Internet Explorer. 
+Since WordPress 5.8, Gutenberg no longer supports any version of Internet Explorer.
 
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 

@@ -51,7 +51,7 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 /**
  * @typedef {Object} VirtualAnchorElement
  * @property {() => DOMRect} getBoundingClientRect A function returning a DOMRect
- * @property {Document}      ownerDocument         The element's ownerDocument
+ * @property {HTMLElement}   contextElement        The actual DOM element
  */
 
 /**
@@ -64,7 +64,7 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
  */
 function createVirtualAnchorElement( range, editableContentElement ) {
 	return {
-		ownerDocument: range.startContainer.ownerDocument,
+		contextElement: editableContentElement,
 		getBoundingClientRect() {
 			return editableContentElement.contains( range.startContainer )
 				? range.getBoundingClientRect()
