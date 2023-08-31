@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import Button from '../../button';
 import { generateThemeVariables, checkContrasts } from '../color-algorithms';
 import { HStack } from '../../h-stack';
 
-const meta: ComponentMeta< typeof Theme > = {
+const meta: Meta< typeof Theme > = {
 	component: Theme,
 	title: 'Components (Experimental)/Theme',
 	argTypes: {
@@ -25,7 +25,7 @@ const meta: ComponentMeta< typeof Theme > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Theme > = ( args ) => (
+const Template: StoryFn< typeof Theme > = ( args ) => (
 	<Theme { ...args }>
 		<Button variant="primary">Hello</Button>
 	</Theme>
@@ -34,7 +34,7 @@ const Template: ComponentStory< typeof Theme > = ( args ) => (
 export const Default = Template.bind( {} );
 Default.args = {};
 
-export const Nested: ComponentStory< typeof Theme > = ( args ) => (
+export const Nested: StoryFn< typeof Theme > = ( args ) => (
 	<Theme accent="tomato">
 		<Button variant="primary">Outer theme (hardcoded)</Button>
 
@@ -52,7 +52,7 @@ Nested.args = {
 /**
  * The rest of the required colors are generated based on the given accent and background colors.
  */
-export const ColorScheme: ComponentStory< typeof Theme > = ( {
+export const ColorScheme: StoryFn< typeof Theme > = ( {
 	accent,
 	background,
 } ) => {

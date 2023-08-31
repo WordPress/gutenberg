@@ -3,7 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type { MotionProps } from 'framer-motion';
-import type { ReferenceType } from '@floating-ui/react-dom';
+import type { ReferenceType, VirtualElement } from '@floating-ui/react-dom';
 
 /**
  * Internal dependencies
@@ -139,42 +139,6 @@ export const placementToMotionAnimationProps = (
 	};
 };
 
-/**
- * Returns the offset of a document's frame element.
- *
- * @param document The iframe's owner document.
- *
- * @return The offset of the document's frame element, or undefined if the
- * document has no frame element.
- */
-export const getFrameOffset = (
-	document?: Document
-): { x: number; y: number } | undefined => {
-	const frameElement = document?.defaultView?.frameElement;
-	if ( ! frameElement ) {
-		return;
-	}
-	const iframeRect = frameElement.getBoundingClientRect();
-	return { x: iframeRect.left, y: iframeRect.top };
-};
-
-export const getFrameScale = (
-	document?: Document
-): {
-	x: number;
-	y: number;
-} => {
-	const frameElement = document?.defaultView?.frameElement as HTMLElement;
-	if ( ! frameElement ) {
-		return { x: 1, y: 1 };
-	}
-	const rect = frameElement.getBoundingClientRect();
-	return {
-		x: rect.width / frameElement.offsetWidth,
-		y: rect.height / frameElement.offsetHeight,
-	};
-};
-
 export const getReferenceOwnerDocument = ( {
 	anchor,
 	anchorRef,
@@ -197,7 +161,10 @@ export const getReferenceOwnerDocument = ( {
 	// with the `getBoundingClientRect()` function (like real elements).
 	// See https://floating-ui.com/docs/virtual-elements for more info.
 	let resultingReferenceOwnerDoc;
-	if ( anchor ) {
+	if ( ( anchor as VirtualElement )?.contextElement ) {
+		resultingReferenceOwnerDoc = ( anchor as VirtualElement ).contextElement
+			?.ownerDocument;
+	} else if ( anchor ) {
 		resultingReferenceOwnerDoc = anchor.ownerDocument;
 	} else if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
 		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefTopBottom )
@@ -231,13 +198,11 @@ export const getReferenceElement = ( {
 	anchorRect,
 	getAnchorRect,
 	fallbackReferenceElement,
-	scale,
 }: Pick<
 	PopoverProps,
 	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
 > & {
 	fallbackReferenceElement: Element | null;
-	scale: { x: number; y: number };
 } ): ReferenceType | null => {
 	let referenceElement = null;
 
@@ -297,22 +262,6 @@ export const getReferenceElement = ( {
 		// If no explicit ref is passed via props, fall back to
 		// anchoring to the popover's parent node.
 		referenceElement = fallbackReferenceElement.parentElement;
-	}
-
-	if ( referenceElement && ( scale.x !== 1 || scale.y !== 1 ) ) {
-		// If the popover is inside an iframe, the coordinates of the
-		// reference element need to be scaled to match the iframe's scale.
-		const rect = referenceElement.getBoundingClientRect();
-		referenceElement = {
-			getBoundingClientRect() {
-				return new window.DOMRect(
-					rect.x * scale.x,
-					rect.y * scale.y,
-					rect.width * scale.x,
-					rect.height * scale.y
-				);
-			},
-		};
 	}
 
 	// Convert any `undefined` value to `null`.
