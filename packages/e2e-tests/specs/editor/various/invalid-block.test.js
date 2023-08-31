@@ -26,7 +26,7 @@ describe( 'invalid blocks', () => {
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Focus on the textarea and enter an invalid paragraph
-		await canvas().click(
+		await canvas().$(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea'
 		);
 		await page.keyboard.type( '<p>invalid paragraph' );
@@ -47,7 +47,7 @@ describe( 'invalid blocks', () => {
 			( node ) => node.textContent
 		);
 		expect( htmlBlockContent ).toEqual(
-			'<p>hello</p><p>invalid paragraph'
+			'<p class="wp-block-paragraph">hello</p><p>invalid paragraph'
 		);
 	} );
 
@@ -63,7 +63,7 @@ describe( 'invalid blocks', () => {
 		await setPostContent(
 			`
 			<!-- wp:paragraph -->
-			<p>aaaa <img src onerror=alert(1)></x dde></x>1
+			<p class="wp-block-paragraph">aaaa <img src onerror=alert(1)></x dde></x>1
 			<!-- /wp:paragraph -->
 			`
 		);

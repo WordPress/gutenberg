@@ -35,11 +35,11 @@ test.describe( 'Draggable block', () => {
 		// Confirm correct setup.
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->` );
 
 		await editor.canvas.focus(
@@ -87,11 +87,11 @@ test.describe( 'Draggable block', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -107,11 +107,11 @@ test.describe( 'Draggable block', () => {
 		// Confirm correct setup.
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->` );
 
 		await editor.canvas.focus(
@@ -163,11 +163,11 @@ test.describe( 'Draggable block', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -243,11 +243,11 @@ test.describe( 'Draggable block', () => {
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
-<p>2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->` );
 	} );
@@ -328,11 +328,11 @@ test.describe( 'Draggable block', () => {
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
-<p>2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->` );
 	} );

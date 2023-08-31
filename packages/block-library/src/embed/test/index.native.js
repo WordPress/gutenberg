@@ -115,7 +115,7 @@ https://wordpress.org/news/2021/07/tatum/
 <!-- /wp:embed -->`;
 
 const EMPTY_PARAGRAPH_HTML =
-	'<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->';
+	'<!-- wp:paragraph --><p class="wp-block-paragraph"></p><!-- /wp:paragraph -->';
 
 const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 	[ 'youtube', 'twitter', 'wordpress', 'vimeo' ].includes( name )

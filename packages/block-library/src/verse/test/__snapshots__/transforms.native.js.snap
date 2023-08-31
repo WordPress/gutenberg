@@ -20,6 +20,6 @@ exports[`Verse block transforms to Group block 1`] = `
 
 exports[`Verse block transforms to Paragraph block 1`] = `
 "<!-- wp:paragraph -->
-<p>Come<br />Home.</p>
+<p class="wp-block-paragraph">Come<br />Home.</p>
 <!-- /wp:paragraph -->"
 `;

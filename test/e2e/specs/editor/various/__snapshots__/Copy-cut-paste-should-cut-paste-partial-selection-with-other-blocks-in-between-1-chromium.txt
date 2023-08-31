@@ -1,5 +1,5 @@
 <!-- wp:paragraph -->
-<p>A block</p>
+<p class="wp-block-paragraph">A block</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:spacer -->
@@ -7,5 +7,5 @@
 <!-- /wp:spacer -->
 
 <!-- wp:paragraph -->
-<p>B block</p>
+<p class="wp-block-paragraph">B block</p>
 <!-- /wp:paragraph -->

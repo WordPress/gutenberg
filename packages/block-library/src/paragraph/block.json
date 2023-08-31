@@ -33,7 +33,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"className": false,
+		"className": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -65,7 +65,6 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true
 	},
 	"editorStyle": "wp-block-paragraph-editor",

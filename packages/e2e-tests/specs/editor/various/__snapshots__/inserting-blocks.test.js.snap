@@ -2,7 +2,7 @@
 
 exports[`Inserting blocks Should insert content using the placeholder and the regular inserter 1`] = `
 "<!-- wp:paragraph -->
-<p>Paragraph block</p>
+<p class="wp-block-paragraph">Paragraph block</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
@@ -14,13 +14,13 @@ exports[`Inserting blocks Should insert content using the placeholder and the re
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`Inserting blocks Should insert content using the placeholder and the regular inserter 2`] = `
 "<!-- wp:paragraph -->
-<p>Paragraph block</p>
+<p class="wp-block-paragraph">Paragraph block</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
@@ -30,11 +30,11 @@ exports[`Inserting blocks Should insert content using the placeholder and the re
 
 exports[`Inserting blocks Should insert content using the placeholder and the regular inserter 3`] = `
 "<!-- wp:paragraph -->
-<p>Paragraph block</p>
+<p class="wp-block-paragraph">Paragraph block</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p class="wp-block-paragraph">Second paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
@@ -56,18 +56,18 @@ lines preserved[/myshortcode]
 exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from block appender 1`] = `
 "<!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
-<p>Paragraph inside group</p>
+<p class="wp-block-paragraph">Paragraph inside group</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
 <!-- wp:paragraph -->
-<p>Paragraph after group</p>
+<p class="wp-block-paragraph">Paragraph after group</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 1`] = `
 "<!-- wp:paragraph -->
-<p>First paragraph</p>
+<p class="wp-block-paragraph">First paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -75,17 +75,17 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p class="wp-block-paragraph">Second paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third paragraph</p>
+<p class="wp-block-paragraph">Third paragraph</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 2`] = `
 "<!-- wp:paragraph -->
-<p>First paragraph</p>
+<p class="wp-block-paragraph">First paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:cover {"layout":{"type":"constrained"}} -->
@@ -97,11 +97,11 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p class="wp-block-paragraph">Second paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third paragraph</p>
+<p class="wp-block-paragraph">Third paragraph</p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -113,6 +113,6 @@ exports[`Inserting blocks inserts blocks at root level when using the root appen
 <!-- /wp:buttons -->
 
 <!-- wp:paragraph -->
-<p>2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->"
 `;

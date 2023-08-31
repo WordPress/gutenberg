@@ -3,7 +3,7 @@ export const textBlocks = `<!-- wp:heading -->
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
+<p class="wp-block-paragraph"><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"textAlign":"left","level":4,"className":"has-primary-background-color has-background","style":{"typography":{"lineHeight":"2.5"}}} -->
@@ -26,7 +26,7 @@ export const textBlocks = `<!-- wp:heading -->
 
 <!-- wp:quote {"align":"left","className":"is-style-large"} -->
 <blockquote class="wp-block-quote has-text-align-left is-style-large"><!-- wp:paragraph -->
-<p>"This will make running your own blog a viable alternative again."</p>
+<p class="wp-block-paragraph">"This will make running your own blog a viable alternative again."</p>
 <!-- /wp:paragraph --><cite>— <a href="https://twitter.com/azumbrunnen_/status/1019347243084800005">Adrian Zumbrunnen</a></cite></blockquote>
 <!-- /wp:quote -->
 
@@ -35,7 +35,7 @@ export const textBlocks = `<!-- wp:heading -->
 <!-- /wp:pullquote -->
 
 <!-- wp:paragraph {"dropCap":true,"className":"custom-class-1 custom-class-2 has-background has-vivid-red-background-color","fontSize":"large"} -->
-<p class="has-drop-cap custom-class-1 custom-class-2 has-background has-vivid-red-background-color has-large-font-size">
+<p class="wp-block-paragraph has-drop-cap custom-class-1 custom-class-2 has-background has-vivid-red-background-color has-large-font-size">
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tempor tincidunt sapien, quis dictum orci sollicitudin quis. Proin sed elit id est pulvinar feugiat vitae eget dolor. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 <!-- /wp:paragraph -->
 
@@ -146,13 +146,13 @@ export const mediaBlocks = `<!-- wp:image -->
 
 <!-- wp:media-text {"isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
 <div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
-<p class="has-large-font-size"></p>
+<p class="wp-block-paragraph has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->
 
 <!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":890,"dimRatio":20,"overlayColor":"luminous-vivid-orange","focalPoint":{"x":"0.63","y":"0.83"},"minHeight":219} -->
 <div class="wp-block-cover" style="min-height:219px"><span aria-hidden="true" class="wp-block-cover__background has-luminous-vivid-orange-background-color has-background-dim-20 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-890" alt="" src="https://cldup.com/cXyG__fTLN.jpg" style="object-position:63% 83%" data-object-fit="cover" data-object-position="63% 83%"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
-<p class="has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
+<p class="wp-block-paragraph has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
 `;
@@ -172,44 +172,44 @@ export const otherBlocks = `
 
 <!-- wp:group -->
 <div id="this-is-another-anchor" class="wp-block-group"><!-- wp:paragraph -->
-<p>One.</p>
+<p class="wp-block-paragraph">One.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Two</p>
+<p class="wp-block-paragraph">Two</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Three.</p>
+<p class="wp-block-paragraph">Three.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
 <!-- wp:columns {"className":"gutenberg-landing\u002d\u002ddevelopers-columns has-2-columns"} -->
 <div class="wp-block-columns gutenberg-landing--developers-columns has-2-columns"><!-- wp:column -->
 <div class="wp-block-column"><!-- wp:paragraph {"align":"left"} -->
-<p class="has-text-align-left"><strong>Built with modern technology.</strong></p>
+<p class="wp-block-paragraph has-text-align-left"><strong>Built with modern technology.</strong></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p class="has-text-align-left">Gutenberg was developed on GitHub using the WordPress REST API, JavaScript, and React.</p>
+<p class="wp-block-paragraph has-text-align-left">Gutenberg was developed on GitHub using the WordPress REST API, JavaScript, and React.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left","fontSize":"small"} -->
-<p class="has-text-align-left has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/language/">Learn more</a></p>
+<p class="wp-block-paragraph has-text-align-left has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/language/">Learn more</a></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
 <div class="wp-block-column"><!-- wp:paragraph {"align":"left"} -->
-<p class="has-text-align-left"><strong>Designed for compatibility.</strong></p>
+<p class="wp-block-paragraph has-text-align-left"><strong>Designed for compatibility.</strong></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p class="has-text-align-left">We recommend migrating features to blocks, but support for existing WordPress functionality remains. There will be transition paths for shortcodes, meta-boxes, and Custom Post Types.</p>
+<p class="wp-block-paragraph has-text-align-left">We recommend migrating features to blocks, but support for existing WordPress functionality remains. There will be transition paths for shortcodes, meta-boxes, and Custom Post Types.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left","fontSize":"small"} -->
-<p class="has-text-align-left has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/reference/faq/">Learn more</a></p>
+<p class="wp-block-paragraph has-text-align-left has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/reference/faq/">Learn more</a></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->

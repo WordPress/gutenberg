@@ -6,12 +6,12 @@ exports[`cpt locking template_lock all should insert line breaks when using ente
 <!-- /wp:image -->
 
 <!-- wp:paragraph {"placeholder":"Add a description"} -->
-<p>First line<br>Second line<br>Third line</p>
+<p class="wp-block-paragraph">First line<br>Second line<br>Third line</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
@@ -26,12 +26,12 @@ exports[`cpt locking template_lock all should not error when deleting the cotent
 <!-- /wp:image -->
 
 <!-- wp:paragraph {"placeholder":"Add a description"} -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
@@ -43,12 +43,12 @@ exports[`cpt locking template_lock all should not error when deleting the cotent
 exports[`cpt locking template_lock all unlocked group should allow blocks to be moved 1`] = `
 "<!-- wp:group {"templateLock":false} -->
 <div class="wp-block-group"><!-- wp:paragraph {"placeholder":"Add a description"} -->
-<p>p1</p>
+<p class="wp-block-paragraph">p1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote --></div>
 <!-- /wp:group -->"
@@ -58,7 +58,7 @@ exports[`cpt locking template_lock all unlocked group should allow blocks to be 
 "<!-- wp:group {"templateLock":false} -->
 <div class="wp-block-group"><!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote --></div>
 <!-- /wp:group -->"
@@ -70,12 +70,12 @@ exports[`cpt locking template_lock false should allow blocks to be inserted 1`] 
 <!-- /wp:image -->
 
 <!-- wp:paragraph {"placeholder":"Add a description"} -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
@@ -92,7 +92,7 @@ exports[`cpt locking template_lock false should allow blocks to be inserted 1`] 
 
 exports[`cpt locking template_lock false should allow blocks to be moved 1`] = `
 "<!-- wp:paragraph {"placeholder":"Add a description"} -->
-<p>p1</p>
+<p class="wp-block-paragraph">p1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
@@ -101,7 +101,7 @@ exports[`cpt locking template_lock false should allow blocks to be moved 1`] = `
 
 <!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
@@ -117,7 +117,7 @@ exports[`cpt locking template_lock false should allow blocks to be removed 1`] =
 
 <!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
@@ -128,7 +128,7 @@ exports[`cpt locking template_lock false should allow blocks to be removed 1`] =
 
 exports[`cpt locking template_lock insert should allow blocks to be moved 1`] = `
 "<!-- wp:paragraph {"placeholder":"Add a description"} -->
-<p>p1</p>
+<p class="wp-block-paragraph">p1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
@@ -137,7 +137,7 @@ exports[`cpt locking template_lock insert should allow blocks to be moved 1`] = 
 
 <!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 

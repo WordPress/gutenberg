@@ -11,7 +11,7 @@ exports[`Block Grouping Group creation creates a group from multiple blocks of d
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>Some paragraph</p>
+<p class="wp-block-paragraph">Some paragraph</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->"
 `;
@@ -19,15 +19,15 @@ exports[`Block Grouping Group creation creates a group from multiple blocks of d
 exports[`Block Grouping Group creation creates a group from multiple blocks of the same type via block transforms 1`] = `
 "<!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
-<p>First Paragraph</p>
+<p class="wp-block-paragraph">First Paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second Paragraph</p>
+<p class="wp-block-paragraph">Second Paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third Paragraph</p>
+<p class="wp-block-paragraph">Third Paragraph</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->"
 `;
@@ -35,15 +35,15 @@ exports[`Block Grouping Group creation creates a group from multiple blocks of t
 exports[`Block Grouping Group creation creates a group from multiple blocks of the same type via options toolbar 1`] = `
 "<!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
-<p>First Paragraph</p>
+<p class="wp-block-paragraph">First Paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second Paragraph</p>
+<p class="wp-block-paragraph">Second Paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third Paragraph</p>
+<p class="wp-block-paragraph">Third Paragraph</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->"
 `;
@@ -59,7 +59,7 @@ exports[`Block Grouping Group creation groups and ungroups multiple blocks of di
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>Some paragraph</p>
+<p class="wp-block-paragraph">Some paragraph</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->"
 `;
@@ -74,7 +74,7 @@ exports[`Block Grouping Group creation groups and ungroups multiple blocks of di
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>Some paragraph</p>
+<p class="wp-block-paragraph">Some paragraph</p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -93,7 +93,7 @@ exports[`Block Grouping Preserving selected blocks attributes preserves width al
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>Some paragraph</p>
+<p class="wp-block-paragraph">Some paragraph</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->"
 `;
@@ -101,15 +101,15 @@ exports[`Block Grouping Preserving selected blocks attributes preserves width al
 exports[`Block Grouping Registering alternative Blocks to handle Grouping interactions should use registered grouping block for grouping interactions 1`] = `
 "<!-- wp:test/alternative-group-block -->
 <!-- wp:paragraph -->
-<p>First Paragraph</p>
+<p class="wp-block-paragraph">First Paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second Paragraph</p>
+<p class="wp-block-paragraph">Second Paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third Paragraph</p>
+<p class="wp-block-paragraph">Third Paragraph</p>
 <!-- /wp:paragraph -->
 <!-- /wp:test/alternative-group-block -->"
 `;

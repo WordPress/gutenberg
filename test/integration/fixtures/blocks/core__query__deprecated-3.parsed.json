@@ -106,8 +106,10 @@
 							"placeholder": "Add text or blocks that will display when a query returns no results."
 						},
 						"innerBlocks": [],
-						"innerHTML": "\n<p>No results found.</p>\n",
-						"innerContent": [ "\n<p>No results found.</p>\n" ]
+						"innerHTML": "\n<p class=\"wp-block-paragraph\">No results found.</p>\n",
+						"innerContent": [
+							"\n<p class=\"wp-block-paragraph\">No results found.</p>\n"
+						]
 					}
 				],
 				"innerHTML": "\n\n",

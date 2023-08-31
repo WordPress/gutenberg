@@ -34,7 +34,7 @@ describe( 'Block Actions Menu', () => {
 	it( "renders the block name in the Picker's header", async () => {
 		const screen = await initializeEditor( {
 			initialHtml: `<!-- wp:paragraph -->
-            <p></p>
+            <p class="wp-block-paragraph"></p>
             <!-- /wp:paragraph -->`,
 		} );
 		const { getByRole } = screen;

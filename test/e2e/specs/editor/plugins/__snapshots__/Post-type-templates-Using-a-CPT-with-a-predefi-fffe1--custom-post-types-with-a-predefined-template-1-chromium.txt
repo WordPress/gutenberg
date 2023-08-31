@@ -3,12 +3,12 @@
 <!-- /wp:image -->
 
 <!-- wp:paragraph {"placeholder":"Add a book description"} -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
@@ -21,7 +21,7 @@
 
 <!-- wp:column -->
 <div class="wp-block-column"><!-- wp:paragraph {"placeholder":"Add a inner paragraph"} -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->

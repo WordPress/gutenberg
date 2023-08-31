@@ -30,18 +30,18 @@ exports[`Pullquote block transforms to Heading block 1`] = `
 
 exports[`Pullquote block transforms to Paragraph block 1`] = `
 "<!-- wp:paragraph -->
-<p>One of the hardest things to do in technology is disrupt yourself.</p>
+<p class="wp-block-paragraph">One of the hardest things to do in technology is disrupt yourself.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Matt Mullenweg</p>
+<p class="wp-block-paragraph">Matt Mullenweg</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`Pullquote block transforms to Quote block 1`] = `
 "<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>One of the hardest things to do in technology is disrupt yourself.</p>
+<p class="wp-block-paragraph">One of the hardest things to do in technology is disrupt yourself.</p>
 <!-- /wp:paragraph --><cite>Matt Mullenweg</cite></blockquote>
 <!-- /wp:quote -->"
 `;

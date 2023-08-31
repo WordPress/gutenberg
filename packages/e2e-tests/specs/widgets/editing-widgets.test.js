@@ -467,19 +467,19 @@ describe( 'Widgets screen', () => {
 			await saveWidgets();
 			let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-			{
-			  "sidebar-1": "<marquee>Howdy</marquee>",
-			}
-		` );
+									{
+									  "sidebar-1": "<marquee>Howdy</marquee>",
+									}
+							` );
 
 			await page.reload();
 
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-			{
-			  "sidebar-1": "<marquee>Howdy</marquee>",
-			}
-		` );
+									{
+									  "sidebar-1": "<marquee>Howdy</marquee>",
+									}
+							` );
 
 			await addMarquee( 2 );
 
@@ -497,10 +497,10 @@ describe( 'Widgets screen', () => {
 			await saveWidgets();
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-			{
-			  "sidebar-1": "<marquee>Howdy</marquee>",
-			}
-		` );
+									{
+									  "sidebar-1": "<marquee>Howdy</marquee>",
+									}
+							` );
 
 			await page.reload();
 			const marqueesAfter = await findAll( {
@@ -831,10 +831,10 @@ describe( 'Widgets screen', () => {
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		{
 		  "sidebar-1": "<div class="widget widget_block widget_text"><div class="widget-content">
-		<p>First Paragraph</p>
+		<p class="wp-block-paragraph">First Paragraph</p>
 		</div></div>
 		<div class="widget widget_block widget_text"><div class="widget-content">
-		<p>Second Paragraph</p>
+		<p class="wp-block-paragraph">Second Paragraph</p>
 		</div></div>",
 		}
 	` );

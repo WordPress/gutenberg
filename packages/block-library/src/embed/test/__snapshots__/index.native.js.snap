@@ -58,7 +58,7 @@ https://www.youtube.com/watch?v=lXMskKTw3Bc
 
 exports[`Embed block create by pasting URL creates link when pasting URL in paragraph block 1`] = `
 "<!-- wp:paragraph -->
-<p><a href="https://www.youtube.com/watch?v=lXMskKTw3Bc">https://www.youtube.com/watch?v=lXMskKTw3Bc</a></p>
+<p class="wp-block-paragraph"><a href="https://www.youtube.com/watch?v=lXMskKTw3Bc">https://www.youtube.com/watch?v=lXMskKTw3Bc</a></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -134,7 +134,7 @@ https://twitter.com/notnownikki
 
 exports[`Embed block retry converts to link if preview request failed 1`] = `
 "<!-- wp:paragraph -->
-<p><a href="https://twitter.com/notnownikki">https://twitter.com/notnownikki</a></p>
+<p class="wp-block-paragraph"><a href="https://twitter.com/notnownikki">https://twitter.com/notnownikki</a></p>
 <!-- /wp:paragraph -->"
 `;
 

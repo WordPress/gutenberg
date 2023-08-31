@@ -54,15 +54,15 @@ exports[`List block transforms to Heading block 1`] = `
 
 exports[`List block transforms to Paragraph block 1`] = `
 "<!-- wp:paragraph -->
-<p>First Item</p>
+<p class="wp-block-paragraph">First Item</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second Item</p>
+<p class="wp-block-paragraph">Second Item</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third Item</p>
+<p class="wp-block-paragraph">Third Item</p>
 <!-- /wp:paragraph -->"
 `;
 

@@ -13,7 +13,7 @@ describe( 'Parser', () => {
 		else:
 			return "Hello Pony"`;
 
-	const originalBlockHtml = `<p>${ innerContent }</p>`;
+	const originalBlockHtml = `<p class="wp-block-paragraph">${ innerContent }</p>`;
 
 	const gbBlockHtml = `
 		<!-- wp:paragraph -->

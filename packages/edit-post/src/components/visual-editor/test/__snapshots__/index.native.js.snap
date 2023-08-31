@@ -2,11 +2,11 @@
 
 exports[`when nothing is selected media buttons and picker display correctly 1`] = `
 "<!-- wp:paragraph -->
-<p>First example paragraph.</p>
+<p class="wp-block-paragraph">First example paragraph.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second example paragraph.</p>
+<p class="wp-block-paragraph">Second example paragraph.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"linkTo":"none"} -->

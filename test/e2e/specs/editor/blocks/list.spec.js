@@ -79,7 +79,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p>1. </p>
+<p class="wp-block-paragraph">1. </p>
 <!-- /wp:paragraph -->`
 		);
 	} );
@@ -94,7 +94,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p>* </p>
+<p class="wp-block-paragraph">* </p>
 <!-- /wp:paragraph -->`
 		);
 	} );
@@ -112,7 +112,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p>* </p>
+<p class="wp-block-paragraph">* </p>
 <!-- /wp:paragraph -->`
 		);
 	} );
@@ -128,7 +128,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p>* </p>
+<p class="wp-block-paragraph">* </p>
 <!-- /wp:paragraph -->`
 		);
 	} );
@@ -147,7 +147,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p>* </p>
+<p class="wp-block-paragraph">* </p>
 <!-- /wp:paragraph -->`
 		);
 	} );
@@ -162,7 +162,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p>* </p>
+<p class="wp-block-paragraph">* </p>
 <!-- /wp:paragraph -->`
 		);
 	} );
@@ -323,11 +323,11 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p>one</p>
+<p class="wp-block-paragraph">one</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>two</p>
+<p class="wp-block-paragraph">two</p>
 <!-- /wp:paragraph -->`
 		);
 	} );
@@ -347,11 +347,11 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p>one</p>
+<p class="wp-block-paragraph">one</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>two</p>
+<p class="wp-block-paragraph">two</p>
 <!-- /wp:paragraph -->`
 		);
 	} );
@@ -397,7 +397,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->`
 		);
 
@@ -456,7 +456,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
@@ -577,7 +577,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list {"ordered":true} -->
@@ -694,7 +694,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -1085,7 +1085,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p>*\u00a0</p>
+<p class="wp-block-paragraph">*\u00a0</p>
 <!-- /wp:paragraph -->`
 		);
 	} );
@@ -1168,7 +1168,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
@@ -1325,7 +1325,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -1347,11 +1347,11 @@ test.describe( 'List (@firefox)', () => {
 
 		expect( await editor.getEditedPostContent() )
 			.toBe( `<!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->` );
 
 		await page.getByRole( 'button', { name: 'Paragraph' } ).click();

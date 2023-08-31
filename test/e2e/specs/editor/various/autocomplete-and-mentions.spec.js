@@ -90,13 +90,13 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				testData.triggerString = 'I am @da';
 				testData.optionText = 'Darth Vader yourfather';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>I am @yourfather.</p>
+<p class="wp-block-paragraph">I am @yourfather.</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = 'I like ~s';
 				testData.optionText = '🍓 Strawberry';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>I like 🍓.</p>
+<p class="wp-block-paragraph">I like 🍓.</p>
 <!-- /wp:paragraph -->`;
 			}
 
@@ -138,13 +138,13 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				testData.triggerString = '@j';
 				testData.optionText = 'Jane Doe testuser';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>Stuck in the middle with @testuser you.</p>
+<p class="wp-block-paragraph">Stuck in the middle with @testuser you.</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = 'a ~m';
 				testData.optionText = '🥭 Mango';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>Stuck in the middle with a 🥭 you.</p>
+<p class="wp-block-paragraph">Stuck in the middle with a 🥭 you.</p>
 <!-- /wp:paragraph -->`;
 			}
 
@@ -176,7 +176,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				testData.firstOptionText = 'Bilbo Baggins thebetterhobbit';
 				testData.secondOptionText = 'Frodo Baggins ringbearer';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>The two greatest hobbits, in order: @thebetterhobbit @ringbearer.</p>
+<p class="wp-block-paragraph">The two greatest hobbits, in order: @thebetterhobbit @ringbearer.</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.firstTriggerString = 'An awesome combination: ~m';
@@ -184,7 +184,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				testData.firstOptionText = '🥭 Mango';
 				testData.secondOptionText = '🫐 Blueberry';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>An awesome combination: 🥭 🫐.</p>
+<p class="wp-block-paragraph">An awesome combination: 🥭 🫐.</p>
 <!-- /wp:paragraph -->`;
 			}
 
@@ -220,13 +220,13 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				testData.triggerString = '@';
 				testData.optionText = 'Katniss Everdeen mockingjay';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>@mockingjay</p>
+<p class="wp-block-paragraph">@mockingjay</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = '~';
 				testData.optionText = '🍓 Strawberry';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>🍓</p>
+<p class="wp-block-paragraph">🍓</p>
 <!-- /wp:paragraph -->`;
 			}
 
@@ -259,13 +259,13 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				testData.triggerString = '@';
 				testData.optionText = 'Jean-Luc Picard makeitso';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>@makeitso</p>
+<p class="wp-block-paragraph">@makeitso</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = '~';
 				testData.optionText = '🍒 Cherry';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>🍒</p>
+<p class="wp-block-paragraph">🍒</p>
 <!-- /wp:paragraph -->`;
 			}
 
@@ -294,7 +294,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				testData.optionText = 'Jane Doe testuser';
 				testData.postCompleterInput = ' ...a secret.';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>My name is @j ...a secret.</p>
+<p class="wp-block-paragraph">My name is @j ...a secret.</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = 'My favorite fruit is ~a';
@@ -302,7 +302,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				testData.postCompleterInput =
 					" ...no I changed my mind. It's mango.";
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>My favorite fruit is ~a ...no I changed my mind. It's mango.</p>
+<p class="wp-block-paragraph">My favorite fruit is ~a ...no I changed my mind. It's mango.</p>
 <!-- /wp:paragraph -->`;
 			}
 
@@ -339,7 +339,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				await page.keyboard.type( ' grapes.' );
 				await expect.poll( editor.getEditedPostContent )
 					.toBe( `<!-- wp:paragraph -->
-<p>Sorry, we are all out of ~g grapes.</p>
+<p class="wp-block-paragraph">Sorry, we are all out of ~g grapes.</p>
 <!-- /wp:paragraph -->` );
 			} );
 		}
@@ -353,45 +353,45 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				testData.triggerString = '@bu';
 				testData.optionText = 'Buddy Elf buddytheelf';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>@buddytheelf test</p>
+<p class="wp-block-paragraph">@buddytheelf test</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>@buddytheelf test</p>
+<p class="wp-block-paragraph">@buddytheelf test</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>@buddytheelf test</p>
+<p class="wp-block-paragraph">@buddytheelf test</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>@buddytheelf test</p>
+<p class="wp-block-paragraph">@buddytheelf test</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = '~b';
 				testData.optionText = '🫐 Blueberry';
 				testData.snapshot = `<!-- wp:paragraph -->
-<p>🫐 test</p>
+<p class="wp-block-paragraph">🫐 test</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>🫐 test</p>
+<p class="wp-block-paragraph">🫐 test</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>🫐 test</p>
+<p class="wp-block-paragraph">🫐 test</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>🫐 test</p>
+<p class="wp-block-paragraph">🫐 test</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->`;
 			}
 
@@ -436,7 +436,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>@ringbearer +thebetterhobbit</p>
+<p class="wp-block-paragraph">@ringbearer +thebetterhobbit</p>
 <!-- /wp:paragraph -->` );
 	} );
 

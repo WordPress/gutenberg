@@ -90,7 +90,7 @@ Due to the lack of inline snapshots in Playwright, some migrated tests are using
 
 ```js
 expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:paragraph -->
-<p>Paragraph</p>
+<p class="wp-block-paragraph">Paragraph</p>
 <!-- /wp:paragraph -->` );
 ```
 

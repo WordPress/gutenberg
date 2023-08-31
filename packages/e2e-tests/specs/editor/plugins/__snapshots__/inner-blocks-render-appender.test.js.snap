@@ -4,7 +4,7 @@ exports[`RenderAppender prop of InnerBlocks Users can customize the appender and
 "<!-- wp:test/inner-blocks-render-appender -->
 <div style="outline:1px solid gray;padding:5px" class="wp-block-test-inner-blocks-render-appender"><!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote --></div>
 <!-- /wp:test/inner-blocks-render-appender -->"
@@ -14,7 +14,7 @@ exports[`RenderAppender prop of InnerBlocks Users can dynamically customize the 
 "<!-- wp:test/inner-blocks-render-appender-dynamic -->
 <div style="outline:1px solid gray;padding:5px" class="wp-block-test-inner-blocks-render-appender-dynamic"><!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 

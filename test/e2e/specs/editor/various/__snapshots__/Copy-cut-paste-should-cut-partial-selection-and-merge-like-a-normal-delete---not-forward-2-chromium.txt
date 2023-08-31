@@ -3,7 +3,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Paragra</p>
+<p class="wp-block-paragraph">Paragra</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->

@@ -65,7 +65,7 @@ async function setLocalAutosaveInterval( value ) {
 
 function wrapParagraph( text ) {
 	return `<!-- wp:paragraph -->
-<p>${ text }</p>
+<p class="wp-block-paragraph">${ text }</p>
 <!-- /wp:paragraph -->`;
 }
 

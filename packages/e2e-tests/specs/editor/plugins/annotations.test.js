@@ -131,7 +131,9 @@ describe( 'Annotations', () => {
 		}, htmlContent[ 0 ] );
 
 		// There should be no <mark> tags in the raw content.
-		expect( html ).toBe( '&lt;p&gt;Paragraph to annotate&lt;/p&gt;' );
+		expect( html ).toBe(
+			'&lt;p class="wp-block-paragraph"&gt;Paragraph to annotate&lt;/p&gt;'
+		);
 	} );
 
 	it( 'keeps the cursor in the same location when applying annotation', async () => {

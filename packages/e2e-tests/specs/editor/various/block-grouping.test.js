@@ -152,7 +152,7 @@ describe( 'Block Grouping', () => {
 			"<!-- wp:group {"layout":{"type":"constrained"}} -->
 			<div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
 			<div class="wp-block-group"><!-- wp:paragraph -->
-			<p>1</p>
+			<p class="wp-block-paragraph">1</p>
 			<!-- /wp:paragraph --></div>
 			<!-- /wp:group --></div>
 			<!-- /wp:group -->"

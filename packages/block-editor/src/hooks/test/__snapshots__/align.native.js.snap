@@ -56,18 +56,18 @@ exports[`Align options for media block sets Wide width option 1`] = `
 
 exports[`Align options for text block sets Align text center option 1`] = `
 "<!-- wp:paragraph {"align":"center"} -->
-<p class="has-text-align-center"></p>
+<p class="wp-block-paragraph has-text-align-center"></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`Align options for text block sets Align text left option 1`] = `
 "<!-- wp:paragraph {"align":"left"} -->
-<p class="has-text-align-left"></p>
+<p class="wp-block-paragraph has-text-align-left"></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`Align options for text block sets Align text right option 1`] = `
 "<!-- wp:paragraph {"align":"right"} -->
-<p class="has-text-align-right"></p>
+<p class="wp-block-paragraph has-text-align-right"></p>
 <!-- /wp:paragraph -->"
 `;

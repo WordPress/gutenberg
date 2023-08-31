@@ -249,7 +249,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<h1 class="wp-block-heading">Some <em>heading</em></h1><p>A paragraph.</p>'
+			'<h1 class="wp-block-heading">Some <em>heading</em></h1><p class="wp-block-paragraph">A paragraph.</p>'
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -367,7 +367,9 @@ describe( 'Blocks raw handling', () => {
 			.map( getBlockContent )
 			.join( '' );
 
-		expect( transformed ).toBe( '<p>1</p><p>2</p>' );
+		expect( transformed ).toBe(
+			'<p class="wp-block-paragraph">1</p><p class="wp-block-paragraph">2</p>'
+		);
 		expect( console ).toHaveLogged();
 	} );
 

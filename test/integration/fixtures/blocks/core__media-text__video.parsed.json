@@ -12,9 +12,9 @@
 					"fontSize": "large"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t\t<p class=\"has-large-font-size\">My Content</p>\n\t\t",
+				"innerHTML": "\n\t\t<p class=\"wp-block-paragraph has-large-font-size\">My Content</p>\n\t\t",
 				"innerContent": [
-					"\n\t\t<p class=\"has-large-font-size\">My Content</p>\n\t\t"
+					"\n\t\t<p class=\"wp-block-paragraph has-large-font-size\">My Content</p>\n\t\t"
 				]
 			}
 		],

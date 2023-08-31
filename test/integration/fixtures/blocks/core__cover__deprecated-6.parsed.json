@@ -14,9 +14,9 @@
 					"fontSize": "large"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t\t<p class=\"has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>\n\t\t",
+				"innerHTML": "\n\t\t<p class=\"wp-block-paragraph has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>\n\t\t",
 				"innerContent": [
-					"\n\t\t<p class=\"has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>\n\t\t"
+					"\n\t\t<p class=\"wp-block-paragraph has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>\n\t\t"
 				]
 			}
 		],
@@ -53,8 +53,10 @@
 				"blockName": "core/paragraph",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n\t\t<p></p>\n\t\t",
-				"innerContent": [ "\n\t\t<p></p>\n\t\t" ]
+				"innerHTML": "\n\t\t<p class=\"wp-block-paragraph\"></p>\n\t\t",
+				"innerContent": [
+					"\n\t\t<p class=\"wp-block-paragraph\"></p>\n\t\t"
+				]
 			}
 		],
 		"innerHTML": "\n<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"background-image: url( https://example.com/some-background-image.png ); min-height: 48vw; background-position: 50% 40%;\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
@@ -87,9 +89,9 @@
 					"fontSize": "large"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t\t<p class=\"has-text-align-center has-large-font-size\">test</p>\n\t\t",
+				"innerHTML": "\n\t\t<p class=\"wp-block-paragraph has-text-align-center has-large-font-size\">test</p>\n\t\t",
 				"innerContent": [
-					"\n\t\t<p class=\"has-text-align-center has-large-font-size\">test</p>\n\t\t"
+					"\n\t\t<p class=\"wp-block-paragraph has-text-align-center has-large-font-size\">test</p>\n\t\t"
 				]
 			}
 		],

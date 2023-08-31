@@ -242,7 +242,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p><strong><em>1</em> <em>2</em></strong></p>
+<p class="wp-block-paragraph"><strong><em>1</em> <em>2</em></strong></p>
 <!-- /wp:paragraph -->` );
 
 		await page.keyboard.type( 'a' );
@@ -267,7 +267,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>a<strong>b<em>c1d</em>e f<em>g2h</em>i</strong>j</p>
+<p class="wp-block-paragraph">a<strong>b<em>c1d</em>e f<em>g2h</em>i</strong>j</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -281,7 +281,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>a<br></p>
+<p class="wp-block-paragraph">a<br></p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -296,7 +296,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'b' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>a<br>b</p>
+<p class="wp-block-paragraph">a<br>b</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -311,7 +311,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>a<br>b</p>
+<p class="wp-block-paragraph">a<br>b</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -326,7 +326,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p><br>a</p>
+<p class="wp-block-paragraph"><br>a</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -339,7 +339,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p><br></p>
+<p class="wp-block-paragraph"><br></p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -401,14 +401,14 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>1  3</p>
+<p class="wp-block-paragraph">1  3</p>
 <!-- /wp:paragraph -->` );
 
 		await page.keyboard.type( '2' );
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>1 2 3</p>
+<p class="wp-block-paragraph">1 2 3</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -427,14 +427,14 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>alpha  gamma</p>
+<p class="wp-block-paragraph">alpha  gamma</p>
 <!-- /wp:paragraph -->` );
 
 		await page.keyboard.type( 'beta' );
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>alpha beta gamma</p>
+<p class="wp-block-paragraph">alpha beta gamma</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -454,14 +454,14 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>alpha  gamma</p>
+<p class="wp-block-paragraph">alpha  gamma</p>
 <!-- /wp:paragraph -->` );
 
 		await page.keyboard.type( 'beta' );
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>alpha beta gamma</p>
+<p class="wp-block-paragraph">alpha beta gamma</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -600,7 +600,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>12</p>
+<p class="wp-block-paragraph">12</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -618,11 +618,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>abc</p>
+<p class="wp-block-paragraph">abc</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>123</p>
+<p class="wp-block-paragraph">123</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -642,7 +642,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>1<br>2</p>
+<p class="wp-block-paragraph">1<br>2</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -657,7 +657,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>123</p>
+<p class="wp-block-paragraph">123</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -676,18 +676,18 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'Delete', { times: 2 } );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>3</p>
+<p class="wp-block-paragraph">3</p>
 <!-- /wp:paragraph -->` );
 
 		await page.keyboard.press( 'Delete' );
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>13</p>
+<p class="wp-block-paragraph">13</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -707,11 +707,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>abc</p>
+<p class="wp-block-paragraph">abc</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>123</p>
+<p class="wp-block-paragraph">123</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -731,11 +731,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>1x</p>
+<p class="wp-block-paragraph">1x</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><br>2</p>
+<p class="wp-block-paragraph"><br>2</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -827,11 +827,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>23</p>
+<p class="wp-block-paragraph">23</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -862,7 +862,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// Confirm correct setup.
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"align":"wide"} -->
@@ -999,11 +999,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>first</p>
+<p class="wp-block-paragraph">first</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>second</p>
+<p class="wp-block-paragraph">second</p>
 <!-- /wp:paragraph -->` );
 	} );
 

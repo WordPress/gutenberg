@@ -2,7 +2,7 @@
 
 exports[`Embedding content should allow the user to convert unembeddable URLs to a paragraph with a link in it 1`] = `
 "<!-- wp:paragraph -->
-<p><a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a></p>
+<p class="wp-block-paragraph"><a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a></p>
 <!-- /wp:paragraph -->"
 `;
 

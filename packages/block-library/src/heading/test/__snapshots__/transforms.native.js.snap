@@ -28,7 +28,7 @@ exports[`Heading block transforms to List block 1`] = `
 
 exports[`Heading block transforms to Paragraph block 1`] = `
 "<!-- wp:paragraph -->
-<p>Example text</p>
+<p class="wp-block-paragraph">Example text</p>
 <!-- /wp:paragraph -->"
 `;
 

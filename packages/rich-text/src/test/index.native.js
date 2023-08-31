@@ -243,7 +243,7 @@ describe( '<RichText/>', () => {
 		it( 'renders component with style and font size', async () => {
 			// Arrange.
 			const initialHtml = `<!-- wp:paragraph {"style":{"color":{"text":"#fcb900"},"typography":{"fontSize":35.56}}} -->
-					<p class="has-text-color" style="color:#fcb900;font-size:35.56px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed imperdiet ut nibh vitae ornare. Sed auctor nec augue at blandit.</p>
+					<p class="wp-block-paragraph has-text-color" style="color:#fcb900;font-size:35.56px">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed imperdiet ut nibh vitae ornare. Sed auctor nec augue at blandit.</p>
 					<!-- /wp:paragraph -->`;
 			// Act.
 			await initializeEditor( { initialHtml } );
