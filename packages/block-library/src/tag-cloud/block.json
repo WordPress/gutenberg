@@ -50,5 +50,6 @@
 			"__experimentalLetterSpacing": true
 		}
 	},
-	"editorStyle": "wp-block-tag-cloud-editor"
+	"editorScript": "file:./editor.min.js",
+	"style": "file:./style.css"
 }

@@ -33,5 +33,6 @@
 		"reusable": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-social-link-editor"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

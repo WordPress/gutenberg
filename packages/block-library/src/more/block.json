@@ -22,5 +22,6 @@
 		"html": false,
 		"multiple": false
 	},
-	"editorStyle": "wp-block-more-editor"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

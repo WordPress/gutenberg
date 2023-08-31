@@ -42,5 +42,8 @@
 			}
 		},
 		"html": false
-	}
+	},
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

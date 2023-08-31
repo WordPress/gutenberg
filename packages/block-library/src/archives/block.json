@@ -49,5 +49,6 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-archives-editor"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

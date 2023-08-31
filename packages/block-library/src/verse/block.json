@@ -57,6 +57,6 @@
 			"style": true
 		}
 	},
-	"style": "wp-block-verse",
-	"editorStyle": "wp-block-verse-editor"
+	"editorScript": "file:./editor.min.js",
+	"style": "file:./style.css"
 }

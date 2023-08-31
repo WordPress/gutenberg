@@ -23,6 +23,5 @@
 		"html": false,
 		"customClassName": false,
 		"reusable": false
-	},
-	"editorStyle": "wp-block-legacy-widget-editor"
+	}
 }

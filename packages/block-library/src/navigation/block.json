@@ -137,6 +137,7 @@
 		"renaming": false
 	},
 	"viewScript": "file:./view.min.js",
-	"editorStyle": "wp-block-navigation-editor",
-	"style": "wp-block-navigation"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

@@ -13,5 +13,6 @@
 		"className": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-nextpage-editor"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

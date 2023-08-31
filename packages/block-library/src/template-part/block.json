@@ -26,5 +26,6 @@
 		"reusable": false,
 		"renaming": false
 	},
-	"editorStyle": "wp-block-template-part-editor"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

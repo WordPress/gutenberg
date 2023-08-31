@@ -67,6 +67,7 @@
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true
 	},
-	"editorStyle": "wp-block-paragraph-editor",
-	"style": "wp-block-paragraph"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

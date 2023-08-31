@@ -40,6 +40,7 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-buttons-editor",
-	"style": "wp-block-buttons"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

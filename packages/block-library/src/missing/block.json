@@ -24,5 +24,6 @@
 		"inserter": false,
 		"html": false,
 		"reusable": false
-	}
+	},
+	"editorScript": "file:./editor.min.js"
 }

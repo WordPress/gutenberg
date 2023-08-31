@@ -47,6 +47,7 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-comments-editor",
-	"usesContext": [ "postId", "postType" ]
+	"usesContext": [ "postId", "postType" ],
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

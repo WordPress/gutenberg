@@ -62,6 +62,7 @@
 		"__unstablePasteTextInline": true,
 		"__experimentalSlashInserter": true
 	},
-	"editorStyle": "wp-block-heading-editor",
-	"style": "wp-block-heading"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

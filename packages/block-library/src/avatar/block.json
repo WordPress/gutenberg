@@ -55,6 +55,7 @@
 	"selectors": {
 		"border": ".wp-block-avatar img"
 	},
-	"editorStyle": "wp-block-avatar-editor",
-	"style": "wp-block-avatar"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }
