@@ -21,13 +21,20 @@ gutenberg_pre_init();
 /**
  * Display a version notice and deactivate the Gutenberg plugin.
  *
- * @since 0.1.0
+ * @since 17.9.0
  */
-function gutenberg_wordpress_version_notice() {
-	echo '<div class="error"><p>';
-	/* translators: %s: Minimum required version */
-	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), '5.9' );
-	echo '</p></div>';
+function gutenberg_version_notice() {
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	$requirements = validate_plugin_requirements( 'gutenberg/gutenberg.php' );
+	$errors       = $requirements->errors;
+
+	if ( isset( $errors['plugin_wp_php_incompatible'][0] ) ) {
+		echo '<div class="error">' . $errors['plugin_wp_php_incompatible'][0] . '</div>';
+	} elseif ( isset( $errors['plugin_wp_incompatible'][0] ) ) {
+		echo '<div class="error">' . $errors['plugin_wp_incompatible'][0] . '</div>';
+	} elseif ( isset( $errors['plugin_php_incompatible'][0] ) ) {
+		echo '<div class="error">' . $errors['plugin_php_incompatible'][0] . '</div>';
+	}
 
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
 }
@@ -47,28 +54,20 @@ function gutenberg_build_files_notice() {
  * Verify that we can initialize the Gutenberg editor , then load it.
  *
  * @since 1.5.0
- *
- * @global string $wp_version             The WordPress version string.
- *
+ * @since 17.9.0 Use `validate_plugin_requirements()` to validate WordPress
+ *               version and PHP version requirements.
  */
 function gutenberg_pre_init() {
-	global $wp_version;
 	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( __DIR__ . '/build/blocks' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}
 
-	// Get unmodified $wp_version.
-	include ABSPATH . WPINC . '/version.php';
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	$requirements = validate_plugin_requirements( 'gutenberg/gutenberg.php' );
 
-	// Strip '-src' from the version string. Messes up version_compare().
-	$version = str_replace( '-src', '', $wp_version );
-
-	// Compare against major release versions (X.Y) rather than minor (X.Y.Z)
-	// unless a minor release is the actual minimum requirement. WordPress reports
-	// X.Y for its major releases.
-	if ( version_compare( $version, '5.9', '<' ) ) {
-		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
+	if ( is_wp_error( $requirements ) ) {
+		add_action( 'admin_notices', 'gutenberg_version_notice' );
 		return;
 	}
 
