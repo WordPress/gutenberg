@@ -25,6 +25,5 @@ class Tests_Fonts_WPRESTFontLibraryController_RegisterRoutes extends WP_UnitTest
 		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/fonts/collections'][0]['methods'], 'Rest server has not the GET method for collections intialized.' );
 		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/fonts/collections/(?P<id>[\/\w-]+)'][0]['methods'], 'Rest server has not the GET method for collection intialized.' );
 	}
-
 }
 

@@ -415,6 +415,5 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 			),
 		);
 	}
-
 }
 

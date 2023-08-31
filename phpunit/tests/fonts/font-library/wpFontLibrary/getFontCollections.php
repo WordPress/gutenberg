@@ -42,5 +42,4 @@ class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'another-font-collection', $font_collections, 'The array should have the key of the registered font collection id.' );
 		$this->assertInstanceOf( 'WP_Font_Collection', $font_collections['another-font-collection'], 'The value of the array $font_collections[id] should be an instance of WP_Font_Collection class.' );
 	}
-
 }

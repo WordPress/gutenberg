@@ -42,6 +42,5 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollections extends WP_REST
 		$this->assertArrayHasKey( 'id', $data[0], 'The response data does not have the key with the collection ID.' );
 		$this->assertArrayHasKey( 'name', $data[0], 'The response data does not have the key with the collection name.' );
 	}
-
 }
 

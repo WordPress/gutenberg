@@ -95,7 +95,6 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 		$response->get_data();
 		$this->assertSame( 500, $response->get_status(), 'The response status is not 500.' );
 	}
-
 }
 
 
