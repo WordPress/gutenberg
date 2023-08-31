@@ -8,6 +8,7 @@ import { hydrate, render } from 'preact';
 import { toVdom, hydratedIslands } from './vdom';
 import { createRootFragment } from './utils';
 import { directivePrefix } from './constants';
+import { updateHead } from './head';
 
 // The cache of visited and prefetched pages.
 const pages = new Map();
@@ -40,7 +41,10 @@ const fetchPage = async ( url, { html } ) => {
 			html = await res.text();
 		}
 		const dom = new window.DOMParser().parseFromString( html, 'text/html' );
-		return regionsToVdom( dom );
+		return {
+			head: dom.querySelector( 'head' ),
+			regions: regionsToVdom( dom ),
+		};
 	} catch ( e ) {
 		return false;
 	}
@@ -56,7 +60,7 @@ const regionsToVdom = ( dom ) => {
 		regions[ id ] = toVdom( region );
 	} );
 
-	return { regions };
+	return regions;
 };
 
 // Prefetch a page. We store the promise to avoid triggering a second fetch for
@@ -78,13 +82,17 @@ const renderRegions = ( page ) => {
 	} );
 };
 
+const nextTick = ( fn ) =>
+	new Promise( ( resolve ) => setTimeout( () => resolve( fn() ) ) );
+
 // Navigate to a new page.
 export const navigate = async ( href, options = {} ) => {
 	const url = cleanUrl( href );
 	prefetch( url, options );
 	const page = await pages.get( url );
 	if ( page ) {
-		renderRegions( page );
+		await updateHead( page.head );
+		await nextTick( () => renderRegions( page ) );
 		window.history[ options.replace ? 'replaceState' : 'pushState' ](
 			{},
 			'',
@@ -101,7 +109,8 @@ window.addEventListener( 'popstate', async () => {
 	const url = cleanUrl( window.location ); // Remove hash.
 	const page = pages.has( url ) && ( await pages.get( url ) );
 	if ( page ) {
-		renderRegions( page );
+		await updateHead( page.head );
+		await nextTick( () => renderRegions( page ) );
 	} else {
 		window.location.reload();
 	}
@@ -122,6 +131,9 @@ export const init = async () => {
 	// Cache the current regions.
 	pages.set(
 		cleanUrl( window.location ),
-		Promise.resolve( regionsToVdom( document ) )
+		Promise.resolve( {
+			head: document.head,
+			regions: regionsToVdom( document ),
+		} )
 	);
 };
