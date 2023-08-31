@@ -40,6 +40,7 @@ import {
 	MEDIA_TYPE_AUDIO,
 	MEDIA_TYPE_ANY,
 } from './constants';
+import styles from './style.scss';
 
 const URL_MEDIA_SOURCE = 'URL';
 
@@ -320,7 +321,7 @@ function URLInput( props ) {
 			isVisible={ props.isVisible }
 			onClose={ props.onClose }
 		>
-			<PanelBody>
+			<PanelBody style={ styles[ 'media-upload__link-input' ] }>
 				<TextControl
 					// eslint-disable-next-line jsx-a11y/no-autofocus
 					autoFocus
