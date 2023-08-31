@@ -74,7 +74,7 @@ test.describe( 'Post Editor Performance', () => {
 
 		const samples = 10;
 		const throwaway = 1;
-		const rounds = throwaway + samples;
+		const rounds = samples + throwaway;
 		for ( let i = 0; i < rounds; i++ ) {
 			test( `Get the durations (${ i + 1 } of ${ rounds })`, async ( {
 				page,
@@ -83,21 +83,21 @@ test.describe( 'Post Editor Performance', () => {
 				// Go to the test page.
 				await page.goto( draftURL );
 
-				// Wait for canvas (legacy or iframed).
+				// Wait for the editor canvas (legacy or iframed).
 				await Promise.any( [
 					page.locator( '.wp-block-post-content' ).waitFor(),
 					page
 						.frameLocator( '[name=editor-canvas]' )
-						.locator( 'body > *' )
-						.first()
+						.locator( 'body' )
 						.waitFor(),
 				] );
 
+				// Wait for the first block to be ready.
 				await editor.canvas.locator( '.wp-block' ).first().waitFor( {
 					timeout: 120_000,
 				} );
 
-				// Save the results.
+				// Get the durations.
 				if ( i >= throwaway ) {
 					const loadingDurations = await getLoadingDurations( page );
 					Object.entries( loadingDurations ).forEach(
@@ -171,7 +171,7 @@ test.describe( 'Post Editor Performance', () => {
 			)
 		);
 
-		// Select the block where we type in
+		// Select the block where we type in.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Paragraph block' } )
 			.first()
@@ -188,6 +188,8 @@ test.describe( 'Post Editor Performance', () => {
 		// probably deserves a dedicated metric itself, though.
 		const throwaway = 1;
 		const rounds = samples + throwaway;
+
+		// Start typing in the middle of the text.
 		await page.keyboard.type( 'x'.repeat( rounds ), {
 			delay: BROWSER_IDLE_WAIT,
 		} );

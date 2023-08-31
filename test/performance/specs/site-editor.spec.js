@@ -93,18 +93,23 @@ test.describe( 'Site Editor Performance', () => {
 		for ( let i = 0; i < rounds; i++ ) {
 			test( `Get the durations (${ i + 1 } of ${ rounds })`, async ( {
 				page,
+				editor,
 			} ) => {
 				// Go to the test page.
 				await page.goto( draftURL );
 
-				// Wait for the first block.
+				// Wait for the editor canvas.
 				await page
-					.frameLocator( 'iframe[name="editor-canvas"]' )
-					.locator( '.wp-block' )
-					.first()
-					.waitFor( { timeout: 60_000 } );
+					.frameLocator( '[name=editor-canvas]' )
+					.locator( 'body' )
+					.waitFor();
 
-				// Save the results.
+				// Wait for the first block to be ready.
+				await editor.canvas.locator( '.wp-block' ).first().waitFor( {
+					timeout: 120_000,
+				} );
+
+				// Get the durations.
 				if ( i >= throwaway ) {
 					const loadingDurations = await getLoadingDurations( page );
 					Object.entries( loadingDurations ).forEach(
