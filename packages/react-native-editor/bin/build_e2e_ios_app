@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+
+DEFAULT_DESTINATION='platform=iOS Simulator,name=iPhone 13'
+if [[ -z "${RN_EDITOR_E2E_IOS_DESTINATION-}" ]]; then
+	DESTINATION="$DEFAULT_DESTINATION"
+else
+	DESTINATION="$RN_EDITOR_E2E_IOS_DESTINATION"
+fi
+
+# Script that encapsulates the xcodebuild call to build the app for E2E testing
+# to allow customizing the destination argument without hardcoding a value
+SKIP_BUNDLING=true \
+	xcodebuild \
+	-workspace ios/GutenbergDemo.xcworkspace \
+	-configuration Release \
+	-scheme GutenbergDemo \
+	-derivedDataPath ios/build/GutenbergDemo \
+	-destination "$DESTINATION"
