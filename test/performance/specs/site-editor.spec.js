@@ -97,11 +97,6 @@ test.describe( 'Site Editor Performance', () => {
 				// Go to the test page.
 				await page.goto( draftURL );
 
-				// Wait for the canvas.
-				await page
-					.locator( '.edit-site-canvas-spinner' )
-					.waitFor( { state: 'hidden', timeout: 60_000 } );
-
 				// Wait for the first block.
 				await page
 					.frameLocator( 'iframe[name="editor-canvas"]' )
