@@ -68,6 +68,12 @@ Set this to customize the text that is shown in the dropdown's header when it is
 
 -   Required: No
 
+### `isOpen`: `boolean`
+
+Control whether the dropdown is open or not.
+
+-   Required: No
+
 ### `onClose`: `() => void`
 
 A callback invoked when the popover should be closed.

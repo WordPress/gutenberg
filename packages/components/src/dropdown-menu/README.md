@@ -171,6 +171,20 @@ A class name to apply to the dropdown menu's toggle element wrapper.
 
 -   Required: No
 
+### `isOpen`: `boolean`
+
+Control whether the dropdown is open or not.
+
+-   Required: No
+
+### `onToggle`: `( willOpen: boolean ) => void`
+
+A callback invoked when the state of the popover changes from open to closed and vice versa.
+
+The callback receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
+
+-   Required: No
+
 #### `popoverProps`: `DropdownProps[ 'popoverProps' ]`
 
 Properties of `popoverProps` object will be passed as props to the nested `Popover` component.
