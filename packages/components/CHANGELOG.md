@@ -31,6 +31,7 @@
 
 ### Enhancements
 
+-   `Dropdown` and `DropdownMenu` allow controlled `isOpen` prop. `DropdownMenu` allow `onToggle` callback ([#54083](https://github.com/WordPress/gutenberg/pull/54083)).
 -   `ProgressBar`: Add transition to determinate indicator ([#53877](https://github.com/WordPress/gutenberg/pull/53877)).
 -   Prevent nested `SlotFillProvider` from rendering ([#53940](https://github.com/WordPress/gutenberg/pull/53940)).
 
