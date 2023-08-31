@@ -3,10 +3,9 @@
  */
 import { createContext, useState, useEffect } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -21,6 +20,14 @@ import { setUIValuesNeeded, isUrlEncoded } from './utils';
 export const FontLibraryContext = createContext( {} );
 
 function FontLibraryProvider( { children } ) {
+
+	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( coreStore );
+	const { globalStylesId } = useSelect( ( select ) => {
+		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		return { globalStylesId	};
+	});
+
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
@@ -176,15 +183,24 @@ function FontLibraryProvider( { children } ) {
 		}
 	}
 
-	async function uninstallFonts( fonts ) {
+	async function uninstallFont( font ) {
 		try {
-			await fetchUninstallFonts( fonts );
+			// Uninstall the font (remove the font files from the server and the post from the database).
+			await fetchUninstallFonts( [ font ] );
+			// Deactivate the font family (remove the font family from the global styles).
+			deactivateFontFamily( font );
+			// Save the global styles to the database.
+			await saveEditedEntityRecord( 'root', 'globalStyles', globalStylesId );
+			// Refresh the library (the the library font families from database).
+			refreshLibrary();
+
 			createSuccessNotice( __( `Font families were uninstalled.` ), {
 				type: 'snackbar',
 			} );
-			refreshLibrary();
+			
 			return true;
 		} catch ( e ) {
+			console.error(e);
 			createErrorNotice( __( 'Error uninstallind fonts.' ), {
 				type: 'snackbar',
 			} );
@@ -192,7 +208,19 @@ function FontLibraryProvider( { children } ) {
 		}
 	}
 
-	const toggleActivateFont = ( font, face ) => {
+	const deactivateFontFamily = ( font ) => {
+		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
+		// We want to save as active all the theme fonts at the beginning
+		const initialCustomFonts = fontFamilies[ font.source ] || [];
+		const newCustomFonts = initialCustomFonts.filter(
+			( f ) => f.slug !== font.slug
+		);
+		setFontFamilies( {
+			[ font.source ]: newCustomFonts,
+		} );
+	}
+
+	const toggleActivateFont = ( font, face, ) => {
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
 		const initialCustomFonts = fontFamilies[ font.source ] || [];
@@ -267,7 +295,6 @@ function FontLibraryProvider( { children } ) {
 			}
 		}
 		setFontFamilies( {
-			...fontFamilies,
 			[ font.source ]: newCustomFonts,
 		} );
 	};
@@ -324,7 +351,7 @@ function FontLibraryProvider( { children } ) {
 				getFontFacesActivated,
 				loadFontFaceAsset,
 				installFonts,
-				uninstallFonts,
+				uninstallFont,
 				toggleActivateFont,
 				getAvailableFontsOutline,
 				modalTabOepn,

@@ -17,7 +17,7 @@ import { FontLibraryContext } from './context';
 import LibraryFontVariant from './library-font-variant';
 
 function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
-	const { uninstallFonts, isFontActivated } =
+	const { uninstallFont, isFontActivated } =
 		useContext( FontLibraryContext );
 	const [ isConfirmOpen, setIsConfirmOpen ] = useState( false );
 
@@ -33,7 +33,7 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 			  ];
 
 	const handleConfirmUninstall = async () => {
-		const result = await uninstallFonts( [ font ] );
+		const result = await uninstallFont( font );
 		// If the font was succesfully uninstalled it is unselected
 		if ( result ) {
 			handleUnselectFont();
@@ -79,14 +79,16 @@ function LibraryFontDetails( { font, handleUnselectFont, canBeRemoved } ) {
 
 			<Spacer margin={ 8 } />
 
-			<Button
-				isDestructive
-				disabled={ ! canBeRemoved || isActive }
-				variant="link"
-				onClick={ handleUninstallClick }
-			>
-				{ __( 'Delete permanently' ) }
-			</Button>
+		
+			{ canBeRemoved && (
+				<Button
+					isDestructive
+					variant="link"
+					onClick={ handleUninstallClick }
+				>
+					{ __( 'Delete permanently' ) }
+				</Button>
+			)}
 		</>
 	);
 }
