@@ -139,3 +139,13 @@ export function getRemovalPromptData( state ) {
 export function getBlockRemovalRules( state ) {
 	return state.blockRemovalRules;
 }
+
+/**
+ * Returns the client ID of the block settings menu that is currently open.
+ *
+ * @param {Object} state Global application state.
+ * @return {string|undefined} The client ID of the block menu that is currently open.
+ */
+export function getOpenedBlockSettingsMenu( state ) {
+	return state.openedBlockSettingsMenu;
+}

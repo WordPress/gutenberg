@@ -69,6 +69,10 @@ export type DropdownMenuProps = {
 	 */
 	icon?: IconProps[ 'icon' ] | null;
 	/**
+	 * Whether the dropdown is opened or not.
+	 */
+	isOpen?: boolean;
+	/**
 	 * A human-readable label to present as accessibility text on the focused
 	 * collapsed menu button.
 	 */
@@ -86,6 +90,11 @@ export type DropdownMenuProps = {
 	 * set with `position` prop.
 	 */
 	popoverProps?: DropdownProps[ 'popoverProps' ];
+	/**
+	 * A function that is called any time the menu is toggled from its closed
+	 * state to its opened state, or vice versa.
+	 */
+	onToggle?: ( next: boolean ) => void;
 	/**
 	 * Properties of `toggleProps` object will be passed as props to the nested
 	 * `Button` component in the `renderToggle` implementation of the `Dropdown`

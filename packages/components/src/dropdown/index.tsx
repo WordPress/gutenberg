@@ -50,6 +50,7 @@ const UnconnectedDropdown = (
 		onClose,
 		onToggle,
 		style,
+		isOpen: isOpenProp,
 
 		// Deprecated props
 		position,
@@ -74,7 +75,10 @@ const UnconnectedDropdown = (
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
 	const containerRef = useRef< HTMLDivElement >();
-	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+	const [ isOpenState, setIsOpen ] = useObservableState( false, onToggle );
+
+	// Allow provided `isOpen` prop to override internal state.
+	const isOpen = isOpenProp ?? isOpenState;
 
 	useEffect(
 		() => () => {

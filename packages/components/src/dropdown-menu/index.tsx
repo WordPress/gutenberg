@@ -49,9 +49,11 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		className,
 		controls,
 		icon = menu,
+		isOpen: isOpenProp,
 		label,
 		popoverProps,
 		toggleProps,
+		onToggle: onToggleProp,
 		menuProps,
 		disableOpenOnArrowDown = false,
 		text,
@@ -92,6 +94,8 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	return (
 		<Dropdown
 			className={ className }
+			isOpen={ isOpenProp }
+			onToggle={ onToggleProp }
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event: React.KeyboardEvent ) => {
