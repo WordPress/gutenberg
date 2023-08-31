@@ -122,7 +122,6 @@ describe( 'state', () => {
 		} );
 
 		it( 'should set the open state of the list view panel', () => {
-			// registry.dispatch( editSiteStore ).toggleFeature( 'name' );
 			expect(
 				listViewPanel( false, {
 					type: 'SET_IS_LIST_VIEW_OPENED',

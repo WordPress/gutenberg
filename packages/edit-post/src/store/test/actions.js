@@ -53,6 +53,20 @@ describe( 'actions', () => {
 		).toBeNull();
 	} );
 
+	it( 'openGeneralSidebar - should turn off distraction free mode when opening a general sidebar', () => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'distractionFree', true );
+		registry
+			.dispatch( editPostStore )
+			.openGeneralSidebar( 'edit-post/block' );
+		expect(
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-post', 'distractionFree' )
+		).toBe( false );
+	} );
+
 	it( 'toggleFeature', () => {
 		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
 		expect(
@@ -101,6 +115,17 @@ describe( 'actions', () => {
 			expect( registry.select( editPostStore ).getEditorMode() ).toEqual(
 				'text'
 			);
+		} );
+		it( 'should turn off distraction free mode when switching to code editor', () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core/edit-post', 'distractionFree', true );
+			registry.dispatch( editPostStore ).switchEditorMode( 'text' );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-post', 'distractionFree' )
+			).toBe( false );
 		} );
 	} );
 
@@ -331,6 +356,56 @@ describe( 'actions', () => {
 			).toEqual( {
 				'core/quote': 'posh',
 			} );
+		} );
+	} );
+
+	describe( 'toggleDistractionFree', () => {
+		it( 'should properly update settings to prevent layout corruption when enabling distraction free mode', () => {
+			// Enable everything that shouldn't be enabled in distraction free mode.
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core/edit-post', 'fixedToolbar', true );
+			registry.dispatch( editPostStore ).setIsListViewOpened( true );
+			registry
+				.dispatch( editPostStore )
+				.openGeneralSidebar( 'edit-post/block' );
+			// Initial state is falsy.
+			registry.dispatch( editPostStore ).toggleDistractionFree();
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-post', 'fixedToolbar' )
+			).toBe( false );
+			expect( registry.select( editPostStore ).isListViewOpened() ).toBe(
+				false
+			);
+			expect( registry.select( editPostStore ).isInserterOpened() ).toBe(
+				false
+			);
+			expect(
+				registry
+					.select( interfaceStore )
+					.getActiveComplementaryArea( editPostStore.name )
+			).toBeNull();
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-post', 'distractionFree' )
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'setIsListViewOpened', () => {
+		it( 'should turn off distraction free mode when opening the list view', () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core/edit-post', 'distractionFree', true );
+			registry.dispatch( editPostStore ).setIsListViewOpened( true );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-post', 'distractionFree' )
+			).toBe( false );
 		} );
 	} );
 } );
