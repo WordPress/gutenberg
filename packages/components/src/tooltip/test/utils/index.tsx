@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import type { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
+
 // TODO: may need to be tested with Playwright; further context:
 // https://github.com/WordPress/gutenberg/pull/52133#issuecomment-1613691258
 // below workaround ensures tooltip is umounted after each test to prevent leaking
@@ -8,7 +13,7 @@
  * to avoid leaking into other tests
  *
  */
-export default async function cleanupTooltip( user: any ) {
+export default async function cleanupTooltip( user: UserEvent ) {
 	await user.tab();
 	await user.tab();
 	await user.click( document.body );

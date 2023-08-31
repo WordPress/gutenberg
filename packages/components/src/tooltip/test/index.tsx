@@ -20,7 +20,6 @@ import cleanupTooltip from './utils/';
 const props = {
 	children: <Button>Button</Button>,
 	text: 'tooltip text',
-	delay: TOOLTIP_DELAY,
 };
 
 describe( 'Tooltip', () => {
@@ -274,5 +273,13 @@ describe( 'Tooltip', () => {
 		expect( onRequestClose ).toHaveBeenCalled();
 
 		await cleanupTooltip( user );
+	} );
+
+	it( 'should associate the tooltip text with its anchor via the accessible description', async () => {
+		render( <Tooltip { ...props } /> );
+
+		expect(
+			screen.getByRole( 'button', { description: 'tooltip text' } )
+		).toBeInTheDocument();
 	} );
 } );
