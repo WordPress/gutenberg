@@ -508,7 +508,7 @@ class WP_Font_Family {
 		if ( ! is_dir( $fonts_dir ) ) {
 			return wp_mkdir_p( $fonts_dir );
 		}
-		
+
 		return false;
 	}
 
