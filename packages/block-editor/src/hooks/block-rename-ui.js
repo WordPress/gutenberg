@@ -25,11 +25,14 @@ import {
 	InspectorControls,
 } from '../components';
 
+const emptyString = ( testString ) => testString?.trim()?.length === 0;
+
 function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
 
 	const nameHasChanged = editedBlockName !== blockName;
 	const nameIsOriginal = editedBlockName === originalBlockName;
+	const nameIsEmpty = emptyString( editedBlockName );
 
 	const isNameValid = nameHasChanged || nameIsOriginal;
 
@@ -46,7 +49,7 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 			sprintf(
 				/* translators: %1$s: type of update (either reset of changed). %2$s: new name/label for the block */
 				__( 'Block name %1$s to: "%2$s".' ),
-				nameIsOriginal ? __( 'reset' ) : __( 'changed' ),
+				nameIsOriginal || nameIsEmpty ? __( 'reset' ) : __( 'changed' ),
 				editedBlockName
 			),
 			'assertive'
@@ -162,9 +165,12 @@ function BlockRenameControl( props ) {
 					onClose={ () => setRenamingBlock( false ) }
 					onSave={ ( newName ) => {
 						// If the new value is the block's original name (e.g. `Group`)
-						// then assume the intent is to reset the value. Therefore reset
-						// the metadata.
-						if ( newName === blockInformation?.title ) {
+						// or it is an empty string then assume the intent is to reset
+						// the value. Therefore reset the metadata.
+						if (
+							newName === blockInformation?.title ||
+							emptyString( newName )
+						) {
 							newName = undefined;
 						}
 
