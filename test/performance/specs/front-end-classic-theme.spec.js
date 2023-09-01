@@ -32,6 +32,7 @@ test.describe( 'Front End Performance', () => {
 			metrics,
 		} ) => {
 			// Go to the base URL.
+			// eslint-disable-next-line playwright/no-networkidle
 			await page.goto( '/', { waitUntil: 'networkidle' } );
 
 			// Take the measurements.

@@ -23,7 +23,9 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 				<Placeholder
 					icon={ <BlockIcon icon={ icon } /> }
 					label={ __( 'Footnotes' ) }
-					// To do: add instructions. We can't add new string in RC.
+					instructions={ __(
+						'Footnotes are not supported here. Add this block to post or page content.'
+					) }
 				/>
 			</div>
 		);
