@@ -40,6 +40,7 @@ function PostAuthorSelect() {
 
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			className="post-author-selector"
 			label={ __( 'Author' ) }
 			options={ authorOptions }

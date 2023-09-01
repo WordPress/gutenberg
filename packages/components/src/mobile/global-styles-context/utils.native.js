@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { camelCase } from 'change-case';
-import { find, get } from 'lodash';
 import { Dimensions } from 'react-native';
 
 /**
@@ -113,9 +112,9 @@ export function getBlockColors(
 		}
 
 		if ( ! isCustomColor ) {
-			const mappedColor = find( defaultColors, {
-				slug: value,
-			} );
+			const mappedColor = Object.values( defaultColors ?? {} ).find(
+				( { slug } ) => slug === value
+			);
 
 			if ( mappedColor ) {
 				blockStyles[ styleKey ] = mappedColor.color;
@@ -143,6 +142,7 @@ export function getBlockTypography(
 	const typographyStyles = {};
 	const customBlockStyles = blockStyleAttributes?.style?.typography || {};
 	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ blockName ];
+	const parsedFontSizes = Object.values( fontSizes ?? {} );
 
 	// Global styles.
 	if ( blockGlobalStyles?.typography ) {
@@ -153,9 +153,9 @@ export function getBlockTypography(
 			if ( parseInt( fontSize, 10 ) ) {
 				typographyStyles.fontSize = fontSize;
 			} else {
-				const mappedFontSize = find( fontSizes, {
-					slug: fontSize,
-				} );
+				const mappedFontSize = parsedFontSizes.find(
+					( { slug } ) => slug === fontSize
+				);
 
 				if ( mappedFontSize ) {
 					typographyStyles.fontSize = mappedFontSize?.size;
@@ -169,9 +169,9 @@ export function getBlockTypography(
 	}
 
 	if ( blockStyleAttributes?.fontSize && baseGlobalStyles ) {
-		const mappedFontSize = find( fontSizes, {
-			slug: blockStyleAttributes?.fontSize,
-		} );
+		const mappedFontSize = parsedFontSizes.find(
+			( { slug } ) => slug === blockStyleAttributes?.fontSize
+		);
 
 		if ( mappedFontSize ) {
 			typographyStyles.fontSize = mappedFontSize?.size;
@@ -189,6 +189,22 @@ export function getBlockTypography(
 
 	return typographyStyles;
 }
+
+/**
+ * Return a value from a certain path of the object.
+ * Path is specified as an array of properties, like: [ 'parent', 'child' ].
+ *
+ * @param {Object} object Input object.
+ * @param {Array}  path   Path to the object property.
+ * @return {*} Value of the object property at the specified path.
+ */
+const getValueFromObjectPath = ( object, path ) => {
+	let value = object;
+	path.forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
 
 export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
@@ -212,9 +228,9 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 				const path = $2.split( '--' );
 				const mappedPresetValue = mappedValues[ path[ 0 ] ];
 				if ( mappedPresetValue && mappedPresetValue.slug ) {
-					const matchedValue = find( mappedPresetValue.values, {
-						slug: path[ 1 ],
-					} );
+					const matchedValue = Object.values(
+						mappedPresetValue.values ?? {}
+					).find( ( { slug } ) => slug === path[ 1 ] );
 					return matchedValue?.[ mappedPresetValue.slug ];
 				}
 				return UNKNOWN_VALUE;
@@ -230,11 +246,11 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 						customValuesData
 					)
 				) {
-					return get( customValuesData, path );
+					return getValueFromObjectPath( customValuesData, path );
 				}
 
 				// Check for camelcase properties.
-				return get( customValuesData, [
+				return getValueFromObjectPath( customValuesData, [
 					...path.slice( 0, path.length - 1 ),
 					camelCase( path[ path.length - 1 ] ),
 				] );
@@ -244,9 +260,9 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 		if ( variable === 'var' ) {
 			stylesBase = stylesBase.replace( varRegex, ( _$1, $2 ) => {
 				if ( mappedValues?.color ) {
-					const matchedValue = find( mappedValues.color?.values, {
-						slug: $2,
-					} );
+					const matchedValue = mappedValues.color?.values?.find(
+						( { slug } ) => slug === $2
+					);
 					return `"${ matchedValue?.color }"`;
 				}
 				return UNKNOWN_VALUE;
@@ -415,6 +431,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 				fontSizes,
 				customLineHeight: features?.custom?.[ 'line-height' ],
 			},
+			spacing: features?.spacing,
 		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};

@@ -1,11 +1,14 @@
 .edit-post-post-url {
 	width: 100%;
 	justify-content: flex-start;
+	align-items: flex-start;
 
 	span {
 		display: block;
 		width: 45%;
 		flex-shrink: 0;
+		// Match padding on tertiary buttons for alignment.
+		padding: $grid-unit-15 * 0.5 0;
 	}
 }
 

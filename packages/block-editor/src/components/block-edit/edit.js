@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,17 +29,9 @@ import BlockContext from '../block-context';
  */
 const DEFAULT_BLOCK_CONTEXT = {};
 
-export const Edit = ( props ) => {
-	const { attributes = {}, name } = props;
+const Edit = ( props ) => {
+	const { name } = props;
 	const blockType = getBlockType( name );
-	const blockContext = useContext( BlockContext );
-
-	// Assign context values using the block type's declared context needs.
-	const context = useMemo( () => {
-		return blockType && blockType.usesContext
-			? pick( blockContext, blockType.usesContext )
-			: DEFAULT_BLOCK_CONTEXT;
-	}, [ blockType, blockContext ] );
 
 	if ( ! blockType ) {
 		return null;
@@ -51,8 +42,33 @@ export const Edit = ( props ) => {
 	// them preferentially as the render value for the block.
 	const Component = blockType.edit || blockType.save;
 
+	return <Component { ...props } />;
+};
+
+const EditWithFilters = withFilters( 'editor.BlockEdit' )( Edit );
+
+const EditWithGeneratedProps = ( props ) => {
+	const { attributes = {}, name } = props;
+	const blockType = getBlockType( name );
+	const blockContext = useContext( BlockContext );
+
+	// Assign context values using the block type's declared context needs.
+	const context = useMemo( () => {
+		return blockType && blockType.usesContext
+			? Object.fromEntries(
+					Object.entries( blockContext ).filter( ( [ key ] ) =>
+						blockType.usesContext.includes( key )
+					)
+			  )
+			: DEFAULT_BLOCK_CONTEXT;
+	}, [ blockType, blockContext ] );
+
+	if ( ! blockType ) {
+		return null;
+	}
+
 	if ( blockType.apiVersion > 1 ) {
-		return <Component { ...props } context={ context } />;
+		return <EditWithFilters { ...props } context={ context } />;
 	}
 
 	// Generate a class name for the block's editable form.
@@ -66,8 +82,12 @@ export const Edit = ( props ) => {
 	);
 
 	return (
-		<Component { ...props } context={ context } className={ className } />
+		<EditWithFilters
+			{ ...props }
+			context={ context }
+			className={ className }
+		/>
 	);
 };
 
-export default withFilters( 'editor.BlockEdit' )( Edit );
+export default EditWithGeneratedProps;

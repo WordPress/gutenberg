@@ -59,7 +59,7 @@ function BlockHTML( { clientId } ) {
 
 		// Ensure the state is updated if we reset so it displays the default content.
 		if ( ! html ) {
-			setHtml( { content } );
+			setHtml( content );
 		}
 	};
 

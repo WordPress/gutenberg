@@ -7,7 +7,13 @@ import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { alignTop, alignCenter, alignBottom } from './icons';
+import {
+	alignTop,
+	alignCenter,
+	alignBottom,
+	alignStretch,
+	spaceBetween,
+} from './icons';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
@@ -22,14 +28,18 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 		icon: alignBottom,
 		title: _x( 'Align bottom', 'Block vertical alignment setting' ),
 	},
+	stretch: {
+		icon: alignStretch,
+		title: _x( 'Stretch to fill', 'Block vertical alignment setting' ),
+	},
+	'space-between': {
+		icon: spaceBetween,
+		title: _x( 'Space between', 'Block vertical alignment setting' ),
+	},
 };
 
 const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
 const DEFAULT_CONTROL = 'top';
-
-const POPOVER_PROPS = {
-	isAlternate: true,
-};
 
 function BlockVerticalAlignmentUI( {
 	value,
@@ -47,9 +57,7 @@ function BlockVerticalAlignmentUI( {
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
-	const extraProps = isToolbar
-		? { isCollapsed }
-		: { popoverProps: { POPOVER_PROPS } };
+	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (
 		<UIComponent

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -11,10 +11,21 @@ import { unregisterFormatType } from '../unregister-format-type';
 import { getFormatType } from '../get-format-type';
 import { store as richTextStore } from '../store';
 
+const UNKNOWN_FORMAT = {
+	name: 'core/unknown',
+	title: 'Clear Unknown Formatting',
+	tagName: '*',
+	className: null,
+	edit: () => null,
+};
+
 describe( 'registerFormatType', () => {
 	beforeAll( () => {
 		// Initialize the rich-text store.
 		require( '../store' );
+
+		// Register "core/unknown" format
+		dispatch( richTextStore ).addFormatTypes( UNKNOWN_FORMAT );
 	} );
 
 	afterEach( () => {

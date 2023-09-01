@@ -2,6 +2,7 @@
  * External dependencies
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const MomentTimezoneDataPlugin = require( 'moment-timezone-data-webpack-plugin' );
 const { join } = require( 'path' );
 
 /**
@@ -75,7 +76,8 @@ const gutenbergPackages = Object.keys( dependencies )
 		( packageName ) =>
 			! BUNDLED_PACKAGES.includes( packageName ) &&
 			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
-			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'interactivity' )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
@@ -98,6 +100,10 @@ const vendors = {
 	'react-dom': [
 		'react-dom/umd/react-dom.development.js',
 		'react-dom/umd/react-dom.production.min.js',
+	],
+	'inert-polyfill': [
+		'wicg-inert/dist/inert.js',
+		'wicg-inert/dist/inert.min.js',
 	],
 };
 const vendorsCopyConfig = Object.entries( vendors ).flatMap(
@@ -151,6 +157,10 @@ module.exports = {
 				} ) )
 				.concat( bundledPackagesPhpConfig )
 				.concat( vendorsCopyConfig ),
+		} ),
+		new MomentTimezoneDataPlugin( {
+			startYear: 2000,
+			endYear: 2040,
 		} ),
 	].filter( Boolean ),
 };

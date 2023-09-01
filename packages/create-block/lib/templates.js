@@ -26,10 +26,15 @@ const predefinedPluginTemplates = {
 			description:
 				'Example block scaffolded with Create Block tool – no build step required.',
 			dashicon: 'smiley',
+			supports: {
+				html: false,
+			},
 			wpScripts: false,
-			editorScript: 'file:./index.js',
-			editorStyle: 'file:./editor.css',
-			style: 'file:./style.css',
+			editorScript: null,
+			editorStyle: null,
+			style: null,
+			viewScript: 'file:./view.js',
+			example: {},
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
 		variants: {
@@ -37,6 +42,7 @@ const predefinedPluginTemplates = {
 			dynamic: {
 				slug: 'example-dynamic-es5',
 				title: 'Example Dynamic (ES5)',
+				render: 'file:./render.php',
 			},
 		},
 	},
@@ -49,12 +55,15 @@ const predefinedPluginTemplates = {
 			supports: {
 				html: false,
 			},
+			viewScript: 'file:./view.js',
+			example: {},
 		},
 		variants: {
 			static: {},
 			dynamic: {
 				slug: 'example-dynamic',
 				title: 'Example Dynamic',
+				render: 'file:./render.php',
 			},
 		},
 	},
@@ -215,7 +224,7 @@ const getPluginTemplate = async ( templateName ) => {
 const getDefaultValues = ( pluginTemplate, variant ) => {
 	return {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
-		apiVersion: 2,
+		apiVersion: 3,
 		namespace: 'create-block',
 		category: 'widgets',
 		author: 'The WordPress Contributors',

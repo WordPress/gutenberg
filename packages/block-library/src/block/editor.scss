@@ -14,3 +14,20 @@
 		display: none;
 	}
 }
+
+.edit-post-visual-editor .block-editor-block-list__block:not(.remove-outline).is-reusable {
+	&.is-highlighted,
+	&.is-selected {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+	}
+
+	&.block-editor-block-list__block:not([contenteditable]):focus {
+		&::after {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+			// Show a light color for dark themes.
+			.is-dark-theme & {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;
+			}
+		}
+	}
+}

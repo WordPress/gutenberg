@@ -22,6 +22,7 @@ import {
 	getSizeConfig,
 } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 import { ContextSystemProvider } from '../ui/context';
 
 function useUniqueId( idProp?: string ) {
@@ -31,16 +32,23 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-// Adapter to map props for the new ui/flex compopnent.
+// Adapter to map props for the new ui/flex component.
 function getUIFlexProps( labelPosition?: LabelPosition ) {
-	const props: { direction?: string; gap?: number; justify?: string } = {};
+	const props: {
+		direction?: string;
+		gap?: number;
+		justify?: string;
+		expanded?: boolean;
+	} = {};
 	switch ( labelPosition ) {
 		case 'top':
 			props.direction = 'column';
+			props.expanded = false;
 			props.gap = 0;
 			break;
 		case 'bottom':
 			props.direction = 'column-reverse';
+			props.expanded = false;
 			props.gap = 0;
 			break;
 		case 'edge':
@@ -67,7 +75,7 @@ export function InputBase(
 		size = 'default',
 		suffix,
 		...props
-	}: InputBaseProps,
+	}: WordPressComponentProps< InputBaseProps, 'div' >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const id = useUniqueId( idProp );

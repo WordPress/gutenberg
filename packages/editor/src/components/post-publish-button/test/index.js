@@ -19,16 +19,6 @@ describe( 'PostPublishButton', () => {
 			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'should be true if forceIsSaving is true', () => {
-			render(
-				<PostPublishButton isPublishable isSaveable forceIsSaving />
-			);
-
-			expect(
-				screen.getByRole( 'button', { name: 'Submit for Review' } )
-			).toHaveAttribute( 'aria-disabled', 'true' );
-		} );
-
 		it( 'should be true if post is not publishable and not forceIsDirty', () => {
 			render(
 				<PostPublishButton
@@ -90,9 +80,7 @@ describe( 'PostPublishButton', () => {
 
 	describe( 'publish status', () => {
 		it( 'should be pending for contributor', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onStatusChange = jest.fn();
 			const onSave = jest.fn();
 			render(
@@ -113,9 +101,7 @@ describe( 'PostPublishButton', () => {
 		} );
 
 		it( 'should be future for scheduled post', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onStatusChange = jest.fn();
 			const onSave = jest.fn();
 			render(
@@ -137,9 +123,7 @@ describe( 'PostPublishButton', () => {
 		} );
 
 		it( 'should be private for private visibility', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onStatusChange = jest.fn();
 			const onSave = jest.fn();
 			render(
@@ -161,9 +145,7 @@ describe( 'PostPublishButton', () => {
 		} );
 
 		it( 'should be publish otherwise', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onStatusChange = jest.fn();
 			const onSave = jest.fn();
 			render(
@@ -186,9 +168,7 @@ describe( 'PostPublishButton', () => {
 
 	describe( 'click', () => {
 		it( 'should save with status', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onStatusChange = jest.fn();
 			const onSave = jest.fn();
 			render(

@@ -42,7 +42,6 @@ export const NameInputControl = styled( InputControl )`
 
 export const PaletteItem = styled( View )`
 	padding: 3px 0 3px ${ space( 3 ) };
-	height: calc( 40px - ${ CONFIG.borderWidth } );
 	border: 1px solid ${ CONFIG.surfaceBorderColor };
 	border-bottom-color: transparent;
 	&:first-of-type {
@@ -58,7 +57,7 @@ export const PaletteItem = styled( View )`
 		border-top-color: transparent;
 	}
 	&.is-selected {
-		border-color: ${ COLORS.ui.theme };
+		border-color: ${ COLORS.theme.accent };
 	}
 `;
 
@@ -69,7 +68,7 @@ export const NameContainer = styled.div`
 	white-space: nowrap;
 	overflow: hidden;
 	${ PaletteItem }:hover & {
-		color: ${ COLORS.ui.theme };
+		color: ${ COLORS.theme.accent };
 	}
 `;
 
@@ -103,7 +102,7 @@ export const PaletteEditStyles = styled( View )`
 
 export const DoneButton = styled( Button )`
 	&& {
-		color: ${ COLORS.ui.theme };
+		color: ${ COLORS.theme.accent };
 	}
 `;
 

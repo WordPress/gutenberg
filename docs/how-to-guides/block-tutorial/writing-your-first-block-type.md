@@ -6,18 +6,46 @@ This guide takes you through creating a basic block to display a message in a po
 
 There are two main types of blocks: static and dynamic, this guide focuses on static blocks. A static block is used to insert HTML content into the post and save it with the post. A dynamic block builds the content on the fly when rendered on the front end, see the [dynamic blocks guide](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md).
 
+<div class="callout callout-alert">
 This guide focuses on just the block, see the [Create a Block tutorial](/docs/getting-started/create-block/README.md) for a complete setup.
+</div>
 
 ## Before you start
 
 Static blocks are implemented in JavaScript, so a basic level of JavaScript is helpful, see the [Getting Started with JavaScript](/docs/how-to-guides/javascript/README.md) for a refresher.
 
-Blocks are added to WordPress using plugins, so you will need:
+Blocks are added to WordPress using plugins, so you will need a WordPress development environment - see the [setup guide](/docs/getting-started/devenv/README.md).
 
--   WordPress development environment, see [setup guide](/docs/getting-started/devenv/README.md)
--   JavaScript build tools (node/npm) if using JSX example
+This tutorial demonstrates the creation of a block in two ways, using JSX and using plain JavaScript. JSX requires a build step, so if you choose to follow the JSX path you will need JavaScript build tools (node/npm). See Step 0 below for details on getting set up.
 
 ## Step-by-step guide
+
+### Step 0: Set up your project
+
+_**Note:** this step is only needed if you are going to use the JSX examples in the following steps. If you intend to work with the plain JavaScript examples these will run without a build step so you can proceed straight to 'Step 1: Configure block.json' below._
+
+Before starting with the JSX examples you will need to set up your project. In your project directory run:
+
+```bash
+npm init
+```
+
+This will create a `package.json` file.
+
+You will then need to add `@wordpress/scripts` as a development dependency to `package.json`. You can do this with:
+
+```bash
+npm install @wordpress/scripts --save-dev
+```
+
+Next, add the following two lines to the `scripts` property in `package.json`:
+
+```json
+"start": "wp-scripts start",
+"build": "wp-scripts build"
+```
+
+You're all set!
 
 ### Step 1: Configure block.json
 
@@ -41,7 +69,7 @@ Create a basic `block.json` file there:
 
 ```json
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"title": "Example: Basic (ESNext)",
 	"name": "gutenberg-examples/example-01-basic-esnext",
 	"category": "layout",
@@ -54,7 +82,7 @@ Create a basic `block.json` file there:
 
 ```json
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"title": "Example: Basic",
 	"name": "gutenberg-examples/example-01-basic",
 	"category": "layout",
@@ -141,6 +169,7 @@ In order to register the block, an asset php file is required in the same direct
 {% JSX %}
 
 Build the scripts and asset file which is used to keep track of dependencies and the build version.
+
 ```bash
 npm run build
 ```

@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	getEditorHtml,
-	initializeEditor,
-	fireEvent,
-	waitFor,
-} from 'test/helpers';
+import { getEditorHtml, initializeEditor, fireEvent } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -28,12 +23,11 @@ afterAll( () => {
 
 describe( 'Shortcode block', () => {
 	it( 'inserts block', async () => {
-		const { getByA11yLabel, getByTestId, getByText } =
-			await initializeEditor();
+		const screen = await initializeEditor();
 
-		fireEvent.press( getByA11yLabel( 'Add block' ) );
+		fireEvent.press( screen.getByLabelText( 'Add block' ) );
 
-		const blockList = getByTestId( 'InserterUI-Blocks' );
+		const blockList = screen.getByTestId( 'InserterUI-Blocks' );
 		// onScroll event used to force the FlatList to render all items
 		fireEvent.scroll( blockList, {
 			nativeEvent: {
@@ -43,22 +37,25 @@ describe( 'Shortcode block', () => {
 			},
 		} );
 
-		fireEvent.press( await waitFor( () => getByText( 'Shortcode' ) ) );
+		fireEvent.press( await screen.findByText( 'Shortcode' ) );
 
-		expect( getByA11yLabel( /Shortcode Block\. Row 1/ ) ).toBeVisible();
+		const [ shortcodeBlock ] = screen.getAllByLabelText(
+			/Shortcode Block\. Row 1/
+		);
+		expect( shortcodeBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
 	it( 'edits content', async () => {
-		const { getByA11yLabel, getByPlaceholderText } = await initializeEditor(
-			{
-				initialHtml: '<!-- wp:shortcode /-->',
-			}
+		const screen = await initializeEditor( {
+			initialHtml: '<!-- wp:shortcode /-->',
+		} );
+		const [ shortcodeBlock ] = screen.getAllByLabelText(
+			/Shortcode Block\. Row 1/
 		);
-		const shortcodeBlock = getByA11yLabel( /Shortcode Block\. Row 1/ );
 		fireEvent.press( shortcodeBlock );
 
-		const textField = getByPlaceholderText( 'Add a shortcode…' );
+		const textField = screen.getByPlaceholderText( 'Add a shortcode…' );
 		fireEvent( textField, 'focus' );
 		fireEvent( textField, 'onChange', {
 			nativeEvent: {

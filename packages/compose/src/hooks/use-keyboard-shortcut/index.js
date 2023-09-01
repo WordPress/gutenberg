@@ -3,7 +3,6 @@
  */
 import Mousetrap from 'mousetrap';
 import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
-import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -60,7 +59,10 @@ function useKeyboardShortcut(
 				  // necessary to maintain the existing behavior.
 				  /** @type {Element} */ ( /** @type {unknown} */ ( document ) )
 		);
-		castArray( shortcuts ).forEach( ( shortcut ) => {
+		const shortcutsArray = Array.isArray( shortcuts )
+			? shortcuts
+			: [ shortcuts ];
+		shortcutsArray.forEach( ( shortcut ) => {
 			const keys = shortcut.split( '+' );
 			// Determines whether a key is a modifier by the length of the string.
 			// E.g. if I add a pass a shortcut Shift+Cmd+M, it'll determine that

@@ -4,6 +4,10 @@ End-To-End (E2E) Playwright test utils for WordPress.
 
 _It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
+<div class="callout callout-alert">
+This package is still under active development. Documentation might not be up-to-date, and the <code>v0.x</code> version can introduce breaking changes without a detailed migration guide. Early adopters are encouraged to use a <a href="https://docs.npmjs.com/cli/v9/configuring-npm/package-lock-json">lock file</a> to prevent unexpected breakages.
+</div>
+
 ## Installation
 
 Install the module
@@ -41,12 +45,10 @@ To use these utilities, instantiate them within each test file:
 ```js
 test.use( {
 	editor: async ( { page }, use ) => {
-		await use( new Editor( { page, hasIframe: true } ) );
+		await use( new Editor( { page } ) );
 	},
 } );
 ```
-
-The `hasIframe` property denotes whether the editor canvas uses an Iframe, as the site editor currently does. Omit this for non-iframe editors.
 
 Within a test or test utility, use the `canvas` property to select elements within the iframe canvas:
 
@@ -60,7 +62,7 @@ Generic Playwright utilities for interacting with web pages.
 
 ```js
 const pageUtils = new PageUtils( { page } );
-await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+await pageUtils.pressKeys( 'primary+a' );
 ```
 
 ### RequestUtils

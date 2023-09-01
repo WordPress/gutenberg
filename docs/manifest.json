@@ -156,6 +156,12 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Extending the Query Loop block",
+		"slug": "extending-the-query-loop-block",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Development Platform",
 		"slug": "platform",
 		"markdown_source": "../docs/how-to-guides/platform/README.md",
@@ -164,14 +170,8 @@
 	{
 		"title": "Building a custom block editor",
 		"slug": "custom-block-editor",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/README.md",
+		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor.md",
 		"parent": "platform"
-	},
-	{
-		"title": "Tutorial: building a custom block editor",
-		"slug": "tutorial",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
-		"parent": "custom-block-editor"
 	},
 	{
 		"title": "Create your First App with Gutenberg Data",
@@ -216,6 +216,12 @@
 		"parent": "how-to-guides"
 	},
 	{
+		"title": "Enqueueing assets in the Editor",
+		"slug": "enqueueing-assets-in-the-editor",
+		"markdown_source": "../docs/how-to-guides/enqueueing-assets-in-the-editor.md",
+		"parent": "how-to-guides"
+	},
+	{
 		"title": "Feature Flags",
 		"slug": "feature-flags",
 		"markdown_source": "../docs/how-to-guides/feature-flags.md",
@@ -228,7 +234,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Getting Started with JavaScript",
+		"title": "How to use JavaScript with the Block Editor",
 		"slug": "javascript",
 		"markdown_source": "../docs/how-to-guides/javascript/README.md",
 		"parent": "how-to-guides"
@@ -306,7 +312,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Propagating updates for block types ",
+		"title": "Propagating updates for block types",
 		"slug": "propagating-updates",
 		"markdown_source": "../docs/how-to-guides/propagating-updates.md",
 		"parent": "how-to-guides"
@@ -432,6 +438,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Selectors",
+		"slug": "block-selectors",
+		"markdown_source": "../docs/reference-guides/block-api/block-selectors.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Styles",
 		"slug": "block-styles",
 		"markdown_source": "../docs/reference-guides/block-api/block-styles.md",
@@ -444,7 +456,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Block Templates",
+		"title": "Templates",
 		"slug": "block-templates",
 		"markdown_source": "../docs/reference-guides/block-api/block-templates.md",
 		"parent": "block-api"
@@ -582,13 +594,13 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Version 2 (living reference)",
+		"title": "Theme.json Version 2",
 		"slug": "theme-json-living",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-living.md",
 		"parent": "theme-json-reference"
 	},
 	{
-		"title": "Version 1 Reference",
+		"title": "Theme.json Version 1 Reference",
 		"slug": "theme-json-v1",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v1.md",
 		"parent": "theme-json-reference"
@@ -597,6 +609,12 @@
 		"title": "Migrating to Newer Versions",
 		"slug": "theme-json-migrations",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Available Styles Options",
+		"slug": "styles-versions",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/styles-versions.md",
 		"parent": "theme-json-reference"
 	},
 	{
@@ -633,12 +651,6 @@
 		"title": "BaseControl",
 		"slug": "base-control",
 		"markdown_source": "../packages/components/src/base-control/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "BaseField",
-		"slug": "base-field",
-		"markdown_source": "../packages/components/src/base-field/README.md",
 		"parent": "components"
 	},
 	{
@@ -711,6 +723,12 @@
 		"title": "CheckboxControl",
 		"slug": "checkbox-control",
 		"markdown_source": "../packages/components/src/checkbox-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CircularOptionPicker",
+		"slug": "circular-option-picker",
+		"markdown_source": "../packages/components/src/circular-option-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -1062,6 +1080,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorToParentButton",
+		"slug": "navigator-to-parent-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Notice",
 		"slug": "notice",
 		"markdown_source": "../packages/components/src/notice/README.md",
@@ -1256,31 +1280,31 @@
 	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
-		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-button/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarDropdownMenu",
 		"slug": "toolbar-dropdown-menu",
-		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-dropdown-menu/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarGroup",
 		"slug": "toolbar-group",
-		"markdown_source": "../packages/components/src/toolbar-group/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-group/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarItem",
 		"slug": "toolbar-item",
-		"markdown_source": "../packages/components/src/toolbar-item/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-item/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "Toolbar",
 		"slug": "toolbar",
-		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1452,6 +1476,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/commands",
+		"slug": "packages-commands",
+		"markdown_source": "../packages/commands/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/components",
 		"slug": "packages-components",
 		"markdown_source": "../packages/components/README.md",
@@ -1464,9 +1494,21 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/core-commands",
+		"slug": "packages-core-commands",
+		"markdown_source": "../packages/core-commands/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-data",
 		"slug": "packages-core-data",
 		"markdown_source": "../packages/core-data/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/create-block-interactive-template",
+		"slug": "packages-create-block-interactive-template",
+		"markdown_source": "../packages/create-block-interactive-template/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1482,16 +1524,10 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/create-block External Template",
+		"title": "External Project Templates",
 		"slug": "packages-create-block-external-template",
 		"markdown_source": "../packages/create-block/docs/external-template.md",
 		"parent": "packages-create-block"
-	},
-	{
-		"title": "@wordpress/custom-templated-path-webpack-plugin",
-		"slug": "packages-custom-templated-path-webpack-plugin",
-		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
-		"parent": "packages"
 	},
 	{
 		"title": "@wordpress/customize-widgets",
@@ -1545,6 +1581,12 @@
 		"title": "@wordpress/dom",
 		"slug": "packages-dom",
 		"markdown_source": "../packages/dom/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/e2e-test-utils-playwright",
+		"slug": "packages-e2e-test-utils-playwright",
+		"markdown_source": "../packages/e2e-test-utils-playwright/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1608,12 +1650,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/experiments",
-		"slug": "packages-experiments",
-		"markdown_source": "../packages/experiments/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
@@ -1641,6 +1677,12 @@
 		"title": "@wordpress/icons",
 		"slug": "packages-icons",
 		"markdown_source": "../packages/icons/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/interactivity",
+		"slug": "packages-interactivity",
+		"markdown_source": "../packages/interactivity/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1692,12 +1734,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/library-export-default-webpack-plugin",
-		"slug": "packages-library-export-default-webpack-plugin",
-		"markdown_source": "../packages/library-export-default-webpack-plugin/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",
@@ -1725,6 +1761,12 @@
 		"title": "@wordpress/nux",
 		"slug": "packages-nux",
 		"markdown_source": "../packages/nux/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/patterns",
+		"slug": "packages-patterns",
+		"markdown_source": "../packages/patterns/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1776,6 +1818,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/private-apis",
+		"slug": "packages-private-apis",
+		"markdown_source": "../packages/private-apis/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/project-management-automation",
 		"slug": "packages-project-management-automation",
 		"markdown_source": "../packages/project-management-automation/README.md",
@@ -1812,6 +1860,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/router",
+		"slug": "packages-router",
+		"markdown_source": "../packages/router/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/scripts",
 		"slug": "packages-scripts",
 		"markdown_source": "../packages/scripts/README.md",
@@ -1845,6 +1899,12 @@
 		"title": "@wordpress/stylelint-config",
 		"slug": "packages-stylelint-config",
 		"markdown_source": "../packages/stylelint-config/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/sync",
+		"slug": "packages-sync",
+		"markdown_source": "../packages/sync/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2016,6 +2076,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Entities and Undo/Redo.",
+		"slug": "entities",
+		"markdown_source": "../docs/explanations/architecture/entities.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Modularity",
 		"slug": "modularity",
 		"markdown_source": "../docs/explanations/architecture/modularity.md",
@@ -2034,7 +2100,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Full Site Editing Templates",
+		"title": "Site Editing Templates",
 		"slug": "full-site-editing-templates",
 		"markdown_source": "../docs/explanations/architecture/full-site-editing-templates.md",
 		"parent": "architecture"
@@ -2124,10 +2190,22 @@
 		"parent": "code"
 	},
 	{
-		"title": "Block Grammar",
-		"slug": "grammar",
-		"markdown_source": "../docs/contributors/code/grammar.md",
-		"parent": "code"
+		"title": "End-to-End Testing",
+		"slug": "e2e",
+		"markdown_source": "../docs/contributors/code/e2e/README.md",
+		"parent": "testing-overview"
+	},
+	{
+		"title": "Migration guide",
+		"slug": "migration",
+		"markdown_source": "../docs/contributors/code/e2e/migration.md",
+		"parent": "e2e"
+	},
+	{
+		"title": "Overusing snapshots",
+		"slug": "overusing-snapshots",
+		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
+		"parent": "e2e"
 	},
 	{
 		"title": "Scripts",
@@ -2238,7 +2316,7 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Localizing Gutenberg Plugin",
+		"title": "Localizing Gutenberg",
 		"slug": "localizing",
 		"markdown_source": "../docs/contributors/localizing.md",
 		"parent": "contributors"
@@ -2265,12 +2343,6 @@
 		"title": "Versions in WordPress",
 		"slug": "versions-in-wordpress",
 		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Upcoming Projects & Roadmap",
-		"slug": "roadmap",
-		"markdown_source": "../docs/contributors/roadmap.md",
 		"parent": "contributors"
 	}
 ]

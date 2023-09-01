@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, forwardRef } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -46,16 +45,5 @@ const ExportedServerSideRender = withSelect( ( select ) => {
 
 	return <ServerSideRender urlQueryArgs={ newUrlQueryArgs } { ...props } />;
 } );
-
-if ( window && window.wp && window.wp.components ) {
-	window.wp.components.ServerSideRender = forwardRef( ( props, ref ) => {
-		deprecated( 'wp.components.ServerSideRender', {
-			version: '6.2',
-			since: '5.3',
-			alternative: 'wp.serverSideRender',
-		} );
-		return <ExportedServerSideRender { ...props } ref={ ref } />;
-	} );
-}
 
 export default ExportedServerSideRender;

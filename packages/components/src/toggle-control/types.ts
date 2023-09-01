@@ -13,10 +13,8 @@ export type ToggleControlProps = Pick<
 	FormToggleProps,
 	'checked' | 'disabled'
 > &
-	Pick<
-		BaseControlProps,
-		'__nextHasNoMarginBottom' | 'help' | 'className'
-	> & {
+	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'className' > & {
+		help?: ReactNode | ( ( checked: boolean ) => ReactNode );
 		/**
 		 * The label for the toggle.
 		 */

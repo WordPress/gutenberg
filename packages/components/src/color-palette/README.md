@@ -1,54 +1,6 @@
 # ColorPalette
 
-## Props
-
-The component accepts the following props.
-
-{ colors, disableCustomColors = false, value, onChange, className, clearable = true }
-
-### colors
-
-Array with the colors to be shown.
-
--   Type: `Array`
--   Required: Yes
-
-### disableCustomColors
-
-Whether to allow custom color or not.
-
--   Type: `Boolean`
--   Required: No
--   Default: false
-
-### value
-
-currently active value
-
--   Type: `String`
--   Required: No
-
-### onChange
-
-Callback called when a color is selected.
-
--   Type: `Function`
--   Required: Yes
-
-### className
-
-classes to be applied to the container.
-
--   Type: `String`
--   Required: No
-
-### clearable
-
-Whether the palette should have a clearing button or not.
-
--   Type: `Boolean`
--   Required: No
--   Default: true
+`ColorPalette` allows the user to pick a color from a list of pre-defined color entries.
 
 ## Usage
 
@@ -79,3 +31,56 @@ If you're using this component outside the editor, you can
 for the `ColorPalette`'s color swatches, by rendering your `ColorPalette` with a
 `Popover.Slot` further up the element tree and within a
 `SlotFillProvider` overall.
+
+## Props
+
+The component accepts the following props.
+
+### `clearable`: `boolean`
+
+Whether the palette should have a clearing button.
+
+-   Required: No
+-   Default: `true`
+
+### `colors`: `PaletteObject[] | ColorObject[]`
+
+Array with the colors to be shown. When displaying multiple color palettes to choose from, the format of the array changes from an array of colors objects, to an array of color palettes.
+
+-   Required: No
+-   Default: `[]`
+
+### `disableCustomColors`: `boolean`
+
+Whether to allow the user to pick a custom color on top of the predefined
+choices (defined via the `colors` prop).
+
+-   Required: No
+-   Default: `false`
+
+### `enableAlpha`: `boolean`
+
+This controls whether the alpha channel will be offered when selecting custom
+colors.
+
+-   Required: No
+-   Default: `false`
+
+### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+
+The heading level.
+
+-   Required: No
+-   Default: `2`
+
+### `value`: `string`
+
+Currently active value.
+
+-   Required: No
+
+### `onChange`: `OnColorChange`
+
+Callback called when a color is selected.
+
+-   Required: Yes

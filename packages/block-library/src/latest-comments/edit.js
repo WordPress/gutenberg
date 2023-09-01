@@ -28,11 +28,20 @@ export default function LatestComments( { attributes, setAttributes } ) {
 	const { commentsToShow, displayAvatar, displayDate, displayExcerpt } =
 		attributes;
 
+	const serverSideAttributes = {
+		...attributes,
+		style: {
+			...attributes?.style,
+			spacing: undefined,
+		},
+	};
+
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display avatar' ) }
 						checked={ displayAvatar }
 						onChange={ () =>
@@ -40,6 +49,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 						}
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display date' ) }
 						checked={ displayDate }
 						onChange={ () =>
@@ -47,6 +57,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 						}
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display excerpt' ) }
 						checked={ displayExcerpt }
 						onChange={ () =>
@@ -56,6 +67,8 @@ export default function LatestComments( { attributes, setAttributes } ) {
 						}
 					/>
 					<RangeControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Number of comments' ) }
 						value={ commentsToShow }
 						onChange={ ( value ) =>
@@ -70,7 +83,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 			<Disabled>
 				<ServerSideRender
 					block="core/latest-comments"
-					attributes={ attributes }
+					attributes={ serverSideAttributes }
 					// The preview uses the site's locale to make it more true to how
 					// the block appears on the frontend. Setting the locale
 					// explicitly prevents any middleware from setting it to 'user'.

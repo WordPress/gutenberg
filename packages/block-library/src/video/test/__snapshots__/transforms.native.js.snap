@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Video block transforms to Columns block 1`] = `
+"<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+<div class="wp-block-column" style="flex-basis:100%"><!-- wp:video -->
+<figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video><figcaption class="wp-element-caption">Cloudup video</figcaption></figure>
+<!-- /wp:video --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Video block transforms to Cover block 1`] = `
+"<!-- wp:cover {"url":"https://i.cloudup.com/YtZFJbuQCE.mov","dimRatio":50,"backgroundType":"video"} -->
+<div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><video class="wp-block-cover__video-background intrinsic-ignore" autoplay muted loop playsinline src="https://i.cloudup.com/YtZFJbuQCE.mov" data-object-fit="cover"></video><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","fontSize":"large"} -->
+<p class="has-text-align-center has-large-font-size">Cloudup video</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`Video block transforms to File block 1`] = `
+"<!-- wp:file {"href":"https://i.cloudup.com/YtZFJbuQCE.mov"} -->
+<div class="wp-block-file"><a href="https://i.cloudup.com/YtZFJbuQCE.mov">Cloudup video</a><a href="https://i.cloudup.com/YtZFJbuQCE.mov" class="wp-block-file__button wp-element-button" download>Download</a></div>
+<!-- /wp:file -->"
+`;
+
+exports[`Video block transforms to Group block 1`] = `
+"<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:video -->
+<figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video><figcaption class="wp-element-caption">Cloudup video</figcaption></figure>
+<!-- /wp:video --></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Video block transforms to Media & Text block 1`] = `
+"<!-- wp:media-text {"mediaType":"video"} -->
+<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure><div class="wp-block-media-text__content"><!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text -->"
+`;

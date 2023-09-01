@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { HTMLInputTypeAttribute } from 'react';
-
-/**
  * Internal dependencies
  */
 import type { BaseControlProps } from '../base-control/types';
@@ -29,5 +24,5 @@ export type TextControlProps = Pick<
 	 *
 	 * @default 'text'
 	 */
-	type?: HTMLInputTypeAttribute;
+	type?: 'email' | 'number' | 'password' | 'tel' | 'text' | 'search' | 'url';
 };

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -11,7 +10,6 @@ import { useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -21,21 +19,21 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
+import Inserter from '../inserter';
+import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
 function selector( select ) {
 	const {
 		__unstableGetEditorMode,
-		isMultiSelecting,
 		hasMultiSelection,
 		isTyping,
-		getSettings,
 		getLastMultiSelectedBlockClientId,
 	} = select( blockEditorStore );
+
 	return {
 		editorMode: __unstableGetEditorMode(),
-		isMultiSelecting: isMultiSelecting(),
+		hasMultiSelection: hasMultiSelection(),
 		isTyping: isTyping(),
-		hasFixedToolbar: getSettings().hasFixedToolbar,
 		lastClientId: hasMultiSelection()
 			? getLastMultiSelectedBlockClientId()
 			: null,
@@ -50,13 +48,11 @@ function SelectedBlockPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
-	const {
-		editorMode,
-		isMultiSelecting,
-		isTyping,
-		hasFixedToolbar,
-		lastClientId,
-	} = useSelect( selector, [] );
+	const { editorMode, hasMultiSelection, isTyping, lastClientId } = useSelect(
+		selector,
+		[]
+	);
+
 	const isInsertionPointVisible = useSelect(
 		( select ) => {
 			const {
@@ -75,26 +71,17 @@ function SelectedBlockPopover( {
 		},
 		[ clientId ]
 	);
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const isToolbarForced = useRef( false );
+	const { shouldShowContextualToolbar, canFocusHiddenToolbar } =
+		useShouldContextualToolbarShow();
+
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const showEmptyBlockSideInserter =
 		! isTyping && editorMode === 'edit' && isEmptyDefaultBlock;
 	const shouldShowBreadcrumb =
-		editorMode === 'navigation' || editorMode === 'zoom-out';
-	const shouldShowContextualToolbar =
-		editorMode === 'edit' &&
-		! hasFixedToolbar &&
-		isLargeViewport &&
-		! isMultiSelecting &&
-		! showEmptyBlockSideInserter &&
-		! isTyping;
-	const canFocusHiddenToolbar =
-		editorMode === 'edit' &&
-		! shouldShowContextualToolbar &&
-		! hasFixedToolbar &&
-		! isEmptyDefaultBlock;
+		! hasMultiSelection &&
+		( editorMode === 'navigation' || editorMode === 'zoom-out' );
 
 	useShortcut(
 		'core/block-editor/focus-toolbar',
@@ -115,51 +102,90 @@ function SelectedBlockPopover( {
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
 
+	useEffect( () => {
+		// Resets the index whenever the active block changes so this is not
+		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+		initialToolbarItemIndexRef.current = undefined;
+	}, [ clientId ] );
+
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
 		clientId,
 	} );
 
-	if ( ! shouldShowBreadcrumb && ! shouldShowContextualToolbar ) {
-		return null;
+	if ( showEmptyBlockSideInserter ) {
+		return (
+			<BlockPopover
+				clientId={ capturingClientId || clientId }
+				__unstableCoverTarget
+				bottomClientId={ lastClientId }
+				className={ classnames(
+					'block-editor-block-list__block-side-inserter-popover',
+					{
+						'is-insertion-point-visible': isInsertionPointVisible,
+					}
+				) }
+				__unstablePopoverSlot={ __unstablePopoverSlot }
+				__unstableContentRef={ __unstableContentRef }
+				resize={ false }
+				shift={ false }
+				{ ...popoverProps }
+			>
+				<div className="block-editor-block-list__empty-block-inserter">
+					<Inserter
+						position="bottom right"
+						rootClientId={ rootClientId }
+						clientId={ clientId }
+						__experimentalIsQuick
+					/>
+				</div>
+			</BlockPopover>
+		);
 	}
 
-	return (
-		<BlockPopover
-			clientId={ capturingClientId || clientId }
-			bottomClientId={ lastClientId }
-			className={ classnames( 'block-editor-block-list__block-popover', {
-				'is-insertion-point-visible': isInsertionPointVisible,
-			} ) }
-			__unstablePopoverSlot={ __unstablePopoverSlot }
-			__unstableContentRef={ __unstableContentRef }
-			resize={ false }
-			{ ...popoverProps }
-		>
-			{ shouldShowContextualToolbar && (
-				<BlockContextualToolbar
-					// If the toolbar is being shown because of being forced
-					// it should focus the toolbar right after the mount.
-					focusOnMount={ isToolbarForced.current }
-					__experimentalInitialIndex={
-						initialToolbarItemIndexRef.current
+	if ( shouldShowBreadcrumb || shouldShowContextualToolbar ) {
+		return (
+			<BlockPopover
+				clientId={ capturingClientId || clientId }
+				bottomClientId={ lastClientId }
+				className={ classnames(
+					'block-editor-block-list__block-popover',
+					{
+						'is-insertion-point-visible': isInsertionPointVisible,
 					}
-					__experimentalOnIndexChange={ ( index ) => {
-						initialToolbarItemIndexRef.current = index;
-					} }
-					// Resets the index whenever the active block changes so
-					// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-					key={ clientId }
-				/>
-			) }
-			{ shouldShowBreadcrumb && (
-				<BlockSelectionButton
-					clientId={ clientId }
-					rootClientId={ rootClientId }
-				/>
-			) }
-		</BlockPopover>
-	);
+				) }
+				__unstablePopoverSlot={ __unstablePopoverSlot }
+				__unstableContentRef={ __unstableContentRef }
+				resize={ false }
+				{ ...popoverProps }
+			>
+				{ shouldShowContextualToolbar && (
+					<BlockContextualToolbar
+						// If the toolbar is being shown because of being forced
+						// it should focus the toolbar right after the mount.
+						focusOnMount={ isToolbarForced.current }
+						__experimentalInitialIndex={
+							initialToolbarItemIndexRef.current
+						}
+						__experimentalOnIndexChange={ ( index ) => {
+							initialToolbarItemIndexRef.current = index;
+						} }
+						// Resets the index whenever the active block changes so
+						// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+						key={ clientId }
+					/>
+				) }
+				{ shouldShowBreadcrumb && (
+					<BlockSelectionButton
+						clientId={ clientId }
+						rootClientId={ rootClientId }
+					/>
+				) }
+			</BlockPopover>
+		);
+	}
+
+	return null;
 }
 
 function wrapperSelector( select ) {
@@ -188,8 +214,7 @@ function wrapperSelector( select ) {
 	);
 
 	// Get the clientId of the topmost parent with the capture toolbars setting.
-	const capturingClientId = find(
-		blockParentsClientIds,
+	const capturingClientId = blockParentsClientIds.find(
 		( parentClientId ) =>
 			parentBlockListSettings[ parentClientId ]
 				?.__experimentalCaptureToolbars

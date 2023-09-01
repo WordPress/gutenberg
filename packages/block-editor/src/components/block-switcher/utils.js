@@ -13,7 +13,7 @@ import { __experimentalGetBlockAttributesNamesByRole as getBlockAttributesNamesB
  * @param {string}  selectedBlockName The block's name to use for matching condition.
  * @param {Set}     consumedBlocks    A set holding the previously matched/consumed blocks.
  *
- * @return {WPBlock?} The matched block if found or nothing(`undefined`).
+ * @return {WPBlock | undefined} The matched block if found or nothing(`undefined`).
  */
 export const getMatchingBlockByName = (
 	block,

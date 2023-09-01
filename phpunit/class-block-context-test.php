@@ -66,7 +66,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 	 * Tests that a block which provides context makes that context available to
 	 * its inner blocks.
 	 */
-	function test_provides_block_context() {
+	public function test_provides_block_context() {
 		$provided_context = array();
 
 		$this->register_block_type(
@@ -104,7 +104,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 					'gutenberg/contextWithAssigned',
 					'gutenberg/contextWithoutDefault',
 				),
-				'render_callback' => function( $attributes, $content, $block ) use ( &$provided_context ) {
+				'render_callback' => static function( $attributes, $content, $block ) use ( &$provided_context ) {
 					$provided_context[] = $block->context;
 
 					return '';
@@ -133,7 +133,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 	 * Tests that a block can receive default-provided context through
 	 * render_block.
 	 */
-	function test_provides_default_context() {
+	public function test_provides_default_context() {
 		global $post;
 
 		$provided_context = array();
@@ -142,7 +142,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 			'gutenberg/test-context-consumer',
 			array(
 				'uses_context'    => array( 'postId', 'postType' ),
-				'render_callback' => function( $attributes, $content, $block ) use ( &$provided_context ) {
+				'render_callback' => static function( $attributes, $content, $block ) use ( &$provided_context ) {
 					$provided_context[] = $block->context;
 
 					return '';
@@ -166,14 +166,14 @@ class Block_Context_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that default block context can be filtered.
 	 */
-	function test_default_context_is_filterable() {
+	public function test_default_context_is_filterable() {
 		$provided_context = array();
 
 		$this->register_block_type(
 			'gutenberg/test-context-consumer',
 			array(
 				'uses_context'    => array( 'example' ),
-				'render_callback' => function( $attributes, $content, $block ) use ( &$provided_context ) {
+				'render_callback' => static function( $attributes, $content, $block ) use ( &$provided_context ) {
 					$provided_context[] = $block->context;
 
 					return '';
@@ -181,7 +181,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$filter_block_context = function( $context ) {
+		$filter_block_context = static function( $context ) {
 			$context['example'] = 'ok';
 			return $context;
 		};

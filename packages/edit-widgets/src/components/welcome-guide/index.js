@@ -177,7 +177,7 @@ export default function WelcomeGuide() {
 								) }
 								<ExternalLink
 									href={ __(
-										'https://wordpress.org/support/article/wordpress-editor/'
+										'https://wordpress.org/documentation/article/wordpress-block-editor/'
 									) }
 								>
 									{ __( "Here's a detailed guide." ) }

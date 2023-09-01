@@ -44,7 +44,7 @@ const createSuggestionTestCase = ( code, output ) => ( {
 		{
 			suggestions: [
 				{
-					desc: 'Replace literal with store definition. Import store if neccessary.',
+					desc: 'Replace literal with store definition. Import store if necessary.',
 					output,
 				},
 			],
@@ -111,11 +111,6 @@ const invalid = [
 	createSuggestionTestCase(
 		`import { select } from '@wordpress/data'; select( 'core/notices' );`,
 		`import { select } from '@wordpress/data';\nimport { store as noticesStore } from '@wordpress/notices'; select( noticesStore );`
-	),
-	// Replace edit-post with editPostStore.
-	createSuggestionTestCase(
-		`import { select } from '@wordpress/data'; select( 'core/edit-post' );`,
-		`import { select } from '@wordpress/data';\nimport { store as editPostStore } from '@wordpress/edit-post'; select( editPostStore );`
 	),
 ];
 const errors = [

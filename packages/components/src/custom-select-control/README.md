@@ -131,6 +131,34 @@ Start opting into the unconstrained width style that will become the default in 
 -   Required: No
 -   Default: `false`
 
+#### onMouseOver
+
+A handler for onMouseOver events.
+
+-   Type: `Function`
+-   Required: No
+
+#### onMouseOut
+
+A handler for onMouseOut events.
+
+-   Type: `Function`
+-   Required: No
+
+#### onFocus
+
+A handler for onFocus events.
+
+-   Type: `Function`
+-   Required: No
+
+#### onBlur
+
+A handler for onBlur events.
+
+-   Type: `Function`
+-   Required: No
+
 ## Related components
 
 -   Like this component, but implemented using a native `<select>` for when custom styling is not necessary, the `SelectControl` component.

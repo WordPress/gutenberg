@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect, useRegistry } from '@wordpress/data';
@@ -50,7 +45,7 @@ export default function MetaBoxes( { location } ) {
 
 	return (
 		<>
-			{ map( metaBoxes, ( { id } ) => (
+			{ ( metaBoxes ?? [] ).map( ( { id } ) => (
 				<MetaBoxVisibility key={ id } id={ id } />
 			) ) }
 			<MetaBoxesArea location={ location } />

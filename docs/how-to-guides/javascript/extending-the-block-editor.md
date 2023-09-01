@@ -1,6 +1,6 @@
 # Extending the Block Editor
 
-Let's look at using the [Block Style example](/docs/reference-guides/filters/block-filters.md#block-styles) to extend the editor. This example allows you to add your own custom CSS class name to any core block type.
+Let's look at using the [Block Style example](/docs/reference-guides/block-api/block-styles.md) to extend the editor. This example allows you to add your own custom CSS class name to any core block type.
 
 Replace the existing `console.log()` code in your `myguten.js` file with:
 

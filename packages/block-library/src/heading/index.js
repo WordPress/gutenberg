@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { heading as icon } from '@wordpress/icons';
@@ -41,7 +36,7 @@ export const settings = {
 		}
 
 		if ( context === 'accessibility' ) {
-			return isEmpty( content )
+			return ! content || content.length === 0
 				? sprintf(
 						/* translators: accessibility text. %s: heading level. */
 						__( 'Level %s. Empty.' ),

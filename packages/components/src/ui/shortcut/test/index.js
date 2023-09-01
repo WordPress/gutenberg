@@ -11,7 +11,7 @@ import { Shortcut } from '..';
 describe( 'Shortcut', () => {
 	it( 'should render null when no shortcut is provided', () => {
 		const { container } = render( <Shortcut /> );
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render a span with the shortcut text', () => {
@@ -28,7 +28,8 @@ describe( 'Shortcut', () => {
 		};
 		render( <Shortcut shortcut={ shortcutObject } /> );
 		const shortcut = screen.getByText( shortcutObject.display );
-		expect( shortcut.getAttribute( 'aria-label' ) ).toBe(
+		expect( shortcut ).toHaveAttribute(
+			'aria-label',
 			shortcutObject.ariaLabel
 		);
 	} );

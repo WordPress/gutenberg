@@ -16,7 +16,7 @@ describe( 'DatePicker', () => {
 
 		expect(
 			screen.getByRole( 'button', { name: 'May 2, 2022. Selected' } )
-		).not.toBeNull();
+		).toBeInTheDocument();
 	} );
 
 	it( "should highlight today's date when not provided a currentDate", () => {
@@ -27,13 +27,11 @@ describe( 'DatePicker', () => {
 			screen.getByRole( 'button', {
 				name: `${ todayDescription }. Selected`,
 			} )
-		).not.toBeNull();
+		).toBeInTheDocument();
 	} );
 
 	it( 'should call onChange when a day is selected', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChange = jest.fn();
 
@@ -52,9 +50,7 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onMonthPreviewed = jest.fn();
 		const onChange = jest.fn();
@@ -116,6 +112,6 @@ describe( 'DatePicker', () => {
 		const button = screen.getByRole( 'button', {
 			name: 'May 20, 2022',
 		} ) as HTMLButtonElement;
-		expect( button.disabled ).toBe( true );
+		expect( button ).toBeDisabled();
 	} );
 } );

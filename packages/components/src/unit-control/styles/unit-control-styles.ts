@@ -18,16 +18,6 @@ type SelectProps = {
 	selectSize: SelectSize;
 };
 
-export const Root = styled.div`
-	box-sizing: border-box;
-	position: relative;
-
-	/* Target the InputControl's backdrop and make focus styles smoother. */
-	&&& ${ BackdropUI } {
-		transition: box-shadow 0.1s linear;
-	}
-`;
-
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
@@ -36,6 +26,10 @@ export const ValueInput = styled( NumberControl )`
 		input {
 			display: block;
 			width: 100%;
+		}
+
+		${ BackdropUI } {
+			transition: box-shadow 0.1s linear;
 		}
 	}
 `;
@@ -60,7 +54,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			height: 24px;
 			margin-inline-end: ${ space( 2 ) };
 			padding: ${ space( 1 ) };
-			color: ${ COLORS.ui.theme };
+			color: ${ COLORS.theme.accent };
 			font-size: 13px;
 			line-height: 1;
 			text-align-last: center;
@@ -129,8 +123,8 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 };
 
 export const UnitSelect = styled.select< SelectProps >`
-	// The && counteracts <select> styles in WP forms.css
-	&& {
+	// The &&& counteracts <select> styles in WP forms.css
+	&&& {
 		appearance: none;
 		background: transparent;
 		border-radius: 2px;

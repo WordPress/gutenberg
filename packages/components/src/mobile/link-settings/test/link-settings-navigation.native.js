@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Keyboard, Platform } from 'react-native';
-import { render, fireEvent, waitFor } from 'test/helpers';
+import { render, fireEvent } from 'test/helpers';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { render, fireEvent, waitFor } from 'test/helpers';
 import LinkSettingsNavigation from '../link-settings-navigation';
 
 beforeAll( () => {
-	jest.useFakeTimers( 'legacy' );
+	jest.useFakeTimers( { legacyFakeTimers: true } );
 } );
 
 afterAll( () => {
@@ -40,13 +40,8 @@ describe( 'Android', () => {
 	it( 'improves back animation performance by dismissing keyboard beforehand', async () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
-		fireEvent.press(
-			screen.getByA11yLabel( 'Link to, Search or type URL' )
-		);
 		// Await back button to allow async state updates to complete
-		const backButton = await waitFor( () =>
-			screen.getByA11yLabel( 'Go back' )
-		);
+		const backButton = await screen.findByLabelText( 'Go back' );
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
 
@@ -57,9 +52,7 @@ describe( 'Android', () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
-		const backButton = await waitFor( () =>
-			screen.getByA11yLabel( 'Apply' )
-		);
+		const backButton = await screen.findByLabelText( 'Apply' );
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
 
@@ -81,9 +74,7 @@ describe( 'iOS', () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
-		const backButton = await waitFor( () =>
-			screen.getByA11yLabel( 'Go back' )
-		);
+		const backButton = await screen.findByLabelText( 'Go back' );
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
 
@@ -94,9 +85,7 @@ describe( 'iOS', () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
-		const backButton = await waitFor( () =>
-			screen.getByA11yLabel( 'Apply' )
-		);
+		const backButton = await screen.findByLabelText( 'Apply' );
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
 

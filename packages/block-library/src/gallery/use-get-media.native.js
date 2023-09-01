@@ -14,7 +14,7 @@ const EMPTY_IMAGE_MEDIA = [];
  *
  * @return {Array} An array of media info options for each gallery image.
  */
-export default function useGetMedia( innerBlockImages ) {
+export default function useGetMedia( innerBlockImages = [] ) {
 	return useSelect(
 		( select ) => {
 			const imagesUploading = innerBlockImages.some(
@@ -34,7 +34,8 @@ export default function useGetMedia( innerBlockImages ) {
 			return (
 				select( coreStore ).getMediaItems( {
 					include: imageIds.join( ',' ),
-					per_page: imageIds.length,
+					per_page:
+						imageIds.length /* 'hard' limit necessary as unbounded queries aren't supported on native */,
 					orderby: 'include',
 				} ) ?? EMPTY_IMAGE_MEDIA
 			);

@@ -7,20 +7,16 @@ import {
 	useFloating,
 	flip as flipMiddleware,
 	shift as shiftMiddleware,
+	limitShift,
 	autoUpdate,
 	arrow,
 	offset as offsetMiddleware,
 	size,
-	Middleware,
-	MiddlewareArguments,
 } from '@floating-ui/react-dom';
 // eslint-disable-next-line no-restricted-imports
-import {
-	motion,
-	useReducedMotion,
-	HTMLMotionProps,
-	MotionProps,
-} from 'framer-motion';
+import type { HTMLMotionProps, MotionProps } from 'framer-motion';
+// eslint-disable-next-line no-restricted-imports
+import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -34,6 +30,7 @@ import {
 	useMemo,
 	useState,
 	useCallback,
+	createPortal,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -43,6 +40,7 @@ import {
 import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { Path, SVG } from '@wordpress/primitives';
+import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -51,7 +49,7 @@ import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import {
-	getFrameOffset,
+	computePopoverPosition,
 	positionToPlacement,
 	placementToMotionAnimationProps,
 	getReferenceOwnerDocument,
@@ -64,14 +62,14 @@ import type {
 	PopoverAnchorRefReference,
 	PopoverAnchorRefTopBottom,
 } from './types';
-import { limitShift as customLimitShift } from './limit-shift';
+import { overlayMiddlewares } from './overlay-middlewares';
 
 /**
  * Name of slot in which popover should fill.
  *
  * @type {string}
  */
-const SLOT_NAME = 'Popover';
+export const SLOT_NAME = 'Popover';
 
 // An SVG displaying a triangle facing down, filled with a solid
 // color and bordered in such a way to create an arrow-like effect.
@@ -106,20 +104,11 @@ const AnimatedWrapper = forwardRef(
 		}: HTMLMotionProps< 'div' > & AnimatedWrapperProps,
 		forwardedRef: ForwardedRef< any >
 	) => {
-		// When animating, animate only once (i.e. when the popover is opened), and
-		// do not animate on subsequent prop changes (as it conflicts with
-		// floating-ui's positioning updates).
-		const [ hasAnimatedOnce, setHasAnimatedOnce ] = useState( false );
 		const shouldReduceMotion = useReducedMotion();
 
 		const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
 			() => placementToMotionAnimationProps( placement ),
 			[ placement ]
-		);
-
-		const onAnimationComplete = useCallback(
-			() => setHasAnimatedOnce( true ),
-			[]
 		);
 
 		const computedAnimationProps: HTMLMotionProps< 'div' > =
@@ -130,10 +119,6 @@ const AnimatedWrapper = forwardRef(
 							...receivedInlineStyles,
 						},
 						...otherMotionProps,
-						onAnimationComplete,
-						animate: hasAnimatedOnce
-							? false
-							: otherMotionProps.animate,
 				  }
 				: {
 						animate: false,
@@ -152,13 +137,27 @@ const AnimatedWrapper = forwardRef(
 
 const slotNameContext = createContext< string | undefined >( undefined );
 
+const fallbackContainerClassname = 'components-popover__fallback-container';
+const getPopoverFallbackContainer = () => {
+	let container = document.body.querySelector(
+		'.' + fallbackContainerClassname
+	);
+	if ( ! container ) {
+		container = document.createElement( 'div' );
+		container.className = fallbackContainerClassname;
+		document.body.append( container );
+	}
+
+	return container;
+};
+
 const UnforwardedPopover = (
 	props: Omit<
 		WordPressComponentProps< PopoverProps, 'div', false >,
 		// To avoid overlaps between the standard HTML attributes and the props
 		// expected by `framer-motion`, omit all framer motion props from popover
-		// props (except for `animate`, which is re-defined in `PopoverProps`).
-		keyof Omit< MotionProps, 'animate' >
+		// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
+		keyof Omit< MotionProps, 'animate' | 'children' >
 	>,
 	forwardedRef: ForwardedRef< any >
 ) => {
@@ -169,7 +168,6 @@ const UnforwardedPopover = (
 		children,
 		className,
 		noArrow = true,
-		isAlternate,
 		position,
 		placement: placementProp = 'bottom-start',
 		offset: offsetProp = 0,
@@ -181,30 +179,24 @@ const UnforwardedPopover = (
 		flip = true,
 		resize = true,
 		shift = false,
+		inline = false,
+		variant,
 
 		// Deprecated props
 		__unstableForcePosition,
-		__unstableShift,
 		anchorRef,
 		anchorRect,
 		getAnchorRect,
-		range,
+		isAlternate,
 
 		// Rest
 		...contentProps
 	} = props;
 
-	if ( range ) {
-		deprecated( '`range` prop in wp.components.Popover', {
-			since: '6.1',
-			version: '6.3',
-		} );
-	}
-
 	let computedFlipProp = flip;
 	let computedResizeProp = resize;
 	if ( __unstableForcePosition !== undefined ) {
-		deprecated( '`__unstableForcePosition` prop wp.components.Popover', {
+		deprecated( '`__unstableForcePosition` prop in wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 			alternative: '`flip={ false }` and  `resize={ false }`',
@@ -216,22 +208,9 @@ const UnforwardedPopover = (
 		computedResizeProp = ! __unstableForcePosition;
 	}
 
-	let shouldShift = shift;
-	if ( __unstableShift !== undefined ) {
-		deprecated( '`__unstableShift` prop in wp.components.Popover', {
-			since: '6.1',
-			version: '6.3',
-			alternative: '`shift` prop`',
-		} );
-
-		// Back-compat.
-		shouldShift = __unstableShift;
-	}
-
 	if ( anchorRef !== undefined ) {
 		deprecated( '`anchorRef` prop in wp.components.Popover', {
 			since: '6.1',
-			version: '6.3',
 			alternative: '`anchor` prop',
 		} );
 	}
@@ -239,7 +218,6 @@ const UnforwardedPopover = (
 	if ( anchorRect !== undefined ) {
 		deprecated( '`anchorRect` prop in wp.components.Popover', {
 			since: '6.1',
-			version: '6.3',
 			alternative: '`anchor` prop',
 		} );
 	}
@@ -247,12 +225,19 @@ const UnforwardedPopover = (
 	if ( getAnchorRect !== undefined ) {
 		deprecated( '`getAnchorRect` prop in wp.components.Popover', {
 			since: '6.1',
-			version: '6.3',
 			alternative: '`anchor` prop',
 		} );
 	}
 
-	const arrowRef = useRef( null );
+	const computedVariant = isAlternate ? 'toolbar' : variant;
+	if ( isAlternate !== undefined ) {
+		deprecated( '`isAlternate` prop in wp.components.Popover', {
+			since: '6.2',
+			alternative: "`variant` prop with the `'toolbar'` value",
+		} );
+	}
+
+	const arrowRef = useRef< HTMLElement | null >( null );
 
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
 		useState< HTMLSpanElement | null >( null );
@@ -274,68 +259,34 @@ const UnforwardedPopover = (
 		? positionToPlacement( position )
 		: placementProp;
 
-	/**
-	 * Offsets the position of the popover when the anchor is inside an iframe.
-	 *
-	 * Store the offset in a ref, due to constraints with floating-ui:
-	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
-	 */
-	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
-
 	const middleware = [
-		// Custom middleware which adjusts the popover's position by taking into
-		// account the offset of the anchor's iframe (if any) compared to the page.
-		{
-			name: 'frameOffset',
-			fn( { x, y }: MiddlewareArguments ) {
-				if ( ! frameOffsetRef.current ) {
-					return {
-						x,
-						y,
-					};
-				}
-
-				return {
-					x: x + frameOffsetRef.current.x,
-					y: y + frameOffsetRef.current.y,
-					data: {
-						// This will be used in the customLimitShift() function.
-						amount: frameOffsetRef.current,
-					},
-				};
-			},
-		},
+		...( placementProp === 'overlay' ? overlayMiddlewares() : [] ),
 		offsetMiddleware( offsetProp ),
-		computedFlipProp ? flipMiddleware() : undefined,
-		computedResizeProp
-			? size( {
-					apply( sizeProps ) {
-						const { firstElementChild } =
-							refs.floating.current ?? {};
+		computedFlipProp && flipMiddleware(),
+		computedResizeProp &&
+			size( {
+				apply( sizeProps ) {
+					const { firstElementChild } = refs.floating.current ?? {};
 
-						// Only HTMLElement instances have the `style` property.
-						if ( ! ( firstElementChild instanceof HTMLElement ) )
-							return;
+					// Only HTMLElement instances have the `style` property.
+					if ( ! ( firstElementChild instanceof HTMLElement ) )
+						return;
 
-						// Reduce the height of the popover to the available space.
-						Object.assign( firstElementChild.style, {
-							maxHeight: `${ sizeProps.availableHeight }px`,
-							overflow: 'auto',
-						} );
-					},
-			  } )
-			: undefined,
-		shouldShift
-			? shiftMiddleware( {
-					crossAxis: true,
-					limiter: customLimitShift(),
-					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
-			  } )
-			: undefined,
+					// Reduce the height of the popover to the available space.
+					Object.assign( firstElementChild.style, {
+						maxHeight: `${ sizeProps.availableHeight }px`,
+						overflow: 'auto',
+					} );
+				},
+			} ),
+		shift &&
+			shiftMiddleware( {
+				crossAxis: true,
+				limiter: limitShift(),
+				padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+			} ),
 		arrow( { element: arrowRef } ),
-	].filter(
-		( m: Middleware | undefined ): m is Middleware => m !== undefined
-	);
+	];
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
 
@@ -364,10 +315,6 @@ const UnforwardedPopover = (
 		// Positioning coordinates
 		x,
 		y,
-		// Callback refs (not regular refs). This allows the position to be updated.
-		// when either elements change.
-		reference: referenceCallbackRef,
-		floating,
 		// Object with "regular" refs to both "reference" and "floating"
 		refs,
 		// Type of CSS position property to use (absolute or fixed)
@@ -376,16 +323,20 @@ const UnforwardedPopover = (
 		placement: computedPlacement,
 		middlewareData: { arrow: arrowData },
 	} = useFloating( {
-		placement: normalizedPlacementFromProps,
+		placement:
+			normalizedPlacementFromProps === 'overlay'
+				? undefined
+				: normalizedPlacementFromProps,
 		middleware,
 		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
 			autoUpdate( referenceParam, floatingParam, updateParam, {
+				layoutShift: false,
 				animationFrame: true,
 			} ),
 	} );
 
 	const arrowCallbackRef = useCallback(
-		( node ) => {
+		( node: HTMLElement | null ) => {
 			arrowRef.current = node;
 			update();
 		},
@@ -394,6 +345,17 @@ const UnforwardedPopover = (
 
 	// When any of the possible anchor "sources" change,
 	// recompute the reference element (real or virtual) and its owner document.
+
+	const anchorRefTop = ( anchorRef as PopoverAnchorRefTopBottom | undefined )
+		?.top;
+	const anchorRefBottom = (
+		anchorRef as PopoverAnchorRefTopBottom | undefined
+	 )?.bottom;
+	const anchorRefStartContainer = ( anchorRef as Range | undefined )
+		?.startContainer;
+	const anchorRefCurrent = ( anchorRef as PopoverAnchorRefReference )
+		?.current;
+
 	useLayoutEffect( () => {
 		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
 			anchor,
@@ -403,6 +365,7 @@ const UnforwardedPopover = (
 			fallbackReferenceElement,
 			fallbackDocument: document,
 		} );
+
 		const resultingReferenceElement = getReferenceElement( {
 			anchor,
 			anchorRef,
@@ -411,56 +374,51 @@ const UnforwardedPopover = (
 			fallbackReferenceElement,
 		} );
 
-		referenceCallbackRef( resultingReferenceElement );
+		refs.setReference( resultingReferenceElement );
 
 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
 	}, [
 		anchor,
-		anchorRef as Element | undefined,
-		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top,
-		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.bottom,
-		( anchorRef as Range | undefined )?.startContainer,
-		( anchorRef as PopoverAnchorRefReference )?.current,
+		anchorRef,
+		anchorRefTop,
+		anchorRefBottom,
+		anchorRefStartContainer,
+		anchorRefCurrent,
 		anchorRect,
 		getAnchorRect,
 		fallbackReferenceElement,
-		referenceCallbackRef,
+		refs,
 	] );
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
-	// document scrolls. Also update the frame offset if the view resizes.
+	// document scrolls.
 	useLayoutEffect( () => {
 		if (
-			// Reference and root documents are the same.
-			referenceOwnerDocument === document ||
-			// Reference and floating are in the same document.
-			referenceOwnerDocument === refs?.floating?.current?.ownerDocument ||
-			// The reference's document has no view (i.e. window)
-			// or frame element (ie. it's not an iframe).
-			! referenceOwnerDocument?.defaultView?.frameElement
+			! referenceOwnerDocument ||
+			! referenceOwnerDocument.defaultView
 		) {
-			frameOffsetRef.current = undefined;
 			return;
 		}
 
 		const { defaultView } = referenceOwnerDocument;
+		const { frameElement } = defaultView;
 
-		const updateFrameOffset = () => {
-			frameOffsetRef.current = getFrameOffset( referenceOwnerDocument );
-			update();
-		};
-		defaultView.addEventListener( 'resize', updateFrameOffset );
+		const scrollContainer = frameElement
+			? getScrollContainer( frameElement )
+			: null;
 
-		updateFrameOffset();
+		defaultView.addEventListener( 'resize', update );
+		scrollContainer?.addEventListener( 'scroll', update );
 
 		return () => {
-			defaultView.removeEventListener( 'resize', updateFrameOffset );
+			defaultView.removeEventListener( 'resize', update );
+			scrollContainer?.removeEventListener( 'scroll', update );
 		};
 	}, [ referenceOwnerDocument, update ] );
 
 	const mergedFloatingRef = useMergeRefs( [
-		floating,
+		refs.setFloating,
 		dialogRef,
 		forwardedRef,
 	] );
@@ -476,7 +434,13 @@ const UnforwardedPopover = (
 			placement={ computedPlacement }
 			className={ classnames( 'components-popover', className, {
 				'is-expanded': isExpanded,
-				'is-alternate': isAlternate,
+				'is-positioned': x !== null && y !== null,
+				// Use the 'alternate' classname for 'toolbar' variant for back compat.
+				[ `is-${
+					computedVariant === 'toolbar'
+						? 'alternate'
+						: computedVariant
+				}` ]: computedVariant,
 			} ) }
 			{ ...contentProps }
 			ref={ mergedFloatingRef }
@@ -487,8 +451,15 @@ const UnforwardedPopover = (
 					? undefined
 					: {
 							position: strategy,
-							left: Number.isNaN( x ) ? 0 : x ?? undefined,
-							top: Number.isNaN( y ) ? 0 : y ?? undefined,
+							top: 0,
+							left: 0,
+							// `x` and `y` are framer-motion specific props and are shorthands
+							// for `translateX` and `translateY`. Currently it is not possible
+							// to use `translateX` and `translateY` because those values would
+							// be overridden by the return value of the
+							// `placementToMotionAnimationProps` function in `AnimatedWrapper`
+							x: computePopoverPosition( x ),
+							y: computePopoverPosition( y ),
 					  }
 			}
 		>
@@ -518,18 +489,12 @@ const UnforwardedPopover = (
 						left:
 							typeof arrowData?.x !== 'undefined' &&
 							Number.isFinite( arrowData.x )
-								? `${
-										arrowData.x +
-										( frameOffsetRef.current?.x ?? 0 )
-								  }px`
+								? `${ arrowData.x }px`
 								: '',
 						top:
 							typeof arrowData?.y !== 'undefined' &&
 							Number.isFinite( arrowData.y )
-								? `${
-										arrowData.y +
-										( frameOffsetRef.current?.y ?? 0 )
-								  }px`
+								? `${ arrowData.y }px`
 								: '',
 					} }
 				>
@@ -539,15 +504,25 @@ const UnforwardedPopover = (
 		</AnimatedWrapper>
 	);
 
-	if ( slot.ref ) {
+	const shouldRenderWithinSlot = slot.ref && ! inline;
+	const hasAnchor = anchorRef || anchorRect || anchor;
+
+	if ( shouldRenderWithinSlot ) {
 		content = <Fill name={ slotName }>{ content }</Fill>;
+	} else if ( ! inline ) {
+		content = createPortal( content, getPopoverFallbackContainer() );
 	}
 
-	if ( anchorRef || anchorRect || anchor ) {
+	if ( hasAnchor ) {
 		return content;
 	}
 
-	return <span ref={ anchorRefFallback }>{ content }</span>;
+	return (
+		<>
+			<span ref={ anchorRefFallback } />
+			{ content }
+		</>
+	);
 };
 
 /**

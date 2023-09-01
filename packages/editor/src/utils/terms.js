@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { groupBy, map, unescape as lodashUnescapeString } from 'lodash';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Returns terms in a tree form.
@@ -19,10 +19,25 @@ export function buildTermsTree( flatTerms ) {
 		};
 	} );
 
-	const termsByParent = groupBy( flatTermsWithParentAndChildren, 'parent' );
-	if ( termsByParent.null && termsByParent.null.length ) {
+	// All terms should have a `parent` because we're about to index them by it.
+	if (
+		flatTermsWithParentAndChildren.some( ( { parent } ) => parent === null )
+	) {
 		return flatTermsWithParentAndChildren;
 	}
+
+	const termsByParent = flatTermsWithParentAndChildren.reduce(
+		( acc, term ) => {
+			const { parent } = term;
+			if ( ! acc[ parent ] ) {
+				acc[ parent ] = [];
+			}
+			acc[ parent ].push( term );
+			return acc;
+		},
+		{}
+	);
+
 	const fillWithChildren = ( terms ) => {
 		return terms.map( ( term ) => {
 			const children = termsByParent[ term.id ];
@@ -39,14 +54,12 @@ export function buildTermsTree( flatTerms ) {
 	return fillWithChildren( termsByParent[ '0' ] || [] );
 }
 
-// Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
 export const unescapeString = ( arg ) => {
-	return lodashUnescapeString( arg.replace( '&#039;', "'" ) );
+	return decodeEntities( arg );
 };
 
 /**
  * Returns a term object with name unescaped.
- * The unescape of the name property is done using lodash unescape function.
  *
  * @param {Object} term The term object to unescape.
  *
@@ -68,5 +81,5 @@ export const unescapeTerm = ( term ) => {
  * @return {Object[]} Array of term objects unescaped.
  */
 export const unescapeTerms = ( terms ) => {
-	return map( terms, unescapeTerm );
+	return ( terms ?? [] ).map( unescapeTerm );
 };

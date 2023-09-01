@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * Internal dependencies
@@ -67,7 +66,7 @@ export const Gallery = ( props ) => {
 			numColumns: displayedColumns,
 			marginHorizontal: TILE_SPACING,
 			marginVertical: TILE_SPACING,
-			__experimentalLayout: { type: 'default', alignments: [] },
+			layout: { type: 'default', alignments: [] },
 			gridProperties: {
 				numColumns: displayedColumns,
 			},
@@ -100,7 +99,7 @@ export const Gallery = ( props ) => {
 				isSelected={ isCaptionSelected }
 				accessible={ true }
 				accessibilityLabelCreator={ ( caption ) =>
-					isEmpty( caption )
+					! caption
 						? /* translators: accessibility text. Empty gallery caption. */
 
 						  'Gallery caption. Empty'

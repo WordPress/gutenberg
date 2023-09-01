@@ -31,11 +31,11 @@
 	height: 36;
 	padding-top: 8;
 	padding-bottom: 8;
-	color: $gray-darken-20;
+	color: $light-secondary;
 }
 
 .infoIconDark {
-	color: $gray-20;
+	color: $dark-tertiary;
 }
 
 .infoSheetIcon {
@@ -82,7 +82,8 @@
 }
 
 .unsupportedBlock {
-	background-color: $gray-lighten-30;
+	height: 142;
+	background-color: #e0e0e0; // $light-dim
 	padding-top: 24;
 	padding-bottom: 24;
 	padding-left: 8;
@@ -96,31 +97,37 @@
 }
 
 .unsupportedBlockDark {
-	background-color: $background-dark-secondary;
+	background-color: #1f1f1f; // $dark-dim
+}
+
+.unsupportedBlockHeader {
+	flex-direction: row;
+	align-items: center;
+	margin-top: 4;
+	margin-bottom: 8;
 }
 
 .unsupportedBlockIcon {
-	color: $gray-dark;
+	color: $light-secondary;
 }
 
 .unsupportedBlockIconDark {
-	color: $white;
+	color: $dark-tertiary;
 }
 
 .unsupportedBlockMessage {
-	margin-top: 4;
 	text-align: center;
-	color: $gray-dark;
-	font-size: 14;
-	font-weight: 600;
+	color: $light-secondary;
+	font-size: 16;
+	font-weight: 400;
+	margin-left: 6;
 }
 
 .unsupportedBlockMessageDark {
-	color: $white;
+	color: $dark-tertiary;
 }
 
 .unsupportedBlockSubtitle {
-	margin-top: 2;
 	text-align: center;
 	color: $gray-darken-20;
 	font-size: 12;

@@ -1,3 +1,5 @@
+/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expect*"] }] */
+
 /**
  * External dependencies
  */
@@ -42,6 +44,7 @@ describe( 'MediaUpload component', () => {
 			const wrapper = render(
 				<MediaUpload
 					allowedTypes={ [ mediaType ] }
+					onSelectURL={ jest.fn() }
 					render={ ( { open, getMediaOptions } ) => {
 						return (
 							<>

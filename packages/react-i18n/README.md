@@ -48,9 +48,7 @@ _Returns_
 
 ### useI18n
 
-React hook providing access to i18n functions. It exposes the `__`, `_x`, `_n`, `_nx`,
-`isRTL` and `hasTranslation` functions from [`@wordpress/i18n`](../i18n).
-Refer to their documentation there.
+React hook providing access to i18n functions. It exposes the `__`, `_x`, `_n`, `_nx`, `isRTL` and `hasTranslation` functions from [`@wordpress/i18n`](../i18n). Refer to their documentation there.
 
 _Usage_
 
@@ -65,8 +63,7 @@ function MyComponent() {
 
 ### withI18n
 
-React higher-order component that passes the i18n translate functions (the same set
-as exposed by the `useI18n` hook) to the wrapped component as props.
+React higher-order component that passes the i18n translate functions (the same set as exposed by the `useI18n` hook) to the wrapped component as props.
 
 _Usage_
 

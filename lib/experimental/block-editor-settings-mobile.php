@@ -22,7 +22,7 @@ function gutenberg_get_block_editor_settings_mobile( $settings ) {
 		isset( $_GET['context'] ) &&
 		'mobile' === $_GET['context']
 	) {
-		if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		if ( wp_theme_has_theme_json() ) {
 			$settings['__experimentalStyles'] = gutenberg_get_global_styles();
 		}
 

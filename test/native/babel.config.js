@@ -11,6 +11,8 @@ module.exports = ( api ) => {
 					extensions: [ 'css', 'scss', 'sass' ],
 				},
 			],
+			'react-native-reanimated/plugin',
+			'@babel/plugin-proposal-export-namespace-from',
 		],
 		overrides: [
 			{

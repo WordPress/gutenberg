@@ -51,6 +51,20 @@ const migrateBorderRadius = ( attributes ) => {
 	};
 };
 
+function migrateAlign( attributes ) {
+	if ( ! attributes.align ) {
+		return attributes;
+	}
+	const { align, ...otherAttributes } = attributes;
+	return {
+		...otherAttributes,
+		className: classnames(
+			otherAttributes.className,
+			`align${ attributes.align }`
+		),
+	};
+}
+
 const migrateCustomColorsAndGradients = ( attributes ) => {
 	if (
 		! attributes.customTextColor &&
@@ -780,10 +794,12 @@ const deprecated = [
 		isEligible: ( attributes ) =>
 			!! attributes.customTextColor ||
 			!! attributes.customBackgroundColor ||
-			!! attributes.customGradient,
+			!! attributes.customGradient ||
+			!! attributes.align,
 		migrate: compose(
 			migrateBorderRadius,
-			migrateCustomColorsAndGradients
+			migrateCustomColorsAndGradients,
+			migrateAlign
 		),
 		save( { attributes } ) {
 			const {

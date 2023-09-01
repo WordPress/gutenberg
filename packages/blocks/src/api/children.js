@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
@@ -75,7 +70,9 @@ export function concat( ...blockNodes ) {
 
 	const result = [];
 	for ( let i = 0; i < blockNodes.length; i++ ) {
-		const blockNode = castArray( blockNodes[ i ] );
+		const blockNode = Array.isArray( blockNodes[ i ] )
+			? blockNodes[ i ]
+			: [ blockNodes[ i ] ];
 		for ( let j = 0; j < blockNode.length; j++ ) {
 			const child = blockNode[ j ];
 			const canConcatToPreviousString =

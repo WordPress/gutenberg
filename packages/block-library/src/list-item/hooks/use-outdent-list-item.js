@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
@@ -11,21 +6,20 @@ import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { cloneBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { name as listItemName } from '../block.json';
-
 export default function useOutdentListItem( clientId ) {
 	const registry = useRegistry();
 	const { canOutdent } = useSelect(
 		( innerSelect ) => {
-			const { getBlockRootClientId } = innerSelect( blockEditorStore );
+			const { getBlockRootClientId, getBlockName } =
+				innerSelect( blockEditorStore );
 			const grandParentId = getBlockRootClientId(
 				getBlockRootClientId( clientId )
 			);
+			const grandParentName = getBlockName( grandParentId );
+			const isListItem = grandParentName === 'core/list-item';
+
 			return {
-				canOutdent: !! grandParentId,
+				canOutdent: isListItem,
 			};
 		},
 		[ clientId ]
@@ -50,21 +44,23 @@ export default function useOutdentListItem( clientId ) {
 		const listId = getBlockRootClientId( id );
 		const parentListItemId = getBlockRootClientId( listId );
 		if ( ! parentListItemId ) return;
-		if ( getBlockName( parentListItemId ) !== listItemName ) return;
+		if ( getBlockName( parentListItemId ) !== 'core/list-item' ) return;
 		return parentListItemId;
 	}
 
 	return [
 		canOutdent,
 		useCallback( ( clientIds = getSelectedBlockClientIds() ) => {
-			clientIds = castArray( clientIds );
+			if ( ! Array.isArray( clientIds ) ) {
+				clientIds = [ clientIds ];
+			}
 
 			if ( ! clientIds.length ) return;
 
 			const firstClientId = clientIds[ 0 ];
 
 			// Can't outdent if it's not a list item.
-			if ( getBlockName( firstClientId ) !== listItemName ) return;
+			if ( getBlockName( firstClientId ) !== 'core/list-item' ) return;
 
 			const parentListItemId = getParentListItemId( firstClientId );
 
@@ -111,7 +107,8 @@ export default function useOutdentListItem( clientId ) {
 					getBlockIndex( parentListItemId ) + 1
 				);
 				if ( ! getBlockOrder( parentListId ).length ) {
-					removeBlock( parentListId );
+					const shouldSelectParent = false;
+					removeBlock( parentListId, shouldSelectParent );
 				}
 			} );
 		}, [] ),

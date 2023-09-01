@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
+import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -25,11 +25,13 @@ async function exportReusableBlock( id ) {
 	} );
 	const title = post.title.raw;
 	const content = post.content.raw;
+	const syncStatus = post.wp_pattern_sync_status;
 	const fileContent = JSON.stringify(
 		{
 			__file: 'wp_block',
 			title,
 			content,
+			syncStatus,
 		},
 		null,
 		2

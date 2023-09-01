@@ -14,7 +14,7 @@ import { waitForModalVisible } from './wait-for-modal-visible';
  * @param {import('@testing-library/react-native').RenderAPI} screen The Testing Library screen.
  */
 export const openBlockSettings = async ( screen ) => {
-	const { getByA11yLabel, getByTestId } = screen;
-	fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+	const { getByLabelText, getByTestId } = screen;
+	fireEvent.press( getByLabelText( 'Open Settings' ) );
 	return waitForModalVisible( getByTestId( 'block-settings-modal' ) );
 };

@@ -3,8 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,15 +11,21 @@ import { compose } from '@wordpress/compose';
 import PostPendingStatusCheck from './check';
 import { store as editorStore } from '../../store';
 
-export function PostPendingStatus( { status, onUpdateStatus } ) {
+export function PostPendingStatus() {
+	const status = useSelect(
+		( select ) => select( editorStore ).getEditedPostAttribute( 'status' ),
+		[]
+	);
+	const { editPost } = useDispatch( editorStore );
 	const togglePendingStatus = () => {
 		const updatedStatus = status === 'pending' ? 'draft' : 'pending';
-		onUpdateStatus( updatedStatus );
+		editPost( { status: updatedStatus } );
 	};
 
 	return (
 		<PostPendingStatusCheck>
 			<CheckboxControl
+				__nextHasNoMarginBottom
 				label={ __( 'Pending review' ) }
 				checked={ status === 'pending' }
 				onChange={ togglePendingStatus }
@@ -29,13 +34,4 @@ export function PostPendingStatus( { status, onUpdateStatus } ) {
 	);
 }
 
-export default compose(
-	withSelect( ( select ) => ( {
-		status: select( editorStore ).getEditedPostAttribute( 'status' ),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateStatus( status ) {
-			dispatch( editorStore ).editPost( { status } );
-		},
-	} ) )
-)( PostPendingStatus );
+export default PostPendingStatus;

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import { isEqual, includes } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -235,7 +235,7 @@ export class DecodeEntityParser {
 	 *
 	 * @param {string} entity Entity fragment discovered in HTML.
 	 *
-	 * @return {?string} Entity substitute value.
+	 * @return {string | undefined} Entity substitute value.
 	 */
 	parse( entity ) {
 		if ( isValidCharacterReference( entity ) ) {
@@ -289,7 +289,7 @@ export function getMeaningfulAttributePairs( token ) {
 		return (
 			value ||
 			key.indexOf( 'data-' ) === 0 ||
-			includes( MEANINGFUL_ATTRIBUTES, key )
+			MEANINGFUL_ATTRIBUTES.includes( key )
 		);
 	} );
 }
@@ -423,7 +423,9 @@ export const isEqualAttributesOfName = {
 		return actualDiff.length === 0 && expectedDiff.length === 0;
 	},
 	style: ( actual, expected ) => {
-		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
+		return fastDeepEqual(
+			...[ actual, expected ].map( getStyleProperties )
+		);
 	},
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
@@ -546,7 +548,7 @@ export const isEqualTokensOfType = {
  *
  * @param {Object[]} tokens Set of tokens to search.
  *
- * @return {Object} Next non-whitespace token.
+ * @return {Object | undefined} Next non-whitespace token.
  */
 export function getNextNonWhitespaceToken( tokens ) {
 	let token;

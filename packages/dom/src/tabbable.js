@@ -159,18 +159,15 @@ export function find( context ) {
  * @return {Element|undefined} Preceding tabbable element.
  */
 export function findPrevious( element ) {
-	const focusables = findFocusable( element.ownerDocument.body );
-	const index = focusables.indexOf( element );
-
-	if ( index === -1 ) {
-		return undefined;
-	}
-
-	// Remove all focusables after and including `element`.
-	focusables.length = index;
-
-	const tabbable = filterTabbable( focusables );
-	return tabbable[ tabbable.length - 1 ];
+	return filterTabbable( findFocusable( element.ownerDocument.body ) )
+		.reverse()
+		.find( ( focusable ) => {
+			return (
+				// eslint-disable-next-line no-bitwise
+				element.compareDocumentPosition( focusable ) &
+				element.DOCUMENT_POSITION_PRECEDING
+			);
+		} );
 }
 
 /**
@@ -182,11 +179,13 @@ export function findPrevious( element ) {
  * @return {Element|undefined} Next tabbable element.
  */
 export function findNext( element ) {
-	const focusables = findFocusable( element.ownerDocument.body );
-	const index = focusables.indexOf( element );
-
-	// Remove all focusables before and including `element`.
-	const remaining = focusables.slice( index + 1 );
-
-	return filterTabbable( remaining )[ 0 ];
+	return filterTabbable( findFocusable( element.ownerDocument.body ) ).find(
+		( focusable ) => {
+			return (
+				// eslint-disable-next-line no-bitwise
+				element.compareDocumentPosition( focusable ) &
+				element.DOCUMENT_POSITION_FOLLOWING
+			);
+		}
+	);
 }

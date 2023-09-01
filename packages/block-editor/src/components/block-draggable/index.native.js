@@ -109,8 +109,12 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 		draggingScrollHandler( event );
 	};
 
-	const { onBlockDragOver, onBlockDragEnd, onBlockDrop, targetBlockIndex } =
-		useBlockDropZone();
+	const {
+		onBlockDragOverWorklet,
+		onBlockDragEnd,
+		onBlockDrop,
+		targetBlockIndex,
+	} = useBlockDropZone();
 
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
@@ -184,7 +188,7 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 		chip.y.value = dragPosition.y;
 		currentYPosition.value = dragPosition.y;
 
-		runOnJS( onBlockDragOver )( { x, y: y + scroll.offsetY.value } );
+		onBlockDragOverWorklet( { x, y: y + scroll.offsetY.value } );
 
 		// Update scrolling velocity
 		scrollOnDragOver( dragPosition.y );
@@ -285,6 +289,58 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 	);
 };
 
+function useIsScreenReaderEnabled() {
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
+		useState( false );
+
+	useEffect( () => {
+		let mounted = true;
+
+		const changeListener = AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			( enabled ) => setIsScreenReaderEnabled( enabled )
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			( screenReaderEnabled ) => {
+				if ( mounted && screenReaderEnabled ) {
+					setIsScreenReaderEnabled( screenReaderEnabled );
+				}
+			}
+		);
+
+		return () => {
+			mounted = false;
+
+			changeListener.remove();
+		};
+	}, [] );
+
+	return isScreenReaderEnabled;
+}
+
+function useIsEditingText() {
+	const [ isEditingText, setIsEditingText ] = useState( () =>
+		RCTAztecView.InputState.isFocused()
+	);
+
+	useEffect( () => {
+		const onFocusChangeAztec = ( { isFocused } ) => {
+			setIsEditingText( isFocused );
+		};
+
+		RCTAztecView.InputState.addFocusChangeListener( onFocusChangeAztec );
+
+		return () => {
+			RCTAztecView.InputState.removeFocusChangeListener(
+				onFocusChangeAztec
+			);
+		};
+	}, [] );
+
+	return isEditingText;
+}
+
 /**
  * Block draggable component
  *
@@ -308,9 +364,8 @@ const BlockDraggable = ( {
 	testID,
 } ) => {
 	const wasBeingDragged = useRef( false );
-	const [ isEditingText, setIsEditingText ] = useState( false );
-	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
-		useState( false );
+	const isEditingText = useIsEditingText();
+	const isScreenReaderEnabled = useIsScreenReaderEnabled();
 
 	const draggingAnimation = {
 		opacity: useSharedValue( 1 ),
@@ -364,43 +419,6 @@ const BlockDraggable = ( {
 		}
 		wasBeingDragged.current = isBeingDragged;
 	}, [ isBeingDragged ] );
-
-	const onFocusChangeAztec = useCallback( ( { isFocused } ) => {
-		setIsEditingText( isFocused );
-	}, [] );
-
-	useEffect( () => {
-		let mounted = true;
-
-		const isAnyAztecInputFocused = RCTAztecView.InputState.isFocused();
-		if ( isAnyAztecInputFocused ) {
-			setIsEditingText( isAnyAztecInputFocused );
-		}
-
-		RCTAztecView.InputState.addFocusChangeListener( onFocusChangeAztec );
-
-		const screenReaderChangedListener = AccessibilityInfo.addEventListener(
-			'screenReaderChanged',
-			setIsScreenReaderEnabled
-		);
-		AccessibilityInfo.isScreenReaderEnabled().then(
-			( screenReaderEnabled ) => {
-				if ( mounted ) {
-					setIsScreenReaderEnabled( screenReaderEnabled );
-				}
-			}
-		);
-
-		return () => {
-			mounted = false;
-
-			RCTAztecView.InputState.removeFocusChangeListener(
-				onFocusChangeAztec
-			);
-
-			screenReaderChangedListener.remove();
-		};
-	}, [] );
 
 	const onLongPressDraggable = useCallback( () => {
 		// Ensure that no text input is focused when starting the dragging gesture in order to prevent conflicts with text editing.

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { selectorArgsToStateKey } from './utils';
@@ -25,7 +20,7 @@ import { selectorArgsToStateKey } from './utils';
  * @return {StateValue|undefined} isResolving value.
  */
 export function getResolutionState( state, selectorName, args ) {
-	const map = get( state, [ selectorName ] );
+	const map = state[ selectorName ];
 	if ( ! map ) {
 		return;
 	}
@@ -135,4 +130,26 @@ export function isResolving( state, selectorName, args ) {
  */
 export function getCachedResolvers( state ) {
 	return state;
+}
+
+/**
+ * Whether the store has any currently resolving selectors.
+ *
+ * @param {State} state Data state.
+ *
+ * @return {boolean} True if one or more selectors are resolving, false otherwise.
+ */
+export function hasResolvingSelectors( state ) {
+	return Object.values( state ).some( ( selectorState ) =>
+		/**
+		 * This uses the internal `_map` property of `EquivalentKeyMap` for
+		 * optimization purposes, since the `EquivalentKeyMap` implementation
+		 * does not support a `.values()` implementation.
+		 *
+		 * @see https://github.com/aduth/equivalent-key-map
+		 */
+		Array.from( selectorState._map.values() ).some(
+			( resolution ) => resolution[ 1 ]?.status === 'resolving'
+		)
+	);
 }

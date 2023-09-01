@@ -11,7 +11,8 @@ import { useMergeRefs } from '@wordpress/compose';
 import BorderBoxControlVisualizer from '../border-box-control-visualizer';
 import { BorderControl } from '../../border-control';
 import { Grid } from '../../grid';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
 import { useBorderBoxControlSplitControls } from './hook';
 
 import type { BorderControlProps } from '../../border-control/types';
@@ -31,10 +32,9 @@ const BorderBoxControlSplitControls = (
 		popoverPlacement,
 		popoverOffset,
 		rightAlignedClassName,
+		size = 'default',
 		value,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize,
 		...otherProps
 	} = useBorderBoxControlSplitControls( props );
 
@@ -65,19 +65,15 @@ const BorderBoxControlSplitControls = (
 		enableAlpha,
 		enableStyle,
 		isCompact: true,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize,
+		size,
 	};
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
 	return (
 		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>
-			<BorderBoxControlVisualizer
-				value={ value }
-				__next36pxDefaultSize={ __next36pxDefaultSize }
-			/>
+			<BorderBoxControlVisualizer value={ value } size={ size } />
 			<BorderControl
 				className={ centeredClassName }
 				hideLabelFromVision={ true }

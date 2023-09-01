@@ -30,8 +30,7 @@ The component accepts the following props:
 
 ### className
 
-The class that will be added to the classes of the wrapper <Composite/> component.
-
+The class that will be added to the classes of the underlying `grid` widget.
 -   Type: `string`
 -   Required: No
 
@@ -44,7 +43,7 @@ Unique ID for the component.
 
 ### label
 
-Accessible label. If provided, sets the `aria-label` attribute of the underlying <Composite/> component.
+Accessible label. If provided, sets the `aria-label` attribute of the underlying `grid` widget.
 
 -   Type: `string`
 -   Required: No
@@ -54,26 +53,27 @@ Accessible label. If provided, sets the `aria-label` attribute of the underlying
 
 If provided, sets the default alignment value.
 
-- Type: `string`
+- Type: `AlignmentMatrixControlValue`
 - Required: No
 - Default: `center center`
 
 ### value
 
 The current alignment value.
-- Type: `string`
+
+- Type: `AlignmentMatrixControlValue`
 - Required: No
 
 ### onChange
 
 A function that receives the updated alignment value.
 
--   Type: `( nextValue: string ) => void`
+-   Type: `( newValue: AlignmentMatrixControlValue ) => void`
 -   Required: No
 
 ### width
 
-If provided, sets the width of the wrapper <Composite/> component.
+If provided, sets the width of the control.
 
  - Type: `number`
  - Required: No

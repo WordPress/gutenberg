@@ -24,8 +24,10 @@ export const StyledSpinner = styled.svg`
 	display: inline-block;
 	margin: 5px 11px 0;
 	position: relative;
-	color: var( --wp-admin-theme-color );
+	color: ${ COLORS.theme.accent };
 	overflow: visible;
+	opacity: 1;
+	background-color: transparent;
 `;
 
 const commonPathProps = css`

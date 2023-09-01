@@ -1,3 +1,8 @@
+.wp-block-archives {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+}
+
 .wp-block-archives-dropdown {
 	label {
 		display: block;

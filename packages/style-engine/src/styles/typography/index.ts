@@ -65,13 +65,25 @@ const letterSpacing = {
 };
 
 const lineHeight = {
-	name: 'letterSpacing',
+	name: 'lineHeight',
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
 			options,
 			[ 'typography', 'lineHeight' ],
 			'lineHeight'
+		);
+	},
+};
+
+const textColumns = {
+	name: 'textColumns',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textColumns' ],
+			'columnCount'
 		);
 	},
 };
@@ -100,6 +112,18 @@ const textTransform = {
 	},
 };
 
+const writingMode = {
+	name: 'writingMode',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'writingMode' ],
+			'writingMode'
+		);
+	},
+};
+
 export default [
 	fontFamily,
 	fontSize,
@@ -107,6 +131,8 @@ export default [
 	fontWeight,
 	letterSpacing,
 	lineHeight,
+	textColumns,
 	textDecoration,
 	textTransform,
+	writingMode,
 ];

@@ -1,0 +1,12 @@
+
+.edit-site-sidebar-navigation-screen-global-styles__revisions {
+	border-radius: $radius-block-ui;
+
+	&:not(:hover) {
+		color: $gray-200;
+
+		.edit-site-sidebar-navigation-screen-global-styles__revisions__label {
+			color: $gray-600;
+		}
+	}
+}

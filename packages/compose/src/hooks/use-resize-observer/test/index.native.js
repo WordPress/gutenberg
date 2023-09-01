@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { create, act } from 'react-test-renderer';
+import { render, fireEvent } from 'test/helpers';
 import { View } from 'react-native';
 
 /**
@@ -13,36 +13,32 @@ const TestComponent = ( { onLayout } ) => {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	return (
-		<View sizes={ sizes } onLayout={ onLayout }>
+		<View testID="test-component" sizes={ sizes } onLayout={ onLayout }>
 			{ resizeObserver }
 		</View>
 	);
 };
 
-const renderWithOnLayout = ( component ) => {
-	const testComponent = create( component );
-
-	const mockNativeEvent = {
-		nativeEvent: {
-			layout: {
-				width: 300,
-				height: 500,
-			},
-		},
-	};
-
-	act( () => {
-		testComponent.toJSON().children[ 0 ].props.onLayout( mockNativeEvent );
-	} );
-
-	return testComponent.toJSON();
-};
-
 describe( 'useResizeObserver()', () => {
 	it( 'should return "{ width: 300, height: 500 }"', () => {
-		const component = renderWithOnLayout( <TestComponent /> );
+		const mockNativeEvent = {
+			nativeEvent: {
+				layout: {
+					width: 300,
+					height: 500,
+				},
+			},
+		};
 
-		expect( component.props.sizes ).toMatchObject( {
+		const { getByTestId } = render(
+			<TestComponent onLayout={ mockNativeEvent } />
+		);
+
+		const resizeObserver = getByTestId( 'resize-observer' );
+		fireEvent( resizeObserver, 'layout', mockNativeEvent );
+
+		const testComponent = getByTestId( 'test-component' );
+		expect( testComponent.props.sizes ).toMatchObject( {
 			width: 300,
 			height: 500,
 		} );

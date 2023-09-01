@@ -176,7 +176,7 @@ watch(
 	PACKAGES_DIR,
 	{ recursive: true, delay: 500, filter: isWatchableFile },
 	( event, filename ) => {
-		// Double check whether we're dealing with a file that needs watching, to accomodate for
+		// Double check whether we're dealing with a file that needs watching, to accommodate for
 		// the inability to watch recursively on linux-based operating systems.
 		if ( ! isSourceFile( filename ) || ! isModulePackage( filename ) ) {
 			return;

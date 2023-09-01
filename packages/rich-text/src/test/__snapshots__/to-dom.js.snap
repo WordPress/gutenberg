@@ -61,9 +61,7 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
-  <em
-    data-rich-text-format-boundary="true"
-  >
+  <em>
     
     <img
       src=""

@@ -71,6 +71,7 @@ function assignRef( ref, value ) {
  */
 export default function useMergeRefs( refs ) {
 	const element = useRef();
+	const isAttached = useRef( false );
 	const didElementChange = useRef( false );
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {import('react').MutableRefObject<TRef[]>} */
@@ -86,7 +87,10 @@ export default function useMergeRefs( refs ) {
 	// ref with the node, except when the element changes in the same cycle, in
 	// which case the ref callbacks will already have been called.
 	useLayoutEffect( () => {
-		if ( didElementChange.current === false ) {
+		if (
+			didElementChange.current === false &&
+			isAttached.current === true
+		) {
 			refs.forEach( ( ref, index ) => {
 				const previousRef = previousRefs.current[ index ];
 				if ( ref !== previousRef ) {
@@ -113,6 +117,7 @@ export default function useMergeRefs( refs ) {
 		assignRef( element, value );
 
 		didElementChange.current = true;
+		isAttached.current = value !== null;
 
 		// When an element changes, the current ref callback should be called
 		// with the new element and the previous one with `null`.

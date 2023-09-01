@@ -1,8 +1,8 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/post-author",
-	"title": "Post Author",
+	"title": "Author",
 	"category": "theme",
 	"description": "Display post author details such as name, avatar, and bio.",
 	"textdomain": "default",
@@ -23,6 +23,14 @@
 		},
 		"byline": {
 			"type": "string"
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self"
 		}
 	},
 	"usesContext": [ "postType", "postId", "queryId" ],
@@ -55,6 +63,5 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-post-author-editor",
 	"style": "wp-block-post-author"
 }

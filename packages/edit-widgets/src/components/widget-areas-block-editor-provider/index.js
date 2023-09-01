@@ -11,11 +11,10 @@ import {
 } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
-	BlockEditorProvider,
-	BlockEditorKeyboardShortcuts,
 	CopyHandler,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -27,7 +26,10 @@ import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
 import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
+import { unlock } from '../../lock-unlock';
 
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,
@@ -97,10 +99,9 @@ export default function WidgetAreasBlockEditorProvider( {
 
 	return (
 		<ShortcutProvider>
-			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
-				<BlockEditorProvider
+				<ExperimentalBlockEditorProvider
 					value={ blocks }
 					onInput={ onInput }
 					onChange={ onChange }
@@ -109,8 +110,8 @@ export default function WidgetAreasBlockEditorProvider( {
 					{ ...props }
 				>
 					<CopyHandler>{ children }</CopyHandler>
-					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
-				</BlockEditorProvider>
+					<PatternsMenuItems rootClientId={ widgetAreaId } />
+				</ExperimentalBlockEditorProvider>
 			</SlotFillProvider>
 		</ShortcutProvider>
 	);

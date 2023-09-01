@@ -1,4 +1,7 @@
 .wp-block-post-comments-form {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	&[style*="font-weight"] :where(.comment-reply-title) {
 		font-weight: inherit;
 	}
@@ -42,7 +45,9 @@
 
 	.comment-form {
 		textarea,
-		input:not([type="submit"]):not([type="checkbox"]) {
+		// Make sure to not set display block on hidden input fields, to prevent
+		// the Safari bug experienced in https://github.com/WordPress/gutenberg/issues/50830
+		input:not([type="submit"]):not([type="checkbox"]):not([type="hidden"]) {
 			display: block;
 			box-sizing: border-box;
 			width: 100%;

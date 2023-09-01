@@ -12,12 +12,17 @@ import './style';
 import './settings';
 import './color';
 import './duotone';
+import './font-family';
 import './font-size';
 import './border';
+import './position';
 import './layout';
 import './content-lock-ui';
 import './metadata';
 import './metadata-name';
+import './behaviors';
+import './custom-fields';
+import './auto-inserting-blocks';
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';

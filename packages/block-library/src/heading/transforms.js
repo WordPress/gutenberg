@@ -7,7 +7,6 @@ import { createBlock, getBlockAttributes } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { getLevelFromHeadingNodeName } from './shared';
-import { name } from './block.json';
 
 const transforms = {
 	from: [
@@ -17,7 +16,7 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
 				attributes.map( ( { content, anchor, align: textAlign } ) =>
-					createBlock( name, {
+					createBlock( 'core/heading', {
 						content,
 						anchor,
 						textAlign,
@@ -42,7 +41,10 @@ const transforms = {
 				};
 			},
 			transform( node ) {
-				const attributes = getBlockAttributes( name, node.outerHTML );
+				const attributes = getBlockAttributes(
+					'core/heading',
+					node.outerHTML
+				);
 				const { textAlign } = node.style || {};
 
 				attributes.level = getLevelFromHeadingNodeName( node.nodeName );
@@ -55,14 +57,14 @@ const transforms = {
 					attributes.align = textAlign;
 				}
 
-				return createBlock( name, attributes );
+				return createBlock( 'core/heading', attributes );
 			},
 		},
 		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'prefix',
 			prefix: Array( level + 1 ).join( '#' ),
 			transform( content ) {
-				return createBlock( name, {
+				return createBlock( 'core/heading', {
 					level,
 					content,
 				} );
@@ -72,7 +74,7 @@ const transforms = {
 			type: 'enter',
 			regExp: new RegExp( `^/(h|H)${ level }$` ),
 			transform( content ) {
-				return createBlock( name, {
+				return createBlock( 'core/heading', {
 					level,
 					content,
 				} );

@@ -3,7 +3,13 @@
  */
 import type { MouseEvent, KeyboardEvent, ReactNode } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { ModalProps } from '../modal/types';
+
 export type DialogInputEvent =
+	| Parameters< ModalProps[ 'onRequestClose' ] >[ 0 ]
 	| KeyboardEvent< HTMLDivElement >
 	| MouseEvent< HTMLButtonElement >;
 

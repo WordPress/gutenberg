@@ -16,7 +16,6 @@ function InputRange(
 	ref: React.ForwardedRef< HTMLInputElement >
 ) {
 	const { describedBy, label, value, ...otherProps } = props;
-
 	return (
 		<BaseInputRange
 			{ ...otherProps }

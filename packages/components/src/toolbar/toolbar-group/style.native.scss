@@ -1,0 +1,10 @@
+.container {
+	flex-direction: row;
+	border-color: $light-quaternary;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.containerDark {
+	border-color: $dark-quaternary;
+}

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { addSubmenu } from '@wordpress/icons';
+import { page, addSubmenu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,7 +17,13 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon: addSubmenu,
+	icon: ( { context } ) => {
+		if ( context === 'list-view' ) {
+			return page;
+		}
+
+		return addSubmenu;
+	},
 
 	__experimentalLabel: ( { label } ) => label,
 

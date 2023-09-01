@@ -44,6 +44,7 @@ export default function save( { attributes } ) {
 		id,
 		minHeight: minHeightProp,
 		minHeightUnit,
+		tagName: Tag,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -102,7 +103,7 @@ export default function save( { attributes } ) {
 	const gradientValue = gradient || customGradient;
 
 	return (
-		<div { ...useBlockProps.save( { className: classes, style } ) }>
+		<Tag { ...useBlockProps.save( { className: classes, style } ) }>
 			<span
 				aria-hidden="true"
 				className={ classnames(
@@ -163,6 +164,6 @@ export default function save( { attributes } ) {
 					className: 'wp-block-cover__inner-container',
 				} ) }
 			/>
-		</div>
+		</Tag>
 	);
 }

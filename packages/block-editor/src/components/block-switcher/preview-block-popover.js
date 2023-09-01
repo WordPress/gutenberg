@@ -15,7 +15,7 @@ export default function PreviewBlockPopover( { blocks } ) {
 			<div className="block-editor-block-switcher__popover__preview__container">
 				<Popover
 					className="block-editor-block-switcher__preview__popover"
-					position="bottom right"
+					placement="bottom-start"
 					focusOnMount={ false }
 				>
 					<div className="block-editor-block-switcher__preview">

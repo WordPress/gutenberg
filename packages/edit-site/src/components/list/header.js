@@ -36,7 +36,11 @@ export default function Header( { templateType } ) {
 
 			{ canCreate && (
 				<div className="edit-site-list-header__right">
-					<AddNewTemplate templateType={ templateType } />
+					<AddNewTemplate
+						templateType={ templateType }
+						showIcon={ false }
+						toggleProps={ { variant: 'primary' } }
+					/>
 				</div>
 			) }
 		</header>

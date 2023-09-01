@@ -9,14 +9,15 @@ import { store as richTextStore } from './store';
 /**
  * @typedef {Object} WPFormat
  *
- * @property {string}   name        A string identifying the format. Must be
- *                                  unique across all registered formats.
- * @property {string}   tagName     The HTML tag this format will wrap the
- *                                  selection with.
- * @property {string}   [className] A class to match the format.
- * @property {string}   title       Name of the format.
- * @property {Function} edit        Should return a component for the user to
- *                                  interact with the new registered format.
+ * @property {string}        name        A string identifying the format. Must be
+ *                                       unique across all registered formats.
+ * @property {string}        tagName     The HTML tag this format will wrap the
+ *                                       selection with.
+ * @property {boolean}       interactive Whether format makes content interactive or not.
+ * @property {string | null} [className] A class to match the format.
+ * @property {string}        title       Name of the format.
+ * @property {Function}      edit        Should return a component for the user to
+ *                                       interact with the new registered format.
  */
 
 /**
@@ -82,7 +83,10 @@ export function registerFormatType( name, settings ) {
 			richTextStore
 		).getFormatTypeForBareElement( settings.tagName );
 
-		if ( formatTypeForBareElement ) {
+		if (
+			formatTypeForBareElement &&
+			formatTypeForBareElement.name !== 'core/unknown'
+		) {
 			window.console.error(
 				`Format "${ formatTypeForBareElement.name }" is already registered to handle bare tag name "${ settings.tagName }".`
 			);

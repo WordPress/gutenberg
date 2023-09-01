@@ -28,6 +28,11 @@ test.describe( 'Group', () => {
 			'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
 		);
 
+		// Select the default, selected Group layout from the variation picker.
+		await editor.canvas.click(
+			'role=button[name="Group: Gather blocks in a container."i]'
+		);
+
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -35,12 +40,17 @@ test.describe( 'Group', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/group' );
 		await expect(
 			page.locator( 'role=option[name="Group"i][selected]' )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
+
+		// Select the default, selected Group layout from the variation picker.
+		await editor.canvas.click(
+			'role=button[name="Group: Gather blocks in a container."i]'
+		);
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -50,7 +60,10 @@ test.describe( 'Group', () => {
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/group' } );
-		await page.click( 'role=button[name="Add block"i]' );
+		await editor.canvas.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
+		await editor.canvas.click( 'role=button[name="Add block"i]' );
 		await page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
 		);

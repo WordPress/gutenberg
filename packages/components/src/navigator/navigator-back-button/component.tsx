@@ -6,12 +6,13 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
 import { View } from '../../view';
 import { useNavigatorBackButton } from './hook';
 import type { NavigatorBackButtonProps } from '../types';
 
-function NavigatorBackButton(
+function UnconnectedNavigatorBackButton(
 	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -54,9 +55,9 @@ function NavigatorBackButton(
  * );
  * ```
  */
-const ConnectedNavigatorBackButton = contextConnect(
-	NavigatorBackButton,
+export const NavigatorBackButton = contextConnect(
+	UnconnectedNavigatorBackButton,
 	'NavigatorBackButton'
 );
 
-export default ConnectedNavigatorBackButton;
+export default NavigatorBackButton;

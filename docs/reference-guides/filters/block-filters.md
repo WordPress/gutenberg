@@ -63,11 +63,13 @@ function addListBlockClassName( settings, name ) {
 		return settings;
 	}
 
-	return lodash.assign( {}, settings, {
-		supports: lodash.assign( {}, settings.supports, {
+	return {
+		...settings,
+		supports: {
+			...settings.supports,
 			className: true,
-		} ),
-	} );
+		},
+	};
 }
 
 wp.hooks.addFilter(
@@ -126,7 +128,10 @@ Adding a background by default to all blocks.
 
 ```js
 function addBackgroundColorStyle( props ) {
-	return lodash.assign( props, { style: { backgroundColor: 'red' } } );
+	return {
+		...props,
+		style: { backgroundColor: 'red' },
+	};
 }
 
 wp.hooks.addFilter(
@@ -179,19 +184,18 @@ _Example:_
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
-const { Fragment } = wp.element;
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody } = wp.components;
 
 const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		return (
-			<Fragment>
+			<>
 				<BlockEdit { ...props } />
 				<InspectorControls>
 					<PanelBody>My custom control</PanelBody>
 				</InspectorControls>
-			</Fragment>
+			</>
 		);
 	};
 }, 'withInspectorControl' );
@@ -277,9 +281,10 @@ var withClientIdClassName = wp.compose.createHigherOrderComponent( function (
 	BlockListBlock
 ) {
 	return function ( props ) {
-		var newProps = lodash.assign( {}, props, {
+		var newProps = {
+			...props,
 			className: 'block-' + props.clientId,
-		} );
+		};
 
 		return el( BlockListBlock, newProps );
 	};

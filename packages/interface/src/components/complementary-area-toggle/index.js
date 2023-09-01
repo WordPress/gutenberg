@@ -24,7 +24,7 @@ function ComplementaryAreaToggle( {
 		( select ) =>
 			select( interfaceStore ).getActiveComplementaryArea( scope ) ===
 			identifier,
-		[ identifier ]
+		[ identifier, scope ]
 	);
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );

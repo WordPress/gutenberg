@@ -26,6 +26,7 @@ import {
 	insert,
 } from '@wordpress/rich-text';
 import { useMergeRefs } from '@wordpress/compose';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -73,7 +74,10 @@ function PostTitle( _, forwardedRef ) {
 			return;
 		}
 
-		const { ownerDocument } = ref.current;
+		const { defaultView } = ref.current.ownerDocument;
+		const { name, parent } = defaultView;
+		const ownerDocument =
+			name === 'editor-canvas' ? parent.document : defaultView.document;
 		const { activeElement, body } = ownerDocument;
 
 		// Only autofocus the title when the post is entirely empty. This should
@@ -166,7 +170,7 @@ function PostTitle( _, forwardedRef ) {
 				( firstBlock.name === 'core/heading' ||
 					firstBlock.name === 'core/paragraph' )
 			) {
-				onUpdate( firstBlock.attributes.content );
+				onUpdate( stripHTML( firstBlock.attributes.content ) );
 				onInsertBlockAfter( content.slice( 1 ) );
 			} else {
 				onInsertBlockAfter( content );
@@ -176,7 +180,10 @@ function PostTitle( _, forwardedRef ) {
 				...create( { html: title } ),
 				...selection,
 			};
-			const newValue = insert( value, create( { html: content } ) );
+			const newValue = insert(
+				value,
+				create( { html: stripHTML( content ) } )
+			);
 			onUpdate( toHTMLString( { value: newValue } ) );
 			setSelection( {
 				start: newValue.start,

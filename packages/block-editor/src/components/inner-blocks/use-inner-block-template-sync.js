@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -40,23 +40,36 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
-	const { getSelectedBlocksInitialCaretPosition } =
-		useSelect( blockEditorStore );
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-	const innerBlocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( clientId ),
+	const {
+		getBlocks,
+		getSelectedBlocksInitialCaretPosition,
+		isBlockSelected,
+	} = useSelect( blockEditorStore );
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	const { innerBlocks } = useSelect(
+		( select ) => ( {
+			innerBlocks: select( blockEditorStore ).getBlocks( clientId ),
+		} ),
 		[ clientId ]
 	);
-	const { getBlocks } = useSelect( blockEditorStore );
 
 	// Maintain a reference to the previous value so we can do a deep equality check.
 	const existingTemplate = useRef( null );
+
 	useLayoutEffect( () => {
+		let isCancelled = false;
+
 		// There's an implicit dependency between useInnerBlockTemplateSync and useNestedSettingsUpdate
 		// The former needs to happen after the latter and since the latter is using microtasks to batch updates (performance optimization),
 		// we need to schedule this one in a microtask as well.
-		// Exemple: If you remove queueMicrotask here, ctrl + click to insert quote block won't close the inserter.
+		// Example: If you remove queueMicrotask here, ctrl + click to insert quote block won't close the inserter.
 		window.queueMicrotask( () => {
+			if ( isCancelled ) {
+				return;
+			}
+
 			// Only synchronize innerBlocks with template if innerBlocks are empty
 			// or a locking "all" or "contentOnly" exists directly on the block.
 			const currentInnerBlocks = getBlocks( clientId );
@@ -65,7 +78,7 @@ export default function useInnerBlockTemplateSync(
 				templateLock === 'all' ||
 				templateLock === 'contentOnly';
 
-			const hasTemplateChanged = ! isEqual(
+			const hasTemplateChanged = ! fastDeepEqual(
 				template,
 				existingTemplate.current
 			);
@@ -80,13 +93,15 @@ export default function useInnerBlockTemplateSync(
 				template
 			);
 
-			if ( ! isEqual( nextBlocks, currentInnerBlocks ) ) {
+			if ( ! fastDeepEqual( nextBlocks, currentInnerBlocks ) ) {
+				__unstableMarkNextChangeAsNotPersistent();
 				replaceInnerBlocks(
 					clientId,
 					nextBlocks,
 					currentInnerBlocks.length === 0 &&
 						templateInsertUpdatesSelection &&
-						nextBlocks.length !== 0,
+						nextBlocks.length !== 0 &&
+						isBlockSelected( clientId ),
 					// This ensures the "initialPosition" doesn't change when applying the template
 					// If we're supposed to focus the block, we'll focus the first inner block
 					// otherwise, we won't apply any auto-focus.
@@ -95,5 +110,9 @@ export default function useInnerBlockTemplateSync(
 				);
 			}
 		} );
+
+		return () => {
+			isCancelled = true;
+		};
 	}, [ innerBlocks, template, templateLock, clientId ] );
 }

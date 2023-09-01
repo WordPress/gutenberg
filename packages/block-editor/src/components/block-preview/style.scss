@@ -11,8 +11,9 @@
 	overflow: hidden;
 
 	.block-editor-block-preview__content {
-		// This element receives inline styles for width, height, and transform-scale.
+		// This element receives inline styles for transform-scale and aspect-ratio.
 		// Those inline styles are calculated to fit a perfect thumbnail.
+		width: 100%;
 
 		// Vertical alignment. It works with the transform: translate(-50%, -50%)`,
 		top: 0;
@@ -29,39 +30,9 @@
 		min-height: auto;
 
 		.block-editor-block-list__insertion-point,
-		.block-editor-block-drop-zone,
-		.reusable-block-indicator,
 		.block-list-appender {
 			display: none;
 		}
-	}
-}
-
-// Hide inserter from previews.
-.block-editor-block-preview__content-iframe .block-list-appender {
-	display: none;
-}
-
-.block-editor-block-preview__live-content {
-	* {
-		pointer-events: none;
-	}
-
-	// Hide the block appender, as the block is not editable in this context.
-	.block-list-appender {
-		display: none;
-	}
-
-	// Revert button disable styles to ensure that button styles render as they will on the
-	// front end of the site. For example, this ensures that Social Links icons display correctly.
-	.components-button:disabled {
-		opacity: initial;
-	}
-
-	// Hide placeholders.
-	.components-placeholder,
-	.block-editor-block-list__block[data-empty="true"] {
-		display: none;
 	}
 }
 

@@ -2,7 +2,7 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useState, useEffect } from '@wordpress/element';
+import { useContext, useSyncExternalStore } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,18 +17,11 @@ import SlotFillContext from './context';
  */
 const useSlot = ( name ) => {
 	const { getSlot, subscribe } = useContext( SlotFillContext );
-	const [ slot, setSlot ] = useState( getSlot( name ) );
-
-	useEffect( () => {
-		setSlot( getSlot( name ) );
-		const unsubscribe = subscribe( () => {
-			setSlot( getSlot( name ) );
-		} );
-
-		return unsubscribe;
-	}, [ name ] );
-
-	return slot;
+	return useSyncExternalStore(
+		subscribe,
+		() => getSlot( name ),
+		() => getSlot( name )
+	);
 };
 
 export default useSlot;
