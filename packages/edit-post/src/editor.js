@@ -14,7 +14,7 @@ import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { CommandMenu } from '@wordpress/commands';
+// eslint-disable-next-line no-unused-vars
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
@@ -27,10 +27,8 @@ import { unlock } from './lock-unlock';
 import useCommonCommands from './hooks/commands/use-common-commands';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
-const { useCommands } = unlock( coreCommandsPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
-	useCommands();
 	useCommonCommands();
 	const {
 		hasFixedToolbar,
@@ -167,7 +165,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 					{ ...props }
 				>
 					<ErrorBoundary>
-						<CommandMenu />
 						<EditorInitialization postId={ postId } />
 						<Layout />
 					</ErrorBoundary>

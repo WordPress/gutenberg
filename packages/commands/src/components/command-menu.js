@@ -21,10 +21,6 @@ import {
 	TextHighlight,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import {
-	store as keyboardShortcutsStore,
-	useShortcut,
-} from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
 
 /**
@@ -184,45 +180,34 @@ function CommandInput( { isOpen, search, setSearch } ) {
 }
 
 export function CommandMenu() {
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
-	const isOpen = useSelect(
-		( select ) => select( commandsStore ).isOpen(),
-		[]
-	);
+	const isOpenRef = useRef( false );
+	const isOpen = useSelect( ( select ) => {
+		return ( isOpenRef.current = select( commandsStore ).isOpen() );
+	}, [] );
 	const { open, close } = useDispatch( commandsStore );
 	const [ loaders, setLoaders ] = useState( {} );
 
 	useEffect( () => {
-		registerShortcut( {
-			name: 'core/commands',
-			category: 'global',
-			description: __( 'Open the command palette.' ),
-			keyCombination: {
-				modifier: 'primary',
-				character: 'k',
-			},
-		} );
-	}, [ registerShortcut ] );
+		const handleUserKeyPress = ( e ) => {
+			if ( e.metaKey && e.key === 'k' ) {
+				// Prevent the Save dialog to open
+				e.preventDefault();
 
-	useShortcut(
-		'core/commands',
-		/** @type {import('react').KeyboardEventHandler} */
-		( event ) => {
-			// Bails to avoid obscuring the effect of the preceding handler(s).
-			if ( event.defaultPrevented ) return;
-
-			event.preventDefault();
-			if ( isOpen ) {
-				close();
-			} else {
-				open();
+				if ( isOpenRef.current ) {
+					close();
+				} else {
+					open();
+				}
 			}
-		},
-		{
-			bindGlobal: true,
-		}
-	);
+		};
+
+		document.addEventListener( 'keydown', handleUserKeyPress );
+
+		return () => {
+			document.removeEventListener( 'keydown', handleUserKeyPress );
+		};
+	}, [ close, open ] );
 
 	const setLoader = useCallback(
 		( name, value ) =>
