@@ -163,32 +163,6 @@ class WP_Font_Family {
 		return true;
 	}
 
-
-	/**
-	 * Gets the overrides for the 'wp_handle_upload' function.
-	 *
-	 * @since 6.4.0
-	 *
-	 * @param string $filename The filename to be used for the uploaded file.
-	 * @return array The overrides for the 'wp_handle_upload' function.
-	 */
-	private function get_upload_overrides( $filename ) {
-		return array(
-			// Arbitrary string to avoid the is_uploaded_file() check applied
-			// when using 'wp_handle_upload'.
-			'action'                   => 'wp_handle_font_upload',
-			// Not testing a form submission.
-			'test_form'                => false,
-			// Seems mime type for files that are not images cannot be tested.
-			// See wp_check_filetype_and_ext().
-			'test_type'                => false,
-			'unique_filename_callback' => static function() use ( $filename ) {
-				// Keep the original filename.
-				return $filename;
-			},
-		);
-	}
-
 	/**
 	 * Downloads a font asset from a specified source URL and saves it to
 	 * the font directory.
@@ -217,25 +191,17 @@ class WP_Font_Family {
 			return false;
 		}
 
-		$overrides = $this->get_upload_overrides( $filename );
-
-		$file = array(
-			'tmp_name' => $temp_file,
-			'name'     => $filename,
-		);
-
-		$handled_file = wp_handle_upload( $file, $overrides );
+		$destination = WP_Font_Library::get_fonts_dir() . '/' . basename($filename);
+		if ( ! rename($temp_file, $destination) ) {
+			return false;
+		}
 
 		// Cleans the temp file.
 		@unlink( $temp_file );
 
-		if ( ! isset( $handled_file['url'] ) ) {
-			return false;
-		}
-
 		// Returns the relative path to the downloaded font asset to be used as
 		// font face src.
-		return $handled_file['url'];
+		return $destination;
 	}
 
 	/**
@@ -268,21 +234,16 @@ class WP_Font_Family {
 			return $new_font_face;
 		}
 
-		// Move the uploaded font asset from the temp folder to the fonts directory.
-		if ( ! function_exists( 'wp_handle_upload' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-		}
+		$destination = WP_Font_Library::get_fonts_dir() . '/' . basename($filename);
 
-		$overrides = $this->get_upload_overrides( $filename );
-
-		$handled_file = wp_handle_upload( $file, $overrides );
-
-		if ( isset( $handled_file['url'] ) ) {
+		if ( rename($file['tmp_name'], $destination) ) {
 			// If the file was successfully moved, update the font face definition
 			// to reference the new file location.
-			$new_font_face['src'] = $handled_file['url'];
+			$new_font_face['src'] = $destination;
+		} else {
+			return false;
 		}
-
+		
 		return $new_font_face;
 	}
 
@@ -374,6 +335,15 @@ class WP_Font_Family {
 		}
 
 		$new_font_faces = array();
+
+	    $wp_content_dir = WP_CONTENT_DIR;
+
+		// Construct the path to the fonts directory
+		$fonts_dir = trailingslashit($wp_content_dir) . 'fonts';
+	
+		wp_mkdir_p($fonts_dir);
+		// var_dump($fonts_dir);
+		
 		foreach ( $this->data['fontFace'] as $font_face ) {
 			// If the fonts are not meant to be dowloaded or uploaded
 			// (for example to install fonts that use a remote url).
@@ -532,6 +502,15 @@ class WP_Font_Family {
 		return $this->create_font_post();
 	}
 
+	private function make_fonts_dir() {
+		$fonts_dir = WP_Font_Library::get_fonts_dir();
+
+		// Ensure the fonts directory exists or create it.
+		if ( ! is_dir($fonts_dir) ) {
+			wp_mkdir_p($fonts_dir);
+		}
+	}
+
 	/**
 	 * Installs the font family into the library.
 	 *
@@ -542,6 +521,7 @@ class WP_Font_Family {
 	 */
 	public function install( $files = null ) {
 		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+		$this->make_fonts_dir();
 		$were_assets_written = $this->download_or_move_font_faces( $files );
 		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
 
