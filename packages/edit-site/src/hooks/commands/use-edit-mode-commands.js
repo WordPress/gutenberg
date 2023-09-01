@@ -195,7 +195,7 @@ function useEditUICommands() {
 	const {
 		openGeneralSidebar,
 		closeGeneralSidebar,
-		setIsInserterOpened,
+		toggleDistractionFree,
 		setIsListViewOpened,
 		switchEditorMode,
 	} = useDispatch( editSiteStore );
@@ -205,6 +205,7 @@ function useEditUICommands() {
 		activeSidebar,
 		showBlockBreadcrumbs,
 		isListViewOpen,
+		isDistractionFree,
 	} = useSelect( ( select ) => {
 		const { isListViewOpened, getEditorMode } = select( editSiteStore );
 		return {
@@ -218,11 +219,14 @@ function useEditUICommands() {
 				'showBlockBreadcrumbs'
 			),
 			isListViewOpen: isListViewOpened(),
+			isDistractionFree: select( preferencesStore ).get(
+				editSiteStore.name,
+				'distractionFree'
+			),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
-	const { get: getPreference } = useSelect( preferencesStore );
-	const { set: setPreference, toggle } = useDispatch( preferencesStore );
+	const { toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
 
 	if ( canvasMode !== 'edit' ) {
@@ -272,20 +276,7 @@ function useEditUICommands() {
 		name: 'core/toggle-distraction-free',
 		label: __( 'Toggle distraction free' ),
 		callback: ( { close } ) => {
-			setPreference( 'core/edit-site', 'fixedToolbar', false );
-			setIsInserterOpened( false );
-			setIsListViewOpened( false );
-			closeGeneralSidebar();
-			toggle( 'core/edit-site', 'distractionFree' );
-			createInfoNotice(
-				getPreference( 'core/edit-site', 'distractionFree' )
-					? __( 'Distraction free on.' )
-					: __( 'Distraction free off.' ),
-				{
-					id: 'core/edit-site/distraction-free-mode/notice',
-					type: 'snackbar',
-				}
-			);
+			toggleDistractionFree();
 			close();
 		},
 	} );
@@ -295,6 +286,9 @@ function useEditUICommands() {
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'fixedToolbar' );
+			if ( isDistractionFree ) {
+				toggleDistractionFree();
+			}
 			close();
 		},
 	} );

@@ -16,6 +16,7 @@ test.describe( 'Nonce', () => {
 		await admin.createNewPost();
 		await page.keyboard.press( 'Enter' );
 		// Wait until the network is idle.
+		// eslint-disable-next-line playwright/no-networkidle
 		await page.waitForLoadState( 'networkidle' );
 		await page.keyboard.type( 'test' );
 

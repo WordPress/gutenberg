@@ -233,4 +233,86 @@ test.describe( 'Links', () => {
 		// This verifies that the editor preference was persisted.
 		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeVisible();
 	} );
+
+	test( 'can toggle link settings and save', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content:
+					'<a href="https://wordpress.org/gutenberg">Gutenberg</a>',
+			},
+		} );
+
+		// Move caret into the link.
+		await pageUtils.pressKeys( 'ArrowRight' );
+
+		// Switch Link UI to "edit" mode.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Open Advanced Settings
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// expect settings for `Open in new tab` and `No follow`
+		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeChecked();
+		await expect( page.getByLabel( 'nofollow' ) ).not.toBeChecked();
+
+		// Toggle both of the settings
+		await page.getByLabel( 'Open in new tab' ).click();
+		await page.getByLabel( 'nofollow' ).click();
+
+		// Save the link
+		await page
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		// Expect correct attributes to be set on the underlying link.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: `<a href="https://wordpress.org/gutenberg" target="_blank" rel="noreferrer noopener nofollow">Gutenberg</a>`,
+				},
+			},
+		] );
+
+		// Move caret back into the link.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		// Edit the link
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Toggle both the settings to be off.
+		// Note: no need to toggle settings again because the open setting should be persisted.
+		await page.getByLabel( 'Open in new tab' ).click();
+		await page.getByLabel( 'nofollow' ).click();
+
+		// Save the link
+		await page
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		// Expect correct attributes to be set on the underlying link.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: `<a href="https://wordpress.org/gutenberg">Gutenberg</a>`,
+				},
+			},
+		] );
+	} );
 } );

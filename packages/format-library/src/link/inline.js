@@ -31,6 +31,17 @@ import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 import useLinkInstanceKey from './use-link-instance-key';
 
+const LINK_SETTINGS = [
+	...LinkControl.DEFAULT_LINK_SETTINGS,
+	{
+		id: 'nofollow',
+		title: createInterpolateElement(
+			__( 'Mark as <code>nofollow</code>' ),
+			{ code: <code /> }
+		),
+	},
+];
+
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
@@ -60,6 +71,7 @@ function InlineLinkUI( {
 		type: activeAttributes.type,
 		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
+		nofollow: activeAttributes.rel?.includes( 'nofollow' ),
 		title: richTextText,
 	};
 
@@ -77,7 +89,6 @@ function InlineLinkUI( {
 		const didToggleSetting =
 			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
 			nextValue.url === undefined;
-
 		// Merge the next value with the current link value.
 		nextValue = {
 			...linkValue,
@@ -93,6 +104,7 @@ function InlineLinkUI( {
 					? String( nextValue.id )
 					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
+			nofollow: nextValue.nofollow,
 		} );
 
 		const newText = nextValue.title || newUrl;
@@ -247,6 +259,7 @@ function InlineLinkUI( {
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
+				settings={ LINK_SETTINGS }
 			/>
 		</Popover>
 	);

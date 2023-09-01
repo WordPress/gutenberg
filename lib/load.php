@@ -165,18 +165,21 @@ if (
 	( defined( 'FONTS_LIBRARY_ENABLE' ) && FONTS_LIBRARY_ENABLE )
 ) {
 	// Loads the Font Library.
-	require __DIR__ . '/experimental/fonts/font-library/class-wp-font-library.php';
-	require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family-utils.php';
-	require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family.php';
-	require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-library-controller.php';
-	require __DIR__ . '/experimental/fonts/font-library/font-library.php';
+	if ( ! class_exists( 'WP_Font_Library' ) ) {
+		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-collection.php';
+		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-library.php';
+		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family-utils.php';
+		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family.php';
+		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-library-controller.php';
+		require __DIR__ . '/experimental/fonts/font-library/font-library.php';
+	}
 
 	// Load the Font Face.
-	require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face.php';
-	require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face-resolver.php';
-
-	// A general purpose file for all fonts PHP functions and hooks.
-	require __DIR__ . '/compat/wordpress-6.4/fonts/fonts.php';
+	if ( ! class_exists( 'WP_Font_Face' ) ) {
+		require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face.php';
+		require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face-resolver.php';
+		require __DIR__ . '/compat/wordpress-6.4/fonts/fonts.php';
+	}
 
 	// Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
 	// @core-merge: do not merge the BC layer files into WordPress Core.

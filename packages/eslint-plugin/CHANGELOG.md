@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Added a new `test-playwright` ruleset using [`eslint-plugin-playwright`](https://www.npmjs.com/package/eslint-plugin-playwright).
+
+## 15.1.0 (2023-08-31)
+
 ## 15.0.0 (2023-08-16)
 
 ### Breaking Changes
