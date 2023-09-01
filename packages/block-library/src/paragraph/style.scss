@@ -50,6 +50,7 @@ p.has-background {
 	color: inherit;
 }
 
-p.has-text-align-right[style*="writing-mode:vertical-rl"] {
+p.has-text-align-right[style*="writing-mode:vertical-rl"],
+p.has-text-align-left[style*="writing-mode:vertical-lr"] {
 	rotate: 180deg;
 }
