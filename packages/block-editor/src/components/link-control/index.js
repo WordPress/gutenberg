@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useRef, useState, useEffect } from '@wordpress/element';
+import { useRef, useState, useEffect, createInterpolateElement } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
@@ -118,6 +118,7 @@ function LinkControl( {
 	searchInputPlaceholder,
 	value,
 	settings = DEFAULT_LINK_SETTINGS,
+	hasNofollowSetting = false,
 	onChange = noop,
 	onRemove,
 	onCancel,
@@ -135,6 +136,19 @@ function LinkControl( {
 	hasTextControl = false,
 	renderControlBottom = null,
 } ) {
+	if ( hasNofollowSetting ) {
+		settings = [
+			...settings,
+			{
+				id: 'nofollow',
+				title: createInterpolateElement(
+					__( 'Mark as <code>nofollow</code>' ),
+					{ code: <code /> }
+				),
+			},
+		];
+	}
+
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
 	}

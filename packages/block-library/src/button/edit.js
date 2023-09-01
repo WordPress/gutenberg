@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useState, useRef, useMemo, createInterpolateElement } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -270,6 +270,7 @@ function ButtonEdit( props ) {
 							richTextRef.current?.focus();
 						} }
 						forceIsEditingLink={ isEditingURL }
+						hasNofollowSetting={ true }
 					/>
 				</Popover>
 			) }
