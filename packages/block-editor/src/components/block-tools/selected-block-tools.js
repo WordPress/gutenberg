@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { forwardRef, useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -41,13 +41,10 @@ function selector( select ) {
 	};
 }
 
-function SelectedBlockTools( {
-	clientId,
-	rootClientId,
-	isEmptyDefaultBlock,
-	isFixed,
-	capturingClientId,
-} ) {
+function WrappedSelectedBlockTools(
+	{ clientId, rootClientId, isEmptyDefaultBlock, isFixed, capturingClientId },
+	ref
+) {
 	const { editorMode, hasMultiSelection, isTyping, lastClientId } = useSelect(
 		selector,
 		[]
@@ -118,6 +115,7 @@ function SelectedBlockTools( {
 	if ( isFixed || ! isLargeViewport ) {
 		return (
 			<BlockContextualToolbar
+				ref={ ref }
 				isFixed={ true }
 				__experimentalInitialIndex={
 					initialToolbarItemIndexRef.current
@@ -152,6 +150,7 @@ function SelectedBlockTools( {
 			>
 				{ shouldShowContextualToolbar && (
 					<BlockContextualToolbar
+						ref={ ref }
 						// If the toolbar is being shown because of being forced
 						// it should focus the toolbar right after the mount.
 						focusOnMount={ isToolbarForced.current }
@@ -178,6 +177,8 @@ function SelectedBlockTools( {
 
 	return null;
 }
+
+const SelectedBlockTools = forwardRef( WrappedSelectedBlockTools );
 
 function wrapperSelector( select ) {
 	const {
@@ -221,7 +222,8 @@ function wrapperSelector( select ) {
 	};
 }
 
-export default function WrappedSelectedBlockTools( { isFixed } ) {
+const UnforwardWrappedSelectedBlockTools = ( props, ref ) => {
+	const { isFixed } = props;
 	const selected = useSelect( wrapperSelector, [] );
 
 	if ( ! selected ) {
@@ -242,6 +244,7 @@ export default function WrappedSelectedBlockTools( { isFixed } ) {
 
 	return (
 		<SelectedBlockTools
+			ref={ ref }
 			clientId={ clientId }
 			rootClientId={ rootClientId }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
@@ -249,4 +252,6 @@ export default function WrappedSelectedBlockTools( { isFixed } ) {
 			capturingClientId={ capturingClientId }
 		/>
 	);
-}
+};
+
+export default forwardRef( UnforwardWrappedSelectedBlockTools );

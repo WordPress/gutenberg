@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
@@ -27,7 +27,10 @@ import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
-function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
+function UnforwardBlockContextualToolbar(
+	{ focusOnMount, isFixed, ...props },
+	ref
+) {
 	// When the toolbar is fixed it can be collapsed
 	const [ isCollapsed, setIsCollapsed ] = useState( false );
 	const toolbarButtonRef = useRef();
@@ -175,11 +178,12 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 
 	return (
 		<NavigableToolbar
+			ref={ ref }
 			focusOnMount={ focusOnMount }
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
-			onChildrenKeyDown={ ( event ) => {
+			handleOnKeyDown={ ( event ) => {
 				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
 					event.preventDefault();
 					lastFocus.current.focus();
@@ -216,4 +220,4 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	);
 }
 
-export default BlockContextualToolbar;
+export default forwardRef( UnforwardBlockContextualToolbar );
