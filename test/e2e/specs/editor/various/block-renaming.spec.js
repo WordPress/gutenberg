@@ -55,7 +55,7 @@ test.describe( 'Block Renaming', () => {
 			);
 
 			const renameModal = page.getByRole( 'dialog', {
-				name: 'Rename block',
+				name: 'Rename',
 			} );
 
 			// Check focus is transferred into modal.

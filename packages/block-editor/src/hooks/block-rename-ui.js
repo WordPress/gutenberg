@@ -63,7 +63,7 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 
 	return (
 		<Modal
-			title={ __( 'Rename block' ) }
+			title={ __( 'Rename' ) }
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-rename-modal"
 			aria={ {
