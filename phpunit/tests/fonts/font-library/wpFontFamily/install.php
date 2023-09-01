@@ -87,7 +87,7 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 		// Pre-checks to ensure starting conditions.
 		foreach ( $expected as $font_file ) {
 			$font_file = static::$fonts_dir . $font_file;
-			$this->assertFileDoesNotExist( $font_file, "Font file [{$font_file}] should not exist in the uploads/fonts/ directory after installing" );
+			$this->assertFileDoesNotExist( $font_file, "Font file [{$font_file}] should not exist in the fonts/ directory after installing" );
 		}
 		$font = new WP_Font_Family( $font_data );
 
@@ -95,7 +95,7 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 		$font->install();
 		foreach ( $expected as $font_file ) {
 			$font_file = static::$fonts_dir . $font_file;
-			$this->assertFileExists( $font_file, "Font file [{$font_file}] should exists in the uploads/fonts/ directory after installing" );
+			$this->assertFileExists( $font_file, "Font file [{$font_file}] should exists in the fonts/ directory after installing" );
 		}
 		$this->assertInstanceOf( WP_Post::class, $font->get_font_post(), 'Font post should exist after install' );
 	}
@@ -169,7 +169,7 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 
 		foreach ( $expected as $font_file ) {
 			$font_file = static::$fonts_dir . $font_file;
-			$this->assertFileExists( $font_file, "Font file [{$font_file}] should exists in the uploads/fonts/ directory after installing" );
+			$this->assertFileExists( $font_file, "Font file [{$font_file}] should exists in the fonts/ directory after installing" );
 		}
 	}
 
