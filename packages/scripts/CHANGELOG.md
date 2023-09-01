@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 26.13.0-next.0 (2023-09-01)
+
 ### Enhancement
 
 -   Added support for `test-playwright` script ([#53108](https://github.com/WordPress/gutenberg/pull/53108)).

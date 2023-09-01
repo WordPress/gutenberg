@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 26.0.0-next.0 (2023-09-01)
+
 ### Breaking changes
 
 -   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889), [#53982](https://github.com/WordPress/gutenberg/pull/53982)).
