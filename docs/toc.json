@@ -37,7 +37,8 @@
 				]
 			},
 			{ "docs/getting-started/full-site-editing.md": [] },
-			{ "docs/getting-started/outreach.md": [] }
+			{ "docs/getting-started/outreach.md": [] },
+			{ "docs/getting-started/glossary.md": [] }
 		]
 	},
 	{
@@ -322,7 +323,6 @@
 				]
 			},
 			{ "docs/explanations/faq.md": [] },
-			{ "docs/explanations/glossary.md": [] },
 			{ "docs/explanations/history.md": [] }
 		]
 	},

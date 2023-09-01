@@ -84,6 +84,12 @@
 		"parent": "getting-started"
 	},
 	{
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "../docs/getting-started/glossary.md",
+		"parent": "getting-started"
+	},
+	{
 		"title": "How-to Guides",
 		"slug": "how-to-guides",
 		"markdown_source": "../docs/how-to-guides/README.md",
@@ -2139,12 +2145,6 @@
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "../docs/explanations/faq.md",
-		"parent": "explanations"
-	},
-	{
-		"title": "Glossary",
-		"slug": "glossary",
-		"markdown_source": "../docs/explanations/glossary.md",
 		"parent": "explanations"
 	},
 	{
