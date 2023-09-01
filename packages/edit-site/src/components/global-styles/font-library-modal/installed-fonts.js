@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useEffect } from '@wordpress/element';
+import { useContext, useEffect, useState } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
@@ -17,6 +17,7 @@ import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import SaveButton from '../../save-button';
 import LibraryFontCard from './library-font-card';
+import { Button } from '@wordpress/components';
 
 function InstalledFonts() {
 	const {
@@ -25,7 +26,9 @@ function InstalledFonts() {
 		baseThemeFonts,
 		handleSetLibraryFontSelected,
 		refreshLibrary,
+		uninstallFont,
 	} = useContext( FontLibraryContext );
+	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 
 	const handleUnselectFont = () => {
 		handleSetLibraryFontSelected( null );
@@ -35,11 +38,29 @@ function InstalledFonts() {
 		handleSetLibraryFontSelected( font );
 	};
 
+	const handleConfirmUninstall = async () => {
+		const result = await uninstallFont( libraryFontSelected );
+		// If the font was succesfully uninstalled it is unselected
+		if ( result ) {
+			handleUnselectFont();
+		}
+	};
+
+	const handleUninstallClick = async () => {
+		setIsConfirmDeleteOpen( true );
+	};
+
+	const handleCancelUninstall = () => {
+		setIsConfirmDeleteOpen( false );
+	};
+
 	const tabDescription = !! libraryFontSelected
 		? __(
 				'Choose font variants. Keep in mind that too many variants could make your site slower.'
 		  )
 		: null;
+
+	const shouldDisplayDeleteButton = !! libraryFontSelected && libraryFontSelected?.source !== 'theme';
 
 	useEffect( () => {
 		refreshLibrary();
@@ -50,7 +71,12 @@ function InstalledFonts() {
 			title={ libraryFontSelected?.name || '' }
 			description={ tabDescription }
 			handleBack={ !! libraryFontSelected && handleUnselectFont }
-			footer={ <Footer /> }
+			footer={ (
+				<Footer
+					shouldDisplayDeleteButton={ shouldDisplayDeleteButton }
+					handleUninstallClick={ handleUninstallClick }
+				/>
+			) }
 		>
 			{ ! libraryFontSelected && (
 				<>
@@ -93,17 +119,29 @@ function InstalledFonts() {
 			{ libraryFontSelected && (
 				<LibraryFontDetails
 					font={ libraryFontSelected }
-					handleUnselectFont={ handleUnselectFont }
-					canBeRemoved={ libraryFontSelected?.source !== 'theme' }
+					isConfirmDeleteOpen={ isConfirmDeleteOpen }
+					handleConfirmUninstall={ handleConfirmUninstall }
+					handleCancelUninstall={ handleCancelUninstall }
 				/>
 			) }
 		</TabLayout>
 	);
 }
 
-function Footer() {
+function Footer({ shouldDisplayDeleteButton, handleUninstallClick }) {
 	return (
-		<HStack justify="flex-end">
+		<HStack justify="space-between">
+			<div>
+				{ shouldDisplayDeleteButton && (
+					<Button
+						isDestructive
+						variant="link"
+						onClick={ handleUninstallClick }
+					>
+						{ __( 'Delete permanently' ) }
+					</Button>
+				)}
+			</div>
 			<SaveButton
 				textForDefaultState={ __( 'Update' ) }
 				textForIsDirtyState={ __( 'Update' ) }
