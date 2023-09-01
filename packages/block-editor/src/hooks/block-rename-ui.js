@@ -130,7 +130,7 @@ function BlockRenameControl( props ) {
 			<InspectorControls group="advanced">
 				<TextControl
 					__nextHasNoMarginBottom
-					label={ __( 'Custom block name' ) }
+					label={ __( 'Block name' ) }
 					value={ customName || '' }
 					onChange={ onChange }
 				/>

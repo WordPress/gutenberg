@@ -161,7 +161,7 @@ test.describe( 'Block Renaming', () => {
 			await advancedPanelToggle.click();
 
 			const nameInput = page.getByRole( 'textbox', {
-				name: 'Custom block name',
+				name: 'Block name',
 			} );
 
 			await expect( nameInput ).toBeEmpty();
