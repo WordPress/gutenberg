@@ -90,55 +90,27 @@ test.describe( 'Block Renaming', () => {
 					},
 				},
 			] );
-		} );
 
-		test( 'allows custom name to be removed and reset to original block name', async ( {
-			editor,
-			page,
-			pageUtils,
-		} ) => {
-			// Prefill with block that already has a custom name.
-			await editor.insertBlock( {
-				name: 'core/group',
-				attributes: {
-					metadata: {
-						name: 'My custom name',
-					},
-				},
-			} );
+			// Re-trigger the rename dialog.
+			await renameMenuItem.click();
 
-			await editor.clickBlockOptionsMenuItem( 'Rename' );
-
-			const renameModal = page.getByRole( 'dialog', {
-				name: 'Rename block',
-			} );
-
-			const saveButton = renameModal.getByRole( 'button', {
-				name: 'Save',
-				type: 'submit',
-			} );
-
-			await expect( saveButton ).toBeDisabled();
-
-			const nameInput = renameModal.getByLabel( 'Block name' );
-
-			await expect( nameInput ).toHaveValue( 'My custom name' );
+			// Expect modal input to contain the custom name.
+			await expect( nameInput ).toHaveValue( 'My new name' );
 
 			// Clear the input of text content.
 			await nameInput.focus();
 			await pageUtils.pressKeys( 'primary+a' );
 			await page.keyboard.press( 'Delete' );
 
-			// Trigger blur event on input.
-			await saveButton.focus();
+			// Check placeholder for input is the original block name.
+			await expect( nameInput ).toHaveAttribute( 'placeholder', 'Group' );
 
-			// Expect value to automatically revert to original block name.
-			await expect( nameInput ).toHaveValue( 'Group' );
-
+			// It should be possible to submit empty.
 			await expect( saveButton ).toBeEnabled();
 
 			await saveButton.click();
 
+			// Expect block to have no custom name (i.e. it should be reset to the original block name).
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/group',
