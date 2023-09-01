@@ -62,6 +62,9 @@ export default function BlockTools( {
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
 
+	// If we go with removing bubblesVirtually from the block controls slot,
+	// we can also remove all of this and all the navigable toolbar forwardRef stuff,
+	// as we don't need to stop the escape unselect shortcut from hitting first.
 	const selectedBlockToolsRef = useRef( null );
 
 	function onKeyDown( event ) {
@@ -106,15 +109,6 @@ export default function BlockTools( {
 				insertBeforeBlock( clientIds[ 0 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
-			if ( selectedBlockToolsRef.current.contains( event.target ) ) {
-				// This shouldn't be necessary, but we have a combination of a few things all combining to create a situation where:
-				// - Because the block toolbar uses createPortal to populate the block toolbar fills, we can't rely on the React event bubbling to hit the onKeyDown listener for the block toolbar
-				// - Since we can't use the React tree, we use the DOM tree which _should_ handle the event bubbling correctly from a `createPortal` element.
-				// - This bubbles via the React tree, which hits this `unselect` escape keypress before the block toolbar DOM event listener has access to it.
-				// An alternative would be to remove the addEventListener on the navigableToolbar and use this event to handle it directly right here. That feels hacky too though.
-				return;
-			}
-
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
