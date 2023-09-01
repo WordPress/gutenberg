@@ -14,6 +14,17 @@ test.describe( 'Block Renaming', () => {
 			page,
 			pageUtils,
 		} ) => {
+			// Turn on block list view by default.
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core/edit-site', 'showListViewByDefault', true );
+			} );
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
 			// Create a two blocks on the page.
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -80,6 +91,11 @@ test.describe( 'Block Renaming', () => {
 				'false'
 			);
 
+			// Check custom name reflected in List View.
+			listView.getByRole( 'link', {
+				name: 'My new name',
+			} );
+
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/group',
@@ -109,6 +125,11 @@ test.describe( 'Block Renaming', () => {
 			await expect( saveButton ).toBeEnabled();
 
 			await saveButton.click();
+
+			// Check the original block name to reflected in List View.
+			listView.getByRole( 'link', {
+				name: 'Group',
+			} );
 
 			// Expect block to have no custom name (i.e. it should be reset to the original block name).
 			await expect.poll( editor.getBlocks ).toMatchObject( [
