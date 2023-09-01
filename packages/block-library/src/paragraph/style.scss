@@ -50,10 +50,6 @@ p.has-background {
 	color: inherit;
 }
 
-p.has-text-align-right.has-writing-mode.is-vertical-rl {
-	transform: scale(-1, -1);
-}
-
-body.rtl p.has-text-align-left.has-writing-mode.is-vertical-lr {
-	transform: scale(-1, -1);
+p.has-text-align-right[style*="writing-mode:vertical-rl"] {
+	rotate: 180deg;
 }

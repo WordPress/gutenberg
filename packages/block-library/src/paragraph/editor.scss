@@ -17,3 +17,7 @@
 		}
 	}
 }
+
+.block-editor-block-list__block[data-type="core/paragraph"].has-text-align-right[style*="writing-mode: vertical-rl"] {
+	rotate: 180deg;
+}
