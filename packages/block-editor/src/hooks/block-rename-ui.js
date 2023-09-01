@@ -33,9 +33,7 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 	const nameHasChanged = editedBlockName !== blockName;
 	const nameIsOriginal = editedBlockName === originalBlockName;
 
-	const isNameValid =
-		( nameHasChanged || nameIsOriginal ) &&
-		! emptyString( editedBlockName );
+	const isNameValid = nameHasChanged || nameIsOriginal;
 
 	const autoSelectInputText = ( event ) => event.target.select();
 
