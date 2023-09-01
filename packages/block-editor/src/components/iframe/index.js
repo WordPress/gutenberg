@@ -39,45 +39,53 @@ import { store as blockEditorStore } from '../../store';
  * should be context dependent, e.g. actions on blocks like Cmd+A should not
  * work globally outside the block editor.
  *
- * @param {Document} doc Document to attach listeners to.
+ * @param {Document} iframeDocument Document to attach listeners to.
  */
-function bubbleEvents( doc ) {
-	const { defaultView } = doc;
-	const { frameElement } = defaultView;
+function useBubbleEvents( iframeDocument ) {
+	return useRefEffect( ( body ) => {
+		const { defaultView } = iframeDocument;
+		const { frameElement } = defaultView;
 
-	function bubbleEvent( event ) {
-		const prototype = Object.getPrototypeOf( event );
-		const constructorName = prototype.constructor.name;
-		const Constructor = window[ constructorName ];
+		function bubbleEvent( event ) {
+			const prototype = Object.getPrototypeOf( event );
+			const constructorName = prototype.constructor.name;
+			const Constructor = window[ constructorName ];
 
-		const init = {};
+			const init = {};
 
-		for ( const key in event ) {
-			init[ key ] = event[ key ];
+			for ( const key in event ) {
+				init[ key ] = event[ key ];
+			}
+
+			if ( event instanceof defaultView.MouseEvent ) {
+				const rect = frameElement.getBoundingClientRect();
+				init.clientX += rect.left;
+				init.clientY += rect.top;
+			}
+
+			// This stopPropagation call ensures React doesn't create a syncthetic event to bubble this event
+			// which would result in two React events being bubbled throught the iframe.
+			event.stopPropagation();
+			const newEvent = new Constructor( event.type, init );
+			const cancelled = ! frameElement.dispatchEvent( newEvent );
+
+			if ( cancelled ) {
+				event.preventDefault();
+			}
 		}
 
-		if ( event instanceof defaultView.MouseEvent ) {
-			const rect = frameElement.getBoundingClientRect();
-			init.clientX += rect.left;
-			init.clientY += rect.top;
+		const eventTypes = [ 'dragover', 'mousemove', 'keydown' ];
+
+		for ( const name of eventTypes ) {
+			body.addEventListener( name, bubbleEvent );
 		}
 
-		// This stopPropagation call ensures React doesn't create a syncthetic event to bubble this event
-		// which would result in two React events being bubbled throught the iframe.
-		event.stopPropagation();
-		const newEvent = new Constructor( event.type, init );
-		const cancelled = ! frameElement.dispatchEvent( newEvent );
-
-		if ( cancelled ) {
-			event.preventDefault();
-		}
-	}
-
-	const eventTypes = [ 'dragover', 'mousemove', 'keydown' ];
-
-	for ( const name of eventTypes ) {
-		doc.body.addEventListener( name, bubbleEvent );
-	}
+		return () => {
+			for ( const name of eventTypes ) {
+				body.removeEventListener( name, bubbleEvent );
+			}
+		};
+	} );
 }
 
 function Iframe( {
@@ -120,7 +128,6 @@ function Iframe( {
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
 
-			bubbleEvents( contentDocument );
 			clearerRef( documentElement );
 
 			// Ideally ALL classes that are added through get_body_class should
@@ -185,6 +192,7 @@ function Iframe( {
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
+		useBubbleEvents( iframeDocument ),
 		contentRef,
 		clearerRef,
 		writingFlowRef,
