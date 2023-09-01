@@ -126,16 +126,17 @@ export default function LeafMoreMenu( props ) {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
-						{ block.attributes?.id && (
-							<MenuItem
-								onClick={ () => {
-									onGoToPage( block );
-									onClose();
-								} }
-							>
-								{ goToLabel }
-							</MenuItem>
-						) }
+						{ block.attributes?.type === 'page' &&
+							block.attributes?.id && (
+								<MenuItem
+									onClick={ () => {
+										onGoToPage( block );
+										onClose();
+									} }
+								>
+									{ goToLabel }
+								</MenuItem>
+							) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem

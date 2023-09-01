@@ -37,6 +37,7 @@ export const format = {
 	attributes: {
 		'data-fn': 'data-fn',
 	},
+	interactive: true,
 	contentEditable: false,
 	[ usesContextKey ]: [ 'postType' ],
 	edit: function Edit( {

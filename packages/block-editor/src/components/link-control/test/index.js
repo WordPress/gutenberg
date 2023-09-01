@@ -1708,7 +1708,7 @@ describe( 'Selecting links', () => {
 } );
 
 describe( 'Addition Settings UI', () => {
-	it( 'should not show a means to toggle the link settings when not editing a link', async () => {
+	it( 'should hide advanced link settings when not editing a link', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
@@ -1723,6 +1723,7 @@ describe( 'Addition Settings UI', () => {
 
 		expect( settingsToggle ).not.toBeInTheDocument();
 	} );
+
 	it( 'should provides a means to toggle the link settings', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
