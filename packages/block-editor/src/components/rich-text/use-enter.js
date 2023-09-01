@@ -59,7 +59,11 @@ export function useEnter( props ) {
 				} );
 
 				if ( transformation ) {
-					onReplace( [ transformation.transform( _value.text ) ] );
+					onReplace( [
+						transformation.transform( {
+							content: _value.text,
+						} ),
+					] );
 					__unstableMarkAutomaticChange();
 				}
 			}
