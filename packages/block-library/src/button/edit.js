@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState, useRef, useMemo, createInterpolateElement } from '@wordpress/element';
+import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -35,6 +35,8 @@ import { useMergeRefs } from '@wordpress/compose';
 import { prependHTTP } from '@wordpress/url';
 
 const NEW_TAB_REL = 'noreferrer noopener';
+const NEW_TAB_TARGET = '_blank';
+const NOFOLLOW_REL = 'nofollow';
 
 function WidthPanel( { selectedWidth, setAttributes } ) {
 	function handleChange( newWidth ) {
@@ -92,19 +94,32 @@ function ButtonEdit( props ) {
 
 	const TagName = tagName || 'a';
 
-	function onToggleOpenInNewTab( value ) {
-		const newLinkTarget = value ? '_blank' : undefined;
+	function updateLinkAttributes( opensInNewWindow, nofollow ) {
+		let newLinkTarget;
+		let updatedRel = rel || '';
 
-		let updatedRel = rel;
-		if ( newLinkTarget && ! rel ) {
-			updatedRel = NEW_TAB_REL;
-		} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
-			updatedRel = undefined;
+		if ( opensInNewWindow ) {
+			newLinkTarget = NEW_TAB_TARGET;
+			updatedRel = updatedRel?.includes( NEW_TAB_REL )
+				? updatedRel
+				: updatedRel + ` ${ NEW_TAB_REL }`;
+		} else {
+			const relRegex = new RegExp( `\\b${ NEW_TAB_REL }\\s*`, 'g' );
+			updatedRel = updatedRel?.replace( relRegex, '' ).trim();
+		}
+
+		if ( nofollow ) {
+			updatedRel = updatedRel?.includes( NOFOLLOW_REL )
+				? updatedRel
+				: updatedRel + ` ${ NOFOLLOW_REL }`;
+		} else {
+			const relRegex = new RegExp( `\\b${ NOFOLLOW_REL }\\s*`, 'g' );
+			updatedRel = updatedRel?.replace( relRegex, '' ).trim();
 		}
 
 		setAttributes( {
 			linkTarget: newLinkTarget,
-			rel: updatedRel,
+			rel: updatedRel || undefined,
 		} );
 	}
 
@@ -138,7 +153,8 @@ function ButtonEdit( props ) {
 
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
-	const opensInNewTab = linkTarget === '_blank';
+	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
+	const nofollow = !! rel?.includes( NOFOLLOW_REL );
 	const isLinkTag = 'a' === TagName;
 
 	function startEditing( event ) {
@@ -164,8 +180,8 @@ function ButtonEdit( props ) {
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
 	const linkValue = useMemo(
-		() => ( { url, opensInNewTab } ),
-		[ url, opensInNewTab ]
+		() => ( { url, opensInNewTab, nofollow } ),
+		[ url, opensInNewTab, nofollow ]
 	);
 
 	return (
@@ -258,12 +274,14 @@ function ButtonEdit( props ) {
 						onChange={ ( {
 							url: newURL = '',
 							opensInNewTab: newOpensInNewTab,
+							nofollow: newNoFollow,
 						} ) => {
 							setAttributes( { url: prependHTTP( newURL ) } );
 
-							if ( opensInNewTab !== newOpensInNewTab ) {
-								onToggleOpenInNewTab( newOpensInNewTab );
-							}
+							updateLinkAttributes(
+								newOpensInNewTab,
+								newNoFollow
+							);
 						} }
 						onRemove={ () => {
 							unlink();

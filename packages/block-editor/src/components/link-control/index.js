@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useRef, useState, useEffect, createInterpolateElement } from '@wordpress/element';
+import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
@@ -38,6 +38,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {boolean=} opensInNewTab Whether link should open in a new browser
  *                                    tab. This value is only assigned if not
  *                                    providing a custom `settings` prop.
+ * @property {boolean=} nofollow      Whether this link is marked as no follow relationship.
  */
 
 /* eslint-disable jsdoc/valid-types */
@@ -141,10 +142,7 @@ function LinkControl( {
 			...settings,
 			{
 				id: 'nofollow',
-				title: createInterpolateElement(
-					__( 'Mark as <code>nofollow</code>' ),
-					{ code: <code /> }
-				),
+				title: __( 'Mark as nofollow' ),
 			},
 		];
 	}

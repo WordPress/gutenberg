@@ -162,6 +162,83 @@ test.describe( 'Buttons', () => {
 		);
 	} );
 
+	test( 'can toggle button link settings', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'WordPress' );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'https://www.wordpress.org/' );
+		await page.keyboard.press( 'Enter' );
+
+		// Edit link.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Open Advanced settings panel.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Navigate to and toggle the "Open in new tab" checkbox.
+		const checkbox = page.getByLabel( 'Open in new tab' );
+		await checkbox.click();
+
+		// Toggle should still have focus and be checked.
+		await expect( checkbox ).toBeChecked();
+		await expect( checkbox ).toBeFocused();
+
+		// Tab back to the Save button and apply the link.
+		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://www.wordpress.org/" target="_blank" rel="noreferrer noopener">WordPress</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+
+		// Edit link again.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Navigate to and toggle the "nofollow" checkbox.
+		await page.getByLabel( 'nofollow' ).click();
+
+		// expect settings for `Open in new tab` and `No follow`
+		await expect( page.getByLabel( 'Open in new tab' ) ).toBeChecked();
+		await expect( page.getByLabel( 'nofollow' ) ).toBeChecked();
+
+		// Tab back to the Save button and apply the link.
+		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		// Check the content again.
+		const newContent = await editor.getEditedPostContent();
+		expect( newContent ).toBe(
+			`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://www.wordpress.org/" target="_blank" rel="noreferrer noopener nofollow">WordPress</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+		);
+	} );
+
 	test( 'can resize width', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
