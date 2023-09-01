@@ -335,14 +335,6 @@ class WP_Font_Family {
 		}
 
 		$new_font_faces = array();
-
-	    $wp_content_dir = WP_CONTENT_DIR;
-
-		// Construct the path to the fonts directory
-		$fonts_dir = trailingslashit($wp_content_dir) . 'fonts';
-	
-		wp_mkdir_p($fonts_dir);
-		// var_dump($fonts_dir);
 		
 		foreach ( $this->data['fontFace'] as $font_face ) {
 			// If the fonts are not meant to be dowloaded or uploaded
