@@ -371,13 +371,6 @@ export default function TypographyPanel( {
 	);
 	const hasTextOrientation = () => !! value?.typography?.textOrientation;
 
-	// Reset text orientation when writing mode is reset.
-	useEffect( () => {
-		if ( writingMode === undefined ) {
-			setTextOrientation( undefined );
-		}
-	}, [ writingMode, setTextOrientation ] );
-
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
