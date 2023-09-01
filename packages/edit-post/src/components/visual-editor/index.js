@@ -180,7 +180,8 @@ export default function VisualEditor( { styles } ) {
 	const desktopCanvasStyles = {
 		height: '100%',
 		width: '100%',
-		margin: 0,
+		marginLeft: 'auto',
+		marginRight: 'auto',
 		display: 'flex',
 		flexFlow: 'column',
 		// Default background color so that grey
@@ -217,7 +218,6 @@ export default function VisualEditor( { styles } ) {
 		ref,
 		useClipboardHandler(),
 		useTypewriter(),
-		useTypingObserver(),
 		useBlockSelectionClearer(),
 	] );
 
@@ -305,6 +305,7 @@ export default function VisualEditor( { styles } ) {
 		? postContentLayout
 		: fallbackLayout;
 
+	const observeTypingRef = useTypingObserver();
 	const titleRef = useRef();
 	useEffect( () => {
 		if ( isWelcomeGuideVisible || ! isCleanNewPost() ) {
@@ -400,6 +401,7 @@ export default function VisualEditor( { styles } ) {
 									}
 								) }
 								contentEditable={ false }
+								ref={ observeTypingRef }
 							>
 								<PostTitle ref={ titleRef } />
 							</div>

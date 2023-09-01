@@ -2,11 +2,17 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Added support for `test-playwright` script ([#53108](https://github.com/WordPress/gutenberg/pull/53108)).
+
+## 26.12.0 (2023-08-31)
+
 ## 26.11.0 (2023-08-16)
 
 ### Enhancement
 
--   Updated `npm-package-json-lint` peer dependency to require v6.0.0 [#53636](https://github.com/WordPress/gutenberg/pull/53636)
+-   Updated `npm-package-json-lint` peer dependency to require v6.0.0 [#53636](https://github.com/WordPress/gutenberg/pull/53636).
 -   The bundled `@svgr/webpack` dependency has been updated from requiring ^6.2.1 to requiring ^8.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
 -   The bundled `cssnano` dependency has been updated from requiring ^5.07 to requiring ^6.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
 
