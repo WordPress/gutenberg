@@ -21,9 +21,9 @@ class Tests_Fonts_WpFontLibrary_SetUploadDir extends WP_UnitTestCase {
 		$expected = array(
 			'subdir'  => '/fonts',
 			'basedir' => '/var/www/html/wp-content',
-			'baseurl' => 'http://example.com/wp-content',
+			'baseurl' => content_url(),
 			'path'    => '/var/www/html/wp-content/fonts',
-			'url'     => 'http://example.com/wp-content/fonts',
+			'url'     => content_url() . '/fonts',
 		);
 		$this->assertSame( $expected, WP_Font_Library::set_upload_dir( $defaults ) );
 	}
