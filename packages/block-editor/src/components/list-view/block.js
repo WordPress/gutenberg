@@ -72,7 +72,8 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle = blockInformation?.title || __( 'Untitled' );
+	const blockTitle =
+		blockInformation?.name || blockInformation?.title || __( 'Untitled' );
 
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
@@ -107,14 +108,14 @@ function ListViewBlock( {
 		? sprintf(
 				// translators: %s: The title of the block. This string indicates a link to select the locked block.
 				__( '%s (locked)' ),
-				blockInformation?.name || blockTitle
+				blockTitle
 		  )
-		: blockInformation?.name || blockTitle;
+		: blockTitle;
 
 	const settingsAriaLabel = sprintf(
 		// translators: %s: The title of the block.
 		__( 'Options for %s' ),
-		blockInformation?.name || blockTitle
+		blockTitle
 	);
 
 	const {
