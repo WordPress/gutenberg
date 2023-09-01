@@ -70,6 +70,7 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 			nextIndex = nextIndex === regions.length ? 0 : nextIndex;
 			nextRegion = regions[ nextIndex ];
 		}
+
 		nextRegion.focus();
 		setIsFocusingRegions( true );
 	}

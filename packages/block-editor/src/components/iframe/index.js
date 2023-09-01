@@ -63,9 +63,6 @@ function useBubbleEvents( iframeDocument ) {
 				init.clientY += rect.top;
 			}
 
-			// This stopPropagation call ensures React doesn't create a syncthetic event to bubble this event
-			// which would result in two React events being bubbled throught the iframe.
-			event.stopPropagation();
 			const newEvent = new Constructor( event.type, init );
 			const cancelled = ! frameElement.dispatchEvent( newEvent );
 
@@ -262,6 +259,9 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
+						// We want to prevent React events from bubbling throught the iframe
+						// we bubble these manually.
+						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
 							className={ classnames(
@@ -269,6 +269,11 @@ function Iframe( {
 								'editor-styles-wrapper',
 								...bodyClasses
 							) }
+							onKeyDown={ ( event ) => {
+								// This stopPropagation call ensures React doesn't create a syncthetic event to bubble this event
+								// which would result in two React events being bubbled throught the iframe.
+								event.stopPropagation();
+							} }
 						>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
