@@ -252,14 +252,12 @@ function BackgroundImagePanelItem( props ) {
 	);
 }
 
-export function BackgroundPanel( props ) {
+export function BackgroundImagePanel( props ) {
 	const isBackgroundImageSupported =
 		useSetting( 'background.backgroundImage' ) &&
 		hasBackgroundSupport( props.name, 'backgroundImage' );
 
-	const isDisabled = [ ! isBackgroundImageSupported ].every( Boolean );
-
-	if ( isDisabled ) {
+	if ( ! isBackgroundImageSupported ) {
 		return null;
 	}
 

@@ -20,7 +20,7 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
  * Internal dependencies
  */
 import BlockList from '../components/block-list';
-import { BACKGROUND_SUPPORT_KEY, BackgroundPanel } from './background';
+import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -375,8 +375,8 @@ export const withBlockControls = createHigherOrderComponent(
 			<>
 				{ shouldDisplayControls && blockEditingMode === 'default' && (
 					<>
-						<BackgroundPanel { ...props } />
 						<ColorEdit { ...props } />
+						<BackgroundImagePanel { ...props } />
 						<TypographyPanel { ...props } />
 						<BorderPanel { ...props } />
 						<DimensionsPanel { ...props } />
