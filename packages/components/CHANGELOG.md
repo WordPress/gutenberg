@@ -6,13 +6,16 @@
 
 -   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889), [#53982](https://github.com/WordPress/gutenberg/pull/53982)).
 
+### Enhancements
+
+-   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch. ([#52255](https://github.com/WordPress/gutenberg/pull/52255))
+
 ## 25.7.0 (2023-08-31)
 
 ### Enhancements
 
 -   `ProgressBar`: Add transition to determinate indicator ([#53877](https://github.com/WordPress/gutenberg/pull/53877)).
 -   Prevent nested `SlotFillProvider` from rendering ([#53940](https://github.com/WordPress/gutenberg/pull/53940)).
--   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch. ([#52255](https://github.com/WordPress/gutenberg/pull/52255))
 
 ### Bug Fix
 
