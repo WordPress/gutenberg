@@ -28,7 +28,7 @@ abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 
-		static::$fonts_dir = WP_CONTENT_DIR . '/fonts/';
+		static::$fonts_dir = WP_Font_Library::get_fonts_dir();
 		wp_mkdir_p( static::$fonts_dir );
 	}
 
