@@ -178,13 +178,13 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
-			{ ...props }
-			onKeyDown={ ( event ) => {
+			onChildrenKeyDown={ ( event ) => {
 				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
 					event.preventDefault();
 					lastFocus.current.focus();
 				}
 			} }
+			{ ...props }
 		>
 			{ ! isCollapsed && <BlockToolbar hideDragHandle={ isFixed } /> }
 			{ isFixed && isLargeViewport && blockType && (
