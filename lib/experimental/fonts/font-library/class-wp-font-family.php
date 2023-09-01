@@ -191,8 +191,8 @@ class WP_Font_Family {
 			return false;
 		}
 
-		$destination = WP_Font_Library::get_fonts_dir() . '/' . basename($filename);
-		if ( ! rename($temp_file, $destination) ) {
+		$destination = WP_Font_Library::get_fonts_dir() . '/' . basename( $filename );
+		if ( ! rename( $temp_file, $destination ) ) {
 			return false;
 		}
 
@@ -234,16 +234,16 @@ class WP_Font_Family {
 			return $new_font_face;
 		}
 
-		$destination = WP_Font_Library::get_fonts_dir() . '/' . basename($filename);
+		$destination = WP_Font_Library::get_fonts_dir() . '/' . basename( $filename );
 
-		if ( rename($file['tmp_name'], $destination) ) {
+		if ( rename( $file['tmp_name'], $destination ) ) {
 			// If the file was successfully moved, update the font face definition
 			// to reference the new file location.
 			$new_font_face['src'] = $destination;
 		} else {
 			return false;
 		}
-		
+
 		return $new_font_face;
 	}
 
@@ -335,7 +335,7 @@ class WP_Font_Family {
 		}
 
 		$new_font_faces = array();
-		
+
 		foreach ( $this->data['fontFace'] as $font_face ) {
 			// If the fonts are not meant to be dowloaded or uploaded
 			// (for example to install fonts that use a remote url).
@@ -494,13 +494,22 @@ class WP_Font_Family {
 		return $this->create_font_post();
 	}
 
+	/**
+	 * Creates font directory if it doesn't exist.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @return bool If the directory was created successfully, false otherwise.
+	 */
 	private function make_fonts_dir() {
 		$fonts_dir = WP_Font_Library::get_fonts_dir();
 
 		// Ensure the fonts directory exists or create it.
-		if ( ! is_dir($fonts_dir) ) {
-			wp_mkdir_p($fonts_dir);
+		if ( ! is_dir( $fonts_dir ) ) {
+			return wp_mkdir_p( $fonts_dir );
 		}
+		
+		return false;
 	}
 
 	/**
