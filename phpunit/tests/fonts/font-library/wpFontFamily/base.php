@@ -8,7 +8,7 @@
 abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 
 	/**
-	 * Fonts directory (in uploads).
+	 * Fonts directory.
 	 *
 	 * @var string
 	 */
@@ -28,9 +28,7 @@ abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 
-		$uploads_dir       = wp_upload_dir();
-		static::$fonts_dir = $uploads_dir['basedir'] . '/fonts/';
-		wp_mkdir_p( static::$fonts_dir );
+		static::$fonts_dir = WP_CONTENT_DIR . '/fonts/';
 	}
 
 	public function set_up() {
