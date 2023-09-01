@@ -25,8 +25,6 @@ import {
 	InspectorControls,
 } from '../components';
 
-const emptyString = ( testString ) => testString?.trim()?.length === 0;
-
 function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
 
@@ -85,18 +83,12 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 			>
 				<VStack spacing="3">
 					<TextControl
-						required
 						__nextHasNoMarginBottom
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
 						hideLabelFromVision={ true }
 						placeholder={ originalBlockName }
 						onChange={ setEditedBlockName }
-						onBlur={ () => {
-							if ( emptyString( editedBlockName ) ) {
-								setEditedBlockName( originalBlockName );
-							}
-						} }
 						onFocus={ autoSelectInputText }
 					/>
 					<HStack justify="right">
