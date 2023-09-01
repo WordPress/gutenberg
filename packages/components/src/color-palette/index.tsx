@@ -250,9 +250,9 @@ function UnforwardedColorPalette(
 
 	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
 	if ( ariaLabel ) {
-		ariaProps = { 'aria-label': ariaLabel as string };
+		ariaProps = { 'aria-label': ariaLabel };
 	} else if ( ariaLabelledby ) {
-		ariaProps = { 'aria-labelledby': ariaLabelledby as string };
+		ariaProps = { 'aria-labelledby': ariaLabelledby };
 	} else {
 		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
 	}
