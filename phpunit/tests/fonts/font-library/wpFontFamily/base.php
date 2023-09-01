@@ -60,7 +60,7 @@ abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 					'size'     => 123,
 				),
 			),
-			'font_filename' => static::$fonts_dir . 'merriweather_normal_400.ttf',
+			'font_filename' => path_join( static::$fonts_dir, 'merriweather_normal_400.ttf' ),
 		);
 	}
 
