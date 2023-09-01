@@ -327,9 +327,7 @@ function RichTextWrapper(
 				} );
 
 				if ( transformation ) {
-					onReplace( [
-						transformation.transform( { content: value.text } ),
-					] );
+					onReplace( [ transformation.transform( value.text ) ] );
 					__unstableMarkAutomaticChange();
 				}
 			}
