@@ -19,7 +19,10 @@ import {
 
 function ScreenDetailsLastModifiedDate( { lastModifiedDateTime } ) {
 	return (
-		<SidebarNavigationScreenDetailsPanelRow justify="space-between">
+		<SidebarNavigationScreenDetailsPanelRow
+			className="edit-site-sidebar-navigation-screen-details-footer__revision"
+			justify="space-between"
+		>
 			<SidebarNavigationScreenDetailsPanelLabel>
 				{ __( 'Last modified' ) }
 			</SidebarNavigationScreenDetailsPanelLabel>

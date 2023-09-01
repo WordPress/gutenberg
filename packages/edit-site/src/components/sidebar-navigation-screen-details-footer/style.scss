@@ -1,4 +1,7 @@
 .edit-site-sidebar-navigation-screen-details-footer {
+	.edit-site-sidebar-navigation-screen-details-footer__revision {
+		padding-left: $grid-unit-15;
+	}
 	.edit-site-sidebar-navigation-screen-details-footer__button {
 		width: 100%;
 		border-radius: $radius-block-ui;
@@ -6,6 +9,11 @@
 		&:hover,
 		&:focus {
 			background-color: $gray-800;
+		}
+
+		// The button provides the left padding.
+		.edit-site-sidebar-navigation-screen-details-footer__revision {
+			padding-left: 0;
 		}
 	}
 	.edit-site-sidebar-navigation-screen-details-footer__icon {
