@@ -156,6 +156,7 @@ function useToolbarFocus(
 function NavigableToolbar( {
 	children,
 	focusOnMount,
+	onChildrenKeyDown = () => {},
 	shouldUseKeyboardFocusShortcut = true,
 	__experimentalInitialIndex: initialIndex,
 	__experimentalOnIndexChange: onIndexChange,
@@ -163,7 +164,6 @@ function NavigableToolbar( {
 } ) {
 	const ref = useRef();
 	const isAccessibleToolbar = useIsAccessibleToolbar( ref );
-
 	useToolbarFocus(
 		ref,
 		focusOnMount,
@@ -172,6 +172,35 @@ function NavigableToolbar( {
 		onIndexChange,
 		shouldUseKeyboardFocusShortcut
 	);
+
+	useEffect( () => {
+		const navigableToolbarRef = ref.current;
+		const toolbarButtons = navigableToolbarRef.querySelectorAll(
+			'[data-toolbar-item="true"]'
+		);
+
+		if ( onChildrenKeyDown ) {
+			const handleChildrenKeyDown = ( event ) => {
+				onChildrenKeyDown( event );
+			};
+
+			toolbarButtons.forEach( ( toolbarButton ) => {
+				toolbarButton.addEventListener(
+					'keydown',
+					handleChildrenKeyDown
+				);
+			} );
+
+			return () => {
+				toolbarButtons.forEach( ( toolbarButton ) => {
+					toolbarButton.removeEventListener(
+						'keydown',
+						handleChildrenKeyDown
+					);
+				} );
+			};
+		}
+	}, [ onChildrenKeyDown, children ] );
 
 	if ( isAccessibleToolbar ) {
 		return (
