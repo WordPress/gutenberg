@@ -90,7 +90,7 @@ class WP_Font_Library {
 	 * @return string Path of the upload directory for fonts.
 	 */
 	public static function get_fonts_dir() {
-		return wp_upload_dir()['basedir'] . '/fonts';
+		return path_join( WP_CONTENT_DIR, 'fonts' );
 	}
 
 	/**
@@ -110,9 +110,11 @@ class WP_Font_Library {
 	 * @return array Modified upload directory.
 	 */
 	public static function set_upload_dir( $defaults ) {
-		$defaults['subdir'] = '/fonts';
-		$defaults['path']   = $defaults['basedir'] . $defaults['subdir'];
-		$defaults['url']    = $defaults['baseurl'] . $defaults['subdir'];
+		$defaults['basedir'] = WP_CONTENT_DIR;
+		$defaults['baseurl'] = content_url();
+		$defaults['subdir']  = '/fonts';
+		$defaults['path']    = self::get_fonts_dir();
+		$defaults['url']     = $defaults['baseurl'] . '/fonts';
 
 		return $defaults;
 	}

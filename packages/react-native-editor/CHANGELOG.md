@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.103.0
 -   [**] Replace third-party dependency react-native-hsv-color-picker with first-party code [#53329]
 -   [*] Search Control - Prevent calling TextInput's methods when undefined [#53745]
 -   [*] Improve horizontal rule styles to avoid invisible lines [#53883]
