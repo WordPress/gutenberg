@@ -662,6 +662,16 @@
 				}
 			}
 		},
+		"settingsPropertiesLightbox": {
+			"type": "object",
+			"properties": {
+				"enabled": {
+					"description": "Defines whether the lightbox is enabled or not.",
+					"type": "boolean",
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
@@ -673,7 +683,8 @@
 				{ "$ref": "#/definitions/settingsPropertiesPosition" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
-				{ "$ref": "#/definitions/settingsPropertiesCustom" }
+				{ "$ref": "#/definitions/settingsPropertiesCustom" },
+				{ "$ref": "#/definitions/settingsPropertiesLightbox" }
 			]
 		},
 		"settingsPropertiesComplete": {
@@ -693,7 +704,8 @@
 						"shadow": {},
 						"spacing": {},
 						"typography": {},
-						"custom": {}
+						"custom": {},
+						"lightbox": {}
 					},
 					"additionalProperties": false
 				}
@@ -2164,6 +2176,7 @@
 						"position": {},
 						"dimensions": {},
 						"custom": {},
+						"lightbox": {},
 						"blocks": {
 							"description": "Settings defined on a per-block basis.",
 							"$ref": "#/definitions/settingsBlocksPropertiesComplete"
