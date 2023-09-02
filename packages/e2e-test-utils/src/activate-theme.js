@@ -23,6 +23,10 @@ export async function activateTheme( slug ) {
 	}
 
 	await page.click( `div[data-slug="${ slug }"] .button.activate` );
+
+	if ( ! isCurrentURL( 'themes.php' ) ) {
+		await visitAdminPage( 'themes.php' );
+	}
 	await page.waitForSelector( `div[data-slug="${ slug }"].active` );
 	await switchUserToTest();
 }
