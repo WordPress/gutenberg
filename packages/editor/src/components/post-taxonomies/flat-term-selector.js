@@ -231,7 +231,7 @@ export function FlatTermSelector( { slug } ) {
 
 	const newTermLabel =
 		taxonomy?.labels?.add_new_item ??
-		( slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' ) );
+		( slug === 'post_tag' ? __( 'Add New Tag' ) : __( 'Add New Term' ) );
 	const singularName =
 		taxonomy?.labels?.singular_name ??
 		( slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' ) );
