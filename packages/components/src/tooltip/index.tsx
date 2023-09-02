@@ -22,7 +22,13 @@ import { positionToPlacement } from '../popover/utils';
 export const TOOLTIP_DELAY = 700;
 
 function Tooltip( props: TooltipProps ) {
-	const { children, delay = TOOLTIP_DELAY, position, shortcut, text } = props;
+	const {
+		children,
+		delay = TOOLTIP_DELAY,
+		position = 'bottom',
+		shortcut,
+		text,
+	} = props;
 
 	const baseId = useInstanceId( Tooltip, 'tooltip' );
 	const describedById = text || shortcut ? baseId : undefined;
@@ -38,17 +44,9 @@ function Tooltip( props: TooltipProps ) {
 		}
 	}
 
-	const DEFAULT_PLACEMENT = 'bottom';
-
 	const tooltipStore = Ariakit.useTooltipStore( {
-		//@ts-ignore
-		placement:
-			// Compute tooltip's placement:
-			// - compute it from the legacy `position` prop (if defined)
-			// - otherwise, fallback to the DEFAULT_PLACEMENT.
-			position === undefined
-				? DEFAULT_PLACEMENT
-				: positionToPlacement( position ),
+		// @ts-ignore
+		placement: positionToPlacement( position ),
 		timeout: delay,
 	} );
 
