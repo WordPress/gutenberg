@@ -21,6 +21,10 @@ export async function activatePlugin( slug ) {
 		return;
 	}
 	await page.click( `tr[data-slug="${ slug }"] .activate a` );
+
+	if ( ! isCurrentURL( 'plugins.php' ) ) {
+		await visitAdminPage( 'plugins.php' );
+	}
 	await page.waitForSelector( `tr[data-slug="${ slug }"] .deactivate a` );
 	await switchUserToTest();
 }
