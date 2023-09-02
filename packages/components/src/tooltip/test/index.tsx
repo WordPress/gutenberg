@@ -98,18 +98,34 @@ describe( 'Tooltip', () => {
 
 	it( 'should respect custom delay prop when showing tooltip', async () => {
 		const user = userEvent.setup();
-		const CUSTOM_DELAY = TOOLTIP_DELAY + 25;
+		const ADDITIONAL_DELAY = 100;
 
-		render( <Tooltip { ...props } delay={ CUSTOM_DELAY } /> );
+		render(
+			<Tooltip { ...props } delay={ TOOLTIP_DELAY + ADDITIONAL_DELAY } />
+		);
 
 		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
 
+		// Advance time by default delay
+		await new Promise( ( resolve ) =>
+			setTimeout( resolve, TOOLTIP_DELAY )
+		);
+
+		// Tooltip hasn't appeared yet
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
 
+		// wait for additional delay for tooltip to appear
+		await waitFor(
+			() =>
+				new Promise( ( resolve ) =>
+					setTimeout( resolve, ADDITIONAL_DELAY )
+				)
+		);
+
 		expect(
-			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
+			screen.getByRole( 'tooltip', { name: /tooltip text/i } )
 		).toBeVisible();
 
 		await cleanupTooltip( user );
