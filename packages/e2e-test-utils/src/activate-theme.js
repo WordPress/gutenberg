@@ -4,6 +4,7 @@
 import { switchUserToAdmin } from './switch-user-to-admin';
 import { switchUserToTest } from './switch-user-to-test';
 import { visitAdminPage } from './visit-admin-page';
+import { isCurrentURL } from './is-current-url';
 
 /**
  * Activates an installed theme.
