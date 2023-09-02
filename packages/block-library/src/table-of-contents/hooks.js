@@ -127,15 +127,18 @@ function observeCallback( select, dispatch, clientId ) {
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		dispatch( blockEditorStore );
 
-	const headings = getLatestHeadings( select, clientId );
-	const storedHeadings = getBlockAttributes( clientId )?.headings;
+	/**
+	 * If the block no longer exists in the store, skip the update.
+	 * The "undo" action recreates the block and provides a new `clientId`.
+	 * The hook still might be observing the changes while the old block unmounts.
+	 */
+	const attributes = getBlockAttributes( clientId );
+	if ( attributes === null ) {
+		return;
+	}
 
-	// When undoing changes to an attribute, `getBlockAttributes` returns `null`,
-	// which triggers an infinite loop of updates. The `undefined` check prevents that.
-	if (
-		storedHeadings !== undefined &&
-		! fastDeepEqual( headings, storedHeadings )
-	) {
+	const headings = getLatestHeadings( select, clientId );
+	if ( ! fastDeepEqual( headings, attributes.headings ) ) {
 		__unstableMarkNextChangeAsNotPersistent();
 		updateBlockAttributes( clientId, { headings } );
 	}
