@@ -58,7 +58,7 @@ function Tooltip( props: TooltipProps ) {
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
 			>
-				{ ! isOnlyChild ? children : null }
+				{ isOnlyChild ? undefined : children }
 			</Ariakit.TooltipAnchor>
 			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
