@@ -1,6 +1,6 @@
 .edit-site-sidebar-navigation-screen-details-footer {
 	.edit-site-sidebar-navigation-screen-details-footer__revision {
-		padding-left: $grid-unit-15;
+		padding: 0.5 * $grid-unit-15 $grid-unit-15;
 	}
 	.edit-site-sidebar-navigation-screen-details-footer__button {
 		width: 100%;
@@ -11,9 +11,9 @@
 			background-color: $gray-800;
 		}
 
-		// The button provides the left padding.
+		// The button provides the padding.
 		.edit-site-sidebar-navigation-screen-details-footer__revision {
-			padding-left: 0;
+			padding: 0;
 		}
 	}
 	.edit-site-sidebar-navigation-screen-details-footer__icon {
