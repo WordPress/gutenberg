@@ -25,9 +25,9 @@ Examples might be adding custom inspector or toolbar controls, registering block
  * Enqueue Editor assets.
  */
 function example_enqueue_editor_assets() {
-    wp_enqueue_script(
-        'example-editor-scripts',
-        plugins_url( 'editor-scripts.css', __FILE__ ) );
+    wp_enqueue_script( 
+        'example-editor-scripts', 
+        plugins_url( 'editor-scripts.js', __FILE__ ) );
     }
     wp_enqueue_style(
         'example-editor-styles',
