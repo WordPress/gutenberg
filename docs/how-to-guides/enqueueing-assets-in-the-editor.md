@@ -27,14 +27,14 @@ Examples might be adding custom inspector or toolbar controls, registering block
 function example_enqueue_editor_assets() {
     wp_enqueue_script(
         'example-editor-scripts',
-        plugins_url( 'editor-scripts.js', __FILE__ ) );
-    }
+        plugins_url( 'editor-scripts.js', __FILE__ )
+    );
     wp_enqueue_style(
         'example-editor-styles',
-        plugins_url( 'editor-styles.css', __FILE__ ) );
-    }
+        plugins_url( 'editor-styles.css', __FILE__ ) 
+    );
 }
-add_action( 'enqueue_block_editor_assets, 'example_enqueue_editor_assets' );
+add_action( 'enqueue_block_editor_assets', 'example_enqueue_editor_assets' );
 ```
 
 While not the recommended approach, it's important to note that `enqueue_block_editor_assets` can be used to style Editor content for backward compatibility. See below for more details.
