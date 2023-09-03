@@ -2342,6 +2342,7 @@ export const __experimentalGetParsedPattern = createSelector(
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
+		state?.settings?.__experimentalUserPatternCategories,
 	]
 );
 
@@ -2352,7 +2353,7 @@ const getAllAllowedPatterns = createSelector(
 
 		const { allowedBlockTypes } = getSettings( state );
 
-		const parsedPatterns = [ ...patterns, ...unsyncedPatterns ]
+		const parsedPatterns = [ ...unsyncedPatterns, ...patterns ]
 			.filter( ( { inserter = true } ) => !! inserter )
 			.map( ( { name } ) =>
 				__experimentalGetParsedPattern( state, name )
@@ -2366,6 +2367,7 @@ const getAllAllowedPatterns = createSelector(
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
 		state.settings.allowedBlockTypes,
+		state?.settings?.__experimentalUserPatternCategories,
 	]
 );
 
