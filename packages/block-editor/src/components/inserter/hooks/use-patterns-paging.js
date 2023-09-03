@@ -3,7 +3,7 @@
  */
 import { useMemo, useState } from '@wordpress/element';
 
-import { useAsyncList } from '@wordpress/compose';
+import { useAsyncList, usePrevious } from '@wordpress/compose';
 
 const PAGE_SIZE = 20;
 const INITIAL_INSERTER_RESULTS = 5;
@@ -12,15 +12,21 @@ const INITIAL_INSERTER_RESULTS = 5;
  * Supplies values needed to page the patterns list client side.
  *
  * @param {Array}  currentCategoryPatterns An array of the current patterns to display.
+ * @param {string} currentCategory         The currently selected category.
  * @param {string} scrollContainerClass    Class of container to scroll when moving between pages.
  *
  * @return {Object} Returns the relevant paging values. (totalItems, categoryPatternsList, numPages, changePage, currentPage)
  */
 export default function usePatternsPaging(
 	currentCategoryPatterns,
+	currentCategory,
 	scrollContainerClass
 ) {
 	const [ currentPage, setCurrentPage ] = useState( 1 );
+	const previousCategory = usePrevious( currentCategory );
+	if ( previousCategory !== currentCategory && currentPage !== 1 ) {
+		setCurrentPage( 1 );
+	}
 	const totalItems = currentCategoryPatterns.length;
 	const pageIndex = currentPage - 1;
 	const categoryPatterns = useMemo( () => {

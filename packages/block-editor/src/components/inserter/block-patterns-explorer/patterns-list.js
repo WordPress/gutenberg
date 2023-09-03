@@ -110,6 +110,7 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 		currentPage,
 	} = usePatternsPaging(
 		filteredBlockPatterns,
+		selectedCategory,
 		'.components-modal__content.is-scrollable'
 	);
 
