@@ -26,7 +26,7 @@ describe( 'PostTaxonomies', () => {
 			show_ui: true,
 		},
 		labels: {
-			add_new_item: 'Add New genre',
+			add_new_item: 'Add New Genre',
 		},
 	};
 
@@ -40,7 +40,7 @@ describe( 'PostTaxonomies', () => {
 			show_ui: true,
 		},
 		labels: {
-			add_new_item: 'Add New category',
+			add_new_item: 'Add New Category',
 		},
 	};
 
@@ -107,10 +107,10 @@ describe( 'PostTaxonomies', () => {
 			screen.queryByRole( 'group', { name: 'Categories' } )
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Add New genre' } )
+			screen.getByRole( 'button', { name: 'Add New Genre' } )
 		).toBeVisible();
 		expect(
-			screen.queryByRole( 'button', { name: 'Add New category' } )
+			screen.queryByRole( 'button', { name: 'Add New Category' } )
 		).not.toBeInTheDocument();
 
 		rerender(
@@ -131,10 +131,10 @@ describe( 'PostTaxonomies', () => {
 			screen.getByRole( 'group', { name: 'Categories' } )
 		).toBeVisible();
 		expect(
-			screen.getByRole( 'button', { name: 'Add New genre' } )
+			screen.getByRole( 'button', { name: 'Add New Genre' } )
 		).toBeVisible();
 		expect(
-			screen.getByRole( 'button', { name: 'Add New category' } )
+			screen.getByRole( 'button', { name: 'Add New Category' } )
 		).toBeVisible();
 	} );
 
@@ -145,7 +145,7 @@ describe( 'PostTaxonomies', () => {
 
 		expect( screen.getByRole( 'group', { name: 'Genres' } ) ).toBeVisible();
 		expect(
-			screen.getByRole( 'button', { name: 'Add New genre' } )
+			screen.getByRole( 'button', { name: 'Add New Genre' } )
 		).toBeVisible();
 
 		rerender(
@@ -164,7 +164,7 @@ describe( 'PostTaxonomies', () => {
 			screen.queryByRole( 'group', { name: 'Genres' } )
 		).not.toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'button', { name: 'Add New genre' } )
+			screen.queryByRole( 'button', { name: 'Add New Genre' } )
 		).not.toBeInTheDocument();
 	} );
 } );
