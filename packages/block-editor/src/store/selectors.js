@@ -2290,28 +2290,23 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 	return true;
 };
 
-function getUnsyncedPatterns( state ) {
-	const reusableBlocks =
+function getUserPatterns( state ) {
+	const userPatterns =
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 	const { patternCategoriesMap: categories } =
 		state?.settings?.__experimentalUserPatternCategories ?? {};
-	return reusableBlocks
-		.filter(
-			( reusableBlock ) =>
-				reusableBlock.wp_pattern_sync_status === 'unsynced'
-		)
-		.map( ( reusableBlock ) => {
-			return {
-				name: `core/block/${ reusableBlock.id }`,
-				title: reusableBlock.title.raw,
-				categories: reusableBlock.wp_pattern_category.map( ( catId ) =>
-					categories && categories.get( catId )
-						? categories.get( catId ).slug
-						: catId
-				),
-				content: reusableBlock.content.raw,
-			};
-		} );
+	return userPatterns.map( ( reusableBlock ) => {
+		return {
+			name: `core/block/${ reusableBlock.id }`,
+			title: reusableBlock.title.raw,
+			categories: reusableBlock.wp_pattern_category.map( ( catId ) =>
+				categories && categories.get( catId )
+					? categories.get( catId ).slug
+					: catId
+			),
+			content: reusableBlock.content.raw,
+		};
+	} );
 }
 
 export const __experimentalUserPatternCategories = createSelector(
@@ -2324,9 +2319,9 @@ export const __experimentalUserPatternCategories = createSelector(
 export const __experimentalGetParsedPattern = createSelector(
 	( state, patternName ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		const unsyncedPatterns = getUnsyncedPatterns( state );
+		const userPatterns = getUserPatterns( state );
 
-		const pattern = [ ...patterns, ...unsyncedPatterns ].find(
+		const pattern = [ ...patterns, ...userPatterns ].find(
 			( { name } ) => name === patternName
 		);
 		if ( ! pattern ) {
@@ -2349,11 +2344,11 @@ export const __experimentalGetParsedPattern = createSelector(
 const getAllAllowedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		const unsyncedPatterns = getUnsyncedPatterns( state );
+		const userPatterns = getUserPatterns( state );
 
 		const { allowedBlockTypes } = getSettings( state );
 
-		const parsedPatterns = [ ...unsyncedPatterns, ...patterns ]
+		const parsedPatterns = [ ...userPatterns, ...patterns ]
 			.filter( ( { inserter = true } ) => !! inserter )
 			.map( ( { name } ) =>
 				__experimentalGetParsedPattern( state, name )

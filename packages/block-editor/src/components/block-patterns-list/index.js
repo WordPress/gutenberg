@@ -11,6 +11,7 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { Icon, symbolFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -100,6 +101,21 @@ function BlockPattern( {
 								<VisuallyHidden id={ descriptionId }>
 									{ pattern.description }
 								</VisuallyHidden>
+							) }
+							{ pattern.id && ! pattern.syncStatus && (
+								<Tooltip
+									position="top center"
+									text={ __(
+										'Editing this pattern will also update anywhere it is used'
+									) }
+								>
+									<span>
+										<Icon
+											className="block-editor-patterns__pattern-icon"
+											icon={ symbolFilled }
+										/>
+									</span>
+								</Tooltip>
 							) }
 						</CompositeItem>
 					</WithToolTip>

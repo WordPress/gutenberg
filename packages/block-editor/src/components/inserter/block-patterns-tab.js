@@ -9,7 +9,7 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { _x, __, isRTL } from '@wordpress/i18n';
-import { useAsyncList, useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -27,6 +27,8 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
+import BlockPatternsPaging from '../block-patterns-paging';
+import usePatternsPaging from './hooks/use-patterns-paging';
 
 const noop = () => {};
 
@@ -168,7 +170,16 @@ export function BlockPatternsCategoryPanel( {
 		[ allPatterns, availableCategories, category.name ]
 	);
 
-	const categoryPatternsList = useAsyncList( currentCategoryPatterns );
+	const {
+		totalItems,
+		categoryPatternsList,
+		numPages,
+		changePage,
+		currentPage,
+	} = usePatternsPaging(
+		currentCategoryPatterns,
+		'.block-editor-inserter__patterns-category-dialog'
+	);
 
 	// Hide block pattern preview on unmount.
 	useEffect( () => () => onHover( null ), [] );
@@ -190,10 +201,18 @@ export function BlockPatternsCategoryPanel( {
 				onHover={ onHover }
 				label={ category.label }
 				orientation="vertical"
-				category={ category.label }
+				category={ category.name }
 				isDraggable
 				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
+			{ numPages > 1 && (
+				<BlockPatternsPaging
+					currentPage={ currentPage }
+					numPages={ numPages }
+					changePage={ changePage }
+					totalItems={ totalItems }
+				/>
+			) }
 		</div>
 	);
 }
