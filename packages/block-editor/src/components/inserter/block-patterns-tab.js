@@ -32,19 +32,6 @@ import usePatternsPaging from './hooks/use-patterns-paging';
 
 const noop = () => {};
 
-// Preferred order of pattern categories. Any other categories should
-// be at the bottom without any re-ordering.
-const patternCategoriesOrder = [
-	'featured',
-	'posts',
-	'text',
-	'gallery',
-	'call-to-action',
-	'banner',
-	'header',
-	'footer',
-];
-
 export const allPatternsCategory = {
 	name: 'allPatterns',
 	label: __( 'All patterns' ),
@@ -77,15 +64,7 @@ function usePatternsCategories( rootClientId ) {
 					pattern.categories?.includes( category.name )
 				)
 			)
-			.sort( ( { label: aLabel }, { label: bLabel } ) => {
-				// Sort categories according to `patternCategoriesOrder`.
-				let aIndex = patternCategoriesOrder.indexOf( aLabel );
-				let bIndex = patternCategoriesOrder.indexOf( bLabel );
-				// All other categories should come after that.
-				if ( aIndex < 0 ) aIndex = patternCategoriesOrder.length;
-				if ( bIndex < 0 ) bIndex = patternCategoriesOrder.length;
-				return aIndex - bIndex;
-			} );
+			.sort( ( a, b ) => a.label.localeCompare( b.label ) );
 
 		if (
 			allPatterns.some(
@@ -192,6 +171,7 @@ export function BlockPatternsCategoryPanel( {
 		currentPage,
 	} = usePatternsPaging(
 		currentCategoryPatterns,
+		category,
 		'.block-editor-inserter__patterns-category-dialog'
 	);
 
