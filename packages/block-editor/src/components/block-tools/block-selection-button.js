@@ -193,6 +193,13 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 			selectBlock( startingBlockClientId );
 			setBlockMovingClientId( null );
 		}
+		if (
+			startingBlockClientId &&
+			selectedBlockClientId === startingBlockClientId &&
+			navigateIn
+		) {
+			return;
+		}
 		if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
 			if ( focusedBlockUid ) {
 				event.preventDefault();
