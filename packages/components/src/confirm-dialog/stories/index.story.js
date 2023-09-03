@@ -110,7 +110,7 @@ _default.parameters = {
 			code: _defaultSnippet,
 			language: 'jsx',
 			type: 'auto',
-			format: 'true',
+			format: true,
 		},
 	},
 };
