@@ -25,8 +25,8 @@ Examples might be adding custom inspector or toolbar controls, registering block
  * Enqueue Editor assets.
  */
 function example_enqueue_editor_assets() {
-    wp_enqueue_script( 
-        'example-editor-scripts', 
+    wp_enqueue_script(
+        'example-editor-scripts',
         plugins_url( 'editor-scripts.js', __FILE__ ) );
     }
     wp_enqueue_style(
@@ -55,15 +55,15 @@ function example_enqueue_editor_content_assets() {
     if ( is_admin() ) {
         wp_enqueue_script(
             'example-editor-content-scripts',
-            plugins_url( 'constent-scripts.css', __FILE__ ) );
-        }
+            plugins_url( 'constent-scripts.css', __FILE__ )
+        );
         wp_enqueue_style(
             'example-editor-content-styles',
-            plugins_url( 'constent-styles.css', __FILE__ ) );
-        }
+            plugins_url( 'constent-styles.css', __FILE__ )
+        );
     }
 }
-add_action( 'enqueue_block_assets, 'example_enqueue_editor_content_assets' );
+add_action( 'enqueue_block_assets', 'example_enqueue_editor_content_assets' );
 ```
 
 You can also use the hook [`block_editor_settings_all`](https://developer.wordpress.org/reference/hooks/block_editor_settings_all/) to modify Editor settings directly. This method is a bit more complicated to implement but provides greater flexibility. It should only be used if `enqueue_block_assets` does not meet your needs.
