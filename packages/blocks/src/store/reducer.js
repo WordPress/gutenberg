@@ -79,7 +79,7 @@ function bootstrappedBlockTypes( state = {}, action ) {
 					};
 				}
 
-				// The `autoInsert` prop is not yet included in the server provided
+				// The `blockHooks` prop is not yet included in the server provided
 				// definitions and needs to be polyfilled. This can be removed when the
 				// minimum supported WordPress is >= 6.4.
 				if (
