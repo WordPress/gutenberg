@@ -4,7 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
 import { Fragment } from '@wordpress/element';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -12,7 +16,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { InspectorControls } from '../components';
+import { BlockIcon, InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
 function AutoInsertingBlocksControl( props ) {
@@ -151,7 +155,11 @@ function AutoInsertingBlocksControl( props ) {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Plugins' ) } initialOpen={ true }>
+			<PanelBody
+				className="block-editor-hooks__auto-inserting-blocks"
+				title={ __( 'Plugins' ) }
+				initialOpen={ true }
+			>
 				{ Object.keys( groupedAutoInsertedBlocks ).map( ( vendor ) => {
 					return (
 						<Fragment key={ vendor }>
@@ -169,7 +177,14 @@ function AutoInsertingBlocksControl( props ) {
 										<ToggleControl
 											checked={ checked }
 											key={ block.title }
-											label={ block.title }
+											label={
+												<HStack justify="flex-start">
+													<BlockIcon
+														icon={ block.icon }
+													/>
+													<span>{ block.title }</span>
+												</HStack>
+											}
 											onChange={ () => {
 												if ( ! checked ) {
 													// Create and insert block.
