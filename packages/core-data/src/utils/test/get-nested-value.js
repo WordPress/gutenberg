@@ -3,7 +3,7 @@
  */
 import getNestedValue from '../get-nested-value';
 
-describe( 'setNestedValue', () => {
+describe( 'getNestedValue', () => {
 	it( 'should return the same object unmodified if path is an empty array', () => {
 		const input = { x: 'y' };
 		const result = getNestedValue( input, [] );
