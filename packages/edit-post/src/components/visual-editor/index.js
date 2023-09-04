@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { PostTitle, store as editorStore } from '@wordpress/editor';
 import {
-	WritingFlow,
 	BlockList,
 	BlockTools,
 	store as blockEditorStore,
@@ -17,10 +16,8 @@ import {
 	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__unstableEditorStyles as EditorStyles,
 	useSetting,
-	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
-	__unstableIframe as Iframe,
+	BlockCanvas,
 	__experimentalRecursionProvider as RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -42,38 +39,6 @@ const { LayoutStyle, useLayoutClasses, useLayoutStyles } = unlock(
 );
 
 const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
-
-function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
-	const ref = useMouseMoveTypingReset();
-
-	if ( ! shouldIframe ) {
-		return (
-			<>
-				<EditorStyles styles={ styles } />
-				<WritingFlow
-					ref={ contentRef }
-					className="editor-styles-wrapper"
-					style={ { flex: '1', ...style } }
-					tabIndex={ -1 }
-				>
-					{ children }
-				</WritingFlow>
-			</>
-		);
-	}
-
-	return (
-		<Iframe
-			ref={ ref }
-			contentRef={ contentRef }
-			style={ { width: '100%', height: '100%', display: 'block' } }
-			name="editor-canvas"
-		>
-			<EditorStyles styles={ styles } />
-			{ children }
-		</Iframe>
-	);
-}
 
 /**
  * Given an array of nested blocks, find the first Post Content
@@ -364,7 +329,7 @@ export default function VisualEditor( { styles } ) {
 					initial={ desktopCanvasStyles }
 					className={ previewMode }
 				>
-					<MaybeIframe
+					<BlockCanvas
 						shouldIframe={ isToBeIframed }
 						contentRef={ contentRef }
 						styles={ styles }
@@ -421,7 +386,7 @@ export default function VisualEditor( { styles } ) {
 								layout={ blockListLayout }
 							/>
 						</RecursionProvider>
-					</MaybeIframe>
+					</BlockCanvas>
 				</motion.div>
 			</motion.div>
 		</BlockTools>

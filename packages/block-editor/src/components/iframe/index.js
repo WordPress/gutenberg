@@ -237,6 +237,7 @@ function Iframe( {
 			<iframe
 				{ ...props }
 				style={ {
+					border: 0,
 					...props.style,
 					height: expand ? contentHeight : props.style?.height,
 					marginTop:

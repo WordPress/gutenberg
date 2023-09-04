@@ -10,9 +10,8 @@ import {
 	BlockSelectionClearer,
 	BlockInspector,
 	CopyHandler,
-	WritingFlow,
+	BlockCanvas,
 	__unstableBlockSettingsMenuFirstItem,
-	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -112,11 +111,13 @@ export default function SidebarBlockEditor( {
 
 				<CopyHandler>
 					<BlockTools>
-						<EditorStyles styles={ settings.defaultEditorStyles } />
 						<BlockSelectionClearer>
-							<WritingFlow className="editor-styles-wrapper">
+							<BlockCanvas
+								shouldIframe={ false }
+								styles={ settings.defaultEditorStyles }
+							>
 								<BlockList renderAppender={ BlockAppender } />
-							</WritingFlow>
+							</BlockCanvas>
 						</BlockSelectionClearer>
 					</BlockTools>
 				</CopyHandler>

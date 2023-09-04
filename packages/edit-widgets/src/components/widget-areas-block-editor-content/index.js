@@ -5,8 +5,7 @@ import {
 	BlockList,
 	BlockTools,
 	BlockSelectionClearer,
-	WritingFlow,
-	__unstableEditorStyles as EditorStyles,
+	BlockCanvas,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -39,11 +38,10 @@ export default function WidgetAreasBlockEditorContent( {
 			<Notices />
 			<BlockTools>
 				<KeyboardShortcuts />
-				<EditorStyles styles={ styles } />
 				<BlockSelectionClearer>
-					<WritingFlow>
+					<BlockCanvas shouldIframe={ false } styles={ styles }>
 						<BlockList className="edit-widgets-main-block-list" />
-					</WritingFlow>
+					</BlockCanvas>
 				</BlockSelectionClearer>
 			</BlockTools>
 		</div>

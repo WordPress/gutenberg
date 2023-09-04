@@ -4,10 +4,9 @@
 import { useEffect, useState } from '@wordpress/element';
 import {
 	BlockEditorProvider,
-	BlockList,
+	BlockCanvas,
 	BlockTools,
 	BlockInspector,
-	WritingFlow,
 } from '@wordpress/block-editor';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
@@ -16,6 +15,7 @@ import '@wordpress/format-library';
  * Internal dependencies
  */
 import styles from './style.lazy.scss';
+import { editorStyles } from './editor-styles';
 
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
@@ -44,11 +44,7 @@ function App() {
 				</div>
 				<div className="playground__content">
 					<BlockTools>
-						<div className="editor-styles-wrapper">
-							<WritingFlow>
-								<BlockList />
-							</WritingFlow>
-						</div>
+						<BlockCanvas styles={ editorStyles } />
 					</BlockTools>
 				</div>
 			</BlockEditorProvider>

@@ -33,9 +33,7 @@ function MyEditorComponent() {
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
 			<BlockTools>
-				<WritingFlow>
-					<BlockList />
-				</WritingFlow>
+				<BlockCanvas />
 			</BlockTools>
 		</BlockEditorProvider>
 	);
@@ -117,6 +115,10 @@ _Parameters_
 _Returns_
 
 -   `WPElement`: Block Breadcrumb.
+
+### BlockCanvas
+
+Undocumented declaration.
 
 ### BlockColorsStyleSelector
 

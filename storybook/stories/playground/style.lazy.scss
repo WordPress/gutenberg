@@ -6,7 +6,6 @@
 @import "~@wordpress/base-styles/z-index";
 
 @import "./reset";
-@import "./editor-styles";
 
 .playground {
 	@include break-small() {
