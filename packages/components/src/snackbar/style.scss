@@ -78,6 +78,8 @@
 
 .components-snackbar-list {
 	position: absolute;
+	bottom: $grid-unit-50;
+	left: $grid-unit-20;
 	z-index: z-index(".components-snackbar-list");
 	width: 100%;
 	box-sizing: border-box;
