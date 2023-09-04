@@ -376,7 +376,7 @@ describe( 'BorderControl', () => {
 			const user = userEvent.setup();
 			const props = createProps();
 			const { rerender } = render( <BorderControl { ...props } /> );
-			await user.type( getWidthInput(), '' );
+			await user.clear( getWidthInput() );
 			rerender( <BorderControl { ...props } /> );
 			await openPopover( user );
 			await user.click( getButton( 'Color: Blue' ) );
@@ -390,7 +390,7 @@ describe( 'BorderControl', () => {
 				shouldSanitizeBorder: false,
 			} );
 			const { rerender } = render( <BorderControl { ...props } /> );
-			await user.type( getWidthInput(), '' );
+			await user.clear( getWidthInput() );
 			rerender( <BorderControl { ...props } /> );
 			await openPopover( user );
 			await user.click( getButton( 'Color: Blue' ) );
@@ -409,9 +409,11 @@ describe( 'BorderControl', () => {
 			await openPopover( user );
 			await user.click( getButton( 'Color: Green' ) );
 			await user.click( getButton( 'Dotted' ) );
-			await user.type( getWidthInput(), '0' );
+			const widthInput = getWidthInput();
+			await user.clear( widthInput );
+			await user.type( widthInput, '0' );
 
-			expect( props.onChange ).toHaveBeenNthCalledWith( 3, {
+			expect( props.onChange ).toHaveBeenNthCalledWith( 4, {
 				color: undefined,
 				style: 'none',
 				width: '0px',
@@ -429,9 +431,10 @@ describe( 'BorderControl', () => {
 			rerender( <BorderControl { ...props } /> );
 			const widthInput = getWidthInput();
 			await user.type( widthInput, '0' );
+			await user.clear( widthInput );
 			await user.type( widthInput, '5' );
 
-			expect( props.onChange ).toHaveBeenNthCalledWith( 4, {
+			expect( props.onChange ).toHaveBeenNthCalledWith( 5, {
 				color: '#00a32a',
 				style: 'dotted',
 				width: '5px',
@@ -452,7 +455,9 @@ describe( 'BorderControl', () => {
 			} );
 
 			await user.type( getWidthInput(), '0' );
+
 			rerender( <BorderControl { ...props } /> );
+			await openPopover( user );
 			await user.click( getButton( 'Color: Green' ) );
 
 			expect( props.onChange ).toHaveBeenCalledWith( {
@@ -479,7 +484,9 @@ describe( 'BorderControl', () => {
 			} );
 
 			await user.type( getWidthInput(), '0' );
+
 			rerender( <BorderControl { ...props } /> );
+			await openPopover( user );
 			await user.click( getButton( 'Dotted' ) );
 
 			expect( props.onChange ).toHaveBeenCalledWith( {
