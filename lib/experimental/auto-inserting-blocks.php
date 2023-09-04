@@ -6,93 +6,6 @@
  */
 
 /**
- * Return a function that auto-inserts a block next to a given "anchor" block.
- *
- * This is a helper function used in the implementation of block hooks.
- * It is not meant for public use.
- *
- * The auto-inserted block can be inserted before or after the anchor block,
- * or as the first or last child of the anchor block.
- *
- * Note that the returned function mutates the automatically inserted block's
- * designated parent block by inserting into the parent's `innerBlocks` array,
- * and by updating the parent's `innerContent` array accordingly.
- *
- * @param array  $inserted_block    The block to insert.
- * @param string $relative_position The position relative to the given block.
- *                                  Can be 'before', 'after', 'first_child', or 'last_child'.
- * @param string $anchor_block_type The automatically inserted block will be inserted next to instances of this block type.
- * @return callable A function that accepts a block's content and returns the content with the inserted block.
- */
-function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $anchor_block_type ) {
-	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block_type ) {
-		if ( $anchor_block_type === $block['blockName'] ) {
-			if ( 'first_child' === $relative_position ) {
-				array_unshift( $block['innerBlocks'], $inserted_block );
-				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
-				// location) to that array.
-				array_unshift( $block['innerContent'], null );
-			} elseif ( 'last_child' === $relative_position ) {
-				array_push( $block['innerBlocks'], $inserted_block );
-				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
-				// location) to that array.
-				array_push( $block['innerContent'], null );
-			}
-			return $block;
-		}
-
-		$anchor_block_index = array_search( $anchor_block_type, array_column( $block['innerBlocks'], 'blockName' ), true );
-		if ( false !== $anchor_block_index && ( 'after' === $relative_position || 'before' === $relative_position ) ) {
-			if ( 'after' === $relative_position ) {
-				$anchor_block_index++;
-			}
-			array_splice( $block['innerBlocks'], $anchor_block_index, 0, array( $inserted_block ) );
-
-			// Find matching `innerContent` chunk index.
-			$chunk_index = 0;
-			while ( $anchor_block_index > 0 ) {
-				if ( ! is_string( $block['innerContent'][ $chunk_index ] ) ) {
-					$anchor_block_index--;
-				}
-				$chunk_index++;
-			}
-			// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-			// when rendering blocks, we also need to insert a value (`null`, to mark a block
-			// location) into that array.
-			array_splice( $block['innerContent'], $chunk_index, 0, array( null ) );
-		}
-		return $block;
-	};
-}
-
-/**
- * Add block hooks information to a block type's controller.
- *
- * @param array  $inserted_block_type The type of block to insert.
- * @param string $position            The position relative to the anchor block.
- *                                    Can be 'before', 'after', 'first_child', or 'last_child'.
- * @param string $anchor_block_type   The hooked block will be inserted next to instances of this block type.
- * @return callable A filter for the `rest_prepare_block_type` hook that adds a `block_hooks` field to the network response.
- */
-function gutenberg_add_block_hooks_field_to_block_type_controller( $inserted_block_type, $position, $anchor_block_type ) {
-	return function( $response, $block_type ) use ( $inserted_block_type, $position, $anchor_block_type ) {
-		if ( $block_type->name !== $inserted_block_type ) {
-			return $response;
-		}
-
-		$data = $response->get_data();
-		if ( ! isset( $data['block_hooks'] ) ) {
-			$data['block_hooks'] = array();
-		}
-		$data['block_hooks'][ $anchor_block_type ] = $position;
-		$response->set_data( $data );
-		return $response;
-	};
-}
-
-/**
  * Register hooked blocks for automatic insertion, based on their block.json metadata.
  *
  * @param array $settings Array of determined settings for registering a block type.
@@ -217,6 +130,93 @@ function gutenberg_add_hooked_block( $hooked_block, $position, $anchor_block ) {
 		 */
 		$controller_extender = gutenberg_add_block_hooks_field_to_block_type_controller( $hooked_block, $position, $anchor_block );
 		add_filter( 'rest_prepare_block_type', $controller_extender, 10, 2 );
+}
+
+/**
+ * Return a function that auto-inserts a block next to a given "anchor" block.
+ *
+ * This is a helper function used in the implementation of block hooks.
+ * It is not meant for public use.
+ *
+ * The auto-inserted block can be inserted before or after the anchor block,
+ * or as the first or last child of the anchor block.
+ *
+ * Note that the returned function mutates the automatically inserted block's
+ * designated parent block by inserting into the parent's `innerBlocks` array,
+ * and by updating the parent's `innerContent` array accordingly.
+ *
+ * @param array  $inserted_block    The block to insert.
+ * @param string $relative_position The position relative to the given block.
+ *                                  Can be 'before', 'after', 'first_child', or 'last_child'.
+ * @param string $anchor_block_type The automatically inserted block will be inserted next to instances of this block type.
+ * @return callable A function that accepts a block's content and returns the content with the inserted block.
+ */
+function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $anchor_block_type ) {
+	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block_type ) {
+		if ( $anchor_block_type === $block['blockName'] ) {
+			if ( 'first_child' === $relative_position ) {
+				array_unshift( $block['innerBlocks'], $inserted_block );
+				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
+				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
+				// location) to that array.
+				array_unshift( $block['innerContent'], null );
+			} elseif ( 'last_child' === $relative_position ) {
+				array_push( $block['innerBlocks'], $inserted_block );
+				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
+				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
+				// location) to that array.
+				array_push( $block['innerContent'], null );
+			}
+			return $block;
+		}
+
+		$anchor_block_index = array_search( $anchor_block_type, array_column( $block['innerBlocks'], 'blockName' ), true );
+		if ( false !== $anchor_block_index && ( 'after' === $relative_position || 'before' === $relative_position ) ) {
+			if ( 'after' === $relative_position ) {
+				$anchor_block_index++;
+			}
+			array_splice( $block['innerBlocks'], $anchor_block_index, 0, array( $inserted_block ) );
+
+			// Find matching `innerContent` chunk index.
+			$chunk_index = 0;
+			while ( $anchor_block_index > 0 ) {
+				if ( ! is_string( $block['innerContent'][ $chunk_index ] ) ) {
+					$anchor_block_index--;
+				}
+				$chunk_index++;
+			}
+			// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
+			// when rendering blocks, we also need to insert a value (`null`, to mark a block
+			// location) into that array.
+			array_splice( $block['innerContent'], $chunk_index, 0, array( null ) );
+		}
+		return $block;
+	};
+}
+
+/**
+ * Add block hooks information to a block type's controller.
+ *
+ * @param array  $inserted_block_type The type of block to insert.
+ * @param string $position            The position relative to the anchor block.
+ *                                    Can be 'before', 'after', 'first_child', or 'last_child'.
+ * @param string $anchor_block_type   The hooked block will be inserted next to instances of this block type.
+ * @return callable A filter for the `rest_prepare_block_type` hook that adds a `block_hooks` field to the network response.
+ */
+function gutenberg_add_block_hooks_field_to_block_type_controller( $inserted_block_type, $position, $anchor_block_type ) {
+	return function( $response, $block_type ) use ( $inserted_block_type, $position, $anchor_block_type ) {
+		if ( $block_type->name !== $inserted_block_type ) {
+			return $response;
+		}
+
+		$data = $response->get_data();
+		if ( ! isset( $data['block_hooks'] ) ) {
+			$data['block_hooks'] = array();
+		}
+		$data['block_hooks'][ $anchor_block_type ] = $position;
+		$response->set_data( $data );
+		return $response;
+	};
 }
 
 /**
