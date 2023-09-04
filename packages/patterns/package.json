@@ -31,6 +31,7 @@
 		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
+		"@babel/runtime": "^7.16.0",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
