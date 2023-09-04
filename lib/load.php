@@ -111,7 +111,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 }
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-block-hooks' ) ) {
-	require __DIR__ . '/experimental/auto-inserting-blocks.php';
+	require __DIR__ . '/experimental/block-hooks.php';
 }
 require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
 require __DIR__ . '/experimental/interactivity-api/store.php';
