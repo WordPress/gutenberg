@@ -13,14 +13,14 @@ if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
 	 *
 	 * @return array Filtered block type metadata.
 	 */
-	function gutenberg_block_core_search_update_interactive_view_script( $metadata ) {
+	function block_core_search_update_interactive_view_script( $metadata ) {
 		if ( 'core/search' === $metadata['name'] ) {
 			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
 			$metadata['supports']['interactivity'] = true;
 		}
 		return $metadata;
 	}
-	add_filter( 'block_type_metadata', 'gutenberg_block_core_search_update_interactive_view_script', 10, 1 );
+	add_filter( 'block_type_metadata', 'block_core_search_update_interactive_view_script', 10, 1 );
 }
 
 /**
