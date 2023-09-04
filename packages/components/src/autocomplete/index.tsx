@@ -182,6 +182,8 @@ export function useAutocomplete( {
 				setAutocompleter( null );
 				setAutocompleterUI( null );
 				event.preventDefault();
+				// This prevents the block editor from handling the escape key to unselect the block.
+				event.stopPropagation();
 				break;
 
 			case 'Enter':

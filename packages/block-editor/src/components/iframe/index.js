@@ -31,6 +31,27 @@ import { useWritingFlow } from '../writing-flow';
 import { useCompatibilityStyles } from './use-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
 
+function bubbleEvent( event, Constructor, frame ) {
+	const init = {};
+
+	for ( const key in event ) {
+		init[ key ] = event[ key ];
+	}
+
+	if ( event instanceof frame.ownerDocument.defaultView.MouseEvent ) {
+		const rect = frame.getBoundingClientRect();
+		init.clientX += rect.left;
+		init.clientY += rect.top;
+	}
+
+	const newEvent = new Constructor( event.type, init );
+	const cancelled = ! frame.dispatchEvent( newEvent );
+
+	if ( cancelled ) {
+		event.preventDefault();
+	}
+}
+
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
  * document to ensure that the keyboard shortcuts and drag and drop work.
@@ -45,41 +66,21 @@ function useBubbleEvents( iframeDocument ) {
 	return useRefEffect( ( body ) => {
 		const { defaultView } = iframeDocument;
 		const { frameElement } = defaultView;
-
-		function bubbleEvent( event ) {
-			const prototype = Object.getPrototypeOf( event );
-			const constructorName = prototype.constructor.name;
-			const Constructor = window[ constructorName ];
-
-			const init = {};
-
-			for ( const key in event ) {
-				init[ key ] = event[ key ];
-			}
-
-			if ( event instanceof defaultView.MouseEvent ) {
-				const rect = frameElement.getBoundingClientRect();
-				init.clientX += rect.left;
-				init.clientY += rect.top;
-			}
-
-			const newEvent = new Constructor( event.type, init );
-			const cancelled = ! frameElement.dispatchEvent( newEvent );
-
-			if ( cancelled ) {
-				event.preventDefault();
-			}
-		}
-
-		const eventTypes = [ 'dragover', 'mousemove', 'keydown' ];
-
+		const eventTypes = [ 'dragover', 'mousemove' ];
+		const handlers = {};
 		for ( const name of eventTypes ) {
-			body.addEventListener( name, bubbleEvent );
+			handlers[ name ] = ( event ) => {
+				const prototype = Object.getPrototypeOf( event );
+				const constructorName = prototype.constructor.name;
+				const Constructor = window[ constructorName ];
+				bubbleEvent( event, Constructor, frameElement );
+			};
+			body.addEventListener( name, handlers[ name ] );
 		}
 
 		return () => {
 			for ( const name of eventTypes ) {
-				body.removeEventListener( name, bubbleEvent );
+				body.removeEventListener( name, handlers[ name ] );
 			}
 		};
 	} );
@@ -273,6 +274,13 @@ function Iframe( {
 								// This stopPropagation call ensures React doesn't create a syncthetic event to bubble this event
 								// which would result in two React events being bubbled throught the iframe.
 								event.stopPropagation();
+								const { defaultView } = iframeDocument;
+								const { frameElement } = defaultView;
+								bubbleEvent(
+									event,
+									window.KeyboardEvent,
+									frameElement
+								);
 							} }
 						>
 							{ contentResizeListener }
