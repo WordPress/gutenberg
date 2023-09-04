@@ -187,7 +187,7 @@ export interface FormTokenFieldProps
 	 *
 	 * @default false
 	 */
-	__experimentalAddOnBlur?: boolean;
+	tokenizeOnBlur?: boolean;
 }
 
 /**
