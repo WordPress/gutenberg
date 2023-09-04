@@ -41,8 +41,7 @@ function gutenberg_register_typography_support( $block_type ) {
 		|| $has_text_columns_support
 		|| $has_text_decoration_support
 		|| $has_text_transform_support
-		|| $has_writing_mode_support
-		|| $has_text_orientation_support;
+		|| $has_writing_mode_support;
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
@@ -168,10 +167,11 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	if ( $has_writing_mode_support && ! $should_skip_writing_mode && isset( $block_attributes['style']['typography']['writingMode'] ) ) {
 		$typography_block_styles['writingMode'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'writingMode' ), null );
-	}
 
-	if ( $has_text_orientation_support && ! $should_skip_text_orentation && isset( $block_attributes['style']['typography']['textOrientation'] ) ) {
-		$typography_block_styles['textOrientation'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'textOrientation' ), null );
+		// Text orientation requires writing mode to be set.
+		if ( $has_text_orientation_support && ! $should_skip_text_orentation && isset( $block_attributes['style']['typography']['textOrientation'] ) ) {
+			$typography_block_styles['textOrientation'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'textOrientation' ), null );
+		}
 	}
 
 	$attributes = array();

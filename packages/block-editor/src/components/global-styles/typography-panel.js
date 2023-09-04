@@ -369,7 +369,6 @@ export default function TypographyPanel( {
 		},
 		[ onChange, value ]
 	);
-	const hasTextOrientation = () => !! value?.typography?.textOrientation;
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -548,7 +547,7 @@ export default function TypographyPanel( {
 							: {}
 					}
 					label={ __( 'Text orientation' ) }
-					hasValue={ hasWritingMode && hasTextOrientation }
+					hasValue={ hasWritingMode }
 					onDeselect={ resetWritingMode }
 					isShownByDefault={ defaultControls.writingMode }
 					panelId={ panelId }
