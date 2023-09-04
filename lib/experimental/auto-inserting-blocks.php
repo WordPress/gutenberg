@@ -174,20 +174,22 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 add_filter( 'block_type_metadata_settings', 'gutenberg_add_hooked_blocks', 10, 2 );
 
 /**
- * Register block for auto-insertion into the frontend and REST API.
+ * Add a block to a given block hook.
  *
- * Register a block for auto-insertion into the frontend and into the markup
+ * A block hook is specified by a block type and a relative position. The hooked block
+ * will be automatically inserted in the given position next to the "anchor" block
+ * whenever the latter is encountered. This applies both to the frontend and to the markup
  * returned by the templates and patterns REST API endpoints.
  *
- * This is currently done by filtering parsed blocks as obtained from a block template
- * template part, or pattern and injecting the auto-inserted block where applicable.
+ * This is currently done by filtering parsed blocks as obtained from a block template,
+ * template part, or pattern, and injecting the hooked block where applicable.
  *
- * @todo In the long run, we'd likely want some sort of registry for auto-inserted blocks.
+ * @todo In the long run, we'd likely want some sort of registry for hooked blocks.
  *
  * @param string $inserted_block  The name of the block to insert.
- * @param string $position        The desired position of the auto-inserted block, relative to its anchor block.
+ * @param string $position        The desired position of the hooked block, relative to its anchor block.
  *                                Can be 'before', 'after', 'first_child', or 'last_child'.
- * @param string $anchor_block    The name of the block to insert the auto-inserted block next to.
+ * @param string $anchor_block    The name of the block to insert the hooked block next to.
  * @return void
  */
 function gutenberg_add_hooked_block( $inserted_block, $position, $anchor_block ) {
