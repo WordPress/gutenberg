@@ -262,7 +262,7 @@ export const withAutoInsertingBlocks = createHigherOrderComponent(
 	'withAutoInsertingBlocks'
 );
 
-if ( window?.__experimentalAutoInsertingBlocks ) {
+if ( window?.__experimentalBlockHooks ) {
 	addFilter(
 		'editor.BlockEdit',
 		'core/auto-inserting-blocks/with-inspector-control',

@@ -32,7 +32,7 @@ function gutenberg_enable_experiments() {
 	}
 
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-auto-inserting-blocks', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalAutoInsertingBlocks = true', 'before' );
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalBlockHooks = true', 'before' );
 	}
 }
 
