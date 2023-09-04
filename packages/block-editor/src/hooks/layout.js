@@ -554,7 +554,6 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 						) }
 
 						<HStack alignment="topLeft">
-							{ /* { type === 'flex' && ( */ }
 							<>
 								<FlexBlock>
 									<CustomSelectControl
