@@ -96,7 +96,7 @@ function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_blo
  * @param array $metadata Metadata provided for registering a block type.
  * @return array Updated settings array.
  */
-function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
+function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 	if ( ! isset( $metadata['__experimentalBlockHooks'] ) ) {
 		return $settings;
 	}
@@ -171,7 +171,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 
 	return $settings;
 }
-add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_blocks', 10, 2 );
+add_filter( 'block_type_metadata_settings', 'gutenberg_add_hooked_blocks', 10, 2 );
 
 /**
  * Register block for auto-insertion into the frontend and REST API.
