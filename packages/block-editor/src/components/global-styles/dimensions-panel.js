@@ -98,7 +98,7 @@ function useHasChildLayout( settings ) {
 	return !! settings?.layout;
 }
 
-function useHasSpacingPresets( settings ) {
+export function useHasSpacingPresets( settings ) {
 	const {
 		custom,
 		theme,
@@ -148,7 +148,7 @@ function splitStyleValue( value ) {
 	return value;
 }
 
-function splitGapValue( value ) {
+export function splitGapValue( value ) {
 	// Check for shorthand value (a string value).
 	if ( value && typeof value === 'string' ) {
 		// If the value is a string, treat it as a single side (top) for the spacing controls.
@@ -219,7 +219,6 @@ export default function DimensionsPanel( {
 	includeLayoutControls = false,
 } ) {
 	const { dimensions, spacing } = settings;
-
 	const decodeValue = ( rawValue ) => {
 		if ( rawValue && typeof rawValue === 'object' ) {
 			return Object.keys( rawValue ).reduce( ( acc, key ) => {
@@ -330,7 +329,7 @@ export default function DimensionsPanel( {
 	const onMouseOverMargin = () => onVisualize( 'margin' );
 
 	// Block Gap
-	const showGapControl = useHasGap( settings );
+	const showGapControl = false;
 	const gapValue = decodeValue( inheritedValue?.spacing?.blockGap );
 	const gapValues = splitGapValue( gapValue );
 	const gapSides = Array.isArray( settings?.spacing?.blockGap )
