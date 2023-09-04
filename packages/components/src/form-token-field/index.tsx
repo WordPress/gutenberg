@@ -168,8 +168,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			__experimentalValidateInput( incompleteTokenValue )
 		) {
 			setIsActive( false );
-			if ( tokenizeOnBlur ) {
-				addCurrentToken( true );
+			if ( tokenizeOnBlur && inputHasValidValue() ) {
+				addNewToken( incompleteTokenValue );
 			}
 		} else {
 			// Reset to initial state
@@ -410,7 +410,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function addCurrentToken( isOnBlur = false ) {
+	function addCurrentToken() {
 		let preventDefault = false;
 		const selectedSuggestion = getSelectedSuggestion();
 
@@ -418,7 +418,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			addNewToken( selectedSuggestion );
 			preventDefault = true;
 		} else if ( inputHasValidValue() ) {
-			addNewToken( incompleteTokenValue, isOnBlur );
+			addNewToken( incompleteTokenValue );
 			preventDefault = true;
 		}
 
@@ -442,7 +442,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function addNewToken( token: string, isOnBlur: boolean = false ) {
+	function addNewToken( token: string ) {
 		if ( ! __experimentalValidateInput( token ) ) {
 			speak( messages.__experimentalInvalid, 'assertive' );
 			return;
@@ -455,7 +455,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		setSelectedSuggestionScroll( false );
 		setIsExpanded( ! __experimentalExpandOnFocus );
 
-		if ( isActive && ! isOnBlur ) {
+		if ( isActive && ! tokenizeOnBlur ) {
 			focus();
 		}
 	}
