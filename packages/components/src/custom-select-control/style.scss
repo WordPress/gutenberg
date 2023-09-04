@@ -37,10 +37,9 @@
 
 .components-custom-select-control__item {
 	align-items: center;
-	display: grid;
-	grid-template-columns: auto auto;
+	display: flex;
 	list-style-type: none;
-	padding: $grid-unit-10 $grid-unit-20;
+	padding: $grid-unit-10 $grid-unit-05;
 	cursor: default;
 	line-height: $icon-size + $grid-unit-05;
 
@@ -65,5 +64,9 @@
 
 	&:last-child {
 		margin-bottom: 0;
+	}
+
+	svg:first-child {
+		margin-right: $grid-unit-05;
 	}
 }
