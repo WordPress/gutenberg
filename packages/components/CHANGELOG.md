@@ -6,6 +6,10 @@
 
 -   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889), [#53982](https://github.com/WordPress/gutenberg/pull/53982)).
 
+### Bug Fixes
+
+-   `Snackbar`: Re-position Snackbar above Modals ([#54153](https://github.com/WordPress/gutenberg/pull/54153)).
+
 ## 25.7.0 (2023-08-31)
 
 ### Enhancements
