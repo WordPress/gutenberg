@@ -41,21 +41,31 @@ describe( 'EditPostPreferencesModal', () => {
 			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => false );
 			render( <EditPostPreferencesModal /> );
-			const dialog = screen.getByRole( 'dialog', {
-				name: 'Preferences',
-			} );
 
+			// The tabpanel is not rendered in small viewports.
 			expect(
 				screen.queryByRole( 'tabpanel', {
 					name: 'General',
 				} )
 			).not.toBeInTheDocument();
 
+			const dialog = screen.getByRole( 'dialog', {
+				name: 'Preferences',
+			} );
+
+			// Checkbox toggle controls are not rendered in small viewports.
 			expect(
 				within( dialog ).queryByLabelText(
 					'Include pre-publish checklist'
 				)
 			).not.toBeInTheDocument();
+
+			// Individual preference nav buttons are rendered in small viewports.
+			expect(
+				within( dialog ).getByRole( 'button', {
+					name: 'General',
+				} )
+			).toBeInTheDocument();
 		} );
 	} );
 
