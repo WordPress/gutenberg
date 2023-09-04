@@ -21,7 +21,7 @@
  * @param string $anchor_block_type The auto-inserted block will be inserted next to instances of this block type.
  * @return callable A function that accepts a block's content and returns the content with the inserted block.
  */
-function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anchor_block_type ) {
+function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $anchor_block_type ) {
 	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block_type ) {
 		if ( $anchor_block_type === $block['blockName'] ) {
 			if ( 'first_child' === $relative_position ) {
@@ -199,7 +199,7 @@ function gutenberg_add_hooked_block( $inserted_block, $position, $anchor_block )
 			'innerBlocks'  => array(),
 		);
 
-		$inserter = gutenberg_auto_insert_block( $inserted_block_array, $position, $anchor_block );
+		$inserter = gutenberg_insert_hooked_block( $inserted_block_array, $position, $anchor_block );
 		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
 
 		/*
