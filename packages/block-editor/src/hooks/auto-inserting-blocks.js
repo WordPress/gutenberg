@@ -46,6 +46,13 @@ function AutoInsertingBlocksControl( props ) {
 			const _autoInsertedBlockClientIds =
 				autoInsertedBlocksForCurrentBlock.reduce(
 					( clientIds, block ) => {
+						// If the block doesn't exist anywhere in the block tree,
+						// we know that we have to display the toggle for it, and set
+						// it to disabled.
+						if ( getGlobalBlockCount( block.name ) === 0 ) {
+							return clientIds;
+						}
+
 						const relativePosition =
 							block?.autoInsert?.[ props.blockName ];
 						let candidates;
@@ -75,23 +82,23 @@ function AutoInsertingBlocksControl( props ) {
 							( { name } ) => name === block.name
 						);
 
+						// If the block exists in the designated location, we consider it auto-inserted
+						// and show the toggle as enabled.
 						if ( autoInsertedBlock ) {
-							clientIds = {
+							return {
 								...clientIds,
 								[ block.name ]: autoInsertedBlock.clientId,
 							};
-						} else if ( getGlobalBlockCount( block.name ) > 0 ) {
-							// If no auto-inserted block was found in any of its designated locations,
-							// but it exists elsewhere in the block tree, we consider it manually inserted.
-							// In this case, we take note and will remove the corresponding toggle from the
-							// block inspector panel.
-							clientIds = {
-								...clientIds,
-								[ block.name ]: false,
-							};
 						}
 
-						return clientIds;
+						// If no auto-inserted block was found in any of its designated locations,
+						// but it exists elsewhere in the block tree, we consider it manually inserted.
+						// In this case, we take note and will remove the corresponding toggle from the
+						// block inspector panel.
+						return {
+							...clientIds,
+							[ block.name ]: false,
+						};
 					},
 					{}
 				);
