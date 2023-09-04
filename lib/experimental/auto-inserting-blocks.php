@@ -186,22 +186,22 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_add_hooked_blocks', 10, 2
  *
  * @todo In the long run, we'd likely want some sort of registry for hooked blocks.
  *
- * @param string $inserted_block  The name of the block to insert.
- * @param string $position        The desired position of the hooked block, relative to its anchor block.
- *                                Can be 'before', 'after', 'first_child', or 'last_child'.
- * @param string $anchor_block    The name of the block to insert the hooked block next to.
+ * @param string $hooked_block  The name of the block to insert.
+ * @param string $position      The desired position of the hooked block, relative to its anchor block.
+ *                              Can be 'before', 'after', 'first_child', or 'last_child'.
+ * @param string $anchor_block  The name of the block to insert the hooked block next to.
  * @return void
  */
-function gutenberg_add_hooked_block( $inserted_block, $position, $anchor_block ) {
-		$inserted_block_array = array(
-			'blockName'    => $inserted_block,
+function gutenberg_add_hooked_block( $hooked_block, $position, $anchor_block ) {
+		$hooked_block_array = array(
+			'blockName'    => $hooked_block,
 			'attrs'        => array(),
 			'innerHTML'    => '',
 			'innerContent' => array(),
 			'innerBlocks'  => array(),
 		);
 
-		$inserter = gutenberg_insert_hooked_block( $inserted_block_array, $position, $anchor_block );
+		$inserter = gutenberg_insert_hooked_block( $hooked_block_array, $position, $anchor_block );
 		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
 
 		/*
@@ -212,7 +212,7 @@ function gutenberg_add_hooked_block( $inserted_block, $position, $anchor_block )
 		 * auto-insertion. We're doing so here (i.e. upon block registration), by adding a filter to
 		 * the controller's response.
 		 */
-		$controller_extender = gutenberg_add_block_hooks_field_to_block_type_controller( $inserted_block, $position, $anchor_block );
+		$controller_extender = gutenberg_add_block_hooks_field_to_block_type_controller( $hooked_block, $position, $anchor_block );
 		add_filter( 'rest_prepare_block_type', $controller_extender, 10, 2 );
 }
 
