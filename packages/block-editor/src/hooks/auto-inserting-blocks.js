@@ -36,12 +36,25 @@ function AutoInsertingBlocksControl( props ) {
 		[ blockTypes, props.blockName ]
 	);
 
-	const autoInsertedBlockClientIds = useSelect(
+	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
 		( select ) => {
-			const { getBlock, getGlobalBlockCount, getBlockRootClientId } =
+			const { getBlock, getBlockIndex, getBlockRootClientId } =
 				select( blockEditorStore );
 
-			const _rootClientId = getBlockRootClientId( props.clientId );
+			return {
+				blockIndex: getBlockIndex( props.clientId ),
+				innerBlocksLength: getBlock( props.clientId )?.innerBlocks
+					?.length,
+				rootClientId: getBlockRootClientId( props.clientId ),
+			};
+		},
+		[ props.clientId ]
+	);
+
+	const autoInsertedBlockClientIds = useSelect(
+		( select ) => {
+			const { getBlock, getGlobalBlockCount } =
+				select( blockEditorStore );
 
 			const _autoInsertedBlockClientIds =
 				autoInsertedBlocksForCurrentBlock.reduce(
@@ -64,7 +77,7 @@ function AutoInsertingBlocksControl( props ) {
 								// as an auto-inserted block (inserted `before` or `after` the current one),
 								// as the block might've been auto-inserted and then moved around a bit by the user.
 								candidates =
-									getBlock( _rootClientId )?.innerBlocks;
+									getBlock( rootClientId )?.innerBlocks;
 								break;
 
 							case 'first_child':
@@ -109,22 +122,12 @@ function AutoInsertingBlocksControl( props ) {
 
 			return EMPTY_OBJECT;
 		},
-		[ autoInsertedBlocksForCurrentBlock, props.blockName, props.clientId ]
-	);
-
-	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
-		( select ) => {
-			const { getBlock, getBlockIndex, getBlockRootClientId } =
-				select( blockEditorStore );
-
-			return {
-				blockIndex: getBlockIndex( props.clientId ),
-				innerBlocksLength: getBlock( props.clientId )?.innerBlocks
-					?.length,
-				rootClientId: getBlockRootClientId( props.clientId ),
-			};
-		},
-		[ props.clientId ]
+		[
+			autoInsertedBlocksForCurrentBlock,
+			props.blockName,
+			props.clientId,
+			rootClientId,
+		]
 	);
 
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
