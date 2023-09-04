@@ -10,17 +10,28 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.103.0
+-   [**] Replace third-party dependency react-native-hsv-color-picker with first-party code [#53329]
 -   [*] Search Control - Prevent calling TextInput's methods when undefined [#53745]
 -   [*] Improve horizontal rule styles to avoid invisible lines [#53883]
 -   [*] Fix horizontal rule style extensions [#53917]
+-   [*] Add block outline to all Social Link blocks when selected [#54011]
+-   [*] Columns block - Fix transforming into a Group block crash [#54035]
+
+## 1.102.1
+- [**] Fix Voice Over and assistive keyboards [#53895]
 
 ## 1.102.0
 -   [*] Display custom color value in mobile Cover Block color picker [#51414]
 -   [**] Display outline around selected Social Link block [#53377]
 -   [**] Fixes font customization not getting updated on iOS [#53391]
 
+## 1.101.2
+-  [**] Fix Voice Over and assistive keyboards [#53895]
+
 ## 1.101.1
--  [**] Fix the dynamic height when opening/closing navigation screens within the bottom sheet. [https://github.com/WordPress/gutenberg/pull/53608]
+-   [**] Fix the dynamic height when opening/closing navigation screens within the bottom sheet. [https://github.com/WordPress/gutenberg/pull/53608]
 
 ## 1.101.0
 -   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]

@@ -62,7 +62,7 @@ export function initializeEditor(
 		welcomeGuideTemplate: true,
 	} );
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch( blocksStore ).reapplyBlockTypeFilters();
 
 	// Check if the block list view should be open by default.
 	// If `distractionFree` mode is enabled, the block list view should not be open.

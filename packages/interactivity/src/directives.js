@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useContext, useMemo, useEffect } from 'preact/hooks';
+import { useContext, useMemo, useEffect, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
@@ -10,22 +10,21 @@ import { deepSignal, peek } from 'deepsignal';
 import { createPortal } from './portals';
 import { useSignalEffect } from './utils';
 import { directive } from './hooks';
+import { SlotProvider, Slot, Fill } from './slots';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
 
-const mergeDeepSignals = ( target, source ) => {
+const mergeDeepSignals = ( target, source, overwrite ) => {
 	for ( const k in source ) {
-		if ( typeof peek( target, k ) === 'undefined' ) {
-			target[ `$${ k }` ] = source[ `$${ k }` ];
-		} else if (
-			isObject( peek( target, k ) ) &&
-			isObject( peek( source, k ) )
-		) {
+		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
 			mergeDeepSignals(
 				target[ `$${ k }` ].peek(),
-				source[ `$${ k }` ].peek()
+				source[ `$${ k }` ].peek(),
+				overwrite
 			);
+		} else if ( overwrite || typeof peek( target, k ) === 'undefined' ) {
+			target[ `$${ k }` ] = source[ `$${ k }` ];
 		}
 	}
 };
@@ -36,20 +35,24 @@ export default () => {
 		'context',
 		( {
 			directives: {
-				context: { default: context },
+				context: { default: newContext },
 			},
 			props: { children },
-			context: inherited,
+			context: inheritedContext,
 		} ) => {
-			const { Provider } = inherited;
-			const inheritedValue = useContext( inherited );
-			const value = useMemo( () => {
-				const localValue = deepSignal( context );
-				mergeDeepSignals( localValue, inheritedValue );
-				return localValue;
-			}, [ context, inheritedValue ] );
+			const { Provider } = inheritedContext;
+			const inheritedValue = useContext( inheritedContext );
+			const currentValue = useRef( deepSignal( {} ) );
+			currentValue.current = useMemo( () => {
+				const newValue = deepSignal( newContext );
+				mergeDeepSignals( newValue, inheritedValue );
+				mergeDeepSignals( currentValue.current, newValue, true );
+				return currentValue.current;
+			}, [ newContext, inheritedValue ] );
 
-			return <Provider value={ value }>{ children }</Provider>;
+			return (
+				<Provider value={ currentValue.current }>{ children }</Provider>
+			);
 		},
 		{ priority: 5 }
 	);
@@ -220,19 +223,46 @@ export default () => {
 					// on the hydration, so we have to do it manually. It doesn't need
 					// deps because it only needs to do it the first time.
 					useEffect( () => {
+						const el = element.ref.current;
+
+						// We set the value directly to the corresponding
+						// HTMLElement instance property excluding the following
+						// special cases.
+						// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
+						if (
+							attribute !== 'width' &&
+							attribute !== 'height' &&
+							attribute !== 'href' &&
+							attribute !== 'list' &&
+							attribute !== 'form' &&
+							// Default value in browsers is `-1` and an empty string is
+							// cast to `0` instead
+							attribute !== 'tabIndex' &&
+							attribute !== 'download' &&
+							attribute !== 'rowSpan' &&
+							attribute !== 'colSpan' &&
+							attribute in el
+						) {
+							try {
+								el[ attribute ] =
+									result === null || result === undefined
+										? ''
+										: result;
+								return;
+							} catch ( err ) {}
+						}
 						// aria- and data- attributes have no boolean representation.
 						// A `false` value is different from the attribute not being
 						// present, so we can't remove it.
 						// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
-						if ( result === false && attribute[ 4 ] !== '-' ) {
-							element.ref.current.removeAttribute( attribute );
+						if (
+							result !== null &&
+							result !== undefined &&
+							( result !== false || attribute[ 4 ] === '-' )
+						) {
+							el.setAttribute( attribute, result );
 						} else {
-							element.ref.current.setAttribute(
-								attribute,
-								result === true && attribute[ 4 ] !== '-'
-									? ''
-									: result
-							);
+							el.removeAttribute( attribute );
 						}
 					}, [] );
 				} );
@@ -275,5 +305,73 @@ export default () => {
 				context: contextValue,
 			} );
 		}
+	);
+
+	// data-wp-slot
+	directive(
+		'slot',
+		( {
+			directives: {
+				slot: { default: slot },
+			},
+			props: { children },
+			element,
+		} ) => {
+			const name = typeof slot === 'string' ? slot : slot.name;
+			const position = slot.position || 'children';
+
+			if ( position === 'before' ) {
+				return (
+					<>
+						<Slot name={ name } />
+						{ children }
+					</>
+				);
+			}
+			if ( position === 'after' ) {
+				return (
+					<>
+						{ children }
+						<Slot name={ name } />
+					</>
+				);
+			}
+			if ( position === 'replace' ) {
+				return <Slot name={ name }>{ children }</Slot>;
+			}
+			if ( position === 'children' ) {
+				element.props.children = (
+					<Slot name={ name }>{ element.props.children }</Slot>
+				);
+			}
+		},
+		{ priority: 4 }
+	);
+
+	// data-wp-fill
+	directive(
+		'fill',
+		( {
+			directives: {
+				fill: { default: fill },
+			},
+			props: { children },
+			evaluate,
+			context,
+		} ) => {
+			const contextValue = useContext( context );
+			const slot = evaluate( fill, { context: contextValue } );
+			return <Fill slot={ slot }>{ children }</Fill>;
+		},
+		{ priority: 4 }
+	);
+
+	// data-wp-slot-provider
+	directive(
+		'slot-provider',
+		( { props: { children } } ) => (
+			<SlotProvider>{ children }</SlotProvider>
+		),
+		{ priority: 4 }
 	);
 };

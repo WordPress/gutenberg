@@ -2941,3 +2941,68 @@ export const getBlockEditingMode = createRegistrySelector(
 			return parentMode === 'contentOnly' ? 'default' : parentMode;
 		}
 );
+
+/**
+ * Indicates if a block is ungroupable.
+ * A block is ungroupable if it is a single grouping block with inner blocks.
+ * If a block has an `ungroup` transform, it is also ungroupable, without the
+ * requirement of being the default grouping block.
+ * Additionally a block can only be ungrouped if it has inner blocks and can
+ * be removed.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block. If not passed the selected block's client id will be used.
+ * @return {boolean} True if the block is ungroupable.
+ */
+export const isUngroupable = createRegistrySelector(
+	( select ) =>
+		( state, clientId = '' ) => {
+			const _clientId = clientId || getSelectedBlockClientId( state );
+			if ( ! _clientId ) {
+				return false;
+			}
+			const { getGroupingBlockName } = select( blocksStore );
+			const block = getBlock( state, _clientId );
+			const groupingBlockName = getGroupingBlockName();
+			const _isUngroupable =
+				block &&
+				( block.name === groupingBlockName ||
+					getBlockType( block.name )?.transforms?.ungroup ) &&
+				!! block.innerBlocks.length;
+
+			return _isUngroupable && canRemoveBlock( state, _clientId );
+		}
+);
+
+/**
+ * Indicates if the provided blocks(by client ids) are groupable.
+ * We need to have at least one block, have a grouping block name set and
+ * be able to remove these blocks.
+ *
+ * @param {Object}   state     Global application state.
+ * @param {string[]} clientIds Block client ids. If not passed the selected blocks client ids will be used.
+ * @return {boolean} True if the blocks are groupable.
+ */
+export const isGroupable = createRegistrySelector(
+	( select ) =>
+		( state, clientIds = EMPTY_ARRAY ) => {
+			const { getGroupingBlockName } = select( blocksStore );
+			const groupingBlockName = getGroupingBlockName();
+			const _clientIds = clientIds?.length
+				? clientIds
+				: getSelectedBlockClientIds( state );
+			const rootClientId = _clientIds?.length
+				? getBlockRootClientId( state, _clientIds[ 0 ] )
+				: undefined;
+			const groupingBlockAvailable = canInsertBlockType(
+				state,
+				groupingBlockName,
+				rootClientId
+			);
+			const _isGroupable = groupingBlockAvailable && _clientIds.length;
+			return (
+				_isGroupable &&
+				canRemoveBlocks( state, _clientIds, rootClientId )
+			);
+		}
+);
