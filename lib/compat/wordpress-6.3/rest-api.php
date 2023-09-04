@@ -85,7 +85,7 @@ if ( ! function_exists( 'add_modified_wp_template_schema' ) ) {
 }
 add_filter( 'rest_api_init', 'add_modified_wp_template_schema' );
 
-// If the Blocks Hooks experiment is enabled, we load the block patterns
+// If the Block Hooks experiment is enabled, we load the block patterns
 // controller in lib/experimental/rest-api.php instead.
 if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-hooks' ) ) {
 	/**
