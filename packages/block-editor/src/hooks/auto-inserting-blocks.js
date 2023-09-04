@@ -183,7 +183,7 @@ function AutoInsertingBlocksControl( props ) {
 	return (
 		<InspectorControls>
 			<PanelBody
-				className="block-editor-hooks__auto-inserting-blocks"
+				className="block-editor-hooks__block-hooks"
 				title={ __( 'Plugins' ) }
 				initialOpen={ true }
 			>
