@@ -10,6 +10,10 @@
 
 -   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch. ([#52255](https://github.com/WordPress/gutenberg/pull/52255))
 
+### Bug Fix
+
+-   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
+
 ## 25.7.0 (2023-08-31)
 
 ### Enhancements

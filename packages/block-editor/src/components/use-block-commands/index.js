@@ -112,12 +112,18 @@ export const useTransformCommands = () => {
 };
 
 const useActionsCommands = () => {
-	const { clientIds } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds } = select( blockEditorStore );
+	const { clientIds, isUngroupable, isGroupable } = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientIds,
+			isUngroupable: _isUngroupable,
+			isGroupable: _isGroupable,
+		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 
 		return {
 			clientIds: selectedBlockClientIds,
+			isUngroupable: _isUngroupable(),
+			isGroupable: _isGroupable(),
 		};
 	}, [] );
 	const {
@@ -194,20 +200,7 @@ const useActionsCommands = () => {
 		canMoveBlocks( clientIds, rootClientId ) &&
 		getBlockCount( rootClientId ) !== 1;
 
-	const commands = [
-		{
-			name: 'ungroup',
-			label: __( 'Ungroup' ),
-			callback: onUngroup,
-			icon: ungroup,
-		},
-		{
-			name: 'Group',
-			label: __( 'Group' ),
-			callback: onGroup,
-			icon: group,
-		},
-	];
+	const commands = [];
 	if ( canInsertDefaultBlock ) {
 		commands.push(
 			{
@@ -262,7 +255,22 @@ const useActionsCommands = () => {
 			icon: move,
 		} );
 	}
-
+	if ( isUngroupable ) {
+		commands.push( {
+			name: 'ungroup',
+			label: __( 'Ungroup' ),
+			callback: onUngroup,
+			icon: ungroup,
+		} );
+	}
+	if ( isGroupable ) {
+		commands.push( {
+			name: 'Group',
+			label: __( 'Group' ),
+			callback: onGroup,
+			icon: group,
+		} );
+	}
 	return {
 		isLoading: false,
 		commands: commands.map( ( command ) => ( {

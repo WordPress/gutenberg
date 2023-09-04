@@ -35,13 +35,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
-	// WordPress 6.2 compat.
-	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-block-patterns-controller-6-2.php';
-	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-block-pattern-categories-controller.php';
-	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-pattern-directory-controller-6-2.php';
-	require_once __DIR__ . '/compat/wordpress-6.2/rest-api.php';
-	require_once __DIR__ . '/compat/wordpress-6.2/block-patterns.php';
-
 	// WordPress 6.3 compat.
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-block-patterns-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-templates-controller-6-3.php';
@@ -80,25 +73,6 @@ require __DIR__ . '/experimental/editor-settings.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
-
-// WordPress 6.2 compat.
-require __DIR__ . '/compat/wordpress-6.2/blocks.php';
-require __DIR__ . '/compat/wordpress-6.2/script-loader.php';
-require __DIR__ . '/compat/wordpress-6.2/block-template-utils.php';
-require __DIR__ . '/compat/wordpress-6.2/get-global-styles-and-settings.php';
-require __DIR__ . '/compat/wordpress-6.2/default-filters.php';
-require __DIR__ . '/compat/wordpress-6.2/site-editor.php';
-require __DIR__ . '/compat/wordpress-6.2/block-editor.php';
-require __DIR__ . '/compat/wordpress-6.2/theme.php';
-require __DIR__ . '/compat/wordpress-6.2/widgets.php';
-require __DIR__ . '/compat/wordpress-6.2/menu.php';
-
-if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
-	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-attribute-token.php';
-	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-span.php';
-	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-text-replacement.php';
-	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-tag-processor.php';
-}
 
 if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-active-formatting-elements.php';

@@ -3,8 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
-import { Fragment } from '@wordpress/element';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import { Fragment, useMemo } from '@wordpress/element';
+import {
+	__experimentalHStack as HStack,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -12,57 +16,56 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { InspectorControls } from '../components';
+import { BlockIcon, InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
+const EMPTY_OBJECT = {};
+
 function AutoInsertingBlocksControl( props ) {
-	const { autoInsertedBlocksForCurrentBlock, groupedAutoInsertedBlocks } =
-		useSelect(
-			( select ) => {
-				const { getBlockTypes } = select( blocksStore );
-				const _autoInsertedBlocksForCurrentBlock =
-					getBlockTypes()?.filter(
-						( { autoInsert } ) =>
-							autoInsert && props.blockName in autoInsert
-					);
+	const blockTypes = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
+	);
 
-				// Group by block namespace (i.e. prefix before the slash).
-				const _groupedAutoInsertedBlocks =
-					_autoInsertedBlocksForCurrentBlock?.reduce(
-						( groups, block ) => {
-							const [ namespace ] = block.name.split( '/' );
-							if ( ! groups[ namespace ] ) {
-								groups[ namespace ] = [];
-							}
-							groups[ namespace ].push( block );
-							return groups;
-						},
-						{}
-					);
+	const autoInsertedBlocksForCurrentBlock = useMemo(
+		() =>
+			blockTypes?.filter(
+				( { autoInsert } ) =>
+					autoInsert && props.blockName in autoInsert
+			),
+		[ blockTypes, props.blockName ]
+	);
 
-				return {
-					autoInsertedBlocksForCurrentBlock:
-						_autoInsertedBlocksForCurrentBlock,
-					groupedAutoInsertedBlocks: _groupedAutoInsertedBlocks,
-				};
-			},
-			[ props.blockName ]
-		);
-
-	const {
-		autoInsertedBlockClientIds,
-		blockIndex,
-		rootClientId,
-		innerBlocksLength,
-	} = useSelect(
+	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
 		( select ) => {
 			const { getBlock, getBlockIndex, getBlockRootClientId } =
 				select( blockEditorStore );
-			const _rootClientId = getBlockRootClientId( props.clientId );
+
+			return {
+				blockIndex: getBlockIndex( props.clientId ),
+				innerBlocksLength: getBlock( props.clientId )?.innerBlocks
+					?.length,
+				rootClientId: getBlockRootClientId( props.clientId ),
+			};
+		},
+		[ props.clientId ]
+	);
+
+	const autoInsertedBlockClientIds = useSelect(
+		( select ) => {
+			const { getBlock, getGlobalBlockCount } =
+				select( blockEditorStore );
 
 			const _autoInsertedBlockClientIds =
 				autoInsertedBlocksForCurrentBlock.reduce(
 					( clientIds, block ) => {
+						// If the block doesn't exist anywhere in the block tree,
+						// we know that we have to display the toggle for it, and set
+						// it to disabled.
+						if ( getGlobalBlockCount( block.name ) === 0 ) {
+							return clientIds;
+						}
+
 						const relativePosition =
 							block?.autoInsert?.[ props.blockName ];
 						let candidates;
@@ -74,7 +77,7 @@ function AutoInsertingBlocksControl( props ) {
 								// as an auto-inserted block (inserted `before` or `after` the current one),
 								// as the block might've been auto-inserted and then moved around a bit by the user.
 								candidates =
-									getBlock( _rootClientId )?.innerBlocks;
+									getBlock( rootClientId )?.innerBlocks;
 								break;
 
 							case 'first_child':
@@ -92,37 +95,65 @@ function AutoInsertingBlocksControl( props ) {
 							( { name } ) => name === block.name
 						);
 
+						// If the block exists in the designated location, we consider it auto-inserted
+						// and show the toggle as enabled.
 						if ( autoInsertedBlock ) {
-							clientIds[ block.name ] =
-								autoInsertedBlock.clientId;
+							return {
+								...clientIds,
+								[ block.name ]: autoInsertedBlock.clientId,
+							};
 						}
 
-						// TOOD: If no auto-inserted block was found in any of its designated locations,
-						// we want to check if it's present elsewhere in the block tree.
-						// If it is, we'd consider it manually inserted and would want to remove the
-						// corresponding toggle from the block inspector panel.
-
-						return clientIds;
+						// If no auto-inserted block was found in any of its designated locations,
+						// but it exists elsewhere in the block tree, we consider it manually inserted.
+						// In this case, we take note and will remove the corresponding toggle from the
+						// block inspector panel.
+						return {
+							...clientIds,
+							[ block.name ]: false,
+						};
 					},
 					{}
 				);
 
-			return {
-				blockIndex: getBlockIndex( props.clientId ),
-				innerBlocksLength: getBlock( props.clientId )?.innerBlocks
-					?.length,
-				rootClientId: _rootClientId,
-				autoInsertedBlockClientIds: _autoInsertedBlockClientIds,
-			};
+			if ( Object.values( _autoInsertedBlockClientIds ).length > 0 ) {
+				return _autoInsertedBlockClientIds;
+			}
+
+			return EMPTY_OBJECT;
 		},
-		[ autoInsertedBlocksForCurrentBlock, props.blockName, props.clientId ]
+		[
+			autoInsertedBlocksForCurrentBlock,
+			props.blockName,
+			props.clientId,
+			rootClientId,
+		]
 	);
 
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
 
-	if ( ! autoInsertedBlocksForCurrentBlock.length ) {
+	// Remove toggle if block isn't present in the designated location but elsewhere in the block tree.
+	const autoInsertedBlocksForCurrentBlockIfNotPresentElsewhere =
+		autoInsertedBlocksForCurrentBlock?.filter(
+			( block ) => autoInsertedBlockClientIds?.[ block.name ] !== false
+		);
+
+	if ( ! autoInsertedBlocksForCurrentBlockIfNotPresentElsewhere.length ) {
 		return null;
 	}
+
+	// Group by block namespace (i.e. prefix before the slash).
+	const groupedAutoInsertedBlocks = autoInsertedBlocksForCurrentBlock.reduce(
+		( groups, block ) => {
+			const [ namespace ] = block.name.split( '/' );
+			if ( ! groups[ namespace ] ) {
+				groups[ namespace ] = [];
+			}
+			groups[ namespace ].push( block );
+			return groups;
+		},
+		{}
+	);
 
 	const insertBlockIntoDesignatedLocation = ( block, relativePosition ) => {
 		switch ( relativePosition ) {
@@ -151,7 +182,11 @@ function AutoInsertingBlocksControl( props ) {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Plugins' ) } initialOpen={ true }>
+			<PanelBody
+				className="block-editor-hooks__auto-inserting-blocks"
+				title={ __( 'Plugins' ) }
+				initialOpen={ true }
+			>
 				{ Object.keys( groupedAutoInsertedBlocks ).map( ( vendor ) => {
 					return (
 						<Fragment key={ vendor }>
@@ -169,7 +204,14 @@ function AutoInsertingBlocksControl( props ) {
 										<ToggleControl
 											checked={ checked }
 											key={ block.title }
-											label={ block.title }
+											label={
+												<HStack justify="flex-start">
+													<BlockIcon
+														icon={ block.icon }
+													/>
+													<span>{ block.title }</span>
+												</HStack>
+											}
 											onChange={ () => {
 												if ( ! checked ) {
 													// Create and insert block.
