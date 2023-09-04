@@ -7,6 +7,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { useRegistry } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useEffect } from '@wordpress/element';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
@@ -122,35 +123,57 @@ function getLatestHeadings( select, clientId ) {
 	return latestHeadings;
 }
 
-function observeCallback( select, dispatch, clientId ) {
-	const { getBlockAttributes } = select( blockEditorStore );
-	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
-		dispatch( blockEditorStore );
+function observeCallback( select, dispatch, context ) {
+	const { clientId, postType, postId } = context;
+	const { getBlock } = select( blockEditorStore );
 
 	/**
 	 * If the block no longer exists in the store, skip the update.
 	 * The "undo" action recreates the block and provides a new `clientId`.
 	 * The hook still might be observing the changes while the old block unmounts.
 	 */
-	const attributes = getBlockAttributes( clientId );
-	if ( attributes === null ) {
+	if ( getBlock( clientId ) === null ) {
 		return;
 	}
 
+	const { getEditedEntityRecord } = select( coreStore );
+	const { editEntityRecord } = dispatch( coreStore );
+
+	const meta = getEditedEntityRecord( 'postType', postType, postId ).meta;
+	const storedHeadings = meta?.table_of_contents
+		? JSON.parse( meta.table_of_contents )
+		: [];
+
 	const headings = getLatestHeadings( select, clientId );
-	if ( ! fastDeepEqual( headings, attributes.headings ) ) {
-		__unstableMarkNextChangeAsNotPersistent();
-		updateBlockAttributes( clientId, { headings } );
+	if ( ! fastDeepEqual( headings, storedHeadings ) ) {
+		editEntityRecord(
+			'postType',
+			postType,
+			postId,
+			{
+				meta: {
+					...meta,
+					table_of_contents: JSON.stringify( headings ),
+				},
+			},
+			{
+				undoIgnore: true,
+			}
+		);
 	}
 }
 
-export function useObserveHeadings( clientId ) {
+export function useObserveHeadings( { clientId, postType, postId } ) {
 	const registry = useRegistry();
 	useEffect( () => {
 		// Todo: Limit subscription to block editor store when data no longer depends on `getPermalink`.
 		// See: https://github.com/WordPress/gutenberg/pull/45513
 		return registry.subscribe( () =>
-			observeCallback( registry.select, registry.dispatch, clientId )
+			observeCallback( registry.select, registry.dispatch, {
+				clientId,
+				postType,
+				postId,
+			} )
 		);
-	}, [ registry, clientId ] );
+	}, [ registry, clientId, postType, postId ] );
 }

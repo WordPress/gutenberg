@@ -17,6 +17,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useEntityProp } from '@wordpress/core-data';
 import { renderToString } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -35,19 +36,22 @@ import { useObserveHeadings } from './hooks';
  *
  * @param {Object}                       props                                   The props.
  * @param {Object}                       props.attributes                        The block attributes.
- * @param {HeadingData[]}                props.attributes.headings               A list of data for each heading in the post.
  * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
  * @param {string}                       props.clientId
  * @param {(attributes: Object) => void} props.setAttributes
+ * @param {Object}                       props.context
+ * @param {string}                       props.context.postType
+ * @param {number}                       props.context.postId
  *
  * @return {WPComponent} The component.
  */
 export default function TableOfContentsEdit( {
-	attributes: { headings = [], onlyIncludeCurrentPage },
+	attributes: { onlyIncludeCurrentPage },
+	context: { postType, postId },
 	clientId,
 	setAttributes,
 } ) {
-	useObserveHeadings( clientId );
+	useObserveHeadings( { clientId, postType, postId } );
 
 	const blockProps = useBlockProps();
 
@@ -63,6 +67,11 @@ export default function TableOfContentsEdit( {
 	);
 
 	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	const [ meta ] = useEntityProp( 'postType', postType, 'meta', postId );
+	const headings = meta?.table_of_contents
+		? JSON.parse( meta.table_of_contents )
+		: [];
 
 	const headingTree = linearToNestedHeadingList( headings );
 
