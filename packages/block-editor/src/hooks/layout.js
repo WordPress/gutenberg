@@ -588,26 +588,33 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 
 						<HStack alignment="topLeft">
 							<>
-								<FlexBlock>
-									<CustomSelectControl
-										label={ __( 'Vertical' ) }
-										value={ verticalControlValue }
-										options={ verticalAlignmentOptions }
-										onChange={ onChangeVertical }
-										__nextUnconstrainedWidth
-										__next36pxDefaultSize
-									/>
-								</FlexBlock>
-								<FlexBlock>
-									<CustomSelectControl
-										label={ __( 'Horizontal' ) }
-										value={ horizontalControlValue }
-										options={ horizontalAlignmentOptions }
-										onChange={ onChangeHorizontal }
-										__nextUnconstrainedWidth
-										__next36pxDefaultSize
-									/>
-								</FlexBlock>
+								{ type === 'flex' && (
+									<FlexBlock>
+										<CustomSelectControl
+											label={ __( 'Vertical' ) }
+											value={ verticalControlValue }
+											options={ verticalAlignmentOptions }
+											onChange={ onChangeVertical }
+											__nextUnconstrainedWidth
+											__next36pxDefaultSize
+										/>
+									</FlexBlock>
+								) }
+								{ ( type === 'flex' ||
+									type === 'constrained' ) && (
+									<FlexBlock>
+										<CustomSelectControl
+											label={ __( 'Horizontal' ) }
+											value={ horizontalControlValue }
+											options={
+												horizontalAlignmentOptions
+											}
+											onChange={ onChangeHorizontal }
+											__nextUnconstrainedWidth
+											__next36pxDefaultSize
+										/>
+									</FlexBlock>
+								) }
 							</>
 						</HStack>
 						<HStack alignment="topLeft">
