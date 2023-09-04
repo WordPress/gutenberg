@@ -20,6 +20,8 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+const { ReusableBlocksRenameHint } = unlock( blockEditorPrivateApis );
+
 export default function PostSyncStatus() {
 	const { syncStatus, postType } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
@@ -86,7 +88,7 @@ export function PostSyncStatusModal() {
 	if ( postType !== 'wp_block' || ! isNewPost ) {
 		return null;
 	}
-	const { ReusableBlocksRenameHint } = unlock( blockEditorPrivateApis );
+
 	return (
 		<>
 			{ isModalOpen && (
