@@ -273,6 +273,12 @@
 					"radius": true
 				}
 			},
+			"core/image": {
+				"lightbox": {
+					"enabled": false,
+					"showUI": true
+				}
+			},
 			"core/pullquote": {
 				"border": {
 					"color": true,
