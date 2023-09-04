@@ -135,7 +135,7 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 
 		gutenberg_add_hooked_block( $inserted_block_name, $mapped_position, $anchor_block_name );
 
-		$settings['auto_insert'][ $anchor_block_name ] = $mapped_position;
+		$settings['block_hooks'][ $anchor_block_name ] = $mapped_position;
 	}
 
 	// Copied from `get_block_editor_server_block_settings()`.
@@ -158,8 +158,8 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 		'example'          => 'example',
 		'variations'       => 'variations',
 	);
-	// Add `auto_insert` to the list of fields to pick.
-	$fields_to_pick['auto_insert'] = 'autoInsert';
+	// Add `block_hooks` to the list of fields to pick.
+	$fields_to_pick['block_hooks'] = 'blockHooks';
 
 	$exposed_settings = array_intersect_key( $settings, $fields_to_pick );
 
