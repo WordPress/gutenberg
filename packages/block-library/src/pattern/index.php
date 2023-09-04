@@ -41,7 +41,7 @@ function render_block_core_pattern( $attributes ) {
 	}
 
 	$pattern = $registry->get_registered( $slug );
-	$content = $pattern['content'];
+	$content = _inject_theme_attribute_in_block_template_content( $pattern['content'] );
 
 	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
 	if ( $gutenberg_experiments && ! empty( $gutenberg_experiments['gutenberg-auto-inserting-blocks'] ) ) {

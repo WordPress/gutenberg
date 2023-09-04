@@ -110,6 +110,12 @@
 		z-index: z-index(".block-editor-block-popover");
 		display: block;
 		width: 100%;
+		overflow: hidden;
+
+		.block-editor-block-toolbar {
+			overflow: auto;
+			overflow-y: hidden;
+		}
 
 		border: none;
 		border-bottom: $border-width solid $gray-200;
@@ -133,14 +139,14 @@
 
 	// on desktop and tablet viewports the toolbar is fixed
 	// on top of interface header
+	$toolbar-margin: $grid-unit-80 * 3 - 2 * $grid-unit + $grid-unit-05;
 	@include break-medium() {
 		&.is-fixed {
-
 			// leave room for block inserter, undo and redo, list view
-			margin-left: $grid-unit-80 * 3 - 2 * $grid-unit + $grid-unit-05;
+			margin-left: $toolbar-margin;
 			// position on top of interface header
 			position: fixed;
-			top: $admin-bar-height + $grid-unit - $border-width;
+			top: $admin-bar-height;
 			// Don't fill up when empty
 			min-height: initial;
 			// remove the border
@@ -148,7 +154,15 @@
 			// has to be flex for collapse button to fit
 			display: flex;
 
+			// Mimic the height of the parent, vertically align center, and provide a max-height.
+			height: $header-height;
+			align-items: center;
+
 			&.is-collapsed {
+				width: initial;
+			}
+
+			&:empty {
 				width: initial;
 			}
 
@@ -156,8 +170,14 @@
 				// leave room for block inserter, undo and redo, list view
 				// and some margin left
 				margin-left: $grid-unit-80 * 4 - 2 * $grid-unit;
-				top: $grid-unit - $border-width;
+
+				top: 0;
+
 				&.is-collapsed {
+					width: initial;
+				}
+
+				&:empty {
 					width: initial;
 				}
 			}
@@ -245,7 +265,7 @@
 
 			.show-icon-labels & {
 
-				margin-left: $grid-unit-80 + 2 * $grid-unit; // inserter and margin ;
+				margin-left: $grid-unit-80 + 2 * $grid-unit; // inserter and margin
 
 				.is-fullscreen-mode & {
 					margin-left: $grid-unit * 18; // site hub, inserter and margin
@@ -318,7 +338,12 @@
 	// except for the inserter on the left
 	@include break-medium() {
 		&.is-fixed {
-			width: 100%;
+			width: calc(100% - #{$toolbar-margin});
+
+			.show-icon-labels & {
+				width: calc(100% + 40px - #{$toolbar-margin}); //there are no undo, redo and list view buttons
+			}
+
 		}
 	}
 
@@ -328,6 +353,9 @@
 	@include break-large() {
 		&.is-fixed {
 			width: auto;
+			.show-icon-labels & {
+				width: auto; //there are no undo, redo and list view buttons
+			}
 		}
 		.is-fullscreen-mode &.is-fixed {
 			// in full screen mode we need to account for

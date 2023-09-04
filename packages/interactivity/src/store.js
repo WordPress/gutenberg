@@ -35,8 +35,24 @@ const getSerializedState = () => {
 	return {};
 };
 
+export const afterLoads = new Set();
+
 const rawState = getSerializedState();
 export const rawStore = { state: deepSignal( rawState ) };
+
+/**
+ * @typedef StoreProps Properties object passed to `store`.
+ * @property {Object} state State to be added to the global store. All the
+ *                          properties included here become reactive.
+ */
+
+/**
+ * @typedef StoreOptions Options object.
+ * @property {(store:any) => void} [afterLoad] Callback to be executed after the
+ *                                             Interactivity API has been set up
+ *                                             and the store is ready. It
+ *                                             receives the store as argument.
+ */
 
 /**
  * Extends the Interactivity API global store with the passed properties.
@@ -76,11 +92,11 @@ export const rawStore = { state: deepSignal( rawState ) };
  * </div>
  * ```
  *
- * @param {Object} properties         Properties to be added to the global store.
- * @param {Object} [properties.state] State to be added to the global store. All
- *                                    the properties included here become reactive.
+ * @param {StoreProps}   properties Properties to be added to the global store.
+ * @param {StoreOptions} [options]  Options passed to the `store` call.
  */
-export const store = ( { state, ...block } ) => {
+export const store = ( { state, ...block }, { afterLoad } = {} ) => {
 	deepMerge( rawStore, block );
 	deepMerge( rawState, state );
+	if ( afterLoad ) afterLoads.add( afterLoad );
 };

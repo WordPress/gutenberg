@@ -12,8 +12,6 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const {
-	readFile,
-	deleteFile,
 	getTypingEventDurations,
 	getClickEventDurations,
 	getHoverEventDurations,
@@ -21,10 +19,11 @@ const {
 	getLoadingDurations,
 	loadBlocksFromHtml,
 	load1000Paragraphs,
-	saveResultsFile,
 	sum,
-	getTraceFilePath,
 } = require( '../utils' );
+
+// See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
+const BROWSER_IDLE_WAIT = 1000;
 
 const results = {
 	serverResponse: [],
@@ -43,11 +42,11 @@ const results = {
 };
 
 test.describe( 'Post Editor Performance', () => {
-	const traceFilePath = getTraceFilePath();
-
-	test.afterAll( async () => {
-		saveResultsFile( __filename, results );
-		deleteFile( traceFilePath );
+	test.afterAll( async ( {}, testInfo ) => {
+		await testInfo.attach( 'results', {
+			body: JSON.stringify( results, null, 2 ),
+			contentType: 'application/json',
+		} );
 	} );
 
 	test.beforeEach( async ( { admin, page } ) => {
@@ -62,11 +61,13 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 
 	test( 'Loading', async ( { browser, page } ) => {
+		// Turn the large post HTML into blocks and insert.
 		await loadBlocksFromHtml(
 			page,
 			path.join( process.env.ASSETS_PATH, 'large-post.html' )
 		);
 
+		// Save the draft.
 		await page
 			.getByRole( 'button', { name: 'Save draft' } )
 			.click( { timeout: 60_000 } );
@@ -74,44 +75,50 @@ test.describe( 'Post Editor Performance', () => {
 			page.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
 
+		// Get the URL that we will be testing against.
 		const draftURL = page.url();
 
-		// Number of sample measurements to take.
-		const samples = 5;
-		// Number of throwaway measurements to perform before recording samples.
-		// Having at least one helps ensure that caching quirks don't manifest in
-		// the results.
+		// Start the measurements.
+		const samples = 10;
 		const throwaway = 1;
-
-		let i = throwaway + samples;
-		while ( i-- ) {
+		const rounds = throwaway + samples;
+		for ( let i = 0; i < rounds; i++ ) {
+			// Open a fresh page in a new context to prevent caching.
 			const testPage = await browser.newPage();
 
+			// Go to the test page URL.
 			await testPage.goto( draftURL );
-			await testPage
-				.frameLocator( 'iframe[name="editor-canvas"]' )
-				.locator( '.wp-block' )
-				.first()
-				.waitFor( {
-					timeout: 120_000,
-				} );
 
-			if ( i < samples ) {
-				const {
-					serverResponse,
-					firstPaint,
-					domContentLoaded,
-					loaded,
-					firstContentfulPaint,
-					firstBlock,
-				} = await getLoadingDurations( testPage );
+			// Get canvas (handles both legacy and iframed canvas).
+			const canvas = await Promise.any( [
+				( async () => {
+					const legacyCanvasLocator = page.locator(
+						'.wp-block-post-content'
+					);
+					await legacyCanvasLocator.waitFor();
+					return legacyCanvasLocator;
+				} )(),
+				( async () => {
+					const iframedCanvasLocator = page.frameLocator(
+						'[name=editor-canvas]'
+					);
+					await iframedCanvasLocator.locator( 'body' ).waitFor();
+					return iframedCanvasLocator;
+				} )(),
+			] );
 
-				results.serverResponse.push( serverResponse );
-				results.firstPaint.push( firstPaint );
-				results.domContentLoaded.push( domContentLoaded );
-				results.loaded.push( loaded );
-				results.firstContentfulPaint.push( firstContentfulPaint );
-				results.firstBlock.push( firstBlock );
+			await canvas.locator( '.wp-block' ).first().waitFor( {
+				timeout: 120_000,
+			} );
+
+			// Save the results.
+			if ( i >= throwaway ) {
+				const loadingDurations = await getLoadingDurations( testPage );
+				Object.entries( loadingDurations ).forEach(
+					( [ metric, duration ] ) => {
+						results[ metric ].push( duration );
+					}
+				);
 			}
 
 			await testPage.close();
@@ -119,47 +126,47 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 
 	test( 'Typing', async ( { browser, page, editor } ) => {
+		// Load the large post fixture.
 		await loadBlocksFromHtml(
 			page,
 			path.join( process.env.ASSETS_PATH, 'large-post.html' )
 		);
+
+		// Append an empty paragraph.
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
+		// Start tracing.
 		await browser.startTracing( page, {
-			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
 
-		let i = 20;
-		while ( i-- ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// The timeout should be big enough to allow all async tasks tor run.
-			// And also to allow Rich Text to mark the change as persistent.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( 2000 );
-			await page.keyboard.type( 'x' );
-		}
+		// The first character typed triggers a longer time (isTyping change).
+		// It can impact the stability of the metric, so we exclude it. It
+		// probably deserves a dedicated metric itself, though.
+		const samples = 10;
+		const throwaway = 1;
+		const rounds = samples + throwaway;
 
-		await browser.stopTracing();
-		const traceResults = JSON.parse( readFile( traceFilePath ) );
+		// Type the testing sequence into the empty paragraph.
+		await page.keyboard.type( 'x'.repeat( rounds ), {
+			delay: BROWSER_IDLE_WAIT,
+		} );
+
+		// Stop tracing and save results.
+		const traceBuffer = await browser.stopTracing();
+		const traceResults = JSON.parse( traceBuffer.toString() );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
-		if (
-			keyDownEvents.length === keyPressEvents.length &&
-			keyPressEvents.length === keyUpEvents.length
-		) {
-			// The first character typed triggers a longer time (isTyping change)
-			// It can impact the stability of the metric, so we exclude it.
-			for ( let j = 1; j < keyDownEvents.length; j++ ) {
-				results.type.push(
-					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
-				);
-			}
+
+		for ( let i = throwaway; i < rounds; i++ ) {
+			results.type.push(
+				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
+			);
 		}
 	} );
 
-	test( 'Typing within containers', async ( { browser, page } ) => {
+	test( 'Typing within containers', async ( { browser, page, editor } ) => {
 		await loadBlocksFromHtml(
 			page,
 			path.join(
@@ -169,78 +176,67 @@ test.describe( 'Post Editor Performance', () => {
 		);
 
 		// Select the block where we type in
-		await page
-			.frameLocator( 'iframe[name="editor-canvas"]' )
+		await editor.canvas
 			.getByRole( 'document', { name: 'Paragraph block' } )
 			.first()
 			.click();
 
-		// Ignore firsted typed character because it's different
-		// It probably deserves a dedicated metric.
-		// (isTyping triggers so it's slower)
-		await page.keyboard.type( 'x' );
-
 		await browser.startTracing( page, {
-			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
 
-		let i = 10;
-		while ( i-- ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( 500 );
-			await page.keyboard.type( 'x' );
-		}
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 500 );
-		await browser.stopTracing();
-		const traceResults = JSON.parse( readFile( traceFilePath ) );
+		const samples = 10;
+		// The first character typed triggers a longer time (isTyping change).
+		// It can impact the stability of the metric, so we exclude it. It
+		// probably deserves a dedicated metric itself, though.
+		const throwaway = 1;
+		const rounds = samples + throwaway;
+		await page.keyboard.type( 'x'.repeat( rounds ), {
+			delay: BROWSER_IDLE_WAIT,
+		} );
+
+		const traceBuffer = await browser.stopTracing();
+		const traceResults = JSON.parse( traceBuffer.toString() );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
-		if (
-			keyDownEvents.length === keyPressEvents.length &&
-			keyPressEvents.length === keyUpEvents.length
-		) {
-			// The first character typed triggers a longer time (isTyping change)
-			// It can impact the stability of the metric, so we exclude it.
-			for ( let j = 1; j < keyDownEvents.length; j++ ) {
-				results.typeContainer.push(
-					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
-				);
-			}
+
+		for ( let i = throwaway; i < rounds; i++ ) {
+			results.typeContainer.push(
+				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
+			);
 		}
 	} );
 
-	test( 'Selecting blocks', async ( { browser, page } ) => {
+	test( 'Selecting blocks', async ( { browser, page, editor } ) => {
 		await load1000Paragraphs( page );
-		const paragraphs = page
-			.frameLocator( 'iframe[name="editor-canvas"]' )
-			.locator( '.wp-block' );
+		const paragraphs = editor.canvas.locator( '.wp-block' );
 
-		await paragraphs.first().click();
-
-		for ( let j = 1; j <= 10; j++ ) {
+		const samples = 10;
+		const throwaway = 1;
+		const rounds = samples + throwaway;
+		for ( let i = 0; i < rounds; i++ ) {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( 1000 );
+			await page.waitForTimeout( BROWSER_IDLE_WAIT );
 			await browser.startTracing( page, {
-				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 
-			await paragraphs.nth( j ).click();
+			await paragraphs.nth( i ).click();
 
-			await browser.stopTracing();
-			const traceResults = JSON.parse( readFile( traceFilePath ) );
-			const allDurations = getSelectionEventDurations( traceResults );
-			results.focus.push(
-				allDurations.reduce( ( acc, eventDurations ) => {
-					return acc + sum( eventDurations );
-				}, 0 )
-			);
+			const traceBuffer = await browser.stopTracing();
+
+			if ( i >= throwaway ) {
+				const traceResults = JSON.parse( traceBuffer.toString() );
+				const allDurations = getSelectionEventDurations( traceResults );
+				results.focus.push(
+					allDurations.reduce( ( acc, eventDurations ) => {
+						return acc + sum( eventDurations );
+					}, 0 )
+				);
+			}
 		}
 	} );
 
@@ -250,9 +246,14 @@ test.describe( 'Post Editor Performance', () => {
 			name: 'Document Overview',
 		} );
 
-		for ( let j = 0; j < 10; j++ ) {
+		const samples = 10;
+		const throwaway = 1;
+		const rounds = samples + throwaway;
+		for ( let i = 0; i < rounds; i++ ) {
+			// Wait for the browser to be idle before starting the monitoring.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( BROWSER_IDLE_WAIT );
 			await browser.startTracing( page, {
-				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
@@ -260,11 +261,13 @@ test.describe( 'Post Editor Performance', () => {
 			// Open List View
 			await listViewToggle.click();
 
-			await browser.stopTracing();
-			const traceResults = JSON.parse( readFile( traceFilePath ) );
-			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
-			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
-				results.listViewOpen.push( mouseClickEvents[ k ] );
+			const traceBuffer = await browser.stopTracing();
+
+			if ( i >= throwaway ) {
+				const traceResults = JSON.parse( traceBuffer.toString() );
+				const [ mouseClickEvents ] =
+					getClickEventDurations( traceResults );
+				results.listViewOpen.push( mouseClickEvents[ 0 ] );
 			}
 
 			// Close List View
@@ -278,9 +281,14 @@ test.describe( 'Post Editor Performance', () => {
 			name: 'Toggle block inserter',
 		} );
 
-		for ( let j = 0; j < 10; j++ ) {
+		const samples = 10;
+		const throwaway = 1;
+		const rounds = samples + throwaway;
+		for ( let i = 0; i < rounds; i++ ) {
+			// Wait for the browser to be idle before starting the monitoring.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( BROWSER_IDLE_WAIT );
 			await browser.startTracing( page, {
-				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
@@ -288,11 +296,13 @@ test.describe( 'Post Editor Performance', () => {
 			// Open Inserter.
 			await globalInserterToggle.click();
 
-			await browser.stopTracing();
-			const traceResults = JSON.parse( readFile( traceFilePath ) );
-			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
-			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
-				results.inserterOpen.push( mouseClickEvents[ k ] );
+			const traceBuffer = await browser.stopTracing();
+
+			if ( i >= throwaway ) {
+				const traceResults = JSON.parse( traceBuffer.toString() );
+				const [ mouseClickEvents ] =
+					getClickEventDurations( traceResults );
+				results.inserterOpen.push( mouseClickEvents[ 0 ] );
 			}
 
 			// Close Inserter.
@@ -309,30 +319,31 @@ test.describe( 'Post Editor Performance', () => {
 		// Open Inserter.
 		await globalInserterToggle.click();
 
-		for ( let j = 0; j < 10; j++ ) {
+		const samples = 10;
+		const throwaway = 1;
+		const rounds = samples + throwaway;
+		for ( let i = 0; i < rounds; i++ ) {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( 500 );
+			await page.waitForTimeout( BROWSER_IDLE_WAIT );
 			await browser.startTracing( page, {
-				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
+
 			await page.keyboard.type( 'p' );
-			await browser.stopTracing();
-			const traceResults = JSON.parse( readFile( traceFilePath ) );
-			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-				getTypingEventDurations( traceResults );
-			if (
-				keyDownEvents.length === keyPressEvents.length &&
-				keyPressEvents.length === keyUpEvents.length
-			) {
+
+			const traceBuffer = await browser.stopTracing();
+
+			if ( i >= throwaway ) {
+				const traceResults = JSON.parse( traceBuffer.toString() );
+				const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+					getTypingEventDurations( traceResults );
 				results.inserterSearch.push(
-					sum( keyDownEvents ) +
-						sum( keyPressEvents ) +
-						sum( keyUpEvents )
+					keyDownEvents[ 0 ] + keyPressEvents[ 0 ] + keyUpEvents[ 0 ]
 				);
 			}
+
 			await page.keyboard.press( 'Backspace' );
 		}
 
@@ -355,16 +366,14 @@ test.describe( 'Post Editor Performance', () => {
 		// Open Inserter.
 		await globalInserterToggle.click();
 
-		// Hover Items.
-		await paragraphBlockItem.hover();
-		await headingBlockItem.hover();
-
-		for ( let j = 0; j < 10; j++ ) {
+		const samples = 10;
+		const throwaway = 1;
+		const rounds = samples + throwaway;
+		for ( let i = 0; i < rounds; i++ ) {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( 200 );
+			await page.waitForTimeout( BROWSER_IDLE_WAIT );
 			await browser.startTracing( page, {
-				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
@@ -373,14 +382,17 @@ test.describe( 'Post Editor Performance', () => {
 			await paragraphBlockItem.hover();
 			await headingBlockItem.hover();
 
-			await browser.stopTracing();
-			const traceResults = JSON.parse( readFile( traceFilePath ) );
-			const [ mouseOverEvents, mouseOutEvents ] =
-				getHoverEventDurations( traceResults );
-			for ( let k = 0; k < mouseOverEvents.length; k++ ) {
-				results.inserterHover.push(
-					mouseOverEvents[ k ] + mouseOutEvents[ k ]
-				);
+			const traceBuffer = await browser.stopTracing();
+
+			if ( i >= throwaway ) {
+				const traceResults = JSON.parse( traceBuffer.toString() );
+				const [ mouseOverEvents, mouseOutEvents ] =
+					getHoverEventDurations( traceResults );
+				for ( let k = 0; k < mouseOverEvents.length; k++ ) {
+					results.inserterHover.push(
+						mouseOverEvents[ k ] + mouseOutEvents[ k ]
+					);
+				}
 			}
 		}
 

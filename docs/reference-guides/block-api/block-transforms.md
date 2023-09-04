@@ -96,7 +96,7 @@ A transformation of type `enter` is an object that takes the following parameter
 
 -   **type** _(string)_: the value `enter`.
 -   **regExp** _(RegExp)_: the Regular Expression to use as a matcher. If the value matches, the transformation will be applied.
--   **transform** _(function)_: a callback that receives the value that has been entered. It should return a block object or an array of block objects.
+-   **transform** _(function)_: a callback that receives an object with a `content` field containing the value that has been entered. It should return a block object or an array of block objects.
 -   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from --- to Separator block**

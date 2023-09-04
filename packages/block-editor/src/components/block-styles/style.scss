@@ -4,9 +4,6 @@
 
 .block-editor-block-styles__preview-panel {
 	display: none;
-	position: absolute;
-	right: $grid-unit-20;
-	left: auto;
 	// Same layer as the sidebar from which it's triggered.
 	z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
 

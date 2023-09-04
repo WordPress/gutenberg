@@ -153,10 +153,7 @@
 }
 
 .wp-lightbox-container {
-
-	.img-container {
-		position: relative;
-	}
+	position: relative;
 
 	button {
 		border: none;
@@ -183,6 +180,7 @@
 	overflow: hidden;
 	width: 100vw;
 	height: 100vh;
+	box-sizing: border-box;
 	visibility: hidden;
 	cursor: zoom-out;
 
@@ -195,25 +193,39 @@
 		z-index: 5000000;
 	}
 
+	.lightbox-image-container {
+		position: absolute;
+		overflow: hidden;
+		top: 50%;
+		left: 50%;
+		transform-origin: top left;
+		transform: translate(-50%, -50%);
+		width: var(--wp--lightbox-container-width);
+		height: var(--wp--lightbox-container-height);
+		z-index: 9999999999;
+	}
+
 	.wp-block-image {
+		position: relative;
+		transform-origin: 0 0;
+		display: flex;
 		width: 100%;
 		height: 100%;
-		position: absolute;
-		z-index: 3000000;
-		box-sizing: border-box;
-		display: flex;
 		justify-content: center;
 		align-items: center;
-		flex-direction: column;
+		box-sizing: border-box;
+		z-index: 3000000;
+		margin: 0;
+
+		img {
+			min-width: var(--wp--lightbox-image-width);
+			min-height: var(--wp--lightbox-image-height);
+			width: var(--wp--lightbox-image-width);
+			height: var(--wp--lightbox-image-height);
+		}
 
 		figcaption {
 			display: none;
-		}
-
-		img {
-			max-width: 100%;
-			max-height: 100%;
-			width: auto;
 		}
 	}
 
@@ -231,78 +243,61 @@
 		opacity: 0.9;
 	}
 
-	&.fade {
-		.wp-block-image {
-			padding: 40px 0;
-
-			@media screen and (min-width: 480px) {
-				padding: 40px;
-			}
-
-			@media screen and (min-width: 1920px) {
-				padding: 40px 80px;
-			}
+	// When fading, make the image come in slightly slower
+	// or faster than the scrim to give a sense of depth.
+	&.active {
+		visibility: visible;
+		animation: both turn-on-visibility 0.25s;
+		img {
+			animation: both turn-on-visibility 0.35s;
 		}
-
-		&.active {
-			visibility: visible;
-			animation: both turn-on-visibility 0.25s;
-
+	}
+	&.hideanimationenabled {
+		&:not(.active) {
+			animation: both turn-off-visibility 0.35s;
 			img {
-				animation: both turn-on-visibility 0.3s;
-			}
-		}
-		&.hideanimationenabled {
-			&:not(.active) {
-				animation: both turn-off-visibility 0.3s;
-
-				img {
-					animation: both turn-off-visibility 0.25s;
-				}
+				animation: both turn-off-visibility 0.25s;
 			}
 		}
 	}
 
-	&.zoom {
-		img {
-			position: absolute;
-			transform-origin: top left;
-			width: var(--lightbox-image-max-width);
-			height: var(--lightbox-image-max-height);
-		}
-
-		&.active {
-			opacity: 1;
-			visibility: visible;
-			.wp-block-image img {
-				animation: lightbox-zoom-in 0.4s forwards;
-
-				@media (prefers-reduced-motion) {
-					animation: both turn-on-visibility 0.4s;
-				}
-			}
-			.scrim {
-				animation: turn-on-visibility 0.4s forwards;
-			}
-		}
-		&.hideanimationenabled {
-			&:not(.active) {
-				.wp-block-image img {
-					animation: lightbox-zoom-out 0.4s forwards;
-
-					@media (prefers-reduced-motion) {
-						animation: both turn-off-visibility 0.4s;
+	@media (prefers-reduced-motion: no-preference) {
+		&.zoom {
+			&.active {
+				opacity: 1;
+				visibility: visible;
+				animation: none;
+				.lightbox-image-container {
+					animation: lightbox-zoom-in 0.4s;
+					// Override fade animation for image
+					img {
+						animation: none;
 					}
 				}
 				.scrim {
-					animation: turn-off-visibility 0.4s forwards;
+					animation: turn-on-visibility 0.4s forwards;
+				}
+			}
+			&.hideanimationenabled {
+				&:not(.active) {
+					animation: none;
+					.lightbox-image-container {
+						animation: lightbox-zoom-out 0.4s;
+						// Override fade animation for image
+						img {
+							animation: none;
+						}
+					}
+					.scrim {
+						animation: turn-off-visibility 0.4s forwards;
+					}
 				}
 			}
 		}
 	}
 }
 
-html.has-lightbox-open {
+html.wp-has-lightbox-open {
 	overflow: hidden;
 }
 
@@ -332,30 +327,23 @@ html.has-lightbox-open {
 
 @keyframes lightbox-zoom-in {
 	0% {
-		left: var(--lightbox-initial-left-position);
-		top: var(--lightbox-initial-top-position);
-		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
+		transform: translate(calc(-50vw + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 	100% {
-		left: var(--lightbox-target-left-position);
-		top: var(--lightbox-target-top-position);
-		transform: scale(1, 1);
+		transform: translate(-50%, -50%) scale(1, 1);
 	}
 }
 
 @keyframes lightbox-zoom-out {
 	0% {
 		visibility: visible;
-		left: var(--lightbox-target-left-position);
-		top: var(--lightbox-target-top-position);
-		transform: scale(1, 1);
+		transform: translate(-50%, -50%) scale(1, 1);
 	}
 	99% {
 		visibility: visible;
 	}
 	100% {
-		left: var(--lightbox-initial-left-position);
-		top: var(--lightbox-initial-top-position);
-		transform: scale(var(--lightbox-scale-width), var(--lightbox-scale-height));
+		visibility: hidden;
+		transform: translate(calc(-50vw + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 }
