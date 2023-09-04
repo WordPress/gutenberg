@@ -91,7 +91,7 @@ function BlocksHooksControl( props ) {
 						( { name } ) => name === block.name
 					);
 
-					// If the block exists in the designated location, we consider it auto-inserted
+					// If the block exists in the designated location, we consider it hooked
 					// and show the toggle as enabled.
 					if ( hookedBlock ) {
 						return {
@@ -100,7 +100,7 @@ function BlocksHooksControl( props ) {
 						};
 					}
 
-					// If no auto-inserted block was found in any of its designated locations,
+					// If no hooked block was found in any of its designated locations,
 					// but it exists elsewhere in the block tree, we consider it manually inserted.
 					// In this case, we take note and will remove the corresponding toggle from the
 					// block inspector panel.
