@@ -26,6 +26,7 @@ const LinkControlSettings = ( { value, onChange = noop, settings } ) => {
 			label={ setting.title }
 			onChange={ handleSettingChange( setting ) }
 			checked={ value ? !! value[ setting.id ] : false }
+			help={ setting?.help }
 		/>
 	) );
 

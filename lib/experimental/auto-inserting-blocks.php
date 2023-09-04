@@ -65,6 +65,31 @@ function gutenberg_auto_insert_block( $inserted_block, $relative_position, $anch
 }
 
 /**
+ * Add auto-insertion information to a block type's controller.
+ *
+ * @param array  $inserted_block_type The type of block to insert.
+ * @param string $position            The position relative to the anchor block.
+ *                                    Can be 'before', 'after', 'first_child', or 'last_child'.
+ * @param string $anchor_block_type   The auto-inserted block will be inserted next to instances of this block type.
+ * @return callable A filter for the `rest_prepare_block_type` hook that adds an `auto_insert` field to the network response.
+ */
+function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_block_type, $position, $anchor_block_type ) {
+	return function( $response, $block_type ) use ( $inserted_block_type, $position, $anchor_block_type ) {
+		if ( $block_type->name !== $inserted_block_type ) {
+			return $response;
+		}
+
+		$data = $response->get_data();
+		if ( ! isset( $data['auto_insert'] ) ) {
+			$data['auto_insert'] = array();
+		}
+		$data['auto_insert'][ $anchor_block_type ] = $position;
+		$response->set_data( $data );
+		return $response;
+	};
+}
+
+/**
  * Register blocks for auto-insertion, based on their block.json metadata.
  *
  * @param array $settings Array of determined settings for registering a block type.
@@ -113,6 +138,37 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 		$settings['auto_insert'][ $anchor_block_name ] = $mapped_position;
 	}
 
+	// Copied from `get_block_editor_server_block_settings()`.
+	$fields_to_pick = array(
+		'api_version'      => 'apiVersion',
+		'title'            => 'title',
+		'description'      => 'description',
+		'icon'             => 'icon',
+		'attributes'       => 'attributes',
+		'provides_context' => 'providesContext',
+		'uses_context'     => 'usesContext',
+		'selectors'        => 'selectors',
+		'supports'         => 'supports',
+		'category'         => 'category',
+		'styles'           => 'styles',
+		'textdomain'       => 'textdomain',
+		'parent'           => 'parent',
+		'ancestor'         => 'ancestor',
+		'keywords'         => 'keywords',
+		'example'          => 'example',
+		'variations'       => 'variations',
+	);
+	// Add `auto_insert` to the list of fields to pick.
+	$fields_to_pick['auto_insert'] = 'autoInsert';
+
+	$exposed_settings = array_intersect_key( $settings, $fields_to_pick );
+
+	// TODO: Make work for blocks registered via direct call to gutenberg_register_auto_inserted_block().
+	wp_add_inline_script(
+		'wp-blocks',
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( array( $inserted_block_name => $exposed_settings ) ) . ');'
+	);
+
 	return $settings;
 }
 add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_blocks', 10, 2 );
@@ -135,7 +191,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_bl
  * @return void
  */
 function gutenberg_register_auto_inserted_block( $inserted_block, $position, $anchor_block ) {
-		$inserted_block = array(
+		$inserted_block_array = array(
 			'blockName'    => $inserted_block,
 			'attrs'        => array(),
 			'innerHTML'    => '',
@@ -143,8 +199,19 @@ function gutenberg_register_auto_inserted_block( $inserted_block, $position, $an
 			'innerBlocks'  => array(),
 		);
 
-		$inserter = gutenberg_auto_insert_block( $inserted_block, $position, $anchor_block );
+		$inserter = gutenberg_auto_insert_block( $inserted_block_array, $position, $anchor_block );
 		add_filter( 'gutenberg_serialize_block', $inserter, 10, 1 );
+
+		/*
+		 * The block-types REST API controller uses objects of the `WP_Block_Type` class, which are
+		 * in turn created upon block type registration. However, that class does not contain
+		 * an `auto_insert` property (and is not easily extensible), so we have to use a different
+		 * mechanism to communicate to the controller which blocks have been registered for
+		 * auto-insertion. We're doing so here (i.e. upon block registration), by adding a filter to
+		 * the controller's response.
+		 */
+		$controller_extender = gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_block, $position, $anchor_block );
+		add_filter( 'rest_prepare_block_type', $controller_extender, 10, 2 );
 }
 
 /**
@@ -256,3 +323,27 @@ function gutenberg_serialize_block( $block ) {
 function gutenberg_serialize_blocks( $blocks ) {
 	return implode( '', array_map( 'gutenberg_serialize_block', $blocks ) );
 }
+
+/**
+ * Register the `auto_insert` field for the block-types REST API controller.
+ *
+ * @return void
+ */
+function gutenberg_register_auto_insert_rest_field() {
+	register_rest_field(
+		'block-type',
+		'auto_insert',
+		array(
+			'schema' => array(
+				'description'       => __( 'Block types that may be automatically inserted near this block and the associated relative position where they are inserted.', 'gutenberg' ),
+				'patternProperties' => array(
+					'^[a-zA-Z0-9-]+/[a-zA-Z0-9-]+$' => array(
+						'type' => 'string',
+						'enum' => array( 'before', 'after', 'first_child', 'last_child' ),
+					),
+				),
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_auto_insert_rest_field' );

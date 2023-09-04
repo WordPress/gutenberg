@@ -9,7 +9,9 @@
 
 ### Enhancement
 
--   The bundled `eslint-plugin-jest` dependency has been updated from requiring `^27.2.1` to requiring `^27.2.3` ([#53975](https://github.com/WordPress/gutenberg/pull/53975)).
+-   Added a new `test-playwright` ruleset using [`eslint-plugin-playwright`](https://www.npmjs.com/package/eslint-plugin-playwright).
+
+## 15.1.0 (2023-08-31)
 
 ## 15.0.0 (2023-08-16)
 
