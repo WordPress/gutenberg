@@ -45,6 +45,7 @@ import {
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import { unlock } from '../../lock-unlock';
+import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
@@ -156,8 +157,7 @@ export default function HeaderEditMode() {
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 
-	const isFocusMode =
-		templateType === 'wp_template_part' || templateType === 'wp_navigation';
+	const isFocusMode = FOCUSABLE_ENTITIES.includes( templateType );
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const longLabel = _x(
@@ -216,6 +216,7 @@ export default function HeaderEditMode() {
 									showIconLabels ? shortLabel : longLabel
 								}
 								showTooltip={ ! showIconLabels }
+								aria-expanded={ isInserterOpen }
 							/>
 						) }
 						{ isLargeViewport && (
@@ -265,6 +266,7 @@ export default function HeaderEditMode() {
 												? 'tertiary'
 												: undefined
 										}
+										aria-expanded={ isListViewOpen }
 									/>
 								) }
 								{ isZoomedOutViewExperimentEnabled &&
@@ -311,39 +313,40 @@ export default function HeaderEditMode() {
 					variants={ toolbarVariants }
 					transition={ toolbarTransition }
 				>
-					{ ! isFocusMode && hasDefaultEditorCanvasView && (
-						<div
-							className={ classnames(
-								'edit-site-header-edit-mode__preview-options',
-								{ 'is-zoomed-out': isZoomedOutView }
-							) }
+					<div
+						className={ classnames(
+							'edit-site-header-edit-mode__preview-options',
+							{ 'is-zoomed-out': isZoomedOutView }
+						) }
+					>
+						<PreviewOptions
+							deviceType={ deviceType }
+							setDeviceType={ setPreviewDeviceType }
+							label={ __( 'View' ) }
+							isEnabled={
+								! isFocusMode && hasDefaultEditorCanvasView
+							}
 						>
-							<PreviewOptions
-								deviceType={ deviceType }
-								setDeviceType={ setPreviewDeviceType }
-								label={ __( 'View' ) }
-							>
-								{ ( { onClose } ) => (
-									<MenuGroup>
-										<MenuItem
-											href={ homeUrl }
-											target="_blank"
-											icon={ external }
-											onClick={ onClose }
-										>
-											{ __( 'View site' ) }
-											<VisuallyHidden as="span">
-												{
-													/* translators: accessibility text */
-													__( '(opens in a new tab)' )
-												}
-											</VisuallyHidden>
-										</MenuItem>
-									</MenuGroup>
-								) }
-							</PreviewOptions>
-						</div>
-					) }
+							{ ( { onClose } ) => (
+								<MenuGroup>
+									<MenuItem
+										href={ homeUrl }
+										target="_blank"
+										icon={ external }
+										onClick={ onClose }
+									>
+										{ __( 'View site' ) }
+										<VisuallyHidden as="span">
+											{
+												/* translators: accessibility text */
+												__( '(opens in a new tab)' )
+											}
+										</VisuallyHidden>
+									</MenuItem>
+								</MenuGroup>
+							) }
+						</PreviewOptions>
+					</div>
 					<SaveButton />
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />

@@ -1,0 +1,19 @@
+{
+	"serverResponse": [],
+	"firstPaint": [],
+	"domContentLoaded": [],
+	"loaded": [],
+	"firstContentfulPaint": [],
+	"firstBlock": [],
+	"type": [
+		75.483, 96.376, 82.063, 101.192, 87.573, 56.599000000000004,
+		63.778999999999996, 93.079, 98.277, 95.365, 94.48599999999999, 55.739,
+		81.715, 66.875, 60.897, 54.249, 52.537, 58.745, 49.615
+	],
+	"typeContainer": [],
+	"focus": [],
+	"listViewOpen": [],
+	"inserterOpen": [],
+	"inserterHover": [],
+	"inserterSearch": []
+}

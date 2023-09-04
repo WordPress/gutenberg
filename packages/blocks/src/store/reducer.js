@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { camelCase } from 'change-case';
+
+/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -52,6 +57,72 @@ function getUniqueItemsByName( items ) {
 	}, [] );
 }
 
+function bootstrappedBlockTypes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BOOTSTRAPPED_BLOCK_TYPE':
+			const { name, blockType } = action;
+			const serverDefinition = state[ name ];
+			let newDefinition;
+			// Don't overwrite if already set. It covers the case when metadata
+			// was initialized from the server.
+			if ( serverDefinition ) {
+				// The `selectors` prop is not yet included in the server provided
+				// definitions and needs to be polyfilled. This can be removed when the
+				// minimum supported WordPress is >= 6.3.
+				if (
+					serverDefinition.selectors === undefined &&
+					blockType.selectors
+				) {
+					newDefinition = {
+						...serverDefinition,
+						selectors: blockType.selectors,
+					};
+				}
+
+				// The `autoInsert` prop is not yet included in the server provided
+				// definitions and needs to be polyfilled. This can be removed when the
+				// minimum supported WordPress is >= 6.4.
+				if (
+					serverDefinition.__experimentalAutoInsert === undefined &&
+					blockType.__experimentalAutoInsert
+				) {
+					newDefinition = {
+						...serverDefinition,
+						...newDefinition,
+						__experimentalAutoInsert:
+							blockType.__experimentalAutoInsert,
+					};
+				}
+			} else {
+				newDefinition = Object.fromEntries(
+					Object.entries( blockType )
+						.filter(
+							( [ , value ] ) =>
+								value !== null && value !== undefined
+						)
+						.map( ( [ key, value ] ) => [
+							camelCase( key ),
+							value,
+						] )
+				);
+				newDefinition.name = name;
+			}
+
+			if ( newDefinition ) {
+				return {
+					...state,
+					[ name ]: newDefinition,
+				};
+			}
+
+			return state;
+		case 'REMOVE_BLOCK_TYPES':
+			return omit( state, action.names );
+	}
+
+	return state;
+}
+
 /**
  * Reducer managing the unprocessed block types in a form passed when registering the by block.
  * It's for internal use only. It allows recomputing the processed block types on-demand after block type filters
@@ -67,7 +138,7 @@ export function unprocessedBlockTypes( state = {}, action ) {
 		case 'ADD_UNPROCESSED_BLOCK_TYPE':
 			return {
 				...state,
-				[ action.blockType.name ]: action.blockType,
+				[ action.name ]: action.blockType,
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
@@ -300,6 +371,7 @@ export function collections( state = {}, action ) {
 }
 
 export default combineReducers( {
+	bootstrappedBlockTypes,
 	unprocessedBlockTypes,
 	blockTypes,
 	blockStyles,

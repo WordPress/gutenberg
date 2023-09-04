@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { View } from '..';
 
-const meta: ComponentMeta< typeof View > = {
+const meta: Meta< typeof View > = {
 	component: View,
 	title: 'Components (Experimental)/View',
 	argTypes: {
@@ -22,11 +22,11 @@ const meta: ComponentMeta< typeof View > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof View > = ( args ) => {
+const Template: StoryFn< typeof View > = ( args ) => {
 	return <View { ...args } />;
 };
 
-export const Default: ComponentStory< typeof View > = Template.bind( {} );
+export const Default: StoryFn< typeof View > = Template.bind( {} );
 Default.args = {
 	children: 'An example tip',
 };

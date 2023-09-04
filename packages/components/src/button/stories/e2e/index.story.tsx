@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Story, Meta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,7 @@ const meta: Meta< typeof Button > = {
 };
 export default meta;
 
-export const VariantStates: Story< typeof Button > = (
+export const VariantStates: StoryFn< typeof Button > = (
 	props: ButtonAsButtonProps
 ) => {
 	const variants: ( typeof props.variant )[] = [
@@ -57,7 +57,7 @@ Icon.args = {
 	icon: wordpress,
 };
 
-export const Dashicons: Story< typeof Button > = ( props ) => {
+export const Dashicons: StoryFn< typeof Button > = ( props ) => {
 	return (
 		<div style={ { display: 'flex', gap: 8 } }>
 			<Button { ...props } />
