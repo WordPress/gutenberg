@@ -100,7 +100,7 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 	if ( ! isset( $metadata['__experimentalBlockHooks'] ) ) {
 		return $settings;
 	}
-	$auto_insert = $metadata['__experimentalBlockHooks'];
+	$block_hooks = $metadata['__experimentalBlockHooks'];
 
 	/**
 	 * Map the camelCased position string from block.json to the snake_cased block type position
@@ -116,7 +116,7 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 	);
 
 	$inserted_block_name = $metadata['name'];
-	foreach ( $auto_insert as $anchor_block_name => $position ) {
+	foreach ( $block_hooks as $anchor_block_name => $position ) {
 		// Avoid infinite recursion (auto-inserting next to or into self).
 		if ( $inserted_block_name === $anchor_block_name ) {
 			_doing_it_wrong(
