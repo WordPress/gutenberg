@@ -11,15 +11,10 @@ import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	BaseControl,
 	CustomSelectControl,
 	FlexBlock,
 	PanelBody,
 	RangeControl,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
@@ -31,8 +26,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import {
-	check,
-	moreHorizontal,
 	arrowRight,
 	arrowDown,
 	grid,
@@ -200,15 +193,6 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 	} = usedLayout;
 	const { type: defaultBlockLayoutType } = defaultBlockLayout;
 
-	const spaceBetweenKey =
-		type === 'flex' && orientation === 'horizontal'
-			? 'justifyContent'
-			: 'verticalAlignment';
-	const stretchKey =
-		type === 'flex' && orientation === 'horizontal'
-			? 'verticalAlignment'
-			: 'justifyContent';
-
 	const blockEditingMode = useBlockEditingMode();
 
 	if ( blockEditingMode !== 'default' ) {
@@ -259,61 +243,69 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 		} );
 	}
 
-	const horizontalAlignmentOptions = [];
-	if ( type === 'constrained' ) {
-		horizontalAlignmentOptions.push(
-			{
-				key: 'left',
-				value: 'left',
-				icon: justifyLeft,
-				name: __( 'Left' ),
-			},
-			{
-				key: 'center',
-				value: 'center',
-				icon: justifyCenter,
-				name: __( 'Center' ),
-			},
-			{
-				key: 'right',
-				value: 'right',
-				icon: justifyRight,
-				name: __( 'Right' ),
-			}
-		);
-	} else if ( orientation === 'vertical' ) {
-		horizontalAlignmentOptions.push(
-			{
-				key: 'fit',
-				value: 'fit',
-				name: __( 'Fit' ),
-			},
-			{
-				key: 'stretch',
-				value: 'stretch',
-				name: __( 'Stretch' ),
-			}
-		);
+	const horizontalAlignmentOptions = [
+		{
+			key: 'left',
+			value: 'left',
+			icon: justifyLeft,
+			name: __( 'Left' ),
+		},
+		{
+			key: 'center',
+			value: 'center',
+			icon: justifyCenter,
+			name: __( 'Center' ),
+		},
+		{
+			key: 'right',
+			value: 'right',
+			icon: justifyRight,
+			name: __( 'Right' ),
+		},
+	];
+	if ( orientation === 'vertical' ) {
+		horizontalAlignmentOptions.push( {
+			key: 'stretch',
+			value: 'stretch',
+			name: __( 'Stretch' ),
+		} );
 	} else {
-		horizontalAlignmentOptions.push(
-			{
-				key: 'fit',
-				value: 'fit',
-				name: __( 'Fit' ),
-			},
-			{
-				key: 'space-between',
-				value: 'space-between',
-				name: __( 'Space Between' ),
-			}
-		);
+		horizontalAlignmentOptions.push( {
+			key: 'space-between',
+			value: 'space-between',
+			name: __( 'Space Between' ),
+		} );
 	}
+
+	const horizontalControlValue = horizontalAlignmentOptions.find(
+		( option ) => option.value === justifyContent
+	);
+
+	const onChangeHorizontal = ( { selectedItem } ) => {
+		const { key } = selectedItem;
+		setAttributes( {
+			layout: {
+				...usedLayout,
+				justifyContent: key,
+			},
+		} );
+	};
 
 	const verticalAlignmentOptions = [
 		{
-			key: 'fit',
-			value: 'fit',
-			name: __( 'Fit' ),
+			key: 'top',
+			value: 'top',
+			name: __( 'Top' ),
+		},
+		{
+			key: 'center',
+			value: 'center',
+			name: __( 'Middle' ),
+		},
+		{
+			key: 'bottom',
+			value: 'bottom',
+			name: __( 'Bottom' ),
 		},
 	];
 	if ( orientation === 'vertical' ) {
@@ -329,6 +321,20 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 			name: __( 'Stretch' ),
 		} );
 	}
+
+	const verticalControlValue = verticalAlignmentOptions.find(
+		( option ) => option.value === verticalAlignment
+	);
+
+	const onChangeVertical = ( { selectedItem } ) => {
+		const { key } = selectedItem;
+		setAttributes( {
+			layout: {
+				...usedLayout,
+				verticalAlignment: key,
+			},
+		} );
+	};
 
 	const onChangeType = ( newType ) => {
 		if ( newType === 'stack' ) {
@@ -431,45 +437,6 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 		} );
 	};
 
-	const onChangeMatrix = ( newValue ) => {
-		const [ horizontal, vertical ] = newValue.split( ' ' );
-		let alignment = horizontal;
-		let justification = vertical;
-
-		if (
-			verticalAlignment === 'stretch' ||
-			verticalAlignment === 'space-between'
-		) {
-			alignment = verticalAlignment;
-		}
-
-		if (
-			justifyContent === 'stretch' ||
-			justifyContent === 'space-between'
-		) {
-			justification = justifyContent;
-		}
-
-		const newLayout = {
-			...usedLayout,
-			justifyContent: justification,
-			verticalAlignment: alignment,
-		};
-
-		if ( newLayout.type === 'default' ) {
-			newLayout.type = 'flex';
-			newLayout.orientation = 'vertical';
-		} else if (
-			newLayout.type === 'constrained' &&
-			newLayout.verticalAlignment !== 'top'
-		) {
-			newLayout.type = 'flex';
-			newLayout.orientation = 'vertical';
-		}
-
-		onChangeLayout( newLayout );
-	};
-
 	let defaultContentWidthValue = 'fill';
 	if ( defaultBlockLayoutType === 'constrained' ) {
 		defaultContentWidthValue = 'theme';
@@ -489,16 +456,6 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 	const selectedContentWidth = innerWidthOptions.find(
 		( option ) => option.value === usedContentWidthValue
 	);
-
-	const matrixValue = `${
-		verticalAlignment === 'space-between' || verticalAlignment === 'stretch'
-			? 'center'
-			: verticalAlignment
-	} ${
-		justifyContent === 'space-between' || justifyContent === 'stretch'
-			? 'center'
-			: justifyContent
-	}`;
 
 	return (
 		<>
@@ -600,201 +557,40 @@ function LayoutPanelPure( { layout, style, setAttributes, name: blockName } ) {
 							{ /* { type === 'flex' && ( */ }
 							<>
 								<FlexBlock>
-									<RangeControl
-										label={ __( 'Block spacing' ) }
-										onChange={ onChangeGap }
-										value={ style?.spacing?.blockGap }
-										min={ 0 }
-										max={ 100 }
-										withInputField={ false }
+									<CustomSelectControl
+										label={ __( 'Vertical' ) }
+										value={ verticalControlValue }
+										options={ verticalAlignmentOptions }
+										onChange={ onChangeVertical }
+										__nextUnconstrainedWidth
+										__next36pxDefaultSize
 									/>
 								</FlexBlock>
 								<FlexBlock>
-									<BaseControl>
-										<HStack>
-											<FlexBlock>
-												<BaseControl.VisualLabel>
-													Align
-												</BaseControl.VisualLabel>
-											</FlexBlock>
-											<DropdownMenu
-												icon={ moreHorizontal }
-												label="Select a direction"
-											>
-												{ () => (
-													<MenuGroup>
-														<MenuItem
-															icon={
-																usedLayout[
-																	spaceBetweenKey
-																] ===
-																	'space-between' &&
-																check
-															}
-															isSelected={
-																usedLayout[
-																	spaceBetweenKey
-																] ===
-																'space-between'
-															}
-															onClick={ () =>
-																usedLayout[
-																	spaceBetweenKey
-																] ===
-																'space-between'
-																	? onChangeLayout(
-																			{
-																				...usedLayout,
-																				verticalAlignment:
-																					spaceBetweenKey ===
-																					'verticalAlignment'
-																						? 'top'
-																						: verticalAlignment,
-																				justifyContent:
-																					spaceBetweenKey ===
-																					'justifyContent'
-																						? 'left'
-																						: justifyContent,
-																			}
-																	  )
-																	: onChangeLayout(
-																			{
-																				...usedLayout,
-																				[ spaceBetweenKey ]:
-																					'space-between',
-																			}
-																	  )
-															}
-															role="menuitemcheckbox"
-															info={
-																'Blocks are spaced evenly to fill the width of the row'
-															}
-														>
-															Space between
-														</MenuItem>
-														<MenuItem
-															icon={
-																usedLayout[
-																	stretchKey
-																] ===
-																	'stretch' &&
-																check
-															}
-															isSelected={
-																usedLayout[
-																	stretchKey
-																] === 'stretch'
-															}
-															onClick={ () =>
-																usedLayout[
-																	stretchKey
-																] === 'stretch'
-																	? onChangeLayout(
-																			{
-																				...usedLayout,
-																				verticalAlignment:
-																					stretchKey ===
-																					'verticalAlignment'
-																						? 'top'
-																						: verticalAlignment,
-																				justifyContent:
-																					stretchKey ===
-																					'justifyContent'
-																						? 'left'
-																						: justifyContent,
-																			}
-																	  )
-																	: onChangeLayout(
-																			{
-																				...usedLayout,
-																				[ stretchKey ]:
-																					'stretch',
-																			}
-																	  )
-															}
-															role="menuitemcheckbox"
-															info={
-																'Blocks within the row fill the entire height'
-															}
-														>
-															Stretch
-														</MenuItem>
-													</MenuGroup>
-												) }
-											</DropdownMenu>
-										</HStack>
-										<AlignmentMatrixControl
-											label={ __(
-												'Change content position'
-											) }
-											value={ matrixValue }
-											onChange={ onChangeMatrix }
-										/>
-									</BaseControl>
+									<CustomSelectControl
+										label={ __( 'Horizontal' ) }
+										value={ horizontalControlValue }
+										options={ horizontalAlignmentOptions }
+										onChange={ onChangeHorizontal }
+										__nextUnconstrainedWidth
+										__next36pxDefaultSize
+									/>
 								</FlexBlock>
-
-								{ /* <FlexBlock>
-										<CustomSelectControl
-											label={ __( 'Justify' ) }
-											value={ justifyControlValue() }
-											options={
-												horizontalAlignmentOptions
-											}
-											onChange={ onChangeJustify }
-											__nextUnconstrainedWidth
-											__next36pxDefaultSize
-										/>
-										<CustomSelectControl
-											label={ __( 'Items' ) }
-											value={ itemsControlValue() }
-											options={ verticalAlignmentOptions }
-											onChange={ onChangeItems }
-											__nextUnconstrainedWidth
-											__next36pxDefaultSize
-										/>
-									</FlexBlock> */ }
 							</>
-							{ /* ) } */ }
+						</HStack>
+						<HStack alignment="topLeft">
+							<FlexBlock>
+								<RangeControl
+									label={ __( 'Block spacing' ) }
+									onChange={ onChangeGap }
+									value={ style?.spacing?.blockGap }
+									min={ 0 }
+									max={ 100 }
+									withInputField={ false }
+								/>
+							</FlexBlock>
 						</HStack>
 
-						{ /* { type === 'constrained' && (
-							<HStack spacing={ 2 } justify="stretch">
-								<FlexBlock>
-									<ToggleGroupControl
-										__nextHasNoMarginBottom
-										style={ {
-											marginBottom: 0,
-											marginTop: 0,
-										} }
-										label={ __( 'Justification' ) }
-										value={
-											usedLayout?.justifyContent ||
-											'center'
-										}
-										isBlock={ true }
-										onChange={ ( selectedItem ) => {
-											onChangeLayout( {
-												...usedLayout,
-												justifyContent: selectedItem,
-											} );
-										} }
-										className="components-toggle-group-control__full-width"
-									>
-										{ horizontalAlignmentOptions.map(
-											( { value, icon, label } ) => (
-												<ToggleGroupControlOptionIcon
-													key={ value }
-													icon={ icon }
-													value={ value }
-													label={ label }
-												/>
-											)
-										) }
-									</ToggleGroupControl>
-								</FlexBlock>
-								<FlexBlock></FlexBlock>
-							</HStack>
-						) } */ }
 						{ constrainedType &&
 							displayControlsForLegacyLayouts && (
 								<constrainedType.inspectorControls
