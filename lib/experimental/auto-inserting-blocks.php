@@ -97,10 +97,10 @@ function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_blo
  * @return array Updated settings array.
  */
 function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
-	if ( ! isset( $metadata['__experimentalAutoInsert'] ) ) {
+	if ( ! isset( $metadata['__experimentalBlockHooks'] ) ) {
 		return $settings;
 	}
-	$auto_insert = $metadata['__experimentalAutoInsert'];
+	$auto_insert = $metadata['__experimentalBlockHooks'];
 
 	/**
 	 * Map the camelCased position string from block.json to the snake_cased block type position
