@@ -21,7 +21,7 @@ import { store as blockEditorStore } from '../store';
 
 const EMPTY_OBJECT = {};
 
-function BlocksHooksControl( props ) {
+function BlockHooksControl( props ) {
 	const blockTypes = useSelect(
 		( select ) => select( blocksStore ).getBlockTypes(),
 		[]
@@ -235,25 +235,25 @@ function BlocksHooksControl( props ) {
 	);
 }
 
-export const withHookedBlocks = createHigherOrderComponent( ( BlockEdit ) => {
+export const withBlockHooks = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		const blockEdit = <BlockEdit key="edit" { ...props } />;
 		return (
 			<>
 				{ blockEdit }
-				<BlocksHooksControl
+				<BlockHooksControl
 					blockName={ props.name }
 					clientId={ props.clientId }
 				/>
 			</>
 		);
 	};
-}, 'withHookedBlocks' );
+}, 'withBlockHooks' );
 
 if ( window?.__experimentalBlockHooks ) {
 	addFilter(
 		'editor.BlockEdit',
-		'core/hooked-blocks/with-inspector-control',
-		withHookedBlocks
+		'core/block-hooks/with-inspector-control',
+		withBlockHooks
 	);
 }
