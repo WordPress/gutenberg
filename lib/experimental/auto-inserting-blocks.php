@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto-inserting blocks.
+ * Block hooks.
  *
  * @package gutenberg
  */
