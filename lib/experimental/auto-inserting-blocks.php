@@ -90,7 +90,7 @@ function gutenberg_add_block_hooks_field_to_block_type_controller( $inserted_blo
 }
 
 /**
- * Register blocks for auto-insertion, based on their block.json metadata.
+ * Register hooked blocks for automatic insertion, based on their block.json metadata.
  *
  * @param array $settings Array of determined settings for registering a block type.
  * @param array $metadata Metadata provided for registering a block type.
@@ -104,7 +104,7 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 
 	/**
 	 * Map the camelCased position string from block.json to the snake_cased block type position
-	 * used in the auto-inserting block registration function.
+	 * used in the hooked block registration function.
 	 *
 	 * @var array
 	 */
