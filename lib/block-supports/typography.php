@@ -30,7 +30,6 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_text_decoration_support  = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support   = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
 	$has_writing_mode_support     = _wp_array_get( $typography_supports, array( '__experimentalWritingMode' ), false );
-	$has_text_orientation_support = _wp_array_get( $typography_supports, array( '__experimentalTextOrientation' ), false );
 
 	$has_typography_support = $has_font_family_support
 		|| $has_font_size_support
