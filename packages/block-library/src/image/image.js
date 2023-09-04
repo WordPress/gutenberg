@@ -523,7 +523,7 @@ export default function Image( {
 						options={ imageSizeOptions }
 					/>
 					<ToolsPanelItem
-						hasValue={ () => lightbox !== undefined }
+						hasValue={ () => !! lightbox }
 						label={ __( 'Expand on Click' ) }
 						onDeselect={ () => {
 							setAttributes( { lightbox: undefined } );
@@ -532,7 +532,7 @@ export default function Image( {
 					>
 						<ToggleControl
 							label={ __( 'Expand on Click' ) }
-							checked={ lightbox?.enabled }
+							checked={ !! lightbox?.enabled }
 							onChange={ ( newValue ) => {
 								setAttributes( {
 									lightbox: { enabled: newValue },
