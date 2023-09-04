@@ -62,6 +62,10 @@ const getButton = ( name ) => {
 	return screen.getByRole( 'button', { name } );
 };
 
+const getColorOption = ( color ) => {
+	return screen.getByRole( 'option', { name: `Color: ${ color }` } );
+};
+
 const queryButton = ( name ) => {
 	return screen.queryByRole( 'button', { name } );
 };
@@ -134,7 +138,7 @@ describe( 'BorderControl', () => {
 			await openPopover( user );
 
 			const customColorPicker = getButton( /Custom color picker/ );
-			const colorSwatchButtons = screen.getAllByRole( 'button', {
+			const colorSwatchButtons = screen.getAllByRole( 'option', {
 				name: /^Color:/,
 			} );
 			const styleLabel = screen.getByText( 'Style' );
@@ -314,7 +318,7 @@ describe( 'BorderControl', () => {
 			const props = createProps();
 			render( <BorderControl { ...props } /> );
 			await openPopover( user );
-			await user.click( getButton( 'Color: Green' ) );
+			await user.click( getColorOption( 'Green' ) );
 
 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
 				...defaultBorder,
@@ -327,7 +331,7 @@ describe( 'BorderControl', () => {
 			const props = createProps();
 			render( <BorderControl { ...props } /> );
 			await openPopover( user );
-			await user.click( getButton( 'Color: Blue' ) );
+			await user.click( getColorOption( 'Blue' ) );
 
 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
 				...defaultBorder,
@@ -379,7 +383,7 @@ describe( 'BorderControl', () => {
 			await user.clear( getWidthInput() );
 			rerender( <BorderControl { ...props } /> );
 			await openPopover( user );
-			await user.click( getButton( 'Color: Blue' ) );
+			await user.click( getColorOption( 'Blue' ) );
 
 			expect( props.onChange ).toHaveBeenCalledWith( undefined );
 		} );
@@ -393,7 +397,7 @@ describe( 'BorderControl', () => {
 			await user.clear( getWidthInput() );
 			rerender( <BorderControl { ...props } /> );
 			await openPopover( user );
-			await user.click( getButton( 'Color: Blue' ) );
+			await user.click( getColorOption( 'Blue' ) );
 
 			expect( props.onChange ).toHaveBeenNthCalledWith( 2, {
 				color: undefined,
@@ -407,7 +411,7 @@ describe( 'BorderControl', () => {
 			const props = createProps();
 			render( <BorderControl { ...props } /> );
 			await openPopover( user );
-			await user.click( getButton( 'Color: Green' ) );
+			await user.click( getColorOption( 'Green' ) );
 			await user.click( getButton( 'Dotted' ) );
 			const widthInput = getWidthInput();
 			await user.clear( widthInput );
@@ -425,7 +429,7 @@ describe( 'BorderControl', () => {
 			const props = createProps();
 			const { rerender } = render( <BorderControl { ...props } /> );
 			await openPopover( user );
-			await user.click( getButton( 'Color: Green' ) );
+			await user.click( getColorOption( 'Green' ) );
 			rerender( <BorderControl { ...props } /> );
 			await user.click( getButton( 'Dotted' ) );
 			rerender( <BorderControl { ...props } /> );
@@ -446,7 +450,7 @@ describe( 'BorderControl', () => {
 			const props = createProps( { value: undefined } );
 			const { rerender } = render( <BorderControl { ...props } /> );
 			await openPopover( user );
-			await user.click( getButton( 'Color: Yellow' ) );
+			await user.click( getColorOption( 'Yellow' ) );
 
 			expect( props.onChange ).toHaveBeenCalledWith( {
 				color: '#bd8600',
@@ -458,7 +462,7 @@ describe( 'BorderControl', () => {
 
 			rerender( <BorderControl { ...props } /> );
 			await openPopover( user );
-			await user.click( getButton( 'Color: Green' ) );
+			await user.click( getColorOption( 'Green' ) );
 
 			expect( props.onChange ).toHaveBeenCalledWith( {
 				color: '#00a32a',

@@ -93,14 +93,14 @@ test.describe( 'Navigation colors', () => {
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Color Text styles' } ).click();
 		await page
-			.getByRole( 'button', { name: 'Color: White' } )
+			.getByRole( 'option', { name: 'Color: White' } )
 			.click( { force: true } );
 
 		await page
 			.getByRole( 'button', { name: 'Color Background styles' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Color: Black' } )
+			.getByRole( 'option', { name: 'Color: Black' } )
 			.click( { force: true } );
 
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
@@ -151,12 +151,12 @@ test.describe( 'Navigation colors', () => {
 		await page.getByRole( 'button', { name: 'Color Link styles' } ).click();
 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
 		await page
-			.getByRole( 'button', { name: 'Color: Vivid red' } )
+			.getByRole( 'option', { name: 'Color: Vivid red' } )
 			.click( { force: true } );
 		await page.getByRole( 'tab', { name: 'Hover' } ).click();
 		// rgb(155, 81, 224) is the color of the "vivid purple" color preset.
 		await page
-			.getByRole( 'button', { name: 'Color: Vivid purple' } )
+			.getByRole( 'option', { name: 'Color: Vivid purple' } )
 			.click( { force: true } );
 
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
@@ -198,7 +198,7 @@ test.describe( 'Navigation colors', () => {
 		// 247, 141, 167 is the color of the "Pale pink" color preset.
 		const palePink = 'rgb(247, 141, 167)';
 		await page
-			.getByRole( 'button', { name: 'Color: Pale pink' } )
+			.getByRole( 'option', { name: 'Color: Pale pink' } )
 			.click( { force: true } );
 
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
@@ -242,7 +242,7 @@ test.describe( 'Navigation colors', () => {
 		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
 		const paleCyan = 'rgb(142, 209, 252)';
 		await page
-			.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
+			.getByRole( 'option', { name: 'Color: Pale cyan blue' } )
 			.click( { force: true } );
 
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
@@ -285,7 +285,7 @@ test.describe( 'Navigation colors', () => {
 		// 247, 141, 167 is the color of the "Pale pink" color preset.
 		const palePink = 'rgb(247, 141, 167)';
 		await page
-			.getByRole( 'button', { name: 'Color: Pale pink' } )
+			.getByRole( 'option', { name: 'Color: Pale pink' } )
 			.click( { force: true } );
 		// Pale cyan blue for the background color.
 		await page
@@ -294,7 +294,7 @@ test.describe( 'Navigation colors', () => {
 		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
 		const paleCyan = 'rgb(142, 209, 252)';
 		await page
-			.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
+			.getByRole( 'option', { name: 'Color: Pale cyan blue' } )
 			.click( { force: true } );
 		// Cyan bluish gray for the submenu and overlay text color.
 		await page
@@ -303,7 +303,7 @@ test.describe( 'Navigation colors', () => {
 		// 171, 184, 195 is the color of the "Cyan bluish gray" color preset.
 		const cyanBluishGray = 'rgb(171, 184, 195)';
 		await page
-			.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
+			.getByRole( 'option', { name: 'Color: Cyan bluish gray' } )
 			.click( { force: true } );
 		// Luminous vivid amber for the submenu and overlay background color.
 		await page
@@ -312,7 +312,7 @@ test.describe( 'Navigation colors', () => {
 		// 252, 185, 0 is the color of the "Luminous vivid amber" color preset.
 		const vividAmber = 'rgb(252, 185, 0)';
 		await page
-			.getByRole( 'button', { name: 'Color: Luminous vivid amber' } )
+			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
 			.click( { force: true } );
 
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
