@@ -86,7 +86,7 @@ export function curateResults(
 		domContentLoaded: average( results.domContentLoaded ),
 		loaded: average( results.loaded ),
 		firstContentfulPaint: average( results.firstContentfulPaint ),
-		firstBlock: average( results.firstBlock ),
+		firstBlock: median( results.firstBlock ),
 		type: average( results.type ),
 		minType: minimum( results.type ),
 		maxType: maximum( results.type ),
