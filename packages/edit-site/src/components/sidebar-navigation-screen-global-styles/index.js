@@ -15,8 +15,6 @@ import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { humanTimeDiff } from '@wordpress/date';
 import { useCallback } from '@wordpress/element';
-import { store as noticesStore } from '@wordpress/notices';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -35,24 +33,7 @@ const noop = () => {};
 export function SidebarNavigationItemGlobalStyles( props ) {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { createNotice } = useDispatch( noticesStore );
-	const { set: setPreference } = useDispatch( preferencesStore );
-	const { get: getPreference } = useSelect( preferencesStore );
 
-	const turnOffDistractionFreeMode = useCallback( () => {
-		const isDistractionFree = getPreference(
-			editSiteStore.name,
-			'distractionFree'
-		);
-		if ( ! isDistractionFree ) {
-			return;
-		}
-		setPreference( editSiteStore.name, 'distractionFree', false );
-		createNotice( 'info', __( 'Distraction free mode turned off' ), {
-			isDismissible: true,
-			type: 'snackbar',
-		} );
-	}, [ createNotice, setPreference, getPreference ] );
 	const hasGlobalStyleVariations = useSelect(
 		( select ) =>
 			!! select(
@@ -73,7 +54,6 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 		<SidebarNavigationItem
 			{ ...props }
 			onClick={ () => {
-				turnOffDistractionFreeMode();
 				// Switch to edit mode.
 				setCanvasMode( 'edit' );
 				// Open global styles sidebar.
@@ -150,9 +130,6 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-	const { createNotice } = useDispatch( noticesStore );
-	const { set: setPreference } = useDispatch( preferencesStore );
-	const { get: getPreference } = useSelect( preferencesStore );
 	const { isViewMode, isStyleBookOpened, revisionsCount } = useSelect(
 		( select ) => {
 			const { getCanvasMode, getEditorCanvasContainerView } = unlock(
@@ -176,28 +153,12 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		[]
 	);
 
-	const turnOffDistractionFreeMode = useCallback( () => {
-		const isDistractionFree = getPreference(
-			editSiteStore.name,
-			'distractionFree'
-		);
-		if ( ! isDistractionFree ) {
-			return;
-		}
-		setPreference( editSiteStore.name, 'distractionFree', false );
-		createNotice( 'info', __( 'Distraction free mode turned off' ), {
-			isDismissible: true,
-			type: 'snackbar',
-		} );
-	}, [ createNotice, setPreference, getPreference ] );
-
 	const openGlobalStyles = useCallback( async () => {
-		turnOffDistractionFreeMode();
 		return Promise.all( [
 			setCanvasMode( 'edit' ),
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
-	}, [ setCanvasMode, openGeneralSidebar, turnOffDistractionFreeMode ] );
+	}, [ setCanvasMode, openGeneralSidebar ] );
 
 	const openStyleBook = useCallback( async () => {
 		await openGlobalStyles();
