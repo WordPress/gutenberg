@@ -21,11 +21,18 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 export default function PostSyncStatus() {
-	const { syncStatus, postType, meta } = useSelect( ( select ) => {
+	const { syncStatus, postType } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
+		const meta = getEditedPostAttribute( 'meta' );
+
+		// When the post is first created, the top level wp_pattern_sync_status is not set so get meta value instead.
+		const currentSyncStatus =
+			meta?.wp_pattern_sync_status === 'unsynced'
+				? 'unsynced'
+				: getEditedPostAttribute( 'wp_pattern_sync_status' );
+
 		return {
-			syncStatus: getEditedPostAttribute( 'wp_pattern_sync_status' ),
-			meta: getEditedPostAttribute( 'meta' ),
+			syncStatus: currentSyncStatus,
 			postType: getEditedPostAttribute( 'type' ),
 		};
 	} );
@@ -33,15 +40,12 @@ export default function PostSyncStatus() {
 	if ( postType !== 'wp_block' ) {
 		return null;
 	}
-	// When the post is first created, the top level wp_pattern_sync_status is not set so get meta value instead.
-	const currentSyncStatus =
-		meta?.wp_pattern_sync_status === 'unsynced' ? 'unsynced' : syncStatus;
 
 	return (
 		<PanelRow className="edit-post-sync-status">
 			<span>{ __( 'Sync status' ) }</span>
 			<div>
-				{ currentSyncStatus === 'unsynced'
+				{ syncStatus === 'unsynced'
 					? __( 'Not synced' )
 					: __( 'Fully synced' ) }
 			</div>
