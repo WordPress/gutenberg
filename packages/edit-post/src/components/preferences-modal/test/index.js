@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -27,21 +27,35 @@ describe( 'EditPostPreferencesModal', () => {
 			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => true );
 			render( <EditPostPreferencesModal /> );
-			await screen.findByRole( 'tab', {
+			const tabPanel = await screen.findByRole( 'tabpanel', {
 				name: 'General',
-				selected: true,
 			} );
+
 			expect(
-				screen.getByRole( 'dialog', { name: 'Preferences' } )
-			).toMatchSnapshot();
+				within( tabPanel ).getByLabelText(
+					'Include pre-publish checklist'
+				)
+			).toBeInTheDocument();
 		} );
-		it( 'small viewports', () => {
+		it( 'small viewports', async () => {
 			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => false );
 			render( <EditPostPreferencesModal /> );
+			const dialog = screen.getByRole( 'dialog', {
+				name: 'Preferences',
+			} );
+
 			expect(
-				screen.getByRole( 'dialog', { name: 'Preferences' } )
-			).toMatchSnapshot();
+				screen.queryByRole( 'tabpanel', {
+					name: 'General',
+				} )
+			).not.toBeInTheDocument();
+
+			expect(
+				within( dialog ).queryByLabelText(
+					'Include pre-publish checklist'
+				)
+			).not.toBeInTheDocument();
 		} );
 	} );
 
