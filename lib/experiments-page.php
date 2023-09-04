@@ -110,7 +110,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Block hooks allow automatically inserting a blocks in a position relative to another.', 'gutenberg' ),
+			'label' => __( 'Block hooks allow automatically inserting a block in a position relative to another.', 'gutenberg' ),
 			'id'    => 'gutenberg-block-hooks',
 		)
 	);
