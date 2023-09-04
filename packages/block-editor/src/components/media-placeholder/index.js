@@ -508,7 +508,7 @@ export function MediaPlaceholder( {
 						) }
 						onChange={ onUpload }
 						accept={ accept }
-						multiple={ multiple }
+						multiple={ !! multiple }
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
