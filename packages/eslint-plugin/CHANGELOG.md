@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The bundled `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` dependencies has been updated from requiring ^5.62.0 to requiring ^6.4.1 ([#53975](https://github.com/WordPress/gutenberg/pull/53975)):
+    -   Removes the deprecated `@typescript-eslint/no-duplicate-imports` rule in favor of `import/no-duplicates`.
+
 ### Enhancement
 
 -   Added a new `test-playwright` ruleset using [`eslint-plugin-playwright`](https://www.npmjs.com/package/eslint-plugin-playwright).

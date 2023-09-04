@@ -192,7 +192,7 @@
 		"eslint-import-resolver-node": "0.3.4",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.25.2",
-		"eslint-plugin-jest": "27.2.1",
+		"eslint-plugin-jest": "27.2.3",
 		"eslint-plugin-jest-dom": "5.0.2",
 		"eslint-plugin-ssr-friendly": "1.0.6",
 		"eslint-plugin-storybook": "0.6.13",
