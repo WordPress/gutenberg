@@ -329,7 +329,7 @@ function gutenberg_serialize_blocks( $blocks ) {
  *
  * @return void
  */
-function gutenberg_register_auto_insert_rest_field() {
+function gutenberg_register_block_hooks_rest_field() {
 	register_rest_field(
 		'block-type',
 		'block_hooks',
@@ -346,4 +346,4 @@ function gutenberg_register_auto_insert_rest_field() {
 		)
 	);
 }
-add_action( 'rest_api_init', 'gutenberg_register_auto_insert_rest_field' );
+add_action( 'rest_api_init', 'gutenberg_register_block_hooks_rest_field' );
