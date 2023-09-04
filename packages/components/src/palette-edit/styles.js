@@ -10,7 +10,7 @@ import Button from '../button';
 import { Heading } from '../heading';
 import { HStack } from '../h-stack';
 import { space } from '../ui/utils/space';
-import { COLORS, CONFIG, rtl } from '../utils';
+import { COLORS, CONFIG } from '../utils';
 import { View } from '../view';
 import InputControl from '../input-control';
 import {
@@ -42,7 +42,7 @@ export const NameInputControl = styled( InputControl )`
 
 export const PaletteItem = styled( View )`
 	padding-block: 3px;
-	${ rtl( { paddingLeft: space( 3 ), paddingRight: 0 } ) };
+	padding-inline-start: ${ space( 3 ) };
 	border: 1px solid ${ CONFIG.surfaceBorderColor };
 	border-bottom-color: transparent;
 	&:first-of-type {
