@@ -8,17 +8,20 @@
 /**
  * Return a function that auto-inserts a block next to a given "anchor" block.
  *
+ * This is a helper function used in the implementation of block hooks.
+ * It is not meant for public use.
+ *
  * The auto-inserted block can be inserted before or after the anchor block,
  * or as the first or last child of the anchor block.
  *
- * Note that the returned function mutates the auto-inserted block's designated
- * parent block by inserting into the parent's `innerBlocks` array, and by
- * updating the parent's `innerContent` array accordingly.
+ * Note that the returned function mutates the automatically inserted block's
+ * designated parent block by inserting into the parent's `innerBlocks` array,
+ * and by updating the parent's `innerContent` array accordingly.
  *
  * @param array  $inserted_block    The block to insert.
  * @param string $relative_position The position relative to the given block.
  *                                  Can be 'before', 'after', 'first_child', or 'last_child'.
- * @param string $anchor_block_type The auto-inserted block will be inserted next to instances of this block type.
+ * @param string $anchor_block_type The automatically inserted block will be inserted next to instances of this block type.
  * @return callable A function that accepts a block's content and returns the content with the inserted block.
  */
 function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $anchor_block_type ) {
