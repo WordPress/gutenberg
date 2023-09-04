@@ -109,8 +109,8 @@ $z-layers: (
 	// Above the block list and the header.
 	".block-editor-block-popover": 31,
 
-	// Show snackbars above everything (similar to popovers)
-	".components-snackbar-list": 100000,
+	// Show snackbars above everything, including modals (similar to popovers)
+	".components-snackbar-list": 100001,
 
 	// Show modal under the wp-admin menus and the popover
 	".components-modal__screen-overlay": 100000,
