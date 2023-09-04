@@ -1113,7 +1113,8 @@ export const mergeBlocks =
 
 		// If previous block is empty, remove previous block and update selection.
 		const blockAHasEmptyContent = blockA?.attributes.content === '';
-		if ( blockAHasEmptyContent && blockB?.attributes.content ) {
+		const blockBHastEmptyContent = blockB?.attributes.content === '';
+		if ( blockAHasEmptyContent && ! blockBHastEmptyContent ) {
 			dispatch.removeBlock( clientIdA );
 
 			if ( canRestoreTextSelection ) {
@@ -1165,20 +1166,18 @@ export const mergeBlocks =
 			);
 		}
 
-		const replacementBlocks = [
-			{
-				...blockA,
-				attributes: {
-					...blockA.attributes,
-					...updatedAttributes,
-				},
-			},
-			...blocksWithTheSameType.slice( 1 ),
-		];
-
 		dispatch.replaceBlocks(
 			[ blockA.clientId, blockB.clientId ],
-			replacementBlocks,
+			[
+				{
+					...blockA,
+					attributes: {
+						...blockA.attributes,
+						...updatedAttributes,
+					},
+				},
+				...blocksWithTheSameType.slice( 1 ),
+			],
 			0 // If we don't pass the `indexToSelect` it will default to the last block.
 		);
 	};
