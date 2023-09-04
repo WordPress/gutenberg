@@ -174,7 +174,7 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 add_filter( 'block_type_metadata_settings', 'gutenberg_add_hooked_blocks', 10, 2 );
 
 /**
- * Add a block to a given block hook.
+ * Register a hooked block for automatic insertion into a given block hook.
  *
  * A block hook is specified by a block type and a relative position. The hooked block
  * will be automatically inserted in the given position next to the "anchor" block
