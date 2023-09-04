@@ -162,7 +162,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 					shouldShowGlobalStylesFooter && (
 						<SidebarNavigationScreenDetailsFooter
 							record={ revisions?.[ 0 ] }
-							onClickRevisions={ openRevisions }
+							onClick={ openRevisions }
 						/>
 					)
 				}

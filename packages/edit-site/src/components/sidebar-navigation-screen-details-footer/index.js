@@ -5,7 +5,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import { humanTimeDiff } from '@wordpress/date';
 import { createInterpolateElement } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
-import { Button, Icon } from '@wordpress/components';
+import {
+	Icon,
+	__experimentalItemGroup as ItemGroup,
+} from '@wordpress/components';
 import { backup } from '@wordpress/icons';
 
 /**
@@ -16,38 +19,11 @@ import {
 	SidebarNavigationScreenDetailsPanelLabel,
 	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
+import SidebarNavigationItem from '../sidebar-navigation-item';
 
-function ScreenDetailsLastModifiedDate( { lastModifiedDateTime } ) {
-	return (
-		<SidebarNavigationScreenDetailsPanelRow
-			className="edit-site-sidebar-navigation-screen-details-footer__revision"
-			justify="space-between"
-		>
-			<SidebarNavigationScreenDetailsPanelLabel>
-				{ __( 'Last modified' ) }
-			</SidebarNavigationScreenDetailsPanelLabel>
-			<SidebarNavigationScreenDetailsPanelValue>
-				{ createInterpolateElement(
-					sprintf(
-						/* translators: %s: is the relative time when the post was last modified. */
-						__( '<time>%s</time>' ),
-						humanTimeDiff( lastModifiedDateTime )
-					),
-					{
-						time: <time dateTime={ lastModifiedDateTime } />,
-					}
-				) }
-			</SidebarNavigationScreenDetailsPanelValue>
-			<Icon
-				className="edit-site-sidebar-navigation-screen-details-footer__icon"
-				icon={ backup }
-			/>
-		</SidebarNavigationScreenDetailsPanelRow>
-	);
-}
 export default function SidebarNavigationScreenDetailsFooter( {
 	record,
-	onClickRevisions,
+	...otherProps
 } ) {
 	/*
 	 * There might be other items in the future,
@@ -58,42 +34,44 @@ export default function SidebarNavigationScreenDetailsFooter( {
 		return null;
 	}
 
-	const lastRevisionId = record?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id;
-
-	let revisionsButtonNavigationProps = null;
-
-	if ( onClickRevisions ) {
-		revisionsButtonNavigationProps = {
-			onClick: onClickRevisions,
-		};
-	}
-
-	if ( lastRevisionId ) {
-		revisionsButtonNavigationProps = {
-			href: addQueryArgs( 'revision.php', {
-				revision: lastRevisionId,
-				gutenberg: true,
-			} ),
-		};
+	const hrefProps = {};
+	if ( record?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ) {
+		hrefProps.href = addQueryArgs( 'revision.php', {
+			revision: record?._links[ 'predecessor-version' ][ 0 ].id,
+			gutenberg: true,
+		} );
+		hrefProps.as = 'a';
 	}
 
 	return (
-		<div className="edit-site-sidebar-navigation-screen-details-footer">
-			{ revisionsButtonNavigationProps ? (
-				<Button
-					className="edit-site-sidebar-navigation-screen-details-footer__button"
-					label={ __( 'Revisions' ) }
-					{ ...revisionsButtonNavigationProps }
-				>
-					<ScreenDetailsLastModifiedDate
-						lastModifiedDateTime={ record.modified }
+		<ItemGroup className="edit-site-sidebar-navigation-screen-details-footer">
+			<SidebarNavigationItem
+				label={ __( 'Revisions' ) }
+				{ ...hrefProps }
+				{ ...otherProps }
+			>
+				<SidebarNavigationScreenDetailsPanelRow justify="space-between">
+					<SidebarNavigationScreenDetailsPanelLabel>
+						{ __( 'Last modified' ) }
+					</SidebarNavigationScreenDetailsPanelLabel>
+					<SidebarNavigationScreenDetailsPanelValue>
+						{ createInterpolateElement(
+							sprintf(
+								/* translators: %s: is the relative time when the post was last modified. */
+								__( '<time>%s</time>' ),
+								humanTimeDiff( record.modified )
+							),
+							{
+								time: <time dateTime={ record.modified } />,
+							}
+						) }
+					</SidebarNavigationScreenDetailsPanelValue>
+					<Icon
+						className="edit-site-sidebar-navigation-screen-details-footer__icon"
+						icon={ backup }
 					/>
-				</Button>
-			) : (
-				<ScreenDetailsLastModifiedDate
-					lastModifiedDateTime={ record.modified }
-				/>
-			) }
-		</div>
+				</SidebarNavigationScreenDetailsPanelRow>
+			</SidebarNavigationItem>
+		</ItemGroup>
 	);
 }
