@@ -65,25 +65,25 @@ function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $an
 }
 
 /**
- * Add auto-insertion information to a block type's controller.
+ * Add block hooks information to a block type's controller.
  *
  * @param array  $inserted_block_type The type of block to insert.
  * @param string $position            The position relative to the anchor block.
  *                                    Can be 'before', 'after', 'first_child', or 'last_child'.
- * @param string $anchor_block_type   The auto-inserted block will be inserted next to instances of this block type.
- * @return callable A filter for the `rest_prepare_block_type` hook that adds an `auto_insert` field to the network response.
+ * @param string $anchor_block_type   The hooked block will be inserted next to instances of this block type.
+ * @return callable A filter for the `rest_prepare_block_type` hook that adds a `block_hooks` field to the network response.
  */
-function gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_block_type, $position, $anchor_block_type ) {
+function gutenberg_add_block_hooks_field_to_block_type_controller( $inserted_block_type, $position, $anchor_block_type ) {
 	return function( $response, $block_type ) use ( $inserted_block_type, $position, $anchor_block_type ) {
 		if ( $block_type->name !== $inserted_block_type ) {
 			return $response;
 		}
 
 		$data = $response->get_data();
-		if ( ! isset( $data['auto_insert'] ) ) {
-			$data['auto_insert'] = array();
+		if ( ! isset( $data['block_hooks'] ) ) {
+			$data['block_hooks'] = array();
 		}
-		$data['auto_insert'][ $anchor_block_type ] = $position;
+		$data['block_hooks'][ $anchor_block_type ] = $position;
 		$response->set_data( $data );
 		return $response;
 	};
@@ -205,12 +205,12 @@ function gutenberg_add_hooked_block( $inserted_block, $position, $anchor_block )
 		/*
 		 * The block-types REST API controller uses objects of the `WP_Block_Type` class, which are
 		 * in turn created upon block type registration. However, that class does not contain
-		 * an `auto_insert` property (and is not easily extensible), so we have to use a different
+		 * a `block_hooks` property (and is not easily extensible), so we have to use a different
 		 * mechanism to communicate to the controller which blocks have been registered for
 		 * auto-insertion. We're doing so here (i.e. upon block registration), by adding a filter to
 		 * the controller's response.
 		 */
-		$controller_extender = gutenberg_add_auto_insert_field_to_block_type_controller( $inserted_block, $position, $anchor_block );
+		$controller_extender = gutenberg_add_block_hooks_field_to_block_type_controller( $inserted_block, $position, $anchor_block );
 		add_filter( 'rest_prepare_block_type', $controller_extender, 10, 2 );
 }
 
@@ -325,14 +325,14 @@ function gutenberg_serialize_blocks( $blocks ) {
 }
 
 /**
- * Register the `auto_insert` field for the block-types REST API controller.
+ * Register the `block_hooks` field for the block-types REST API controller.
  *
  * @return void
  */
 function gutenberg_register_auto_insert_rest_field() {
 	register_rest_field(
 		'block-type',
-		'auto_insert',
+		'block_hooks',
 		array(
 			'schema' => array(
 				'description'       => __( 'This block is automatically inserted near any occurence of the block types used as keys of this map, into a relative position given by the corresponding value.', 'gutenberg' ),
