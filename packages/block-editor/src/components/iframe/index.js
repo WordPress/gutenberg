@@ -45,6 +45,9 @@ function bubbleEvent( event, Constructor, frame ) {
 	}
 
 	const newEvent = new Constructor( event.type, init );
+	if ( init.defaultPrevented ) {
+		newEvent.preventDefault();
+	}
 	const cancelled = ! frame.dispatchEvent( newEvent );
 
 	if ( cancelled ) {

@@ -76,7 +76,6 @@ function useDialog( options: DialogOptions ): useDialogReturn {
 				currentOptions.current?.onClose
 			) {
 				event.preventDefault();
-				event.stopPropagation();
 				currentOptions.current.onClose();
 			}
 		} );
