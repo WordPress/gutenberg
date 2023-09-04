@@ -208,8 +208,8 @@ function gutenberg_add_hooked_block( $hooked_block, $position, $anchor_block ) {
 		 * The block-types REST API controller uses objects of the `WP_Block_Type` class, which are
 		 * in turn created upon block type registration. However, that class does not contain
 		 * a `block_hooks` property (and is not easily extensible), so we have to use a different
-		 * mechanism to communicate to the controller which blocks have been registered for
-		 * auto-insertion. We're doing so here (i.e. upon block registration), by adding a filter to
+		 * mechanism to communicate to the controller which hooked blocks have been registered for
+		 * automatic insertion. We're doing so here (i.e. upon block registration), by adding a filter to
 		 * the controller's response.
 		 */
 		$controller_extender = gutenberg_add_block_hooks_field_to_block_type_controller( $hooked_block, $position, $anchor_block );
