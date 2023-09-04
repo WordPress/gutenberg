@@ -235,28 +235,25 @@ function BlocksHooksControl( props ) {
 	);
 }
 
-export const withAutoInsertingBlocks = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			const blockEdit = <BlockEdit key="edit" { ...props } />;
-			return (
-				<>
-					{ blockEdit }
-					<BlocksHooksControl
-						blockName={ props.name }
-						clientId={ props.clientId }
-					/>
-				</>
-			);
-		};
-	},
-	'withAutoInsertingBlocks'
-);
+export const withHookedBlocks = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		const blockEdit = <BlockEdit key="edit" { ...props } />;
+		return (
+			<>
+				{ blockEdit }
+				<BlocksHooksControl
+					blockName={ props.name }
+					clientId={ props.clientId }
+				/>
+			</>
+		);
+	};
+}, 'withHookedBlocks' );
 
 if ( window?.__experimentalBlockHooks ) {
 	addFilter(
 		'editor.BlockEdit',
 		'core/hooked-blocks/with-inspector-control',
-		withAutoInsertingBlocks
+		withHookedBlocks
 	);
 }
