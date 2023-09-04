@@ -173,6 +173,13 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 
 
 ---
+
+### enabled
+
+Defines whether the lightbox is enabled or not.
+
+
+---
 ## Styles
 
 

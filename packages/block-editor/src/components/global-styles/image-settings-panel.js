@@ -13,22 +13,19 @@ export function useHasImageSettingsPanel( name ) {
 }
 
 export default function ImageSettingsPanel( {
-	name,
 	onChange,
-	settings,
+	userSettings,
 	panelId,
 } ) {
-	const hasImageSettingsPanel = useHasImageSettingsPanel( name );
-
 	const resetLightbox = () => {
-		onChange( false );
+		onChange( undefined );
 	};
 
-	const decodeValue = () => {
-		return settings.lightbox ? settings.lightbox.enabled : false;
+	const onChangeLightbox = ( newSetting ) => {
+		onChange( {
+			enabled: newSetting,
+		} );
 	};
-
-	const lightbox = decodeValue();
 
 	return (
 		<>
@@ -37,23 +34,19 @@ export default function ImageSettingsPanel( {
 				resetAll={ resetLightbox }
 				panelId={ panelId }
 			>
-				{ hasImageSettingsPanel && (
-					<ToolsPanelItem
-						hasValue={ () => !! lightbox }
+				<ToolsPanelItem
+					hasValue={ () => !! userSettings?.lightbox }
+					label={ __( 'Expand on Click' ) }
+					onDeselect={ resetLightbox }
+					isShownByDefault={ true }
+					panelId={ panelId }
+				>
+					<ToggleControl
 						label={ __( 'Expand on Click' ) }
-						onDeselect={ resetLightbox }
-						isShownByDefault={ true }
-						panelId={ panelId }
-					>
-						<ToggleControl
-							label={ __( 'Expand on Click' ) }
-							checked={ lightbox }
-							onChange={ ( newValue ) => {
-								onChange( newValue );
-							} }
-						/>
-					</ToolsPanelItem>
-				) }
+						checked={ !! userSettings?.lightbox?.enabled }
+						onChange={ onChangeLightbox }
+					/>
+				</ToolsPanelItem>
 			</ToolsPanel>
 		</>
 	);

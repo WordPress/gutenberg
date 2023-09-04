@@ -92,6 +92,7 @@ function ScreenBlock( { name, variation } ) {
 		shouldDecodeEncode: false,
 	} );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
+	const [ userSettings ] = useGlobalSetting( '', name, 'user' );
 	const settings = useSettingsForBlockElement( rawSettings, name );
 	const blockType = getBlockType( name );
 	const blockVariations = useBlockVariations( name );
@@ -150,9 +151,7 @@ function ScreenBlock( { name, variation } ) {
 	const onChangeLightbox = ( newSetting ) => {
 		setSettings( {
 			...rawSettings,
-			lightbox: {
-				enabled: newSetting,
-			},
+			lightbox: newSetting,
 		} );
 	};
 	const onChangeBorders = ( newStyle ) => {
@@ -264,9 +263,8 @@ function ScreenBlock( { name, variation } ) {
 			) }
 			{ hasImageSettingsPanel && (
 				<ImageSettingsPanel
-					name={ name }
 					onChange={ onChangeLightbox }
-					settings={ settings }
+					userSettings={ userSettings }
 				/>
 			) }
 
