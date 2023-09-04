@@ -73,16 +73,16 @@ function BlocksHooksControl( props ) {
 						case 'before':
 						case 'after':
 							// Any of the current block's siblings (with the right block type) qualifies
-							// as an auto-inserted block (inserted `before` or `after` the current one),
-							// as the block might've been auto-inserted and then moved around a bit by the user.
+							// as a hooked block (inserted `before` or `after` the current one), as the block
+							// might've been automatically inserted and then moved around a bit by the user.
 							candidates = getBlock( rootClientId )?.innerBlocks;
 							break;
 
 						case 'first_child':
 						case 'last_child':
 							// Any of the current block's child blocks (with the right block type) qualifies
-							// as an auto-inserted first or last child block, as the block might've been
-							// auto-inserted and then moved around a bit by the user.
+							// as a hooked first or last child block, as the block might've been automatically
+							// inserted and then moved around a bit by the user.
 							candidates = getBlock( props.clientId ).innerBlocks;
 							break;
 					}
