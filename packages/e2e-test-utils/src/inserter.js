@@ -340,17 +340,6 @@ export async function insertPattern( searchTerm ) {
 }
 
 /**
- * Inserts a reusable block matching a given search term via the global
- * inserter.
- *
- * @param {string} searchTerm The term by which to find the reusable block to
- *                            insert.
- */
-export async function insertReusableBlock( searchTerm ) {
-	await insertFromGlobalInserter( 'Synced patterns', searchTerm );
-}
-
-/**
  * Inserts a Block Directory block matching a given search term via the global
  * inserter.
  *
