@@ -86,5 +86,21 @@ export const init = () => {
 		}
 	);
 
+	// TODO: of course remove this... Just testing to add the filter once.
+	// addFilter(
+	// 	'siteEditor.pageListColumns',
+	// 	'my/unique-filter',
+	// 	( columns ) => {
+	// 		return [
+	// 			{
+	// 				header: 'Status',
+	// 				id: 'status',
+	// 				cell: ( props ) => props.row.original.status,
+	// 			},
+	// 			...columns,
+	// 		];
+	// 	}
+	// );
+
 	return initBlock( { name, metadata, settings } );
 };

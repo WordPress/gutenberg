@@ -220,10 +220,13 @@ export default function SidebarNavigationScreenPages() {
 						) ) }
 						<SidebarNavigationItem
 							className="edit-site-sidebar-navigation-screen-pages__see-all"
-							href="edit.php?post_type=page"
-							onClick={ () => {
-								document.location = 'edit.php?post_type=page';
-							} }
+							{ ...useLink( {
+								path: '/pages',
+							} ) }
+							// href="edit.php?post_type=page"
+							// onClick={ () => {
+							// 	document.location = 'edit.php?post_type=page';
+							// } }
 						>
 							{ __( 'Manage all pages' ) }
 						</SidebarNavigationItem>

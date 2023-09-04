@@ -9,6 +9,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import PagePatterns from '../page-patterns';
 import PageTemplateParts from '../page-template-parts';
 import PageTemplates from '../page-templates';
+import PagePages from '../page-pages';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -24,6 +25,8 @@ export default function PageMain() {
 		return <PageTemplateParts />;
 	} else if ( path === '/patterns' ) {
 		return <PagePatterns />;
+	} else if ( path === '/pages' ) {
+		return <PagePages />;
 	}
 
 	return null;
