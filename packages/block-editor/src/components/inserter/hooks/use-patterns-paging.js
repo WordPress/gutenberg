@@ -14,17 +14,24 @@ const INITIAL_INSERTER_RESULTS = 5;
  * @param {Array}  currentCategoryPatterns An array of the current patterns to display.
  * @param {string} currentCategory         The currently selected category.
  * @param {string} scrollContainerClass    Class of container to scroll when moving between pages.
+ * @param {string} currentFilter           The currently search filter.
  *
  * @return {Object} Returns the relevant paging values. (totalItems, categoryPatternsList, numPages, changePage, currentPage)
  */
 export default function usePatternsPaging(
 	currentCategoryPatterns,
 	currentCategory,
-	scrollContainerClass
+	scrollContainerClass,
+	currentFilter = ''
 ) {
 	const [ currentPage, setCurrentPage ] = useState( 1 );
 	const previousCategory = usePrevious( currentCategory );
-	if ( previousCategory !== currentCategory && currentPage !== 1 ) {
+	const previousFilter = usePrevious( currentFilter );
+	if (
+		( previousCategory !== currentCategory ||
+			previousFilter !== currentFilter ) &&
+		currentPage !== 1
+	) {
 		setCurrentPage( 1 );
 	}
 	const totalItems = currentCategoryPatterns.length;

@@ -111,7 +111,8 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 	} = usePatternsPaging(
 		filteredBlockPatterns,
 		selectedCategory,
-		'.components-modal__content.is-scrollable'
+		'.components-modal__content.is-scrollable',
+		filterValue
 	);
 
 	const hasItems = !! filteredBlockPatterns?.length;
