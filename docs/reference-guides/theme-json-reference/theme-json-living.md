@@ -180,6 +180,13 @@ Defines whether the lightbox is enabled or not.
 
 
 ---
+
+### showUI
+
+Defines whether to show the Lightbox UI in the block editor
+
+
+---
 ## Styles
 
 

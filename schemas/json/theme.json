@@ -669,6 +669,11 @@
 					"description": "Defines whether the lightbox is enabled or not.",
 					"type": "boolean",
 					"additionalProperties": false
+				},
+				"showUI": {
+					"description": "Defines whether to show the Lightbox UI in the block editor",
+					"type": "boolean",
+					"additionalProperties": false
 				}
 			}
 		},

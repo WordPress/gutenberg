@@ -102,7 +102,7 @@ function ScreenBlock( { name, variation } ) {
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
-	const hasImageSettingsPanel = useHasImageSettingsPanel( name );
+	const hasImageSettingsPanel = useHasImageSettingsPanel( name, settings );
 	const hasVariationsPanel = !! blockVariations?.length && ! variation;
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
