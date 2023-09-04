@@ -59,7 +59,7 @@ test.describe( 'Block moving mode', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Fourth Paragraph' );
 
-		// Move a paragraph block in the first group block into the next group block.
+		// Move a paragraph block in the first group block into the second group block.
 		const paragraphBlock = editor.canvas.locator(
 			'text="First Paragraph"'
 		);
@@ -70,7 +70,7 @@ test.describe( 'Block moving mode', () => {
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Move to' } ).click();
-		await page.keyboard.press( 'ArrowLeft' ); // Select the parent group block.
+		await page.keyboard.press( 'ArrowLeft' ); // Select the first group block.
 		await page.keyboard.press( 'ArrowDown' ); // Select the second group block.
 		await page.keyboard.press( 'ArrowRight' ); // Enter the second group block.
 		await page.keyboard.press( 'ArrowDown' ); // Move down in the second group block.
