@@ -27,7 +27,7 @@ function BlocksHooksControl( props ) {
 		[]
 	);
 
-	const autoInsertedBlocksForCurrentBlock = useMemo(
+	const hookedBlocksForCurrentBlock = useMemo(
 		() =>
 			blockTypes?.filter(
 				( { autoInsert } ) =>
@@ -51,79 +51,75 @@ function BlocksHooksControl( props ) {
 		[ props.clientId ]
 	);
 
-	const autoInsertedBlockClientIds = useSelect(
+	const hookedBlockClientIds = useSelect(
 		( select ) => {
 			const { getBlock, getGlobalBlockCount } =
 				select( blockEditorStore );
 
-			const _autoInsertedBlockClientIds =
-				autoInsertedBlocksForCurrentBlock.reduce(
-					( clientIds, block ) => {
-						// If the block doesn't exist anywhere in the block tree,
-						// we know that we have to display the toggle for it, and set
-						// it to disabled.
-						if ( getGlobalBlockCount( block.name ) === 0 ) {
-							return clientIds;
-						}
+			const _hookedBlockClientIds = hookedBlocksForCurrentBlock.reduce(
+				( clientIds, block ) => {
+					// If the block doesn't exist anywhere in the block tree,
+					// we know that we have to display the toggle for it, and set
+					// it to disabled.
+					if ( getGlobalBlockCount( block.name ) === 0 ) {
+						return clientIds;
+					}
 
-						const relativePosition =
-							block?.autoInsert?.[ props.blockName ];
-						let candidates;
+					const relativePosition =
+						block?.autoInsert?.[ props.blockName ];
+					let candidates;
 
-						switch ( relativePosition ) {
-							case 'before':
-							case 'after':
-								// Any of the current block's siblings (with the right block type) qualifies
-								// as an auto-inserted block (inserted `before` or `after` the current one),
-								// as the block might've been auto-inserted and then moved around a bit by the user.
-								candidates =
-									getBlock( rootClientId )?.innerBlocks;
-								break;
+					switch ( relativePosition ) {
+						case 'before':
+						case 'after':
+							// Any of the current block's siblings (with the right block type) qualifies
+							// as an auto-inserted block (inserted `before` or `after` the current one),
+							// as the block might've been auto-inserted and then moved around a bit by the user.
+							candidates = getBlock( rootClientId )?.innerBlocks;
+							break;
 
-							case 'first_child':
-							case 'last_child':
-								// Any of the current block's child blocks (with the right block type) qualifies
-								// as an auto-inserted first or last child block, as the block might've been
-								// auto-inserted and then moved around a bit by the user.
-								candidates = getBlock(
-									props.clientId
-								).innerBlocks;
-								break;
-						}
+						case 'first_child':
+						case 'last_child':
+							// Any of the current block's child blocks (with the right block type) qualifies
+							// as an auto-inserted first or last child block, as the block might've been
+							// auto-inserted and then moved around a bit by the user.
+							candidates = getBlock( props.clientId ).innerBlocks;
+							break;
+					}
 
-						const autoInsertedBlock = candidates?.find(
-							( { name } ) => name === block.name
-						);
+					const autoInsertedBlock = candidates?.find(
+						( { name } ) => name === block.name
+					);
 
-						// If the block exists in the designated location, we consider it auto-inserted
-						// and show the toggle as enabled.
-						if ( autoInsertedBlock ) {
-							return {
-								...clientIds,
-								[ block.name ]: autoInsertedBlock.clientId,
-							};
-						}
-
-						// If no auto-inserted block was found in any of its designated locations,
-						// but it exists elsewhere in the block tree, we consider it manually inserted.
-						// In this case, we take note and will remove the corresponding toggle from the
-						// block inspector panel.
+					// If the block exists in the designated location, we consider it auto-inserted
+					// and show the toggle as enabled.
+					if ( autoInsertedBlock ) {
 						return {
 							...clientIds,
-							[ block.name ]: false,
+							[ block.name ]: autoInsertedBlock.clientId,
 						};
-					},
-					{}
-				);
+					}
 
-			if ( Object.values( _autoInsertedBlockClientIds ).length > 0 ) {
-				return _autoInsertedBlockClientIds;
+					// If no auto-inserted block was found in any of its designated locations,
+					// but it exists elsewhere in the block tree, we consider it manually inserted.
+					// In this case, we take note and will remove the corresponding toggle from the
+					// block inspector panel.
+					return {
+						...clientIds,
+						[ block.name ]: false,
+					};
+				},
+				{}
+			);
+
+			if ( Object.values( _hookedBlockClientIds ).length > 0 ) {
+				return _hookedBlockClientIds;
 			}
 
 			return EMPTY_OBJECT;
 		},
 		[
-			autoInsertedBlocksForCurrentBlock,
+			hookedBlocksForCurrentBlock,
 			props.blockName,
 			props.clientId,
 			rootClientId,
@@ -133,17 +129,17 @@ function BlocksHooksControl( props ) {
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
 
 	// Remove toggle if block isn't present in the designated location but elsewhere in the block tree.
-	const autoInsertedBlocksForCurrentBlockIfNotPresentElsewhere =
-		autoInsertedBlocksForCurrentBlock?.filter(
-			( block ) => autoInsertedBlockClientIds?.[ block.name ] !== false
+	const hookedBlocksForCurrentBlockIfNotPresentElsewhere =
+		hookedBlocksForCurrentBlock?.filter(
+			( block ) => hookedBlockClientIds?.[ block.name ] !== false
 		);
 
-	if ( ! autoInsertedBlocksForCurrentBlockIfNotPresentElsewhere.length ) {
+	if ( ! hookedBlocksForCurrentBlockIfNotPresentElsewhere.length ) {
 		return null;
 	}
 
 	// Group by block namespace (i.e. prefix before the slash).
-	const groupedAutoInsertedBlocks = autoInsertedBlocksForCurrentBlock.reduce(
+	const groupedAutoInsertedBlocks = hookedBlocksForCurrentBlock.reduce(
 		( groups, block ) => {
 			const [ namespace ] = block.name.split( '/' );
 			if ( ! groups[ namespace ] ) {
@@ -194,8 +190,7 @@ function BlocksHooksControl( props ) {
 							{ groupedAutoInsertedBlocks[ vendor ].map(
 								( block ) => {
 									const checked =
-										block.name in
-										autoInsertedBlockClientIds;
+										block.name in hookedBlockClientIds;
 
 									return (
 										<ToggleControl
@@ -227,7 +222,7 @@ function BlocksHooksControl( props ) {
 
 												// Remove block.
 												const clientId =
-													autoInsertedBlockClientIds[
+													hookedBlockClientIds[
 														block.name
 													];
 												removeBlock( clientId, false );
