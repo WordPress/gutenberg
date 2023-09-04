@@ -117,13 +117,11 @@ function AutoInsertingBlocksControl( props ) {
 			const { getBlock, getBlockIndex, getBlockRootClientId } =
 				select( blockEditorStore );
 
-			const _rootClientId = getBlockRootClientId( props.clientId );
-
 			return {
 				blockIndex: getBlockIndex( props.clientId ),
 				innerBlocksLength: getBlock( props.clientId )?.innerBlocks
 					?.length,
-				rootClientId: _rootClientId,
+				rootClientId: getBlockRootClientId( props.clientId ),
 			};
 		},
 		[ props.clientId ]
