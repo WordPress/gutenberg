@@ -75,13 +75,16 @@ export const ColorfulWrapper = styled.div`
 
 	width: 216px;
 
+	.components-popover__content:has( & ) {
+		overflow: visible !important;
+	}
+
 	.react-colorful {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		width: 216px;
 		height: auto;
-		overflow: hidden;
 	}
 
 	.react-colorful__saturation {
