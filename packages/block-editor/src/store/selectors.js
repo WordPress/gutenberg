@@ -2979,8 +2979,8 @@ export const isUngroupable = createRegistrySelector(
  * We need to have at least one block, have a grouping block name set and
  * be able to remove these blocks.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client Id of the block. If not passed the selected blocks client ids will be used.
+ * @param {Object}   state     Global application state.
+ * @param {string[]} clientIds Block client ids. If not passed the selected blocks client ids will be used.
  * @return {boolean} True if the blocks are groupable.
  */
 export const isGroupable = createRegistrySelector(

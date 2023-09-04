@@ -1084,7 +1084,7 @@ Indicates if the provided blocks(by client ids) are groupable. We need to have a
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _clientId_ `string`: Client Id of the block. If not passed the selected blocks client ids will be used.
+-   _clientIds_ `string[]`: Block client ids. If not passed the selected blocks client ids will be used.
 
 _Returns_
 
