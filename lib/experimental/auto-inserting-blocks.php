@@ -117,11 +117,11 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 
 	$inserted_block_name = $metadata['name'];
 	foreach ( $block_hooks as $anchor_block_name => $position ) {
-		// Avoid infinite recursion (auto-inserting next to or into self).
+		// Avoid infinite recursion (hooking to itself).
 		if ( $inserted_block_name === $anchor_block_name ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Cannot auto-insert block next to itself.', 'gutenberg' ),
+				__( 'Cannot hook block to itself.', 'gutenberg' ),
 				'6.4.0'
 			);
 			continue;
