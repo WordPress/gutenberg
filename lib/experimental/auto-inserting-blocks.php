@@ -133,7 +133,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 
 		$mapped_position = $property_mappings[ $position ];
 
-		gutenberg_register_auto_inserted_block( $inserted_block_name, $mapped_position, $anchor_block_name );
+		gutenberg_add_hooked_block( $inserted_block_name, $mapped_position, $anchor_block_name );
 
 		$settings['auto_insert'][ $anchor_block_name ] = $mapped_position;
 	}
@@ -163,7 +163,7 @@ function gutenberg_register_auto_inserted_blocks( $settings, $metadata ) {
 
 	$exposed_settings = array_intersect_key( $settings, $fields_to_pick );
 
-	// TODO: Make work for blocks registered via direct call to gutenberg_register_auto_inserted_block().
+	// TODO: Make work for blocks registered via direct call to gutenberg_add_hooked_block().
 	wp_add_inline_script(
 		'wp-blocks',
 		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( array( $inserted_block_name => $exposed_settings ) ) . ');'
@@ -190,7 +190,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_auto_inserted_bl
  * @param string $anchor_block    The name of the block to insert the auto-inserted block next to.
  * @return void
  */
-function gutenberg_register_auto_inserted_block( $inserted_block, $position, $anchor_block ) {
+function gutenberg_add_hooked_block( $inserted_block, $position, $anchor_block ) {
 		$inserted_block_array = array(
 			'blockName'    => $inserted_block,
 			'attrs'        => array(),
