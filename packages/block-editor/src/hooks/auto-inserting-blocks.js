@@ -87,16 +87,16 @@ function BlocksHooksControl( props ) {
 							break;
 					}
 
-					const autoInsertedBlock = candidates?.find(
+					const hookedBlock = candidates?.find(
 						( { name } ) => name === block.name
 					);
 
 					// If the block exists in the designated location, we consider it auto-inserted
 					// and show the toggle as enabled.
-					if ( autoInsertedBlock ) {
+					if ( hookedBlock ) {
 						return {
 							...clientIds,
-							[ block.name ]: autoInsertedBlock.clientId,
+							[ block.name ]: hookedBlock.clientId,
 						};
 					}
 
@@ -139,7 +139,7 @@ function BlocksHooksControl( props ) {
 	}
 
 	// Group by block namespace (i.e. prefix before the slash).
-	const groupedAutoInsertedBlocks = hookedBlocksForCurrentBlock.reduce(
+	const groupedHookedBlocks = hookedBlocksForCurrentBlock.reduce(
 		( groups, block ) => {
 			const [ namespace ] = block.name.split( '/' );
 			if ( ! groups[ namespace ] ) {
@@ -183,54 +183,50 @@ function BlocksHooksControl( props ) {
 				title={ __( 'Plugins' ) }
 				initialOpen={ true }
 			>
-				{ Object.keys( groupedAutoInsertedBlocks ).map( ( vendor ) => {
+				{ Object.keys( groupedHookedBlocks ).map( ( vendor ) => {
 					return (
 						<Fragment key={ vendor }>
 							<h3>{ vendor }</h3>
-							{ groupedAutoInsertedBlocks[ vendor ].map(
-								( block ) => {
-									const checked =
-										block.name in hookedBlockClientIds;
+							{ groupedHookedBlocks[ vendor ].map( ( block ) => {
+								const checked =
+									block.name in hookedBlockClientIds;
 
-									return (
-										<ToggleControl
-											checked={ checked }
-											key={ block.title }
-											label={
-												<HStack justify="flex-start">
-													<BlockIcon
-														icon={ block.icon }
-													/>
-													<span>{ block.title }</span>
-												</HStack>
-											}
-											onChange={ () => {
-												if ( ! checked ) {
-													// Create and insert block.
-													const relativePosition =
-														block.autoInsert[
-															props.blockName
-														];
-													insertBlockIntoDesignatedLocation(
-														createBlock(
-															block.name
-														),
-														relativePosition
-													);
-													return;
-												}
-
-												// Remove block.
-												const clientId =
-													hookedBlockClientIds[
-														block.name
+								return (
+									<ToggleControl
+										checked={ checked }
+										key={ block.title }
+										label={
+											<HStack justify="flex-start">
+												<BlockIcon
+													icon={ block.icon }
+												/>
+												<span>{ block.title }</span>
+											</HStack>
+										}
+										onChange={ () => {
+											if ( ! checked ) {
+												// Create and insert block.
+												const relativePosition =
+													block.autoInsert[
+														props.blockName
 													];
-												removeBlock( clientId, false );
-											} }
-										/>
-									);
-								}
-							) }
+												insertBlockIntoDesignatedLocation(
+													createBlock( block.name ),
+													relativePosition
+												);
+												return;
+											}
+
+											// Remove block.
+											const clientId =
+												hookedBlockClientIds[
+													block.name
+												];
+											removeBlock( clientId, false );
+										} }
+									/>
+								);
+							} ) }
 						</Fragment>
 					);
 				} ) }
