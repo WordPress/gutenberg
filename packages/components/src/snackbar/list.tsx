@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useReducedMotion } from '@wordpress/compose';
-import { useRef } from '@wordpress/element';
+import { createPortal, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -72,7 +72,7 @@ export function SnackbarList( {
 	const removeNotice =
 		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
 			onRemove?.( notice.id );
-	return (
+	return createPortal(
 		<div className={ className } tabIndex={ -1 } ref={ listRef }>
 			{ children }
 			<AnimatePresence>
@@ -103,7 +103,8 @@ export function SnackbarList( {
 					);
 				} ) }
 			</AnimatePresence>
-		</div>
+		</div>,
+		document.body
 	);
 }
 
