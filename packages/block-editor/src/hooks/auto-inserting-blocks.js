@@ -30,8 +30,8 @@ function BlocksHooksControl( props ) {
 	const hookedBlocksForCurrentBlock = useMemo(
 		() =>
 			blockTypes?.filter(
-				( { autoInsert } ) =>
-					autoInsert && props.blockName in autoInsert
+				( { blockHooks } ) =>
+					blockHooks && props.blockName in blockHooks
 			),
 		[ blockTypes, props.blockName ]
 	);
@@ -66,7 +66,7 @@ function BlocksHooksControl( props ) {
 					}
 
 					const relativePosition =
-						block?.autoInsert?.[ props.blockName ];
+						block?.blockHooks?.[ props.blockName ];
 					let candidates;
 
 					switch ( relativePosition ) {
@@ -207,7 +207,7 @@ function BlocksHooksControl( props ) {
 											if ( ! checked ) {
 												// Create and insert block.
 												const relativePosition =
-													block.autoInsert[
+													block.blockHooks[
 														props.blockName
 													];
 												insertBlockIntoDesignatedLocation(
