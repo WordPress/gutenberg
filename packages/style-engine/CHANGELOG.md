@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Style engine: provide a way to extend default block support style definitions [#45296](https://github.com/WordPress/gutenberg/pull/45296)
+
 ## 1.24.0 (2023-08-31)
 
 ## 1.23.0 (2023-08-16)
