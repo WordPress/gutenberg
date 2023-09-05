@@ -18,6 +18,7 @@
 ### Internal
 
 -   `Composite`: Convert to TypeScript ([#54028](https://github.com/WordPress/gutenberg/pull/54028)).
+-   `BorderControl`: Refactor unit tests to use `userEvent` ([#54155](https://github.com/WordPress/gutenberg/pull/54155))
 
 ## 25.7.0 (2023-08-31)
 
