@@ -399,6 +399,8 @@ const UnforwardedPopover = (
 	const shouldReduceMotion = useReducedMotion();
 	const shouldAnimate = animate && ! isExpanded && ! shouldReduceMotion;
 
+	const [ animationFinished, setAnimationFinished ] = useState( false );
+
 	const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
 		() => placementToMotionAnimationProps( computedPlacement ),
 		[ computedPlacement ]
@@ -410,6 +412,7 @@ const UnforwardedPopover = (
 					...motionInlineStyles,
 					...style,
 				},
+				onAnimationComplete: () => setAnimationFinished( true ),
 				...otherMotionProps,
 		  }
 		: {
@@ -417,16 +420,16 @@ const UnforwardedPopover = (
 				style,
 		  };
 
-	// Disable reason: We care to capture the _bubbled_ events from inputs
-	// within popover as inferring close intent.
+	// When Floating UI has finished positioning and Framer Motion has finished animating
+	// the popover, add the `is-positioned` class to signal that all transitions have finished.
+	const isPositioned =
+		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
 
 	let content = (
-		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<motion.div
 			className={ classnames( 'components-popover', className, {
 				'is-expanded': isExpanded,
-				'is-positioned': x !== null && y !== null,
+				'is-positioned': isPositioned,
 				// Use the 'alternate' classname for 'toolbar' variant for back compat.
 				[ `is-${
 					computedVariant === 'toolbar'
