@@ -109,10 +109,14 @@ const BottomSheetModalWithRef = (
 	 * would simplify migrating to `BottomSheetModal` in the future if the editor
 	 * header navigation is rendered by React Native, not the native host app.
 	 */
-	useImperativeHandle( ref, () => ( {
-		present: handlePresent,
-		dismiss: handleDismiss,
-	} ) );
+	useImperativeHandle(
+		ref,
+		() => ( {
+			present: handlePresent,
+			dismiss: handleDismiss,
+		} ),
+		[ handleDismiss, handlePresent ]
+	);
 
 	const handleClose = useCallback( () => {
 		setVisible( false );
