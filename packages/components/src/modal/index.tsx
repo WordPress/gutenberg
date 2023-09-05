@@ -204,10 +204,7 @@ function UnforwardedModal(
 		onPointerDown: ( event ) => {
 			if ( event.isPrimary && event.target === event.currentTarget ) {
 				pressTarget = event.target;
-				// Avoids loss of focus yet also leaves `useFocusOutside`
-				// practically useless with its only potential trigger being
-				// programmatic focus movement. TODO opt for either removing
-				// the hook or enhancing it such that this isn't needed.
+				// Avoids focus changing so that focus return works as expected.
 				event.preventDefault();
 			}
 		},
