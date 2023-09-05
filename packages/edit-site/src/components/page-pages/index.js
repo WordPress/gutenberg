@@ -31,7 +31,8 @@ import PageActions from '../page-actions';
 import {
 	DataTableRows,
 	DataTableGlobalSearchInput,
-	DataTablePagination,
+	DataTablePaginationNumbers,
+	DataTablePaginationTotalItems,
 	DataTableProvider,
 } from '../datatable';
 
@@ -65,7 +66,7 @@ export default function PagePages() {
 	const [ paginationInfo, setPaginationInfo ] = useState();
 	const [ { pageIndex, pageSize }, setPagination ] = useState( {
 		pageIndex: 0,
-		pageSize: 2,
+		pageSize: 3,
 	} );
 	// TODO: probably memo other objects passed as state(ex:https://tanstack.com/table/v8/docs/examples/react/pagination-controlled).
 	const pagination = useMemo(
@@ -221,9 +222,12 @@ export default function PagePages() {
 							className="edit-site-table"
 							isLoading={ isLoading }
 						/>
-						<DataTablePagination
-							totalItems={ paginationInfo?.totalItems }
-						/>
+						<HStack justify="space-between">
+							<DataTablePaginationTotalItems
+								totalItems={ paginationInfo?.totalItems }
+							/>
+							<DataTablePaginationNumbers />
+						</HStack>
 					</VStack>
 				</DataTableProvider>
 			</div>

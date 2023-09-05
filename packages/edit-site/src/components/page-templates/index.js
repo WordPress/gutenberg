@@ -6,6 +6,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
@@ -24,7 +25,8 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import {
 	DataTableRows,
 	DataTableGlobalSearchInput,
-	DataTablePagination,
+	DataTablePaginationTotalItems,
+	DataTablePaginationNumbers,
 	DataTableProvider,
 } from '../datatable';
 
@@ -117,14 +119,17 @@ export default function PageTemplates() {
 						columns={ columns }
 						options={ {
 							initialState: {
-								pagination: { pageSize: 5 },
+								pagination: { pageSize: 2 },
 							},
 						} }
 					>
 						<VStack>
 							<DataTableGlobalSearchInput />
 							<DataTableRows className="edit-site-table" />
-							<DataTablePagination />
+							<HStack justify="space-between">
+								<DataTablePaginationTotalItems />
+								<DataTablePaginationNumbers />
+							</HStack>
 						</VStack>
 					</DataTableProvider>
 				</div>
