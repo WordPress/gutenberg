@@ -202,7 +202,7 @@ function UnforwardedModal(
 		onPointerUp: React.PointerEventHandler< HTMLDivElement >;
 	} = {
 		onPointerDown: ( event ) => {
-			if ( event.isPrimary && event.target === event.currentTarget ) {
+			if ( event.target === event.currentTarget ) {
 				pressTarget = event.target;
 				// Avoids focus changing so that focus return works as expected.
 				event.preventDefault();
