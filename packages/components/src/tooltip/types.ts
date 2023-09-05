@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import type * as Ariakit from '@ariakit/react/tooltip';
-/**
  * Internal dependencies
  */
 import type { PopoverProps } from '../popover/types';
@@ -14,7 +10,7 @@ export type TooltipProps = {
 	 *
 	 * **Note**: Accepts only one child element.
 	 */
-	children: Ariakit.TooltipProps[ 'render' ];
+	children: React.ReactElement;
 	/**
 	 * The amount of time in milliseconds to wait before showing the tooltip.
 	 *

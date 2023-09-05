@@ -2,8 +2,6 @@
 
 Tooltip is a React component to render floating help text relative to a node when it receives focus or it is hovered upon by a mouse. If the tooltip exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
 
-This component utilizes [Ariakit's tooltip](https://ariakit.org/components/tooltip) which is based on the [WAI-ARIA Tooltip Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/).
-
 ## Usage
 
 Render a Tooltip, passing as a child the element to which it should anchor:
@@ -22,7 +20,7 @@ const MyTooltip = () => (
 
 The component accepts the following props:
 
-#### `children`: `Element`
+#### `children`: `React.ReactElement`
 
 The element to which the tooltip should anchor.
 
