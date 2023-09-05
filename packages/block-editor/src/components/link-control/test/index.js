@@ -1013,6 +1013,11 @@ describe( 'Link submission', () => {
 
 		await user.type( searchInput, '#appendtolinktext' );
 
+		// As typing triggers the search handler, we need to wait for the
+		// search results to be returned. We can use the presence of the
+		// search results listbox as a proxy for this.
+		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+
 		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'false' );
 	} );
 } );
