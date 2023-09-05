@@ -41,10 +41,12 @@ export default function SidebarNavigationScreen( {
 	description,
 	backPath: backPathProp,
 } ) {
-	const { dashboardLink } = useSelect( ( select ) => {
+	const { dashboardLink, themePreviewBackLink } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 		return {
 			dashboardLink: getSettings().__experimentalDashboardLink,
+			themePreviewBackLink:
+				getSettings().__experimentalThemePreviewBackLink,
 		};
 	}, [] );
 	const { getTheme } = useSelect( coreStore );
@@ -99,7 +101,7 @@ export default function SidebarNavigationScreen( {
 							href={
 								! isPreviewingTheme()
 									? dashboardLink || 'index.php'
-									: 'themes.php'
+									: themePreviewBackLink || 'themes.php'
 							}
 						/>
 					) }
