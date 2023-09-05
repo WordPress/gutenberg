@@ -5,11 +5,19 @@
  * @param {HTMLElement} element Popover element.
  */
 function toBePositionedPopover( element ) {
-	const popover = element.closest( '.components-popover' ) || element;
-	const pass = popover.classList.contains( 'is-positioned' );
+	const popover = element && element.closest( '.components-popover' );
+	const isPopoverPositioned =
+		popover && popover.classList.contains( 'is-positioned' );
+	const pass = !! popover && !! isPopoverPositioned;
+
 	return {
 		pass,
-		message: () => `Received element is ${ pass ? '' : 'not ' }positioned`,
+		message: () => {
+			const is = pass ? 'is' : 'is not';
+			return ! popover
+				? `Received element ${ is }, or ${ is } positioned inside, a Popover component.`
+				: `Received element ${ is } positioned`;
+		},
 	};
 }
 
