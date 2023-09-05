@@ -27,17 +27,10 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollections extends WP_REST
 
 		// Add a font collection.
 		$config = array(
-<<<<<<< HEAD
 			'id'          => 'my-font-collection',
 			'name'        => 'My Font Collection',
 			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
 			'src'         => $mock_file,
-=======
-			'id'             => 'my-font-collection',
-			'name'           => 'My Font Collection',
-			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
-			'data_json_file' => $mock_file,
->>>>>>> trunk
 		);
 		wp_register_font_collection( $config );
 
@@ -49,9 +42,5 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollections extends WP_REST
 		$this->assertArrayHasKey( 'id', $data[0], 'The response data does not have the key with the collection ID.' );
 		$this->assertArrayHasKey( 'name', $data[0], 'The response data does not have the key with the collection name.' );
 	}
-<<<<<<< HEAD
-
-=======
->>>>>>> trunk
 }
 
