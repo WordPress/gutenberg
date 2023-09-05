@@ -33,7 +33,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 
 	$should_load_view_script = false;
 
-	if ( isset( $block->parsed_block['lightboxEnabled'] )  ) {
+	if ( isset( $block->parsed_block['lightboxEnabled'] ) ) {
 		$should_load_view_script = true;
 	}
 
@@ -54,10 +54,17 @@ function render_block_core_image( $attributes, $content, $block ) {
 	return $processor->get_updated_html();
 }
 
+/**
+ * Add the lightboxEnabled flag to the block data.
+ *
+ * This is used to determine whether the lightbox should be rendered or not.
+ *
+ * @param  array $block Block data.
+ * @return array        Filtered block data.
+ */
+function block_core_image_should_render_lightbox( $block ) {
 
-function should_render_lightbox_core( $block ) {
-
-	if( 'core/image' !== $block['blockName'] ) {
+	if ( 'core/image' !== $block['blockName'] ) {
 		return $block;
 	}
 
@@ -66,14 +73,13 @@ function should_render_lightbox_core( $block ) {
 		$lightbox_settings = $block['attrs']['lightbox'];
 		// If the lightbox setting is not set in the block attributes, get it from
 		// the global settings.
-
 	} else {
-		$lightbox_settings = gutenberg_get_global_settings( array('lightbox'), array( 'block_name' => 'core/image' ) );
+		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
 	}
 
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 
-	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered
+	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered.
 	if ( isset( $lightbox_settings ) &&
 	true === $lightbox_settings['enabled'] &&
 		'none' === $link_destination
@@ -83,7 +89,7 @@ function should_render_lightbox_core( $block ) {
 
 	return $block;
 }
-add_filter( 'render_block_data', 'should_render_lightbox_core', 10, 1 );
+add_filter( 'render_block_data', 'block_core_image_should_render_lightbox', 10, 1 );
 
 
 /**

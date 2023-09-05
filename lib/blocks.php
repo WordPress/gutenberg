@@ -436,37 +436,49 @@ function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $si
 
 add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 4 );
 
-function should_render_lightbox_gutenberg( $block ) {
 
-	if( 'core/image' !== $block['blockName'] ) {
+/**
+ * Check if the lightbox should be rendered for a given block.
+ *
+ * This function is INTENTIONALLY left out of core as it only provides
+ * backwards compatibility for the legacy lightbox syntax that was only
+ * introduced in Gutenberg. The legacy syntax was using the `behaviors` key in
+ * the block attrbutes and the `theme.json` file.
+ *
+ * @param array $block The block to check.
+ * @return array The block with the lightboxEnabled flag set if the lightbox should be rendered.
+ */
+function gutenberg_should_render_lightbox( $block ) {
+
+	if ( 'core/image' !== $block['blockName'] ) {
 		return $block;
 	}
 
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['lightbox'] ) ) {
 		$lightbox_settings = $block['attrs']['lightbox'];
-	// If not present, check legacy syntax
-	} else if( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
+		// If not present, check legacy syntax.
+	} elseif ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
 		$lightbox_settings = $block['attrs']['behaviors']['lightbox'];
 	}
 
-	// If not present in block attributes, check global settings
-	if(!isset($lightbox_settings)) {
-		$lightbox_settings = gutenberg_get_global_settings( array('lightbox'), array( 'block_name' => 'core/image' ) );
+	// If not present in block attributes, check global settings.
+	if ( ! isset( $lightbox_settings ) ) {
+		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
 	}
 
-	// If not present in global settings, check legacy syntax
-	if(!isset($lightbox_settings) || is_null($lightbox_settings['enabled']) ) {
+	// If not present in global settings, check legacy syntax.
+	if ( ! isset( $lightbox_settings ) || is_null( $lightbox_settings['enabled'] ) ) {
 		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
-		if ( isset( $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'] ) )  {
+		if ( isset( $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'] ) ) {
 			$lightbox_settings = $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
 		}
 	}
 
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 
-	// If the lightbox is enabled, the image is not linked, flag the lightbox to be rendered
-	if ( isset($lightbox_settings) &&
+	// If the lightbox is enabled, the image is not linked, flag the lightbox to be rendered.
+	if ( isset( $lightbox_settings ) &&
 		true === $lightbox_settings['enabled'] &&
 		'none' === $link_destination
 	) {
@@ -476,4 +488,7 @@ function should_render_lightbox_gutenberg( $block ) {
 	return $block;
 }
 
-add_filter( 'render_block_data', 'should_render_lightbox_gutenberg', 15, 1 );
+// Run with a priority of 15 to ensure it runs after
+// `block_core_image_should_render_lightbox` core filter (that has a
+// priority of 10).
+add_filter( 'render_block_data', 'gutenberg_should_render_lightbox', 15, 1 );
