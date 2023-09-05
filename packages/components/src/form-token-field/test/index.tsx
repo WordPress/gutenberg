@@ -240,7 +240,7 @@ describe( 'FormTokenField', () => {
 			expectTokensToBeInTheDocument( [ 'grapefruit' ] );
 		} );
 
-		it( "should not add a token with the input's value when pressing the tab key", async () => {
+		it( "should not add a token with the input's value when tokenizeOnBlur is not set and pressing the tab key", async () => {
 			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
