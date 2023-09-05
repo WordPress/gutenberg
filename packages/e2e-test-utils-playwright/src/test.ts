@@ -120,9 +120,15 @@ const test = base.extend<
 		await use( page );
 
 		// Clear local storage after each test.
-		await page.evaluate( () => {
-			window.localStorage.clear();
-		} );
+		// This needs to be wrapped with a try/catch because it can fail when
+		// the test is skipped (e.g. via fixme).
+		try {
+			await page.evaluate( () => {
+				window.localStorage.clear();
+			} );
+		} catch ( error ) {
+			// noop.
+		}
 
 		await page.close();
 	},

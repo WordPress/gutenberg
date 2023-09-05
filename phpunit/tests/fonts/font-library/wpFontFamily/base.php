@@ -28,8 +28,7 @@ abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 
-		$uploads_dir       = wp_upload_dir();
-		static::$fonts_dir = $uploads_dir['basedir'] . '/fonts/';
+		static::$fonts_dir = WP_Font_Library::get_fonts_dir();
 		wp_mkdir_p( static::$fonts_dir );
 	}
 
@@ -61,7 +60,7 @@ abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 					'size'     => 123,
 				),
 			),
-			'font_filename' => static::$fonts_dir . 'merriweather_normal_400.ttf',
+			'font_filename' => path_join( static::$fonts_dir, 'merriweather_normal_400.ttf' ),
 		);
 	}
 

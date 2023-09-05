@@ -31,5 +31,4 @@ abstract class WP_REST_Font_Library_Controller_UnitTestCase extends WP_UnitTestC
 		$property->setAccessible( true );
 		$property->setValue( array() );
 	}
-
 }

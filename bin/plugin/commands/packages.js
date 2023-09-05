@@ -150,6 +150,7 @@ async function runNpmReleaseBranchSyncStep( pluginReleaseBranch, config ) {
 		 */
 		await repo
 			.raw( 'rm', '-r', '.' )
+			.fetch( 'origin', pluginReleaseBranch, [ '--depth=1' ] )
 			.raw( 'checkout', `origin/${ pluginReleaseBranch }`, '--', '.' );
 
 		const { commit: commitHash } = await repo.commit(

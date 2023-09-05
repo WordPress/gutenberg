@@ -31,6 +31,30 @@ import { useWritingFlow } from '../writing-flow';
 import { useCompatibilityStyles } from './use-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
 
+function bubbleEvent( event, Constructor, frame ) {
+	const init = {};
+
+	for ( const key in event ) {
+		init[ key ] = event[ key ];
+	}
+
+	if ( event instanceof frame.ownerDocument.defaultView.MouseEvent ) {
+		const rect = frame.getBoundingClientRect();
+		init.clientX += rect.left;
+		init.clientY += rect.top;
+	}
+
+	const newEvent = new Constructor( event.type, init );
+	if ( init.defaultPrevented ) {
+		newEvent.preventDefault();
+	}
+	const cancelled = ! frame.dispatchEvent( newEvent );
+
+	if ( cancelled ) {
+		event.preventDefault();
+	}
+}
+
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
  * document to ensure that the keyboard shortcuts and drag and drop work.
@@ -39,42 +63,30 @@ import { store as blockEditorStore } from '../../store';
  * should be context dependent, e.g. actions on blocks like Cmd+A should not
  * work globally outside the block editor.
  *
- * @param {Document} doc Document to attach listeners to.
+ * @param {Document} iframeDocument Document to attach listeners to.
  */
-function bubbleEvents( doc ) {
-	const { defaultView } = doc;
-	const { frameElement } = defaultView;
-
-	function bubbleEvent( event ) {
-		const prototype = Object.getPrototypeOf( event );
-		const constructorName = prototype.constructor.name;
-		const Constructor = window[ constructorName ];
-
-		const init = {};
-
-		for ( const key in event ) {
-			init[ key ] = event[ key ];
+function useBubbleEvents( iframeDocument ) {
+	return useRefEffect( ( body ) => {
+		const { defaultView } = iframeDocument;
+		const { frameElement } = defaultView;
+		const eventTypes = [ 'dragover', 'mousemove' ];
+		const handlers = {};
+		for ( const name of eventTypes ) {
+			handlers[ name ] = ( event ) => {
+				const prototype = Object.getPrototypeOf( event );
+				const constructorName = prototype.constructor.name;
+				const Constructor = window[ constructorName ];
+				bubbleEvent( event, Constructor, frameElement );
+			};
+			body.addEventListener( name, handlers[ name ] );
 		}
 
-		if ( event instanceof defaultView.MouseEvent ) {
-			const rect = frameElement.getBoundingClientRect();
-			init.clientX += rect.left;
-			init.clientY += rect.top;
-		}
-
-		const newEvent = new Constructor( event.type, init );
-		const cancelled = ! frameElement.dispatchEvent( newEvent );
-
-		if ( cancelled ) {
-			event.preventDefault();
-		}
-	}
-
-	const eventTypes = [ 'dragover', 'mousemove' ];
-
-	for ( const name of eventTypes ) {
-		doc.addEventListener( name, bubbleEvent );
-	}
+		return () => {
+			for ( const name of eventTypes ) {
+				body.removeEventListener( name, handlers[ name ] );
+			}
+		};
+	} );
 }
 
 function Iframe( {
@@ -117,7 +129,6 @@ function Iframe( {
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
 
-			bubbleEvents( contentDocument );
 			clearerRef( documentElement );
 
 			// Ideally ALL classes that are added through get_body_class should
@@ -182,6 +193,7 @@ function Iframe( {
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
+		useBubbleEvents( iframeDocument ),
 		contentRef,
 		clearerRef,
 		writingFlowRef,
@@ -251,6 +263,9 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
+						// We want to prevent React events from bubbling throught the iframe
+						// we bubble these manually.
+						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
 							className={ classnames(
@@ -258,6 +273,18 @@ function Iframe( {
 								'editor-styles-wrapper',
 								...bodyClasses
 							) }
+							onKeyDown={ ( event ) => {
+								// This stopPropagation call ensures React doesn't create a syncthetic event to bubble this event
+								// which would result in two React events being bubbled throught the iframe.
+								event.stopPropagation();
+								const { defaultView } = iframeDocument;
+								const { frameElement } = defaultView;
+								bubbleEvent(
+									event,
+									window.KeyboardEvent,
+									frameElement
+								);
+							} }
 						>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>

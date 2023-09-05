@@ -29,19 +29,15 @@ const BlockSettingsMenuControlsSlot = ( {
 	clientIds = null,
 	__unstableDisplayLocation,
 } ) => {
-	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
+	const { selectedBlocks, selectedClientIds } = useSelect(
 		( select ) => {
-			const {
-				getBlockNamesByClientId,
-				getSelectedBlockClientIds,
-				canRemoveBlocks,
-			} = select( blockEditorStore );
+			const { getBlockNamesByClientId, getSelectedBlockClientIds } =
+				select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
 				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
-				canRemove: canRemoveBlocks( ids ),
 			};
 		},
 		[ clientIds ]
@@ -55,8 +51,7 @@ const BlockSettingsMenuControlsSlot = ( {
 	const convertToGroupButtonProps =
 		useConvertToGroupButtonProps( selectedClientIds );
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
-	const showConvertToGroupButton =
-		( isGroupable || isUngroupable ) && canRemove;
+	const showConvertToGroupButton = isGroupable || isUngroupable;
 
 	return (
 		<Slot

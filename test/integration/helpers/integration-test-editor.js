@@ -16,7 +16,6 @@ import {
 	WritingFlow,
 } from '@wordpress/block-editor';
 import { registerCoreBlocks } from '@wordpress/block-library';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import '@wordpress/format-library';
 import {
 	createBlock,
@@ -66,21 +65,19 @@ export function Editor( { testBlocks, settings = {} } ) {
 	}, [] );
 
 	return (
-		<ShortcutProvider>
-			<BlockEditorProvider
-				value={ currentBlocks }
-				onInput={ updateBlocks }
-				onChange={ updateBlocks }
-				settings={ settings }
-			>
-				<BlockInspector />
-				<BlockTools>
-					<WritingFlow>
-						<BlockList />
-					</WritingFlow>
-				</BlockTools>
-			</BlockEditorProvider>
-		</ShortcutProvider>
+		<BlockEditorProvider
+			value={ currentBlocks }
+			onInput={ updateBlocks }
+			onChange={ updateBlocks }
+			settings={ settings }
+		>
+			<BlockInspector />
+			<BlockTools>
+				<WritingFlow>
+					<BlockList />
+				</WritingFlow>
+			</BlockTools>
+		</BlockEditorProvider>
 	);
 }
 
