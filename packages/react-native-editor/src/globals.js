@@ -7,6 +7,7 @@ import jsdom from 'jsdom-jscore-rn';
 import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
 import 'react-native-url-polyfill/auto';
 import EventSource from 'react-native-sse';
+import 'event-target-polyfill';
 
 /**
  * Babel polyfills
