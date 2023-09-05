@@ -8,10 +8,6 @@ import deprecated from '@wordpress/deprecated';
  */
 import type { FocusableIframeProps } from './types';
 
-/**
- * @param {Object}                                 props
- * @param {import('react').Ref<HTMLIFrameElement>} props.iframeRef
- */
 export default function FocusableIframe( {
 	iframeRef,
 	...props
