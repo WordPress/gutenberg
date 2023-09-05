@@ -1,5 +1,5 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
+const EXCLUDED_EXTERNALS = [ '@wordpress/icons', '@wordpress/interface' ];
 
 /**
  * Default request to global transformation
@@ -36,10 +36,6 @@ function defaultRequestToExternal( request ) {
 
 	if ( request.includes( 'react-refresh/runtime' ) ) {
 		return 'ReactRefreshRuntime';
-	}
-
-	if ( BUNDLED_PACKAGES.includes( request ) ) {
-		return undefined;
 	}
 
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
@@ -93,6 +89,7 @@ function camelCaseDash( string ) {
 }
 
 module.exports = {
+	EXCLUDED_EXTERNALS,
 	camelCaseDash,
 	defaultRequestToExternal,
 	defaultRequestToHandle,
