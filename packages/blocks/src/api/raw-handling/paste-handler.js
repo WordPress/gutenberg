@@ -70,25 +70,12 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
  * block, and the original plain text content does not have any line breaks,
  * then treat it as inline paste.
  *
- * @param {Object}  options
- * @param {Array}   options.blocks
- * @param {string}  options.plainText
- * @param {string}  options.mode
- * @param {boolean} options.preserveWhiteSpace
+ * @param {Object} options
+ * @param {Array}  options.blocks
+ * @param {string} options.plainText
+ * @param {string} options.mode
  */
-function maybeConvertToInline( {
-	blocks,
-	plainText,
-	mode,
-	preserveWhiteSpace,
-} ) {
-	if ( mode === 'INLINE' ) {
-		// To do: this filter is a bit too agressive for internal paste, it
-		// will remove highlights for example. We should try to remove only
-		// block level elements.
-		return filterInlineHTML( plainText, preserveWhiteSpace );
-	}
-
+function maybeConvertToInline( { blocks, plainText, mode } ) {
 	if (
 		mode === 'AUTO' &&
 		blocks.length === 1 &&
@@ -169,12 +156,18 @@ export function pasteHandler( {
 		HTML = HTML.normalize();
 	}
 
+	if ( mode === 'INLINE' ) {
+		// To do: this filter is a bit too agressive for internal paste, it
+		// will remove highlights for example. We should try to remove only
+		// block level elements.
+		return filterInlineHTML( HTML, preserveWhiteSpace );
+	}
+
 	if ( disableFilters ) {
 		return maybeConvertToInline( {
 			blocks: htmlToBlocks( normaliseBlocks( HTML ), pasteHandler ),
 			plainText,
 			mode,
-			preserveWhiteSpace,
 		} );
 	}
 
