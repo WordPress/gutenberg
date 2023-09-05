@@ -2,7 +2,7 @@
 	const { useSelect } = wp.data;
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
-	const { InnerBlocks } = wp.blockEditor;
+	const { InnerBlocks, useBlockProps } = wp.blockEditor;
 	const divProps = {
 		className: 'product',
 		style: { outline: '1px solid gray', padding: 5 },
@@ -10,7 +10,7 @@
 
 	const allowedBlocksWhenSingleEmptyChild = [ 'core/image', 'core/list' ];
 	const allowedBlocksWhenTwoChildren = [ 'core/gallery', 'core/video' ];
-    const allowedBlocksWhenTreeOrMoreChildren = [ 'core/gallery', 'core/video', 'core/list'  ];
+	const allowedBlocksWhenTreeOrMoreChildren = [ 'core/gallery', 'core/video', 'core/list'  ];
 
 	registerBlockType( 'test/allowed-blocks-dynamic', {
 		apiVersion: 3,
@@ -26,20 +26,23 @@
 				},
 				[ props.clientId ]
 			);
-            let allowedBlocks = allowedBlocksWhenSingleEmptyChild;
-            if ( props.numberOfChildren === 2 ) {
-                allowedBlocks = allowedBlocksWhenTwoChildren;
-            } else if( props.numberOfChildren > 2 ){
-                allowedBlocks = allowedBlocksWhenTreeOrMoreChildren;
-            }
+			const blockProps = useBlockProps({
+				...divProps,
+				'data-number-of-children': numberOfChildren,
+			});
+
+			let allowedBlocks = allowedBlocksWhenSingleEmptyChild;
+			if ( numberOfChildren === 2 ) {
+				allowedBlocks = allowedBlocksWhenTwoChildren;
+			} else if( numberOfChildren > 2 ){
+				allowedBlocks = allowedBlocksWhenTreeOrMoreChildren;
+			}
+
 			return el(
 				'div',
-				{
-					...divProps,
-					'data-number-of-children': numberOfChildren,
-				},
+				blockProps,
 				el( InnerBlocks, {
-					allowedBlocks,
+					allowedBlocks
 				} )
 			);
 		},
