@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { isRTL, __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { pencil } from '@wordpress/icons';
+import { drawerLeft, drawerRight } from '@wordpress/icons';
 import {
 	__experimentalUseNavigator as useNavigator,
 	Icon,
@@ -112,9 +112,10 @@ export default function SidebarNavigationScreenTemplate() {
 						} }
 					/>
 					<SidebarButton
+						isPressed
 						onClick={ () => setCanvasMode( 'edit' ) }
-						label={ __( 'Edit' ) }
-						icon={ pencil }
+						label={ __( 'Close sidebar & edit' ) }
+						icon={ isRTL() ? drawerRight : drawerLeft }
 					/>
 				</>
 			}
