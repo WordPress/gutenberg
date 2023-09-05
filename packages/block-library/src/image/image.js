@@ -24,6 +24,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
+	useSetting,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
@@ -173,6 +174,7 @@ export default function Image( {
 			},
 			[ clientId ]
 		);
+
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
@@ -367,6 +369,18 @@ export default function Image( {
 		availableUnits: [ 'px' ],
 	} );
 
+	const lightboxSetting = useSetting( 'lightbox' );
+
+	const lightboxChecked = useMemo( () => {
+		// If the lightbox is set in the block attributes, use that.
+		if ( lightbox?.enabled ) return true;
+
+		// If the lightbox is NOT set in the block attributes AND it IS enabled in
+		// the settings, use that.
+		if ( ! lightbox && lightboxSetting?.enabled ) return true;
+		return false;
+	}, [ lightbox, lightboxSetting ] );
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -532,7 +546,7 @@ export default function Image( {
 					>
 						<ToggleControl
 							label={ __( 'Expand on Click' ) }
-							checked={ !! lightbox?.enabled }
+							checked={ lightboxChecked }
 							onChange={ ( newValue ) => {
 								setAttributes( {
 									lightbox: { enabled: newValue },

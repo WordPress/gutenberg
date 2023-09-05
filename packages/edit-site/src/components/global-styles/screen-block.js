@@ -149,10 +149,25 @@ function ScreenBlock( { name, variation } ) {
 		}
 	};
 	const onChangeLightbox = ( newSetting ) => {
-		setSettings( {
-			...rawSettings,
-			lightbox: newSetting,
-		} );
+		// If the newSetting is undefined, this means that the user has deselected
+		// (reset) the lightbox setting.
+		if ( newSetting === undefined ) {
+			setSettings( {
+				...rawSettings,
+				lightbox: undefined,
+			} );
+
+			// Otherwise, we simply set the lightbox setting to the new value but
+			// taking care of not overriding the other lightbox settings.
+		} else {
+			setSettings( {
+				...rawSettings,
+				lightbox: {
+					...rawSettings.lightbox,
+					...newSetting,
+				},
+			} );
+		}
 	};
 	const onChangeBorders = ( newStyle ) => {
 		if ( ! newStyle?.border ) {
@@ -265,6 +280,7 @@ function ScreenBlock( { name, variation } ) {
 				<ImageSettingsPanel
 					onChange={ onChangeLightbox }
 					userSettings={ userSettings }
+					settings={ settings }
 				/>
 			) }
 

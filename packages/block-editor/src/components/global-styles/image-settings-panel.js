@@ -15,6 +15,7 @@ export function useHasImageSettingsPanel( name, settings ) {
 export default function ImageSettingsPanel( {
 	onChange,
 	userSettings,
+	settings,
 	panelId,
 } ) {
 	const resetLightbox = () => {
@@ -43,10 +44,7 @@ export default function ImageSettingsPanel( {
 				>
 					<ToggleControl
 						label={ __( 'Expand on Click' ) }
-						// TODO: Figure out if we want to use the `userSettings` or the global
-						// settings. If we use the global settings, this means that the
-						// checkbox will be checked following the `theme.json` value.
-						checked={ !! userSettings?.lightbox?.enabled }
+						checked={ !! settings?.lightbox?.enabled }
 						onChange={ onChangeLightbox }
 					/>
 				</ToolsPanelItem>
