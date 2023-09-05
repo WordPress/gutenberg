@@ -251,6 +251,8 @@ PODS:
     - glog
   - react-native-blur (4.2.0):
     - React-Core
+  - react-native-context-menu-view (1.11.0):
+    - React-Core
   - react-native-get-random-values (1.4.0):
     - React-Core
   - react-native-safe-area (0.5.1):
@@ -430,6 +432,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../../../node_modules/react-native/ReactCommon/logger`)
   - "react-native-blur (from `../../../node_modules/@react-native-community/blur`)"
+  - react-native-context-menu-view (from `../../../node_modules/react-native-context-menu-view`)
   - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
   - react-native-safe-area (from `../../../node_modules/react-native-safe-area`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
@@ -512,6 +515,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/logger"
   react-native-blur:
     :path: "../../../node_modules/@react-native-community/blur"
+  react-native-context-menu-view:
+    :path: "../../../node_modules/react-native-context-menu-view"
   react-native-get-random-values:
     :path: "../../../node_modules/react-native-get-random-values"
   react-native-safe-area:
@@ -594,6 +599,7 @@ SPEC CHECKSUMS:
   React-jsinspector: b6ed4cb3ffa27a041cd440300503dc512b761450
   React-logger: 186dd536128ae5924bc38ed70932c00aa740cd5b
   react-native-blur: 3e9c8e8e9f7d17fa1b94e1a0ae9fd816675f5382
+  react-native-context-menu-view: 12ab3d39caae4a8aa697ffc09db2eaa925610c4e
   react-native-get-random-values: b6fb85e7169b9822976793e467458c151c3e8b69
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
   react-native-safe-area-context: 36cc67648134e89465663b8172336a19eeda493d
