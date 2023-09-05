@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import type { MutableRefObject, ReactNode, ReactText } from 'react';
-// eslint-disable-next-line no-restricted-imports
-import type { RadioStateReturn } from 'reakit';
+import type { ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -18,7 +16,7 @@ export type ToggleGroupControlOptionBaseProps = {
 	 * @default false
 	 */
 	isIcon?: boolean;
-	value: ReactText;
+	value: string | number;
 	/**
 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
 	 * show the aria-label or the label prop text.
@@ -107,11 +105,11 @@ export type ToggleGroupControlProps = Pick<
 	/**
 	 * Callback when a segment is selected.
 	 */
-	onChange?: ( value: ReactText | undefined ) => void;
+	onChange?: ( value: string | number | undefined ) => void;
 	/**
 	 * The selected value.
 	 */
-	value?: ReactText;
+	value?: string | number;
 	/**
 	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
 	 * `ToggleGroupControlOptionIcon` components.
@@ -125,33 +123,16 @@ export type ToggleGroupControlProps = Pick<
 	size?: 'default' | '__unstable-large';
 };
 
-type ToggleGroupControlAsRadioContext = {
-	isDeselectable?: false;
-} & RadioStateReturn;
-
-type ToggleGroupControlAsButtonContext = { isDeselectable: true } & Pick<
-	RadioStateReturn,
-	'state' | 'setState'
->;
-
-export type ToggleGroupControlContextProps = Pick<
-	ToggleGroupControlProps,
-	'isBlock' | 'size'
-> & {
+export type ToggleGroupControlContextProps = {
+	isDeselectable?: boolean;
 	baseId: string;
-} & ( ToggleGroupControlAsRadioContext | ToggleGroupControlAsButtonContext );
-
-export type ToggleGroupControlBackdropProps = {
-	containerRef: MutableRefObject< HTMLElement | undefined >;
-	containerWidth?: number | null;
-	isAdaptiveWidth?: boolean;
-	state?: any;
+	isBlock: ToggleGroupControlProps[ 'isBlock' ];
+	size: ToggleGroupControlProps[ 'size' ];
+	value: ToggleGroupControlProps[ 'value' ];
+	setValue: ( newValue: string | number | undefined ) => void;
 };
 
 export type ToggleGroupControlMainControlProps = Pick<
 	ToggleGroupControlProps,
-	'children' | 'isAdaptiveWidth' | 'label' | 'size'
-> & {
-	onChange: ( value: ReactText | undefined ) => void;
-	value?: ReactText;
-};
+	'children' | 'isAdaptiveWidth' | 'label' | 'size' | 'onChange' | 'value'
+>;
