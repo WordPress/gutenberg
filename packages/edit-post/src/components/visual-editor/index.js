@@ -333,6 +333,7 @@ export default function VisualEditor( { styles } ) {
 						shouldIframe={ isToBeIframed }
 						contentRef={ contentRef }
 						styles={ styles }
+						height="100%"
 					>
 						{ themeSupportsLayout &&
 							! themeHasDisabledLayoutStyles &&

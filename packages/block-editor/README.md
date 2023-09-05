@@ -33,7 +33,7 @@ function MyEditorComponent() {
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
 			<BlockTools>
-				<BlockCanvas />
+				<BlockCanvas height="400px" />
 			</BlockTools>
 		</BlockEditorProvider>
 	);

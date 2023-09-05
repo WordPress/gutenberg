@@ -115,6 +115,7 @@ export default function SidebarBlockEditor( {
 							<BlockCanvas
 								shouldIframe={ false }
 								styles={ settings.defaultEditorStyles }
+								height="100%"
 							>
 								<BlockList renderAppender={ BlockAppender } />
 							</BlockCanvas>

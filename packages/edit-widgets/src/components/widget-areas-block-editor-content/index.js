@@ -39,7 +39,11 @@ export default function WidgetAreasBlockEditorContent( {
 			<BlockTools>
 				<KeyboardShortcuts />
 				<BlockSelectionClearer>
-					<BlockCanvas shouldIframe={ false } styles={ styles }>
+					<BlockCanvas
+						shouldIframe={ false }
+						styles={ styles }
+						height="100%"
+					>
 						<BlockList className="edit-widgets-main-block-list" />
 					</BlockCanvas>
 				</BlockSelectionClearer>

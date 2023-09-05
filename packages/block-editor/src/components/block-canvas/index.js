@@ -9,6 +9,7 @@ import { useMouseMoveTypingReset } from '../observe-typing';
 
 function BlockCanvas( {
 	shouldIframe = true,
+	height = '300px',
 	children = <BlockList />,
 	styles,
 	contentRef,
@@ -23,8 +24,8 @@ function BlockCanvas( {
 				<WritingFlow
 					ref={ contentRef }
 					className="editor-styles-wrapper"
-					style={ { flex: '1' } }
 					tabIndex={ -1 }
+					style={ { height } }
 				>
 					{ children }
 				</WritingFlow>
@@ -38,10 +39,9 @@ function BlockCanvas( {
 			ref={ resetTypingRef }
 			contentRef={ contentRef }
 			style={ {
-				...iframeProps?.style,
 				width: '100%',
-				height: '100%',
-				display: 'block',
+				height,
+				...iframeProps?.style,
 			} }
 			name="editor-canvas"
 		>

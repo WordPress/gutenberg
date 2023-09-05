@@ -42,11 +42,9 @@ function App() {
 				<div className="playground__sidebar">
 					<BlockInspector />
 				</div>
-				<div className="playground__content">
-					<BlockTools>
-						<BlockCanvas styles={ editorStyles } />
-					</BlockTools>
-				</div>
+				<BlockTools className="playground__content">
+					<BlockCanvas height="100%" styles={ editorStyles } />
+				</BlockTools>
 			</BlockEditorProvider>
 		</div>
 	);

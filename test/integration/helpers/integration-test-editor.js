@@ -72,7 +72,7 @@ export function Editor( { testBlocks, settings = {} } ) {
 		>
 			<BlockInspector />
 			<BlockTools>
-				<BlockCanvas shouldIframe={ false } />
+				<BlockCanvas height="100%" shouldIframe={ false } />
 			</BlockTools>
 		</BlockEditorProvider>
 	);

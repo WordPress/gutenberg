@@ -69,6 +69,7 @@ function EditorCanvas( {
 
 	return (
 		<BlockCanvas
+			height="100%"
 			iframeProps={ {
 				expand: isZoomOutMode,
 				scale: isZoomOutMode ? 0.45 : undefined,

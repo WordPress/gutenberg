@@ -332,7 +332,7 @@ return (
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>
-			<BlockCanvas />
+			<BlockCanvas height="400px" />
 		</BlockEditorProvider>
 	</div>
 );
@@ -427,7 +427,7 @@ return (
             <Sidebar.InspectorFill> /* <-- SIDEBAR */
                 <BlockInspector />
             </Sidebar.InspectorFill>
-            <BlockCanvas />
+            <BlockCanvas height="400px" />
         </BlockEditorProvider>
     </div>
 );
