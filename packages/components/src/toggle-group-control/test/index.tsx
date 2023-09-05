@@ -21,10 +21,6 @@ import {
 } from '../index';
 import type { ToggleGroupControlProps } from '../types';
 
-function getWrappingPopoverElement( element: HTMLElement ) {
-	return element.closest( '.components-popover' );
-}
-
 const ControlledToggleGroupControl = ( {
 	value: valueProp,
 	onChange,
@@ -141,11 +137,7 @@ describe.each( [
 			'Click for Delicious Gnocchi'
 		);
 
-		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( tooltip )
-			).toBePositionedPopover()
-		);
+		await waitFor( () => expect( tooltip ).toBePositionedPopover() );
 
 		expect( tooltip ).toBeVisible();
 	} );
