@@ -15,6 +15,9 @@
 
 -   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
 
+-   `CircularOptionPicker`: make focus styles resilient to button size changes ([#54156](https://github.com/WordPress/gutenberg/issues/54156)).
+
+
 ### Internal
 
 -   `Composite`: Convert to TypeScript ([#54028](https://github.com/WordPress/gutenberg/pull/54028)).
