@@ -65,6 +65,10 @@ function FontLibraryProvider( { children } ) {
 	// Save font families to the global styles post in the database.
 	const saveFontFamilies = () => {
 		saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [ 'settings.typography.fontFamilies' ] );
+		createSuccessNotice(
+			__( `Font families were updated succesfully.` ),
+			{ type: 'snackbar' }
+		);
 	}
 
 	// Library Fonts
