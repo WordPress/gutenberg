@@ -10,11 +10,21 @@
 	"attributes": {
 		"ref": {
 			"type": "number"
+		},
+		"layout": {
+			"type": "array",
+			"default": {
+				"type": "constrained"
+			}
 		}
 	},
 	"supports": {
 		"customClassName": false,
 		"html": false,
-		"inserter": false
+		"inserter": false,
+		"layout": {
+			"allowSizingOnChildren": true,
+			"allowEditing": false
+		}
 	}
 }

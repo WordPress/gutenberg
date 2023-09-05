@@ -42,8 +42,8 @@ Create and save content to reuse across your site. Update the pattern, and the c
 
 -	**Name:** core/block
 -	**Category:** reusable
--	**Supports:** ~~customClassName~~, ~~html~~, ~~inserter~~
--	**Attributes:** ref
+-	**Supports:** layout (allowSizingOnChildren, ~~allowEditing~~), ~~customClassName~~, ~~html~~, ~~inserter~~
+-	**Attributes:** layout, ref
 
 ## Button
 
