@@ -413,11 +413,12 @@ describe( 'BorderControl', () => {
 			await openPopover( user );
 			await user.click( getColorOption( 'Green' ) );
 			await user.click( getButton( 'Dotted' ) );
-			const widthInput = getWidthInput();
-			await user.clear( widthInput );
-			await user.type( widthInput, '0' );
+			await user.type( getWidthInput(), '0', {
+				initialSelectionStart: 0,
+				initialSelectionEnd: 1,
+			} );
 
-			expect( props.onChange ).toHaveBeenNthCalledWith( 4, {
+			expect( props.onChange ).toHaveBeenNthCalledWith( 3, {
 				color: undefined,
 				style: 'none',
 				width: '0px',
@@ -434,11 +435,16 @@ describe( 'BorderControl', () => {
 			await user.click( getButton( 'Dotted' ) );
 			rerender( <BorderControl { ...props } /> );
 			const widthInput = getWidthInput();
-			await user.type( widthInput, '0' );
-			await user.clear( widthInput );
-			await user.type( widthInput, '5' );
+			await user.type( widthInput, '0', {
+				initialSelectionStart: 0,
+				initialSelectionEnd: 1,
+			} );
+			await user.type( widthInput, '5', {
+				initialSelectionStart: 0,
+				initialSelectionEnd: 1,
+			} );
 
-			expect( props.onChange ).toHaveBeenNthCalledWith( 5, {
+			expect( props.onChange ).toHaveBeenNthCalledWith( 4, {
 				color: '#00a32a',
 				style: 'dotted',
 				width: '5px',
