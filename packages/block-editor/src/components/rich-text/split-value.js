@@ -13,7 +13,6 @@ export function splitValue( {
 	pastedBlocks = [],
 	onReplace,
 	onSplit,
-	onSplitMiddle,
 	multilineTag,
 } ) {
 	if ( ! onReplace || ! onSplit ) {
@@ -35,8 +34,8 @@ export function splitValue( {
 
 	// Create a block with the content before the caret if there's no pasted
 	// blocks, or if there are pasted blocks and the value is not empty. We do
-	// not want a leading empty block on paste, but we do if split with e.g. the
-	// enter key.
+	// not want a leading empty block on paste, but we do if we split with e.g.
+	// the enter key.
 	if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
 		blocks.push(
 			onSplit(
@@ -53,19 +52,13 @@ export function splitValue( {
 	if ( hasPastedBlocks ) {
 		blocks.push( ...pastedBlocks );
 		lastPastedBlockIndex += pastedBlocks.length;
-	} else if ( onSplitMiddle ) {
-		blocks.push( onSplitMiddle() );
 	}
 
-	// If there's pasted blocks, append a block with non empty content / after
-	// the caret. Otherwise, do append an empty block if there is no
-	// `onSplitMiddle` prop, but if there is and the content is empty, the
-	// middle block is enough to set focus in.
-	if (
-		hasPastedBlocks
-			? ! isEmpty( after )
-			: ! onSplitMiddle || ! isEmpty( after )
-	) {
+	// Create a block with the content after the caret if there's no pasted
+	// blocks, or if there are pasted blocks and the value is not empty. We do
+	// not want a trailing empty block on paste, but we do if we split with e.g.
+	// the enter key.
+	if ( ! hasPastedBlocks || ! isEmpty( after ) ) {
 		blocks.push(
 			onSplit(
 				toHTMLString( {
