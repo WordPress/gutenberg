@@ -275,7 +275,7 @@
 			},
 			"core/image": {
 				"lightbox": {
-					"enabled": false,
+					"enabled": null,
 					"showUI": true
 				}
 			},

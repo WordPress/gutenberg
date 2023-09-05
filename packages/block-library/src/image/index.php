@@ -32,22 +32,8 @@ function render_block_core_image( $attributes, $content, $block ) {
 	}
 
 	$should_load_view_script = false;
-	$link_destination        = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 
-	// Get the lightbox setting from the block attributes.
-	if ( isset( $attributes['lightbox'] ) ) {
-		$lightbox_settings = $attributes['lightbox'];
-		// If the lightbox setting is not set in the block attributes, get it from
-		// the global settings.
-	} else {
-		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
-	}
-
-	// If the lightbox is enabled, the image is not linked, and the Interactivity API is enabled, load the view script.
-	if ( isset( $lightbox_settings['enabled'] ) &&
-		true === $lightbox_settings['enabled'] &&
-		'none' === $link_destination
-	) {
+	if ( isset( $block->parsed_block['lightboxEnabled'] )  ) {
 		$should_load_view_script = true;
 	}
 
@@ -69,15 +55,11 @@ function render_block_core_image( $attributes, $content, $block ) {
 }
 
 
-/**
- * Add the directives and layout needed for the lightbox behavior.
- *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
- */
-function block_core_image_render_lightbox( $block_content, $block ) {
-	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
+function should_render_lightbox_core( $block ) {
+
+	if( 'core/image' !== $block['blockName'] ) {
+		return $block;
+	}
 
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['lightbox'] ) ) {
@@ -86,14 +68,34 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		// the global settings.
 
 	} else {
-		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
+		$lightbox_settings = gutenberg_get_global_settings( array('lightbox'), array( 'block_name' => 'core/image' ) );
 	}
 
-	if ( ! isset( $lightbox_settings ) || 'none' !== $link_destination ) {
-		return $block_content;
+	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
+
+	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered
+	if ( isset( $lightbox_settings ) &&
+	true === $lightbox_settings['enabled'] &&
+		'none' === $link_destination
+	) {
+		$block['lightboxEnabled'] = true;
 	}
 
-	if ( isset( $lightbox_settings['enabled'] ) && false === $lightbox_settings['enabled'] ) {
+	return $block;
+}
+add_filter( 'render_block_data', 'should_render_lightbox_core', 10, 1 );
+
+
+/**
+ * Add the directives and layout needed for the lightbox behavior.
+ *
+ * @param  string $block_content Rendered block content.
+ * @param  array  $block         Block object.
+ * @return string                Filtered block content.
+ */
+function block_core_image_render_lightbox( $block_content, $block ) {
+
+	if ( ! isset( $block['lightboxEnabled'] ) || false === $block['lightboxEnabled'] ) {
 		return $block_content;
 	}
 
@@ -262,16 +264,13 @@ HTML;
 	return str_replace( '</figure>', $lightbox_html . '</figure>', $body_content );
 }
 
-// TODO: We should not be adding a separate filter but rather move the
-// the lightbox rendering to the `render_block_core_image` function.
-
 // Use priority 15 to run this hook after other hooks/plugins.
 // They could use the `render_block_{$this->name}` filter to modify the markup.
 add_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15, 2 );
 
-	/**
-	 * Registers the `core/image` block on server.
-	 */
+/**
+ * Registers the `core/image` block on server.
+ */
 function register_block_core_image() {
 	register_block_type_from_metadata(
 		__DIR__ . '/image',
@@ -280,4 +279,4 @@ function register_block_core_image() {
 		)
 	);
 }
-	add_action( 'init', 'register_block_core_image' );
+add_action( 'init', 'register_block_core_image' );
