@@ -183,7 +183,7 @@ export interface FormTokenFieldProps
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**
-	 * If true add any incompleteTokenValue as a new token.
+	 * If true, add any incompleteTokenValue as a new token when the field loses focus.
 	 *
 	 * @default false
 	 */
