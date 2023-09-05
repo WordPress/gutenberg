@@ -13,7 +13,6 @@ import { useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import TabLayout from './tab-layout';
 import { ALLOWED_FILE_EXTENSIONS } from './constants';
 import { FontLibraryContext } from './context';
 import { Font } from '../../../../lib/lib-font.browser';
