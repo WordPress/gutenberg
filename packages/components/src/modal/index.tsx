@@ -35,8 +35,9 @@ import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 
-// Used to count the number of open modals.
+// Used to track and dismiss the prior modal when another opens.
 let openModalCount = 0;
+let dismissOpenModal: ModalProps[ 'onRequestClose' ];
 
 function UnforwardedModal(
 	props: ModalProps,
@@ -128,7 +129,10 @@ function UnforwardedModal(
 
 		if ( openModalCount === 1 ) {
 			document.body.classList.add( bodyOpenClassName );
+		} else if ( openModalCount > 1 ) {
+			dismissOpenModal();
 		}
+		dismissOpenModal = onRequestClose;
 
 		return () => {
 			openModalCount--;
@@ -137,7 +141,7 @@ function UnforwardedModal(
 				document.body.classList.remove( bodyOpenClassName );
 			}
 		};
-	}, [ bodyOpenClassName ] );
+	}, [ bodyOpenClassName, onRequestClose ] );
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
