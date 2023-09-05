@@ -123,9 +123,10 @@ export default function VisualEditor( { styles } ) {
 			select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const _isTemplateMode = isEditingTemplate();
+		const postTypeSlug = getCurrentPostType();
 		let _wrapperBlockName;
 
-		if ( getCurrentPostType() === 'wp_block' ) {
+		if ( postTypeSlug === 'wp_block' ) {
 			_wrapperBlockName = 'core/block';
 		} else if ( ! _isTemplateMode ) {
 			_wrapperBlockName = 'core/post-content';
@@ -133,6 +134,7 @@ export default function VisualEditor( { styles } ) {
 
 		const editorSettings = getEditorSettings();
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
+		const postType = select( coreStore ).getPostType( postTypeSlug );
 		const canEditTemplate = select( coreStore ).canUser(
 			'create',
 			'templates'
@@ -146,7 +148,7 @@ export default function VisualEditor( { styles } ) {
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
-				supportsTemplateMode && canEditTemplate
+				postType?.viewable && supportsTemplateMode && canEditTemplate
 					? getEditedPostTemplate()
 					: undefined,
 			wrapperBlockName: _wrapperBlockName,
