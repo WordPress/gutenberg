@@ -38,7 +38,7 @@ describe( 'getNestedValue', () => {
 		expect( result ).toEqual( 456 );
 	} );
 
-	it( 'should return the nested value if it different to undefined', () => {
+	it( 'should return the nested value if it is different to undefined', () => {
 		const input = { x: { y: { z: null } } };
 		const result = getNestedValue( input, 'x.y.z', 456 );
 
