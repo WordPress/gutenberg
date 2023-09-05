@@ -530,7 +530,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$block_supports_layout = ( block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false ) ) && ! wp_should_skip_block_supports_serialization( $block_type, 'layout' );
 	$layout_from_parent    = $block['attrs']['style']['layout']['selfStretch'] ?? null;
 
 	if ( ! $block_supports_layout && ! $layout_from_parent ) {

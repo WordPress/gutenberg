@@ -23,6 +23,7 @@
 		"html": false,
 		"inserter": false,
 		"layout": {
+			"__experimentalSkipSerialization": true,
 			"allowSizingOnChildren": true,
 			"allowEditing": false
 		}
