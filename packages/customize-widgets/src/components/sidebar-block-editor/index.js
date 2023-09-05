@@ -10,7 +10,7 @@ import {
 	BlockSelectionClearer,
 	BlockInspector,
 	CopyHandler,
-	BlockCanvas,
+	privateApis as blockEditorPrivateApis,
 	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
@@ -26,6 +26,11 @@ import SidebarEditorProvider from './sidebar-editor-provider';
 import WelcomeGuide from '../welcome-guide';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import BlockAppender from '../block-appender';
+import { unlock } from '../../lock-unlock';
+
+const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
+	blockEditorPrivateApis
+);
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,

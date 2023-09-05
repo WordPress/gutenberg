@@ -3,8 +3,8 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 import {
-	BlockEditorProvider,
 	BlockCanvas,
+	BlockEditorProvider,
 	BlockTools,
 	BlockInspector,
 } from '@wordpress/block-editor';

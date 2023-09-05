@@ -17,7 +17,6 @@ import {
 	__unstableUseTypingObserver as useTypingObserver,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	useSetting,
-	BlockCanvas,
 	__experimentalRecursionProvider as RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -34,9 +33,12 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { LayoutStyle, useLayoutClasses, useLayoutStyles } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	LayoutStyle,
+	useLayoutClasses,
+	useLayoutStyles,
+	ExperimentalBlockCanvas: BlockCanvas,
+} = unlock( blockEditorPrivateApis );
 
 const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
 

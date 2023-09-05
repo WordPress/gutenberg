@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	BlockCanvas,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -21,6 +21,10 @@ import { __ } from '@wordpress/i18n';
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+
+const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
+	blockEditorPrivateApis
+);
 
 function EditorCanvas( {
 	enableResizing,

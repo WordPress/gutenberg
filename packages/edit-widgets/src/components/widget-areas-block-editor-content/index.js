@@ -5,7 +5,7 @@ import {
 	BlockList,
 	BlockTools,
 	BlockSelectionClearer,
-	BlockCanvas,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -16,6 +16,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import { unlock } from '../../lock-unlock';
+
+const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
+	blockEditorPrivateApis
+);
 
 export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,

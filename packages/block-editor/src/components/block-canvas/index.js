@@ -7,7 +7,7 @@ import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
 
-function BlockCanvas( {
+export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
 	height = '300px',
 	children = <BlockList />,
@@ -48,6 +48,14 @@ function BlockCanvas( {
 			<EditorStyles styles={ styles } />
 			{ children }
 		</Iframe>
+	);
+}
+
+function BlockCanvas( { children, height, styles } ) {
+	return (
+		<ExperimentalBlockCanvas height={ height } styles={ styles }>
+			{ children }
+		</ExperimentalBlockCanvas>
 	);
 }
 
