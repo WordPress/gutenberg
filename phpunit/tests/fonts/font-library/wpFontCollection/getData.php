@@ -33,12 +33,12 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 		file_put_contents( $mock_file, '{"this is mock data":true}' );
 
 		return array(
-			'with a data_json_file' => array(
+			'with a src' => array(
 				'config'        => array(
-					'id'             => 'my-collection',
-					'name'           => 'My Collection',
-					'description'    => 'My collection description',
-					'data_json_file' => $mock_file,
+					'id'          => 'my-collection',
+					'name'        => 'My Collection',
+					'description' => 'My collection description',
+					'src'         => $mock_file,
 				),
 				'expected_data' => array(
 					'id'          => 'my-collection',
