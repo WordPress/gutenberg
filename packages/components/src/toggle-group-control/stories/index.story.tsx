@@ -2,20 +2,16 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
-// eslint-disable-next-line no-restricted-imports
-import { motion, MotionContext } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
-import { useState, useContext, useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Button from '../../button';
-import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
@@ -52,7 +48,6 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 		useState< ToggleGroupControlProps[ 'value' ] >();
 
 	return (
-		<>
 			<ToggleGroupControl
 				__nextHasNoMarginBottom
 				{ ...props }
@@ -62,10 +57,6 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 				} }
 				value={ value }
 			/>
-			<Button onClick={ () => setValue( undefined ) } variant="tertiary">
-				Reset
-			</Button>
-		</>
 	);
 };
 
@@ -148,139 +139,4 @@ export const Deselectable: StoryFn< typeof ToggleGroupControl > = Template.bind(
 Deselectable.args = {
 	...WithIcons.args,
 	isDeselectable: true,
-};
-
-// TODO: remove before merging
-export const DoubleToggles: StoryFn< typeof ToggleGroupControl > = () => {
-	const aligns = [ 'Left', 'Center', 'Right' ];
-	const quantities = [ 'One', 'Two', 'Three', 'Four' ];
-
-	const [ alignState, setAlignState ] = useState< string | undefined >();
-	const [ quantityState, setQuantityState ] = useState<
-		string | undefined
-	>();
-
-	return (
-		<div>
-			<ToggleGroupControl
-				onChange={ ( value ) => setAlignState( value as string ) }
-				value={ alignState }
-				label={ 'Pick an alignment option' }
-			>
-				{ aligns.map( ( key ) => (
-					<ToggleGroupControlOption
-						key={ key }
-						value={ key }
-						label={ key }
-					/>
-				) ) }
-			</ToggleGroupControl>
-			<Button
-				onClick={ () => setAlignState( undefined ) }
-				variant="tertiary"
-			>
-				Reset
-			</Button>
-
-			<ToggleGroupControl
-				onChange={ ( value ) => setQuantityState( value as string ) }
-				value={ quantityState }
-				label={ 'Pick a quantity' }
-			>
-				{ quantities.map( ( key ) => (
-					<ToggleGroupControlOption
-						key={ key }
-						value={ key }
-						label={ key }
-					/>
-				) ) }
-			</ToggleGroupControl>
-			<Button
-				onClick={ () => setQuantityState( undefined ) }
-				variant="tertiary"
-			>
-				Reset
-			</Button>
-		</div>
-	);
-};
-
-// TODO: Remove before merging as well.
-const ExampleSlotFill = createSlotFill( 'Example' );
-
-const Slot = () => {
-	const motionContextValue = useContext( MotionContext );
-
-	// Forwarding the content of the slot so that it can be used by the fill
-	const fillProps = useMemo(
-		() => ( {
-			forwardedContext: [
-				[ MotionContext.Provider, { value: motionContextValue } ],
-			],
-		} ),
-		[ motionContextValue ]
-	);
-
-	return <ExampleSlotFill.Slot bubblesVirtually fillProps={ fillProps } />;
-};
-
-type ForwardedContextTuple< P = {} > = [
-	React.ComponentType< React.PropsWithChildren< P > >,
-	P
-];
-
-const Fill = ( { children }: { children: React.ReactNode } ) => {
-	const innerMarkup = <>{ children }</>;
-
-	return (
-		<ExampleSlotFill.Fill>
-			{ ( fillProps: { forwardedContext?: ForwardedContextTuple[] } ) => {
-				const { forwardedContext = [] } = fillProps;
-
-				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
-						<Provider { ...props }>{ inner }</Provider>
-					),
-					innerMarkup
-				);
-			} }
-		</ExampleSlotFill.Fill>
-	);
-};
-
-export const RenderViaSlot: StoryFn< typeof ToggleGroupControl > = () => {
-	const [ alignState, setAlignState ] = useState< string | undefined >();
-	const aligns = [ 'Left', 'Center', 'Right' ];
-
-	return (
-		<SlotFillProvider>
-			{ /* This motion.div element breaks the `ToggleGroupControl` backdrop,
-			 * because motion registers it as the "motion parent" of the backdrop
-			 * (even if the `ToggleGroupControl` gets rendered in another part of the
-			 * tree via Slot/Fill)
-			 */ }
-			<motion.div>
-				<Fill>
-					<ToggleGroupControl
-						onChange={ ( value ) =>
-							setAlignState( value as string )
-						}
-						value={ alignState }
-						label={ 'Pick an alignment option' }
-					>
-						{ aligns.map( ( key ) => (
-							<ToggleGroupControlOption
-								key={ key }
-								value={ key }
-								label={ key }
-							/>
-						) ) }
-					</ToggleGroupControl>
-				</Fill>
-			</motion.div>
-			<div>
-				<Slot />
-			</div>
-		</SlotFillProvider>
-	);
 };
