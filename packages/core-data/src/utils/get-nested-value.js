@@ -11,6 +11,9 @@
  * @return {*} Value of the object property at the specified path.
  */
 export default function getNestedValue( object, path, defaultValue ) {
+	if ( ( ! object || typeof object !== 'object' ) || (typeof path !== 'string' && !Array.isArray(path)) ) {
+		return object;
+	}
 	const normalizedPath = Array.isArray( path ) ? path : path.split( '.' );
 	let value = object;
 	normalizedPath.forEach( ( fieldName ) => {
