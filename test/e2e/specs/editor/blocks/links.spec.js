@@ -299,7 +299,7 @@ test.describe( 'Links', () => {
 		// Toggle both the settings to be off.
 		// Note: no need to toggle settings again because the open setting should be persisted.
 		await page.getByLabel( 'Open in new tab' ).click();
-		await page.getByLabel( 'Add no-follow for search engines' ).click();
+		await page.getByLabel( 'nofollow' ).click();
 
 		// Save the link
 		await page
