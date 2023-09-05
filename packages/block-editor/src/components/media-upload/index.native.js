@@ -325,6 +325,10 @@ function URLInput( props ) {
 				<TextControl
 					// eslint-disable-next-line jsx-a11y/no-autofocus
 					autoFocus
+					autoCapitalize="none"
+					autoCorrect={ false }
+					autoComplete={ Platform.isIOS ? 'url' : 'off' }
+					keyboardType="url"
 					label={ __( 'Insert from URL' ) }
 					onChange={ props.onChange }
 					placeholder={ __( 'Type a URL' ) }
