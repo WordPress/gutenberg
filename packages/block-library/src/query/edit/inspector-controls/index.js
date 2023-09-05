@@ -218,7 +218,7 @@ export default function QueryInspectorControls( props ) {
 						<ToggleControl
 							label={ __( 'Enhanced pagination' ) }
 							help={ __(
-								"Don't refresh the page when paginating to another page."
+								'Browsing between pages won’t require a full page reload.'
 							) }
 							checked={ !! enhancedPagination }
 							onChange={ ( value ) =>
