@@ -266,7 +266,7 @@ test.describe( 'Links', () => {
 		// expect settings for `Open in new tab` and `No follow`
 		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeChecked();
 		await expect(
-			page.getByLabel( 'Add no-follow for search engines' )
+			page.getByLabel( 'nofollow' )
 		).not.toBeChecked();
 
 		// Toggle both of the settings
