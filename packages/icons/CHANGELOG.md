@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.32.0 (2023-08-31)
+
 ### Bug Fix
 
 -   Fixed invalid XML namespace on `alignJustify`, `customLink`, `mapMarker`, `postContent` and `title` ([#53955](https://github.com/WordPress/gutenberg/pull/53955)).

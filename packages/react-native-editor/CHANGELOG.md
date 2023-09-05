@@ -10,10 +10,15 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.103.0
 -   [**] Replace third-party dependency react-native-hsv-color-picker with first-party code [#53329]
 -   [*] Search Control - Prevent calling TextInput's methods when undefined [#53745]
 -   [*] Improve horizontal rule styles to avoid invisible lines [#53883]
 -   [*] Fix horizontal rule style extensions [#53917]
+-   [*] Add block outline to all Social Link blocks when selected [#54011]
+-   [*] Columns block - Fix transforming into a Group block crash [#54035]
+-   [*] Fix Social Icons block alignment [#54100]
 
 ## 1.102.1
 - [**] Fix Voice Over and assistive keyboards [#53895]

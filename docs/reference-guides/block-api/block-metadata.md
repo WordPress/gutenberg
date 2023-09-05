@@ -601,6 +601,16 @@ PHP file to use when rendering the block type on the server to show on the front
 -   `$content` (`string`): The block default content.
 -   `$block` (`WP_Block`): The block instance.
 
+An example implementation of the `render.php` file defined with `render` could look like:
+
+```php
+<div <?php echo get_block_wrapper_attributes(); ?>>
+	<?php echo esc_html( $attributes['label'] ); ?>
+</div>
+```
+
+_Note: This file loads for every instance of the block type when rendering the page HTML on the server. Accounting for that is essential when declaring functions or classes in the file. The simplest way to avoid the risk of errors is to consume that shared logic from another file._
+
 ## Assets
 
 ### `WPDefinedPath`

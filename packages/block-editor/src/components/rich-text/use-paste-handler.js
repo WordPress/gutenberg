@@ -58,7 +58,6 @@ export function usePasteHandler( props ) {
 				tagName,
 				onReplace,
 				onSplit,
-				onSplitMiddle,
 				__unstableEmbedURLOnPaste,
 				multilineTag,
 				preserveWhiteSpace,
@@ -179,7 +178,6 @@ export function usePasteHandler( props ) {
 						pastedBlocks: blocks,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
 						multilineTag,
 					} );
 				}
@@ -239,7 +237,6 @@ export function usePasteHandler( props ) {
 						pastedBlocks: content,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
 						multilineTag,
 					} );
 				}

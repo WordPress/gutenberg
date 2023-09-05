@@ -1,5 +1,5 @@
 /**
- * Stores the type of a rich rext format, such as core/bold.
+ * Stores the type of a rich text format, such as core/bold.
  */
 export type RichTextFormat = {
 	type:
@@ -26,6 +26,6 @@ export type RichTextValue = {
 	text: string;
 	formats: Array< RichTextFormatList >;
 	replacements: Array< RichTextFormat >;
-	start: number | undefined;
-	end: number | undefined;
+	start: number;
+	end: number;
 };

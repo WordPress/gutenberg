@@ -30,17 +30,27 @@ jobs:
         environment: WordPress packages
         steps:
             - name: Checkout (for CLI)
+              if: ${{ github.event.inputs.release_type != 'wp' }}
               uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
               with:
                   path: cli
                   ref: trunk
 
             - name: Checkout (for publishing)
+              if: ${{ github.event.inputs.release_type != 'wp' }}
               uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
                   ref: trunk
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+
+            - name: Checkout (for publishing WP major version)
+              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
+              uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+              with:
+                  path: publish
+                  ref: wp/${{ github.event.inputs.wp_version }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
 
             - name: Configure git user name and email (for publishing)
@@ -50,9 +60,17 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Setup Node.js
+              if: ${{ github.event.inputs.release_type != 'wp' }}
               uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: 'cli/.nvmrc'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: Setup Node.js (for WP major version)
+              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+              with:
+                  node-version-file: 'publish/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
 
             - name: Publish development packages to npm ("next" dist-tag)
@@ -73,7 +91,7 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-            - name: Publish packages to npm for WP major ("wp/${{ github.event.inputs.wp_version || 'X.Y' }}" dist-tag)
+            - name: Publish packages to npm for WP major version ("wp/${{ github.event.inputs.wp_version || 'X.Y' }}" dist-tag)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
               run: |
                   cd publish

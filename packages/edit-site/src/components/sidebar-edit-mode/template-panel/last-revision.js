@@ -50,7 +50,6 @@ const PostLastRevision = () => {
 			<Button
 				href={ addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
-					gutenberg: true,
 				} ) }
 				className="edit-site-template-last-revision__title"
 				icon={ backup }

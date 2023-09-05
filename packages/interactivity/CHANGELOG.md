@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.2.0 (2023-08-31)
+
 ### Enhancements
 
 -   Support keys using `data-wp-key`. ([#53844](https://github.com/WordPress/gutenberg/pull/53844))
