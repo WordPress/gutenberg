@@ -22,7 +22,7 @@ import { ESCAPE } from '@wordpress/keycodes';
 import { store as editPostStore } from '../../store';
 import ListViewOutline from './list-view-outline';
 
-export default function ListViewSidebar() {
+export default function ListViewSidebar( { listViewToggleElement } ) {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
 
 	// This hook handles focus when the sidebar first renders.
@@ -35,6 +35,9 @@ export default function ListViewSidebar() {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
 			setIsListViewOpened( false );
+
+			// TODO: Only set the focus here if no blocks are selected.
+			listViewToggleElement?.focus();
 		}
 	}
 
@@ -96,8 +99,9 @@ export default function ListViewSidebar() {
 			)
 		) {
 			setIsListViewOpened( false );
-			// If the list view or outline does not have focus, focus should be moved to it.
+			// TODO: Should we set focus here on the list view button toggle, too?
 		} else {
+			// If the list view or outline does not have focus, focus should be moved to it.
 			handleSidebarFocus( tab );
 		}
 	} );
