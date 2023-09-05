@@ -75,10 +75,6 @@ export const ColorfulWrapper = styled.div`
 
 	width: 216px;
 
-	.components-popover__content:has( & ) {
-		overflow: visible !important;
-	}
-
 	.react-colorful {
 		display: flex;
 		flex-direction: column;

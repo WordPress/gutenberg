@@ -147,6 +147,7 @@ export function CustomColorPickerDropdown( {
 	const popoverProps = useMemo< DropdownProps[ 'popoverProps' ] >(
 		() => ( {
 			shift: true,
+			resize: false,
 			...( isRenderedInSidebar
 				? {
 						// When in the sidebar: open to the left (stacking),
