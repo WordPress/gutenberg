@@ -55,8 +55,8 @@ test.describe( 'Router navigate', () => {
 			await route.continue();
 		} );
 
-		await page.getByTestId( 'link 1' ).click( { delay: 60 } );
-		await page.getByTestId( 'link 2' ).click( { delay: 60 } );
+		await page.getByTestId( 'link 1' ).click();
+		await page.getByTestId( 'link 2' ).click();
 
 		await expect( navigations ).toHaveText( '2' );
 		await expect( status ).toHaveText( 'busy' );
