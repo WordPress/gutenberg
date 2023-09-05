@@ -26,7 +26,7 @@ import {
  * Internal dependencies
  */
 import { waitForStoreResolvers } from './wait-for-store-resolvers';
-import { unlock } from '../../lock-unlock';
+import { unlock } from '../../../packages/block-library/src/lock-unlock';
 
 const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
 	blockEditorPrivateApis
