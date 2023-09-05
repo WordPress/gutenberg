@@ -8,7 +8,6 @@ import { Modal, TabPanel } from '@wordpress/components';
  * Internal dependencies
  */
 import InstalledFonts from './installed-fonts';
-import LocalFonts from './local-fonts';
 import { MODAL_TABS } from './constants';
 
 function FontLibraryModal( {
@@ -30,8 +29,6 @@ function FontLibraryModal( {
 			>
 				{ ( tab ) => {
 					switch ( tab.name ) {
-						case 'local-fonts':
-							return <LocalFonts />;
 						case 'installed-fonts':
 						default:
 							return <InstalledFonts />;

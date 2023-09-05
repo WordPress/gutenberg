@@ -34,7 +34,7 @@ function FontsGrid( { title, children, pageSize = 32 } ) {
 			<VStack spacing={ 0 }>
 				{ title && (
 					<>
-						<Text className="font-library-modal__fonts-grid__subtitle">
+						<Text className="font-library-modal__subtitle">
 							{ title }
 						</Text>
 						<Spacer margin={ 2 } />

@@ -9,11 +9,6 @@ export const MODAL_TABS = [
 		title: __( 'Library' ),
 		className: 'installed-fonts',
 	},
-	{
-		name: 'local-fonts',
-		title: __( 'Upload' ),
-		className: 'local-fonts',
-	},
 ];
 
 export const DEFAULT_DEMO_CONFIG = {

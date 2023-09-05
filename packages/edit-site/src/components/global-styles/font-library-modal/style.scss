@@ -6,6 +6,12 @@
 	.components-modal__content {
 		padding-top: 0;
 	}
+
+	.font-library-modal__subtitle {
+		text-transform: uppercase;
+		font-weight: 500;
+		font-size: 11px;
+	}
 }
 
 .font-library-modal__tab-layout {
@@ -27,12 +33,6 @@
 }
 
 .font-library-modal__fonts-grid {
-	.font-library-modal__fonts-grid__subtitle {
-		text-transform: uppercase;
-		font-weight: 500;
-		font-size: 11px;
-	}
-
 	.font-library-modal__fonts-grid__main {
 		display: flex;
 		flex-direction: column;
@@ -81,10 +81,9 @@
 	align-items: center;
 	display: flex;
 	justify-content: center;
-	min-height: calc(100vh - 360px);
+	height: 100px;
 	width: 100%;
-	border: 1px dashed #e5e5e5;
-	border-radius: 8px;
+	background-color: #e5e5e5;
 }
 
 .font-library-modal__font-name {

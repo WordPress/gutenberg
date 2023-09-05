@@ -3,11 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	Button,
 	DropZone,
+	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
 	FormFileUpload,
 } from '@wordpress/components';
-import { file } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -24,7 +24,6 @@ function LocalFonts() {
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
 	};
-
 	const onFilesUpload = ( event ) => {
 		handleFilesUpload( event.target.files );
 	};
@@ -163,29 +162,21 @@ function LocalFonts() {
 	};
 
 	return (
-		<TabLayout
-			description={ __(
-				'Drag and drop or select font files here to install'
-			) }
-		>
+		<>
+			<Text className="font-library-modal__subtitle">{ __( "Upload Fonts" ) }</Text>
+			<Spacer margin={ 2 } />
 			<DropZone onFilesDrop={ handleDropZone } />
-
-			<div className="font-library-modal__upload-area">
-				<FormFileUpload
-					accept="font/*"
-					multiple={ true }
-					onChange={ onFilesUpload }
-					render={ ( { openFileDialog } ) => (
-						<Button
-							onClick={ openFileDialog }
-							icon={ file }
-							variant="secondary"
-							text={ __( 'Select font files' ) }
-						/>
-					) }
-				/>
-			</div>
-		</TabLayout>
+			<FormFileUpload
+				accept="font/*"
+				multiple={ true }
+				onChange={ onFilesUpload }
+				render={ ( { openFileDialog } ) => (
+					<div className="font-library-modal__upload-area" onClick={ openFileDialog }>
+						<span>{ __("Drag and drop you font files here.") }</span>
+					</div>
+				) }
+			/>
+		</>
 	);
 }
 

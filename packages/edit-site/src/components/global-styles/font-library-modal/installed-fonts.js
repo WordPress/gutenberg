@@ -17,6 +17,7 @@ import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import LibraryFontCard from './library-font-card';
 import { Button } from '@wordpress/components';
+import LocalFonts from './local-fonts';
 
 function InstalledFonts() {
 	const {
@@ -112,6 +113,9 @@ function InstalledFonts() {
 							</FontsGrid>
 						</>
 					) }
+
+					<Spacer margin={ 8 } />
+					<LocalFonts />					
 				</>
 			) }
 
