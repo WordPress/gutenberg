@@ -47,7 +47,7 @@ export default function SidebarNavigationScreenPattern() {
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
-							navigator.goTo( `/${ postType }/all` );
+							navigator.goTo( backPath );
 						} }
 					/>
 					<SidebarButton
