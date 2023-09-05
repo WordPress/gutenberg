@@ -4,7 +4,7 @@
 import { createContext, useState, useEffect } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { useEntityRecord, useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 
@@ -29,6 +29,9 @@ function FontLibraryProvider( { children } ) {
 		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
 		return { globalStylesId	};
 	});
+
+	const globalStyles = useEntityRecord('root', 'globalStyles', globalStylesId);
+	const fontFamiliesHasChanges = !!globalStyles?.edits?.settings?.typography?.fontFamilies;
 
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
@@ -364,7 +367,8 @@ function FontLibraryProvider( { children } ) {
 				modalTabOepn,
 				toggleModal,
 				refreshLibrary,
-				saveFontFamilies
+				saveFontFamilies,
+				fontFamiliesHasChanges
 			} }
 		>
 			{ children }

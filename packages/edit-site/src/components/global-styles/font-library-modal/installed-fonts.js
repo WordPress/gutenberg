@@ -128,7 +128,7 @@ function InstalledFonts() {
 }
 
 function Footer({ shouldDisplayDeleteButton, handleUninstallClick }) {
-	const { saveFontFamilies } = useContext( FontLibraryContext );
+	const { saveFontFamilies, fontFamiliesHasChanges } = useContext( FontLibraryContext );
 	return (
 		<HStack justify="space-between">
 			<div>
@@ -143,6 +143,7 @@ function Footer({ shouldDisplayDeleteButton, handleUninstallClick }) {
 				)}
 			</div>
 			<Button
+				disabled={ ! fontFamiliesHasChanges }
 				variant='primary'
 				onClick={saveFontFamilies}
 			>
