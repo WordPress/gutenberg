@@ -465,6 +465,11 @@ function gutenberg_should_render_lightbox( $block ) {
 	// If not present in block attributes, check global settings.
 	if ( ! isset( $lightbox_settings ) ) {
 		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
+
+		// If not present in global settings, check the top-level global settings.
+		if ( ! isset( $lightbox_settings['enabled'] ) ) {
+			$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
+		}
 	}
 
 	// If not present in global settings, check legacy syntax.

@@ -75,6 +75,11 @@ function block_core_image_should_render_lightbox( $block ) {
 		// the global settings.
 	} else {
 		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
+
+		// If not present in global settings, check the top-level global settings.
+		if ( ! isset( $lightbox_settings['enabled'] ) ) {
+			$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
+		}
 	}
 
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
