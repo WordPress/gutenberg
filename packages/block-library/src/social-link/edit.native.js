@@ -158,7 +158,7 @@ const SocialLinkEdit = ( {
 		  );
 
 	return (
-		<View>
+		<View style={ styles.container }>
 			{ isSelected && (
 				<>
 					<BlockControls>

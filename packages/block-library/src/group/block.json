@@ -24,6 +24,7 @@
 		"__experimentalOnEnter": true,
 		"__experimentalOnMerge": true,
 		"__experimentalSettings": true,
+		"__experimentalMetadata": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"ariaLabel": true,
