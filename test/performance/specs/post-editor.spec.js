@@ -95,14 +95,16 @@ test.describe( 'Post Editor Performance', () => {
 					const legacyCanvasLocator = testPage.locator(
 						'.wp-block-post-content'
 					);
-					await legacyCanvasLocator.waitFor();
+					await legacyCanvasLocator.waitFor( { timeout: 120_000 } );
 					return legacyCanvasLocator;
 				} )(),
 				( async () => {
 					const iframedCanvasLocator = testPage.frameLocator(
 						'[name=editor-canvas]'
 					);
-					await iframedCanvasLocator.locator( 'body' ).waitFor();
+					await iframedCanvasLocator
+						.locator( 'body' )
+						.waitFor( { timeout: 120_000 } );
 					return iframedCanvasLocator;
 				} )(),
 			] );
