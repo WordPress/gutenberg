@@ -19,6 +19,9 @@ export interface EntityRecordResolution< RecordType > {
 	/** The edited entity record */
 	editedRecord: Partial< RecordType >;
 
+	/** The edits to the edited entity record */
+	edits: Partial< RecordType >;
+
 	/** Apply local (in-browser) edits to the edited entity record */
 	edit: ( diff: Partial< RecordType > ) => void;
 
@@ -163,7 +166,7 @@ export default function useEntityRecord< RecordType >(
 		[ editEntityRecord, kind, name, recordId, saveEditedEntityRecord ]
 	);
 
-	const { editedRecord, hasEdits } = useSelect(
+	const { editedRecord, hasEdits, edits } = useSelect(
 		( select ) => ( {
 			editedRecord: select( coreStore ).getEditedEntityRecord(
 				kind,
@@ -171,6 +174,11 @@ export default function useEntityRecord< RecordType >(
 				recordId
 			),
 			hasEdits: select( coreStore ).hasEditsForEntityRecord(
+				kind,
+				name,
+				recordId
+			),
+			edits: select( coreStore ).getEntityRecordNonTransientEdits(
 				kind,
 				name,
 				recordId
@@ -195,6 +203,7 @@ export default function useEntityRecord< RecordType >(
 		record,
 		editedRecord,
 		hasEdits,
+		edits,
 		...querySelectRest,
 		...mutations,
 	};
