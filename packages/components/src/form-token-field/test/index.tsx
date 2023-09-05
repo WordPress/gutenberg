@@ -9,7 +9,6 @@ import {
 	within,
 	getDefaultNormalizer,
 	waitFor,
-	act,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
@@ -219,9 +218,7 @@ describe( 'FormTokenField', () => {
 
 			// Add 'grapefruit' token by typing it and check blur of field does not tokenize it.
 			await user.type( input, 'grapefruit' );
-			act( () => {
-				input.blur();
-			} );
+			await user.click( document.body );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 0 );
 			expectTokensNotToBeInTheDocument( [ 'grapefruit' ] );
 
@@ -236,9 +233,7 @@ describe( 'FormTokenField', () => {
 			// Add 'grapefruit' token by typing it and check blur of field tokenizes it.
 			await user.type( input, 'grapefruit' );
 
-			act( () => {
-				input.blur();
-			} );
+			await user.click( document.body );
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, [
 				'grapefruit',
 			] );
