@@ -51,7 +51,7 @@ const VALID_SETTINGS = [
 	'layout.definitions',
 	'layout.wideSize',
 	'lightbox.enabled',
-	'lightbox.showUI',
+	'lightbox.allowEditing',
 	'position.fixed',
 	'position.sticky',
 	'spacing.customSpacingSize',

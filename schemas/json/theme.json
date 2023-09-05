@@ -670,8 +670,8 @@
 					"type": "boolean",
 					"additionalProperties": false
 				},
-				"showUI": {
-					"description": "Defines whether to show the Lightbox UI in the block editor",
+				"allowEditing": {
+					"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
 					"type": "boolean",
 					"additionalProperties": false
 				}

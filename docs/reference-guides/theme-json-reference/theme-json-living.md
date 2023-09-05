@@ -181,9 +181,9 @@ Defines whether the lightbox is enabled or not.
 
 ---
 
-### showUI
+### allowEditing
 
-Defines whether to show the Lightbox UI in the block editor
+Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.
 
 
 ---

@@ -347,7 +347,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              `position.fixed` and `position.sticky`.
 	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
 	 * @since 6.4.0 Added `layout.allowEditing`.
-	 * @since 6.4.0 Added `lightbox.enabled` and `lightbox.showUI`.
+	 * @since 6.4.0 Added `lightbox.enabled` and `lightbox.allowEditing`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -387,7 +387,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'lightbox'                      => array(
 			'enabled' => null,
-			'showUI'  => null,
+			'allowEditing'  => null,
 		),
 		'position'                      => array(
 			'fixed'  => null,

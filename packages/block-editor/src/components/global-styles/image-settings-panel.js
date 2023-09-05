@@ -9,7 +9,7 @@ import {
 import { __, _x } from '@wordpress/i18n';
 
 export function useHasImageSettingsPanel( name, settings ) {
-	return name === 'core/image' && settings?.lightbox?.showUI;
+	return name === 'core/image' && settings?.lightbox?.allowEditing;
 }
 
 export default function ImageSettingsPanel( {
