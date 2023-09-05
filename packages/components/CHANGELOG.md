@@ -14,6 +14,10 @@
 
 -   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
 
+### Internal
+
+-   `Composite`: Convert to TypeScript ([#54028](https://github.com/WordPress/gutenberg/pull/54028)).
+
 ## 25.7.0 (2023-08-31)
 
 ### Enhancements
