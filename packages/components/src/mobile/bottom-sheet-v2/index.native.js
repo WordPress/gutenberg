@@ -90,7 +90,7 @@ const BottomSheetModalWithRef = (
 	/**
 	 * `internalIndex` is used to allow displaying the modal on initial render,
 	 * which is required in some areas of the code base that do not easily support
-	 * an call to an imperative `present` method.
+	 * a call to an imperative `present` method.
 	 */
 	const [ internalIndex, setInternalIndex ] = useState( index );
 	const [ visible, setVisible ] = useState( index >= 0 );
