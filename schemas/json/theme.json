@@ -664,16 +664,15 @@
 		},
 		"settingsPropertiesLightbox": {
 			"type": "object",
+			"additionalProperties": false,
 			"properties": {
 				"enabled": {
 					"description": "Defines whether the lightbox is enabled or not.",
-					"type": "boolean",
-					"additionalProperties": false
+					"type": "boolean"
 				},
 				"allowEditing": {
 					"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
-					"type": "boolean",
-					"additionalProperties": false
+					"type": "boolean"
 				}
 			}
 		},
