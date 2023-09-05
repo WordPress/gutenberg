@@ -385,6 +385,38 @@ const elementTypes = [
 ];
 
 /**
+ * Override the default block element to include section styles.
+ *
+ * NOTE: This likely could/should be merged with the element styles however for
+ * a basic proof of concept it is being kept separate for now.
+ *
+ * @param {Function} BlockListBlock Original component.
+ * @return {Function} Wrapped component.
+ */
+const withSectionStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		// While exploring section styling the blocks supported will be limited.
+		if ( props.name !== 'core/group' ) {
+			return <BlockListBlock { ...props } />;
+		}
+
+		const sectionClass = `wp-section-${ useInstanceId( BlockListBlock ) }`;
+		const sectionStyles = props.attributes?.style?.blocks;
+
+		return (
+			<BlockListBlock
+				{ ...props }
+				className={
+					sectionStyles
+						? classnames( props.className, sectionClass )
+						: props.className
+				}
+			/>
+		);
+	}
+);
+
+/**
  * Override the default block element to include elements styles.
  *
  * @param {Function} BlockListBlock Original component
@@ -535,4 +567,10 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/with-elements-styles',
 	withElementsStyles
+);
+
+addFilter(
+	'editor.BlockListBlock',
+	'core/editor/with-section-styles',
+	withSectionStyles
 );
