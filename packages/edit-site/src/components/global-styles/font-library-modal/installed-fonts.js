@@ -15,7 +15,6 @@ import TabLayout from './tab-layout';
 import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
-import SaveButton from '../../save-button';
 import LibraryFontCard from './library-font-card';
 import { Button } from '@wordpress/components';
 
@@ -129,6 +128,7 @@ function InstalledFonts() {
 }
 
 function Footer({ shouldDisplayDeleteButton, handleUninstallClick }) {
+	const { saveFontFamilies } = useContext( FontLibraryContext );
 	return (
 		<HStack justify="space-between">
 			<div>
@@ -142,11 +142,12 @@ function Footer({ shouldDisplayDeleteButton, handleUninstallClick }) {
 					</Button>
 				)}
 			</div>
-			<SaveButton
-				textForDefaultState={ __( 'Update' ) }
-				textForIsDirtyState={ __( 'Update' ) }
-				textForDisabledState={ __( 'Update' ) }
-			/>
+			<Button
+				variant='primary'
+				onClick={saveFontFamilies}
+			>
+				{ __( 'Update' ) }
+			</Button>
 		</HStack>
 	);
 }

@@ -21,7 +21,9 @@ export const FontLibraryContext = createContext( {} );
 
 function FontLibraryProvider( { children } ) {
 
-	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( coreStore );
+	const {
+		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
+	} = useDispatch( coreStore );
 	const { globalStylesId } = useSelect( ( select ) => {
 		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
 		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
@@ -56,6 +58,11 @@ function FontLibraryProvider( { children } ) {
 		undefined,
 		'base'
 	);
+
+	// Save font families to the global styles post in the database.
+	const saveFontFamilies = () => {
+		saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [ 'settings.typography.fontFamilies' ] );
+	}
 
 	// Library Fonts
 	const [ modalTabOepn, setModalTabOepn ] = useState( false );
@@ -190,7 +197,7 @@ function FontLibraryProvider( { children } ) {
 			// Deactivate the font family (remove the font family from the global styles).
 			deactivateFontFamily( font );
 			// Save the global styles to the database.
-			await saveEditedEntityRecord( 'root', 'globalStyles', globalStylesId );
+			await saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [ 'settings.typography.fontFamilies' ] );
 			// Refresh the library (the the library font families from database).
 			refreshLibrary();
 
@@ -357,6 +364,7 @@ function FontLibraryProvider( { children } ) {
 				modalTabOepn,
 				toggleModal,
 				refreshLibrary,
+				saveFontFamilies
 			} }
 		>
 			{ children }
