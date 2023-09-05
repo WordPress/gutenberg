@@ -45,10 +45,7 @@ function UnconnectedToggleGroupControl(
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
 
-	const baseId = useInstanceId(
-		ToggleGroupControl,
-		'toggle-group-control'
-	).toString();
+	const baseId = useInstanceId( ToggleGroupControl, 'toggle-group-control' );
 
 	const cx = useCx();
 

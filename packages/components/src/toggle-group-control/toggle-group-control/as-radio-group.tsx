@@ -43,7 +43,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 	const generatedId = useInstanceId(
 		ToggleGroupControlAsRadioGroup,
 		'toggle-group-control-as-radio-group'
-	).toString();
+	);
 	const baseId = idProp || generatedId;
 
 	// Use a heuristic to understand if the component is being used in controlled

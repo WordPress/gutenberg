@@ -37,7 +37,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 	const generatedId = useInstanceId(
 		ToggleGroupControlAsButtonGroup,
 		'toggle-group-control-as-button-group'
-	).toString();
+	);
 	const baseId = idProp || generatedId;
 
 	// Use a heuristic to understand if the component is being used in controlled

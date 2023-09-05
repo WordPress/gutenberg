@@ -64,7 +64,7 @@ function ToggleGroupControlOptionBase(
 	const id = useInstanceId(
 		ToggleGroupControlOptionBase,
 		toggleGroupControlContext.baseId || 'toggle-group-control-option-base'
-	) as string;
+	);
 
 	const buttonProps = useContextSystem(
 		{ ...props, id },
