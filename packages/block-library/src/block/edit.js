@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -22,6 +27,7 @@ import {
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 
 export default function ReusableBlockEdit( { attributes: { ref } } ) {
 	const hasAlreadyRendered = useHasRecursion( ref );
@@ -45,8 +51,27 @@ export default function ReusableBlockEdit( { attributes: { ref } } ) {
 		ref
 	);
 
+	const inheritedAlignment = useMemo( () => {
+		const alignments = [ 'wide', 'full' ];
+		// Determine the widest setting of all the contained blocks.
+		const widestAlignment = blocks.reduce( ( accumulator, block ) => {
+			const { align } = block.attributes;
+			return alignments.indexOf( align ) >
+				alignments.indexOf( accumulator )
+				? align
+				: accumulator;
+		}, undefined );
+
+		// Set the align class of the pattern block to match the widest
+		// alignment of children.
+		return widestAlignment;
+	}, [ blocks ] );
+
 	const blockProps = useBlockProps( {
-		className: 'block-library-block__reusable-block-container',
+		className: classNames(
+			'block-library-block__reusable-block-container',
+			{ [ `align${ inheritedAlignment }` ]: inheritedAlignment }
+		),
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
