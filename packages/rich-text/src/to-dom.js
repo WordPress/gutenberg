@@ -67,36 +67,28 @@ function append( element, child ) {
 	if ( typeof child === 'string' ) {
 		child = element.ownerDocument.createTextNode( child );
 	}
-	if ( 'type' in child ) {
-		child = contextuallyCreate( element, child );
+
+	const { type, attributes } = child;
+
+	if ( type ) {
+		let addAttribute;
+		if ( type === 'svg' || element.namespaceURI === NS_SVG ) {
+			child = element.ownerDocument.createElementNS( NS_SVG, type );
+			addAttribute = ( key, value ) => {
+				if ( key === 'xlink:href' )
+					child.setAttributeNS( NS_XLINK, key, value );
+				else child.setAttribute( key, value );
+			};
+		} else {
+			child = element.ownerDocument.createElement( type );
+			addAttribute = child.setAttribute.bind( child );
+		}
+		for ( const key in attributes ) {
+			addAttribute( key, attributes[ key ] );
+		}
 	}
 
 	return element.appendChild( child );
-}
-
-function contextuallyCreate( element, child ) {
-	const { ownerDocument: doc, namespaceURI } = element;
-	const { type, attributes } = child;
-	const [ childNode, addAttribute ] =
-		type === 'svg' || namespaceURI === NS_SVG
-			? [
-					doc.createElementNS( NS_SVG, type ),
-					( node, key, value ) => {
-						if ( key === 'xlink:href' ) {
-							node.setAttributeNS( NS_XLINK, key, value );
-						} else {
-							node.setAttribute( key, value );
-						}
-					},
-			  ]
-			: [
-					doc.createElement( type ),
-					( node, key, value ) => node.setAttribute( key, value ),
-			  ];
-	for ( const key in attributes ) {
-		addAttribute( childNode, key, attributes[ key ] );
-	}
-	return childNode;
 }
 
 function appendText( node, text ) {
