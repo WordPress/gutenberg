@@ -124,7 +124,9 @@ export default function SidebarNavigationScreenPage() {
 				</>
 			}
 			footer={
-				<SidebarNavigationScreenDetailsFooter record={ record } />
+				record?.modified ? (
+					<SidebarNavigationScreenDetailsFooter record={ record } />
+				) : null
 			}
 		/>
 	) : null;

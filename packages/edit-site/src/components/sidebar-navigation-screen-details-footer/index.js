@@ -27,18 +27,14 @@ export default function SidebarNavigationScreenDetailsFooter( {
 } ) {
 	/*
 	 * There might be other items in the future,
-	 * but for now it's just modified date,
-	 * so return null if there's no record?.modified.
+	 * but for now it's just modified date.
+	 * Later we might render a list of items and isolate
+	 * the following logic.
 	 */
-	if ( ! record?.modified ) {
-		return null;
-	}
-
 	const hrefProps = {};
 	if ( record?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ) {
 		hrefProps.href = addQueryArgs( 'revision.php', {
 			revision: record?._links[ 'predecessor-version' ][ 0 ].id,
-			gutenberg: true,
 		} );
 		hrefProps.as = 'a';
 	}

@@ -61,7 +61,9 @@ export default function usePatternDetails( postType, postId ) {
 		);
 	}
 
-	const footer = <SidebarNavigationScreenDetailsFooter record={ record } />;
+	const footer = record?.modified ? (
+		<SidebarNavigationScreenDetailsFooter record={ record } />
+	) : null;
 
 	const details = [];
 
