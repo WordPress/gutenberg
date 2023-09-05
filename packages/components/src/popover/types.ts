@@ -14,11 +14,6 @@ type DomRectWithOwnerDocument = DOMRect & {
 
 type PopoverPlacement = Placement | 'overlay';
 
-export type AnimatedWrapperProps = {
-	placement: PopoverPlacement;
-	shouldAnimate?: boolean;
-};
-
 export type PopoverAnchorRefReference = MutableRefObject<
 	Element | null | undefined
 >;
