@@ -271,7 +271,7 @@ test.describe( 'Links', () => {
 
 		// Toggle both of the settings
 		await page.getByLabel( 'Open in new tab' ).click();
-		await page.getByLabel( 'Add no-follow for search engines' ).click();
+		await page.getByLabel( 'nofollow' ).click();
 
 		// Save the link
 		await page
