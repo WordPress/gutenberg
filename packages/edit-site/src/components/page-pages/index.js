@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-// import { PaginationState } from '@tanstack/react-table';
-
-/**
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
@@ -33,7 +28,9 @@ import {
 	DataTableGlobalSearchInput,
 	DataTablePaginationNumbers,
 	DataTablePaginationTotalItems,
+	DataTablePagination,
 	DataTableProvider,
+	DataTableActions,
 } from '../datatable';
 
 const EMPTY_ARRAY = [];
@@ -146,6 +143,7 @@ export default function PagePages() {
 				},
 				maxSize: 400,
 				sortingFn: 'alphanumeric',
+				enableHiding: false,
 				// TODO: check about footers..
 				// footer: ( props ) => props.column.id,
 			},
@@ -178,6 +176,7 @@ export default function PagePages() {
 						/>
 					);
 				},
+				enableHiding: false,
 			},
 		],
 		[]
@@ -214,9 +213,10 @@ export default function PagePages() {
 					} }
 				>
 					<VStack>
-						<HStack justify="flex-start">
+						<HStack justify="space-between">
 							<DataTableGlobalSearchInput />
 							<ToggleStatusFilter onChange={ setStatus } />
+							<DataTableActions />
 						</HStack>
 						<DataTableRows
 							className="edit-site-table"
@@ -227,6 +227,11 @@ export default function PagePages() {
 								totalItems={ paginationInfo?.totalItems }
 							/>
 							<DataTablePaginationNumbers />
+						</HStack>
+						<HStack justify="flex-start">
+							<DataTablePagination
+								totalItems={ paginationInfo?.totalItems }
+							/>
 						</HStack>
 					</VStack>
 				</DataTableProvider>

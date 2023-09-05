@@ -27,7 +27,9 @@ import {
 	DataTableGlobalSearchInput,
 	DataTablePaginationTotalItems,
 	DataTablePaginationNumbers,
+	DataTablePagination,
 	DataTableProvider,
+	DataTableActions,
 } from '../datatable';
 
 export default function PageTemplates() {
@@ -70,6 +72,7 @@ export default function PageTemplates() {
 				},
 				maxSize: 400,
 				sortingFn: 'alphanumeric',
+				enableHiding: false,
 			},
 			{
 				header: __( 'Added by' ),
@@ -96,6 +99,7 @@ export default function PageTemplates() {
 						/>
 					);
 				},
+				enableHiding: false,
 			},
 		],
 		[]
@@ -124,11 +128,17 @@ export default function PageTemplates() {
 						} }
 					>
 						<VStack>
-							<DataTableGlobalSearchInput />
+							<HStack justify="space-between">
+								<DataTableGlobalSearchInput />
+								<DataTableActions />
+							</HStack>
 							<DataTableRows className="edit-site-table" />
 							<HStack justify="space-between">
 								<DataTablePaginationTotalItems />
 								<DataTablePaginationNumbers />
+							</HStack>
+							<HStack justify="flex-start">
+								<DataTablePagination />
 							</HStack>
 						</VStack>
 					</DataTableProvider>

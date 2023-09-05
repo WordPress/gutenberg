@@ -3,20 +3,15 @@
  */
 import {
 	Button,
-	SelectControl,
 	__experimentalHStack as HStack,
+	__experimentalText as Text,
 } from '@wordpress/components';
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, __, _x, _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { useDataTableContext } from './context';
-
-// type DataTablePaginationProps = {
-// 	className?: string;
-// 	totalItems: number;
-// };
 
 export function DataTablePaginationTotalItems( {
 	// If passed, use it as it's for controlled pagination.
@@ -35,15 +30,15 @@ export function DataTablePaginationTotalItems( {
 }
 
 export function DataTablePaginationNumbers() {
-	const midSize = 2;
-	const endSize = 1;
 	const table = useDataTableContext();
 	const totalPages = table.getPageCount();
-	const currentPage = table.getState().pagination.pageIndex + 1;
 	if ( ! totalPages ) {
 		return null;
 	}
+	const currentPage = table.getState().pagination.pageIndex + 1;
 	const pageLinks = [];
+	const midSize = 2;
+	const endSize = 1;
 	let dots = false;
 	for ( let i = 1; i <= totalPages; i++ ) {
 		const isActive = i === currentPage;
@@ -52,7 +47,7 @@ export function DataTablePaginationNumbers() {
 				<Button
 					key={ i }
 					className="current"
-					disabled={ true }
+					isPressed={ true }
 					text={ i }
 				/>
 			);
@@ -84,20 +79,79 @@ export function DataTablePaginationNumbers() {
 	);
 }
 
-export function DatatablePageSizeControl() {
+// For now I copied the patterns list Pagination component, because
+// the datatable pagination starts from index zero(`0`).
+export function DataTablePagination( {
+	// If passed, use it as it's for controlled pagination.
+	totalItems = 0,
+} ) {
 	const table = useDataTableContext();
+	const currentPage = table.getState().pagination.pageIndex + 1;
+	const numPages = table.getPageCount();
+	const _totalItems = totalItems || table.getCoreRowModel().rows.length;
 	return (
-		<SelectControl
-			label={ __( 'Number of items per page' ) }
-			hideLabelFromVision={ true }
-			value={ table.getState().pagination.pageSize }
-			options={ [ 2, 5, 20, 50 ].map( ( pageSize ) => ( {
-				// Only for TS and prototype..
-				value: pageSize.toString(),
-				label: `Show ${ pageSize }`,
-			} ) ) }
-			onChange={ ( value ) => table.setPageSize( +value ) }
-			style={ { minWidth: '100px' } }
-		/>
+		<HStack
+			expanded={ false }
+			spacing={ 3 }
+			justify="flex-start"
+			className="edit-site-patterns__grid-pagination"
+		>
+			<Text variant="muted">
+				{
+					// translators: %s: Total number of entries.
+					sprintf(
+						// translators: %s: Total number of entries.
+						_n( '%s item', '%s items', _totalItems ),
+						_totalItems
+					)
+				}
+			</Text>
+			<HStack expanded={ false } spacing={ 1 }>
+				<Button
+					variant="tertiary"
+					onClick={ () => table.setPageIndex( 0 ) }
+					disabled={ ! table.getCanPreviousPage() }
+					aria-label={ __( 'First page' ) }
+				>
+					«
+				</Button>
+				<Button
+					variant="tertiary"
+					onClick={ () => table.previousPage() }
+					disabled={ ! table.getCanPreviousPage() }
+					aria-label={ __( 'Previous page' ) }
+				>
+					‹
+				</Button>
+			</HStack>
+			<Text variant="muted">
+				{ sprintf(
+					// translators: %1$s: Current page number, %2$s: Total number of pages.
+					_x( '%1$s of %2$s', 'paging' ),
+					currentPage,
+					numPages
+				) }
+			</Text>
+			<HStack expanded={ false } spacing={ 1 }>
+				<Button
+					variant="tertiary"
+					onClick={ () => table.nextPage() }
+					disabled={ ! table.getCanNextPage() }
+					aria-label={ __( 'Next page' ) }
+				>
+					›
+				</Button>
+				<Button
+					variant="tertiary"
+					onClick={ () =>
+						table.setPageIndex( table.getPageCount() - 1 )
+					}
+					disabled={ ! table.getCanNextPage() }
+					aria-label={ __( 'Last page' ) }
+				>
+					»
+				</Button>
+			</HStack>
+		</HStack>
 	);
 }
