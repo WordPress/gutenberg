@@ -98,7 +98,7 @@ const BottomSheetModalWithRef = (
 	const handlePresent = useCallback( () => {
 		setVisible( true );
 		setInternalIndex( index >= 0 ? index : 0 );
-	}, [] );
+	}, [ index ] );
 
 	const handleDismiss = useCallback( () => {
 		bottomSheetRef.current?.close();
