@@ -35,7 +35,7 @@ const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
 	{
 		id: 'nofollow',
-		title: __( 'Mark as nofollow for search engines' ),
+		title: __( 'Mark as nofollow' ),
 	},
 ];
 
