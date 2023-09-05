@@ -1914,9 +1914,8 @@ export function blockEditingModes( state = new Map(), action ) {
 }
 
 export function openedBlockSettingsMenu( state = null, action ) {
-	switch ( action.type ) {
-		case 'SET_OPENED_BLOCK_SETTINGS_MENU':
-			return action.clientId || null;
+	if ( 'SET_OPENED_BLOCK_SETTINGS_MENU' === action.type ) {
+		return action?.clientId;
 	}
 	return state;
 }
