@@ -4,81 +4,134 @@
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	DropZone,
 	FormFileUpload,
-	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { file } from '@wordpress/icons';
-import { useState, useContext } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import TabLayout from './tab-layout';
 import { ALLOWED_FILE_EXTENSIONS } from './constants';
-import LocalFontVariant from './local-font-variant';
 import { FontLibraryContext } from './context';
+import { Font } from '../../../../lib/lib-font.browser';
 
 function LocalFonts() {
 	const { installFonts, refreshLibrary } = useContext( FontLibraryContext );
-	const [ selectedFiles, setSelectedFiles ] = useState( [] );
-	const [ fontFacesLoaded, setFontFacesLoaded ] = useState( [] );
-	const [ isInstalling, setIsInstalling ] = useState( false );
-
-	const onFilesUpload = ( files ) => {
-		const uniqueFilenames = new Set();
-		const allowedFiles = [ ...selectedFiles, ...files ].filter(
-			( file ) => {
-				if ( uniqueFilenames.has( file.name ) ) {
-					return false; // Discard duplicates
-				}
-				// Eliminates files that are not allowed
-				const fileExtension = file.name
-					.split( '.' )
-					.pop()
-					.toLowerCase();
-				if ( ALLOWED_FILE_EXTENSIONS.includes( fileExtension ) ) {
-					uniqueFilenames.add( file.name );
-					return true; // Keep file if the extension is allowed
-				}
-				return false; // Discard file extension not allowed
-			}
-		);
-		setSelectedFiles( allowedFiles );
-	};
-
-	const onFontFaceLoad = ( face ) => {
-		setFontFacesLoaded( ( prevFontFaces ) => [ ...prevFontFaces, face ] );
-	};
-
-	const onFontFaceRemove = ( face ) => {
-		setSelectedFiles(
-			selectedFiles.filter( ( file ) => file.name !== face.file.name )
-		);
-	};
 
 	const handleDropZone = ( files ) => {
-		onFilesUpload( files );
+		handleFilesUpload( files );
 	};
 
-	const handleFilesUpload = ( event ) => {
-		onFilesUpload( event.target.files );
+	const onFilesUpload = ( event ) => {
+		handleFilesUpload( event.target.files );
 	};
 
-	const handleInstall = async () => {
-		setIsInstalling( ! isInstalling );
-		// Gets the filenames of the files that are selected (files selected and not deleted by the user using the ui)
-		const selectedFilesnames = selectedFiles.map( ( file ) => file.name );
+	/**
+	 * Filters the selected files to only allow the ones with the allowed extensions
+	 *
+	 * @param {Array} files The files to be filtered
+	 * @return {Array} The filtered files
+	 */
+	const handleFilesUpload = ( files ) => {
+		const uniqueFilenames = new Set();
+		const selectedFiles = [ ...files ];
+		const allowedFiles = selectedFiles.filter( ( file ) => {
+			if ( uniqueFilenames.has( file.name ) ) {
+				return false; // Discard duplicates
+			}
+			// Eliminates files that are not allowed
+			const fileExtension = file.name.split( '.' ).pop().toLowerCase();
+			if ( ALLOWED_FILE_EXTENSIONS.includes( fileExtension ) ) {
+				uniqueFilenames.add( file.name );
+				return true; // Keep file if the extension is allowed
+			}
+			return false; // Discard file extension not allowed
+		} );
+		if ( allowedFiles.length > 0 ) {
+			loadFiles( allowedFiles );
+		}
+	};
 
-		// Gets the fontFaces that are selected
-		const fontFaces = fontFacesLoaded.filter( ( face ) =>
-			selectedFilesnames.includes( face.file.name )
+	/**
+	 * Loads the selected files and reads the font metadata
+	 *
+	 * @param {Array} selectedFiles The files to be loaded
+	 * @return {void}
+	 *
+	 */
+	const loadFiles = async ( files ) => {
+		const fontFacesLoaded = await Promise.all(
+			files.map( async (fontFile) => {
+				const fontFaceData = await getFontFaceMetadata( fontFile );
+				await addFontFaceToBrowser( fontFaceData );
+				return fontFaceData;
+			}
+		) );
+		await handleInstall( fontFacesLoaded );
+	};
+
+	// Create a function to read the file as array buffer
+	async function readFileAsArrayBuffer( file ) {
+		return new Promise( ( resolve, reject ) => {
+			const reader = new FileReader();
+			reader.readAsArrayBuffer( file );
+			reader.onload = () => resolve( reader.result );
+			reader.onerror = reject;
+		} );
+	}
+
+	const getFontFaceMetadata = async ( fontFile ) => {
+		const buffer = await readFileAsArrayBuffer( fontFile );
+		const fontObj = new Font( 'Uploaded Font' );
+		fontObj.fromDataBuffer( buffer, fontFile.name );
+		// Assuming that fromDataBuffer triggers onload event and returning a Promise
+		const onloadEvent = await new Promise(
+			( resolve ) => ( fontObj.onload = resolve )
 		);
+		const font = onloadEvent.detail.font;
+		const { name } = font.opentype.tables;
+		const fontName = name.get( 16 ) || name.get( 1 );
+		const isItalic = name.get( 2 ).toLowerCase().includes( 'italic' );
+		const fontWeight =
+			font.opentype.tables[ 'OS/2' ].usWeightClass || 'normal';
+		const isVariable = !! font.opentype.tables.fvar;
+		const weightAxis =
+			isVariable &&
+			font.opentype.tables.fvar.axes.find(
+				( { tag } ) => tag === 'wght'
+			);
+		const weightRange = weightAxis
+			? `${ weightAxis.minValue } ${ weightAxis.maxValue }`
+			: null;
+		return {
+			file: fontFile,
+			fontFamily: fontName,
+			fontStyle: isItalic ? 'italic' : 'normal',
+			fontWeight: weightRange || fontWeight,
+		}
+	}
 
+	const addFontFaceToBrowser = async  (fontFaceData ) => {
+		const data = await fontFaceData.file.arrayBuffer();
+		const newFont = new FontFace( fontFaceData.fontFamily, data, {
+			style: fontFaceData.fontStyle,
+			weight: fontFaceData.fontWeight,
+		} );
+		const loadedFace = await newFont.load();
+		document.fonts.add( loadedFace );
+	} 
+
+	/**
+	 * Creates the font family definition and sends it to the server
+	 *
+	 * @param {Array} fontFaces The font faces to be installed
+	 * @return {void}
+	 */
+	const handleInstall = async ( fontFaces ) => {
 		const formData = new FormData();
-
 		// Creates the fontFamilies array that will be sent to the server
 		const fontFamiliesObject = fontFaces.reduce(
 			( acc, { file, ...item }, i ) => {
@@ -103,49 +156,10 @@ function LocalFonts() {
 			{}
 		);
 		const fontFamilies = Object.values( fontFamiliesObject );
-
 		// Adds the fontFamilies to the formData
 		formData.append( 'fontFamilies', JSON.stringify( fontFamilies ) );
-
 		await installFonts( formData );
-		setIsInstalling( ( pevIsInstalling ) => ! pevIsInstalling );
-		setSelectedFiles( [] );
-		setFontFacesLoaded( [] );
 		refreshLibrary();
-	};
-
-	const Footer = () => {
-		return (
-			<HStack justify="flex-end">
-				<Button
-					variant="primary"
-					isBusy={ isInstalling }
-					disabled={ ! selectedFiles.length || isInstalling }
-					onClick={ handleInstall }
-				>
-					{ __( 'Upload Fonts' ) }
-				</Button>
-			</HStack>
-		);
-	};
-
-	const SelectFilesButton = ( props ) => {
-		return (
-			<FormFileUpload
-				accept="font/*"
-				multiple={ true }
-				onChange={ handleFilesUpload }
-				render={ ( { openFileDialog } ) => (
-					<Button
-						onClick={ openFileDialog }
-						icon={ file }
-						variant="secondary"
-						text={ __( 'Select font files' ) }
-						{ ...props }
-					/>
-				) }
-			/>
-		);
 	};
 
 	return (
@@ -153,41 +167,24 @@ function LocalFonts() {
 			description={ __(
 				'Drag and drop or select font files here to install'
 			) }
-			footer={ <Footer /> }
 		>
 			<DropZone onFilesDrop={ handleDropZone } />
 
-			{ selectedFiles.length === 0 && (
-				<div className="font-library-modal__upload-area">
-					<SelectFilesButton />
-				</div>
-			) }
-
-			{ selectedFiles.length > 0 && (
-				<>
-					<Spacer margin={ 8 } />
-
-					<VStack spacing={ 4 }>
-						{ selectedFiles.map( ( file ) => (
-							<LocalFontVariant
-								fontFile={ file }
-								key={ file.name }
-								onFontFaceLoad={ onFontFaceLoad }
-								onFontFaceRemove={ onFontFaceRemove }
-							/>
-						) ) }
-					</VStack>
-
-					<Spacer margin={ 8 } />
-
-					<SelectFilesButton
-						text={ __( 'Add more files…' ) }
-						variant="tertiary"
-						icon={ null }
-						isSmall
-					/>
-				</>
-			) }
+			<div className="font-library-modal__upload-area">
+				<FormFileUpload
+					accept="font/*"
+					multiple={ true }
+					onChange={ onFilesUpload }
+					render={ ( { openFileDialog } ) => (
+						<Button
+							onClick={ openFileDialog }
+							icon={ file }
+							variant="secondary"
+							text={ __( 'Select font files' ) }
+						/>
+					) }
+				/>
+			</div>
 		</TabLayout>
 	);
 }
