@@ -265,11 +265,13 @@ test.describe( 'Links', () => {
 
 		// expect settings for `Open in new tab` and `No follow`
 		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeChecked();
-		await expect( page.getByLabel( 'nofollow' ) ).not.toBeChecked();
+		await expect(
+			page.getByLabel( 'Add no-follow for search engines' )
+		).not.toBeChecked();
 
 		// Toggle both of the settings
 		await page.getByLabel( 'Open in new tab' ).click();
-		await page.getByLabel( 'nofollow' ).click();
+		await page.getByLabel( 'Add no-follow for search engines' ).click();
 
 		// Save the link
 		await page
@@ -297,7 +299,7 @@ test.describe( 'Links', () => {
 		// Toggle both the settings to be off.
 		// Note: no need to toggle settings again because the open setting should be persisted.
 		await page.getByLabel( 'Open in new tab' ).click();
-		await page.getByLabel( 'nofollow' ).click();
+		await page.getByLabel( 'Add no-follow for search engines' ).click();
 
 		// Save the link
 		await page
