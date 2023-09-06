@@ -12,7 +12,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { fetchInstallFonts, fetchUninstallFonts } from './resolvers';
-import { DEFAULT_DEMO_CONFIG } from './utils/constants';
 import { unlock } from '../../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import { setUIValuesNeeded, mergeFontFamilies, loadFontFaceInBrowser, getDisplaySrcFromFontFace } from './utils';
@@ -130,7 +129,6 @@ function FontLibraryProvider( { children } ) {
 
 	// Demo
 	const [ loadedFontUrls ] = useState( new Set() );
-	const [ demoConfig ] = useState( DEFAULT_DEMO_CONFIG );
 
 	// Theme data
 	const { site, currentTheme } = useSelect( ( select ) => {
@@ -343,7 +341,6 @@ function FontLibraryProvider( { children } ) {
 	return (
 		<FontLibraryContext.Provider
 			value={ {
-				demoConfig,
 				libraryFontSelected,
 				handleSetLibraryFontSelected,
 				themeFonts,

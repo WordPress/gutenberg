@@ -14,7 +14,7 @@ function FontFaceDemo( { fontFace, text, style = {} } ) {
 	const ref = useRef( null );
 	const [ isIntersecting, setIsIntersecting ] = useState( false );
 	const [ isAssetLoaded, setIsAssetLoaded ] = useState( false );
-	const { demoConfig, loadFontFaceAsset } = useContext( FontLibraryContext );
+	const { loadFontFaceAsset } = useContext( FontLibraryContext );
 	const { fontFamily, fontStyle, fontWeight } = fontFace;
 
 	const demoStyle = {
@@ -22,7 +22,7 @@ function FontFaceDemo( { fontFace, text, style = {} } ) {
 		fontStyle,
 		fontFamily,
 		flexShrink: 0,
-		fontSize: `${ demoConfig.fontSize }px`,
+		fontSize: '18px',
 		opacity: isAssetLoaded ? '1' : '0',
 		transition: 'opacity 0.3s ease-in-out',
 		...style,
@@ -50,7 +50,7 @@ function FontFaceDemo( { fontFace, text, style = {} } ) {
 
 	return (
 		<Text style={ demoStyle } ref={ ref }>
-			{ demoConfig.text || text }
+			{ text }
 		</Text>
 	);
 }
