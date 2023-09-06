@@ -294,6 +294,7 @@ function BlockPatternsTabs( {
 									setPatternFilter( value );
 									onSelectCategory( selectedCategory, value );
 								} }
+								aria-label={ __( 'Filter patterns by type' ) }
 							/>
 							{ categories.map( ( category ) => (
 								<Item
