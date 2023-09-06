@@ -84,6 +84,12 @@
 		"parent": "getting-started"
 	},
 	{
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "../docs/getting-started/glossary.md",
+		"parent": "getting-started"
+	},
+	{
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "../docs/getting-started/faq.md",
@@ -2146,12 +2152,6 @@
 		"slug": "design-resources",
 		"markdown_source": "../docs/explanations/user-interface/design-resources.md",
 		"parent": "user-interface"
-	},
-	{
-		"title": "Glossary",
-		"slug": "glossary",
-		"markdown_source": "../docs/explanations/glossary.md",
-		"parent": "explanations"
 	},
 	{
 		"title": "History",
