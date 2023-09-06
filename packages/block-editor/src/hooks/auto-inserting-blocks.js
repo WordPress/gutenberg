@@ -193,9 +193,6 @@ function AutoInsertingBlocksControl( props ) {
 							<h3>{ vendor }</h3>
 							{ groupedAutoInsertedBlocks[ vendor ].map(
 								( block ) => {
-									// TODO: Display block icon.
-									// <BlockIcon icon={ block.icon } />
-
 									const checked =
 										block.name in
 										autoInsertedBlockClientIds;
