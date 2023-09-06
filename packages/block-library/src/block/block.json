@@ -15,9 +15,6 @@
 			"type": "number"
 		}
 	},
-	"providesContext": {
-		"dynamicContent": "dynamicContent"
-	},
 	"supports": {
 		"customClassName": false,
 		"html": false,
