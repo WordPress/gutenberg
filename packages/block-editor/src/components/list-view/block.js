@@ -23,6 +23,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 import { focus } from '@wordpress/dom';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -150,6 +151,20 @@ function ListViewBlock( {
 		}
 	}, [] );
 
+	// If multiple blocks are selected, deselect all blocks when the user
+	// presses the escape key.
+	const onKeyDown = ( event ) => {
+		if (
+			event.keyCode === ESCAPE &&
+			! event.defaultPrevented &&
+			selectedClientIds.length > 0
+		) {
+			event.stopPropagation();
+			event.preventDefault();
+			selectBlock( event, undefined );
+		}
+	};
+
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
 		toggleBlockHighlight( clientId, true );
@@ -257,6 +272,7 @@ function ListViewBlock( {
 	return (
 		<ListViewLeaf
 			className={ classes }
+			onKeyDown={ onKeyDown }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }

@@ -22,7 +22,7 @@ import './metadata';
 import './metadata-name';
 import './behaviors';
 import './custom-fields';
-import './auto-inserting-blocks';
+import './block-hooks';
 import './block-rename-ui';
 
 export { useCustomSides } from './dimensions';

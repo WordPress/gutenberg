@@ -132,7 +132,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 
 		const marginLeft = parseFloat( computedToolbarStyle.marginLeft );
 		const pinnedItemsWidth = computedPinnedItemsStyle
-			? parseFloat( computedPinnedItemsStyle.width ) + 10 // 10 is the pinned items padding
+			? parseFloat( computedPinnedItemsStyle.width )
 			: 0;
 		const leftHeaderWidth = computedLeftHeaderStyle
 			? parseFloat( computedLeftHeaderStyle.width )
@@ -143,6 +143,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			leftHeaderWidth +
 			pinnedItemsWidth +
 			marginLeft +
+			( pinnedItems || leftHeader ? 2 : 0 ) + // Prevents button focus border from being cut off
 			( isFullscreen ? 0 : 160 ) // the width of the admin sidebar expanded
 		}px)`;
 	}, [

@@ -37,7 +37,8 @@
 				]
 			},
 			{ "docs/getting-started/full-site-editing.md": [] },
-			{ "docs/getting-started/outreach.md": [] }
+			{ "docs/getting-started/outreach.md": [] },
+			{ "docs/getting-started/faq.md": [] }
 		]
 	},
 	{
@@ -269,6 +270,9 @@
 					},
 					{ "docs/reference-guides/data/data-core-blocks.md": [] },
 					{
+						"docs/reference-guides/data/data-core-commands.md": []
+					},
+					{
 						"docs/reference-guides/data/data-core-customize-widgets.md": []
 					},
 					{ "docs/reference-guides/data/data-core-edit-post.md": [] },
@@ -321,7 +325,6 @@
 					}
 				]
 			},
-			{ "docs/explanations/faq.md": [] },
 			{ "docs/explanations/glossary.md": [] },
 			{ "docs/explanations/history.md": [] }
 		]

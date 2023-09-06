@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Improve `navigate()` to render only the result of the last call when multiple happen simultaneously. ([#54201](https://github.com/WordPress/gutenberg/pull/54201))
+
 ## 2.2.0 (2023-08-31)
 
 ### Enhancements

@@ -209,7 +209,11 @@ function InlineLinkUI( {
 	// See https://github.com/WordPress/gutenberg/pull/34742.
 	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
 
-	// The focusOnMount prop shouldn't evolve during render of a Popover
+	// Focus should only be moved into the Popover when the Link is being created or edited.
+	// When the Link is in "preview" mode focus should remain on the rich text because at
+	// this point the Link dialog is informational only and thus the user should be able to
+	// continue editing the rich text.
+	// Ref used because the focusOnMount prop shouldn't evolve during render of a Popover
 	// otherwise it causes a render of the content.
 	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
 

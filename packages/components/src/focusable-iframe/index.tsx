@@ -3,12 +3,15 @@
  */
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-
 /**
- * @param {Object}                                 props
- * @param {import('react').Ref<HTMLIFrameElement>} props.iframeRef
+ * Internal dependencies
  */
-export default function FocusableIframe( { iframeRef, ...props } ) {
+import type { FocusableIframeProps } from './types';
+
+export default function FocusableIframe( {
+	iframeRef,
+	...props
+}: FocusableIframeProps ) {
 	const ref = useMergeRefs( [ iframeRef, useFocusableIframe() ] );
 	deprecated( 'wp.components.FocusableIframe', {
 		since: '5.9',
