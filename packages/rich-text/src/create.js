@@ -298,7 +298,7 @@ function filterRange( node, range, filter ) {
  * @param {string} string
  */
 function collapseWhiteSpace( string ) {
-	return string.replace( /[\n\r\t]+/g, ' ' );
+	return string.replace( /[\n\r]+/g, ' ' );
 }
 
 /**

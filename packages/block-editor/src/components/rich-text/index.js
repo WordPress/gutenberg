@@ -37,6 +37,7 @@ import { useBeforeInputRules } from './use-before-input-rules';
 import { useInputRules } from './use-input-rules';
 import { useDelete } from './use-delete';
 import { useEnter } from './use-enter';
+import { useTab } from './use-tab';
 import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
 import { useShortcuts } from './use-shortcuts';
@@ -398,6 +399,10 @@ function RichTextWrapper(
 						onChange,
 						disableLineBreaks,
 						onSplitAtEnd,
+					} ),
+					useTab( {
+						value,
+						onChange,
 					} ),
 					useFirefoxCompat(),
 					anchorRef,
