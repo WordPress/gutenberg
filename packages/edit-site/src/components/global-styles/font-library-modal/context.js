@@ -15,7 +15,7 @@ import { fetchInstallFonts, fetchUninstallFonts } from './resolvers';
 import { DEFAULT_DEMO_CONFIG } from './utils/constants';
 import { unlock } from '../../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
-import { setUIValuesNeeded, isUrlEncoded, mergeFontFamilies, loadFontFaceInBrowser, getDisplaySrcFromFontFace } from './utils';
+import { setUIValuesNeeded, mergeFontFamilies, loadFontFaceInBrowser, getDisplaySrcFromFontFace } from './utils';
 
 export const FontLibraryContext = createContext( {} );
 
