@@ -158,6 +158,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 					} }
 				>
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						isBusy={ isBusy }
