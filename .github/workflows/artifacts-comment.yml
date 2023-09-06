@@ -4,8 +4,6 @@ on:
     workflows: [Build Gutenberg Plugin Zip]
     types: 
       - completed
-      - requested
-      - in_progress
 
 jobs:
   artifacts-url-comments:
