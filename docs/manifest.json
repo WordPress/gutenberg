@@ -84,6 +84,12 @@
 		"parent": "getting-started"
 	},
 	{
+		"title": "Frequently Asked Questions",
+		"slug": "faq",
+		"markdown_source": "../docs/getting-started/faq.md",
+		"parent": "getting-started"
+	},
+	{
 		"title": "How-to Guides",
 		"slug": "how-to-guides",
 		"markdown_source": "../docs/how-to-guides/README.md",
@@ -2140,12 +2146,6 @@
 		"slug": "design-resources",
 		"markdown_source": "../docs/explanations/user-interface/design-resources.md",
 		"parent": "user-interface"
-	},
-	{
-		"title": "Frequently Asked Questions",
-		"slug": "faq",
-		"markdown_source": "../docs/explanations/faq.md",
-		"parent": "explanations"
 	},
 	{
 		"title": "Glossary",

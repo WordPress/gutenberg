@@ -18,7 +18,7 @@ Through the Block editor, you create content modularly using Blocks. There are a
 
 A [Block](https://developer.wordpress.org/block-editor/explanations/architecture/key-concepts/#blocks) is a discrete element such as a Paragraph, Heading, Media element, or Embed. Each block is treated as a separate element with individual editing and format controls. When all these components are pieced together, they make up the content that is then [stored in the WordPress database](https://developer.wordpress.org/block-editor/explanations/architecture/data-flow/#serialization-and-parsing).
 
-The Block Editor is the result of the [work done on the **Gutenberg project**](https://developer.wordpress.org/block-editor/explanations/faq/#what-is-gutenberg) which is aimed to revolutionize the WordPress editing experience.
+The Block Editor is the result of the [work done on the **Gutenberg project**](https://developer.wordpress.org/block-editor/getting-started/faq/#what-is-gutenberg) which is aimed to revolutionize the WordPress editing experience.
 
 Besides offering an [enhanced editing experience](https://wordpress.org/gutenberg/) through visual content creation tools, the Block Editor is also a powerful developer platform with a [rich feature set of APIs](https://developer.wordpress.org/block-editor/reference-guides/) that allow it to be manipulated and extended in a multitude of different ways.
 
@@ -44,7 +44,7 @@ This section is the heart of the handbook and is where you can get down to the n
 
 **[Explanations](https://developer.wordpress.org/block-editor/explanations/)**
 
-This section enables you to go deeper and reinforce your practical knowledge with a theoretical understanding of the [Architecture](https://developer.wordpress.org/block-editor/explanations/architecture/) of the block editor. Its [Glossary of terms](https://developer.wordpress.org/block-editor/explanations/glossary/) and [FAQs](https://developer.wordpress.org/block-editor/explanations/faq/) should answer any outstanding questions you may have.
+This section enables you to go deeper and reinforce your practical knowledge with a theoretical understanding of the [Architecture](https://developer.wordpress.org/block-editor/explanations/architecture/) of the block editor. Its [Glossary of terms](https://developer.wordpress.org/block-editor/explanations/glossary/) and [FAQs](https://developer.wordpress.org/block-editor/getting-started/faq/) should answer any outstanding questions you may have.
 
 
 **[Contributor Guide](https://developer.wordpress.org/block-editor/contributors/)**

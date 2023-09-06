@@ -55,6 +55,6 @@ The [WordPress.org Roadmap](https://wordpress.org/about/roadmap/) with Four Phas
 Checking in on [issues](https://github.com/WordPress/gutenberg/issues) and [PRs](https://github.com/WordPress/gutenberg/pulls) on GitHub. This will give you a nearly real-time understanding of what’s being worked on by the developers and designers. 
 
 -   [Glossary](/docs/explanations/glossary.md)
--   [Frequently Asked Questions](/docs/explanations/faq.md)
+-   [Frequently Asked Questions](/docs/getting-started/faq.md)
 -   [Project History](/docs/explanations/history.md)
 -   [Outreach](/docs/getting-started/outreach.md)

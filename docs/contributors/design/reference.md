@@ -3,7 +3,7 @@
 -   [Glossary](/docs/explanations/glossary.md)
 -   [Coding Guidelines](/docs/contributors/code/coding-guidelines.md)
 -   [Testing Overview](/docs/contributors/code/testing-overview.md)
--   [Frequently Asked Questions](/docs/explanations/faq.md)
+-   [Frequently Asked Questions](/docs/getting-started/faq.md)
 
 ## Logo
 
