@@ -8,6 +8,10 @@ import testData from './helpers/test-data';
 const onlyOniOS = ! isAndroid() ? describe : describe.skip;
 
 describe( 'Gutenberg Editor Audio Block tests', () => {
+	it( 'fails on purpose', async () => {
+		expect( false ).toBeTruthy();
+	} );
+
 	it( 'should be able to add an audio block and a file to it', async () => {
 		await editorPage.initializeEditor();
 		// add an audio block
