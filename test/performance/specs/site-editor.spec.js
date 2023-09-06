@@ -74,12 +74,9 @@ test.describe( 'Site Editor Performance', () => {
 				page.getByRole( 'button', { name: 'Saved' } )
 			).toBeDisabled();
 
-			// Get the ID of the saved page.
-			const testPageId = new URL( page.url() ).searchParams.get( 'post' );
-
 			// Open the test page in Site Editor.
 			await admin.visitSiteEditor( {
-				postId: testPageId,
+				postId: new URL( page.url() ).searchParams.get( 'post' ),
 				postType: 'page',
 			} );
 
@@ -93,23 +90,18 @@ test.describe( 'Site Editor Performance', () => {
 		for ( let i = 0; i < rounds; i++ ) {
 			test( `Get the durations (${ i + 1 } of ${ rounds })`, async ( {
 				page,
-				editor,
 			} ) => {
 				// Go to the test page.
 				await page.goto( draftURL );
 
-				// Wait for the editor canvas.
+				// Wait for the first block.
 				await page
-					.frameLocator( '[name=editor-canvas]' )
-					.locator( 'body' )
-					.waitFor();
+					.frameLocator( 'iframe[name="editor-canvas"]' )
+					.locator( '.wp-block' )
+					.first()
+					.waitFor( { timeout: 120_000 } );
 
-				// Wait for the first block to be ready.
-				await editor.canvas.locator( '.wp-block' ).first().waitFor( {
-					timeout: 120_000,
-				} );
-
-				// Get the durations.
+				// Save the results.
 				if ( i >= throwaway ) {
 					const loadingDurations = await getLoadingDurations( page );
 					Object.entries( loadingDurations ).forEach(
@@ -141,12 +133,9 @@ test.describe( 'Site Editor Performance', () => {
 			page.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
 
-		// Get the ID of the saved page.
-		const testPageId = new URL( page.url() ).searchParams.get( 'post' );
-
 		// Open the test page in Site Editor.
 		await admin.visitSiteEditor( {
-			postId: testPageId,
+			postId: new URL( page.url() ).searchParams.get( 'post' ),
 			postType: 'page',
 		} );
 
@@ -154,7 +143,7 @@ test.describe( 'Site Editor Performance', () => {
 		const firstParagraph = editor.canvas
 			.getByText( 'Lorem ipsum dolor sit amet' )
 			.first();
-		await firstParagraph.waitFor( { timeout: 60_000 } );
+		await firstParagraph.waitFor( { timeout: 120_000 } );
 
 		// Enter edit mode.
 		await editor.canvas.locator( 'body' ).click();

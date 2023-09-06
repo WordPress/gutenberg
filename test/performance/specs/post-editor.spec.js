@@ -78,22 +78,34 @@ test.describe( 'Post Editor Performance', () => {
 		for ( let i = 0; i < rounds; i++ ) {
 			test( `Get the durations (${ i + 1 } of ${ rounds })`, async ( {
 				page,
-				editor,
 			} ) => {
 				// Go to the test page.
 				await page.goto( draftURL );
 
-				// Wait for the editor canvas (legacy or iframed).
-				await Promise.any( [
-					page.locator( '.wp-block-post-content' ).waitFor(),
-					page
-						.frameLocator( '[name=editor-canvas]' )
-						.locator( 'body' )
-						.waitFor(),
+				// Get canvas (handles both legacy and iframed canvas).
+				const canvas = await Promise.any( [
+					( async () => {
+						const legacyCanvasLocator = page.locator(
+							'.wp-block-post-content'
+						);
+						await legacyCanvasLocator.waitFor( {
+							timeout: 120_000,
+						} );
+						return legacyCanvasLocator;
+					} )(),
+					( async () => {
+						const iframedCanvasLocator = page.frameLocator(
+							'[name=editor-canvas]'
+						);
+						await iframedCanvasLocator
+							.locator( 'body' )
+							.waitFor( { timeout: 120_000 } );
+						return iframedCanvasLocator;
+					} )(),
 				] );
 
-				// Wait for the first block to be ready.
-				await editor.canvas.locator( '.wp-block' ).first().waitFor( {
+				// Wait for the first block to be visible.
+				await canvas.locator( '.wp-block' ).first().waitFor( {
 					timeout: 120_000,
 				} );
 

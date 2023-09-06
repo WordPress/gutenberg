@@ -3,7 +3,7 @@
  */
 import { useCommand } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
-import { external, plus, symbol } from '@wordpress/icons';
+import { plus, symbol } from '@wordpress/icons';
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -42,7 +42,8 @@ export function useAdminNavigationCommands() {
 	} );
 	useCommand( {
 		name: 'core/manage-reusable-blocks',
-		label: __( 'Open patterns' ),
+		label: __( 'Patterns' ),
+		icon: symbol,
 		callback: ( { close } ) => {
 			if ( isTemplatesAccessible && isBlockBasedTheme ) {
 				const args = {
@@ -58,6 +59,5 @@ export function useAdminNavigationCommands() {
 				document.location.href = 'edit.php?post_type=wp_block';
 			}
 		},
-		icon: isSiteEditor ? symbol : external,
 	} );
 }

@@ -112,7 +112,7 @@ class Tests_Fonts_WpFontFamily_Uninstall extends WP_Font_Family_UnitTestCase {
 
 		// Check that the files were uninstalled.
 		foreach ( $files_to_uninstall as $font_file ) {
-			$font_file = static::$fonts_dir . $font_file;
+			$font_file = path_join( static::$fonts_dir, $font_file );
 			$this->assertFileDoesNotExist( $font_file, "Font file [{$font_file}] should not exists in the uploads/fonts/ directory after uninstalling" );
 		}
 		// Check that the Merriweather file was not uninstalled.
