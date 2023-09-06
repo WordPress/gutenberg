@@ -11,16 +11,9 @@
 		"dynamicContent": {
 			"type": "object"
 		},
-		"patternId": {
-			"type": "string"
-		},
 		"ref": {
 			"type": "number"
 		}
-	},
-	"providesContext": {
-		"dynamicContent": "dynamicContent",
-		"patternId": "patternId"
 	},
 	"supports": {
 		"customClassName": false,
