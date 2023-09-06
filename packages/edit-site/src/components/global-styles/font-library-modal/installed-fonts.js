@@ -44,6 +44,7 @@ function InstalledFonts() {
 		if ( result ) {
 			handleUnselectFont();
 		}
+		setIsConfirmDeleteOpen( false );
 	};
 
 	const handleUninstallClick = async () => {
