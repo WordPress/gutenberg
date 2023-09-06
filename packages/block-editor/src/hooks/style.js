@@ -132,6 +132,10 @@ const skipSerializationPathsSave = {
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: [ BACKGROUND_SUPPORT_KEY ], // Skip serialization of background support in save mode.
 };
 
+const skipSerializationPathsSaveChecks = {
+	[ `${ BACKGROUND_SUPPORT_KEY }` ]: true,
+};
+
 /**
  * A dictionary used to normalize feature names between support flags, style
  * object properties and __experimentSkipSerialization configuration arrays.
@@ -287,7 +291,9 @@ export function addSaveProps(
 
 	let { style } = attributes;
 	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
-		const skipSerialization = getBlockSupport( blockType, indicator );
+		const skipSerialization =
+			skipSerializationPathsSaveChecks[ indicator ] ||
+			getBlockSupport( blockType, indicator );
 
 		if ( skipSerialization === true ) {
 			style = omitStyle( style, path );
@@ -298,20 +304,6 @@ export function addSaveProps(
 				const feature = renamedFeatures[ featureName ] || featureName;
 				style = omitStyle( style, [ [ ...path, feature ] ] );
 			} );
-		} else if (
-			!! skipSerialization &&
-			typeof skipSerialization === 'object'
-		) {
-			Object.entries( skipSerialization ).forEach(
-				( [ featureName, value ] ) => {
-					const feature =
-						renamedFeatures[ featureName ] || featureName;
-					// Allow a truthy value to skip serialization of the feature.
-					if ( !! value ) {
-						style = omitStyle( style, [ [ ...path, feature ] ] );
-					}
-				}
-			);
 		}
 	} );
 
