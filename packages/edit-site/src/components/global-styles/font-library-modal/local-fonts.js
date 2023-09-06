@@ -170,7 +170,7 @@ function LocalFonts() {
 				onChange={ onFilesUpload }
 				render={ ( { openFileDialog } ) => (
 					<div className="font-library-modal__upload-area" onClick={ openFileDialog }>
-						<span>{ __("Drag and drop you font files here.") }</span>
+						<span>{ __("Drag and drop your font files here.") }</span>
 					</div>
 				) }
 			/>
