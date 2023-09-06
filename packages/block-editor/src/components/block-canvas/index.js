@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { useMergeRefs } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import BlockList from '../block-list';
@@ -6,16 +11,19 @@ import EditorStyles from '../editor-styles';
 import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
+import { useClipboardHandler } from '../copy-handler';
 
 export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
 	height = '300px',
 	children = <BlockList />,
 	styles,
-	contentRef,
+	contentRef: contentRefProp,
 	iframeProps,
 } ) {
 	const resetTypingRef = useMouseMoveTypingReset();
+	const copyHandler = useClipboardHandler();
+	const contentRef = useMergeRefs( [ copyHandler, contentRefProp ] );
 
 	if ( ! shouldIframe ) {
 		return (
