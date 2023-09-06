@@ -7,7 +7,7 @@ name: Pull request automation
 jobs:
     pull-request-automation:
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' }}
+        if: ${{ github.repository == 'BeyondspaceStudio/gutenberg' }}
         strategy:
             matrix:
                 node: ['16']
