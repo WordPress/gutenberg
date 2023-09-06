@@ -18,7 +18,7 @@ async function prPreviewLink( payload, octokit ) {
 	const owner = payload.repository.owner.login;
 	const pullRequestNumber = payload.pull_request.number;
 
-	const workflowRun = payload.workflow_run
+	const workflowRun = payload?.workflow_run
     const repoHtmlUrl = payload?.repository?.html_url
     const checkSuiteNumber = workflowRun?.check_suite_id
     const artifactsUrl = workflowRun?.artifacts_url
