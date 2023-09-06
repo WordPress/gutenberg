@@ -1,4 +1,4 @@
-import { isUrlEncoded } from "../utils";
+import { isUrlEncoded } from '../index';
 
 describe( 'isUrlEncoded', () => {
 	// Test when input is not a string

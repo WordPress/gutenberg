@@ -1,4 +1,4 @@
-import { mergeFontFaces } from '../utils';
+import { mergeFontFaces } from '../index';
 
 describe( 'mergeFontFaces', () => {
 	it( 'should return an empty array when both existing and incoming arrays are empty', () => {

@@ -8,7 +8,7 @@ import { Modal, TabPanel } from '@wordpress/components';
  * Internal dependencies
  */
 import InstalledFonts from './installed-fonts';
-import { MODAL_TABS } from './constants';
+import { MODAL_TABS } from './utils/constants';
 
 function FontLibraryModal( {
 	onRequestClose,

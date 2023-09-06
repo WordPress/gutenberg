@@ -1,4 +1,4 @@
-import { setUIValuesNeeded } from '../utils';
+import { setUIValuesNeeded } from '../index';
 
 describe( 'setUIValuesNeeded function', () => {
 	test( 'Should set name from fontFamily if name is missing', () => {

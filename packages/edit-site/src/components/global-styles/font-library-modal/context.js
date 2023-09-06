@@ -12,10 +12,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { fetchInstallFonts, fetchUninstallFonts } from './resolvers';
-import { DEFAULT_DEMO_CONFIG } from './constants';
+import { DEFAULT_DEMO_CONFIG } from './utils/constants';
 import { unlock } from '../../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
-import { setUIValuesNeeded, isUrlEncoded, mergeFontFamilies } from './utils';
+import { setUIValuesNeeded, isUrlEncoded, mergeFontFamilies, loadFontFaceInBrowser, getDisplaySrcFromFontFace } from './utils';
 
 export const FontLibraryContext = createContext( {} );
 
@@ -328,40 +328,15 @@ function FontLibraryProvider( { children } ) {
 	};
 
 	const loadFontFaceAsset = async ( fontFace ) => {
-		if ( ! fontFace.src ) {
-			return;
-		}
-
-		let src = fontFace.src;
-		if ( Array.isArray( src ) ) {
-			src = src[ 0 ];
-		}
-
-		// If it is a theme font, we need to make the url absolute
-		if ( src.startsWith( 'file:.' ) ) {
-			src = src.replace( 'file:.', themeUrl );
-		}
-
-		if ( loadedFontUrls.has( src ) ) {
-			return;
-		}
-
-		if ( ! isUrlEncoded ( src ) ) {
-			src = encodeURI( src );
-		}
-
-		const newFont = new FontFace( fontFace.fontFamily, `url( ${ src } )`, {
-			style: fontFace.fontStyle,
-			weight: fontFace.fontWeight,
-		} );
-
-		try {
-			const loadedFace = await newFont.load();
-			document.fonts.add( loadedFace );
-		} catch ( e ) {
-			// If the url is not valid we mark the font as loaded
-			console.error( e );
-		}
+		// If the font doesn't have a src, don't load it.
+		if ( ! fontFace.src ) return;
+		// Get the src of the font.
+		const src = getDisplaySrcFromFontFace( fontFace.src, themeUrl );
+		// If the font is already loaded, don't load it again.
+		if ( loadedFontUrls.has( src ) ) return;
+		// Load the font in the browser.
+		loadFontFaceInBrowser( fontFace, src );
+		// Add the font to the loaded fonts list.
 		loadedFontUrls.add( src );
 	};
 

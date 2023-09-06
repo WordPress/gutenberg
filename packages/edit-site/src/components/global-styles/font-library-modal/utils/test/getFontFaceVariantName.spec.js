@@ -1,4 +1,4 @@
-import { getFontFaceVariantName } from '../utils';
+import { getFontFaceVariantName } from '../index';
 
 describe( 'getFontFaceVariantName', () => {
 	it( 'should return "Normal" for fontWeight 400 and fontStyle "normal"', () => {

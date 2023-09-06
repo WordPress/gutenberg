@@ -65,3 +65,29 @@ export function mergeFontFamilies( existing = [], incoming = [] ) {
 	}
 	return Array.from( map.values() );
 }
+
+export async function loadFontFaceInBrowser ( fontFace, src ) {
+	const newFont = new FontFace( fontFace.fontFamily, `url( ${ src } )`, {
+		style: fontFace.fontStyle,
+		weight: fontFace.fontWeight,
+	} );
+	const loadedFace = await newFont.load();
+	document.fonts.add( loadedFace );
+}
+
+export function getDisplaySrcFromFontFace( input, urlPrefix ) {
+	let src;
+	if ( Array.isArray( input ) ) {
+		src = input[ 0 ];
+	} else {
+		src = input;
+	}
+	// If it is a theme font, we need to make the url absolute
+	if ( src.startsWith( 'file:.' ) && urlPrefix ) {
+		src = src.replace( 'file:.', urlPrefix );
+	}
+	if ( ! isUrlEncoded ( src ) ) {
+		src = encodeURI( src );
+	}
+	return  src;
+}
