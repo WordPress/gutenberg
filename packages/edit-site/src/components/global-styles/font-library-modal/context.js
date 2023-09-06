@@ -221,7 +221,7 @@ function FontLibraryProvider( { children } ) {
 			return true;
 		} catch ( e ) {
 			console.error(e);
-			createErrorNotice( __( 'Error uninstallind fonts.' ), {
+			createErrorNotice( __( 'Error uninstalling fonts.' ), {
 				type: 'snackbar',
 			} );
 			return false;
