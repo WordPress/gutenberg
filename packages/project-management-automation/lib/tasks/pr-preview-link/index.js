@@ -18,12 +18,12 @@ async function prPreviewLink( payload, octokit ) {
 	const owner = payload.repository.owner.login;
 	const pullRequestNumber = payload.pull_request.number;
 
-	const workflowRun = payload?.workflow_run
-    const repoHtmlUrl = payload?.repository?.html_url
-    const checkSuiteNumber = workflowRun?.check_suite_id
-    const artifactsUrl = workflowRun?.artifacts_url
+	// const workflowRun = payload?.workflow_run
+    // const repoHtmlUrl = payload?.repository?.html_url
+    // const checkSuiteNumber = workflowRun?.check_suite_id
+    // const artifactsUrl = workflowRun?.artifacts_url
 
-	debug( JSON.stringify( {workflowRun, repoHtmlUrl, checkSuiteNumber, artifactsUrl}) );
+	// debug( JSON.stringify( {workflowRun, repoHtmlUrl, checkSuiteNumber, artifactsUrl}) );
 	
 	debug( 'artifacts: detail data.' );
 	// Retrieve artifacts for a specific workflow run
