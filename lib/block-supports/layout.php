@@ -529,14 +529,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$layout_from_parent    = $block['attrs']['style']['layout']['selfStretch'] ?? null;
+	$block_type                = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_supports_layout     = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$layout_from_parent        = $block['attrs']['style']['layout']['selfStretch'] ?? null;
+	$skip_server_serialization = $block_type ? _wp_array_get( $block_type->supports, array( 'layout', '__experimentalSkipServerSerialization' ), false ): false;
 
-	// We don't want to serialize layout for core/block blocks on frontend as this is only needed for layout compatibility in the editor.
-	$is_synced_pattern = 'core/block' === $block['blockName'];
-
-	if ( ( ! $block_supports_layout && ! $layout_from_parent ) || $is_synced_pattern ) {
+	if ( ( ! $block_supports_layout && ! $layout_from_parent ) || $skip_server_serialization ) {
 		return $block_content;
 	}
 

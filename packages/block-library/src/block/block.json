@@ -24,7 +24,8 @@
 		"inserter": false,
 		"layout": {
 			"allowSizingOnChildren": true,
-			"allowEditing": false
+			"allowEditing": false,
+			"__experimentalSkipServerSerialization": true
 		}
 	}
 }
