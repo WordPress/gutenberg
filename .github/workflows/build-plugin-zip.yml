@@ -185,6 +185,9 @@ jobs:
                   name: gutenberg-plugin
                   path: ./gutenberg.zip
 
+            - name: workflow artifact pull request comment
+              uses: tonyhallett/artifacts-url-comments@v1.1.0
+
             - name: Build release notes draft
               if: ${{ needs.bump-version.outputs.new_version }}
               env:
