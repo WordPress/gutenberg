@@ -533,7 +533,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	$layout_from_parent    = $block['attrs']['style']['layout']['selfStretch'] ?? null;
 
-	// We don't want to serialize layout for core/block blocks on frontend as this is only needed for layout comaptibility in the editor.
+	// We don't want to serialize layout for core/block blocks on frontend as this is only needed for layout compatibility in the editor.
 	$is_synced_pattern = 'core/block' === $block['blockName'];
 
 	if ( (! $block_supports_layout && ! $layout_from_parent ) || $is_synced_pattern ) {
