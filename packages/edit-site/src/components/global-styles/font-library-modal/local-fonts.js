@@ -165,7 +165,7 @@ function LocalFonts() {
 			<Spacer margin={ 2 } />
 			<DropZone onFilesDrop={ handleDropZone } />
 			<FormFileUpload
-				accept="font/*"
+				accept="font/*,.woff,.woff2"
 				multiple={ true }
 				onChange={ onFilesUpload }
 				render={ ( { openFileDialog } ) => (
