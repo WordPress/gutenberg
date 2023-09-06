@@ -54,6 +54,7 @@ function InserterMenu(
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] =
 		useState( null );
+	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
 	const [ selectedTab, setSelectedTab ] = useState( null );
@@ -120,8 +121,9 @@ function InserterMenu(
 	);
 
 	const onClickPatternCategory = useCallback(
-		( patternCategory ) => {
+		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
+			setPatternFilter( filter );
 		},
 		[ setSelectedPatternCategory ]
 	);
@@ -291,6 +293,7 @@ function InserterMenu(
 					onInsert={ onInsertPattern }
 					onHover={ onHoverPattern }
 					category={ selectedPatternCategory }
+					patternFilter={ patternFilter }
 					showTitlesAsTooltip
 				/>
 			) }

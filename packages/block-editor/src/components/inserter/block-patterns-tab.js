@@ -16,6 +16,7 @@ import {
 	__experimentalHStack as HStack,
 	FlexBlock,
 	Button,
+	SelectControl,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
@@ -34,15 +35,36 @@ const noop = () => {};
 
 export const allPatternsCategory = {
 	name: 'allPatterns',
-	label: __( 'All patterns' ),
+	label: __( 'All' ),
 };
-
-function usePatternsCategories( rootClientId ) {
+const PATTERN_TYPES = {
+	synced: 'synced',
+	unsynced: 'unsynced',
+	theme: 'theme',
+};
+const SYNC_FILTERS = [
+	{ value: 'all', label: __( 'Unfiltered' ) },
+	{ value: PATTERN_TYPES.theme, label: __( 'Theme patterns' ) },
+	{ value: PATTERN_TYPES.synced, label: __( 'My synced patterns' ) },
+	{ value: PATTERN_TYPES.unsynced, label: __( 'My standard patterns' ) },
+];
+function usePatternsCategories( rootClientId, filter = 'all' ) {
 	const { patterns: allPatterns, allCategories } = usePatternsState(
 		undefined,
 		rootClientId
 	);
-
+	const filteredPatterns =
+		filter === 'all'
+			? allPatterns
+			: allPatterns.filter(
+					( pattern ) =>
+						( filter === PATTERN_TYPES.unsynced &&
+							pattern.syncStatus === filter ) ||
+						( filter === PATTERN_TYPES.synced &&
+							pattern.syncStatus === '' ) ||
+						( filter === PATTERN_TYPES.theme &&
+							! pattern.name.startsWith( 'core/block' ) )
+			  );
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
 			if ( ! pattern.categories || ! pattern.categories.length ) {
@@ -60,14 +82,14 @@ function usePatternsCategories( rootClientId ) {
 	const populatedCategories = useMemo( () => {
 		const categories = allCategories
 			.filter( ( category ) =>
-				allPatterns.some( ( pattern ) =>
+				filteredPatterns.some( ( pattern ) =>
 					pattern.categories?.includes( category.name )
 				)
 			)
 			.sort( ( a, b ) => a.label.localeCompare( b.label ) );
 
 		if (
-			allPatterns.some(
+			filteredPatterns.some(
 				( pattern ) => ! hasRegisteredCategory( pattern )
 			) &&
 			! categories.find(
@@ -79,7 +101,7 @@ function usePatternsCategories( rootClientId ) {
 				label: _x( 'Uncategorized' ),
 			} );
 		}
-		if ( allPatterns.length > 0 ) {
+		if ( filteredPatterns.length > 0 ) {
 			categories.unshift( {
 				name: allPatternsCategory.name,
 				label: allPatternsCategory.label,
@@ -87,7 +109,7 @@ function usePatternsCategories( rootClientId ) {
 		}
 
 		return categories;
-	}, [ allCategories, allPatterns, hasRegisteredCategory ] );
+	}, [ allCategories, filteredPatterns, hasRegisteredCategory ] );
 
 	return populatedCategories;
 }
@@ -98,6 +120,7 @@ export function BlockPatternsCategoryDialog( {
 	onHover,
 	category,
 	showTitlesAsTooltip,
+	patternFilter,
 } ) {
 	const container = useRef();
 
@@ -120,6 +143,7 @@ export function BlockPatternsCategoryDialog( {
 				onHover={ onHover }
 				category={ category }
 				showTitlesAsTooltip={ showTitlesAsTooltip }
+				patternFilter={ patternFilter }
 			/>
 		</div>
 	);
@@ -131,6 +155,7 @@ export function BlockPatternsCategoryPanel( {
 	onHover = noop,
 	category,
 	showTitlesAsTooltip,
+	patternFilter,
 } ) {
 	const { patterns: allPatterns, onClickPattern } = usePatternsState(
 		onInsert,
@@ -140,6 +165,24 @@ export function BlockPatternsCategoryPanel( {
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
+				if (
+					patternFilter === PATTERN_TYPES.theme &&
+					pattern.name.startsWith( 'core/block' )
+				) {
+					return false;
+				}
+				if (
+					patternFilter === PATTERN_TYPES.synced &&
+					pattern.syncStatus !== ''
+				) {
+					return false;
+				}
+				if (
+					patternFilter === PATTERN_TYPES.unsynced &&
+					pattern.syncStatus !== PATTERN_TYPES.unsynced
+				) {
+					return false;
+				}
 				if ( category.name === allPatternsCategory.name ) {
 					return true;
 				}
@@ -159,7 +202,7 @@ export function BlockPatternsCategoryPanel( {
 
 				return availablePatternCategories.length === 0;
 			} ),
-		[ allPatterns, availableCategories, category.name ]
+		[ allPatterns, availableCategories, category.name, patternFilter ]
 	);
 
 	const {
@@ -218,7 +261,8 @@ function BlockPatternsTabs( {
 	rootClientId,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const categories = usePatternsCategories( rootClientId );
+	const [ patternFilter, setPatternFilter ] = useState( 'all' );
+	const categories = usePatternsCategories( rootClientId, patternFilter );
 	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
@@ -230,12 +274,25 @@ function BlockPatternsTabs( {
 							role="list"
 							className="block-editor-inserter__block-patterns-tabs"
 						>
+							<SelectControl
+								__nextHasNoMarginBottom
+								label={ __( 'Filters' ) }
+								options={ SYNC_FILTERS }
+								value={ patternFilter }
+								onChange={ ( value ) => {
+									setPatternFilter( value );
+									onSelectCategory( selectedCategory, value );
+								} }
+							/>
 							{ categories.map( ( category ) => (
 								<Item
 									role="listitem"
 									key={ category.name }
 									onClick={ () =>
-										onSelectCategory( category )
+										onSelectCategory(
+											category,
+											patternFilter
+										)
 									}
 									className={
 										category === selectedCategory
