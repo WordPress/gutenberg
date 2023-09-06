@@ -74,4 +74,56 @@ test.describe( 'Router navigate', () => {
 		await expect( status ).toHaveText( 'idle' );
 		await expect( title ).toHaveText( 'Link 2' );
 	} );
+
+	test( 'should update the URL from the last navigation if only varies in the URL fragment', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		const link1 = utils.getLink( 'router navigate - link 1' );
+
+		const navigations = page.getByTestId( 'router navigations' );
+		const status = page.getByTestId( 'router status' );
+		const title = page.getByTestId( 'title' );
+
+		await expect( navigations ).toHaveText( '0' );
+		await expect( status ).toHaveText( 'idle' );
+
+		const resolvers: Function[] = [];
+
+		await page.route( link1, async ( route ) => {
+			await new Promise( ( r ) => resolvers.push( r ) );
+			await route.continue();
+		} );
+
+		await page.getByTestId( 'link 1' ).click();
+		await page.getByTestId( 'link 1 with hash' ).click();
+
+		const href = ( await page
+			.getByTestId( 'link 1 with hash' )
+			.getAttribute( 'href' ) ) as string;
+
+		await expect( navigations ).toHaveText( '2' );
+		await expect( status ).toHaveText( 'busy' );
+		await expect( title ).toHaveText( 'Main' );
+
+		{
+			const resolver = resolvers.pop();
+			if ( resolver ) resolver();
+		}
+
+		await expect( navigations ).toHaveText( '1' );
+		await expect( status ).toHaveText( 'busy' );
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( page ).toHaveURL( href );
+
+		{
+			const resolver = resolvers.pop();
+			if ( resolver ) resolver();
+		}
+
+		await expect( navigations ).toHaveText( '0' );
+		await expect( status ).toHaveText( 'idle' );
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( page ).toHaveURL( href );
+	} );
 } );

@@ -19,7 +19,9 @@
 					state.router.navigations += 1;
 					state.router.status = 'busy';
 
-					await navigate( e.target.href );
+					const force = e.target.dataset.forceNavigation === 'true';
+
+					await navigate( e.target.href, { force } );
 
 					state.router.navigations -= 1;
 

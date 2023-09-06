@@ -31,6 +31,12 @@
 				data-wp-on--click="actions.router.navigate"
 				href="$link"
 			>link $i</a>
+			<a
+				data-testid="link $i with hash"
+				data-wp-on--click="actions.router.navigate"
+				data-force-navigation="true"
+				href="$link#link-$i-with-hash"
+			>link $i with hash</a>
 HTML;
 		}
 	}
