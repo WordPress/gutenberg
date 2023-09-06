@@ -5,8 +5,7 @@ import {
 	BlockList,
 	BlockTools,
 	BlockSelectionClearer,
-	WritingFlow,
-	__unstableEditorStyles as EditorStyles,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -17,6 +16,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import { unlock } from '../../lock-unlock';
+
+const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
+	blockEditorPrivateApis
+);
 
 export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
@@ -39,11 +43,14 @@ export default function WidgetAreasBlockEditorContent( {
 			<Notices />
 			<BlockTools>
 				<KeyboardShortcuts />
-				<EditorStyles styles={ styles } />
 				<BlockSelectionClearer>
-					<WritingFlow>
+					<BlockCanvas
+						shouldIframe={ false }
+						styles={ styles }
+						height="100%"
+					>
 						<BlockList className="edit-widgets-main-block-list" />
-					</WritingFlow>
+					</BlockCanvas>
 				</BlockSelectionClearer>
 			</BlockTools>
 		</div>

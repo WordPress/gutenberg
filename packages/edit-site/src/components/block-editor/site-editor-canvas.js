@@ -128,7 +128,6 @@ export default function SiteEditorCanvas() {
 									enableResizing={ enableResizing }
 									settings={ settings }
 									contentRef={ mergedRefs }
-									readonly={ isViewMode }
 								>
 									{ resizeObserver }
 									<BlockList
