@@ -31,16 +31,28 @@ export const ALIGNMENT_LABEL: Record< AlignmentMatrixControlValue, string > = {
 export const ALIGNMENTS = GRID.flat();
 
 /**
- * Parses and transforms an incoming value to better match the alignment values
+ * Normalizes an incoming value to better match the alignment values
+ *
+ * @param value an alignment value to normalize
+ *
+ * @return The normalized value
+ */
+export function normalizeValue( value: AlignmentMatrixControlValue ) {
+	return value === 'center' ? 'center center' : value;
+}
+
+/**
+ * Normalizes and transforms an incoming value to better match the alignment values
  *
  * @param value An alignment value to parse.
  *
  * @return The parsed value.
  */
 export function transformValue( value: AlignmentMatrixControlValue ) {
-	const nextValue = value === 'center' ? 'center center' : value;
-
-	return nextValue.replace( '-', ' ' ) as AlignmentMatrixControlValue;
+	return normalizeValue( value ).replace(
+		'-',
+		' '
+	) as AlignmentMatrixControlValue;
 }
 
 /**
@@ -58,6 +70,19 @@ export function getItemId(
 	const valueId = transformValue( value ).replace( ' ', '-' );
 
 	return `${ prefixId }-${ valueId }`;
+}
+
+/**
+ * Extracts an item value from its ID
+ *
+ * @param prefixId An ID prefix to remove
+ * @param id       An item ID
+ * @return         The item value
+ */
+export function getItemValue( prefixId: string, id: string ) {
+	return transformValue(
+		id.replace( prefixId + '-', '' ) as AlignmentMatrixControlValue
+	);
 }
 
 /**
