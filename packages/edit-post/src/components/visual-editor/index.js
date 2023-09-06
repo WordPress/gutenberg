@@ -13,7 +13,6 @@ import {
 	store as blockEditorStore,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypewriter as useTypewriter,
-	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	useSetting,
@@ -185,7 +184,6 @@ export default function VisualEditor( { styles } ) {
 	const ref = useRef();
 	const contentRef = useMergeRefs( [
 		ref,
-		useClipboardHandler(),
 		useTypewriter(),
 		useBlockSelectionClearer(),
 	] );
