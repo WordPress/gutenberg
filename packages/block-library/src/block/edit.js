@@ -11,6 +11,7 @@ import {
 	useEntityProp,
 	useEntityRecord,
 } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
 import {
 	Placeholder,
 	Spinner,
@@ -26,6 +27,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
 
@@ -34,6 +36,8 @@ export default function ReusableBlockEdit( {
 	setAttributes,
 } ) {
 	const [ inheritedAlignment, setInheritedAlignment ] = useState();
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
@@ -68,6 +72,7 @@ export default function ReusableBlockEdit( {
 		}, undefined );
 		// If we don't have a wide or full alignment set we can remove the default layout attribute
 		if ( ! alignments.includes( widestAlignment ) ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				layout: undefined,
 			} );
@@ -76,6 +81,7 @@ export default function ReusableBlockEdit( {
 		}
 		// Set the align class of the pattern block to match the widest
 		// alignment of children.
+		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( {
 			layout: { type: 'constrained' },
 		} );
