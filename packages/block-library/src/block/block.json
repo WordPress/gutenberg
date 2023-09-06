@@ -10,12 +10,6 @@
 	"attributes": {
 		"ref": {
 			"type": "number"
-		},
-		"layout": {
-			"type": "array",
-			"default": {
-				"type": "constrained"
-			}
 		}
 	},
 	"supports": {

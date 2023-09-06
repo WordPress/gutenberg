@@ -33,6 +33,9 @@ function addEditorOnlyLayoutSupportForPatterns( blockSettings ) {
 		blockSettings.supports.layout = {
 			allowSizingOnChildren: true,
 			allowEditing: false,
+			default: {
+				type: 'constrained',
+			},
 		};
 	}
 
