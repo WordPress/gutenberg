@@ -89,7 +89,7 @@
 		"markdown_source": "../docs/getting-started/glossary.md",
 		"parent": "getting-started"
 	},
-  {
+	{
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "../docs/getting-started/faq.md",
@@ -2153,7 +2153,6 @@
 		"markdown_source": "../docs/explanations/user-interface/design-resources.md",
 		"parent": "user-interface"
 	},
-
 	{
 		"title": "History",
 		"slug": "history",
