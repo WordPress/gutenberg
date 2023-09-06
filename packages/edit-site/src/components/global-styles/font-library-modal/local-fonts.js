@@ -18,7 +18,7 @@ import { FontLibraryContext } from './context';
 import { Font } from '../../../../lib/lib-font.browser';
 
 function LocalFonts() {
-	const { installFonts, refreshLibrary } = useContext( FontLibraryContext );
+	const { installFonts } = useContext( FontLibraryContext );
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
@@ -157,7 +157,6 @@ function LocalFonts() {
 		// Adds the fontFamilies to the formData
 		formData.append( 'fontFamilies', JSON.stringify( fontFamilies ) );
 		await installFonts( formData );
-		refreshLibrary();
 	};
 
 	return (
