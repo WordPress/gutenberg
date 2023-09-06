@@ -21,11 +21,6 @@
 	"supports": {
 		"customClassName": false,
 		"html": false,
-		"inserter": false,
-		"layout": {
-			"allowSizingOnChildren": true,
-			"allowEditing": false,
-			"__experimentalSkipServerSerialization": true
-		}
+		"inserter": false
 	}
 }

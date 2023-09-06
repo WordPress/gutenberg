@@ -532,9 +532,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type                = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout     = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	$layout_from_parent        = $block['attrs']['style']['layout']['selfStretch'] ?? null;
-	$skip_server_serialization = $block_type ? _wp_array_get( $block_type->supports, array( 'layout', '__experimentalSkipServerSerialization' ), false ) : false;
 
-	if ( ( ! $block_supports_layout && ! $layout_from_parent ) || $skip_server_serialization ) {
+	if ( ( ! $block_supports_layout && ! $layout_from_parent ) ) {
 		return $block_content;
 	}
 
