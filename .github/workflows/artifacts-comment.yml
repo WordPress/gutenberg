@@ -2,7 +2,10 @@ name: add artifact links to pull request and related issues
 on:
   workflow_run:
     workflows: [Build Gutenberg Plugin Zip]
-    types: [completed]
+    types: 
+      - completed
+      - requested
+      - in_progress
 
 jobs:
   artifacts-url-comments:
