@@ -126,8 +126,13 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	}
 	$content = $processor->get_updated_html();
 
-	// Currently, the only supported animation is 'zoom'.
+	// Currently, the only animation type surfaced in the UI is the default
+	// zoom animation; however, here is also support for the legacy syntax,
+	// which supported configuring a fade animation as well.
 	$lightbox_animation = 'zoom';
+	if ( isset( $block['lightboxAnimation'] ) ) {
+		$lightbox_animation = $block['lightboxAnimation'];
+	}
 
 	// We want to store the src in the context so we can set it dynamically when the lightbox is opened.
 	$z = new WP_HTML_Tag_Processor( $content );

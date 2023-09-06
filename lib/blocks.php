@@ -488,6 +488,11 @@ function gutenberg_should_render_lightbox( $block ) {
 		'none' === $link_destination
 	) {
 		$block['lightboxEnabled'] = true;
+
+		// The legacy syntax allows setting the animation type.
+		if ( isset( $lightbox_settings['animation'] ) ) {
+			$block['lightboxAnimation'] = $lightbox_settings['animation'];
+		}
 	}
 
 	return $block;
