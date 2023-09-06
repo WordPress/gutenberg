@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ const meta: Meta< typeof SelectControl > = {
 };
 export default meta;
 
-const SelectControlWithState: Story< typeof SelectControl > = ( props ) => {
+const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 	const [ selection, setSelection ] = useState< string[] >();
 
 	if ( props.multiple ) {
@@ -82,7 +82,7 @@ WithLabelAndHelpText.args = {
  * As an alternative to the `options` prop, `optgroup`s and `options` can be
  * passed in as `children` for more customizeability.
  */
-export const WithCustomChildren: Story< typeof SelectControl > = ( args ) => {
+export const WithCustomChildren: StoryFn< typeof SelectControl > = ( args ) => {
 	return (
 		<SelectControlWithState { ...args }>
 			<option value="option-1">Option 1</option>

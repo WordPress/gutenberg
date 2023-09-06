@@ -21,10 +21,6 @@ const props = {
 	delay: TOOLTIP_DELAY,
 };
 
-function getWrappingPopoverElement( element ) {
-	return element.closest( '.components-popover' );
-}
-
 describe( 'Tooltip', () => {
 	it( 'should not render the tooltip if multiple children are passed', async () => {
 		const user = userEvent.setup();
@@ -75,9 +71,7 @@ describe( 'Tooltip', () => {
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( screen.getByText( 'tooltip text' ) )
-			).toBePositionedPopover()
+			expect( screen.getByText( 'tooltip text' ) ).toBePositionedPopover()
 		);
 	} );
 
@@ -100,9 +94,7 @@ describe( 'Tooltip', () => {
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( screen.getByText( 'tooltip text' ) )
-			).toBePositionedPopover()
+			expect( screen.getByText( 'tooltip text' ) ).toBePositionedPopover()
 		);
 
 		await user.unhover( button );
@@ -146,9 +138,7 @@ describe( 'Tooltip', () => {
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( screen.getByText( 'tooltip text' ) )
-			).toBePositionedPopover()
+			expect( screen.getByText( 'tooltip text' ) ).toBePositionedPopover()
 		);
 	} );
 
@@ -174,9 +164,7 @@ describe( 'Tooltip', () => {
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( screen.getByText( 'tooltip text' ) )
-			).toBePositionedPopover()
+			expect( screen.getByText( 'tooltip text' ) ).toBePositionedPopover()
 		);
 	} );
 
@@ -282,7 +270,7 @@ describe( 'Tooltip', () => {
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		await waitFor( () =>
 			expect(
-				getWrappingPopoverElement( screen.getByText( 'shortcut text' ) )
+				screen.getByText( 'shortcut text' )
 			).toBePositionedPopover()
 		);
 	} );
@@ -315,9 +303,7 @@ describe( 'Tooltip', () => {
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( screen.getByText( '⇧⌘,' ) )
-			).toBePositionedPopover()
+			expect( screen.getByText( '⇧⌘,' ) ).toBePositionedPopover()
 		);
 	} );
 } );

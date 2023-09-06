@@ -95,6 +95,20 @@ function ScreenBlock( { name, variation } ) {
 	const [ userSettings ] = useGlobalSetting( '', name, 'user' );
 	const settings = useSettingsForBlockElement( rawSettings, name );
 	const blockType = getBlockType( name );
+
+	// Only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
+	if (
+		settings?.spacing?.blockGap &&
+		blockType?.supports?.spacing?.blockGap &&
+		( blockType?.supports?.spacing?.__experimentalSkipSerialization ===
+			true ||
+			blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
+				( spacingType ) => spacingType === 'blockGap'
+			) )
+	) {
+		settings.spacing.blockGap = false;
+	}
+
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );

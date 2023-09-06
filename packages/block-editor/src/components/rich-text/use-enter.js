@@ -37,7 +37,6 @@ export function useEnter( props ) {
 				value,
 				onReplace,
 				onSplit,
-				onSplitMiddle,
 				multilineTag,
 				onChange,
 				disableLineBreaks,
@@ -78,7 +77,6 @@ export function useEnter( props ) {
 						value: _value,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
 						multilineTag,
 					} );
 				} else {
@@ -100,7 +98,6 @@ export function useEnter( props ) {
 						value: _value,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
 						multilineTag,
 					} );
 				}

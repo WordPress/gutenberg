@@ -459,9 +459,10 @@ test.describe( 'Image', () => {
 					attributes: { url },
 				},
 			] = blocks;
-			expect(
-				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
-			).toBe( url );
+			await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+				'src',
+				url
+			);
 			expect(
 				new URL( url ).host,
 				'should be updated to the media library'
@@ -492,9 +493,10 @@ test.describe( 'Image', () => {
 				},
 			] = blocks;
 			expect( url ).not.toBe( firstUrl );
-			expect(
-				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
-			).toBe( url );
+			await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+				'src',
+				url
+			);
 			expect(
 				new URL( url ).host,
 				'should be updated to the media library'
@@ -1017,6 +1019,108 @@ test.describe.skip( 'Image - interactivity', () => {
 			await expect(
 				page.getByRole( 'button', { name: 'Enlarge image' } )
 			).not.toBeInViewport();
+		} );
+
+		test.describe( 'Animation Select visibility', () => {
+			test( 'Animation selector should appear if Behavior is Lightbox', async ( {
+				editor,
+				page,
+				imageBlockUtils,
+			} ) => {
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				filename = await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+				const image = imageBlock.locator( 'role=img' );
+				await expect( image ).toBeVisible();
+				await expect( image ).toHaveAttribute(
+					'src',
+					new RegExp( filename )
+				);
+
+				await editor.openDocumentSettingsSidebar();
+
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( 'lightbox' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).toBeVisible();
+			} );
+			test( 'Animation selector should NOT appear if Behavior is None', async ( {
+				page,
+				editor,
+				imageBlockUtils,
+			} ) => {
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				filename = await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+				const image = imageBlock.locator( 'role=img' );
+				await expect( image ).toBeVisible();
+				await expect( image ).toHaveAttribute(
+					'src',
+					new RegExp( filename )
+				);
+
+				await editor.openDocumentSettingsSidebar();
+
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( '' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).toBeHidden();
+			} );
+			test( 'Animation selector should NOT appear if Behavior is Default', async ( {
+				page,
+				editor,
+				imageBlockUtils,
+			} ) => {
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				filename = await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+				const image = imageBlock.locator( 'role=img' );
+				await expect( image ).toBeVisible();
+				await expect( image ).toHaveAttribute(
+					'src',
+					new RegExp( filename )
+				);
+
+				await editor.openDocumentSettingsSidebar();
+
+				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				const behaviorSelect = page.getByRole( 'combobox', {
+					name: 'Behaviors',
+				} );
+				await behaviorSelect.selectOption( 'default' );
+				await expect(
+					page.getByRole( 'combobox', {
+						name: 'Animation',
+					} )
+				).toBeHidden();
+			} );
 		} );
 
 		test.describe( 'keyboard navigation', () => {

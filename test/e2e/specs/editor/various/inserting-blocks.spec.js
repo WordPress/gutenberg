@@ -15,23 +15,12 @@ test.use( {
 } );
 
 test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
-	test.beforeEach( async ( { admin, page } ) => {
-		await admin.createNewPost();
-		// To do: some drag an drop tests are failing, so run them without
-		// iframe for now.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'inserts blocks by dragging and dropping from the global inserter', async ( {
+		admin,
 		page,
 		editor,
 		insertingBlocksUtils,
@@ -40,6 +29,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+
+		await admin.createNewPost();
+		await insertingBlocksUtils.runWithoutIframe();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -111,10 +103,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} );
 
 	test( 'cancels dragging blocks from the global inserter by pressing Escape', async ( {
+		admin,
 		page,
 		editor,
 		insertingBlocksUtils,
 	} ) => {
+		await admin.createNewPost();
+		await insertingBlocksUtils.runWithoutIframe();
+
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
 		await editor.insertBlock( {
@@ -168,6 +164,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} );
 
 	test( 'inserts patterns by dragging and dropping from the global inserter', async ( {
+		admin,
 		page,
 		editor,
 		insertingBlocksUtils,
@@ -176,6 +173,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+
+		await admin.createNewPost();
+		await insertingBlocksUtils.runWithoutIframe();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -239,10 +239,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} );
 
 	test( 'cancels dragging patterns from the global inserter by pressing Escape', async ( {
+		admin,
 		page,
 		editor,
 		insertingBlocksUtils,
 	} ) => {
+		await admin.createNewPost();
+		await insertingBlocksUtils.runWithoutIframe();
+
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
 		await editor.insertBlock( {
@@ -300,9 +304,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 	// A test for https://github.com/WordPress/gutenberg/issues/43090.
 	test( 'should close the inserter when clicking on the toggle button', async ( {
+		admin,
 		page,
 		editor,
+		insertingBlocksUtils,
 	} ) => {
+		await admin.createNewPost();
+		await insertingBlocksUtils.runWithoutIframe();
+
 		const inserterButton = page.getByRole( 'button', {
 			name: 'Toggle block inserter',
 		} );
@@ -341,13 +350,14 @@ test.describe( 'insert media from inserter', () => {
 			requestUtils.deleteAllPosts(),
 		] );
 	} );
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
-	} );
+
 	test( 'insert media from the global inserter', async ( {
+		admin,
 		page,
 		editor,
 	} ) => {
+		await admin.createNewPost();
+
 		await page.click(
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
@@ -379,5 +389,17 @@ class InsertingBlocksUtils {
 		this.draggableChip = this.page.locator(
 			'data-testid=block-draggable-chip >> visible=true'
 		);
+	}
+
+	async runWithoutIframe() {
+		/**
+		 * @todo Some drag an drop tests are failing, so run them without iframe for now.
+		 */
+		return await this.page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
 	}
 }

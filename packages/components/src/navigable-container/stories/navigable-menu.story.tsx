@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { NavigableMenu } from '..';
 
-const meta: ComponentMeta< typeof NavigableMenu > = {
+const meta: Meta< typeof NavigableMenu > = {
 	title: 'Components/NavigableMenu',
 	component: NavigableMenu,
 	argTypes: {
@@ -24,7 +24,7 @@ const meta: ComponentMeta< typeof NavigableMenu > = {
 };
 export default meta;
 
-export const Default: ComponentStory< typeof NavigableMenu > = ( args ) => {
+export const Default: StoryFn< typeof NavigableMenu > = ( args ) => {
 	return (
 		<>
 			<button>Before navigable menu</button>

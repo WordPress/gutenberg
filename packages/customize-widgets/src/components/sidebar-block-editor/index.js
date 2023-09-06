@@ -10,11 +10,8 @@ import {
 	BlockSelectionClearer,
 	BlockInspector,
 	CopyHandler,
-	ObserveTyping,
-	WritingFlow,
-	BlockEditorKeyboardShortcuts,
+	privateApis as blockEditorPrivateApis,
 	__unstableBlockSettingsMenuFirstItem,
-	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -29,6 +26,11 @@ import SidebarEditorProvider from './sidebar-editor-provider';
 import WelcomeGuide from '../welcome-guide';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import BlockAppender from '../block-appender';
+import { unlock } from '../../lock-unlock';
+
+const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
+	blockEditorPrivateApis
+);
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -95,7 +97,6 @@ export default function SidebarBlockEditor( {
 
 	return (
 		<>
-			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
@@ -115,15 +116,14 @@ export default function SidebarBlockEditor( {
 
 				<CopyHandler>
 					<BlockTools>
-						<EditorStyles styles={ settings.defaultEditorStyles } />
 						<BlockSelectionClearer>
-							<WritingFlow className="editor-styles-wrapper">
-								<ObserveTyping>
-									<BlockList
-										renderAppender={ BlockAppender }
-									/>
-								</ObserveTyping>
-							</WritingFlow>
+							<BlockCanvas
+								shouldIframe={ false }
+								styles={ settings.defaultEditorStyles }
+								height="100%"
+							>
+								<BlockList renderAppender={ BlockAppender } />
+							</BlockCanvas>
 						</BlockSelectionClearer>
 					</BlockTools>
 				</CopyHandler>

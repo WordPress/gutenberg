@@ -41,8 +41,8 @@ export const NameInputControl = styled( InputControl )`
 `;
 
 export const PaletteItem = styled( View )`
-	padding: 3px 0 3px ${ space( 3 ) };
-	height: calc( 40px - ${ CONFIG.borderWidth } );
+	padding-block: 3px;
+	padding-inline-start: ${ space( 3 ) };
 	border: 1px solid ${ CONFIG.surfaceBorderColor };
 	border-bottom-color: transparent;
 	&:first-of-type {
