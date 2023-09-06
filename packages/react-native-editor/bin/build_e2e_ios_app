@@ -1,5 +1,7 @@
 #!/bin/bash -eu
 
+set -o pipefail
+
 DEFAULT_DESTINATION='platform=iOS Simulator,name=iPhone 13'
 if [[ -z "${RN_EDITOR_E2E_IOS_DESTINATION-}" ]]; then
 	DESTINATION="$DEFAULT_DESTINATION"
