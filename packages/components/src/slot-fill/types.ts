@@ -92,6 +92,11 @@ export type SlotFillBubblesVirtuallyContext = {
 		name: SlotKey,
 		ref: SlotFillBubblesVirtuallyFillRef
 	) => void;
+
+	/**
+	 * This helps the provider know if it's using the default context value or not.
+	 */
+	isDefault?: boolean;
 };
 
 export type BaseSlotFillContext = {

@@ -35,6 +35,7 @@ function Slot(
 		as,
 		// `children` is not allowed. However, if it is passed,
 		// it will be displayed as is, so remove `children`.
+		// @ts-ignore
 		children,
 		...restProps
 	} = props;

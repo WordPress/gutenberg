@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,9 +13,10 @@ import { createContext, useContext } from '@wordpress/element';
  */
 import { Slot, Fill, Provider as SlotFillProvider } from '../';
 
-const meta: ComponentMeta< typeof Slot > = {
+const meta: Meta< typeof Slot > = {
 	component: Slot,
 	title: 'Components/SlotFill',
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { Fill, SlotFillProvider },
 	argTypes: {
 		name: { control: { type: null } },
@@ -30,7 +31,7 @@ const meta: ComponentMeta< typeof Slot > = {
 
 export default meta;
 
-export const Default: ComponentStory< typeof Slot > = ( props ) => {
+export const Default: StoryFn< typeof Slot > = ( props ) => {
 	return (
 		<SlotFillProvider>
 			<h2>Profile</h2>
@@ -51,7 +52,7 @@ Default.args = {
 	as: 'span',
 };
 
-export const WithFillProps: ComponentStory< typeof Slot > = ( props ) => {
+export const WithFillProps: StoryFn< typeof Slot > = ( props ) => {
 	return (
 		<SlotFillProvider>
 			<h2>Profile</h2>
@@ -76,7 +77,7 @@ WithFillProps.args = {
 	...Default.args,
 };
 
-export const WithSlotChildren: ComponentStory< typeof Slot > = ( props ) => {
+export const WithSlotChildren: StoryFn< typeof Slot > = ( props ) => {
 	return (
 		<SlotFillProvider>
 			<h2>Profile</h2>
@@ -109,7 +110,7 @@ WithSlotChildren.args = {
 	...Default.args,
 };
 
-export const WithContext: ComponentStory< typeof Slot > = ( props ) => {
+export const WithContext: StoryFn< typeof Slot > = ( props ) => {
 	const Context = createContext< string | number >( '' );
 	const ContextFill = ( { name }: { name: string } ) => {
 		const value = useContext( Context );
