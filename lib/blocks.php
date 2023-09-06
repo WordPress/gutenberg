@@ -38,7 +38,6 @@ function gutenberg_reregister_core_block_types() {
 				'social-links',
 				'spacer',
 				'table',
-				'table-of-contents',
 				'text-columns',
 				'verse',
 				'video',
