@@ -346,7 +346,7 @@ function FontLibraryProvider( { children } ) {
 			return;
 		}
 
-		if ( ! isUrlEncoded ) {
+		if ( ! isUrlEncoded ( src ) ) {
 			src = encodeURI( src );
 		}
 

@@ -14,7 +14,7 @@ export function setUIValuesNeeded( font, extraValues = {} ) {
 }
 
 export function isUrlEncoded( url ) {
-	if ( typeof uri !== 'string' ) {
+	if ( typeof url !== 'string' ) {
 		return false;
 	}
 	return url !== decodeURIComponent( url );
