@@ -1,3 +1,4 @@
+
 /**
  * Internal dependencies
  */
@@ -17,9 +18,36 @@ async function prPreviewLink( payload, octokit ) {
 	const owner = payload.repository.owner.login;
 	const pullRequestNumber = payload.pull_request.number;
 
-	debug( 'pr-preview-link: Adding comment to PR.' );
+	debug( JSON.stringify({repo, owner, pullRequestNumber, octokit})  );
+	
+	debug( 'artifacts: detail data.' );
+	// Retrieve artifacts for a specific workflow run
+	const getArtifacts = async (owner, repo, runId) => {
+		try {
+		const response = await octokit.rest.actions.listWorkflowRunArtifacts({
+			owner,
+			repo,
+			run_id: runId,
+		});
+	
+		// Parse the response and extract the download URL or other information
+		const artifacts = response.data.artifacts;
+		// ... process the artifacts as needed
+	
+		return artifacts;
+		} catch (error) {
+		console.error("Error retrieving artifacts:", error);
+		throw error;
+		}
+	};
+	
+	const runId = 6035878166;
+	
+	const artifacts = await getArtifacts("WordPress", repo, runId)
+	debug(Object.keys(artifacts).toString());
 
-	await octokit.issues.createComment( {
+	debug( 'pr-preview-link: Adding comment to PR.' );
+	await octokit.rest.issues.createComment( {
 		owner,
 		repo,
 		issue_number: pullRequestNumber,
