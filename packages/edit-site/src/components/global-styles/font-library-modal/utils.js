@@ -4,7 +4,7 @@
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 
 export function setUIValuesNeeded( font, extraValues = {} ) {
-	if ( ! font.name ) {
+	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
 		font.name = font.fontFamily || font.slug;
 	}
 	return {
