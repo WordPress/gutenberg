@@ -7,7 +7,6 @@ import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
 	BlockTools,
-	BlockSelectionClearer,
 	BlockInspector,
 	privateApis as blockEditorPrivateApis,
 	__unstableBlockSettingsMenuFirstItem,
@@ -114,15 +113,13 @@ export default function SidebarBlockEditor( {
 				/>
 
 				<BlockTools>
-					<BlockSelectionClearer>
-						<BlockCanvas
-							shouldIframe={ false }
-							styles={ settings.defaultEditorStyles }
-							height="100%"
-						>
-							<BlockList renderAppender={ BlockAppender } />
-						</BlockCanvas>
-					</BlockSelectionClearer>
+					<BlockCanvas
+						shouldIframe={ false }
+						styles={ settings.defaultEditorStyles }
+						height="100%"
+					>
+						<BlockList renderAppender={ BlockAppender } />
+					</BlockCanvas>
 				</BlockTools>
 
 				{ createPortal(
