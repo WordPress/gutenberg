@@ -529,11 +529,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	$block_type                = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$block_supports_layout     = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$layout_from_parent        = $block['attrs']['style']['layout']['selfStretch'] ?? null;
+	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$layout_from_parent    = $block['attrs']['style']['layout']['selfStretch'] ?? null;
 
-	if ( ( ! $block_supports_layout && ! $layout_from_parent ) ) {
+	if ( ! $block_supports_layout && ! $layout_from_parent ) {
 		return $block_content;
 	}
 
