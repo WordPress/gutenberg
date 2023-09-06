@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { SlotFillProvider, Popover } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/components';
 import { UnsavedChangesWarning } from '@wordpress/editor';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -35,17 +34,14 @@ export default function App() {
 	}
 
 	return (
-		<ShortcutProvider style={ { height: '100%' } }>
-			<SlotFillProvider>
-				<GlobalStylesProvider>
-					<Popover.Slot />
-					<UnsavedChangesWarning />
-					<RouterProvider>
-						<Layout />
-						<PluginArea onError={ onPluginAreaError } />
-					</RouterProvider>
-				</GlobalStylesProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+		<SlotFillProvider>
+			<GlobalStylesProvider>
+				<UnsavedChangesWarning />
+				<RouterProvider>
+					<Layout />
+					<PluginArea onError={ onPluginAreaError } />
+				</RouterProvider>
+			</GlobalStylesProvider>
+		</SlotFillProvider>
 	);
 }

@@ -1077,6 +1077,19 @@ _Returns_
 
 -   `boolean`: Whether block is first in multi-selection.
 
+### isGroupable
+
+Indicates if the provided blocks(by client ids) are groupable. We need to have at least one block, have a grouping block name set and be able to remove these blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientIds_ `string[]`: Block client ids. If not passed the selected blocks client ids will be used.
+
+_Returns_
+
+-   `boolean`: True if the blocks are groupable.
+
 ### isLastBlockChangePersistent
 
 Returns true if the most recent block change is be considered persistent, or false otherwise. A persistent change is one committed by BlockEditorProvider via its `onChange` callback, in addition to `onInput`.
@@ -1140,6 +1153,19 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether user is typing.
+
+### isUngroupable
+
+Indicates if a block is ungroupable. A block is ungroupable if it is a single grouping block with inner blocks. If a block has an `ungroup` transform, it is also ungroupable, without the requirement of being the default grouping block. Additionally a block can only be ungrouped if it has inner blocks and can be removed.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: Client Id of the block. If not passed the selected block's client id will be used.
+
+_Returns_
+
+-   `boolean`: True if the block is ungroupable.
 
 ### isValidTemplate
 

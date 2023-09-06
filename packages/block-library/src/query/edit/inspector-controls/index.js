@@ -17,7 +17,8 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -40,8 +41,8 @@ import {
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout } = props;
-	const { query, displayLayout } = attributes;
+	const { attributes, setQuery, setDisplayLayout, setAttributes } = props;
+	const { query, displayLayout, enhancedPagination } = attributes;
 	const {
 		order,
 		orderBy,
@@ -123,6 +124,18 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
 
+	const enhancedPaginationNotice = __(
+		'Enhanced Pagination might cause interactive blocks within the Post Template to stop working. Disable it if you experience any issues.'
+	);
+
+	const isFirstRender = useRef( true ); // Don't speak on first render.
+	useEffect( () => {
+		if ( ! isFirstRender.current && enhancedPagination ) {
+			speak( enhancedPaginationNotice );
+		}
+		isFirstRender.current = false;
+	}, [ enhancedPagination, enhancedPaginationNotice ] );
+
 	const showFiltersPanel =
 		showTaxControl ||
 		showAuthorControl ||
@@ -201,6 +214,29 @@ export default function QueryInspectorControls( props ) {
 									setQuery( { sticky: value } )
 								}
 							/>
+						) }
+						<ToggleControl
+							label={ __( 'Enhanced pagination' ) }
+							help={ __(
+								'Browsing between pages won’t require a full page reload.'
+							) }
+							checked={ !! enhancedPagination }
+							onChange={ ( value ) =>
+								setAttributes( {
+									enhancedPagination: !! value,
+								} )
+							}
+						/>
+						{ enhancedPagination && (
+							<div>
+								<Notice
+									spokenMessage={ null }
+									status="warning"
+									isDismissible={ false }
+								>
+									{ enhancedPaginationNotice }
+								</Notice>
+							</div>
 						) }
 					</PanelBody>
 				</InspectorControls>

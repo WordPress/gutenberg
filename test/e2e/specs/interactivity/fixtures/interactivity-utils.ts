@@ -3,6 +3,11 @@
  */
 import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
+type AddPostWithBlockOptions = {
+	alias?: string;
+	attributes?: Record< string, any >;
+};
+
 export default class InteractivityUtils {
 	links: Map< string, string >;
 	requestUtils: RequestUtils;
@@ -28,15 +33,25 @@ export default class InteractivityUtils {
 		return url.href;
 	}
 
-	async addPostWithBlock( blockName: string ) {
+	async addPostWithBlock(
+		name: string,
+		{ attributes, alias }: AddPostWithBlockOptions = {}
+	) {
+		const block = attributes
+			? `${ name } ${ JSON.stringify( attributes ) }`
+			: name;
+
+		if ( ! alias ) alias = block;
+
 		const payload = {
-			content: `<!-- wp:${ blockName } /-->`,
+			content: `<!-- wp:${ block } /-->`,
 			status: 'publish' as 'publish',
 			date_gmt: '2023-01-01T00:00:00',
 		};
 
 		const { link } = await this.requestUtils.createPost( payload );
-		this.links.set( blockName, link );
+		this.links.set( alias, link );
+		return this.getLink( alias );
 	}
 
 	async deleteAllPosts() {

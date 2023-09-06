@@ -19,7 +19,7 @@ exports[`Search Block renders block with button inside option 1`] = `
         ]
       }
     >
-      <RCTAztecView
+      <View
         accessibilityState={
           {
             "busy": undefined,
@@ -29,57 +29,71 @@ exports[`Search Block renders block with button inside option 1`] = `
             "selected": undefined,
           }
         }
-        accessible={true}
-        activeFormats={[]}
-        blockType={
+        accessibilityValue={
           {
-            "tag": "p",
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
           }
         }
-        disableEditingMenu={false}
+        accessible={false}
+        collapsable={false}
         focusable={true}
-        fontFamily="serif"
-        fontSize={16}
-        isMultiline={false}
-        maxImagesWidth={200}
-        onBackspace={[Function]}
         onBlur={[Function]}
-        onChange={[Function]}
         onClick={[Function]}
-        onContentSizeChange={[Function]}
-        onEnter={[Function]}
         onFocus={[Function]}
-        onHTMLContentWithCursor={[Function]}
-        onKeyDown={[Function]}
-        onPaste={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
-        onSelectionChange={[Function]}
         onStartShouldSetResponder={[Function]}
-        placeholder="Add label…"
-        placeholderTextColor="gray"
-        selectionColor="black"
-        style={
-          {
-            "backgroundColor": undefined,
-            "maxWidth": undefined,
-            "minHeight": 0,
+      >
+        <RCTAztecView
+          activeFormats={[]}
+          blockType={
+            {
+              "tag": "p",
+            }
           }
-        }
-        text={
-          {
-            "eventCount": undefined,
-            "linkTextColor": undefined,
-            "selection": null,
-            "tag": "p",
-            "text": "<p>Search</p>",
+          disableEditingMenu={false}
+          fontFamily="serif"
+          fontSize={16}
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
+          onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          onSelectionChange={[Function]}
+          placeholder="Add label…"
+          placeholderTextColor="gray"
+          selectionColor="black"
+          style={
+            {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
+            }
           }
-        }
-        triggerKeyCodes={[]}
-      />
+          text={
+            {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "tag": "p",
+              "text": "<p>Search</p>",
+            }
+          }
+          triggerKeyCodes={[]}
+        />
+      </View>
     </View>
   </View>
   <View
@@ -144,7 +158,7 @@ exports[`Search Block renders block with button inside option 1`] = `
             ]
           }
         >
-          <RCTAztecView
+          <View
             accessibilityState={
               {
                 "busy": undefined,
@@ -154,59 +168,73 @@ exports[`Search Block renders block with button inside option 1`] = `
                 "selected": undefined,
               }
             }
-            accessible={true}
-            activeFormats={[]}
-            blockType={
+            accessibilityValue={
               {
-                "tag": "p",
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
               }
             }
-            disableEditingMenu={false}
+            accessible={false}
+            collapsable={false}
             focusable={true}
-            fontFamily="serif"
-            fontSize={16}
-            isMultiline={false}
-            maxImagesWidth={200}
-            minWidth={75}
-            onBackspace={[Function]}
             onBlur={[Function]}
-            onChange={[Function]}
             onClick={[Function]}
-            onContentSizeChange={[Function]}
-            onEnter={[Function]}
             onFocus={[Function]}
-            onHTMLContentWithCursor={[Function]}
-            onKeyDown={[Function]}
-            onPaste={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
-            onSelectionChange={[Function]}
             onStartShouldSetResponder={[Function]}
-            placeholder=""
-            placeholderTextColor="gray"
-            selectionColor="black"
-            style={
-              {
-                "backgroundColor": undefined,
-                "maxWidth": NaN,
-                "minHeight": 0,
+          >
+            <RCTAztecView
+              activeFormats={[]}
+              blockType={
+                {
+                  "tag": "p",
+                }
               }
-            }
-            text={
-              {
-                "eventCount": undefined,
-                "linkTextColor": undefined,
-                "selection": null,
-                "tag": "p",
-                "text": "<p>Search Button</p>",
+              disableEditingMenu={false}
+              fontFamily="serif"
+              fontSize={16}
+              isMultiline={false}
+              maxImagesWidth={200}
+              minWidth={75}
+              onBackspace={[Function]}
+              onBlur={[Function]}
+              onChange={[Function]}
+              onContentSizeChange={[Function]}
+              onEnter={[Function]}
+              onFocus={[Function]}
+              onHTMLContentWithCursor={[Function]}
+              onKeyDown={[Function]}
+              onPaste={[Function]}
+              onSelectionChange={[Function]}
+              placeholder=""
+              placeholderTextColor="gray"
+              selectionColor="black"
+              style={
+                {
+                  "backgroundColor": undefined,
+                  "maxWidth": NaN,
+                  "minHeight": 0,
+                }
               }
-            }
-            textAlign="center"
-            triggerKeyCodes={[]}
-          />
+              text={
+                {
+                  "eventCount": undefined,
+                  "linkTextColor": undefined,
+                  "selection": null,
+                  "tag": "p",
+                  "text": "<p>Search Button</p>",
+                }
+              }
+              textAlign="center"
+              triggerKeyCodes={[]}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -233,7 +261,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         ]
       }
     >
-      <RCTAztecView
+      <View
         accessibilityState={
           {
             "busy": undefined,
@@ -243,57 +271,71 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
             "selected": undefined,
           }
         }
-        accessible={true}
-        activeFormats={[]}
-        blockType={
+        accessibilityValue={
           {
-            "tag": "p",
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
           }
         }
-        disableEditingMenu={false}
+        accessible={false}
+        collapsable={false}
         focusable={true}
-        fontFamily="serif"
-        fontSize={16}
-        isMultiline={false}
-        maxImagesWidth={200}
-        onBackspace={[Function]}
         onBlur={[Function]}
-        onChange={[Function]}
         onClick={[Function]}
-        onContentSizeChange={[Function]}
-        onEnter={[Function]}
         onFocus={[Function]}
-        onHTMLContentWithCursor={[Function]}
-        onKeyDown={[Function]}
-        onPaste={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
-        onSelectionChange={[Function]}
         onStartShouldSetResponder={[Function]}
-        placeholder="Add label…"
-        placeholderTextColor="gray"
-        selectionColor="black"
-        style={
-          {
-            "backgroundColor": undefined,
-            "maxWidth": undefined,
-            "minHeight": 0,
+      >
+        <RCTAztecView
+          activeFormats={[]}
+          blockType={
+            {
+              "tag": "p",
+            }
           }
-        }
-        text={
-          {
-            "eventCount": undefined,
-            "linkTextColor": undefined,
-            "selection": null,
-            "tag": "p",
-            "text": "<p>Search</p>",
+          disableEditingMenu={false}
+          fontFamily="serif"
+          fontSize={16}
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
+          onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          onSelectionChange={[Function]}
+          placeholder="Add label…"
+          placeholderTextColor="gray"
+          selectionColor="black"
+          style={
+            {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
+            }
           }
-        }
-        triggerKeyCodes={[]}
-      />
+          text={
+            {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "tag": "p",
+              "text": "<p>Search</p>",
+            }
+          }
+          triggerKeyCodes={[]}
+        />
+      </View>
     </View>
   </View>
   <View
@@ -428,7 +470,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
             ]
           }
         >
-          <RCTAztecView
+          <View
             accessibilityState={
               {
                 "busy": undefined,
@@ -438,59 +480,73 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
                 "selected": undefined,
               }
             }
-            accessible={true}
-            activeFormats={[]}
-            blockType={
+            accessibilityValue={
               {
-                "tag": "p",
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
               }
             }
-            disableEditingMenu={false}
+            accessible={false}
+            collapsable={false}
             focusable={true}
-            fontFamily="serif"
-            fontSize={16}
-            isMultiline={false}
-            maxImagesWidth={200}
-            minWidth={75}
-            onBackspace={[Function]}
             onBlur={[Function]}
-            onChange={[Function]}
             onClick={[Function]}
-            onContentSizeChange={[Function]}
-            onEnter={[Function]}
             onFocus={[Function]}
-            onHTMLContentWithCursor={[Function]}
-            onKeyDown={[Function]}
-            onPaste={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
-            onSelectionChange={[Function]}
             onStartShouldSetResponder={[Function]}
-            placeholder=""
-            placeholderTextColor="gray"
-            selectionColor="black"
-            style={
-              {
-                "backgroundColor": undefined,
-                "maxWidth": NaN,
-                "minHeight": 0,
+          >
+            <RCTAztecView
+              activeFormats={[]}
+              blockType={
+                {
+                  "tag": "p",
+                }
               }
-            }
-            text={
-              {
-                "eventCount": undefined,
-                "linkTextColor": undefined,
-                "selection": null,
-                "tag": "p",
-                "text": "<p>Search Button</p>",
+              disableEditingMenu={false}
+              fontFamily="serif"
+              fontSize={16}
+              isMultiline={false}
+              maxImagesWidth={200}
+              minWidth={75}
+              onBackspace={[Function]}
+              onBlur={[Function]}
+              onChange={[Function]}
+              onContentSizeChange={[Function]}
+              onEnter={[Function]}
+              onFocus={[Function]}
+              onHTMLContentWithCursor={[Function]}
+              onKeyDown={[Function]}
+              onPaste={[Function]}
+              onSelectionChange={[Function]}
+              placeholder=""
+              placeholderTextColor="gray"
+              selectionColor="black"
+              style={
+                {
+                  "backgroundColor": undefined,
+                  "maxWidth": NaN,
+                  "minHeight": 0,
+                }
               }
-            }
-            textAlign="center"
-            triggerKeyCodes={[]}
-          />
+              text={
+                {
+                  "eventCount": undefined,
+                  "linkTextColor": undefined,
+                  "selection": null,
+                  "tag": "p",
+                  "text": "<p>Search Button</p>",
+                }
+              }
+              textAlign="center"
+              triggerKeyCodes={[]}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -517,7 +573,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         ]
       }
     >
-      <RCTAztecView
+      <View
         accessibilityState={
           {
             "busy": undefined,
@@ -527,57 +583,71 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             "selected": undefined,
           }
         }
-        accessible={true}
-        activeFormats={[]}
-        blockType={
+        accessibilityValue={
           {
-            "tag": "p",
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
           }
         }
-        disableEditingMenu={false}
+        accessible={false}
+        collapsable={false}
         focusable={true}
-        fontFamily="serif"
-        fontSize={16}
-        isMultiline={false}
-        maxImagesWidth={200}
-        onBackspace={[Function]}
         onBlur={[Function]}
-        onChange={[Function]}
         onClick={[Function]}
-        onContentSizeChange={[Function]}
-        onEnter={[Function]}
         onFocus={[Function]}
-        onHTMLContentWithCursor={[Function]}
-        onKeyDown={[Function]}
-        onPaste={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
-        onSelectionChange={[Function]}
         onStartShouldSetResponder={[Function]}
-        placeholder="Add label…"
-        placeholderTextColor="gray"
-        selectionColor="black"
-        style={
-          {
-            "backgroundColor": undefined,
-            "maxWidth": undefined,
-            "minHeight": 0,
+      >
+        <RCTAztecView
+          activeFormats={[]}
+          blockType={
+            {
+              "tag": "p",
+            }
           }
-        }
-        text={
-          {
-            "eventCount": undefined,
-            "linkTextColor": undefined,
-            "selection": null,
-            "tag": "p",
-            "text": "<p>Search</p>",
+          disableEditingMenu={false}
+          fontFamily="serif"
+          fontSize={16}
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
+          onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          onSelectionChange={[Function]}
+          placeholder="Add label…"
+          placeholderTextColor="gray"
+          selectionColor="black"
+          style={
+            {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
+            }
           }
-        }
-        triggerKeyCodes={[]}
-      />
+          text={
+            {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "tag": "p",
+              "text": "<p>Search</p>",
+            }
+          }
+          triggerKeyCodes={[]}
+        />
+      </View>
     </View>
   </View>
   <View
@@ -642,7 +712,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             ]
           }
         >
-          <RCTAztecView
+          <View
             accessibilityState={
               {
                 "busy": undefined,
@@ -652,59 +722,73 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
                 "selected": undefined,
               }
             }
-            accessible={true}
-            activeFormats={[]}
-            blockType={
+            accessibilityValue={
               {
-                "tag": "p",
+                "max": undefined,
+                "min": undefined,
+                "now": undefined,
+                "text": undefined,
               }
             }
-            disableEditingMenu={false}
+            accessible={false}
+            collapsable={false}
             focusable={true}
-            fontFamily="serif"
-            fontSize={16}
-            isMultiline={false}
-            maxImagesWidth={200}
-            minWidth={75}
-            onBackspace={[Function]}
             onBlur={[Function]}
-            onChange={[Function]}
             onClick={[Function]}
-            onContentSizeChange={[Function]}
-            onEnter={[Function]}
             onFocus={[Function]}
-            onHTMLContentWithCursor={[Function]}
-            onKeyDown={[Function]}
-            onPaste={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
-            onSelectionChange={[Function]}
             onStartShouldSetResponder={[Function]}
-            placeholder=""
-            placeholderTextColor="gray"
-            selectionColor="black"
-            style={
-              {
-                "backgroundColor": undefined,
-                "maxWidth": NaN,
-                "minHeight": 0,
+          >
+            <RCTAztecView
+              activeFormats={[]}
+              blockType={
+                {
+                  "tag": "p",
+                }
               }
-            }
-            text={
-              {
-                "eventCount": undefined,
-                "linkTextColor": undefined,
-                "selection": null,
-                "tag": "p",
-                "text": "<p>Search Button</p>",
+              disableEditingMenu={false}
+              fontFamily="serif"
+              fontSize={16}
+              isMultiline={false}
+              maxImagesWidth={200}
+              minWidth={75}
+              onBackspace={[Function]}
+              onBlur={[Function]}
+              onChange={[Function]}
+              onContentSizeChange={[Function]}
+              onEnter={[Function]}
+              onFocus={[Function]}
+              onHTMLContentWithCursor={[Function]}
+              onKeyDown={[Function]}
+              onPaste={[Function]}
+              onSelectionChange={[Function]}
+              placeholder=""
+              placeholderTextColor="gray"
+              selectionColor="black"
+              style={
+                {
+                  "backgroundColor": undefined,
+                  "maxWidth": NaN,
+                  "minHeight": 0,
+                }
               }
-            }
-            textAlign="center"
-            triggerKeyCodes={[]}
-          />
+              text={
+                {
+                  "eventCount": undefined,
+                  "linkTextColor": undefined,
+                  "selection": null,
+                  "tag": "p",
+                  "text": "<p>Search Button</p>",
+                }
+              }
+              textAlign="center"
+              triggerKeyCodes={[]}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -731,7 +815,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
         ]
       }
     >
-      <RCTAztecView
+      <View
         accessibilityState={
           {
             "busy": undefined,
@@ -741,57 +825,71 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
             "selected": undefined,
           }
         }
-        accessible={true}
-        activeFormats={[]}
-        blockType={
+        accessibilityValue={
           {
-            "tag": "p",
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
           }
         }
-        disableEditingMenu={false}
+        accessible={false}
+        collapsable={false}
         focusable={true}
-        fontFamily="serif"
-        fontSize={16}
-        isMultiline={false}
-        maxImagesWidth={200}
-        onBackspace={[Function]}
         onBlur={[Function]}
-        onChange={[Function]}
         onClick={[Function]}
-        onContentSizeChange={[Function]}
-        onEnter={[Function]}
         onFocus={[Function]}
-        onHTMLContentWithCursor={[Function]}
-        onKeyDown={[Function]}
-        onPaste={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
-        onSelectionChange={[Function]}
         onStartShouldSetResponder={[Function]}
-        placeholder="Add label…"
-        placeholderTextColor="gray"
-        selectionColor="black"
-        style={
-          {
-            "backgroundColor": undefined,
-            "maxWidth": undefined,
-            "minHeight": 0,
+      >
+        <RCTAztecView
+          activeFormats={[]}
+          blockType={
+            {
+              "tag": "p",
+            }
           }
-        }
-        text={
-          {
-            "eventCount": undefined,
-            "linkTextColor": undefined,
-            "selection": null,
-            "tag": "p",
-            "text": "<p>Search</p>",
+          disableEditingMenu={false}
+          fontFamily="serif"
+          fontSize={16}
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
+          onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          onSelectionChange={[Function]}
+          placeholder="Add label…"
+          placeholderTextColor="gray"
+          selectionColor="black"
+          style={
+            {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
+            }
           }
-        }
-        triggerKeyCodes={[]}
-      />
+          text={
+            {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "tag": "p",
+              "text": "<p>Search</p>",
+            }
+          }
+          triggerKeyCodes={[]}
+        />
+      </View>
     </View>
   </View>
   <View
