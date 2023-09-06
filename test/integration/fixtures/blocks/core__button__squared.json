@@ -3,6 +3,7 @@
 		"name": "core/button",
 		"isValid": true,
 		"attributes": {
+			"tagName": "a",
 			"text": "My button",
 			"style": {
 				"border": {
