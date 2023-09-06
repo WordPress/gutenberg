@@ -206,7 +206,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              `--wp--style--root--padding-*`, and `box-shadow` properties,
 	 *              removed the `--wp--style--block-gap` property.
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
-	 * @since 6.3.0 Added `writing-mode` property.
+	 * @since 6.4.0 Added `writing-mode` property.
 	 * @since 6.4.0 Added `text-orientation` property.
 	 *
 	 * @var array
