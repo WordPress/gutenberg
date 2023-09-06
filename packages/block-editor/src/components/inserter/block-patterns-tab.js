@@ -8,7 +8,7 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { _x, __, isRTL } from '@wordpress/i18n';
+import { _x, __, _n, isRTL, sprintf } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -20,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -110,7 +111,17 @@ function usePatternsCategories( rootClientId, filter = 'all' ) {
 
 		return categories;
 	}, [ allCategories, filteredPatterns, hasRegisteredCategory ] );
-
+	speak(
+		sprintf(
+			/* translators: %d: number of categories . */
+			_n(
+				'%d category button displayed.',
+				'%d category buttons displayed.',
+				populatedCategories.length
+			),
+			populatedCategories.length
+		)
+	);
 	return populatedCategories;
 }
 
