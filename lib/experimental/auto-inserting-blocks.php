@@ -335,7 +335,7 @@ function gutenberg_register_auto_insert_rest_field() {
 		'auto_insert',
 		array(
 			'schema' => array(
-				'description'       => __( 'Block types that may be automatically inserted near this block and the associated relative position where they are inserted.', 'gutenberg' ),
+				'description'       => __( 'This block is automatically inserted near any occurence of the block types used as keys of this map, into a relative position given by the corresponding value.', 'gutenberg' ),
 				'patternProperties' => array(
 					'^[a-zA-Z0-9-]+/[a-zA-Z0-9-]+$' => array(
 						'type' => 'string',
