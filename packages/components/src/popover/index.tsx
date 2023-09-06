@@ -58,7 +58,6 @@ import {
 import type { WordPressComponentProps } from '../ui/context';
 import type {
 	PopoverProps,
-	AnimatedWrapperProps,
 	PopoverAnchorRefReference,
 	PopoverAnchorRefTopBottom,
 } from './types';
@@ -92,47 +91,6 @@ const ArrowTriangle = () => (
 			vectorEffect="non-scaling-stroke"
 		/>
 	</SVG>
-);
-
-const AnimatedWrapper = forwardRef(
-	(
-		{
-			style: receivedInlineStyles,
-			placement,
-			shouldAnimate = false,
-			...props
-		}: HTMLMotionProps< 'div' > & AnimatedWrapperProps,
-		forwardedRef: ForwardedRef< any >
-	) => {
-		const shouldReduceMotion = useReducedMotion();
-
-		const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
-			() => placementToMotionAnimationProps( placement ),
-			[ placement ]
-		);
-
-		const computedAnimationProps: HTMLMotionProps< 'div' > =
-			shouldAnimate && ! shouldReduceMotion
-				? {
-						style: {
-							...motionInlineStyles,
-							...receivedInlineStyles,
-						},
-						...otherMotionProps,
-				  }
-				: {
-						animate: false,
-						style: receivedInlineStyles,
-				  };
-
-		return (
-			<motion.div
-				{ ...computedAnimationProps }
-				{ ...props }
-				ref={ forwardedRef }
-			/>
-		);
-	}
 );
 
 const slotNameContext = createContext< string | undefined >( undefined );
@@ -423,18 +381,55 @@ const UnforwardedPopover = (
 		forwardedRef,
 	] );
 
-	// Disable reason: We care to capture the _bubbled_ events from inputs
-	// within popover as inferring close intent.
+	const style = isExpanded
+		? undefined
+		: {
+				position: strategy,
+				top: 0,
+				left: 0,
+				// `x` and `y` are framer-motion specific props and are shorthands
+				// for `translateX` and `translateY`. Currently it is not possible
+				// to use `translateX` and `translateY` because those values would
+				// be overridden by the return value of the
+				// `placementToMotionAnimationProps` function.
+				x: computePopoverPosition( x ),
+				y: computePopoverPosition( y ),
+		  };
+
+	const shouldReduceMotion = useReducedMotion();
+	const shouldAnimate = animate && ! isExpanded && ! shouldReduceMotion;
+
+	const [ animationFinished, setAnimationFinished ] = useState( false );
+
+	const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
+		() => placementToMotionAnimationProps( computedPlacement ),
+		[ computedPlacement ]
+	);
+
+	const animationProps: HTMLMotionProps< 'div' > = shouldAnimate
+		? {
+				style: {
+					...motionInlineStyles,
+					...style,
+				},
+				onAnimationComplete: () => setAnimationFinished( true ),
+				...otherMotionProps,
+		  }
+		: {
+				animate: false,
+				style,
+		  };
+
+	// When Floating UI has finished positioning and Framer Motion has finished animating
+	// the popover, add the `is-positioned` class to signal that all transitions have finished.
+	const isPositioned =
+		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
 
 	let content = (
-		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<AnimatedWrapper
-			shouldAnimate={ animate && ! isExpanded }
-			placement={ computedPlacement }
+		<motion.div
 			className={ classnames( 'components-popover', className, {
 				'is-expanded': isExpanded,
-				'is-positioned': x !== null && y !== null,
+				'is-positioned': isPositioned,
 				// Use the 'alternate' classname for 'toolbar' variant for back compat.
 				[ `is-${
 					computedVariant === 'toolbar'
@@ -442,26 +437,11 @@ const UnforwardedPopover = (
 						: computedVariant
 				}` ]: computedVariant,
 			} ) }
+			{ ...animationProps }
 			{ ...contentProps }
 			ref={ mergedFloatingRef }
 			{ ...dialogProps }
 			tabIndex={ -1 }
-			style={
-				isExpanded
-					? undefined
-					: {
-							position: strategy,
-							top: 0,
-							left: 0,
-							// `x` and `y` are framer-motion specific props and are shorthands
-							// for `translateX` and `translateY`. Currently it is not possible
-							// to use `translateX` and `translateY` because those values would
-							// be overridden by the return value of the
-							// `placementToMotionAnimationProps` function in `AnimatedWrapper`
-							x: computePopoverPosition( x ),
-							y: computePopoverPosition( y ),
-					  }
-			}
 		>
 			{ /* Prevents scroll on the document */ }
 			{ isExpanded && <ScrollLock /> }
@@ -501,7 +481,7 @@ const UnforwardedPopover = (
 					<ArrowTriangle />
 				</div>
 			) }
-		</AnimatedWrapper>
+		</motion.div>
 	);
 
 	const shouldRenderWithinSlot = slot.ref && ! inline;

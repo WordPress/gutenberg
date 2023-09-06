@@ -10,14 +10,9 @@ import { useRef } from '@wordpress/element';
 import {
 	BlockList,
 	BlockTools,
-	__unstableUseClipboardHandler as useClipboardHandler,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	useMergeRefs,
-	useViewportMatch,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -76,8 +71,6 @@ export default function SiteEditorCanvas() {
 		! isMobileViewport;
 
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [ contentRef, useClipboardHandler() ] );
-
 	const isTemplateTypeNavigation = templateType === 'wp_navigation';
 
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
@@ -127,8 +120,7 @@ export default function SiteEditorCanvas() {
 								<EditorCanvas
 									enableResizing={ enableResizing }
 									settings={ settings }
-									contentRef={ mergedRefs }
-									readonly={ isViewMode }
+									contentRef={ contentRef }
 								>
 									{ resizeObserver }
 									<BlockList

@@ -78,11 +78,21 @@ const renderRegions = ( page ) => {
 	} );
 };
 
+// Variable to store the current navigation.
+let navigatingTo = '';
+
 // Navigate to a new page.
 export const navigate = async ( href, options = {} ) => {
 	const url = cleanUrl( href );
+	navigatingTo = href;
 	prefetch( url, options );
 	const page = await pages.get( url );
+
+	// Once the page is fetched, the destination URL could have changed (e.g.,
+	// by clicking another link in the meantime). If so, bail out, and let the
+	// newer execution to update the HTML.
+	if ( navigatingTo !== href ) return;
+
 	if ( page ) {
 		renderRegions( page );
 		window.history[ options.replace ? 'replaceState' : 'pushState' ](
