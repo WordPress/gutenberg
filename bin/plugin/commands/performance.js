@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const { spawn } = require( 'child_process' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 const SimpleGit = require( 'simple-git' );
@@ -10,7 +11,6 @@ const SimpleGit = require( 'simple-git' );
  */
 const { formats, log } = require( '../lib/logger' );
 const {
-	runShellScript,
 	readJSONFile,
 	askForConfirmation,
 	getRandomTemporaryPath,
@@ -21,6 +21,41 @@ const config = require( '../config' );
 const ARTIFACTS_PATH =
 	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
 const RESULTS_FILE_SUFFIX = '.performance-results.json';
+
+// @ts-ignore
+function runShellScript( script, cwd, env = {} ) {
+	console.log( `Executing: ${ script }` );
+
+	return new Promise( ( resolve, reject ) => {
+		const child = spawn( script, [], {
+			cwd,
+			env: {
+				NO_CHECKS: 'true',
+				PATH: process.env.PATH,
+				HOME: process.env.HOME,
+				USER: process.env.USER,
+				...env,
+			},
+			shell: true,
+			stdio: 'inherit', // This makes the child process inherit the parent's stdio
+		} );
+
+		child.on( 'close', ( code ) => {
+			if ( code !== 0 ) {
+				reject( new Error( `Process exited with code ${ code }` ) );
+			} else {
+				resolve( null );
+			}
+		} );
+
+		child.on( 'error', ( error ) => {
+			console.error(
+				`Failed to start child process: ${ error.message }`
+			);
+			reject( error );
+		} );
+	} );
+}
 
 /**
  * @typedef WPPerformanceCommandOptions
