@@ -66,8 +66,7 @@ export default function ReusableBlockEdit( {
 				? align
 				: accumulator;
 		}, undefined );
-		// Set the align class of the pattern block to match the widest
-		// alignment of children.
+		// If we don't have a wide or full alignment set we can remove the default layout attribute
 		if ( ! alignments.includes( widestAlignment ) ) {
 			setAttributes( {
 				layout: undefined,
@@ -75,6 +74,8 @@ export default function ReusableBlockEdit( {
 			setInheritedAlignment( undefined );
 			return;
 		}
+		// Set the align class of the pattern block to match the widest
+		// alignment of children.
 		setAttributes( {
 			layout: { type: 'constrained' },
 		} );
