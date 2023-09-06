@@ -23,12 +23,16 @@ function gutenberg_get_block_editor_settings_mobile( $settings ) {
 		'mobile' === $_GET['context']
 	) {
 		if ( wp_theme_has_theme_json() ) {
-			$context = array(
+			$context                          = array(
 				'transforms' => array(
 					'resolve-variables',
 				),
 			);
-			$settings['__experimentalStyles'] = gutenberg_get_global_styles(array(), $context);
+			$settings['__experimentalStyles'] = gutenberg_get_global_styles( array(), $context );
+		}
+		// Adding the Gutenberg plugin version is necessary for feature compatibility in the mobile apps.
+		if ( defined( 'GUTENBERG_VERSION' ) ) {
+			$settings['gutenbergVersion'] = GUTENBERG_VERSION;
 		}
 
 		// To tell mobile that the site uses quote v2 (inner blocks).
