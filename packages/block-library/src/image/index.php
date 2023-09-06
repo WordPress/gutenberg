@@ -90,7 +90,7 @@ function block_core_image_should_render_lightbox( $block ) {
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 
 	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered.
-	if ( isset( $lightbox_settings ) &&
+	if ( isset( $lightbox_settings['enabled'] ) &&
 	true === $lightbox_settings['enabled'] &&
 		'none' === $link_destination
 	) {

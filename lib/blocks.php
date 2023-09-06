@@ -471,7 +471,7 @@ function gutenberg_should_render_lightbox( $block ) {
 	}
 
 	// If not present in global settings, check legacy syntax.
-	if ( ! isset( $lightbox_settings ) || is_null( $lightbox_settings['enabled'] ) ) {
+	if ( ! isset( $lightbox_settings['enabled'] ) ) {
 		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_data();
 		if ( isset( $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'] ) ) {
 			$lightbox_settings = $theme_data['behaviors']['blocks'][ $block['blockName'] ]['lightbox'];
@@ -481,7 +481,7 @@ function gutenberg_should_render_lightbox( $block ) {
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 
 	// If the lightbox is enabled, the image is not linked, flag the lightbox to be rendered.
-	if ( isset( $lightbox_settings ) &&
+	if ( isset( $lightbox_settings['enabled'] ) &&
 		true === $lightbox_settings['enabled'] &&
 		'none' === $link_destination
 	) {
