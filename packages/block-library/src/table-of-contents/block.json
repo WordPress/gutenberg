@@ -10,13 +10,6 @@
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {
-		"headings": {
-			"type": "array",
-			"items": {
-				"type": "object"
-			},
-			"default": []
-		},
 		"onlyIncludeCurrentPage": {
 			"type": "boolean",
 			"default": false

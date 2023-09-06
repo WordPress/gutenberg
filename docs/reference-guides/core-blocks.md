@@ -852,7 +852,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Experimental:** true
 -	**Category:** layout
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** headings, onlyIncludeCurrentPage
+-	**Attributes:** onlyIncludeCurrentPage
 
 ## Tag Cloud
 

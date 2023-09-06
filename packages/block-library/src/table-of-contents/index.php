@@ -136,7 +136,10 @@ function block_core_table_of_contents_build_list( $tree ) {
  * @return string Returns the HTML representing the table of contents.
  */
 function render_block_core_table_of_contents( $attributes, $content, $block ) {
-	// @todo: Maybe return saved block content if it exists, for backward compatibility.
+	// Fallback to static content when it exists. The post hasn't been updated to use headings via post-meta.
+	if ( trim( $content ) !== '' ) {
+		return $content;
+	}
 
 	// Bail out early if the post ID is not set for some reason.
 	if ( empty( $block->context['postId'] ) ) {
