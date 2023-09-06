@@ -47,9 +47,9 @@ function block_core_table_of_contents_build_headings_tree( $headings ) {
 		return $headings;
 	}
 
-	$tree         = array();
-	$firstHeading = $headings[0];
-	$total        = count( $headings );
+	$tree          = array();
+	$first_heading = $headings[0];
+	$total         = count( $headings );
 
 	foreach ( $headings as $key => $heading ) {
 		if ( empty( $heading['content'] ) ) {
@@ -57,7 +57,7 @@ function block_core_table_of_contents_build_headings_tree( $headings ) {
 		}
 
 		// Make sure we are only working with the same level as the first iteration in our set.
-		if ( $heading['level'] !== $firstHeading['level'] ) {
+		if ( $heading['level'] !== $first_heading['level'] ) {
 			continue;
 		}
 
@@ -102,7 +102,7 @@ function block_core_table_of_contents_build_headings_tree( $headings ) {
  *
  * @since 6.4.0
  *
- * @param array $headings An array of nested headings.
+ * @param array $tree An array of nested headings.
  * @return string $list A list of Table of Content items.
  */
 function block_core_table_of_contents_build_list( $tree ) {
@@ -112,7 +112,7 @@ function block_core_table_of_contents_build_list( $tree ) {
 		$heading  = $item['heading'];
 		$children = isset( $item['children'] ) ? '<ol>' . block_core_table_of_contents_build_list( $item['children'] ) . '</ol>' : '';
 
-		if ( ! empty( $heading['link'] )) {
+		if ( ! empty( $heading['link'] ) ) {
 			$content = '<a class="wp-block-table-of-contents__entry" href="' . esc_url( $heading['link'] ) . '">' . esc_html( $heading['content'] ) . '</a>';
 		} else {
 			$content = '<span class=wp-block-table-of-contents__entry>' . esc_html( $heading['content'] ) . '</span>';
