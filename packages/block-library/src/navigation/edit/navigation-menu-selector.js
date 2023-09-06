@@ -5,9 +5,8 @@ import {
 	MenuGroup,
 	MenuItem,
 	MenuItemsChoice,
-	DropdownMenu,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -45,6 +44,9 @@ function NavigationMenuSelector( {
 	actionLabel,
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
+	icon,
+	text = '',
+	toggleProps,
 } ) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
@@ -128,10 +130,11 @@ function NavigationMenuSelector( {
 	] );
 
 	const NavigationMenuSelectorDropdown = (
-		<DropdownMenu
+		<ToolbarDropdownMenu
 			label={ selectorLabel }
-			icon={ moreVertical }
-			toggleProps={ { isSmall: true } }
+			icon={ icon }
+			toggleProps={ toggleProps }
+			text={ text }
 		>
 			{ ( { onClose } ) => (
 				<>
@@ -190,7 +193,7 @@ function NavigationMenuSelector( {
 					) }
 				</>
 			) }
-		</DropdownMenu>
+		</ToolbarDropdownMenu>
 	);
 
 	return NavigationMenuSelectorDropdown;

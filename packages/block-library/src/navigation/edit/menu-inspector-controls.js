@@ -5,6 +5,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	InspectorControls,
 	store as blockEditorStore,
+	BlockControls,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -14,6 +15,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
+import { chevronDown, moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -150,6 +152,27 @@ const MenuInspectorControls = ( props ) => {
 					>
 						{ __( 'Menu' ) }
 					</Heading>
+					<BlockControls group="inline">
+						<NavigationMenuSelector
+							currentMenuId={ currentMenuId }
+							onSelectClassicMenu={ onSelectClassicMenu }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
+							onCreateNew={ onCreateNew }
+							createNavigationMenuIsSuccess={
+								createNavigationMenuIsSuccess
+							}
+							createNavigationMenuIsError={
+								createNavigationMenuIsError
+							}
+							actionLabel={ actionLabel }
+							isManageMenusButtonDisabled={
+								isManageMenusButtonDisabled
+							}
+							icon={ chevronDown }
+							text={ __( 'Change' ) }
+							toggleProps={ { iconPosition: 'right' } }
+						/>
+					</BlockControls>
 					{ blockEditingMode === 'default' && (
 						<NavigationMenuSelector
 							currentMenuId={ currentMenuId }
@@ -166,6 +189,8 @@ const MenuInspectorControls = ( props ) => {
 							isManageMenusButtonDisabled={
 								isManageMenusButtonDisabled
 							}
+							icon={ moreVertical }
+							toggleProps={ { isSmall: 'true' } }
 						/>
 					) }
 				</HStack>
