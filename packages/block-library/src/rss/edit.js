@@ -77,7 +77,11 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 								}
 								className="wp-block-rss__placeholder-input"
 							/>
-							<Button variant="primary" type="submit">
+							<Button
+								__next40pxDefaultSize
+								variant="primary"
+								type="submit"
+							>
 								{ __( 'Use URL' ) }
 							</Button>
 						</HStack>
