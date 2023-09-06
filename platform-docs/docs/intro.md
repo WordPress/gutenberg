@@ -26,7 +26,6 @@ To build a block editor, you need to install the following dependencies
  - `@wordpress/element`
  - `@wordpress/block-library`
  - `@wordpress/components`
- - `@wordpress/keyboard-shortcuts`
 
 ## Setup vite to use JSX and @wordpress/element as a pragma
 
@@ -77,14 +76,9 @@ It's time to render our first block editor.
 import { createRoot, createElement, useState } from "@wordpress/element";
 import {
   BlockEditorProvider,
-  BlockList,
-  BlockEditorKeyboardShortcuts,
-  WritingFlow,
-  ObserveTyping,
+  BlockCanvas,
 } from "@wordpress/block-editor";
 import { registerCoreBlocks } from "@wordpress/block-library";
-import { Popover, SlotFillProvider } from "@wordpress/components";
-import { ShortcutProvider } from "@wordpress/keyboard-shortcuts";
 
 // Default styles that are needed for the editor.
 import "@wordpress/components/build-style/style.css";
@@ -101,36 +95,21 @@ registerCoreBlocks();
 function Editor() {
   const [blocks, setBlocks] = useState([]);
   return (
-    // The Shortcut Provider enables the keyboard shortcuts of the editor.
-    <ShortcutProvider>
-      {/* The Slot Fill Provider is necessary to allow popovers and dropdowns to render properly */}
-      <SlotFillProvider>
-        {/* 
-            The BlockEditorProvider is the wrapper of the block editor's state.
-            All the UI elements of the block editor need to be rendered within this provider.
-          */}
-        <BlockEditorProvider
-          value={blocks}
-          onChange={setBlocks}
-          onInput={setBlocks}
-        >
-          <BlockEditorKeyboardShortcuts.Register />
-
-          {/*
-             The WritingFlow component enables arrow navigation accross the blocks 
-             and a few other keyboard interactions within the block editor
-            */}
-          <WritingFlow>
-            {/* The ObserveTyping component allows the editor to automatically show or hide the block toolbar while typing. */}
-            <ObserveTyping>
-              <BlockList />
-            </ObserveTyping>
-          </WritingFlow>
-        </BlockEditorProvider>
-        {/* Wrapper that renders popovers and dropdowns */}
-        <Popover.Slot />¨
-      </SlotFillProvider>
-    </ShortcutProvider>
+    {/* 
+        The BlockEditorProvider is the wrapper of the block editor's state.
+        All the UI elements of the block editor need to be rendered within this provider.
+      */}
+    <BlockEditorProvider
+      value={blocks}
+      onChange={setBlocks}
+      onInput={setBlocks}
+    >
+      {/*
+          The BlockCanvas component render the block list within an iframe
+          and wire up all the necessary events to make the block editor work.
+        */}
+      <BlockCanvas height="500px" />
+    </BlockEditorProvider>
   );
 }
 

@@ -17,12 +17,13 @@ The Gutenberg platform allows you to render these pieces separately and lay them
 
 ## The Block Toolbar
 
-Wrapping your `BlockList` component within the `BlockTools` wrapper allows the editor to render a block toolbar adjacent to the selected block.
+Wrapping your `BlockCanvas` component within the `BlockTools` wrapper allows the editor to render a block toolbar adjacent to the selected block.
 
 ## The Block Inspector
 
-Render `BlockInspector`.
+You can use the `BlockInspector` to render what is called the block inspector. It's a set of tools that are specific to the selected block.
+While the block toolbar contains what is considered the "main tools" to manipuate each block, the block inspector is meant to render advanced tools and customization options. It is generally rendered as a sidebar or a modal.
 
 ## The Block Inserter
 
-`Inserter`
+By default the block editor renders a block inserter at the end of the canvas if there's no block selected. It also renders an inserter if you hover the area between two consecutive blocks. That said, you can also decide to render a permanent inserter for instance in a header of your editor. You can do so by using the `Inserter` component.

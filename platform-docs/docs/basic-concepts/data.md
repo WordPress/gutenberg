@@ -2,9 +2,7 @@
 sidebar_position: 2
 ---
 
-# Data
-
-## Data Format
+# Data Format
 
 A block editor document is a collection of semantically consistent descriptions of what each block is and what its essential data is.
 
