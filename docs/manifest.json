@@ -1980,6 +1980,12 @@
 		"parent": "data"
 	},
 	{
+		"title": "The Commands Data",
+		"slug": "data-core-commands",
+		"markdown_source": "../docs/reference-guides/data/data-core-commands.md",
+		"parent": "data"
+	},
+	{
 		"title": "Customize Widgets",
 		"slug": "data-core-customize-widgets",
 		"markdown_source": "../docs/reference-guides/data/data-core-customize-widgets.md",

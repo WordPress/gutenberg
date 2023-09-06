@@ -269,6 +269,9 @@
 					},
 					{ "docs/reference-guides/data/data-core-blocks.md": [] },
 					{
+						"docs/reference-guides/data/data-core-commands.md": []
+					},
+					{
 						"docs/reference-guides/data/data-core-customize-widgets.md": []
 					},
 					{ "docs/reference-guides/data/data-core-edit-post.md": [] },
