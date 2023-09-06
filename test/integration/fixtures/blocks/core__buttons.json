@@ -15,6 +15,7 @@
 				"isValid": true,
 				"attributes": {
 					"tagName": "a",
+					"type": "button",
 					"text": "My button 1"
 				},
 				"innerBlocks": []
@@ -24,6 +25,7 @@
 				"isValid": true,
 				"attributes": {
 					"tagName": "a",
+					"type": "button",
 					"text": "My button 2"
 				},
 				"innerBlocks": []
@@ -33,6 +35,7 @@
 				"isValid": true,
 				"attributes": {
 					"tagName": "a",
+					"type": "button",
 					"text": "My button 3"
 				},
 				"innerBlocks": []
@@ -42,6 +45,7 @@
 				"isValid": true,
 				"attributes": {
 					"tagName": "button",
+					"type": "button",
 					"text": "My button 4"
 				},
 				"innerBlocks": []

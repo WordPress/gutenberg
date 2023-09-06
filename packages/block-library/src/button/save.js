@@ -18,6 +18,7 @@ import {
 export default function save( { attributes, className } ) {
 	const {
 		tagName,
+		type,
 		textAlign,
 		fontSize,
 		linkTarget,
@@ -34,6 +35,7 @@ export default function save( { attributes, className } ) {
 	}
 
 	const TagName = tagName || 'a';
+	const buttonType = type || 'button';
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const colorProps = getColorClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
@@ -68,6 +70,7 @@ export default function save( { attributes, className } ) {
 		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
 			<RichText.Content
 				tagName={ TagName }
+				type={ 'button' === TagName ? buttonType : null }
 				className={ buttonClasses }
 				href={ 'button' === TagName ? null : url }
 				title={ title }

@@ -44,9 +44,9 @@
 					"tagName": "button"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">My button 4</button></div>\n\t",
+				"innerHTML": "\n\t<div class=\"wp-block-button\"><button type=\"button\" class=\"wp-block-button__link wp-element-button\">My button 4</button></div>\n\t",
 				"innerContent": [
-					"\n\t<div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">My button 4</button></div>\n\t"
+					"\n\t<div class=\"wp-block-button\"><button type=\"button\" class=\"wp-block-button__link wp-element-button\">My button 4</button></div>\n\t"
 				]
 			}
 		],

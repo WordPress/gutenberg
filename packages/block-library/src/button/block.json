@@ -13,6 +13,10 @@
 			"type": "string",
 			"default": "a"
 		},
+		"type": {
+			"type": "string",
+			"default": "button"
+		},
 		"textAlign": {
 			"type": "string"
 		},
