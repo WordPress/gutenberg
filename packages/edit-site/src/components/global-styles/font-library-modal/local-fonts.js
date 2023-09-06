@@ -120,7 +120,7 @@ function LocalFonts() {
 		} );
 		const loadedFace = await newFont.load();
 		document.fonts.add( loadedFace );
-	} 
+	}
 
 	/**
 	 * Creates the font family definition and sends it to the server
