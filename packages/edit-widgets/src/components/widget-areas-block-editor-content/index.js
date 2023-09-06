@@ -4,7 +4,6 @@
 import {
 	BlockList,
 	BlockTools,
-	BlockSelectionClearer,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -43,15 +42,13 @@ export default function WidgetAreasBlockEditorContent( {
 			<Notices />
 			<BlockTools>
 				<KeyboardShortcuts />
-				<BlockSelectionClearer>
-					<BlockCanvas
-						shouldIframe={ false }
-						styles={ styles }
-						height="100%"
-					>
-						<BlockList className="edit-widgets-main-block-list" />
-					</BlockCanvas>
-				</BlockSelectionClearer>
+				<BlockCanvas
+					shouldIframe={ false }
+					styles={ styles }
+					height="100%"
+				>
+					<BlockList className="edit-widgets-main-block-list" />
+				</BlockCanvas>
 			</BlockTools>
 		</div>
 	);

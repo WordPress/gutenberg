@@ -12,6 +12,7 @@ import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
 import { useClipboardHandler } from '../copy-handler';
+import { useBlockSelectionClearer } from '../block-selection-clearer';
 
 export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
@@ -23,7 +24,12 @@ export function ExperimentalBlockCanvas( {
 } ) {
 	const resetTypingRef = useMouseMoveTypingReset();
 	const copyHandler = useClipboardHandler();
-	const contentRef = useMergeRefs( [ copyHandler, contentRefProp ] );
+	const clearerRef = useBlockSelectionClearer();
+	const contentRef = useMergeRefs( [
+		copyHandler,
+		contentRefProp,
+		clearerRef,
+	] );
 
 	if ( ! shouldIframe ) {
 		return (

@@ -11,7 +11,6 @@ import {
 	BlockList,
 	BlockTools,
 	store as blockEditorStore,
-	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseTypingObserver as useTypingObserver,
 	__experimentalUseResizeCanvas as useResizeCanvas,
@@ -182,13 +181,7 @@ export default function VisualEditor( { styles } ) {
 	}
 
 	const ref = useRef();
-	const contentRef = useMergeRefs( [
-		ref,
-		useTypewriter(),
-		useBlockSelectionClearer(),
-	] );
-
-	const blockSelectionClearerRef = useBlockSelectionClearer();
+	const contentRef = useMergeRefs( [ ref, useTypewriter() ] );
 
 	// fallbackLayout is used if there is no Post Content,
 	// and for Post Title.
@@ -322,7 +315,6 @@ export default function VisualEditor( { styles } ) {
 				animate={ {
 					padding: isTemplateMode ? '48px 48px 0' : 0,
 				} }
-				ref={ blockSelectionClearerRef }
 			>
 				<motion.div
 					animate={ animatedStyles }
