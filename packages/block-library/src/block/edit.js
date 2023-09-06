@@ -27,9 +27,13 @@ import {
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';
-import { useMemo } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
-export default function ReusableBlockEdit( { attributes: { ref } } ) {
+export default function ReusableBlockEdit( {
+	attributes: { ref },
+	setAttributes,
+} ) {
+	const [ inheritedAlignment, setInheritedAlignment ] = useState();
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
@@ -51,8 +55,9 @@ export default function ReusableBlockEdit( { attributes: { ref } } ) {
 		ref
 	);
 
-	const inheritedAlignment = useMemo( () => {
-		const alignments = [ 'wide', 'full' ];
+	const alignments = [ 'wide', 'full' ];
+
+	useEffect( () => {
 		// Determine the widest setting of all the contained blocks.
 		const widestAlignment = blocks.reduce( ( accumulator, block ) => {
 			const { align } = block.attributes;
@@ -61,10 +66,19 @@ export default function ReusableBlockEdit( { attributes: { ref } } ) {
 				? align
 				: accumulator;
 		}, undefined );
-
 		// Set the align class of the pattern block to match the widest
 		// alignment of children.
-		return widestAlignment;
+		if ( ! alignments.includes( widestAlignment ) ) {
+			setAttributes( {
+				layout: undefined,
+			} );
+			setInheritedAlignment( undefined );
+			return;
+		}
+		setAttributes( {
+			layout: { type: 'constrained' },
+		} );
+		setInheritedAlignment( widestAlignment );
 	}, [ blocks ] );
 
 	const blockProps = useBlockProps( {
