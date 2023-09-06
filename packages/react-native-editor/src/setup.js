@@ -71,6 +71,7 @@ const setupInitHooks = () => {
 				rawStyles,
 				rawFeatures,
 				galleryWithImageBlocks,
+				gutenbergVersion,
 				locale,
 			} = props;
 
@@ -95,6 +96,7 @@ const setupInitHooks = () => {
 				rawStyles,
 				rawFeatures,
 				galleryWithImageBlocks,
+				gutenbergVersion,
 				locale,
 			};
 		}
