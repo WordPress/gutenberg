@@ -386,8 +386,8 @@ class WP_Theme_JSON_Gutenberg {
 			'allowEditing' => null,
 		),
 		'lightbox'                      => array(
-			'enabled' => null,
-			'allowEditing'  => null,
+			'enabled'      => null,
+			'allowEditing' => null,
 		),
 		'position'                      => array(
 			'fixed'  => null,
@@ -421,7 +421,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textTransform'  => null,
 			'writingMode'    => null,
 		),
-		'behaviors' => null,
+		'behaviors'                     => null,
 	);
 
 	/**
