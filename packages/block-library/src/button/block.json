@@ -9,6 +9,10 @@
 	"keywords": [ "link" ],
 	"textdomain": "default",
 	"attributes": {
+		"tagName": {
+			"type": "string",
+			"default": "a"
+		},
 		"textAlign": {
 			"type": "string"
 		},
@@ -22,14 +26,14 @@
 		"title": {
 			"type": "string",
 			"source": "attribute",
-			"selector": "a",
+			"selector": "a,button",
 			"attribute": "title",
 			"__experimentalRole": "content"
 		},
 		"text": {
 			"type": "string",
 			"source": "html",
-			"selector": "a",
+			"selector": "a,button",
 			"__experimentalRole": "content"
 		},
 		"linkTarget": {
