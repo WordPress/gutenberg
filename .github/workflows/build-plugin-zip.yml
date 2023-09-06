@@ -187,6 +187,8 @@ jobs:
 
             - name: workflow artifact pull request comment
               uses: tonyhallett/artifacts-url-comments@v1.1.0
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Build release notes draft
               if: ${{ needs.bump-version.outputs.new_version }}
