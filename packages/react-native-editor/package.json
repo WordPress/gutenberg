@@ -63,7 +63,6 @@
 		"react-native-get-random-values": "1.4.0",
 		"react-native-linear-gradient": "2.7.3",
 		"react-native-modal": "13.0.1",
-		"react-native-prompt-android": "https://raw.githubusercontent.com/wordpress-mobile/react-native-prompt-android/v1.0.0-wp-4/react-native-prompt-android-1.0.0-wp-4.tgz",
 		"react-native-reanimated": "2.17.0",
 		"react-native-safe-area": "^0.5.0",
 		"react-native-safe-area-context": "4.6.3",
