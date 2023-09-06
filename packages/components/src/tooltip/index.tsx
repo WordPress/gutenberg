@@ -45,7 +45,6 @@ function Tooltip( props: TooltipProps ) {
 	}
 
 	const tooltipStore = Ariakit.useTooltipStore( {
-		// @ts-ignore
 		placement: positionToPlacement( position ),
 		timeout: delay,
 	} );
