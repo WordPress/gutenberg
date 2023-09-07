@@ -730,6 +730,11 @@ test.describe( 'Image', () => {
 	} );
 } );
 
+// Skipping these tests for now as we plan
+// to update them to use the new lightbox syntax
+// once it's merged -- see the following PRs
+// https://github.com/WordPress/gutenberg/pull/53851
+// https://github.com/WordPress/gutenberg/pull/54071
 test.describe.skip( 'Image - interactivity', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
