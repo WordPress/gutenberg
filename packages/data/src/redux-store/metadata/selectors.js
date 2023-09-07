@@ -166,25 +166,30 @@ export function hasResolvingSelectors( state ) {
  *
  * @return {Object} Object, containing selector totals by status.
  */
-export const countSelectorsByStatus = createSelector( ( state ) => {
-	const selectorsByStatus = {};
+export const countSelectorsByStatus = createSelector(
+	( state ) => {
+		const selectorsByStatus = {};
 
-	Object.values( state ).forEach( ( selectorState ) =>
-		/**
-		 * This uses the internal `_map` property of `EquivalentKeyMap` for
-		 * optimization purposes, since the `EquivalentKeyMap` implementation
-		 * does not support a `.values()` implementation.
-		 *
-		 * @see https://github.com/aduth/equivalent-key-map
-		 */
-		Array.from( selectorState._map.values() ).forEach( ( resolution ) => {
-			const currentStatus = resolution[ 1 ]?.status ?? 'error';
-			if ( ! selectorsByStatus[ currentStatus ] ) {
-				selectorsByStatus[ currentStatus ] = 0;
-			}
-			selectorsByStatus[ currentStatus ]++;
-		} )
-	);
+		Object.values( state ).forEach( ( selectorState ) =>
+			/**
+			 * This uses the internal `_map` property of `EquivalentKeyMap` for
+			 * optimization purposes, since the `EquivalentKeyMap` implementation
+			 * does not support a `.values()` implementation.
+			 *
+			 * @see https://github.com/aduth/equivalent-key-map
+			 */
+			Array.from( selectorState._map.values() ).forEach(
+				( resolution ) => {
+					const currentStatus = resolution[ 1 ]?.status ?? 'error';
+					if ( ! selectorsByStatus[ currentStatus ] ) {
+						selectorsByStatus[ currentStatus ] = 0;
+					}
+					selectorsByStatus[ currentStatus ]++;
+				}
+			)
+		);
 
-	return selectorsByStatus;
-} );
+		return selectorsByStatus;
+	},
+	( state ) => [ state ]
+);
