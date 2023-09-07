@@ -128,7 +128,7 @@ test.describe( 'Site Editor Performance', () => {
 		}
 	} );
 
-	test( 'Typing', async ( { browser, page, admin, editor } ) => {
+	test( 'Typing', async ( { browser, page, admin } ) => {
 		// Load the large post fixture.
 		await loadBlocksFromHtml(
 			page,
@@ -154,30 +154,32 @@ test.describe( 'Site Editor Performance', () => {
 			postType: 'page',
 		} );
 
-		// Wait for the first paragraph to be ready.
-		const firstParagraph = editor.canvas
-			.getByText( 'Lorem ipsum dolor sit amet' )
-			.first();
-		await firstParagraph.waitFor( { timeout: 60_000 } );
+		const canvas = page.frameLocator( 'iframe[name="editor-canvas"]' );
 
 		// Enter edit mode.
-		await editor.canvas.locator( 'body' ).click();
-		// Second click is needed for the legacy edit mode.
-		await editor.canvas
-			.getByRole( 'document', { name: /Block:( Post)? Content/ } )
-			.click();
+		await canvas.locator( 'body' ).click( { timeout: 120_000 } );
+		const postContent = canvas.getByRole( 'document', {
+			name: /Block:( Post)? Content/,
+		} );
+		// Second (content) click is needed to enter the legacy edit mode.
+		await postContent.click();
 
-		// Append an empty paragraph.
+		// Append an empty paragraph to the end of the post content.
 		// Since `editor.insertBlock( { name: 'core/paragraph' } )` is not
-		// working in page edit mode, we need to _manually_ insert a new
-		// paragraph.
-		await editor.canvas
+		// working in Site Editor, we need to _manually_ insert a new paragraph.
+		await canvas
 			.getByText( 'Quamquam tu hanc copiosiorem etiam soles dicere.' )
 			.last()
-			.click(); // Enters edit mode for the last post's element, which is a list item.
+			.selectText(); // Enter edit mode and select the text.
+		await page.keyboard.press( 'ArrowRight' ); // Move the cursor to the end.
+		await page.keyboard.press( 'Enter' ); // Create a new list item.
+		await page.keyboard.press( 'Enter' ); // Exit the list and create a new paragraph.
 
-		await page.keyboard.press( 'Enter' ); // Creates a new list item.
-		await page.keyboard.press( 'Enter' ); // Exits the list and creates a new paragraph.
+		const emptyBlock = canvas.getByRole( 'document', {
+			name: /Empty block/,
+		} );
+
+		await expect( emptyBlock ).toBeFocused();
 
 		// Start tracing.
 		await browser.startTracing( page, {
@@ -191,10 +193,14 @@ test.describe( 'Site Editor Performance', () => {
 		const samples = 10;
 		const throwaway = 1;
 		const rounds = samples + throwaway;
+		const testString = 'x'.repeat( rounds );
 
 		// Type the testing sequence into the empty paragraph.
-		await page.keyboard.type( 'x'.repeat( rounds ), {
+		await emptyBlock.type( testString, {
 			delay: BROWSER_IDLE_WAIT,
+			// The extended timeout is needed because the typing is very slow
+			// and the `delay` value itself does not extend it.
+			timeout: testString.length * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
 		} );
 
 		// Stop tracing and save results.
@@ -207,5 +213,10 @@ test.describe( 'Site Editor Performance', () => {
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);
 		}
+
+		// Ensure that it's the last canvas element that contains the test string.
+		await expect(
+			canvas.locator( '[contenteditable="true"]' ).last()
+		).toHaveText( testString );
 	} );
 } );
