@@ -16,7 +16,7 @@ const debug = require( '../../debug' );
 async function prPreviewLink( payload, octokit ) {
 	const repo = payload.repository.name;
 	const owner = payload.repository.owner.login;
-	const pullRequestNumber = '1234'; // fake one payload.pull_request.number
+	const pullRequestNumber = 1234; // fake one payload.pull_request.number
 
 	debug(JSON.stringify(payload));
 
