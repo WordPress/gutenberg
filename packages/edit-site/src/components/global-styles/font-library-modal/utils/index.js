@@ -29,17 +29,17 @@ export function getFontFaceVariantName( face ) {
 	return `${ weightName } ${ styleName }`;
 }
 
-export function mergeFontFaces ( existing = [], incoming = [] ) {
+export function mergeFontFaces( existing = [], incoming = [] ) {
 	const map = new Map();
 	for ( const face of existing ) {
 		map.set( `${ face.fontWeight }${ face.fontStyle }`, face );
 	}
 	for ( const face of incoming ) {
 		// This will overwrite if the src already exists, keeping it unique.
-		map.set( `${ face.fontWeight }${ face.fontStyle }`, face ); 
+		map.set( `${ face.fontWeight }${ face.fontStyle }`, face );
 	}
 	return Array.from( map.values() );
-};
+}
 
 export function mergeFontFamilies( existing = [], incoming = [] ) {
 	const map = new Map();
@@ -58,7 +58,10 @@ export function mergeFontFamilies( existing = [], incoming = [] ) {
 				incomingFontFaces
 			);
 			// Except for the fontFace key all the other keys are overwritten with the incoming values.
-			map.set( font.slug, { ...restIncoming, fontFace: mergedFontFaces } );
+			map.set( font.slug, {
+				...restIncoming,
+				fontFace: mergedFontFaces,
+			} );
 		} else {
 			map.set( font.slug, { ...font } );
 		}
@@ -66,7 +69,8 @@ export function mergeFontFamilies( existing = [], incoming = [] ) {
 	return Array.from( map.values() );
 }
 
-export async function loadFontFaceInBrowser ( fontFace, src ) {
+export async function loadFontFaceInBrowser( fontFace, src ) {
+	// eslint-disable-next-line no-undef
 	const newFont = new FontFace( fontFace.fontFamily, `url( ${ src } )`, {
 		style: fontFace.fontStyle,
 		weight: fontFace.fontWeight,
@@ -86,8 +90,8 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	if ( src.startsWith( 'file:.' ) && urlPrefix ) {
 		src = src.replace( 'file:.', urlPrefix );
 	}
-	if ( ! isUrlEncoded ( src ) ) {
+	if ( ! isUrlEncoded( src ) ) {
 		src = encodeURI( src );
 	}
-	return  src;
+	return src;
 }

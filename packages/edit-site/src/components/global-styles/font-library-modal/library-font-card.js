@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { chevronRight } from '@wordpress/icons';
@@ -20,8 +20,11 @@ function LibraryFontCard( { font, ...props } ) {
 		font.slug,
 		font.source
 	).length;
-	const variantsText = __(
-		`${ variantsActive }/${ variantsInstalled } variants active`
+	const variantsText = sprintf(
+		/* translators: %1$d: Active font variants, %2$d: Total font variants */
+		__( '%1$s/%2$s variants active' ),
+		variantsActive,
+		variantsInstalled
 	);
 
 	return (

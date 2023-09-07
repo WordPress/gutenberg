@@ -55,7 +55,7 @@ test.describe( 'Template Revert', () => {
 			page.locator(
 				'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
 			)
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'should show the original content after revert', async ( {

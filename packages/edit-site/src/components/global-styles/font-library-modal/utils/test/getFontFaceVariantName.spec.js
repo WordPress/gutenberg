@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { getFontFaceVariantName } from '../index';
 
 describe( 'getFontFaceVariantName', () => {

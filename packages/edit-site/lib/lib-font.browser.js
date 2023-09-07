@@ -1,6 +1,8 @@
+/* eslint eslint-comments/no-unlimited-disable: 0 */
+/* eslint-disable */
 // import pako from 'pako';
-import unbrotli from "./unbrotli";
-import GzipDecode from "./inflate";
+import unbrotli from './unbrotli';
+import GzipDecode from './inflate';
 
 let fetchFunction = globalThis.fetch;
 // if ( ! fetchFunction ) {
@@ -3826,3 +3828,4 @@ class LongVertMetric {
 }
 var vmtx$1 = Object.freeze( { __proto__: null, vmtx: vmtx } );
 export { Font };
+/* eslint-enable */

@@ -215,7 +215,7 @@ test.describe( 'Template Part', () => {
 
 		// There should be a paragraph but no header template part.
 		await expect( paragraph ).toBeVisible();
-		await expect( templatePartWithParagraph ).not.toBeVisible();
+		await expect( templatePartWithParagraph ).toBeHidden();
 	} );
 
 	test( 'shows changes in a template when a template part it contains is modified', async ( {
@@ -355,7 +355,7 @@ test.describe( 'Template Part', () => {
 		// Verify that the widget area import button is not there.
 		await expect(
 			page.getByRole( 'combobox', { name: 'Import widget area' } )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'Keeps focus in place on undo in template parts', async ( {

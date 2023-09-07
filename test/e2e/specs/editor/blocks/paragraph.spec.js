@@ -87,7 +87,7 @@ test.describe( 'Paragraph', () => {
 			);
 
 			await expect( draggingUtils.dropZone ).toBeVisible();
-			await expect( draggingUtils.insertionIndicator ).not.toBeVisible();
+			await expect( draggingUtils.insertionIndicator ).toBeHidden();
 
 			await drop(
 				editor.canvas.locator( '[data-type="core/paragraph"]' )
@@ -129,7 +129,7 @@ test.describe( 'Paragraph', () => {
 			await draggingUtils.dragOver( boundingBox.x, boundingBox.y );
 
 			await expect( draggingUtils.dropZone ).toBeVisible();
-			await expect( draggingUtils.insertionIndicator ).not.toBeVisible();
+			await expect( draggingUtils.insertionIndicator ).toBeHidden();
 
 			await page.mouse.up();
 
@@ -157,7 +157,7 @@ test.describe( 'Paragraph', () => {
 			await draggingUtils.dragOver( boundingBox.x, boundingBox.y );
 
 			await expect( draggingUtils.dropZone ).toBeVisible();
-			await expect( draggingUtils.insertionIndicator ).not.toBeVisible();
+			await expect( draggingUtils.insertionIndicator ).toBeHidden();
 
 			await page.mouse.up();
 
@@ -264,7 +264,7 @@ test.describe( 'Paragraph', () => {
 						headingBox.x,
 						headingBox.y + headingBox.height - 1
 					);
-					await expect( draggingUtils.dropZone ).not.toBeVisible();
+					await expect( draggingUtils.dropZone ).toBeHidden();
 					await expect(
 						draggingUtils.insertionIndicator
 					).toBeVisible();
@@ -310,7 +310,7 @@ test.describe( 'Paragraph', () => {
 						headingBox.x,
 						headingBox.y + 1
 					);
-					await expect( draggingUtils.dropZone ).not.toBeVisible();
+					await expect( draggingUtils.dropZone ).toBeHidden();
 					await expect(
 						draggingUtils.insertionIndicator
 					).toBeVisible();

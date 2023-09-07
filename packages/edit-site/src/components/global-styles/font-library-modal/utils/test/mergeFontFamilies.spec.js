@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { mergeFontFamilies } from '../index';
 
 describe( 'mergeFontFamilies', () => {
@@ -66,7 +69,7 @@ describe( 'mergeFontFamilies', () => {
 				fontFamily: 'Piazzolla',
 				fontFace: [
 					{ fontWeight: 400, fontStyle: 'normal', src: 'url' },
-                    { fontWeight: 500, fontStyle: 'normal', src: 'url' },
+					{ fontWeight: 500, fontStyle: 'normal', src: 'url' },
 				],
 			},
 		];
@@ -77,7 +80,7 @@ describe( 'mergeFontFamilies', () => {
 				fontFamily: 'Piazzolla, serif',
 				fontFace: [
 					{ fontWeight: 800, fontStyle: 'normal', src: 'url' },
-                    { fontWeight: 400, fontStyle: 'normal', src: 'url' },
+					{ fontWeight: 400, fontStyle: 'normal', src: 'url' },
 				],
 			},
 		];
@@ -93,7 +96,7 @@ describe( 'mergeFontFamilies', () => {
 				fontFamily: 'Piazzolla, serif',
 				fontFace: [
 					{ fontWeight: 400, fontStyle: 'normal', src: 'url' },
-                    { fontWeight: 500, fontStyle: 'normal', src: 'url' },
+					{ fontWeight: 500, fontStyle: 'normal', src: 'url' },
 					{ fontWeight: 800, fontStyle: 'normal', src: 'url' },
 				],
 			},

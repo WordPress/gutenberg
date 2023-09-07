@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { mergeFontFaces } from '../index';
 
 describe( 'mergeFontFaces', () => {

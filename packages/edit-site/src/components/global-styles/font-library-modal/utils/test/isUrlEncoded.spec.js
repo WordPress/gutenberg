@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { isUrlEncoded } from '../index';
 
 describe( 'isUrlEncoded', () => {

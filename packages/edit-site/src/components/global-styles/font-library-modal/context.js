@@ -4,7 +4,11 @@
 import { createContext, useState, useEffect } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEntityRecord, useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import {
+	useEntityRecord,
+	useEntityRecords,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 
@@ -14,23 +18,30 @@ import { __ } from '@wordpress/i18n';
 import { fetchInstallFonts, fetchUninstallFonts } from './resolvers';
 import { unlock } from '../../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
-import { setUIValuesNeeded, mergeFontFamilies, loadFontFaceInBrowser, getDisplaySrcFromFontFace } from './utils';
+import {
+	setUIValuesNeeded,
+	mergeFontFamilies,
+	loadFontFaceInBrowser,
+	getDisplaySrcFromFontFace,
+} from './utils';
 
 export const FontLibraryContext = createContext( {} );
 
 function FontLibraryProvider( { children } ) {
-
-	const {
-		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
-	} = useDispatch( coreStore );
+	const { __experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits } =
+		useDispatch( coreStore );
 	const { globalStylesId } = useSelect( ( select ) => {
 		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		return { globalStylesId	};
-	});
+		return { globalStylesId: __experimentalGetCurrentGlobalStylesId() };
+	} );
 
-	const globalStyles = useEntityRecord('root', 'globalStyles', globalStylesId);
-	const fontFamiliesHasChanges = !!globalStyles?.edits?.settings?.typography?.fontFamilies;
+	const globalStyles = useEntityRecord(
+		'root',
+		'globalStyles',
+		globalStylesId
+	);
+	const fontFamiliesHasChanges =
+		!! globalStyles?.edits?.settings?.typography?.fontFamilies;
 
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
@@ -41,14 +52,16 @@ function FontLibraryProvider( { children } ) {
 		setRefreshKey( ( prevKey ) => prevKey + 1 );
 	};
 
-	const { records: libraryPosts = [], isResolving: isResolvingLibrary, hasResolved: hasResolvedLibrary  } = useEntityRecords(
-		'postType',
-		'wp_font_family',
-		{ refreshKey }
-	);
+	const {
+		records: libraryPosts = [],
+		isResolving: isResolvingLibrary,
+		hasResolved: hasResolvedLibrary,
+	} = useEntityRecords( 'postType', 'wp_font_family', { refreshKey } );
 
-	const libraryFonts = 
-		( libraryPosts || [] ).map( ( post ) => JSON.parse( post.content.raw ) ) || [];
+	const libraryFonts =
+		( libraryPosts || [] ).map( ( post ) =>
+			JSON.parse( post.content.raw )
+		) || [];
 
 	// Global Styles (settings) font families
 	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
@@ -63,12 +76,13 @@ function FontLibraryProvider( { children } ) {
 
 	// Save font families to the global styles post in the database.
 	const saveFontFamilies = () => {
-		saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [ 'settings.typography.fontFamilies' ] );
-		createSuccessNotice(
-			__( `Font families were updated succesfully.` ),
-			{ type: 'snackbar' }
-		);
-	}
+		saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
+			'settings.typography.fontFamilies',
+		] );
+		createSuccessNotice( __( `Font families were updated succesfully.` ), {
+			type: 'snackbar',
+		} );
+	};
 
 	// Library Fonts
 	const [ modalTabOepn, setModalTabOepn ] = useState( false );
@@ -132,17 +146,16 @@ function FontLibraryProvider( { children } ) {
 
 	// Theme data
 	const { site, currentTheme } = useSelect( ( select ) => {
-		const currentTheme = select( 'core' ).getCurrentTheme();
 		return {
-			site: select( 'core' ).getSite(),
-			currentTheme,
+			site: select( coreStore ).getSite(),
+			currentTheme: select( coreStore ).getCurrentTheme(),
 		};
 	} );
 	const themeUrl =
 		site?.url + '/wp-content/themes/' + currentTheme?.stylesheet;
 
-	const getAvailableFontsOutline = ( fontFamilies ) => {
-		const outline = fontFamilies.reduce( ( acc, font ) => {
+	const getAvailableFontsOutline = ( availableFontFamilies ) => {
+		const outline = availableFontFamilies.reduce( ( acc, font ) => {
 			const availableFontFaces = Array.isArray( font?.fontFace )
 				? font?.fontFace.map(
 						( face ) => `${ face.fontStyle + face.fontWeight }`
@@ -185,7 +198,9 @@ function FontLibraryProvider( { children } ) {
 			// Activate the font families (add the font families to the global styles).
 			activateCustomFontFamilies( fontsInstalled );
 			// Save the global styles to the database.
-			saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [ 'settings.typography.fontFamilies' ] );
+			saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
+				'settings.typography.fontFamilies',
+			] );
 			createSuccessNotice(
 				__( `Font families were installed succesfully.` ),
 				{ type: 'snackbar' }
@@ -193,7 +208,8 @@ function FontLibraryProvider( { children } ) {
 			refreshLibrary();
 			return true;
 		} catch ( e ) {
-			console.error(e);
+			// eslint-disable-next-line no-console
+			console.error( e );
 			createErrorNotice( __( 'Error installing fonts.' ), {
 				type: 'snackbar',
 			} );
@@ -208,17 +224,23 @@ function FontLibraryProvider( { children } ) {
 			// Deactivate the font family (remove the font family from the global styles).
 			deactivateFontFamily( font );
 			// Save the global styles to the database.
-			await saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [ 'settings.typography.fontFamilies' ] );
+			await saveSpecifiedEntityEdits(
+				'root',
+				'globalStyles',
+				globalStylesId,
+				[ 'settings.typography.fontFamilies' ]
+			);
 			// Refresh the library (the the library font families from database).
 			refreshLibrary();
 
 			createSuccessNotice( __( `Font families were uninstalled.` ), {
 				type: 'snackbar',
 			} );
-			
+
 			return true;
 		} catch ( e ) {
-			console.error(e);
+			// eslint-disable-next-line no-console
+			console.error( e );
 			createErrorNotice( __( 'Error uninstalling fonts.' ), {
 				type: 'snackbar',
 			} );
@@ -236,18 +258,21 @@ function FontLibraryProvider( { children } ) {
 		setFontFamilies( {
 			[ font.source ]: newCustomFonts,
 		} );
-	}
+	};
 
 	const activateCustomFontFamilies = ( fontsToAdd ) => {
 		// Merge the existing custom fonts with the new fonts.
-		const newCustomFonts = mergeFontFamilies( fontFamilies['custom'], fontsToAdd );
+		const newCustomFonts = mergeFontFamilies(
+			fontFamilies.custom,
+			fontsToAdd
+		);
 		// Activate the fonts by set the new custom fonts array.
 		setFontFamilies( {
-			[ 'custom' ]: newCustomFonts,
+			custom: newCustomFonts,
 		} );
-	}
+	};
 
-	const toggleActivateFont = ( font, face, ) => {
+	const toggleActivateFont = ( font, face ) => {
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
 		const initialCustomFonts = fontFamilies[ font.source ] || [];

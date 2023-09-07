@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	Button,
 	DropZone,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
@@ -31,7 +32,7 @@ function LocalFonts() {
 	 * Filters the selected files to only allow the ones with the allowed extensions
 	 *
 	 * @param {Array} files The files to be filtered
-	 * @return {Array} The filtered files
+	 * @return {void}
 	 */
 	const handleFilesUpload = ( files ) => {
 		const uniqueFilenames = new Set();
@@ -56,25 +57,24 @@ function LocalFonts() {
 	/**
 	 * Loads the selected files and reads the font metadata
 	 *
-	 * @param {Array} selectedFiles The files to be loaded
+	 * @param {Array} files The files to be loaded
 	 * @return {void}
-	 *
 	 */
 	const loadFiles = async ( files ) => {
 		const fontFacesLoaded = await Promise.all(
-			files.map( async (fontFile) => {
+			files.map( async ( fontFile ) => {
 				const fontFaceData = await getFontFaceMetadata( fontFile );
 				await addFontFaceToBrowser( fontFaceData );
 				return fontFaceData;
-			}
-		) );
+			} )
+		);
 		await handleInstall( fontFacesLoaded );
 	};
 
 	// Create a function to read the file as array buffer
 	async function readFileAsArrayBuffer( file ) {
 		return new Promise( ( resolve, reject ) => {
-			const reader = new FileReader();
+			const reader = new window.FileReader();
 			reader.readAsArrayBuffer( file );
 			reader.onload = () => resolve( reader.result );
 			reader.onerror = reject;
@@ -109,18 +109,18 @@ function LocalFonts() {
 			fontFamily: fontName,
 			fontStyle: isItalic ? 'italic' : 'normal',
 			fontWeight: weightRange || fontWeight,
-		}
-	}
+		};
+	};
 
-	const addFontFaceToBrowser = async  (fontFaceData ) => {
+	const addFontFaceToBrowser = async ( fontFaceData ) => {
 		const data = await fontFaceData.file.arrayBuffer();
-		const newFont = new FontFace( fontFaceData.fontFamily, data, {
+		const newFont = new window.FontFace( fontFaceData.fontFamily, data, {
 			style: fontFaceData.fontStyle,
 			weight: fontFaceData.fontWeight,
 		} );
 		const loadedFace = await newFont.load();
 		document.fonts.add( loadedFace );
-	}
+	};
 
 	/**
 	 * Creates the font family definition and sends it to the server
@@ -161,7 +161,9 @@ function LocalFonts() {
 
 	return (
 		<>
-			<Text className="font-library-modal__subtitle">{ __( "Upload Fonts" ) }</Text>
+			<Text className="font-library-modal__subtitle">
+				{ __( 'Upload Fonts' ) }
+			</Text>
 			<Spacer margin={ 2 } />
 			<DropZone onFilesDrop={ handleDropZone } />
 			<FormFileUpload
@@ -169,9 +171,14 @@ function LocalFonts() {
 				multiple={ true }
 				onChange={ onFilesUpload }
 				render={ ( { openFileDialog } ) => (
-					<div className="font-library-modal__upload-area" onClick={ openFileDialog }>
-						<span>{ __("Drag and drop your font files here.") }</span>
-					</div>
+					<Button
+						className="font-library-modal__upload-area"
+						onClick={ openFileDialog }
+					>
+						<span>
+							{ __( 'Drag and drop your font files here.' ) }
+						</span>
+					</Button>
 				) }
 			/>
 		</>

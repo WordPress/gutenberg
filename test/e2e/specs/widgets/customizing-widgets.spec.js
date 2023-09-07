@@ -147,7 +147,7 @@ test.describe( 'Widgets Customizer', () => {
 		// Go back to the widgets editor.
 		await backButton.click();
 		await expect( widgetsFooter1Heading ).toBeVisible();
-		await expect( inspectorHeading ).not.toBeVisible();
+		await expect( inspectorHeading ).toBeHidden();
 
 		await editor.clickBlockToolbarButton( 'Options' );
 		await showMoreSettingsButton.click();
@@ -161,7 +161,7 @@ test.describe( 'Widgets Customizer', () => {
 		// Go back to the widgets editor.
 		await expect( widgetsFooter1Heading ).toBeVisible();
 
-		await expect( inspectorHeading ).not.toBeVisible();
+		await expect( inspectorHeading ).toBeHidden();
 	} );
 
 	test( 'should handle the inserter outer section', async ( {
@@ -207,7 +207,7 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( publishSettings ).toBeVisible();
 
 		// Expect the inserter outer section to be closed.
-		await expect( inserterHeading ).not.toBeVisible();
+		await expect( inserterHeading ).toBeHidden();
 
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
@@ -226,7 +226,7 @@ test.describe( 'Widgets Customizer', () => {
 		await page.click( 'role=button[name=/Back$/] >> visible=true' );
 
 		// Expect the inserter outer section to be closed.
-		await expect( inserterHeading ).not.toBeVisible();
+		await expect( inserterHeading ).toBeHidden();
 	} );
 
 	test( 'should move focus to the block', async ( {
@@ -315,7 +315,7 @@ test.describe( 'Widgets Customizer', () => {
 			await page.click(
 				'role=heading[name="Customizing ▸ Widgets Footer #1"i][level=3]'
 			);
-			await expect( blockToolbar ).not.toBeVisible();
+			await expect( blockToolbar ).toBeHidden();
 
 			await paragraphBlock.focus();
 			await editor.showBlockToolbar();
@@ -324,7 +324,7 @@ test.describe( 'Widgets Customizer', () => {
 		// Expect clicking on the preview iframe should clear the selection.
 		{
 			await page.click( '#customize-preview' );
-			await expect( blockToolbar ).not.toBeVisible();
+			await expect( blockToolbar ).toBeHidden();
 
 			await paragraphBlock.focus();
 			await editor.showBlockToolbar();
@@ -339,7 +339,7 @@ test.describe( 'Widgets Customizer', () => {
 			const { x, y, width, height } = await editorContainer.boundingBox();
 			// Simulate Clicking on the empty space at the end of the editor.
 			await page.mouse.click( x + width / 2, y + height + 10 );
-			await expect( blockToolbar ).not.toBeVisible();
+			await expect( blockToolbar ).toBeHidden();
 		}
 	} );
 
@@ -462,7 +462,7 @@ test.describe( 'Widgets Customizer', () => {
 		// Expect pressing the Escape key to close the dropdown,
 		// but not close the editor.
 		await page.keyboard.press( 'Escape' );
-		await expect( optionsMenu ).not.toBeVisible();
+		await expect( optionsMenu ).toBeHidden();
 		await expect( paragraphBlock ).toBeVisible();
 
 		await paragraphBlock.focus();
@@ -530,7 +530,7 @@ test.describe( 'Widgets Customizer', () => {
 		// integrate the G sidebar inside the customizer.
 		await expect(
 			page.locator( 'role=heading[name=/Block Settings/][level=3]' )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'should stay in block settings after making a change in that area', async ( {

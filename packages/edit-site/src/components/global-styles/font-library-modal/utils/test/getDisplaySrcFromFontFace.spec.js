@@ -1,14 +1,24 @@
+/**
+ * Internal dependencies
+ */
 import { getDisplaySrcFromFontFace } from '../index';
 
 describe( 'getDisplaySrcFromFontFace', () => {
 	it( 'returns the first item when input is an array', () => {
-		const input = [ 'http://example.com/font-asset-1.ttf', 'http://example.com/font-asset-2.ttf' ];
-		expect( getDisplaySrcFromFontFace( input ) ).toBe( 'http://example.com/font-asset-1.ttf' );
+		const input = [
+			'http://example.com/font-asset-1.ttf',
+			'http://example.com/font-asset-2.ttf',
+		];
+		expect( getDisplaySrcFromFontFace( input ) ).toBe(
+			'http://example.com/font-asset-1.ttf'
+		);
 	} );
 
 	it( 'returns the input when it is a string', () => {
 		const input = 'http://example.com/font-asset-1.ttf';
-		expect( getDisplaySrcFromFontFace( input ) ).toBe( 'http://example.com/font-asset-1.ttf' );
+		expect( getDisplaySrcFromFontFace( input ) ).toBe(
+			'http://example.com/font-asset-1.ttf'
+		);
 	} );
 
 	it( 'makes URL absolute when it starts with file:. and urlPrefix is given', () => {

@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { setUIValuesNeeded } from '../index';
 
 describe( 'setUIValuesNeeded function', () => {
@@ -25,8 +28,8 @@ describe( 'setUIValuesNeeded function', () => {
 		const result = setUIValuesNeeded( font, extraValues );
 		expect( result ).toEqual( {
 			name: 'Arial',
-            slug: 'arial',
-            source: 'custom',
+			slug: 'arial',
+			source: 'custom',
 		} );
 	} );
 

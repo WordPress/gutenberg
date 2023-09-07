@@ -6,6 +6,7 @@ import { useContext, useEffect, useState } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
+	Button,
 } from '@wordpress/components';
 
 /**
@@ -16,7 +17,6 @@ import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import LibraryFontCard from './library-font-card';
-import { Button } from '@wordpress/components';
 import LocalFonts from './local-fonts';
 
 function InstalledFonts() {
@@ -61,23 +61,24 @@ function InstalledFonts() {
 		  )
 		: null;
 
-	const shouldDisplayDeleteButton = !! libraryFontSelected && libraryFontSelected?.source !== 'theme';
+	const shouldDisplayDeleteButton =
+		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
 
 	useEffect( () => {
 		refreshLibrary();
-	}, [] );
+	}, [ refreshLibrary ] );
 
 	return (
 		<TabLayout
 			title={ libraryFontSelected?.name || '' }
 			description={ tabDescription }
 			handleBack={ !! libraryFontSelected && handleUnselectFont }
-			footer={ (
+			footer={
 				<Footer
 					shouldDisplayDeleteButton={ shouldDisplayDeleteButton }
 					handleUninstallClick={ handleUninstallClick }
 				/>
-			) }
+			}
 		>
 			{ ! libraryFontSelected && (
 				<>
@@ -116,7 +117,7 @@ function InstalledFonts() {
 					) }
 
 					<Spacer margin={ 8 } />
-					<LocalFonts />					
+					<LocalFonts />
 				</>
 			) }
 
@@ -132,8 +133,9 @@ function InstalledFonts() {
 	);
 }
 
-function Footer({ shouldDisplayDeleteButton, handleUninstallClick }) {
-	const { saveFontFamilies, fontFamiliesHasChanges } = useContext( FontLibraryContext );
+function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
+	const { saveFontFamilies, fontFamiliesHasChanges } =
+		useContext( FontLibraryContext );
 	return (
 		<HStack justify="space-between">
 			<div>
@@ -145,12 +147,12 @@ function Footer({ shouldDisplayDeleteButton, handleUninstallClick }) {
 					>
 						{ __( 'Delete permanently' ) }
 					</Button>
-				)}
+				) }
 			</div>
 			<Button
 				disabled={ ! fontFamiliesHasChanges }
-				variant='primary'
-				onClick={saveFontFamilies}
+				variant="primary"
+				onClick={ saveFontFamilies }
 			>
 				{ __( 'Update' ) }
 			</Button>
