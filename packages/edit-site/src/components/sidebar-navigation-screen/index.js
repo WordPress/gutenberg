@@ -96,11 +96,7 @@ export default function SidebarNavigationScreen( {
 									? __( 'Go to the Dashboard' )
 									: __( 'Go back to the theme showcase' )
 							}
-							href={
-								! isPreviewingTheme()
-									? dashboardLink || 'index.php'
-									: 'themes.php'
-							}
+							href={ dashboardLink || 'index.php' }
 						/>
 					) }
 					<Heading
