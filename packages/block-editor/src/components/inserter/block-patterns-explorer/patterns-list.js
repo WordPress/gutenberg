@@ -72,23 +72,16 @@ function PatternList( {
 		if ( ! searchValue ) {
 			return allPatterns.filter( ( pattern ) => {
 				if (
-					filterValue === PATTERN_TYPES.theme &&
-					pattern.name.startsWith( 'core/block' )
+					( filterValue === PATTERN_TYPES.theme &&
+						pattern.name.startsWith( 'core/block' ) ) ||
+					( filterValue === PATTERN_TYPES.synced &&
+						pattern.syncStatus !== '' ) ||
+					( filterValue === PATTERN_TYPES.unsynced &&
+						pattern.syncStatus !== PATTERN_TYPES.unsynced )
 				) {
 					return false;
 				}
-				if (
-					filterValue === PATTERN_TYPES.synced &&
-					pattern.syncStatus !== ''
-				) {
-					return false;
-				}
-				if (
-					filterValue === PATTERN_TYPES.unsynced &&
-					pattern.syncStatus !== PATTERN_TYPES.unsynced
-				) {
-					return false;
-				}
+
 				if ( selectedCategory === allPatternsCategory.name ) {
 					return true;
 				}

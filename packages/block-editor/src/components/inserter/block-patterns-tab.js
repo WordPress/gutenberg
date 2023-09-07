@@ -171,23 +171,16 @@ export function BlockPatternsCategoryPanel( {
 		() =>
 			allPatterns.filter( ( pattern ) => {
 				if (
-					patternFilter === PATTERN_TYPES.theme &&
-					pattern.name.startsWith( 'core/block' )
+					( patternFilter === PATTERN_TYPES.theme &&
+						pattern.name.startsWith( 'core/block' ) ) ||
+					( patternFilter === PATTERN_TYPES.synced &&
+						pattern.syncStatus !== '' ) ||
+					( patternFilter === PATTERN_TYPES.unsynced &&
+						pattern.syncStatus !== PATTERN_TYPES.unsynced )
 				) {
 					return false;
 				}
-				if (
-					patternFilter === PATTERN_TYPES.synced &&
-					pattern.syncStatus !== ''
-				) {
-					return false;
-				}
-				if (
-					patternFilter === PATTERN_TYPES.unsynced &&
-					pattern.syncStatus !== PATTERN_TYPES.unsynced
-				) {
-					return false;
-				}
+
 				if ( category.name === allPatternsCategory.name ) {
 					return true;
 				}
