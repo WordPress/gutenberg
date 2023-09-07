@@ -13,6 +13,7 @@ import { wordpress, category, media } from '@wordpress/icons';
  * Internal dependencies
  */
 import TabPanel from '..';
+import cleanupTooltip from '../../tooltip/test/utils';
 
 const TABS = [
 	{
@@ -116,7 +117,7 @@ describe.each( [
 			for ( let i = 0; i < allTabs.length; i++ ) {
 				expect(
 					screen.queryByText( TABS_WITH_ICON[ i ].title )
-				).not.toBeInTheDocument();
+				).not.toBeVisible();
 
 				await user.hover( allTabs[ i ] );
 
@@ -128,6 +129,8 @@ describe.each( [
 
 				await user.unhover( allTabs[ i ] );
 			}
+
+			await cleanupTooltip( user );
 		} );
 
 		it( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
@@ -157,38 +160,40 @@ describe.each( [
 
 			// Tab to focus the tablist. Make sure alpha is focused, and that the
 			// corresponding tooltip is shown.
-			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Alpha' ) ).not.toBeVisible();
 			await user.keyboard( '[Tab]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
-			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Alpha' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure beta is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Beta' ) ).not.toBeVisible();
 			await user.keyboard( '[ArrowRight]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Beta' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure gamma is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Gamma' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Gamma' ) ).not.toBeVisible();
 			await user.keyboard( '[ArrowRight]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
-			expect( screen.getByText( 'Gamma' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Gamma' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure beta is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Beta' ) ).not.toBeVisible();
 			await user.keyboard( '[ArrowLeft]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Beta' ) ).toBeVisible();
 			expect( await getSelectedTab() ).toHaveFocus();
+
+			await cleanupTooltip( user );
 		} );
 	} );
 
