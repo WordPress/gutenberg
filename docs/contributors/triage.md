@@ -2,6 +2,8 @@
 
 To keep the repository healthy, it needs to be triaged regularly. **Triage is the practice of reviewing existing issues and pull requests to make sure they’re relevant, actionable, and have all the information they need**. Anyone can help triage, although you’ll need to be a member of the triage team for the Gutenberg repository to modify an issue’s labels or edit its title.
 
+> Besides this page, the [How to do triage on GitHub](https://learn.wordpress.org/tutorial/how-to-do-triage-on-github/) tutorial is another great resource to get introduced to triage
+
 ## Join the triage team
 
 The triage team is an open group of people with a particular role of making sure triage is done consistently across the Gutenberg repo. There are various types of triage which happen:
