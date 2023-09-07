@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	__experimentalText as Text,
 	__experimentalVStack as VStack,

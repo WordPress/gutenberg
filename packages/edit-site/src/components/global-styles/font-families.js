@@ -9,7 +9,7 @@ import {
 	Button,
 	Tooltip,
 } from '@wordpress/components';
-import { plus, typography } from '@wordpress/icons';
+import { typography } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
 
 /**
