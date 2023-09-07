@@ -23,7 +23,7 @@ jobs:
 
         steps:
             - name: checkout
-              uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+              uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
 
             - name: Use desired version of Java
               uses: actions/setup-java@cd89f46ac9d01407894225f350157564c9c7cee2 # v3.12.0
