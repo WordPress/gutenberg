@@ -367,6 +367,7 @@ function LinkControl( {
 		`block-editor-link-control___description`
 	);
 
+	const isPreviewing = value && ! isEditingLink && ! isCreatingPage;
 	return (
 		<div
 			tabIndex={ -1 }
@@ -452,10 +453,47 @@ function LinkControl( {
 							{ errorMessage }
 						</Notice>
 					) }
+
+					{ showSettings && (
+						<div className="block-editor-link-control__tools">
+							{ ! currentInputIsEmpty && (
+								<LinkControlSettingsDrawer
+									settingsOpen={ isSettingsOpen }
+									setSettingsOpen={
+										setSettingsOpenWithPreference
+									}
+								>
+									<LinkSettings
+										value={ internalControlValue }
+										settings={ settings }
+										onChange={ createSetInternalSettingValueHandler(
+											settingsKeys
+										) }
+									/>
+								</LinkControlSettingsDrawer>
+							) }
+						</div>
+					) }
+
+					{ showActions && (
+						<div className="block-editor-link-control__search-actions">
+							<Button
+								variant="primary"
+								onClick={ isDisabled ? noop : handleSubmit }
+								className="block-editor-link-control__search-submit"
+								aria-disabled={ isDisabled }
+							>
+								{ __( 'Save' ) }
+							</Button>
+							<Button variant="tertiary" onClick={ handleCancel }>
+								{ __( 'Cancel' ) }
+							</Button>
+						</div>
+					) }
 				</>
 			) }
 
-			{ value && ! isEditingLink && ! isCreatingPage && (
+			{ isPreviewing && (
 				<>
 					<VisuallyHidden>
 						<p id={ dialogDescritionId }>
@@ -494,41 +532,6 @@ function LinkControl( {
 						} }
 					/>
 				</>
-			) }
-
-			{ showSettings && (
-				<div className="block-editor-link-control__tools">
-					{ ! currentInputIsEmpty && (
-						<LinkControlSettingsDrawer
-							settingsOpen={ isSettingsOpen }
-							setSettingsOpen={ setSettingsOpenWithPreference }
-						>
-							<LinkSettings
-								value={ internalControlValue }
-								settings={ settings }
-								onChange={ createSetInternalSettingValueHandler(
-									settingsKeys
-								) }
-							/>
-						</LinkControlSettingsDrawer>
-					) }
-				</div>
-			) }
-
-			{ showActions && (
-				<div className="block-editor-link-control__search-actions">
-					<Button
-						variant="primary"
-						onClick={ isDisabled ? noop : handleSubmit }
-						className="block-editor-link-control__search-submit"
-						aria-disabled={ isDisabled }
-					>
-						{ __( 'Save' ) }
-					</Button>
-					<Button variant="tertiary" onClick={ handleCancel }>
-						{ __( 'Cancel' ) }
-					</Button>
-				</div>
 			) }
 
 			{ renderControlBottom && renderControlBottom() }
