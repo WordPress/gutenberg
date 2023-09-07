@@ -140,6 +140,10 @@ export type DropdownMenuProps = {
 	 * A valid DropdownMenu must specify a `controls` or `children` prop, or both.
 	 */
 	controls?: DropdownOption[] | DropdownOption[][];
+
+	open?: boolean;
+	onToggle?: ( willOpen: boolean ) => void;
+	defaultOpen?: boolean;
 };
 
 export type DropdownMenuInternalContext = {
