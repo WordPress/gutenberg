@@ -111,6 +111,10 @@ export type DropdownProps = {
 	 * @deprecated
 	 */
 	position?: PopoverProps[ 'position' ];
+
+	open?: boolean;
+
+	defaultOpen?: boolean;
 };
 
 export type DropdownInternalContext = {
