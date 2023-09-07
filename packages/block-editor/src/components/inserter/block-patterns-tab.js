@@ -261,7 +261,10 @@ function BlockPatternsTabs( {
 								value={ patternFilter }
 								onChange={ ( value ) => {
 									setPatternFilter( value );
-									onSelectCategory( selectedCategory, value );
+									onSelectCategory(
+										allPatternsCategory,
+										value
+									);
 								} }
 							/>
 							{ categories.map( ( category ) => (

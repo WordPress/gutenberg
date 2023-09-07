@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { default as BlockPatternsFilter } from '../block-patterns-filter';
+import { allPatternsCategory } from '../block-patterns-tab';
 
 function PatternCategoriesList( {
 	selectedCategory,
@@ -69,7 +70,10 @@ function PatternExplorerSidebar( {
 			/>
 			<BlockPatternsFilter
 				value={ filterValue }
-				onChange={ setFilterValue }
+				onChange={ ( value ) => {
+					setFilterValue( value );
+					onClickCategory( allPatternsCategory.name );
+				} }
 			/>
 			{ ! searchValue && (
 				<PatternCategoriesList
