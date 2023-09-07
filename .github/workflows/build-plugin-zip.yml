@@ -173,6 +173,12 @@ jobs:
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
+            
+            - name: Update Gutenberg plugin build comment
+              uses: ./.github/building-notification
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  build_status: in_progress
 
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh

@@ -1,0 +1,13 @@
+name: Gutenberg building status notification
+description: >
+    Update building status and link to gutenberg.run & artifacts download.
+inputs:
+    github_token:
+        description: Secret GitHub API token to use for making API requests.
+        required: true
+    build_status:
+        description: Status of build Gutenberg plugin workflow
+        required: true
+runs:
+    using: node12
+    main: ./packages/project-management-automation/lib/tasks/pr-preview-link/index.js
