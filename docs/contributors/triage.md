@@ -20,7 +20,7 @@ These are the expectations of being a triage team member:
 
 If you would like to join this team, simply ask in #core-editor [Slack](https://make.wordpress.org/chat/) at any time.
 
-## Triage on your own
+## Triage your first issues
 
 To start simply choose from one of these filtered lists below. Note: You can find most of these filters by selecting the “Sort” option from the [overall Issues page](https://github.com/wordpress/gutenberg/issues).
 
