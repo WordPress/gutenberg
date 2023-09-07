@@ -254,10 +254,10 @@ describe( 'Button', () => {
 			);
 
 			expect(
-				screen.getByRole( 'button', {
-					description: 'Description text',
+				screen.getByRole( 'tooltip', {
+					hidden: true,
 				} )
-			).toBeVisible();
+			).toHaveTextContent( 'Description text' );
 		} );
 
 		it( 'should allow tooltip disable', async () => {
