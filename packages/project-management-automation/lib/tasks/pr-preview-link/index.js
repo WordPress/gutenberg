@@ -92,7 +92,7 @@ const createBuildSummary = async ( { buildStatus, commitHash, pullRequestNumber,
 		status = "🚫  Build failed!";
 	}
 
-	await octokit.markdown.render( {
+	await octokit.rest.markdown.render(( {
 		text:
 			`
 <!--gutenberg-run-placeholder:cmt@v1-->
