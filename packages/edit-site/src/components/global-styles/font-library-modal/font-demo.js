@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { __experimentalText as Text } from '@wordpress/components';
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 
@@ -29,7 +28,7 @@ function FontFaceDemo( { fontFace, text, style = {} } ) {
 	};
 
 	useEffect( () => {
-		const observer = new IntersectionObserver( ( [ entry ] ) => {
+		const observer = new window.IntersectionObserver( ( [ entry ] ) => {
 			setIsIntersecting( entry.isIntersecting );
 		}, {} );
 		observer.observe( ref.current );
@@ -46,7 +45,7 @@ function FontFaceDemo( { fontFace, text, style = {} } ) {
 			}
 		};
 		loadAsset();
-	}, [ fontFace, isIntersecting ] );
+	}, [ fontFace, isIntersecting, loadFontFaceAsset ] );
 
 	return (
 		<Text style={ demoStyle } ref={ ref }>

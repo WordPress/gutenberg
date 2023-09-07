@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
@@ -17,7 +16,7 @@ function FontsGrid( { title, children, pageSize = 32 } ) {
 
 	useEffect( () => {
 		if ( lastItem ) {
-			const observer = new IntersectionObserver( ( [ entry ] ) => {
+			const observer = new window.IntersectionObserver( ( [ entry ] ) => {
 				if ( entry.isIntersecting ) {
 					setPage( ( prevPage ) => prevPage + 1 );
 				}
