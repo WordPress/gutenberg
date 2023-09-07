@@ -4,19 +4,12 @@
  *
  * @package    WordPress
  * @subpackage Fonts
- */
-
-require_once dirname( __DIR__ ) . '/base.php';
-
-/**
- * Test WP_Font_Face::generate_and_print().
  *
- * @package WordPress
- * @subpackage Fonts
+ * @since 6.4.0
  *
- * @since X.X.X
  * @group fonts
  * @group fontface
+ *
  * @covers WP_Font_Face::generate_and_print
  */
 class Tests_Fonts_WPFontFace_GenerateAndPrint extends WP_UnitTestCase {
