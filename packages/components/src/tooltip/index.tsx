@@ -8,6 +8,7 @@ import * as Ariakit from '@ariakit/react/tooltip';
  */
 import { useInstanceId } from '@wordpress/compose';
 import { Children } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -26,7 +27,8 @@ function Tooltip( props: TooltipProps ) {
 		children,
 		delay = TOOLTIP_DELAY,
 		hideOnClick = true,
-		position = 'bottom',
+		placement,
+		position,
 		shortcut,
 		text,
 	} = props;
@@ -45,8 +47,29 @@ function Tooltip( props: TooltipProps ) {
 		}
 	}
 
+	const DEFAULT_PLACEMENT = 'bottom';
+
+	// Compute tooltip's placement:
+	// - give priority to `placement` prop, if defined
+	// - otherwise, compute it from the legacy `position` prop (if defined)
+	// - finally, fallback to the DEFAULT_PLACEMENT.
+	let computedPlacement;
+	if ( placement !== undefined ) {
+		computedPlacement = placement;
+	} else if ( position !== undefined ) {
+		computedPlacement = positionToPlacement( position );
+	}
+	computedPlacement = computedPlacement || DEFAULT_PLACEMENT;
+
+	if ( position !== undefined ) {
+		deprecated( '`position` prop in wp.components.tooltip', {
+			since: '6.4',
+			alternative: '`placement` prop',
+		} );
+	}
+
 	const tooltipStore = Ariakit.useTooltipStore( {
-		placement: positionToPlacement( position ),
+		placement: computedPlacement,
 		timeout: delay,
 	} );
 
