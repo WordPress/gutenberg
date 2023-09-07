@@ -21,7 +21,9 @@ function LibraryFontDetails( {
 } ) {
 	const fontFaces =
 		font.fontFace && font.fontFace.length
-			? font.fontFace
+			? font.fontFace.sort( ( a, b ) =>
+					a.fontWeight > b.fontWeight ? 1 : -1
+			  )
 			: [
 					{
 						fontFamily: font.fontFamily,
