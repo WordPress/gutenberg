@@ -136,6 +136,12 @@ test.describe( 'Post Editor Performance', () => {
 
 		// Append an empty paragraph.
 		await editor.insertBlock( { name: 'core/paragraph' } );
+		const canvas = page.frameLocator( 'iframe[name=editor-canvas]' );
+		const emptyBlock = canvas.getByRole( 'document', {
+			name: /Empty block/,
+		} );
+
+		await expect( emptyBlock ).toBeFocused();
 
 		// Start tracing.
 		await browser.startTracing( page, {
@@ -149,10 +155,14 @@ test.describe( 'Post Editor Performance', () => {
 		const samples = 10;
 		const throwaway = 1;
 		const rounds = samples + throwaway;
+		const testString = 'x'.repeat( rounds );
 
 		// Type the testing sequence into the empty paragraph.
-		await page.keyboard.type( 'x'.repeat( rounds ), {
+		await emptyBlock.type( testString, {
 			delay: BROWSER_IDLE_WAIT,
+			// The extended timeout is needed because the typing is very slow
+			// and the `delay` value itself does not extend it.
+			timeout: rounds * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
 		} );
 
 		// Stop tracing and save results.
@@ -166,6 +176,11 @@ test.describe( 'Post Editor Performance', () => {
 				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 			);
 		}
+
+		// Ensure that it's the last canvas element that contains the test string.
+		await expect(
+			canvas.locator( '[contenteditable="true"]' ).last()
+		).toHaveText( testString );
 	} );
 
 	test( 'Typing within containers', async ( { browser, page, editor } ) => {
