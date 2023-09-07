@@ -96,8 +96,8 @@ Here are some guidelines to follow when doing triage specifically around the tim
 Along with the general triage flows listed previously, there are some specific additions to the flows for more design-centric triage for design minded folks participating in triage.
 
 -   PR testing and reviews: this should be your first stop for daily self triage.
--  Label `Needs design feedback`: check if the issue does need design feedback and, if possible, give it. You can organize this by priority, project boards or by least commented. Once there are enough opinions, please remove this label and decide on next steps (ie adding the Needs Design label).
-- Label  `Needs design`: Does it really need a design? Does this fit a focus? If it has a design mark as `Needs design feedback` to better categorize the issue.
+-  Label `Needs Design Feedback`: check if the issue does need design feedback and, if possible, give it. You can organize this by priority, project boards or by least commented. Once there are enough opinions, please remove this label and decide on next steps (ie adding the Needs Design label).
+- Label  `Needs Design`: Does it really need a design? Does this fit a focus? If it has a design mark as `Needs Design Feedback` to better categorize the issue.
 
 Reminders:
 
