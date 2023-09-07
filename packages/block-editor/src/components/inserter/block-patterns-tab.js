@@ -43,6 +43,16 @@ export const allPatternsCategory = {
 	label: __( 'All' ),
 };
 
+export function isPatternFiltered( pattern, filterValue ) {
+	return (
+		( filterValue === PATTERN_TYPES.theme &&
+			pattern.name.startsWith( 'core/block' ) ) ||
+		( filterValue === PATTERN_TYPES.synced && pattern.syncStatus !== '' ) ||
+		( filterValue === PATTERN_TYPES.unsynced &&
+			pattern.syncStatus !== PATTERN_TYPES.unsynced )
+	);
+}
+
 export function usePatternsCategories( rootClientId, filter = 'all' ) {
 	const { patterns: allPatterns, allCategories } = usePatternsState(
 		undefined,
@@ -52,13 +62,7 @@ export function usePatternsCategories( rootClientId, filter = 'all' ) {
 		filter === 'all'
 			? allPatterns
 			: allPatterns.filter(
-					( pattern ) =>
-						( filter === PATTERN_TYPES.unsynced &&
-							pattern.syncStatus === filter ) ||
-						( filter === PATTERN_TYPES.synced &&
-							pattern.syncStatus === '' ) ||
-						( filter === PATTERN_TYPES.theme &&
-							! pattern.name.startsWith( 'core/block' ) )
+					( pattern ) => ! isPatternFiltered( pattern, filter )
 			  );
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
@@ -170,14 +174,7 @@ export function BlockPatternsCategoryPanel( {
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
-				if (
-					( patternFilter === PATTERN_TYPES.theme &&
-						pattern.name.startsWith( 'core/block' ) ) ||
-					( patternFilter === PATTERN_TYPES.synced &&
-						pattern.syncStatus !== '' ) ||
-					( patternFilter === PATTERN_TYPES.unsynced &&
-						pattern.syncStatus !== PATTERN_TYPES.unsynced )
-				) {
+				if ( isPatternFiltered( pattern, patternFilter ) ) {
 					return false;
 				}
 

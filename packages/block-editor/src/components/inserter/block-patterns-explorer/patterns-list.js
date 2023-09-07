@@ -18,8 +18,7 @@ import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
-import { allPatternsCategory } from '../block-patterns-tab';
-import { PATTERN_TYPES } from '../block-patterns-filter';
+import { allPatternsCategory, isPatternFiltered } from '../block-patterns-tab';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
@@ -71,14 +70,7 @@ function PatternList( {
 	const filteredBlockPatterns = useMemo( () => {
 		if ( ! searchValue ) {
 			return allPatterns.filter( ( pattern ) => {
-				if (
-					( filterValue === PATTERN_TYPES.theme &&
-						pattern.name.startsWith( 'core/block' ) ) ||
-					( filterValue === PATTERN_TYPES.synced &&
-						pattern.syncStatus !== '' ) ||
-					( filterValue === PATTERN_TYPES.unsynced &&
-						pattern.syncStatus !== PATTERN_TYPES.unsynced )
-				) {
+				if ( isPatternFiltered( pattern, filterValue ) ) {
 					return false;
 				}
 
