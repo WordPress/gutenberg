@@ -595,6 +595,8 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
 
-// This action should be removed in core when backporting.
-// https://github.com/WordPress/wordpress-develop/blob/362624176cba41a2dda57c3e89031aa6c3e4decf/src/wp-includes/default-filters.php#L573
+/*
+ * This action should be removed in core when backporting.
+ * See https://github.com/WordPress/wordpress-develop/blob/362624176cba41a2dda57c3e89031aa6c3e4decf/src/wp-includes/default-filters.php#L573.
+ */
 remove_action( 'admin_enqueue_scripts', 'wp_common_block_scripts_and_styles' );
