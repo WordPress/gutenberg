@@ -9,7 +9,7 @@ const SimpleGit = require( 'simple-git' );
 /**
  * Internal dependencies
  */
-const { formats } = require( '../lib/logger' );
+const { formats, log } = require( '../lib/logger' );
 const {
 	readJSONFile,
 	askForConfirmation,
@@ -22,46 +22,9 @@ const ARTIFACTS_PATH =
 	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
 const RESULTS_FILE_SUFFIX = '.performance-results.json';
 
-class Logger {
-	constructor() {
-		// @ts-ignore
-		this.crumbs = [];
-		this.level = 0;
-	}
-
-	enterSub() {
-		this.level += 1;
-	}
-
-	exitSub() {
-		if ( this.level > 0 ) {
-			this.level -= 1;
-		}
-	}
-
-	reset() {
-		this.level = 0;
-	}
-
-	newline() {
-		console.log( '\n' );
-	}
-	// @ts-ignore
-	print( text ) {
-		this.crumbs = this.crumbs.slice( 0, this.level );
-		this.crumbs.push( text );
-		const timestamp = new Date().toISOString();
-
-		console.log( `[${ timestamp }] ${ this.crumbs.join( ' > ' ) }` );
-	}
-}
-const logger = new Logger();
-
 // @ts-ignore
 function runShellScript( script, cwd, env = {} ) {
-	logger.enterSub();
-	logger.print( `Executing: ${ script }` );
-	logger.exitSub();
+	console.log( `Executing: ${ script }` );
 
 	return new Promise( ( resolve, reject ) => {
 		const child = spawn( script, [], {
@@ -167,7 +130,12 @@ async function runPerformanceTests( branches, options ) {
 		branches = [ 'trunk' ];
 	}
 
-	console.log( formats.title( '\n💃 Performance Tests 🕺\n\n' ) );
+	log(
+		formats.title( '\n💃 Performance Tests 🕺\n' ),
+		'\nWelcome! This tool runs the performance tests on multiple branches and displays a comparison table.\n' +
+			'In order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.\n' +
+			'Make sure these ports are not used before continuing.\n'
+	);
 
 	if ( ! runningInCI ) {
 		await askForConfirmation( 'Ready to go? ' );
@@ -177,9 +145,8 @@ async function runPerformanceTests( branches, options ) {
 	 * 1- Preparing the tests directory.
 	 */
 
-	logger.print( 'Preparing the tests directories' );
-	logger.enterSub();
-	logger.print( 'Cloning the repository' );
+	log( '\n>> Preparing the tests directories' );
+	log( '    >> Cloning the repository' );
 
 	/**
 	 * @type {string[]} git refs against which to run tests;
@@ -213,7 +180,7 @@ async function runPerformanceTests( branches, options ) {
 
 	if ( !! options.testsBranch ) {
 		const branchName = formats.success( options.testsBranch );
-		logger.print( `Fetching the test-runner branch: ${ branchName }` );
+		log( `    >> Fetching the test-runner branch: ${ branchName }` );
 
 		// @ts-ignore
 		await SimpleGit( performanceTestDirectory )
@@ -221,7 +188,7 @@ async function runPerformanceTests( branches, options ) {
 			.raw( 'checkout', options.testsBranch );
 	}
 
-	logger.print( 'Installing dependencies and building packages' );
+	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
 		`bash -c "${ [
 			'source $HOME/.nvm/nvm.sh',
@@ -232,21 +199,17 @@ async function runPerformanceTests( branches, options ) {
 		].join( ' && ' ) }"`,
 		performanceTestDirectory
 	);
-	logger.print( 'Creating the environment folders' );
+	log( '    >> Creating the environment folders' );
 	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs' );
 
 	/*
 	 * 2- Preparing the environment directories per branch.
 	 */
 
-	logger.reset();
-	logger.newline();
-	logger.print( 'Preparing an environment directory per branch' );
-	logger.enterSub();
+	log( '\n>> Preparing an environment directory per branch' );
 	const branchDirectories = {};
 	for ( const branch of branches ) {
-		logger.print( branch );
-		logger.enterSub();
+		log( `    >> Branch: ${ branch }` );
 		const sanitizedBranch = sanitizeBranchName( branch );
 		const environmentDirectory = rootDirectory + '/envs/' + sanitizedBranch;
 		// @ts-ignore
@@ -258,17 +221,19 @@ async function runPerformanceTests( branches, options ) {
 		const fancyBranch = formats.success( branch );
 
 		if ( branch === options.testsBranch ) {
-			logger.print( `Re-using the testing branch for ${ fancyBranch }` );
+			log(
+				`        >> Re-using the testing branch for ${ fancyBranch }`
+			);
 			await runShellScript(
 				`cp -R ${ performanceTestDirectory } ${ buildPath }`
 			);
 		} else {
-			logger.print( `Fetching` );
+			log( `        >> Fetching the ${ fancyBranch } branch` );
 			// @ts-ignore
 			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
 		}
 
-		logger.print( `Building` );
+		log( `        >> Building the ${ fancyBranch } branch` );
 		await runShellScript(
 			'bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build"',
 			buildPath
@@ -334,7 +299,7 @@ async function runPerformanceTests( branches, options ) {
 				'$1'
 			);
 			const zipUrl = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
-			logger.print( `Using WordPress version ${ zipVersion }` );
+			log( `        Using WordPress version ${ zipVersion }` );
 
 			// Patch the environment's .wp-env.json config to use the specified WP
 			// version:
@@ -354,27 +319,21 @@ async function runPerformanceTests( branches, options ) {
 	}
 
 	// Printing the used folders.
-	logger.reset();
-	logger.newline();
-	logger.print(
-		`Perf Tests Directory : ${ formats.success(
-			performanceTestDirectory
-		) }`
+	log(
+		'\n>> Perf Tests Directory : ' +
+			formats.success( performanceTestDirectory )
 	);
 	for ( const branch of branches ) {
 		// @ts-ignore
 		const envPath = formats.success( branchDirectories[ branch ] );
-		logger.print( `Environment Directory (${ branch }) : ${ envPath }` );
+		log( `>> Environment Directory (${ branch }) : ${ envPath }` );
 	}
 
 	/*
 	 * 3- Running the tests.
 	 */
 
-	logger.reset();
-	logger.newline();
-	logger.print( 'Running the tests' );
-	logger.enterSub();
+	log( '\n>> Running the tests' );
 
 	const testSuites = getFilesFromDir(
 		path.join( performanceTestDirectory, 'test/performance/specs' )
@@ -387,36 +346,31 @@ async function runPerformanceTests( branches, options ) {
 
 	for ( const testSuite of testSuites ) {
 		for ( let i = 1; i <= TEST_ROUNDS; i++ ) {
-			const roundInfo =
-				TEST_ROUNDS > 1 ? ` (round ${ i } of ${ TEST_ROUNDS })` : '';
-			logger.print( testSuite + roundInfo );
-			logger.enterSub();
+			const roundInfo = `round ${ i } of ${ TEST_ROUNDS }`;
+			log( `    >> Suite: ${ testSuite } (${ roundInfo })` );
 			for ( const branch of branches ) {
 				const sanitizedBranch = sanitizeBranchName( branch );
 				const runKey = `${ testSuite }_${ sanitizedBranch }_round-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
-				logger.print( branch );
-				logger.enterSub();
-				logger.print( 'Starting the environment' );
+				log( `        >> Branch: ${ branch }` );
+				log( '            >> Starting the environment.' );
 				await runShellScript(
 					`${ wpEnvPath } start`,
 					environmentDirectory
 				);
-				logger.print( 'Running the test' );
+				log( '            >> Running the test.' );
 				await runTestSuite(
 					testSuite,
 					performanceTestDirectory,
 					runKey
 				);
-				logger.print( 'Stopping the environment' );
+				log( '            >> Stopping the environment' );
 				await runShellScript(
 					`${ wpEnvPath } stop`,
 					environmentDirectory
 				);
-				logger.exitSub();
 			}
-			logger.exitSub();
 		}
 	}
 
@@ -471,17 +425,13 @@ async function runPerformanceTests( branches, options ) {
 	 * 5- Displaying the results.
 	 */
 
-	logger.reset();
-	logger.newline();
-	logger.print( '🎉 Results' );
-	logger.newline();
-	logger.print(
-		'Please note that client side metrics EXCLUDE the server response time.'
+	log( '\n>> 🎉 Results.\n' );
+	log(
+		'\nPlease note that client side metrics EXCLUDE the server response time.\n'
 	);
 
 	for ( const testSuite of testSuites ) {
-		logger.newline();
-		logger.print( testSuite );
+		log( `\n>> ${ testSuite }\n` );
 
 		// Invert the results so we can display them in a table.
 		/** @type {Record<string, Record<string, string>>} */
