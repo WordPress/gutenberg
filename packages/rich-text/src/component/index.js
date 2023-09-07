@@ -125,6 +125,7 @@ export function useRichText( {
 			...record.current,
 			start: selectionStart,
 			end: selectionEnd,
+			activeFormats: undefined,
 		};
 	}
 
@@ -218,7 +219,7 @@ export function useRichText( {
 			ref.current.focus();
 		}
 
-		applyFromProps();
+		applyRecord( record.current );
 		hadSelectionUpdate.current = false;
 	}, [ hadSelectionUpdate.current ] );
 

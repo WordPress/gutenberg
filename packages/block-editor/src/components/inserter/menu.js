@@ -260,6 +260,7 @@ function InserterMenu(
 							filterValue={ delayedFilterValue }
 							onSelect={ onSelect }
 							onHover={ onHover }
+							onHoverPattern={ onHoverPattern }
 							rootClientId={ rootClientId }
 							clientId={ clientId }
 							isAppender={ isAppender }

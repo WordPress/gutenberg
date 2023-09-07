@@ -121,3 +121,107 @@ function gutenberg_register_metadata_attribute( $args ) {
 	return $args;
 }
 add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
+
+
+$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
+	/**
+	 * Renders the block meta attributes.
+	 *
+	 * @param string   $block_content Block Content.
+	 * @param array    $block Block attributes.
+	 * @param WP_Block $block_instance The block instance.
+	 */
+	function gutenberg_render_block_connections( $block_content, $block, $block_instance ) {
+		$connection_sources = require __DIR__ . '/connection-sources/index.php';
+		$block_type         = $block_instance->block_type;
+
+		// Allowlist of blocks that support block connections.
+		// Currently, we only allow the following blocks and attributes:
+		// - Paragraph: content.
+		// - Image: url.
+		$blocks_attributes_allowlist = array(
+			'core/paragraph' => array( 'content' ),
+			'core/image'     => array( 'url' ),
+		);
+
+		// Whitelist of the block types that support block connections.
+		// Currently, we only allow the Paragraph and Image blocks to use block connections.
+		if ( ! in_array( $block['blockName'], array_keys( $blocks_attributes_allowlist ), true ) ) {
+			return $block_content;
+		}
+
+		// If for some reason, the block type is not found, skip it.
+		if ( null === $block_type ) {
+			return $block_content;
+		}
+
+		// If the block does not have support for block connections, skip it.
+		if ( ! block_has_support( $block_type, array( '__experimentalConnections' ), false ) ) {
+			return $block_content;
+		}
+
+		// Get all the attributes that have a connection.
+		$connected_attributes = _wp_array_get( $block['attrs'], array( 'connections', 'attributes' ), false );
+		if ( ! $connected_attributes ) {
+			return $block_content;
+		}
+
+		foreach ( $connected_attributes as $attribute_name => $attribute_value ) {
+
+			// If the attribute is not in the allowlist, skip it.
+			if ( ! in_array( $attribute_name, $blocks_attributes_allowlist[ $block['blockName'] ], true ) ) {
+				continue;
+			}
+
+			// If the source value is not "meta_fields", skip it because the only supported
+			// connection source is meta (custom fields) for now.
+			if ( 'meta_fields' !== $attribute_value['source'] ) {
+				continue;
+			}
+
+			// If the attribute does not have a source, skip it.
+			if ( ! isset( $block_type->attributes[ $attribute_name ]['source'] ) ) {
+				continue;
+			}
+
+			// If the attribute does not specify the name of the custom field, skip it.
+			if ( ! isset( $attribute_value['value'] ) ) {
+				continue;
+			}
+
+			// Get the content from the connection source.
+			$custom_value = $connection_sources[ $attribute_value['source'] ](
+				$block_instance,
+				$attribute_value['value']
+			);
+
+			$tags  = new WP_HTML_Tag_Processor( $block_content );
+			$found = $tags->next_tag(
+				array(
+					// TODO: In the future, when blocks other than Paragraph and Image are
+					// supported, we should build the full query from CSS selector.
+					'tag_name' => $block_type->attributes[ $attribute_name ]['selector'],
+				)
+			);
+			if ( ! $found ) {
+				return $block_content;
+			};
+			$tag_name     = $tags->get_tag();
+			$markup       = "<$tag_name>$custom_value</$tag_name>";
+			$updated_tags = new WP_HTML_Tag_Processor( $markup );
+			$updated_tags->next_tag();
+
+			// Get all the attributes from the original block and add them to the new markup.
+			$names = $tags->get_attribute_names_with_prefix( '' );
+			foreach ( $names as $name ) {
+				$updated_tags->set_attribute( $name, $tags->get_attribute( $name ) );
+			}
+
+			return $updated_tags->get_updated_html();
+		}
+
+		return $block_content;
+	}
+	add_filter( 'render_block', 'gutenberg_render_block_connections', 10, 3 );
+}

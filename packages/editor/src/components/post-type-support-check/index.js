@@ -21,7 +21,7 @@ import { store as editorStore } from '../../store';
  *
  * @return {WPComponent} The component to be rendered.
  */
-export function PostTypeSupportCheck( { children, supportKeys } ) {
+function PostTypeSupportCheck( { children, supportKeys } ) {
 	const postType = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
 		const { getPostType } = select( coreStore );

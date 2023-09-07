@@ -109,6 +109,7 @@ export default function QueryContent( {
 				attributes={ attributes }
 				setQuery={ updateQuery }
 				setDisplayLayout={ updateDisplayLayout }
+				setAttributes={ setAttributes }
 			/>
 			<BlockControls>
 				<QueryToolbar

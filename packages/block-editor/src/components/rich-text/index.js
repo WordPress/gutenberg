@@ -100,7 +100,6 @@ function RichTextWrapper(
 		onMerge,
 		onSplit,
 		__unstableOnSplitAtEnd: onSplitAtEnd,
-		__unstableOnSplitMiddle: onSplitMiddle,
 		identifier,
 		preserveWhiteSpace,
 		__unstablePastePlainText: pastePlainText,
@@ -380,7 +379,6 @@ function RichTextWrapper(
 						tagName,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
 						__unstableEmbedURLOnPaste,
 						multilineTag,
 						preserveWhiteSpace,
@@ -396,13 +394,12 @@ function RichTextWrapper(
 						value,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
 						multilineTag,
 						onChange,
 						disableLineBreaks,
 						onSplitAtEnd,
 					} ),
-					useFirefoxCompat( { value, onChange } ),
+					useFirefoxCompat(),
 					anchorRef,
 				] ) }
 				contentEditable={ true }
@@ -412,6 +409,13 @@ function RichTextWrapper(
 					props.className,
 					'rich-text'
 				) }
+				// Setting tabIndex to 0 is unnecessary, the element is already
+				// focusable because it's contentEditable. This also fixes a
+				// Safari bug where it's not possible to Shift+Click multi
+				// select blocks when Shift Clicking into an element with
+				// tabIndex because Safari will focus the element. However,
+				// Safari will correctly ignore nested contentEditable elements.
+				tabIndex={ props.tabIndex === 0 ? null : props.tabIndex }
 			/>
 		</>
 	);

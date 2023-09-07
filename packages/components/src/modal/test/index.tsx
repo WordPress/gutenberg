@@ -115,4 +115,18 @@ describe( 'Modal', () => {
 		await user.click( modalFrame.parentElement! );
 		expect( opener ).toHaveFocus();
 	} );
+
+	it( 'should render `headerActions` React nodes', async () => {
+		render(
+			<Modal
+				headerActions={ <button>A sweet button</button> }
+				onRequestClose={ noop }
+			>
+				<p>Modal content</p>
+			</Modal>
+		);
+		expect(
+			screen.getByText( 'A sweet button', { selector: 'button' } )
+		).toBeInTheDocument();
+	} );
 } );

@@ -2,7 +2,8 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import { colord, extend, Colord } from 'colord';
+import type { Colord } from 'colord';
+import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
 /**

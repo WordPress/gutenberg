@@ -163,6 +163,10 @@
 			color: $gray-600;
 		}
 
+		.edit-site-patterns__dropdown {
+			flex-shrink: 0;
+		}
+
 		&.is-placeholder .edit-site-patterns__preview {
 			min-height: $grid-unit-80;
 			color: $gray-600;
@@ -179,7 +183,7 @@
 
 	.edit-site-patterns__preview {
 		flex: 0 1 auto;
-		margin-bottom: $grid-unit-20;
+		margin-bottom: $grid-unit-15;
 	}
 }
 

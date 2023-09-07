@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, Pressable } from 'react-native';
+import { Image } from 'react-native';
 import {
 	getEditorHtml,
 	initializeEditor,
@@ -12,7 +12,6 @@ import {
 	getBlock,
 	openBlockSettings,
 } from 'test/helpers';
-import HsvColorPicker from 'react-native-hsv-color-picker';
 
 /**
  * WordPress dependencies
@@ -541,9 +540,6 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'displays the hex color value in the custom color picker', async () => {
-		HsvColorPicker.mockImplementation( ( props ) => {
-			return <Pressable { ...props } testID="hsv-color-picker" />;
-		} );
 		const screen = await initializeEditor( {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );

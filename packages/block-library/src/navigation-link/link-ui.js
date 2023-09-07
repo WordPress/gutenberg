@@ -188,7 +188,6 @@ export function LinkUI( props ) {
 			<LinkControl
 				hasTextControl
 				hasRichPreviews
-				className={ props.className }
 				value={ link }
 				showInitialSuggestions={ true }
 				withCreateSuggestion={ userCanCreate }

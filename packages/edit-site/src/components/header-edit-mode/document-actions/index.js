@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { sprintf, __, isRTL } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -33,8 +33,18 @@ import { store as coreStore } from '@wordpress/core-data';
 import useEditedEntityRecord from '../../use-edited-entity-record';
 import { store as editSiteStore } from '../../../store';
 
+const typeLabels = {
+	wp_block: __( 'Editing pattern:' ),
+	wp_navigation: __( 'Editing navigation menu:' ),
+	wp_template: __( 'Editing template:' ),
+	wp_template_part: __( 'Editing template part:' ),
+};
+
 export default function DocumentActions() {
-	const isPage = useSelect( ( select ) => select( editSiteStore ).isPage() );
+	const isPage = useSelect(
+		( select ) => select( editSiteStore ).isPage(),
+		[]
+	);
 	return isPage ? <PageDocumentActions /> : <TemplateDocumentActions />;
 }
 
@@ -118,8 +128,6 @@ function TemplateDocumentActions( { className, onBack } ) {
 		);
 	}
 
-	const entityLabel = getEntityLabel( record.type );
-
 	let typeIcon = icon;
 	if ( record.type === 'wp_navigation' ) {
 		typeIcon = navigationIcon;
@@ -137,11 +145,7 @@ function TemplateDocumentActions( { className, onBack } ) {
 			onBack={ onBack }
 		>
 			<VisuallyHidden as="span">
-				{ sprintf(
-					/* translators: %s: the entity being edited, like "template"*/
-					__( 'Editing %s: ' ),
-					entityLabel
-				) }
+				{ typeLabels[ record.type ] ?? typeLabels.wp_template }
 			</VisuallyHidden>
 			{ getTitle() }
 		</BaseDocumentActions>
@@ -186,21 +190,4 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			</Button>
 		</div>
 	);
-}
-
-function getEntityLabel( entityType ) {
-	let label = '';
-	switch ( entityType ) {
-		case 'wp_navigation':
-			label = 'navigation menu';
-			break;
-		case 'wp_template_part':
-			label = 'template part';
-			break;
-		default:
-			label = 'template';
-			break;
-	}
-
-	return label;
 }

@@ -43,7 +43,7 @@ test.describe( 'Global styles revisions', () => {
 			.getByRole( 'button', { name: 'Color Background styles' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
+			.getByRole( 'option', { name: 'Color: Cyan bluish gray' } )
 			.click( { force: true } );
 
 		await editor.saveSiteEditorEntities();
@@ -73,7 +73,7 @@ test.describe( 'Global styles revisions', () => {
 			.getByRole( 'button', { name: 'Color Background styles' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Color: Luminous vivid amber' } )
+			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
 			.click( { force: true } );
 
 		await userGlobalStylesRevisions.openRevisions();

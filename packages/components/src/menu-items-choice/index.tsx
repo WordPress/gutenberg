@@ -59,7 +59,7 @@ function MenuItemsChoice( {
 						key={ item.value }
 						role="menuitemradio"
 						disabled={ item.disabled }
-						icon={ isSelected && check }
+						icon={ isSelected ? check : null }
 						info={ item.info }
 						isSelected={ isSelected }
 						shortcut={ item.shortcut }

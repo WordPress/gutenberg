@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.25.0 (2023-08-31)
+
+## 4.24.0 (2023-08-16)
+
+## 4.23.0 (2023-08-10)
+
 ### Enhancement
 
 -   Add support for the `example` property and add it to the default template ([#52803](https://github.com/WordPress/gutenberg/pull/52803)).

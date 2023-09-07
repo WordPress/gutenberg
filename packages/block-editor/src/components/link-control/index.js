@@ -14,6 +14,7 @@ import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -201,14 +202,11 @@ function LinkControl( {
 		useCreatePage( createSuggestion );
 
 	useEffect( () => {
-		if (
-			forceIsEditingLink !== undefined &&
-			forceIsEditingLink !== isEditingLink
-		) {
-			setIsEditingLink( forceIsEditingLink );
+		if ( forceIsEditingLink === undefined ) {
+			return;
 		}
-		// Todo: bug if the missing dep is introduced. Will need a fix.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+
+		setIsEditingLink( forceIsEditingLink );
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
@@ -358,6 +356,7 @@ function LinkControl( {
 						className={ classnames( {
 							'block-editor-link-control__search-input-wrapper': true,
 							'has-text-control': showTextControl,
+							'has-actions': showActions,
 						} ) }
 					>
 						{ showTextControl && (
@@ -391,6 +390,17 @@ function LinkControl( {
 							}
 							hideLabelFromVision={ ! showTextControl }
 						/>
+						{ ! showActions && (
+							<div className="block-editor-link-control__search-enter">
+								<Button
+									onClick={ isDisabled ? noop : handleSubmit }
+									label={ __( 'Submit' ) }
+									icon={ keyboardReturn }
+									className="block-editor-link-control__search-submit"
+									aria-disabled={ isDisabled }
+								/>
+							</div>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -411,6 +421,25 @@ function LinkControl( {
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
+					additionalControls={ () => {
+						// Expose the "Opens in new tab" settings in the preview
+						// as it is the most common setting to change.
+						if (
+							settings?.find(
+								( setting ) => setting.id === 'opensInNewTab'
+							)
+						) {
+							return (
+								<LinkSettings
+									value={ internalControlValue }
+									settings={ settings?.filter(
+										( { id } ) => id === 'opensInNewTab'
+									) }
+									onChange={ onChange }
+								/>
+							);
+						}
+					} }
 					onRemove={ () => {
 						onRemove();
 						setIsEditingLink( true );
@@ -459,5 +488,6 @@ function LinkControl( {
 }
 
 LinkControl.ViewerFill = ViewerFill;
+LinkControl.DEFAULT_LINK_SETTINGS = DEFAULT_LINK_SETTINGS;
 
 export default LinkControl;

@@ -37,7 +37,9 @@
 				]
 			},
 			{ "docs/getting-started/full-site-editing.md": [] },
-			{ "docs/getting-started/outreach.md": [] }
+			{ "docs/getting-started/outreach.md": [] },
+			{ "docs/getting-started/glossary.md": [] },
+			{ "docs/getting-started/faq.md": [] }
 		]
 	},
 	{
@@ -104,6 +106,7 @@
 				]
 			},
 			{ "docs/how-to-guides/curating-the-editor-experience.md": [] },
+			{ "docs/how-to-guides/enqueueing-assets-in-the-editor.md": [] },
 			{ "docs/how-to-guides/feature-flags.md": [] },
 			{ "docs/how-to-guides/format-api.md": [] },
 			{
@@ -268,6 +271,9 @@
 					},
 					{ "docs/reference-guides/data/data-core-blocks.md": [] },
 					{
+						"docs/reference-guides/data/data-core-commands.md": []
+					},
+					{
 						"docs/reference-guides/data/data-core-customize-widgets.md": []
 					},
 					{ "docs/reference-guides/data/data-core-edit-post.md": [] },
@@ -320,8 +326,6 @@
 					}
 				]
 			},
-			{ "docs/explanations/faq.md": [] },
-			{ "docs/explanations/glossary.md": [] },
 			{ "docs/explanations/history.md": [] }
 		]
 	},

@@ -2,6 +2,7 @@
 	width: 100%;
 	position: relative;
 	justify-content: flex-start;
+	align-items: flex-start;
 
 	span {
 		display: block;
@@ -15,6 +16,7 @@
 .components-button.edit-post-post-schedule__toggle {
 	text-align: left;
 	white-space: normal;
+	height: auto;
 
 	// This span is added by the Popover in Tooltip when no anchor is
 	// provided. We set its width to 0 so that it does not cause the button text
