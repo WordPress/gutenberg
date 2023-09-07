@@ -129,4 +129,8 @@ abstract class WP_Font_Face_UnitTestCase extends WP_UnitTestCase {
 
 		parent::tear_down();
 	}
+
+	public function filter_set_theme_root() {
+		return self::$theme_root;
+	}
 }
