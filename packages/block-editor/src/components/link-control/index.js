@@ -91,9 +91,6 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  *
  * @property {(WPLinkControlSetting[])=}  settings                   An array of settings objects. Each object will used to
  *                                                                   render a `ToggleControl` for that setting.
- * @property {boolean=}                   forceIsEditingLink         If passed as either `true` or `false`, controls the
- *                                                                   internal editing state of the component to respective
- *                                                                   show or not show the URL input field.
  * @property {WPLinkControlValue=}        value                      Current link value.
  * @property {WPLinkControlOnChangeProp=} onChange                   Value change handler, called with the updated value if
  *                                                                   the user selects a new link or updates settings.
@@ -130,7 +127,6 @@ function LinkControl( {
 	noDirectEntry = false,
 	showSuggestions = true,
 	showInitialSuggestions,
-	forceIsEditingLink,
 	createSuggestion,
 	withCreateSuggestion,
 	inputValue: propInputValue = '',
@@ -198,22 +194,8 @@ function LinkControl( {
 	const valueHasChanges =
 		value && ! isShallowEqualObjects( internalControlValue, value );
 
-	const [ isEditingLink, setIsEditingLink ] = useState(
-		forceIsEditingLink !== undefined
-			? forceIsEditingLink
-			: ! value || ! value.url
-	);
-
 	const { createPage, isCreatingPage, errorMessage } =
 		useCreatePage( createSuggestion );
-
-	useEffect( () => {
-		if ( forceIsEditingLink === undefined ) {
-			return;
-		}
-
-		setIsEditingLink( forceIsEditingLink );
-	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
 		// We don't auto focus into the Link UI on mount
@@ -236,7 +218,7 @@ function LinkControl( {
 		nextFocusTarget.focus();
 
 		isEndingEditWithFocus.current = false;
-	}, [ isEditingLink, isCreatingPage ] );
+	}, [ isCreatingPage ] );
 
 	const hasLinkValue = value?.url?.trim()?.length > 0;
 
@@ -248,8 +230,6 @@ function LinkControl( {
 		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
 			wrapperNode.current.ownerDocument.activeElement
 		);
-
-		setIsEditingLink( false );
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
@@ -330,8 +310,7 @@ function LinkControl( {
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
-	const shownUnlinkControl =
-		onRemove && value && ! isEditingLink && ! isCreatingPage;
+	const shownUnlinkControl = onRemove && value && ! isCreatingPage;
 
 	const showActions = hasLinkValue;
 
@@ -359,13 +338,9 @@ function LinkControl( {
 				<LinkPreview
 					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
 					value={ value }
-					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
-					onRemove={ () => {
-						onRemove();
-						setIsEditingLink( true );
-					} }
+					onRemove={ onRemove }
 				/>
 			) }
 
