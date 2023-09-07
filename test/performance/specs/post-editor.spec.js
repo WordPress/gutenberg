@@ -183,7 +183,7 @@ test.describe( 'Post Editor Performance', () => {
 		).toHaveText( testString );
 	} );
 
-	test( 'Typing within containers', async ( { browser, page, editor } ) => {
+	test( 'Typing within containers', async ( { browser, page } ) => {
 		await loadBlocksFromHtml(
 			page,
 			path.join(
@@ -192,8 +192,9 @@ test.describe( 'Post Editor Performance', () => {
 			)
 		);
 
-		// Select the block where we type in
-		await editor.canvas
+		const canvas = page.frameLocator( 'iframe[name=editor-canvas]' );
+		// Select the block where we type in.
+		await canvas
 			.getByRole( 'document', { name: 'Paragraph block' } )
 			.first()
 			.click();
@@ -225,9 +226,10 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	test( 'Selecting blocks', async ( { browser, page, editor } ) => {
+	test( 'Selecting blocks', async ( { browser, page } ) => {
 		await load1000Paragraphs( page );
-		const paragraphs = editor.canvas.locator( '.wp-block' );
+		const canvas = page.frameLocator( 'iframe[name=editor-canvas]' );
+		const paragraphs = canvas.locator( '.wp-block' );
 
 		const samples = 10;
 		const throwaway = 1;
