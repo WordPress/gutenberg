@@ -77,15 +77,17 @@ function PatternList( {
 				if ( selectedCategory === allPatternsCategory.name ) {
 					return true;
 				}
-				return selectedCategory === 'uncategorized'
-					? ! pattern.categories?.length ||
-							pattern.categories.every(
-								( category ) =>
-									! registeredPatternCategories.includes(
-										category
-									)
-							)
-					: pattern.categories?.includes( selectedCategory );
+
+				if ( selectedCategory === 'uncategorized' ) {
+					const hasKnownCategory = pattern.categories.some(
+						( category ) =>
+							registeredPatternCategories.includes( category )
+					);
+
+					return ! pattern.categories?.length || ! hasKnownCategory;
+				}
+
+				return pattern.categories?.includes( selectedCategory );
 			} );
 		}
 		return searchItems( allPatterns, searchValue );
