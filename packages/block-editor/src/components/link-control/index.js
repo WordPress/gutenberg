@@ -13,7 +13,7 @@ import {
 	TextControl,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
@@ -355,6 +355,7 @@ function LinkControl( {
 	const showTextControl = hasLinkValue && hasTextControl;
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
+	const isCreating = isEditingLink && ! value && ! isCreatingPage;
 	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
 	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 
@@ -386,10 +387,20 @@ function LinkControl( {
 			{ isEditing && (
 				<>
 					<VisuallyHidden>
-						<h2 id={ dialogTitleId }>{ __( 'Edit Link' ) }</h2>
+						<h2 id={ dialogTitleId }>
+							{ sprintf(
+								// translators: %s: action name for the link mode (edit or create).
+								__( '%s Link' ),
+								isCreating ? __( 'Create' ) : __( 'Edit' )
+							) }
+						</h2>
 
 						<p id={ dialogDescritionId }>
-							{ __( 'Editing the link.' ) }
+							{ sprintf(
+								// translators: %s: action name for the link action (edit or create).
+								__( '%s the link' ),
+								isCreating ? __( 'Creating' ) : __( 'Editing' )
+							) }
 						</p>
 					</VisuallyHidden>
 					<div
