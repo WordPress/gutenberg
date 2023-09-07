@@ -27,7 +27,7 @@ remove_action( 'in_admin_header', 'wp_global_styles_render_svg_filters' );
  * }
  */
 function _gutenberg_get_iframed_editor_assets() {
-	global $wp_styles, $wp_scripts, $pagenow;
+	global $wp_styles, $wp_scripts;
 
 	// Keep track of the styles and scripts instance to restore later.
 	$current_wp_styles  = $wp_styles;
