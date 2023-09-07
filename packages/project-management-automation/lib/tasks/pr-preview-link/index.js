@@ -94,7 +94,7 @@ const createBuildSummary = async ( { buildStatus, commitHash, pullRequestNumber,
 
 	debug(JSON.stringify({ buildStatus, commitHash, pullRequestNumber, artifactsUrl }))
 
-	const response = await octokit.rest.markdown.render({ "text": `markdown ${buildStatus}`, "mode": "gfm" });
+	const response = await octokit.rest.markdown.render({ "text": `#markdown ${buildStatus}`, "mode": "gfm" });
 	return response.data;
 };
 
