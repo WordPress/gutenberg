@@ -69,6 +69,12 @@ export type DropdownMenuProps = {
 	 */
 	icon?: IconProps[ 'icon' ] | null;
 	/**
+	 * The initial open state of the dropdown.
+	 *
+	 * @default false
+	 */
+	defaultOpen?: boolean;
+	/**
 	 * Whether the dropdown is opened or not.
 	 */
 	open?: boolean;

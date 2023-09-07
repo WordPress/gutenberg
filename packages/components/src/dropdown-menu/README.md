@@ -171,13 +171,20 @@ A class name to apply to the dropdown menu's toggle element wrapper.
 
 -   Required: No
 
-### `open`: `boolean`
+#### `defaultOpen`: `boolean`
+
+The initial open state of the dropdown.
+
+-   Required: No
+-   Default: `false`
+
+#### `open`: `boolean`
 
 Control whether the dropdown is open or not.
 
 -   Required: No
 
-### `onToggle`: `( willOpen: boolean ) => void`
+#### `onToggle`: `( willOpen: boolean ) => void`
 
 A callback invoked when the state of the popover changes from open to closed and vice versa.
 

@@ -49,6 +49,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		className,
 		controls,
 		icon = menu,
+		defaultOpen,
 		open: openProp,
 		label,
 		popoverProps,
@@ -94,6 +95,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	return (
 		<Dropdown
 			className={ className }
+			defaultOpen={ defaultOpen }
 			open={ openProp }
 			onToggle={ onToggleProp }
 			popoverProps={ mergedPopoverProps }

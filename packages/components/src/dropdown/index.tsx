@@ -17,22 +17,7 @@ import deprecated from '@wordpress/deprecated';
 import { contextConnect, useContextSystem } from '../ui/context';
 import Popover from '../popover';
 import type { DropdownProps, DropdownInternalContext } from './types';
-
-function useObservableState(
-	initialState: boolean,
-	onStateChange?: ( newState: boolean ) => void
-) {
-	const [ state, setState ] = useState( initialState );
-	return [
-		state,
-		( value: boolean ) => {
-			setState( value );
-			if ( onStateChange ) {
-				onStateChange( value );
-			}
-		},
-	] as const;
-}
+import { useControlledValue } from '../utils/hooks';
 
 const UnconnectedDropdown = (
 	props: DropdownProps,
@@ -50,6 +35,7 @@ const UnconnectedDropdown = (
 		onClose,
 		onToggle,
 		style,
+		defaultOpen = false,
 		open: openProp,
 
 		// Deprecated props
@@ -75,10 +61,17 @@ const UnconnectedDropdown = (
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
 	const containerRef = useRef< HTMLDivElement >();
-	const [ isOpenState, setIsOpen ] = useObservableState( false, onToggle );
+	const [ isOpenValue, setIsOpen ] = useControlledValue( {
+		defaultValue: defaultOpen,
+		onChange: onToggle,
+		value: openProp,
+	} );
 
-	// Allow provided `isOpen` prop to override internal state.
-	const isOpen = openProp ?? isOpenState;
+	// `renderToggle` and `renderContent` expect `isOpen` to be a boolean, but
+	// TypeScript believes it can be `undefined` because of how `useControlledValue`
+	// is typed. This assertion is safe because `isOpen` is initialized to `false`
+	// and `setIsOpen` is only called with `false` or `true`.
+	const isOpen = isOpenValue || false;
 
 	useEffect(
 		() => () => {
