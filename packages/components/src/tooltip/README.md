@@ -37,7 +37,7 @@ The amount of time in milliseconds to wait before showing the tooltip.
 
 #### `position`: `string`
 
-The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
 
 -   Required: No
 -   Default: `"bottom"`

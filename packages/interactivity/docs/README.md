@@ -5,7 +5,7 @@
 
 > Interactivity API is a current [proposal](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/) that **is only available in Gutenberg** at the moment and not in WordPress Core as it is still very experimental, and very likely to change.
 
-> As part of an [Open Source project](https://developer.wordpress.org/block-editor/explanations/faq/#the-gutenberg-project) we encourage participation in helping shape this API and its Docs. The [discussions](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) and [issues](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Interactivity%20API) in GitHub are the best place to engage.
+> As part of an [Open Source project](https://developer.wordpress.org/block-editor/getting-started/faq/#the-gutenberg-project) we encourage participation in helping shape this API and its Docs. The [discussions](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) and [issues](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Interactivity%20API) in GitHub are the best place to engage.
 
 
 ## Quick start

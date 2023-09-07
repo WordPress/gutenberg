@@ -19,10 +19,6 @@ const EXAMPLE_COLORS = [
 ];
 const INITIAL_COLOR = EXAMPLE_COLORS[ 0 ].color;
 
-function getWrappingPopoverElement( element: HTMLElement ) {
-	return element.closest( '.components-popover' );
-}
-
 const ControlledColorPalette = ( {
 	onChange,
 }: {
@@ -192,9 +188,7 @@ describe( 'ColorPalette', () => {
 		const dropdownColorInput = screen.getByLabelText( 'Hex color' );
 
 		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( dropdownColorInput )
-			).toBePositionedPopover()
+			expect( dropdownColorInput ).toBePositionedPopover()
 		);
 	} );
 

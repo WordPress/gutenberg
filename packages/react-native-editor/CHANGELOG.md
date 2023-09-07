@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]
 
 ## 1.103.0
 -   [**] Replace third-party dependency react-native-hsv-color-picker with first-party code [#53329]

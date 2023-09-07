@@ -46,7 +46,8 @@ $preview-image-height: 140px;
 }
 
 // Provides positioning context for search actions
-.block-editor-link-control__search-input-container {
+.block-editor-link-control__search-input-container,
+.block-editor-link-control__search-input-wrapper {
 	position: relative;
 }
 
@@ -77,6 +78,17 @@ $preview-image-height: 140px;
 
 .block-editor-link-control__search-error {
 	margin: -$grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
+}
+
+.block-editor-link-control__search-enter {
+	position: absolute;
+	right: 19px; // specific to place the button properly.
+	top: 3px;
+
+	svg {
+		position: relative;
+		top: -2px; // the icon itself is not centered within the bounds; this centers it.
+	}
 }
 
 .block-editor-link-control__search-actions {
@@ -452,8 +464,13 @@ $preview-image-height: 140px;
 		left: auto;
 		bottom: auto;
 		top: calc(50% - #{$spinner-size} / 2);
-		right: $grid-unit-20;
+		right: $grid-unit-50;
 	}
+}
+
+.block-editor-link-control .block-editor-link-control__search-input-wrapper.has-actions .components-spinner {
+	top: calc(50% + #{$spinner-size} / 4); // Add top spacing because this input has a visual label.
+	right: $grid-unit-15;
 }
 
 .block-editor-link-control__search-item-action {
