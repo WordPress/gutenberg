@@ -42,7 +42,6 @@ const automations = [
 	},
 	{
 		event: 'workflow_run',
-		action: 'opened',
 		task: prPreviewLink,
 	},
 	{
