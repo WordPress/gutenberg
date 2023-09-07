@@ -6,7 +6,12 @@
  * @subpackage Fonts
  *
  * @since 6.4.0
- *
+ */
+
+// @core-merge this line of code is not needed when merging into Core.
+require_once dirname( __DIR__ ) . '/base.php';
+
+/**
  * @group fonts
  * @group fontface
  *
