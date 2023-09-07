@@ -13,6 +13,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { FontLibraryContext } from './font-library-modal/context';
+import { getPreviewStyle } from './font-library-modal/utils';
 
 function FontFamilyItem( { font } ) {
 	const { handleSetLibraryFontSelected, toggleModal } =
@@ -24,11 +25,13 @@ function FontFamilyItem( { font } ) {
 		handleSetLibraryFontSelected( font );
 		toggleModal( 'installed-fonts' );
 	};
+	
+	const previewStyle = getPreviewStyle( font );
 
 	return (
 		<Item onClick={ handleClick }>
 			<HStack justify="space-between">
-				<FlexItem style={ { fontFamily: font.fontFamily } }>
+				<FlexItem style={ previewStyle }>
 					{ font.name }
 				</FlexItem>
 				<FlexItem style={ { color: '#9e9e9e' } }>

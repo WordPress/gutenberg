@@ -13,6 +13,7 @@ import {
  * Internal dependencies
  */
 import FontDemo from './font-demo';
+import { getPreviewStyle } from './utils';
 
 function FontCard( { font, onClick, actionHandler, variantsText } ) {
 	const fakeFontFace = {
@@ -30,6 +31,8 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 			  ) || font.fontFace[ 0 ]
 			: fakeFontFace;
 
+	const demoStyle = getPreviewStyle( font );
+
 	const variantsCount = font.fontFace?.length || 1;
 
 	const style = {
@@ -43,7 +46,7 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 			className="font-library-modal__font-card"
 		>
 			<Flex justify="space-between" wrap={ false }>
-				<FontDemo fontFace={ displayFontFace } text={ font.name } />
+				<FontDemo fontFace={ displayFontFace } text={ font.name } style={ demoStyle } />
 				<Flex justify="flex-end">
 					<FlexItem>
 						<Text className="font-library-modal__font-card__count">
