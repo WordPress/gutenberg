@@ -26,6 +26,9 @@ export default function LinkPreview( {
 	onRemove,
 	additionalControls,
 } ) {
+	// Only use the image if the type is a media attachment.
+	const showRichDataImage = value?.type === 'attachment';
+
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
@@ -117,6 +120,30 @@ export default function LinkPreview( {
 				) }
 				<ViewerSlot fillProps={ value } />
 			</div>
+
+			{ !! (
+				hasRichData &&
+				showRichDataImage &&
+				( richData?.image || isFetching )
+			) && (
+				<div className="block-editor-link-control__search-item-bottom">
+					{ ( richData?.image || isFetching ) && (
+						<div
+							aria-hidden={ ! richData?.image }
+							className={ classnames(
+								'block-editor-link-control__search-item-image',
+								{
+									'is-placeholder': ! richData?.image,
+								}
+							) }
+						>
+							{ richData?.image && (
+								<img src={ richData?.image } alt="" />
+							) }
+						</div>
+					) }
+				</div>
+			) }
 
 			{ additionalControls && additionalControls() }
 		</div>
