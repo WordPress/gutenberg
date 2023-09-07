@@ -1,22 +1,19 @@
-/**
- * External dependencies
- */
-const { setFailed, getInput } = require( '@actions/core' );
-const { getOctokit, context } = require( '@actions/github' );
 
 /**
  * Internal dependencies
  */
 const debug = require( '../../debug' );
 
+/** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
+/** @typedef {import('@octokit/webhooks').WebhookPayloadPullRequest} WebhookPayloadPullRequest */
+
 /**
  * Adds a comment to new PRs with a link to the corresponding gutenberg.run preview site.
  *
  * @param {WebhookPayloadPullRequest} payload Pull request event payload.
  * @param {GitHub}                    octokit Initialized Octokit REST client.
- * @param {string}                    buildStatus Gutenberg plugin build status
  */
-async function prPreviewLink( payload, octokit, buildStatus ) {
+async function prPreviewLink( payload, octokit ) {
 	const repo = payload.repository.name;
 	const owner = payload.repository.owner.login;
 	const pullRequestNumber = payload.pull_request.number;
@@ -66,39 +63,8 @@ async function prPreviewLink( payload, octokit, buildStatus ) {
 		issue_number: pullRequestNumber,
 		body:
 			'Preview site for this PR: http://gutenberg.run/' +
-			pullRequestNumber + buildStatus,
+			pullRequestNumber,
 	} );
 }
 
-/**
- * Automation task function.
- *
- * @typedef {( payload: any, octokit: ReturnType<getOctokit> ) => void} WPAutomationTask
- */
-
-( async function main() {
-	const token = getInput( 'github_token' );
-	const buildStatus = getInput( 'build_status' );
-	
-	if ( ! token ) {
-		setFailed( 'main: Input `github_token` is required' );
-		return;
-	}
-
-	const octokit = getOctokit( token );
-
-	debug(
-		`main: Received event = '${ context.eventName }', action = '${ context.payload.action }'`
-	);
-
-	try {
-		debug( `main: Starting task ${ '' }` );
-		await prPreviewLink( context.payload, octokit, buildStatus );
-	} catch ( error ) {
-		setFailed(
-			`main: Task ${ '' } failed with error: ${ error }`
-		);
-	}
-
-	debug( 'main: All done!' );
-} )();
+module.exports = prPreviewLink;

@@ -6,16 +6,31 @@ on:
       - completed
 
 jobs:
-  artifacts-url-comments:
-    name: add artifact links to pull request and related issues job
-    runs-on: windows-2019
+  on-success:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
+      - run: echo 'The triggering workflow passed'
       - name: add artifact links to pull request and related issues step
         uses: tonyhallett/artifacts-url-comments@v1.1.0
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            prefix: Here are the artifacts 
+            prefix: Here are the artifacts success
+            suffix: Have a nice day.
+            format: name
+            addTo: pullandissues
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - run: echo 'The triggering workflow failed'
+      - name: add artifact links to pull request and related issues step
+        uses: tonyhallett/artifacts-url-comments@v1.1.0
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            prefix: Here are the artifacts failed
             suffix: Have a nice day.
             format: name
             addTo: pullandissues
