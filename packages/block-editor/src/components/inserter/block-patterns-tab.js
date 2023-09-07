@@ -200,14 +200,7 @@ export function BlockPatternsCategoryPanel( {
 		[ allPatterns, availableCategories, category.name, patternFilter ]
 	);
 
-	const {
-		totalItems,
-		categoryPatterns,
-		categoryPatternsAsyncList,
-		numPages,
-		changePage,
-		currentPage,
-	} = usePatternsPaging(
+	const pagingProps = usePatternsPaging(
 		currentCategoryPatterns,
 		category,
 		'.block-editor-inserter__patterns-category-dialog'
@@ -227,8 +220,8 @@ export function BlockPatternsCategoryPanel( {
 			</div>
 			<p>{ category.description }</p>
 			<BlockPatternList
-				shownPatterns={ categoryPatternsAsyncList }
-				blockPatterns={ categoryPatterns }
+				shownPatterns={ pagingProps.categoryPatternsAsyncList }
+				blockPatterns={ pagingProps.categoryPatterns }
 				onClickPattern={ onClickPattern }
 				onHover={ onHover }
 				label={ category.label }
@@ -237,13 +230,8 @@ export function BlockPatternsCategoryPanel( {
 				isDraggable
 				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
-			{ numPages > 1 && (
-				<BlockPatternsPaging
-					currentPage={ currentPage }
-					numPages={ numPages }
-					changePage={ changePage }
-					totalItems={ totalItems }
-				/>
+			{ pagingProps.numPages > 1 && (
+				<BlockPatternsPaging { ...pagingProps } />
 			) }
 		</div>
 	);

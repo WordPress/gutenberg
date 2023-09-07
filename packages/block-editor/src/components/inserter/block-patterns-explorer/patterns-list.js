@@ -113,14 +113,7 @@ function PatternList( {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak, filteredBlockPatterns.length ] );
 
-	const {
-		totalItems,
-		categoryPatterns,
-		categoryPatternsAsyncList,
-		numPages,
-		changePage,
-		currentPage,
-	} = usePatternsPaging(
+	const pagingProps = usePatternsPaging(
 		filteredBlockPatterns,
 		selectedCategory,
 		'.components-modal__content.is-scrollable',
@@ -140,19 +133,14 @@ function PatternList( {
 				{ ! hasItems && <InserterNoResults /> }
 				{ hasItems && (
 					<BlockPatternsList
-						shownPatterns={ categoryPatternsAsyncList }
-						blockPatterns={ categoryPatterns }
+						shownPatterns={ pagingProps.categoryPatternsAsyncList }
+						blockPatterns={ pagingProps.categoryPatterns }
 						onClickPattern={ onClickPattern }
 						isDraggable={ false }
 					/>
 				) }
-				{ numPages > 1 && (
-					<BlockPatternsPaging
-						currentPage={ currentPage }
-						numPages={ numPages }
-						changePage={ changePage }
-						totalItems={ totalItems }
-					/>
+				{ pagingProps.numPages > 1 && (
+					<BlockPatternsPaging { ...pagingProps } />
 				) }
 			</InserterListbox>
 		</div>
