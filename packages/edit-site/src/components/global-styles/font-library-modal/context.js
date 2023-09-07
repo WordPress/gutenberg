@@ -346,6 +346,7 @@ function FontLibraryProvider( { children } ) {
 			}
 		}
 		setFontFamilies( {
+			...fontFamilies,
 			[ font.source ]: newCustomFonts,
 		} );
 	};
