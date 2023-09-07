@@ -2,6 +2,11 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -25,6 +30,7 @@ const meta: Meta< typeof DropdownMenu > = {
 	title: 'Components/DropdownMenu',
 	component: DropdownMenu,
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -34,15 +40,34 @@ const meta: Meta< typeof DropdownMenu > = {
 			mapping: { menu, chevronDown, more },
 			control: { type: 'select' },
 		},
+		open: { control: { type: null } },
+		defaultOpen: { control: { type: null } },
+		onToggle: { control: { type: null } },
 	},
 };
 export default meta;
 
-const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
-	<div style={ { height: 150 } }>
-		<DropdownMenu { ...props } />
-	</div>
-);
+const Template: StoryFn< typeof DropdownMenu > = ( props ) => {
+	const [ open, setOpen ] = useState( false );
+	return (
+		<div style={ { height: 150 } }>
+			<DropdownMenu
+				{ ...props }
+				open={ open }
+				onToggle={ ( willOpen ) => {
+					setOpen( willOpen );
+					props.onToggle?.( willOpen );
+				} }
+				// Only used if uncontrolled (ie. no `open` prop passed)
+				// defaultOpen={ false }
+			/>
+
+			<button onClick={ () => setOpen( ! open ) }>
+				Toggle (controlled update)
+			</button>
+		</div>
+	);
+};
 
 export const Default = Template.bind( {} );
 Default.args = {
