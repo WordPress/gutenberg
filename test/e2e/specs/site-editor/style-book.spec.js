@@ -30,16 +30,16 @@ test.describe( 'Style Book', () => {
 	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
 			page.locator( 'role=button[name="Toggle block inserter"i]' )
-		).toBeHidden();
+		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="Tools"i]' )
-		).toBeHidden();
+		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="Undo"i]' )
-		).toBeHidden();
+		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="Redo"i]' )
-		).toBeHidden();
+		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="View"i]' )
 		).toBeDisabled();
@@ -139,7 +139,7 @@ test.describe( 'Style Book', () => {
 		await expect(
 			styleBookRegion,
 			'should close when close button is clicked'
-		).toBeHidden();
+		).not.toBeVisible();
 
 		// Open Style Book again.
 		await page.getByRole( 'button', { name: 'Style Book' } ).click();
@@ -153,7 +153,7 @@ test.describe( 'Style Book', () => {
 		await expect(
 			styleBookRegion,
 			'should close when Escape key is pressed'
-		).toBeHidden();
+		).not.toBeVisible();
 	} );
 } );
 

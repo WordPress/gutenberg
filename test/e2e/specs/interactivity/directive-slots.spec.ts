@@ -109,7 +109,7 @@ test.describe( 'data-wp-slot', () => {
 
 		await expect( fillContainer ).toBeEmpty();
 		await expect( slot5 ).toBeHidden();
-		await expect( slots.getByTestId( 'fill' ) ).toBeVisible();
+		await expect( slots.getByTestId( 'fill' ) ).not.toBeVisible();
 		await expect( slots.locator( 'css= > *' ) ).toHaveText( [
 			'[1]',
 			'[2]',

@@ -331,7 +331,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 
 		// List View should be closed.
-		await expect( listView ).toBeHidden();
+		await expect( listView ).not.toBeVisible();
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -352,7 +352,7 @@ test.describe( 'List View', () => {
 
 		// Close List View and ensure it's closed.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).toBeHidden();
+		await expect( listView ).not.toBeVisible();
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -377,7 +377,7 @@ test.describe( 'List View', () => {
 
 		// Close List View and ensure it's closed.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).toBeHidden();
+		await expect( listView ).not.toBeVisible();
 	} );
 
 	test( 'should place focus on the currently selected block in the canvas', async ( {

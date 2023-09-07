@@ -105,7 +105,7 @@ test.describe( 'Site Editor List View', () => {
 		// Since focus is now inside the list view, the shortcut should close
 		// the sidebar.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).toBeHidden();
+		await expect( listView ).not.toBeVisible();
 
 		// Focus should now be on the Open Navigation button since that is
 		// where we opened the list view sidebar. This is not a perfect
@@ -130,7 +130,7 @@ test.describe( 'Site Editor List View', () => {
 				} )
 		).toBeFocused();
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).toBeHidden();
+		await expect( listView ).not.toBeVisible();
 		await expect( openNavigationButton ).toBeFocused();
 	} );
 } );
