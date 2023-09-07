@@ -92,6 +92,11 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			return;
 		}
 
+		// bail if we're in the customizer
+		if ( document.body.classList.contains( 'wp-customizer' ) ) {
+			return;
+		}
+
 		const blockToolbar = document.querySelector(
 			'.block-editor-block-contextual-toolbar'
 		);
