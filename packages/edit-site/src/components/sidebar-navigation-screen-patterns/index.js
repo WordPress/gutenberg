@@ -13,7 +13,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
-import { file, starFilled, lockSmall } from '@wordpress/icons';
+import { file, starFilled, lockOutline } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -76,7 +76,10 @@ function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 									) }
 								>
 									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
-										<Icon icon={ lockSmall } size={ 24 } />
+										<Icon
+											icon={ lockOutline }
+											size={ 18 }
+										/>
 									</span>
 								</Tooltip>
 							</Flex>

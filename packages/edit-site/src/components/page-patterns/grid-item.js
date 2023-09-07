@@ -28,7 +28,7 @@ import {
 	symbolFilled as uncategorized,
 	symbol,
 	moreVertical,
-	lockSmall,
+	lockOutline,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
@@ -213,7 +213,7 @@ function GridItem( { categoryId, item, ...props } ) {
 								text={ __( 'This pattern cannot be edited.' ) }
 							>
 								<span className="edit-site-patterns__pattern-lock-icon">
-									<Icon icon={ lockSmall } size={ 24 } />
+									<Icon icon={ lockOutline } size={ 18 } />
 								</span>
 							</Tooltip>
 						) }
