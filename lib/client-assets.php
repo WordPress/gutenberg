@@ -284,7 +284,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-commands' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-commands' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
@@ -409,7 +409,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-site',
 		gutenberg_url( 'build/edit-site/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-commands' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-commands' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-site', 'rtl', 'replace' );
@@ -594,3 +594,7 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 // Enqueue stored styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
+
+// This action should be removed in core when backporting.
+// https://github.com/WordPress/wordpress-develop/blob/362624176cba41a2dda57c3e89031aa6c3e4decf/src/wp-includes/default-filters.php#L573
+remove_action( 'admin_enqueue_scripts', 'wp_common_block_scripts_and_styles' );
