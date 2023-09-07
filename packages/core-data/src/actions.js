@@ -780,7 +780,7 @@ export const saveEditedEntityRecord =
  * @param {string} kind        Kind of the entity.
  * @param {string} name        Name of the entity.
  * @param {Object} recordId    ID of the record.
- * @param {Array}  itemsToSave List of entity properties or properties paths to save.
+ * @param {Array}  itemsToSave List of entity properties or property paths to save.
  * @param {Object} options     Saving options.
  */
 export const __experimentalSaveSpecifiedEntityEdits =
