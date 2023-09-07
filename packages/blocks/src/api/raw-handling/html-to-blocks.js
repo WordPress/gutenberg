@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { createBlock, findTransform } from '../factory';
+import { getBlockType } from '../registration';
 import { getBlockAttributes } from '../parser/get-block-attributes';
 import { getRawTransforms } from './get-raw-transforms';
 
@@ -28,10 +29,13 @@ export function htmlToBlocks( html, handler ) {
 		);
 
 		if ( ! rawTransform ) {
+			// Should not be hardcoded.
+			const blockType = getBlockType( 'core/html' )
+				? 'core/html'
+				: 'core/freeform';
 			return createBlock(
-				// Should not be hardcoded.
-				'core/html',
-				getBlockAttributes( 'core/html', node.outerHTML )
+				blockType,
+				getBlockAttributes( blockType, node.outerHTML )
 			);
 		}
 
