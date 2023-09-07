@@ -35,6 +35,7 @@ jobs:
               with:
                   path: cli
                   ref: trunk
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Checkout (for publishing)
               if: ${{ github.event.inputs.release_type != 'wp' }}
@@ -44,6 +45,7 @@ jobs:
                   # Later, we switch this branch in the script that publishes packages.
                   ref: trunk
                   token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Checkout (for publishing WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
@@ -52,6 +54,7 @@ jobs:
                   path: publish
                   ref: wp/${{ github.event.inputs.wp_version }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Configure git user name and email (for publishing)
               run: |

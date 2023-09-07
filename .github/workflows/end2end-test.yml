@@ -28,6 +28,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -72,6 +74,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -118,6 +122,7 @@ jobs:
             - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
               with:
                   ref: trunk
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - uses: actions/download-artifact@v3
               id: download_artifact

@@ -25,6 +25,7 @@ jobs:
                   ref: ${{ github.event.pull_request.head.ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}
                   fetch-depth: ${{ env.PR_COMMIT_COUNT }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
             - name: 'Fetch relevant history from origin'
               run: git fetch origin ${{ github.event.pull_request.base.ref }}
             - name: Check CHANGELOG status
