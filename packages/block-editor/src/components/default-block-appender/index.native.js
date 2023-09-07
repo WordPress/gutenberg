@@ -51,7 +51,11 @@ export function DefaultBlockAppender( {
 				{ showSeparator ? (
 					<BlockInsertionPoint />
 				) : (
-					<RichText placeholder={ value } onChange={ noop } />
+					<RichText
+						placeholder={ value }
+						onChange={ noop }
+						tagName="p"
+					/>
 				) }
 			</View>
 		</Pressable>
