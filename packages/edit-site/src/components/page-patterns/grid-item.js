@@ -154,7 +154,8 @@ function GridItem( { categoryId, item, ...props } ) {
 						: undefined
 				}
 			>
-				{ isEmpty && __( 'Empty pattern' ) }
+				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
+				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
 				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
 			</button>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
