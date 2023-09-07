@@ -16,7 +16,6 @@ import {
 	__experimentalHStack as HStack,
 	FlexBlock,
 	Button,
-	SelectControl,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
@@ -31,6 +30,11 @@ import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
 import BlockPatternsPaging from '../block-patterns-paging';
 import usePatternsPaging from './hooks/use-patterns-paging';
+import {
+	PATTERN_TYPES,
+	SYNC_FILTERS,
+	default as BlockPatternsFilter,
+} from './block-patterns-filter';
 
 const noop = () => {};
 
@@ -38,18 +42,8 @@ export const allPatternsCategory = {
 	name: 'allPatterns',
 	label: __( 'All' ),
 };
-const PATTERN_TYPES = {
-	synced: 'synced',
-	unsynced: 'unsynced',
-	theme: 'theme',
-};
-const SYNC_FILTERS = [
-	{ value: 'all', label: __( 'Unfiltered' ) },
-	{ value: PATTERN_TYPES.theme, label: __( 'Theme patterns' ) },
-	{ value: PATTERN_TYPES.synced, label: __( 'My synced patterns' ) },
-	{ value: PATTERN_TYPES.unsynced, label: __( 'My standard patterns' ) },
-];
-function usePatternsCategories( rootClientId, filter = 'all' ) {
+
+export function usePatternsCategories( rootClientId, filter = 'all' ) {
 	const { patterns: allPatterns, allCategories } = usePatternsState(
 		undefined,
 		rootClientId
@@ -272,7 +266,7 @@ function BlockPatternsTabs( {
 	rootClientId,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const [ patternFilter, setPatternFilter ] = useState( 'all' );
+	const [ patternFilter, setPatternFilter ] = useState( SYNC_FILTERS.all );
 	const categories = usePatternsCategories( rootClientId, patternFilter );
 	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -285,16 +279,12 @@ function BlockPatternsTabs( {
 							role="list"
 							className="block-editor-inserter__block-patterns-tabs"
 						>
-							<SelectControl
-								__nextHasNoMarginBottom
-								label={ __( 'Filters' ) }
-								options={ SYNC_FILTERS }
+							<BlockPatternsFilter
 								value={ patternFilter }
 								onChange={ ( value ) => {
 									setPatternFilter( value );
 									onSelectCategory( selectedCategory, value );
 								} }
-								aria-label={ __( 'Filter patterns by type' ) }
 							/>
 							{ categories.map( ( category ) => (
 								<Item
@@ -364,6 +354,7 @@ function BlockPatternsTabs( {
 					initialCategory={ initialCategory }
 					patternCategories={ categories }
 					onModalClose={ () => setShowPatternsExplorer( false ) }
+					rootClientId={ rootClientId }
 				/>
 			) }
 		</>

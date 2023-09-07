@@ -19,6 +19,7 @@ import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import { allPatternsCategory } from '../block-patterns-tab';
+import { PATTERN_TYPES } from '../block-patterns-filter';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
@@ -44,7 +45,12 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	);
 }
 
-function PatternList( { filterValue, selectedCategory, patternCategories } ) {
+function PatternList( {
+	searchValue,
+	filterValue,
+	selectedCategory,
+	patternCategories,
+} ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
@@ -63,8 +69,26 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 	);
 
 	const filteredBlockPatterns = useMemo( () => {
-		if ( ! filterValue ) {
+		if ( ! searchValue ) {
 			return allPatterns.filter( ( pattern ) => {
+				if (
+					filterValue === PATTERN_TYPES.theme &&
+					pattern.name.startsWith( 'core/block' )
+				) {
+					return false;
+				}
+				if (
+					filterValue === PATTERN_TYPES.synced &&
+					pattern.syncStatus !== ''
+				) {
+					return false;
+				}
+				if (
+					filterValue === PATTERN_TYPES.unsynced &&
+					pattern.syncStatus !== PATTERN_TYPES.unsynced
+				) {
+					return false;
+				}
 				if ( selectedCategory === allPatternsCategory.name ) {
 					return true;
 				}
@@ -79,8 +103,9 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 					: pattern.categories?.includes( selectedCategory );
 			} );
 		}
-		return searchItems( allPatterns, filterValue );
+		return searchItems( allPatterns, searchValue );
 	}, [
+		searchValue,
 		filterValue,
 		allPatterns,
 		selectedCategory,

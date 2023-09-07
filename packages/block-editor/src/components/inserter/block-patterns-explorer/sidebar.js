@@ -4,6 +4,11 @@
 import { Button, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { default as BlockPatternsFilter } from '../block-patterns-filter';
+
 function PatternCategoriesList( {
 	selectedCategory,
 	patternCategories,
@@ -31,14 +36,14 @@ function PatternCategoriesList( {
 	);
 }
 
-function PatternsExplorerSearch( { filterValue, setFilterValue } ) {
+function PatternsExplorerSearch( { searchValue, setSearchValue } ) {
 	const baseClassName = 'block-editor-block-patterns-explorer__search';
 	return (
 		<div className={ baseClassName }>
 			<SearchControl
 				__nextHasNoMarginBottom
-				onChange={ setFilterValue }
-				value={ filterValue }
+				onChange={ setSearchValue }
+				value={ searchValue }
 				label={ __( 'Search for patterns' ) }
 				placeholder={ __( 'Search' ) }
 			/>
@@ -52,15 +57,21 @@ function PatternExplorerSidebar( {
 	onClickCategory,
 	filterValue,
 	setFilterValue,
+	searchValue,
+	setSearchValue,
 } ) {
 	const baseClassName = 'block-editor-block-patterns-explorer__sidebar';
 	return (
 		<div className={ baseClassName }>
 			<PatternsExplorerSearch
-				filterValue={ filterValue }
-				setFilterValue={ setFilterValue }
+				searchValue={ searchValue }
+				setSearchValue={ setSearchValue }
 			/>
-			{ ! filterValue && (
+			<BlockPatternsFilter
+				value={ filterValue }
+				onChange={ setFilterValue }
+			/>
+			{ ! searchValue && (
 				<PatternCategoriesList
 					selectedCategory={ selectedCategory }
 					patternCategories={ patternCategories }
