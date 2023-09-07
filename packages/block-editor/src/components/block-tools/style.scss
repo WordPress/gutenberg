@@ -203,11 +203,6 @@
 			& > .block-editor-block-toolbar__group-collapse-fixed-toolbar {
 				border: none;
 
-				.wp-customizer & {
-					// In the customizer, the collapse button is not shown.
-					display: none;
-				}
-
 				.show-icon-labels & {
 					.components-button.has-icon {
 						// Hide the button icons when labels are set to display...
