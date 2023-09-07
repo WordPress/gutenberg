@@ -93,18 +93,7 @@ const createBuildSummary = async ( { buildStatus, commitHash, pullRequestNumber,
 	}
 
 	await octokit.rest.markdown.render( {
-		text:
-			`
-<!--gutenberg-run-placeholder:cmt@v1-->
-# Gutenberg Plugin build status
-
- Name                    | Result |
- ----------------------- | - |
- **Last commit:**        | \`${commitHash.substring(0, 8)}\` |
- **Status**:             | ${buildStatus} |
- **Preview URL**:        | ${pullRequestNumber} |
- **Branch Preview URL**: | ${artifactsUrl} |
-  `
+		text: `# Gutenberg Plugin build status ${JSON.stringify({ buildStatus, commitHash, pullRequestNumber, artifactsUrl })}`
 	} )
 };
 
