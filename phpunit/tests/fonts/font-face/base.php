@@ -10,7 +10,7 @@ require_once __DIR__ . '/wp-font-face-tests-dataset.php';
 /**
  * Abstracts the common tasks for the Font Face tests.
  */
-abstract class WP_Font_Face_TestCase extends WP_UnitTestCase {
+abstract class WP_Font_Face_UnitTestCase extends WP_UnitTestCase {
 	use WP_Font_Face_Tests_Datasets;
 
 	/**
