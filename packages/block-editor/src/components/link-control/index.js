@@ -376,10 +376,6 @@ function LinkControl( {
 			aria-labelledby={ dialogTitleId }
 			aria-describedby={ dialogDescritionId }
 		>
-			<VisuallyHidden>
-				<h2 id={ dialogTitleId }>Link</h2>
-			</VisuallyHidden>
-
 			{ isCreatingPage && (
 				<div className="block-editor-link-control__loading">
 					<Spinner />
@@ -390,6 +386,8 @@ function LinkControl( {
 			{ isEditing && (
 				<>
 					<VisuallyHidden>
+						<h2 id={ dialogTitleId }>{ __( 'Edit Link' ) }</h2>
+
 						<p id={ dialogDescritionId }>
 							{ __( 'Editing the link.' ) }
 						</p>
@@ -496,6 +494,7 @@ function LinkControl( {
 			{ isPreviewing && (
 				<>
 					<VisuallyHidden>
+						<h2 id={ dialogTitleId }>{ __( 'Preview Link' ) }</h2>
 						<p id={ dialogDescritionId }>
 							{ __( 'Previewing the currently selected link.' ) }
 						</p>
