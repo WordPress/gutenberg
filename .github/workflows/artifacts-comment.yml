@@ -3,7 +3,7 @@ on:
   workflow_run:
     workflows: [Build Gutenberg Plugin Zip]
     types: 
-      - completed
+      - complete
 
 jobs:
   artifacts-url-comments:
