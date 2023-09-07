@@ -26,7 +26,7 @@ class Gutenberg_REST_Block_Patterns_Controller extends Gutenberg_REST_Block_Patt
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$response = parent::prepare_item_for_response( $item, $request );
-		if ( ! gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+		if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-hooks' ) ) {
 			return $response;
 		}
 

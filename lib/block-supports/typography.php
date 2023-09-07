@@ -415,7 +415,14 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 
 /**
  * Returns a font-size value based on a given font-size preset.
- * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
+ * Takes into account fluid typography parameters and attempts to return a CSS
+ * formula depending on available, valid values.
+ *
+ * @since 6.1.0
+ * @since 6.1.1 Adjusted rules for min and max font sizes.
+ * @since 6.2.0 Added 'settings.typography.fluid.minFontSize' support.
+ * @since 6.3.0 Using layout.wideSize as max viewport width, and logarithmic scale factor to calculate minimum font scale.
+ * @since 6.4.0 Added configurable min and max viewport width values to the typography.fluid theme.json schema.
  *
  * @param array $preset                     {
  *     Required. fontSizes preset value as seen in theme.json.

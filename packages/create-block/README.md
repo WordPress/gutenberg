@@ -100,7 +100,7 @@ $ npx @wordpress/create-block@latest --template ./path/to/template-directory
 
 #### `--variant`
 
-With this argument, `create-block` will generate a [dynamic block](https://developer.wordpress.org/block-editor/explanations/glossary/#dynamic-block) based on the built-in template.
+With this argument, `create-block` will generate a [dynamic block](https://developer.wordpress.org/block-editor/getting-started/glossary/#dynamic-block) based on the built-in template.
 
 ```bash
 $ npx @wordpress/create-block@latest --variant dynamic

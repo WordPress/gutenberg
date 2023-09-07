@@ -92,17 +92,19 @@ test.describe( 'Post Editor Performance', () => {
 			// Get canvas (handles both legacy and iframed canvas).
 			const canvas = await Promise.any( [
 				( async () => {
-					const legacyCanvasLocator = page.locator(
+					const legacyCanvasLocator = testPage.locator(
 						'.wp-block-post-content'
 					);
-					await legacyCanvasLocator.waitFor();
+					await legacyCanvasLocator.waitFor( { timeout: 120_000 } );
 					return legacyCanvasLocator;
 				} )(),
 				( async () => {
-					const iframedCanvasLocator = page.frameLocator(
+					const iframedCanvasLocator = testPage.frameLocator(
 						'[name=editor-canvas]'
 					);
-					await iframedCanvasLocator.locator( 'body' ).waitFor();
+					await iframedCanvasLocator
+						.locator( 'body' )
+						.waitFor( { timeout: 120_000 } );
 					return iframedCanvasLocator;
 				} )(),
 			] );

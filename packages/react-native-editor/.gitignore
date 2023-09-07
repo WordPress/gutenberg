@@ -120,5 +120,4 @@ bin/wp-cli.phar
 # Ruby / CocoaPods
 
 ios/Pods
-ios/vendor
 /vendor/bundle/

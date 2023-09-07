@@ -332,12 +332,7 @@ return (
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>
-			<div className="editor-styles-wrapper">
-				<BlockEditorKeyboardShortcuts />
-				<WritingFlow>
-					<BlockList className="getdavesbe-block-editor__block-list" />
-				</WritingFlow>
-			</div>
+			<BlockCanvas height="400px" />
 		</BlockEditorProvider>
 	</div>
 );
@@ -419,27 +414,6 @@ Here is roughly how this works together to render the list of blocks:
 
 The `@wordpress/block-editor` package components are among the most complex and involved. Understanding them is crucial if you want to grasp how the editor functions at a fundamental level. Studying these components is strongly advised.
 
-### Utility components in the custom block editor
-
-Jumping back to your custom `<BlockEditor>` component, it is also worth noting the following "utility" components:
-
-```js
-// File: src/components/block-editor/index.js
-
-<div className="editor-styles-wrapper">
-	<BlockEditorKeyboardShortcuts /> /* 1. */
-	<WritingFlow>
-		/* 2. */
-		<BlockList className="getdavesbe-block-editor__block-list" />
-	</WritingFlow>
-</div>
-```
-
-These provide other important elements of functionality for the editor instance.
-
-1. [`<BlockEditorKeyboardShortcuts />`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/keyboard-shortcuts/index.js) – Enables and usage of keyboard shortcuts within the editor
-2. [`<WritingFlow>`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/writing-flow/index.js) – Handles selection, focus management, and navigation across blocks
-
 ## Reviewing the sidebar
 
 Also within the render of the `<BlockEditor>`, is the `<Sidebar>` component.
@@ -453,9 +427,7 @@ return (
             <Sidebar.InspectorFill> /* <-- SIDEBAR */
                 <BlockInspector />
             </Sidebar.InspectorFill>
-            <div className="editor-styles-wrapper">
-                // snip
-            </div>
+            <BlockCanvas height="400px" />
         </BlockEditorProvider>
     </div>
 );
