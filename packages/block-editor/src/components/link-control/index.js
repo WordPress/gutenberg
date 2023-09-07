@@ -333,16 +333,15 @@ function LinkControl( {
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
-	const showActions = isEditingLink && hasLinkValue;
+	const showActions = hasLinkValue;
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
 	const showTextControl = hasLinkValue && hasTextControl;
 
-	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
 	const isDisabled = ! valueHasChanges || currentInputIsEmpty;
-	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
+	const showSettings = !! settings?.length && hasLinkValue;
 
 	return (
 		<div
@@ -356,101 +355,78 @@ function LinkControl( {
 				</div>
 			) }
 
-			{ isEditing && (
-				<>
-					<div
-						className={ classnames( {
-							'block-editor-link-control__search-input-wrapper': true,
-							'has-text-control': showTextControl,
-							'has-actions': showActions,
-						} ) }
-					>
-						{ showTextControl && (
-							<TextControl
-								__nextHasNoMarginBottom
-								ref={ textInputRef }
-								className="block-editor-link-control__field block-editor-link-control__text-content"
-								label={ __( 'Text' ) }
-								value={ internalControlValue?.title }
-								onChange={ setInternalTextInputValue }
-								onKeyDown={ handleSubmitWithEnter }
-								size="__unstable-large"
-							/>
-						) }
-						<LinkControlSearchInput
-							currentLink={ value }
-							className="block-editor-link-control__field block-editor-link-control__search-input"
-							placeholder={ searchInputPlaceholder }
-							value={ currentUrlInputValue }
-							withCreateSuggestion={ withCreateSuggestion }
-							onCreateSuggestion={ createPage }
-							onChange={ setInternalURLInputValue }
-							onSelect={ handleSelectSuggestion }
-							showInitialSuggestions={ showInitialSuggestions }
-							allowDirectEntry={ ! noDirectEntry }
-							showSuggestions={ showSuggestions }
-							suggestionsQuery={ suggestionsQuery }
-							withURLSuggestion={ ! noURLSuggestion }
-							createSuggestionButtonText={
-								createSuggestionButtonText
-							}
-							hideLabelFromVision={ ! showTextControl }
-						/>
-						{ ! showActions && (
-							<div className="block-editor-link-control__search-enter">
-								<Button
-									onClick={ isDisabled ? noop : handleSubmit }
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
-									className="block-editor-link-control__search-submit"
-									aria-disabled={ isDisabled }
-								/>
-							</div>
-						) }
-					</div>
-					{ errorMessage && (
-						<Notice
-							className="block-editor-link-control__search-error"
-							status="error"
-							isDismissible={ false }
-						>
-							{ errorMessage }
-						</Notice>
-					) }
-				</>
-			) }
-
-			{ value && ! isEditingLink && ! isCreatingPage && (
+			{ hasLinkValue && ! isCreatingPage && (
 				<LinkPreview
 					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
 					value={ value }
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
-					additionalControls={ () => {
-						// Expose the "Opens in new tab" settings in the preview
-						// as it is the most common setting to change.
-						if (
-							settings?.find(
-								( setting ) => setting.id === 'opensInNewTab'
-							)
-						) {
-							return (
-								<LinkSettings
-									value={ internalControlValue }
-									settings={ settings?.filter(
-										( { id } ) => id === 'opensInNewTab'
-									) }
-									onChange={ onChange }
-								/>
-							);
-						}
-					} }
 					onRemove={ () => {
 						onRemove();
 						setIsEditingLink( true );
 					} }
 				/>
+			) }
+
+			<div
+				className={ classnames( {
+					'block-editor-link-control__search-input-wrapper': true,
+					'has-text-control': showTextControl,
+					'has-actions': showActions,
+				} ) }
+			>
+				<LinkControlSearchInput
+					currentLink={ value }
+					className="block-editor-link-control__field block-editor-link-control__search-input"
+					placeholder={ searchInputPlaceholder }
+					value={ currentUrlInputValue }
+					withCreateSuggestion={ withCreateSuggestion }
+					onCreateSuggestion={ createPage }
+					onChange={ setInternalURLInputValue }
+					onSelect={ handleSelectSuggestion }
+					showInitialSuggestions={ showInitialSuggestions }
+					allowDirectEntry={ ! noDirectEntry }
+					showSuggestions={ showSuggestions }
+					suggestionsQuery={ suggestionsQuery }
+					withURLSuggestion={ ! noURLSuggestion }
+					createSuggestionButtonText={ createSuggestionButtonText }
+					hideLabelFromVision={ ! showTextControl }
+				/>
+
+				{ showTextControl && (
+					<TextControl
+						__nextHasNoMarginBottom
+						ref={ textInputRef }
+						className="block-editor-link-control__field block-editor-link-control__text-content"
+						label={ __( 'Text' ) }
+						value={ internalControlValue?.title }
+						onChange={ setInternalTextInputValue }
+						onKeyDown={ handleSubmitWithEnter }
+						size="__unstable-large"
+					/>
+				) }
+
+				{ ! showActions && (
+					<div className="block-editor-link-control__search-enter">
+						<Button
+							onClick={ isDisabled ? noop : handleSubmit }
+							label={ __( 'Submit' ) }
+							icon={ keyboardReturn }
+							className="block-editor-link-control__search-submit"
+							aria-disabled={ isDisabled }
+						/>
+					</div>
+				) }
+			</div>
+			{ errorMessage && (
+				<Notice
+					className="block-editor-link-control__search-error"
+					status="error"
+					isDismissible={ false }
+				>
+					{ errorMessage }
+				</Notice>
 			) }
 
 			{ showSettings && (
