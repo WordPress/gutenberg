@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __, _n } from '@wordpress/i18n';
+import { _n } from '@wordpress/i18n';
 import {
 	__experimentalText as Text,
+	Button,
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
@@ -36,7 +37,7 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 	};
 
 	return (
-		<div
+		<Button
 			onClick={ onClick }
 			style={ style }
 			className="font-library-modal__font-card"
@@ -55,7 +56,7 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 					<FlexItem>{ !! actionHandler && actionHandler }</FlexItem>
 				</Flex>
 			</Flex>
-		</div>
+		</Button>
 	);
 }
 
