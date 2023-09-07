@@ -18,14 +18,12 @@ export const SYNC_FILTERS = [
 
 export default function BlockPatternsFilter( { onChange, value } ) {
 	return (
-		<>
-			<SelectControl
-				label={ __( 'Filters' ) }
-				options={ SYNC_FILTERS }
-				value={ value }
-				onChange={ onChange }
-				aria-label={ __( 'Filter patterns by type' ) }
-			/>
-		</>
+		<SelectControl
+			label={ __( 'Filters' ) }
+			options={ SYNC_FILTERS }
+			value={ value }
+			onChange={ onChange }
+			aria-label={ __( 'Filter patterns by type' ) }
+		/>
 	);
 }
