@@ -2,6 +2,9 @@ on:
     pull_request_target:
         types: [opened]
     push:
+    workflow_run:
+        workflows: [Build Gutenberg Plugin Zip]
+        types: [completed, in_progress]
 name: Pull request automation
 
 jobs:

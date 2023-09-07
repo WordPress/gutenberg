@@ -41,7 +41,7 @@ const automations = [
 		task: assignFixedIssues,
 	},
 	{
-		event: 'pull_request_target',
+		event: 'workflow_run',
 		action: 'opened',
 		task: prPreviewLink,
 	},
