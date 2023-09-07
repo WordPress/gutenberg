@@ -50,7 +50,7 @@ const UnconnectedDropdown = (
 		onClose,
 		onToggle,
 		style,
-		isOpen: isOpenProp,
+		open: openProp,
 
 		// Deprecated props
 		position,
@@ -78,7 +78,7 @@ const UnconnectedDropdown = (
 	const [ isOpenState, setIsOpen ] = useObservableState( false, onToggle );
 
 	// Allow provided `isOpen` prop to override internal state.
-	const isOpen = isOpenProp ?? isOpenState;
+	const isOpen = openProp ?? isOpenState;
 
 	useEffect(
 		() => () => {

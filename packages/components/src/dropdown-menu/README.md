@@ -171,7 +171,7 @@ A class name to apply to the dropdown menu's toggle element wrapper.
 
 -   Required: No
 
-### `isOpen`: `boolean`
+### `open`: `boolean`
 
 Control whether the dropdown is open or not.
 

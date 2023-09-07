@@ -49,7 +49,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		className,
 		controls,
 		icon = menu,
-		isOpen: isOpenProp,
+		open: openProp,
 		label,
 		popoverProps,
 		toggleProps,
@@ -94,7 +94,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	return (
 		<Dropdown
 			className={ className }
-			isOpen={ isOpenProp }
+			open={ openProp }
 			onToggle={ onToggleProp }
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {

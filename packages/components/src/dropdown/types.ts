@@ -60,7 +60,7 @@ export type DropdownProps = {
 	/**
 	 * Whether the dropdown is opened or not.
 	 */
-	isOpen?: boolean;
+	open?: boolean;
 	/**
 	 * A callback invoked when the popover should be closed.
 	 */

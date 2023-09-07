@@ -71,7 +71,7 @@ export type DropdownMenuProps = {
 	/**
 	 * Whether the dropdown is opened or not.
 	 */
-	isOpen?: boolean;
+	open?: boolean;
 	/**
 	 * A human-readable label to present as accessibility text on the focused
 	 * collapsed menu button.
