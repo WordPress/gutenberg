@@ -66,7 +66,7 @@ function InstalledFonts() {
 
 	useEffect( () => {
 		refreshLibrary();
-	}, [ refreshLibrary ] );
+	}, [] );
 
 	return (
 		<TabLayout
