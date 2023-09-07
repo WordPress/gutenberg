@@ -17,7 +17,7 @@ async function prPreviewLink( payload, octokit ) {
 	const repo = payload.repository.name;
 	const owner = payload.repository.owner.login;
 	const action = payload.action;
-	const pullRequestNumber = payload.workflow_run.pull_requests[0].head.number; // fake one payload.pull_request.number
+	const pullRequestNumber = payload.workflow_run.pull_requests[0].number; // fake one payload.pull_request.number
 
 	if (action === 'in_progress') {
 		await octokit.rest.issues.createComment( {
