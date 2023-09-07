@@ -307,10 +307,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		admin,
 		page,
 		editor,
-		insertingBlocksUtils,
 	} ) => {
 		await admin.createNewPost();
-		await insertingBlocksUtils.runWithoutIframe();
 
 		const inserterButton = page.getByRole( 'button', {
 			name: 'Toggle block inserter',

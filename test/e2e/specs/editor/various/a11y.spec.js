@@ -22,13 +22,6 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		pageUtils,
 		editor,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		// On a new post, initial focus is set on the Post title.
 		await expect(
 			editor.canvas.locator( 'role=textbox[name=/Add title/i]' )
