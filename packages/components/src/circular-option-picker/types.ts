@@ -15,7 +15,7 @@ import type { ButtonAsButtonProps } from '../button/types';
 import type { DropdownProps } from '../dropdown/types';
 import type { WordPressComponentProps } from '../ui/context';
 
-export type CircularOptionPickerProps = {
+type CommonCircularOptionPickerProps = {
 	/**
 	 * An ID to apply to the component.
 	 */
@@ -41,21 +41,40 @@ export type CircularOptionPickerProps = {
 	 */
 	children?: ReactNode;
 	/**
-	 * Whether the keyboard interaction should wrap around.
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
 	 *
-	 * @default true
+	 * @default false
 	 */
-	loop?: boolean;
-} & (
-	| {
-			'aria-label': string;
-			'aria-labelledby'?: never;
-	  }
-	| {
-			'aria-label'?: never;
-			'aria-labelledby': string;
-	  }
- );
+	asButtons?: boolean;
+};
+
+export type ListboxCircularOptionPickerProps =
+	CommonCircularOptionPickerProps & {
+		asButtons: false | undefined;
+		/**
+		 * Prevents keyboard interaction from wrapping around.
+		 * Only used when `asButtons` is not true.
+		 *
+		 * @default false
+		 */
+		disableLooping?: boolean;
+	} & (
+			| {
+					'aria-label': string;
+					'aria-labelledby'?: never;
+			  }
+			| {
+					'aria-label'?: never;
+					'aria-labelledby': string;
+			  }
+		 );
+
+export type ButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps;
+
+export type CircularOptionPickerProps =
+	| ListboxCircularOptionPickerProps
+	| ButtonsCircularOptionPickerProps;
 
 export type DropdownLinkActionProps = {
 	buttonProps?: Omit<

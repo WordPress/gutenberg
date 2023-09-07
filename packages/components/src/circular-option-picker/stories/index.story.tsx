@@ -9,11 +9,7 @@ import { useState, createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	ButtonAction,
-	default as CircularOptionPicker,
-	DropdownLinkAction,
-} from '..';
+import CircularOptionPicker from '..';
 
 const CircularOptionPickerStoryContext = createContext< {
 	currentColor?: string;
@@ -25,11 +21,14 @@ const meta: Meta< typeof CircularOptionPicker > = {
 	component: CircularOptionPicker,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
-		'CircularOptionPicker.Option': Option,
+		'CircularOptionPicker.Option': CircularOptionPicker.Option,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
-		'CircularOptionPicker.ButtonAction': ButtonAction,
+		'CircularOptionPicker.OptionGroup': CircularOptionPicker.OptionGroup,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
-		'CircularOptionPicker.DropdownLinkAction': DropdownLinkAction,
+		'CircularOptionPicker.ButtonAction': CircularOptionPicker.ButtonAction,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'CircularOptionPicker.DropdownLinkAction':
+			CircularOptionPicker.DropdownLinkAction,
 	},
 	argTypes: {
 		actions: { control: { type: null } },
@@ -113,6 +112,12 @@ const Template: StoryFn< typeof CircularOptionPicker > = ( props ) => (
 
 export const Default = Template.bind( {} );
 Default.args = { options: <DefaultOptions /> };
+
+export const AsButtons = Template.bind( {} );
+AsButtons.args = {
+	...Default.args,
+	asButtons: true,
+};
 
 export const WithButtonAction = Template.bind( {} );
 WithButtonAction.args = {
