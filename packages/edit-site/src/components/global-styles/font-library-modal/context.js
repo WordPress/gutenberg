@@ -24,6 +24,7 @@ import {
 	loadFontFaceInBrowser,
 	getDisplaySrcFromFontFace,
 } from './utils';
+import { toggleFont } from './utils/toggleFont';
 
 export const FontLibraryContext = createContext( {} );
 
@@ -275,79 +276,13 @@ function FontLibraryProvider( { children } ) {
 	const toggleActivateFont = ( font, face ) => {
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
-		const initialCustomFonts = fontFamilies[ font.source ] || [];
-		const activatedFont = initialCustomFonts.find(
-			( f ) => f.slug === font.slug
-		);
-		let newCustomFonts;
-
-		// Entire font family
-		if ( ! face ) {
-			if ( ! activatedFont ) {
-				// If the font is not active, activate the entire font family
-				newCustomFonts = [ ...initialCustomFonts, font ];
-			} else {
-				// If the font is already active, deactivate the entire font family
-				newCustomFonts = initialCustomFonts.filter(
-					( f ) => f.slug !== font.slug
-				);
-			}
-		} else {
-			//single font variant
-			let newFontFaces;
-
-			// If the font family is active
-			if ( activatedFont ) {
-				const activatedFontFace = ( activatedFont.fontFace || [] ).find(
-					( f ) =>
-						f.fontWeight === face.fontWeight &&
-						f.fontStyle === face.fontStyle
-				);
-				// If the font variant is active
-				if ( activatedFontFace ) {
-					// Deactivate the font variant
-					newFontFaces = activatedFont.fontFace.filter(
-						( f ) =>
-							! (
-								f.fontWeight === face.fontWeight &&
-								f.fontStyle === face.fontStyle
-							)
-					);
-					// If there are no more font faces, deactivate the font family
-					if ( newFontFaces?.length === 0 ) {
-						newCustomFonts = initialCustomFonts.filter(
-							( f ) => f.slug !== font.slug
-						);
-					} else {
-						// set the newFontFaces in the newCustomFonts
-						newCustomFonts = initialCustomFonts.map( ( f ) =>
-							f.slug === font.slug
-								? { ...f, fontFace: newFontFaces }
-								: f
-						);
-					}
-				} else {
-					// Activate the font variant
-					newFontFaces = [ ...activatedFont.fontFace, face ];
-					// set the newFontFaces in the newCustomFonts
-					newCustomFonts = initialCustomFonts.map( ( f ) =>
-						f.slug === font.slug
-							? { ...f, fontFace: newFontFaces }
-							: f
-					);
-				}
-			} else {
-				// If the font family is not active, activate the font family with the font variant
-				newFontFaces = [ face ];
-				newCustomFonts = [
-					...initialCustomFonts,
-					{ ...font, fontFace: newFontFaces },
-				];
-			}
-		}
+		const initialFonts = fontFamilies[ font.source ] || [];
+		// Toggles the received font family or font face
+		const newFonts = toggleFont( font, face, initialFonts );
+		// Updates the font families activated in global settings:
 		setFontFamilies( {
 			...fontFamilies,
-			[ font.source ]: newCustomFonts,
+			[ font.source ]: newFonts,
 		} );
 	};
 
