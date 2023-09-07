@@ -33,6 +33,9 @@
 			"selector": "figcaption",
 			"__experimentalRole": "content"
 		},
+		"behaviors": {
+			"type": "object"
+		},
 		"lightbox": {
 			"type": "object",
 			"enabled": {

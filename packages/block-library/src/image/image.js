@@ -67,6 +67,7 @@ import { isExternalImage } from './edit';
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 import { evalAspectRatio } from './utils';
+import deprecated from '@wordpress/deprecated';
 
 const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -759,6 +760,22 @@ export default function Image( {
 				{ img }
 			</ResizableBox>
 		);
+	}
+
+	const { behaviors } = attributes;
+
+	if ( behaviors ) {
+		deprecated( 'Lightbox using `behaviors` syntax', {
+			since: '16.7 on 2023.09.27',
+			version: '16.9 on 2023.10.11',
+			alternative: 'new lightbox syntax',
+			plugin: 'Gutenberg',
+			link: 'https://github.com/WordPress/gutenberg/pull/54071',
+			hint: `You can update your lightbox settings with the new syntax
+				   by toggling the image block's Expand on Click setting in the global styles
+				   or block settings, or by modifying settings in theme.json with
+				   { 'blocks': { 'core/image' :  { 'lightbox' : { 'enabled': true | false } } } }`,
+		} );
 	}
 
 	return (
