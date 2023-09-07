@@ -9,7 +9,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { TextControl, SelectControl } from '@wordpress/components';
+import { TextControl, SelectControl, PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -62,16 +62,12 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { action, method, email, submissionMethod } = attributes;
 	const blockProps = useBlockProps();
 
-	const { hasInnerBlocks, formMethods } = useSelect(
+	const { hasInnerBlocks } = useSelect(
 		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
 			const { getBlock } = select( blockEditorStore );
 			const block = getBlock( clientId );
 			return {
 				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
-				formMethods: Object.values(
-					settings.formOptions.availableMethods
-				),
 			};
 		},
 		[ clientId ]
@@ -88,69 +84,90 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	return (
 		<>
 			<InspectorControls>
-				<SelectControl
-					__nextHasNoMarginBottom
-					label={ __( 'Submissions method' ) }
-					options={ formMethods }
-					value={ submissionMethod }
-					onChange={ ( value ) =>
-						setAttributes( { submissionMethod: value } )
-					}
-					help={ __(
-						'Select the method to use for form submissions.'
-					) }
-				/>
-				{ submissionMethod === 'email' && (
-					<TextControl
-						__nextHasNoMarginBottom
-						autoComplete="off"
-						label={ __( 'Email for form submissions' ) }
-						value={ email }
-						required
-						onChange={ ( value ) => {
-							setAttributes( { email: value } );
-							setAttributes( { action: `mailto:${ value }` } );
-							setAttributes( { method: 'post' } );
-						} }
-						help={ __(
-							'The email address where form submissions will be sent. Separate multiple email addresses with a comma.'
-						) }
+				<PanelBody title={ __( 'Settings' ) }>
+					<SelectControl
+						// __nextHasNoMarginBottom
+						// size={ '__unstable-large' }
+						label={ __( 'Submissions method' ) }
+						options={ [
+							// TODO: Allow plugins to add their own submission methods.
+							{
+								label: __( 'Send email' ),
+								value: 'email',
+							},
+							{
+								label: __( '- Custom -' ),
+								value: 'custom',
+							},
+						] }
+						value={ submissionMethod }
+						onChange={ ( value ) =>
+							setAttributes( { submissionMethod: value } )
+						}
+						help={
+							submissionMethod === 'custom'
+								? __(
+										'Select the method to use for form submissions. Additional options for the "custom" mode can be found in the "Andvanced" section.'
+								  )
+								: __(
+										'Select the method to use for form submissions.'
+								  )
+						}
 					/>
-				) }
-				{ submissionMethod !== 'email' && (
-					<InspectorControls group="advanced">
-						<SelectControl
-							__nextHasNoMarginBottom
-							label={ __( 'Method' ) }
-							options={ [
-								{ label: 'Get', value: 'get' },
-								{ label: 'Post', value: 'post' },
-							] }
-							value={ method }
-							onChange={ ( value ) =>
-								setAttributes( { method: value } )
-							}
-							help={ __(
-								'Select the method to use for form submissions.'
-							) }
-						/>
+					{ submissionMethod === 'email' && (
 						<TextControl
 							__nextHasNoMarginBottom
 							autoComplete="off"
-							label={ __( 'Form action' ) }
-							value={ action }
-							onChange={ ( newVal ) => {
+							label={ __( 'Email for form submissions' ) }
+							value={ email }
+							required
+							onChange={ ( value ) => {
+								setAttributes( { email: value } );
 								setAttributes( {
-									action: newVal,
+									action: `mailto:${ value }`,
 								} );
+								setAttributes( { method: 'post' } );
 							} }
 							help={ __(
-								'The URL where the form should be submitted.'
+								'The email address where form submissions will be sent. Separate multiple email addresses with a comma.'
 							) }
 						/>
-					</InspectorControls>
-				) }
+					) }
+				</PanelBody>
 			</InspectorControls>
+			{ submissionMethod !== 'email' && (
+				<InspectorControls group="advanced">
+					<SelectControl
+						__nextHasNoMarginBottom
+						label={ __( 'Method' ) }
+						options={ [
+							{ label: 'Get', value: 'get' },
+							{ label: 'Post', value: 'post' },
+						] }
+						value={ method }
+						onChange={ ( value ) =>
+							setAttributes( { method: value } )
+						}
+						help={ __(
+							'Select the method to use for form submissions.'
+						) }
+					/>
+					<TextControl
+						__nextHasNoMarginBottom
+						autoComplete="off"
+						label={ __( 'Form action' ) }
+						value={ action }
+						onChange={ ( newVal ) => {
+							setAttributes( {
+								action: newVal,
+							} );
+						} }
+						help={ __(
+							'The URL where the form should be submitted.'
+						) }
+					/>
+				</InspectorControls>
+			) }
 			<form
 				{ ...innerBlocksProps }
 				className="wp-block-form"

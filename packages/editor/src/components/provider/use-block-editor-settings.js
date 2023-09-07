@@ -49,7 +49,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'focusMode',
 	'distractionFree',
 	'fontSizes',
-	'formOptions',
 	'gradients',
 	'generateAnchors',
 	'hasFixedToolbar',

@@ -59,30 +59,6 @@ function block_core_form_view_script() {
 add_action( 'wp_enqueue_scripts', 'block_core_form_view_script' );
 
 /**
- * Adds extra settings to the block editor, for the forms block.
- *
- * @param array $settings The block editor settings.
- *
- * @return array The block editor settings with extra settings added.
- */
-function block_core_form_editor_settings( $settings ) {
-	$settings['formOptions'] = array(
-		'availableMethods' => array(
-			'email'  => array(
-				'label' => __( 'Send email', 'gutenberg' ),
-				'value' => 'email',
-			),
-			'custom' => array(
-				'label' => __( '- Custom -', 'gutenberg' ),
-				'value' => 'custom',
-			),
-		),
-	);
-	return $settings;
-}
-add_filter( 'block_editor_settings_all', 'block_core_form_editor_settings' );
-
-/**
  * Adds extra fields to the form.
  *
  * If the form is a comment form, adds the post ID as a hidden field,
