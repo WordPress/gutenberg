@@ -24,7 +24,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import styles from './style';
+import styles from './style.scss';
 
 function BottomSheetWithRef(
 	{ children, index, onClose, snapPoints = [ '50%' ] } = {},
