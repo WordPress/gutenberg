@@ -17,15 +17,18 @@ async function prPreviewLink( payload, octokit ) {
 	const repo = payload.repository.name;
 	const owner = payload.repository.owner.login;
 	const action = payload.action;
-	const pullRequestNumber = payload.workflow_run.pull_requests[0].number; // fake one payload.pull_request.number
-
+	const pullRequestNumber = payload.workflow_run.pull_requests[0].number;
+	  
 	if (action === 'in_progress') {
+		const commentBody = await createBuildSummary({
+			buildStatus: action, commitHash: '12345678', pullRequestNumber, artifactsUrl: 'N/A'
+		}, octokit);
+
 		await octokit.rest.issues.createComment( {
 			owner,
 			repo,
 			issue_number: pullRequestNumber,
-			body:
-				'Building plugin',
+			body: commentBody,
 		} );
 		return;
 	}
@@ -80,5 +83,29 @@ async function prPreviewLink( payload, octokit ) {
 			pullRequestNumber,
 	} );
 }
+
+const createBuildSummary = async ( { buildStatus, commitHash, pullRequestNumber, artifactsUrl }, octokit ) => {
+	let status = "⚡️  Building in progress...";
+	if (buildStatus === "success") {
+		status = "✅  Build successful!";
+	} else if (buildStatus === "failure") {
+		status = "🚫  Build failed!";
+	}
+
+	await octokit.markdown.render( {
+		text:
+			`
+<!--gutenberg-run-placeholder:cmt@v1-->
+# Gutenberg Plugin build status
+
+ Name                    | Result |
+ ----------------------- | - |
+ **Last commit:**        | \`${commitHash.substring(0, 8)}\` |
+ **Status**:             | ${buildStatus} |
+ **Preview URL**:        | ${pullRequestNumber} |
+ **Branch Preview URL**: | ${artifactsUrl} |
+  `
+	} )
+};
 
 module.exports = prPreviewLink;
