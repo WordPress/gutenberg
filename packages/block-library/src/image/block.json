@@ -36,8 +36,7 @@
 		"lightbox": {
 			"type": "object",
 			"enabled": {
-				"type": "boolean",
-				"default": false
+				"type": "boolean"
 			}
 		},
 		"title": {
