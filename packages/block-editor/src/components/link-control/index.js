@@ -224,7 +224,7 @@ function LinkControl( {
 			return;
 		}
 
-		// Do not announcement automattic mode state change
+		// Do not announcement automatic mode state change
 		// via speak().
 		setIsEditingLink( forceIsEditingLink );
 	}, [ forceIsEditingLink ] );
