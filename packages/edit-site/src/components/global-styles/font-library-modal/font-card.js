@@ -46,7 +46,11 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 			className="font-library-modal__font-card"
 		>
 			<Flex justify="space-between" wrap={ false }>
-				<FontDemo fontFace={ displayFontFace } text={ font.name } style={ demoStyle } />
+				<FontDemo
+					fontFace={ displayFontFace }
+					text={ font.name }
+					style={ demoStyle }
+				/>
 				<Flex justify="flex-end">
 					<FlexItem>
 						<Text className="font-library-modal__font-card__count">

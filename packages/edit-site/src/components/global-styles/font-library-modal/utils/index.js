@@ -108,7 +108,7 @@ function findNearest( input, numbers ) {
 }
 
 function extractFontWeights( fontFaces ) {
-	let result = [];
+	const result = [];
 
 	fontFaces.forEach( ( face ) => {
 		const weights = String( face.fontWeight ).split( ' ' );

@@ -25,15 +25,13 @@ function FontFamilyItem( { font } ) {
 		handleSetLibraryFontSelected( font );
 		toggleModal( 'installed-fonts' );
 	};
-	
+
 	const previewStyle = getPreviewStyle( font );
 
 	return (
 		<Item onClick={ handleClick }>
 			<HStack justify="space-between">
-				<FlexItem style={ previewStyle }>
-					{ font.name }
-				</FlexItem>
+				<FlexItem style={ previewStyle }>{ font.name }</FlexItem>
 				<FlexItem style={ { color: '#9e9e9e' } }>
 					{ variantsCount }{ ' ' }
 					{ _n( 'variant', 'variants', variantsCount ) }
