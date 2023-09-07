@@ -4,15 +4,15 @@
  * - If only the font is provided (without face), the entire font family's activation is toggled.
  * - If both font and face are provided, the activation of the specific font variant is toggled.
  *
- * @param  {Object} font - The font to be toggled.
- * @param  {string} font.slug - The unique identifier for the font.
- * @param  {Array} [font.fontFace] - The list of font variants (faces) associated with the font.
+ * @param {Object} font            - The font to be toggled.
+ * @param {string} font.slug       - The unique identifier for the font.
+ * @param {Array}  [font.fontFace] - The list of font variants (faces) associated with the font.
  *
- * @param  {Object} [face] - The specific font variant to be toggled.
- * @param  {string} face.fontWeight - The weight of the font variant.
- * @param  {string} face.fontStyle - The style of the font variant.
+ * @param {Object} [face]          - The specific font variant to be toggled.
+ * @param {string} face.fontWeight - The weight of the font variant.
+ * @param {string} face.fontStyle  - The style of the font variant.
  *
- * @param  {Array} initialfonts - The initial list of custom fonts.
+ * @param {Array}  initialfonts    - The initial list of custom fonts.
  *
  * @return {Array} - The updated list of custom fonts with the font/font variant toggled.
  *
@@ -42,9 +42,9 @@ export function toggleFont( font, face, initialfonts ) {
 		if ( ! activatedFont ) {
 			// If the font is not active, activate the entire font family
 			return [ ...initialfonts, font ];
-		} 
-        // If the font is already active, deactivate the entire font family
-        return initialfonts.filter( ( f ) => ! isFontActivated( f ) );
+		}
+		// If the font is already active, deactivate the entire font family
+		return initialfonts.filter( ( f ) => ! isFontActivated( f ) );
 	};
 
 	// Toggle the activation status of a specific font variant
