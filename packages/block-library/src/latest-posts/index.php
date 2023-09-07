@@ -51,12 +51,12 @@ function render_block_core_latest_posts( $attributes ) {
 	$filter_latest_posts_excerpt_more = static function( $more ) use ( $attributes ) {
 		$use_excerpt = 'excerpt' === $attributes['displayPostContentRadio'];
 		/* translators: %1$s is a URL to a post, excerpt truncation character, default … */
-		return $use_excerpt ? sprintf( __( ' … <a href="%1$s" rel="noopener noreferrer">Read more</a>', 'gutenberg' ), esc_url( get_permalink() ) ) : $more;
+		return $use_excerpt ? sprintf( __( ' … <a href="%1$s" rel="noopener noreferrer">Read more</a>' ), esc_url( get_permalink() ) ) : $more;
 	};
 
 	add_filter( 'excerpt_more', $filter_latest_posts_excerpt_more );
 
-	if ( isset( $attributes['categories'] ) ) {
+	if ( ! empty( $attributes['categories'] ) ) {
 		$args['category__in'] = array_column( $attributes['categories'], 'id' );
 	}
 	if ( isset( $attributes['selectedAuthor'] ) ) {

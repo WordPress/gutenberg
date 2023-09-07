@@ -12,6 +12,12 @@
 	}
 }
 
+// Navigation focus mode requires padding around the root Navigation block
+// for presentational purposes.
+.edit-site-block-editor__block-list.is-navigation-block {
+	padding: $grid-unit-30;
+}
+
 .edit-site-visual-editor {
 	position: relative;
 	height: 100%;

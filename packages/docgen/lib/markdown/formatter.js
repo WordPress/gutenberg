@@ -207,8 +207,10 @@ module.exports = (
 				( tag ) => {
 					const name = tag.name;
 					const type = getTypeOutput( tag );
-
-					return `- *${ name }* ${ type }`;
+					const desc = cleanSpaces( tag.description );
+					return `- *${ name }* ${ type }${
+						desc ? `: ${ desc }` : ''
+					}`;
 				},
 				docs
 			);

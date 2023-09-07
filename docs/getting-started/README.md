@@ -20,7 +20,7 @@ Welcome! Let's get started building with blocks. Blocks are at the core of exten
 -   Learn [about using theme.json](/docs/how-to-guides/themes/theme-json.md) to define settings and styles for your theme.
 
 -   [Create a Block Theme](/docs/how-to-guides/themes/create-block-theme.md) - Learn how block themes use blocks to build templates and the theme.json to provide styles.
--   [Convert as Classic Theme to a Block Theme](https://developer.wordpress.org/themes/block-themes/converting-a-classic-theme-to-a-block-theme/) - Learn how to adopt various pieces of full site editing in your classic theme.
+-   [Convert a Classic Theme to a Block Theme](https://developer.wordpress.org/themes/block-themes/converting-a-classic-theme-to-a-block-theme/) - Learn how to adopt various pieces of full site editing in your classic theme.
 
 ## Ways to Stay Informed
 
@@ -54,7 +54,7 @@ The [WordPress.org Roadmap](https://wordpress.org/about/roadmap/) with Four Phas
 
 Checking in on [issues](https://github.com/WordPress/gutenberg/issues) and [PRs](https://github.com/WordPress/gutenberg/pulls) on GitHub. This will give you a nearly real-time understanding of what’s being worked on by the developers and designers. 
 
--   [Glossary](/docs/explanations/glossary.md)
--   [Frequently Asked Questions](/docs/explanations/faq.md)
+-   [Glossary](/docs/getting-started/glossary.md)
+-   [Frequently Asked Questions](/docs/getting-started/faq.md)
 -   [Project History](/docs/explanations/history.md)
 -   [Outreach](/docs/getting-started/outreach.md)

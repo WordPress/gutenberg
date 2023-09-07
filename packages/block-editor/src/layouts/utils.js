@@ -4,6 +4,11 @@
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { LAYOUT_DEFINITIONS } from './definitions';
+
+/**
  * Utility to generate the proper CSS selector for layout styles.
  *
  * @param {string} selectors CSS selector, also supports multiple comma-separated selectors.
@@ -35,14 +40,14 @@ export function appendSelectors( selectors, append = '' ) {
  * with the provided `blockGapValue`.
  *
  * @param {string} selector          The CSS selector to target for the generated rules.
- * @param {Object} layoutDefinitions Layout definitions object from theme.json.
+ * @param {Object} layoutDefinitions Layout definitions object.
  * @param {string} layoutType        The layout type (e.g. `default` or `flex`).
  * @param {string} blockGapValue     The current blockGap value to be applied.
  * @return {string} The generated CSS rules.
  */
 export function getBlockGapCSS(
 	selector,
-	layoutDefinitions,
+	layoutDefinitions = LAYOUT_DEFINITIONS,
 	layoutType,
 	blockGapValue
 ) {

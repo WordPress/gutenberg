@@ -26,15 +26,11 @@ function BlockBreadcrumb( { rootLabelText } ) {
 		const {
 			getSelectionStart,
 			getSelectedBlockClientId,
-			getBlockParents,
-			getBlockEditingMode,
+			getEnabledBlockParents,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			parents: getBlockParents( selectedBlockClientId ).filter(
-				( parentClientId ) =>
-					getBlockEditingMode( parentClientId ) !== 'disabled'
-			),
+			parents: getEnabledBlockParents( selectedBlockClientId ),
 			clientId: selectedBlockClientId,
 			hasSelection: !! getSelectionStart().clientId,
 		};

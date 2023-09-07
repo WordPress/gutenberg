@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
+	parse,
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 
@@ -40,11 +41,13 @@ function createBlockCompleter() {
 					const {
 						getSelectedBlockClientId,
 						getBlockName,
-						getBlockInsertionPoint,
 						getBlockListSettings,
+						getBlockRootClientId,
 					} = select( blockEditorStore );
 					const selectedBlockClientId = getSelectedBlockClientId();
-					const _rootClientId = getBlockInsertionPoint().rootClientId;
+					const _rootClientId = getBlockRootClientId(
+						selectedBlockClientId
+					);
 					return {
 						selectedBlockName: selectedBlockClientId
 							? getBlockName( selectedBlockClientId )
@@ -114,14 +117,28 @@ function createBlockCompleter() {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );
 		},
 		getOptionCompletion( inserterItem ) {
-			const { name, initialAttributes, innerBlocks } = inserterItem;
+			const {
+				name,
+				initialAttributes,
+				innerBlocks,
+				syncStatus,
+				content,
+			} = inserterItem;
+
 			return {
 				action: 'replace',
-				value: createBlock(
-					name,
-					initialAttributes,
-					createBlocksFromInnerBlocksTemplate( innerBlocks )
-				),
+				value:
+					syncStatus === 'unsynced'
+						? parse( content, {
+								__unstableSkipMigrationLogs: true,
+						  } )
+						: createBlock(
+								name,
+								initialAttributes,
+								createBlocksFromInnerBlocksTemplate(
+									innerBlocks
+								)
+						  ),
 			};
 		},
 	};

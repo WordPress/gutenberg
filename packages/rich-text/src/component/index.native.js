@@ -63,6 +63,35 @@ const flatColorPalettes = memize( ( colorsPalettes ) => [
 	...( colorsPalettes?.default || [] ),
 ] );
 
+const getSelectionColor = memize(
+	(
+		currentSelectionColor,
+		defaultSelectionColor,
+		baseGlobalStyles,
+		isBlockBasedTheme
+	) => {
+		let selectionColor = defaultSelectionColor;
+		if ( currentSelectionColor ) {
+			selectionColor = currentSelectionColor;
+		}
+
+		if ( isBlockBasedTheme ) {
+			const colordTextColor = colord( selectionColor );
+			const colordBackgroundColor = colord(
+				baseGlobalStyles?.color?.background
+			);
+			const isColordTextReadable = colordTextColor.isReadable(
+				colordBackgroundColor
+			);
+			if ( ! isColordTextReadable ) {
+				selectionColor = baseGlobalStyles?.color?.text;
+			}
+		}
+
+		return selectionColor;
+	}
+);
+
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
@@ -1154,6 +1183,17 @@ export class RichText extends Component {
 			},
 		];
 
+		const defaultSelectionColor = getStylesFromColorScheme(
+			styles[ 'rich-text-selection' ],
+			styles[ 'rich-text-selection--dark' ]
+		).color;
+		const selectionColor = getSelectionColor(
+			this.props.selectionColor,
+			defaultSelectionColor,
+			baseGlobalStyles,
+			this.getIsBlockBasedTheme()
+		);
+
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;
 
@@ -1238,7 +1278,7 @@ export class RichText extends Component {
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
 					minWidth={ minWidth }
 					id={ this.props.id }
-					selectionColor={ this.props.selectionColor }
+					selectionColor={ selectionColor }
 					disableAutocorrection={ this.props.disableAutocorrection }
 				/>
 				{ isSelected && (

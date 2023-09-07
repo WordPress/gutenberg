@@ -26,15 +26,6 @@ type BaseButtonProps = {
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**
-	 * Start opting into the larger `isSmall` button size that will become the
-	 * default small size in a future version.
-	 *
-	 * Only takes effect when the `isSmall` prop is `true`.
-	 *
-	 * @default false
-	 */
-	__next32pxSmallSize?: boolean;
-	/**
 	 * The button's children.
 	 */
 	children?: ReactNode;
@@ -74,8 +65,13 @@ type BaseButtonProps = {
 	 * Renders a pressed button style.
 	 */
 	isPressed?: boolean;
+	// TODO: Deprecate officially (add console warning and move to DeprecatedButtonProps).
 	/**
 	 * Decreases the size of the button.
+	 *
+	 * Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
+	 *
+	 * @deprecated Use the `'small'` value on the `size` prop instead.
 	 */
 	isSmall?: boolean;
 	/**
@@ -92,6 +88,18 @@ type BaseButtonProps = {
 	 * If provided, renders a Tooltip component for the button.
 	 */
 	showTooltip?: boolean;
+	/**
+	 * The size of the button.
+	 *
+	 * - `'default'`: For normal text-label buttons, unless it is a toggle button.
+	 * - `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
+	 * - `'small'`: For icon buttons associated with more advanced or auxiliary features.
+	 *
+	 * If the deprecated `isSmall` prop is also defined, this prop will take precedence.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'default' | 'compact' | 'small';
 	/**
 	 * If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
 	 */

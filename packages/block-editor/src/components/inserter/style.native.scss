@@ -1,26 +1,21 @@
 /** @format */
-
-.inserter-menu__add-block-button-icon {
-	color: $blue-50;
-}
-
-.inserter-menu__add-block-button-icon--dark {
-	color: $blue-30;
-}
-
-.inserter-menu__add-block-button-icon--expanded {
-	color: $white;
-}
-
 .inserter-menu__add-block-button {
-	border-radius: 22px;
-	background-color: $blue-50;
-	margin: 8px;
-	padding: 6px 16px 6px 12px;
+	border-radius: 2px;
+	background-color: $black;
+	margin: 9px $grid-unit-20 10px $grid-unit-20;
+	padding: 0;
 }
 
 .inserter-menu__add-block-button--dark {
-	background-color: $blue-30;
+	background-color: $white;
+}
+
+.inserter-menu__add-block-button-icon {
+	color: $white;
+}
+
+.inserter-menu__add-block-button-icon--dark {
+	color: $black;
 }
 
 .inserter-menu__add-block-button-text {

@@ -94,10 +94,6 @@ Waits for a modal to be visible.
 
 Executes a function that triggers store resolvers and waits for them to be finished.
 
-### [`waitFor`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/wait-for.js)
-
-Custom implementation of the "waitFor" utility from `@testing-library/react-native` library.
-
 ### [`withFakeTimers`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/with-fake-timers.js)
 
 Set up fake timers for executing a function and restores them afterwards.

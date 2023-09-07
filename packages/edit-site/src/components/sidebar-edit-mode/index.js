@@ -56,11 +56,13 @@ export function SidebarComplementaryAreaFills() {
 	useEffect( () => {
 		// Don't automatically switch tab when the sidebar is closed or when we
 		// are focused on page content.
-		if ( ! isEditorSidebarOpened || hasPageContentFocus ) {
+		if ( ! isEditorSidebarOpened ) {
 			return;
 		}
 		if ( hasBlockSelection ) {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+			if ( ! hasPageContentFocus ) {
+				enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+			}
 		} else {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}

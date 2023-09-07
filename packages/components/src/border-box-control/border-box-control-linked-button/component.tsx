@@ -10,7 +10,8 @@ import { __ } from '@wordpress/i18n';
 import Button from '../../button';
 import Tooltip from '../../tooltip';
 import { View } from '../../view';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
 import { useBorderBoxControlLinkedButton } from './hook';
 
 import type { LinkedButtonProps } from '../types';

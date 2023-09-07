@@ -141,11 +141,18 @@ export const removeTemplate =
 				throw lastError;
 			}
 
+			// Depending on how the entity was retrieved it's title might be
+			// an object or simple string.
+			const templateTitle =
+				typeof template.title === 'string'
+					? template.title
+					: template.title?.rendered;
+
 			registry.dispatch( noticesStore ).createSuccessNotice(
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" deleted.' ),
-					decodeEntities( template.title.rendered )
+					decodeEntities( templateTitle )
 				),
 				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
 			);
@@ -173,6 +180,37 @@ export function setTemplatePart( templatePartId ) {
 		type: 'SET_EDITED_POST',
 		postType: 'wp_template_part',
 		id: templatePartId,
+	};
+}
+
+/**
+ * Action that sets a navigation menu.
+ *
+ * @param {string} navigationMenuId The Navigation Menu Post ID.
+ *
+ * @return {Object} Action object.
+ */
+export function setNavigationMenu( navigationMenuId ) {
+	return {
+		type: 'SET_EDITED_POST',
+		postType: 'wp_navigation',
+		id: navigationMenuId,
+	};
+}
+
+/**
+ * Action that sets an edited entity.
+ *
+ * @param {string} postType The entity's post type.
+ * @param {string} postId   The entity's ID.
+ *
+ * @return {Object} Action object.
+ */
+export function setEditedEntity( postType, postId ) {
+	return {
+		type: 'SET_EDITED_POST',
+		postType,
+		id: postId,
 	};
 }
 
@@ -335,12 +373,20 @@ export function updateSettings( settings ) {
  * @param {boolean} isOpen If true, opens the list view. If false, closes it.
  *                         It does not toggle the state, but sets it directly.
  */
-export function setIsListViewOpened( isOpen ) {
-	return {
-		type: 'SET_IS_LIST_VIEW_OPENED',
-		isOpen,
+export const setIsListViewOpened =
+	( isOpen ) =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-site', 'distractionFree' );
+		if ( isDistractionFree && isOpen ) {
+			dispatch.toggleDistractionFree();
+		}
+		dispatch( {
+			type: 'SET_IS_LIST_VIEW_OPENED',
+			isOpen,
+		} );
 	};
-}
 
 /**
  * Sets whether the save view panel should be open.
@@ -495,7 +541,13 @@ export const revertTemplate =
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { registry } ) => {
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-site', 'distractionFree' );
+		if ( isDistractionFree ) {
+			dispatch.toggleDistractionFree();
+		}
 		registry
 			.dispatch( interfaceStore )
 			.enableComplementaryArea( editSiteStoreName, name );
@@ -514,7 +566,7 @@ export const closeGeneralSidebar =
 
 export const switchEditorMode =
 	( mode ) =>
-	( { registry } ) => {
+	( { dispatch, registry } ) => {
 		registry
 			.dispatch( 'core/preferences' )
 			.set( 'core/edit-site', 'editorMode', mode );
@@ -527,6 +579,12 @@ export const switchEditorMode =
 		if ( mode === 'visual' ) {
 			speak( __( 'Visual editor selected' ), 'assertive' );
 		} else if ( mode === 'text' ) {
+			const isDistractionFree = registry
+				.select( preferencesStore )
+				.get( 'core/edit-site', 'distractionFree' );
+			if ( isDistractionFree ) {
+				dispatch.toggleDistractionFree();
+			}
 			speak( __( 'Code editor selected' ), 'assertive' );
 		}
 	};
@@ -547,5 +605,48 @@ export const setHasPageContentFocus =
 		dispatch( {
 			type: 'SET_HAS_PAGE_CONTENT_FOCUS',
 			hasPageContentFocus,
+		} );
+	};
+
+/**
+ * Action that toggles Distraction free mode.
+ * Distraction free mode expects there are no sidebars, as due to the
+ * z-index values set, you can't close sidebars.
+ */
+export const toggleDistractionFree =
+	() =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-site', 'distractionFree' );
+		if ( ! isDistractionFree ) {
+			registry.batch( () => {
+				registry
+					.dispatch( preferencesStore )
+					.set( 'core/edit-site', 'fixedToolbar', false );
+				dispatch.setIsInserterOpened( false );
+				dispatch.setIsListViewOpened( false );
+				dispatch.closeGeneralSidebar();
+			} );
+		}
+		registry.batch( () => {
+			registry
+				.dispatch( preferencesStore )
+				.set(
+					'core/edit-site',
+					'distractionFree',
+					! isDistractionFree
+				);
+			registry
+				.dispatch( noticesStore )
+				.createInfoNotice(
+					isDistractionFree
+						? __( 'Distraction free off.' )
+						: __( 'Distraction free on.' ),
+					{
+						id: 'core/edit-site/distraction-free-mode/notice',
+						type: 'snackbar',
+					}
+				);
 		} );
 	};

@@ -21,16 +21,15 @@ export const Appender = forwardRef(
 		const { insertedBlock, setInsertedBlock } = useListViewContext();
 
 		const instanceId = useInstanceId( Appender );
-		const { hideInserter } = useSelect(
+		const hideInserter = useSelect(
 			( select ) => {
 				const { getTemplateLock, __unstableGetEditorMode } =
 					select( blockEditorStore );
 
-				return {
-					hideInserter:
-						!! getTemplateLock( clientId ) ||
-						__unstableGetEditorMode() === 'zoom-out',
-				};
+				return (
+					!! getTemplateLock( clientId ) ||
+					__unstableGetEditorMode() === 'zoom-out'
+				);
 			},
 			[ clientId ]
 		);

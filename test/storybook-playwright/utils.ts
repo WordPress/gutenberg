@@ -21,7 +21,7 @@ const buildDecoratorString = ( decorators: Decorators = {} ) => {
 	return decoratorParamStrings.join( ';' );
 };
 
-export const gotoStoryId = (
+export const gotoStoryId = async (
 	page: Page,
 	storyId: string,
 	{ decorators }: Options = {}
@@ -35,7 +35,7 @@ export const gotoStoryId = (
 
 	params.set( 'id', storyId );
 
-	page.goto(
+	await page.goto(
 		`http://localhost:${ STORYBOOK_PORT }/iframe.html?${ params.toString() }`,
 		{ waitUntil: 'load' }
 	);

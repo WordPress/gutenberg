@@ -21,6 +21,7 @@ test.describe( 'Using Hooks API', () => {
 		page,
 		editor,
 	} ) => {
+		await editor.openDocumentSettingsSidebar();
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'First paragraph' );
 		await page.click(
@@ -35,6 +36,7 @@ test.describe( 'Using Hooks API', () => {
 		editor,
 		page,
 	} ) => {
+		await editor.openDocumentSettingsSidebar();
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'First paragraph' );
 

@@ -499,11 +499,11 @@ dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string | T`: The store descriptor. The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `StoreNameOrDescriptor`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `ActionCreatorsOf< ConfigOf< T > >`: Object containing the action creators.
+-   `DispatchReturn< StoreNameOrDescriptor >`: Object containing the action creators.
 
 ### plugins
 
@@ -1027,6 +1027,105 @@ function Component() {
 	return <button onClick={ callback }>Click me</button>;
 }
 ```
+
+## Selectors
+
+The following selectors are available on the object returned by `wp.data.select( 'core' )`.
+
+_Example_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+
+function Component() {
+	const result = useSelect( ( select ) => {
+		const query = { per_page: 20 };
+		const selectorArgs = [ 'postType', 'page', query ];
+
+		return {
+			pages: select( coreDataStore ).getEntityRecords( ...selectorArgs ),
+			hasStartedResolution: select( coreDataStore ).hasStartedResolution(
+				'getEntityRecords', // _selectorName_
+				selectorArgs
+			),
+			hasFinishedResolution: select(
+				coreDataStore
+			).hasFinishedResolution( 'getEntityRecords', selectorArgs ),
+			isResolving: select( coreDataStore ).isResolving(
+				'getEntityRecords',
+				selectorArgs
+			),
+		};
+	} );
+
+	if ( result.hasStartedResolution ) {
+		return <>Fetching data...</>;
+	}
+
+	if ( result.isResolving ) {
+		return (
+			<>
+				{
+					// show a spinner
+				 }
+			</>
+		);
+	}
+
+	if ( result.hasFinishedResolution ) {
+		return (
+			<>
+				{
+					// data is ready
+				 }
+			</>
+		);
+	}
+}
+```
+
+### hasFinishedResolution
+
+Returns true if resolution has completed for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution has completed.
+
+### hasStartedResolution
+
+Returns true if resolution has already been triggered for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution has been triggered.
+
+### isResolving
+
+Returns true if resolution has been triggered but has not yet completed for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution is in progress.
 
 ## Going further
 

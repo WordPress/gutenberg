@@ -8,8 +8,12 @@ import classnames from 'classnames';
  */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { useSelect } from '@wordpress/data';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
+import { store as interfaceStore } from '@wordpress/interface';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,6 +21,9 @@ import { useSelect } from '@wordpress/data';
 import { textFormattingShortcuts } from './config';
 import Shortcut from './shortcut';
 import DynamicShortcut from './dynamic-shortcut';
+
+export const KEYBOARD_SHORTCUT_HELP_MODAL_NAME =
+	'edit-site/keyboard-shortcut-help';
 
 const ShortcutList = ( { shortcuts } ) => (
 	/*
@@ -82,14 +89,21 @@ const ShortcutCategorySection = ( {
 	);
 };
 
-export default function KeyboardShortcutHelpModal( {
-	isModalActive,
-	toggleModal,
-} ) {
+export default function KeyboardShortcutHelpModal() {
+	const isModalActive = useSelect( ( select ) =>
+		select( interfaceStore ).isModalActive(
+			KEYBOARD_SHORTCUT_HELP_MODAL_NAME
+		)
+	);
+	const { closeModal, openModal } = useDispatch( interfaceStore );
+	const toggleModal = () =>
+		isModalActive
+			? closeModal()
+			: openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
+	useShortcut( 'core/edit-site/keyboard-shortcuts', toggleModal );
 	if ( ! isModalActive ) {
 		return null;
 	}
-
 	return (
 		<Modal
 			className="edit-site-keyboard-shortcut-help-modal"

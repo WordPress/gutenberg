@@ -9,6 +9,7 @@ import { css } from '@emotion/react';
  */
 import { Flex } from '../flex';
 import { space } from '../ui/utils/space';
+import { boxSizingReset } from '../utils';
 
 type TokensAndInputWrapperProps = {
 	__next40pxDefaultSize: boolean;
@@ -27,6 +28,7 @@ const deprecatedPaddings = ( {
 
 export const TokensAndInputWrapperFlex = styled( Flex )`
 	padding: 7px;
+	${ boxSizingReset }
 
 	${ deprecatedPaddings }
 `;

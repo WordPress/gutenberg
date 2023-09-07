@@ -84,7 +84,7 @@ export function unregisterCommandLoader( name ) {
 }
 
 /**
- * Opens the command center.
+ * Opens the command palette.
  *
  * @return {Object} action.
  */
@@ -95,7 +95,7 @@ export function open() {
 }
 
 /**
- * Closes the command center.
+ * Closes the command palette.
  *
  * @return {Object} action.
  */

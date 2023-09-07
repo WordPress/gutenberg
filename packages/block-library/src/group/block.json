@@ -22,13 +22,17 @@
 	},
 	"supports": {
 		"__experimentalOnEnter": true,
+		"__experimentalOnMerge": true,
 		"__experimentalSettings": true,
+		"__experimentalMetadata": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"ariaLabel": true,
 		"html": false,
 		"color": {
 			"gradients": true,
+			"heading": true,
+			"button": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -75,7 +79,7 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSizingOnChildren": true
 		}
 	},

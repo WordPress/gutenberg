@@ -60,11 +60,6 @@ const registerGutenberg = ( {
 			);
 		}
 
-		componentDidMount() {
-			// Dispatch post-render hooks.
-			doAction( 'native.render', this.filteredProps );
-		}
-
 		render() {
 			return cloneElement( this.editorComponent, this.filteredProps );
 		}

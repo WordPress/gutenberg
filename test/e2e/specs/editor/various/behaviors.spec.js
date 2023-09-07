@@ -21,69 +21,12 @@ test.describe( 'Testing behaviors functionality', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deleteAllPosts();
 	} );
-	test.beforeEach( async ( { admin, page, requestUtils } ) => {
+	test.beforeEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
-		await admin.visitAdminPage(
-			'/admin.php',
-			'page=gutenberg-experiments'
-		);
-
-		await page
-			.locator( `#gutenberg-interactivity-api-core-blocks` )
-			.setChecked( true );
-		await page.locator( `input[name="submit"]` ).click();
-		await page.waitForLoadState();
 	} );
 
-	test.afterEach( async ( { admin, page, requestUtils } ) => {
+	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
-		await admin.visitAdminPage(
-			'/admin.php',
-			'page=gutenberg-experiments'
-		);
-
-		await page
-			.locator( `#gutenberg-interactivity-api-core-blocks` )
-			.setChecked( false );
-		await page.locator( `input[name="submit"]` ).click();
-		await page.waitForLoadState();
-	} );
-
-	test( '`No Behaviors` should be the default as defined in the core theme.json', async ( {
-		admin,
-		editor,
-		requestUtils,
-		page,
-		behaviorUtils,
-	} ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-		await admin.createNewPost();
-		const media = await behaviorUtils.createMedia();
-		await editor.insertBlock( {
-			name: 'core/image',
-			attributes: {
-				alt: filename,
-				id: media.id,
-				url: media.source_url,
-			},
-		} );
-
-		await editor.openDocumentSettingsSidebar();
-		const editorSettings = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await editorSettings
-			.getByRole( 'button', { name: 'Advanced' } )
-			.click();
-		const select = editorSettings.getByRole( 'combobox', {
-			name: 'Behavior',
-		} );
-
-		// By default, no behaviors should be selected.
-		await expect( select ).toHaveValue( '' );
-
-		// By default, you should be able to select the Lightbox behavior.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 2 );
 	} );
 
 	test( 'Behaviors UI can be disabled in the `theme.json`', async ( {
@@ -143,7 +86,12 @@ test.describe( 'Testing behaviors functionality', () => {
 				id: media.id,
 				url: media.source_url,
 				// Explicitly set the value for behaviors to true.
-				behaviors: { lightbox: true },
+				behaviors: {
+					lightbox: {
+						enabled: true,
+						animation: 'zoom',
+					},
+				},
 			},
 		} );
 
@@ -162,8 +110,8 @@ test.describe( 'Testing behaviors functionality', () => {
 		// attributes takes precedence over the theme's value.
 		await expect( select ).toHaveValue( 'lightbox' );
 
-		// There should be 2 options available: `No behaviors` and `Lightbox`.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 2 );
+		// There should be 3 options available: `No behaviors` and `Lightbox`.
+		await expect( select.getByRole( 'option' ) ).toHaveCount( 3 );
 
 		// We can change the value of the behaviors dropdown to `No behaviors`.
 		await select.selectOption( { label: 'No behaviors' } );
@@ -171,50 +119,6 @@ test.describe( 'Testing behaviors functionality', () => {
 
 		// Here we should also check that the block renders on the frontend with the
 		// lightbox even though the theme.json has it set to false.
-	} );
-
-	test( 'You can set the default value for the behaviors in the theme.json', async ( {
-		admin,
-		editor,
-		requestUtils,
-		page,
-		behaviorUtils,
-	} ) => {
-		// In this theme, the default value for settings.behaviors.blocks.core/image.lightbox is `true`.
-		await requestUtils.activateTheme( 'behaviors-enabled' );
-		await admin.createNewPost();
-		const media = await behaviorUtils.createMedia();
-
-		await editor.insertBlock( {
-			name: 'core/image',
-			attributes: {
-				alt: filename,
-				id: media.id,
-				url: media.source_url,
-			},
-		} );
-
-		await editor.openDocumentSettingsSidebar();
-		const editorSettings = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await editorSettings
-			.getByRole( 'button', { name: 'Advanced' } )
-			.click();
-		const select = editorSettings.getByRole( 'combobox', {
-			name: 'Behavior',
-		} );
-
-		// The behaviors dropdown should be present and the value should be set to
-		// `lightbox`.
-		await expect( select ).toHaveValue( 'lightbox' );
-
-		// There should be 2 options available: `No behaviors` and `Lightbox`.
-		await expect( select.getByRole( 'option' ) ).toHaveCount( 2 );
-
-		// We can change the value of the behaviors dropdown to `No behaviors`.
-		await select.selectOption( { label: 'No behaviors' } );
-		await expect( select ).toHaveValue( '' );
 	} );
 
 	test( 'Lightbox behavior is disabled if the Image has a link', async ( {
@@ -254,7 +158,7 @@ test.describe( 'Testing behaviors functionality', () => {
 		await expect( select ).toBeDisabled();
 	} );
 
-	test( 'Lightbox behavior control has a Reset button that removes the markup', async ( {
+	test( 'Lightbox behavior control has a default option that removes the markup', async ( {
 		admin,
 		editor,
 		requestUtils,
@@ -293,17 +197,151 @@ test.describe( 'Testing behaviors functionality', () => {
 			.last()
 			.click();
 
-		const resetButton = editorSettings.getByRole( 'button', {
-			name: 'Reset',
+		const select = editorSettings.getByRole( 'combobox', {
+			name: 'Behavior',
 		} );
 
-		expect( resetButton ).toBeDefined();
-
-		await resetButton.last().click();
+		await select.selectOption( { label: 'Default' } );
 		expect( await editor.getEditedPostContent() )
 			.toBe( `<!-- wp:image {"id":${ media.id }} -->
 <figure class="wp-block-image"><img src="http://localhost:8889/wp-content/uploads/${ year }/${ month }/1024x768_e2e_test_image_size.jpeg" alt="1024x768_e2e_test_image_size.jpeg" class="wp-image-${ media.id }"/></figure>
 <!-- /wp:image -->` );
+	} );
+
+	test( 'Should load the view script if the lightbox is disabled in theme.json but enabled via block settings', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		await requestUtils.activateTheme( 'twentytwentythree' );
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+				behaviors: {
+					lightbox: {
+						enabled: true,
+					},
+				},
+			},
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		// The view script should be loaded !!!
+		const interactivityScript = page.locator(
+			'script#wp-block-image-view-js'
+		);
+		await expect( interactivityScript ).toHaveCount( 1 );
+	} );
+
+	test( 'Should load the view script if the lightbox is enabled via theme.json', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		await requestUtils.activateTheme( 'behaviors-enabled' );
+
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+			},
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		// The view script should be loaded !!!
+		const interactivityScript = page.locator(
+			'script#wp-block-image-view-js'
+		);
+		await expect( interactivityScript ).toHaveCount( 1 );
+	} );
+
+	test( 'Should NOT load the view script if the lightbox is disabled in theme.json and in block settings', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		await requestUtils.activateTheme( 'twentytwentythree' );
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+				behaviors: {
+					lightbox: {
+						enabled: false,
+					},
+				},
+			},
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		// The view script should NOT be loaded !!!
+		const interactivityScript = page.locator(
+			'script#wp-block-image-view-js'
+		);
+		await expect( interactivityScript ).toHaveCount( 0 );
+	} );
+
+	test( 'Should NOT load the view script if the lightbox is enabled in theme.json but disabled in block settings', async ( {
+		admin,
+		editor,
+		requestUtils,
+		page,
+		behaviorUtils,
+	} ) => {
+		await requestUtils.activateTheme( 'behaviors-enabled' );
+		await admin.createNewPost();
+		const media = await behaviorUtils.createMedia();
+
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+				behaviors: {
+					lightbox: {
+						enabled: false,
+					},
+				},
+			},
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		// The view script should NOT be loaded !!!
+		const interactivityScript = page.locator(
+			'script#wp-block-image-view-js'
+		);
+		await expect( interactivityScript ).toHaveCount( 0 );
 	} );
 } );
 

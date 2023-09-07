@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -9,7 +8,11 @@ import classnames from 'classnames';
  */
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
-import { getComputedFluidTypographyValue } from '../components/font-sizes/fluid-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from '../components/global-styles/typography-utils';
+import { kebabCase } from '../utils/object';
 
 /*
  * This utility is intended to assist where the serialization of the typography
@@ -27,24 +30,16 @@ import { getComputedFluidTypographyValue } from '../components/font-sizes/fluid-
  */
 export function getTypographyClassesAndStyles( attributes, settings ) {
 	let typographyStyles = attributes?.style?.typography || {};
-	const fluidTypographySettings = settings?.typography?.fluid;
+	const fluidTypographySettings =
+		getFluidTypographyOptionsFromSettings( settings );
 
-	if (
-		!! fluidTypographySettings &&
-		( true === fluidTypographySettings ||
-			Object.keys( fluidTypographySettings ).length !== 0 )
-	) {
-		const newFontSize =
-			getComputedFluidTypographyValue( {
-				fontSize: attributes?.style?.typography?.fontSize,
-				minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
-				maximumViewPortWidth: settings?.layout?.wideSize,
-			} ) || attributes?.style?.typography?.fontSize;
-		typographyStyles = {
-			...typographyStyles,
-			fontSize: newFontSize,
-		};
-	}
+	typographyStyles = {
+		...typographyStyles,
+		fontSize: getTypographyFontSizeValue(
+			{ size: attributes?.style?.typography?.fontSize },
+			fluidTypographySettings
+		),
+	};
 
 	const style = getInlineStyles( { typography: typographyStyles } );
 	const fontFamilyClassName = !! attributes?.fontFamily

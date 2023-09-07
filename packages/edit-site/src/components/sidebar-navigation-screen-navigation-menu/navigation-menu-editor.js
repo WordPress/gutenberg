@@ -1,59 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import {
-	isPreviewingTheme,
-	currentlyPreviewingTheme,
-} from '../../utils/is-previewing-theme';
 import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
-import { noop } from '.';
 
-const { useHistory } = unlock( routerPrivateApis );
+const noop = () => {};
 
-export default function NavigationMenuEditor( { navigationMenu } ) {
-	const history = useHistory();
-
-	const onSelect = useCallback(
-		( selectedBlock ) => {
-			const { attributes, name } = selectedBlock;
-			if (
-				attributes.kind === 'post-type' &&
-				attributes.id &&
-				attributes.type &&
-				history
-			) {
-				history.push( {
-					postType: attributes.type,
-					postId: attributes.id,
-					...( isPreviewingTheme() && {
-						gutenberg_theme_preview: currentlyPreviewingTheme(),
-					} ),
-				} );
-			}
-			if ( name === 'core/page-list-item' && attributes.id && history ) {
-				history.push( {
-					postType: 'page',
-					postId: attributes.id,
-					...( isPreviewingTheme() && {
-						gutenberg_theme_preview: currentlyPreviewingTheme(),
-					} ),
-				} );
-			}
-		},
-		[ history ]
-	);
-
+export default function NavigationMenuEditor( { navigationMenuId } ) {
 	const { storedSettings } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 
@@ -63,16 +25,14 @@ export default function NavigationMenuEditor( { navigationMenu } ) {
 	}, [] );
 
 	const blocks = useMemo( () => {
-		if ( ! navigationMenu ) {
+		if ( ! navigationMenuId ) {
 			return [];
 		}
 
-		return [
-			createBlock( 'core/navigation', { ref: navigationMenu?.id } ),
-		];
-	}, [ navigationMenu ] );
+		return [ createBlock( 'core/navigation', { ref: navigationMenuId } ) ];
+	}, [ navigationMenuId ] );
 
-	if ( ! navigationMenu || ! blocks?.length ) {
+	if ( ! navigationMenuId || ! blocks?.length ) {
 		return null;
 	}
 
@@ -84,10 +44,7 @@ export default function NavigationMenuEditor( { navigationMenu } ) {
 			onInput={ noop }
 		>
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
-				<NavigationMenuContent
-					rootClientId={ blocks[ 0 ].clientId }
-					onSelect={ onSelect }
-				/>
+				<NavigationMenuContent rootClientId={ blocks[ 0 ].clientId } />
 			</div>
 		</BlockEditorProvider>
 	);

@@ -268,6 +268,19 @@ _Parameters_
 -   _options_ `[Object]`:
 -   _options.allowUndo_ `[boolean]`: Whether to allow the user to undo reverting the template. Default true.
 
+### setEditedEntity
+
+Action that sets an edited entity.
+
+_Parameters_
+
+-   _postType_ `string`: The entity's post type.
+-   _postId_ `string`: The entity's ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setEditedPostContext
 
 Set's the current block editor context.
@@ -328,6 +341,18 @@ _Parameters_
 
 -   _isOpen_ `boolean`: If true, opens the save view. If false, closes it. It does not toggle the state, but sets it directly.
 
+### setNavigationMenu
+
+Action that sets a navigation menu.
+
+_Parameters_
+
+-   _navigationMenuId_ `string`: The Navigation Menu Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setNavigationPanelActiveMenu
 
 > **Deprecated**
@@ -382,6 +407,10 @@ _Returns_
 ### switchEditorMode
 
 Undocumented declaration.
+
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
 ### toggleFeature
 

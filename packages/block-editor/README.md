@@ -20,9 +20,7 @@ import {
 	BlockList,
 	BlockTools,
 	WritingFlow,
-	ObserveTyping,
 } from '@wordpress/block-editor';
-import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent() {
@@ -34,16 +32,9 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<SlotFillProvider>
-				<BlockTools>
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList />
-						</ObserveTyping>
-					</WritingFlow>
-				</BlockTools>
-				<Popover.Slot />
-			</SlotFillProvider>
+			<BlockTools>
+				<BlockCanvas height="400px" />
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }
@@ -120,6 +111,38 @@ _Parameters_
 
 -   _props_ `Object`: Component props.
 -   _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
+
+_Returns_
+
+-   `WPElement`: Block Breadcrumb.
+
+### BlockCanvas
+
+BlockCanvas component is a component used to display the canvas of the block editor. What we call the canvas is an iframe containing the block list that you can manipulate. The component is also responsible of wiring up all the necessary hooks to enable the keyboard navigation across blocks in the editor and inject content styles into the iframe.
+
+_Usage_
+
+```jsx
+function MyBlockEditor() {
+	const [ blocks, updateBlocks ] = useState( [] );
+	return (
+		<BlockEditorProvider
+			value={ blocks }
+			onInput={ updateBlocks }
+			onChange={ persistBlocks }
+		>
+			<BlockCanvas height="400px" />
+		</BlockEditorProvider>
+	);
+}
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.height_ `string`: Canvas height, defaults to 300px.
+-   _props.styles_ `Array`: Content styles to inject into the iframe.
+-   _props.children_ `WPElement`: Content of the canvas, defaults to the BlockList component.
 
 _Returns_
 
@@ -417,8 +440,8 @@ const fontSize = getComputedFluidTypographyValue( {
 _Parameters_
 
 -   _args_ `Object`:
--   _args.minimumViewPortWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
--   _args.maximumViewPortWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+-   _args.minimumViewportWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+-   _args.maximumViewportWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
 -   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
 -   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
@@ -545,6 +568,18 @@ _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
 
+### HeadingLevelDropdown
+
+Dropdown for selecting a heading level (1 through 6) or paragraph (0).
+
+_Parameters_
+
+-   _props_ `WPHeadingLevelDropdownProps`: Component props.
+
+_Returns_
+
+-   `WPComponent`: The toolbar.
+
 ### HeightControl
 
 HeightControl renders a linked unit control and range control for adjusting the height of a block.
@@ -668,6 +703,10 @@ _Related_
 
 Private @wordpress/block-editor APIs.
 
+### ReusableBlocksRenameHint
+
+Undocumented declaration.
+
 ### RichText
 
 _Related_
@@ -699,6 +738,7 @@ _Properties_
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `boolean|Array`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
+-   _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
@@ -776,6 +816,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+### useBlockCommands
+
+Undocumented declaration.
+
 ### useBlockDisplayInformation
 
 Hook used to try to find a matching block variation and return the appropriate information for display reasons. In order to to try to find a match we need to things: 1. Block's client id to extract it's current attributes. 2. A block variation should have set `isActive` prop to a proper function.
@@ -798,9 +842,68 @@ _Returns_
 
 -   `Object`: Block edit context
 
+### useBlockEditingMode
+
+Allows a block to restrict the user interface that is displayed for editing that block and its inner blocks.
+
+_Usage_
+
+```js
+function MyBlock( { attributes, setAttributes } ) {
+	useBlockEditingMode( 'disabled' );
+	return <div { ...useBlockProps() }></div>;
+}
+```
+
+`mode` can be one of three options:
+
+-   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
+    selected.
+-   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
+    toolbar, the block movers, block settings.
+-   `'default'`: Allows editing the block as normal.
+
+The mode is inherited by all of the block's inner blocks, unless they have
+their own mode.
+
+If called outside of a block context, the mode is applied to all blocks.
+
+_Parameters_
+
+-   _mode_ `?BlockEditingMode`: The editing mode to apply. If undefined, the current editing mode is not changed.
+
+_Returns_
+
+-   `BlockEditingMode`: The current editing mode.
+
 ### useBlockProps
 
 This hook is used to lightly mark an element as a block element. The element should be the outermost element of a block. Call this hook and pass the returned props to the element to mark as a block. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
+
+Use of this hook on the outermost element of a block is required if using API >= v2.
+
+_Usage_
+
+```js
+import { useBlockProps } from '@wordpress/block-editor';
+
+export default function Edit() {
+
+  const blockProps = useBlockProps(
+    className: 'my-custom-class',
+    style: {
+      color: '#222222',
+      backgroundColor: '#eeeeee'
+    }
+  )
+
+  return (
+    <div { ...blockProps }>
+
+    </div>
+  )
+}
+```
 
 _Parameters_
 

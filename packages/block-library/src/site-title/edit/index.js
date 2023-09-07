@@ -15,15 +15,13 @@ import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 
-/**
- * Internal dependencies
- */
-import LevelControl from './level-toolbar';
+const HEADING_LEVELS = [ 0, 1, 2, 3, 4, 5, 6 ];
 
 export default function SiteTitleEdit( {
 	attributes,
@@ -95,8 +93,9 @@ export default function SiteTitleEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<LevelControl
-					level={ level }
+				<HeadingLevelDropdown
+					options={ HEADING_LEVELS }
+					value={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

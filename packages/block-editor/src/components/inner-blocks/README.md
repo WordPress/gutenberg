@@ -185,3 +185,13 @@ For example, a button block, deeply nested in several levels of block `X` that u
 
 -   **Type:** `Array`
 -   **Default:** - `undefined`. Determines which block types should be shown in the block inserter. For example, when inserting a block within the Navigation block we specify `core/navigation-link` and `core/navigation-link/page` as these are the most commonly used inner blocks. `prioritizedInserterBlocks` takes an array of the form {blockName}/{variationName}, where {variationName} is optional.
+
+### `defaultBlock`
+
+- **Type:** `Array`
+- **Default:** - `undefined`. Determines which block type should be inserted by default and any attributes that should be set by default when the block is inserted. Takes an array in the form of `[ blockname, {blockAttributes} ]`.
+
+### `directInsert`
+
+- **Type:** `Boolean`
+- **Default:** - `undefined`. Determines whether the default block should be inserted directly into the InnerBlocks area by the block appender.

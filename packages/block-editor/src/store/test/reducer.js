@@ -3328,25 +3328,32 @@ describe( 'state', () => {
 			expect( state.clientIds ).toEqual( [ clientIdOne, clientIdTwo ] );
 		} );
 
-		it( 'should return client ids of all blocks when inner blocks are replaced with REPLACE_INNER_BLOCKS', () => {
-			const clientIdOne = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
-			const clientIdTwo = '9db792c6-a25a-495d-adbd-97d56a4c4189';
+		it( 'should return client ids of the original blocks when inner blocks are replaced with REPLACE_INNER_BLOCKS', () => {
+			const initialBlocks = deepFreeze( [
+				'62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+				'9db792c6-a25a-495d-adbd-97d56a4c4189',
+			] );
 
 			const action = {
 				blocks: [
 					{
-						clientId: clientIdOne,
+						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
 					},
 					{
-						clientId: clientIdTwo,
+						clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
 					},
 				],
 				type: 'REPLACE_INNER_BLOCKS',
 			};
 
-			const state = lastBlockInserted( {}, action );
+			const state = lastBlockInserted(
+				{
+					clientIds: initialBlocks,
+				},
+				action
+			);
 
-			expect( state.clientIds ).toEqual( [ clientIdOne, clientIdTwo ] );
+			expect( state.clientIds ).toEqual( initialBlocks );
 		} );
 
 		it( 'should return empty state if last block inserted is called with action RESET_BLOCKS', () => {

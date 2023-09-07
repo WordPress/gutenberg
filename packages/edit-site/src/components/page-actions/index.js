@@ -8,7 +8,7 @@ import { moreVertical } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import DeletePageMenuItem from './delete-page-menu-item';
+import TrashPageMenuItem from './trash-page-menu-item';
 
 export default function PageActions( {
 	postId,
@@ -25,7 +25,7 @@ export default function PageActions( {
 		>
 			{ () => (
 				<MenuGroup>
-					<DeletePageMenuItem
+					<TrashPageMenuItem
 						postId={ postId }
 						onRemove={ onRemove }
 					/>

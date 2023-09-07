@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { create, Control } from 'rungen';
+import type { Control } from 'rungen';
+import { create } from 'rungen';
 import isPromise from 'is-promise';
 import type { Dispatch, AnyAction } from 'redux';
 

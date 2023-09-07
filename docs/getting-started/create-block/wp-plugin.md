@@ -123,7 +123,7 @@ The `register_block_type` function registers the block we are going to create an
 
 For the `editorScript` provided in the block metadata, the build process creates a secondary asset file that contains the list of dependencies and a file version based on the timestamp, this is the `build/index.asset.php` file.
 
-The `wp_register_script` function used internally registers a name, called the handle, and relates that name to the script file. The dependencies are used to specify if the script requires including other libraries. The version is specified so the browser will reload if the file changed.
+The `wp_register_script` function used internally registers a name, called the handle, and relates that name to the script file. The dependencies are used to specify if the script requires including other libraries. The version is specified so the browser will reload if the file is changed.
 
 The `wp_set_script_translations` function tells WordPress to load translations for this script, if they exist. See more about [translations & internationalization.](/docs/how-to-guides/internationalization.md)
 

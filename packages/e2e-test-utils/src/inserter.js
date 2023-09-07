@@ -106,8 +106,8 @@ export async function selectGlobalInserterTab( label ) {
 		case 'Media':
 			labelSelector = `. = "${ label }"`;
 			break;
-		case 'Reusable':
-			// Reusable tab label is an icon, hence the different selector.
+		case 'Synced patterns':
+			// Synced patterns tab label is an icon, hence the different selector.
 			labelSelector = `@aria-label = "${ label }"`;
 			break;
 	}
@@ -180,7 +180,7 @@ export async function searchGlobalInserter( category, searchTerm ) {
 	switch ( category ) {
 		case 'Blocks':
 		case 'Patterns':
-		case 'Reusable': {
+		case 'Synced patterns': {
 			waitForInsertElement = async () => {
 				return await page.waitForXPath(
 					`//*[@role='option' and contains(., '${ searchTerm }')]`
@@ -220,7 +220,7 @@ export async function searchGlobalInserter( category, searchTerm ) {
  * If the entity is not instantly available in the open inserter, a search will
  * be performed. If the search returns no results, an error will be thrown.
  *
- * Available categories: Blocks, Patterns, Reusable and Block Directory.
+ * Available categories: Blocks, Patterns, Synced patterns and Block Directory.
  *
  * @param {string} category   The category to insert from.
  * @param {string} searchTerm The term by which to find the entity to insert.
@@ -231,8 +231,8 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 
 	let insertButton;
 
-	if ( [ 'Blocks', 'Reusable' ].includes( category ) ) {
-		// If it's a block, see it it's insertable without searching...
+	if ( [ 'Blocks', 'Synced patterns' ].includes( category ) ) {
+		// If it's a block, see if it's insertable without searching...
 		try {
 			insertButton = (
 				await page.$x(
@@ -260,7 +260,7 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 	await insertButton.click();
 
 	// Extra wait for the reusable block to be ready.
-	if ( category === 'Reusable' ) {
+	if ( category === 'Synced patterns' ) {
 		await canvas().waitForSelector(
 			'.block-library-block__reusable-block-container'
 		);
@@ -347,7 +347,7 @@ export async function insertPattern( searchTerm ) {
  *                            insert.
  */
 export async function insertReusableBlock( searchTerm ) {
-	await insertFromGlobalInserter( 'Reusable', searchTerm );
+	await insertFromGlobalInserter( 'Synced patterns', searchTerm );
 }
 
 /**

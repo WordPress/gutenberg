@@ -6,9 +6,9 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
-import { settings as settingsIcon } from '@wordpress/icons';
+import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { useReducedMotion, useInstanceId } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { _x, isRTL } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 
 function LinkSettingsDrawer( { children, settingsOpen, setSettingsOpen } ) {
@@ -28,10 +28,11 @@ function LinkSettingsDrawer( { children, settingsOpen, setSettingsOpen } ) {
 				className="block-editor-link-control__drawer-toggle"
 				aria-expanded={ settingsOpen }
 				onClick={ () => setSettingsOpen( ! settingsOpen ) }
-				icon={ settingsIcon }
-				label={ __( 'Link Settings' ) }
+				icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
 				aria-controls={ settingsDrawerId }
-			/>
+			>
+				{ _x( 'Advanced', 'Additional link settings' ) }
+			</Button>
 			<MaybeAnimatePresence>
 				{ settingsOpen && (
 					<MaybeMotionDiv

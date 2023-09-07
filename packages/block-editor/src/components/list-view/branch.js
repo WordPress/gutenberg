@@ -91,6 +91,7 @@ function ListViewBranch( props ) {
 		selectedClientIds,
 		level = 1,
 		path = '',
+		isBranchDragged = false,
 		isBranchSelected = false,
 		listPosition = 0,
 		fixedListWindow,
@@ -167,7 +168,8 @@ function ListViewBranch( props ) {
 				);
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBlocks );
-				const showBlock = isDragged || blockInView || isSelected;
+				const showBlock =
+					isDragged || blockInView || isSelected || isBranchDragged;
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
@@ -176,7 +178,7 @@ function ListViewBranch( props ) {
 								selectBlock={ selectBlock }
 								isSelected={ isSelected }
 								isBranchSelected={ isSelectedBranch }
-								isDragged={ isDragged }
+								isDragged={ isDragged || isBranchDragged }
 								level={ level }
 								position={ position }
 								rowCount={ rowCount }
@@ -194,7 +196,7 @@ function ListViewBranch( props ) {
 								<td className="block-editor-list-view-placeholder" />
 							</tr>
 						) }
-						{ hasNestedBlocks && shouldExpand && ! isDragged && (
+						{ hasNestedBlocks && shouldExpand && (
 							<ListViewBranch
 								parentId={ clientId }
 								blocks={ innerBlocks }
@@ -205,6 +207,7 @@ function ListViewBranch( props ) {
 								listPosition={ nextPosition + 1 }
 								fixedListWindow={ fixedListWindow }
 								isBranchSelected={ isSelectedBranch }
+								isBranchDragged={ isDragged || isBranchDragged }
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								isSyncedBranch={ syncedBranch }

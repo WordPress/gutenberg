@@ -3,7 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const TRANSLATED_SITE_PROPERTIES = {
@@ -13,41 +13,39 @@ const TRANSLATED_SITE_PROPERTIES = {
 	site_icon: __( 'Icon' ),
 	show_on_front: __( 'Show on front' ),
 	page_on_front: __( 'Page on front' ),
+	posts_per_page: __( 'Maximum posts per page' ),
+	default_comment_status: __( 'Allow comments on new posts' ),
 };
 
 export const useIsDirty = () => {
-	const { dirtyEntityRecords } = useSelect( ( select ) => {
-		const dirtyRecords =
-			select( coreStore ).__experimentalGetDirtyEntityRecords();
+	const { editedEntities, siteEdits } = useSelect( ( select ) => {
+		const { __experimentalGetDirtyEntityRecords, getEntityRecordEdits } =
+			select( coreStore );
 
+		return {
+			editedEntities: __experimentalGetDirtyEntityRecords(),
+			siteEdits: getEntityRecordEdits( 'root', 'site' ),
+		};
+	}, [] );
+
+	const dirtyEntityRecords = useMemo( () => {
 		// Remove site object and decouple into its edited pieces.
-		const dirtyRecordsWithoutSite = dirtyRecords.filter(
+		const editedEntitiesWithoutSite = editedEntities.filter(
 			( record ) => ! ( record.kind === 'root' && record.name === 'site' )
 		);
 
-		const siteEdits = select( coreStore ).getEntityRecordEdits(
-			'root',
-			'site'
-		);
-
-		const siteEditsAsEntities = [];
+		const editedSiteEntities = [];
 		for ( const property in siteEdits ) {
-			siteEditsAsEntities.push( {
+			editedSiteEntities.push( {
 				kind: 'root',
 				name: 'site',
 				title: TRANSLATED_SITE_PROPERTIES[ property ] || property,
 				property,
 			} );
 		}
-		const dirtyRecordsWithSiteItems = [
-			...dirtyRecordsWithoutSite,
-			...siteEditsAsEntities,
-		];
 
-		return {
-			dirtyEntityRecords: dirtyRecordsWithSiteItems,
-		};
-	}, [] );
+		return [ ...editedEntitiesWithoutSite, ...editedSiteEntities ];
+	}, [ editedEntities, siteEdits ] );
 
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );

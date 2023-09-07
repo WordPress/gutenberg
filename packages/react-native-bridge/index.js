@@ -177,6 +177,14 @@ export function subscribeShowEditorHelp( callback ) {
 	return gutenbergBridgeEvents.addListener( 'showEditorHelp', callback );
 }
 
+export function subscribeOnUndoPressed( callback ) {
+	return gutenbergBridgeEvents.addListener( 'onUndoPressed', callback );
+}
+
+export function subscribeOnRedoPressed( callback ) {
+	return gutenbergBridgeEvents.addListener( 'onRedoPressed', callback );
+}
+
 /**
  * Request media picker for the given media source.
  *
@@ -464,6 +472,14 @@ export function sendEventToHost( eventName, properties ) {
  */
 export function generateHapticFeedback() {
 	RNReactNativeGutenbergBridge.generateHapticFeedback();
+}
+
+export function toggleUndoButton( isDisabled ) {
+	RNReactNativeGutenbergBridge.toggleUndoButton( isDisabled );
+}
+
+export function toggleRedoButton( isDisabled ) {
+	RNReactNativeGutenbergBridge.toggleRedoButton( isDisabled );
 }
 
 export default RNReactNativeGutenbergBridge;

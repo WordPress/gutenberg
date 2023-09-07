@@ -104,6 +104,8 @@ test.describe( 'Preview', () => {
 		page,
 		previewUtils,
 	} ) => {
+		await editor.openDocumentSettingsSidebar();
+
 		const editorPage = page;
 
 		// Type aaaaa in the title field.
@@ -180,7 +182,10 @@ test.describe( 'Preview', () => {
 
 		// Return to editor and switch to Draft.
 		await editorPage.bringToFront();
-		await page.click( 'role=button[name="Switch to draft"i]' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Switch to draft' } )
+			.click();
 		// FIXME: The confirmation dialog is not named yet.
 		await page.click( 'role=dialog >> role=button[name="OK"i]' );
 

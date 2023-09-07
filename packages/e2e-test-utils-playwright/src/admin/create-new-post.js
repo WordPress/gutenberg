@@ -30,37 +30,26 @@ export async function createNewPost( {
 
 	await this.visitAdminPage( 'post-new.php', query );
 
-	await this.page.waitForSelector( '.edit-post-layout' );
+	// Wait for both iframed and non-iframed canvas and resolve once the
+	// currently available one is ready. To make this work, we need an inner
+	// legacy canvas selector that is unavailable directly when the canvas is
+	// iframed.
+	await Promise.any( [
+		this.page.locator( '.wp-block-post-content' ).waitFor(),
+		this.page
+			.frameLocator( '[name=editor-canvas]' )
+			.locator( 'body > *' )
+			.first()
+			.waitFor(),
+	] );
 
-	const isWelcomeGuideActive = await this.page.evaluate( () =>
+	await this.page.evaluate( ( welcomeGuide ) => {
 		window.wp.data
-			.select( 'core/edit-post' )
-			.isFeatureActive( 'welcomeGuide' )
-	);
-	const isFullscreenMode = await this.page.evaluate( () =>
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-post', 'welcomeGuide', welcomeGuide );
+
 		window.wp.data
-			.select( 'core/edit-post' )
-			.isFeatureActive( 'fullscreenMode' )
-	);
-
-	if ( showWelcomeGuide !== isWelcomeGuideActive ) {
-		await this.page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/edit-post' )
-				.toggleFeature( 'welcomeGuide' )
-		);
-
-		await this.page.reload();
-		await this.page.waitForSelector( '.edit-post-layout' );
-	}
-
-	if ( isFullscreenMode ) {
-		await this.page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/edit-post' )
-				.toggleFeature( 'fullscreenMode' )
-		);
-
-		await this.page.waitForSelector( 'body:not(.is-fullscreen-mode)' );
-	}
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-post', 'fullscreenMode', false );
+	}, showWelcomeGuide );
 }

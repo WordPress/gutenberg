@@ -4,8 +4,7 @@
 import {
 	hideBlockInterface,
 	showBlockInterface,
-	setBlockEditingMode,
-	unsetBlockEditingMode,
+	__experimentalUpdateSettings,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -25,28 +24,57 @@ describe( 'private actions', () => {
 		} );
 	} );
 
-	describe( 'setBlockEditingMode', () => {
-		it( 'should return the SET_BLOCK_EDITING_MODE action', () => {
-			expect(
-				setBlockEditingMode(
-					'14501cc2-90a6-4f52-aa36-ab6e896135d1',
-					'default'
-				)
-			).toEqual( {
-				type: 'SET_BLOCK_EDITING_MODE',
-				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
-				mode: 'default',
+	describe( '__experimentalUpdateSettings', () => {
+		const experimentalSettings = {
+			inserterMediaCategories: 'foo',
+			blockInspectorAnimation: 'bar',
+		};
+
+		const stableSettings = {
+			foo: 'foo',
+			bar: 'bar',
+			baz: 'baz',
+		};
+
+		const settings = {
+			...experimentalSettings,
+			...stableSettings,
+		};
+
+		it( 'should dispatch provided settings by default', () => {
+			expect( __experimentalUpdateSettings( settings ) ).toEqual( {
+				type: 'UPDATE_SETTINGS',
+				settings,
+				reset: false,
 			} );
 		} );
-	} );
 
-	describe( 'unsetBlockEditingMode', () => {
-		it( 'should return the UNSET_BLOCK_EDITING_MODE action', () => {
+		it( 'should dispatch provided settings with reset flag when `reset` argument is truthy', () => {
 			expect(
-				unsetBlockEditingMode( '14501cc2-90a6-4f52-aa36-ab6e896135d1' )
+				__experimentalUpdateSettings( settings, {
+					stripExperimentalSettings: false,
+					reset: true,
+				} )
 			).toEqual( {
-				type: 'UNSET_BLOCK_EDITING_MODE',
-				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				type: 'UPDATE_SETTINGS',
+				settings,
+				reset: true,
+			} );
+		} );
+
+		it( 'should strip experimental settings from a given settings object when `stripExperimentalSettings` argument is truthy', () => {
+			expect(
+				__experimentalUpdateSettings( settings, {
+					stripExperimentalSettings: true,
+				} )
+			).toEqual( {
+				type: 'UPDATE_SETTINGS',
+				settings: {
+					foo: 'foo',
+					bar: 'bar',
+					baz: 'baz',
+				},
+				reset: false,
 			} );
 		} );
 	} );

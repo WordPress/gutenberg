@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useToolbarState, Toolbar } from 'reakit/Toolbar';
+import { useToolbarStore, Toolbar } from '@ariakit/react/toolbar';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -21,22 +21,18 @@ function UnforwardedToolbarContainer(
 	{ label, ...props }: WordPressComponentProps< ToolbarProps, 'div', false >,
 	ref: ForwardedRef< any >
 ) {
-	// https://reakit.io/docs/basic-concepts/#state-hooks
-	// Passing baseId for server side rendering (which includes snapshots)
-	// If an id prop is passed to Toolbar, toolbar items will use it as a base for their ids
-	const toolbarState = useToolbarState( {
-		loop: true,
-		baseId: props.id,
+	const toolbarStore = useToolbarStore( {
+		focusLoop: true,
 		rtl: isRTL(),
 	} );
 
 	return (
 		// This will provide state for `ToolbarButton`'s
-		<ToolbarContext.Provider value={ toolbarState }>
+		<ToolbarContext.Provider value={ toolbarStore }>
 			<Toolbar
 				ref={ ref }
 				aria-label={ label }
-				{ ...toolbarState }
+				store={ toolbarStore }
 				{ ...props }
 			/>
 		</ToolbarContext.Provider>

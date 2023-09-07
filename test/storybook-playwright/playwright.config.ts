@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { PlaywrightTestConfig } from '@playwright/test';
+import type { PlaywrightTestConfig } from '@playwright/test';
 
 const config: PlaywrightTestConfig = {
 	outputDir: 'test-results/output',

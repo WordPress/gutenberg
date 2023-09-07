@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
+import { ToolbarItem as BaseToolbarItem } from '@ariakit/react/toolbar';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -14,18 +14,16 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import ToolbarContext from '../toolbar-context';
+import type { ToolbarItemProps } from './types';
 
 function ToolbarItem(
-	{
-		children,
-		as: Component,
-		...props
-	}: React.ComponentPropsWithoutRef< typeof BaseToolbarItem >,
+	{ children, as: Component, ...props }: ToolbarItemProps,
 	ref: ForwardedRef< any >
 ) {
-	const accessibleToolbarState = useContext( ToolbarContext );
+	const accessibleToolbarStore = useContext( ToolbarContext );
+	const isRenderProp = typeof children === 'function';
 
-	if ( typeof children !== 'function' && ! Component ) {
+	if ( ! isRenderProp && ! Component ) {
 		warning(
 			'`ToolbarItem` is a generic headless component. You must pass either a `children` prop as a function or an `as` prop as a component. ' +
 				'See https://developer.wordpress.org/block-editor/components/toolbar-item/'
@@ -35,24 +33,24 @@ function ToolbarItem(
 
 	const allProps = { ...props, ref, 'data-toolbar-item': true };
 
-	if ( ! accessibleToolbarState ) {
+	if ( ! accessibleToolbarStore ) {
 		if ( Component ) {
 			return <Component { ...allProps }>{ children }</Component>;
 		}
-		if ( typeof children !== 'function' ) {
+		if ( ! isRenderProp ) {
 			return null;
 		}
 		return children( allProps );
 	}
 
+	const render = isRenderProp ? children : Component && <Component />;
+
 	return (
 		<BaseToolbarItem
-			{ ...accessibleToolbarState }
 			{ ...allProps }
-			as={ Component }
-		>
-			{ children }
-		</BaseToolbarItem>
+			store={ accessibleToolbarStore }
+			render={ render }
+		/>
 	);
 }
 

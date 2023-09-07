@@ -43,19 +43,4 @@ describe( 'PostPublishButton', () => {
 			await page.$( '.editor-post-publish-button[aria-disabled="true"]' )
 		).not.toBeNull();
 	} );
-
-	it( 'should be disabled when metabox is being saved', async () => {
-		await canvas().type( '.editor-post-title__input', 'E2E Test Post' ); // Make it saveable.
-		expect(
-			await page.$( '.editor-post-publish-button[aria-disabled="true"]' )
-		).toBeNull();
-
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/edit-post' ).requestMetaBoxUpdates();
-			return true;
-		} );
-		expect(
-			await page.$( '.editor-post-publish-button[aria-disabled="true"]' )
-		).not.toBeNull();
-	} );
 } );

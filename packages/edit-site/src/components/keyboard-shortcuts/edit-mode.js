@@ -29,7 +29,7 @@ function KeyboardShortcutsEditMode() {
 		[]
 	);
 	const { redo, undo } = useDispatch( coreStore );
-	const { setIsListViewOpened, switchEditorMode } =
+	const { setIsListViewOpened, switchEditorMode, toggleDistractionFree } =
 		useDispatch( editSiteStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
@@ -112,6 +112,10 @@ function KeyboardShortcutsEditMode() {
 			`core/edit-site/transform-paragraph-to-heading-${ level }`,
 			( event ) => handleTextLevelShortcut( event, level )
 		);
+	} );
+
+	useShortcut( 'core/edit-site/toggle-distraction-free', () => {
+		toggleDistractionFree();
 	} );
 
 	return null;

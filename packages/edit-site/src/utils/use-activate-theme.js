@@ -29,9 +29,9 @@ export function useActivateTheme() {
 				'themes.php?action=activate&stylesheet=' +
 				currentlyPreviewingTheme() +
 				'&_wpnonce=' +
-				window.BLOCK_THEME_ACTIVATE_NONCE;
+				window.WP_BLOCK_THEME_ACTIVATE_NONCE;
 			await window.fetch( activationURL );
-			const { gutenberg_theme_preview: themePreview, ...params } =
+			const { wp_theme_preview: themePreview, ...params } =
 				location.params;
 			history.replace( params );
 		}

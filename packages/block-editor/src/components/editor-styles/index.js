@@ -43,13 +43,13 @@ function useDarkThemeBodyClassName( styles ) {
 				body.appendChild( tempCanvas );
 
 				backgroundColor = defaultView
-					.getComputedStyle( tempCanvas, null )
+					?.getComputedStyle( tempCanvas, null )
 					.getPropertyValue( 'background-color' );
 
 				body.removeChild( tempCanvas );
 			} else {
 				backgroundColor = defaultView
-					.getComputedStyle( canvas, null )
+					?.getComputedStyle( canvas, null )
 					.getPropertyValue( 'background-color' );
 			}
 			const colordBackgroundColor = colord( backgroundColor );

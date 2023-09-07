@@ -10,7 +10,7 @@ import { useDispatch } from '@wordpress/data';
 import { store as commandsStore } from '../store';
 
 /**
- * Attach a command to the Global command menu.
+ * Attach a command to the command palette.
  *
  * @param {import('../store/actions').WPCommandConfig} command command config.
  */
@@ -28,7 +28,7 @@ export default function useCommand( command ) {
 			label: command.label,
 			searchLabel: command.searchLabel,
 			icon: command.icon,
-			callback: currentCallback.current,
+			callback: ( ...args ) => currentCallback.current( ...args ),
 		} );
 		return () => {
 			unregisterCommand( command.name );

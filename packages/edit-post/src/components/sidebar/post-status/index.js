@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import { PostSwitchToDraftButton } from '@wordpress/editor';
+import { PostSwitchToDraftButton, PostSyncStatus } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -51,12 +51,14 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 						<PostFormat />
 						<PostSlug />
 						<PostAuthor />
+						<PostSyncStatus />
 						{ fills }
 						<HStack
 							style={ {
 								marginTop: '16px',
 							} }
 							spacing={ 4 }
+							wrap
 						>
 							<PostSwitchToDraftButton />
 							<PostTrash />

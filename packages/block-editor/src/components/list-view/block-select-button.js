@@ -6,16 +6,19 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	Tooltip,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock } from '@wordpress/icons';
+import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -26,6 +29,7 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
+import useListViewImages from './use-list-view-images';
 
 function ListViewBlockSelectButton(
 	{
@@ -52,14 +56,26 @@ function ListViewBlockSelectButton(
 	} );
 	const { isLocked } = useBlockLock( clientId );
 	const {
+		canInsertBlockType,
 		getSelectedBlockClientIds,
 		getPreviousBlockClientId,
 		getBlockRootClientId,
 		getBlockOrder,
+		getBlocksByClientId,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
-	const { removeBlocks } = useDispatch( blockEditorStore );
+	const { duplicateBlocks, removeBlocks } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
+	const isSticky = blockInformation?.positionType === 'sticky';
+	const images = useListViewImages( { clientId, isExpanded } );
+
+	const positionLabel = blockInformation?.positionLabel
+		? sprintf(
+				// translators: 1: Position of selected block, e.g. "Sticky" or "Fixed".
+				__( 'Position: %1$s' ),
+				blockInformation.positionLabel
+		  )
+		: '';
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -70,10 +86,35 @@ function ListViewBlockSelectButton(
 		onDragStart?.( event );
 	};
 
+	// Determine which blocks to update:
+	// If the current (focused) block is part of the block selection, use the whole selection.
+	// If the focused block is not part of the block selection, only update the focused block.
+	function getBlocksToUpdate() {
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const isUpdatingSelectedBlocks =
+			selectedBlockClientIds.includes( clientId );
+		const firstBlockClientId = isUpdatingSelectedBlocks
+			? selectedBlockClientIds[ 0 ]
+			: clientId;
+		const firstBlockRootClientId =
+			getBlockRootClientId( firstBlockClientId );
+
+		const blocksToUpdate = isUpdatingSelectedBlocks
+			? selectedBlockClientIds
+			: [ clientId ];
+
+		return {
+			blocksToUpdate,
+			firstBlockClientId,
+			firstBlockRootClientId,
+			selectedBlockClientIds,
+		};
+	}
+
 	/**
 	 * @param {KeyboardEvent} event
 	 */
-	function onKeyDownHandler( event ) {
+	async function onKeyDownHandler( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
 		} else if (
@@ -81,18 +122,12 @@ function ListViewBlockSelectButton(
 			event.keyCode === DELETE ||
 			isMatch( 'core/block-editor/remove', event )
 		) {
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const isDeletingSelectedBlocks =
-				selectedBlockClientIds.includes( clientId );
-			const firstBlockClientId = isDeletingSelectedBlocks
-				? selectedBlockClientIds[ 0 ]
-				: clientId;
-			const firstBlockRootClientId =
-				getBlockRootClientId( firstBlockClientId );
-
-			const blocksToDelete = isDeletingSelectedBlocks
-				? selectedBlockClientIds
-				: [ clientId ];
+			const {
+				blocksToUpdate: blocksToDelete,
+				firstBlockClientId,
+				firstBlockRootClientId,
+				selectedBlockClientIds,
+			} = getBlocksToUpdate();
 
 			// Don't update the selection if the blocks cannot be deleted.
 			if ( ! canRemoveBlocks( blocksToDelete, firstBlockRootClientId ) ) {
@@ -118,6 +153,36 @@ function ListViewBlockSelectButton(
 			}
 
 			updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
+		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+
+			const { blocksToUpdate, firstBlockRootClientId } =
+				getBlocksToUpdate();
+
+			const canDuplicate = getBlocksByClientId( blocksToUpdate ).every(
+				( block ) => {
+					return (
+						!! block &&
+						hasBlockSupport( block.name, 'multiple', true ) &&
+						canInsertBlockType( block.name, firstBlockRootClientId )
+					);
+				}
+			);
+
+			if ( canDuplicate ) {
+				const updatedBlocks = await duplicateBlocks(
+					blocksToUpdate,
+					false
+				);
+
+				if ( updatedBlocks?.length ) {
+					// If blocks have been duplicated, focus the first duplicated block.
+					updateFocusAndSelection( updatedBlocks[ 0 ], false );
+				}
+			}
 		}
 	}
 
@@ -166,6 +231,30 @@ function ListViewBlockSelectButton(
 							</Truncate>
 						</span>
 					) }
+					{ positionLabel && isSticky && (
+						<Tooltip text={ positionLabel }>
+							<span className="block-editor-list-view-block-select-button__sticky">
+								<Icon icon={ pinSmall } />
+							</span>
+						</Tooltip>
+					) }
+					{ images.length ? (
+						<span
+							className="block-editor-list-view-block-select-button__images"
+							aria-hidden
+						>
+							{ images.map( ( image, index ) => (
+								<span
+									className="block-editor-list-view-block-select-button__image"
+									key={ image.clientId }
+									style={ {
+										backgroundImage: `url(${ image.url })`,
+										zIndex: images.length - index, // Ensure the first image is on top, and subsequent images are behind.
+									} }
+								/>
+							) ) }
+						</span>
+					) : null }
 					{ isLocked && (
 						<span className="block-editor-list-view-block-select-button__lock">
 							<Icon icon={ lock } />

@@ -24,11 +24,11 @@ The component accepts the following props:
 
 ### position
 
-The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
 
 -   Type: `String`
 -   Required: No
--   Default: `"top center"`
+-   Default: `"bottom"`
 
 ### children
 

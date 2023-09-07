@@ -34,6 +34,7 @@ import {
 } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 import { shouldSkipSerialization } from './utils';
+import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const styleSupportKeys = [
@@ -44,8 +45,8 @@ const styleSupportKeys = [
 	SPACING_SUPPORT_KEY,
 ];
 
-const hasStyleSupport = ( blockType ) =>
-	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
+const hasStyleSupport = ( nameOrType ) =>
+	styleSupportKeys.some( ( key ) => hasBlockSupport( nameOrType, key ) );
 
 /**
  * Returns the inline styles to add depending on the style object
@@ -347,6 +348,10 @@ export function addEditProps( settings ) {
  */
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		if ( ! hasStyleSupport( props.name ) ) {
+			return <BlockEdit key="edit" { ...props } />;
+		}
+
 		const shouldDisplayControls = useDisplayBlockControls();
 		const blockEditingMode = useBlockEditingMode();
 
@@ -360,12 +365,24 @@ export const withBlockControls = createHigherOrderComponent(
 						<DimensionsPanel { ...props } />
 					</>
 				) }
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},
 	'withToolbarControls'
 );
+
+// Defines which element types are supported, including their hover styles or
+// any other elements that have been included under a single element type
+// e.g. heading and h1-h6.
+const elementTypes = [
+	{ elementType: 'button' },
+	{ elementType: 'link', pseudo: [ ':hover' ] },
+	{
+		elementType: 'heading',
+		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
+	},
+];
 
 /**
  * Override the default block element to include elements styles.
@@ -379,47 +396,84 @@ const withElementsStyles = createHigherOrderComponent(
 			BlockListBlock
 		) }`;
 
-		const skipLinkColorSerialization = shouldSkipSerialization(
-			props.name,
-			COLOR_SUPPORT_KEY,
-			'link'
-		);
+		// The .editor-styles-wrapper selector is required on elements styles. As it is
+		// added to all other editor styles, not providing it causes reset and global
+		// styles to override element styles because of higher specificity.
+		const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }`;
+		const blockElementStyles = props.attributes.style?.elements;
 
 		const styles = useMemo( () => {
-			// The .editor-styles-wrapper selector is required on elements styles. As it is
-			// added to all other editor styles, not providing it causes reset and global
-			// styles to override element styles because of higher specificity.
-			const elements = [
-				{
-					styles: ! skipLinkColorSerialization
-						? props.attributes.style?.elements?.link
-						: undefined,
-					selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS.link }`,
-				},
-				{
-					styles: ! skipLinkColorSerialization
-						? props.attributes.style?.elements?.link?.[ ':hover' ]
-						: undefined,
-					selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS.link }:hover`,
-				},
-			];
-			const elementCssRules = [];
-			for ( const { styles: elementStyles, selector } of elements ) {
-				if ( elementStyles ) {
-					const cssRule = compileCSS( elementStyles, {
-						selector,
-					} );
-					elementCssRules.push( cssRule );
-				}
+			if ( ! blockElementStyles ) {
+				return;
 			}
-			return elementCssRules.length > 0
-				? elementCssRules.join( '' )
+
+			const elementCSSRules = [];
+
+			elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
+				const skipSerialization = shouldSkipSerialization(
+					props.name,
+					COLOR_SUPPORT_KEY,
+					elementType
+				);
+
+				if ( skipSerialization ) {
+					return;
+				}
+
+				const elementStyles = blockElementStyles?.[ elementType ];
+
+				// Process primary element type styles.
+				if ( elementStyles ) {
+					const selector = scopeSelector(
+						baseElementSelector,
+						ELEMENTS[ elementType ]
+					);
+
+					elementCSSRules.push(
+						compileCSS( elementStyles, { selector } )
+					);
+
+					// Process any interactive states for the element type.
+					if ( pseudo ) {
+						pseudo.forEach( ( pseudoSelector ) => {
+							if ( elementStyles[ pseudoSelector ] ) {
+								elementCSSRules.push(
+									compileCSS(
+										elementStyles[ pseudoSelector ],
+										{
+											selector: scopeSelector(
+												baseElementSelector,
+												`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
+											),
+										}
+									)
+								);
+							}
+						} );
+					}
+				}
+
+				// Process related elements e.g. h1-h6 for headings
+				if ( elements ) {
+					elements.forEach( ( element ) => {
+						if ( blockElementStyles[ element ] ) {
+							elementCSSRules.push(
+								compileCSS( blockElementStyles[ element ], {
+									selector: scopeSelector(
+										baseElementSelector,
+										ELEMENTS[ element ]
+									),
+								} )
+							);
+						}
+					} );
+				}
+			} );
+
+			return elementCSSRules.length > 0
+				? elementCSSRules.join( '' )
 				: undefined;
-		}, [
-			props.attributes.style?.elements,
-			blockElementsContainerIdentifier,
-			skipLinkColorSerialization,
-		] );
+		}, [ baseElementSelector, blockElementStyles, props.name ] );
 
 		const element = useContext( BlockList.__unstableElementContext );
 

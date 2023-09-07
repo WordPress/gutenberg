@@ -1,0 +1,14 @@
+{
+	"apiVersion": 2,
+	"name": "test/router-regions",
+	"title": "E2E Interactivity tests - router regions",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScript": "router-regions-view",
+	"render": "file:./render.php"
+}

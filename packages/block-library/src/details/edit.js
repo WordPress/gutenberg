@@ -30,15 +30,18 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 	} );
 
 	// Check if either the block or the inner blocks are selected.
-	const hasSelection = useSelect( ( select ) => {
-		const { isBlockSelected, hasSelectedInnerBlock } =
-			select( blockEditorStore );
-		/* Sets deep to true to also find blocks inside the details content block. */
-		return (
-			hasSelectedInnerBlock( clientId, true ) ||
-			isBlockSelected( clientId )
-		);
-	}, [] );
+	const hasSelection = useSelect(
+		( select ) => {
+			const { isBlockSelected, hasSelectedInnerBlock } =
+				select( blockEditorStore );
+			/* Sets deep to true to also find blocks inside the details content block. */
+			return (
+				hasSelectedInnerBlock( clientId, true ) ||
+				isBlockSelected( clientId )
+			);
+		},
+		[ clientId ]
+	);
 
 	return (
 		<>

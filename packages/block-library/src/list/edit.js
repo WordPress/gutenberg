@@ -137,6 +137,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 			marginHorizontal: NATIVE_MARGIN_SPACING,
 			renderAppender: false,
 		} ),
+		__experimentalCaptureToolbars: true,
 	} );
 	useMigrateOnLoad( attributes, clientId );
 	const { ordered, type, reversed, start } = attributes;
@@ -177,10 +178,12 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 			{ controls }
 			{ ordered && (
 				<OrderedListSettings
-					setAttributes={ setAttributes }
-					ordered={ ordered }
-					reversed={ reversed }
-					start={ start }
+					{ ...{
+						setAttributes,
+						reversed,
+						start,
+						type,
+					} }
 				/>
 			) }
 		</>
