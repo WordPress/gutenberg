@@ -257,6 +257,7 @@ function FontLibraryProvider( { children } ) {
 			( f ) => f.slug !== font.slug
 		);
 		setFontFamilies( {
+			...fontFamilies,
 			[ font.source ]: newCustomFonts,
 		} );
 	};
@@ -269,6 +270,7 @@ function FontLibraryProvider( { children } ) {
 		);
 		// Activate the fonts by set the new custom fonts array.
 		setFontFamilies( {
+			...fontFamilies,
 			custom: newCustomFonts,
 		} );
 	};
