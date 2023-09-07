@@ -94,7 +94,8 @@ const createBuildSummary = async ( { buildStatus, commitHash, pullRequestNumber,
 
 	debug(JSON.stringify({ buildStatus, commitHash, pullRequestNumber, artifactsUrl }))
 
-	return await octokit.rest.markdown.render({ "text": `markdown`, "mode": "gfm" })
+	const response = await octokit.rest.markdown.render({ "text": `markdown ${buildStatus}`, "mode": "gfm" });
+	return response.data;
 };
 
 module.exports = prPreviewLink;
