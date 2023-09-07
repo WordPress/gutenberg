@@ -23,14 +23,14 @@ import { store as blockEditorStore } from '../../store';
  * editor, so we need to filter them out.
  */
 function UnIframedBlockAssets() {
-	const blockAssets =
-		useSelect( ( select ) => {
-			return select( blockEditorStore ).getSettings()
-				.__unstableResolvedAssets;
-		}, [] ) || {};
-	const { styles: _styles = '', scripts: _scripts = '' } = blockAssets;
+	const blockAssets = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings()
+			.__unstableResolvedAssets;
+	}, [] );
+	const { styles: _styles = '', scripts: _scripts = '' } = blockAssets || {};
 	const assetsHtml = _styles + _scripts;
 	const filteredAssetsHtml = useMemo( () => {
+		if ( ! assetsHtml ) return '';
 		const doc = document.implementation.createHTMLDocument( '' );
 		doc.body.innerHTML = assetsHtml;
 		// Remove assets already enqueued in the editor document.
@@ -41,6 +41,8 @@ function UnIframedBlockAssets() {
 		} );
 		return doc.body.innerHTML;
 	}, [ assetsHtml ] );
+
+	if ( ! filteredAssetsHtml ) return null;
 
 	return (
 		<div dangerouslySetInnerHTML={ { __html: filteredAssetsHtml } }></div>
