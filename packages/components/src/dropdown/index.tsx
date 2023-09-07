@@ -87,7 +87,9 @@ const UnconnectedDropdown = (
 			! containerRef.current.contains( ownerDocument.activeElement ) &&
 			( ! dialog || dialog.contains( containerRef.current ) )
 		) {
-			close();
+			// Temporarily disable this functionality to make sure that the storybook
+			// example works
+			// close();
 		}
 	}
 
