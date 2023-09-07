@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import createSelector from 'rememo';
+
+/**
  * Internal dependencies
  */
 import { selectorArgsToStateKey } from './utils';
@@ -161,7 +166,7 @@ export function hasResolvingSelectors( state ) {
  *
  * @return {Object} Object, containing selector totals by status.
  */
-export function countSelectorsByStatus( state ) {
+export const countSelectorsByStatus = createSelector( ( state ) => {
 	const selectorsByStatus = {};
 
 	Object.values( state ).forEach( ( selectorState ) =>
@@ -182,4 +187,4 @@ export function countSelectorsByStatus( state ) {
 	);
 
 	return selectorsByStatus;
-}
+} );

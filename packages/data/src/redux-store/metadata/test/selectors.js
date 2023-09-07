@@ -418,4 +418,28 @@ describe( 'countSelectorsByStatus', () => {
 			error: 2,
 		} );
 	} );
+
+	it( 'applies memoization and returns the same object for the same state', () => {
+		const { countSelectorsByStatus } = registry.select( 'store' );
+
+		expect( countSelectorsByStatus() ).toBe( countSelectorsByStatus() );
+
+		registry.dispatch( 'store' ).startResolution( 'getFoo', [] );
+		registry.dispatch( 'store' ).finishResolution( 'getFoo', [] );
+
+		expect( countSelectorsByStatus() ).toBe( countSelectorsByStatus() );
+	} );
+
+	it( 'returns a new object when different state is provided', () => {
+		const { countSelectorsByStatus } = registry.select( 'store' );
+
+		const result1 = countSelectorsByStatus();
+
+		registry.dispatch( 'store' ).startResolution( 'getFoo', [] );
+		registry.dispatch( 'store' ).finishResolution( 'getFoo', [] );
+
+		const result2 = countSelectorsByStatus();
+
+		expect( result1 ).not.toBe( result2 );
+	} );
 } );
