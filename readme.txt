@@ -1,5 +1,5 @@
 === Gutenberg ===
-Contributors: matveb, joen, karmatosed
+Contributors: matveb, joen, karmatosed, youknowriad, aduth, ellatrix, gziolo, jorgefilipecosta, mamaduka, tyxla, talldanwp, ntsekouras, noisysocks, mkaz, get_dave, oandregal, aaronrobertshaw, wildworks, ramonopoly, mciampini, scruffian, afercia, zieladam, kevin940726, andrewserong, isabel_brison, annezazu
 Tested up to: 6.3
 Stable tag: V.V.V
 License: GPLv2 or later
