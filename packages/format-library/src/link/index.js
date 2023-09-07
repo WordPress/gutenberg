@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	getTextContent,
 	applyFormat,
@@ -39,6 +39,18 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
+
+	// When the format is active toggle the state keeping track
+	// of whether to show the Link UI. This is needed to ensure
+	// that the addingLink state alone controls the visibility
+	// of the Link UI. This allows the Link UI to be forced to
+	// close (even if the format is active) if the user closes
+	// the Popover.
+	useEffect( () => {
+		if ( isActive ) {
+			setAddingLink( true );
+		}
+	}, [ isActive ] );
 
 	function addLink() {
 		const text = getTextContent( slice( value ) );
@@ -108,7 +120,7 @@ function Edit( {
 					aria-expanded={ addingLink || isActive }
 				/>
 			) }
-			{ ( addingLink || isActive ) && (
+			{ addingLink && (
 				<InlineLinkUI
 					addingLink={ addingLink }
 					stopAddingLink={ stopAddingLink }
