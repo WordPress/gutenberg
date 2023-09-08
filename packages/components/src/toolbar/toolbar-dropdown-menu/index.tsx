@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * WordPress dependencies
  */
@@ -19,7 +17,7 @@ function ToolbarDropdownMenu( props, ref ) {
 		return <DropdownMenu { ...props } />;
 	}
 
-	// ToobarItem will pass all props to the render prop child, which will pass
+	// ToolbarItem will pass all props to the render prop child, which will pass
 	// all props to the toggle of DropdownMenu. This means that ToolbarDropdownMenu
 	// has the same API as DropdownMenu.
 	return (
