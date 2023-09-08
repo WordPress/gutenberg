@@ -1,17 +1,14 @@
-export default function getIntersectingFontFaces(
-	intendedFontsFamilies,
-	existingFontFamilies
-) {
+export default function getIntersectingFontFaces( incoming, existing ) {
 	const matches = [];
 
-	for ( const intendedFont of intendedFontsFamilies ) {
-		const existingFont = existingFontFamilies.find(
-			( f ) => f.slug === intendedFont.slug
+	for ( const incomingFont of incoming ) {
+		const existingFont = existing.find(
+			( f ) => f.slug === incomingFont.slug
 		);
 
 		if ( existingFont ) {
-			if ( intendedFont?.fontFace ) {
-				const matchingFaces = intendedFont.fontFace.filter(
+			if ( incomingFont?.fontFace ) {
+				const matchingFaces = incomingFont.fontFace.filter(
 					( face ) => {
 						return ( existingFont?.fontFace || [] ).find( ( f ) => {
 							return (
@@ -23,7 +20,7 @@ export default function getIntersectingFontFaces(
 				);
 				matches.push( { ...existingFont, fontFace: matchingFaces } );
 			} else {
-				matches.push( intendedFont );
+				matches.push( incomingFont );
 			}
 		}
 	}
