@@ -5,24 +5,6 @@
  * @package WordPress
  */
 
-if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
-	/**
-	 * Replaces view script for the File block with version using Interactivity API.
-	 *
-	 * @param array $metadata Block metadata as read in via block.json.
-	 *
-	 * @return array Filtered block type metadata.
-	 */
-	function block_core_search_update_interactive_view_script( $metadata ) {
-		if ( 'core/search' === $metadata['name'] ) {
-			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
-			$metadata['supports']['interactivity'] = true;
-		}
-		return $metadata;
-	}
-	add_filter( 'block_type_metadata', 'block_core_search_update_interactive_view_script', 10, 1 );
-}
-
 /**
  * Dynamically renders the `core/search` block.
  *
@@ -98,24 +80,21 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		$is_expandable_searchfield = 'button-only' === $button_position && 'expand-searchfield' === $button_behavior;
 		if ( $is_expandable_searchfield ) {
-			if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
-				wp_store(
-					array(
-						'selectors' => array(
-							'core' => array(
-								'search' => array(
-									'tabindex' => 'true' === $open_by_default ? '0' : '-1',
-								),
+			wp_store(
+				array(
+					'selectors' => array(
+						'core' => array(
+							'search' => array(
+								'tabindex' => 'true' === $open_by_default ? '0' : '-1',
 							),
 						),
-					)
-				);
-				$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.core.search.isSearchInputVisible' );
-				$input->set_attribute( 'data-wp-bind--tabindex', 'selectors.core.search.tabindex' );
-			} else {
-				$input->set_attribute( 'aria-hidden', 'true' );
-				$input->set_attribute( 'tabindex', '-1' );
-			}
+					),
+				)
+			);
+			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.core.search.isSearchInputVisible' );
+			$input->set_attribute( 'data-wp-bind--tabindex', 'selectors.core.search.tabindex' );
+			$input->set_attribute( 'aria-hidden', 'true' );
+			$input->set_attribute( 'tabindex', '-1' );
 		}
 
 		// If the script already exists, there is no point in removing it from viewScript.
@@ -176,42 +155,38 @@ function render_block_core_search( $attributes, $content, $block ) {
 		if ( $button->next_tag() ) {
 			$button->add_class( implode( ' ', $button_classes ) );
 			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
-				if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
-					$aria_label_expanded  = __( 'Submit Search' );
-					$aria_label_collapsed = __( 'Expand search field' );
-					wp_store(
-						array(
-							'state'     => array(
-								'core' => array(
-									'search' => array(
-										'ariaLabelCollapsed' => $aria_label_collapsed,
-										'ariaLabelExpanded'  => $aria_label_expanded,
-									),
+				$aria_label_expanded  = __( 'Submit Search' );
+				$aria_label_collapsed = __( 'Expand search field' );
+				wp_store(
+					array(
+						'state'     => array(
+							'core' => array(
+								'search' => array(
+									'ariaLabelCollapsed' => $aria_label_collapsed,
+									'ariaLabelExpanded'  => $aria_label_expanded,
 								),
 							),
-							'selectors' => array(
-								'core' => array(
-									'search' => array(
-										'ariaLabel'    => 'true' === $open_by_default ? $aria_label_expanded : $aria_label_collapsed,
-										'ariaControls' => 'true' === $open_by_default ? null : $input_id,
-										'type'         => 'true' === $open_by_default ? 'submit' : 'button',
-									),
+						),
+						'selectors' => array(
+							'core' => array(
+								'search' => array(
+									'ariaLabel'    => 'true' === $open_by_default ? $aria_label_expanded : $aria_label_collapsed,
+									'ariaControls' => 'true' === $open_by_default ? null : $input_id,
+									'type'         => 'true' === $open_by_default ? 'submit' : 'button',
 								),
 							),
-						)
-					);
-					$button->set_attribute( 'data-wp-bind--aria-label', 'selectors.core.search.ariaLabel' );
-					$button->set_attribute( 'data-wp-bind--aria-controls', 'selectors.core.search.ariaControls' );
-					$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.core.search.isSearchInputVisible' );
-					$button->set_attribute( 'data-wp-bind--type', 'selectors.core.search.type' );
-					$button->set_attribute( 'data-wp-on--click', 'actions.core.search.openSearchInput' );
-				} else {
-					$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
-					$button->set_attribute( 'data-toggled-aria-label', __( 'Submit Search' ) );
-					$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
-					$button->set_attribute( 'aria-expanded', 'false' );
-					$button->set_attribute( 'type', 'button' ); // Will be set to submit after clicking.
-				}
+						),
+					)
+				);
+				$button->set_attribute( 'data-wp-bind--aria-label', 'selectors.core.search.ariaLabel' );
+				$button->set_attribute( 'data-wp-bind--aria-controls', 'selectors.core.search.ariaControls' );
+				$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.core.search.isSearchInputVisible' );
+				$button->set_attribute( 'data-wp-bind--type', 'selectors.core.search.type' );
+				$button->set_attribute( 'data-wp-on--click', 'actions.core.search.openSearchInput' );
+				$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
+				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
+				$button->set_attribute( 'aria-expanded', 'false' );
+				$button->set_attribute( 'type', 'button' ); // Will be set to submit after clicking.
 			} else {
 				$button->set_attribute( 'aria-label', wp_strip_all_tags( $attributes['buttonText'] ) );
 			}
@@ -229,7 +204,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		array( 'class' => $classnames )
 	);
 	$form_directives      = '';
-	if ( gutenberg_should_block_use_interactivity_api( 'core/search' ) ) {
+	if ( $is_expandable_searchfield ) {
 		$form_directives = '
 			data-wp-interactive
 			data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": ' . $open_by_default . ', "inputId": "' . $input_id . '" } } }\'
