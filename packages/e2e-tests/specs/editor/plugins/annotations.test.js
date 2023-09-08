@@ -29,13 +29,6 @@ describe( 'Annotations', () => {
 
 	beforeEach( async () => {
 		await createNewPost();
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 	} );
 
 	/**
@@ -100,7 +93,7 @@ describe( 'Annotations', () => {
 	 */
 	async function getRichTextInnerHTML() {
 		const htmlContent = await canvas().$$( '.wp-block-paragraph' );
-		return await page.evaluate( ( el ) => {
+		return await canvas().evaluate( ( el ) => {
 			return el.innerHTML;
 		}, htmlContent[ 0 ] );
 	}
@@ -126,7 +119,7 @@ describe( 'Annotations', () => {
 		const htmlContent = await canvas().$$(
 			'.block-editor-block-list__block-html-textarea'
 		);
-		const html = await page.evaluate( ( el ) => {
+		const html = await canvas().evaluate( ( el ) => {
 			return el.innerHTML;
 		}, htmlContent[ 0 ] );
 
@@ -145,7 +138,7 @@ describe( 'Annotations', () => {
 
 		await removeAnnotations();
 		const htmlContent = await canvas().$$( '.wp-block-paragraph' );
-		const html = await page.evaluate( ( el ) => {
+		const html = await canvas().evaluate( ( el ) => {
 			return el.innerHTML;
 		}, htmlContent[ 0 ] );
 

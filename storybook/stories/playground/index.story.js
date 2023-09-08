@@ -3,20 +3,19 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 import {
+	BlockCanvas,
 	BlockEditorProvider,
-	BlockList,
 	BlockTools,
 	BlockInspector,
-	WritingFlow,
 } from '@wordpress/block-editor';
 import { registerCoreBlocks } from '@wordpress/block-library';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import '@wordpress/format-library';
 
 /**
  * Internal dependencies
  */
 import styles from './style.lazy.scss';
+import { editorStyles } from './editor-styles';
 
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
@@ -35,26 +34,18 @@ function App() {
 
 	return (
 		<div className="playground">
-			<ShortcutProvider>
-				<BlockEditorProvider
-					value={ blocks }
-					onInput={ updateBlocks }
-					onChange={ updateBlocks }
-				>
-					<div className="playground__sidebar">
-						<BlockInspector />
-					</div>
-					<div className="playground__content">
-						<BlockTools>
-							<div className="editor-styles-wrapper">
-								<WritingFlow>
-									<BlockList />
-								</WritingFlow>
-							</div>
-						</BlockTools>
-					</div>
-				</BlockEditorProvider>
-			</ShortcutProvider>
+			<BlockEditorProvider
+				value={ blocks }
+				onInput={ updateBlocks }
+				onChange={ updateBlocks }
+			>
+				<div className="playground__sidebar">
+					<BlockInspector />
+				</div>
+				<BlockTools className="playground__content">
+					<BlockCanvas height="100%" styles={ editorStyles } />
+				</BlockTools>
+			</BlockEditorProvider>
 		</div>
 	);
 }

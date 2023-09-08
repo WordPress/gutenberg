@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "26.11.0",
+	"version": "26.12.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,6 +38,7 @@
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/dependency-extraction-webpack-plugin": "file:../dependency-extraction-webpack-plugin",
+		"@wordpress/e2e-test-utils-playwright": "file:../e2e-test-utils-playwright",
 		"@wordpress/eslint-plugin": "file:../eslint-plugin",
 		"@wordpress/jest-preset-default": "file:../jest-preset-default",
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
@@ -71,6 +72,7 @@
 		"minimist": "^1.2.0",
 		"npm-package-json-lint": "^6.4.0",
 		"npm-packlist": "^3.0.0",
+		"playwright-core": "1.32.0",
 		"postcss": "^8.4.5",
 		"postcss-loader": "^6.2.1",
 		"prettier": "npm:wp-prettier@2.8.5",
@@ -90,6 +92,7 @@
 		"webpack-dev-server": "^4.4.0"
 	},
 	"peerDependencies": {
+		"@playwright/test": "^1.32.0",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	},
