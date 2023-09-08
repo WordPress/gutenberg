@@ -48,7 +48,7 @@ function SinglePalette( {
 	colors,
 	onChange,
 	value,
-	...otherProps
+	...additionalProps
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
 		return colors.map( ( { color, name }, index ) => {
@@ -95,7 +95,7 @@ function SinglePalette( {
 		<CircularOptionPicker.OptionGroup
 			className={ className }
 			options={ colorOptions }
-			{ ...otherProps }
+			{ ...additionalProps }
 		/>
 	);
 }
@@ -178,6 +178,8 @@ function UnforwardedColorPalette(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
+		asButtons,
+		disableLooping,
 		clearable = true,
 		colors = [],
 		disableCustomColors = false,
@@ -188,7 +190,7 @@ function UnforwardedColorPalette(
 		headingLevel = 2,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
-		...otherProps
+		...additionalProps
 	} = props;
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
 
@@ -248,17 +250,27 @@ function UnforwardedColorPalette(
 		</CircularOptionPicker.ButtonAction>
 	);
 
-	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
+	let ariaProps:
+		| { 'aria-label': string }
+		| { 'aria-labelledby': string }
+		| {} = {};
+
 	if ( ariaLabel ) {
 		ariaProps = { 'aria-label': ariaLabel };
 	} else if ( ariaLabelledby ) {
-		ariaProps = { 'aria-labelledby': ariaLabelledby };
-	} else {
-		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
+		ariaProps = {
+			'aria-labelledby': ariaLabelledby,
+		};
+	} else if ( ! asButtons ) {
+		ariaProps = {
+			'aria-label': __( 'Custom color picker.' ),
+		};
 	}
 
+	const metaProps = asButtons ? { asButtons } : { disableLooping };
+
 	return (
-		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
+		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>
 			{ ! disableCustomColors && (
 				<CustomColorPickerDropdown
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
@@ -311,6 +323,7 @@ function UnforwardedColorPalette(
 			) }
 			<CircularOptionPicker
 				{ ...ariaProps }
+				{ ...metaProps }
 				actions={ actions }
 				options={
 					hasMultipleColorOrigins ? (
