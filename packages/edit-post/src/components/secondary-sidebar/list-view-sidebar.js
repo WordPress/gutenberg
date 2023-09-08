@@ -1,16 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalListView as ListView } from '@wordpress/block-editor';
+import {
+	__experimentalListView as ListView,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { Button, TabPanel } from '@wordpress/components';
 import {
 	useFocusOnMount,
 	useFocusReturn,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
-import { useRef, useState } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -23,6 +26,10 @@ import { store as editPostStore } from '../../store';
 import ListViewOutline from './list-view-outline';
 
 export default function ListViewSidebar( { listViewToggleElement } ) {
+	const hasBlocksSelected = useSelect(
+		( select ) => !! select( blockEditorStore ).getBlockSelectionStart(),
+		[]
+	);
 	const { setIsListViewOpened } = useDispatch( editPostStore );
 
 	// This hook handles focus when the sidebar first renders.
@@ -31,15 +38,19 @@ export default function ListViewSidebar( { listViewToggleElement } ) {
 	const headerFocusReturnRef = useFocusReturn();
 	const contentFocusReturnRef = useFocusReturn();
 
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-			event.preventDefault();
-			setIsListViewOpened( false );
+	const closeOnEscape = useCallback(
+		( event ) => {
+			if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+				event.preventDefault();
+				setIsListViewOpened( false );
 
-			// TODO: Only set the focus here if no blocks are selected.
-			listViewToggleElement?.focus();
-		}
-	}
+				if ( ! hasBlocksSelected ) {
+					listViewToggleElement?.focus();
+				}
+			}
+		},
+		[ hasBlocksSelected, listViewToggleElement, setIsListViewOpened ]
+	);
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the dropZoneElement updates.
