@@ -29,6 +29,10 @@ class Gutenberg_REST_Block_Patterns_Controller extends Gutenberg_REST_Block_Patt
 
 		$data = $response->get_data();
 
+		if ( empty( $data['content'] ) ) {
+			return $response;
+		}
+
 		$blocks          = parse_blocks( $data['content'] );
 		$data['content'] = gutenberg_serialize_blocks( $blocks ); // Serialize or render?
 
