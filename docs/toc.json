@@ -386,8 +386,7 @@
 			},
 			{
 				"docs/contributors/design/README.md": [
-					{ "docs/contributors/design/the-block.md": [] },
-					{ "docs/contributors/design/reference.md": [] }
+					{ "docs/contributors/design/the-block.md": [] }
 				]
 			},
 			{

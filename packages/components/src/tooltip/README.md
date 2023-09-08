@@ -1,8 +1,6 @@
-# Tooltip
+# ToolTip
 
-Tooltip is a React component to render floating help text relative to a node when it receives focus or when the user places the mouse cursor atop it. If the tooltip exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
-
-Accessibility note: the tooltip text is hidden from screen readers and assistive technologies that understand ARIA. To make it accessible, use an `aria-label` attribute on the same element the tooltip is applied to, preferably using the same text used for the tooltip.
+Tooltip is a React component to render floating help text relative to a node when it receives focus or it is hovered upon by a mouse. If the tooltip exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
 
 ## Usage
 
@@ -22,49 +20,38 @@ const MyTooltip = () => (
 
 The component accepts the following props:
 
-### position
-
-The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
-
--   Type: `String`
--   Required: No
--   Default: `"bottom"`
-
-### children
+#### `children`: `React.ReactElement`
 
 The element to which the tooltip should anchor.
 
-**NOTE:** You must pass only a single child. Tooltip renders itself as a clone of `children` with a [`Popover`](/packages/components/src/popover/README.md) added as an additional child.
+**NOTE:** Accepts only one child element.
 
--   Type: `Element`
 -   Required: Yes
 
-### text
+#### `delay`: `number`
 
-The tooltip text to show on focus or hover.
+The amount of time in milliseconds to wait before showing the tooltip.
 
--   Type: `String`
+-   Required: No
+-   Default: `700`
+
+#### `position`: `string`
+
+The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+
+-   Required: No
+-   Default: `"bottom"`
+
+#### `shortcut`: `string` | `object`
+
+An option for adding accessible keyboard shortcuts.
+
+If shortcut is a string, it is expecting the display text. If shortcut is an object, it will accept the properties of `display`: `string` and `ariaLabel`: `string`.
+
 -   Required: No
 
-### shortcut (web only)
+#### `text`: `string`
 
--   Type: `string` or `object`
+The text shown in the tooltip when anchor element is focused or hovered.
+
 -   Required: No
-
-If shortcut is a string, it is expecting the display text. If shortcut is an object, it will accept the properties of `display` (string) and `ariaLabel` (string).
-
-### delay (web only)
-
-Time in milliseconds to wait before showing tooltip after the tooltip's visibility is toggled. This prop is currently only available for the web platforms.
-
--   Type: `Number`
--   Required: No
--   Default: 700
-
-### visible (native only)
-
-Whether the tooltip should be displayed on initial render. This prop is currently only available for the native mobile app built with React Native.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
