@@ -444,6 +444,16 @@ export function undoManager( state = createUndoManager() ) {
 	return state;
 }
 
+export function editsReference( state = {}, action ) {
+	switch ( action.type ) {
+		case 'EDIT_ENTITY_RECORD':
+		case 'UNDO':
+		case 'REDO':
+			return {};
+	}
+	return state;
+}
+
 /**
  * Reducer managing embed preview data.
  *
@@ -565,7 +575,7 @@ export default combineReducers( {
 	themeGlobalStyleRevisions,
 	taxonomies,
 	entities,
-	//undo,
+	editsReference,
 	undoManager,
 	embedPreviews,
 	userPermissions,

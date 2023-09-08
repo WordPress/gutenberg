@@ -1130,12 +1130,9 @@ export const hasFetchedAutosaves = createRegistrySelector(
  *
  * @return A value whose reference will change only when an edit occurs.
  */
-export const getReferenceByDistinctEdits = createSelector(
-	// This unused state argument is listed here for the documentation generating tool (docgen).
-	( state: State ) => [],
-	// TODO: fix me, this changes more often than edits.
-	( state: State ) => [ state.entities.records ]
-);
+export function getReferenceByDistinctEdits( state ) {
+	return state.editsReference;
+}
 
 /**
  * Retrieve the frontend template used for a given link.
