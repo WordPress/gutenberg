@@ -8,7 +8,6 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 	Tooltip,
-	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -93,7 +92,12 @@ function BlockPattern( {
 								blocks={ blocks }
 								viewportWidth={ viewportWidth }
 							/>
-							<HStack className="block-editor-patterns__pattern-details">
+							<div className="block-editor-patterns__pattern-details">
+								{ ! showTooltip && (
+									<div className="block-editor-block-patterns-list__item-title">
+										{ pattern.title }
+									</div>
+								) }
 								{ pattern.id && ! pattern.syncStatus && (
 									<Tooltip
 										position="top center"
@@ -109,12 +113,7 @@ function BlockPattern( {
 										</div>
 									</Tooltip>
 								) }
-								{ ! showTooltip && (
-									<div className="block-editor-block-patterns-list__item-title">
-										{ pattern.title }
-									</div>
-								) }
-							</HStack>
+							</div>
 							{ !! pattern.description && (
 								<VisuallyHidden id={ descriptionId }>
 									{ pattern.description }
