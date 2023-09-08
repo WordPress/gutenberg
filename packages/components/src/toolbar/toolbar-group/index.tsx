@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * External dependencies
  */
@@ -17,6 +15,7 @@ import ToolbarButton from '../toolbar-button';
 import ToolbarGroupContainer from './toolbar-group-container';
 import ToolbarGroupCollapsed from './toolbar-group-collapsed';
 import ToolbarContext from '../toolbar-context';
+import type { ToolbarGroupProps } from './types';
 
 /**
  * Renders a collapsible group of controls
@@ -55,7 +54,7 @@ function ToolbarGroup( {
 	isCollapsed,
 	title,
 	...props
-} ) {
+}: ToolbarGroupProps ) {
 	// It'll contain state if `ToolbarGroup` is being used within
 	// `<Toolbar label="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );
@@ -94,7 +93,7 @@ function ToolbarGroup( {
 	return (
 		<ToolbarGroupContainer className={ finalClassName } { ...props }>
 			{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
-				controlSet.map( ( control, indexOfControl ) => (
+				controlSet.map( ( control: any, indexOfControl: number ) => (
 					<ToolbarButton
 						key={ [ indexOfSet, indexOfControl ].join() }
 						containerClassName={
