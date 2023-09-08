@@ -206,15 +206,15 @@ function getWebpackEntryPoints() {
 
 	// 2. Checks whether any block metadata files can be detected in the defined source directory.
 	//    It scans all discovered files looking for JavaScript assets and converts them to entry points.
-	const srcDirectory = fromProjectRoot( getWordPressSrcDirectory() ) + sep;
-	const blockMetadataFiles = glob(
-		join( srcDirectory, '**/block.json' ).replace( /\\/g, '/' ),
-		{
-			absolute: true,
-		}
-	);
+	const blockMetadataFiles = glob( '**/block.json', {
+		absolute: true,
+		cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+	} );
 
 	if ( blockMetadataFiles.length > 0 ) {
+		const srcDirectory = fromProjectRoot(
+			getWordPressSrcDirectory() + sep
+		);
 		const entryPoints = blockMetadataFiles.reduce(
 			( accumulator, blockMetadataFile ) => {
 				// wrapping in try/catch in case the file is malformed
@@ -333,13 +333,12 @@ function getRenderPropPaths() {
 	}
 
 	// Checks whether any block metadata files can be detected in the defined source directory.
+	const blockMetadataFiles = glob( '**/block.json', {
+		absolute: true,
+		cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+	} );
+
 	const srcDirectory = fromProjectRoot( getWordPressSrcDirectory() + sep );
-	const blockMetadataFiles = glob(
-		join( srcDirectory, '**/block.json' ).replace( /\\/g, '/' ),
-		{
-			absolute: true,
-		}
-	);
 
 	const renderPaths = blockMetadataFiles.map( ( blockMetadataFile ) => {
 		const { render } = JSON.parse( readFileSync( blockMetadataFile ) );
