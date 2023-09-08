@@ -159,3 +159,24 @@ export function getPreviewStyle( family ) {
 
 	return style;
 }
+
+export function makeFormDataFromFontFamilies( fontFamilies ) {
+	const formData = new FormData();
+	const newFontFamilies = fontFamilies.map( ( family ) => {
+		if ( family?.fontFace ) {
+			family.fontFace = family.fontFace.map( ( face, i ) => {
+				if ( face.file ) {
+					// Add the files to the formData
+					formData.append( `files${ i }`, face.file, face.file.name );
+					// remove the file object from the face object the file is referenced by the uploadedFile key
+					const { file, ...faceWithoutFileProperty } = face;
+					return faceWithoutFileProperty;
+				}
+				return face;
+			} );
+		}
+		return family;
+	} );
+	formData.append( 'fontFamilies', JSON.stringify( newFontFamilies ) );
+	return formData;
+}
