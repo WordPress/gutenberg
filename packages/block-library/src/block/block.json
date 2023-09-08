@@ -15,6 +15,12 @@
 	"supports": {
 		"customClassName": false,
 		"html": false,
-		"inserter": false
+		"inserter": false,
+		"layout": {
+			"allowEditing": false,
+			"default": {
+				"type": "constrained"
+			}
+		}
 	}
 }

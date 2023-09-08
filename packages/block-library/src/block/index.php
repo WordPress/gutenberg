@@ -8,8 +8,8 @@
 /**
  * Renders the `core/block` block on server.
  *
- * @param array  $attributes The block attributes.
- * @param string $content    The block content.
+ * @param array  $attributes    The block attributes.
+ * @param string $block_content The block content.
  *
  * @return string Rendered HTML of the referenced block.
  */
@@ -42,6 +42,32 @@ function render_block_core_block( $attributes, $block_content ) {
 
 	$seen_refs[ $attributes['ref'] ] = true;
 
+	// We need to determine the widest alignment of inner blocks so it can be
+	// applied to the pattern's wrapper.
+	$widest_alignment  = null;
+	$filter_alignments = static function( $parsed_block, $source_block, $parent_block ) use ( &$widest_alignment ) {
+		// If this isn't a top level block in the pattern or we have already
+		// determined that we have a full aligned block, skip it.
+		if ( isset( $parent_block ) || 'full' === $widest_alignment ) {
+			return $parsed_block;
+		}
+
+		$alignment = _wp_array_get( $parsed_block, array( 'attrs', 'align' ), null );
+
+		if ( 'full' === $alignment ) {
+			$widest_alignment = $alignment;
+			return $parsed_block;
+		}
+
+		if ( 'wide' === $alignment ) {
+			$widest_alignment = $alignment;
+		}
+
+		return $parsed_block;
+	};
+
+	add_filter( 'render_block_data', $filter_alignments, 10, 3 );
+
 	// Handle embeds for reusable blocks.
 	global $wp_embed;
 
@@ -50,6 +76,8 @@ function render_block_core_block( $attributes, $block_content ) {
 	$content = do_blocks( $content );
 
 	unset( $seen_refs[ $attributes['ref'] ] );
+
+	remove_filter( 'render_block_data', $filter_alignments, 10 );
 
 	// Older block versions used only the post's content without incorporating
 	// the editor's wrapper. Newer versions added a wrapper through saved
@@ -60,6 +88,12 @@ function render_block_core_block( $attributes, $block_content ) {
 
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 	$processor->next_tag();
+
+	// Apply the alignment class to the original block content so its all
+	// copied across to the result with other classes etc.
+	if ( null !== $widest_alignment ) {
+		$processor->add_class( 'align' . $widest_alignment );
+	}
 
 	$tag_name = $processor->get_tag();
 	$markup   = "<$tag_name>$content</$tag_name>";

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -12,6 +17,7 @@ import {
 	TextControl,
 	PanelBody,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	useInnerBlocksProps,
@@ -21,9 +27,17 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useEffect, useState } from '@wordpress/element';
 
-export default function ReusableBlockEdit( { attributes: { ref } } ) {
+const fullAlignments = [ 'full', 'left', 'right' ];
+
+export default function ReusableBlockEdit( { attributes, setAttributes } ) {
+	const { ref } = attributes;
+	const [ inferredAlignment, setInferredAlignment ] = useState();
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
@@ -45,8 +59,42 @@ export default function ReusableBlockEdit( { attributes: { ref } } ) {
 		ref
 	);
 
+	useEffect( () => {
+		// Determine the widest setting of all the contained blocks.
+		let widestAlignment;
+		for ( const block of blocks ) {
+			const { align } = block.attributes;
+
+			if ( fullAlignments.includes( align ) ) {
+				widestAlignment = 'full';
+				break;
+			}
+
+			if ( align === 'wide' ) {
+				widestAlignment = align;
+			}
+		}
+
+		// If we don't have a wide or full alignment set, we can remove
+		// the default layout attribute.
+		if ( ! widestAlignment ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { layout: undefined } );
+			setInferredAlignment( widestAlignment );
+			return;
+		}
+
+		// Adopt the widest alignment of the pattern block's children.
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { layout: { type: 'constrained' } } );
+		setInferredAlignment( widestAlignment );
+	}, [ blocks, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
+
 	const blockProps = useBlockProps( {
-		className: 'block-library-block__reusable-block-container',
+		className: classnames(
+			'block-library-block__reusable-block-container',
+			{ [ `align${ inferredAlignment }` ]: !! inferredAlignment }
+		),
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
