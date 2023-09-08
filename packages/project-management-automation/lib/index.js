@@ -11,6 +11,7 @@ const assignFixedIssues = require( './tasks/assign-fixed-issues' );
 const firstTimeContributorAccountLink = require( './tasks/first-time-contributor-account-link' );
 const firstTimeContributorLabel = require( './tasks/first-time-contributor-label' );
 const addMilestone = require( './tasks/add-milestone' );
+const prPreviewLink = require( './tasks/pr-preview-link' );
 const debug = require( './debug' );
 
 /**
@@ -51,6 +52,10 @@ const automations = [
 	{
 		event: 'push',
 		task: addMilestone,
+	},
+	{
+		event: 'workflow_run',
+		task: prPreviewLink,
 	},
 ];
 
