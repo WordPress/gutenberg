@@ -29,7 +29,7 @@ This handbook is focused on block development and is divided into five sections,
 
 **[Getting Started](https://developer.wordpress.org/block-editor/getting-started/)**
 
-For those just starting out with block development this is where you can get set up with a [development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/) and learn the [fundamentals of block development](https://developer.wordpress.org/block-editor/getting-started/create-block/).
+For those just starting out with block development this is where you can get set up with a [development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/) and learn the [fundamentals of block development](https://developer.wordpress.org/block-editor/getting-started/create-block/). Its [Glossary of terms](https://developer.wordpress.org/block-editor/getting-started/glossary/) and [FAQs](https://developer.wordpress.org/block-editor/getting-started/faq/) should answer any outstanding questions you may have.
 
 
 **[How-to Guides](https://developer.wordpress.org/block-editor/how-to-guides/)**
@@ -44,8 +44,7 @@ This section is the heart of the handbook and is where you can get down to the n
 
 **[Explanations](https://developer.wordpress.org/block-editor/explanations/)**
 
-This section enables you to go deeper and reinforce your practical knowledge with a theoretical understanding of the [Architecture](https://developer.wordpress.org/block-editor/explanations/architecture/) of the block editor. Its [Glossary of terms](https://developer.wordpress.org/block-editor/explanations/glossary/) and [FAQs](https://developer.wordpress.org/block-editor/getting-started/faq/) should answer any outstanding questions you may have.
-
+This section enables you to go deeper and reinforce your practical knowledge with a theoretical understanding of the [Architecture](https://developer.wordpress.org/block-editor/explanations/architecture/) of the block editor.
 
 **[Contributor Guide](https://developer.wordpress.org/block-editor/contributors/)**
 

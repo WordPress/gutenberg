@@ -30,6 +30,7 @@ export function UnforwardedSpinner(
 			focusable="false"
 			{ ...props }
 			ref={ forwardedRef }
+			data-testid="components-spinner"
 		>
 			{ /* Gray circular background */ }
 			<SpinnerTrack
