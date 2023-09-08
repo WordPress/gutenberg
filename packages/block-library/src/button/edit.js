@@ -38,6 +38,14 @@ const NEW_TAB_REL = 'noreferrer noopener';
 const NEW_TAB_TARGET = '_blank';
 const NOFOLLOW_REL = 'nofollow';
 
+const LINK_SETTINGS = [
+	...LinkControl.DEFAULT_LINK_SETTINGS,
+	{
+		id: 'nofollow',
+		title: __( 'Mark as nofollow' ),
+	},
+];
+
 function WidthPanel( { selectedWidth, setAttributes } ) {
 	function handleChange( newWidth ) {
 		// Check if we are toggling the width off
@@ -288,7 +296,7 @@ function ButtonEdit( props ) {
 							richTextRef.current?.focus();
 						} }
 						forceIsEditingLink={ isEditingURL }
-						hasNofollowSetting={ true }
+						settings={ LINK_SETTINGS }
 					/>
 				</Popover>
 			) }

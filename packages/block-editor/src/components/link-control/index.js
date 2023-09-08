@@ -38,7 +38,6 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {boolean=} opensInNewTab Whether link should open in a new browser
  *                                    tab. This value is only assigned if not
  *                                    providing a custom `settings` prop.
- * @property {boolean=} nofollow      Whether this link is marked as no follow relationship.
  */
 
 /* eslint-disable jsdoc/valid-types */
@@ -119,7 +118,6 @@ function LinkControl( {
 	searchInputPlaceholder,
 	value,
 	settings = DEFAULT_LINK_SETTINGS,
-	hasNofollowSetting = false,
 	onChange = noop,
 	onRemove,
 	onCancel,
@@ -137,16 +135,6 @@ function LinkControl( {
 	hasTextControl = false,
 	renderControlBottom = null,
 } ) {
-	if ( hasNofollowSetting ) {
-		settings = [
-			...settings,
-			{
-				id: 'nofollow',
-				title: __( 'Mark as nofollow' ),
-			},
-		];
-	}
-
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
 	}
