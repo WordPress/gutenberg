@@ -45,7 +45,8 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"ariaLabel": true
 	},
 	"example": {}
 }

@@ -12,8 +12,10 @@ const ENTRY_CLASS_NAME = 'wp-block-table-of-contents__entry';
 
 export default function TableOfContentsList( {
 	nestedHeadingList,
+	disableLinkActivation,
 }: {
 	nestedHeadingList: NestedHeadingData[];
+	disableLinkActivation?: boolean;
 } ): WPElement {
 	return (
 		<>
@@ -21,7 +23,21 @@ export default function TableOfContentsList( {
 				const { content, link } = node.heading;
 
 				const entry = link ? (
-					<a className={ ENTRY_CLASS_NAME } href={ link }>
+					<a
+						className={ ENTRY_CLASS_NAME }
+						href={ link }
+						aria-disabled={ disableLinkActivation || undefined }
+						onClick={
+							disableLinkActivation
+								? ( event ) => event?.preventDefault()
+								: undefined
+						}
+						onContextMenu={
+							disableLinkActivation
+								? ( event ) => event?.preventDefault()
+								: undefined
+						}
+					>
 						{ content }
 					</a>
 				) : (

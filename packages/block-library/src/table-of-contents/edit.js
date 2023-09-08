@@ -137,8 +137,11 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ol inert="true">
-					<TableOfContentsList nestedHeadingList={ headingTree } />
+				<ol>
+					<TableOfContentsList
+						nestedHeadingList={ headingTree }
+						disableLinkActivation={ true }
+					/>
 				</ol>
 			</nav>
 			{ toolbarControls }
