@@ -31,7 +31,9 @@ jobs:
                 node: ['16']
 
         steps:
-            - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+            - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -109,7 +111,9 @@ jobs:
             WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
 
         steps:
-            - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+            - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -122,7 +126,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@4bd44f22a98a19e0950cbad5f31095157cc9621b # v2.25.4
+              uses: shivammathur/setup-php@72ae4ccbe57f82bbe08411e84e2130bd4ba1c10f # v2.25.5
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -217,10 +221,12 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+              uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@4bd44f22a98a19e0950cbad5f31095157cc9621b # v2.25.4
+              uses: shivammathur/setup-php@72ae4ccbe57f82bbe08411e84e2130bd4ba1c10f # v2.25.5
               with:
                   php-version: '7.4'
                   coverage: none
@@ -284,7 +290,9 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+            - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node

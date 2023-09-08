@@ -67,98 +67,59 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	}
 }
 
-if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) ) {
 
-	/**
-	 * Add Interactivity API directives to the navigation-submenu and page-list blocks markup using the Tag Processor
-	 * The final HTML of the navigation-submenu and the page-list blocks will look similar to this:
-	 *
-	 * <li
-	 *   class="has-child"
-	 *   data-wp-context='{ "core": { "navigation": { "isMenuOpen": false, "overlay": false } } }'
-	 *   data-wp-effect="effects.core.navigation.initMenu"
-	 *   data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
-	 *   data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
-	 * >
-	 *   <button
-	 *     class="wp-block-navigation-submenu__toggle"
-	 *     data-wp-on.click="actions.core.navigation.openMenu"
-	 *     data-wp-bind.aria-expanded="context.core.navigation.isMenuOpen"
-	 *   >
-	 *   </button>
-	 *   <span>Title</span>
-	 *   <ul class="wp-block-navigation__submenu-container">
-	 *     SUBMENU ITEMS
-	 *   </ul>
-	 * </li>
-	 *
-	 * @param string $w Markup of the navigation block.
-	 * @param array  $block_attributes Block attributes.
-	 *
-	 * @return string Submenu markup with the directives injected.
-	 */
-	function block_core_navigation_add_directives_to_submenu( $w, $block_attributes ) {
-		while ( $w->next_tag(
+/**
+ * Add Interactivity API directives to the navigation-submenu and page-list
+ * blocks markup using the Tag Processor.
+ *
+ * @param string $w Markup of the navigation block.
+ * @param array  $block_attributes Block attributes.
+ *
+ * @return string Submenu markup with the directives injected.
+ */
+function block_core_navigation_add_directives_to_submenu( $w, $block_attributes ) {
+	while ( $w->next_tag(
+		array(
+			'tag_name'   => 'LI',
+			'class_name' => 'has-child',
+		)
+	) ) {
+		// Add directives to the parent `<li>`.
+		$w->set_attribute( 'data-wp-interactive', true );
+		$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "submenuOpenedBy": {}, "type": "submenu" } } }' );
+		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
+		$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.handleMenuFocusout' );
+		$w->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
+		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
+			$w->set_attribute( 'data-wp-on--mouseenter', 'actions.core.navigation.openMenuOnHover' );
+			$w->set_attribute( 'data-wp-on--mouseleave', 'actions.core.navigation.closeMenuOnHover' );
+		}
+
+		// Add directives to the toggle submenu button.
+		if ( $w->next_tag(
 			array(
-				'tag_name'   => 'LI',
-				'class_name' => 'has-child',
+				'tag_name'   => 'BUTTON',
+				'class_name' => 'wp-block-navigation-submenu__toggle',
 			)
 		) ) {
-			// Add directives to the parent `<li>`.
-			$w->set_attribute( 'data-wp-interactive', true );
-			$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "submenuOpenedBy": {}, "type": "submenu" } } }' );
-			$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
-			$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.handleMenuFocusout' );
-			$w->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
-			if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
-				$w->set_attribute( 'data-wp-on--mouseenter', 'actions.core.navigation.openMenuOnHover' );
-				$w->set_attribute( 'data-wp-on--mouseleave', 'actions.core.navigation.closeMenuOnHover' );
-			}
-
-			// Add directives to the toggle submenu button.
-			if ( $w->next_tag(
-				array(
-					'tag_name'   => 'BUTTON',
-					'class_name' => 'wp-block-navigation-submenu__toggle',
-				)
-			) ) {
-				$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.toggleMenuOnClick' );
-				$w->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
-			};
-
-			// Add directives to the submenu.
-			if ( $w->next_tag(
-				array(
-					'tag_name'   => 'UL',
-					'class_name' => 'wp-block-navigation__submenu-container',
-				)
-			) ) {
-				$w->set_attribute( 'data-wp-on--focusin', 'actions.core.navigation.openMenuOnFocus' );
-			}
-
-			// Iterate through subitems if exist.
-			block_core_navigation_add_directives_to_submenu( $w, $block_attributes );
+			$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.toggleMenuOnClick' );
+			$w->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
+		};
+		// Add directives to the submenu.
+		if ( $w->next_tag(
+			array(
+				'tag_name'   => 'UL',
+				'class_name' => 'wp-block-navigation__submenu-container',
+			)
+		) ) {
+			$w->set_attribute( 'data-wp-on--focus', 'actions.core.navigation.openMenuOnFocus' );
 		}
-		return $w->get_updated_html();
-	};
 
-	/**
-	 * Replaces view script for the Navigation block with version using Interactivity API.
-	 *
-	 * @param array $metadata Block metadata as read in via block.json.
-	 *
-	 * @return array Filtered block type metadata.
-	 */
-	function gutenberg_block_core_navigation_update_interactive_view_script( $metadata ) {
-		if ( 'core/navigation' === $metadata['name'] ) {
-			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
-			$metadata['supports']['interactivity'] = true;
-		}
-		return $metadata;
+		// Iterate through subitems if exist.
+		block_core_navigation_add_directives_to_submenu( $w, $block_attributes );
 	}
-	add_filter( 'block_type_metadata', 'gutenberg_block_core_navigation_update_interactive_view_script', 10, 1 );
-}
-
+	return $w->get_updated_html();
+};
 
 /**
  * Build an array with CSS classes and inline styles defining the colors
@@ -288,10 +249,6 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 function block_core_navigation_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
-
-
-
-
 
 /**
  * Filter out empty "null" blocks from the block list.
@@ -671,38 +628,25 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks_html .= '</ul>';
 	}
 
-	$needed_script_map = array(
-		'wp-block-navigation-view'   => ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ),
-		'wp-block-navigation-view-2' => $is_responsive_menu,
-	);
+	$should_load_view_script = ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
+	$view_js_file            = 'wp-block-navigation-view';
 
-	$should_load_view_script = false;
-	if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) ) {
-		// TODO: The script is still loaded even when it isn't needed when the Interactivity API is used.
-		$should_load_view_script = count( array_filter( $needed_script_map ) ) > 0;
-	} else {
-		foreach ( $needed_script_map as $view_script_handle => $is_view_script_needed ) {
+	// If the script already exists, there is no point in removing it from viewScript.
+	if ( ! wp_script_is( $view_js_file ) ) {
+		$script_handles = $block->block_type->view_script_handles;
 
-			// If the script already exists, there is no point in removing it from viewScript.
-			if ( wp_script_is( $view_script_handle ) ) {
-				continue;
-			}
-
-			$script_handles = $block->block_type->view_script_handles;
-
-			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-			if ( ! $is_view_script_needed && in_array( $view_script_handle, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_script_handle ) );
-			}
-			// If the script is needed, but it was previously removed, add it again.
-			if ( $is_view_script_needed && ! in_array( $view_script_handle, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_script_handle ) );
-			}
+		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		}
+		// If the script is needed, but it was previously removed, add it again.
+		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
 		}
 	}
 
 	// Add directives to the submenu if needed.
-	if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) && $has_submenus && $should_load_view_script ) {
+	if ( $has_submenus && $should_load_view_script ) {
 		$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
 		$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $w, $attributes );
 	}
@@ -750,7 +694,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$responsive_container_directives = '';
 	$responsive_dialog_directives    = '';
 	$close_button_directives         = '';
-	if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) && $should_load_view_script ) {
+	if ( $should_load_view_script ) {
 		$nav_element_directives          = '
 			data-wp-interactive
 			data-wp-context=\'{ "core": { "navigation": { "overlayOpenedBy": {}, "type": "overlay", "roleAttribute": "" } } }\'
@@ -778,11 +722,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s" %11$s>%9$s</button>
+		'<button aria-haspopup="true" %3$s class="%6$s" %11$s>%9$s</button>
 			<div class="%5$s" style="%7$s" id="%1$s" %12$s>
-				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
+				<div class="wp-block-navigation__responsive-close" tabindex="-1">
 					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s" %13$s>
-							<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close" %14$s>%10$s</button>
+							<button %4$s class="wp-block-navigation__responsive-container-close" %14$s>%10$s</button>
 						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
 							%2$s
 						</div>
