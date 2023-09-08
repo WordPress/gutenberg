@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { toggleFont } from '../toggleFont';
 
 describe( 'toggleFont function', () => {
