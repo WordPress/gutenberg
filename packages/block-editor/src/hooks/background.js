@@ -145,7 +145,6 @@ function BackgroundImagePanelItem( props ) {
 		}
 
 		if ( isBlobURL( media.url ) ) {
-			// TODO: Might need to revoke the blob URL.
 			return;
 		}
 

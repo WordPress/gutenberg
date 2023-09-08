@@ -498,16 +498,16 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'block_styles'    => array(
 					'background' => array(
 						'backgroundImage' => array(
-							'url' => 'http://example.com/image.jpg',
+							'url' => 'https://example.com/image.jpg',
 						),
 						'backgroundSize'  => 'cover',
 					),
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => "background-image:url('http://example.com/image.jpg');background-size:cover;",
+					'css'          => "background-image:url('https://example.com/image.jpg');background-size:cover;",
 					'declarations' => array(
-						'background-image' => "url('http://example.com/image.jpg')",
+						'background-image' => "url('https://example.com/image.jpg')",
 						'background-size'  => 'cover',
 					),
 				),
