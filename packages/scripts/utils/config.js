@@ -258,9 +258,12 @@ function getWebpackEntryPoints() {
 
 							// Detects the proper file extension used in the defined source directory.
 							const [ entryFilepath ] = glob(
-								`${ getWordPressSrcDirectory() }/${ entryName }.[jt]s?(x)`,
+								`${ entryName }.[jt]s?(x)`,
 								{
 									absolute: true,
+									cwd: fromProjectRoot(
+										getWordPressSrcDirectory()
+									),
 								}
 							);
 
@@ -300,13 +303,12 @@ function getWebpackEntryPoints() {
 	}
 
 	// 3. Checks whether a standard file name can be detected in the defined source directory,
-	//    and converts the discovered file to entry point.
-	const [ entryFile ] = glob(
-		`${ getWordPressSrcDirectory() }/index.[jt]s?(x)`,
-		{
-			absolute: true,
-		}
-	);
+	//  and converts the discovered file to entry point.
+	const [ entryFile ] = glob( 'index.[jt]s?(x)', {
+		absolute: true,
+		cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+	} );
+
 	if ( ! entryFile ) {
 		log(
 			chalk.yellow(
