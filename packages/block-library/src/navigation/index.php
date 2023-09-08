@@ -142,24 +142,6 @@ function block_core_navigation_add_directives_to_submenu( $w, $block_attributes 
 };
 
 /**
- * Replaces view script for the Navigation block with version using Interactivity API.
- *
- * @param array $metadata Block metadata as read in via block.json.
- *
- * @return array Filtered block type metadata.
- */
-function gutenberg_block_core_navigation_update_interactive_view_script( $metadata ) {
-	if ( 'core/navigation' === $metadata['name'] ) {
-		$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
-		$metadata['supports']['interactivity'] = true;
-	}
-		return $metadata;
-}
-add_filter( 'block_type_metadata', 'gutenberg_block_core_navigation_update_interactive_view_script', 10, 1 );
-
-
-
-/**
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the navigation markup in the front-end.
  *
@@ -287,10 +269,6 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 function block_core_navigation_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
-
-
-
-
 
 /**
  * Filter out empty "null" blocks from the block list.
@@ -764,11 +742,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s" %11$s>%9$s</button>
+		'<button aria-haspopup="true" %3$s class="%6$s" %11$s>%9$s</button>
 			<div class="%5$s" style="%7$s" id="%1$s" %12$s>
-				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
+				<div class="wp-block-navigation__responsive-close" tabindex="-1">
 					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s" %13$s>
-							<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close" %14$s>%10$s</button>
+							<button %4$s class="wp-block-navigation__responsive-container-close" %14$s>%10$s</button>
 						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
 							%2$s
 						</div>
