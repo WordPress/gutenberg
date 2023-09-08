@@ -74,7 +74,6 @@ function _gutenberg_wp_ajax_signaling_server() {
 		if ( isset( $subscriber_to_messages[ $subscriber_id ] ) && count( $subscriber_to_messages[ $subscriber_id ] ) > 0 ) {
 			$messages                                 = array_map( 'json_encode', $subscriber_to_messages[ $subscriber_id ] );
 			$subscriber_to_messages[ $subscriber_id ] = array();
-			$data                                     = null;
 			if ( count( $messages ) > 1 ) {
 				$data = implode( '|MULTIPLE|', $messages );
 			} else {
