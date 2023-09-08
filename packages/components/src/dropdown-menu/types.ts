@@ -50,7 +50,7 @@ type DropdownCallbackProps = {
 	onClose: () => void;
 };
 
-// Manually including `as` prop because `WordPressComponentProps` polymorhpism
+// Manually including `as` prop because `WordPressComponentProps` polymorphism
 // creates a union that is too large for TypeScript to handle.
 type ToggleProps = Partial<
 	Omit<
