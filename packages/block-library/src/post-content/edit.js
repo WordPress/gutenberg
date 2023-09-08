@@ -20,14 +20,19 @@ import { useSelect } from '@wordpress/data';
  */
 import { useCanEditEntity } from '../utils/hooks';
 
-function ReadOnlyContent( { userCanEdit, postType, postId } ) {
+function ReadOnlyContent( {
+	layoutClassNames,
+	userCanEdit,
+	postType,
+	postId,
+} ) {
 	const [ , , content ] = useEntityProp(
 		'postType',
 		postType,
 		'content',
 		postId
 	);
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return content?.protected && ! userCanEdit ? (
 		<div { ...blockProps }>
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
@@ -77,7 +82,8 @@ function EditableContent( { context = {} } ) {
 }
 
 function Content( props ) {
-	const { context: { queryId, postType, postId } = {} } = props;
+	const { context: { queryId, postType, postId } = {}, layoutClassNames } =
+		props;
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	if ( userCanEdit === undefined ) {
 		return null;
@@ -90,6 +96,7 @@ function Content( props ) {
 		<EditableContent { ...props } />
 	) : (
 		<ReadOnlyContent
+			layoutClassNames={ layoutClassNames }
 			userCanEdit={ userCanEdit }
 			postType={ postType }
 			postId={ postId }
@@ -133,11 +140,9 @@ function RecursionError() {
 
 export default function PostContentEdit( {
 	context,
-	attributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
-	const { layout = {} } = attributes;
 	const hasAlreadyRendered = useHasRecursion( contextPostId );
 
 	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
@@ -147,7 +152,10 @@ export default function PostContentEdit( {
 	return (
 		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
-				<Content context={ context } layout={ layout } />
+				<Content
+					context={ context }
+					layoutClassNames={ layoutClassNames }
+				/>
 			) : (
 				<Placeholder layoutClassNames={ layoutClassNames } />
 			) }
