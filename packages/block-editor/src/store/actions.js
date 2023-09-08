@@ -13,6 +13,7 @@ import {
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
 	getBlockSupport,
+	isUnmodifiedBlock,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -1112,19 +1113,10 @@ export const mergeBlocks =
 		}
 
 		// If previous block is empty, remove previous block and update selection.
-		const blockAHasEmptyContent = blockA?.attributes.content === '';
-		const blockBHastEmptyContent = blockB?.attributes.content === '';
+		const blockAHasEmptyContent = isUnmodifiedBlock( blockA );
+		const blockBHastEmptyContent = isUnmodifiedBlock( blockB );
 		if ( blockAHasEmptyContent && ! blockBHastEmptyContent ) {
-			dispatch.removeBlock( clientIdA );
-
-			if ( canRestoreTextSelection ) {
-				dispatch.selectionChange(
-					blockB.clientId,
-					attributeKey,
-					offset,
-					offset
-				);
-			}
+			dispatch.removeBlock( clientIdA, false );
 
 			return;
 		}

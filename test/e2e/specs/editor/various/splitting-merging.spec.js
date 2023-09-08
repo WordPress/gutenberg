@@ -262,15 +262,16 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await editor.insertBlock( { name: 'core/heading' } );
-		await page.keyboard.type( 'Heading' );
-		await pageUtils.pressKeys( 'ArrowLeft', { times: 7 } );
+		await page.keyboard.type( 'a' );
+		await pageUtils.pressKeys( 'ArrowLeft' );
 		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( 'b' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:heading -->
-<h2 class="wp-block-heading">Heading</h2>
+<h2 class="wp-block-heading">ba</h2>
 <!-- /wp:heading -->`
 		);
 	} );
