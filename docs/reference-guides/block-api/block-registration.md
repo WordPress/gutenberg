@@ -234,6 +234,7 @@ example: {
 #### variations (optional)
 
 -   **Type:** `Object[]`
+-   **Since**: `WordPress 5.9.0`
 
 Similarly to how the block's styles can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted. See the [Block Variations API](/docs/reference-guides/block-api/block-variations.md) for more details.
 
@@ -265,12 +266,36 @@ parent: [ 'core/columns' ],
 #### ancestor (optional)
 
 -   **Type:** `Array`
+-   **Since**: `WordPress 6.0.0`
 
 The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a 'Comment Content' block inside a 'Column' block, as long as 'Column' is somewhere within a 'Comment Template' block. In comparison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
 
 ```js
 // Only allow this block when it is nested at any level in a Columns block.
 ancestor: [ 'core/columns' ],
+```
+
+#### Block Hooks (optional)
+
+-   **Type:** `Object`
+-   **Since**: `WordPress 6.4.0`
+
+Block Hooks is the API that allows a block to hook into the rendering of another block or multiple blocks. It will enable a block to render its content before or after another block. Alternatively, it's possible to hook into the rendering of a parent block and prepend or append the block to the list of inner blocks. The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Allowed target values are:
+
+-   `before` – inject before the target block.
+-   `after` - inject after the target block.
+-   `firstChild` - inject before the first inner block of the target container block.
+-   `lastChild` - inject after the last inner block of the target container block.
+
+```js
+{
+	blockHooks: {
+		'core/verse': 'before'
+		'core/spacer': 'after',
+		'core/column': 'firstChild',
+		'core/group': 'lastChild',
+	}
+}
 ```
 
 ## Block Collections
