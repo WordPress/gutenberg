@@ -408,11 +408,6 @@ export default function Image( {
 						unitsOptions={ dimensionsUnitsOptions }
 					/>
 				) }
-				<ResolutionTool
-					value={ sizeSlug }
-					onChange={ updateImage }
-					options={ imageSizeOptions }
-				/>
 			</ToolsPanel>
 		</InspectorControls>
 	);
