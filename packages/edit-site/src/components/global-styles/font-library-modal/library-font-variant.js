@@ -36,18 +36,24 @@ function LibraryFontVariant( { face, font } ) {
 	};
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
+	const checkboxId = `${ font.slug }-${ face.fontStyle }`;
 
 	return (
-		<div className="font-library-modal__library-font-variant">
+		<label
+			className="font-library-modal__library-font-variant"
+			htmlFor={ checkboxId }
+		>
 			<Flex justify="space-between" align="center" gap="1rem">
 				<FontFaceDemo fontFace={ face } text={ displayName } />
 				<CheckboxControl
 					checked={ isIstalled }
 					onChange={ handleToggleActivation }
 					__nextHasNoMarginBottom={ true }
+					id={ checkboxId }
+					label={ false }
 				/>
 			</Flex>
-		</div>
+		</label>
 	);
 }
 
