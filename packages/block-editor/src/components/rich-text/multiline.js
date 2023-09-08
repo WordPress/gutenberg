@@ -11,6 +11,7 @@ import { useDispatch } from '@wordpress/data';
 import { RichTextWrapper } from './';
 import { store as blockEditorStore } from '../../store';
 import { useBlockEditContext } from '../block-edit';
+import { getMultilineTag } from './utils';
 
 function RichTextMultiline(
 	{
@@ -34,7 +35,7 @@ function RichTextMultiline(
 	const { clientId } = useBlockEditContext();
 	const { selectionChange } = useDispatch( blockEditorStore );
 
-	const multilineTagName = multiline.toLowerCase();
+	const multilineTagName = getMultilineTag( multiline );
 	value = value || `<${ multilineTagName }></${ multilineTagName }>`;
 	const padded = `</${ multilineTagName }>${ value }<${ multilineTagName }>`;
 	const values = padded.split(

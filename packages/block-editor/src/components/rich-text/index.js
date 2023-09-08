@@ -44,7 +44,7 @@ import { useInputEvents } from './use-input-events';
 import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
-import { getMultilineTag, getAllowedFormats } from './utils';
+import { getAllowedFormats } from './utils';
 import { Content } from './content';
 import RichTextMultiline from './multiline';
 
@@ -146,7 +146,6 @@ export function RichTextWrapper(
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
-	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		disableFormats,
@@ -261,7 +260,6 @@ export function RichTextWrapper(
 		onSelectionChange,
 		placeholder,
 		__unstableIsSelected: isSelected,
-		__unstableMultilineTag: multilineTag,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableDependencies: [ ...dependencies, tagName ],
@@ -349,7 +347,6 @@ export function RichTextWrapper(
 						onReplace,
 						onSplit,
 						__unstableEmbedURLOnPaste,
-						multilineTag,
 						preserveWhiteSpace,
 						pastePlainText,
 					} ),
@@ -363,7 +360,6 @@ export function RichTextWrapper(
 						value,
 						onReplace,
 						onSplit,
-						multilineTag,
 						onChange,
 						disableLineBreaks,
 						onSplitAtEnd,
