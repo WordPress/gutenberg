@@ -34,6 +34,10 @@ function gutenberg_enable_experiments() {
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-block-hooks', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalBlockHooks = true', 'before' );
 	}
+
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-fonts-api', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalFontsAPI = true', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );

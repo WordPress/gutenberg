@@ -134,9 +134,10 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
  * the Font Face (redesigned Fonts API) to be merged before the Font Library while
  * keeping Fonts API available for sites that are using it.
  */
+
+$gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if (
-	( defined( 'FONT_LIBRARY_ENABLE' ) && FONT_LIBRARY_ENABLE ) ||
-	( defined( 'FONTS_LIBRARY_ENABLE' ) && FONTS_LIBRARY_ENABLE )
+	$gutenberg_experiments && array_key_exists( 'gutenberg-fonts-api', $gutenberg_experiments )
 ) {
 	// Loads the Font Library.
 	if ( ! class_exists( 'WP_Font_Library' ) ) {
