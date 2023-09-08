@@ -254,6 +254,11 @@ describe( 'Button', () => {
 			);
 
 			expect(
+				screen.getByRole( 'button', {
+					description: 'Description text',
+				} )
+			).toBeVisible();
+			expect(
 				screen.getByRole( 'tooltip', {
 					hidden: true,
 				} )
