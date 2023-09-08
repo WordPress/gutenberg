@@ -161,32 +161,34 @@ const MenuInspectorControls = ( props ) => {
 					>
 						{ __( 'Menu' ) }
 					</Heading>
-					{ navigationMenus && navigationMenus.length > 1 && (
-						<BlockControls group="inline">
-							<NavigationMenuSelector
-								currentMenuId={ currentMenuId }
-								onSelectClassicMenu={ onSelectClassicMenu }
-								onSelectNavigationMenu={
-									onSelectNavigationMenu
-								}
-								onCreateNew={ onCreateNew }
-								createNavigationMenuIsSuccess={
-									createNavigationMenuIsSuccess
-								}
-								createNavigationMenuIsError={
-									createNavigationMenuIsError
-								}
-								actionLabel={ actionLabel }
-								isManageMenusButtonDisabled={
-									isManageMenusButtonDisabled
-								}
-								ariaLabel={ __( 'Choose Navigation Menu' ) }
-								icon={ chevronDown }
-								text={ currentTitle }
-								toggleProps={ { iconPosition: 'right' } }
-							/>
-						</BlockControls>
-					) }
+					{ currentTitle &&
+						navigationMenus &&
+						navigationMenus.length > 1 && (
+							<BlockControls group="inline">
+								<NavigationMenuSelector
+									currentMenuId={ currentMenuId }
+									onSelectClassicMenu={ onSelectClassicMenu }
+									onSelectNavigationMenu={
+										onSelectNavigationMenu
+									}
+									onCreateNew={ onCreateNew }
+									createNavigationMenuIsSuccess={
+										createNavigationMenuIsSuccess
+									}
+									createNavigationMenuIsError={
+										createNavigationMenuIsError
+									}
+									actionLabel={ actionLabel }
+									isManageMenusButtonDisabled={
+										isManageMenusButtonDisabled
+									}
+									ariaLabel={ __( 'Choose Navigation Menu' ) }
+									icon={ chevronDown }
+									text={ currentTitle }
+									toggleProps={ { iconPosition: 'right' } }
+								/>
+							</BlockControls>
+						) }
 
 					{ blockEditingMode === 'default' && (
 						<NavigationMenuSelector
