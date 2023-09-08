@@ -39,6 +39,14 @@ import type { ModalProps } from './types';
 // Used to count the number of open modals.
 let openModalCount = 0;
 
+function focusFirstNonCloseButtonElement( tabbables: HTMLElement[] ) {
+	return tabbables.find(
+		// Ignore the `Close` button.
+		// See: https://github.com/WordPress/gutenberg/issues/54106.
+		( tabbableNode ) => tabbableNode?.ariaLabel !== 'Close'
+	);
+}
+
 function UnforwardedModal(
 	props: ModalProps,
 	forwardedRef: ForwardedRef< HTMLDivElement >
@@ -47,7 +55,7 @@ function UnforwardedModal(
 		bodyOpenClassName = 'modal-open',
 		role = 'dialog',
 		title = null,
-		focusOnMount = true,
+		focusOnMount = focusFirstNonCloseButtonElement,
 		shouldCloseOnEsc = true,
 		shouldCloseOnClickOutside = true,
 		isDismissible = true,
