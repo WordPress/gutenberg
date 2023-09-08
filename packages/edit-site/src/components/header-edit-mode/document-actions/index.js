@@ -10,7 +10,6 @@ import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
-	VisuallyHidden,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
@@ -32,13 +31,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import useEditedEntityRecord from '../../use-edited-entity-record';
 import { store as editSiteStore } from '../../../store';
-
-const typeLabels = {
-	wp_block: __( 'Editing pattern:' ),
-	wp_navigation: __( 'Editing navigation menu:' ),
-	wp_template: __( 'Editing template:' ),
-	wp_template_part: __( 'Editing template part:' ),
-};
 
 export default function DocumentActions() {
 	const isPage = useSelect(
@@ -144,9 +136,6 @@ function TemplateDocumentActions( { className, onBack } ) {
 			icon={ typeIcon }
 			onBack={ onBack }
 		>
-			<VisuallyHidden as="span">
-				{ typeLabels[ record.type ] ?? typeLabels.wp_template }
-			</VisuallyHidden>
 			{ getTitle() }
 		</BaseDocumentActions>
 	);
