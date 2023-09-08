@@ -7,6 +7,7 @@ import {
 	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
+import { symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -3288,7 +3289,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getInserterItems', () => {
-		it( 'should properly list block type', () => {
+		it( 'should properly list block type and reusable block items', () => {
 			const state = {
 				blocks: {
 					byClientId: new Map(),
@@ -3303,7 +3304,17 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				settings: {},
+				settings: {
+					__experimentalReusableBlocks: [
+						{
+							id: 1,
+							isTemporary: false,
+							clientId: 'block1',
+							title: { raw: 'Reusable Block 1' },
+							content: { raw: '<!-- /wp:test-block-a -->' },
+						},
+					],
+				},
 				// Intentionally include a test case which considers
 				// `insertUsage` as not present within preferences.
 				//
@@ -3330,6 +3341,26 @@ describe( 'selectors', () => {
 				title: 'Test Block A',
 				utility: 1,
 				variations: [],
+			} );
+			const reusableBlockItem = items.find(
+				( item ) => item.id === 'core/block/1'
+			);
+			expect( reusableBlockItem ).toEqual( {
+				category: 'reusable',
+				content: '<!-- /wp:test-block-a -->',
+				frecency: 0,
+				icon: {
+					src: symbol,
+					foreground: 'var(--wp-block-synced-color)',
+				},
+				id: 'core/block/1',
+				initialAttributes: { ref: 1 },
+				isDisabled: false,
+				keywords: [ 'reusable' ],
+				name: 'core/block',
+				syncStatus: undefined,
+				title: 'Reusable Block 1',
+				utility: 1,
 			} );
 		} );
 
@@ -3427,6 +3458,8 @@ describe( 'selectors', () => {
 				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
+				'core/block/1',
+				'core/block/2',
 			] );
 
 			const secondBlockFirstCall = getInserterItems( state, 'block4' );
@@ -3441,6 +3474,8 @@ describe( 'selectors', () => {
 				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
+				'core/block/1',
+				'core/block/2',
 			] );
 			expect( secondBlockSecondCall.map( ( item ) => item.id ) ).toEqual(
 				[ 'core/test-block-b' ]
