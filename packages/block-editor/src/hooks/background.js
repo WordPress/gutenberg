@@ -95,8 +95,8 @@ export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
 	} );
 }
 
-function InspectorImagePreview( { url: imgUrl } ) {
-	const imgLabel = getFilename( imgUrl );
+function InspectorImagePreview( { label, url: imgUrl } ) {
+	const imgLabel = label || getFilename( imgUrl );
 	return (
 		<ItemGroup as="span">
 			<HStack justify="flex-start" as="span">
@@ -117,7 +117,8 @@ function InspectorImagePreview( { url: imgUrl } ) {
 function BackgroundImagePanelItem( props ) {
 	const { attributes, clientId, setAttributes } = props;
 
-	const { id, url } = attributes.style?.background?.backgroundImage || {};
+	const { id, title, url } =
+		attributes.style?.background?.backgroundImage || {};
 
 	const { mediaUpload } = useSelect( ( select ) => {
 		return {
@@ -174,6 +175,7 @@ function BackgroundImagePanelItem( props ) {
 					url: media.url,
 					id: media.id,
 					source: 'file',
+					title: media.title || undefined,
 				},
 			},
 		};
@@ -227,7 +229,12 @@ function BackgroundImagePanelItem( props ) {
 						allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
 						accept="image/*"
 						onSelect={ onSelectMedia }
-						name={ <InspectorImagePreview url={ url } /> }
+						name={
+							<InspectorImagePreview
+								label={ title }
+								url={ url }
+							/>
+						}
 						variant="secondary"
 					/>
 				) }
