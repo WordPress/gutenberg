@@ -28,7 +28,7 @@ import CategorySelector from './category-selector';
 export default function CreatePatternModal( {
 	onSuccess,
 	onError,
-	clientIds,
+	content,
 	onClose,
 	className = 'patterns-menu-items__convert-modal',
 } ) {
@@ -44,7 +44,7 @@ export default function CreatePatternModal( {
 				const newPattern = await createPattern(
 					patternTitle,
 					sync,
-					clientIds,
+					content,
 					categories
 				);
 				onSuccess( {
@@ -61,11 +61,11 @@ export default function CreatePatternModal( {
 		},
 		[
 			createPattern,
-			clientIds,
+			content,
+			categories,
 			onSuccess,
 			createErrorNotice,
 			onError,
-			categories,
 		]
 	);
 

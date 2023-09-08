@@ -2,12 +2,16 @@
  * WordPress dependencies
  */
 import { DropdownMenu } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plus, symbol, symbolFilled } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
+import {
+	privateApis as editPatternsPrivateApis,
+	store as patternsStore,
+} from '@wordpress/patterns';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -15,6 +19,7 @@ import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import CreateTemplatePartModal from '../create-template-part-modal';
 import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
+import { USER_PATTERN_CATEGORY } from '../page-patterns/utils';
 import { store as editSiteStore } from '../../store';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -29,6 +34,10 @@ export default function AddNewPattern() {
 		const settings = select( editSiteStore ).getSettings();
 		return !! settings.supportsTemplatePartsMode;
 	}, [] );
+	const { __experimentalCreatePatternFromFile: createPatternFromFile } =
+		useDispatch( patternsStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
+	const patternUploadInputRef = useRef();
 
 	function handleCreatePattern( { pattern, categoryId } ) {
 		setShowPatternModal( false );
@@ -63,6 +72,13 @@ export default function AddNewPattern() {
 			icon: symbol,
 			onClick: () => setShowPatternModal( true ),
 			title: __( 'Create pattern' ),
+		},
+		{
+			icon: symbol,
+			onClick: () => {
+				patternUploadInputRef.current.click();
+			},
+			title: __( 'Import pattern from JSON' ),
 		},
 	];
 
@@ -101,6 +117,29 @@ export default function AddNewPattern() {
 					onError={ handleError }
 				/>
 			) }
+
+			<input
+				type="file"
+				accept=".json"
+				hidden
+				ref={ patternUploadInputRef }
+				onChange={ async ( event ) => {
+					const file = event.target.files?.[ 0 ];
+					if ( ! file ) return;
+					try {
+						const pattern = await createPatternFromFile( file );
+						handleCreatePattern( {
+							pattern,
+							categoryId: USER_PATTERN_CATEGORY,
+						} );
+					} catch ( err ) {
+						createErrorNotice( err.message, {
+							type: 'snackbar',
+							id: 'import-pattern-error',
+						} );
+					}
+				} }
+			/>
 		</>
 	);
 }

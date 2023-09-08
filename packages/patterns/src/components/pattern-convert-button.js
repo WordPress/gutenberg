@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	isReusableBlock,
+	createBlock,
+	serialize,
+} from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
@@ -13,6 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
+import { store as patternsStore } from '../store';
 import CreatePatternModal from './create-pattern-modal';
 
 /**
@@ -25,6 +31,8 @@ import CreatePatternModal from './create-pattern-modal';
  */
 export default function PatternConvertButton( { clientIds, rootClientId } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { __experimentalSetEditingPattern } = useDispatch( patternsStore );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const canConvert = useSelect(
 		( select ) => {
@@ -74,12 +82,26 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 		},
 		[ clientIds, rootClientId ]
 	);
+	const content = useSelect(
+		( select ) =>
+			serialize(
+				select( blockEditorStore ).getBlocksByClientId( clientIds )
+			),
+		[ clientIds ]
+	);
 
 	if ( ! canConvert ) {
 		return null;
 	}
 
 	const handleSuccess = ( { pattern } ) => {
+		const newBlock = createBlock( 'core/block', {
+			ref: pattern.id,
+		} );
+
+		replaceBlocks( clientIds, newBlock );
+		__experimentalSetEditingPattern( newBlock.clientId, true );
+
 		createSuccessNotice(
 			pattern.wp_pattern_sync_status === 'unsynced'
 				? sprintf(
@@ -111,7 +133,7 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 			</MenuItem>
 			{ isModalOpen && (
 				<CreatePatternModal
-					clientIds={ clientIds }
+					content={ content }
 					onSuccess={ ( pattern ) => {
 						handleSuccess( pattern );
 					} }
