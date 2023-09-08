@@ -37,7 +37,7 @@ export default function getIntersectingFontFaces( incoming, existing ) {
 
 		if ( existingFont ) {
 			if ( incomingFont?.fontFace ) {
-				const matchingFaces = ( incomingFont.fontFace || [] ).filter(
+				const matchingFaces = incomingFont.fontFace.filter(
 					( face ) => {
 						return ( existingFont?.fontFace || [] ).find( ( f ) => {
 							return (
