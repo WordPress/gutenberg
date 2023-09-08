@@ -7,19 +7,14 @@ import {
 	__experimentalUseFocusOutside as useFocusOutside,
 } from '@wordpress/compose';
 
-/**
- * External dependencies
- */
-import type { FocusEvent } from 'react';
-
 export default createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {
 		const [ handleFocusOutside, setHandleFocusOutside ] = useState<
-			undefined | ( ( event: FocusEvent ) => void )
+			undefined | ( ( event: React.FocusEvent ) => void )
 		>( undefined );
 
 		const bindFocusOutsideHandler = useCallback<
-			( node: FocusEvent ) => void
+			( node: React.FocusEvent ) => void
 		>(
 			( node: any ) =>
 				setHandleFocusOutside( () =>
