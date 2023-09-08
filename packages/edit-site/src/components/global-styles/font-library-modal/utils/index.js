@@ -147,9 +147,13 @@ export function getPreviewStyle( family ) {
 			const nearestWeight = findNearest( 400, normalWeights );
 			style.fontWeight = String( nearestWeight ) || '400';
 		} else {
-			style.fontStyle = family.fontFace[ 0 ].fontStyle || 'normal';
+			style.fontStyle =
+				( family.fontFace.length && family.fontFace[ 0 ].fontStyle ) ||
+				'normal';
 			style.fontWeight =
-				String( family.fontFace[ 0 ].fontWeight ) || '400';
+				( family.fontFace.length &&
+					String( family.fontFace[ 0 ].fontWeight ) ) ||
+				'400';
 		}
 	}
 
