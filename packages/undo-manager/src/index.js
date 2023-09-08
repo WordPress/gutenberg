@@ -93,6 +93,7 @@ export function createUndoManager() {
 		cachedRecord.forEach( ( changes ) => {
 			latestRecord = addHistoryChangesIntoRecord( latestRecord, changes );
 		} );
+		cachedRecord = [];
 		history[ index ] = latestRecord;
 	};
 
