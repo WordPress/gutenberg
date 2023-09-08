@@ -23,8 +23,10 @@ import {
 	mergeFontFamilies,
 	loadFontFaceInBrowser,
 	getDisplaySrcFromFontFace,
+	makeFormDataFromFontFamilies,
 } from './utils';
 import { toggleFont } from './utils/toggleFont';
+import getIntersectingFontFaces from './utils/get-intersecting-font-faces';
 
 export const FontLibraryContext = createContext( {} );
 
@@ -194,10 +196,18 @@ function FontLibraryProvider( { children } ) {
 
 	async function installFonts( fonts ) {
 		try {
+			// Prepare formData to install.
+			const formData = makeFormDataFromFontFamilies( fonts );
 			// Install the fonts (upload the font files to the server and create the post in the database).
-			const fontsInstalled = await fetchInstallFonts( fonts );
+			const fontsInstalled = await fetchInstallFonts( formData );
+			// Get intersecting font faces between the fonts we tried to installed and the fonts that were installed
+			// (to avoid activating a non installed font).
+			const fontToBeActivated = getIntersectingFontFaces(
+				fonts,
+				fontsInstalled
+			);
 			// Activate the font families (add the font families to the global styles).
-			activateCustomFontFamilies( fontsInstalled );
+			activateCustomFontFamilies( fontToBeActivated );
 			// Save the global styles to the database.
 			saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
 				'settings.typography.fontFamilies',

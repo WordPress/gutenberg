@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { cleanForSlug } from '@wordpress/url';
+
+/**
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
@@ -158,4 +163,31 @@ export function getPreviewStyle( family ) {
 	}
 
 	return style;
+}
+
+export function makeFormDataFromFontFamilies( fontFamilies ) {
+	const formData = new FormData();
+	const newFontFamilies = fontFamilies.map( ( family ) => {
+		if ( family?.fontFace ) {
+			family.fontFace = family.fontFace.map( ( face ) => {
+				if ( face.file ) {
+					// Slugified file name because the it might contain spaces or characters treated differently on the server.
+					const slugifiedName = cleanForSlug( face.file.name );
+					// Add the files to the formData
+					formData.append( slugifiedName, face.file, face.file.name );
+					// remove the file object from the face object the file is referenced by the uploadedFile key
+					const { file, ...faceWithoutFileProperty } = face;
+					const newFace = {
+						...faceWithoutFileProperty,
+						uploadedFile: slugifiedName,
+					};
+					return newFace;
+				}
+				return face;
+			} );
+		}
+		return family;
+	} );
+	formData.append( 'fontFamilies', JSON.stringify( newFontFamilies ) );
+	return formData;
 }
