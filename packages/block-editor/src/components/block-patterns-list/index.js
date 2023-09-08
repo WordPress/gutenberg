@@ -8,10 +8,11 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 	Tooltip,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { Icon, symbolFilled } from '@wordpress/icons';
+import { Icon, symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -92,30 +93,32 @@ function BlockPattern( {
 								blocks={ blocks }
 								viewportWidth={ viewportWidth }
 							/>
-							{ ! showTooltip && (
-								<div className="block-editor-block-patterns-list__item-title">
-									{ pattern.title }
-								</div>
-							) }
+							<HStack>
+								{ ! showTooltip && (
+									<div className="block-editor-block-patterns-list__item-title">
+										{ pattern.title }
+									</div>
+								) }
+								{ pattern.id && ! pattern.syncStatus && (
+									<Tooltip
+										position="top center"
+										text={ __(
+											'Editing this pattern will also update anywhere it is usedxx'
+										) }
+									>
+										<div className="block-editor-patterns__pattern-icon-wrapper">
+											<Icon
+												className="block-editor-patterns__pattern-icon"
+												icon={ symbol }
+											/>
+										</div>
+									</Tooltip>
+								) }
+							</HStack>
 							{ !! pattern.description && (
 								<VisuallyHidden id={ descriptionId }>
 									{ pattern.description }
 								</VisuallyHidden>
-							) }
-							{ pattern.id && ! pattern.syncStatus && (
-								<Tooltip
-									position="top center"
-									text={ __(
-										'Editing this pattern will also update anywhere it is used'
-									) }
-								>
-									<span>
-										<Icon
-											className="block-editor-patterns__pattern-icon"
-											icon={ symbolFilled }
-										/>
-									</span>
-								</Tooltip>
 							) }
 						</CompositeItem>
 					</WithToolTip>

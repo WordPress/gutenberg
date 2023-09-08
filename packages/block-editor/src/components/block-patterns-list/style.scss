@@ -45,9 +45,10 @@
 		color: var(--wp-admin-theme-color);
 	}
 
-	.block-editor-patterns__pattern-icon {
-		fill: #fff;
-		background: var(--wp-block-synced-color);
-		border-radius: 4px;
+	.block-editor-patterns__pattern-icon-wrapper {
+		padding-top: $grid-unit-10;
+		.block-editor-patterns__pattern-icon {
+			fill: var(--wp-block-synced-color);
+		}
 	}
 }
