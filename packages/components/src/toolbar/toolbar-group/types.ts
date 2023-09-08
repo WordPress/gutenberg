@@ -4,7 +4,12 @@
 import type { ReactNode } from 'react';
 
 // TODO: Type these props correctly
-type ToolbarControls = {};
+type ToolbarControls = {
+	// icon?: string;
+	// title?: string;
+	// onClick: ( event?: Event ) => void;
+	// isActive?: boolean;
+};
 
 export type ToolbarGroupProps = {
 	/**

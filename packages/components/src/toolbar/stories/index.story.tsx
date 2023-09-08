@@ -117,7 +117,6 @@ Default.args = {
 				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
-					// @ts-expect-error TODO: Remove when ToolbarGroup is typed
 					icon={ false }
 					label="More rich text controls"
 					controls={ [
@@ -131,7 +130,6 @@ Default.args = {
 				/>
 			</ToolbarGroup>
 			<ToolbarGroup
-				// @ts-expect-error TODO: Remove when ToolbarGroup is typed
 				icon={ more }
 				label="Align"
 				isCollapsed

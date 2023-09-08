@@ -93,6 +93,7 @@ function ToolbarGroup( {
 	return (
 		<ToolbarGroupContainer className={ finalClassName } { ...props }>
 			{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
+				// @ts-expect-error Type issue
 				controlSet.map( ( control: any, indexOfControl: number ) => (
 					<ToolbarButton
 						key={ [ indexOfSet, indexOfControl ].join() }
